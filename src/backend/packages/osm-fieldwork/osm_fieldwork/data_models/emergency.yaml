@@ -1,0 +1,9 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - emergency: not null
+      fire_hydrant:type: not null

@@ -1,0 +1,18 @@
+select:
+  - osm_id: id
+  - version
+from:
+  - ways_line
+  - relations
+where:
+  tags:
+    - highway: not null
+keep:
+  - name
+  - highway
+  - smoothness
+  - surface
+  - tracktype
+  - width
+  - ref
+  - ref:usfs

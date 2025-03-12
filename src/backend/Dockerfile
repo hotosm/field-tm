@@ -90,11 +90,13 @@ RUN apt-get update --quiet \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock /_lock/
+COPY packages /_lock/packages
 # Ensure caching & install with or without monitoring, depending on flag
 RUN --mount=type=cache,target=/root/.cache <<EOT
     uv sync \
         --project /_lock \
         --locked \
+        --no-editable \
         --no-dev \
         --no-install-project \
     $(if [ -z "$MONITORING" ]; then \
@@ -190,10 +192,12 @@ FROM add-odk-certs AS debug
 USER appuser
 COPY --from=uv /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock /_lock/
+COPY packages /_lock/packages
 RUN --mount=type=cache,target=/root/.cache <<EOT
     uv sync \
         --project /_lock \
         --locked \
+        --no-editable \
         --no-install-project \
         --group debug \
         --group test \

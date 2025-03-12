@@ -1,0 +1,6 @@
+token = "pCyGkLSOqaovqJFMs8ceUDkvUCBkW9u06aWEAwuNn9djd5sj01mPdQ54OR8G5WjI"
+
+[central]
+base_url = "https://proxy"
+username = "test@hotosm.org"
+password = "Password1234"

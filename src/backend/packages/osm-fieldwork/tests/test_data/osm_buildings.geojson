@@ -1,0 +1,4528 @@
+{
+    "type": "FeatureCollection",
+    "generator": "JOSM",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851274",
+                "id": "1136851274",
+                "version": "1",
+                "label": "1136851274",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99481200000,
+                    38.53357400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "421485078",
+                "version": "1",
+                "id": "421485078",
+                "label": "421485078",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99158700000,
+                    38.53722700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441865259",
+                "version": "1",
+                "label": "441865259",
+                "building": "yes",
+                "title": "441865259"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99286900000,
+                    38.53575100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441860748",
+                "version": "1",
+                "id": "441860748",
+                "title": "441860748",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99140700000,
+                    38.53638200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Sherman Lofts",
+                "name": "Sherman Lofts",
+                "version": "4",
+                "title": "Sherman Lofts",
+                "id": "4379982291",
+                "building": "residential"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99275400000,
+                    38.53667900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853756",
+                "label": "1136853756",
+                "version": "1",
+                "title": "1136853756",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99397200000,
+                    38.53381100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "addr:street": "North F Street",
+                "title": "Arlie Dale's Jug Liquors",
+                "label": "Arlie Dale's Jug Liquors",
+                "name": "Arlie Dale's Jug Liquors",
+                "id": "421484657",
+                "addr:housenumber": "220",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99087400000,
+                    38.53753600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "420041889",
+                "version": "1",
+                "title": "420041889",
+                "id": "420041889",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99237900000,
+                    38.53699500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853753",
+                "version": "1",
+                "label": "1136853753",
+                "title": "1136853753",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99365900000,
+                    38.53361600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "131680836",
+                "version": "4",
+                "id": "131680836",
+                "building": "church",
+                "title": "131680836"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99259000000,
+                    38.53161800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441860744",
+                "id": "441860744",
+                "title": "441860744",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99192000000,
+                    38.53652700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864513",
+                "title": "441864513",
+                "building": "yes",
+                "id": "441864513"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99296300000,
+                    38.53480100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441865268",
+                "id": "441865268",
+                "version": "1",
+                "label": "441865268",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99292600000,
+                    38.53587800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863943",
+                "version": "1",
+                "title": "441863943",
+                "id": "441863943",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99340000000,
+                    38.53505200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851285",
+                "id": "1136851285",
+                "version": "1",
+                "label": "1136851285",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99529500000,
+                    38.53372200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863942",
+                "version": "2",
+                "title": "441863942",
+                "building": "yes",
+                "id": "441863942"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99228000000,
+                    38.53362800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441860750",
+                "version": "1",
+                "label": "441860750",
+                "title": "441860750",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99272500000,
+                    38.53647600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851303",
+                "version": "1",
+                "title": "1136851303",
+                "id": "1136851303",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99487100000,
+                    38.53454200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441865266",
+                "version": "1",
+                "id": "441865266",
+                "building": "yes",
+                "label": "441865266"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99268900000,
+                    38.53567600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "amenity": "pub",
+                "name": "146 Taphouse",
+                "id": "10916230083",
+                "label": "146 Taphouse",
+                "title": "146 Taphouse"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99274000000,
+                    38.53673600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864054",
+                "version": "1",
+                "title": "441864054",
+                "id": "441864054",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99160100000,
+                    38.53537600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441863933",
+                "title": "441863933",
+                "id": "441863933",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99293400000,
+                    38.53406200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851265",
+                "version": "1",
+                "label": "1136851265",
+                "title": "1136851265",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99507800000,
+                    38.53325600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "420041893",
+                "title": "420041893",
+                "label": "420041893",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99215100000,
+                    38.53677500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "title": "Safeway",
+                "label": "Safeway",
+                "id": "125489007",
+                "name": "Safeway",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99441800000,
+                    38.53617700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441864870",
+                "version": "1",
+                "id": "441864870",
+                "building": "yes",
+                "label": "441864870"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99190800000,
+                    38.53584800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "addr:housenumber": "118",
+                "label": "Four Winds Gallery",
+                "id": "4379982594",
+                "name": "Four Winds Gallery",
+                "title": "Four Winds Gallery",
+                "addr:street": "F Street",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99223000000,
+                    38.53601400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441863934",
+                "title": "441863934",
+                "id": "441863934",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99331300000,
+                    38.53434600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "421484658",
+                "title": "421484658",
+                "building": "yes",
+                "id": "421484658"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99095700000,
+                    38.53785800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136848341",
+                "version": "1",
+                "title": "1136848341",
+                "building": "yes",
+                "label": "1136848341"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99623300000,
+                    38.53581500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441864520",
+                "id": "441864520",
+                "version": "1",
+                "label": "441864520",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99241200000,
+                    38.53507700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "North F Street",
+                "addr:housenumber": "140",
+                "version": "2",
+                "amenity": "cafe",
+                "name": "Mama D's",
+                "id": "421485073",
+                "label": "Mama D's",
+                "title": "Mama D's",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99125800000,
+                    38.53704700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "label": "441863417",
+                "title": "441863417",
+                "id": "441863417",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99335800000,
+                    38.53558600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853738",
+                "title": "1136853738",
+                "version": "1",
+                "id": "1136853738",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99437800000,
+                    38.53217900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851266",
+                "version": "1",
+                "label": "1136851266",
+                "building": "yes",
+                "title": "1136851266"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99519900000,
+                    38.53319800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "844282032",
+                "version": "1",
+                "amenity": "shelter",
+                "id": "844282032",
+                "title": "844282032",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99444600000,
+                    38.53289700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864864",
+                "version": "1",
+                "label": "441864864",
+                "title": "441864864",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99133300000,
+                    38.53571200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "North F Street",
+                "name": "Victoria Bar",
+                "version": "1",
+                "amenity": "bar",
+                "title": "Victoria Bar",
+                "addr:housenumber": "143",
+                "label": "Victoria Bar",
+                "id": "4379975290"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99093000000,
+                    38.53694800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864518",
+                "version": "1",
+                "title": "441864518",
+                "id": "441864518",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99266500000,
+                    38.53471400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441865263",
+                "title": "441865263",
+                "version": "1",
+                "id": "441865263",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99266400000,
+                    38.53595200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851307",
+                "version": "1",
+                "title": "1136851307",
+                "id": "1136851307",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99471500000,
+                    38.53472500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864758",
+                "version": "1",
+                "title": "441864758",
+                "id": "441864758",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99206000000,
+                    38.53490900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "First United Methodist Church of Salida",
+                "name": "First United Methodist Church of Salida",
+                "version": "1",
+                "addr:housenumber": "228",
+                "amenity": "place_of_worship",
+                "addr:street": "East 4th Street",
+                "id": "131680819",
+                "building": "yes",
+                "label": "First United Methodist Church of Salida"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99216600000,
+                    38.53278400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "label": "421486095",
+                "title": "421486095",
+                "id": "421486095",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99066000000,
+                    38.53605700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851281",
+                "version": "1",
+                "title": "1136851281",
+                "id": "1136851281",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99555500000,
+                    38.53346400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853744",
+                "version": "1",
+                "label": "1136853744",
+                "title": "1136853744",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99308600000,
+                    38.53387300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136848345",
+                "version": "1",
+                "id": "1136848345",
+                "title": "1136848345",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99683700000,
+                    38.53540600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441860745",
+                "title": "441860745",
+                "version": "1",
+                "id": "441860745",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99131500000,
+                    38.53647700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "5695036321",
+                "version": "1",
+                "name": "Seasons Café",
+                "amenity": "restaurant",
+                "label": "Seasons Café",
+                "title": "Seasons Café"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99187400000,
+                    38.53836800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "421484662",
+                "version": "1",
+                "id": "421484662",
+                "label": "421484662",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99187300000,
+                    38.53836700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441863416",
+                "title": "441863416",
+                "id": "441863416",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99317000000,
+                    38.53521900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864777",
+                "title": "441864777",
+                "building": "yes",
+                "id": "441864777"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99216400000,
+                    38.53556600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851289",
+                "title": "1136851289",
+                "building": "yes",
+                "id": "1136851289"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99540200000,
+                    38.53400400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853759",
+                "version": "1",
+                "id": "1136853759",
+                "title": "1136853759",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99330600000,
+                    38.53399500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851277",
+                "version": "1",
+                "label": "1136851277",
+                "building": "yes",
+                "title": "1136851277"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99468900000,
+                    38.53369600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Benson's",
+                "version": "3",
+                "addr:street": "North F Street",
+                "addr:housenumber": "128",
+                "name": "Benson's",
+                "amenity": "pub",
+                "title": "Benson's",
+                "building": "yes",
+                "id": "421485070"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99153000000,
+                    38.53685800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:housenumber": "209",
+                "name": "The Beekeeper's Honey Boutique",
+                "title": "The Beekeeper's Honey Boutique",
+                "version": "1",
+                "label": "The Beekeeper's Honey Boutique",
+                "addr:street": "West 3rd Street",
+                "id": "1023099845",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99497500000,
+                    38.53534500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851299",
+                "version": "1",
+                "label": "1136851299",
+                "building": "yes",
+                "title": "1136851299"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99490800000,
+                    38.53433400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Brown Dog Coffee Co.",
+                "version": "3",
+                "name": "Brown Dog Coffee Co.",
+                "amenity": "cafe",
+                "addr:street": "F Street",
+                "addr:housenumber": "105",
+                "label": "Brown Dog Coffee Co.",
+                "id": "441860751",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99172900000,
+                    38.53607200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "amenity": "drinking_water",
+                "label": "5003687081",
+                "id": "5003687081",
+                "title": "5003687081"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99349200000,
+                    38.53298100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851294",
+                "version": "1",
+                "id": "1136851294",
+                "building": "yes",
+                "label": "1136851294"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99433100000,
+                    38.53400300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485081",
+                "version": "2",
+                "title": "421485081",
+                "building": "yes",
+                "id": "421485081"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99146300000,
+                    38.53724600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863418",
+                "version": "1",
+                "title": "441863418",
+                "id": "441863418",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99353800000,
+                    38.53576500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851292",
+                "version": "1",
+                "title": "1136851292",
+                "id": "1136851292",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99530000000,
+                    38.53416300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441860747",
+                "version": "1",
+                "title": "441860747",
+                "id": "441860747",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99125600000,
+                    38.53653600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:housenumber": "130A",
+                "name": "Van de Water",
+                "title": "Van de Water",
+                "version": "1",
+                "addr:street": "West 1st Street",
+                "label": "Van de Water",
+                "id": "4379964090",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99216500000,
+                    38.53663100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1023098997",
+                "version": "1",
+                "addr:housenumber": "106",
+                "label": "1023098997",
+                "building": "house",
+                "addr:street": "East 4th Street",
+                "id": "1023098997"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99389800000,
+                    38.53376600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "1136853746",
+                "label": "1136853746",
+                "title": "1136853746",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99347900000,
+                    38.53353700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "5003687079",
+                "version": "1",
+                "id": "5003687079",
+                "label": "5003687079",
+                "amenity": "waste_basket"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99350800000,
+                    38.53295600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851264",
+                "version": "1",
+                "label": "1136851264",
+                "title": "1136851264",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99556600000,
+                    38.53291800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421486032",
+                "title": "421486032",
+                "version": "1",
+                "id": "421486032",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99183400000,
+                    38.53647600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "10142054600",
+                "tourism": "information",
+                "version": "1",
+                "title": "10142054600",
+                "id": "10142054600"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98848800000,
+                    38.53825600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864754",
+                "version": "1",
+                "label": "441864754",
+                "building": "yes",
+                "title": "441864754"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99191800000,
+                    38.53481800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864511",
+                "version": "1",
+                "label": "441864511",
+                "title": "441864511",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99293700000,
+                    38.53465000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441865262",
+                "version": "1",
+                "title": "441865262",
+                "id": "441865262",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99307700000,
+                    38.53587200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864512",
+                "version": "1",
+                "label": "441864512",
+                "building": "yes",
+                "title": "441864512"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99275000000,
+                    38.53500200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851198",
+                "version": "1",
+                "label": "1136851198",
+                "title": "1136851198",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99563400000,
+                    38.53379000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "131682317",
+                "addr:housenumber": "349",
+                "addr:street": "E Street",
+                "name": "Ascension Church",
+                "title": "Ascension Church",
+                "amenity": "place_of_worship",
+                "label": "Ascension Church",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99263200000,
+                    38.53331300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851291",
+                "version": "1",
+                "title": "1136851291",
+                "id": "1136851291",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99512700000,
+                    38.53410900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851297",
+                "version": "1",
+                "label": "1136851297",
+                "title": "1136851297",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99496300000,
+                    38.53450300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441865265",
+                "version": "1",
+                "id": "441865265",
+                "label": "441865265",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99258100000,
+                    38.53578200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864049",
+                "version": "1",
+                "label": "441864049",
+                "title": "441864049",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99149200000,
+                    38.53514200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "4",
+                "amenity": "pub",
+                "id": "4325512577",
+                "name": "Woods High Mountain Distillery",
+                "title": "Woods High Mountain Distillery",
+                "label": "Woods High Mountain Distillery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99252200000,
+                    38.53684900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "East Sackett Street",
+                "label": "421485066",
+                "version": "3",
+                "id": "421485066",
+                "title": "421485066",
+                "building": "yes",
+                "addr:housenumber": "133"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99042600000,
+                    38.53655100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "label": "441863937",
+                "title": "441863937",
+                "id": "441863937",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99269800000,
+                    38.53391600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851269",
+                "title": "1136851269",
+                "id": "1136851269",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99503900000,
+                    38.53339100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "420041894",
+                "title": "420041894",
+                "label": "420041894",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99212900000,
+                    38.53668800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853731",
+                "version": "1",
+                "label": "1136853731",
+                "title": "1136853731",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99470400000,
+                    38.53194000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864866",
+                "title": "441864866",
+                "id": "441864866",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99178800000,
+                    38.53573200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Las Carmelinas",
+                "title": "Las Carmelinas",
+                "version": "1",
+                "label": "Las Carmelinas",
+                "amenity": "restaurant",
+                "id": "10916228376"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99236300000,
+                    38.53647900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441863939",
+                "version": "1",
+                "id": "441863939",
+                "label": "441863939",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99388500000,
+                    38.53463300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "id": "131680820",
+                "name": "The Boathouse",
+                "amenity": "restaurant",
+                "label": "The Boathouse",
+                "building": "yes",
+                "title": "The Boathouse"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99068800000,
+                    38.53772600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "addr:street": "West 1st Street",
+                "name": "Wanderlust Road",
+                "title": "Wanderlust Road",
+                "id": "420041888",
+                "addr:housenumber": "146",
+                "label": "Wanderlust Road",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99253100000,
+                    38.53695700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "label": "441864515",
+                "title": "441864515",
+                "id": "441864515",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99236600000,
+                    38.53494300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "addr:street": "North F Street",
+                "title": "Colorado Mountain Realty",
+                "name": "Colorado Mountain Realty",
+                "addr:housenumber": "138",
+                "label": "Colorado Mountain Realty",
+                "id": "421485072",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99136200000,
+                    38.53703200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "id": "131680821",
+                "title": "131680821",
+                "label": "131680821",
+                "amenity": "school"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99196800000,
+                    38.53142400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853736",
+                "version": "1",
+                "id": "1136853736",
+                "title": "1136853736",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99464900000,
+                    38.53207300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851267",
+                "title": "1136851267",
+                "building": "yes",
+                "id": "1136851267"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99540000000,
+                    38.53329900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "511553299",
+                "title": "511553299",
+                "version": "2",
+                "amenity": "toilets",
+                "label": "511553299",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99350300000,
+                    38.53299000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864865",
+                "title": "441864865",
+                "building": "yes",
+                "id": "441864865"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99151100000,
+                    38.53585600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Salida Rotary Amphitheater",
+                "version": "2",
+                "amenity": "theatre",
+                "label": "Salida Rotary Amphitheater",
+                "name": "Salida Rotary Amphitheater",
+                "id": "4379981789"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98967500000,
+                    38.53696700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864516",
+                "version": "1",
+                "title": "441864516",
+                "id": "441864516",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99276900000,
+                    38.53468700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441865260",
+                "title": "441865260",
+                "id": "441865260",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99261100000,
+                    38.53597800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851304",
+                "title": "1136851304",
+                "id": "1136851304",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99480500000,
+                    38.53465200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441865267",
+                "version": "1",
+                "id": "441865267",
+                "label": "441865267",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99281300000,
+                    38.53580500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851268",
+                "title": "1136851268",
+                "id": "1136851268",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99532100000,
+                    38.53341600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853743",
+                "version": "1",
+                "label": "1136853743",
+                "title": "1136853743",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99318300000,
+                    38.53387200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136848342",
+                "version": "1",
+                "title": "1136848342",
+                "label": "1136848342",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99624000000,
+                    38.53553100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "4427737492",
+                "version": "1",
+                "title": "4427737492",
+                "id": "4427737492",
+                "amenity": "bench"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99106900000,
+                    38.53801200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Bank of the West",
+                "amenity": "bank",
+                "version": "2",
+                "id": "131680844",
+                "name": "Bank of the West",
+                "title": "Bank of the West",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99369100000,
+                    38.53652000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "amenity": "theatre",
+                "title": "Salida - Steam Plant Event Center",
+                "id": "421484661",
+                "label": "Salida - Steam Plant Event Center",
+                "building": "yes",
+                "name": "Salida - Steam Plant Event Center"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99186500000,
+                    38.53814400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441865258",
+                "version": "1",
+                "label": "441865258",
+                "title": "441865258",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99157500000,
+                    38.53558900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136853760",
+                "version": "1",
+                "id": "1136853760",
+                "label": "1136853760",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99357800000,
+                    38.53410600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851276",
+                "version": "1",
+                "label": "1136851276",
+                "title": "1136851276",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99489200000,
+                    38.53371900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "North F Street",
+                "version": "4",
+                "id": "421485069",
+                "label": "The Great Divide",
+                "name": "The Great Divide",
+                "title": "The Great Divide",
+                "amenity": "restaurant",
+                "building": "yes",
+                "addr:housenumber": "122"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99161900000,
+                    38.53673500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "name": "Little Red Hen Bakery",
+                "id": "1023098816",
+                "label": "Little Red Hen Bakery",
+                "addr:housenumber": "302",
+                "operator": "Red Hen",
+                "addr:street": "G Street",
+                "title": "Little Red Hen Bakery",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99493400000,
+                    38.53518900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851302",
+                "title": "1136851302",
+                "id": "1136851302",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99460800000,
+                    38.53440000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441864871",
+                "version": "1",
+                "id": "441864871",
+                "label": "441864871",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99163100000,
+                    38.53590000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "tourism": "artwork",
+                "id": "10135936418",
+                "label": "Mod Buffalo",
+                "version": "1",
+                "name": "Mod Buffalo",
+                "title": "Mod Buffalo"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99231400000,
+                    38.53579300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "id": "421484660",
+                "title": "Rivers Edge",
+                "label": "Rivers Edge",
+                "amenity": "restaurant",
+                "name": "Rivers Edge",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99176500000,
+                    38.53804200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851293",
+                "version": "1",
+                "id": "1136851293",
+                "label": "1136851293",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99424200000,
+                    38.53414200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485077",
+                "version": "1",
+                "id": "421485077",
+                "title": "421485077",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99160500000,
+                    38.53733700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441863414",
+                "title": "441863414",
+                "building": "yes",
+                "id": "441863414"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99368100000,
+                    38.53584600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "title": "1136848322",
+                "label": "1136848322",
+                "id": "1136848322",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99561900000,
+                    38.53441300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "name": "Cafe Dawn",
+                "title": "Cafe Dawn",
+                "amenity": "cafe",
+                "label": "Cafe Dawn",
+                "building:levels": "1",
+                "building": "yes",
+                "id": "421486093"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99118800000,
+                    38.53612700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "4379975589",
+                "name": "Yellow Feather",
+                "title": "Yellow Feather",
+                "version": "1",
+                "label": "Yellow Feather",
+                "addr:street": "West 1st Street",
+                "addr:housenumber": "124",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99205100000,
+                    38.53655900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853755",
+                "version": "1",
+                "label": "1136853755",
+                "title": "1136853755",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99381900000,
+                    38.53371900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "844651004",
+                "id": "844651004",
+                "version": "1",
+                "label": "844651004",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99279500000,
+                    38.53715300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853745",
+                "label": "1136853745",
+                "version": "1",
+                "title": "1136853745",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99353100000,
+                    38.53348100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:housenumber": "419",
+                "version": "1",
+                "name": "Salida First Baptist Church",
+                "label": "Salida First Baptist Church",
+                "id": "131680812",
+                "amenity": "place_of_worship",
+                "title": "Salida First Baptist Church",
+                "addr:street": "D Street",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99208600000,
+                    38.53220100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851283",
+                "version": "1",
+                "id": "1136851283",
+                "building": "yes",
+                "label": "1136851283"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99541400000,
+                    38.53367000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "10139049649",
+                "title": "10139049649",
+                "tourism": "information",
+                "version": "1",
+                "label": "10139049649"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98986500000,
+                    38.53809900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441860742",
+                "version": "2",
+                "building": "retail",
+                "title": "441860742",
+                "id": "441860742"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99221900000,
+                    38.53618000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864756",
+                "title": "441864756",
+                "id": "441864756",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99197600000,
+                    38.53478300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441860743",
+                "title": "441860743",
+                "id": "441860743",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99316000000,
+                    38.53691000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851286",
+                "version": "1",
+                "label": "1136851286",
+                "title": "1136851286",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99549500000,
+                    38.53391200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853747",
+                "version": "1",
+                "id": "1136853747",
+                "title": "1136853747",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99327600000,
+                    38.53335400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851290",
+                "title": "1136851290",
+                "version": "1",
+                "id": "1136851290",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99507800000,
+                    38.53399800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "addr:housenumber": "129",
+                "addr:street": "West 1st Street",
+                "label": "441862005",
+                "id": "441862005",
+                "building": "yes",
+                "title": "441862005"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99246900000,
+                    38.53634000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851298",
+                "version": "1",
+                "label": "1136851298",
+                "title": "1136851298",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99503500000,
+                    38.53442100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441865261",
+                "version": "1",
+                "title": "441865261",
+                "id": "441865261",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99258900000,
+                    38.53602000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864050",
+                "title": "441864050",
+                "id": "441864050",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99197300000,
+                    38.53522700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "tourism": "picnic_site",
+                "id": "5006135226",
+                "version": "1",
+                "label": "5006135226",
+                "title": "5006135226"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99387000000,
+                    38.53329300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "id": "131680842",
+                "title": "Saint Joseph School",
+                "building": "school",
+                "label": "Saint Joseph School",
+                "name": "Saint Joseph School"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99192600000,
+                    38.53140000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "East Sackett Street",
+                "name": "The Fritz",
+                "title": "The Fritz",
+                "version": "2",
+                "id": "421485065",
+                "addr:housenumber": "113",
+                "amenity": "restaurant",
+                "label": "The Fritz",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99077000000,
+                    38.53677600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "name": "Absolute Bikes",
+                "label": "Absolute Bikes",
+                "id": "131680846",
+                "title": "Absolute Bikes",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99230600000,
+                    38.53840800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851273",
+                "version": "1",
+                "id": "1136851273",
+                "label": "1136851273",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99491000000,
+                    38.53348000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Las Camalinas",
+                "name": "Las Camalinas",
+                "title": "Las Camalinas",
+                "version": "4",
+                "id": "420041895",
+                "addr:housenumber": "128",
+                "addr:street": "West 1st Street",
+                "amenity": "restaurant",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99201300000,
+                    38.53668400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "label": "Bunny and Clydes",
+                "id": "441860749",
+                "amenity": "cafe",
+                "addr:street": "West 1st Street",
+                "name": "Bunny and Clydes",
+                "addr:housenumber": "203",
+                "building": "yes",
+                "title": "Bunny and Clydes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99325700000,
+                    38.53683800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864779",
+                "title": "441864779",
+                "id": "441864779",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99208000000,
+                    38.53564600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Bungle Jungle",
+                "id": "4379975689",
+                "name": "Bungle Jungle",
+                "label": "Bungle Jungle",
+                "version": "1",
+                "addr:street": "West 1st Street",
+                "addr:housenumber": "132",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99223600000,
+                    38.53668000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441863940",
+                "version": "1",
+                "label": "441863940",
+                "building": "yes",
+                "title": "441863940"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99402100000,
+                    38.53449200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Palace Hotel",
+                "addr:street": "North F Street",
+                "tourism": "hotel",
+                "name": "Palace Hotel",
+                "id": "421484654",
+                "version": "2",
+                "addr:housenumber": "204",
+                "label": "Palace Hotel",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99101100000,
+                    38.53740700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "420041890",
+                "title": "420041890",
+                "version": "1",
+                "label": "420041890",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99239500000,
+                    38.53686700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864757",
+                "title": "441864757",
+                "id": "441864757",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99224000000,
+                    38.53489800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Great Wall",
+                "version": "2",
+                "name": "Great Wall",
+                "amenity": "restaurant",
+                "id": "441863932",
+                "building": "yes",
+                "title": "Great Wall"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99405100000,
+                    38.53520100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "4",
+                "amenity": "post_office",
+                "title": "United States Post Office",
+                "label": "United States Post Office",
+                "id": "131680814",
+                "operator": "United States Postal Service",
+                "addr:street": "D Street",
+                "addr:housenumber": "310",
+                "building": "yes",
+                "name": "United States Post Office"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99186000000,
+                    38.53319800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853737",
+                "version": "1",
+                "id": "1136853737",
+                "title": "1136853737",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99455200000,
+                    38.53200500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "131680809",
+                "version": "3",
+                "name": "Salida Regional Library",
+                "addr:housenumber": "405",
+                "title": "Salida Regional Library",
+                "addr:street": "E Street",
+                "amenity": "library",
+                "label": "Salida Regional Library",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99305000000,
+                    38.53277800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "10135936420",
+                "title": "10135936420",
+                "version": "1",
+                "id": "10135936420",
+                "amenity": "restaurant"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99213300000,
+                    38.53568100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "title": "420041896",
+                "id": "420041896",
+                "label": "420041896",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99200400000,
+                    38.53657800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864519",
+                "title": "441864519",
+                "version": "1",
+                "id": "441864519",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99281300000,
+                    38.53488600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441865269",
+                "version": "1",
+                "label": "441865269",
+                "title": "441865269",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99247300000,
+                    38.53588800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863935",
+                "version": "1",
+                "title": "441863935",
+                "id": "441863935",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99375900000,
+                    38.53503100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Saint Joseph Catholic Church",
+                "id": "802067599",
+                "name": "Saint Joseph Catholic Church",
+                "version": "4",
+                "addr:street": "East 5th Street",
+                "amenity": "place_of_worship",
+                "title": "Saint Joseph Catholic Church",
+                "addr:housenumber": "320"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99242300000,
+                    38.53167200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136853750",
+                "id": "1136853750",
+                "title": "1136853750",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99297100000,
+                    38.53368200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "amenity": "bank",
+                "title": "High Country Bank",
+                "version": "2",
+                "id": "131680833",
+                "label": "High Country Bank",
+                "building": "yes",
+                "name": "High Country Bank"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99327900000,
+                    38.53612000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "4427737493",
+                "version": "1",
+                "title": "4427737493",
+                "amenity": "toilets",
+                "id": "4427737493"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99114900000,
+                    38.53790600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "4",
+                "id": "358931601",
+                "title": "Saint Joseph School",
+                "label": "Saint Joseph School",
+                "amenity": "school",
+                "name": "Saint Joseph School"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99210500000,
+                    38.53167600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864778",
+                "title": "441864778",
+                "id": "441864778",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99230700000,
+                    38.53541800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "4",
+                "addr:street": "East 1st Street",
+                "name": "Osake",
+                "amenity": "restaurant",
+                "label": "Osake",
+                "addr:housenumber": "137",
+                "id": "441861895",
+                "building": "yes",
+                "title": "Osake"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99128100000,
+                    38.53559900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Sprockets",
+                "addr:housenumber": "151",
+                "version": "2",
+                "label": "Sprockets",
+                "id": "4379975990",
+                "addr:street": "West 1st Street",
+                "amenity": "restaurant",
+                "name": "Sprockets"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99283100000,
+                    38.53678000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851279",
+                "title": "1136851279",
+                "id": "1136851279",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99564600000,
+                    38.53352800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "421484655",
+                "version": "1",
+                "label": "421484655",
+                "title": "421484655",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99109200000,
+                    38.53732700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136853752",
+                "title": "1136853752",
+                "building": "yes",
+                "id": "1136853752"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99311200000,
+                    38.53394400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851272",
+                "version": "1",
+                "id": "1136851272",
+                "building": "yes",
+                "label": "1136851272"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99507700000,
+                    38.53370600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Eye Candy",
+                "addr:street": "North F Street",
+                "id": "421485068",
+                "addr:housenumber": "118",
+                "version": "2",
+                "name": "Eye Candy",
+                "label": "Eye Candy",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99166400000,
+                    38.53667800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136848343",
+                "version": "1",
+                "title": "1136848343",
+                "label": "1136848343",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99593400000,
+                    38.53576400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851305",
+                "version": "1",
+                "title": "1136851305",
+                "id": "1136851305",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99451400000,
+                    38.53445600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864869",
+                "title": "441864869",
+                "id": "441864869",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99182800000,
+                    38.53595600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Sweetie's",
+                "version": "2",
+                "amenity": "cafe",
+                "id": "4379981891",
+                "addr:housenumber": "124",
+                "addr:street": "F Street",
+                "label": "Sweetie's",
+                "title": "Sweetie's"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99228200000,
+                    38.53597400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485075",
+                "version": "1",
+                "title": "421485075",
+                "id": "421485075",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99138800000,
+                    38.53764000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "First Presbyterian Church",
+                "title": "First Presbyterian Church",
+                "version": "1",
+                "addr:housenumber": "7",
+                "id": "131682316",
+                "addr:street": "Poncha Boulevard",
+                "amenity": "place_of_worship",
+                "building": "yes",
+                "label": "First Presbyterian Church"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99662500000,
+                    38.53645700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851295",
+                "version": "1",
+                "id": "1136851295",
+                "label": "1136851295",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99449700000,
+                    38.53414600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485076",
+                "version": "1",
+                "title": "421485076",
+                "id": "421485076",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99172600000,
+                    38.53737300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863415",
+                "version": "1",
+                "title": "441863415",
+                "id": "441863415",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99383900000,
+                    38.53568500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Crispy Duck",
+                "version": "2",
+                "amenity": "cafe",
+                "addr:street": "West 1st Street",
+                "name": "Crispy Duck",
+                "id": "4379975394",
+                "addr:housenumber": "123",
+                "title": "Crispy Duck"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99216900000,
+                    38.53636600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441861900",
+                "title": "441861900",
+                "version": "1",
+                "id": "441861900",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99089900000,
+                    38.53594100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136853754",
+                "version": "1",
+                "label": "1136853754",
+                "title": "1136853754",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99374200000,
+                    38.53367400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "421484663",
+                "title": "421484663",
+                "version": "1",
+                "building": "yes",
+                "label": "421484663"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99240100000,
+                    38.53776700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851296",
+                "id": "1136851296",
+                "version": "1",
+                "label": "1136851296",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99448300000,
+                    38.53453500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "1133047466",
+                "title": "1133047466",
+                "building": "yes",
+                "label": "1133047466"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99097900000,
+                    38.53251400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "5007526778",
+                "version": "1",
+                "title": "5007526778",
+                "label": "5007526778",
+                "amenity": "waste_basket"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99300800000,
+                    38.53287200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851270",
+                "version": "1",
+                "title": "1136851270",
+                "id": "1136851270",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99521900000,
+                    38.53353200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421486082",
+                "version": "2",
+                "title": "421486082",
+                "building": "yes",
+                "id": "421486082"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99148800000,
+                    38.53629200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "10139049648",
+                "version": "1",
+                "id": "10139049648",
+                "label": "10139049648",
+                "amenity": "bicycle_repair_station"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98984500000,
+                    38.53808100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:housenumber": "150",
+                "title": "Gallery 150",
+                "version": "3",
+                "name": "Gallery 150",
+                "addr:street": "West 1st Street",
+                "id": "420041887",
+                "label": "Gallery 150",
+                "building": "yes",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99259800000,
+                    38.53699500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851287",
+                "version": "1",
+                "label": "1136851287",
+                "title": "1136851287",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99528300000,
+                    38.53390500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "1136853757",
+                "label": "1136853757",
+                "title": "1136853757",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99353200000,
+                    38.53382600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851275",
+                "version": "1",
+                "label": "1136851275",
+                "title": "1136851275",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99491200000,
+                    38.53385300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "amenity": "cinema",
+                "title": "Storyville Cinema",
+                "version": "2",
+                "addr:street": "West 1st Street",
+                "label": "Storyville Cinema",
+                "addr:housenumber": "135",
+                "building": "yes",
+                "name": "Storyville Cinema",
+                "id": "441860753"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99262100000,
+                    38.53638800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851300",
+                "title": "1136851300",
+                "building": "yes",
+                "id": "1136851300"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99480500000,
+                    38.53427000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864048",
+                "version": "1",
+                "label": "Amicas Wood Fired Pizza",
+                "amenity": "pub",
+                "title": "Amicas Wood Fired Pizza",
+                "name": "Amicas Wood Fired Pizza",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99181700000,
+                    38.53521700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "5006135225",
+                "tourism": "picnic_site",
+                "version": "1",
+                "label": "5006135225",
+                "title": "5006135225"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99447500000,
+                    38.53300700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864051",
+                "version": "1",
+                "title": "441864051",
+                "id": "441864051",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99176100000,
+                    38.53510500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485064",
+                "version": "1",
+                "title": "421485064",
+                "id": "421485064",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99094200000,
+                    38.53684900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851271",
+                "version": "1",
+                "id": "1136851271",
+                "label": "1136851271",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99512700000,
+                    38.53361400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441863374",
+                "version": "1",
+                "id": "441863374",
+                "label": "441863374",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99139200000,
+                    38.53720500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Green Cat Gallery",
+                "name": "The Green Cat Gallery",
+                "version": "1",
+                "id": "1023099846",
+                "addr:housenumber": "124",
+                "addr:street": "G Street",
+                "label": "The Green Cat Gallery",
+                "building": "yes",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99340100000,
+                    38.53666700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Joshua Been",
+                "version": "1",
+                "name": "Joshua Been",
+                "label": "Joshua Been",
+                "id": "4379982889",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99263500000,
+                    38.53665500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441860746",
+                "version": "1",
+                "title": "441860746",
+                "id": "441860746",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99137100000,
+                    38.53642000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853758",
+                "version": "1",
+                "id": "1136853758",
+                "title": "1136853758",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99377700000,
+                    38.53396400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Ferraro's",
+                "addr:street": "North F Street",
+                "version": "2",
+                "addr:housenumber": "216",
+                "name": "Ferraro's",
+                "amenity": "restaurant",
+                "title": "Ferraro's",
+                "id": "421484656",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99092100000,
+                    38.53747600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "420041891",
+                "version": "2",
+                "title": "420041891",
+                "label": "420041891",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99226700000,
+                    38.53687800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "1136853735",
+                "label": "1136853735",
+                "title": "1136853735",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99474400000,
+                    38.53214600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "5",
+                "addr:street": "North F Street",
+                "building": "retail",
+                "id": "421485067",
+                "label": "Salida Mountain Sports",
+                "name": "Salida Mountain Sports",
+                "addr:housenumber": "110",
+                "title": "Salida Mountain Sports"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99174900000,
+                    38.53659500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864514",
+                "title": "441864514",
+                "id": "441864514",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99286400000,
+                    38.53483500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441865264",
+                "version": "1",
+                "title": "441865264",
+                "id": "441865264",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99273800000,
+                    38.53587900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "id": "441863938",
+                "amenity": "pub",
+                "title": "Moonlight Pizza and Brewpub",
+                "name": "Moonlight Pizza and Brewpub",
+                "building": "yes",
+                "label": "Moonlight Pizza and Brewpub"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99359600000,
+                    38.53495600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "id": "1133047465",
+                "title": "1133047465",
+                "label": "1133047465",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99337300000,
+                    38.53168100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "East Sackett Street",
+                "version": "2",
+                "label": "441861898",
+                "title": "441861898",
+                "addr:housenumber": "203",
+                "id": "441861898",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98993100000,
+                    38.53614600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853748",
+                "version": "1",
+                "id": "1136853748",
+                "title": "1136853748",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99313000000,
+                    38.53354800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "3",
+                "label": "441860752",
+                "title": "441860752",
+                "id": "441860752",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99294000000,
+                    38.53657400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441864780",
+                "version": "1",
+                "title": "441864780",
+                "id": "441864780",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99223000000,
+                    38.53550100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "441864056",
+                "version": "1",
+                "id": "441864056",
+                "building": "yes",
+                "label": "441864056"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99159200000,
+                    38.53527700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Bork & Watkins",
+                "version": "1",
+                "addr:street": "West 1st Street",
+                "title": "Bork & Watkins",
+                "id": "4379975592",
+                "addr:housenumber": "149",
+                "name": "Bork & Watkins",
+                "tourism": "gallery"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99277500000,
+                    38.53674800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "Salida Bike Co.",
+                "version": "3",
+                "addr:street": "North F Street",
+                "name": "Salida Bike Co.",
+                "id": "421485074",
+                "addr:housenumber": "148",
+                "title": "Salida Bike Co.",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99121600000,
+                    38.53710700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "441863936",
+                "title": "441863936",
+                "version": "1",
+                "id": "441863936",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99279200000,
+                    38.53399000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851284",
+                "version": "1",
+                "id": "1136851284",
+                "label": "1136851284",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99520400000,
+                    38.53376300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "title": "420041892",
+                "id": "420041892",
+                "label": "420041892",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99221800000,
+                    38.53681600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "10135936419",
+                "version": "1",
+                "label": "10135936419",
+                "title": "10135936419",
+                "amenity": "waste_basket"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99229200000,
+                    38.53593300000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "2",
+                "name": "Amicas",
+                "label": "Amicas",
+                "amenity": "restaurant",
+                "id": "441864868",
+                "title": "Amicas",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99198400000,
+                    38.53580100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864517",
+                "title": "441864517",
+                "id": "441864517",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99261800000,
+                    38.53513600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "Sub Culture Bike Shop",
+                "version": "1",
+                "label": "Sub Culture Bike Shop",
+                "id": "420041309",
+                "name": "Sub Culture Bike Shop",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99217500000,
+                    38.53726100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441863941",
+                "title": "441863941",
+                "id": "441863941",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99401300000,
+                    38.53546100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136853740",
+                "id": "1136853740",
+                "building": "yes",
+                "title": "1136853740"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99458500000,
+                    38.53231600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853739",
+                "version": "1",
+                "title": "1136853739",
+                "id": "1136853739",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99447900000,
+                    38.53225800000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421486094",
+                "version": "2",
+                "title": "421486094",
+                "id": "421486094",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99105500000,
+                    38.53604600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "addr:street": "North F Street",
+                "title": "Little Cambodia",
+                "version": "1",
+                "id": "4379981892",
+                "amenity": "cafe",
+                "label": "Little Cambodia",
+                "addr:housenumber": "135",
+                "name": "Little Cambodia"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99103800000,
+                    38.53683500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "540407788",
+                "title": "540407788",
+                "id": "540407788",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99263000000,
+                    38.53794600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136851306",
+                "title": "1136851306",
+                "version": "1",
+                "id": "1136851306",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99445100000,
+                    38.53462500000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "First Christian Church",
+                "name": "First Christian Church",
+                "version": "1",
+                "id": "131680824",
+                "addr:housenumber": "302",
+                "amenity": "place_of_worship",
+                "addr:street": "East 4th Street",
+                "title": "First Christian Church",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99177200000,
+                    38.53255900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441861892",
+                "amenity": "fire_station",
+                "version": "2",
+                "title": "Salida Fire Department",
+                "addr:housenumber": "124",
+                "addr:street": "E Street",
+                "label": "Salida Fire Department",
+                "name": "Salida Fire Department",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99111900000,
+                    38.53553900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "1136851282",
+                "version": "1",
+                "id": "1136851282",
+                "label": "1136851282",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99545600000,
+                    38.53354200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136853751",
+                "id": "1136853751",
+                "building": "yes",
+                "title": "1136853751"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99286700000,
+                    38.53376900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421486088",
+                "version": "2",
+                "title": "421486088",
+                "id": "421486088",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99125600000,
+                    38.53626100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "540407783",
+                "version": "3",
+                "label": "540407783",
+                "title": "540407783",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98833100000,
+                    38.53843000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "441864521",
+                "version": "1",
+                "label": "441864521",
+                "title": "441864521",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99252700000,
+                    38.53523100000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": "1136851288",
+                "version": "1",
+                "label": "1136851288",
+                "building": "yes",
+                "title": "1136851288"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99518600000,
+                    38.53384700000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1136853749",
+                "title": "1136853749",
+                "version": "1",
+                "id": "1136853749",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99330700000,
+                    38.53371000000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851278",
+                "title": "1136851278",
+                "building": "yes",
+                "id": "1136851278"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99481400000,
+                    38.53390600000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "421485071",
+                "version": "1",
+                "title": "421485071",
+                "id": "421485071",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99138000000,
+                    38.53697200000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "1136851301",
+                "title": "1136851301",
+                "id": "1136851301",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99467300000,
+                    38.53432900000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "version": "1",
+                "label": "441864867",
+                "title": "441864867",
+                "id": "441864867",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.99143800000,
+                    38.53577400000
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "label": "1108090542",
+                "title": "1108090542",
+                "version": "1",
+                "id": "1108090542",
+                "building": "yes"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -105.98967000000,
+                    38.53695400000
+                ]
+            }
+        }
+    ]
+}

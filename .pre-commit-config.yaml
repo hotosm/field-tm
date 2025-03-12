@@ -64,6 +64,8 @@ repos:
             "!src/mapper/pnpm-lock.yaml",
             "!src/mapper/src/lib/migrations/**",
             "!src/backend/tests/test_data/**",
+            "!src/backend/packages/osm-fieldwork/tests/test_data/**",
+            "!src/backend/packages/osm-fieldwork/osm_fieldwork/data_models/**",
           ]
 
   # # Lint: Dockerfile (disabled until binary is bundled)
@@ -111,4 +113,14 @@ repos:
     hooks:
       - id: markdownlint
         args:
-          [--fix, --disable, MD033, --ignore, CHANGELOG.md, --ignore, .github]
+          [
+            --fix,
+            --disable,
+            MD033,
+            --ignore,
+            CHANGELOG.md,
+            --ignore,
+            .github,
+            --ignore,
+            src/backend/packages/osm-fieldwork/CHANGELOG.md,
+          ]

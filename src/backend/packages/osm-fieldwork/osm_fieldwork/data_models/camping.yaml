@@ -1,0 +1,20 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - tourism:
+        - camp_site
+        - camp_pitch
+
+keep:
+  - leisure
+  - backcountry
+  - fee
+  - capacity:persons
+  - reservation
+  - capacity:caravans
+  - access
+  - tourism

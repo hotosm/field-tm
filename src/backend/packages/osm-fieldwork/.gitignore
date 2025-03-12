@@ -1,0 +1,71 @@
+# gdb_history
+TAGS
+*~
+.deps
+.libs
+py-compile
+NEWS
+*__pycache__/
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode
+
+# output files
+*.pbf
+*.pdf
+*.html
+*.mbtiles
+*.sqlitedb
+*.pmtiles
+*tiles/
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# PDM
+pdm.toml
+.pdm-python
+__pypackages__
+
+# Python builds
+build
+dist
+
+# Docs
+site
+.cache
+
+**/**/*customtiles*

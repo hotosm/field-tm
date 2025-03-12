@@ -43,3 +43,7 @@ tests:
           - src/backend/tests/**
           - src/frontend/tests/**
           - src/frontend/e2e/**
+dependency:osm-fieldwork:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/backend/osm-fieldwork/**
