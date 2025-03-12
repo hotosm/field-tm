@@ -1,0 +1,12 @@
+select:
+  - osm_id: id
+  - version
+from:
+  - ways_line
+where:
+  tags:
+    - waterway: not null
+
+keep:
+  - name
+  - intermittent

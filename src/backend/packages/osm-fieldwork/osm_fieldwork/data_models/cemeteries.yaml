@@ -1,0 +1,10 @@
+select:
+  osm_id: id
+from:
+  - ways_poly
+where:
+  tags:
+    - amenity:
+        - grave_yard
+      landuse:
+        - cemetery

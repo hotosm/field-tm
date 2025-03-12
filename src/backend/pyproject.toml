@@ -45,7 +45,7 @@ dependencies = [
     "sozipfile==0.3.2",
     "cryptography==43.0.3",
     "pyjwt==2.9.0",
-    "osm-fieldwork==0.21.1",
+    "osm-fieldwork",
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",
@@ -147,9 +147,13 @@ large_file_skip_byte_limit = 30000  # Required to process fmtm_base_schema.sql
 exclude_rules = "CP05, RF02"  # Avoid capitalisation of enums
 
 [tool.codespell]
-skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*"
+skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*"
 ignore-words-list = "ProjectIn"
 write-changes = true
 
 [tool.uv.sources]
+osm-fieldwork = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "master-modified" }
+
+[tool.uv.workspace]
+members = ["packages/*"]

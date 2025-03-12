@@ -1,0 +1,13 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - amenity: not null
+      toilets:access: not null
+      toilets:disposal: not null
+      toilets:position: not null
+      toilets:unisex: not null
+      toilets:wheelchair: not null

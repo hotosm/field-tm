@@ -1,0 +1,29 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - healthcare: not null
+      social_facility: not null
+      healthcare:speciality: not null
+
+keep:
+  - healthcare:type
+  - healthcare
+  - wheelchair
+  - toilets:wheelchair
+  - building:ownership
+  - building:roof_type
+  - email
+  - healthcare:speciality
+  - roof:material
+  - phone
+  - facility:ventilator
+  - facility:icu
+  - facility:operating_theatre
+  - facility:x-ray
+  - addr:city
+  - building:level
+  - pharmacy

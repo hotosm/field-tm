@@ -41,8 +41,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path
-from osm_fieldwork.make_data_extract import getChoices
+from osm_fieldwork.data_models import data_models_path, get_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -374,8 +373,8 @@ async def get_categories(current_user: Annotated[AuthUser, Depends(login_require
     """
     # FIXME update to use osm-rawdata
     categories = (
-        getChoices()
-    )  # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
+        get_choices()
+    )  # categories are fetched from osm_fieldwork.data_models.get_choices()
     return categories
 
 

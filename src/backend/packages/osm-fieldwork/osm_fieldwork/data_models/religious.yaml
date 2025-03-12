@@ -1,0 +1,8 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - religion: not null

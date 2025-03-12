@@ -276,7 +276,6 @@ async def append_fields_to_user_xlsform(
     xlsform: BytesIO,
     form_name: str = "buildings",
     additional_entities: Optional[list[str]] = None,
-    existing_id: Optional[str] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -285,7 +284,6 @@ async def append_fields_to_user_xlsform(
         xlsform,
         form_name=form_name,
         additional_entities=additional_entities,
-        existing_id=existing_id,
         new_geom_type=new_geom_type,
     )
 
@@ -294,7 +292,6 @@ async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
     form_name: str = "buildings",
     additional_entities: Optional[list[str]] = None,
-    existing_id: Optional[str] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
@@ -302,7 +299,6 @@ async def validate_and_update_user_xlsform(
         xlsform,
         form_name=form_name,
         additional_entities=additional_entities,
-        existing_id=existing_id,
         new_geom_type=new_geom_type,
     )
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -34,7 +34,6 @@ wheels/
 .installed.cfg
 *.egg
 venv/
-src/backend/osm-fieldwork
 
 __pycache__
 credentials.txt

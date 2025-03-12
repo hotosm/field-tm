@@ -1,0 +1,40 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - amenity:
+        - cafe
+        - bar
+        - pub
+        - restaurant
+        - fuel
+    - shop:
+        - convenience
+        - supermarket
+        - bakery
+        - alcohol
+        - greengrocer
+        - farm
+
+keep:
+  - leisure
+  - backcountry
+  - fee
+  - capacity:persons
+  - reservation
+  - capacity:caravans
+  - access
+  - tourism
+  - parking
+  - amenity
+  - shop
+  - cuisine
+  - amenity
+  - convenience
+  - diesel
+  - version
+  - name
+  - name:en

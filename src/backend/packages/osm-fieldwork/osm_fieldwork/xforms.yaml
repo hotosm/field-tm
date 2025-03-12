@@ -1,0 +1,173 @@
+# This section is for simple tag translation. Sometimes the value from
+# the choices sheet of the XLSXForm is very close, but not an exact
+# match to an approved OSM tags. Many XLSXForms that used OMK tried
+# hard to use the (almost) same value as the official OSM one. This
+# makes it easier to deal with older forms without having to edit the
+# raw data.
+
+# ODK allows a colon in a selection name, but does not for the
+# variable name that later gets used as a tag. When using existing OSM
+# data we need to handle converting the tag name back to the colon
+# version for OSM.
+convert:
+  - camptype: tourism
+  - openfire: leisure=firepit
+  - fire_pit: leisure=firepit
+  - picnic_table: leisure=picnic_table
+  - latitude: lat
+  - longitude: lon
+  - altitude: ele
+  - submitterid: uid
+  - submittername: user
+  - submissiondate: timestamp
+  - comment: note
+  - view: viewpoint
+  - Monday: Mo
+  - Tuesday: Tu
+  - Wednesday: We
+  - Thursday: Th
+  - Friday: Fr
+  - Saturday: Sa
+  - Sunday: Su
+  - waterpoint_name: name
+  - cemetery_name: name
+  - waterpoint_type: man_made
+  - faucet: valve=yes
+  - well: well=yes
+  - borehole: borehole=yes
+  - drinkable_water: amenity=drinking_water
+  - drinking_water: amenity=drinking_water
+  - irrigation: irrigation=yes
+  - livestock: drinking_water=no
+  - waterpoint_code: ref
+  - pump_type: pump
+  - waterpoint_access: access
+  - fee: fee=yes
+  - power_type: power_source
+  - provider: operator:type
+  - operator_type: operator:type
+  - cemetery_services:
+      - cemetery: amenity=grave_yard
+      - cremation: amenity=crematorium
+  - xid: id
+  - food: amenity
+  - brewery: craft=brewery
+  - housing: building
+  - xlocation: geometry
+  - coordinates: geometry
+  - healthcare_type: healthcare
+  - building_material: building:material
+  - floors: building:levels
+  - roof_material: roof:material
+  - building_condition: building:condition
+  - building_floor: building:floor
+  - building_prefab: building:prefabricated
+  - building_levels: building:levels
+  - levels_underground: building:levels:underground
+  - emergency:
+      - fire_station: amenity=fire_station
+      - police: amenity=police
+      - hospital: amenity=hospital
+      - clinic: amenity=clinic
+      - toilets: amenity=toilets
+  - amenity:
+      - coffee: amenity=cafe,cuisine=coffee_shop
+  - government: amenity
+
+# All of the data that goes in a different non-OSM file
+private:
+  - building_material_other
+  - flood_prone
+  - under_construction
+  - toilets_number
+  - building_damage
+  - building_type
+  - addr_district
+  - addr_sector
+  - addr_cell
+  - addr_village
+  - evacuation_center
+  - income
+  - age
+  - gender
+  - education
+  - waterpoint_type_other
+  - waterpoint_provider
+  - waterpoint_provider_other
+  - waterpoint_capacity
+  - waterpoint_quantity
+  - waterpoint_access
+  - waterpoint_access_other
+  - waterpoint_elevation
+  - waterpoint_mgmt
+  - fee_cost
+  - end_time
+  - locality
+  - municipality
+  - town
+  - place
+  - district
+  - elev
+  - area
+  - geological_site
+  - lateral_material
+  - lateral_system
+  - access_roof
+  - updatedat
+  - cell
+  - cellular
+
+# All of these tags are in the CSV file, and can be ignored
+ignore:
+  - object_type
+  - __id
+  - model
+  - type
+  - accuracy
+  - meta
+  - __system
+  - status
+  - reviewState
+  - formVersion
+  - edits
+  - attachmentsexpected
+  - attachmentspresent
+  - reviewstate
+  - edits
+  - gps_type
+  - deviceid
+  - deviceId
+  - key
+  - start
+  - end
+  - today
+  - status
+  - audio
+  - image
+  - phonenumber
+  - detail
+  - highway_type
+  - waterpoint_img
+  - enum_name
+  - username
+  - model
+  - email
+  - category
+  - existing
+  - formversion
+  - building_menu
+  - food_menu
+  - medical_menu
+  - retail_menu
+  - government_menu
+  - note
+  - instanceid
+  - begin_group
+  - end_group
+  - image
+
+multiple:
+  - healthcare
+  - amenity_type
+  - specialty
+  - features

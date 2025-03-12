@@ -1,0 +1,26 @@
+select:
+  osm_id: id
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - amenity:
+        - college
+        - indergarten
+        - school
+        - music_school
+        - language_school
+        - university
+
+keep:
+  - wheelchar
+  - religion
+  - toilets:wheelchair
+  - place_of_worship
+  - building:levels
+  - roof:material
+  - building:condition
+  - building:lateral:system
+  - building:lateral:material
+  - building:levels:underground

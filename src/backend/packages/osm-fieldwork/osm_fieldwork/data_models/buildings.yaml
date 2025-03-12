@@ -1,0 +1,26 @@
+select:
+  - osm_id: id
+  - version
+from:
+  - nodes
+  - ways_poly
+where:
+  tags:
+    - building: not null
+      amenity: not null
+      tourism: not null
+
+keep:
+  - building
+  - building:levels
+  - building:material
+  - roof:material
+  - roof:shape
+  - roof:levels
+  - cuisine
+  - amenity
+  - convenience
+  - diesel
+  - version
+  - name
+  - name:en
