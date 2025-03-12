@@ -87,6 +87,23 @@ wait_for_db() {
     exit 1  # Exit with an error code
 }
 
+wait_for_s3() {
+    max_retries=6
+    retry_interval=10
+
+    for ((i = 0; i < max_retries; i++)); do
+        if curl --silent --head --fail -o /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}"; then
+            echo "S3 is available."
+            return 0  # S3 is available, exit successfully
+        fi
+        echo "S3 is not yet available. Retrying in ${retry_interval} seconds..."
+        sleep ${retry_interval}
+    done
+
+    echo "Timed out waiting for S3 to become available."
+    exit 1  # Exit with an error code
+}
+
 create_db_schema_if_missing() {
     table_exists=$(psql -t "$db_url" -c "
         SELECT EXISTS (SELECT 1 FROM information_schema.tables
@@ -220,6 +237,7 @@ scripts_to_execute=()
 check_all_db_vars_present
 check_all_s3_vars_present
 wait_for_db
+wait_for_s3
 db_url="postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}/${FMTM_DB_NAME}"
 
 # Apply schema, if needed
