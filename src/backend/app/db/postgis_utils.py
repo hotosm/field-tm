@@ -325,13 +325,21 @@ def add_required_geojson_properties(
             properties["osm_id"] = feature_id
         else:
             osm_id = (
-                properties.get("osm_id")
+                properties.get(
+                    "osm_id"
+                )  # osm_id property takes priority (i.e. it's from OSM)
                 or properties.get("id")
-                or properties.get("fid")
+                or properties.get("fid")  # fid is typical from tools like QGIS
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
                 or getrandbits(30)
             )
+
+            # Ensure negative osm_id if it's derived
+            # NOTE this is important to denote the geom is not from OSM
+            if not properties.get("osm_id"):
+                osm_id = -abs(int(osm_id))
+
             feature["id"] = str(osm_id)
             properties["osm_id"] = osm_id
 
