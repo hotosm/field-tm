@@ -53,8 +53,8 @@ services:
     volumes:
       # - certs:/etc/letsencrypt
       - certs:/data
-      - fmtm_frontend:/var/www/html/fmtm.hotosm.org:ro
-      - fmtm_mapper_frontend:/var/www/html/mapper.fmtm.hotosm.org:ro
+      - fmtm_frontend:/var/www/html/fmtm.hotosm.org
+      - fmtm_mapper_frontend:/var/www/html/mapper.fmtm.hotosm.org
     environment:
       # General
       BUNKERWEB_INSTANCES: proxy:5000
