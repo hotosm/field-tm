@@ -404,7 +404,7 @@ services:
     # Hardcode some vars for dev, as not necessarily present in the .env file
     environment:
       # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
-      - S3_ENDPOINT="http://s3:9000"
+      - S3_ENDPOINT=http://s3:9000
       - S3_BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME:-"fmtm-db-backups"}
     networks:
       - fmtm-net
