@@ -88,8 +88,8 @@ wait_for_db() {
 }
 
 wait_for_s3() {
-    max_retries=6
-    retry_interval=10
+    max_retries=10
+    retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
         if curl --silent --head --fail -o /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}"; then
