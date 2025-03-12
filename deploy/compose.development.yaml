@@ -153,8 +153,9 @@ services:
     volumes:
       - fmtm_logs:/opt/logs
     depends_on:
-      proxy:
-        condition: service_healthy
+      # The S3 service must be fully available behind proxy prior to start
+      proxy-setup:
+        condition: service_completed_successfully
       fmtm-db:
         condition: service_healthy
       migrations:
@@ -202,8 +203,9 @@ services:
   central:
     image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2024.2.1}"
     depends_on:
-      proxy:
-        condition: service_healthy
+      # The S3 service must be fully available behind proxy prior to start
+      proxy-setup:
+        condition: service_completed_successfully
       central-db:
         condition: service_healthy
       s3:
@@ -241,10 +243,10 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: nc -z localhost 8383 || exit 1
-      start_period: 30s
+      start_period: 15s
       interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 10
 
   central-webhook:
     image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.0-rc}"
