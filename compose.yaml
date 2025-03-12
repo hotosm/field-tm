@@ -98,7 +98,7 @@ x-proxy-env: &proxy-env # General
 
 services:
   proxy:
-    image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
+    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-dev}"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -117,19 +117,6 @@ services:
       fmtm-net:
         ipv4_address: 10.20.30.50
     restart: "unless-stopped"
-
-  # This is needed by bunkerweb to generate the nginx configs
-  proxy-setup:
-    image: "ghcr.io/bunkerity/bunkerweb-scheduler:${BUNKERWEB_TAG:-1.6.0}"
-    depends_on:
-      proxy:
-        condition: service_started
-    environment: *proxy-env
-    networks:
-      - fmtm-net
-    restart: "no"
-    # If success or timeout exits with 0 code, else use actual exit code
-    entrypoint: sh -c 'timeout 120 ./entrypoint.sh || [ $? -eq 124 ] && exit 0'
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
