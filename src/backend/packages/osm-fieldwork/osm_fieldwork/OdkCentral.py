@@ -197,6 +197,37 @@ class OdkCentral:
                 log.info("No projects returned. Is this a first run?")
         return projects
 
+    def findProject(
+        self,
+        name: str = None,
+        project_id: int = None,
+    ):
+        """Get the project data from Central.
+
+        Args:
+            name (str): The name of the project
+
+        Returns:
+            (dict): the project data from ODK Central
+        """
+        # First, populate self.projects
+        self.listProjects()
+
+        if self.projects:
+            if name:
+                log.debug(f"Finding project by name: {name}")
+                for _key, value in self.projects.items():
+                    if name == value["name"]:
+                        log.info(f"ODK project found: {name}")
+                        return value
+            if project_id:
+                log.debug(f"Finding project by id: {project_id}")
+                for _key, value in self.projects.items():
+                    if project_id == value["id"]:
+                        log.info(f"ODK project found: {project_id}")
+                        return value
+        return None
+
     def createProject(
         self,
         name: str,
