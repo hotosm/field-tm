@@ -286,8 +286,6 @@ async def append_mandatory_fields(
         form_name(str): the friendly form name in ODK web view.
         additional_entities(list[str]): add extra select_one_from_file fields to
             reference an additional Entity list (set of geometries).
-            The values should be plural, so that 's' will be stripped in the
-            field name.
         new_geom_type (DbGeomType): the type of geometry required when collecting
             new geometry data: point, line, polygon.
 

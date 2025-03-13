@@ -53,14 +53,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["osm_fieldwork"]
 
-[tool.pytest.ini_options]
-addopts = "-ra -q -p no:warnings"
-testpaths = [
-    "tests",
-]
-pythonpath = "osm_fieldwork"
-asyncio_mode="auto"
-
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "0.21.1"
@@ -95,6 +87,7 @@ ignore = ["N805", "B008"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+# TODO update these from PDM --> uv setup
 [project.scripts]
 basemapper = "osm_fieldwork.basemapper:main"
 osm2favorites = "osm_fieldwork.osm2favorities:main"

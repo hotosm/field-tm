@@ -1,6 +1,4 @@
-#!/bin/python3
-
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -35,6 +33,7 @@ import os
 import zlib
 from base64 import b64encode
 from datetime import datetime
+from xml.etree import ElementTree
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, Union
@@ -614,6 +613,35 @@ class OdkForm(OdkCentral):
             log.error(f"Couldn't fetch {filename} from Central: {status['message']}")
         return result.content
 
+    def validateMedia(self, filename: str) -> bool:
+        """Validate the specified filename is present in the XForm."""
+        if not self.xml:
+            return False
+        xform_filenames = []
+        namespaces = {
+            "h": "http://www.w3.org/1999/xhtml",
+            "odk": "http://www.opendatakit.org/xforms",
+            "xforms": "http://www.w3.org/2002/xforms",
+        }
+
+        root = ElementTree.fromstring(self.xml)
+        instances = root.findall(".//xforms:model/xforms:instance[@src]", namespaces)
+
+        for inst in instances:
+            src_value = inst.attrib.get("src", "")
+            if src_value.startswith("jr://"):
+                src_value = src_value[len("jr://") :]  # Remove jr:// prefix
+            if src_value.startswith("file/"):
+                src_value = src_value[len("file/") :]  # Remove file/ prefix
+            xform_filenames.append(src_value)
+
+        if filename not in xform_filenames:
+            msg = f"Filename ({filename}) is not present in XForm media: {xform_filenames}"
+            log.error(msg)
+            raise ValueError(msg)
+
+        return True
+
     def uploadMedia(
         self,
         projectId: int,
@@ -621,7 +649,7 @@ class OdkForm(OdkCentral):
         data: Union[str, Path, BytesIO],
         filename: Optional[str] = None,
     ) -> Optional[requests.Response]:
-        """Upload an attachment to the ODK Central server.
+        """Upload a media to the ODK form (e.g. img, audio, video for a question).
 
         Args:
             projectId (int): The ID of the project on ODK Central
@@ -635,23 +663,26 @@ class OdkForm(OdkCentral):
         # BytesIO memory object
         if isinstance(data, BytesIO):
             if filename is None:
-                log.error("Cannot pass BytesIO object and not include the filename arg")
-                return None
+                msg = "Cannot pass BytesIO object and not include the filename arg"
+                log.error(msg)
+                raise ValueError(msg)
             media = data.getvalue()
         # Filepath
         elif isinstance(data, str) or isinstance(data, Path):
             media_file_path = Path(data)
             if not media_file_path.exists():
-                log.error(f"File does not exist on disk: {data}")
-                return None
+                msg = f"File does not exist on disk: {media_file_path}"
+                log.error(msg)
+                raise ValueError(msg)
             with open(media_file_path, "rb") as file:
                 media = file.read()
             filename = str(Path(data).name)
 
         # Validate filename present in XForm
-        if self.xml:
-            if not self.validateMedia(filename):
-                return None
+        if not self.validateMedia(filename):
+            msg = f"Uploaded media ({filename}), but is not present as a form field"
+            log.error(msg)
+            raise ValueError(msg)
 
         # Must first convert to draft if already published
         if not self.draft or self.published:
@@ -661,8 +692,9 @@ class OdkForm(OdkCentral):
             result = self.session.post(url, verify=self.verify)
             if result.status_code != 200:
                 status = result.json()
-                log.error(f"Couldn't modify {form_name} to draft: {status['message']}")
-                return None
+                msg = f"Couldn't modify {form_name} to draft: {status['message']}"
+                log.error(msg)
+                raise ValueError(msg)
 
         # Upload the media
         url = f"{self.base}projects/{projectId}/forms/{form_name}/draft/attachments/{filename}"
@@ -675,14 +707,16 @@ class OdkForm(OdkCentral):
             log.debug(f"Uploaded {filename} to Central")
         else:
             status = result.json()
-            log.error(f"Couldn't upload {filename} to Central: {status['message']}")
-            return None
+            msg = f"Couldn't upload {filename} to Central: {status['message']}"
+            log.error(msg)
+            raise ValueError(msg)
 
         # Publish the draft by default
         if self.published:
             self.publishForm(projectId, form_name)
 
-        self.addMedia(media, filename)
+        # Add to the form var
+        self.media[filename] = media
 
         return result
 

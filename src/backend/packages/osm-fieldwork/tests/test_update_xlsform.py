@@ -121,8 +121,8 @@ def check_form_title(workbook: Workbook) -> None:
     form_title_col_index = get_column_index(settings_sheet, "form_title")
 
     form_title_value = settings_sheet.cell(row=2, column=form_title_col_index).value
-    # NOTE the 's' is stripped from 'buildings' to make it singular
-    assert form_title_value == "building", "form_title field is not set to 'building'"
+    # NOTE previously we would strip 's' from plurals, but we no longer do this
+    assert form_title_value == "buildings", "form_title field is not set to 'building'"
 
 
 def check_translation_fields(workbook: Workbook):

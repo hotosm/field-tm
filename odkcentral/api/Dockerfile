@@ -33,8 +33,17 @@ RUN apt-get update --quiet \
     && update-ca-certificates
 # Copy minio mc client to create S3 buckets
 COPY --from=minio /usr/bin/mc /usr/local/bin/
+
 # Modify the S3 submission photo upload to every 15 minutes
 RUN sed -i 's/^0 5 \* \* \*/\*\/15 * * * */' /etc/cron.d/odk
+
+# Add custom code s3-sync endpoint
+# https://forum.getodk.org/t/possibility-of-an-endpoint-to-trigger-pending-uploads-to-s3/54110
+COPY s3-sync/20250313-01-s3-sync-permission.js /usr/odk/lib/model/migrations/
+COPY s3-sync/s3.js /usr/odk/lib/resources/
+# Modify the lib/http/service.js file to include our new router
+RUN sed -i "/require('\.\.\/resources\/oidc')(service, endpoint);/a \ \ require('../resources/s3')(service, endpoint);" lib/http/service.js
+
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
 ENTRYPOINT ["/container-entrypoint.sh"]

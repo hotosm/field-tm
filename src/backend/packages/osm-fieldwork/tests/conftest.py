@@ -17,25 +17,21 @@
 #
 """Configuration and fixtures for PyTest."""
 
-import logging
-import sys
+import os
 import uuid
 from pathlib import Path
+from io import BytesIO
+from xml.etree import ElementTree
+from tempfile import NamedTemporaryFile
+from time import time
 
 import pytest
+from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.OdkCentralAsync import OdkDataset
 
-logging.basicConfig(
-    level="DEBUG",
-    format=("%(asctime)s.%(msecs)03d [%(levelname)s] %(name)s | %(funcName)s:%(lineno)d | %(message)s"),
-    datefmt="%y-%m-%d %H:%M:%S",
-    stream=sys.stdout,
-)
-
-odk_config_file = str(Path(__file__).parent / ".pyodk_config.toml")
 test_data_dir = Path(__file__).parent / "test_data"
 
 
@@ -88,7 +84,7 @@ test_data_dir = Path(__file__).parent / "test_data"
 # def token():
 #     """Get persistent ODK Central requests session."""
 #     response = requests.post("http://central:8383/v1/sessions", json={
-#         "email": "test@hotosm.org",
+#         "email": "admin@hotosm.org",
 #         "password": "Password1234"
 #     })
 #     return response.json().get("token")
@@ -97,7 +93,7 @@ test_data_dir = Path(__file__).parent / "test_data"
 @pytest.fixture(scope="session")
 def project():
     """Get persistent ODK Central requests session."""
-    return OdkProject("https://proxy", "test@hotosm.org", "Password1234")
+    return OdkProject("https://odkcentral:8443", "admin@hotosm.org", "Password1234")
 
 
 @pytest.fixture(scope="session")
@@ -110,8 +106,8 @@ def project_details(project):
 def appuser():
     """Get appuser for a project."""
     return OdkAppUser(
-        url="https://proxy",
-        user="test@hotosm.org",
+        url="https://odkcentral:8443",
+        user="admin@hotosm.org",
         passwd="Password1234",
     )
 
@@ -132,11 +128,36 @@ def odk_form(project_details) -> tuple:
     """Get appuser for a project."""
     odk_id = project_details.get("id")
     form = OdkForm(
-        url="https://proxy",
-        user="test@hotosm.org",
+        url="https://odkcentral:8443",
+        user="admin@hotosm.org",
         passwd="Password1234",
     )
     return odk_id, form
+
+
+def update_xform_version(xform_bytesio: BytesIO) -> tuple[str, BytesIO]:
+    """Update the form version in XML."""
+    namespaces = {
+        "h": "http://www.w3.org/1999/xhtml",
+        "odk": "http://www.opendatakit.org/xforms",
+        "xforms": "http://www.w3.org/2002/xforms",
+    }
+    # Get the form version from the XML
+    tree = ElementTree.parse(xform_bytesio)
+    root = tree.getroot()
+
+    xml_data = root.findall(".//xforms:data[@version]", namespaces)
+    new_version = str(int(time()))
+    for dt in xml_data:
+        dt.set("version", new_version)
+
+    # Write updated XML back into BytesIO
+    xform_new_version = BytesIO()
+    tree.write(xform_new_version, encoding="utf-8", xml_declaration=True)
+
+    # Reset the position for next operations
+    xform_new_version.seek(0)
+    return new_version, xform_new_version
 
 
 @pytest.fixture(scope="function")
@@ -145,8 +166,35 @@ def odk_form_cleanup(odk_form):
     odk_id, xform = odk_form
     test_xform = test_data_dir / "buildings.xml"
 
-    form_name = xform.createForm(odk_id, str(test_xform))
+    # Modify the form version so we can publish form if same id existed previously
+    with open(test_xform, "rb") as xform_file:
+        xform_bytesio = BytesIO(xform_file.read())
+    new_form_version, xform_bytesio_new_version = update_xform_version(xform_bytesio)
+
+    form_name = xform.createForm(odk_id, xform_bytesio_new_version)
     assert form_name == "test_form"
+
+    # Before yield is used in tests
+    yield odk_id, form_name, xform
+    # After yield is test cleanup
+
+    success = xform.deleteForm(odk_id, form_name)
+    assert success
+
+
+@pytest.fixture(scope="function")
+def odk_form__with_attachment_cleanup(odk_form):
+    """Get xform for project, with automatic cleanup after."""
+    odk_id, xform = odk_form
+    test_xform = test_data_dir / "buildings_geojson_upload.xml"
+
+    form_name = xform.createForm(odk_id, str(test_xform))
+    assert form_name == "test_form_geojson"
+
+    # Publish form first
+    response_code = xform.publishForm(odk_id, form_name)
+    assert response_code == 200
+    assert xform.published == True
 
     # Before yield is used in tests
     yield odk_id, form_name, xform
@@ -161,8 +209,8 @@ async def odk_dataset(project_details) -> tuple:
     """Get dataset (entity list) for a project."""
     odk_id = project_details.get("id")
     dataset = OdkDataset(
-        url="https://proxy",
-        user="test@hotosm.org",
+        url="https://odkcentral:8443",
+        user="admin@hotosm.org",
         passwd="Password1234",
     )
 
@@ -221,15 +269,32 @@ async def odk_dataset_cleanup(odk_dataset):
 
 
 @pytest.fixture(scope="function")
-async def odk_submission(odk_form_cleanup) -> tuple:
+def pyodk_config() -> CentralConfig:
+    odk_central_url = os.getenv("ODK_CENTRAL_URL")
+    odk_central_user = os.getenv("ODK_CENTRAL_USER")
+    odk_central_password = os.getenv("ODK_CENTRAL_PASSWD", "")
+    return CentralConfig(
+        base_url=odk_central_url,
+        username=odk_central_user,
+        password=odk_central_password,
+    )
+
+
+@pytest.fixture(scope="function")
+async def odk_submission(odk_form_cleanup, pyodk_config) -> tuple:
     """A submission for the project form."""
     xform_xls_definition = test_data_dir / "buildings.xml"
+    # Modify the form version so we can publish form if same id existed previously
+    with open(xform_xls_definition, "rb") as xform_file:
+        xform_bytesio = BytesIO(xform_file.read())
+    new_form_version, xform_bytesio_new_version = update_xform_version(xform_bytesio)
+
     odk_id, form_name, xform = odk_form_cleanup
 
     # NOTE this submission does not select an existing entity, but creates a new feature
     submission_id = str(uuid.uuid4())
     submission_xml = f"""
-        <data id="{form_name}" version="v1">
+        <data id="{form_name}" version="{new_form_version}">
         <meta>
             <instanceID>{submission_id}</instanceID>
         </meta>
@@ -279,10 +344,14 @@ async def odk_submission(odk_form_cleanup) -> tuple:
         </data>
     """
 
-    with Client(config_path=odk_config_file) as client:
+    with Client(pyodk_config) as client:
         # Update the form to ensure we know the version number for submission
         # for some reason osm_fieldwork.OdkForm.create does not set the version number
-        client.forms.update(form_name, project_id=odk_id, definition=xform_xls_definition)
+        with NamedTemporaryFile(suffix=".xml", mode='wb') as temp_file:
+            temp_file.write(xform_bytesio_new_version.getvalue())
+            temp_file.flush()  # Ensure data is written to disk before using it
+            client.forms.update(form_name, project_id=odk_id, definition=temp_file.name)
+
         client.submissions.create(
             project_id=odk_id,
             form_id=form_name,
@@ -298,8 +367,8 @@ async def odk_submission(odk_form_cleanup) -> tuple:
 def cleanup():
     """Cleanup projects and forms after all tests (session)."""
     project = OdkProject(
-        url="https://proxy",
-        user="test@hotosm.org",
+        url="https://odkcentral:8443",
+        user="admin@hotosm.org",
         passwd="Password1234",
     )
 
