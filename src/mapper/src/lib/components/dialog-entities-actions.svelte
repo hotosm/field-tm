@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { distance } from '@turf/distance';
 	import type { Coord } from '@turf/helpers';
-	import type { SlDialog } from '@shoelace-style/shoelace';
+	import type { SlDialog, SlDrawer } from '@shoelace-style/shoelace';
 
 	import { m } from "$translations/messages.js";
 	import { TaskStatusEnum, type ProjectData } from '$lib/types';
@@ -16,6 +16,7 @@
 		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
 		projectData: ProjectData;
+		webFormsDrawerRef: SlDrawer | undefined;
 	};
 
 	function getStatusStyle(status: statusType) {
@@ -33,11 +34,13 @@
 		}
 	}
 
-	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData }: Props = $props();
+	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, webFormsDrawerRef }: Props = $props();
 
 	let dialogRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
 	let showCommentsPopup: boolean = $state(false);
+
+	const displayWebFormsButton = new URLSearchParams(window.location.search).get('webforms') === 'true';
 
 	const entitiesStore = getEntitiesStatusStore();
 	const alertStore = getAlertStore();
@@ -268,6 +271,30 @@
 							></hot-icon>
 							<span class="font-barlow font-medium text-sm">{m['popup.map_in_odk']()}</span>
 						</sl-button>
+						{#if displayWebFormsButton}
+							<sl-button
+								loading={entitiesStore.updateEntityStatusLoading}
+								variant="default"
+								size="small"
+								class="primary flex-grow"
+								onclick={() => {
+									toggleTaskActionModal(false);
+									webFormsDrawerRef?.show();
+								}}
+								onkeydown={(e: KeyboardEvent) => {
+									if (e.key === 'Enter') {
+										toggleTaskActionModal(false);
+										webFormsDrawerRef?.show();
+									}
+								}}
+								role="button"
+								tabindex="0"
+							>
+								<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
+								></hot-icon>
+								<span class="font-barlow font-medium text-sm">MAP IN ODK WEB FORMS</span>
+							</sl-button>
+						{/if}
 					</div>
 				{/if}
 			</div>

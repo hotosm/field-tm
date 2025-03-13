@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+	<body style="height: 100vh; overflow-y: scroll; position: relative">
+		<script type="module">
+			import OdkWebForm from 'https://hotosm.github.io/web-forms/odk-web-form.js';
+
+			// we created this static html file for a few reasons:
+			// 1) we were running into issues where the css styles imported in the main layout page
+			//    was preventing dropdowns from rendering in the web component
+			// 2) we want to load as few libraries as possible to avoid conflicts
+
+			const entityId = new URL(window.location.href).searchParams.get('entityId');
+			const projectId = new URL(window.location.href).searchParams.get('projectId');
+			const api_url = new URL(window.location.href).searchParams.get('api_url');
+			const language = new URL(window.location.href).searchParams.get('language');
+
+			// we are creating an instance of a web component programmatically
+			// and not by inserting a <odk-web-form> tag in the html
+			// because we need to pass a function as fetchFormAttachment
+			// (and you can't pass a function as a tag attribute in HTML)
+			const odkWebForm = new OdkWebForm({
+				formXml: `${api_url}/projects/${projectId}/form-xml`,
+				header: false,
+				missingResourceBehavior: 'BLANK',
+				fetchFormAttachment: function (url) {
+					url = url.toString();
+					if (url === 'jr://file-csv/features.csv') {
+						// we are faking a "Form Dataset" by building one programmatically
+						// https://docs.getodk.org/form-datasets/
+						// we are essentially creating a "list" of dropdown options
+						// where there is only one option
+						const csv = `"name","label"\n"${entityId || ''}","${entityId || ''}"`;
+
+						// we are faking a fetch response because ODK Web Forms expects that
+						return (async () => ({
+							status: 200,
+							text: async () => csv,
+						}))();
+					} else if (url === 'jr://instance/last-saved') {
+						// we are faking an HTTP Response of "Not Found"
+						// while preventing an error from being thrown
+						// (assuming missingResourceBehavior is also set to "BLANK")
+						return (async () => ({
+							status: 404,
+						}))();
+					} else {
+						return fetch(url);
+					}
+				},
+
+				onOdkForm: true,
+
+				// hack to make sure isEmitSubscribed function in OdkWebForm.vue returns true
+				// if you attach an event listener in Vue, I think it'll appear as a prop
+				// however, when using a web component, you have to explicitly run addEventListener
+				// which is done by the wrapper.svelete component
+				// by pulling the ref to the web component instance from inside the iframe
+				onSubmit: true,
+			});
+
+			document.body.appendChild(odkWebForm);
+		</script>
+	</body>
+</html>
