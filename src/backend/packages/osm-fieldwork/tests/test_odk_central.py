@@ -156,29 +156,11 @@ def test_create_form_draft(project, odk_form_cleanup):
     assert len(project.listForms(odk_id)) == 1
 
 
-def test_upload_media_filepath(project, odk_form):
+def test_upload_media_filepath(project, odk_form__with_attachment_cleanup):
     """Create form and upload media."""
-    odk_id, xform = odk_form
-    # NOTE here we use an old alternative form for testing geojson media upload
-    test_xform = test_data_dir / "buildings_geojson_upload.xml"
-    with open(test_xform, "rb") as xform_file:
-        xform_bytesio = BytesIO(xform_file.read())
+    odk_id, original_form_name, xform = odk_form__with_attachment_cleanup
 
-    # Create form
-    form_name = "test_form_geojson"
-    existing_form = xform.getDetails(odk_id, "test_form_geojson")
-    if existing_form.get("xmlFormId") == "test_form_geojson":
-        pass
-    else:
-        # We only create the form if it does not exist
-        form_name = xform.createForm(odk_id, xform_bytesio)
-        assert form_name == "test_form_geojson"
-        # Publish form first
-        response_code = xform.publishForm(odk_id, form_name)
-        assert response_code == 200
-        assert xform.published == True
-
-    # Upload media
+    # Upload media from filepath
     result = xform.uploadMedia(
         odk_id,
         "test_form_geojson",
@@ -187,39 +169,15 @@ def test_upload_media_filepath(project, odk_form):
     assert result.status_code == 200
 
 
-def test_upload_media_bytesio_publish(project, odk_form):
+def test_upload_media_bytesio_publish(project, odk_form__with_attachment_cleanup):
     """Create form and upload media."""
-    odk_id, xform = odk_form
-    # NOTE here we use an old alternative form for testing geojson media upload
-    test_xform = test_data_dir / "buildings_geojson_upload.xml"
-    with open(test_xform, "rb") as xform_file:
-        xform_bytesio = BytesIO(xform_file.read())
+    odk_id, original_form_name, xform = odk_form__with_attachment_cleanup
 
-    # Create form
-    form_name = "test_form_geojson"
-    existing_form = xform.getDetails(odk_id, "test_form_geojson")
-    if existing_form.get("xmlFormId") == "test_form_geojson":
-        pass
-    else:
-        # We only create the form if it does not exist
-        form_name = xform.createForm(odk_id, xform_bytesio)
-        assert form_name == "test_form_geojson"
-        # Publish form first
-        response_code = xform.publishForm(odk_id, form_name)
-        assert response_code == 200
-        assert xform.published == True
-
-    # Upload media
+    # Upload media as object
     with open(test_data_dir / "osm_buildings.geojson", "rb") as geojson:
         geojson_bytesio = BytesIO(geojson.read())
     result = xform.uploadMedia(odk_id, "test_form_geojson", geojson_bytesio, filename="osm_buildings.geojson")
     assert result.status_code == 200
-
-    # Delete form
-    success = xform.deleteForm(odk_id, "test_form_geojson")
-    assert success
-
-    assert len(project.listForms(odk_id)) == 0
 
 
 def test_form_fields_no_form(odk_form_cleanup):
@@ -270,7 +228,7 @@ def test_invalid_connection_sync():
         OdkCentral("https://somerandominvalidurl546456546.xyz", "test@hotosm.org", "Password1234")
 
     with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
-        OdkCentral("https://proxy", "thisuser@notexist.org", "Password1234")
+        OdkCentral("https://odkcentral:8443", "thisuser@notexist.org", "Password1234")
 
 
 async def test_invalid_connection_async():
@@ -280,5 +238,5 @@ async def test_invalid_connection_async():
             pass
 
     with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
-        async with OdkCentralAsync("https://proxy", "thisuser@notexist.org", "Password1234"):
+        async with OdkCentralAsync("https://odkcentral:8443", "thisuser@notexist.org", "Password1234"):
             pass

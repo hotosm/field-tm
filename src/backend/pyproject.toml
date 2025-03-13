@@ -124,6 +124,10 @@ extraPaths = ["__pypackages__/3.12/lib/"]
 addopts = "-ra -q"
 testpaths = [
     "tests",
+    "package_tests",
+]
+pythonpath = [
+    "package_tests",
 ]
 asyncio_mode="auto"
 asyncio_default_fixture_loop_scope="session"

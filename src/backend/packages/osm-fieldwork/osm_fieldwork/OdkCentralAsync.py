@@ -1,6 +1,4 @@
-#!/bin/python3
-
-# Copyright (c) 2024 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -111,6 +109,33 @@ class OdkCentral:
                 raise ConnectionError("ODK credentials are invalid, or may have changed. Please update them.") from response_error
             raise response_error
 
+    async def s3_reset(self) -> None:
+        """Reset failed S3 uploads."""
+        url = f"{self.base}s3/reset-failed"
+        try:
+            async with self.session.get(url, ssl=self.verify) as response:
+                if not response.ok:
+                    msg = "Failed to trigger S3 reset in Central"
+                    log.error(msg)
+                    raise Exception(msg)
+        except aiohttp.ClientError as e:
+            msg = f"ClientError during S3 reset attempt in Central: {e}"
+            log.error(msg)
+            raise aiohttp.ClientError(msg) from e
+
+    async def s3_sync(self) -> None:
+        """Trigger the S3 sync system endpoint."""
+        url = f"{self.base}s3/sync"
+        try:
+            async with self.session.get(url, ssl=self.verify) as response:
+                if not response.ok:
+                    msg = "Failed to trigger S3 sync in Central"
+                    log.error(msg)
+                    raise Exception(msg)
+        except aiohttp.ClientError as e:
+            msg = f"ClientError during S3 sync attempt in Central: {e}"
+            log.error(msg)
+            raise aiohttp.ClientError(msg) from e
 
 class OdkProject(OdkCentral):
     """Class to manipulate a project on an ODK Central server."""
@@ -344,10 +369,29 @@ class OdkForm(OdkCentral):
             if result.status in (301, 302, 303, 307, 308):  # is a redirect to the S3 URL
                 s3_url = result.headers.get("Location")
                 if not s3_url:
-                    log.error(f"Couldn't fetch {filename} from Central: {await result.text()}")
+                    try:
+                        text_body = await result.text()
+                    except UnicodeDecodeError:
+                        text_body = "[Binary data]"
+                    log.error(
+                        f"No 'Location' response header for {filename} from Central: "
+                        f"{text_body}"
+                    )
                     return filename, None
             else:
-                log.error(f"Couldn't fetch {filename} from Central: {await result.text()}")
+                try:
+                    log.error(
+                        f"Incorrect response code for {filename} from Central: "
+                        f"{await result.text()}"
+                    )
+                except UnicodeDecodeError:
+                    log.error(f"Central response code: {result.status}")
+                    log.error(
+                        "Central appears to be returning the binary data instead "
+                        "of the S3 URL. Is Central configured to use S3 storage? "
+                        "Or perhaps the file is simply not uploaded to S3 yet."
+                    )
+
                 return filename, None
 
             return filename, s3_url
