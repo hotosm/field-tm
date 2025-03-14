@@ -18,13 +18,25 @@
 """Logic for FMTM tasks."""
 
 from datetime import datetime, timedelta, timezone
+from textwrap import dedent
 
+from fastapi import (
+    Request,
+)
+from loguru import logger as log
+from osm_login_python.core import Auth
 from psycopg import Connection
 from psycopg.rows import class_row
 
+from app.auth.auth_schemas import ProjectUserDict
+from app.auth.providers.osm import (
+    get_osm_token,
+    send_osm_message,
+)
 from app.central.central_crud import get_entities_data, update_entity_mapping_status
+from app.config import settings
 from app.db.enums import EntityState
-from app.db.models import DbOdkEntities, DbProject
+from app.db.models import DbOdkEntities, DbProject, DbProjectTeam, DbTask
 from app.db.postgis_utils import timestamp
 from app.tasks import task_schemas
 
@@ -178,3 +190,61 @@ async def unlock_old_locked_tasks(db, project_id):
     """
     async with db.cursor() as cur:
         await cur.execute(unlock_query, {"project_id": project_id})
+
+
+async def send_task_assignment_notifications(
+    request: Request,
+    osm_auth: Auth,
+    team: DbProjectTeam,
+    project_user: ProjectUserDict,
+    task: DbTask,
+    assignee_id: int,
+):
+    """Send OSM notifications to team members or assignee for task assignment."""
+    osm_token = get_osm_token(request, osm_auth)
+    project = project_user.get("project")
+    user = project_user.get("user")
+
+    project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
+    if not project_url.startswith("http"):
+        project_url = f"https://{project_url}"
+
+    if assignee_id:
+        assignee_message_content = dedent(f"""
+            You have been assigned to task **{task.project_task_index}** in project
+            **{project.name}** by **{user.username}**.
+
+            [View Project]({project_url})
+
+            Thank you for being a part of our platform!
+        """)
+
+        send_osm_message(
+            osm_token=osm_token,
+            title=f"Task Assignment in {project.name}",
+            body=assignee_message_content,
+            osm_id=assignee_id,
+        )
+
+        log.info(f"OSM notification sent to {assignee_id} for task {task.id}")
+
+    elif team:
+        team_message_content = dedent(f"""
+            You have been assigned to task **{task.project_task_index}** in project
+            **{project.name}** by **{user.username}** as a part of team
+            **{team.team_name}**.
+
+            [View Project]({project_url})
+
+            Thank you for being a part of our platform!
+        """)
+
+        for user in team.users:
+            send_osm_message(
+                osm_token=osm_token,
+                title=f"Task Assignment in {project.name}",
+                body=team_message_content,
+                osm_id=user["id"],
+            )
+
+        log.info(f"OSM notifications sent to {team.users} for task {task.id}")

@@ -25,7 +25,7 @@ import json
 from datetime import timedelta
 from io import BytesIO
 from re import sub
-from typing import TYPE_CHECKING, Annotated, Optional, Self
+from typing import TYPE_CHECKING, Annotated, List, Optional, Self
 from uuid import UUID
 
 import geojson
@@ -76,6 +76,7 @@ if TYPE_CHECKING:
         BasemapUpdate,
         GeometryLogIn,
         ProjectIn,
+        ProjectTeamIn,
         ProjectUpdate,
     )
     from app.tasks.task_schemas import TaskEventIn
@@ -114,7 +115,7 @@ class DbUserRole(BaseModel):
         role: ProjectRole,
     ) -> Self:
         """Create a new user role."""
-        async with db.cursor() as cur:
+        async with db.cursor(row_factory=class_row(cls)) as cur:
             params = {
                 "project_id": project_id,
                 "user_id": user_id,
@@ -126,20 +127,32 @@ class DbUserRole(BaseModel):
                     (user_id, project_id, role)
                 VALUES
                     (%(user_id)s, %(project_id)s, %(role)s)
-                RETURNING *;
+                    ON CONFLICT (user_id, project_id) DO UPDATE
+                    SET role = EXCLUDED.role
+                    WHERE user_roles.role < EXCLUDED.role;
             """,
                 params,
             )
-            new_role = await cur.fetchone()
 
-        if new_role is None:
-            msg = f"Unknown SQL error for data: {params}"
-            log.error(f"Failed user role creation: {params}")
+            # NOTE this will return the latest role, even if it's not updated
+            # to make sure something is always returned
+            await cur.execute(
+                """
+                SELECT * FROM user_roles
+                WHERE user_id = %(user_id)s AND project_id = %(project_id)s;
+            """,
+                params,
+            )
+            latest_role = await cur.fetchone()
+
+        if latest_role is None:
+            msg = f"Failed to create user role: {params}"
+            log.error(msg)
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
             )
 
-        return new_role
+        return latest_role
 
     @classmethod
     async def all(
@@ -756,6 +769,7 @@ class DbTaskEvent(BaseModel):
 
     project_id: Annotated[Optional[int], Field(gt=0)] = None
     user_id: Annotated[Optional[int], Field(gt=0)] = None
+    team_id: Optional[UUID] = None
     username: Optional[str] = None
     comment: Optional[str] = None
     created_at: Optional[AwareDatetime] = None
@@ -837,6 +851,11 @@ class DbTaskEvent(BaseModel):
         model_dump = dump_and_check_model(event_in)
         columns = ", ".join(model_dump.keys())
         value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
+        username = (
+            "NULL"
+            if model_dump.get("user_id") is None
+            else "(SELECT username FROM users WHERE id = %(user_id)s)"
+        )
 
         # NOTE the project_id need not be passed, as it's extracted from the task
         async with db.cursor(row_factory=class_row(cls)) as cur:
@@ -852,17 +871,20 @@ class DbTaskEvent(BaseModel):
                         VALUES (
                             gen_random_uuid(),
                             (SELECT project_id FROM tasks WHERE id = %(task_id)s),
-                            (SELECT username FROM users WHERE id = %(user_id)s),
+                            {username},
                             {value_placeholders}
                         )
                         RETURNING *
                     )
                     SELECT
                         inserted.*,
-                        u.profile_img
-                    FROM inserted
-                    JOIN users u ON u.id = inserted.user_id;
-            """,
+                        CASE WHEN inserted.user_id IS NOT NULL THEN
+                            (SELECT profile_img FROM users WHERE id = inserted.user_id)
+                        ELSE
+                            NULL
+                        END as profile_img
+                    FROM inserted;
+                """,
                 model_dump,
             )
             new_task_event = await cur.fetchone()
@@ -875,6 +897,173 @@ class DbTaskEvent(BaseModel):
             )
 
         return new_task_event
+
+
+class DbProjectTeam(BaseModel):
+    """Table project_teams."""
+
+    team_id: UUID
+    team_name: Optional[str] = None
+    project_id: int
+
+    # Computed
+    users: Optional[list[dict]] = []
+
+    @classmethod
+    async def one(cls, db: Connection, team_id: UUID) -> Self:
+        """Fetch a single team by its ID along with user details."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                SELECT pt.team_id, pt.team_name, pt.project_id,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', u.id,
+                            'username', u.username,
+                            'profile_img', u.profile_img
+                        )
+                    ) FILTER (WHERE u.id IS NOT NULL), '[]'
+                ) AS users
+                FROM project_teams pt
+                LEFT JOIN project_team_users ptu
+                    ON pt.team_id = ptu.team_id
+                LEFT JOIN users u
+                    ON ptu.user_id = u.id
+                WHERE pt.team_id = %(team_id)s
+                GROUP BY pt.team_id;
+                """,
+                {"team_id": team_id},
+            )
+            team = await cur.fetchone()
+
+        if team is None:
+            raise KeyError(f"Team ({team_id}) not found.")
+
+        return team
+
+    @classmethod
+    async def create(cls, db: Connection, team_in: "ProjectTeamIn") -> Self:
+        """Create a new team for a project."""
+        model_dump = dump_and_check_model(team_in)
+        columns = ", ".join(model_dump.keys())
+        value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                f"""
+                    INSERT INTO project_teams
+                        ({columns})
+                    VALUES
+                        ({value_placeholders})
+                    RETURNING *;
+                """,
+                model_dump,
+            )
+            return await cur.fetchone()
+
+    @classmethod
+    async def update(
+        cls, db: Connection, team_id: UUID, team_update: "ProjectTeamIn"
+    ) -> Self:
+        """Update a team for a project."""
+        model_dump = dump_and_check_model(team_update)
+        placeholders = ", ".join(f"{key} = %({key})s" for key in model_dump.keys())
+        sql = f"""
+            UPDATE project_teams
+                SET {placeholders}
+            WHERE team_id = %(team_id)s
+            RETURNING *;
+        """
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(sql, {"team_id": team_id, **model_dump})
+            updated_team = await cur.fetchone()
+
+        if updated_team is None:
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail=f"Failed to update team {team_id}",
+            )
+        return updated_team
+
+    @classmethod
+    async def delete(cls, db: Connection, team_id: str):
+        """Delete a team."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM project_teams WHERE team_id = %(team_id)s;",
+                {"team_id": team_id},
+            )
+            await cur.execute(
+                "DELETE FROM project_team_users WHERE team_id = %(team_id)s;",
+                {"team_id": team_id},
+            )
+
+    @classmethod
+    async def all(cls, db: Connection, project_id: int) -> list[Self]:
+        """Fetch all teams for a project along with users."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                SELECT pt.team_id, pt.team_name, pt.project_id,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', u.id,
+                            'username', u.username,
+                            'profile_img', u.profile_img
+                        )
+                    ) FILTER (WHERE u.id IS NOT NULL), '[]'
+                ) AS users
+                FROM project_teams pt
+                LEFT JOIN project_team_users ptu ON pt.team_id = ptu.team_id
+                LEFT JOIN users u ON ptu.user_id = u.id
+                WHERE pt.project_id = %(project_id)s
+                GROUP BY pt.team_id;
+                """,
+                {"project_id": project_id},
+            )
+            teams = await cur.fetchall()
+
+        return teams
+
+
+class DbProjectTeamUser(BaseModel):
+    """Table project_team_users."""
+
+    team_id: UUID
+    user_id: int
+
+    @classmethod
+    async def create(cls, db: Connection, team_id: UUID, user_ids: List[int]):
+        """Add users to a team."""
+        model_dump = [{"team_id": team_id, "user_id": user_id} for user_id in user_ids]
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.executemany(
+                """
+                    INSERT INTO public.project_team_users
+                        (team_id, user_id)
+                    VALUES
+                        (%(team_id)s, %(user_id)s)
+                    ON CONFLICT (team_id, user_id) DO NOTHING;
+                """,
+                model_dump,
+            )
+
+    @classmethod
+    async def delete(cls, db: Connection, team_id: UUID, user_ids: List[int]):
+        """Remove users from a team."""
+        model_dump = [{"team_id": team_id, "user_id": user_id} for user_id in user_ids]
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.executemany(
+                """
+                    DELETE FROM public.project_team_users
+                    WHERE team_id = %(team_id)s AND user_id = %(user_id)s;
+                """,
+                model_dump,
+            )
 
 
 class DbTask(BaseModel):

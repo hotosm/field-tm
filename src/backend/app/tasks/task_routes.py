@@ -17,18 +17,26 @@
 #
 """Routes for FMTM tasks."""
 
-from typing import Annotated
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Request,
+)
 from loguru import logger as log
+from osm_login_python.core import Auth
 from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
+from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import mapper, super_admin
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
-from app.db.models import DbTask, DbTaskEvent, DbUser
-from app.tasks import task_crud, task_schemas
+from app.db.enums import HTTPStatus, TaskEvent
+from app.db.models import DbProjectTeam, DbTask, DbTaskEvent, DbUser
+from app.projects import project_deps
+from app.tasks import task_crud, task_deps, task_schemas
 
 router = APIRouter(
     prefix="/tasks",
@@ -91,18 +99,47 @@ async def get_specific_task(
 
 @router.post("/{task_id}/event", response_model=task_schemas.TaskEventOut)
 async def add_new_task_event(
-    task_id: int,
+    request: Request,
+    task: Annotated[DbTask, Depends(task_deps.get_task)],
     new_event: task_schemas.TaskEventIn,
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
     db: Annotated[Connection, Depends(db_conn)],
+    osm_auth: Annotated[Auth, Depends(init_osm_auth)],
+    team: Annotated[Optional[DbProjectTeam], Depends(project_deps.get_project_team)],
+    assignee_id: Optional[int] = None,
+    notify: bool = False,
 ):
     """Add a new event to the events table / update task status."""
     user_id = project_user.get("user").id
-    log.info(f"Task {task_id} event: {new_event.event.name} (by user {user_id})")
 
+    log.info(f"Task {task.id} event: {new_event.event.name} (by user {user_id})")
     new_event.user_id = user_id
-    new_event.task_id = task_id
-    return await DbTaskEvent.create(db, new_event)
+    new_event.task_id = task.id
+
+    if new_event.event == TaskEvent.ASSIGN:
+        if not (assignee_id or team.team_id):
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="Assignee or Team ID is required for ASSIGN event",
+            )
+
+        # NOTE: This is saving the assignee instead of the current user if assignee is
+        # provided else it will save the team if team is provided
+        if assignee_id:
+            new_event.user_id = assignee_id
+        elif team:
+            new_event.user_id = None
+            new_event.username = None
+            new_event.team_id = team.team_id
+
+    event = await DbTaskEvent.create(db, new_event)
+
+    if notify and event.event == TaskEvent.ASSIGN and (assignee_id or team):
+        await task_crud.send_task_assignment_notifications(
+            request, osm_auth, team, project_user, task, assignee_id
+        )
+
+    return event
 
 
 @router.get("/{task_id}/history", response_model=list[task_schemas.TaskEventOut])

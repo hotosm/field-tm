@@ -18,7 +18,8 @@
 
 """Project dependencies for use in Depends."""
 
-from typing import Annotated
+from typing import Annotated, Optional
+from uuid import UUID
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
@@ -27,7 +28,7 @@ from pydantic import Field
 
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.db.models import DbProject
+from app.db.models import DbProject, DbProjectTeam
 
 
 async def get_project(
@@ -68,3 +69,22 @@ async def check_project_dup_name(db: Connection, name: str):
             status_code=HTTPStatus.CONFLICT,
             detail=f"Project with name '{name}' already exists.",
         )
+
+
+async def get_project_team(
+    project_id: int,
+    db: Annotated[Connection, Depends(db_conn)],
+    team_id: Optional[UUID] = None,
+) -> DbProjectTeam:
+    """Dependency to fetch a team and validate it belongs to the project."""
+    if not team_id:
+        return None
+
+    team = await DbProjectTeam.one(db, team_id)
+
+    if not team or team.project_id != project_id:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail="Unauthorized access to this team."
+        )
+
+    return team
