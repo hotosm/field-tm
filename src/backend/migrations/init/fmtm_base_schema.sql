@@ -308,6 +308,7 @@ CREATE TABLE public.task_events (
     task_id integer NOT NULL,
     project_id integer,
     user_id integer,
+    team_id UUID,
     username character varying,
     state public.mappingstate,
     comment text,
@@ -398,6 +399,30 @@ CREATE TABLE public.geometrylog (
 );
 ALTER TABLE public.geometrylog OWNER TO fmtm;
 
+CREATE TABLE IF NOT EXISTS public.project_teams (
+    team_id UUID DEFAULT gen_random_uuid(),
+    team_name VARCHAR UNIQUE,
+    project_id INTEGER NOT NULL
+);
+ALTER TABLE public.project_teams OWNER TO fmtm;
+
+CREATE SEQUENCE public.team_name_seq
+AS integer
+START WITH 1
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+CACHE 1;
+
+ALTER SEQUENCE public.team_name_seq OWNED BY public.project_teams.team_name;
+
+CREATE TABLE IF NOT EXISTS public.project_team_users (
+    team_id UUID,
+    user_id INTEGER NOT NULL
+);
+ALTER TABLE public.project_team_users OWNER TO fmtm;
+
+
 -- nextval for primary keys (autoincrement)
 
 ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval(
@@ -411,6 +436,10 @@ ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval(
 );
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval(
     'public.xlsforms_id_seq'::regclass
+);
+ALTER TABLE ONLY public.project_teams
+ALTER COLUMN team_name SET DEFAULT (
+    'Team ' || nextval('public.team_name_seq'::regclass)
 );
 
 
@@ -467,6 +496,12 @@ ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
 ALTER TABLE ONLY public.geometrylog
 ADD CONSTRAINT geometrylog_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.project_teams
+ADD CONSTRAINT project_teams_pkey PRIMARY KEY (team_id);
+
+ALTER TABLE ONLY public.project_team_users
+ADD CONSTRAINT project_team_users_pkey PRIMARY KEY (team_id, user_id);
+
 -- Indexing
 
 CREATE INDEX idx_projects_outline ON public.projects USING gist (outline);
@@ -516,6 +551,10 @@ ON public.odk_entities USING btree (
 CREATE INDEX idx_geometrylog_geojson
 ON public.geometrylog USING gin (geojson);
 
+CREATE INDEX idx_project_team_users_team_id
+ON public.project_team_users USING btree (
+    team_id
+);
 
 -- Foreign keys
 
@@ -566,6 +605,21 @@ ALTER TABLE ONLY public.user_roles
 ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (
     user_id
 ) REFERENCES public.users (id);
+
+ALTER TABLE ONLY public.task_events
+ADD CONSTRAINT fk_team_id FOREIGN KEY (
+    team_id
+) REFERENCES public.project_teams (team_id);
+
+ALTER TABLE ONLY public.project_teams
+ADD CONSTRAINT fk_projects FOREIGN KEY (
+    project_id
+) REFERENCES public.projects (id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.project_team_users
+ADD CONSTRAINT fk_users FOREIGN KEY (
+    user_id
+) REFERENCES public.users (id) ON DELETE CASCADE;
 
 -- Triggers
 
