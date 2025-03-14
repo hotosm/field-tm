@@ -21,6 +21,7 @@
 from contextlib import asynccontextmanager
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 from fastapi import UploadFile
 from fastapi.exceptions import HTTPException
@@ -79,3 +80,13 @@ async def validate_xlsform_extension(xlsform: UploadFile):
 async def read_xlsform(xlsform: UploadFile) -> BytesIO:
     """Read an XLSForm, validate extension, return wrapped in BytesIO."""
     return await validate_xlsform_extension(xlsform)
+
+
+async def read_form_media(
+    media_uploads: list[UploadFile],
+) -> Optional[dict[str, BytesIO]]:
+    """Read all uploaded form media for upload to ODK Central."""
+    file_data_dict = {
+        file.filename: BytesIO(await file.read()) for file in media_uploads
+    }
+    return file_data_dict

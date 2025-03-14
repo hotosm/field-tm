@@ -17,18 +17,19 @@
 #
 """Routes to relay requests to ODK Central server."""
 
+from io import BytesIO
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
 from app.auth.roles import project_manager
-from app.central import central_crud
+from app.central import central_crud, central_deps
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
@@ -108,6 +109,43 @@ async def refresh_appuser_token(
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         msg = f"failed to refresh the appuser token for project {project_id}"
+        log.error(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=msg,
+        ) from e
+
+
+@router.post("/upload-form-media")
+async def upload_form_media(
+    current_user: Annotated[AuthUser, Depends(project_manager)],
+    media_attachments: Annotated[
+        dict[str, BytesIO], Depends(central_deps.read_form_media)
+    ],
+):
+    """Upload media attachments to a form in Central."""
+    project = current_user.get("project")
+    project_id = project.id
+    project_odk_id = project.odkid
+    project_xform_id = project.odk_form_id
+    project_odk_creds = project.odk_credentials
+
+    try:
+        await central_crud.upload_form_media(
+            project_xform_id,
+            project_odk_id,
+            project_odk_creds,
+            media_attachments,
+        )
+
+        return Response(status_code=HTTPStatus.OK)
+
+    except Exception as e:
+        log.exception(f"Error: {e}")
+        msg = (
+            f"Failed to upload form media for FMTM project ({project_id}) "
+            f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
+        )
         log.error(msg)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,

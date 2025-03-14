@@ -22,6 +22,8 @@ import json
 from asyncio import gather
 from datetime import datetime
 from io import BytesIO, StringIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Optional, Union
 from uuid import uuid4
 
@@ -31,6 +33,8 @@ from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_mandatory_fields
 from psycopg import Connection
+from pyodk._utils.config import CentralConfig
+from pyodk.client import Client
 from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
@@ -954,3 +958,34 @@ async def get_appuser_token(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the app user token.",
         ) from e
+
+
+async def upload_form_media(
+    xform_id: str,
+    project_odk_id: int,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+    media_attachments: dict[str, BytesIO],
+):
+    """Upload form media attachments to ODK."""
+    attachment_filepaths = []
+
+    # Write all uploaded data to temp files for upload (required by PyODK)
+    # We must use TemporaryDir and preserve the uploaded file names
+    with TemporaryDirectory() as temp_dir:
+        for file_name, file_data in media_attachments.items():
+            temp_path = Path(temp_dir) / file_name
+            with open(temp_path, "wb") as temp_file:
+                temp_file.write(file_data.getvalue())
+            attachment_filepaths.append(temp_path)
+
+        pyodk_config = CentralConfig(
+            base_url=odk_credentials.odk_central_url,
+            username=odk_credentials.odk_central_user,
+            password=odk_credentials.odk_central_password,
+        )
+        with Client(pyodk_config) as client:
+            return client.forms.update(
+                project_id=project_odk_id,
+                form_id=xform_id,
+                attachments=attachment_filepaths,
+            )
