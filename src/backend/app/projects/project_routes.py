@@ -44,6 +44,7 @@ from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path, get_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
+from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
@@ -78,7 +79,6 @@ from app.db.postgis_utils import (
     merge_polygons,
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
-    split_geojson_by_task_areas,
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -893,10 +893,33 @@ async def add_new_entity(
 
         # Add required properties and extract entity data
         featcol = add_required_geojson_properties(geojson)
-        properties = list(featcol["features"][0]["properties"].keys())
-        task_geojson = await split_geojson_by_task_areas(db, featcol, project.id)
+        featcol["features"][0]["properties"]["project_id"] = project.id
+
+        # Get task_id of the feature if inside task boundary
+        async with db.cursor(row_factory=dict_row) as cur:
+            await cur.execute(
+                await cur.execute(
+                    """
+                SELECT t.project_task_index AS task_id
+                FROM tasks t
+                WHERE t.project_id = %s
+                AND ST_Within(
+                    ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326),
+                    t.outline
+                )
+                LIMIT 1;
+                """,
+                    (project.id, json.dumps(features[0].get("geometry"))),
+                )
+            )
+            result = await cur.fetchone()
+
+        task_id = ""
+        if result and (task_id := result.get("task_id")):
+            featcol["features"][0]["properties"]["task_id"] = task_id
+
         entities_list = await central_crud.task_geojson_dict_to_entity_values(
-            task_geojson
+            {task_id: featcol}
         )
 
         if not entities_list:
@@ -908,7 +931,7 @@ async def add_new_entity(
         return await central_crud.create_entity(
             project_odk_creds,
             project_odk_id,
-            properties=properties,
+            properties=list(featcol["features"][0]["properties"].keys()),
             entity=entities_list[0],
             dataset_name="features",
         )
