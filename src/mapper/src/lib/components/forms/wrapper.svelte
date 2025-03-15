@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { onSetLanguageTag, languageTag } from '$translations/runtime.js';
 	import type { SlDrawer } from '@shoelace-style/shoelace';
+
+	import { getCommonStore } from '$store/common.svelte.ts';
+
 	const API_URL = import.meta.env.VITE_API_URL;
 	type Props = {
 		drawerRef: SlDrawer | undefined;
@@ -8,6 +10,7 @@
 		projectId: number | undefined;
 		webFormsRef: HTMLElement | undefined;
 	};
+	const commonStore = getCommonStore();
 	let { drawerRef = $bindable(undefined), entityId, webFormsRef = $bindable(undefined), projectId }: Props = $props();
 	let iframeRef: HTMLIFrameElement;
 	let odkForm: any;
@@ -30,7 +33,7 @@
 			odkForm = evt.detail[0];
 			console.log('set odkForm', odkForm);
 			// over-write default language
-			setFormLanguage(languageTag());
+			setFormLanguage(commonStore.locale);
 			// select feature that you clicked on map
 			odkForm
 				.getChildren()
@@ -47,6 +50,11 @@
 			}
 		}
 	};
+	$effect(() => {
+		if (commonStore.locale) {
+			setFormLanguage(commonStore.locale);
+		}
+	});
 	$effect(() => {
 		// we want to rerun this $effect function whenever a new iframe is rendered
 		// because projectId and entityId are state keys that force a re-render below when they change
@@ -68,8 +76,6 @@
 			};
 		}
 	});
-	onSetLanguageTag((newLocale: string) => setFormLanguage(newLocale));
-	console.log({ entityId, projectId });
 </script>
 
 <hot-drawer
@@ -86,7 +92,7 @@
 				<iframe
 					bind:this={iframeRef}
 					title="odk-web-forms-wrapper"
-					src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&api_url=${API_URL}&language=${languageTag()}`}
+					src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&api_url=${API_URL}&language=${commonStore.locale}`}
 					style="height: {window.outerHeight}px; width: 100%; z-index: 11;"
 				>
 				</iframe>
