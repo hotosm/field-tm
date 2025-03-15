@@ -42,13 +42,19 @@ gen_current_env() {
     ./envsubst -i deploy/compose.sub.yaml
 }
 
-pull_and_deploy() {
+pull_and_rebuild_frontends() {
     # Pull images (must run in a subshell to be within 'deploy' dir for ../compose.yaml extend)
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
         docker compose -f - pull)
 
-    # Deploy
+    # Rebuild frontends (required to have correct API vars)
+    (cd deploy &&
+        ../envsubst -i compose.sub.yaml | \
+        docker compose -f - build ui ui-mapper)
+}
+
+deploy() {
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
         docker compose -f - up -d)
@@ -56,4 +62,5 @@ pull_and_deploy() {
 
 install_envsubst_if_missing
 gen_current_env
-pull_and_deploy
+pull_and_rebuild_frontends
+deploy
