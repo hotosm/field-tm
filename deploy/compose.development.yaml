@@ -170,7 +170,7 @@ services:
     # accessible to the proxy, then shuts down
     image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-development}"
     build:
-      context: src
+      context: ../src
       dockerfile: Dockerfile.ui.prod
       args:
         APP_VERSION: ${GIT_BRANCH}
