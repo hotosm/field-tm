@@ -51,7 +51,7 @@ pull_and_rebuild_frontends() {
     # Rebuild frontends (required to have correct API vars)
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
-        docker compose -f - build ui ui-mapper)
+        docker compose -f - build ui)
 }
 
 deploy() {
