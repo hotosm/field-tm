@@ -666,12 +666,12 @@ async def get_data_extract(
     else:
         extract_config = None
 
-    fgb_url = await project_crud.generate_data_extract(
+    geojson_url = await project_crud.generate_data_extract(
         clean_boundary_geojson,
         extract_config,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
+    return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
 
 
 @router.get("/data-extract-url")
@@ -690,13 +690,13 @@ async def get_or_set_data_extract(
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
 
 
-@router.post("/upload-custom-extract")
-async def upload_custom_extract(
+@router.post("/upload-data-extract")
+async def upload_data_extract(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
-    custom_extract_file: UploadFile = File(...),
+    data_extract_file: UploadFile = File(...),
 ):
-    """Upload a custom data extract geojson for a project.
+    """Upload a data extract geojson for a project.
 
     The frontend has the option to upload flatgeobuf, but this must first
     be deserialised to GeoJSON before upload here.
@@ -714,7 +714,7 @@ async def upload_custom_extract(
     Extracts are best generated with https://export.hotosm.org for full compatibility.
 
     Request Body
-    - 'custom_extract_file' (file): File with the data extract features.
+    - 'data_extract_file' (file): File with the data extract features.
 
     Query Params:
     - 'project_id' (int): the project's id. Required.
@@ -722,7 +722,7 @@ async def upload_custom_extract(
     project_id = project_user_dict.get("project").id
 
     # Validating for .geojson File.
-    file_name = os.path.splitext(custom_extract_file.filename)
+    file_name = os.path.splitext(data_extract_file.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json", ".fgb"]
     if file_ext not in allowed_extensions:
@@ -731,9 +731,9 @@ async def upload_custom_extract(
         )
 
     # read entire file
-    extract_data = await custom_extract_file.read()
+    extract_data = await data_extract_file.read()
 
-    fgb_url = await project_crud.upload_custom_geojson_extract(
+    fgb_url = await project_crud.upload_geojson_data_extract(
         db, project_id, extract_data
     )
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
