@@ -66,6 +66,10 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
   const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
   const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
+  // convert dataExtractGeojson to file object to upload to /upload-data-extract endpoint
+  const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
+  const dataExtractGeojsonFile = new File([dataExtractBlob], 'outline.json', { type: 'application/json' });
+
   useEffect(() => {
     const featureCount =
       (dataExtractGeojson?.features?.length ?? 0) + (additionalFeatureGeojson?.features?.length ?? 0);
@@ -123,7 +127,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
       task_split_type: taskSplittingMethod,
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: projectDetails.hashtags,
-      data_extract_url: projectDetails.data_extract_url,
       custom_tms_url: projectDetails.custom_tms_url,
     };
     // Append osm_category if set
@@ -150,8 +153,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         projectData,
         taskAreaGeojsonFile,
         xlsFormFile?.file,
-        customDataExtractUpload?.file,
-        projectDetails.dataExtractType === 'osm_data_extract',
+        customDataExtractUpload?.file || dataExtractGeojsonFile,
         additionalFeature?.file,
         projectDetails.project_admins as number[],
         combinedFeaturesCount,

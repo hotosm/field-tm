@@ -19,8 +19,7 @@ const CreateProjectService = (
   projectData: any,
   taskAreaGeojson: any,
   formUpload: any,
-  dataExtractFile: File | null,
-  isOsmExtract: boolean,
+  dataExtractFile: File,
   additionalFeature: any,
   projectAdmins: number[],
   combinedFeaturesCount: number,
@@ -56,22 +55,12 @@ const CreateProjectService = (
 
       // Upload data extract
       let extractResponse;
-      if (isOsmExtract) {
-        // Generated extract from raw-data-api
-        extractResponse = await API.get(
-          `${VITE_API_URL}/projects/data-extract-url?project_id=${projectId}&url=${projectData.data_extract_url}`,
-        );
-      } else if (dataExtractFile) {
-        // post custom data extract
-        const dataExtractFormData = new FormData();
-        dataExtractFormData.append('custom_extract_file', dataExtractFile);
-        extractResponse = await API.post(
-          `${VITE_API_URL}/projects/upload-custom-extract?project_id=${projectId}`,
-          dataExtractFormData,
-        );
-      } else {
-        throw new Error('Neither isOsmExtract or dataExtractFile was set');
-      }
+      const dataExtractFormData = new FormData();
+      dataExtractFormData.append('data_extract_file', dataExtractFile);
+      extractResponse = await API.post(
+        `${VITE_API_URL}/projects/upload-data-extract?project_id=${projectId}`,
+        dataExtractFormData,
+      );
       hasAPISuccess = isStatusSuccess(extractResponse.status);
 
       if (!hasAPISuccess) {
