@@ -898,8 +898,7 @@ async def add_new_entity(
         # Get task_id of the feature if inside task boundary
         async with db.cursor(row_factory=dict_row) as cur:
             await cur.execute(
-                await cur.execute(
-                    """
+                """
                 SELECT t.project_task_index AS task_id
                 FROM tasks t
                 WHERE t.project_id = %s
@@ -909,8 +908,7 @@ async def add_new_entity(
                 )
                 LIMIT 1;
                 """,
-                    (project.id, json.dumps(features[0].get("geometry"))),
-                )
+                (project.id, json.dumps(features[0].get("geometry"))),
             )
             result = await cur.fetchone()
 
