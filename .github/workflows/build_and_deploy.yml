@@ -103,7 +103,7 @@ jobs:
           # Run without migrations (avoid exit code 0)
           # Also run within if block to capture logs if failure
           if docker compose up --detach \
-              --no-deps --wait --wait-timeout 60 \
+              --no-deps --wait --wait-timeout 120 \
               central-db central s3 api
           then
               docker compose logs api
