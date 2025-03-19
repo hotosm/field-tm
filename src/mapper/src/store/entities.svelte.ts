@@ -91,15 +91,16 @@ function getEntitiesStatusStore() {
 		if (!entitiesStream) return;
 		entitiesShape = new Shape(entitiesStream);
 
+		// use Map for quick lookups
+		const entityMap = new Map(entitiesList.map((entity) => [entity.id, entity.osm_id]));
+
 		entitiesShape.subscribe((entities: ShapeData) => {
 			const rows: entitiesShapeType[] = entities.rows;
-			if (rows && Array.isArray(rows)) {
-				entitiesStatusList = rows?.map((entity) => {
-					return {
-						...entity,
-						osmid: entitiesList?.find((entityx) => entityx.id === entity.entity_id)?.osm_id,
-					};
-				});
+			if (Array.isArray(rows)) {
+				entitiesStatusList = rows.map((entity) => ({
+					...entity,
+					osmid: entityMap.get(entity.entity_id) || null,
+				}));
 			}
 		});
 	}

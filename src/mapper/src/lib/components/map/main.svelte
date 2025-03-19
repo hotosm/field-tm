@@ -37,7 +37,7 @@
 	import RedLockImg from '$assets/images/red-lock.png';
 	import Arrow from '$assets/images/arrow.png';
 
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 	import Legend from '$lib/components/map/legend.svelte';
 	import LayerSwitcher from '$lib/components/map/layer-switcher.svelte';
 	import Geolocation from '$lib/components/map/geolocation.svelte';
@@ -93,6 +93,11 @@
 	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
 	let selectedStyleUrl: string | undefined = $state(undefined);
 
+	// use Map for quick lookups
+	let entityMapByEntity = $derived(
+		new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.entity_id, entity])),
+	);
+	let entityMapByOsm = $derived(new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.osmid, entity])));
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
 		projectBasemapStore.projectPmtilesUrl
@@ -306,9 +311,7 @@
 			return {
 				...geojsonData,
 				features: geojsonData.features.map((feature) => {
-					const entity = entitiesStore.entitiesStatusList.find(
-						(entity) => entity.entity_id === feature?.properties?.entity_id,
-					);
+					const entity = entityMapByEntity.get(feature?.properties?.entity_id);
 					return {
 						...feature,
 						properties: {
@@ -323,9 +326,7 @@
 			return {
 				...geojsonData,
 				features: geojsonData.features.map((feature) => {
-					const entity = entitiesStore.entitiesStatusList.find(
-						(entity) => entity.osmid === feature?.properties?.osm_id,
-					);
+					const entity = entityMapByOsm.get(feature?.properties?.osm_id);
 					return {
 						...feature,
 						properties: {
@@ -547,7 +548,7 @@
 		extractGeomCols={true}
 		promoteId="id"
 		processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData, '')}
-		geojsonUpdateDependency={entitiesStore.entitiesStatusList}
+		geojsonUpdateDependency={[entityMapByEntity, entityMapByOsm]}
 	>
 		{#if primaryGeomType === MapGeomTypes.POLYGON}
 			<FillLayer
