@@ -16,7 +16,7 @@
 		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
 		projectData: ProjectData;
-		webFormsDrawerRef: SlDrawer | undefined;
+		displayWebFormsDrawer: Boolean;
 	};
 
 	function getStatusStyle(status: statusType) {
@@ -34,7 +34,13 @@
 		}
 	}
 
-	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, webFormsDrawerRef }: Props = $props();
+	let {
+		isTaskActionModalOpen,
+		toggleTaskActionModal,
+		selectedTab,
+		projectData,
+		displayWebFormsDrawer = $bindable(false),
+	}: Props = $props();
 
 	const entitiesStore = getEntitiesStatusStore();
 	const alertStore = getAlertStore();
@@ -280,12 +286,12 @@
 								class="primary flex-grow"
 								onclick={() => {
 									toggleTaskActionModal(false);
-									webFormsDrawerRef?.show();
+									displayWebFormsDrawer = true;
 								}}
 								onkeydown={(e: KeyboardEvent) => {
 									if (e.key === 'Enter') {
 										toggleTaskActionModal(false);
-										webFormsDrawerRef?.show();
+										displayWebFormsDrawer = true;
 									}
 								}}
 								role="button"
