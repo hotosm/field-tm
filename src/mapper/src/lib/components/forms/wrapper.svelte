@@ -5,13 +5,14 @@
 
 	const API_URL = import.meta.env.VITE_API_URL;
 	type Props = {
-		drawerRef: SlDrawer | undefined;
+		display: Boolean;
 		entityId: string | undefined;
 		projectId: number | undefined;
 		webFormsRef: HTMLElement | undefined;
 	};
 	const commonStore = getCommonStore();
-	let { drawerRef = $bindable(undefined), entityId, webFormsRef = $bindable(undefined), projectId }: Props = $props();
+	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId }: Props = $props();
+	let drawerRef: SlDrawer;
 	let iframeRef: HTMLIFrameElement;
 	let odkForm: any;
 	// to-do: hide drawer upon successful submission
@@ -25,7 +26,7 @@
 				method: 'POST',
 				body: data,
 			});
-			drawerRef?.hide();
+			display = false;
 		})();
 	}
 	function handleOdkForm(evt: any) {
@@ -63,7 +64,7 @@
 		entityId;
 		if (iframeRef) {
 			const intervalId = setInterval(() => {
-				webFormsRef = iframeRef.contentDocument?.querySelector('odk-web-form') || undefined;
+				webFormsRef = iframeRef?.contentDocument?.querySelector('odk-web-form') || undefined;
 				if (webFormsRef) {
 					clearInterval(intervalId);
 					webFormsRef.addEventListener('submit', handleSubmit);
@@ -76,12 +77,22 @@
 			};
 		}
 	});
+	$effect(() => {
+		if (drawerRef) {
+			drawerRef.addEventListener('sl-hide', function () {
+				if (display) {
+					display = false;
+				}
+			});
+		}
+	});
 </script>
 
 <hot-drawer
 	id="odk-web-forms-drawer"
 	bind:this={drawerRef}
 	contained
+	open={display}
 	placement="start"
 	class="drawer-contained drawer-placement-start drawer-overview"
 	style="--size: 100vw; --header-spacing: 0px"

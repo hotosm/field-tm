@@ -10,7 +10,7 @@
 	import type SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 	import ImportQrGif from '$assets/images/importQr.gif';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
@@ -35,8 +35,8 @@
 
 	let { data }: Props = $props();
 
-	let odkWebFormsWrapperRef: SlDrawer | undefined = $state();
 	let webFormsRef: HTMLElement | undefined = $state();
+	let displayWebFormsDrawer = $state(false);
 
 	let maplibreMap: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
@@ -290,7 +290,7 @@
 		}}
 		selectedTab={commonStore.selectedTab}
 		projectData={data?.project}
-		webFormsDrawerRef={odkWebFormsWrapperRef}
+		bind:displayWebFormsDrawer
 	/>
 	{#if commonStore.selectedTab !== 'map'}
 		<BottomSheet onClose={() => tabGroup.show('map')}>
@@ -344,40 +344,42 @@
 		</hot-dialog>
 	{/if}
 
-	<sl-tab-group
-		class="z-9999 fixed bottom-0 left-0 right-0"
-		placement="bottom"
-		no-scroll-controls
-		onsl-tab-show={(e: CustomEvent<{ name: string }>) => {
-			commonStore.setSelectedTab(e.detail.name);
-			if (
-				e.detail.name !== 'qrcode' &&
-				+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load']
-			) {
-				localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['task_selection'].toString());
-				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['task_selection']);
-			}
-		}}
-		style="--panel-display: none"
-		bind:this={tabGroup}
-	>
-		<sl-tab slot="nav" panel="map">
-			<hot-icon name="map" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
-		</sl-tab>
-		<sl-tab slot="nav" panel="offline">
-			<hot-icon name="wifi-off" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
-		</sl-tab>
-		<sl-tab slot="nav" panel="qrcode">
-			<hot-icon name="qr-code" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
-		</sl-tab>
-		<sl-tab slot="nav" panel="events">
-			<hot-icon name="three-dots" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
-		</sl-tab>
-	</sl-tab-group>
+	{#if displayWebFormsDrawer === false}
+		<sl-tab-group
+			class={'z-9999 fixed bottom-0 left-0 right-0'}
+			placement="bottom"
+			no-scroll-controls
+			onsl-tab-show={(e: CustomEvent<{ name: string }>) => {
+				commonStore.setSelectedTab(e.detail.name);
+				if (
+					e.detail.name !== 'qrcode' &&
+					+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load']
+				) {
+					localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['task_selection'].toString());
+					projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['task_selection']);
+				}
+			}}
+			style="--panel-display: none"
+			bind:this={tabGroup}
+		>
+			<sl-tab slot="nav" panel="map">
+				<hot-icon name="map" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
+			</sl-tab>
+			<sl-tab slot="nav" panel="offline">
+				<hot-icon name="wifi-off" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
+			</sl-tab>
+			<sl-tab slot="nav" panel="qrcode">
+				<hot-icon name="qr-code" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
+			</sl-tab>
+			<sl-tab slot="nav" panel="events">
+				<hot-icon name="three-dots" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
+			</sl-tab>
+		</sl-tab-group>
+	{/if}
 
 	<OdkWebFormsWrapper
-		bind:drawerRef={odkWebFormsWrapperRef}
 		bind:webFormsRef
+		bind:display={displayWebFormsDrawer}
 		projectId={data?.projectId}
 		entityId={selectedEntityId}
 	/>
