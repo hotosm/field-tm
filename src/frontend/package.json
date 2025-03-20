@@ -95,6 +95,7 @@
     "react-lazy-load-image-component": "^1.6.2",
     "react-loading-skeleton": "^3.4.0",
     "react-redux": "^9.1.2",
+    "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^6.25.1",
     "react-spinners": "^0.14.1",
     "recharts": "^2.13.0-alpha.4",

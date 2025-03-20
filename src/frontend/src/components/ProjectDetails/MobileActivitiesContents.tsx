@@ -1,5 +1,5 @@
 import React from 'react';
-import ActivitiesPanel from '@/components/ProjectDetails/ActivitiesPanel';
+import TaskActivity from '@/components/ProjectDetails/Tabs/TaskActivity';
 import CoreModules from '@/shared/CoreModules';
 import { useAppSelector } from '@/types/reduxTypes';
 
@@ -14,7 +14,7 @@ const MobileActivitiesContents = ({ map }: mobileActivitiesContentsType) => {
 
   return (
     <div className="fmtm-w-full fmtm-bg-white fmtm-mb-[10vh]">
-      <ActivitiesPanel params={params} state={state.projectTaskBoundries} defaultTheme={defaultTheme} map={map} />
+      <TaskActivity params={params} state={state.projectTaskBoundries} defaultTheme={defaultTheme} map={map} />
     </div>
   );
 };

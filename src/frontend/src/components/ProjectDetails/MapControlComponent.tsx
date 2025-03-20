@@ -4,12 +4,15 @@ import AssetModules from '@/shared/AssetModules';
 import VectorLayer from 'ol/layer/Vector';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { useLocation } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetails/ProjectOptions';
-import useOutsideClick from '@/hooks/useOutsideClick';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { Tooltip } from '@mui/material';
-import MapLegends from '@/components/MapLegends';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+} from '@/components/common/Dropdown';
 
 type mapControlComponentType = {
   map: any;
@@ -20,33 +23,30 @@ type mapControlComponentType = {
 const btnList = [
   {
     id: 'add',
-    icon: <AssetModules.AddIcon />,
+    icon: <AssetModules.AddIcon className="!fmtm-text-[1rem]" />,
     title: 'Zoom In',
   },
   {
     id: 'minus',
-    icon: <AssetModules.RemoveIcon />,
+    icon: <AssetModules.RemoveIcon className="!fmtm-text-[1rem]" />,
     title: 'Zoom Out',
   },
   {
     id: 'currentLocation',
-    icon: <AssetModules.MyLocationIcon />,
+    icon: <AssetModules.MyLocationIcon className="!fmtm-text-[1rem]" />,
     title: 'My Location',
   },
   {
     id: 'taskBoundries',
-    icon: <AssetModules.CropFreeIcon />,
+    icon: <AssetModules.CropFreeIcon className="!fmtm-text-[1rem]" />,
     title: 'Zoom to Project',
   },
 ];
 
 const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlComponentType) => {
-  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
-  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
-  const [divRef, toggle, handleToggle] = useOutsideClick();
 
   const handleOnClick = (btnId) => {
     const actualZoom = map.getView().getZoom();
@@ -75,42 +75,38 @@ const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlCom
   };
 
   return (
-    <div className="fmtm-absolute fmtm-top-4  fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
+    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
+      <LayerSwitchMenu map={map} pmTileLayerUrl={pmTileLayerUrl} />
       {btnList.map((btn) => (
-        <Tooltip title={btn.title} placement="left" key={btn.title}>
+        <Tooltip title={btn.title} placement="left" arrow key={btn.title}>
           <div
-            className={`fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center ${
+            className={`fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-6 fmtm-h-6 fmtm-min-h-6 fmtm-min-w-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-t fmtm-border-blue-light ${
               geolocationStatus && btn.id === 'currentLocation' ? 'fmtm-text-primaryRed' : ''
             }`}
             onClick={() => handleOnClick(btn.id)}
           >
-            <div>{btn.icon}</div>
+            {btn.icon}
           </div>
         </Tooltip>
       ))}
-      <LayerSwitchMenu map={map} pmTileLayerUrl={pmTileLayerUrl} />
-      {/* download options */}
-      <div
-        className={`fmtm-relative ${!pathname.includes('project/') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}
-        ref={divRef}
-      >
-        <div
-          onClick={() => handleToggle()}
-          className="fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center"
-        >
-          <AssetModules.FileDownloadIcon />
-        </div>
-        <div
-          className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-white fmtm-p-2 fmtm-rounded-md ${
-            toggle
-              ? 'fmtm-right-[3rem] fmtm-top-0 md:fmtm-top-0 sm:fmtm-hidden'
-              : '-fmtm-right-[60rem] fmtm-top-0 sm:fmtm-hidden'
-          }`}
-        >
-          <ProjectOptions projectName={projectName} />
-        </div>
-      </div>
-      <MapLegends defaultTheme={defaultTheme} />
+      {/* download options (mobile screens) */}
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger className="fmtm-outline-none fmtm-border-t fmtm-border-blue-light fmtm-bg-white md:fmtm-hidden">
+          <Tooltip title="Base Maps" placement="left" arrow>
+            <AssetModules.FileDownloadIcon className="!fmtm-text-[1rem]" />
+          </Tooltip>
+        </DropdownMenuTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            className="fmtm-border-none fmtm-z-50 fmtm-bg-white"
+            align="end"
+            alignOffset={200}
+            sideOffset={-25}
+          >
+            <ProjectOptions projectName={projectName} />
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenu>
     </div>
   );
 };

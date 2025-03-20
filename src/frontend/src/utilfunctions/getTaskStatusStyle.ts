@@ -64,11 +64,11 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
   const borderStrokeColor = isTaskStatusLocked && taskLockedByUser ? secondaryStrokeColor : strokeColor;
 
   const lockedPolygonStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_mapping,
+    mapTheme.palette.mapFeatureColors.LOCKED_FOR_MAPPING,
     borderStrokeColor,
   );
   const lockedValidationStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_validation,
+    mapTheme.palette.mapFeatureColors.LOCKED_FOR_VALIDATION,
     borderStrokeColor,
   );
   const iconStyle = createIconStyle(AssetModules.LockPng);
@@ -81,7 +81,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.ready,
+        color: mapTheme.palette.mapFeatureColors.UNLOCKED_TO_MAP,
       }),
     }),
     LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
@@ -91,7 +91,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.mapped,
+        color: mapTheme.palette.mapFeatureColors.UNLOCKED_TO_VALIDATE,
       }),
     }),
     LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
@@ -101,7 +101,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.validated,
+        color: mapTheme.palette.mapFeatureColors.UNLOCKED_DONE,
       }),
     }),
   };

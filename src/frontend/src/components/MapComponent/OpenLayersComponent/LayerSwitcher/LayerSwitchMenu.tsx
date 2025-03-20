@@ -32,13 +32,13 @@ const LayerCard = ({ layer, changeBaseLayerHandler, active }: layerCardPropType)
     >
       {layer === 'None' ? (
         <div
-          className={`fmtm-w-[3.5rem] fmtm-duration-200 fmtm-h-[3.5rem] fmtm-rounded-md group-hover/layer:fmtm-border-primaryRed fmtm-border-[2px] ${
+          className={`fmtm-w-[3rem] fmtm-duration-200 fmtm-h-[3rem] fmtm-rounded-md group-hover/layer:fmtm-border-primaryRed fmtm-border-[2px] ${
             active ? '!fmtm-border-primaryRed' : 'fmtm-border-grey-100'
           }`}
         ></div>
       ) : (
         <img
-          className={`group-hover/layer:fmtm-border-primaryRed fmtm-w-[3.5rem] fmtm-h-[3.5rem] fmtm-border-[2px] fmtm-bg-contain fmtm-rounded-md ${
+          className={`group-hover/layer:fmtm-border-primaryRed fmtm-w-[3rem] fmtm-h-[3rem] fmtm-border-[2px] fmtm-bg-contain fmtm-rounded-md ${
             active ? '!fmtm-border-primaryRed fmtm-duration-200' : 'fmtm-border-grey-100'
           }`}
           src={layerIcons[layer] ? layerIcons[layer] : satelliteImg}
@@ -46,7 +46,7 @@ const LayerCard = ({ layer, changeBaseLayerHandler, active }: layerCardPropType)
         />
       )}
       <p
-        className={`fmtm-text-sm fmtm-flex fmtm-justify-center group-hover/layer:fmtm-text-primaryRed fmtm-duration-200 ${
+        className={`fmtm-body-sm fmtm-flex fmtm-justify-center group-hover/layer:fmtm-text-primaryRed fmtm-duration-200 ${
           active ? 'fmtm-text-primaryRed' : ''
         }`}
       >
@@ -117,16 +117,16 @@ const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayer
   };
 
   return (
-    <div>
+    <div className="fmtm-w-6 fmtm-h-6 fmtm-max-w-6 fmtm-max-h-6">
       <DropdownMenu modal={false} onOpenChange={(status) => setIsLayerMenuOpen(status)}>
         <DropdownMenuTrigger className="fmtm-outline-none">
-          <Tooltip title="Base Maps" placement={isLayerMenuOpen ? 'bottom' : 'left'}>
+          <Tooltip title="Base Maps" placement={isLayerMenuOpen ? 'bottom' : 'left'} arrow>
             <div
               style={{
                 backgroundImage: activeLayer === 'None' ? 'none' : `url(${layerIcons[activeLayer] || satelliteImg})`,
                 backgroundColor: 'white',
               }}
-              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-9 fmtm-h-9 fmtm-border-[1px] fmtm-border-primaryRed hover:fmtm-border-[2px] fmtm-duration-75 fmtm-cursor-pointer fmtm-bg-contain fmtm-rounded-full ${
+              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-6 fmtm-h-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-cursor-pointer fmtm-bg-contain ${
                 activeLayer === 'None' ? '!fmtm-border-primaryRed' : ''
               }`}
             ></div>
@@ -141,7 +141,7 @@ const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayer
           >
             <div className="fmtm-bg-white  fmtm-max-h-[20rem] fmtm-overflow-y-scroll scrollbar fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-pt-1 fmtm-rounded-lg fmtm-p-3">
               <div>
-                <h6 className="fmtm-text-base fmtm-mb-2">Base Maps</h6>
+                <h6 className="fmtm-body-sm-semibold fmtm-mb-2">Base Maps</h6>
                 <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-4">
                   {baseLayers.map((layer) => (
                     <LayerCard
@@ -155,7 +155,7 @@ const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayer
               </div>
               {hasPMTile && (
                 <div>
-                  <h6 className="fmtm-text-base fmtm-mb-1">Tiles</h6>
+                  <h6 className="fmtm-body-sm-semibold fmtm-mb-1">Tiles</h6>
                   <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-y-2">
                     <LayerCard
                       key="Custom"

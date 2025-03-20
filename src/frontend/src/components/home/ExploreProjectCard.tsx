@@ -1,20 +1,15 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/types/reduxTypes';
 import CustomizedImage from '@/utilities/CustomizedImage';
 import CustomizedProgressBar from '@/utilities/CustomizedProgressBar';
-import { HomeActions } from '@/store/slices/HomeSlice';
 import { projectType } from '@/models/home/homeModel';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
 export default function ExploreProjectCard({ data }: { data: projectType }) {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const handleProjectCardClick = () => {
-    const project: projectType = data;
-    dispatch(HomeActions.SetSelectedProject(project));
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       // Redirect to mapper frontend on mobile
