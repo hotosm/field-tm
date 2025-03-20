@@ -14,6 +14,7 @@ interface ISearchbarProps {
   onBlur?: () => void;
   required?: boolean;
   wrapperStyle?: string;
+  type?: 'text' | 'number';
 }
 
 export default function Searchbar({
@@ -27,6 +28,7 @@ export default function Searchbar({
   onBlur,
   wrapperStyle,
   required = true, // in default required is true
+  type = 'text',
 }: ISearchbarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const handleClearSearch = () => {
@@ -60,7 +62,7 @@ export default function Searchbar({
 
         <input
           ref={inputRef}
-          type="text"
+          type={type}
           className={`fmtm-block fmtm-w-full fmtm-rounded-lg fmtm-border  fmtm-border-grey-300
             fmtm-pl-[35px] fmtm-pr-[28px] fmtm-text-base fmtm-font-normal 
             fmtm-text-gray-500 placeholder:fmtm-font-normal placeholder:fmtm-text-gray-500 fmtm-outline-none ${

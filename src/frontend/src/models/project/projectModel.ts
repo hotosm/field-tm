@@ -61,6 +61,7 @@ export type projectInfoType = {
   bbox: [number, number, number, number];
   last_active: string;
   num_contributors: number | null;
+  instructions: string;
 };
 
 export type taskType = {
@@ -77,6 +78,7 @@ export type taskType = {
 export type outlineType = {
   type: string;
   coordinates: number[][][];
+  properties: Record<string, any>;
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };

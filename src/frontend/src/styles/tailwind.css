@@ -69,18 +69,18 @@
     }
 
     .scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 3px;
+      height: 3px;
     }
     .scrollbar::-webkit-scrollbar-track {
       border-radius: 100vh;
       background: transparent;
-      margin-block: 6px;
+      margin-block: 3px;
     }
     .scrollbar::-webkit-scrollbar-thumb {
       background: #bdbdbd;
       border-radius: 100vh;
-      padding-inline: 4px;
+      padding-inline: 2px;
     }
     .scrollbar::-webkit-scrollbar-thumb:hover {
       background: #bdbdbd;

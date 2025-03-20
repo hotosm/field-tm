@@ -43,11 +43,11 @@ export default function MapStyles() {
   useEffect(() => {
     // Example usage:
     const lockedPolygonStyle = createPolygonStyle(
-      mapTheme.palette.mapFeatureColors.locked_for_mapping,
+      mapTheme.palette.mapFeatureColors.LOCKED_FOR_MAPPING,
       secondaryStrokeColor,
     );
     const lockedValidationStyle = createPolygonStyle(
-      mapTheme.palette.mapFeatureColors.locked_for_validation,
+      mapTheme.palette.mapFeatureColors.LOCKED_FOR_VALIDATION,
       secondaryStrokeColor,
     );
     const iconStyle = createIconStyle(AssetModules.LockPng);
@@ -60,7 +60,7 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.ready,
+          color: mapTheme.palette.mapFeatureColors.UNLOCKED_TO_MAP,
         }),
       }),
       LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
@@ -70,7 +70,7 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.mapped,
+          color: mapTheme.palette.mapFeatureColors.UNLOCKED_TO_VALIDATE,
         }),
       }),
       LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
@@ -80,7 +80,7 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.validated,
+          color: mapTheme.palette.mapFeatureColors.UNLOCKED_DONE,
         }),
       }),
     };

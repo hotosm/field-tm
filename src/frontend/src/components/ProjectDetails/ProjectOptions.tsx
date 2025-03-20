@@ -79,11 +79,11 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
   };
 
   return (
-    <div className="fmtm-flex fmtm-gap-2 fmtm-flex-col lg:fmtm-flex-row">
+    <div className="fmtm-flex fmtm-gap-2 fmtm-flex-col">
       {downloadButtonList.map((btn) => (
         <Button
           key={btn.downloadType}
-          variant="secondary-red"
+          variant="secondary-grey"
           onClick={() => handleDownload(btn.downloadType)}
           isLoading={btn.isLoading}
         >
