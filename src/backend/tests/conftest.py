@@ -295,7 +295,7 @@ async def odk_project(db, client, project, tasks):
     with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
         data_extracts = json.dumps(json.load(f))
     log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_s3_path = await project_crud.upload_custom_geojson_extract(
+    data_extract_s3_path = await project_crud.upload_geojson_data_extract(
         db,
         project.id,
         data_extracts,
