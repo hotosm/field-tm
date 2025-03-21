@@ -270,13 +270,13 @@ async def test_create_odk_project():
 async def test_upload_data_extracts(client, project):
     """Test uploading data extracts in GeoJSON and flatgeobuf formats."""
     geojson_file = {
-        "custom_extract_file": (
+        "data_extract_file": (
             "file.geojson",
             open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb"),
         )
     }
     response = await client.post(
-        f"/projects/upload-custom-extract?project_id={project.id}",
+        f"/projects/upload-data-extract?project_id={project.id}",
         files=geojson_file,
     )
 
@@ -328,7 +328,7 @@ async def test_generate_project_files(db, client, project):
     with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
         data_extracts = json.dumps(json.load(f))
     log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_s3_path = await project_crud.upload_custom_geojson_extract(
+    data_extract_s3_path = await project_crud.upload_geojson_data_extract(
         db,
         project_id,
         data_extracts,

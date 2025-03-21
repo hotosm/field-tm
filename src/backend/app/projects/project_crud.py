@@ -141,7 +141,7 @@ async def generate_data_extract(
 
     Returns:
         str:
-            URL for the flatgeobuf data extract.
+            URL for the geojson data extract.
     """
     if not extract_config:
         raise HTTPException(
@@ -156,7 +156,7 @@ async def generate_data_extract(
         if settings.RAW_DATA_API_AUTH_TOKEN
         else None,
     )
-    fgb_url = pg.execQuery(
+    geojson_url = pg.execQuery(
         aoi,
         extra_params={
             "fileName": (
@@ -164,14 +164,13 @@ async def generate_data_extract(
                 if settings.RAW_DATA_API_AUTH_TOKEN
                 else "fmtm_extract"
             ),
-            "outputType": "fgb",
+            "outputType": "geojson",
             "bind_zip": False,
             "useStWithin": False,
-            "fgb_wrap_geoms": True,
         },
     )
 
-    if not fgb_url:
+    if not geojson_url:
         msg = "Could not get download URL for data extract. Did the API change?"
         log.error(msg)
         raise HTTPException(
@@ -179,7 +178,7 @@ async def generate_data_extract(
             detail=msg,
         )
 
-    return fgb_url
+    return geojson_url
 
 
 # ---------------------------
@@ -288,7 +287,7 @@ async def get_or_set_data_extract_url(
     return url
 
 
-async def upload_custom_extract_to_s3(
+async def upload_data_extract_to_s3(
     db: Connection,
     project_id: int,
     fgb_content: bytes,
@@ -307,7 +306,7 @@ async def upload_custom_extract_to_s3(
     log.debug(f"Uploading custom data extract for project ({project.id})")
 
     fgb_obj = BytesIO(fgb_content)
-    s3_fgb_path = f"{project.organisation_id}/{project_id}/custom_extract.fgb"
+    s3_fgb_path = f"{project.organisation_id}/{project_id}/data_extract.fgb"
 
     log.debug(f"Uploading fgb to S3 path: /{s3_fgb_path}")
     add_obj_to_bucket(
@@ -333,7 +332,7 @@ async def upload_custom_extract_to_s3(
     return s3_fgb_full_url
 
 
-async def upload_custom_geojson_extract(
+async def upload_geojson_data_extract(
     db: Connection,
     project_id: int,
     geojson_raw: Union[str, bytes],
@@ -343,13 +342,13 @@ async def upload_custom_geojson_extract(
     Args:
         db (Connection): The database connection.
         project_id (int): The ID of the project.
-        geojson_raw (str): The custom data extracts contents.
+        geojson_raw (str): The data extracts contents.
 
     Returns:
         str: URL to fgb file in S3.
     """
     project = await project_deps.get_project_by_id(db, project_id)
-    log.debug(f"Uploading custom data extract for project ({project.id})")
+    log.debug(f"Uploading data extract for project ({project.id})")
 
     featcol = parse_geojson_file_to_featcol(geojson_raw)
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
@@ -373,7 +372,7 @@ async def upload_custom_geojson_extract(
         log.error(msg)
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
-    return await upload_custom_extract_to_s3(
+    return await upload_data_extract_to_s3(
         db,
         project_id,
         fgb_data,
