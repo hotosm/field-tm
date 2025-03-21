@@ -133,23 +133,19 @@ const DataExtract = ({
     try {
       const response = await axios.post(`${VITE_API_URL}/projects/generate-data-extract`, dataExtractRequestFormData);
 
-      const fgbUrl = response.data.url;
+      const dataExtractGeojsonUrl = response.data.url;
       // Append url to project data & remove custom files
       dispatch(
         CreateProjectActions.SetIndividualProjectDetailsData({
           ...formValues,
-          data_extract_url: fgbUrl,
           dataExtractType: extractType,
           customDataExtractUpload: null,
         }),
       );
 
       // Extract fgb and set geojson to map
-      const fgbFile = await fetch(fgbUrl);
-      const binaryData = await fgbFile.arrayBuffer();
-      const uint8ArrayData = new Uint8Array(binaryData);
-      // Deserialize the binary data
-      const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
+      const geojsonExtractFile = await fetch(dataExtractGeojsonUrl);
+      const geojsonExtract = await geojsonExtractFile.json();
       if ((geojsonExtract && (geojsonExtract as dataExtractGeojsonType))?.features?.length > 0) {
         dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
         await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
