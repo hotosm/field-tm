@@ -164,8 +164,16 @@ async def get_submission_by_project(
         ValueError: If the submission file cannot be found.
 
     """
+    hashtags = project.hashtags
     xform = get_odk_form(project.odk_credentials)
-    return xform.listSubmissions(project.odkid, project.odk_form_id, filters)
+    data = xform.listSubmissions(project.odkid, project.odk_form_id, filters)
+
+    def add_hashtags(item):
+        item["hashtags"] = hashtags
+        return item
+
+    data["value"] = list(map(add_hashtags, data["value"]))
+    return data
 
 
 async def get_submission_detail(
