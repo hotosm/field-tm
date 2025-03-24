@@ -720,11 +720,11 @@ class DbOrganisationManagers(BaseModel):
                 FROM organisation_managers AS om
                 INNER JOIN users AS u
                     ON u.id = om.user_id
-                WHERE om.organisation_id = %(org_id)s;
+                WHERE om.organisation_id = %(org_id)s
             """
             params = {"org_id": org_id}
             if user_id:
-                sql += " AND user_id = %(user_id)s"
+                sql += " AND om.user_id = %(user_id)s"
                 params["user_id"] = user_id
             sql += ";"
             await cur.execute(sql, params)
