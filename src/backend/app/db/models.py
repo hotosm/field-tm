@@ -1290,11 +1290,10 @@ class DbProject(BaseModel):
     ] = None
     total_tasks: Optional[int] = None
     num_contributors: Optional[int] = None
-    # FIXME we could add the following to the project summary cards
-    # Also required uncommenting of the ProjectSummary fields
-    # tasks_mapped: Optional[int] = 0
-    # tasks_validated: Optional[int] = 0
-    # tasks_bad: Optional[int] = 0
+    total_submissions: Optional[int] = 0
+    tasks_mapped: Optional[int] = 0
+    tasks_validated: Optional[int] = 0
+    tasks_bad: Optional[int] = 0
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1478,38 +1477,81 @@ class DbProject(BaseModel):
         db: Connection,
         skip: Optional[int] = None,
         limit: Optional[int] = None,
+        org_id: Optional[int] = None,
         user_id: Optional[int] = None,
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
-        filters = []
-        params = {"offset": skip, "limit": limit} if skip and limit else {}
+        filters_map = {
+            "organisation_id = %(org_id)s": org_id,
+            "author_id = %(user_id)s": user_id,  # project author
+            "hashtags && %(hashtags)s": hashtags,
+            # search term (project name using ILIKE for case-insensitive match)
+            "p.slug ILIKE %(search)s": f"%{search}%" if search else None,
+        }
 
-        # Filter by user_id (project author)
-        if user_id:
-            filters.append("author_id = %(user_id)s")
-            params["user_id"] = user_id
-
-        # Filter by hashtags
-        if hashtags:
-            filters.append("hashtags && %(hashtags)s")
-            params["hashtags"] = hashtags
-
-        # Filter by search term (project name using ILIKE for case-insensitive match)
-        if search:
-            filters.append("p.slug ILIKE %(search)s")
-            params["search"] = f"%{search}%"
+        # Build filters and params dynamically
+        filters = [condition for condition, value in filters_map.items() if value]
+        params = {
+            key: value
+            for key, value in {
+                "offset": skip,
+                "limit": limit,
+                "org_id": org_id,
+                "user_id": user_id,
+                "hashtags": hashtags,
+                "search": f"%{search}%" if search else None,
+            }.items()
+            if value
+        }
 
         # Base query with optional filtering
         sql = f"""
+            -- get latest task status
+            WITH latest_task_events AS (
+                SELECT
+                    ev.event_id,
+                    ev.task_id,
+                    ev.event,
+                    ev.user_id,
+                    ev.project_id
+                FROM (
+                    SELECT
+                        ev.*,
+                        ROW_NUMBER() OVER
+                        (
+                        PARTITION BY ev.task_id ORDER BY ev.created_at DESC
+                        ) AS rn
+                    FROM task_events ev
+                ) ev
+                WHERE ev.rn = 1
+            )
+
             SELECT
                 p.*,
                 ST_AsGeoJSON(p.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
                 project_org.logo as organisation_logo,
                 COUNT(t.id) AS total_tasks,
-                COUNT(DISTINCT task_events.user_id) AS num_contributors
+                COUNT(DISTINCT ev.user_id) AS num_contributors,
+                COUNT(
+                    DISTINCT CASE WHEN et.status = 'SURVEY_SUBMITTED'
+                    THEN et.entity_id END
+                ) as total_submissions,
+                COUNT(
+                    DISTINCT CASE WHEN ev.event = 'FINISH'
+                    THEN ev.event_id END
+                ) as tasks_mapped,
+                COUNT(
+                    DISTINCT CASE WHEN ev.event = 'BAD'
+                    THEN ev.event_id END
+                ) as tasks_bad,
+                COUNT(
+                    DISTINCT CASE WHEN ev.event = 'GOOD'
+                    THEN ev.event_id END
+                ) as tasks_validated
+
             FROM
                 projects p
             LEFT JOIN
@@ -1517,7 +1559,9 @@ class DbProject(BaseModel):
             LEFT JOIN
                 tasks t ON p.id = t.project_id
             LEFT JOIN
-                task_events ON p.id = task_events.project_id
+                latest_task_events ev ON p.id = ev.project_id
+            LEFT JOIN
+                odk_entities et on p.id = et.project_id
             {"WHERE " + " AND ".join(filters) if filters else ""}
             GROUP BY
                 p.id, project_org.id
