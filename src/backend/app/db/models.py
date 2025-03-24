@@ -665,6 +665,10 @@ class DbOrganisationManagers(BaseModel):
     organisation_id: int
     user_id: int
 
+    # calculated
+    username: Optional[str] = ""
+    profile_img: Optional[str] = ""
+
     @classmethod
     async def create(
         cls,
@@ -708,8 +712,14 @@ class DbOrganisationManagers(BaseModel):
         """Get organisation manager by organisation and user ID."""
         async with db.cursor(row_factory=class_row(cls)) as cur:
             sql = """
-                SELECT * FROM organisation_managers
-                WHERE organisation_id = %(org_id)s
+                SELECT
+                    om.user_id,
+                    u.username,
+                    u.profile_img
+                FROM organisation_managers AS om
+                INNER JOIN users AS u
+                    ON u.id = om.user_id
+                WHERE om.organisation_id = %(org_id)s;
             """
             params = {"org_id": org_id}
             if user_id:
