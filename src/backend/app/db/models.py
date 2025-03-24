@@ -713,6 +713,7 @@ class DbOrganisationManagers(BaseModel):
         async with db.cursor(row_factory=class_row(cls)) as cur:
             sql = """
                 SELECT
+                    om.organisation_id,
                     om.user_id,
                     u.username,
                     u.profile_img
