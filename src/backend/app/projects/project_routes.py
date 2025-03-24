@@ -148,13 +148,14 @@ async def read_project_summaries(
     db: Annotated[Connection, Depends(db_conn)],
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
+    org_id: Optional[int] = None,
     user_id: Optional[int] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
 ):
     """Get a paginated summary of projects."""
     return await project_crud.get_paginated_projects(
-        db, page, results_per_page, user_id, hashtags, search
+        db, page, results_per_page, org_id, user_id, hashtags, search
     )
 
 
