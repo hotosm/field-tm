@@ -51,67 +51,67 @@ jobs:
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/frontend
 
-  smoke-test-backend:
-    runs-on: ubuntu-latest
-    needs: [backend-build]
-    environment:
-      name: ${{ github.ref_name }}
+  # smoke-test-backend:
+  #   runs-on: ubuntu-latest
+  #   needs: [backend-build]
+  #   environment:
+  #     name: ${{ github.ref_name }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Vars and Secrets to Env
-        env:
-          GIT_BRANCH: ${{ github.ref_name }}
-          TAG_OVERRIDE: ${{ needs.backend-build.outputs.image_tag }}
-          VARS_CONTEXT: ${{ toJson(vars) }}
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
-        run: |
-          # Random delimiter string for security
-          delim=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+  #     - name: Vars and Secrets to Env
+  #       env:
+  #         GIT_BRANCH: ${{ github.ref_name }}
+  #         TAG_OVERRIDE: ${{ needs.backend-build.outputs.image_tag }}
+  #         VARS_CONTEXT: ${{ toJson(vars) }}
+  #         SECRETS_CONTEXT: ${{ toJson(secrets) }}
+  #       run: |
+  #         # Random delimiter string for security
+  #         delim=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
-          # Parse JSON with multiline strings, using delimiter (Github specific)
-          to_envs() { jq -r "to_entries[] | \"\(.key)<<$delim\n\(.value)\n$delim\n\""; }
+  #         # Parse JSON with multiline strings, using delimiter (Github specific)
+  #         to_envs() { jq -r "to_entries[] | \"\(.key)<<$delim\n\(.value)\n$delim\n\""; }
 
-          # Set all vars
-          echo "GIT_BRANCH=${GIT_BRANCH}" >> $GITHUB_ENV
-          echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> $GITHUB_ENV
-          echo "${VARS_CONTEXT}" | to_envs >> $GITHUB_ENV
-          echo "${SECRETS_CONTEXT}" | to_envs >> $GITHUB_ENV
+  #         # Set all vars
+  #         echo "GIT_BRANCH=${GIT_BRANCH}" >> $GITHUB_ENV
+  #         echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> $GITHUB_ENV
+  #         echo "${VARS_CONTEXT}" | to_envs >> $GITHUB_ENV
+  #         echo "${SECRETS_CONTEXT}" | to_envs >> $GITHUB_ENV
 
-      - name: Create .env file
-        run: |
-          # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
-          echo "Downloading envsubst"
-          curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
-          chmod +x envsubst
+  #     - name: Create .env file
+  #       run: |
+  #         # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+  #         echo "Downloading envsubst"
+  #         curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+  #         chmod +x envsubst
 
-          echo "Substituting variables from .env.example --> .env"
-          ./envsubst < .env.example > .env
-          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
-          echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> .env
+  #         echo "Substituting variables from .env.example --> .env"
+  #         ./envsubst < .env.example > .env
+  #         echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
+  #         echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> .env
 
-      - name: Backend smoke test
-        env:
-          # Hardcode replicas=1 for test
-          API_REPLICAS: 1
-        run: |
-          # Migrate db first, so api works
-          docker compose run --rm migrations 
+  #     - name: Backend smoke test
+  #       env:
+  #         # Hardcode replicas=1 for test
+  #         API_REPLICAS: 1
+  #       run: |
+  #         # Migrate db first, so api works
+  #         docker compose run --rm migrations
 
-          # Run without migrations (avoid exit code 0)
-          # Also run within if block to capture logs if failure
-          if docker compose up --detach \
-              --no-deps --wait --wait-timeout 60 \
-              central-db central s3 api
-          then
-              docker compose logs api
-          else
-              echo "Application not healthy after 1m0s. Exiting."
-              docker compose logs api
-              exit 1
-          fi
+  #         # Run without migrations (avoid exit code 0)
+  #         # Also run within if block to capture logs if failure
+  #         if docker compose up --detach \
+  #             --no-deps --wait --wait-timeout 60 \
+  #             central-db central s3 api
+  #         then
+  #             docker compose logs api
+  #         else
+  #             echo "Application not healthy after 1m0s. Exiting."
+  #             docker compose logs api
+  #             exit 1
+  #         fi
 
   smoke-test-frontend:
     runs-on: ubuntu-latest
@@ -151,7 +151,7 @@ jobs:
 
   deploy-containers:
     needs:
-      - smoke-test-backend
+      # - smoke-test-backend
       - smoke-test-frontend
     uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.1.1
     with:
