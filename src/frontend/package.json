@@ -74,6 +74,7 @@
     "@tiptap/pm": "^2.4.0",
     "@tiptap/react": "^2.4.0",
     "@tiptap/starter-kit": "^2.4.0",
+    "@turf/centroid": "^7.2.0",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
