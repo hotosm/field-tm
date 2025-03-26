@@ -1,9 +1,10 @@
 import { Fill, Icon, Stroke, Style } from 'ol/style';
-import { asArray, asString } from 'ol/color';
-import { getCenter } from 'ol/extent';
+import { asArray } from 'ol/color';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
 import { GeoGeomTypesEnum } from '@/types/enums';
+import { centroid } from '@turf/centroid';
+import getFeatureGeojson from '@/components/MapComponent/OpenLayersComponent/helpers/getFeatureGeojson';
 
 function createPolygonStyle(fillColor: string, strokeColor: string) {
   return new Style({
@@ -43,7 +44,8 @@ function createIconStyle(iconSrc: string, scale: number = 0.8, color: any = 'red
       opacity: 1,
     }),
     geometry: function (feature) {
-      const polygonCentroid = getCenter(feature.getGeometry().getExtent());
+      const polygonCoord = getFeatureGeojson(feature, {});
+      const polygonCentroid = centroid(polygonCoord)?.geometry?.coordinates;
       return new Point(polygonCentroid);
     },
   });
