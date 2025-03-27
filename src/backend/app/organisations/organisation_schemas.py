@@ -111,3 +111,11 @@ class OrganisationOut(BaseModel):
     url: Optional[str]
     associated_email: Optional[str]
     odk_central_url: Optional[str]
+
+
+class OrgManagersOut(BaseModel):
+    """Detail of Organisation Managers."""
+
+    user_id: int
+    username: str
+    profile_img: str
