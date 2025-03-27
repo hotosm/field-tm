@@ -45,6 +45,7 @@ from app.organisations.organisation_schemas import (
     OrganisationIn,
     OrganisationOut,
     OrganisationUpdate,
+    OrgManagersOut,
     parse_organisation_input,
 )
 
@@ -183,6 +184,19 @@ async def add_new_organisation_admin(
         org_user_dict.get("org").id,
         user_id,
     )
+
+
+@router.get("/org-admins", response_model=list[OrgManagersOut])
+async def get_organisation_admins(
+    db: Annotated[Connection, Depends(db_conn)],
+    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+):
+    """Get the list of organisation admins."""
+    org_managers = await DbOrganisationManagers.get(
+        db,
+        org_user_dict.get("org").id,
+    )
+    return org_managers
 
 
 @router.get("/{org_id}", response_model=OrganisationOut)

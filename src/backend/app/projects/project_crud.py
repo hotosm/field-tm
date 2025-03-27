@@ -882,6 +882,7 @@ async def get_paginated_projects(
     db: Connection,
     page: int,
     results_per_page: int,
+    org_id: Optional[int] = None,
     user_id: Optional[int] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
@@ -892,7 +893,7 @@ async def get_paginated_projects(
 
     # Get subset of projects
     projects = await DbProject.all(
-        db, user_id=user_id, hashtags=hashtags, search=search
+        db, org_id=org_id, user_id=user_id, hashtags=hashtags, search=search
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
