@@ -70,7 +70,7 @@ async def get_api_key(
     NOTE currently requires super admin permission.
     """
     try:
-        api_token = await generate_api_token(db, current_user.id)
+        api_token = await generate_api_token(db, current_user.sub)
     except ValueError as e:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,

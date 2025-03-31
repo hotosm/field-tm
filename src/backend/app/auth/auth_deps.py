@@ -238,12 +238,22 @@ async def refresh_cookies(
     response_plus_cookies = set_cookies(response, new_access_token, new_refresh_token)
 
     # Invalidate any temp cookies from mapper frontend
-    for cookie_name in [
+    temp_cookie_names = [
         f"{settings.cookie_name}_temp",
         f"{settings.cookie_name}_temp_refresh",
-    ]:
+    ]
+
+    response_plus_cookies = await expire_cookies(
+        response_plus_cookies, temp_cookie_names
+    )
+    return response_plus_cookies
+
+
+async def expire_cookies(response: Response, cookie_names: list[str]) -> Response:
+    """Expire cookies by setting max_age to 0."""
+    for cookie_name in cookie_names:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
-        response_plus_cookies.set_cookie(
+        response.set_cookie(
             key=cookie_name,
             value="",
             max_age=0,  # Set to expire immediately
@@ -254,8 +264,7 @@ async def refresh_cookies(
             httponly=True,
             samesite="lax",
         )
-
-    return response_plus_cookies
+    return response
 
 
 ### Endpoint Dependencies ###
@@ -266,7 +275,7 @@ async def login_required(
 ) -> AuthUser:
     """Dependency for endpoints requiring login."""
     if settings.DEBUG:
-        return AuthUser(sub="fmtm|1", username="localadmin", role=UserRole.ADMIN)
+        return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
 
     # Extract access token only from the FMTM cookie
     extracted_token = access_token or get_cookie_value(
@@ -281,7 +290,7 @@ async def mapper_login_required(
 ) -> AuthUser:
     """Dependency for mapper frontend login."""
     if settings.DEBUG:
-        return AuthUser(sub="fmtm|1", username="localadmin", role=UserRole.ADMIN)
+        return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
 
     # Extract access token from FMTM cookie, fallback to temp auth cookie
     extracted_token = access_token or get_cookie_value(
@@ -292,13 +301,12 @@ async def mapper_login_required(
 
     # Verify login and continue
     if extracted_token:
-        print("mapper")
         return await _authenticate_user(extracted_token)
 
     # Else user has no token, so we provide login data automatically
     username = "svcfmtm"
     temp_user = {
-        "sub": "fmtm|20386219",
+        "sub": "osm|20386219",
         "username": username,
         "role": UserRole.MAPPER,
     }

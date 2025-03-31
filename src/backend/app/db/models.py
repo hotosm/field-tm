@@ -102,7 +102,7 @@ def dump_and_check_model(db_model: BaseModel):
 class DbUserRole(BaseModel):
     """Table user_roles."""
 
-    user_id: int
+    user_sub: str
     project_id: int
     role: ProjectRole
 
@@ -111,23 +111,23 @@ class DbUserRole(BaseModel):
         cls,
         db: Connection,
         project_id: int,
-        user_id: int,
+        user_sub: str,
         role: ProjectRole,
     ) -> Self:
         """Create a new user role."""
         async with db.cursor(row_factory=class_row(cls)) as cur:
             params = {
                 "project_id": project_id,
-                "user_id": user_id,
+                "user_sub": user_sub,
                 "role": role.name,
             }
             await cur.execute(
                 """
                 INSERT INTO user_roles
-                    (user_id, project_id, role)
+                    (user_sub, project_id, role)
                 VALUES
-                    (%(user_id)s, %(project_id)s, %(role)s)
-                    ON CONFLICT (user_id, project_id) DO UPDATE
+                    (%(user_sub)s, %(project_id)s, %(role)s)
+                    ON CONFLICT (user_sub, project_id) DO UPDATE
                     SET role = EXCLUDED.role
                     WHERE user_roles.role < EXCLUDED.role;
             """,
@@ -139,7 +139,7 @@ class DbUserRole(BaseModel):
             await cur.execute(
                 """
                 SELECT * FROM user_roles
-                WHERE user_id = %(user_id)s AND project_id = %(project_id)s;
+                WHERE user_sub = %(user_sub)s AND project_id = %(project_id)s;
             """,
                 params,
             )
@@ -181,7 +181,7 @@ class DbUserRole(BaseModel):
 class DbUser(BaseModel):
     """Table users."""
 
-    id: int  # NOTE normally the OSM ID
+    sub: str
     username: str
     role: Optional[UserRole] = None
     profile_img: Optional[str] = None
@@ -205,7 +205,7 @@ class DbUser(BaseModel):
     orgs_managed: Optional[list[int]] = None
 
     @classmethod
-    async def one(cls, db: Connection, user_identifier: int | str) -> Self:
+    async def one(cls, db: Connection, user_subidentifier: str) -> Self:
         """Get a user either by ID or username, including roles and orgs managed."""
         async with db.cursor(row_factory=class_row(cls)) as cur:
             sql = """
@@ -224,32 +224,20 @@ class DbUser(BaseModel):
                 ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
 
                 FROM users u
-                LEFT JOIN user_roles ur ON u.id = ur.user_id
-                LEFT JOIN organisation_managers om ON u.id = om.user_id
+                LEFT JOIN user_roles ur ON u.sub = ur.user_sub
+                LEFT JOIN organisation_managers om ON u.sub = om.user_sub
+                WHERE u.sub ILIKE %(user_subidentifier)s
+                GROUP BY u.sub;
             """
-
-            if isinstance(user_identifier, int):
-                # Is ID
-                sql += """
-                    WHERE u.id = %(user_identifier)s
-                    GROUP BY u.id;
-                """
-            else:
-                # Is username (basic flexible matching)
-                sql += """
-                    WHERE u.username ILIKE %(user_identifier)s
-                    GROUP BY u.id;
-                """
-                user_identifier = f"{user_identifier}%"
 
             await cur.execute(
                 sql,
-                {"user_identifier": user_identifier},
+                {"user_subidentifier": user_subidentifier},
             )
             db_user = await cur.fetchone()
 
         if db_user is None:
-            raise KeyError(f"User ({user_identifier}) not found.")
+            raise KeyError(f"User ({user_subidentifier}) not found.")
 
         return db_user
 
@@ -290,38 +278,38 @@ class DbUser(BaseModel):
             return await cur.fetchall()
 
     @classmethod
-    async def delete(cls, db: Connection, user_id: int) -> bool:
+    async def delete(cls, db: Connection, user_sub: str) -> bool:
         """Delete a user and their related data."""
         async with db.cursor() as cur:
             await cur.execute(
                 """
-                UPDATE task_events SET user_id = NULL WHERE user_id = %(user_id)s;
+                UPDATE task_events SET user_sub = NULL WHERE user_sub = %(user_sub)s;
             """,
-                {"user_id": user_id},
+                {"user_sub": user_sub},
             )
             await cur.execute(
                 """
-                UPDATE projects SET author_id = NULL WHERE author_id = %(user_id)s;
+                UPDATE projects SET author_sub = NULL WHERE author_sub = %(user_sub)s;
             """,
-                {"user_id": user_id},
+                {"user_sub": user_sub},
             )
             await cur.execute(
                 """
-                DELETE FROM organisation_managers WHERE user_id = %(user_id)s;
+                DELETE FROM organisation_managers WHERE user_sub = %(user_sub)s;
             """,
-                {"user_id": user_id},
+                {"user_sub": user_sub},
             )
             await cur.execute(
                 """
-                DELETE FROM user_roles WHERE user_id = %(user_id)s;
+                DELETE FROM user_roles WHERE user_sub = %(user_sub)s;
             """,
-                {"user_id": user_id},
+                {"user_sub": user_sub},
             )
             await cur.execute(
                 """
-                DELETE FROM users WHERE id = %(user_id)s;
+                DELETE FROM users WHERE id = %(user_sub)s;
             """,
-                {"user_id": user_id},
+                {"user_sub": user_sub},
             )
 
     @classmethod
@@ -341,7 +329,7 @@ class DbUser(BaseModel):
         columns = ", ".join(model_dump.keys())
         value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
         conflict_statement = """
-            ON CONFLICT ("username") DO UPDATE
+            ON CONFLICT (sub) DO UPDATE
             SET
                 role = EXCLUDED.role,
                 mapping_level = EXCLUDED.mapping_level,
@@ -373,7 +361,7 @@ class DbUser(BaseModel):
 
     @classmethod
     async def update(
-        cls, db: Connection, user_id: int, user_update: "UserUpdate"
+        cls, db: Connection, user_sub: str, user_update: "UserUpdate"
     ) -> Self:
         """Update the role of a specific user."""
         model_dump = dump_and_check_model(user_update)
@@ -381,19 +369,19 @@ class DbUser(BaseModel):
         sql = f"""
             UPDATE users
             SET {", ".join(placeholders)}
-            WHERE id = %(user_id)s
+            WHERE sub = %(user_sub)s
             RETURNING *;
         """
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
                 sql,
-                {"user_id": user_id, **model_dump},
+                {"user_sub": user_sub, **model_dump},
             )
             updated_user = await cur.fetchone()
 
         if updated_user is None:
-            msg = f"Failed to update user with ID: {user_id}"
+            msg = f"Failed to update user: {user_sub}"
             log.error(msg)
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
@@ -419,7 +407,7 @@ class DbOrganisation(BaseModel):
     url: Optional[str] = None
     type: Optional[OrganisationType] = None
     approved: Optional[bool] = None
-    created_by: Optional[int] = None  # this is not foreign key linked intentionally
+    created_by: Optional[str] = None  # this is not foreign key linked intentionally
     associated_email: Optional[str] = None
     odk_central_url: Optional[str] = None
     odk_central_user: Optional[str] = None
@@ -458,7 +446,7 @@ class DbOrganisation(BaseModel):
 
     @classmethod
     async def all(
-        cls, db: Connection, current_user_id: int = 0
+        cls, db: Connection, current_user_sub: str = ""
     ) -> Optional[list[Self]]:
         """Fetch all organisations.
 
@@ -472,7 +460,7 @@ class DbOrganisation(BaseModel):
                     WHEN (
                         SELECT role
                         FROM users
-                        WHERE id = %(user_id)s) = 'ADMIN'
+                        WHERE sub = %(user_sub)s) = 'ADMIN'
                         THEN TRUE
                     ELSE approved
                 END = TRUE
@@ -480,7 +468,7 @@ class DbOrganisation(BaseModel):
         """
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, {"user_id": current_user_id})
+            await cur.execute(sql, {"user_sub": current_user_sub})
             return await cur.fetchall()
 
     @classmethod
@@ -488,13 +476,13 @@ class DbOrganisation(BaseModel):
         cls,
         db: Connection,
         org_in: "OrganisationIn",
-        user_id: int,
+        user_sub: str,
         new_logo: UploadFile,
         ignore_conflict: bool = False,
     ) -> Optional[Self]:
         """Create a new organisation."""
         # Set requesting user to the org owner
-        org_in.created_by = user_id
+        org_in.created_by = user_sub
 
         model_dump = dump_and_check_model(org_in)
         columns = ", ".join(model_dump.keys())
@@ -532,7 +520,7 @@ class DbOrganisation(BaseModel):
         except Exception as e:
             # Log errors only for actual failures (e.g., DB errors)
             msg = f"Unknown SQL error for data: {model_dump}"
-            log.error(f"User ({user_id}) failed organisation creation: {e}")
+            log.error(f"User ({user_sub}) failed organisation creation: {e}")
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
             ) from e
@@ -663,7 +651,7 @@ class DbOrganisationManagers(BaseModel):
     """Table organisation_managers."""
 
     organisation_id: int
-    user_id: int
+    user_sub: str
 
     # calculated
     username: Optional[str] = ""
@@ -674,31 +662,31 @@ class DbOrganisationManagers(BaseModel):
         cls,
         db: Connection,
         org_id: int,
-        user_id: int,
+        user_sub: str,
     ) -> Self:
         """Add a new organisation manager.
 
         Args:
             db (Connection): The database connection.
             org_id (int): The organisation ID.
-            user_id (int): The user ID to add as manager.
+            user_sub (int): The user ID to add as manager.
 
         Returns:
             Self: An instance of DbOrganisationManagers.
         """
-        log.info(f"Adding user ({user_id}) as org ({org_id}) admin")
+        log.info(f"Adding user ({user_sub}) as org ({org_id}) admin")
         sql = """
             INSERT INTO public.organisation_managers
-                (organisation_id, user_id)
+                (organisation_id, user_sub)
             VALUES
-                (%(org_id)s, %(user_id)s)
-            ON CONFLICT (organisation_id, user_id) DO NOTHING;
+                (%(org_id)s, %(user_sub)s)
+            ON CONFLICT (organisation_id, user_sub) DO NOTHING;
         """
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             data = {
                 "org_id": org_id,
-                "user_id": user_id,
+                "user_sub": user_sub,
             }
             await cur.execute(sql, data)
 
@@ -707,25 +695,25 @@ class DbOrganisationManagers(BaseModel):
         cls,
         db: Connection,
         org_id: int,
-        user_id: Optional[int] = None,
+        user_sub: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Get organisation manager by organisation and user ID."""
         async with db.cursor(row_factory=class_row(cls)) as cur:
             sql = """
                 SELECT
                     om.organisation_id,
-                    om.user_id,
+                    om.user_sub,
                     u.username,
                     u.profile_img
                 FROM organisation_managers AS om
                 INNER JOIN users AS u
-                    ON u.id = om.user_id
+                    ON u.sub = om.user_sub
                 WHERE om.organisation_id = %(org_id)s
             """
             params = {"org_id": org_id}
-            if user_id:
-                sql += " AND om.user_id = %(user_id)s"
-                params["user_id"] = user_id
+            if user_sub:
+                sql += " AND user_sub = %(user_sub)s"
+                params["user_sub"] = user_sub
             sql += ";"
             await cur.execute(sql, params)
             return await cur.fetchall()
@@ -779,7 +767,7 @@ class DbTaskEvent(BaseModel):
     event: TaskEvent
 
     project_id: Annotated[Optional[int], Field(gt=0)] = None
-    user_id: Annotated[Optional[int], Field(gt=0)] = None
+    user_sub: Optional[str] = None
     team_id: Optional[UUID] = None
     username: Optional[str] = None
     comment: Optional[str] = None
@@ -843,7 +831,7 @@ class DbTaskEvent(BaseModel):
             FROM
                 public.task_events the
             LEFT JOIN
-                users u ON u.id = the.user_id
+                users u ON u.sub = the.user_sub
             WHERE {filters_joined}
             ORDER BY created_at DESC;
         """
@@ -864,8 +852,8 @@ class DbTaskEvent(BaseModel):
         value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
         username = (
             "NULL"
-            if model_dump.get("user_id") is None
-            else "(SELECT username FROM users WHERE id = %(user_id)s)"
+            if model_dump.get("user_sub") is None
+            else "(SELECT username FROM users WHERE sub = %(user_sub)s)"
         )
 
         # NOTE the project_id need not be passed, as it's extracted from the task
@@ -889,8 +877,10 @@ class DbTaskEvent(BaseModel):
                     )
                     SELECT
                         inserted.*,
-                        CASE WHEN inserted.user_id IS NOT NULL THEN
-                            (SELECT profile_img FROM users WHERE id = inserted.user_id)
+                        CASE WHEN inserted.user_sub IS NOT NULL THEN
+                            (SELECT profile_img FROM users
+                                WHERE sub = inserted.user_sub
+                            )
                         ELSE
                             NULL
                         END as profile_img
@@ -930,17 +920,17 @@ class DbProjectTeam(BaseModel):
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
-                            'id', u.id,
+                            'sub', u.sub,
                             'username', u.username,
                             'profile_img', u.profile_img
                         )
-                    ) FILTER (WHERE u.id IS NOT NULL), '[]'
+                    ) FILTER (WHERE u.sub IS NOT NULL), '[]'
                 ) AS users
                 FROM project_teams pt
                 LEFT JOIN project_team_users ptu
                     ON pt.team_id = ptu.team_id
                 LEFT JOIN users u
-                    ON ptu.user_id = u.id
+                    ON ptu.user_sub = u.sub
                 WHERE pt.team_id = %(team_id)s
                 GROUP BY pt.team_id;
                 """,
@@ -1020,15 +1010,15 @@ class DbProjectTeam(BaseModel):
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
-                            'id', u.id,
+                            'sub', u.sub,
                             'username', u.username,
                             'profile_img', u.profile_img
                         )
-                    ) FILTER (WHERE u.id IS NOT NULL), '[]'
+                    ) FILTER (WHERE u.sub IS NOT NULL), '[]'
                 ) AS users
                 FROM project_teams pt
                 LEFT JOIN project_team_users ptu ON pt.team_id = ptu.team_id
-                LEFT JOIN users u ON ptu.user_id = u.id
+                LEFT JOIN users u ON ptu.user_sub = u.sub
                 WHERE pt.project_id = %(project_id)s
                 GROUP BY pt.team_id;
                 """,
@@ -1043,35 +1033,39 @@ class DbProjectTeamUser(BaseModel):
     """Table project_team_users."""
 
     team_id: UUID
-    user_id: int
+    user_sub: str
 
     @classmethod
-    async def create(cls, db: Connection, team_id: UUID, user_ids: List[int]):
+    async def create(cls, db: Connection, team_id: UUID, user_subs: List[str]):
         """Add users to a team."""
-        model_dump = [{"team_id": team_id, "user_id": user_id} for user_id in user_ids]
+        model_dump = [
+            {"team_id": team_id, "user_sub": user_sub} for user_sub in user_subs
+        ]
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.executemany(
                 """
                     INSERT INTO public.project_team_users
-                        (team_id, user_id)
+                        (team_id, user_sub)
                     VALUES
-                        (%(team_id)s, %(user_id)s)
-                    ON CONFLICT (team_id, user_id) DO NOTHING;
+                        (%(team_id)s, %(user_sub)s)
+                    ON CONFLICT (team_id, user_sub) DO NOTHING;
                 """,
                 model_dump,
             )
 
     @classmethod
-    async def delete(cls, db: Connection, team_id: UUID, user_ids: List[int]):
+    async def delete(cls, db: Connection, team_id: UUID, user_subs: List[str]):
         """Remove users from a team."""
-        model_dump = [{"team_id": team_id, "user_id": user_id} for user_id in user_ids]
+        model_dump = [
+            {"team_id": team_id, "user_sub": user_sub} for user_sub in user_subs
+        ]
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.executemany(
                 """
                     DELETE FROM public.project_team_users
-                    WHERE team_id = %(team_id)s AND user_id = %(user_id)s;
+                    WHERE team_id = %(team_id)s AND user_sub = %(user_sub)s;
                 """,
                 model_dump,
             )
@@ -1088,7 +1082,7 @@ class DbTask(BaseModel):
 
     # Calculated
     task_state: Optional[MappingState] = None
-    actioned_by_uid: Optional[int] = None
+    actioned_by_uid: Optional[str] = None
     actioned_by_username: Optional[str] = None
 
     @classmethod
@@ -1106,7 +1100,7 @@ class DbTask(BaseModel):
                         COALESCE(
                             latest_event.state, 'UNLOCKED_TO_MAP'
                         ) AS task_state,
-                        COALESCE(latest_event.user_id, NULL) AS actioned_by_uid,
+                        COALESCE(latest_event.user_sub, NULL) AS actioned_by_uid,
                         COALESCE(latest_event.username, NULL) AS actioned_by_username
                     FROM
                         tasks
@@ -1114,12 +1108,12 @@ class DbTask(BaseModel):
                         SELECT
                             th.event,
                             th.state,
-                            th.user_id,
+                            th.user_sub,
                             u.username
                         FROM
                             task_events th
                         LEFT JOIN
-                            users u ON u.id = th.user_id
+                            users u ON u.sub = th.user_sub
                         WHERE
                             th.task_id = tasks.id
                             AND th.event != 'COMMENT'
@@ -1154,7 +1148,7 @@ class DbTask(BaseModel):
                 tasks.*,
                 ST_AsGeoJSON(tasks.outline)::jsonb AS outline,
                 COALESCE(latest_event.state, 'UNLOCKED_TO_MAP') AS task_state,
-                COALESCE(latest_event.user_id, NULL) AS actioned_by_uid,
+                COALESCE(latest_event.user_sub, NULL) AS actioned_by_uid,
                 COALESCE(latest_event.username, NULL) AS actioned_by_username
             FROM
                 tasks
@@ -1162,12 +1156,12 @@ class DbTask(BaseModel):
                 SELECT
                     th.event,
                     th.state,
-                    th.user_id,
+                    th.user_sub,
                     u.username
                 FROM
                     task_events th
                 LEFT JOIN
-                    users u ON u.id = th.user_id
+                    users u ON u.sub = th.user_sub
                 WHERE
                     th.task_id = tasks.id
                     AND th.event != 'COMMENT'
@@ -1253,7 +1247,7 @@ class DbProject(BaseModel):
     name: str
     outline: Optional[dict] = None
     odkid: Optional[int] = None
-    author_id: Optional[int] = None
+    author_sub: Optional[str] = None
     organisation_id: Optional[int] = None
     short_description: Optional[str] = None
     description: Optional[str] = None
@@ -1375,12 +1369,12 @@ class DbProject(BaseModel):
                         th.event,
                         th.state,
                         th.created_at,
-                        th.user_id,
+                        th.user_sub,
                         u.username AS username
                     FROM
                         task_events th
                     LEFT JOIN
-                        users u ON u.id = th.user_id
+                        users u ON u.sub = th.user_sub
                     WHERE
                         th.event != 'COMMENT'
                     ORDER BY
@@ -1431,7 +1425,7 @@ class DbProject(BaseModel):
                                     'UNLOCKED_TO_MAP'
                                 ),
                                 'actioned_by_uid', COALESCE(
-                                    latest_status_per_task.user_id,
+                                    latest_status_per_task.user_sub,
                                     NULL
                                 ),
                                 'actioned_by_username', COALESCE(
@@ -1489,14 +1483,14 @@ class DbProject(BaseModel):
         skip: Optional[int] = None,
         limit: Optional[int] = None,
         org_id: Optional[int] = None,
-        user_id: Optional[int] = None,
+        user_sub: Optional[str] = None,
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         filters_map = {
             "organisation_id = %(org_id)s": org_id,
-            "author_id = %(user_id)s": user_id,  # project author
+            "author_sub = %(user_sub)s": user_sub,  # project author
             "hashtags && %(hashtags)s": hashtags,
             # search term (project name using ILIKE for case-insensitive match)
             "p.slug ILIKE %(search)s": f"%{search}%" if search else None,
@@ -1510,7 +1504,7 @@ class DbProject(BaseModel):
                 "offset": skip,
                 "limit": limit,
                 "org_id": org_id,
-                "user_id": user_id,
+                "user_sub": user_sub,
                 "hashtags": hashtags,
                 "search": f"%{search}%" if search else None,
             }.items()
@@ -1525,7 +1519,7 @@ class DbProject(BaseModel):
                     ev.event_id,
                     ev.task_id,
                     ev.event,
-                    ev.user_id,
+                    ev.user_sub,
                     ev.project_id
                 FROM (
                     SELECT
@@ -1545,7 +1539,7 @@ class DbProject(BaseModel):
                 ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
                 project_org.logo as organisation_logo,
                 COUNT(t.id) AS total_tasks,
-                COUNT(DISTINCT ev.user_id) AS num_contributors,
+                COUNT(DISTINCT ev.user_sub) AS num_contributors,
                 COUNT(
                     DISTINCT CASE WHEN et.status = 'SURVEY_SUBMITTED'
                     THEN et.entity_id END

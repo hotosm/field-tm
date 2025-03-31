@@ -42,7 +42,7 @@ from app.db.models import DbOdkEntities, DbUser
 
 async def generate_api_token(
     db: Connection,
-    user_id: int,
+    user_sub: str,
 ) -> str:
     """Generate a new API token for a given user."""
     async with db.cursor(row_factory=class_row(DbUser)) as cur:
@@ -50,14 +50,14 @@ async def generate_api_token(
             """
                 UPDATE users
                 SET api_key = %(api_key)s
-                WHERE id = %(user_id)s
+                WHERE sub = %(user_sub)s
                 RETURNING *;
             """,
-            {"user_id": user_id, "api_key": token_urlsafe(32)},
+            {"user_sub": user_sub, "api_key": token_urlsafe(32)},
         )
         db_user = await cur.fetchone()
         if not db_user.api_key:
-            msg = f"Failed to generate API Key for user ({user_id})"
+            msg = f"Failed to generate API Key for user ({user_sub})"
             log.error(msg)
             raise ValueError(msg)
 

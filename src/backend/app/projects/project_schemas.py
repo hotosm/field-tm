@@ -361,7 +361,7 @@ class BackgroundTaskStatus(BaseModel):
 class ProjectTeamUser(BaseModel):
     """Single user with name and image for project team."""
 
-    id: int
+    sub: str
     username: str
     profile_img: Optional[str] = None
 

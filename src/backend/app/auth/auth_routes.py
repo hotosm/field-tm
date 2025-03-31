@@ -29,12 +29,14 @@ from psycopg.rows import class_row
 
 from app.auth.auth_deps import (
     create_jwt_tokens,
+    expire_cookies,
     login_required,
     mapper_login_required,
     refresh_cookies,
     set_cookies,
 )
 from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.providers.google import handle_google_callback, init_google_auth
 from app.auth.providers.osm import handle_osm_callback, init_osm_auth
 from app.config import settings
 from app.db.database import db_conn
@@ -48,15 +50,14 @@ router = APIRouter(
 )
 
 
-@router.get("/osm-login")
-async def login_url(osm_auth=Depends(init_osm_auth)):
+@router.get("/login/osm")
+async def login_url_osm(osm_auth=Depends(init_osm_auth)):
     """Get Login URL for OSM Oauth Application.
 
     The application must be registered on openstreetmap.org.
     Open the download url returned to get access_token.
 
     Args:
-        request: The GET request.
         osm_auth: The Auth object from osm-login-python.
 
     Returns:
@@ -64,12 +65,30 @@ async def login_url(osm_auth=Depends(init_osm_auth)):
             Includes URL params: client_id, redirect_uri, permission scope.
     """
     login_url = osm_auth.login()
-    log.debug(f"Login URL returned: {login_url}")
+    log.debug(f"OSM Login URL returned: {login_url}")
     return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
 
 
-@router.get("/callback")
-async def callback(
+@router.get("/login/google")
+async def login_url_google(google_auth=Depends(init_google_auth)):
+    """Get Login URL for Google Oauth Application.
+
+    The application must be registered with Google.
+    Open the URL returned to start Google authorization flow.
+
+    Args:
+        google_auth: The GoogleAuth object.
+
+    Returns:
+        login_url (string): URL to authorize user in Google.
+    """
+    login_url = google_auth.login()
+    log.debug(f"Google Login URL returned: {login_url}")
+    return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
+
+
+@router.get("/callback/osm")
+async def osm_callback(
     request: Request, osm_auth: Annotated[AuthUser, Depends(init_osm_auth)]
 ) -> JSONResponse:
     """Performs oauth token exchange with OpenStreetMap.
@@ -80,6 +99,23 @@ async def callback(
     try:
         # This includes the main cookie, refresh cookie, osm token cookie
         response_plus_cookies = await handle_osm_callback(request, osm_auth)
+        return response_plus_cookies
+    except Exception as e:
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e
+
+
+@router.get("/callback/google")
+async def google_callback(
+    request: Request, google_auth=Depends(init_google_auth)
+) -> JSONResponse:
+    """Performs oauth token exchange with Google.
+
+    Provides an access token that can be used for authenticating other endpoints.
+    Also returns a cookie containing the access token for persistence in frontend apps.
+    """
+    try:
+        # This includes the main cookie, refresh cookie
+        response_plus_cookies = await handle_google_callback(request, google_auth)
         return response_plus_cookies
     except Exception as e:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e
@@ -96,25 +132,15 @@ async def logout():
     temp_refresh_cookie_name = f"{fmtm_cookie_name}_temp_refresh"
     osm_cookie_name = f"{fmtm_cookie_name}_osm"
 
-    for cookie_name in [
+    cookie_names = [
         fmtm_cookie_name,
         refresh_cookie_name,
         temp_cookie_name,
         temp_refresh_cookie_name,
         osm_cookie_name,
-    ]:
-        log.debug(f"Resetting cookie in response named '{cookie_name}'")
-        response.set_cookie(
-            key=cookie_name,
-            value="",
-            max_age=0,  # Set to expire immediately
-            expires=0,  # Set to expire immediately
-            path="/",
-            domain=settings.FMTM_DOMAIN,
-            secure=False if settings.DEBUG else True,
-            httponly=True,
-            samesite="lax",
-        )
+    ]
+
+    response = await expire_cookies(response, cookie_names)
     return response
 
 
@@ -127,19 +153,34 @@ async def get_or_create_user(
         upsert_sql = """
             WITH upserted_user AS (
                 INSERT INTO users (
-                    id, username, profile_img, role, registered_at
-                ) VALUES (
-                    %(user_id)s, %(username)s, %(profile_img)s, %(role)s, NOW()
+                    sub,
+                    username,
+                    email_address,
+                    profile_img,
+                    role,
+                    registered_at
                 )
-                ON CONFLICT (id)
+                VALUES (
+                    %(user_sub)s,
+                    %(username)s,
+                    %(email_address)s,
+                    %(profile_img)s,
+                    %(role)s,
+                    NOW()
+                )
+                ON CONFLICT (sub)
                 DO UPDATE SET
                     profile_img = EXCLUDED.profile_img,
                     last_login_at = NOW()
-                RETURNING id, username, profile_img, role
+                RETURNING sub, username, email_address, profile_img, role
             )
 
             SELECT
-                u.id, u.username, u.profile_img, u.role,
+                u.sub,
+                u.username,
+                u.email_address,
+                u.profile_img,
+                u.role,
 
                 -- Aggregate the organisation IDs managed by the user
                 array_agg(
@@ -153,17 +194,23 @@ async def get_or_create_user(
                 ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
 
             FROM upserted_user u
-            LEFT JOIN user_roles ur ON u.id = ur.user_id
-            LEFT JOIN organisation_managers om ON u.id = om.user_id
-            GROUP BY u.id, u.username, u.profile_img, u.role;
+            LEFT JOIN user_roles ur ON u.sub = ur.user_sub
+            LEFT JOIN organisation_managers om ON u.sub = om.user_sub
+            GROUP BY
+                u.sub,
+                u.username,
+                u.email_address,
+                u.profile_img,
+                u.role;
         """
 
         async with db.cursor(row_factory=class_row(DbUser)) as cur:
             await cur.execute(
                 upsert_sql,
                 {
-                    "user_id": user_data.id,
+                    "user_sub": user_data.sub,
                     "username": user_data.username,
+                    "email_address": user_data.email,
                     "profile_img": user_data.profile_img or "",
                     "role": UserRole(user_data.role).name,
                 },
@@ -173,7 +220,7 @@ async def get_or_create_user(
         if not db_user_details:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
-                detail=f"User ID ({user_data.id}) could not be inserted in db",
+                detail=f"User ({user_data.sub}) could not be inserted in db",
             )
 
         return db_user_details
@@ -181,17 +228,7 @@ async def get_or_create_user(
     except Exception as e:
         await db.rollback()
         log.exception(f"Exception occurred: {e}", stack_info=True)
-        if 'duplicate key value violates unique constraint "users_username_key"' in str(
-            e
-        ):
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail=f"User with this username {user_data.username} already exists.",
-            ) from e
-        else:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST, detail=str(e)
-            ) from e
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e)) from e
 
 
 @router.get("/me", response_model=FMTMUser)
@@ -199,11 +236,11 @@ async def my_data(
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(login_required)],
 ):
-    """Read access token and get user details from OSM.
+    """Read access token and get user details.
 
     Args:
         db (Connection): The db connection.
-        current_user (AuthUser): User data provided by osm-login-python Auth.
+        current_user (AuthUser): User data provided by authentication.
 
     Returns:
         FMTMUser: The dict of user data.
@@ -220,10 +257,25 @@ async def refresh_management_cookies(
 
     This endpoint is specific to the management desktop frontend.
     Any temp auth cookies will be ignored and removed.
-    OSM login is required.
+    Authentication is required.
+    If signed in with login method other than OSM, the user will be logged out and
+    a forbidden status will be returned.
 
     NOTE this endpoint has no db calls and returns in ~2ms.
     """
+    if "osm" not in current_user.sub.lower():
+        response = Response(
+            status_code=HTTPStatus.FORBIDDEN,
+            content="Please log in using OSM for management access.",
+        )
+        cookie_names = [
+            settings.cookie_name,
+            f"{settings.cookie_name}_refresh",
+        ]
+
+        response = await expire_cookies(response, cookie_names)
+        return response
+
     return await refresh_cookies(
         request,
         current_user,
@@ -241,7 +293,7 @@ async def refresh_mapper_token(
 
     This endpoint is specific to the mapper mobile frontend.
     By default the user will be logged in with a temporary auth cookie.
-    OSM auth is optional, if the user wishes to be attributed for contributions.
+    Authentication is optional, if the user wishes to be attributed for contributions.
 
     NOTE this endpoint has no db calls and returns in ~2ms.
     """
@@ -262,7 +314,7 @@ async def refresh_mapper_token(
     # Refresh the temp cookies (we must re-create the 'sub' field)
     temp_jwt_details = {
         **current_user.model_dump(exclude=["id"]),
-        "sub": f"fmtm|{current_user.id}",
+        "sub": current_user.sub,
         "aud": settings.FMTM_DOMAIN,
         "iat": int(time()),
         "exp": int(time()) + 86400,  # set token expiry to 1 day

@@ -139,7 +139,7 @@ async def unlock_old_locked_tasks(db, project_id):
     """Unlock tasks locked for more than 3 days."""
     unlock_query = """
         WITH svc_user AS (
-            SELECT id AS svc_user_id, username AS svc_username
+            SELECT id AS svc_user_sub, username AS svc_username
             FROM users
             WHERE username = 'svcfmtm'
         ),
@@ -171,7 +171,7 @@ async def unlock_old_locked_tasks(db, project_id):
             task_id,
             project_id,
             event,
-            user_id,
+            user_sub,
             state,
             created_at,
             username
@@ -181,7 +181,7 @@ async def unlock_old_locked_tasks(db, project_id):
             fe.task_id,
             fe.project_id,
             'RESET'::taskevent,
-            svc.svc_user_id,
+            svc.svc_user_sub,
             'UNLOCKED_TO_MAP'::mappingstate,
             NOW(),
             svc.svc_username
@@ -198,7 +198,7 @@ async def send_task_assignment_notifications(
     team: DbProjectTeam,
     project_user: ProjectUserDict,
     task: DbTask,
-    assignee_id: int,
+    assignee_sub: str,
 ):
     """Send OSM notifications to team members or assignee for task assignment."""
     osm_token = get_osm_token(request, osm_auth)
@@ -209,7 +209,7 @@ async def send_task_assignment_notifications(
     if not project_url.startswith("http"):
         project_url = f"https://{project_url}"
 
-    if assignee_id:
+    if assignee_sub:
         assignee_message_content = dedent(f"""
             You have been assigned to task **{task.project_task_index}** in project
             **{project.name}** by **{user.username}**.
@@ -223,10 +223,10 @@ async def send_task_assignment_notifications(
             osm_token=osm_token,
             title=f"Task Assignment in {project.name}",
             body=assignee_message_content,
-            osm_id=assignee_id,
+            osm_sub=assignee_sub,
         )
 
-        log.info(f"OSM notification sent to {assignee_id} for task {task.id}")
+        log.info(f"OSM notification sent to {assignee_sub} for task {task.id}")
 
     elif team:
         team_message_content = dedent(f"""
@@ -244,7 +244,7 @@ async def send_task_assignment_notifications(
                 osm_token=osm_token,
                 title=f"Task Assignment in {project.name}",
                 body=team_message_content,
-                osm_id=user["id"],
+                osm_sub=user["sub"],
             )
 
         log.info(f"OSM notifications sent to {team.users} for task {task.id}")

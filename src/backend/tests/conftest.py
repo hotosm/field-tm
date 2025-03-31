@@ -93,14 +93,14 @@ async def admin_user(db):
     db_user = await get_or_create_user(
         db,
         AuthUser(
-            sub="fmtm|1",
+            sub="osm|1",
             username="localadmin",
             role=UserRole.ADMIN,
         ),
     )
 
     return FMTMUser(
-        id=db_user.id,
+        sub=db_user.sub,
         username=db_user.username,
         role=UserRole[db_user.role],
         profile_img=db_user.profile_img,
@@ -114,7 +114,7 @@ async def organisation(db):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def organisation_data(admin_user):
+async def organisation_data():
     """A test organisation using the test user."""
     organisation_name = "svcfmtm hot org"
     slug = slugify(organisation_name)
@@ -155,7 +155,7 @@ async def new_organisation(db, admin_user, organisation_data):
     new_organisation = await DbOrganisation.create(
         db,
         new_organisation_data,
-        admin_user.id,
+        admin_user.sub,
         None,
     )
     return new_organisation
@@ -210,7 +210,7 @@ async def project(db, admin_user, organisation):
                 ]
             ],
         },
-        author_id=admin_user.id,
+        author_sub=admin_user.sub,
         organisation_id=organisation.id,
         odkid=odkproject.get("id"),
     )
@@ -277,11 +277,11 @@ async def tasks(project, db):
 @pytest_asyncio.fixture(scope="function")
 async def task_event(db, project, tasks, admin_user):
     """Create a new task event in the database."""
-    user = await get_user(admin_user.id, db)
+    user = await get_user(admin_user.sub, db)
     for task in tasks:
         new_event = TaskEventIn(
             task_id=task.id,
-            user_id=user.id,
+            user_sub=user.sub,
             event=TaskEvent.MAP,
             comment="We added a comment!",
         )

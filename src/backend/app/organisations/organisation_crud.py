@@ -41,7 +41,7 @@ async def init_admin_org(db: Connection) -> None:
     """Init admin org and user at application startup."""
     # Create admin user
     admin_user = UserIn(
-        id=1,
+        sub="osm|1",
         username="localadmin",
         role=UserRole.ADMIN,
         name="Admin",
@@ -53,7 +53,7 @@ async def init_admin_org(db: Connection) -> None:
 
     # Create service user
     svc_user = UserIn(
-        id=20386219,
+        sub="osm|20386219",
         username="svcfmtm",
         name="FMTM Service Account",
         email_address=settings.ODK_CENTRAL_USER,
@@ -88,14 +88,14 @@ async def init_admin_org(db: Connection) -> None:
         hotosm_org = await DbOrganisation.create(
             db,
             org_in,
-            admin_user.id,
+            admin_user.sub,
             org_logo,
             ignore_conflict=True,
         )
 
     # Make admin user manager of HOTOSM
     if hotosm_org:
-        await DbOrganisationManagers.create(db, hotosm_org.id, admin_user.id)
+        await DbOrganisationManagers.create(db, hotosm_org.id, admin_user.sub)
 
 
 async def get_my_organisations(
@@ -118,7 +118,7 @@ async def get_my_organisations(
         FROM organisations org
         JOIN organisation_managers managers
             ON managers.organisation_id = org.id
-        WHERE managers.user_id = %(user_id)s
+        WHERE managers.user_sub = %(user_sub)s
 
         UNION
 
@@ -126,21 +126,21 @@ async def get_my_organisations(
         FROM organisations org
         JOIN projects project
             ON project.organisation_id = org.id
-        WHERE project.author_id = %(user_id)s;
+        WHERE project.author_sub = %(user_sub)s;
     """
     async with db.cursor(row_factory=class_row(OrganisationOut)) as cur:
-        await cur.execute(sql, {"user_id": current_user.id})
+        await cur.execute(sql, {"user_sub": current_user.sub})
         return await cur.fetchall()
 
 
 async def send_approval_message(
     request: Request,
-    creator_id: int,
+    creator_sub: str,
     organisation_name: str,
     osm_auth: Auth,
 ):
     """Send message to the organisation creator after approval."""
-    log.info(f"Sending approval message to organisation creator ({creator_id}).")
+    log.info(f"Sending approval message to organisation creator ({creator_sub}).")
     osm_token = get_osm_token(request, osm_auth)
     message_content = dedent(f"""
         ## Congratulations!
@@ -153,8 +153,8 @@ async def send_approval_message(
     """)
     send_osm_message(
         osm_token=osm_token,
-        osm_id=creator_id,
+        osm_sub=creator_sub,
         title="Your organisation has been approved!",
         body=message_content,
     )
-    log.info(f"Approval message sent to organisation creator ({creator_id}).")
+    log.info(f"Approval message sent to organisation creator ({creator_sub}).")

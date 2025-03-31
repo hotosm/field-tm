@@ -110,12 +110,12 @@ async def read_projects_to_featcol(
 async def read_projects(
     current_user: Annotated[AuthUser, Depends(login_required)],
     db: Annotated[Connection, Depends(db_conn)],
-    user_id: int = None,
+    user_sub: str = None,
     skip: int = 0,
     limit: int = 100,
 ):
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, user_id)
+    projects = await DbProject.all(db, skip, limit, user_sub)
     return projects
 
 
@@ -149,13 +149,13 @@ async def read_project_summaries(
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
     org_id: Optional[int] = None,
-    user_id: Optional[int] = None,
+    user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
 ):
     """Get a paginated summary of projects."""
     return await project_crud.get_paginated_projects(
-        db, page, results_per_page, org_id, user_id, hashtags, search
+        db, page, results_per_page, org_id, user_sub, hashtags, search
     )
 
 
@@ -169,12 +169,12 @@ async def search_project(
     search: str,
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
-    user_id: Optional[int] = None,
+    user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
 ):
     """Search projects by string, hashtag, or other criteria."""
     return await project_crud.get_paginated_projects(
-        db, page, results_per_page, user_id, hashtags, search
+        db, page, results_per_page, user_sub, hashtags, search
     )
 
 
@@ -756,7 +756,7 @@ async def add_new_project_manager(
     await DbUserRole.create(
         db,
         org_user_dict["project"].id,
-        new_manager.id,
+        new_manager.sub,
         ProjectRole.PROJECT_MANAGER,
     )
 
@@ -1244,7 +1244,7 @@ async def create_project(
 
     # Create the project in the FMTM DB
     project_info.odkid = odkproject["id"]
-    project_info.author_id = db_user.id
+    project_info.author_sub = db_user.sub
     project = await DbProject.create(db, project_info)
     if not project:
         raise HTTPException(
@@ -1509,30 +1509,30 @@ async def delete_project_team(
 @router.post("/{project_id}/teams/{team_id}/users")
 async def add_team_users(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    users: List[int],
+    user_subs: List[str],
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(project_manager)],
 ):
     """Add users to a team."""
     # Assign mapper user roles to the project
-    for user_id in users:
+    for user_sub in user_subs:
         await DbUserRole.create(
             db,
             project_user.get("project").id,
-            user_id,
+            user_sub,
             ProjectRole.MAPPER,
         )
-    await DbProjectTeamUser.create(db, team.team_id, users)
+    await DbProjectTeamUser.create(db, team.team_id, user_subs)
     return Response(status_code=HTTPStatus.OK)
 
 
 @router.delete("/{project_id}/teams/{team_id}/users")
 async def remove_team_users(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    users: List[int],
+    user_subs: List[str],
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(project_manager)],
 ):
     """Add users to a team."""
-    await DbProjectTeamUser.delete(db, team.team_id, users)
+    await DbProjectTeamUser.delete(db, team.team_id, user_subs)
     return Response(status_code=HTTPStatus.NO_CONTENT)

@@ -71,7 +71,7 @@ async def test_approve_organisation(client, db, new_organisation):
     assert data["approved"] is True
     assert (
         await DbOrganisationManagers.get(
-            db, org_id=new_organisation.id, user_id=new_organisation.created_by
+            db, org_id=new_organisation.id, user_sub=new_organisation.created_by
         )
         is not None
     )
