@@ -39,7 +39,7 @@ class UserUpdate(DbUser):
     """User details for update in DB."""
 
     # Exclude (do not allow update)
-    id: Annotated[Optional[int], Field(exclude=True)] = None
+    sub: Annotated[Optional[str], Field(exclude=True)] = None
     username: Annotated[Optional[str], Field(exclude=True)] = None
     registered_at: Annotated[Optional[AwareDatetime], Field(exclude=True)] = None
     tasks_mapped: Annotated[Optional[int], Field(exclude=True)] = None
@@ -52,7 +52,7 @@ class UserUpdate(DbUser):
 
 
 class UserOut(DbUser):
-    """User with ID and role."""
+    """User and role."""
 
     # Mandatory user role field
     role: UserRole
@@ -70,7 +70,7 @@ class UserRole(BaseModel):
 class UserRolesOut(DbUserRole):
     """User role for a specific project."""
 
-    user_id: int
+    user_sub: str
     role: ProjectRole
     project_id: Optional[int] = None
 
@@ -85,5 +85,5 @@ class PaginatedUsers(BaseModel):
 class Usernames(BaseModel):
     """User info with username and their id."""
 
-    id: int
+    sub: str
     username: str

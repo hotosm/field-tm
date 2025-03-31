@@ -883,7 +883,7 @@ async def get_paginated_projects(
     page: int,
     results_per_page: int,
     org_id: Optional[int] = None,
-    user_id: Optional[int] = None,
+    user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
 ) -> dict:
@@ -893,7 +893,7 @@ async def get_paginated_projects(
 
     # Get subset of projects
     projects = await DbProject.all(
-        db, org_id=org_id, user_id=user_id, hashtags=hashtags, search=search
+        db, org_id=org_id, user_sub=user_sub, hashtags=hashtags, search=search
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
@@ -921,11 +921,11 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
     query = """
         SELECT
             u.username as user,
-            COUNT(th.user_id) as contributions
+            COUNT(th.user_sub) as contributions
         FROM
             users u
         JOIN
-            task_events th ON u.id = th.user_id
+            task_events th ON u.sub = th.user_sub
         WHERE
             th.project_id = %(project_id)s
         GROUP BY u.username
@@ -963,7 +963,7 @@ async def send_project_manager_message(
 
     send_osm_message(
         osm_token=osm_token,
-        osm_id=new_manager.id,
+        osm_sub=new_manager.sub,
         title=f"You have been assigned to project {project.name} as a manager",
         body=message_content,
     )

@@ -322,7 +322,7 @@ async def send_test_osm_message(
 
     email_url = f"{settings.OSM_URL}api/0.6/user/messages"
     headers = {"Authorization": f"Bearer {osm_token}"}
-    log.debug(f"Sending message to user ({current_user.id}) via OSM API: {email_url}")
+    log.debug(f"Sending message to user ({current_user.sub}) via OSM API: {email_url}")
     response = requests.post(email_url, headers=headers, data=post_body)
 
     if response.status_code == 200:

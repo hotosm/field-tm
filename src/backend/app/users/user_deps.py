@@ -29,13 +29,11 @@ from app.db.enums import HTTPStatus
 from app.db.models import DbUser
 
 
-async def get_user(
-    id: str | int, db: Annotated[Connection, Depends(db_conn)]
-) -> DbUser:
+async def get_user(sub: str, db: Annotated[Connection, Depends(db_conn)]) -> DbUser:
     """Return a user from the DB, else exception.
 
     Args:
-        id (str | int): The user ID (integer) or username (string) to check.
+        sub (str): The user ID with provider.
         db (Connection): The database connection.
 
     Returns:
@@ -45,12 +43,6 @@ async def get_user(
         HTTPException: Raised with a 404 status code if the user is not found.
     """
     try:
-        try:
-            # Is ID (int)
-            id = int(id)
-        except ValueError:
-            # Is username (str)
-            pass
-        return await DbUser.one(db, id)
+        return await DbUser.one(db, sub)
     except KeyError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e

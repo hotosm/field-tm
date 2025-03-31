@@ -42,8 +42,7 @@ from app.projects.project_deps import get_project, get_project_by_id
 async def get_uid(user_data: AuthUser | DbUser) -> int:
     """Extract user id from returned OSM user."""
     try:
-        user_id = user_data.id
-        return user_id
+        return user_data.sub
 
     except Exception as e:
         log.exception(
@@ -85,7 +84,7 @@ async def check_access(
         Optional[DbUser]: The user details if access is granted,
             otherwise None.
     """
-    user_id = await get_uid(user)
+    user_sub = await get_uid(user)
 
     sql = """
         WITH role_hierarchy AS (
@@ -98,7 +97,7 @@ async def check_access(
 
         SELECT *
         FROM users
-        WHERE id = %(user_id)s
+        WHERE sub = %(user_sub)s
             AND (
                 CASE
                     -- Simple check to see if ADMIN or blocked (READ_ONLY)
@@ -110,7 +109,7 @@ async def check_access(
                         EXISTS (
                             SELECT 1
                             FROM organisation_managers
-                            WHERE organisation_managers.user_id = %(user_id)s
+                            WHERE organisation_managers.user_sub = %(user_sub)s
                             AND organisation_managers.organisation_id = %(org_id)s
                         )
 
@@ -124,7 +123,7 @@ async def check_access(
                             JOIN role_hierarchy AS required_role_h
                                 ON %(role)s::public.projectrole
                                     = required_role_h.role::public.projectrole
-                            WHERE user_roles.user_id = %(user_id)s
+                            WHERE user_roles.user_sub = %(user_sub)s
                             AND user_roles.project_id = %(project_id)s
                             AND user_role_h.level >= required_role_h.level
                         )
@@ -139,7 +138,7 @@ async def check_access(
                                 JOIN projects
                                     ON projects.organisation_id =
                                         organisation_managers.organisation_id
-                                WHERE organisation_managers.user_id = %(user_id)s
+                                WHERE organisation_managers.user_sub = %(user_sub)s
                                 AND projects.id = %(project_id)s
                             )
                         )
@@ -151,7 +150,7 @@ async def check_access(
         await cur.execute(
             sql,
             {
-                "user_id": user_id,
+                "user_sub": user_sub,
                 "project_id": project_id,
                 "org_id": org_id,
                 "role": getattr(role, "name", None),
@@ -363,7 +362,7 @@ async def mapper(
     # If project is public, skip permission check
     if project.visibility == ProjectVisibility.PUBLIC:
         return {
-            "user": await DbUser.one(db, current_user.id),
+            "user": await DbUser.one(db, current_user.sub),
             "project": project,
         }
 
@@ -384,34 +383,34 @@ async def project_contributors(
     current_user: Annotated[AuthUser, Depends(login_required)],
 ) -> ProjectUserDict:
     """A contributor to a specific project."""
-    user_id = current_user.id
+    user_sub = current_user.sub
     project_id = project.id
     org_id = project.organisation_id
 
     query = """
         SELECT * FROM users
-        WHERE id = %(user_id)s
+        WHERE sub = %(user_sub)s
             AND (
                 CASE WHEN role = 'ADMIN' THEN true
                 ELSE
                     EXISTS (
                         SELECT 1 FROM organisation_managers
-                        WHERE organisation_managers.user_id = %(user_id)s
+                        WHERE organisation_managers.user_sub = %(user_sub)s
                           AND organisation_managers.organisation_id = %(org_id)s
                     )
                     OR EXISTS (
                         SELECT 1 FROM user_roles
-                        WHERE user_roles.user_id = %(user_id)s
+                        WHERE user_roles.user_sub = %(user_sub)s
                           AND user_roles.project_id = %(project_id)s
                           AND user_roles.role = 'PROJECT_MANAGER'
                     )
                     OR EXISTS (
                         SELECT 1 FROM projects
-                        WHERE projects.author_id = %(user_id)s
+                        WHERE projects.author_sub = %(user_sub)s
                     )
                     OR EXISTS (
                         SELECT 1 FROM task_events
-                        WHERE task_events.user_id = %(user_id)s
+                        WHERE task_events.user_sub = %(user_sub)s
                           AND task_events.project_id = %(project_id)s
                     )
                 END
@@ -420,7 +419,7 @@ async def project_contributors(
     async with db.cursor() as cur:
         await cur.execute(
             query,
-            {"user_id": user_id, "project_id": project_id, "org_id": org_id},
+            {"user_sub": user_sub, "project_id": project_id, "org_id": org_id},
         )
         db_user = await cur.fetchone()
 

@@ -69,7 +69,7 @@ async def process_inactive_users(
             for user in users_to_warn:
                 if SVC_OSM_TOKEN:
                     await send_warning_email_or_osm(
-                        user.id, user.username, days, SVC_OSM_TOKEN
+                        user.sub, user.username, days, SVC_OSM_TOKEN
                     )
                 else:
                     log.warning(
@@ -92,11 +92,11 @@ async def process_inactive_users(
 
         for user in users_to_delete:
             log.info(f"Deleting user {user.username} due to inactivity.")
-            await DbUser.delete(db, user.id)
+            await DbUser.delete(db, user.sub)
 
 
 async def send_warning_email_or_osm(
-    user_id: int,
+    user_sub: str,
     username: str,
     days_remaining: int,
     osm_token: str,
@@ -117,7 +117,7 @@ async def send_warning_email_or_osm(
 
     send_osm_message(
         osm_token=osm_token,
-        osm_id=user_id,
+        osm_sub=user_sub,
         title="FMTM account deletion warning",
         body=message_content,
     )

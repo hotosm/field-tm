@@ -62,7 +62,7 @@ async def get_userlist(
     if not users:
         return []
     return [
-        user_schemas.Usernames(id=user.id, username=user.username) for user in users
+        user_schemas.Usernames(sub=user.sub, username=user.username) for user in users
     ]
 
 
@@ -75,15 +75,15 @@ async def get_user_roles(_: Annotated[DbUser, Depends(mapper)]):
     return user_roles
 
 
-@router.patch("/{user_id}", response_model=user_schemas.UserOut)
+@router.patch("/{user_sub}", response_model=user_schemas.UserOut)
 async def update_existing_user(
-    user_id: int,
+    user_sub: str,
     new_user_data: user_schemas.UserUpdate,
     _: Annotated[DbUser, Depends(super_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Change the role of a user."""
-    return await DbUser.update(db=db, user_id=user_id, user_update=new_user_data)
+    return await DbUser.update(db=db, user_sub=user_sub, user_update=new_user_data)
 
 
 @router.get("/{id}", response_model=user_schemas.UserOut)
@@ -110,8 +110,8 @@ async def delete_user_by_identifier(
     log.info(
         f"User {current_user.username} attempting deletion of user {user.username}"
     )
-    await DbUser.delete(db, user.id)
-    log.info(f"User {user.id} deleted successfully.")
+    await DbUser.delete(db, user.sub)
+    log.info(f"User {user.sub} deleted successfully.")
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
@@ -141,7 +141,7 @@ async def get_project_users(
         return []
     return [
         user_schemas.UserRolesOut(
-            user_id=user.user_id, project_id=user.project_id, role=user.role
+            user_sub=user.user_sub, project_id=user.project_id, role=user.role
         )
         for user in users
     ]
