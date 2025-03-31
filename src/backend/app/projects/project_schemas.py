@@ -226,8 +226,8 @@ class ProjectSummary(BaseModel):
 
     id: int
     name: str
-    organisation_id: int
-    priority: ProjectPriority
+    organisation_id: Optional[int]
+    priority: Optional[ProjectPriority]
 
     # FIXME Do we need outline in summary?
     outline: Optional[Polygon]

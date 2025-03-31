@@ -1435,8 +1435,7 @@ class DbProject(BaseModel):
                             )
                         -- Required filter if the task array is empty
                         ) FILTER (WHERE tasks.id IS NOT NULL), '[]'::json
-                    ) AS tasks,
-                    COUNT(tasks.id) AS total_tasks
+                    ) AS tasks
                 FROM
                     projects p
                 -- For org name, logo, and ODK credentials
@@ -1486,6 +1485,7 @@ class DbProject(BaseModel):
         user_sub: Optional[str] = None,
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
+        minimal: bool = False,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         filters_map = {
@@ -1511,68 +1511,87 @@ class DbProject(BaseModel):
             if value
         }
 
-        # Base query with optional filtering
-        sql = f"""
-            -- get latest task status
-            WITH latest_task_events AS (
+        if minimal:
+            # Minimal query for mapper frontend
+            sql = f"""
                 SELECT
-                    ev.event_id,
-                    ev.task_id,
-                    ev.event,
-                    ev.user_sub,
-                    ev.project_id
-                FROM (
+                    p.id,
+                    p.name,
+                    p.location_str,
+                    p.short_description,
+                    project_org.logo AS organisation_logo
+                FROM
+                    projects p
+                LEFT JOIN
+                    organisations project_org ON p.organisation_id = project_org.id
+                {"WHERE " + " AND ".join(filters) if filters else ""}
+                GROUP BY
+                    p.id, project_org.id
+                ORDER BY
+                    p.created_at DESC
+            """
+        else:
+            # Base query with optional filtering
+            sql = f"""
+                -- get latest task status
+                WITH latest_task_events AS (
                     SELECT
-                        ev.*,
-                        ROW_NUMBER() OVER
-                        (
-                        PARTITION BY ev.task_id ORDER BY ev.created_at DESC
-                        ) AS rn
-                    FROM task_events ev
-                ) ev
-                WHERE ev.rn = 1
-            )
+                        ev.event_id,
+                        ev.task_id,
+                        ev.event,
+                        ev.user_sub,
+                        ev.project_id
+                    FROM (
+                        SELECT
+                            ev.*,
+                            ROW_NUMBER() OVER
+                            (
+                            PARTITION BY ev.task_id ORDER BY ev.created_at DESC
+                            ) AS rn
+                        FROM task_events ev
+                    ) ev
+                    WHERE ev.rn = 1
+                )
 
-            SELECT
-                p.*,
-                ST_AsGeoJSON(p.outline)::jsonb AS outline,
-                ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
-                project_org.logo as organisation_logo,
-                COUNT(t.id) AS total_tasks,
-                COUNT(DISTINCT ev.user_sub) AS num_contributors,
-                COUNT(
-                    DISTINCT CASE WHEN et.status = 'SURVEY_SUBMITTED'
-                    THEN et.entity_id END
-                ) as total_submissions,
-                COUNT(
-                    DISTINCT CASE WHEN ev.event = 'FINISH'
-                    THEN ev.event_id END
-                ) as tasks_mapped,
-                COUNT(
-                    DISTINCT CASE WHEN ev.event = 'BAD'
-                    THEN ev.event_id END
-                ) as tasks_bad,
-                COUNT(
-                    DISTINCT CASE WHEN ev.event = 'GOOD'
-                    THEN ev.event_id END
-                ) as tasks_validated
+                SELECT
+                    p.*,
+                    ST_AsGeoJSON(p.outline)::jsonb AS outline,
+                    ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
+                    project_org.logo as organisation_logo,
+                    COUNT(DISTINCT ev.user_sub) AS num_contributors,
+                    COUNT(
+                        DISTINCT CASE WHEN et.status = 'SURVEY_SUBMITTED'
+                        THEN et.entity_id END
+                    ) as total_submissions,
+                    COUNT(
+                        DISTINCT CASE WHEN ev.event = 'FINISH'
+                        THEN ev.event_id END
+                    ) as tasks_mapped,
+                    COUNT(
+                        DISTINCT CASE WHEN ev.event = 'BAD'
+                        THEN ev.event_id END
+                    ) as tasks_bad,
+                    COUNT(
+                        DISTINCT CASE WHEN ev.event = 'GOOD'
+                        THEN ev.event_id END
+                    ) as tasks_validated
 
-            FROM
-                projects p
-            LEFT JOIN
-                organisations project_org ON p.organisation_id = project_org.id
-            LEFT JOIN
-                tasks t ON p.id = t.project_id
-            LEFT JOIN
-                latest_task_events ev ON p.id = ev.project_id
-            LEFT JOIN
-                odk_entities et on p.id = et.project_id
-            {"WHERE " + " AND ".join(filters) if filters else ""}
-            GROUP BY
-                p.id, project_org.id
-            ORDER BY
-                p.created_at DESC
-        """
+                FROM
+                    projects p
+                LEFT JOIN
+                    organisations project_org ON p.organisation_id = project_org.id
+                LEFT JOIN
+                    tasks t ON p.id = t.project_id
+                LEFT JOIN
+                    latest_task_events ev ON p.id = ev.project_id
+                LEFT JOIN
+                    odk_entities et on p.id = et.project_id
+                {"WHERE " + " AND ".join(filters) if filters else ""}
+                GROUP BY
+                    p.id, project_org.id
+                ORDER BY
+                    p.created_at DESC
+            """
         sql += (
             """
             OFFSET %(offset)s

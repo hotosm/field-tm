@@ -886,6 +886,7 @@ async def get_paginated_projects(
     user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
+    minimal: bool = False,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -893,7 +894,12 @@ async def get_paginated_projects(
 
     # Get subset of projects
     projects = await DbProject.all(
-        db, org_id=org_id, user_sub=user_sub, hashtags=hashtags, search=search
+        db,
+        org_id=org_id,
+        user_sub=user_sub,
+        hashtags=hashtags,
+        search=search,
+        minimal=minimal,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
