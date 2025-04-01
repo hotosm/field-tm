@@ -33,7 +33,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'Manage Organizations',
-      ref: '/manage/organization',
+      ref: '/organization',
       isExternalLink: false,
       isActive: true,
     },

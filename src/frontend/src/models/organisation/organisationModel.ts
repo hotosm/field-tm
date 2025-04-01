@@ -20,14 +20,16 @@ export interface OrganisationListModel {
 }
 
 export interface GetOrganisationDataModel {
-  name: string;
-  slug: string;
-  description: string;
-  type: number;
   id: number;
-  logo: string | null;
-  url: string;
+  name: string;
   approved: boolean;
+  type: string;
+  community_type: string;
+  logo: string | null;
+  description: string;
+  slug: string;
+  url: string;
+  associated_email: string;
   odk_central_url: string | null;
 }
 
@@ -42,4 +44,10 @@ export type consentDetailsFormDataType = {
   review_documentation: string[];
   log_into: string[];
   participated_in: string[];
+};
+
+export type OrganizationAdminsModel = {
+  user_sub: string;
+  username: string;
+  profile_img: string | null;
 };

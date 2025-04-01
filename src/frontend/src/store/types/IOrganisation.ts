@@ -1,7 +1,11 @@
-import { consentDetailsFormDataType, GetOrganisationDataModel } from '@/models/organisation/organisationModel';
+import {
+  consentDetailsFormDataType,
+  GetOrganisationDataModel,
+  OrganizationAdminsModel,
+} from '@/models/organisation/organisationModel';
 
 export interface IOrganisationState {
-  organisationFormData: Record<string, any>;
+  organisationFormData: GetOrganisationDataModel;
   organisationData: GetOrganisationDataModel[];
   myOrganisationData: GetOrganisationDataModel[];
   postOrganisationData: GetOrganisationDataModel | null;
@@ -15,4 +19,8 @@ export interface IOrganisationState {
     organizationApproving: boolean;
     organizationRejecting: boolean;
   };
+  organizationDeleteLoading: boolean;
+  organisationFormDataLoading: boolean;
+  getOrganizationAdminsLoading: boolean;
+  organizationAdmins: OrganizationAdminsModel[];
 }

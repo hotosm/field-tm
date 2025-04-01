@@ -22,6 +22,10 @@ export const initialState: IOrganisationState = {
     organizationApproving: false,
     organizationRejecting: false,
   },
+  organizationDeleteLoading: false,
+  organisationFormDataLoading: false,
+  getOrganizationAdminsLoading: false,
+  organizationAdmins: [],
 };
 
 const OrganisationSlice = createSlice({
@@ -55,6 +59,9 @@ const OrganisationSlice = createSlice({
     SetConsentApproval(state, action: PayloadAction<boolean>) {
       state.consentApproval = action.payload;
     },
+    SetIndividualOrganizationLoading(state, action: PayloadAction<boolean>) {
+      state.organisationFormDataLoading = action.payload;
+    },
     SetIndividualOrganization(state, action: PayloadAction<IOrganisationState['organisationFormData']>) {
       state.organisationFormData = action.payload;
     },
@@ -66,6 +73,15 @@ const OrganisationSlice = createSlice({
     },
     SetOrganizationApprovalStatus(state, action: PayloadAction<boolean>) {
       state.organizationApprovalStatus.isSuccess = action.payload;
+    },
+    SetOrganizationDeleting(state, action: PayloadAction<boolean>) {
+      state.organizationDeleteLoading = action.payload;
+    },
+    GetOrganizationAdminsLoading(state, action: PayloadAction<boolean>) {
+      state.getOrganizationAdminsLoading = action.payload;
+    },
+    SetOrganizationAdmins(state, action: PayloadAction<IOrganisationState['organizationAdmins']>) {
+      state.organizationAdmins = action.payload;
     },
   },
 });

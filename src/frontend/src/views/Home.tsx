@@ -1,90 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
-import windowDimention from '@/hooks/WindowDimension';
 import { HomeSummaryService } from '@/api/HomeService';
 import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
 import HomePageFilters from '@/components/home/HomePageFilters';
-import CoreModules from '@/shared/CoreModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import { projectType } from '@/models/home/homeModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Pagination from '@/components/common/Pagination';
+import useDebouncedInput from '@/hooks/useDebouncedInput';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   useDocumentTitle('Explore Projects');
   const dispatch = useAppDispatch();
-  const { type } = windowDimention();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [paginationPage, setPaginationPage] = useState(1);
 
-  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
-  const stateHome = useAppSelector((state) => state.home);
+  const filteredProjectCards = useAppSelector((state) => state.home.homeProjectSummary);
+  const homeProjectLoading = useAppSelector((state) => state.home.homeProjectLoading);
 
-  const filteredProjectCards = stateHome.homeProjectSummary;
-
-  let cardsPerRow = new Array(
-    type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1,
-  ).fill(0);
-
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, 500]);
+  const [searchTextData, handleChangeData] = useDebouncedInput({
+    ms: 400,
+    init: searchQuery,
+    onChange: (e) => {
+      setSearchQuery(e.target.value);
+    },
+  });
 
   useEffect(() => {
-    if (debouncedSearch) {
-      dispatch(
-        HomeSummaryService(
-          `${
-            import.meta.env.VITE_API_URL
-          }/projects/search?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
-        ),
-      );
-    }
-  }, [debouncedSearch, paginationPage]);
+    dispatch(
+      HomeSummaryService(
+        `${VITE_API_URL}/projects/search?page=${paginationPage}&results_per_page=12&search=${searchQuery}`,
+      ),
+    );
+  }, [searchQuery, paginationPage]);
 
   useEffect(() => {
     setPaginationPage(1);
-  }, [debouncedSearch]);
-
-  useEffect(() => {
-    if (!debouncedSearch) {
-      dispatch(
-        HomeSummaryService(
-          `${import.meta.env.VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12`,
-        ),
-      );
-    }
-  }, [paginationPage, debouncedSearch]);
+  }, [searchQuery]);
 
   return (
     <div
       style={{ flex: 1, background: '#F5F5F5' }}
-      className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full fmtm-mt-1 lg:fmtm-overflow-hidden"
+      className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full lg:fmtm-overflow-hidden"
     >
       <div className="fmtm-h-full">
-        <HomePageFilters searchText={searchQuery} onSearch={handleSearch} />
-        {stateHome.homeProjectLoading == false ? (
-          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-7 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-120px)] fmtm-pb-16 lg:fmtm-pb-0">
+        <HomePageFilters searchText={searchTextData} onSearch={handleChangeData} />
+        {!homeProjectLoading ? (
+          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-2 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-85px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
               className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}
             >
               {filteredProjectCards.length > 0 ? (
                 <>
                   <div
-                    className={`fmtm-grid fmtm-gap-5 ${
+                    className={`fmtm-grid fmtm-gap-3 ${
                       !showMapStatus
                         ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
                         : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-overflow-y-scroll lg:scrollbar'
@@ -113,22 +89,11 @@ const Home = () => {
             {showMapStatus && <ProjectListMap />}
           </div>
         ) : (
-          <CoreModules.Stack
-            sx={{
-              display: {
-                xs: 'flex',
-                sm: 'flex',
-                md: 'flex',
-                lg: 'flex',
-                xl: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'left',
-                width: '100%',
-              },
-            }}
+          <div
+            className={`fmtm-grid fmtm-gap-3 fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6 lg:scrollbar fmtm-mt-2`}
           >
-            <ProjectCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
-          </CoreModules.Stack>
+            <ProjectCardSkeleton />
+          </div>
         )}
       </div>
     </div>

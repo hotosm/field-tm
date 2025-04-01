@@ -12,7 +12,7 @@ const CreateEditOrganizationHeader = ({ organizationId }: { organizationId: stri
         </div>
         <div
           className="hover:fmtm-bg-gray-200 fmtm-rounded-full fmtm-p-2 fmtm-duration-300 fmtm-cursor-pointer"
-          onClick={() => navigate('/manage/organization')}
+          onClick={() => navigate('/organization')}
         >
           <AssetModules.CloseIcon />
         </div>

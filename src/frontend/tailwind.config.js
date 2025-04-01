@@ -59,6 +59,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
   prefix: 'fmtm-',
 };

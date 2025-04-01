@@ -32,7 +32,7 @@ const SelectContent = ({ className, children, position = 'popper', ref, ...props
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'fmtm-relative fmtm-z-50 fmtm-min-w-[8rem] fmtm-overflow-hidden fmtm-rounded-md fmtm-border fmtm-bg-white text-popover-foreground fmtm-shadow-md data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0 data-[state=closed]:fmtm-zoom-out-95 fmtm-data-[state=open]:zoom-in-95 data-[side=bottom]:fmtm-slide-in-from-top-2 data-[side=left]:fmtm-slide-in-from-right-2 data-[side=right]:fmtm-slide-in-from-left-2 data-[side=top]:fmtm-slide-in-from-bottom-2',
+        'fmtm-relative fmtm-z-50 fmtm-min-w-[8rem] fmtm-overflow-hidden fmtm-rounded-md fmtm-border fmtm-bg-white text-popover-foreground fmtm-shadow-md data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0 data-[state=closed]:fmtm-zoom-out-95 data-[state=open]:fmtm-zoom-in-95 data-[side=bottom]:fmtm-slide-in-from-top-2 data-[side=left]:fmtm-slide-in-from-right-2 data-[side=right]:fmtm-slide-in-from-left-2 data-[side=top]:fmtm-slide-in-from-bottom-2',
         position === 'popper' &&
           'data-[side=bottom]:fmtm-translate-y-1 data-[side=left]:fmtm--translate-x-1 data-[side=right]:fmtm-translate-x-1 data-[side=top]:fmtm--translate-y-1',
         className,

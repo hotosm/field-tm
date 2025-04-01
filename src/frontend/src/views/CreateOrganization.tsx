@@ -1,23 +1,19 @@
 import React, { useEffect } from 'react';
-import CoreModules from '@/shared/CoreModules';
 import CreateEditOrganizationHeader from '@/components/CreateEditOrganization/CreateEditOrganizationHeader';
 import ConsentDetailsForm from '@/components/CreateEditOrganization/ConsentDetailsForm';
 import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { useHasManagedAnyOrganization, useIsAdmin, useIsOrganizationAdmin } from '@/hooks/usePermissions';
+import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
 import NoAccessComponent from '@/views/NoAccessComponent';
+import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 
-const CreateEditOrganization = () => {
-  const params = CoreModules.useParams();
+const CreateOrganization = () => {
   const dispatch = useAppDispatch();
-  const organizationId: string = params.id;
   const isAdmin = useIsAdmin();
-  const isOrganizationAdmin = useIsOrganizationAdmin(+organizationId);
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
 
-  if ((organizationId && !isOrganizationAdmin) || (!organizationId && hasManagedAnyOrganization && !isAdmin))
-    return <NoAccessComponent />;
+  if (hasManagedAnyOrganization && !isAdmin) return <NoAccessComponent />;
 
   const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 
@@ -40,11 +36,16 @@ const CreateEditOrganization = () => {
   }, []);
 
   return (
-    <div className="fmtm-bg-[#F5F5F5]">
-      <CreateEditOrganizationHeader organizationId={organizationId} />
-      <div className="fmtm-box-border fmtm-pt-4">
-        {organizationId || (!organizationId && consentApproval) ? (
-          <CreateEditOrganizationForm organizationId={organizationId} />
+    <div className="fmtm-h-full lg:fmtm-overflow-hidden">
+      <CreateEditOrganizationHeader organizationId={''} />
+      <div className="fmtm-box-border fmtm-pt-4 lg:fmtm-h-[calc(100%-42.5px)]">
+        {consentApproval ? (
+          <div className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 lg:fmtm-gap-10 fmtm-pt-4 fmtm-h-full`}>
+            <InstructionsSidebar />
+            <div className="fmtm-w-full fmtm-h-full xl:fmtm-max-w-[50rem] fmtm-bg-white">
+              <CreateEditOrganizationForm organizationId={''} />
+            </div>
+          </div>
         ) : (
           <ConsentDetailsForm />
         )}
@@ -53,4 +54,4 @@ const CreateEditOrganization = () => {
   );
 };
 
-export default CreateEditOrganization;
+export default CreateOrganization;

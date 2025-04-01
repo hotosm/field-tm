@@ -24,7 +24,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fmtm-bg-background/80 fmtm-fixed fmtm-inset-0 fmtm-z-50 fmtm-backdrop-blur-sm fmtm-transition-all fmtm-duration-100 data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out data-[state=open]:fmtm-fade-in',
+      'fmtm-bg-grey-500 fmtm-opacity-50 fmtm-fixed fmtm-inset-0 fmtm-z-50 fmtm-backdrop-blur-sm fmtm-transition-all fmtm-duration-100 data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out data-[state=open]:fmtm-fade-in',
       className,
     )}
     {...props}
@@ -41,15 +41,15 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fmtm-bg-background fmtm-fixed fmtm-z-50 fmtm-grid fmtm-w-full fmtm-gap-4 fmtm-rounded-b-lg fmtm-border fmtm-p-6 fmtm-shadow-lg fmtm-animate-in data-[state=open]:fmtm-fade-in-90 data-[state=open]:fmtm-slide-in-from-bottom-10 sm:fmtm-max-w-lg sm:fmtm-rounded-lg sm:fmtm-zoom-in-90 data-[state=open]:sm:fmtm-slide-in-from-bottom-0',
+        'fmtm-bg-white fmtm-fixed fmtm-z-50 fmtm-grid fmtm-w-full fmtm-gap-4 fmtm-rounded-b-lg fmtm-border fmtm-p-6 fmtm-shadow-lg fmtm-animate-in data-[state=open]:fmtm-fade-in-90 data-[state=open]:fmtm-slide-in-from-bottom-10 sm:fmtm-max-w-lg sm:fmtm-rounded-lg sm:fmtm-zoom-in-90 data-[state=open]:sm:fmtm-slide-in-from-bottom-0',
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="fmtm-ring-offset-background focus:fmtm-ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground fmtm-absolute fmtm-right-4 fmtm-top-4 fmtm-rounded-sm fmtm-opacity-70 fmtm-transition-opacity hover:fmtm-opacity-100 focus:fmtm-outline-none focus:fmtm-ring-2 focus:fmtm-ring-offset-2 disabled:fmtm-pointer-events-none">
-        <X className="fmtm-h-4 fmtm-w-4" />
-        <span className="sr-only">Close</span>
+      <DialogPrimitive.Close className="fmtm-absolute fmtm-z-50 fmtm-right-4 fmtm-top-4 fmtm-rounded-sm fmtm-opacity-70 fmtm-ring-offset-black fmtm-transition-opacity hover:fmtm-opacity-100 focus:fmtm-outline-none disabled:fmtm-pointer-events-none data-[state=open]:fmtm-bg-white data-[state=open]:fmtm-text-black  fmtm-w-fit">
+        <X className="fmtm-h-6 fmtm-w-6 fmtm-text-black fmtm-cursor-pointer hover:fmtm-scale-110 fmtm-duration-150 fmtm-bg-white fmtm-rounded-full fmtm-p-1" />
+        <span className="fmtm-sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
