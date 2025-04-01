@@ -214,7 +214,7 @@ const ProjectDetails = () => {
                           key={tab.id}
                           className={`fmtm-body-md fmtm-rounded-none fmtm-border-b fmtm-py-1 fmtm-px-5 fmtm-duration-200 fmtm-w-fit fmtm-text-grey-900 fmtm-text-nowrap ${
                             selectedTab === tab.id ? 'fmtm-border-primaryRed fmtm-button' : 'fmtm-border-transparent'
-                          } ${(taskModalStatus && tab.id === 'project_info') || (!taskModalStatus && (tab.id === 'task_activity' || tab.id === 'comments')) ? 'fmtm-hidden' : ''}`}
+                          } ${(taskModalStatus && (tab.id === 'project_info' || tab.id === 'instructions' || tab.id === 'task_list')) || (!taskModalStatus && (tab.id === 'task_activity' || tab.id === 'comments')) ? 'fmtm-hidden' : ''}`}
                           onClick={() => setSelectedTab(tab.id)}
                         >
                           {tab.name}
@@ -224,7 +224,7 @@ const ProjectDetails = () => {
                   </div>
                   {getTabContent(selectedTab)}
                 </div>
-                {selectedTab !== 'comments' && selectedTab !== 'task_list' && (
+                {selectedTab !== 'comments' && (
                   <div className="fmtm-flex fmtm-gap-[0.625rem]">
                     <Link to={`/manage/project/${params?.id}`} className="!fmtm-w-1/2">
                       <Button variant="secondary-grey" className="fmtm-w-full">
