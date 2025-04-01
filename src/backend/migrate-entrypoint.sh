@@ -58,6 +58,10 @@ check_all_s3_vars_present() {
         echo "Environment variable S3_SECRET_KEY is not set."
         exit 1
     fi
+    if [ -z "${S3_BUCKET_NAME}" ]; then
+        echo "Environment variable S3_BUCKET_NAME is not set."
+        exit 1
+    fi
     if [ -z "${S3_BACKUP_BUCKET_NAME}" ]; then
         echo "Environment variable S3_BACKUP_BUCKET_NAME is not set."
         exit 1
@@ -67,6 +71,7 @@ check_all_s3_vars_present() {
     export S3_ENDPOINT="${S3_ENDPOINT//\"/}"
     export S3_ACCESS_KEY="${S3_ACCESS_KEY//\"/}"
     export S3_SECRET_KEY="${S3_SECRET_KEY//\"/}"
+    export S3_BUCKET_NAME="${S3_BUCKET_NAME//\"/}"
     export S3_BACKUP_BUCKET_NAME="${S3_BACKUP_BUCKET_NAME//\"/}"
 }
 
@@ -173,6 +178,17 @@ check_if_missing_migrations() {
     done
 }
 
+init_buckets() {
+    DATA_BUCKET_NAME=${S3_BUCKET_NAME}
+    BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
+    echo "Ensuring S3 bucket ${BUCKET_NAME} exists"
+    mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
+    mc mb "s3/${DATA_BUCKET_NAME}" --ignore-existing
+    mc mb "s3/${BACKUP_BUCKET_NAME}" --ignore-existing
+    mc anonymous set download "s3/${DATA_BUCKET_NAME}"
+    mc anonymous set download "s3/${BACKUP_BUCKET_NAME}"
+}
+
 backup_db() {
     echo "Backing up database, prior to migrations."
     db_backup_file="$HOME/fmtm_pre_migrate_$(date +'%Y%m%d%H%M%S').dump"
@@ -192,9 +208,6 @@ backup_db() {
 
     BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
-    mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
-    mc mb "s3/${BUCKET_NAME}" --ignore-existing
-    mc anonymous set download "s3/${BUCKET_NAME}"
     mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/pre-migrate/"
 
     pretty_echo "Backup complete: $db_backup_file to bucket ${BUCKET_NAME}/pre-migrate/"
@@ -227,7 +240,6 @@ SQL
 copy_frontend_config_to_s3() {
     BUCKET_NAME="fmtm-data"
     echo "Uploading config.json to S3 bucket ${BUCKET_NAME}"
-    mc alias set s3 "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
     mc cp /opt/frontend-config.json "s3/${BUCKET_NAME}/frontend/config.json"
 }
 
@@ -239,7 +251,7 @@ copy_frontend_config_to_s3() {
 ### Script START ###
 ####################
 
-pretty_echo "### Script Start ###"
+pretty_echo "### Migrations Start ###"
 
 # Var: array of migration files to run
 scripts_to_execute=()
@@ -249,6 +261,7 @@ check_all_db_vars_present
 check_all_s3_vars_present
 wait_for_db
 wait_for_s3
+init_buckets
 db_url="postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}/${FMTM_DB_NAME}"
 
 # Apply schema, if needed
@@ -263,7 +276,7 @@ if [ ${#scripts_to_execute[@]} -gt 0 ]; then
 else
     pretty_echo "No new migrations found."
 fi
-pretty_echo "### Script End: Migrations Complete ###"
+pretty_echo "### Migrations End ###"
 
 pretty_echo "### Copying Frontend Config ###"
 copy_frontend_config_to_s3

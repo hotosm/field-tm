@@ -411,6 +411,7 @@ services:
     environment:
       # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
       - S3_ENDPOINT=http://s3:9000
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-"fmtm-data"}
       - S3_BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME:-"fmtm-db-backups"}
     networks:
       - fmtm-net
