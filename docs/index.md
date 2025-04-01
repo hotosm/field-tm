@@ -66,9 +66,9 @@ Find a phone that:
 Has mobile data or an internet plan.
 Works well with the app.(ODK Collect)
 Access the OSM registration site and register.
-https://www.openstreetmap.org/
-Install ODK Collect on your phone, by clicking the link bellow and following the procedure.
-https://fmtm.hotosm.org/
+<https://www.openstreetmap.org/>
+Install ODK Collect on your phone, by clicking the link below and following the procedure.
+<https://fmtm.hotosm.org/>
 Click in the humberg icon on the top right side of your screen.
 Click Download Custom ODK Collect.
 From the FMTM page, choose a campaign.
