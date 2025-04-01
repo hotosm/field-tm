@@ -155,6 +155,7 @@ COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
 COPY stats/ /opt/stats/
 COPY scheduler/ /opt/scheduler/
+COPY frontend-config.json /opt/frontend-config.json
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs \

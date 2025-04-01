@@ -403,8 +403,6 @@ services:
         condition: service_healthy
       s3:
         condition: service_healthy
-    volumes:
-      - ./src/mapper/static/config.json:/opt/frontend-config.json:ro
     env_file:
       - .env
     # Hardcode some vars for dev, as not necessarily present in the .env file
