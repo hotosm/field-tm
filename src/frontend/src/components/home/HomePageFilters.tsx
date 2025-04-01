@@ -24,7 +24,7 @@ const HomePageFilters = ({ searchText, onSearch }: homePageFiltersPropType) => {
       <h5>PROJECTS</h5>
       <Searchbar
         value={searchText}
-        onChange={(e) => onSearch(e.target.value)}
+        onChange={onSearch}
         wrapperStyle="!fmtm-w-[10.313rem] !fmtm-h-9"
         className="!fmtm-rounded !fmtm-h-9"
       />

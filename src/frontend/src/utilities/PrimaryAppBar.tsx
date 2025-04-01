@@ -80,32 +80,26 @@ export default function PrimaryAppBar() {
             Explore Projects
           </Link>
           {authDetails && (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger className="fmtm-outline-none fmtm-w-fit">
-                <div
-                  className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-                    location.pathname.includes('/manage') ? 'fmtm-border-red-medium' : 'fmtm-border-white'
-                  } fmtm-border-b-2 fmtm-flex fmtm-items-center fmtm-gap-1`}
-                >
-                  <p>Manage</p>
-                  <AssetModules.ArrowDropDownIcon className="!fmtm-text-sm" />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="fmtm-py-2 fmtm-border-none fmtm-bg-white !fmtm-shadow-[0px_0px_20px_4px_rgba(0,0,0,0.05)]"
-                align="center"
-                sideOffset={10}
+            <>
+              <Link
+                to="/organization"
+                className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
+                  location.pathname === '/organization' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+                } fmtm-border-b-2`}
               >
-                {isAdmin && (
-                  <Link to="/manage/user">
-                    <DropdownMenuItem>Manage User</DropdownMenuItem>
-                  </Link>
-                )}
-                <Link to="/manage/organization">
-                  <DropdownMenuItem>Manage Organization</DropdownMenuItem>
+                Organizations
+              </Link>
+              {isAdmin && (
+                <Link
+                  to="/manage/user"
+                  className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
+                    location.pathname === '/manage/user' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+                  } fmtm-border-b-2`}
+                >
+                  Manage Users
                 </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+            </>
           )}
         </div>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">

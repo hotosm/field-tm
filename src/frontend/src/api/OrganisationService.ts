@@ -1,10 +1,15 @@
-import axios from 'axios';
-import { GetOrganisationDataModel, OrganisationModal } from '@/models/organisation/organisationModel';
+import axios, { AxiosResponse } from 'axios';
+import {
+  GetOrganisationDataModel,
+  OrganisationModal,
+  OrganizationAdminsModel,
+} from '@/models/organisation/organisationModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { API } from '.';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { AppDispatch } from '@/store/Store';
+import { NavigateFunction } from 'react-router-dom';
 
 function appendObjectToFormData(formData: FormData, object: Record<string, any>) {
   for (const [key, value] of Object.entries(object)) {
@@ -123,6 +128,7 @@ export const GetIndividualOrganizationService = (url: string) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));
     const getOrganisationData = async (url: string) => {
       try {
+        dispatch(OrganisationAction.SetIndividualOrganizationLoading(true));
         const getOrganisationDataResponse = await axios.get(url);
         const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
         dispatch(OrganisationAction.SetIndividualOrganization(response));
@@ -132,6 +138,8 @@ export const GetIndividualOrganizationService = (url: string) => {
             message: error.response.data.detail || 'Failed to fetch organization.',
           }),
         );
+      } finally {
+        dispatch(OrganisationAction.SetIndividualOrganizationLoading(false));
       }
     };
     await getOrganisationData(url);
@@ -230,5 +238,56 @@ export const RejectOrganizationService = (url: string) => {
       }
     };
     await rejectOrganization(url);
+  };
+};
+
+export const DeleteOrganizationService = (url: string, navigate: NavigateFunction) => {
+  return async (dispatch: AppDispatch) => {
+    const rejectOrganization = async (url: string) => {
+      try {
+        dispatch(OrganisationAction.SetOrganizationDeleting(true));
+        await axios.delete(url);
+        navigate('/organization');
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: 'Organization deleted successfully',
+            variant: 'success',
+          }),
+        );
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: 'Failed to delete organization',
+          }),
+        );
+      } finally {
+        dispatch(OrganisationAction.SetOrganizationDeleting(false));
+      }
+    };
+    await rejectOrganization(url);
+  };
+};
+
+export const GetOrganizationAdminsService = (url: string, params: { org_id: number }) => {
+  return async (dispatch: AppDispatch) => {
+    const getOrganizationAdmins = async (url: string, params: { org_id: number }) => {
+      try {
+        dispatch(OrganisationAction.GetOrganizationAdminsLoading(true));
+        const getOrganizationAdminsResponse: AxiosResponse<OrganizationAdminsModel[]> = await axios.get(url, {
+          params,
+        });
+        const response = getOrganizationAdminsResponse.data;
+        dispatch(OrganisationAction.SetOrganizationAdmins(response));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: 'Failed to fetch organization admins',
+          }),
+        );
+      } finally {
+        dispatch(OrganisationAction.GetOrganizationAdminsLoading(false));
+      }
+    };
+    await getOrganizationAdmins(url, params);
   };
 };

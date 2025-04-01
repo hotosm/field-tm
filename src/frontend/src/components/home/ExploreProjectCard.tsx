@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomizedImage from '@/utilities/CustomizedImage';
-import CustomizedProgressBar from '@/utilities/CustomizedProgressBar';
+import { Tooltip } from '@mui/material';
 import { projectType } from '@/models/home/homeModel';
-import CoreModules from '@/shared/CoreModules';
-import AssetModules from '@/shared/AssetModules';
+import defaultOrgLogo from '@/assets/images/project_icon.png';
 
-export default function ExploreProjectCard({ data }: { data: projectType }) {
+export default function ExploreProjectCard({ data, className }: { data: projectType; className?: string }) {
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {
@@ -25,45 +23,85 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
   return (
     <div
       onClick={handleProjectCardClick}
-      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer"
+      className={`hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
     >
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
-          <div className="fmtm-flex fmtm-justify-between">
-            {data.organisation_logo ? (
-              <div className="fmtm-h-[50px]">
-                <CoreModules.CardMedia component="img" src={data.organisation_logo} sx={{ height: 50 }} />
-              </div>
-            ) : (
-              <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
-            )}
-            <p>#{data.id}</p>
+          {data.organisation_logo ? (
+            <img src={data.organisation_logo} className="fmtm-h-7 fmtm-max-h-7" alt="organization logo" />
+          ) : (
+            <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
+          )}
+          <div className="fmtm-my-3">
+            <p className="fmtm-body-sm-semibold fmtm-text-[#706E6E] fmtm-mb-1">ID: #{data.id}</p>
+            <p
+              className="fmtm-capitalize fmtm-body-sm fmtm-line-clamp-1 fmtm-text-[#7A7676]"
+              title={data?.location_str}
+            >
+              {data?.location_str || '-'}
+            </p>
           </div>
 
-          <div className="fmtm-flex fmtm-flex-col fmtm-justify-start fmtm-mt-[2%]">
-            <p className="fmtm-line-clamp-3 fmtm-text-xl fmtm-capitalize fmtm-font-bold" title={data.name}>
+          <div>
+            <p
+              className="fmtm-button fmtm-text-[#090909] fmtm-line-clamp-1 fmtm-capitalize fmtm-mb-1"
+              title={data.name}
+            >
               {data.name}
             </p>
             <p
-              className="fmtm-capitalize fmtm-line-clamp-2 fmtm-mt-[5%] fmtm-text-[#7A7676]"
+              className="fmtm-body-md fmtm-capitalize fmtm-line-clamp-3 fmtm-text-[#2B2B2B] fmtm-min-h-[3.938rem]"
               title={data.short_description}
             >
               {data.short_description}
             </p>
-            <div className="fmtm-flex fmtm-items-start fmtm-mt-[1.63rem] fmtm-gap-2">
-              <AssetModules.LocationOn color="error" style={{ fontSize: '22px' }} />
-              <p className="fmtm-capitalize fmtm-line-clamp-1 fmtm-text-[#7A7676]" title={data?.location_str}>
-                {data?.location_str || '-'}
-              </p>
-            </div>
           </div>
         </div>
-        <div>
-          <div className="fmtm-flex fmtm-items-center fmtm-gap-1 fmtm-mt-[7%] fmtm-ml-[2%]">
-            <p className="fmtm-text-2xl fmtm-font-bold">{data.num_contributors}</p>
-            <p className="fmtm-text-lg">{data.num_contributors === 1 ? 'contributor' : 'contributors'}</p>
+        <div className="fmtm-mt-4">
+          <div className="fmtm-flex fmtm-justify-between fmtm-mb-1">
+            <p className="fmtm-body-sm-semibold">{data?.total_tasks} Tasks</p>
+            <p className="fmtm-body-sm-semibold">{data?.total_submissions} Submissions</p>
           </div>
-          <CustomizedProgressBar data={data} height={7} />
+          <Tooltip
+            title={
+              <div>
+                <p>{data?.total_tasks} Total Tasks</p>
+                <p>{data?.tasks_mapped} Tasks Mapped</p>
+                <p>{data?.tasks_validated} Tasks Validated</p>
+              </div>
+            }
+            placement="top"
+            arrow
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: '#333333',
+                  color: '#ffffff',
+                  fontSize: '12px',
+                },
+              },
+              arrow: {
+                sx: {
+                  color: '#333333',
+                },
+              },
+            }}
+          >
+            <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
+              <div
+                style={{
+                  width: `${(data?.tasks_mapped / data?.total_tasks) * 100}%`,
+                }}
+                className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
+              />
+              <div
+                style={{
+                  width: `${(data?.tasks_validated / data?.total_tasks) * 100}%`,
+                }}
+                className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
+              />
+            </div>
+          </Tooltip>
         </div>
       </div>
     </div>

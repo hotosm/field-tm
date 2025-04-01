@@ -31,7 +31,7 @@ export default function Pagination({
 
   return (
     <div
-      className={`fmtm-bottom-0 fmtm-flex fmtm-items-center fmtm-justify-between fmtm-flex-col sm:fmtm-flex-row fmtm-bg-white fmtm-py-2 fmtm-px-11 fmtm-shadow-black fmtm-shadow-2xl fmtm-z-50 fmtm-gap-1 ${className}`}
+      className={`fmtm-bottom-0 fmtm-flex fmtm-items-center fmtm-justify-between fmtm-flex-col sm:fmtm-flex-row fmtm-bg-white fmtm-py-2 fmtm-px-11 fmtm-shadow-[0px_-5px_10px_0px_rgba(0,0,0,0.1)]  fmtm-z-50 fmtm-gap-1 ${className}`}
     >
       <p className="fmtm-body-sm fmtm-text-grey-800">
         Showing {showing} of {totalCount} results
@@ -39,25 +39,27 @@ export default function Pagination({
 
       <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-center fmtm-gap-x-6 fmtm-gap-y-1">
         {/* Go to page */}
-        <div className="fmtm-flex fmtm-flex-1 fmtm-items-center fmtm-justify-center fmtm-gap-2 fmtm-md:pr-6">
-          <p className="fmtm-body-sm fmtm-whitespace-nowrap fmtm-text-grey-800">Go to Page</p>
-          <input
-            type="number"
-            min={1}
-            disabled={isLoading}
-            defaultValue={currentPageState}
-            value={currentPageState}
-            onChange={(e) => {
-              const value =
-                Number(e.target.value) > (paginationRange[paginationRange.length - 1] as number)
-                  ? (paginationRange[paginationRange.length - 1] as number)
-                  : +e.target.value;
-              setCurrentPageState(value);
-              handlePageChange(value);
-            }}
-            className="fmtm-body-md fmtm-outline-none fmtm-border fmtm-border-[#D0D5DD] fmtm-rounded-lg fmtm-w-8 fmtm-h-8 fmtm-p-1"
-          />
-        </div>
+        {paginationRange.length > 1 && (
+          <div className="fmtm-flex fmtm-flex-1 fmtm-items-center fmtm-justify-center fmtm-gap-2 fmtm-md:pr-6">
+            <p className="fmtm-body-sm fmtm-whitespace-nowrap fmtm-text-grey-800">Go to Page</p>
+            <input
+              type="number"
+              min={1}
+              disabled={isLoading}
+              defaultValue={currentPageState}
+              value={currentPageState}
+              onChange={(e) => {
+                const value =
+                  Number(e.target.value) > (paginationRange[paginationRange.length - 1] as number)
+                    ? (paginationRange[paginationRange.length - 1] as number)
+                    : +e.target.value;
+                setCurrentPageState(value);
+                handlePageChange(value);
+              }}
+              className="fmtm-body-md fmtm-outline-none fmtm-border fmtm-border-[#D0D5DD] fmtm-rounded-lg fmtm-w-8 fmtm-h-8 fmtm-p-1"
+            />
+          </div>
+        )}
 
         {/* pagination-numbers */}
         {paginationRange.length > 1 && (

@@ -115,7 +115,7 @@ const Organisation = () => {
               onClick={() => loadMyOrganisations()}
             />
             {(!hasManagedAnyOrganization || isAdmin) && (
-              <CoreModules.Link to={'/manage/organization/new'}>
+              <CoreModules.Link to={'/organization/new'}>
                 <CoreModules.Button
                   variant="outlined"
                   color="error"

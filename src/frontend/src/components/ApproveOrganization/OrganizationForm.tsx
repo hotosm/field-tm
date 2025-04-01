@@ -52,7 +52,7 @@ const OrganizationForm = () => {
     if (organizationApprovalSuccess) {
       dispatch(OrganisationAction.SetOrganisationFormData({}));
       dispatch(OrganisationAction.SetOrganizationApprovalStatus(false));
-      navigate('/manage/organization');
+      navigate('/organization');
     }
   }, [organizationApprovalSuccess]);
 

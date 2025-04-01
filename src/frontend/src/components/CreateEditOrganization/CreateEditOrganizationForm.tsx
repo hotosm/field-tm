@@ -7,13 +7,8 @@ import { OrganisationAction } from '@/store/slices/organisationSlice';
 import useForm from '@/hooks/useForm';
 import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
-import {
-  GetIndividualOrganizationService,
-  PatchOrganizationDataService,
-  PostOrganisationDataService,
-} from '@/api/OrganisationService';
+import { PatchOrganizationDataService, PostOrganisationDataService } from '@/api/OrganisationService';
 import { diffObject } from '@/utilfunctions/compareUtils';
-import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
@@ -91,16 +86,10 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
       if (searchParams.get('popup') === 'true') {
         window.close();
       } else {
-        navigate('/manage/organization');
+        navigate('/organization');
       }
     }
   }, [postOrganisationData]);
-
-  useEffect(() => {
-    if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${API_URL}/organisation/${organizationId}`));
-    }
-  }, [organizationId]);
 
   useEffect(() => {
     if (!values?.fillODKCredentials) {
@@ -123,16 +112,13 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   }, []);
 
   return (
-    <div
-      className={`fmtm-flex ${
-        !organizationId ? 'fmtm-flex-col lg:fmtm-flex-row' : 'fmtm-justify-center'
-      } fmtm-gap-5 lg:fmtm-gap-10`}
-    >
-      {!organizationId && <InstructionsSidebar />}
-      <div className="fmtm-bg-white fmtm-w-full lg:fmtm-w-[70%] xl:fmtm-w-[55rem] fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9">
-        <h5 className="fmtm-text-[#484848] fmtm-text-2xl fmtm-font-[600] fmtm-pb-3 lg:fmtm-pb-7 fmtm-font-archivo fmtm-tracking-wide">
-          Organizational Details
-        </h5>
+    <div className="fmtm-relative fmtm-bg-white fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden">
+      <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
+        {!organizationId && (
+          <h5 className="fmtm-text-[#484848] fmtm-text-2xl fmtm-font-[600] fmtm-pb-3 lg:fmtm-pb-7 fmtm-font-archivo fmtm-tracking-wide">
+            Organizational Details
+          </h5>
+        )}
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
           <InputTextField
             id="name"
@@ -244,18 +230,17 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
             acceptedInput="image/*"
           />
         </div>
-
-        <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">
-          {!organizationId && (
-            <Button variant="secondary-red" onClick={() => dispatch(OrganisationAction.SetConsentApproval(false))}>
-              Back
-            </Button>
-          )}
-
-          <Button variant="primary-red" onClick={handleSubmit} isLoading={postOrganisationDataLoading}>
-            {!organizationId ? 'Submit' : 'Update'}
+      </div>
+      <div className="fmtm-bg-white fmtm-py-2 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-shadow-2xl fmtm-z-50">
+        {!organizationId && (
+          <Button variant="secondary-red" onClick={() => dispatch(OrganisationAction.SetConsentApproval(false))}>
+            Back
           </Button>
-        </div>
+        )}
+
+        <Button variant="primary-red" onClick={handleSubmit} isLoading={postOrganisationDataLoading}>
+          {!organizationId ? 'Submit' : 'Update'}
+        </Button>
       </div>
     </div>
   );
