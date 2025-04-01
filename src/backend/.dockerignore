@@ -13,6 +13,4 @@
 !uv.lock
 !migrations
 !scheduler
-
-**/__pycache__
-**/*.pyc
+!frontend-config.json
