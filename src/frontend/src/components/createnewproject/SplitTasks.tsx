@@ -157,6 +157,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         additionalFeature?.file,
         projectDetails.project_admins as number[],
         combinedFeaturesCount,
+        projectDetails.dataExtractType === 'no_data_extract',
       ),
     );
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));

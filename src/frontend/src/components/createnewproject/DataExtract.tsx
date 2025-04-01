@@ -20,6 +20,7 @@ import UploadArea from '@/components/common/UploadArea';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { fileType } from '@/store/types/ICommon';
 import { valid } from 'geojson-validation';
+import type { FeatureCollection } from 'geojson';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -38,6 +39,7 @@ const newGeomOptions = [
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Fetch data from OSM' },
   { name: 'data_extract', value: 'custom_data_extract', label: 'Upload custom map data' },
+  { name: 'data_extract', value: 'no_data_extract', label: 'No existing data' },
 ];
 
 const DataExtract = ({
@@ -59,6 +61,13 @@ const DataExtract = ({
   const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
   useEffect(() => {
+    // Creating project without data extract, allow to continue
+    if (extractType === 'no_data_extract') {
+      setDisableNextButton(false);
+      return;
+    }
+
+    // No data extract geojson provided, although specified
     if (!dataExtractGeojson) {
       setDisableNextButton(true);
       return;
@@ -225,9 +234,13 @@ const DataExtract = ({
       setCustomDataExtractUpload(geojsonFromFgbFile);
     }
 
+    validateDataExtractGeojson(extractFeatCol, uploadedFile);
+  };
+
+  const validateDataExtractGeojson = (extractFeatCol: FeatureCollection, uploadedFile: File) => {
     const isGeojsonValid = valid(extractFeatCol, true);
 
-    if (isGeojsonValid?.length === 0 && extractFeatCol && extractFeatCol?.features?.length > 0) {
+    if (isGeojsonValid?.length === 0 && extractFeatCol) {
       handleCustomChange('customDataExtractUpload', uploadedFile);
       handleCustomChange('task_split_type', task_split_type.CHOOSE_AREA_AS_TASK.toString());
       dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));

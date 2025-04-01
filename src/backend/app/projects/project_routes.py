@@ -1178,9 +1178,11 @@ async def upload_project_task_boundaries(
         geom_type="Polygon",
     )
     success = await DbTask.create(db, project_id, featcol_single_geom_type)
-    if not success:
-        return JSONResponse(content={"message": "failure"})
-    return JSONResponse(content={"message": "success"})
+    if success:
+        return JSONResponse(content={"message": "success"})
+
+    log.error(f"Failed to create task areas for project {project_id}")
+    return JSONResponse(content={"message": "failure"})
 
 
 ####################
@@ -1246,10 +1248,16 @@ async def create_project(
     # Create the project in the FMTM DB
     project_info.odkid = odkproject["id"]
     project_info.author_sub = db_user.sub
-    project = await DbProject.create(db, project_info)
+    try:
+        project = await DbProject.create(db, project_info)
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Project creation failed.",
+        ) from e
     if not project:
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
         )
 
