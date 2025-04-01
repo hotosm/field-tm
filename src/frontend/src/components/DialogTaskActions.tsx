@@ -102,7 +102,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     const authDetailsCopy = authDetails != null ? { ...authDetails } : {};
 
     if (btnId != undefined) {
-      if (authDetailsCopy.hasOwnProperty('id')) {
+      if (authDetailsCopy.hasOwnProperty('sub')) {
         // if (btnId === 'MERGE_WITH_OSM') {
         //   navigate(`/conflate-data/${currentProjectId}/${taskId}`);
         //   return;

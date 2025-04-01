@@ -20,7 +20,7 @@ export const getUserDetailsFromApi = async (fetchClient = fetch) => {
 // then the user is redirected back to the mapper frontend URL requested
 export const osmLoginRedirect = async () => {
 	try {
-		const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/osm-login`);
+		const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm`);
 		const data = await resp.json();
 		window.location = data.login_url;
 	} catch (error) {}

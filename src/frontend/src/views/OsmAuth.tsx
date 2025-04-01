@@ -30,7 +30,7 @@ function OsmAuth() {
       if (authCode) {
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/callback?code=${authCode}&state=${state}`,
+            `${import.meta.env.VITE_API_URL}/auth/callback/osm?code=${authCode}&state=${state}`,
             { credentials: 'include' },
           );
 
