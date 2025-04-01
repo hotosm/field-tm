@@ -193,7 +193,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
   };
 
   const LockedPopup = (properties: Record<string, any>) => {
-    if (properties.actioned_by_uid === authDetails?.id) {
+    if (properties.actioned_by_uid === authDetails?.sub) {
       return <p>This task was locked by you</p>;
     }
     return null;
@@ -224,7 +224,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           zIndex={5}
           style=""
           getTaskStatusStyle={(feature) => {
-            return getTaskStatusStyle(feature, mapTheme, feature.getProperties()?.actioned_by_uid == authDetails?.id);
+            return getTaskStatusStyle(feature, mapTheme, feature.getProperties()?.actioned_by_uid == authDetails?.sub);
           }}
         />
       )}
