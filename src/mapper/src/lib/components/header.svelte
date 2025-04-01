@@ -9,8 +9,8 @@
 	import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
 	import type { SlSelectEvent } from '@shoelace-style/shoelace/dist/events';
 
-	import { setLocale as setParaglideLocale, locales } from "$translations/runtime.js";
-	import { m } from "$translations/messages.js";
+	import { setLocale as setParaglideLocale, locales } from '$translations/runtime.js';
+	import { m } from '$translations/messages.js';
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
@@ -18,6 +18,7 @@
 	import { getAlertStore } from '$store/common.svelte';
 	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
+	import { goto } from '$app/navigation';
 
 	let drawerRef: SlDrawer | undefined = $state();
 	let drawerOpenButtonRef: SlTooltip | undefined = $state();
@@ -44,7 +45,7 @@
 	const handleLocaleSelect = (event: SlSelectEvent) => {
 		const selectedItem = event.detail.item;
 		commonStore.setLocale(selectedItem.value);
-		setParaglideLocale(selectedItem.value) // paraglide function for UI changes (causes reload)
+		setParaglideLocale(selectedItem.value); // paraglide function for UI changes (causes reload)
 	};
 
 	onMount(() => {
@@ -62,8 +63,16 @@
 </script>
 
 <div class="p-3 flex items-center justify-between font-barlow">
-	<div class="flex items-center gap-1">
-		<a href={window.location.origin}><img src={commonStore.config?.logoUrl} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" /></a>
+	<div
+		onclick={() => goto('/')}
+		onkeydown={(e) => {
+			if (e.key === 'Enter') goto('/');
+		}}
+		role="button"
+		tabindex="0"
+		class="flex items-center gap-1"
+	>
+		<img src={commonStore.config?.logoUrl} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
 		<!-- The approach below is finicky - can loading the logo via CSS work nicely? -->
 		<!-- <a href={window.location.origin} 
 			class="inline-block flex h-[2.2rem] sm:h-[3rem] w-[2.2rem] sm:w-[3rem] bg-no-repeat bg-cover"
@@ -166,7 +175,8 @@
 		<div class="locale-selection">
 			<sl-dropdown>
 				<hot-button slot="trigger" caret>
-					<hot-icon name="translate"></hot-icon> {commonStore.locale}
+					<hot-icon name="translate"></hot-icon>
+					{commonStore.locale}
 				</hot-button>
 				<sl-menu>
 					{#each locales as locale}
@@ -197,7 +207,7 @@
 				role="button"
 				tabindex="0"
 			>
-			{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m['header.sign_out']()}</span>{/key}
+				{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m['header.sign_out']()}</span>{/key}
 			</hot-button>
 		{/if}
 	</div>
