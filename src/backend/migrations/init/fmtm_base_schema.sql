@@ -658,14 +658,14 @@ EXECUTE FUNCTION public.set_task_state();
 
 -- Materialized Views
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_project_stats AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_project_stats AS
 WITH latest_task_events AS (
     SELECT DISTINCT ON (ev.project_id, ev.task_id)
         ev.project_id,
         ev.task_id,
         ev.event_id,
         ev.event
-    FROM task_events AS ev
+    FROM public.task_events AS ev
     ORDER BY ev.project_id ASC, ev.task_id ASC, ev.created_at DESC
 )
 
@@ -696,9 +696,9 @@ SELECT
                 THEN lte.event_id
         END
     ) AS tasks_validated
-FROM projects AS p
-LEFT JOIN task_events AS ev ON p.id = ev.project_id
-LEFT JOIN odk_entities AS et ON p.id = et.project_id
+FROM public.projects AS p
+LEFT JOIN public.task_events AS ev ON p.id = ev.project_id
+LEFT JOIN public.odk_entities AS et ON p.id = et.project_id
 LEFT JOIN latest_task_events AS lte ON p.id = lte.project_id
 GROUP BY p.id;
 
