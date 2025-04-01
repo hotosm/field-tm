@@ -91,7 +91,9 @@
 			const url = `${API_URL}/submission?project_id=${projectId}`;
 			var data = new FormData();
 			data.append('submission_xml', submission_xml);
-			data.append('submission_files', pic);
+			if (pic && pic?.name) {
+				data.append('submission_files', pic);
+			}
 			await fetch(url, {
 				method: 'POST',
 				body: data,
