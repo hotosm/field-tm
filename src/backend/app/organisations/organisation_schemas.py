@@ -118,4 +118,4 @@ class OrgManagersOut(BaseModel):
 
     user_sub: str
     username: str
-    profile_img: str
+    profile_img: Optional[str] = None

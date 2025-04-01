@@ -656,6 +656,52 @@ BEFORE INSERT ON public.task_events
 FOR EACH ROW
 EXECUTE FUNCTION public.set_task_state();
 
+-- Materialized Views
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_project_stats AS
+WITH latest_task_events AS (
+    SELECT DISTINCT ON (ev.project_id, ev.task_id)
+        ev.project_id,
+        ev.task_id,
+        ev.event_id,
+        ev.event
+    FROM task_events AS ev
+    ORDER BY ev.project_id ASC, ev.task_id ASC, ev.created_at DESC
+)
+
+SELECT
+    p.id AS project_id,
+    count(DISTINCT ev.user_sub) AS num_contributors,
+    count(
+        DISTINCT CASE
+            WHEN et.status = 'SURVEY_SUBMITTED'
+                THEN et.entity_id
+        END
+    ) AS total_submissions,
+    count(
+        DISTINCT CASE
+            WHEN lte.event = 'FINISH'
+                THEN lte.event_id
+        END
+    ) AS tasks_mapped,
+    count(
+        DISTINCT CASE
+            WHEN lte.event = 'BAD'
+                THEN lte.event_id
+        END
+    ) AS tasks_bad,
+    count(
+        DISTINCT CASE
+            WHEN lte.event = 'GOOD'
+                THEN lte.event_id
+        END
+    ) AS tasks_validated
+FROM projects AS p
+LEFT JOIN task_events AS ev ON p.id = ev.project_id
+LEFT JOIN odk_entities AS et ON p.id = et.project_id
+LEFT JOIN latest_task_events AS lte ON p.id = lte.project_id
+GROUP BY p.id;
+
 -- Finalise
 
 REVOKE USAGE ON SCHEMA public FROM public;

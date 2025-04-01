@@ -230,7 +230,7 @@ class ProjectSummary(BaseModel):
     priority: Optional[ProjectPriority]
 
     # FIXME Do we need outline in summary?
-    outline: Optional[Polygon]
+    # outline: Optional[Polygon]
     hashtags: Optional[list[str]]
     location_str: Optional[str] = None
     short_description: Optional[str] = None
