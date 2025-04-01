@@ -437,6 +437,9 @@ services:
         # Check inactive users every Sunday 00:00
         echo '0 0 * * 0 /opt/scheduler/inactive_users.py' >> ./crontab
 
+        # Run project stats script every 10 mins
+        echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
+
         exec /usr/local/bin/supercronic ./crontab
       "
     restart: "unless-stopped"
