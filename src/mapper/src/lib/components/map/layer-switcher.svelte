@@ -142,7 +142,7 @@ map = new Map({
 	function selectStyle(style: MapLibreStylePlusMetadata) {
 		const currentMapStyle = map?.getStyle();
 
-		if (style.name === currentMapStyle.name) return;
+		if (!currentMapStyle || style.name === currentMapStyle.name) return;
 
 		setSelectedStyleUrl(style.metadata.thumbnail);
 

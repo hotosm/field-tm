@@ -224,6 +224,13 @@ SQL
     done
 }
 
+copy_frontend_config_to_s3() {
+    BUCKET_NAME="fmtm-data"
+    echo "Uploading config.json to S3 bucket ${BUCKET_NAME}"
+    mc alias set s3 "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
+    mc cp /opt/frontend-config.json "s3/${BUCKET_NAME}/frontend/config.json"
+}
+
 ### Functions END ###
 
 
@@ -257,6 +264,9 @@ else
     pretty_echo "No new migrations found."
 fi
 pretty_echo "### Script End: Migrations Complete ###"
+
+pretty_echo "### Copying Frontend Config ###"
+copy_frontend_config_to_s3
 
 ####################
 ###  Script END  ###

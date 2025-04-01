@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import type { PageLoad } from '../$types';
+import type { PageLoad } from './$types';
 import { getLoginStore } from '$store/login.svelte.ts';
 import { refreshCookies, getUserDetailsFromApi } from '$lib/utils/login';
 

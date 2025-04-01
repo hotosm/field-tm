@@ -69,6 +69,7 @@ mapper-frontend-dev:
   pnpm install
   VITE_API_URL=https://api.stage.fmtm.hotosm.org \
   VITE_SYNC_URL=https://sync.stage.fmtm.hotosm.org \
+  VITE_S3_URL=https://s3.stage.fmtm.hotosm.org \
   pnpm run dev
 
 # Start FMTM without ODK Central
