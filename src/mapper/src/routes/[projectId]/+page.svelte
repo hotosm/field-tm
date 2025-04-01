@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$styles/page.css';
 	import '$styles/button.css';
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
 	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
@@ -152,9 +152,11 @@
 		}
 		// if project loaded for the first time then show qrcode tab
 		if (+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load']) {
-			tabGroup.updateComplete.then(() => {
-				tabGroup.show('qrcode');
-			});
+			if (tabGroup) {
+				tabGroup.updateComplete.then(() => {
+					tabGroup.show('qrcode');
+				});
+			}
 		}
 	});
 

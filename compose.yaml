@@ -211,6 +211,7 @@ services:
     environment:
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
+      - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -402,6 +403,8 @@ services:
         condition: service_healthy
       s3:
         condition: service_healthy
+    volumes:
+      - ./src/mapper/static/config.json:/opt/frontend-config.json:ro
     env_file:
       - .env
     # Hardcode some vars for dev, as not necessarily present in the .env file
