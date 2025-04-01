@@ -223,7 +223,7 @@
 		entitiesUrl={data.project.data_extract_url}
 		primaryGeomType={data.project.primary_geom_type}
 		draw={isDrawEnabled}
-		drawGeomType={data.project.new_geom_type}
+		drawGeomType={data.project?.new_geom_type}
 		handleDrawnGeom={(drawInstance, geom) => {
 			newFeatureDrawInstance = drawInstance;
 			newFeatureGeom = geom;

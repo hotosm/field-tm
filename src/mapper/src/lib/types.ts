@@ -1,6 +1,5 @@
 import type { UUID } from 'crypto';
-import type { Polygon } from 'geojson';
-import type { MapGeomTypes } from '$constants/enums.ts';
+import type { Point, Polygon } from 'geojson';
 import { m } from '$translations/messages.js';
 
 export type ProjectTask = {
@@ -56,10 +55,6 @@ export type TaskStatus = {
 	UNLOCKED_TO_VALIDATE: string;
 	LOCKED_FOR_VALIDATION: string;
 	UNLOCKED_DONE: string;
-	// INVALIDATED: string;
-	// BAD: string;
-	// SPLIT: string;
-	// ARCHIVED: string;
 };
 export const TaskStatusEnum: TaskStatus = Object.freeze({
 	UNLOCKED_TO_MAP: m['task_states.UNLOCKED_TO_MAP'](),
@@ -75,10 +70,6 @@ export type TaskEvent = {
 	VALIDATE: string;
 	GOOD: string;
 	BAD: string;
-	// SPLIT: string;
-	// MERGE: string;
-	// ASSIGN: string;
-	// COMMENT: string;
 };
 export const TaskEventEnum: TaskEvent = Object.freeze({
 	MAP: 'MAP',
@@ -116,4 +107,30 @@ export type TaskEventType = {
 	task_id: number;
 	user_id: number;
 	username: string;
+};
+
+export type projectType = {
+	centroid: Point;
+	hashtags: string[];
+	id: number;
+	location_str: string | null;
+	name: string;
+	num_contributors: number;
+	organisation_id: number;
+	organisation_logo: string | null;
+	outline: Polygon;
+	priority: number;
+	short_description: string;
+	total_tasks: string;
+};
+
+export type paginationType = {
+	has_next: boolean;
+	has_prev: boolean;
+	next_num: number | null;
+	page: number | null;
+	pages: number | null;
+	prev_num: number | null;
+	per_page: number;
+	total: number | null;
 };
