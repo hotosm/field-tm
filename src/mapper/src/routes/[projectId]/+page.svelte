@@ -381,7 +381,8 @@
 		bind:webFormsRef
 		bind:display={displayWebFormsDrawer}
 		projectId={data?.projectId}
-		entityId={selectedEntityId}
+		entityId={selectedEntityId || undefined}
+		taskId={taskStore.selectedTaskId || undefined}
 	/>
 </div>
 

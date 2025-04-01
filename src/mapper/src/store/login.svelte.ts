@@ -1,6 +1,7 @@
 type authDetailsType = {
 	id: number;
 	username: string;
+	email_address?: string;
 	picture: string;
 	role: string;
 	// Here we omit project_roles and orgs_managed as they are not needed
