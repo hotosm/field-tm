@@ -1,44 +1,114 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"task_states": {
-		"UNLOCKED_TO_MAP": "",
-		"LOCKED_FOR_MAPPING": "",
-		"UNLOCKED_TO_VALIDATE": "",
-		"LOCKED_FOR_VALIDATION": "",
-		"UNLOCKED_DONE": ""
+		"UNLOCKED_TO_MAP": "Pronto",
+		"LOCKED_FOR_MAPPING": "Bloqueado para mapeamento",
+		"UNLOCKED_TO_VALIDATE": "Pronto para validação",
+		"LOCKED_FOR_VALIDATION": "Bloqueado para validação",
+		"UNLOCKED_DONE": "Validado"
 	},
 	"entity_states": {
-		"READY": "",
-		"OPENED_IN_ODK": "",
-		"SURVEY_SUBMITTED": "",
-		"MARKED_BAD": ""
+		"READY": "Pronto",
+		"OPENED_IN_ODK": "Aberto no ODK",
+		"SURVEY_SUBMITTED": "Pesquisa enviada",
+		"MARKED_BAD": "Marcado como ruim"
 	},
 	"header": {
-		"about": "",
-		"guide_for_mappers": "",
-		"support": "",
-		"download_custom_odk_collect": "",
+		"about": "Sobre",
+		"guide_for_mappers": "Guia para mapeadores",
+		"support": "Suporte",
+		"download_custom_odk_collect": "Baixar ODK Collect personalizado",
 		"sign_in": "INICIAR SESSÃO",
 		"sign_out": "SAIR"
 	},
 	"map": {
-		"enable_geolocation": "",
-		"enable_geolocation_got_it": "",
-		"exit_navigation": "",
-		"click_on_a_task": "",
-		"click_on_the_map": ""
+		"enable_geolocation": "Para a melhor experiência, ative a localização",
+		"enable_geolocation_got_it": "Entendi!",
+		"exit_navigation": "Sair da navegação",
+		"click_on_a_task": "CLIQUE EM UMA TAREFA PARA SELECIONAR UM RECURSO PARA MAPEAR",
+		"click_on_the_map": "Clique no mapa para criar um novo ponto"
 	},
 	"popup": {
 		"task": "Tarefa",
-		"task_id": "ID da tarefa",
+		"task_id": "ID da Tarefa",
 		"feature": "Recurso",
 		"start_mapping_task": "Deseja começar a mapear a tarefa #{taskId}?",
-		"map_new_feature": "",
-		"start_mapping": "",
-		"cancel_mapping": "",
-		"cancel": "",
-		"navigate_here": "",
-		"map_in_odk": ""
+		"map_new_feature": "MAPEAR NOVO RECURSO",
+		"start_mapping": "INICIAR MAPEAMENTO",
+		"cancel_mapping": "CANCELAR MAPEAMENTO",
+		"cancel": "CANCELAR",
+		"navigate_here": "NAVEGAR ATÉ AQUI",
+		"map_in_odk": "MAPEAR RECURSO NO ODK"
+	},
+	"stack_group": {
+		"project_information": "Informações do projeto",
+		"comment": "Comentário",
+		"instructions": "Instruções",
+		"activities": "Atividades"
+	},
+	"legend": {
+		"features": "Legenda (Recursos)"
+	},
+	"qr": {
+		"download": "Baixar QR"
+	},
+	"odk": {
+		"open": "Abrir ODK"
+	},
+	"basemaps": {
+		"manage": "Gerenciar mapas base",
+		"no_basemaps_available": "Não há mapas base disponíveis para este projeto.",
+		"ask_pm": "Por favor, solicite ao gerente do projeto que crie mapas base.",
+		"show_on_map": "Mostrar no mapa",
+		"store_offline": "Armazenar offline",
+		"download_mbtiles": "Baixar MBTiles"
+	},
+	"project_info": {
+		"organization_name": "Gnome da organização",
+		"description": "Descrição",
+		"total_tasks": "Total de tarefas",
+		"project_id": "ID do projeto"
+	},
+	"activities": {
+		"update_status_to": "atualizou o status para",
+		"no_activities_on_task_yet": "Nenhuma atividade ainda nesta tarefa",
+		"no_activities_yet": "Nenhuma atividade ainda"
+	},
+	"comment": {
+		"clear": "LIMPAR",
+		"comment": "COMENTAR",
+		"no_comments_yet_on_task": "Nenhum comentário ainda nesta tarefa",
+		"no_comments_yet": "Nenhum comentário ainda"
+	},
+	"dialog_entities_actions": {
+		"distance_constraint": "Este projeto tem restrição de distância ativada. Por favor, ative a geolocalização do dispositivo para melhor funcionalidade",
+		"feature_must_be": "O recurso deve estar dentro de",
+		"meters_location": "metros da sua localização",
+		"enable_location": "Ative a geolocalização para navegar até a entidade.",
+		"map_in_webforms": "MAPEAR NOS FORMULÁRIOS WEB DO ODK",
+		"you_are": "Você está",
+		"away_sure": "longe do recurso. Tem certeza de que deseja mapear este recurso?",
+		"status": "Status",
+		"comments": "Comentários",
+		"entity_uuid": "UUID da entidade"
+	},
+	"dialog_task_actions": {
+		"complete_mapping": "CONCLUIR MAPEAMENTO",
+		"locked_is_complete": "foi bloqueado. A tarefa está completamente mapeada?",
+		"task": "Tarefa"
+	},
+	"pagination": {
+		"go_to_page": "Ir para a página"
+	},
+	"qrcode": {
+		"scan_to_open_odk": "Escaneie para abrir o ODK Collect",
+		"moreinfo": "Mais informações sobre a importação manual do código QR"
+	},
+	"index": {
+		"no_instructions": "Sem instruções"
+	},
+	"geolocation": {
+		"distance": "Distância"
 	},
 	"scan_qr_code": "Digitize este código QR no ODK Collect a partir do telefone de outro usuário ou faça o download e importe-o manualmente",
 	"download": "BAIXAR"

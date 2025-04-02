@@ -115,7 +115,7 @@
 			if (!coordFrom) {
 				alertStore.setAlert({
 					message:
-						'This project has distance constraint enabled. Please enable device geolocation for optimal functionality',
+						m['dialog_entities_actions.distance_constraint'](),
 					variant: 'warning',
 				});
 				return;
@@ -125,7 +125,7 @@
 			if (entityDistance && entityDistance > projectData?.geo_restrict_distance_meters) {
 				// Feature is far away from user, warn user
 				alertStore.setAlert({
-					message: `The feature must be within ${projectData?.geo_restrict_distance_meters} meters of your location`,
+					message: `${m['dialog_entities_actions.feature_must_be']()} ${projectData?.geo_restrict_distance_meters} ${m['dialog_entities_actions.meters_location']()}`,
 					variant: 'warning',
 				});
 				return;
@@ -148,7 +148,7 @@
 
 	const navigateToEntity = () => {
 		if (!entitiesStore.toggleGeolocation) {
-			alertStore.setAlert({ message: 'Please enable geolocation to navigate to the entity.', variant: 'warning' });
+			alertStore.setAlert({ message: m['dialog_entities_actions.enable_location'](), variant: 'warning' });
 			return;
 		}
 		entitiesStore.setEntityToNavigate(selectedEntityCoordinate);
@@ -183,12 +183,12 @@
 						<p class="text-[#161616] font-medium ml-2">{selectedEntity?.task_id}</p>
 					</div>
 					<div class="flex">
-						<p class="min-w-[6.25rem] text-[#2B2B2B]">Entity Uuid</p>
+						<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.entity_uuid']()}</p>
 						:
 						<p class="break-all text-[#161616] font-medium ml-2">{selectedEntity?.entity_id}</p>
 					</div>
 					<div class="flex items-center">
-						<p class="min-w-[6.25rem] text-[#2B2B2B]">Status</p>
+						<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.status']()}</p>
 						:
 						<p
 							class={`text-[#161616] font-medium border-[1px] border-solid ml-2 py-1 px-3 rounded-full ${getStatusStyle(selectedEntity?.status)}`}
@@ -198,7 +198,7 @@
 					</div>
 					{#if entityComments?.length > 0}
 						<div class="flex">
-							<p class="min-w-[6.25rem] text-[#2B2B2B]">Comments</p>
+							<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.comments']()}</p>
 							:
 							<div class="flex flex-col ml-2 gap-2 flex-1">
 								{#each entityComments?.slice(0, 2) as comment}
@@ -299,7 +299,7 @@
 							>
 								<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
 								></hot-icon>
-								<span class="font-barlow font-medium text-sm">MAP IN ODK WEB FORMS</span>
+								<span class="font-barlow font-medium text-sm">{m['dialog_entities_actions.map_in_webforms']()}</span>
 							</sl-button>
 						{/if}
 					</div>
@@ -321,7 +321,7 @@
 	>
 		<div class="flex items-start flex-col">
 			<p class="text-base mb-5 text-gray-700">
-				Your are <b
+				{m['dialog_entities_actions.you_are']()} <b
 					>{(
 						distance(
 							entitiesStore.selectedEntityCoordinate?.coordinate as Coord,
@@ -329,7 +329,7 @@
 							{ units: 'kilometers' },
 						) * 1000
 					).toFixed(2)}m</b
-				> away from the feature. Are you sure you want to map this feature?
+				> {m['dialog_entities_actions.away_sure']()}
 			</p>
 			<div class="flex gap-2 ml-auto">
 				<sl-button

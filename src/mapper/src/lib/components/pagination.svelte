@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getPaginationRange, DOTS } from '$lib/utils/getPaginationRange';
+	import { m } from "$translations/messages.js";
 
 	type propsType = {
 		showing: number;
@@ -42,7 +43,7 @@
 	<div class="flex flex-wrap justify-center gap-x-6 gap-y-1">
 		<!-- Go to Page -->
 		<div class="flex flex-1 items-center justify-center gap-2 md:pr-6">
-			<p class="text-[0.75rem] leading-normal font-normal whitespace-nowrap text-[#484848]">Go to Page</p>
+			<p class="text-[0.75rem] leading-normal font-normal whitespace-nowrap text-[#484848]">{m['pagination.go_to_page']()}</p>
 			<input
 				type="number"
 				min="1"

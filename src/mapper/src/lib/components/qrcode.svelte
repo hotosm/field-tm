@@ -29,7 +29,7 @@
 	<div class="text-center w-full">
 		<div class="text-lg font-medium">
 			{#key commonStore.locale}<span class="mr-1">{m.scan_qr_code()}</span>{/key}
-			<sl-tooltip content="More information on manually importing qr code" placement="bottom">
+			<sl-tooltip content={m['qrcode.moreinfo']()} placement="bottom">
 				<hot-icon
 					onclick={() => {
 						if (infoDialogRef) infoDialogRef?.show();
@@ -50,7 +50,7 @@
 
 	<!-- QR Code Container -->
 	<div class="flex justify-center w-full max-w-sm">
-		<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250" class="p-4 bg-white m-4"></hot-qr-code>
+		<hot-qr-code value={qrCodeData} label={m['qrcode.scan_to_open_odk']()} size="250" class="p-4 bg-white m-4"></hot-qr-code>
 	</div>
 
 	<!-- Download Button -->

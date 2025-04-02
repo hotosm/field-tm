@@ -313,7 +313,7 @@
 							class="w-full max-w-[200px]"
 							href="odkcollect://form/{data.project.odk_form_id}"
 						>
-							<span class="font-barlow font-medium text-base uppercase">Open ODK</span></sl-button
+							<span class="font-barlow font-medium text-base uppercase">{m['odk.open']()}</span></sl-button
 						>
 					{/if}
 				</QRCodeComponent>

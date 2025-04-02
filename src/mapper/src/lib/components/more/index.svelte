@@ -5,25 +5,26 @@
 	import ProjectInfo from '$lib/components/more/project-info.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { ProjectData, TaskEventType } from '$lib/types';
+	import { m } from "$translations/messages.js";
 
 	type stackType = '' | 'Comment' | 'Instructions' | 'Activities' | 'Project Information';
 
 	const stackGroup: { icon: string; title: stackType }[] = [
 		{
 			icon: 'info-circle',
-			title: 'Project Information',
+			title: m['stack_group.project_information'](),
 		},
 		{
 			icon: 'chat',
-			title: 'Comment',
+			title: m['stack_group.comment'](),
 		},
 		{
 			icon: 'description',
-			title: 'Instructions',
+			title: m['stack_group.instructions'](),
 		},
 		{
 			icon: 'list-ul',
-			title: 'Activities',
+			title: m['stack_group.activities'](),
 		},
 	];
 
@@ -114,7 +115,7 @@
 			<Editor editable={false} content={projectData?.per_task_instructions} />
 		{:else}
 			<div class="flex justify-center mt-10">
-				<p class="text-[#484848] text-base">No Instructions</p>
+				<p class="text-[#484848] text-base">{m['index.no_instructions']()}</p>
 			</div>
 		{/if}
 	{/if}
