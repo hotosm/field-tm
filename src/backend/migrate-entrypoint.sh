@@ -179,13 +179,10 @@ check_if_missing_migrations() {
 }
 
 init_buckets() {
-    DATA_BUCKET_NAME=${S3_BUCKET_NAME}
     BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Ensuring S3 bucket ${BUCKET_NAME} exists"
     mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
-    mc mb "s3/${DATA_BUCKET_NAME}" --ignore-existing
     mc mb "s3/${BACKUP_BUCKET_NAME}" --ignore-existing
-    mc anonymous set download "s3/${DATA_BUCKET_NAME}"
     mc anonymous set download "s3/${BACKUP_BUCKET_NAME}"
 }
 
@@ -237,12 +234,6 @@ SQL
     done
 }
 
-copy_frontend_config_to_s3() {
-    BUCKET_NAME="fmtm-data"
-    echo "Uploading config.json to S3 bucket ${BUCKET_NAME}"
-    mc cp /opt/frontend-config.json "s3/${BUCKET_NAME}/frontend/config.json"
-}
-
 ### Functions END ###
 
 
@@ -277,9 +268,6 @@ else
     pretty_echo "No new migrations found."
 fi
 pretty_echo "### Migrations End ###"
-
-pretty_echo "### Copying Frontend Config ###"
-copy_frontend_config_to_s3
 
 ####################
 ###  Script END  ###
