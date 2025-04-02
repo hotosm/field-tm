@@ -360,7 +360,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.0-beta.23}"
+    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.3}"
     depends_on:
       proxy:
         condition: service_started
@@ -370,6 +370,8 @@ services:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
+      # For development we do not need to include auth token security
+      ELECTRIC_INSECURE: true
       # OTEL_EXPORT: otlp
       # OTLP_ENDPOINT: https://...
       # ELECTRIC_WRITE_TO_PG_MODE: direct_writes

@@ -305,7 +305,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.0-beta.23}"
+    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.3}"
     depends_on:
       proxy:
         condition: service_started
