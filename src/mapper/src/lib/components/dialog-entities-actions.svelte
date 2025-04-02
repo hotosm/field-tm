@@ -260,9 +260,9 @@
 						</sl-button>
 						<sl-button
 							loading={entitiesStore.updateEntityStatusLoading}
-							variant="default"
+							variant="primary"
 							size="small"
-							class="primary flex-grow"
+							class="flex-grow"
 							onclick={() => {
 								handleMapFeature();
 							}}
@@ -281,9 +281,9 @@
 						{#if displayWebFormsButton}
 							<sl-button
 								loading={entitiesStore.updateEntityStatusLoading}
-								variant="default"
+								variant="primary"
 								size="small"
-								class="primary flex-grow"
+								class="flex-grow"
 								onclick={() => {
 									toggleTaskActionModal(false);
 									displayWebFormsDrawer = true;
@@ -348,9 +348,9 @@
 					<span class="font-barlow font-medium text-sm">NO</span>
 				</sl-button>
 				<sl-button
-					variant="default"
+					variant="primary"
 					size="small"
-					class="primary flex-grow"
+					class="flex-grow"
 					onclick={() => {
 						mapFeature();
 						toggleDistanceWarningDialog = false;

@@ -76,9 +76,8 @@
 						<span class="font-barlow font-medium text-sm">{m['popup.cancel']()}</span>
 					</sl-button>
 					<sl-button
-						variant="default"
+						variant="primary"
 						size="small"
-						class="primary"
 						onclick={() => {
 							if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
 						}}

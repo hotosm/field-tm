@@ -263,7 +263,8 @@
 						role="button"
 						tabindex="0"
 						size="small"
-						class="primary w-fit"
+						class="w-fit"
+						variant="primary"
 						loading={isGeometryCreationLoading}
 					>
 						<span class="font-barlow font-medium text-xs uppercase">PROCEED</span>
@@ -308,7 +309,8 @@
 					{#if +(projectSetupStepStore.projectSetupStep || 0) !== projectSetupStepEnum['odk_project_load']}
 						<sl-button
 							size="small"
-							class="primary w-full max-w-[200px]"
+							variant="primary"
+							class="w-full max-w-[200px]"
 							href="odkcollect://form/{data.project.odk_form_id}"
 						>
 							<span class="font-barlow font-medium text-base uppercase">Open ODK</span></sl-button
@@ -338,7 +340,8 @@
 					role="button"
 					tabindex="0"
 					size="small"
-					class="primary w-fit ml-auto"
+					variant="primary"
+					class="w-fit ml-auto"
 				>
 					<span class="font-barlow font-medium text-SM uppercase">CLOSE</span>
 				</sl-button>
