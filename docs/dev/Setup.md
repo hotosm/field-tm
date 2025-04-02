@@ -111,6 +111,68 @@ This will open a new pull request in the FMTM repository, where you can:
 
 That's it! You've now contributed to the Field Mapping Tasking Manager.
 
+## Alternative Operating Systems
+
+### Windows
+
+Windows Subsystem for Linux (WSL) can be used to run Docker.
+
+This will run a Linux machine inside Windows very efficiently.
+
+To install follow the
+[official instructions][11].
+
+Then continue with the FMTM installation.
+
+### MacOS
+
+[Colima][12] is recommended
+to run `docker` and `docker compose` commands.
+
+Install colima, docker, docker compose using brew:
+
+```sh
+brew install colima
+brew install docker docker-compose
+```
+
+Then configure the docker compose plugin to work on MacOS:
+
+```sh
+mkdir -p ~/.docker/cli-plugins
+
+ln -sfn $(brew --prefix)/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+```
+
+Run Colima:
+
+```sh
+colima start
+```
+
+Then continue with the FMTM installation.
+
+> Note: only tagged backend images are multi-architecture, supporting
+> MacOS. The regular images for fast continuous deployment are not:
+> `backend:development`, `backend:staging`, `backend:main`.
+
+### A Note on Docker Desktop
+
+While in theory FMTM should run using Docker-Desktop, it has not
+been tested.
+
+The authors opinion is that the official Linux Docker Daemon
+should be installed in WSL or MacOS, instead of using Docker Desktop.
+
+> Colima is a wrapper to run the Docker Daemon.
+
+Although Docker Desktop may have a user friendly GUI, it simply
+runs docker commands inside a Linux virtual machine underneath.
+
+It is often easier and more flexible to do this yourself.
+Plus it gives you access to all other other tools available
+in a Linux operating system!
+
 ## Help and Support
 
 If you encounter any issues or need assistance while using FMTM, you can access
@@ -134,3 +196,5 @@ The FMTM Developer Team
 [8]: https://docs.fmtm.dev/INSTALL/#setup-your-local-environment
 [9]: https://docs.fmtm.dev/faq
 [10]: https://hotosm.slack.com/archives/C04PCBFDEGN
+[11]: https://learn.microsoft.com/en-us/windows/wsl/install "official instructions"
+[12]: https://github.com/abiosoft/colima "Colima"
