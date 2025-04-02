@@ -8,10 +8,10 @@ services:
     image: docker.io/machines/filestash:latest
     environment:
       - ADMIN_PASSWORD=pass
-      - APPLICATION_URL=http://localhost:8334
-    # - OFFICE_URL=http://wopi_server:9980
-    # - OFFICE_FILESTASH_URL=http://app:8334
-    # - OFFICE_REWRITE_URL=http://127.0.0.1:9980
+      - APPLICATION_URL=localhost:8334
+    # - OFFICE_URL=wopi_server:9980
+    # - OFFICE_FILESTASH_URL=app:8334
+    # - OFFICE_REWRITE_URL=127.0.0.1:9980
     ports:
       - "8334:8334"
     networks:

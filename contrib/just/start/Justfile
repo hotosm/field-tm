@@ -104,7 +104,9 @@ s3-browser:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
-  @echo " Access the S3 Browser at: http://localhost:8334"
+  @echo " Access the S3 Browser at:    http://localhost:8334"
+  @echo ""
+  @echo " Access Minio S3 buckets at:  http://localhost:9000"
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
