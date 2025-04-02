@@ -40,6 +40,76 @@
 		"navigate_here": "NAVIGATE HERE",
 		"map_in_odk": "MAP FEATURE IN ODK"
 	},
+	"stack_group": {
+		"project_information": "Project Information",
+		"comment": "Comment",
+		"instructions": "Instructions",
+		"activities": "Activities"
+	},
+	"legend": {
+		"features": "Legend (Features)"
+	},
+	"qr": {
+		"download": "Download QR"
+	},
+	"odk": {
+		"open": "Open ODK"
+	},
+	"basemaps": {
+		"manage": "Manage Basemaps",
+		"no_basemaps_available": "There are no basemaps available for this project.",
+		"ask_pm": "Please ask the project manager to create basemaps.",
+		"show_on_map": "Show on Map",
+		"store_offline": "Store Offline",
+		"download_mbtiles": "Download MBTiles"
+	},
+	"project_info": {
+		"organization_name": "Organization Name",
+		"description": "Description",
+		"total_tasks": "Total tasks",
+		"project_id": "Project ID"
+	},
+	"activities": {
+		"update_status_to": "updated status to",
+		"no_activities_on_task_yet": "No activities yet on task",
+		"no_activities_yet": "No activities yet"
+	},
+	"comment": {
+		"clear": "CLEAR",
+		"comment": "COMMENT",
+		"no_comments_yet_on_task": "No comments yet on task",
+		"no_comments_yet": "No comments yet"
+	},
+	"dialog_entities_actions": {
+		"distance_constraint": "This project has distance constraint enabled. Please enable device geolocation for optimal functionality",
+		"feature_must_be": "The feature must be within",
+		"meters_location": "meters of your location",
+		"enable_location": "Please enable geolocation to navigate to the entity.",
+		"map_in_webforms": "MAP IN ODK WEB FORMS",
+		"you_are": "You are",
+		"away_sure": "away from the feature. Are you sure you want to map this feature?",
+		"status": "Status",
+		"comments": "Comments",
+		"entity_uuid": "Entity Uuid"
+	},
+	"dialog_task_actions": {
+		"complete_mapping": "COMPLETE MAPPING",
+		"locked_is_complete": "has been locked. Is the task completely mapped?",
+		"task": "Task"
+	},
+	"pagination": {
+		"go_to_page": "Go to page"
+	},
+	"qrcode": {
+		"scan_to_open_odk": "Scan to open ODK Collect",
+		"moreinfo": "More information on manually importing qr code"
+	},
+	"index": {
+		"no_instructions": "No Instructions"
+	},
+	"geolocation": {
+		"distance": "Distance"
+	},
 	"scan_qr_code": "Scan this QR code in ODK Collect from another users phone, or download and import it manually",
 	"download": "DOWNLOAD"
 }

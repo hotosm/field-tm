@@ -12,6 +12,7 @@
 	import type { Basemap } from '$lib/utils/basemaps';
 	import { getProjectBasemapStore } from '$store/common.svelte.ts';
 	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/utils/basemaps';
+	import { m } from "$translations/messages.js";
 
 	interface Props {
 		projectId: number;
@@ -34,7 +35,7 @@
 	<!-- Text above the basemap selector -->
 	<div class="text-center w-full">
 		<div class="font-bold text-lg font-medium">
-			<span class="mr-1">Manage Basemaps</span>
+			<span class="mr-1">{m['basemaps.manage']()}</span>
 		</div>
 	</div>
 
@@ -61,8 +62,8 @@
 			</sl-select>
 		{:else}
 			<div class="text-center w-full">
-				<div class="text-sm font-medium">There are no basemaps available for this project.</div>
-				<div class="text-sm font-medium pt-2">Please ask the project manager to create basemaps.</div>
+				<div class="text-sm font-medium">{m['basemaps.no_basemaps_available']()}</div>
+				<div class="text-sm font-medium pt-2">{m['basemaps.ask_pm']()}</div>
 			</div>
 		{/if}
 	</div>
@@ -81,7 +82,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-barlow font-medium text-base uppercase">Show On Map</span>
+			<span class="font-barlow font-medium text-base uppercase">{m['basemaps.show_on_map']()}</span>
 		</hot-button>
 
 		<hot-button
@@ -96,7 +97,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-barlow font-medium text-base uppercase">Store Offline</span>
+			<span class="font-barlow font-medium text-base uppercase">{m['basemaps.store_offline']()}</span>
 		</hot-button>
 
 		<!-- Download Mbtiles Button -->
@@ -113,7 +114,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-medium text-base uppercase">Download MBTiles</span>
+			<span class="font-medium text-base uppercase">{m['basemaps.download_mbtiles']()}</span>
 		</hot-button>
 	{/if}
 

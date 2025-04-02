@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TaskEventType } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { m } from "$translations/messages.js";
 
 	interface Props {
 		taskEvents: TaskEventType[];
@@ -18,8 +19,8 @@
 		<div class="flex justify-center mt-10">
 			<p class="text-[#484848] text-base">
 				{taskStore?.selectedTaskIndex
-					? `No activities yet on task ${taskStore?.selectedTaskIndex}`
-					: 'No activities yet'}
+					? `${m["activities.no_activities_on_task_yet"]()} ${taskStore?.selectedTaskIndex}`
+					: m["activities.no_activities_yet"]()}
 			</p>
 		</div>
 	{:else}
@@ -51,7 +52,7 @@
 				</div>
 				<div class="px-3 flex items-center fmtm-justify-between gap-2">
 					<p class="font-normal text-[#484848] flex-1">
-						<span class="capitalize">{event?.username}</span> updated status to <span>{event?.state}</span>
+						<span class="capitalize">{event?.username}</span> {m['activities.update_status_to']()} <span>{event?.state}</span>
 					</p>
 					<hot-icon
 						onkeydown={(e: KeyboardEvent) => {

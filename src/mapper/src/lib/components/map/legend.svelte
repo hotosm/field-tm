@@ -17,7 +17,7 @@
 </script>
 
 <div class={`${isOpen ? 'flex' : 'hidden'} flex-col gap-2`}>
-	<p class="font-semibold leading-0 text-lg mb-3">Legend (Features)</p>
+	<p class="font-semibold leading-0 text-lg mb-3">{m['legend.features']()}</p>
 	{#each taskStatuses as taskStatus}
 		<div class="flex items-center gap-2">
 			<div
