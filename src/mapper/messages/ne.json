@@ -1,0 +1,115 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"task_states": {
+		"UNLOCKED_TO_VALIDATE": "",
+		"LOCKED_FOR_VALIDATION": "",
+		"UNLOCKED_TO_MAP": "तयार",
+		"LOCKED_FOR_MAPPING": "म्यापिङको लागि लक",
+		"UNLOCKED_DONE": "प्रमाणीकृत"
+	},
+	"entity_states": {
+		"READY": "",
+		"OPENED_IN_ODK": "",
+		"SURVEY_SUBMITTED": "सर्वेक्षण पेश",
+		"MARKED_BAD": "खराब"
+	},
+	"header": {
+		"about": "",
+		"guide_for_mappers": "Mappers को लागी गाइड",
+		"support": "समर्थन",
+		"download_custom_odk_collect": "ODK Collect डाउनलोड",
+		"sign_in": "साइन इन",
+		"sign_out": "साइन आउट"
+	},
+	"map": {
+		"enable_geolocation": "उत्कृष्ट अनुभवको लागि, स्थान सक्रिय गर्नुहोस्",
+		"enable_geolocation_got_it": "बुझ्यो!",
+		"exit_navigation": "नेभिगेसनबाट बाहिर",
+		"click_on_a_task": "म्यापिङको लागि FEATURE चयन गर्न TASK मा क्लिक गर्नुहोस्",
+		"click_on_the_map": "नयाँ बिन्दु सिर्जना गर्न नक्सामा क्लिक गर्नुहोस्"
+	},
+	"popup": {
+		"task": "",
+		"task_id": "",
+		"feature": "",
+		"start_mapping_task": "के तपाइँ TASK म्यापिङ सुरु गर्न चाहनुहुन्छ #{taskId}?",
+		"map_new_feature": "",
+		"start_mapping": "",
+		"cancel_mapping": "",
+		"cancel": "",
+		"navigate_here": "",
+		"map_in_odk": ""
+	},
+	"stack_group": {
+		"project_information": "",
+		"comment": "",
+		"instructions": "",
+		"activities": ""
+	},
+	"legend": {
+		"features": ""
+	},
+	"qr": {
+		"download": ""
+	},
+	"odk": {
+		"open": ""
+	},
+	"basemaps": {
+		"manage": "",
+		"no_basemaps_available": "",
+		"ask_pm": "",
+		"show_on_map": "",
+		"store_offline": "",
+		"download_mbtiles": ""
+	},
+	"project_info": {
+		"organization_name": "",
+		"description": "",
+		"total_tasks": "",
+		"project_id": ""
+	},
+	"activities": {
+		"update_status_to": "",
+		"no_activities_on_task_yet": "",
+		"no_activities_yet": ""
+	},
+	"comment": {
+		"clear": "",
+		"comment": "",
+		"no_comments_yet_on_task": "",
+		"no_comments_yet": ""
+	},
+	"dialog_entities_actions": {
+		"distance_constraint": "",
+		"feature_must_be": "",
+		"meters_location": "",
+		"enable_location": "",
+		"map_in_webforms": "",
+		"you_are": "",
+		"away_sure": "",
+		"status": "",
+		"comments": "",
+		"entity_uuid": ""
+	},
+	"dialog_task_actions": {
+		"complete_mapping": "",
+		"locked_is_complete": "",
+		"task": ""
+	},
+	"pagination": {
+		"go_to_page": ""
+	},
+	"qrcode": {
+		"scan_to_open_odk": "",
+		"moreinfo": ""
+	},
+	"index": {
+		"no_instructions": ""
+	},
+	"geolocation": {
+		"distance": ""
+	},
+	"scan_qr_code": "",
+	"download": ""
+}
