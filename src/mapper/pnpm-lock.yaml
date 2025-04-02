@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@electric-sql/client':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       '@electric-sql/pglite':
-        specifier: ^0.2.16
-        version: 0.2.16
+        specifier: ^0.2.17
+        version: 0.2.17
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
@@ -52,7 +52,7 @@ importers:
         version: 0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
       drizzle-orm:
         specifier: ^0.35.3
-        version: 0.35.3(@electric-sql/pglite@0.2.16)(@libsql/client-wasm@0.14.0)(@prisma/client@4.8.1)(@types/react@18.3.3)(kysely@0.27.6)
+        version: 0.35.3(@electric-sql/pglite@0.2.17)(@libsql/client-wasm@0.14.0)(@prisma/client@4.8.1)(@types/react@18.3.3)(kysely@0.27.6)
       flatgeobuf:
         specifier: ^3.36.0
         version: 3.36.0
@@ -652,11 +652,11 @@ packages:
     resolution: {integrity: sha512-WyOx8cJQ+FQus4Mm4uPIZA64gbk3Wxh0so5Lcii0aJifqwoVOlfFtorjLE0Hen4OYyHZMXDWqMmaQemBhgxFRQ==}
     engines: {node: '>=14'}
 
-  '@electric-sql/client@1.0.0':
-    resolution: {integrity: sha512-kGiVbBIlMqc/CeJpWZuLjxNkm0836NWxeMtIWH2w5IUK8pUL13hyxg3ZkR7+FlTGhpKuZRiCP5nPOH9D6wbhPw==}
+  '@electric-sql/client@1.0.1':
+    resolution: {integrity: sha512-v0jeiU/smGMUyNZpcQMohGl6dX+6CdVJ6ti6PBDJDZWsAnT2gtLC+qbUTwCMd0wQ4dBrvTbkSJ7jQ25aKRXUAw==}
 
-  '@electric-sql/pglite@0.2.16':
-    resolution: {integrity: sha512-dCSHpoOKuTxecaYhWDRp2yFTN3XWcMPMrBVl5yOR8VZEUprz4+R3iuU7BipmlsqBnBDO/6l9H/C2ZwJdunkWyw==}
+  '@electric-sql/pglite@0.2.17':
+    resolution: {integrity: sha512-qEpKRT2oUaWDH6tjRxLHjdzMqRUGYDnGZlKrnL4dJ77JVMcP2Hpo3NYnOSPKdZdeec57B6QPprCUFg0picx5Pw==}
 
   '@esbuild/aix-ppc64@0.23.1':
     resolution: {integrity: sha512-6VhYk1diRqrhBAqpJEdjASR/+WVRtfjpqKuNw11cLiaWpAT/Uu+nokB+UJnevzy/P9C/ty6AOe0dwueMrGh/iQ==}
@@ -4648,11 +4648,11 @@ snapshots:
 
   '@ctrl/tinycolor@4.1.0': {}
 
-  '@electric-sql/client@1.0.0':
+  '@electric-sql/client@1.0.1':
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.28.0
 
-  '@electric-sql/pglite@0.2.16': {}
+  '@electric-sql/pglite@0.2.17': {}
 
   '@esbuild/aix-ppc64@0.23.1':
     optional: true
@@ -6176,11 +6176,11 @@ snapshots:
 
   devalue@5.1.1: {}
 
-  drizzle-orm@0.35.3(@electric-sql/pglite@0.2.16)(@libsql/client-wasm@0.14.0)(@prisma/client@4.8.1)(@types/react@18.3.3)(kysely@0.27.6):
+  drizzle-orm@0.35.3(@electric-sql/pglite@0.2.17)(@libsql/client-wasm@0.14.0)(@prisma/client@4.8.1)(@types/react@18.3.3)(kysely@0.27.6):
     dependencies:
       '@libsql/client-wasm': 0.14.0
     optionalDependencies:
-      '@electric-sql/pglite': 0.2.16
+      '@electric-sql/pglite': 0.2.17
       '@prisma/client': 4.8.1
       '@types/react': 18.3.3
       kysely: 0.27.6
