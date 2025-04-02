@@ -45,11 +45,19 @@ create_s3_buckets() {
     python /opt/app/s3.py
 }
 
+init_project_stats() {
+    echo "Initializing project stats materialized view..."
+    python /opt/scheduler/project_stats.py
+}
+
 # Start wait in background with tmp log files
 wait_for_db &
 wait_for_s3 &
 # Wait until checks complete
 wait
+
+# Initialize project stats materialized view when the service starts
+init_project_stats
 
 # Skip init S3 if env var present
 if [ "${S3_SKIP_BUCKET_INIT}" != true ]; then
