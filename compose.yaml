@@ -97,7 +97,7 @@ services:
       sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
       sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.fmtm.localhost_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor
+      sync.fmtm.localhost_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
       odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
       odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works

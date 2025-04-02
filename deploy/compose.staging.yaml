@@ -74,7 +74,7 @@ services:
       WHITELIST_URI: https://stage.fmtm.hotosm.org
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema,electric-cursor
+      # Required for electric headers electric-offset, electric-handle, electric-schema,electric-cursor,electric-up-to-date
       KEEP_UPSTREAM_HEADERS: yes
       REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -116,7 +116,7 @@ services:
       sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.stage.fmtm.hotosm.org
       sync.stage.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
       # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor
+      sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
       odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
       odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
