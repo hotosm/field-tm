@@ -67,7 +67,7 @@ services:
       WHITELIST_URI: https://fmtm.hotosm.org
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema
+      # Required for electric headers electric-offset, electric-handle, electric-schema,electric-cursor
       KEEP_UPSTREAM_HEADERS: yes
       REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -109,7 +109,7 @@ services:
       sync.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.fmtm.hotosm.org
       sync.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
       # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
+      sync.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor
     ports:
       - 80:8080
       - 443:8443

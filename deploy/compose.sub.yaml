@@ -74,7 +74,7 @@ services:
       WHITELIST_URI: https://${FMTM_DOMAIN}
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema
+      # Required for electric headers electric-offset, electric-handle, electric-schema,electric-cursor
       KEEP_UPSTREAM_HEADERS: yes
       REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -118,7 +118,7 @@ services:
       sync.${FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://mapper.${FMTM_DOMAIN}
       sync.${FMTM_DOMAIN}_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
       # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.${FMTM_DOMAIN}_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
+      sync.${FMTM_DOMAIN}_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor
       odk.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
       odk.${FMTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
