@@ -62,7 +62,7 @@ services:
       WHITELIST_URI: http://fmtm.localhost:7050
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema
+      # Required for electric headers electric-offset, electric-handle, electric-schema, electric-cursor
       KEEP_UPSTREAM_HEADERS: yes
       REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -96,6 +96,8 @@ services:
       s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
       sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
       sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+      # Expose-Headers are RESPONSE headers the browser is allowed to access
+      sync.fmtm.localhost_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor
       odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
       odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
