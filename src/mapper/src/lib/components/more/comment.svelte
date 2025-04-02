@@ -84,9 +84,9 @@
 					class="secondary col-span-2 sm:col-span-1"><span class="font-barlow text-sm">CLEAR</span></sl-button
 				>
 				<sl-button
-					variant="default"
+					variant="primary"
 					size="small"
-					class="primary col-span-2 sm:col-span-1"
+					class="col-span-2 sm:col-span-1"
 					onclick={() => {
 						if (taskStore.selectedTaskId) commentTask(projectId, taskStore.selectedTaskId, currentComment);
 						editorRef?.commands.clearContent(true);

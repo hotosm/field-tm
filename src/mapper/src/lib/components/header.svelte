@@ -195,7 +195,7 @@
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
 			<hot-button
-				class="primary rounded"
+				class="rounded"
 				variant="primary"
 				size="small"
 				onclick={handleSignOut}
