@@ -541,6 +541,7 @@
 		/>
 	</GeoJSON>
 	<!-- The features / entities -->
+	{#if entitiesUrl}
 	<FlatGeobuf
 		id="entities"
 		url={entitiesUrl}
@@ -625,6 +626,7 @@
 			/>
 		{/if}
 	</FlatGeobuf>
+	{/if}
 	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
 			<FillLayer
