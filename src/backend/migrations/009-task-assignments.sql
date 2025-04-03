@@ -51,11 +51,16 @@ CREATE TABLE IF NOT EXISTS public.project_team_users (
 );
 
 -- Add foreign key constraints for project_team_users
-DO $$ 
+DO $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.table_constraints 
-        WHERE constraint_name = 'fk_users' 
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'users'
+        AND column_name = 'id'
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_name = 'fk_users'
         AND table_name = 'project_team_users'
     ) THEN
         ALTER TABLE public.project_team_users
