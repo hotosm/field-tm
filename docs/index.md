@@ -112,12 +112,21 @@ The **Field Mapper** surveys locations and collects data from them. The basic
 work flow that a **Field Mapper** has to consider is as follows:
 
 1. Find a phone that:
-   - Works well with the app.
    - Has mobile data or an internet plan.
-2. Install all necessary apps on the phone.
-3. Access the **OSM** registration site and register.
-4. Follow the tutorial and choose a campaign.
+   - Works well with the app.(ODK Collect)
+2. Access the **OSM** registration site and register.
+   - <https://www.openstreetmap.org/>
+3. Install ODK Collect on your phone, by clicking the link below
+   and following the procedure.
+   - <https://fmtm.hotosm.org/>
+   - Click in the humberg icon on the top right side of your screen.
+   - Click Download Custom ODK Collect.
+4. From the FMTM page, choose a campaign.
 5. Select a task from the campaign.
+   - Scan the QR code that will be displayed after opening the project for the
+     first time before selecting the task.
+   - If you have already opened the project before, you can get the QR code
+     from the QR code tab
 6. Launch the map app which allows you to see the moving map of the points that
    you are now responsible for.
 7. Complete each point within the task, making sure to answer the questions in
