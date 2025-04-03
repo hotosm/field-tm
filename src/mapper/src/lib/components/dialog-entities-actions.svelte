@@ -84,7 +84,8 @@
 				entitiesStore.updateEntityStatus(projectData.id, {
 					entity_id: entityUuid,
 					status: 1,
-					label: `${m['popup.task']()} ${selectedEntity?.task_id} ${m['popup.feature']()} ${selectedEntity?.osmid}`,
+					// NOTE here we don't translate the field as English values are always saved as the Entity label
+					label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
 				});
 
 				if (taskStore.selectedTaskId && taskStore.selectedTaskState === TaskStatusEnum['UNLOCKED_TO_MAP']) {
@@ -286,11 +287,23 @@
 								class="flex-grow"
 								onclick={() => {
 									toggleTaskActionModal(false);
+									entitiesStore.updateEntityStatus(projectData.id, {
+										entity_id: selectedEntity?.entity_id,
+										status: 1,
+										// NOTE here we don't translate the field as English values are always saved as the Entity label
+										label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
+									});
 									displayWebFormsDrawer = true;
 								}}
 								onkeydown={(e: KeyboardEvent) => {
 									if (e.key === 'Enter') {
 										toggleTaskActionModal(false);
+										entitiesStore.updateEntityStatus(projectData.id, {
+											entity_id: selectedEntity?.entity_id,
+											status: 1,
+											// NOTE here we don't translate the field as English values are always saved as the Entity label
+											label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
+										});
 										displayWebFormsDrawer = true;
 									}
 								}}

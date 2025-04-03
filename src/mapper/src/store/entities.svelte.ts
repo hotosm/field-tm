@@ -2,6 +2,8 @@ import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { LngLatLike } from 'svelte-maplibre';
+
+import type { EntityStatusPayload } from '$lib/types';
 import { getAlertStore } from './common.svelte';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -149,7 +151,7 @@ function getEntitiesStatusStore() {
 		}
 	}
 
-	async function updateEntityStatus(projectId: number, payload: Record<string, any>) {
+	async function updateEntityStatus(projectId: number, payload: EntityStatusPayload) {
 		try {
 			updateEntityStatusLoading = true;
 			await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entity/status`, {
@@ -166,7 +168,7 @@ function getEntitiesStatusStore() {
 		}
 	}
 
-	async function createEntity(projectId: number, payload: Record<string, any>) {
+	async function createEntity(projectId: number, payload: FeatureCollection) {
 		try {
 			const resp = await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/create-entity`, {
 				method: 'POST',
