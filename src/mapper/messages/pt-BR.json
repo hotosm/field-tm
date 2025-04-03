@@ -49,9 +49,6 @@
 	"legend": {
 		"features": "Legenda (Recursos)"
 	},
-	"qr": {
-		"download": "Baixar QR"
-	},
 	"odk": {
 		"open": "Abrir ODK"
 	},

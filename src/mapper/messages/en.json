@@ -49,9 +49,6 @@
 	"legend": {
 		"features": "Legend (Features)"
 	},
-	"qr": {
-		"download": "Download QR"
-	},
 	"odk": {
 		"open": "Open ODK"
 	},
