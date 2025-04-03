@@ -36,7 +36,7 @@ const Home = () => {
   useEffect(() => {
     dispatch(
       HomeSummaryService(
-        `${VITE_API_URL}/projects/search?page=${paginationPage}&results_per_page=12&search=${searchQuery}`,
+        `${VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12&search=${searchQuery}`,
       ),
     );
   }, [searchQuery, paginationPage]);
