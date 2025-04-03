@@ -164,27 +164,6 @@ async def read_project_summaries(
 
 
 @router.get(
-    "/search",
-    response_model=project_schemas.PaginatedProjectSummaries,
-)
-async def search_project(
-    db: Annotated[Connection, Depends(db_conn)],
-    search: str,
-    page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
-    results_per_page: int = Query(13, le=100),
-    user_sub: Optional[str] = None,
-    hashtags: Optional[str] = None,
-):
-    """Search projects by string, hashtag, or other criteria.
-
-    NOTE this is a public endpoint with no auth requirements.
-    """
-    return await project_crud.get_paginated_projects(
-        db, page, results_per_page, user_sub, hashtags, search
-    )
-
-
-@router.get(
     "/{project_id}/entities", response_model=central_schemas.EntityFeatureCollection
 )
 async def get_odk_entities_geojson(
