@@ -134,3 +134,9 @@ export type paginationType = {
 	per_page: number;
 	total: number | null;
 };
+
+export type EntityStatusPayload = {
+	entity_id: UUID;
+	status: number;
+	// label: string, // label is now automatically determined
+};

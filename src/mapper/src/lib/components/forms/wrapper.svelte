@@ -3,6 +3,7 @@
 
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
+	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 
 	const CUSTOM_UPLOAD_ELEMENT_ID = '95c6807c-82b4-4208-b5df-5a3e795227b0';
 
@@ -16,6 +17,11 @@
 	};
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
+	const entitiesStore = getEntitiesStatusStore();
+	// use Map for quick lookups
+	let entityMap = $derived(new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.entity_id, entity])));
+	const selectedEntityId = $derived(entitiesStore.selectedEntity || '');
+	const selectedEntity = $derived(entityMap.get(selectedEntityId));
 
 	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, taskId }: Props = $props();
 	let drawerRef: SlDrawer;
@@ -94,10 +100,20 @@
 			if (pic && pic?.name) {
 				data.append('submission_files', pic);
 			}
+			// Submit the XML + any submission media
 			await fetch(url, {
 				method: 'POST',
 				body: data,
 			});
+
+			// Set the entity status to SURVEY_SUBMITTED (2)
+			entitiesStore.updateEntityStatus(projectId, {
+				entity_id: selectedEntity?.entity_id,
+				status: 2,
+				// NOTE here we don't translate the field as English values are always saved as the Entity label
+				label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
+			});
+
 			display = false;
 		})();
 	}

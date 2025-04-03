@@ -21,7 +21,7 @@ import json
 import os
 from io import BytesIO
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, List, Optional
 
 import requests
 from fastapi import (
@@ -863,22 +863,26 @@ async def add_additional_entity_list(
 async def add_new_entity(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
-    geojson: Dict[str, Any],
+    geojson: FeatureCollection,
 ):
-    """Create an Entity for the project in ODK."""
+    """Create an Entity for the project in ODK.
+
+    NOTE a FeatureCollection must be uploaded.
+    """
     try:
         project = project_user_dict.get("project")
         project_odk_id = project.odkid
         project_odk_creds = project.odk_credentials
 
-        features = geojson.get("features")
+        featcol_dict = geojson.model_dump()
+        features = featcol_dict.get("features")
         if not features or not isinstance(features, list):
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST, detail="Invalid GeoJSON format"
             )
 
         # Add required properties and extract entity data
-        featcol = add_required_geojson_properties(geojson)
+        featcol = add_required_geojson_properties(featcol_dict)
         featcol["features"][0]["properties"]["project_id"] = project.id
 
         # Get task_id of the feature if inside task boundary
