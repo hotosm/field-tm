@@ -27,6 +27,7 @@ from typing import Optional
 from fastapi import HTTPException, Response
 from loguru import logger as log
 from psycopg import Connection
+from pyodk._endpoints.submissions import Submission
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
@@ -212,7 +213,7 @@ async def create_new_submission(
     submission_xml: str,
     device_id: Optional[str] = None,
     submission_attachments: Optional[dict[str, BytesIO]] = None,
-):
+) -> Submission:
     """Create a new submission in ODK Central, using pyodk REST endpoint."""
     submission_attachments = submission_attachments or {}  # Ensure always a dict
     attachment_filepaths = []

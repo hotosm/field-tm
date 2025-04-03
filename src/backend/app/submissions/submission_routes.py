@@ -24,6 +24,7 @@ from typing import Annotated, Optional
 import geojson
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
+from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission as CentralSubmissionOut
 
@@ -82,7 +83,7 @@ async def create_submission(
     """
     project = project_user.get("project")
 
-    return await submission_crud.create_new_submission(
+    new_submission = await submission_crud.create_new_submission(
         project.odk_credentials,
         project.odkid,
         project.odk_form_id,
@@ -90,6 +91,16 @@ async def create_submission(
         device_id,
         submission_attachments,
     )
+
+    # Ensure S3 photos are upload to S3 after upload
+    async with OdkCentral(
+        url=project.odk_credentials.odk_central_url,
+        user=project.odk_credentials.odk_central_user,
+        passwd=project.odk_credentials.odk_central_password,
+    ) as odk_central:
+        await odk_central.s3_sync()
+
+    return new_submission
 
 
 @router.get("/download")
