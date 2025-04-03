@@ -3,7 +3,6 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { useAppSelector } from '@/types/reduxTypes';
 import { GetProjectQrCode } from '@/api/Files';
-import { m } from '$translations/messages.js';
 
 type tasksComponentType = {
   projectId?: string;
@@ -43,7 +42,7 @@ const QrcodeComponent = ({ projectId }: tasksComponentType) => {
           onClick={downloadQR}
         >
           <AssetModules.FileDownloadOutlinedIcon />
-          <p>{m['qr.download']()}</p>
+          <p>Download QR</p>
           <AssetModules.QrCode2OutlinedIcon />
         </button>
       </div>
