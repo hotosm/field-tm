@@ -387,7 +387,7 @@
 		bind:display={displayWebFormsDrawer}
 		projectId={data?.projectId}
 		entityId={selectedEntityId || undefined}
-		taskId={taskStore.selectedTaskId || undefined}
+		taskId={taskStore.selectedTaskIndex || undefined}
 	/>
 </div>
 
