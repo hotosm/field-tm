@@ -59,10 +59,10 @@ export default defineConfig({
 	],
 	server: {
 		host: true,
-		port: 7055,
+		port: 7053,
 	},
 	preview: {
-		port: 7055,
+		port: 7053,
 	},
 	resolve: {
 		alias: {
