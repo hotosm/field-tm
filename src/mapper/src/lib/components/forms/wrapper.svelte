@@ -78,6 +78,10 @@
 
 			let submission_xml = await payload.detail[0].data.instanceFile.text();
 
+			// entity id isn't included in the payload by default because we marked it as not relevant earlier
+			// (in order to hide it from the user's display)
+			submission_xml = submission_xml.replace('<warmup/>', `<warmup/><feature>${entityId}</feature>`);
+
 			submission_xml = submission_xml.replace('<start/>', `<start>${startDate}</start>`);
 			submission_xml = submission_xml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
 
@@ -127,7 +131,14 @@
 			const nodes = odkForm.getChildren();
 
 			// select feature that you clicked on map
-			nodes.find((it: any) => it.definition.nodeset === '/data/feature')?.setValueState([entityId]);
+			const featureNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature');
+			if (featureNode) {
+				featureNode?.setValueState([entityId]);
+
+				// hide this node because we don't need to see it after setting the value
+				featureNode.state.clientState.relevant = false;
+			}
+
 			nodes.find((it: any) => it.definition.nodeset === '/data/task_id')?.setValueState(`${taskId}`);
 		}
 	}
