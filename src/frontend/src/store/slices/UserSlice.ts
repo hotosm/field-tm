@@ -34,7 +34,7 @@ const UserSlice = createSlice({
     },
     UpdateUserList: (state, action: PayloadAction<userType>) => {
       state.userList.results = state.userList.results.map((user) =>
-        user.id === action.payload.id ? action.payload : user,
+        user.sub === action.payload.sub ? action.payload : user,
       );
     },
     SetUpdateUserRoleLoading: (state, action: PayloadAction<boolean>) => {

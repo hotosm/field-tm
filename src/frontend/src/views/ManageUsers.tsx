@@ -28,12 +28,12 @@ const ManageUsers = () => {
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const userList = useAppSelector((state) => state.user.userList);
 
-  const updateRole = (id: number, currentRole: roleType, newRole: roleType) => {
+  const updateRole = (userSub: string, currentRole: roleType, newRole: roleType) => {
     if (currentRole === newRole) {
       dispatch(CommonActions.SetSnackBar({ message: 'Role up-to-date', variant: 'info' }));
       return;
     }
-    dispatch(UpdateUserRole(`${VITE_API_URL}/users/${id}`, { role: newRole }));
+    dispatch(UpdateUserRole(`${VITE_API_URL}/users/${userSub}`, { role: newRole }));
   };
 
   const userDatacolumns = [
@@ -61,7 +61,7 @@ const ManageUsers = () => {
     },
     {
       header: 'User ID',
-      accessorKey: 'id',
+      accessorKey: 'sub',
     },
     {
       header: 'Role',
@@ -81,7 +81,7 @@ const ManageUsers = () => {
     {
       header: ' ',
       cell: ({ row }: any) => {
-        const userId = row?.original?.id;
+        const userSub = row?.original?.sub;
         const currentRole = row?.original?.role;
         return (
           <>
@@ -95,7 +95,7 @@ const ManageUsers = () => {
                     key={role}
                     className="hover:fmtm-bg-red-50 fmtm-duration-200 fmtm-outline-none fmtm-py-1 fmtm-px-4 fmtm-cursor-pointer fmtm-rounded"
                     onSelect={() => {
-                      updateRole(userId, currentRole as roleType, role as roleType);
+                      updateRole(userSub, currentRole as roleType, role as roleType);
                     }}
                   >
                     {roleLabel[role]}
