@@ -38,7 +38,8 @@
 		"cancel_mapping": "CANCEL MAPPING",
 		"cancel": "CANCEL",
 		"navigate_here": "NAVIGATE HERE",
-		"map_in_odk": "MAP FEATURE IN ODK"
+		"map_in_odk": "MAP FEATURE IN ODK",
+		"collect_data": "COLLECT DATA"
 	},
 	"stack_group": {
 		"project_information": "Project Information",
@@ -87,7 +88,8 @@
 		"away_sure": "away from the feature. Are you sure you want to map this feature?",
 		"status": "Status",
 		"comments": "Comments",
-		"entity_uuid": "Entity Uuid"
+		"entity_uuid": "Entity Uuid",
+		"collect_data": "COLLECT DATA"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "COMPLETE MAPPING",

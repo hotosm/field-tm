@@ -8,6 +8,7 @@ interface ConfigJson {
 	logoUrl: string;
 	logoText: string;
 	cssFile: string;
+	enableWebforms: boolean;
 }
 
 interface AlertDetails {

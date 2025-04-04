@@ -13,9 +13,9 @@
 	// Required for PWA to work with svelte
 	const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 
-	onMount(() => {
-		commonStore.setConfig(data.config);
+	commonStore.setConfig(data.config);
 
+	onMount(() => {
 		// Dynamically inject CSS specified in config
 		if (data.config?.cssFile) {
 			const linkElement = document.createElement('link');

@@ -38,7 +38,8 @@
 		"cancel_mapping": "",
 		"cancel": "",
 		"navigate_here": "",
-		"map_in_odk": ""
+		"map_in_odk": "",
+		"collect_data": ""
 	},
 	"stack_group": {
 		"project_information": "",
@@ -87,7 +88,8 @@
 		"away_sure": "",
 		"status": "",
 		"comments": "",
-		"entity_uuid": ""
+		"entity_uuid": "",
+		"collect_data": ""
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "",
