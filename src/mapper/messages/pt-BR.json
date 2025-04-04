@@ -38,7 +38,8 @@
 		"cancel_mapping": "CANCELAR MAPEAMENTO",
 		"cancel": "CANCELAR",
 		"navigate_here": "NAVEGAR ATÉ AQUI",
-		"map_in_odk": "MAPEAR RECURSO NO ODK"
+		"map_in_odk": "MAPEAR RECURSO NO ODK",
+		"collect_data": "COLETAR DADOS"
 	},
 	"stack_group": {
 		"project_information": "Informações do projeto",
@@ -87,7 +88,8 @@
 		"away_sure": "longe do recurso. Tem certeza de que deseja mapear este recurso?",
 		"status": "Status",
 		"comments": "Comentários",
-		"entity_uuid": "UUID da entidade"
+		"entity_uuid": "UUID da entidade",
+		"collect_data": "COLETAR DADOS"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "CONCLUIR MAPEAMENTO",
