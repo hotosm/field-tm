@@ -80,7 +80,7 @@ type EditProjectResponseTypes = {
   outline: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
   osm_category: string;
-  hashtags: string;
+  hashtags: string[];
 };
 
 export type ProjectDetailsTypes = {
@@ -94,7 +94,7 @@ export type ProjectDetailsTypes = {
   organisation?: number;
   odk_central_url?: string;
   name?: string;
-  hashtags?: string;
+  hashtags?: string[];
   short_description?: string;
   description?: string;
   task_split_type?: number;

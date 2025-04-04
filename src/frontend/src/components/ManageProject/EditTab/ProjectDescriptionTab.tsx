@@ -1,6 +1,6 @@
-import React from 'react';
-import TextArea from '../../common/TextArea';
-import InputTextField from '../../common/InputTextField';
+import React, { useState } from 'react';
+import TextArea from '@/components/common/TextArea';
+import InputTextField from '@/components/common/InputTextField';
 import Button from '@/components/common/Button';
 import EditProjectValidation from '@/components/ManageProject/EditTab/validation/EditProjectDetailsValidation';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
@@ -11,10 +11,17 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import AssetModules from '@/shared/AssetModules';
+import Chips from '@/components/common/Chips';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectDescriptionTab = ({ projectId }) => {
   useDocumentTitle('Manage Project: Project Description');
   const dispatch = useAppDispatch();
+
+  const [hashtag, setHashtag] = useState('');
+
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
   const editProjectDetailsLoading = useAppSelector((state) => state.createproject.editProjectDetailsLoading);
 
@@ -22,7 +29,7 @@ const ProjectDescriptionTab = ({ projectId }) => {
     const changedValues = diffObject(editProjectDetails, values);
     dispatch(CreateProjectActions.SetIndividualProjectDetails(values));
     if (Object.keys(changedValues).length > 0) {
-      dispatch(PatchProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${projectId}`, changedValues));
+      dispatch(PatchProjectDetails(`${VITE_API_URL}/projects/${projectId}`, changedValues));
     } else {
       dispatch(
         CommonActions.SetSnackBar({
@@ -32,11 +39,13 @@ const ProjectDescriptionTab = ({ projectId }) => {
       );
     }
   };
+
   const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
     editProjectDetails,
     submission,
     EditProjectValidation,
   );
+
   return (
     <form onSubmit={handleSubmit} className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-flex-grow fmtm-gap-5">
       <InputTextField
@@ -79,16 +88,43 @@ const ProjectDescriptionTab = ({ projectId }) => {
           editable={true}
         />
       </div>
-      <InputTextField
-        id="tags"
-        name="hashtags"
-        label="Hashtags"
-        value={values?.hashtags}
-        onChange={handleChange}
-        fieldType="text"
-        classNames="fmtm-w-full"
-        errorMsg={errors.hashtags}
-      />
+      <div>
+        <div className="fmtm-flex fmtm-items-end">
+          <InputTextField
+            id="hashtags"
+            label="Hashtags"
+            value={hashtag}
+            onChange={(e) => {
+              setHashtag(e.target.value);
+            }}
+            fieldType="text"
+            errorMsg={errors.hashtag}
+            classNames="fmtm-flex-1"
+          />
+          <Button
+            disabled={!hashtag.trim()}
+            variant="primary-red"
+            className="!fmtm-rounded-full fmtm-w-8 fmtm-h-8 fmtm-max-h-8 fmtm-max-w-8 fmtm-mx-2 fmtm-mb-[2px]"
+            onClick={() => {
+              if (!hashtag.trim()) return;
+              handleCustomChange('hashtags', [...values.hashtags, hashtag]);
+              setHashtag('');
+            }}
+          >
+            <AssetModules.AddIcon />
+          </Button>
+        </div>
+        <Chips
+          className="fmtm-my-2"
+          data={values?.hashtags}
+          clearChip={(i) => {
+            handleCustomChange(
+              'hashtags',
+              values.hashtags.filter((_, index) => index !== i),
+            );
+          }}
+        />
+      </div>
       <div className="fmtm-flex fmtm-justify-center fmtm-mt-4">
         <Button variant="primary-red" isLoading={editProjectDetailsLoading} type="submit">
           SAVE
