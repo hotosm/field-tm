@@ -34,7 +34,7 @@ export const refreshCookies = async () => {
 
 export const osmLoginRedirect = async () => {
   try {
-    const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm`);
+    const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm/management`);
     const data = await resp.json();
     window.location = data.login_url;
   } catch (error) {

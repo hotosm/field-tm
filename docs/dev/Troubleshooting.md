@@ -25,8 +25,6 @@ OSM_URL
   field required (type=value_error.missing)
 OSM_SCOPE
   field required (type=value_error.missing)
-OSM_LOGIN_REDIRECT_URI
-  field required (type=value_error.missing)
 ```
 
 Then you need to set the env variables on your system.

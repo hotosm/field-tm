@@ -16,11 +16,15 @@ export const getUserDetailsFromApi = async (fetchClient = fetch) => {
 	}
 };
 
-// Note the callback is handled in the management frontend under /osmauth,
-// then the user is redirected back to the mapper frontend URL requested
-export const osmLoginRedirect = async () => {
+export const loginRedirect = async (accountType: 'osm_account' | 'google_account') => {
 	try {
-		const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm`);
+		let resp;
+		if (accountType === 'osm_account') {
+			resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm/mapper`);
+		} else if (accountType === 'google_account') {
+			resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/google`);
+		}
+		if (!resp) return;
 		const data = await resp.json();
 		window.location = data.login_url;
 	} catch (error) {}

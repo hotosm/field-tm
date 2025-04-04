@@ -7,6 +7,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import Toast from '$lib/components/toast.svelte';
 	import Header from '$lib/components/header.svelte';
+	import '$styles/page.css';
 
 	let { data, children }: PageProps = $props();
 	const commonStore = getCommonStore();
@@ -23,13 +24,13 @@
 			linkElement.href = data.config.cssFile;
 			document.head.appendChild(linkElement);
 		}
-	})
+	});
 </script>
 
-<svelte:head> 
- 	{@html webManifestLink} 
+<svelte:head>
+	{@html webManifestLink}
 </svelte:head>
-<main class="flex flex-col h-screen overflow-hidden">
+<main class="flex flex-col h-screen overflow-hidden font-barlow">
 	<Header />
 	<Toast />
 	{@render children?.({ data })}

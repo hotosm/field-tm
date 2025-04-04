@@ -1,34 +1,35 @@
 <script lang="ts">
 	import OSMLogo from '$assets/images/osm-logo.png';
-	import { osmLoginRedirect } from '$lib/utils/login';
+	import GoogleLogo from '$assets/images/google-logo.svg';
+	import { loginRedirect } from '$lib/utils/login';
 	import { getLoginStore } from '$store/login.svelte.ts';
 
 	type loginOptionsType = {
-		id: string;
+		id: 'osm_account' | 'google_account';
 		name: string;
-		icon?: string;
-		image?: string;
-		description: string;
+		image: string;
+		description?: string;
 	};
 
 	const loginOptions: loginOptionsType[] = [
 		{
 			id: 'osm_account',
-			name: 'Personal OSM Account',
+			name: 'Sign in with OSM',
 			image: OSMLogo,
 			description: 'Edits made in FMTM will be credited to your OSM account.',
+		},
+		{
+			id: 'google_account',
+			name: 'Sign in with Google',
+			image: GoogleLogo,
 		},
 	];
 
 	let dialogRef;
 	const loginStore = getLoginStore();
 
-	const handleSignIn = async (selectedOption: string) => {
-		if (selectedOption === 'osm_account') {
-			// store current url in local storage so that the user can be redirected to current page after login
-			sessionStorage.setItem('requestedPath', window.location.pathname);
-			osmLoginRedirect();
-		}
+	const handleSignIn = async (selectedOption: 'osm_account' | 'google_account') => {
+		loginRedirect(selectedOption);
 	};
 </script>
 
@@ -68,18 +69,15 @@
 						}
 					}}
 					tabindex="0"
-					class="option-card bg-[#F5F5F5] text-gray-700 p-3 border-1 border-solid border-white hover:border-[#d73f3f] rounded-md duration-300 hover:text-red-600 cursor-pointer text-sm flex items-start gap-3 group"
+					class="option-card bg-[#F5F5F5] text-gray-700 p-3 border-1 border-solid border-white hover:border-[#d73f3f] rounded-md duration-300 hover:text-red-600 cursor-pointer text-sm flex items-start gap-3 group flex items-center"
 				>
-					<div class="w-10 max-w-10 min-w-10">
-						{#if option?.image}
-							<img src={option?.image} class="w-full" alt="personal osm account" />
-						{:else}
-							<hot-icon name={option?.icon} class="text-[2.5rem]"></hot-icon>
-						{/if}
-					</div>
+					<img src={option?.image} class="w-10" alt="personal osm account" />
+
 					<div class="flex flex-col">
 						<div class="text-lg font-medium">{option.name}</div>
-						<div class="">{option.description}</div>
+						{#if option.description}
+							<div class="">{option.description}</div>
+						{/if}
 					</div>
 				</div>
 			{/each}
