@@ -120,7 +120,7 @@ def get_application() -> FastAPI:
         description="HOTOSM Field Tasking Manager",
         version=__version__,
         license_info={
-            "name": "GPL-3.0-only",
+            "name": "AGPL-3.0-only",
             "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE.md",
         },
         debug=settings.DEBUG,

@@ -2,27 +2,12 @@
 
 <!-- markdownlint-disable -->
 <p align="center">
-  <img src="https://github.com/hotosm/fmtm/blob/main/images/hot_logo.png?raw=true" style="width: 200px;" alt="HOT"></a>
+  <img src="https://raw.githubusercontent.com/hotosm/fmtm/main/docs/images/hot_logo.png" style="width: 200px;" alt="HOT"></a>
 </p>
 <p align="center">
   <em>Processing field data from ODK to OpenStreetMap format, and other field utils.</em>
 </p>
 <p align="center">
-  <a href="https://github.com/hotosm/osm-fieldwork/actions/workflows/build.yml" target="_blank">
-      <img src="https://github.com/hotosm/osm-fieldwork/workflows/Build/badge.svg" alt="Build">
-  </a>
-  <a href="https://github.com/hotosm/osm-fieldwork/actions/workflows/build-ci.yml" target="_blank">
-      <img src="https://github.com/hotosm/osm-fieldwork/workflows/Build CI Img/badge.svg" alt="CI Build">
-  </a>
-  <a href="https://github.com/hotosm/osm-fieldwork/actions/workflows/docs.yml" target="_blank">
-      <img src="https://github.com/hotosm/osm-fieldwork/workflows/Publish Docs/badge.svg" alt="Publish Docs">
-  </a>
-  <a href="https://github.com/hotosm/osm-fieldwork/actions/workflows/publish.yml" target="_blank">
-      <img src="https://github.com/hotosm/osm-fieldwork/workflows/Publish to PyPi.org/badge.svg" alt="Publish">
-  </a>
-  <a href="https://github.com/hotosm/osm-fieldwork/actions/workflows/pytest.yml" target="_blank">
-      <img src="https://github.com/hotosm/osm-fieldwork/actions/workflows/pytest.yml/badge.svg?branch=main" alt="Test">
-  </a>
   <a href="https://pypi.org/project/osm-fieldwork" target="_blank">
       <img src="https://img.shields.io/pypi/v/osm-fieldwork?color=%2334D058&label=pypi%20package" alt="Package version">
   </a>
@@ -30,7 +15,7 @@
       <img src="https://img.shields.io/pypi/dm/osm-fieldwork.svg" alt="Downloads">
   </a>
   <a href="https://github.com/hotosm/osm-fieldwork/blob/main/LICENSE.md" target="_blank">
-      <img src="https://img.shields.io/github/license/hotosm/osm-fieldwork.svg" alt="License">
+      <img src="https://img.shields.io/badge/license-GPL%203.0-orange.svg" alt="License">
   </a>
 </p>
 

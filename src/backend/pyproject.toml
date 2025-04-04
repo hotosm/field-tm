@@ -53,7 +53,7 @@ dependencies = [
     "pyodk",
 ]
 readme = "../../README.md"
-license = {text = "GPL-3.0-only"}
+license = {text = "AGPL-3.0-only"}
 
 [dependency-groups]
 dev = [

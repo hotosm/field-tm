@@ -17,7 +17,7 @@
     "test:e2e-install-deps": "playwright install-deps",
     "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx src"
   },
-  "license": "GPL-3.0-only",
+  "license": "(AGPL-3.0-only OR CC-BY-4.0)",
   "author": {
     "name": "HOTOSM",
     "email": "sysadmin@hotosm.org"
