@@ -20,6 +20,7 @@
 
 import os
 from time import time
+from typing import Optional
 
 import requests
 from fastapi import Request, Response
@@ -36,16 +37,27 @@ if settings.DEBUG:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-async def init_osm_auth():
-    """Initialise Auth object from osm-login-python."""
+async def init_osm_auth(mapper: Optional[bool] = None):
+    """Initialize Auth object from osm-login-python."""
+    login_redirect_uri = (
+        settings.mapper_osm_login_redirect_uri
+        if mapper
+        else settings.manager_osm_login_redirect_uri
+    )
+
     return Auth(
         osm_url=settings.OSM_URL,
         client_id=settings.OSM_CLIENT_ID,
         client_secret=settings.OSM_CLIENT_SECRET.get_secret_value(),
         secret_key=settings.OSM_SECRET_KEY.get_secret_value(),
-        login_redirect_uri=settings.OSM_LOGIN_REDIRECT_URI,
+        login_redirect_uri=login_redirect_uri,
         scope=settings.OSM_SCOPE,
     )
+
+
+async def get_mapper_osm_auth():
+    """Wrapper function to await async dependency."""
+    return await init_osm_auth(mapper=True)
 
 
 async def handle_osm_callback(request: Request, osm_auth: Auth):

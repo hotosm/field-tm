@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { getUserDetailsFromApi } from '@/utilfunctions/login';
 import { useAppDispatch } from '@/types/reduxTypes';
+import { Loader2 } from 'lucide-react';
 
 function OsmAuth() {
   const navigate = useNavigate();
@@ -73,7 +74,16 @@ function OsmAuth() {
     return <div>Error: {error}</div>;
   }
 
-  return <>{!isReadyToRedirect ? null : <div>redirecting</div>}</>;
+  return (
+    <>
+      {!isReadyToRedirect ? null : (
+        <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-justify-center fmtm-items-center">
+          <Loader2 className="fmtm-h-10 fmtm-w-10 fmtm-animate-spin fmtm-text-primaryRed" />
+          <h3 className="fmtm-text-grey-700 fmtm-font-semibold">Signing in...</h3>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default OsmAuth;

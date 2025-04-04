@@ -104,7 +104,7 @@ async def init_google_auth():
     required_settings = [
         settings.GOOGLE_CLIENT_ID,
         settings.GOOGLE_CLIENT_SECRET,
-        settings.GOOGLE_LOGIN_REDIRECT_URI,
+        settings.google_login_redirect_uri,
     ]
     if not all(required_settings):
         raise HTTPException(
@@ -117,7 +117,7 @@ async def init_google_auth():
         token_url="https://www.googleapis.com/oauth2/v4/token",
         client_id=settings.GOOGLE_CLIENT_ID,
         client_secret=settings.GOOGLE_CLIENT_SECRET.get_secret_value(),
-        login_redirect_uri=settings.GOOGLE_LOGIN_REDIRECT_URI,
+        login_redirect_uri=settings.google_login_redirect_uri,
         scope=[
             "openid",
             "https://www.googleapis.com/auth/userinfo.email",

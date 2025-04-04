@@ -84,7 +84,7 @@ services:
       fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Required for vite websockets / live-reload
       fmtm.localhost_REVERSE_PROXY_WS: yes
-      mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7053
+      mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7057
       mapper.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Required for vite websockets / live-reload
       mapper.fmtm.localhost_REVERSE_PROXY_WS: yes
@@ -215,7 +215,7 @@ services:
       - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     ports:
-      - "7053:7053"
+      - "7057:7057"
     networks:
       - fmtm-net
     restart: "unless-stopped"

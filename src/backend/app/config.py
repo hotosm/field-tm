@@ -238,16 +238,54 @@ class Settings(BaseSettings):
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
-    OSM_SECRET_KEY: SecretStr
+
     # NOTE www is required for now
     # https://github.com/openstreetmap/operations/issues/951#issuecomment-1748717154
     OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
     OSM_SCOPE: list[str] = ["read_prefs", "send_messages"]
-    OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth"
+    OSM_SECRET_KEY: SecretStr
+
+    @computed_field
+    @property
+    def manager_osm_login_redirect_uri(self) -> str:
+        """The constructed OSM redirect URL for manager frontend.
+
+        Must be set in the OAuth2 config for the openstreetmap profile.
+        """
+        if self.DEBUG:
+            uri = "http://127.0.0.1:7051/osmauth"
+        else:
+            uri = f"https://{self.FMTM_DOMAIN}/osmauth"
+        return uri
+
+    @computed_field
+    @property
+    def mapper_osm_login_redirect_uri(self) -> str:
+        """The constructed OSM redirect URL for mapper frontend.
+
+        Must be set in the OAuth2 config for the openstreetmap profile.
+        """
+        if self.DEBUG:
+            uri = "http://127.0.0.1:7057/osmauth"
+        else:
+            uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
+        return uri
 
     GOOGLE_CLIENT_ID: Optional[str] = ""
     GOOGLE_CLIENT_SECRET: Optional[SecretStr] = ""
-    GOOGLE_LOGIN_REDIRECT_URI: Optional[str] = "http://127.0.0.1:7051/googleauth"
+
+    @computed_field
+    @property
+    def google_login_redirect_uri(self) -> str:
+        """The constructed Google redirect URL for mapper frontend.
+
+        Must be set in the OAuth2 config for the Google profile.
+        """
+        if self.DEBUG:
+            uri = "http://127.0.0.1:7057/googleauth"
+        else:
+            uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
+        return uri
 
     S3_ENDPOINT: str
     S3_ACCESS_KEY: str
