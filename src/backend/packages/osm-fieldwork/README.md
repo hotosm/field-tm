@@ -14,7 +14,7 @@
   <a href="https://pypistats.org/packages/osm-fieldwork" target="_blank">
       <img src="https://img.shields.io/pypi/dm/osm-fieldwork.svg" alt="Downloads">
   </a>
-  <a href="https://github.com/hotosm/osm-fieldwork/blob/main/LICENSE.md" target="_blank">
+  <a href="https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork/LICENSE.md" target="_blank">
       <img src="https://img.shields.io/badge/license-GPL%203.0-orange.svg" alt="License">
   </a>
 </p>
@@ -23,7 +23,7 @@
 
 📖 **Documentation**: <a href="https://hotosm.github.io/osm-fieldwork/" target="_blank">https://hotosm.github.io/osm-fieldwork/</a>
 
-🖥️ **Source Code**: <a href="https://github.com/hotosm/osm-fieldwork" target="_blank">https://github.com/hotosm/osm-fieldwork</a>
+🖥️ **Source Code**: <a href="https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork" target="_blank">https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork</a>
 
 ---
 
@@ -90,16 +90,16 @@ these are now part of the backend for the
 
 To install osm-fieldwork, you can use pip. Here are two options:
 
-- Directly from the main branch:
-
-```bash
-pip install git+https://github.com/hotosm/osm-fieldwork.git
-```
-
 - Latest on PyPi:
 
 ```bash
 pip install osm-fieldwork
+```
+
+- Directly from the latest development code:
+
+```bash
+pip install git+https://github.com/hotosm/fmtm.git#subdirectory=src/backend/packages/osm-fieldwork
 ```
 
 ## Configure
