@@ -4,6 +4,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
+	import { fetchBlobUrl } from '$lib/utils/fetch.ts';
 
 	const CUSTOM_UPLOAD_ELEMENT_ID = '95c6807c-82b4-4208-b5df-5a3e795227b0';
 
@@ -30,6 +31,10 @@
 	let startDate: string | undefined;
 
 	let pic: any;
+
+	const formXmlPromise = fetchBlobUrl(`${API_URL}/projects/${projectId}/form-xml`);
+
+	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
 
 	function handleMutation() {
 		if (!iframeRef) return;
@@ -210,19 +215,22 @@
 	class="drawer-contained drawer-placement-start drawer-overview"
 	style="--size: 100vw; --header-spacing: 0px"
 >
-	{#if entityId}
-		{#key projectId}
-			{#key entityId}
-				<iframe
-					bind:this={iframeRef}
-					title="odk-web-forms-wrapper"
-					src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&api_url=${API_URL}&language=${commonStore.locale}`}
-					style="height: 100%; width: 100%; z-index: 11;"
-				>
-				</iframe>
+	{#await odkWebFormPromise then odkWebFormUrl}
+		{#if entityId}
+			{#key projectId}
+				{#await formXmlPromise then formXml}
+					{#key entityId}
+						<iframe
+							bind:this={iframeRef}
+							title="odk-web-forms-wrapper"
+							src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}`}
+							style="height: 100%; width: 100%; z-index: 11;"
+						></iframe>
+					{/key}
+				{/await}
 			{/key}
-		{/key}
-	{/if}
+		{/if}
+	{/await}
 </hot-drawer>
 
 <style>
