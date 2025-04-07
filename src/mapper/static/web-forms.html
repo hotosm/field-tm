@@ -2,7 +2,8 @@
 <html>
 	<body style="height: 100vh; overflow-y: scroll; position: relative">
 		<script type="module">
-			import OdkWebForm from 'https://hotosm.github.io/web-forms/odk-web-form.js';
+			const odkWebFormUrl = new URL(window.location.href).searchParams.get('odkWebFormUrl');
+			const OdkWebForm = (await import(odkWebFormUrl)).default;
 
 			// we created this static html file for a few reasons:
 			// 1) we were running into issues where the css styles imported in the main layout page
@@ -11,7 +12,7 @@
 
 			const entityId = new URL(window.location.href).searchParams.get('entityId');
 			const projectId = new URL(window.location.href).searchParams.get('projectId');
-			const api_url = new URL(window.location.href).searchParams.get('api_url');
+			const formXml = new URL(window.location.href).searchParams.get('formXml');
 			const language = new URL(window.location.href).searchParams.get('language');
 
 			// we are creating an instance of a web component programmatically
@@ -19,7 +20,7 @@
 			// because we need to pass a function as fetchFormAttachment
 			// (and you can't pass a function as a tag attribute in HTML)
 			const odkWebForm = new OdkWebForm({
-				formXml: `${api_url}/projects/${projectId}/form-xml`,
+				formXml: formXml,
 				header: false,
 				missingResourceBehavior: 'BLANK',
 				fetchFormAttachment: function (url) {
