@@ -96,6 +96,26 @@ Field survey-based data collection:
   Despite this we will definitely look for opportunities to learn from / collaborate
   into the future.
 
+OpenStreetMap tagging:
+
+- **StreetComplete**: a super simple and intuitive mobile app for improving
+  OpenStreetMap. New features can be mapped, in addition to tags, directly
+  uploaded to OSM. While FieldTM definitely wants to be used to update
+  OSM, it's not the only usage mode we need to focus on (often users need
+  less public data, such as slum mapping or census data). The app is also
+  very much focused on editing as an _individual_, and not about coordinated
+  mapping as a team.
+
+- **EveryDoor**: another excellent app in the OSM ecosystem, perhaps focused
+  slightly more at power users. It has many similar great features as
+  StreetComplete, but also has the same properties that make it not a direct
+  competitor for FieldTM.
+
+In the long run, these two tools would be excellent candidates for integration
+at the low level of FieldTM. It is conceivable that a field mapping campaign
+could possibly use **either** ODK, StreetComplete, or EveryDoor to do the
+actual mapping (while FieldTM coordinates).
+
 Unmaintained projects:
 
 - **MapCampaigner**: a now dead project. In our opinion, this tool certainly helped
