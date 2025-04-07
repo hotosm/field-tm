@@ -46,4 +46,4 @@ tests:
 dependency:osm-fieldwork:
   - changed-files:
       - any-glob-to-any-file:
-          - src/backend/osm-fieldwork/**
+          - src/backend/packages/osm-fieldwork/**
