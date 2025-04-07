@@ -990,3 +990,18 @@ async def upload_form_media(
                 form_id=xform_id,
                 attachments=attachment_filepaths,
             )
+
+
+async def get_form_media(
+    xform_id: str,
+    project_odk_id: int,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+):
+    """Get a list of form media attachments."""
+    async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
+        form_attachments = await async_odk_form.listFormAttachments(
+            project_odk_id,
+            xform_id,
+        )
+        return form_attachments
+    # TODO continue from here

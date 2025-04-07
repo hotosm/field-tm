@@ -227,61 +227,30 @@ class OdkForm(OdkCentral):
         """
         super().__init__(url, user, passwd)
 
-    # NOTE this does not work and has been abandoned for now
-    # Probably best to use pyodk instead
-    # async def createSubmission(
-    #     self,
-    #     projectId: int,
-    #     appuser_token: str,
-    #     submission_xml: str,
-    #     submission_media_name: Optional[str] = None,
-    #     submission_media_bytes: Optional[bytes] = None,
-    # ):
-    #     """Create a new form submission via ODK OpenRosa API.
+    async def listFormAttachments(self, projectId: int, xform: str):
+        """Fetch a list of attachments listed for upload on a given form.
 
-    #     Args:
-    #         projectId (int): The ODK project ID.
-    #         appuser_token (str): An appuser token with access permissions on the form.
-    #         submission_xml (str): The XML submission, created by JavaRosa,
-    #             web-forms, or similar.
-    #         submission_media_name (str, optional): The name of the media file.
-    #         submission_media_bytes (bytes, optional): Bytes of media (e.g. photo)
-    #             file to upload with the submission.
+        Returns data in format:
 
-    #     Returns:
-    #         dict: The submission response metadata.
-    #     """
-    #     url = f"{self.base}key/{appuser_token}/projects/{projectId}/submission"
-    #     headers = {
-    #         "X-OpenRosa-Version": "1.0",
-    #     }
+        [
+            {'name': '1731673738156.jpg', 'exists': False},
+        ]
 
-    #     # Prepare multipart form data
-    #     form_data = FormData()
-    #     form_data.add_field(
-    #         "xml_submission_file",
-    #         submission_xml.encode(encoding="utf-8"),
-    #         content_type="text/xml",
-    #     )
-    #     if submission_media_bytes and submission_media_name:
-    #         form_data.add_field(
-    #             submission_media_name,
-    #             submission_media_bytes,
-    #             filename=submission_media_name,
-    #             content_type="image/jpeg",
-    #         )
+        Args:
+            projectId (int): The ID of the project on ODK Central
+            xform (str): The XForm to get the details of from ODK Central
 
-    #     try:
-    #         async with self.session.post(url, data=form_data, headers=headers, ssl=self.verify) as response:
-    #             if response.status != 201:
-    #                 msg = f"Unexpected response {response.status}: {await response.text()}"
-    #                 log.error(msg)
-    #                 response.raise_for_status()
-    #             return await response.text()
-    #     except aiohttp.ClientError as e:
-    #         msg = f"Error creating submission: {e}"
-    #         log.error(msg)
-    #         raise aiohttp.ClientError(msg) from e
+        Returns:
+            (list[dict]): The list of form attachments.
+        """
+        url = f"{self.base}projects/{projectId}/forms/{xform}/attachments"
+        try:
+            async with self.session.get(url, ssl=self.verify) as response:
+                return await response.json()
+        except aiohttp.ClientError as e:
+            msg = f"Error fetching submissions: {e}"
+            log.error(msg)
+            raise aiohttp.ClientError(msg) from e
 
     async def listSubmissions(self, projectId: int, xform: str):
         """Fetch a list of submission instances for a given form.
