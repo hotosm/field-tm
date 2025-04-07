@@ -137,6 +137,8 @@ async def upload_form_media(
             project_odk_creds,
             media_attachments,
         )
+        # FIXME this doesn't publish the form after??
+        # FIXME is the form still in draft?
 
         return Response(status_code=HTTPStatus.OK)
 
@@ -144,6 +146,39 @@ async def upload_form_media(
         log.exception(f"Error: {e}")
         msg = (
             f"Failed to upload form media for FMTM project ({project_id}) "
+            f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
+        )
+        log.error(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=msg,
+        ) from e
+
+
+@router.post("/get-form-media")
+async def get_form_media(
+    current_user: Annotated[AuthUser, Depends(project_manager)],
+):
+    """Return the project form attachments as a list of files."""
+    project = current_user.get("project")
+    project_id = project.id
+    project_odk_id = project.odkid
+    project_xform_id = project.odk_form_id
+    # project_odk_creds = project.odk_credentials
+
+    try:
+        # FIXME we hardcode here to test with, but should swap to code below eventually
+        return {"mdp.png": "https://s3.mdp.fmtm.hotosm.org/fmtm-data/frontend/mdp.png"}
+        # return await central_crud.get_form_media(
+        #     project_xform_id,
+        #     project_odk_id,
+        #     project_odk_creds,
+        # )
+
+    except Exception as e:
+        log.exception(f"Error: {e}")
+        msg = (
+            f"Failed to get form media for FMTM project ({project_id}) "
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
         log.error(msg)
