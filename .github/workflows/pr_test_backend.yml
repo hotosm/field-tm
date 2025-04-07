@@ -23,6 +23,6 @@ jobs:
       compose_service: api
       compose_command: pytest
       cache_extra_imgs: |
-        "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"
+        "ghcr.io/hotosm/postgis:${{ vars.POSTGIS_TAG }}"
         "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
     secrets: inherit
