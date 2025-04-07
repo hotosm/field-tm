@@ -98,7 +98,6 @@ line-length = 88
 target-version = "py312"
 exclude = [
     ".ruff_cache",
-    "__pypackages__",
     "app/__version__.py",
     "stats",
 ]
@@ -116,9 +115,6 @@ extend-immutable-calls = [
     "fastapi.File",
     "fastapi.Security",
 ]
-
-[tool.pyright]
-extraPaths = ["__pypackages__/3.12/lib/"]
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

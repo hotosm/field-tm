@@ -71,7 +71,6 @@ exclude = [
     ".git",
     ".ruff_cache",
     ".vscode",
-    "__pypackages__",
     "build",
     "dist",
     "osm_fieldwork/__version__.py",
