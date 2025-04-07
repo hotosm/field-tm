@@ -105,14 +105,6 @@ just migrate
 - It is a good idea to have your code 'type checked' to avoid potential
   future bugs.
 - To do this, install `pyright` (VSCode has an extension).
-- You may need to add the backend dependencies to `extraPaths`. In VSCode
-  your settings.json would include:
-
-```json
-{
-  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.12/lib/"]
-}
-```
 
 ### Interactive Debugging
 
