@@ -69,11 +69,11 @@ Field survey-based data collection:
   field data collection forward. Kobo do provide a free public server backed by the
   UN, as a general public good, and is widely adopted as a result.
 
-- **Ona**: proprietary software that also has a difficult relationship with Kobo.
-  The history is complex, but at some point Ona had to become closed-source and
-  paid software. Since then they have open-sourced their code again, and have
-  done some great work around data management and analytics, however,
-  their main objective is not the same as FMTM: coordinating field mapping.
+- **Ona**: ODK-compatible software that also has a difficult relationship with Kobo.
+  The history is complex, but at some point Ona had to make their front end
+  closed-source. They have a lot of open-source components (like their back end)
+  and have done some great work around data management and analytics, however,
+  their main objective is not the same as FieldTM: _coordinating_ field mapping.
 
 - **ODK**: I won't cover much here, as we talk about it a lot elsewhere.
   If you are collected mobile survey data then this is a tool at the forefront
