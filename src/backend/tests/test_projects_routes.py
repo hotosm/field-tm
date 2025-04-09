@@ -32,7 +32,7 @@ from loguru import logger as log
 
 from app.central.central_crud import create_odk_project
 from app.config import settings
-from app.db.enums import EntityState, HTTPStatus, MappingState
+from app.db.enums import EntityState, HTTPStatus, MappingState, ProjectRole
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import check_crs
 from app.projects import project_crud
@@ -525,6 +525,233 @@ async def test_project_task_split(client):
     # Test without required value should cause validation error
     response = await client.post("/projects/task-split")
     assert response.status_code == 422
+
+
+async def test_read_project(client, project):
+    """Test read project by id."""
+    response = await client.get(f"projects/{project.id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == project.id
+    assert data["odkid"] == project.odkid
+    assert data["name"] == project.name
+    assert data["bbox"] == project.bbox
+    assert data["organisation_logo"] == project.organisation_logo
+
+    # Test with minimal param
+    response = await client.get(f"/projects/{project.id}/minimal")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == project.id
+    assert data["odkid"] == project.odkid
+    assert data["name"] == project.name
+    assert data["bbox"] is None
+    assert data["organisation_logo"] is None
+
+
+async def test_update_and_download_project_form(client, project):
+    """Test updating and downloading the XLSForm for a project."""
+    updated_xls_content = b"updated xlsform data"
+    xls_file = BytesIO(updated_xls_content)
+    xls_file.name = "form.xlsx"
+
+    with patch(
+        "app.central.central_deps.read_xlsform", return_value=xls_file
+    ) and patch("app.central.central_crud.update_project_xform", return_value=None):
+        response = await client.post(
+            f"projects/update-form?project_id={project.id}",
+            data={"xform_id": "test-xform-id"},
+            files={
+                "xlsform": (
+                    "form.xlsx",
+                    updated_xls_content,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            },
+        )
+        assert response.status_code == 200
+        assert (
+            response.json()["message"]
+            == f"Successfully updated the form for project {project.id}"
+        )
+
+        # Test downloading the updated XLSForm
+        response = await client.get(f"projects/download-form/{project.id}")
+
+        assert response.status_code == 200
+        assert (
+            response.headers["Content-Disposition"]
+            == f"attachment; filename={project.id}_xlsform.xlsx"
+        )
+        assert response.headers["Content-Type"] == "application/media"
+        assert response.content is not None
+        assert response.content == b"updated xlsform data"
+
+
+async def test_get_contributors(client, project, task_events, admin_user):
+    """Test fetching contributors of a project."""
+    response = await client.get(f"projects/contributors/{project.id}")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert isinstance(data, list)
+    assert len(data) > 0
+    assert all(
+        "user" in contributor and "contributions" in contributor for contributor in data
+    )
+
+    contributor = data[0]
+    assert contributor["user"] == admin_user.username
+    assert contributor["contributions"] == 2
+
+
+async def test_add_new_project_manager(client, project, new_mapper_user):
+    """Test adding a new project manager."""
+    with patch(
+        "app.projects.project_crud.send_project_manager_message", return_value=None
+    ):
+        response = await client.post(
+            "projects/add-manager",
+            params={"project_id": project.id, "sub": new_mapper_user.sub},
+        )
+
+    assert response.status_code == 200
+
+    # Verify manager was added by fetching project users
+    response = await client.get(f"/users/{project.id}/project-users")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    # Ensure the new manager is in the response
+    assert any(
+        user["user_sub"] == new_mapper_user.sub and user["role"] == "PROJECT_MANAGER"
+        for user in data
+    )
+
+
+async def test_create_entity(client, db, odk_project, tasks):
+    """Test creating an entity and verifying task_id matching within task boundary."""
+    # Sample GeoJSON with a point that would lie inside a task boundary
+    geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"project_id": odk_project.id},
+                "geometry": {"type": "Point", "coordinates": [85.30125, 27.7122]},
+            }
+        ],
+    }
+    project_task_index_list = [task.project_task_index for task in tasks]
+
+    response = await client.post(
+        f"projects/{odk_project.id}/create-entity", json=geojson
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    # Check if the task_id in the returned data matches the task_id within the boundary
+    assert int(data["currentVersion"]["data"]["task_id"]) in project_task_index_list
+
+
+async def test_download_project_boundary(client, project):
+    """Test downloading a project boundary as GeoJSON."""
+    response = await client.get(f"/projects/{project.id}/download")
+
+    assert response.status_code == 200
+    assert (
+        response.headers["Content-Disposition"]
+        == f"attachment; filename={project.slug}.geojson"
+    )
+    assert response.headers["Content-Type"] == "application/media"
+
+    content = json.loads(response.content)
+    assert content["type"] == "Polygon"
+    assert "coordinates" in content
+    assert isinstance(content["coordinates"], list)
+
+
+async def test_download_task_boundaries(client, project, tasks):
+    """Test downloading task boundaries as GeoJSON."""
+    response = await client.get(f"/projects/{project.id}/download_tasks")
+
+    assert response.status_code == 200
+    assert (
+        response.headers["Content-Disposition"]
+        == "attachment; filename=task_boundary.geojson"
+    )
+    assert response.headers["Content-Type"] == "application/media"
+
+    content = json.loads(response.content)
+
+    assert content["type"] == "FeatureCollection"
+    assert "features" in content
+    assert isinstance(content["features"], list)
+    assert len(content["features"]) == len(tasks)
+
+    project_task_index_list = [task.project_task_index for task in tasks]
+    for feature in content["features"]:
+        assert "geometry" in feature
+        assert "properties" in feature
+        assert "task_id" in feature["properties"]
+        assert feature["properties"]["task_id"] in project_task_index_list
+
+
+@pytest.mark.parametrize(
+    "status,role,expected_status",
+    [
+        ("NEW", ProjectRole.MAPPER, HTTPStatus.OK),
+        ("BAD", ProjectRole.PROJECT_MANAGER, HTTPStatus.OK),
+        ("BAD", ProjectRole.MAPPER, HTTPStatus.FORBIDDEN),
+        ("INVALID", ProjectRole.MAPPER, HTTPStatus.UNPROCESSABLE_ENTITY),
+    ],
+)
+async def test_create_geom_log(
+    client, status, role, expected_status, geom_log_data, admin_user
+):
+    """Test creating geometry log entries with different statuses and roles."""
+    geom_log_data["status"] = status
+    project_id = geom_log_data["project_id"]
+    with patch("app.projects.project_routes.check_access") as mock_check_access:
+        mock_check_access.return_value = (
+            admin_user if role == ProjectRole.PROJECT_MANAGER else None
+        )
+        response = await client.post(
+            f"/projects/{project_id}/geometry/records",
+            json=geom_log_data,
+        )
+        assert response.status_code == expected_status
+
+        if expected_status == HTTPStatus.OK:
+            data = response.json()
+            assert data["status"] == status
+            assert data["project_id"] == project_id
+            assert "id" in data
+
+
+async def test_read_geom_logs(client, project, geom_log):
+    """Test retrieving all geometry logs for a project."""
+    response = await client.get(f"/projects/{project.id}/geometry/records")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 1
+
+    matching_logs = [log for log in data if log["project_id"] == project.id]
+    assert len(matching_logs) >= 1
+
+
+async def test_delete_geom_log(client, project, geom_log):
+    """Test deleting a geometry log entry."""
+    response = await client.delete(
+        f"/projects/{project.id}/geometry/records/{geom_log.id}"
+    )
+    assert response.status_code == HTTPStatus.NO_CONTENT
+
+    response = await client.delete(f"/projects/{project.id}/geometry/records/{uuid4()}")
+    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 if __name__ == "__main__":
