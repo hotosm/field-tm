@@ -11,6 +11,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
+import { NavigateFunction } from 'react-router-dom';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -129,7 +130,7 @@ const CreateProjectService = (
       // dispatch(CreateProjectActions.CreateProjectLoading(false));
     } catch (error: any) {
       if (projectId) {
-        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, false));
+        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`));
       }
 
       await dispatch(CreateProjectActions.GenerateProjectError(true));
@@ -546,23 +547,19 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
   };
 };
 
-const DeleteProjectService = (url: string, hasRedirect: boolean = true) => {
+const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
   return async (dispatch: AppDispatch) => {
     const deleteProject = async (url: string) => {
       try {
+        dispatch(CreateProjectActions.SetProjectDeletePending(true));
         await API.delete(url);
         dispatch(
           CommonActions.SetSnackBar({
-            message: `Project deleted. ${hasRedirect && 'Redirecting...'}`,
+            message: `Project deleted`,
             variant: 'success',
           }),
         );
-        // Redirect to homepage
-        if (hasRedirect) {
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 2000);
-        }
+        if (navigate) navigate('/');
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(
@@ -571,8 +568,9 @@ const DeleteProjectService = (url: string, hasRedirect: boolean = true) => {
               variant: 'success',
             }),
           );
-        } else {
         }
+      } finally {
+        dispatch(CreateProjectActions.SetProjectDeletePending(false));
       }
     };
 

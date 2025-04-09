@@ -251,7 +251,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
                 >
                   <UploadAreaComponent
-                    title="Upload Form"
+                    title="Upload AOI"
                     label="Please upload .geojson, .json file"
                     data={geojsonFile ? [geojsonFile] : []}
                     onUploadFile={(updatedFiles, fileInputRef) => {

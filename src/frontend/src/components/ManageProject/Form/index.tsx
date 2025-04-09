@@ -17,7 +17,7 @@ type FileType = {
   previewURL: string;
 };
 
-const FormUpdateTab = ({ projectId }) => {
+const FormUpdate = ({ projectId }) => {
   useDocumentTitle('Manage Project: Form Update');
   const dispatch = useAppDispatch();
 
@@ -49,37 +49,39 @@ const FormUpdateTab = ({ projectId }) => {
   };
 
   return (
-    <div className="fmtm-flex fmtm-flex-col fmtm-gap-10">
-      <div>
-        <p className="fmtm-text-base">⚠️ IMPORTANT ⚠️</p>
-        <p className="fmtm-text-base fmtm-mt-2">
-          Please{' '}
-          <a
-            className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-            onClick={() =>
-              dispatch(DownloadProjectForm(`${API_URL}/projects/download-form/${projectId}`, 'form', projectId))
-            }
-          >
-            download
-          </a>{' '}
-          {`your form and modify it, before re-uploading below.`}
-        </p>
-        <p className="fmtm-text-base fmtm-mt-2">Do not upload the original form, as it has since been updated.</p>
+    <div className="fmtm-relative fmtm-flex fmtm-flex-col fmtm-w-full fmtm-h-full">
+      <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex fmtm-flex-col fmtm-gap-y-5 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
+        <div>
+          <p className="fmtm-text-base">⚠️ IMPORTANT ⚠️</p>
+          <p className="fmtm-text-base fmtm-mt-2">
+            Please{' '}
+            <a
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+              onClick={() =>
+                dispatch(DownloadProjectForm(`${API_URL}/projects/download-form/${projectId}`, 'form', projectId))
+              }
+            >
+              download
+            </a>{' '}
+            {`your form and modify it, before re-uploading below.`}
+          </p>
+          <p className="fmtm-text-base fmtm-mt-2">Do not upload the original form, as it has since been updated.</p>
+        </div>
+        <div>
+          <UploadArea
+            title="Upload Form"
+            label="Please upload .xls, .xlsx, .xml file"
+            data={uploadForm || []}
+            onUploadFile={(updatedFiles) => {
+              setUploadForm(updatedFiles as FileType[]);
+              formError && setFormError(false);
+            }}
+            acceptedInput=".xls, .xlsx, .xml"
+          />
+          {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
+        </div>
       </div>
-      <div>
-        <UploadArea
-          title="Upload Form"
-          label="Please upload .xls, .xlsx, .xml file"
-          data={uploadForm || []}
-          onUploadFile={(updatedFiles) => {
-            setUploadForm(updatedFiles as FileType[]);
-            formError && setFormError(false);
-          }}
-          acceptedInput=".xls, .xlsx, .xml"
-        />
-        {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
-      </div>
-      <div className="fmtm-flex fmtm-justify-center">
+      <div className="fmtm-py-2 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-shadow-2xl fmtm-z-50">
         <Button variant="primary-red" onClick={onSave} isLoading={formUpdateLoading}>
           UPDATE
         </Button>
@@ -88,4 +90,4 @@ const FormUpdateTab = ({ projectId }) => {
   );
 };
 
-export default FormUpdateTab;
+export default FormUpdate;

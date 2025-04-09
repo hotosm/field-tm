@@ -39,6 +39,7 @@ export type CreateProjectStateTypes = {
   descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
+  isProjectDeletePending: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };

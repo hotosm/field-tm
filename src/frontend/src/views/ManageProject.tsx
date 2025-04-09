@@ -1,68 +1,122 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import EditTab from '@/components/ManageProject/EditTab';
+import { useNavigate, useParams } from 'react-router-dom';
 import UserTab from '@/components/ManageProject/UserTab';
-import DeleteTab from '@/components/ManageProject/DeleteTab';
 import AssetModules from '@/shared/AssetModules.js';
-import CoreModules from '@/shared/CoreModules';
 import { GetIndividualProjectDetails } from '@/api/CreateProjectService';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import Button from '@/components/common/Button';
+import InputTextField from '@/components/common/InputTextField';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
+import { DeleteProjectService } from '@/api/CreateProjectService';
+import EditDetails from '@/components/ManageProject/Details';
+import FormUpdate from '@/components/ManageProject/Form';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const tabList = [
-  // { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
-  { id: 'edit', name: 'EDIT', icon: <AssetModules.EditIcon style={{ fontSize: '20px' }} /> },
-  { id: 'delete', name: 'DELETE', icon: <AssetModules.DeleteIcon style={{ fontSize: '20px' }} /> },
+  { id: 'details', name: 'Details', icon: <AssetModules.InfoIcon className="!fmtm-text-[1.125rem]" /> },
+  { id: 'form', name: 'Form', icon: <AssetModules.SubmissionIcon className="!fmtm-text-[1.125rem]" /> },
 ];
+
 const ManageProject = () => {
   const dispatch = useAppDispatch();
-  const params = CoreModules.useParams();
+  const params = useParams();
   const navigate = useNavigate();
   const projectId = params.id;
-  const [tabView, setTabView] = useState<'users' | 'edit' | string>('edit');
+
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
+  const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
+
+  const [selectedTab, setSelectedTab] = useState('details');
+  const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
+  const [confirmProjectName, setConfirmProjectName] = useState('');
+
+  const getContent = (tab: string) => {
+    switch (tab) {
+      case 'users':
+        return <UserTab />;
+      case 'details':
+        return <EditDetails projectId={projectId} />;
+      case 'form':
+        return <FormUpdate projectId={projectId} />;
+      default:
+        return <></>;
+    }
+  };
 
   useEffect(() => {
-    dispatch(
-      GetIndividualProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${projectId}?project_id=${projectId}`),
-    );
+    dispatch(GetIndividualProjectDetails(`${VITE_API_URL}/projects/${projectId}?project_id=${projectId}`));
   }, [projectId]);
 
   return (
-    <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-bg-[#F5F5F5] fmtm-gap-8 fmtm-flex-1">
-      <div className="sm:fmtm-w-[15%] sm:fmtm-min-w-[7.3rem] fmtm-flex sm:fmtm-flex-col fmtm-items-center sm:fmtm-items-start fmtm-gap-4 sm:fmtm-gap-0 ">
-        <div
-          onClick={() => navigate(`/project/${params?.id}`)}
-          className="fmtm-flex fmtm-items-center sm:fmtm-mb-8 fmtm-cursor-pointer hover:fmtm-text-primaryRed fmtm-duration-300"
-        >
-          <AssetModules.ArrowBackIosIcon style={{ fontSize: '20px' }} />
-          <p className="fmtm-text-base">BACK</p>
-        </div>
-        <div className="fmtm-flex fmtm-flex-row sm:fmtm-flex-col sm:fmtm-w-full fmtm-bg-[#F2F2F2] fmtm-h-full">
-          {tabList.map((tab) => (
-            <div
-              key={tab.id}
-              className={`fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-text-base fmtm-px-3 sm:fmtm-px-5 fmtm-py-1 sm:fmtm-py-3 fmtm-duration-300 fmtm-cursor-pointer hover:fmtm-text-primaryRed hover:fmtm-bg-[#EFE0E0] ${
-                tabView === tab.id ? 'fmtm-text-primaryRed fmtm-bg-[#EFE0E0]' : ''
-              }`}
-              onClick={() => setTabView(tab.id)}
-            >
-              <div className="fmtm-pb-1">{tab.icon}</div>
-              <p>{tab.name}</p>
-            </div>
-          ))}
-        </div>
+    <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-py-3 fmtm-gap-5">
+      <div className="fmtm-flex fmtm-items-center">
+        <AssetModules.ChevronLeftIcon
+          className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer fmtm-text-grey-800"
+          onClick={() => navigate(`/project/${projectId}`)}
+        />
+        <h4 className="fmtm-text-grey-800">Manage Project</h4>
       </div>
-      <div className=" sm:fmtm-w-[calc(100%-140px)] lg:fmtm-w-[85%]">
-        <h2 className="fmtm-font-archivo fmtm-text-xl fmtm-font-semibold fmtm-text-[#484848] fmtm-tracking-wider fmtm-mb-8">
-          {editProjectDetails?.name}
-        </h2>
-        {tabView === 'users' ? (
-          <UserTab />
-        ) : tabView === 'edit' ? (
-          <EditTab projectId={projectId} />
-        ) : (
-          <DeleteTab projectId={projectId} projectName={editProjectDetails?.name} />
-        )}
+      <div className="sm:fmtm-flex-1 fmtm-flex fmtm-justify-center fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
+        {/* left container */}
+        <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl sm:fmtm-w-[17.5rem] fmtm-p-6 fmtm-flex sm:fmtm-flex-col fmtm-flex-wrap sm:fmtm-flex-nowrap fmtm-gap-x-5">
+          <div className="fmtm-flex-1 fmtm-flex sm:fmtm-flex-col fmtm-h-fit">
+            {tabList.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedTab(tab.id)}
+                className={`fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-px-5 fmtm-py-3 fmtm-rounded fmtm-duration-200 ${
+                  selectedTab === tab.id ? 'fmtm-text-red-medium fmtm-bg-red-light' : 'hover:fmtm-text-red-medium'
+                }`}
+              >
+                {tab.icon} {tab.name}
+              </button>
+            ))}
+          </div>
+          <Dialog open={toggleDeleteModal} onOpenChange={setToggleDeleteModal}>
+            <DialogTrigger>
+              <Button
+                variant="link-grey"
+                onClick={() => {
+                  setToggleDeleteModal(true);
+                }}
+                className="fmtm-mx-auto"
+              >
+                <AssetModules.DeleteIcon className="!fmtm-text-[1.125rem]" /> Delete Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Project?</DialogTitle>
+              </DialogHeader>
+              <div>
+                <p className="fmtm-body-lg fmtm-mb-1">Please type the project name to confirm.</p>
+                <InputTextField
+                  fieldType="text"
+                  value={confirmProjectName}
+                  onChange={(e) => setConfirmProjectName(e.target.value)}
+                />
+                <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
+                  <Button variant="link-grey" onClick={() => setToggleDeleteModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary-red"
+                    isLoading={isProjectDeletePending}
+                    disabled={confirmProjectName !== editProjectDetails?.name}
+                    onClick={() => dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate))}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+        {/* right container */}
+        <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl fmtm-w-full fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar">
+          {getContent(selectedTab)}
+        </div>
       </div>
     </div>
   );
