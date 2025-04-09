@@ -65,16 +65,14 @@ Field survey-based data collection:
 
 - **KoboCollect**: fork of ODK, same mobile app essentially, but different back end.
   Has a slightly complicated relationship with ODK, formerly taking from the
-  community and not giving back. However, they now contribute financially to ODK,
-  and definitely have some great ideas in this field. In our opinion, ODK is more
-  innovative in pushing field data collection forward though. Kobo do provide a
-  free public server backed by the UN, as a general public good, and is widely
-  adopted as a result.
+  community and not giving back. In our opinion, ODK is more innovative in pushing
+  field data collection forward. Kobo do provide a free public server backed by the
+  UN, as a general public good, and is widely adopted as a result.
 
-- **Ona**: proprietary software, with a slightly shady history of building open-source
-  tools using NGO money, then changing the license to a closed model. Were legally
-  forced to open-source the original work done, but everything since has been closed.
-  Have since done some great work around data management and analytics, however,
+- **Ona**: proprietary software that also has a difficult relationship with Kobo.
+  The history is complex, but at some point Ona had to become closed-source and
+  paid software. Since then they have open-sourced their code again, and have
+  done some great work around data management and analytics, however,
   their main objective is not the same as FMTM: coordinating field mapping.
 
 - **ODK**: I won't cover much here, as we talk about it a lot elsewhere.
@@ -161,7 +159,7 @@ collection ecosystem. Instead, it is a higher level tool, aimed at
   of Kobo, could (and should) probably support the Kobo data collection app going
   forward.
 - This does raise challenges, as new features integrated in ODK Collect take approx
-  3 months to be integrated into KoboCollect.
+  6 months to be integrated into KoboCollect.
 
   !!! note
 
@@ -177,10 +175,11 @@ collection ecosystem. Instead, it is a higher level tool, aimed at
         HOT also aims to provide am equivalent free ODK data collection server:
         [https://odk.hotosm.org](https://odk.hotosm.org)
 
-- The Kobo backend is currently (2024) a Python application based on the original
-  ODK Aggregate backend of ODK. The Kobo backend became much better than ODK's over
-  time. However, ODK have since completely overhauled their backend to a Node server
-  called ODK Collect, which is rock-solid and much more advanced than the competition.
+- The Kobo backend is currently (2024) a Python application based an old open-source
+  tool called FormHub. The functionality of Kobo's and ODK's backends has diverged
+  significantly over time. However, recently ODK have completely overhauled their
+  backend to a Node server called ODK Central, which is rock-solid and much more
+  advanced than the competition.
 - The Kobo web-based form builder is still a big differentiator between the tools,
   as it is much more user-friendly (less technical) than ODK's requirement to know
   XLSForm language. However the capability of the web form builder is much less
