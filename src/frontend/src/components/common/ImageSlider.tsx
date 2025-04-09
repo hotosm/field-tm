@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
-import { Dialog, DialogContent } from '@/components/common/Modal';
+import { Dialog, DialogContent } from '@/components/RadixComponents/Dialog';
 
 type ImageSliderProps = {
   // key:value pairs of {filename:URL}

@@ -54,6 +54,7 @@ export const initialState: CreateProjectStateTypes = {
   customFileValidity: false,
   additionalFeatureGeojson: null,
   descriptionToFocus: null,
+  isProjectDeletePending: false,
 };
 
 const CreateProject = createSlice({
@@ -214,6 +215,9 @@ const CreateProject = createSlice({
     },
     SetDescriptionToFocus(state, action: PayloadAction<CreateProjectStateTypes['descriptionToFocus']>) {
       state.descriptionToFocus = action.payload;
+    },
+    SetProjectDeletePending(state, action: PayloadAction<boolean>) {
+      state.isProjectDeletePending = action.payload;
     },
   },
 });
