@@ -21,7 +21,7 @@
 						{ credentials: 'include' },
 					);
 				} else {
-					response = await fetch(`${import.meta.env.VITE_API_URL}/auth/callback/osm?code=${authCode}&state=${state}`, {
+					response = await fetch(`${import.meta.env.VITE_API_URL}/auth/callback/osm/mapper?code=${authCode}&state=${state}`, {
 						credentials: 'include',
 					});
 				}

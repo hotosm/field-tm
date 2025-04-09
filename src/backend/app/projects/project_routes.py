@@ -46,7 +46,7 @@ from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 from psycopg.rows import dict_row
 
-from app.auth.auth_deps import login_required, mapper_login_required
+from app.auth.auth_deps import login_required, mapper_login_required, public_view
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import check_access, mapper, org_admin, project_manager
@@ -148,6 +148,7 @@ async def read_project_summaries(
     db: Annotated[Connection, Depends(db_conn)],
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
+    current_user: Annotated[Optional[AuthUser], Depends(public_view)] = None,
     org_id: Optional[int] = None,
     user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
@@ -159,7 +160,15 @@ async def read_project_summaries(
     NOTE this is a public endpoint with no auth requirements.
     """
     return await project_crud.get_paginated_projects(
-        db, page, results_per_page, org_id, user_sub, hashtags, search, minimal
+        db,
+        page,
+        results_per_page,
+        current_user,
+        org_id,
+        user_sub,
+        hashtags,
+        search,
+        minimal,
     )
 
 

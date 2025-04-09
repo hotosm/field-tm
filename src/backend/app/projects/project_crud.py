@@ -891,6 +891,7 @@ async def get_paginated_projects(
     db: Connection,
     page: int,
     results_per_page: int,
+    current_user: Optional[str] = None,
     org_id: Optional[int] = None,
     user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
@@ -904,6 +905,7 @@ async def get_paginated_projects(
     # Get subset of projects
     projects = await DbProject.all(
         db,
+        current_user=current_user,
         org_id=org_id,
         user_sub=user_sub,
         hashtags=hashtags,
