@@ -268,6 +268,23 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
 
 
 ### Endpoint Dependencies ###
+async def public_view(
+    request: Request,
+    access_token: Annotated[Optional[str], Header()] = None,
+) -> Optional[AuthUser]:
+    """Optional login dependency: returns AuthUser if authenticated, else None."""
+    if settings.DEBUG:
+        return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
+
+    extracted_token = access_token or get_cookie_value(request, settings.cookie_name)
+
+    if not extracted_token:
+        return None
+
+    try:
+        return await _authenticate_user(extracted_token)
+    except Exception:
+        return None  # Fail silently to allow access to public content
 
 
 async def login_required(
