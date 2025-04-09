@@ -817,7 +817,7 @@ async def update_project_form(
                 "project_id": project.id,
             },
         )
-        db.commit()
+        await db.commit()
 
     return JSONResponse(
         status_code=HTTPStatus.OK,

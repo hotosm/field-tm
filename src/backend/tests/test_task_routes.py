@@ -24,6 +24,27 @@ import pytest
 from app.db.enums import MappingState, TaskEvent
 
 
+async def test_read_tasks(client, project, tasks):
+    """Test retrieving all tasks for a project."""
+    response = await client.get(f"/tasks?project_id={project.id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == len(tasks)
+    for task in data:
+        assert "id" in task
+        assert "project_id" in task
+
+
+async def test_get_specific_task(client, project, tasks):
+    """Test retrieving a specific task by ID."""
+    task = tasks[0]
+    response = await client.get(f"/tasks/{task.id}?project_id={project.id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == task.id
+    assert data["project_id"] == task.project_id
+
+
 async def test_read_task_history(client, task_event):
     """Test task events for a project."""
     task_id = task_event.task_id
@@ -44,10 +65,12 @@ async def test_read_task_history(client, task_event):
     assert data["state"] == MappingState.LOCKED_FOR_MAPPING
 
 
-async def test_submit_task_events(client, tasks):
+async def test_submit_task_events(client, tasks, project_team, admin_user):
     """Test update the task status."""
     task_id = tasks[0].id
-    project_id = tasks[0].project_id
+    non_existent_task_id = tasks[-1].id + 1
+    project_id = project_team["project"].id
+    team = project_team["team"]
 
     # LOCK MAP
     response = await client.post(
@@ -99,6 +122,67 @@ async def test_submit_task_events(client, tasks):
     assert data["event"] == TaskEvent.COMMENT
     assert data["state"] is None
     assert data["comment"] == "Hello!"
+
+    # ASSIGN WITH TEAM
+    response = await client.post(
+        f"tasks/{task_id}/event?project_id={project_id}&team_id={team.team_id}&notify=false",
+        json={
+            "event": TaskEvent.ASSIGN,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["event"] == TaskEvent.ASSIGN
+    assert UUID(data["team_id"]) == team.team_id
+    # User is not assigned when team is assigned
+    assert data["user_sub"] is None
+    assert data["state"] == MappingState.LOCKED_FOR_MAPPING
+
+    # ASSIGN WITH AN ASSIGNEE
+    response = await client.post(
+        f"tasks/{task_id}/event?project_id={project_id}&assignee_sub={admin_user.sub}&notify=false",
+        json={
+            "event": TaskEvent.ASSIGN,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["event"] == TaskEvent.ASSIGN
+    assert data["user_sub"] == admin_user.sub
+    # Team is not assigned when user is assigned
+    assert data["team_id"] is None
+    assert data["state"] == MappingState.LOCKED_FOR_MAPPING
+
+    # INVALID TASK
+    response = await client.post(
+        f"tasks/{non_existent_task_id}/event?project_id={project_id}",
+        json={"event": TaskEvent.MAP},
+    )
+    assert response.status_code == 404
+
+    # INVALID EVENT
+    response = await client.post(
+        f"tasks/{task_id}/event?project_id={project_id}",
+        json={"event": "INVALID_EVENT"},
+    )
+    assert response.status_code == 422
+
+
+async def test_get_task_activity(client, tasks, task_events):
+    """Test retrieving task activity for a project."""
+    project_id = tasks[0].project_id
+
+    response = await client.get(f"/tasks/activity?project_id={project_id}")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert data
+    item = data[0]
+    assert "date" in item
+    assert "mapped" in item
+    assert item["mapped"] == 1
+    assert "validated" in item
+    assert item["validated"] == 1
 
 
 if __name__ == "__main__":
