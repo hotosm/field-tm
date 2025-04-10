@@ -24,6 +24,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from loguru import logger as log
+from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 
 from app.auth.auth_deps import login_required
@@ -137,8 +138,13 @@ async def upload_form_media(
             project_odk_creds,
             media_attachments,
         )
-        # FIXME this doesn't publish the form after??
-        # FIXME is the form still in draft?
+
+        async with OdkCentral(
+            url=project_odk_creds.odk_central_url,
+            user=project_odk_creds.odk_central_user,
+            passwd=project_odk_creds.odk_central_password,
+        ) as odk_central:
+            await odk_central.s3_sync()
 
         return Response(status_code=HTTPStatus.OK)
 
@@ -164,16 +170,14 @@ async def get_form_media(
     project_id = project.id
     project_odk_id = project.odkid
     project_xform_id = project.odk_form_id
-    # project_odk_creds = project.odk_credentials
+    project_odk_creds = project.odk_credentials
 
     try:
-        # FIXME we hardcode here to test with, but should swap to code below eventually
-        return {"mdp.png": "https://s3.mdp.fmtm.hotosm.org/fmtm-data/frontend/mdp.png"}
-        # return await central_crud.get_form_media(
-        #     project_xform_id,
-        #     project_odk_id,
-        #     project_odk_creds,
-        # )
+        return await central_crud.get_form_media(
+            project_xform_id,
+            project_odk_id,
+            project_odk_creds,
+        )
 
     except Exception as e:
         log.exception(f"Error: {e}")

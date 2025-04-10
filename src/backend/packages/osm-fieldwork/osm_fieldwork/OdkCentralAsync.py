@@ -252,6 +252,65 @@ class OdkForm(OdkCentral):
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
 
+    async def getFormAttachmentUrls(
+        self,
+        projectId: int,
+        xform: str,
+    ) -> dict[str, str]:
+        """Get a dictionary of form attachment names and their pre-signed URLs.
+
+        Args:
+            projectId (int): The ID of the project on ODK Central.
+            xform (str): The XForm ID to get attachments from.
+
+        Returns:
+            dict[str, str]: A dictionary mapping attachment names to URLs.
+        """
+        attachments = await self.listFormAttachments(projectId, xform)
+        if not attachments:
+            return {}
+
+        async def fetch_url(attachment: dict) -> tuple[str, Optional[str]]:
+            """Fetch the pre-signed URL for a given form attachment filename."""
+            filename = attachment["name"]
+            url = f"{self.base}projects/{projectId}/forms/{xform}/attachments/{filename}"
+            result = await self.session.get(url, ssl=self.verify, allow_redirects=False)
+
+            if result.status in (301, 302, 303, 307, 308):  # is a redirect to the S3 URL
+                s3_url = result.headers.get("Location")
+                if not s3_url:
+                    try:
+                        text_body = await result.text()
+                    except UnicodeDecodeError:
+                        text_body = "[Binary data]"
+                    log.error(
+                        f"No 'Location' response header for form attachment {filename} from Central: "
+                        f"{text_body}"
+                    )
+                    return filename, None
+
+            else:
+                try:
+                    log.error(
+                        f"Incorrect response code for form attachment {filename} from Central: "
+                        f"{await result.text()}"
+                    )
+                except UnicodeDecodeError:
+                    log.error(f"Central response code: {result.status}")
+                    log.error(
+                        "Central appears to be returning the binary data instead "
+                        "of the S3 URL. Is Central configured to use S3 storage? "
+                        "Or perhaps the file is simply not uploaded to S3 yet."
+                    )
+
+                return filename, None
+
+            return filename, s3_url
+
+        urls = await gather(*(fetch_url(attachment) for attachment in attachments))
+        
+        return {filename: url for filename, url in urls if url is not None}
+
     async def listSubmissions(self, projectId: int, xform: str):
         """Fetch a list of submission instances for a given form.
 
