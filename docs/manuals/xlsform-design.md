@@ -78,7 +78,25 @@ A few terms should be explained:
 
 ## Translations
 
-- Fields for translations...
+- Ideally two letter ISO codes should be used, along with a label,
+  e.g. `image::english(en)`.
+- Note the important thing is consistency of usage. The ISO codes
+  are not actually validated. So as long as they match `en`
+  throughout the form, everything should work.
+- As a consequence, it is entirely valid to use language variants,
+  such as `pt-BR` for Brazilian Portuguese, _as long as you are
+  consistent_.
+
+### Media Files Gotcha
+
+- In the `choices` label, if you include any translated fields, such
+  as `label::spanish(es)`, then references to media files **must**
+  also be translated.
+- For example, you need to have an image field for every available
+  translation in your form: `image::english(en)=file.jpg` and
+  `image::spanish(es)=file.jpg`.
+- The image file could be the same for each language, or a
+  different file for each language.
 
 ## Creating Entities
 
