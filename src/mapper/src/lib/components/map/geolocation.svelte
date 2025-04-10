@@ -228,7 +228,7 @@
 			hoist
 			open
 			trigger="manual"
-			style="--max-width: fit-content"
+			style="--max-width: calc(100vw - 55px)"
 			onclick={() => tooltipRef.hide()}
 			onkeydown={(e: KeyboardEvent) => {
 				e.key === 'Enter' && tooltipRef.hide();
@@ -236,7 +236,7 @@
 			role="button"
 			tabindex="0"
 		>
-			<div slot="content" class="flex items-center gap-1">
+			<div slot="content" class="flex items-center flex-wrap gap-1">
 				<span>{m['map.enable_geolocation']()}</span>
 				<button
 					class="text-white rounded"
