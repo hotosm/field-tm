@@ -30,6 +30,7 @@
 	let isFirstLoad = $derived(
 		+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load'],
 	);
+	const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
 
 	const handleSignOut = async () => {
 		try {
@@ -137,7 +138,7 @@
 			<hot-icon
 				name="list"
 				class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
-				style={isFirstLoad ? 'background-color: var(--sl-color-warning-300);' : ''}
+				style={isFirstLoad && !enableWebforms ? 'background-color: var(--sl-color-warning-300);' : ''}
 				onclick={() => {
 					drawerRef?.show();
 				}}
@@ -149,7 +150,7 @@
 			></hot-icon>
 		{/snippet}
 		<!-- add tooltip on first load -->
-		{#if isFirstLoad}
+		{#if isFirstLoad && !enableWebforms}
 			<hot-tooltip
 				bind:this={drawerOpenButtonRef}
 				content="First download the custom ODK Collect app here"

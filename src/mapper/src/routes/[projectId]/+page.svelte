@@ -56,6 +56,7 @@
 	const newBadGeomStream = getNewBadGeomStream(data.projectId);
 
 	const selectedEntityId = $derived(entitiesStore.selectedEntity);
+	const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
@@ -144,8 +145,14 @@
 	$effect(() => {
 		// if project loaded for the first time, set projectSetupStep to 1 else get it from localStorage
 		if (!localStorage.getItem(`project-${data.projectId}-setup`)) {
-			localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['odk_project_load'].toString());
-			projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['odk_project_load']);
+			// if webforms enabled, avoid project load in odk step
+			if (enableWebforms) {
+				localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['task_selection'].toString());
+				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['task_selection']);
+			} else {
+				localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['odk_project_load'].toString());
+				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['odk_project_load']);
+			}
 		} else {
 			const projectStep = localStorage.getItem(`project-${data.projectId}-setup`);
 			projectSetupStepStore.setProjectSetupStep(projectStep ? +projectStep : 0);
@@ -373,9 +380,11 @@
 			<sl-tab slot="nav" panel="offline">
 				<hot-icon name="wifi-off" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
 			</sl-tab>
-			<sl-tab slot="nav" panel="qrcode">
-				<hot-icon name="qr-code" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
-			</sl-tab>
+			{#if (!enableWebforms)}
+				<sl-tab slot="nav" panel="qrcode">
+					<hot-icon name="qr-code" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
+				</sl-tab>
+			 {/if}
 			<sl-tab slot="nav" panel="events">
 				<hot-icon name="three-dots" class="!text-[1.7rem] !sm:text-[2rem]"></hot-icon>
 			</sl-tab>
