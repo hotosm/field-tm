@@ -28,8 +28,8 @@ from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 
 from app.auth.auth_deps import login_required
-from app.auth.auth_schemas import AuthUser
-from app.auth.roles import project_manager
+from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.roles import mapper, project_manager
 from app.central import central_crud, central_deps
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
@@ -163,10 +163,10 @@ async def upload_form_media(
 
 @router.post("/get-form-media", response_model=dict[str, str])
 async def get_form_media(
-    current_user: Annotated[AuthUser, Depends(project_manager)],
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ):
     """Return the project form attachments as a list of files."""
-    project = current_user.get("project")
+    project = project_user.get("project")
     project_id = project.id
     project_odk_id = project.odkid
     project_xform_id = project.odk_form_id

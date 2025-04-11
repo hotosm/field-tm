@@ -238,7 +238,6 @@ class Settings(BaseSettings):
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
-
     # NOTE www is required for now
     # https://github.com/openstreetmap/operations/issues/951#issuecomment-1748717154
     OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
