@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -18,7 +18,7 @@
 
 # Update a variable in the .env file
 [no-cd]
-update key value:
+dotenv-update key value:
   #!/usr/bin/env sh
 
   var_name={{key}}
@@ -32,3 +32,22 @@ update key value:
     echo "${new_var}" >> .env
   fi
 
+# Configure web-forms for the mapper frontend (local only)
+[no-cd]
+enable-webforms:
+  #!/usr/bin/env sh
+  set -e
+
+  CONTAINER=fmtm-central-1
+  CONFIG_PATH=src/mapper/static/config.json
+  CONTAINER_CONFIG_PATH=/usr/odk/config.json
+
+  # Copy config into container
+  docker cp "$CONFIG_PATH" "$CONTAINER":"$CONTAINER_CONFIG_PATH"
+
+  # Modify JSON using jq inside the container
+  docker exec "$CONTAINER" sh -c \
+    "jq '.enableWebforms = true' '${CONTAINER_CONFIG_PATH}' > '${CONTAINER_CONFIG_PATH}.tmp' && mv '${CONTAINER_CONFIG_PATH}.tmp' '${CONTAINER_CONFIG_PATH}'"
+
+  # Upload updated config to S3
+  docker exec "$CONTAINER" mc cp "$CONTAINER_CONFIG_PATH" s3/fmtm-data/frontend/config.json

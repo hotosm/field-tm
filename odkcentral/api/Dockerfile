@@ -28,6 +28,7 @@ RUN apt-get update --quiet \
     && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --quiet --no-install-recommends \
         "ca-certificates" \
+        "jq" \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
