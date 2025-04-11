@@ -255,9 +255,12 @@ export const DeleteOrganizationService = (url: string, navigate: NavigateFunctio
           }),
         );
       } catch (error) {
+        const message =
+          error?.response?.data?.detail || "Failed to delete organisation";
         dispatch(
           CommonActions.SetSnackBar({
-            message: 'Failed to delete organization',
+            message,
+            variant: 'error',
           }),
         );
       } finally {
