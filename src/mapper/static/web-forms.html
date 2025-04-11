@@ -1,5 +1,26 @@
 <!doctype html>
 <html>
+	<head>
+		<style>
+			.columns-pack label.value-option.no-buttons {
+				background-color: lightgray;
+				background-position: center;
+				background-repeat: no-repeat;
+				position: relative;
+				height: 50px;
+				width: 75px;
+			}
+			.columns-pack .p-radiobutton.p-component {
+				display: none;
+			}
+
+			.columns-pack .label-text {
+				left: 50%;
+				position: absolute;
+				transform: translate(-50%, 50px);
+			}
+		</style>
+	</head>
 	<body style="height: 100vh; overflow-y: scroll; position: relative">
 		<script type="module">
 			const odkWebFormUrl = new URL(window.location.href).searchParams.get('odkWebFormUrl');
@@ -13,7 +34,35 @@
 			const entityId = new URL(window.location.href).searchParams.get('entityId');
 			const projectId = new URL(window.location.href).searchParams.get('projectId');
 			const formXml = new URL(window.location.href).searchParams.get('formXml');
+			const formMedia = JSON.parse(new URL(window.location.href).searchParams.get('formMedia'));
 			const language = new URL(window.location.href).searchParams.get('language');
+
+			const style = document.createElement('style');
+			const formXmlString = await fetch(formXml).then((res) => res.text());
+			const domParser = new DOMParser();
+			const formXmlDoc = domParser.parseFromString(formXmlString, 'application/xml');
+			const translations = formXmlDoc.querySelectorAll('model itext translation');
+			for (let i = 0; i < translations.length; i++) {
+				const translation = translations[i];
+				const lang = translation.getAttribute('lang');
+				const texts = translation.querySelectorAll('text');
+				for (let ii = 0; ii < texts.length; ii++) {
+					const text = texts[ii];
+					const text_id = text.getAttribute('id');
+					const value = text.querySelector('value:not([form=image])')?.textContent;
+					if (value) {
+						const image = text.querySelector('value[form=image]');
+						if (image) {
+							const filename = image.textContent.trim().replace('jr://images/', '');
+							if (filename in formMedia) {
+								const imageUrl = formMedia[filename];
+								style.innerHTML += `.columns-pack label.value-option.no-buttons[for$=${value}] { background-image: url("${imageUrl}"); }\n`;
+							}
+						}
+					}
+				}
+			}
+			document.body.appendChild(style);
 
 			// we are creating an instance of a web component programmatically
 			// and not by inserting a <odk-web-form> tag in the html

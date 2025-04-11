@@ -4,7 +4,9 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { fetchBlobUrl } from '$lib/utils/fetch.ts';
+	import { fetchBlobUrl, fetchFormMediBlobUrls } from '$lib/utils/fetch.ts';
+
+	import type { Action } from 'svelte/action';
 
 	const CUSTOM_UPLOAD_ELEMENT_ID = '95c6807c-82b4-4208-b5df-5a3e795227b0';
 
@@ -26,7 +28,6 @@
 
 	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, taskId }: Props = $props();
 	let drawerRef: SlDrawer;
-	let iframeRef: HTMLIFrameElement | undefined;
 	let odkForm: any;
 	let startDate: string | undefined;
 
@@ -36,36 +37,34 @@
 
 	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
 
-	function handleMutation() {
-		if (!iframeRef) return;
-		if (!iframeRef.contentDocument) return;
+	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
+
+	function handleMutation(iframe: HTMLIFrameElement) {
+		if (!iframe.contentDocument) return;
 		if (!odkForm) return;
 		if (!webFormsRef) return;
 
 		// check if we've already added the custom upload input
-		if (iframeRef.contentDocument.getElementById(CUSTOM_UPLOAD_ELEMENT_ID)) return;
-		console.log('over-writing control node');
+		if (iframe.contentDocument.getElementById(CUSTOM_UPLOAD_ELEMENT_ID)) return;
 
 		const uploadControl = odkForm.getChildren().find((n: any) => n.constructor.name === 'UploadControl');
-		const uploadControlNodeId = uploadControl.nodeId;
-		const uploadControlNodeSelector = `[id='${uploadControlNodeId}_container']`;
-		const uploadControlNode = webFormsRef.querySelector(uploadControlNodeSelector);
+		const uploadControlNode = webFormsRef.querySelector(`[id='${uploadControl.nodeId}_container']`);
 		if (!uploadControlNode) return;
 
-		const controlText = iframeRef.contentDocument.createElement('div');
+		const controlText = iframe.contentDocument.createElement('div');
 		controlText.id = CUSTOM_UPLOAD_ELEMENT_ID;
 		controlText.className = 'control-text';
 		controlText.style.marginBottom = '.75rem';
 
-		const label = iframeRef.contentDocument.createElement('label');
+		const label = iframe.contentDocument.createElement('label');
 		label.style.fontWeight = '400';
 		label.style.lineHeight = '1.8rem';
-		const span = iframeRef.contentDocument.createElement('span');
+		const span = iframe.contentDocument.createElement('span');
 		span.textContent = uploadControl.engineState.label.chunks.map((chunk: any) => chunk.asString).join(' ');
 		label.appendChild(span);
 		controlText.appendChild(label);
-		const inputWrapper = iframeRef.contentDocument.createElement('div');
-		const input = iframeRef.contentDocument.createElement('input');
+		const inputWrapper = iframe.contentDocument.createElement('div');
+		const input = iframe.contentDocument.createElement('input');
 		input.id = CUSTOM_UPLOAD_ELEMENT_ID;
 		input.addEventListener('change', () => {
 			pic = input.files?.[0];
@@ -129,7 +128,6 @@
 	function handleOdkForm(evt: any) {
 		if (evt?.detail?.[0]) {
 			odkForm = evt.detail[0];
-			console.log('set odkForm', odkForm);
 			// over-write default language
 			setFormLanguage(commonStore.locale);
 
@@ -170,16 +168,15 @@
 			setFormLanguage(commonStore.locale);
 		}
 	});
-	$effect(() => {
-		// we want to rerun this $effect function whenever a new iframe is rendered
-		// because projectId and entityId are state keys that force a re-render below when they change
-		// we add them here inside the $effect function, so Svelte knows that the function depends on them
-		projectId;
-		entityId;
-		if (iframeRef) {
-			const observer = new MutationObserver(handleMutation);
+
+	const handleIframe: Action = (node) => {
+		$effect(() => {
+			const iframe = node as unknown as HTMLIFrameElement;
+
+			// we want to rerun this $effect function whenever a new iframe is rendered
+			const observer = new MutationObserver(() => handleMutation(iframe));
 			const intervalId = setInterval(() => {
-				webFormsRef = iframeRef?.contentDocument?.querySelector('odk-web-form') || undefined;
+				webFormsRef = iframe?.contentDocument?.querySelector('odk-web-form') || undefined;
 				if (webFormsRef) {
 					clearInterval(intervalId);
 					webFormsRef.addEventListener('submit', handleSubmit);
@@ -193,8 +190,9 @@
 				clearInterval(intervalId);
 				observer.disconnect();
 			};
-		}
-	});
+		});
+	};
+
 	$effect(() => {
 		if (drawerRef) {
 			drawerRef.addEventListener('sl-hide', function () {
@@ -219,14 +217,16 @@
 		{#if entityId}
 			{#key projectId}
 				{#await formXmlPromise then formXml}
-					{#key entityId}
-						<iframe
-							bind:this={iframeRef}
-							title="odk-web-forms-wrapper"
-							src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}`}
-							style="height: 100%; width: 100%; z-index: 11;"
-						></iframe>
-					{/key}
+					{#await formMediaPromise then formMedia}
+						{#key entityId}
+							<iframe
+								use:handleIframe
+								title="odk-web-forms-wrapper"
+								src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
+								style="height: 100%; width: 100%; z-index: 11;"
+							></iframe>
+						{/key}
+					{/await}
 				{/await}
 			{/key}
 		{/if}
