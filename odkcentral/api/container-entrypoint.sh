@@ -72,6 +72,7 @@ if [ "$S3_SERVER" != "http://s3:9000" ]; then
     mc anonymous set none "s3/${S3_BUCKET_NAME}"
 else
     echo "🔓 Allowing public access to bucket: $S3_BUCKET_NAME - assumed local dev setup"
+    mc anonymous set download "s3/${S3_BUCKET_NAME}"
 fi
 
 ### Run server (hardcode WORKER_COUNT=1 for dev) ###
