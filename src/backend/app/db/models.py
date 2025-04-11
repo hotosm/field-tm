@@ -620,12 +620,12 @@ class DbOrganisation(BaseModel):
                 )
                 return True
         
-        except psycopg.errors.ForeignKeyViolation:
+        except psycopg.errors.ForeignKeyViolation as e:
             raise HTTPException(
                 status_code=HTTPStatus.CONFLICT,
                 detail="""Cannot delete organization with existing projects.
                 Delete all projects first."""
-            )
+            ) from e
         except Exception as e:
             raise HTTPException(
                 status_code = HTTPStatus.BAD_REQUEST,
