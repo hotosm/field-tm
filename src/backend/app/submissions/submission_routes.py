@@ -464,11 +464,11 @@ async def conflate_geojson(
         ) from e
 
 
-@router.get("/{submission_id}/photos")
+@router.get("/{submission_id}/photos", response_model=dict[str, str])
 async def submission_photos(
     submission_id: str,
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
-) -> dict:
+):
     """This api returns the submission detail of individual submission.
 
     NOTE Prerequisites:

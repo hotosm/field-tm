@@ -161,7 +161,7 @@ async def upload_form_media(
         ) from e
 
 
-@router.post("/get-form-media")
+@router.post("/get-form-media", response_model=dict[str, str])
 async def get_form_media(
     current_user: Annotated[AuthUser, Depends(project_manager)],
 ):

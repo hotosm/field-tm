@@ -46,6 +46,7 @@ from app.db.postgis_utils import (
     javarosa_to_geojson_geom,
     parse_geojson_file_to_featcol,
 )
+from app.s3 import strip_presigned_url_for_local_dev
 
 
 def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
@@ -999,8 +1000,15 @@ async def get_form_media(
 ):
     """Get a list of form media attachments with their URLs."""
     async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
-        attachment_urls = await async_odk_form.getFormAttachmentUrls(
+        form_attachment_urls = await async_odk_form.getFormAttachmentUrls(
             project_odk_id,
             xform_id,
         )
-        return attachment_urls
+
+    if settings.DEBUG:
+        form_attachment_urls = {
+            filename: strip_presigned_url_for_local_dev(url)
+            for filename, url in form_attachment_urls.items()
+        }
+
+    return form_attachment_urls
