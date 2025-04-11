@@ -10,7 +10,7 @@ export type projectRoleType =
   | 'PROJECT_MANAGER';
 
 export type userType = {
-  id: number;
+  sub: string;
   username: string;
   role: roleType;
   profile_img: string;

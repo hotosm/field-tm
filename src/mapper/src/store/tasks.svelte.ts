@@ -3,6 +3,10 @@ import type { ShapeData, Row } from '@electric-sql/client';
 import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 
 import type { ProjectTask, TaskEventType } from '$lib/types';
+import { getLoginStore } from '$store/login.svelte.ts';
+import { getTimeDiff } from '$lib/utils/datetime';
+
+const loginStore = getLoginStore();
 
 let taskEventShape: Shape;
 let featcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
@@ -17,6 +21,9 @@ let selectedTask: any = $state(null);
 let selectedTaskState: string = $state('');
 let selectedTaskGeom: GeoJSON | null = $state(null);
 let taskIdIndexMap: Record<number, number> = $state({});
+let commentMention: TaskEventType | null = $state(null);
+
+let userDetails = $derived(loginStore.getAuthDetails);
 
 function getTaskEventStream(projectId: number): ShapeStream | undefined {
 	if (!projectId) {
@@ -35,14 +42,21 @@ function getTaskStore() {
 	async function subscribeToTaskEvents(taskEventStream: ShapeStream | undefined) {
 		if (!taskEventStream) return;
 		taskEventShape = new Shape(taskEventStream);
-
 		taskEventShape.subscribe((taskEvent: ShapeData) => {
 			const rows: Row[] = taskEvent.rows;
 			if (rows && Array.isArray(rows)) {
+				latestEvent = rows?.slice(-1)?.[0];
+
+				// if the logged in user is tagged, add mentioned comment to the state
+				if (
+					latestEvent?.event === 'COMMENT' &&
+					latestEvent?.comment?.includes(`@${userDetails?.username}`) &&
+					latestEvent.comment?.startsWith('#submissionId:uuid:') &&
+					getTimeDiff(new Date(latestEvent?.created_at)) < 120
+				) {
+					commentMention = latestEvent;
+				}
 				for (const newEvent of rows) {
-					if (newEvent) {
-						latestEvent = newEvent;
-					}
 					if (newEvent.task_id === selectedTaskId) {
 						selectedTaskState = newEvent.state;
 					}
@@ -99,12 +113,17 @@ function getTaskStore() {
 		taskIdIndexMap = idIndexMappedRecord;
 	}
 
+	function dismissCommentMention() {
+		commentMention = null;
+	}
+
 	return {
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
 		subscribeToEvents: subscribeToTaskEvents,
 		setSelectedTaskId: setSelectedTaskId,
 		setTaskIdIndexMap: setTaskIdIndexMap,
+		dismissCommentMention: dismissCommentMention,
 		get featcol() {
 			return featcol;
 		},
@@ -134,6 +153,9 @@ function getTaskStore() {
 		},
 		get taskIdIndexMap() {
 			return taskIdIndexMap;
+		},
+		get commentMention() {
+			return commentMention;
 		},
 	};
 }
