@@ -263,8 +263,8 @@ async def remove_organisation_admin(
     if current_user.sub == user_sub:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail="You cannot remove your own admin role."
+            detail="You cannot remove your own admin role.",
         )
-    
+
     await DbOrganisationManagers.delete(db, user_sub)
     return Response(status_code=HTTPStatus.NO_CONTENT)

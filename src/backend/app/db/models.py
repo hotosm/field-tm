@@ -29,9 +29,9 @@ from typing import TYPE_CHECKING, Annotated, List, Optional, Self
 from uuid import UUID
 
 import geojson
+import psycopg
 from fastapi import HTTPException, UploadFile
 from loguru import logger as log
-import psycopg
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
 from psycopg.rows import class_row
@@ -619,17 +619,17 @@ class DbOrganisation(BaseModel):
                     f"/{org_id}/",
                 )
                 return True
-        
+
         except psycopg.errors.ForeignKeyViolation as e:
             raise HTTPException(
                 status_code=HTTPStatus.CONFLICT,
                 detail="""Cannot delete organization with existing projects.
-                Delete all projects first."""
+                Delete all projects first.""",
             ) from e
         except Exception as e:
             raise HTTPException(
-                status_code = HTTPStatus.BAD_REQUEST,
-                detail = f"Failed to delete organization: {e}"
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail=f"Failed to delete organization: {e}",
             ) from e
 
     @classmethod
@@ -716,15 +716,15 @@ class DbOrganisationManagers(BaseModel):
             sql += ";"
             await cur.execute(sql, params)
             return await cur.fetchall()
-    
+
     @classmethod
     async def delete(cls, db: Connection, user_sub: str):
         """Delete an organization manager.
-        
+
         Args:
             db: Database connection
             user_sub: The subject ID of the user to remove
-            
+
         Returns:
             None
         """
@@ -733,6 +733,7 @@ class DbOrganisationManagers(BaseModel):
                 "DELETE FROM organisation_managers WHERE user_sub = %(user_sub)s;",
                 {"user_sub": user_sub},
             )
+
 
 class DbXLSForm(BaseModel):
     """Table xlsforms.
