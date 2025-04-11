@@ -66,8 +66,13 @@ odk-cmd --email "${SYSADMIN_EMAIL}" user-promote || true
 echo "Creating S3 bucket ${S3_BUCKET_NAME} to store submission media"
 mc alias set s3 "$S3_SERVER" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
 mc mb "s3/${S3_BUCKET_NAME}" --ignore-existing
-# Prevent anonymous access (pre-signed URL download only)
-mc anonymous set none "s3/${S3_BUCKET_NAME}"
+# Prevent anonymous access (pre-signed URL download only, in production)
+if [ "$S3_SERVER" != "http://s3:9000" ]; then
+    echo "🔐 Preventing public access to bucket: $S3_BUCKET_NAME"
+    mc anonymous set none "s3/${S3_BUCKET_NAME}"
+else
+    echo "🔓 Allowing public access to bucket: $S3_BUCKET_NAME - assumed local dev setup"
+fi
 
 ### Run server (hardcode WORKER_COUNT=1 for dev) ###
 export WORKER_COUNT=1

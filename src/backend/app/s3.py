@@ -291,6 +291,23 @@ def create_bucket_if_not_exists(client: Minio, bucket_name: str, is_public: bool
         log.debug(f"S3 bucket already exists: {bucket_name}")
 
 
+def strip_presigned_url_for_local_dev(url: str) -> str:
+    """Helper for local development handling docker URL + pre-signing.
+
+    For local dev only, we need to iterate through and replace S3_ENDPOINT
+    with S3_DOWNLOAD_ROOT, due to internal docker name used for S3 URL.
+    The bucket is also public in local dev, so we remove pre-signed portion
+    of URL, giving us direct access without a signature mismatch
+    """
+    host_accessible_url = url.replace(settings.S3_ENDPOINT, settings.S3_DOWNLOAD_ROOT)
+    try:
+        split_url_on_presign_vars = host_accessible_url.split("?")
+        return split_url_on_presign_vars[0]
+    except Exception as e:
+        log.debug(f"Failed to convert S3 URL for local development: {e}")
+        return url
+
+
 def is_connection_secure(minio_url: str):
     """Determine from URL string if is http or https."""
     if minio_url.startswith("http://"):

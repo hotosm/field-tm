@@ -42,6 +42,7 @@ from app.config import settings
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects import project_crud
+from app.s3 import strip_presigned_url_for_local_dev
 
 # async def convert_json_to_osm(file_path):
 #     """Wrapper for osm-fieldwork json2osm."""
@@ -260,11 +261,9 @@ async def get_submission_photos(
             project.odkid, project.odk_form_id, submission_id
         )
 
-    # For local dev only, we need to iterate through and replace S3_ENDPOINT
-    # with S3_DOWNLOAD_ROOT, due to internal docker name used for S3 URL
     if settings.DEBUG:
         submission_photos = {
-            filename: url.replace(settings.S3_ENDPOINT, settings.S3_DOWNLOAD_ROOT)
+            filename: strip_presigned_url_for_local_dev(url)
             for filename, url in submission_photos.items()
         }
 
