@@ -11,7 +11,8 @@
 		"READY": "Pronto",
 		"OPENED_IN_ODK": "Aberto no ODK",
 		"SURVEY_SUBMITTED": "Pesquisa enviada",
-		"MARKED_BAD": "Marcado como ruim"
+		"MARKED_BAD": "Marcado como ruim",
+		"VALIDATED": "Validado"
 	},
 	"header": {
 		"about": "Sobre",

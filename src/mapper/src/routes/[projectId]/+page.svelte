@@ -45,7 +45,7 @@
 	let isDrawEnabled: boolean = $state(false);
 	let latestEventTime: string = $state('');
 	let isGeometryCreationLoading: boolean = $state(false);
-
+	
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
 	const commonStore = getCommonStore();
@@ -56,11 +56,13 @@
 	const newBadGeomStream = getNewBadGeomStream(data.projectId);
 
 	const selectedEntityId = $derived(entitiesStore.selectedEntity);
+	const latestEvent = $derived(taskStore.latestEvent);
+	const commentMention = $derived(taskStore.commentMention);
 	const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
-		if (taskStore.latestEvent) {
+		if (latestEvent) {
 			taskStore.appendTaskStatesToFeatcol(data.project.tasks);
 		}
 	});
@@ -78,8 +80,8 @@
 	// update the latest time time every minute
 	$effect(() => {
 		const updateLatestTime = () => {
-			if (taskStore.latestEvent?.created_at) {
-				latestEventTime = convertDateToTimeAgo(taskStore.latestEvent.created_at);
+			if (latestEvent?.created_at) {
+				latestEventTime = convertDateToTimeAgo(latestEvent.created_at);
 			}
 		};
 
@@ -90,11 +92,10 @@
 		return () => clearInterval(interval); // Cleanup interval on unmount
 	});
 
-	function zoomToTask(taskId: number) {
+	function zoomToTask(taskId: number, fitOptions?: Record<string, any> =  {duration: 0}) {
 		const taskObj = data.project.tasks.find((task: ProjectTask) => task.id === taskId);
 
 		if (!taskObj) return;
-
 		// Set as selected task for buttons
 		taskStore.setSelectedTaskId(taskObj.id, taskObj?.task_index);
 
@@ -102,7 +103,7 @@
 		const taskBuffer = buffer(taskPolygon, 5, { units: 'meters' });
 		if (taskBuffer && maplibreMap) {
 			const taskBbox: [number, number, number, number] = bbox(taskBuffer) as [number, number, number, number];
-			maplibreMap.fitBounds(taskBbox, { duration: 500 });
+			maplibreMap.fitBounds(taskBbox, fitOptions);
 		}
 
 		// Open the map tab
@@ -208,13 +209,66 @@
 </script>
 
 <!-- There is a new event to display in the top right corner -->
-{#if taskStore.latestEvent}
+{#if latestEvent}
 	<div
 		id="notification-banner"
 		class="absolute z-10 top-15 sm:top-18.8 right-0 font-sans flex bg-white text-black bg-opacity-70 text-sm sm:text-base px-1 rounded-bl-md"
 	>
-		<b class="">{latestEventTime}</b>&nbsp;| {taskStore.latestEvent.event}
-		on task {taskStore.taskIdIndexMap[taskStore.latestEvent.task_id]} by {taskStore.latestEvent.username || 'anon'}
+		<b class="">{latestEventTime}</b>&nbsp;| {latestEvent.event}
+		on task {taskStore.taskIdIndexMap[latestEvent.task_id]} by {latestEvent.username || 'anon'}
+	</div>
+{/if}
+
+<!-- Alert shown when user is tagged on a comment when they is active -->
+{#if commentMention}
+	<div class="absolute top-25 z-50 left-0 right-0 mx-5">
+		<sl-alert open={true} variant="neutral" style="padding: 0px;">
+			<sl-icon slot="icon" name="chat" class="mb-auto mt-7 animate-pulse"></sl-icon>
+			<strong>{commentMention?.username} mentioned you on a comment</strong><br />
+			<p>{commentMention?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}</p>
+			<div class="mt-3 ml-auto w-fit">
+				<sl-button
+					onclick={() => {
+						taskStore.dismissCommentMention();
+					}}
+					onkeydown={(e: KeyboardEvent) => {
+						if (e.key === 'Enter') {
+							taskStore.dismissCommentMention();
+						}
+					}}
+					role="button"
+					tabindex="0"
+					size="small"
+					class="link-gray w-fit"
+				>
+					<span class="font-barlow font-medium text-xs uppercase">Dismiss</span>
+				</sl-button>
+				<sl-button
+					onclick={() => {
+						zoomToTask(commentMention.task_id, { duration: 0, padding:	{bottom: 325} });
+						const osmId = commentMention?.comment?.split(' ')?.[1]?.replace('#featureId:', '');
+						entitiesStore.setSelectedEntity(osmId);
+						openedActionModal = 'entity-modal'
+						taskStore.dismissCommentMention();
+					}}
+					onkeydown={(e: KeyboardEvent) => {
+						if (e.key === 'Enter') {
+							const osmId = commentMention?.comment?.split(' ')?.[1]?.replace('#featureId:', '');
+							if (osmId) {
+								entitiesStore.setSelectedEntity(osmId);
+							}
+							taskStore.dismissCommentMention();
+						}
+					}}
+					role="button"
+					tabindex="0"
+					size="small"
+					class="link-red w-fit"
+				>
+					<span class="font-barlow font-medium text-xs uppercase">Tap to View</span>
+				</sl-button>
+			</div>
+		</sl-alert>
 	</div>
 {/if}
 

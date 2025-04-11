@@ -1,9 +1,13 @@
+export function getTimeDiff(date: Date) {
+	const now = new Date(new Date().toISOString());
+	return Math.floor((now.getTime() - date.getTime()) / 1000);
+}
+
 // Convert a UTC date string to a 'time ago' string, in minutes, hours, or days.
 export function convertDateToTimeAgo(dateToFormat: string): string {
 	// Convert dateToFormat string to UTC date
 	const theDate = new Date(dateToFormat);
-	const now = new Date(new Date().toISOString()); // Force UTC for the current date
-	const timeDiff = Math.floor((now.getTime() - theDate.getTime()) / 1000); // time difference in seconds
+	const timeDiff = getTimeDiff(theDate);
 
 	let timeAgo;
 	if (timeDiff < 3600) {

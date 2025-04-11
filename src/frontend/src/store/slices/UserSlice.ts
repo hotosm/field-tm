@@ -20,6 +20,8 @@ export const initialState: UserStateTypes = {
   updateUserRoleLoading: false,
   userListForSelect: [],
   userListForSelectLoading: false,
+  userNames: [],
+  getUserNamesLoading: false,
 };
 
 const UserSlice = createSlice({
@@ -45,6 +47,12 @@ const UserSlice = createSlice({
     },
     SetUserListForSelectLoading: (state, action: PayloadAction<boolean>) => {
       state.userListLoading = action.payload;
+    },
+    SetUserNames: (state, action: PayloadAction<UserStateTypes['userNames']>) => {
+      state.userNames = action.payload;
+    },
+    GetUserNamesLoading: (state, action: PayloadAction<boolean>) => {
+      state.getUserNamesLoading = action.payload;
     },
   },
 });

@@ -11,6 +11,7 @@
 		"READY": "तयार",
 		"OPENED_IN_ODK": "ODK मा खोलिएको",
 		"SURVEY_SUBMITTED": "सर्वेक्षण पेश",
+		"VALIDATED": "प्रमाणीकृत",
 		"MARKED_BAD": "खराब चिन्हित"
 	},
 	"header": {

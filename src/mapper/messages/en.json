@@ -11,7 +11,8 @@
 		"READY": "Ready",
 		"OPENED_IN_ODK": "Opened In ODK",
 		"SURVEY_SUBMITTED": "Survey Submitted",
-		"MARKED_BAD": "Marked Bad"
+		"MARKED_BAD": "Marked Bad",
+		"VALIDATED": "Validated"
 	},
 	"header": {
 		"about": "About",
