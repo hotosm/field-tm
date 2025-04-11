@@ -31,6 +31,7 @@ from uuid import UUID
 import geojson
 from fastapi import HTTPException, UploadFile
 from loguru import logger as log
+import psycopg
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
 from psycopg.rows import class_row
@@ -593,45 +594,43 @@ class DbOrganisation(BaseModel):
     @classmethod
     async def delete(cls, db: Connection, org_id: int) -> bool:
         """Delete an organisation and its related data."""
-        sql = """
-            WITH deleted_task_events AS (
-                DELETE FROM task_events
-                WHERE project_id IN (
-                    SELECT id FROM projects WHERE organisation_id = %(org_id)s
+        try:
+            sql = """
+                WITH deleted_org_managers AS (
+                    DELETE FROM organisation_managers
+                    WHERE organisation_id = %(org_id)s
+                    RETURNING organisation_id
+                ),
+                deleted_org AS (
+                    DELETE FROM organisations
+                    WHERE id = %(org_id)s
+                    RETURNING id
                 )
-                RETURNING project_id
-            ), deleted_tasks AS (
-                DELETE FROM tasks
-                WHERE project_id IN (
-                    SELECT id FROM projects WHERE organisation_id = %(org_id)s
+                SELECT id FROM deleted_org;
+            """
+
+            async with db.cursor() as cur:
+                await cur.execute(sql, {"org_id": org_id})
+                success = await cur.fetchone()
+
+            if success:
+                await delete_all_objs_under_prefix(
+                    settings.S3_BUCKET_NAME,
+                    f"/{org_id}/",
                 )
-                RETURNING project_id
-            ), deleted_projects AS (
-                DELETE FROM projects
-                WHERE organisation_id = %(org_id)s
-                RETURNING organisation_id
-            ), deleted_org_managers AS (
-                DELETE FROM organisation_managers
-                WHERE organisation_id = %(org_id)s
-                RETURNING organisation_id
-            ),deleted_org AS (
-                DELETE FROM organisations
-                WHERE id = %(org_id)s
-                RETURNING id
+                return True
+        
+        except psycopg.errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=HTTPStatus.CONFLICT,
+                detail="""Cannot delete organization with existing projects.
+                Delete all projects first."""
             )
-            SELECT id FROM deleted_org;
-        """
-
-        async with db.cursor() as cur:
-            await cur.execute(sql, {"org_id": org_id})
-            success = await cur.fetchone()
-
-        if success:
-            await delete_all_objs_under_prefix(
-                settings.S3_BUCKET_NAME,
-                f"/{org_id}/",
-            )
-            return True
+        except Exception as e:
+            raise HTTPException(
+                status_code = HTTPStatus.BAD_REQUEST,
+                detail = f"Failed to delete organization: {e}"
+            ) from e
 
     @classmethod
     async def unapproved(cls, db: Connection) -> Optional[list[Self]]:
@@ -717,7 +716,23 @@ class DbOrganisationManagers(BaseModel):
             sql += ";"
             await cur.execute(sql, params)
             return await cur.fetchall()
-
+    
+    @classmethod
+    async def delete(cls, db: Connection, user_sub: str):
+        """Delete an organization manager.
+        
+        Args:
+            db: Database connection
+            user_sub: The subject ID of the user to remove
+            
+        Returns:
+            None
+        """
+        async with db.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM organisation_managers WHERE user_sub = %(user_sub)s;",
+                {"user_sub": user_sub},
+            )
 
 class DbXLSForm(BaseModel):
     """Table xlsforms.

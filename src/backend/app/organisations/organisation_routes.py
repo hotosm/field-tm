@@ -235,3 +235,36 @@ async def delete_org(
             detail=f"Failed deleting org ({org.name}).",
         )
     return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@router.delete("/org-admin/{user_sub}")
+async def remove_organisation_admin(
+    user_sub: str,
+    db: Annotated[Connection, Depends(db_conn)],
+    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+):
+    """Remove an organization admin.
+
+    The logged in user must be either the admin of the organization or a super admin.
+    Users cannot delete their own admin role.
+
+    Args:
+        user_sub: The subject ID of the user to remove as admin
+        db: Database connection
+        org_user_dict: Dictionary containing authenticated user and organization info
+
+    Returns:
+        204 No Content on success
+
+    Raises:
+        HTTPException: 400 if attempting to delete own role
+    """
+    current_user = org_user_dict.get("user")
+    if current_user.sub == user_sub:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="You cannot remove your own admin role."
+        )
+    
+    await DbOrganisationManagers.delete(db, user_sub)
+    return Response(status_code=HTTPStatus.NO_CONTENT)
