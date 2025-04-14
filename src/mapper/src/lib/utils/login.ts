@@ -1,3 +1,5 @@
+import type { LoginProviderKey } from '$store/common.svelte';
+
 // The /auth/me endpoint does an UPSERT in the database, ensuring the user
 // exists in the FMTM DB
 export const getUserDetailsFromApi = async (fetchClient = fetch) => {
@@ -16,18 +18,27 @@ export const getUserDetailsFromApi = async (fetchClient = fetch) => {
 	}
 };
 
-export const loginRedirect = async (accountType: 'osm_account' | 'google_account') => {
+export const loginRedirect = async (provider: LoginProviderKey) => {
 	try {
-		let resp;
-		if (accountType === 'osm_account') {
-			resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm/mapper`);
-		} else if (accountType === 'google_account') {
-			resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/google`);
+		let url: string | undefined;
+
+		switch (provider) {
+			case 'osm':
+				url = `${import.meta.env.VITE_API_URL}/auth/login/osm/mapper`;
+				break;
+			case 'google':
+				url = `${import.meta.env.VITE_API_URL}/auth/login/google`;
+				break;
 		}
-		if (!resp) return;
+
+		if (!url) return;
+
+		const resp = await fetch(url);
 		const data = await resp.json();
-		window.location = data.login_url;
-	} catch (error) {}
+		window.location.href = data.login_url;
+	} catch (error) {
+		console.error('Login redirect failed:', error);
+	}
 };
 
 export const refreshCookies = async (fetchClient = fetch) => {

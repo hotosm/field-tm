@@ -4,11 +4,18 @@ import { getBasemapList } from '$lib/utils/basemaps';
 
 import { getLocale as getParaglideLocale, locales } from '$translations/runtime.js';
 
+export const LOGIN_PROVIDER_KEYS = ['osm', 'google'] as const;
+export type LoginProviderKey = (typeof LOGIN_PROVIDER_KEYS)[number];
+export interface LoginProviders {
+	osm: boolean;
+	google: boolean;
+}
 interface ConfigJson {
 	logoUrl: string;
 	logoText: string;
 	cssFile: string;
 	enableWebforms: boolean;
+	loginProviders: LoginProviders;
 }
 
 interface AlertDetails {
