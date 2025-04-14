@@ -3,32 +3,41 @@
 	import GoogleLogo from '$assets/images/google-logo.svg';
 	import { loginRedirect } from '$lib/utils/login';
 	import { getLoginStore } from '$store/login.svelte.ts';
+	import type { LoginProviderKey } from '$store/common.svelte.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 
-	type loginOptionsType = {
-		id: 'osm_account' | 'google_account';
+	const commonStore = getCommonStore();
+	const loginStore = getLoginStore();
+
+	type LoginOption = {
+		id: LoginProviderKey;
 		name: string;
 		image: string;
 		description?: string;
 	};
-
-	const loginOptions: loginOptionsType[] = [
-		{
-			id: 'osm_account',
+	const ALL_LOGIN_PROVIDERS: Record<LoginProviderKey, Omit<LoginOption, 'id'>> = {
+		osm: {
 			name: 'Sign in with OSM',
 			image: OSMLogo,
 			description: 'Edits made in FMTM will be credited to your OSM account.',
 		},
-		{
-			id: 'google_account',
+		google: {
 			name: 'Sign in with Google',
 			image: GoogleLogo,
-		},
-	];
+		}
+	};
+	// Determine enabled providers from config (default enabled, unless disabled)
+	const loginOptions: LoginOption[] = Object.entries(ALL_LOGIN_PROVIDERS)
+		.filter(([key]) => commonStore.config?.loginProviders?.[key as LoginProviderKey] !== false)
+		.map(([key, info]) => ({
+			id: key as LoginProviderKey,
+			...info,
+		}));
 
+	// 🧼 Refs / handlers
 	let dialogRef;
-	const loginStore = getLoginStore();
 
-	const handleSignIn = async (selectedOption: 'osm_account' | 'google_account') => {
+	const handleSignIn = async (selectedOption: LoginProviderKey) => {
 		loginRedirect(selectedOption);
 	};
 </script>
