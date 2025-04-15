@@ -49,7 +49,7 @@ pull_and_rebuild_frontends() {
         docker compose -f - pull)
 
     # Rebuild frontends (required to have correct API vars)
-    (cd deploy &&
+    (export COMPOSE_BAKE=true && cd deploy &&
         ../envsubst -i compose.sub.yaml | \
         docker compose -f - build ui)
 }
