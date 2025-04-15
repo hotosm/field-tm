@@ -1,0 +1,43 @@
+.map-legend {
+	--at-apply: flex-col gap-2;
+}
+
+.map-legend.open {
+	--at-apply: flex;
+}
+
+.map-legend.closed {
+	--at-apply: hidden;
+}
+
+.map-legend .title {
+	--at-apply: font-semibold leading-0 text-lg mb-3;
+}
+
+.map-legend .task-status {
+	--at-apply: flex items-center gap-2;
+}
+
+.map-legend .task-status .color {
+	--at-apply: w-5 h-5 opacity-40 border-solid border-[1px] border-neutral-100;
+}
+
+.map-legend .task-status .label {
+	--at-apply: font-regular text-neutral-800 text-nowrap leading-0;
+}
+
+.map-legend .task-status .ready {
+	background-color: var(--sl-color-neutral-300);
+}
+
+.map-legend .task-status .opened-in-odk {
+	background-color: var(--sl-color-warning-700);
+}
+
+.map-legend .task-status .submitted {
+	background-color: var(--sl-color-success-700);
+}
+
+.map-legend .task-status .bad {
+	background-color: var(--sl-color-primary-700);
+}

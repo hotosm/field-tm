@@ -23,6 +23,7 @@ map = new Map({
 ``` -->
 
 <script lang="ts">
+	import '$styles/map-layer-switcher.css';
 	import { onDestroy } from 'svelte';
 
 	type MapLibreStylePlusMetadata = maplibregl.StyleSpecification & {
@@ -178,12 +179,12 @@ map = new Map({
 	});
 </script>
 
-<div class={`${isOpen ? 'block' : 'hidden'}`}>
-	<p class="font-semibold text-lg mb-2">Base Maps</p>
-	<div class="grid grid-cols-3 w-full gap-3">
+<div class={`layer-switcher ${isOpen ? 'open' : 'closed'}`}>
+	<p class="title">Base Maps</p>
+	<div class="content">
 		{#each allStyles as style, _}
 			<div
-				class={`layer-card ${selectedStyleUrl === style.metadata.thumbnail ? 'active' : ''} h-[3.75rem] relative overflow-hidden rounded-md cursor-pointer hover:border-red-600`}
+				class={`layer-card ${selectedStyleUrl === style.metadata.thumbnail ? 'active' : ''}`}
 				onclick={() => selectStyle(style)}
 				role="button"
 				onkeydown={(e) => {
@@ -191,23 +192,10 @@ map = new Map({
 				}}
 				tabindex="0"
 			>
-				<img src={style.metadata.thumbnail} alt="Style Thumbnail" class="w-full h-full object-cover" />
-				<span class="absolute top-0 left-0 bg-white bg-opacity-80 px-1 rounded-br text-sm">{style.name}</span>
+				<img src={style.metadata.thumbnail} alt="Style Thumbnail" />
+				<span class="name">{style.name}</span>
 			</div>
 		{/each}
 	</div>
 </div>
 
-<style>
-	.layer-card {
-		border: 2px solid white;
-	}
-	.layer-card:hover {
-		border-color: #d73f3f;
-		transition-duration: 200ms;
-	}
-
-	.active {
-		border-color: #d73f3f;
-	}
-</style>

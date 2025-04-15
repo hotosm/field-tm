@@ -105,6 +105,9 @@ importers:
       '@unocss/extractor-svelte':
         specifier: ^0.65.0-beta.2
         version: 0.65.0-beta.2
+      '@unocss/transformer-directives':
+        specifier: 66.1.0-beta.11
+        version: 66.1.0-beta.11
       '@vite-pwa/sveltekit':
         specifier: ^0.6.7
         version: 0.6.8(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(vite-plugin-pwa@0.21.1(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))(workbox-build@7.3.0)(workbox-window@7.3.0))
@@ -1652,6 +1655,9 @@ packages:
   '@unocss/core@0.65.0-beta.2':
     resolution: {integrity: sha512-Wq2IbocJrHx6QXBxSQLkqIzZbDMVAELC/NeMTxFj3OjtrfrjjPI/X/WTaOyBEtwTs6jLi7hBZ7kRYHy5AxKoyQ==}
 
+  '@unocss/core@66.1.0-beta.11':
+    resolution: {integrity: sha512-KkCyEO+KK1B05hA9uu+gcm/bvkr7a+bj6IP/S4Yu9ojtRVpJwpDnwAEdc6vgLk6qNWyM4V88dVqWGrRYy0Buvg==}
+
   '@unocss/extractor-arbitrary-variants@0.65.0-beta.2':
     resolution: {integrity: sha512-ne8UZPaf0KBEaz6z+5kiXKM/+UYrVJUE0gMIFk5g74EXLHX2Gf2K44ZLnJeB/O/LHBDz9JpCBkaMoD/Z+XIgEA==}
 
@@ -1698,6 +1704,10 @@ packages:
     resolution: {integrity: sha512-MLNjy6+xJp4kIkqbBTAU85gq2SYJ+raXwQAt6Pikh7dcKS0Krvq0rySAwgKSy2/ut3DQecE82BJAAVRQOQGEMw==}
     engines: {node: '>=14'}
 
+  '@unocss/rule-utils@66.1.0-beta.11':
+    resolution: {integrity: sha512-qK5YQbstTP0rUgRkm1s1Ly9TMBKzP38TARVdh35yKW03YY8Lq1huUGEnLt5JV6iPdWzuiNRnnD/KKjBzZvP5FQ==}
+    engines: {node: '>=14'}
+
   '@unocss/transformer-attributify-jsx@0.65.0-beta.2':
     resolution: {integrity: sha512-TdLlbjsIN039rC7GssSzk5UMWX7ZY3hr3nGJhEJxMT5K32nfs4YGgC4DNcAcJj+QrdrejvvY55Rh4XCjkHHomQ==}
 
@@ -1706,6 +1716,9 @@ packages:
 
   '@unocss/transformer-directives@0.65.0-beta.2':
     resolution: {integrity: sha512-Wgatb9X/rrZXKHW28s5cOMoUCLBJUKdNDTZ3E1+G2ZhYk9fv7qVeSYXR78X4eQ5Skn5GMVMzCgmxWDeZmthFCg==}
+
+  '@unocss/transformer-directives@66.1.0-beta.11':
+    resolution: {integrity: sha512-y0So6FuHwjSblmPLGk/9zG/A0V/kn3w9Rh+61gRCV7dzVFADjXk6Q8RybVOAsXt2SEanyCwxlkWp7uObfkd5Pg==}
 
   '@unocss/transformer-variant-group@0.65.0-beta.2':
     resolution: {integrity: sha512-MVwaYPv689xycENxEk8GXjCIHzQMHPZoDSOIp/Ow2susO963ah9E1oRmjL2QX1fImUiauWy7EAOjHvJix/UoHA==}
@@ -2047,6 +2060,10 @@ packages:
 
   css-tree@3.0.1:
     resolution: {integrity: sha512-8Fxxv+tGhORlshCdCwnNJytvlvq46sOLSYEx2ZIGurahWvMucSRnyjPA3AmrMq4VPRYbHVpWj5VkiVasrM2H4Q==}
+    engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
+
+  css-tree@3.1.0:
+    resolution: {integrity: sha512-0eW44TGN5SQXU1mWSkKwFstI/22X2bG1nYzZTYMAWjylYURhse752YgbE4Cx46AC+bAvI+/dYTPRk1LqSUnu6w==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
   cssesc@3.0.0:
@@ -2964,6 +2981,9 @@ packages:
 
   mdn-data@2.12.1:
     resolution: {integrity: sha512-rsfnCbOHjqrhWxwt5/wtSLzpoKTzW7OXdT5lLOIH1OTYhWu9rRJveGq0sKvDZODABH7RX+uoR+DYcpFnq4Tf6Q==}
+
+  mdn-data@2.12.2:
+    resolution: {integrity: sha512-IEn+pegP1aManZuckezWCO+XZQDplx1366JoVhTpMpBB1sPey/SbveZQUosKiKiGYjg1wH4pMlNgXbCiYgihQA==}
 
   mdurl@2.0.0:
     resolution: {integrity: sha512-Lf+9+2r+Tdp5wXDXC4PcIBjTDtq4UKjCPMQhKIuzpJNW0b96kVqSwW0bT7FhRSfmAiFYgP+SCRvdrDozfh0U5w==}
@@ -5622,6 +5642,8 @@ snapshots:
 
   '@unocss/core@0.65.0-beta.2': {}
 
+  '@unocss/core@66.1.0-beta.11': {}
+
   '@unocss/extractor-arbitrary-variants@0.65.0-beta.2':
     dependencies:
       '@unocss/core': 0.65.0-beta.2
@@ -5701,6 +5723,11 @@ snapshots:
       '@unocss/core': 0.65.0-beta.2
       magic-string: 0.30.17
 
+  '@unocss/rule-utils@66.1.0-beta.11':
+    dependencies:
+      '@unocss/core': 66.1.0-beta.11
+      magic-string: 0.30.17
+
   '@unocss/transformer-attributify-jsx@0.65.0-beta.2':
     dependencies:
       '@unocss/core': 0.65.0-beta.2
@@ -5714,6 +5741,12 @@ snapshots:
       '@unocss/core': 0.65.0-beta.2
       '@unocss/rule-utils': 0.65.0-beta.2
       css-tree: 3.0.1
+
+  '@unocss/transformer-directives@66.1.0-beta.11':
+    dependencies:
+      '@unocss/core': 66.1.0-beta.11
+      '@unocss/rule-utils': 66.1.0-beta.11
+      css-tree: 3.1.0
 
   '@unocss/transformer-variant-group@0.65.0-beta.2':
     dependencies:
@@ -6102,6 +6135,11 @@ snapshots:
   css-tree@3.0.1:
     dependencies:
       mdn-data: 2.12.1
+      source-map-js: 1.2.1
+
+  css-tree@3.1.0:
+    dependencies:
+      mdn-data: 2.12.2
       source-map-js: 1.2.1
 
   cssesc@3.0.0: {}
@@ -7034,6 +7072,8 @@ snapshots:
   math-intrinsics@1.1.0: {}
 
   mdn-data@2.12.1: {}
+
+  mdn-data@2.12.2: {}
 
   mdurl@2.0.0: {}
 

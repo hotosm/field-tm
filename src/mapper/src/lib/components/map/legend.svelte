@@ -1,30 +1,30 @@
 <script lang="ts">
 	import '$styles/page.css';
+	import '$styles/map-legend.css';
 	import { m } from "$translations/messages.js";
 
-	type taskStatusesType = { status: string; color: string };
+	type taskStatusesType = { status: string; className: string };
 	type Props = {
 		isOpen: boolean;
 	};
 	const { isOpen }: Props = $props();
 
 	const taskStatuses: taskStatusesType[] = [
-		{ status: m['entity_states.READY'](), color: '#9c9a9a' },
-		{ status: m['entity_states.OPENED_IN_ODK'](), color: '#fae15f' },
-		{ status: m['entity_states.SURVEY_SUBMITTED'](), color: '#71bf86' },
-		{ status: m['entity_states.MARKED_BAD'](), color: '#fa1100' },
+		{ status: m['entity_states.READY'](), className: 'ready' },
+		{ status: m['entity_states.OPENED_IN_ODK'](), className: 'opened-in-odk' },
+		{ status: m['entity_states.SURVEY_SUBMITTED'](), className: 'submitted' },
+		{ status: m['entity_states.MARKED_BAD'](), className: 'bad' },
 	];
 </script>
 
-<div class={`${isOpen ? 'flex' : 'hidden'} flex-col gap-2`}>
-	<p class="font-semibold leading-0 text-lg mb-3">{m['legend.features']()}</p>
+<div class={`map-legend ${isOpen ? 'open' : 'closed'}`}>
+	<p class="title">{m['legend.features']()}</p>
 	{#each taskStatuses as taskStatus}
-		<div class="flex items-center gap-2">
+		<div class="task-status">
 			<div
-				style="background-color: {taskStatus.color};"
-				class="w-5 h-5 opacity-40 border-solid border-[1px] border-[#D0D0D0]"
+				class={`color ${taskStatus.className}`}
 			></div>
-			<p class="font-regular text-[#494949] text-nowrap leading-0">{taskStatus?.status}</p>
+			<p class="label">{taskStatus?.status}</p>
 		</div>
 	{/each}
 </div>

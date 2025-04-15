@@ -1,0 +1,51 @@
+.geolocation {
+	--at-apply: flex flex-col gap-y-2;
+}
+
+.geolocation .tooltip {
+	--max-width: calc(100vw - 55px);
+}
+
+.geolocation .content {
+	--at-apply: flex items-center flex-wrap gap-1;
+}
+
+.geolocation .button {
+	border: white 1px solid;
+	width: fit-content;
+	padding-left: 10px;
+	padding-right: 10px;
+	--at-apply: text-white rounded;
+}
+
+.geolocation .geolocate-icon {
+	--at-apply: text-[1.2rem] cursor-pointer duration-200;
+}
+
+.geolocation .geolocate-icon.toggle {
+	--at-apply: text-primary-600;
+}
+
+.geolocation .geolocate-icon.not-toggle {
+	--at-apply: text-neutral-800;
+}
+
+.geolocation-exit {
+	--at-apply: font-barlow w-full flex justify-center absolute z-10 bottom-2 pointer-events-none;
+}
+
+.geolocation-exit .content {
+	--at-apply: bg-white rounded-md py-2 px-4 flex items-center gap-6 pointer-events-auto shadow-md z-10;
+}
+
+.geolocation-exit .distance {
+	--at-apply: text-black text-base font-medium;
+}
+
+.geolocation-exit sl-button {
+	--at-apply: secondary;
+}
+
+.geolocate-exit sl-button span {
+	--at-apply: text-sm;
+}

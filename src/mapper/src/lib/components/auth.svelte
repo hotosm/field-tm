@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import '$styles/auth.css';
 	import { getUserDetailsFromApi } from '$lib/utils/login';
 	import { getAlertStore } from '$store/common.svelte';
 	import { getLoginStore } from '$store/login.svelte';
@@ -54,7 +55,7 @@
 	});
 </script>
 
-<div class="h-full flex flex-col justify-center items-center">
-	<sl-spinner style="font-size: 4rem; --track-width: 4px;"></sl-spinner>
-	<h2 class="font-barlow text-[#757575] font-semibold">Signing in...</h2>
+<div class="spinner">
+	<sl-spinner></sl-spinner>
+	<h2>Signing in...</h2>
 </div>

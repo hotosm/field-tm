@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/qr-code.css';
 	import type { Snippet } from 'svelte';
 	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
@@ -24,11 +25,11 @@
 	);
 </script>
 
-<div class="font-barlow flex flex-col items-center p-4 space-y-4">
+<div class="qr-code">
 	<!-- Text above the QR code -->
-	<div class="text-center w-full">
-		<div class="text-lg font-medium">
-			{#key commonStore.locale}<span class="mr-1">{m.scan_qr_code()}</span>{/key}
+	<div class="title-wrapper">
+		<div class="title">
+			{#key commonStore.locale}<span>{m.scan_qr_code()}</span>{/key}
 			<sl-tooltip content={m['qrcode.moreinfo']()} placement="bottom">
 				<hot-icon
 					onclick={() => {
@@ -42,19 +43,19 @@
 					role="button"
 					tabindex="0"
 					name="info-circle-fill"
-					class="!text-[14px] text-[#b91c1c] cursor-pointer duration-200 scale-[1.5]"
 				></hot-icon>
 			</sl-tooltip>
 		</div>
 	</div>
 
 	<!-- QR Code Container -->
-	<div class="flex justify-center w-full max-w-sm">
-		<hot-qr-code value={qrCodeData} label={m['qrcode.scan_to_open_odk']()} size="250" class="p-4 bg-white m-4"></hot-qr-code>
+	<div class="qr-code-container">
+		<hot-qr-code value={qrCodeData} label={m['qrcode.scan_to_open_odk']()} size="250"></hot-qr-code>
 	</div>
 
 	<!-- Download Button -->
 	<sl-button
+		class="download-button"
 		onclick={() => downloadQrCode(projectName)}
 		onkeydown={(e: KeyboardEvent) => {
 			e.key === 'Enter' && downloadQrCode(projectName);
@@ -62,10 +63,9 @@
 		role="button"
 		tabindex="0"
 		size="small"
-		class="secondary w-full max-w-[200px]"
 	>
-		<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"></hot-icon>
-		{#key commonStore.locale}<span class="font-barlow font-medium text-base uppercase">{m.download()} QR</span>{/key}
+		<hot-icon slot="prefix" name="download"></hot-icon>
+		{#key commonStore.locale}<span>{m.download()} QR</span>{/key}
 	</sl-button>
 
 	{@render children?.()}

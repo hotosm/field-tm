@@ -47,7 +47,7 @@ button {
   height: 100vh;
 }
 
-.content {
+.page-content {
   height: 81vh;
   overflow: auto;
   padding: 5px;

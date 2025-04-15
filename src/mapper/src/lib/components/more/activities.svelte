@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/activities.css';
 	import type { TaskEventType } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { m } from "$translations/messages.js";
@@ -14,10 +15,10 @@
 	const taskIdIndexMap: Record<number, number> = taskStore.taskIdIndexMap;
 </script>
 
-<div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-2 pb-2">
+<div class="activities">
 	{#if taskEvents?.length === 0}
-		<div class="flex justify-center mt-10">
-			<p class="text-[#484848] text-base">
+		<div class="header">
+			<p>
 				{taskStore?.selectedTaskIndex
 					? `${m["activities.no_activities_on_task_yet"]()} ${taskStore?.selectedTaskIndex}`
 					: m["activities.no_activities_yet"]()}
@@ -25,20 +26,20 @@
 		</div>
 	{:else}
 		{#each taskEvents as event (event?.event_id)}
-			<div class="flex flex-col gap-2 py-3 bg-[#F6F5F5] rounded-md mr-1">
-				<div class="flex gap-4 px-3">
+			<div class="event">
+				<div class="event-content">
 					<hot-icon
 						name="person-fill"
 						style="border: 1px solid"
-						class="!text-[1.7rem] text-red-600 cursor-pointer duration-200 rounded-full p-[2px] bg-white"
+						class="icon"
 					></hot-icon>
-					<div class="flex flex-col gap-1 flex-1">
-						<p class="font-semibold capitalize">{event?.username}</p>
-						<div class="flex items-center justify-between">
-							<p class="text-[#484848] text-sm">#{taskIdIndexMap[event?.task_id]}</p>
-							<div class="flex items-center gap-2">
-								<hot-icon name="clock-history" class="!text-[1rem] text-red-600 cursor-pointer duration-200"></hot-icon>
-								<p class="text-[#484848] text-sm">
+					<div class="detail">
+						<p class="username">{event?.username}</p>
+						<div class="meta">
+							<p class="task-id">#{taskIdIndexMap[event?.task_id]}</p>
+							<div class="history">
+								<hot-icon name="clock-history" class="icon"></hot-icon>
+								<p class="created-at">
 									<span>
 										{event?.created_at?.split(' ')[0]}
 									</span>
@@ -50,8 +51,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="px-3 flex items-center fmtm-justify-between gap-2">
-					<p class="font-normal text-[#484848] flex-1">
+				<div class="event-more">
+					<p class="username">
 						<span class="capitalize">{event?.username}</span> {m['activities.update_status_to']()} <span>{event?.state}</span>
 					</p>
 					<hot-icon
@@ -66,7 +67,7 @@
 							zoomToTask(event?.task_id);
 						}}
 						name="map"
-						class="!text-[1rem] text-[#484848] hover:text-red-600 cursor-pointer duration-200"
+						class="icon"
 					></hot-icon>
 				</div>
 			</div>

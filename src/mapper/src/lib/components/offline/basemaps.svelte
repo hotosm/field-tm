@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/basemaps.css';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { SlSelectEvent } from '@shoelace-style/shoelace/dist/events';
@@ -31,16 +32,16 @@
 	});
 </script>
 
-<div class="flex flex-col items-center p-4 space-y-4 font-barlow">
+<div class="basemaps">
 	<!-- Text above the basemap selector -->
-	<div class="text-center w-full">
-		<div class="font-bold text-lg font-medium">
-			<span class="mr-1">{m['basemaps.manage']()}</span>
+	<div class="text-above">
+		<div class="basemaps-content">
+			<span>{m['basemaps.manage']()}</span>
 		</div>
 	</div>
 
 	<!-- Basemap selector -->
-	<div class="flex justify-center w-full max-w-sm">
+	<div class="selector">
 		{#if basemapsAvailable}
 			<!-- Note here we cannot two way bind:var to the web-component,
             so use event instead -->
@@ -61,9 +62,9 @@
 				{/each}
 			</sl-select>
 		{:else}
-			<div class="text-center w-full">
-				<div class="text-sm font-medium">{m['basemaps.no_basemaps_available']()}</div>
-				<div class="text-sm font-medium pt-2">{m['basemaps.ask_pm']()}</div>
+			<div class="no-basemaps-available">
+				<div class="msg1">{m['basemaps.no_basemaps_available']()}</div>
+				<div class="msg2">{m['basemaps.ask_pm']()}</div>
 			</div>
 		{/if}
 	</div>
@@ -78,11 +79,11 @@
 			role="button"
 			tabindex="0"
 			size="small"
-			class="secondary w-full max-w-[200px]"
+			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
+			<hot-icon slot="prefix" name="download" class="icon"
 			></hot-icon>
-			<span class="font-barlow font-medium text-base uppercase">{m['basemaps.show_on_map']()}</span>
+			<span>{m['basemaps.show_on_map']()}</span>
 		</hot-button>
 
 		<hot-button
@@ -93,11 +94,11 @@
 			role="button"
 			tabindex="0"
 			size="small"
-			class="secondary w-full max-w-[200px]"
+			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
+			<hot-icon slot="prefix" name="download" class="icon"
 			></hot-icon>
-			<span class="font-barlow font-medium text-base uppercase">{m['basemaps.store_offline']()}</span>
+			<span>{m['basemaps.store_offline']()}</span>
 		</hot-button>
 
 		<!-- Download Mbtiles Button -->
@@ -110,11 +111,11 @@
 			role="button"
 			tabindex="0"
 			size="small"
-			class="secondary w-full max-w-[200px]"
+			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
+			<hot-icon slot="prefix" name="download" class="icon"
 			></hot-icon>
-			<span class="font-medium text-base uppercase">{m['basemaps.download_mbtiles']()}</span>
+			<span>{m['basemaps.download_mbtiles']()}</span>
 		</hot-button>
 	{/if}
 
