@@ -47,7 +47,6 @@ pandas_monkeypatch()
 FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
-SURVEY_GROUP_NAME = "survey_questions"
 DEFAULT_LANGUAGES = {
     "english": "en",
     "french": "fr",
@@ -164,12 +163,13 @@ def create_survey_group() -> dict[str, pd.DataFrame]:
     begin_group = pd.DataFrame(
         {
             "type": ["begin group"],
-            "name": ["survery_questions"],
-            "label::english(en)": ["survery_questions"],
-            "label::swahili(sw)": ["maswali_ya_utafiti"],
-            "label::french(fr)": ["questions_enquête"],
-            "label::spanish(es)": ["preguntas_de_encuesta"],
-            "label::portuguese(pt-BR)": ["perguntas_de_pesquisa"],
+            "name": ["survey_questions"],
+            "label::english(en)": ["Survey Questions"],
+            "label::swahili(sw)": ["Maswali ya Utafiti"],
+            "label::french(fr)": ["Questions de l'enquête"],
+            "label::spanish(es)": ["Preguntas de la encuesta"],
+            "label::portuguese(pt-BR)": ["Perguntas da pesquisa"],
+            "label::nepali(ne)": ["सर्वेक्षण प्रश्नहरू"],
             "relevant": "(${new_feature} != '') or (${building_exists} = 'yes')",
         }
     )

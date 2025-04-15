@@ -81,17 +81,6 @@ def get_mandatory_fields(new_geom_type: DbGeomType):
         raise ValueError(f"Unsupported geometry type: {new_geom_type}")
 
     return [
-        {
-            "type": "note",
-            "name": "instructions",
-            "label::english(en)": """Welcome ${username}. This survey form was generated
-                                by HOT's FMTM to record map features.""",
-            "label::nepali(ne)": """स्वागत छ ${username}। नक्सा Data रेकर्ड गर्न HOT को FMTM द्वारा
-                                यो सर्वेक्षण फारम उत्पन्न भएको थियो।""",
-            "label::portuguese(pt-BR)": """Bem-vindo ${username}. Este formulário de pesquisa foi gerado
-                                pelo FMTM do HOT para registrar os recursos do mapa.""",
-        },
-        {"notes": "Fields essential to FMTM"},
         {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
         {
             "type": "select_one_from_file features.csv",
