@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/comment.css';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import { commentTask } from '$lib/db/events';
 	import type { TaskEventType } from '$lib/types';
@@ -18,32 +19,32 @@
 	const taskStore = getTaskStore();
 </script>
 
-<div class="h-[calc(100%-2.25rem)] sm:h-[calc(100%-2.6rem)]">
+<div class="comments">
 	<div
-		class={`overflow-y-scroll overflow-x-hidden flex flex-col gap-2 ${taskStore.selectedTaskIndex ? 'h-[calc(100%-11.875rem)]' : 'h-[100%]'}`}
+		class={`comments-content ${taskStore.selectedTaskIndex ? 'selected' : 'not-selected'}`}
 	>
 		{#if comments?.length === 0}
-			<div class="flex justify-center mt-10">
-				<p class="text-[#484848] text-base">
+			<div class="no-comments">
+				<p>
 					{taskStore?.selectedTaskIndex ? `${m['comment.no_comments_yet_on_task']()} ${taskStore?.selectedTaskIndex}` : m['comment.no_comments_yet']()}
 				</p>
 			</div>
 		{:else}
 			{#each comments as comment (comment?.event_id)}
-				<div class="flex flex-col gap-2 py-3 bg-[#F6F5F5] rounded-md">
-					<div class="flex gap-4 px-3">
+				<div class="comment">
+					<div class="wrapper">
 						<hot-icon
 							name="person-fill"
-							class="!text-[1.7rem] text-red-600 cursor-pointer duration-200 rounded-full p-[2px] bg-white border-1 border-solid"
+							class="icon"
 						></hot-icon>
-						<div class="flex flex-col gap-1 flex-1">
-							<p class="font-semibold capitalize">{comment?.username}</p>
-							<div class="flex items-center justify-between">
-								<p class="text-[#484848] text-sm">#{comment?.task_id}</p>
-								<div class="flex items-center gap-2">
-									<hot-icon name="clock-history" class="!text-[1rem] text-red-600 cursor-pointer duration-200"
+						<div class="details">
+							<p class="username">{comment?.username}</p>
+							<div class="meta">
+								<p class="task-id">#{comment?.task_id}</p>
+								<div class="history">
+									<hot-icon name="clock-history" class="icon"
 									></hot-icon>
-									<p class="text-[#484848] text-sm">
+									<p class="created-at">
 										<span>
 											{comment?.created_at?.split(' ')[0]}
 										</span>
@@ -61,7 +62,7 @@
 		{/if}
 	</div>
 	{#if taskStore.selectedTaskId}
-		<div class="mt-2">
+		<div class="add-comment">
 			<Editor
 				editable={true}
 				content=""
@@ -72,7 +73,7 @@
 					editorRef = editor;
 				}}
 			/>
-			<div class="w-full flex justify-end my-2 gap-2">
+			<div class="wrapper">
 				<sl-button
 					onclick={() => {
 						editorRef?.commands.clearContent(true);
@@ -82,19 +83,20 @@
 					tabindex="0"
 					variant="default"
 					size="small"
-					class="secondary col-span-2 sm:col-span-1"><span class="font-barlow text-sm">{m['comment.clear']()}</span></sl-button
-				>
+					class="button-clear">
+						<span>{m['comment.clear']()}</span>
+				</sl-button>
 				<sl-button
 					variant="primary"
 					size="small"
-					class="col-span-2 sm:col-span-1"
+					class="button-comment"
 					onclick={() => {
 						if (taskStore.selectedTaskId) commentTask(projectId, taskStore.selectedTaskId, currentComment);
 						editorRef?.commands.clearContent(true);
 					}}
 					onkeydown={() => {}}
 					role="button"
-					tabindex="0"><span class="font-barlow text-sm">{m['comment.comment']()}</span></sl-button
+					tabindex="0"><span>{m['comment.comment']()}</span></sl-button
 				>
 			</div>
 		</div>

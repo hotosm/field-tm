@@ -1,6 +1,6 @@
 <script lang="ts">
+	import '$styles/forms.css';
 	import type { SlDrawer } from '@shoelace-style/shoelace';
-
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
@@ -228,8 +228,7 @@
 	contained
 	open={display}
 	placement="start"
-	class="drawer-contained drawer-placement-start drawer-overview"
-	style="--size: 100vw; --header-spacing: 0px"
+	class="forms-wrapper-drawer"
 >
 	{#await odkWebFormPromise then odkWebFormUrl}
 		{#if entityId}
@@ -238,10 +237,10 @@
 					{#await formMediaPromise then formMedia}
 						{#key entityId}
 							<iframe
+								class="iframe"
 								use:handleIframe
 								title="odk-web-forms-wrapper"
 								src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
-								style="height: 100%; width: 100%; z-index: 11;"
 							></iframe>
 						{/key}
 					{/await}
@@ -250,12 +249,3 @@
 		{/if}
 	{/await}
 </hot-drawer>
-
-<style>
-	#odk-web-forms-drawer::part(panel) {
-		z-index: 11;
-	}
-	#odk-web-forms-drawer::part(body) {
-		padding: 0;
-	}
-</style>

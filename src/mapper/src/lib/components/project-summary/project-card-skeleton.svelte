@@ -1,17 +1,18 @@
 <script>
+	import '$styles/project-summary.css';
 	import Skeleton from '$lib/components/skeleton.svelte';
 </script>
 
-<div class="box-border h-[16rem] bg-white rounded-lg p-4 flex flex-col justify-between rounded-lg">
+<div class="project-summary">
 	<div>
-		<Skeleton className="w-8 h-8 !rounded-full" />
-		<div class="my-3">
-			<Skeleton className="w-8 h-[14px] !rounded-full mb-1" />
-			<Skeleton className="w-[80px] h-[14px] !rounded-full" />
+		<Skeleton className="skeleton1" />
+		<div class="skeleton-section">
+			<Skeleton className="skeleton2" />
+			<Skeleton className="skeleton3" />
 		</div>
-		<Skeleton className="w-14 h-[14px] !rounded-full mb-1" />
-		<Skeleton className="w-full h-[14px] !rounded-full" />
-		<Skeleton className="w-full h-[14px] !rounded-full my-1" />
-		<Skeleton className="w-[50%] h-[14px] !rounded-full" />
+		<Skeleton className="skeleton4" />
+		<Skeleton className="skeleton5" />
+		<Skeleton className="skeleton6" />
+		<Skeleton className="skeleton7" />
 	</div>
 </div>

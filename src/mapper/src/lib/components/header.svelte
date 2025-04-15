@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/header.css';
 	import { onMount, onDestroy } from 'svelte';
 	import type { SlDrawer, SlTooltip } from '@shoelace-style/shoelace';
 	// FIXME this is a workaround to re-import, as using sl-dropdown
@@ -62,8 +63,7 @@
 		dropdown?.removeEventListener('sl-select', handleLocaleSelect);
 	});
 </script>
-
-<div class="p-3 flex items-center justify-between font-barlow">
+<div class="header">
 	<div
 		onclick={() => goto('/')}
 		onkeydown={(e) => {
@@ -71,30 +71,27 @@
 		}}
 		role="button"
 		tabindex="0"
-		class="flex items-center gap-1"
+		class="logo"
 	>
-		<img src={commonStore.config?.logoUrl} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
+		<img src={commonStore.config?.logoUrl} alt="hot-logo" />
 		<!-- The approach below is finicky - can loading the logo via CSS work nicely? -->
 		<!-- <a href={window.location.origin} 
 			class="inline-block flex h-[2.2rem] sm:h-[3rem] w-[2.2rem] sm:w-[3rem] bg-no-repeat bg-cover"
 			style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/45/Humanitarian_OpenStreetMap_Team_logo.svg');"
 			aria-label="Home"
 		></a> -->
-		<span
-			class="text-sm sm:text-base font-bold text-red-600 h-[2.2rem] sm:h-[3rem] max-w-[6rem] sm:max-w-[8rem] p-0 m-0 flex items-center justify-center leading-[1.1] sm:leading-[1.2] text-left"
-			style="color: var(--sl-color-primary-700); font-family: var(--sl-font-sans);"
-		>
+		<span class="logo-text">
 			{commonStore.config?.logoText}
 		</span>
 	</div>
-	<div class="flex items-center gap-4">
+	<div class="nav">
 		<!-- profile image and username display -->
 		{#if loginStore?.getAuthDetails?.username}
-			<div class="flex items-center gap-2">
+			<div class="user">
 				{#if !loginStore?.getAuthDetails?.picture}
 					<hot-icon
 						name="person-fill"
-						class="!text-[1.5rem] text-[#52525B] leading-0 cursor-pointer text-red-600 duration-200"
+						class=""
 						onclick={() => {}}
 						onkeydown={() => {}}
 						role="button"
@@ -104,18 +101,15 @@
 					<img
 						src={loginStore?.getAuthDetails?.picture}
 						alt="profile"
-						class="w-[1.8rem] h-[1.8rem] min-w-[1.8rem] min-h-[1.8rem] max-w-[1.8rem] max-h-[1.8rem] rounded-full"
 					/>
 				{/if}
-				<p
-					class="font-medium text-sm sm:text-base text-ellipsis whitespace-nowrap overflow-hidden max-w-[6rem] sm:max-w-fit"
-				>
+				<p class="username">
 					{loginStore?.getAuthDetails?.username}
 				</p>
 			</div>
 		{:else}
 			<hot-button
-				class="hover:bg-gray-50 rounded"
+				class="login-link"
 				variant="text"
 				size="small"
 				onclick={() => {
@@ -129,7 +123,7 @@
 				role="button"
 				tabindex="0"
 			>
-				<span class="font-barlow font-medium text-base">{m['header.sign_in']()}</span>
+				<span>{m['header.sign_in']()}</span>
 			</hot-button>
 		{/if}
 
@@ -137,8 +131,7 @@
 		{#snippet drawerOpenButton()}
 			<hot-icon
 				name="list"
-				class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
-				style={isFirstLoad && !enableWebforms ? 'background-color: var(--sl-color-warning-300);' : ''}
+				class="drawer-icon ${isFirstLoad && !enableWebforms ? 'drawer-icon-firstload' : ''}"
 				onclick={() => {
 					drawerRef?.show();
 				}}
@@ -172,7 +165,7 @@
 <Login />
 
 <hot-drawer bind:this={drawerRef} class="drawer-overview">
-	<div class="flex flex-col gap-8 px-4">
+	<div class="content">
 		<div class="locale-selection">
 			<sl-dropdown>
 				<hot-button slot="trigger" caret>
@@ -191,12 +184,12 @@
 				target="_blank"
 				rel="noopener noreferrer"
 				href={menu.path}
-				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black font-barlow">{menu.name}</a
+				class="menu-item">{menu.name}</a
 			>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
 			<hot-button
-				class="rounded"
+				class="sign-out"
 				variant="primary"
 				size="small"
 				onclick={handleSignOut}
@@ -208,7 +201,7 @@
 				role="button"
 				tabindex="0"
 			>
-				{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m['header.sign_out']()}</span>{/key}
+				{#key commonStore.locale}<span>{m['header.sign_out']()}</span>{/key}
 			</hot-button>
 		{/if}
 	</div>

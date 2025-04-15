@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/bottom-sheet.css';
 	import type { Snippet } from 'svelte';
 	import { onMount } from 'svelte';
 
@@ -91,21 +92,17 @@
 	<!-- sheet container -->
 	<div
 		bind:this={bottomSheetRef}
-		class={`z-30 bottom-sheet fixed w-[100vw] left-0 bottom-0 flex items-center flex-col justify-end duration-100 ease-linear z-20 ${
-			!show ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-none'
-		}`}
+		class={`sheet-container ${!show ? 'opacity-0' : 'opacity-100'}`}
 	>
 		<!-- sheet content -->
 		<div
-			style="border-top-left-radius: 25px; border-top-right-radius: 25px;"
 			bind:this={sheetContentRef}
-			class={`bottom-sheet-content shadow-[0px_-10px_10px_5px_rgba(0,0,0,0.05)] w-full relative bg-white max-h-[100vh] h-[50vh] max-w-[100vw] pb-6 duration-300 ease-in-out overflow-hidden md:max-w-[580px] lg:max-w-[750px] ${
-				!show ? 'translate-y-[100%]' : 'translate-y-[0%] pointer-events-auto'
+			class={`sheet-container-content 
+			${!show ? 'translate-y-[100%]' : 'translate-y-[0%]'
 			} ${isDragging ? 'transition-none' : ''}`}
 		>
 			<div
-				style={' border-top-left-radius: 1rem;'}
-				class="flex justify-center py-4 sm:py-8 cursor-grab select-none w-full"
+				class="action"
 				onmousedown={dragStart}
 				ontouchstart={dragStart}
 				onmousemove={dragging}
@@ -117,10 +114,10 @@
 				tabindex="0"
 				onblur={() => {}}
 			>
-				<span class="h-[6px] w-[3.25rem] block bg-[#d2d2d4] rounded-full pointer-events-none"></span>
+				<span></span>
 			</div>
 			<!-- body -->
-			<div class="overflow-y-scroll scrollbar h-[calc(100%-5rem)] sm:h-[calc(100%-6.7rem)] px-4 relative">
+			<div class="body">
 				{@render children?.()}
 			</div>
 		</div>

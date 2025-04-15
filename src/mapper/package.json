@@ -29,6 +29,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.16.0",
 		"@typescript-eslint/parser": "^8.16.0",
 		"@unocss/extractor-svelte": "^0.65.0-beta.2",
+		"@unocss/transformer-directives": "66.1.0-beta.11",
 		"@vite-pwa/sveltekit": "^0.6.7",
 		"eslint": "^9.16.0",
 		"eslint-config-prettier": "^9.1.0",

@@ -1,8 +1,9 @@
 <script lang="ts">
+	import '$styles/skeleton.css';
 	type propsType = {
 		className?: string;
 	};
 	const { className }: propsType = $props();
 </script>
 
-<div class={`animate-pulse rounded-md bg-[#D7D7D7] ${className}`}></div>
+<div class={`skeleton ${className}`}></div>

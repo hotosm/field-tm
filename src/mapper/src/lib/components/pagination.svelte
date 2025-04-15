@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/pagination.css';
 	import { getPaginationRange, DOTS } from '$lib/utils/getPaginationRange';
 	import { m } from "$translations/messages.js";
 
@@ -34,45 +35,45 @@
 </script>
 
 <div
-	class={`bottom-0 flex items-center justify-between flex-col sm:flex-row bg-white py-2 px-11 shadow-black shadow-2xl z-50 gap-1 ${className} box-border`}
+	class={`pagination ${className}`}
 >
-	<p class="text-[0.75rem] leading-normal font-normal text-[#484848]">
+	<p class="showing-count">
 		Showing {showing} of {totalCount} results
 	</p>
 
-	<div class="flex flex-wrap justify-center gap-x-6 gap-y-1">
+	<div class="content">
 		<!-- Go to Page -->
-		<div class="flex flex-1 items-center justify-center gap-2 md:pr-6">
-			<p class="text-[0.75rem] leading-normal font-normal whitespace-nowrap text-[#484848]">{m['pagination.go_to_page']()}</p>
+		<div class="goto-page">
+			<p class="title">{m['pagination.go_to_page']()}</p>
 			<input
 				type="number"
 				min="1"
 				value={currentPageState}
 				disabled={isLoading}
-				class="body-md outline-none border border-[#D0D5DD] rounded-lg w-8 h-8 p-1"
+				class="input"
 				oninput={handleInputChange}
 			/>
 		</div>
 
 		{#if paginationRange.length > 1}
-			<div class="flex items-center gap-2 overflow-x-auto max-sm:w-[100%] max-sm:justify-center">
+			<div class="actions">
 				<!-- Previous Button -->
 				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button
 					disabled={currentPage === 1}
 					onclick={() => handlePageChange(currentPage - 1)}
-					class={`w-5 h-5 min-w-5 min-h-5 rounded-full flex items-center justify-center border-[0px] ${currentPage === 1 ? 'cursor-not-allowed text-[#BDBDBD]' : 'hover:bg-[#FFEDED] duration-100 hover:text-[#B11E20]'}`}
+					class={`prev-button page ${currentPage === 1 ? 'first-page' : 'not-first-page'}`}
 				>
-					<hot-icon name="chevron-left" class="!text-[0.8rem] text-[#B11E20] cursor-pointer"></hot-icon>
+					<hot-icon name="chevron-left"></hot-icon>
 				</button>
 
 				<!-- Page Numbers -->
 				{#each paginationRange as pageNumber}
 					{#if pageNumber === DOTS}
-						<span class="text-[0.75rem] leading-normal font-normal-regular text-black-600">&#8230;</span>
+						<span class="page-num-dots">&#8230;</span>
 					{:else}
 						<div
-							class={`grid h-8 cursor-pointer place-items-center px-3`}
+							class="page-num-wrapper"
 							onclick={() => handlePageChange(+pageNumber)}
 							onkeydown={(e) => {
 								if (e.key === 'Enter') handlePageChange(+pageNumber);
@@ -81,7 +82,7 @@
 							tabindex="0"
 						>
 							<p
-								class={`text-[0.75rem] leading-normal font-normal ${currentPage === pageNumber ? '!font-bold text-[#D73F37]' : 'texy-[#484848] text-[#212121]'}`}
+								class={`page-num ${currentPage === pageNumber ? 'current-page' : 'not-current-page'}`}
 							>
 								{pageNumber}
 							</p>
@@ -94,9 +95,9 @@
 				<button
 					disabled={currentPage === paginationRange[paginationRange.length - 1]}
 					onclick={() => handlePageChange(currentPage + 1)}
-					class={`w-5 h-5 min-w-5 min-h-5 rounded-full flex items-center justify-center border-[0px] ${currentPage === paginationRange[paginationRange.length - 1] ? 'cursor-not-allowed text-[#BDBDBD]' : 'hover:bg-[#FFEDED] duration-100 hover:text-[#B11E20]'}`}
+					class={`next-button ${currentPage === paginationRange[paginationRange.length - 1] ? 'last-page' : 'not-last-page'}`}
 				>
-					<hot-icon name="chevron-right" class="!text-[0.8rem] text-[#B11E20] cursor-pointer"></hot-icon>
+					<hot-icon name="chevron-right"></hot-icon>
 				</button>
 			</div>
 		{/if}

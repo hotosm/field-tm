@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/more.css';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import Comment from '$lib/components/more/comment.svelte';
 	import Activities from '$lib/components/more/activities.svelte';
@@ -73,11 +74,11 @@
 	});
 </script>
 
-<div class={`font-barlow font-medium ${activeStack === 'comment' ? 'h-full' : 'h-fit'}`}>
+<div class={`more ${activeStack === 'comment' ? 'more-comment' : 'more-no-comment'}`}>
 	{#if activeStack === ''}
 		{#each stackGroup as stack}
 			<div
-				class="group flex items-center justify-between hover:bg-red-50 rounded-md p-2 duration-200 cursor-pointer"
+				class="stack"
 				onclick={() => {
 					activeStack = stack.id;
 					activeStackTitle = stack.title;
@@ -91,21 +92,21 @@
 				tabindex="0"
 				role="button"
 			>
-				<div class="flex items-center gap-3">
-					<hot-icon name={stack.icon} class="text-[1.25rem]"></hot-icon>
+				<div class="icon-title">
+					<hot-icon name={stack.icon} class="icon"></hot-icon>
 					<p>{stack.title}</p>
 				</div>
-				<hot-icon name="chevron-right" class="text-[1rem] group-hover:translate-x-1 duration-200"></hot-icon>
+				<hot-icon name="chevron-right" class="icon-next"></hot-icon>
 			</div>
 		{/each}
 	{/if}
 
 	<!-- header -->
 	{#if activeStack !== ''}
-		<div class="flex items-center gap-x-2 sticky -top-1 bg-white pb-2 z-50">
+		<div class="active-stack-header">
 			<hot-icon
 				name="chevron-left"
-				class="text-[1rem] hover:-translate-x-[2px] duration-200 cursor-pointer text-[1.125rem] text-black hover:text-red-600 duration-200"
+				class="icon"
 				onclick={() => {
 					activeStack = ''; 
 					activeStackTitle = ''
@@ -119,7 +120,7 @@
 				tabindex="0"
 				role="button"
 			></hot-icon>
-			<p class="text-[1.125rem] font-semibold">{activeStackTitle}</p>
+			<p class="title">{activeStackTitle}</p>
 		</div>
 	{/if}
 
@@ -131,8 +132,8 @@
 		{#if projectData?.per_task_instructions}
 			<Editor editable={false} content={projectData?.per_task_instructions} />
 		{:else}
-			<div class="flex justify-center mt-10">
-				<p class="text-[#484848] text-base">{m['index.no_instructions']()}</p>
+			<div class="active-stack-instructions">
+				<p>{m['index.no_instructions']()}</p>
 			</div>
 		{/if}
 	{/if}

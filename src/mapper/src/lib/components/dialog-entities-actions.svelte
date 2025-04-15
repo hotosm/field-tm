@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$styles/dialog-entities-actions.css';
 	import { distance } from '@turf/distance';
 	import type { Coord } from '@turf/helpers';
 	import type { SlDialog, SlDrawer } from '@shoelace-style/shoelace';
@@ -22,13 +23,13 @@
 	function getStatusStyle(status: statusType) {
 		switch (status) {
 			case 'READY':
-				return 'bg-gray-100 text-gray-700';
+				return 'bg-neutral-100 text-neutral-700';
 			case 'OPENED_IN_ODK':
-				return 'bg-yellow-100 text-yellow-700';
+				return 'bg-warning-100 text-warning-700';
 			case 'SURVEY_SUBMITTED':
-				return 'bg-green-100 text-green-700';
+				return 'bg-success-100 text-success-700';
 			case 'MARKED_BAD':
-				return 'bg-red-100 text-red-700';
+				return 'bg-danger-100 text-danger-700';
 			case 'VALIDATED':
 				return 'bg-blue-100 text-blue-700';
 		}
@@ -158,14 +159,13 @@
 </script>
 
 {#if isTaskActionModalOpen && selectedTab === 'map' && selectedEntity}
-	<div class="font-barlow flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
+	<div class="task-action-modal">
 		<div
-			class="bg-white w-full font-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl max-h-[60vh] overflow-y-scroll"
+			class="content"
 		>
-			<div class="flex justify-end">
+			<div class="icon">
 				<hot-icon
 					name="close"
-					class="!text-[1.5rem] text-[#52525B] cursor-pointer hover:text-red-600 duration-200"
 					onclick={() => toggleTaskActionModal(false)}
 					onkeydown={(e: KeyboardEvent) => {
 						if (e.key === 'Enter') {
@@ -176,52 +176,52 @@
 					tabindex="0"
 				></hot-icon>
 			</div>
-			<div class="flex flex-col gap-4">
-				<p class="text-[#333] text-lg font-semibold">{m['popup.feature']()} {selectedEntity?.osmid}</p>
-				<div class="flex flex-col gap-2">
-					<div class="flex">
-						<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['popup.task_id']()}</p>
+			<div class="section-container">
+				<p class="selected-title">{m['popup.feature']()} {selectedEntity?.osmid}</p>
+				<div class="section">
+					<div class="item">
+						<p class="label">{m['popup.task_id']()}</p>
 						:
-						<p class="text-[#161616] font-medium ml-2">{selectedEntity?.task_id}</p>
+						<p class="value">{selectedEntity?.task_id}</p>
 					</div>
-					<div class="flex">
-						<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.entity_uuid']()}</p>
+					<div class="item">
+						<p class="label">{m['dialog_entities_actions.entity_uuid']()}</p>
 						:
-						<p class="break-all text-[#161616] font-medium ml-2">{selectedEntity?.entity_id}</p>
+						<p class="value">{selectedEntity?.entity_id}</p>
 					</div>
-					<div class="flex items-center">
-						<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.status']()}</p>
+					<div class="item items-center">
+						<p class="label">{m['dialog_entities_actions.status']()}</p>
 						:
 						<p
-							class={`text-[#161616] font-medium border-[1px] border-solid ml-2 py-1 px-3 rounded-full ${getStatusStyle(selectedEntity?.status)}`}
+							class={`${getStatusStyle(selectedEntity?.status)}`}
 						>
 							{m[`entity_states.${selectedEntity?.status}`]()}
 						</p>
 					</div>
 					{#if entityComments?.length > 0}
-						<div class="flex">
-							<p class="min-w-[6.25rem] text-[#2B2B2B]">{m['dialog_entities_actions.comments']()}</p>
+						<div class="dialog-comments">
+							<p class="label">{m['dialog_entities_actions.comments']()}</p>
 							:
-							<div class="flex flex-col ml-2 gap-2 flex-1">
+							<div class="dialog-comments-list">
 								{#each entityComments?.slice(0, 2) as comment}
-									<div class="bg-[#F6F5F5] rounded px-2 py-1">
-										<div class="flex items-center justify-between mb-1">
+									<div class="dialog-comment">
+										<div class="dialog-comment-content">
 											<p>{comment?.username}</p>
-											<div class="flex items-center gap-2">
-												<hot-icon name="clock-history" class="!text-[0.8rem] text-red-600 cursor-pointer"></hot-icon>
-												<p class="text-sm">{comment?.created_at?.split(' ')[0]}</p>
+											<div class="dialog-comment-info">
+												<hot-icon name="clock-history"></hot-icon>
+												<p class="created-at">{comment?.created_at?.split(' ')[0]}</p>
 											</div>
 										</div>
-										<p class="font-medium">
+										<p class="dialog-comment-text">
 											{comment?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}
 										</p>
 									</div>
 								{/each}
 								{#if entityComments?.length > 2}
-									<div class="flex items-center gap-2">
-										<div class="h-[1px] bg-gray-200 flex flex-1"></div>
+									<div class="dialog-comment-see-all">
+										<div class="dialog-comment-see-all-empty"></div>
 										<div
-											class="text-sm text-gray-600 hover:text-gray-800 cursor-pointer font-light"
+											class="dialog-comment-see-all-link"
 											onclick={() => (showCommentsPopup = true)}
 											onkeydown={(e: KeyboardEvent) => {
 												if (e.key === 'Enter') {
@@ -240,12 +240,12 @@
 					{/if}
 				</div>
 				{#if selectedEntity?.status !== 'SURVEY_SUBMITTED' && selectedEntity?.status !== 'VALIDATED'}
-					<div class="flex gap-2">
+					<div class="entity">
 						<sl-button
 							disabled={entityToNavigate?.entityId === selectedEntity?.entity_id}
 							variant="default"
 							size="small"
-							class="secondary flex-grow"
+							class="entity-button-to"
 							onclick={() => {
 								navigateToEntity();
 							}}
@@ -257,15 +257,14 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="direction" class="!text-[1rem] cursor-pointer duration-200"></hot-icon>
-							<span class="font-barlow font-medium text-sm">{m['popup.navigate_here']()}</span>
+							<hot-icon slot="prefix" name="direction"></hot-icon>
+							<span>{m['popup.navigate_here']()}</span>
 						</sl-button>
 						{#if enableWebforms === false}
 							<sl-button
 								loading={entitiesStore.updateEntityStatusLoading}
 								variant="primary"
 								size="small"
-								class="flex-grow"
 								onclick={() => {
 									handleMapFeature();
 								}}
@@ -277,9 +276,9 @@
 								role="button"
 								tabindex="0"
 							>
-								<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
+								<hot-icon slot="prefix" name="location"
 								></hot-icon>
-								<span class="font-barlow font-medium text-sm">{m['popup.map_in_odk']()}</span>
+								<span>{m['popup.map_in_odk']()}</span>
 							</sl-button>
 						{/if}
 						{#if enableWebforms}
@@ -287,7 +286,6 @@
 								loading={entitiesStore.updateEntityStatusLoading}
 								variant="primary"
 								size="small"
-								class="flex-grow"
 								onclick={() => {
 									toggleTaskActionModal(false);
 									entitiesStore.updateEntityStatus(projectData.id, {
@@ -313,9 +311,9 @@
 								role="button"
 								tabindex="0"
 							>
-								<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
+								<hot-icon slot="prefix" name="location"
 								></hot-icon>
-								<span class="font-barlow font-medium text-sm">{m['dialog_entities_actions.collect_data']()}</span>
+								<span>{m['dialog_entities_actions.collect_data']()}</span>
 							</sl-button>
 						{/if}
 					</div>
@@ -328,15 +326,15 @@
 {#if entitiesStore.selectedEntityCoordinate?.coordinate && entitiesStore.userLocationCoord}
 	<hot-dialog
 		bind:this={dialogRef}
-		class="dialog-overview z-50 font-barlow font-regular"
+		class="entity-dialog"
 		open={toggleDistanceWarningDialog}
 		onsl-hide={() => {
 			toggleDistanceWarningDialog = false;
 		}}
 		noHeader
 	>
-		<div class="flex items-start flex-col">
-			<p class="text-base mb-5 text-gray-700">
+		<div class="entity-dialog-content">
+			<p class="entity-dialog-youare">
 				{m['dialog_entities_actions.you_are']()} <b
 					>{(
 						distance(
@@ -347,11 +345,11 @@
 					).toFixed(2)}m</b
 				> {m['dialog_entities_actions.away_sure']()}
 			</p>
-			<div class="flex gap-2 ml-auto">
+			<div class="entity-dialog-actions">
 				<sl-button
 					variant="default"
 					size="small"
-					class="secondary flex-grow"
+					class="secondary"
 					onclick={() => (toggleDistanceWarningDialog = false)}
 					onkeydown={(e: KeyboardEvent) => {
 						if (e.key === 'Enter') {
@@ -361,12 +359,11 @@
 					role="button"
 					tabindex="0"
 				>
-					<span class="font-barlow font-medium text-sm">NO</span>
+					<span>NO</span>
 				</sl-button>
 				<sl-button
 					variant="primary"
 					size="small"
-					class="flex-grow"
 					onclick={() => {
 						mapFeature();
 						toggleDistanceWarningDialog = false;
@@ -380,7 +377,7 @@
 					role="button"
 					tabindex="0"
 				>
-					<span class="font-barlow font-medium text-sm">YES</span>
+					<span>YES</span>
 				</sl-button>
 			</div>
 		</div>
@@ -389,23 +386,23 @@
 
 <hot-dialog
 	label="Feature Comments"
-	class="dialog-overview z-50 font-barlow font-regular"
+	class="feature-comments-dialog"
 	open={showCommentsPopup}
 	onsl-hide={() => {
 		showCommentsPopup = false;
 	}}
 >
-	<div class="flex flex-col gap-3">
+	<div class="feature-comments">
 		{#each entityComments as comment}
-			<div class="bg-[#F6F5F5] rounded px-2 py-1">
-				<div class="flex items-center justify-between mb-2">
+			<div class="feature-comment">
+				<div class="feature-comment-meta">
 					<p>{comment?.username}</p>
-					<div class="flex items-center gap-2">
-						<hot-icon name="clock-history" class="!text-[0.8rem] text-red-600 cursor-pointer"></hot-icon>
-						<p class="text-sm">{comment?.created_at?.split(' ')[0]}</p>
+					<div class="feature-comment-history">
+						<hot-icon name="clock-history"></hot-icon>
+						<p>{comment?.created_at?.split(' ')[0]}</p>
 					</div>
 				</div>
-				<p class="font-medium">
+				<p>
 					{comment?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}
 				</p>
 			</div>
