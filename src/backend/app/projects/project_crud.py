@@ -985,36 +985,3 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
-
-
-async def send_invitation_message(
-    request: Request,
-    project: DbProject,
-    invitee_username: str,
-    osm_auth: Auth,
-):
-    """Send an invitation message to a user to join a project."""
-    log.info(f"Sending invitation message to osm user ({invitee_username}).")
-
-    osm_token = get_osm_token(request, osm_auth)
-
-    project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
-    if not project_url.startswith("http"):
-        project_url = f"https://{project_url}"
-
-    message_content = dedent(f"""
-        You have been invited to join the project **{project.name}**.
-
-        Please click this link:
-        [Project]({project_url})
-
-        Thank you for being a part of our platform!
-    """)
-
-    send_osm_message(
-        osm_token=osm_token,
-        osm_username=invitee_username,
-        title=f"You have been invited to join the project {project.name}",
-        body=message_content,
-    )
-    log.info(f"Invitation message sent to osm user ({invitee_username}).")

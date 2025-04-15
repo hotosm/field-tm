@@ -81,7 +81,12 @@ if TYPE_CHECKING:
         ProjectUpdate,
     )
     from app.tasks.task_schemas import TaskEventIn
-    from app.users.user_schemas import UserIn, UserUpdate
+    from app.users.user_schemas import (
+        UserIn,
+        UserInviteIn,
+        UserInviteUpdate,
+        UserUpdate,
+    )
 
 
 def dump_and_check_model(db_model: BaseModel):
@@ -364,7 +369,7 @@ class DbUser(BaseModel):
     async def update(
         cls, db: Connection, user_sub: str, user_update: "UserUpdate"
     ) -> Self:
-        """Update the role of a specific user."""
+        """Update a specific user record."""
         model_dump = dump_and_check_model(user_update)
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
         sql = f"""
@@ -389,6 +394,142 @@ class DbUser(BaseModel):
             )
 
         return updated_user
+
+
+class DbUserInvite(BaseModel):
+    """Table user_invites."""
+
+    token: Optional[UUID] = None
+    project_id: Optional[int] = None
+    osm_username: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[ProjectRole] = None
+    expires_at: Optional[AwareDatetime] = None
+    used_at: Optional[AwareDatetime] = None
+    created_at: Optional[AwareDatetime] = None
+
+    @classmethod
+    async def one(cls, db: Connection, token: str) -> Self:
+        """Get a user invite record by it's token."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            sql = """
+                SELECT *
+                FROM user_invites
+                WHERE token = %(token)s;
+            """
+
+            await cur.execute(
+                sql,
+                {"token": token},
+            )
+            db_user_invite = await cur.fetchone()
+
+        if db_user_invite is None:
+            raise KeyError(f"User invite token ({token}) not found.")
+
+        return db_user_invite
+
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        project_id: int,
+    ) -> Optional[list[Self]]:
+        """Fetch all user invites for a project."""
+        sql = """
+            SELECT * FROM user_invites
+            WHERE project_id = %(project_id)s
+            ORDER BY created_at DESC;
+        """
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+                {"project_id": project_id},
+            )
+            return await cur.fetchall()
+
+    @classmethod
+    async def delete(cls, db: Connection, token: str) -> None:
+        """Delete a user and their related data."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM user_invites WHERE token = %(token)s;
+            """,
+                {"token": token},
+            )
+
+    @classmethod
+    async def create(
+        cls,
+        db: Connection,
+        project_id: int,
+        user_in: "UserInviteIn",
+    ) -> Self:
+        """Create a new user invite."""
+        model_dump = dump_and_check_model(user_in)
+        model_dump.update({"project_id": project_id})
+        columns = ", ".join(model_dump.keys())
+        value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
+
+        sql = f"""
+            INSERT INTO user_invites
+                ({columns})
+            VALUES
+                ({value_placeholders})
+            RETURNING *;
+        """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(sql, model_dump)
+            new_user_invite = await cur.fetchone()
+
+        if new_user_invite is None:
+            msg = f"Unknown SQL error for data: {model_dump}"
+            log.error(f"Failed user invite creation: {model_dump}")
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+            )
+
+        return new_user_invite
+
+    @classmethod
+    async def update(
+        cls, db: Connection, token: UUID, user_update: "UserInviteUpdate"
+    ) -> Self:
+        """Update the a user invite record."""
+        model_dump = dump_and_check_model(user_update)
+        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
+        sql = f"""
+            UPDATE user_invites
+            SET {", ".join(placeholders)}
+            WHERE token = %(token)s
+            RETURNING *;
+        """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+                {"token": token, **model_dump},
+            )
+            updated_user_invite = await cur.fetchone()
+
+        if updated_user_invite is None:
+            msg = f"Failed to update user invite: {token}"
+            log.error(msg)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+            )
+
+        return updated_user_invite
+
+    def is_expired(self) -> bool:
+        """Helper to check if invite is expired."""
+        if bool(self.used_at):
+            return True
+        if self.expires_at:
+            return timestamp() > self.expires_at
+        return False
 
 
 class DbOrganisation(BaseModel):
