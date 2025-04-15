@@ -185,14 +185,16 @@ async def accept_invite(
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(login_required)],
 ):
-    """Accept a user invite and generate relevant DB entries."""
+    """Accept a user invite token and generate relevant DB entries."""
     invite = await DbUserInvite.one(db, token)
     if not invite or invite.is_expired():
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Invite has expired (valid 7 days)"
         )
 
+    # Create the role for the user / project
     await DbUserRole.create(db, invite.project_id, current_user.sub, invite.role)
+    # Expire the token
     await DbUserInvite.update(
         db,
         invite.token,
