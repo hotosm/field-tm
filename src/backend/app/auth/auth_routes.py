@@ -27,11 +27,10 @@ from loguru import logger as log
 from psycopg import Connection
 from psycopg.rows import class_row
 
-from app.auth.auth_deps import (
+from app.auth.auth_deps import login_required, public_endpoint
+from app.auth.auth_logic import (
     create_jwt_tokens,
     expire_cookies,
-    login_required,
-    mapper_login_required,
     refresh_cookies,
     set_cookies,
 )
@@ -169,15 +168,11 @@ async def logout():
     # Reset all cookies (logout)
     fmtm_cookie_name = settings.cookie_name
     refresh_cookie_name = f"{fmtm_cookie_name}_refresh"
-    temp_cookie_name = f"{fmtm_cookie_name}_temp"
-    temp_refresh_cookie_name = f"{fmtm_cookie_name}_temp_refresh"
     osm_cookie_name = f"{fmtm_cookie_name}_osm"
 
     cookie_names = [
         fmtm_cookie_name,
         refresh_cookie_name,
-        temp_cookie_name,
-        temp_refresh_cookie_name,
         osm_cookie_name,
     ]
 
@@ -297,14 +292,16 @@ async def refresh_management_cookies(
     """Uses the refresh token to generate a new access token.
 
     This endpoint is specific to the management desktop frontend.
-    Any temp auth cookies will be ignored and removed.
     Authentication is required.
     If signed in with login method other than OSM, the user will be logged out and
     a forbidden status will be returned.
 
     NOTE this endpoint has no db calls and returns in ~2ms.
     """
-    if "osm" not in current_user.sub.lower():
+    # Only allow login via OSM for management frontend
+    # and revoke cookies if service account set via mapper frontend
+    user_sub = current_user.sub.lower()
+    if "osm" not in user_sub or current_user.username == "svcfmtm":
         response = Response(
             status_code=HTTPStatus.FORBIDDEN,
             content="Please log in using OSM for management access.",
@@ -328,12 +325,12 @@ async def refresh_management_cookies(
 @router.get("/refresh/mapper", response_model=Optional[FMTMUser])
 async def refresh_mapper_token(
     request: Request,
-    current_user: Annotated[AuthUser, Depends(mapper_login_required)],
+    current_user: Annotated[AuthUser, Depends(public_endpoint)],
 ):
     """Uses the refresh token to generate a new access token.
 
     This endpoint is specific to the mapper mobile frontend.
-    By default the user will be logged in with a temporary auth cookie.
+    By default the user will be logged in with a service account.
     Authentication is optional, if the user wishes to be attributed for contributions.
 
     NOTE this endpoint has no db calls and returns in ~2ms.
@@ -370,6 +367,4 @@ async def refresh_mapper_token(
         response,
         fmtm_token,
         refresh_token,
-        f"{settings.cookie_name}_temp",
-        f"{settings.cookie_name}_temp_refresh",
     )

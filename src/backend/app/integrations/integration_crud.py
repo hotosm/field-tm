@@ -79,7 +79,7 @@ async def update_entity_status_in_fmtm(
             log.warning(f"Missing entity state in webhook event: {odk_event.data}")
             return HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                content="Missing entity state property",
+                detail="Missing entity state property",
             )
 
         try:
@@ -92,7 +92,7 @@ async def update_entity_status_in_fmtm(
             )
             return HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                content="Invalid entity state",
+                detail="Invalid entity state",
             )
 
         log.debug(

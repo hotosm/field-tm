@@ -30,29 +30,14 @@ from psycopg import Connection
 from psycopg.rows import class_row
 from pydantic import Field
 
-from app.auth.auth_deps import login_required, mapper_login_required
+from app.auth.auth_deps import login_required, public_endpoint
+from app.auth.auth_logic import get_uid
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, ProjectRole, ProjectVisibility
 from app.db.models import DbProject, DbUser
 from app.organisations.organisation_deps import get_organisation
 from app.projects.project_deps import get_project, get_project_by_id
-
-
-async def get_uid(user_data: AuthUser | DbUser) -> int:
-    """Extract user id from returned OSM user."""
-    try:
-        return user_data.sub
-
-    except Exception as e:
-        log.exception(
-            f"Failed to get user id from auth object: {user_data}. Error: {e}",
-            stack_info=True,
-        )
-        raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
-            detail="Auth failed. No user id present",
-        ) from e
 
 
 async def check_access(
@@ -350,7 +335,7 @@ async def mapper(
     project: Annotated[DbProject, Depends(get_project)],
     db: Annotated[Connection, Depends(db_conn)],
     # Here temp auth token/cookie is allowed
-    current_user: Annotated[AuthUser, Depends(mapper_login_required)],
+    current_user: Annotated[AuthUser, Depends(public_endpoint)],
 ) -> ProjectUserDict:
     """A mapper for a specific project.
 

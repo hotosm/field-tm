@@ -34,6 +34,7 @@ from fastapi.responses import JSONResponse
 from loguru import logger as log
 from psycopg import Connection
 
+from app.auth.auth_deps import login_required
 from app.auth.roles import super_admin
 from app.central.central_schemas import (
     OdkCentralWebhookRequest,
@@ -46,7 +47,6 @@ from app.integrations.integration_crud import (
     update_entity_status_in_fmtm,
     # update_entity_status_in_odk,
 )
-from app.integrations.integration_deps import valid_api_token
 
 router = APIRouter(
     prefix="/integrations",
@@ -88,7 +88,7 @@ async def get_api_key(
 )
 async def update_entity_status_from_webhook(
     db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[DbUser, Depends(valid_api_token)],
+    current_user: Annotated[DbUser, Depends(login_required)],
     odk_event: OdkCentralWebhookRequest,
 ):
     """ODK Central webhook triggers.

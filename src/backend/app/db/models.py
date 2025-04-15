@@ -1523,21 +1523,12 @@ class DbProject(BaseModel):
         cls, db: Connection, current_user: Optional[str]
     ) -> dict:
         """Extract user context information for authorization checks."""
-        access_info = {
-            "is_authenticated": current_user is not None,
-            "is_superadmin": False,
-            "managed_org_ids": [],
-            "user_sub": None,
-        }
-
-        if current_user:
-            db_user = await DbUser.one(db, current_user.sub)
-            access_info["is_superadmin"] = db_user.role == UserRole.ADMIN
-            managed_orgs = (
-                db_user.orgs_managed if hasattr(db_user, "orgs_managed") else []
-            )
-            access_info["managed_org_ids"] = managed_orgs
-            access_info["user_sub"] = current_user.sub
+        access_info = {}
+        db_user = await DbUser.one(db, current_user.sub)
+        managed_orgs = db_user.orgs_managed if hasattr(db_user, "orgs_managed") else []
+        access_info["is_superadmin"] = db_user.role == UserRole.ADMIN
+        access_info["managed_org_ids"] = managed_orgs
+        access_info["user_sub"] = current_user.sub
 
         return access_info
 
@@ -1586,19 +1577,15 @@ class DbProject(BaseModel):
             if value
         }
 
-        if access_info["is_authenticated"]:
-            params["current_user_sub"] = access_info["user_sub"]
-            if access_info["managed_org_ids"]:
-                params["managed_org_ids"] = access_info["managed_org_ids"]
+        params["current_user_sub"] = access_info["user_sub"]
+        if access_info["managed_org_ids"]:
+            params["managed_org_ids"] = access_info["managed_org_ids"]
 
         return filters, params, needs_user_roles_join
 
     @classmethod
     def _build_visibility_filter(cls, access_info: dict) -> Optional[str]:
         """Build visibility filter based on user context."""
-        if not access_info["is_authenticated"]:
-            return "p.visibility = 'PUBLIC'"
-
         if access_info["is_superadmin"]:
             # Superadmin sees everything
             return None
