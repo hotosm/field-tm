@@ -23,7 +23,7 @@ from fastapi import APIRouter, Depends, Query, Response
 from loguru import logger as log
 from psycopg import Connection
 
-from app.auth.roles import mapper, org_admin, project_manager, super_admin
+from app.auth.roles import mapper, project_manager, super_admin, validator
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
@@ -54,7 +54,7 @@ async def get_users(
 @router.get("/usernames", response_model=list[user_schemas.Usernames])
 async def get_userlist(
     db: Annotated[Connection, Depends(db_conn)],
-    _: Annotated[DbUser, Depends(org_admin)],
+    _: Annotated[DbUser, Depends(validator)],
     search: str = "",
 ):
     """Get all user list with info such as id and username."""
