@@ -28,7 +28,7 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from osm_login_python.core import Auth
 
-from app.auth.auth_deps import create_jwt_tokens, set_cookies
+from app.auth.auth_logic import create_jwt_tokens, set_cookies
 from app.config import settings
 from app.db.enums import HTTPStatus, UserRole
 
