@@ -366,6 +366,18 @@ CREATE TABLE public.users (
 );
 ALTER TABLE public.users OWNER TO fmtm;
 
+CREATE TABLE IF NOT EXISTS public.user_invites (
+    token UUID DEFAULT gen_random_uuid(),
+    project_id integer NOT NULL,
+    role public.projectrole NOT NULL DEFAULT 'MAPPER',
+    osm_username VARCHAR,
+    email VARCHAR,
+    expires_at timestamp with time zone DEFAULT now() + interval '7 days',
+    used_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now()
+);
+ALTER TABLE public.user_invites OWNER TO fmtm;
+
 CREATE TABLE public.odk_entities (
     entity_id UUID NOT NULL,
     status public.entitystate NOT NULL,
@@ -442,7 +454,6 @@ ALTER COLUMN team_name SET DEFAULT (
     'Team ' || nextval('public.team_name_seq'::regclass)
 );
 
-
 -- Constraints for primary keys
 
 ALTER TABLE public._migrations
@@ -480,6 +491,9 @@ ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_sub, project_id);
 
 ALTER TABLE ONLY public.users
 ADD CONSTRAINT users_pkey PRIMARY KEY (sub);
+
+ALTER TABLE ONLY public.user_invites
+ADD CONSTRAINT user_invites_pkey PRIMARY KEY (token);
 
 ALTER TABLE ONLY public.odk_entities
 ADD CONSTRAINT odk_entities_pkey PRIMARY KEY (entity_id);
@@ -536,6 +550,10 @@ ON public.task_events USING btree (
 CREATE INDEX idx_task_event_user_sub
 ON public.task_events USING btree (
     task_id, user_sub
+);
+CREATE INDEX idx_user_invites_project
+ON public.user_invites USING btree (
+    project_id
 );
 CREATE INDEX idx_entities_project_id
 ON public.odk_entities USING btree (
@@ -602,6 +620,11 @@ ALTER TABLE ONLY public.user_roles
 ADD CONSTRAINT user_roles_user_sub_fkey FOREIGN KEY (
     user_sub
 ) REFERENCES public.users (sub);
+
+ALTER TABLE ONLY public.user_invites
+ADD CONSTRAINT user_invites_project_id_fkey FOREIGN KEY (
+    project_id
+) REFERENCES public.projects (id);
 
 ALTER TABLE ONLY public.task_events
 ADD CONSTRAINT fk_team_id FOREIGN KEY (

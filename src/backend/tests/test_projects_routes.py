@@ -618,7 +618,7 @@ async def test_add_new_project_manager(client, project, new_mapper_user):
     assert response.status_code == 200
 
     # Verify manager was added by fetching project users
-    response = await client.get(f"/users/{project.id}/project-users")
+    response = await client.get(f"/projects/{project.id}/users")
     assert response.status_code == 200
 
     data = response.json()

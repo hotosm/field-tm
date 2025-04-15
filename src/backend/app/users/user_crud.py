@@ -22,12 +22,15 @@ from datetime import datetime, timedelta, timezone
 from textwrap import dedent
 from typing import Optional
 
+from fastapi import Request
 from loguru import logger as log
+from osm_login_python.core import Auth
 from psycopg import Connection
 from psycopg.rows import class_row
 
-from app.auth.providers.osm import send_osm_message
-from app.db.models import DbUser
+from app.auth.providers.osm import get_osm_token, send_osm_message
+from app.config import settings
+from app.db.models import DbProject, DbUser
 from app.projects.project_crud import get_pagination
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
@@ -124,6 +127,39 @@ async def send_warning_email_or_osm(
     log.info(f"Sent warning to {username}: {days_remaining} days remaining.")
 
 
+async def send_invitation_osm_message(
+    request: Request,
+    project: DbProject,
+    invitee_username: str,
+    osm_auth: Auth,
+):
+    """Send an invitation message to a user to join a project."""
+    log.info(f"Sending invitation message to osm user ({invitee_username}).")
+
+    osm_token = get_osm_token(request, osm_auth)
+
+    project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
+    if not project_url.startswith("http"):
+        project_url = f"https://{project_url}"
+
+    message_content = dedent(f"""
+        You have been invited to join the project **{project.name}**.
+
+        Please click this link:
+        [Project]({project_url})
+
+        Thank you for being a part of our platform!
+    """)
+
+    send_osm_message(
+        osm_token=osm_token,
+        osm_username=invitee_username,
+        title=f"You have been invited to join the project {project.name}",
+        body=message_content,
+    )
+    log.info(f"Invitation message sent to osm user ({invitee_username}).")
+
+
 async def get_paginated_users(
     db: Connection,
     page: int,
@@ -132,13 +168,16 @@ async def get_paginated_users(
 ) -> dict:
     """Helper function to fetch paginated users with optional filters."""
     # Get subset of users
-    users = await DbUser.all(db, search=search)
+    users = await DbUser.all(db, search=search) or []
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
-    paginated_users = users[start_index:end_index]
+
+    if not users:
+        paginated_users = []
+    else:
+        paginated_users = users[start_index:end_index]
 
     pagination = await get_pagination(
         page, len(paginated_users), results_per_page, len(users)
     )
-
     return {"results": paginated_users, "pagination": pagination}
