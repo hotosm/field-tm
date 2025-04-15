@@ -26,7 +26,7 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const primaryGeomOptions = [
   { name: 'primary_geom_type', value: 'POLYGON', label: 'Polygons (e.g. buildings)' },
-  { name: 'primary_geom_type', value: 'POINT', label: 'Points, or polygon centroids' },
+  { name: 'primary_geom_type', value: 'POINT', label: 'Points (e.g. POIs)' },
   { name: 'primary_geom_type', value: 'LINESTRING', label: 'Lines (e.g. roads, rivers)' },
 ];
 
@@ -135,6 +135,8 @@ const DataExtract = ({
     if (projectDetails.osmFormSelectionName) {
       dataExtractRequestFormData.append('osm_category', projectDetails.osmFormSelectionName);
     }
+    dataExtractRequestFormData.append('geom_type', formValues.primaryGeomType);
+    dataExtractRequestFormData.append('centroid', formValues.includeCentroid);
 
     // Set flatgeobuf as loading
     dispatch(CreateProjectActions.SetFgbFetchingStatus(true));
@@ -299,17 +301,37 @@ const DataExtract = ({
             className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between"
           >
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              <RadioButton
-                topic="What type of geometry do you wish to map?"
-                options={primaryGeomOptions}
-                direction="column"
-                value={formValues.primaryGeomType}
-                onChangeData={(value) => {
-                  handleCustomChange('primaryGeomType', value);
-                }}
-                errorMsg={errors.primaryGeomType}
-                required
-              />
+              <label className="fmtm-text-sm font-medium">What type of geometry do you wish to map?</label>
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+                {primaryGeomOptions.map((option) => (
+                  <div key={option.value} className="fmtm-flex fmtm-flex-col">
+                    <label className="fmtm-flex fmtm-items-center fmtm-gap-2">
+                      <input
+                        type="radio"
+                        name="primary_geom_type"
+                        value={option.value}
+                        checked={formValues.primaryGeomType === option.value}
+                        onChange={(e) => handleCustomChange('primaryGeomType', e.target.value)}
+                      />
+                      {option.label}
+                    </label>
+
+                    {option.value === 'POINT' && formValues.primaryGeomType === 'POINT' && (
+                      <div className="fmtm-ml-8 fmtm-mt-1 fmtm-flex fmtm-items-center fmtm-gap-2">
+                        <input
+                          type="checkbox"
+                          id="includeCentroid"
+                          checked={formValues.includeCentroid || false}
+                          onChange={(e) => handleCustomChange('includeCentroid', e.target.checked)}
+                        />
+                        <label htmlFor="includeCentroid" className="fmtm-text-sm">
+                          Include polygon centroids
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
               <CustomCheckbox
                 key="newFeatureType"
                 label="I want to use a mix of geometry types"

@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 
 import requests
+import yaml
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -53,11 +54,7 @@ from app.auth.roles import check_access, mapper, org_admin, project_manager
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import (
-    HTTPStatus,
-    ProjectRole,
-    XLSFormType,
-)
+from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
@@ -644,6 +641,8 @@ async def get_data_extract(
     geojson_file: UploadFile = File(...),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
     osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
+    centroid: Annotated[bool, Form()] = False,
+    geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
 ):
     """Get a new data extract for a given project AOI.
 
@@ -654,17 +653,33 @@ async def get_data_extract(
     clean_boundary_geojson = merge_polygons(boundary_geojson)
 
     # Get extract config file from existing data_models
+    geom_type = geom_type.name.lower()
+    extract_config = None
     if osm_category:
         config_filename = XLSFormType(osm_category).name
         data_model = f"{data_models_path}/{config_filename}.yaml"
-        with open(data_model, "rb") as data_model_yaml:
-            extract_config = BytesIO(data_model_yaml.read())
-    else:
-        extract_config = None
+
+        with open(data_model) as f:
+            config = yaml.safe_load(f)
+
+        data_config = {
+            ("polygon", False): ["ways_poly"],
+            ("point", True): ["ways_poly", "nodes"],
+            ("point", False): ["nodes"],
+            ("linestring", False): ["ways_line"],
+        }
+
+        config["from"] = data_config.get((geom_type, centroid))
+        # Serialize to YAML string
+        yaml_str = yaml.safe_dump(config, sort_keys=False)
+
+        # Encode to bytes and wrap in BytesIO
+        extract_config = BytesIO(yaml_str.encode("utf-8"))
 
     geojson_url = await project_crud.generate_data_extract(
         clean_boundary_geojson,
         extract_config,
+        centroid,
     )
 
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
