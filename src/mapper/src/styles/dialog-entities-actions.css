@@ -1,309 +1,172 @@
 /* Task action modal */
 
 .task-action-modal {
-    --at-apply:
-        font-barlow
-        flex
-        justify-center
-        w-[100vw]
-        absolute
-        bottom-[4rem]
-        left-0
-        pointer-events-none
-        z-50;
+	--at-apply: font-barlow flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
 }
 
 .task-action-modal .content {
-    --at-apply:
-        bg-white
-        w-full
-        font-regular
-        md:max-w-[580px]
-        pointer-events-auto
-        px-4
-        py-3
-        sm:py-4
-        rounded-t-3xl
-        max-h-[60vh]
-        overflow-y-scroll;
+	--at-apply: bg-white w-full font-regular md: max-w-[580px] pointer-events-auto px-4 py-3 sm: py-4 rounded-t-3xl
+		max-h-[60vh] overflow-y-scroll;
 }
 
 .task-action-modal .icon {
-    --at-apply:
-        flex
-        justify-end;
+	--at-apply: flex justify-end;
 }
 
 .task-action-modal .icon hot-icon {
-    --at-apply:
-        text-[1.5rem]
-        text-neutral-800
-        cursor-pointer
-        hover:text-primary-600
-        duration-200;
+	--at-apply: text-[1.5rem] text-neutral-800 cursor-pointer hover: text-primary-600 duration-200;
 }
 
 .section-container {
-    --at-apply:
-        flex
-        flex-col
-        gap-4;
+	--at-apply: flex flex-col gap-4;
 }
 
 .selected-title {
-    --at-apply:
-        text-neutral-950
-        text-lg
-        font-semibold;
+	--at-apply: text-neutral-950 text-lg font-semibold;
 }
 
 .section {
-    --at-apply:
-        flex
-        flex-col
-        gap-2;
+	--at-apply: flex flex-col gap-2;
 }
 
 .item {
-    --at-apply:
-        flex;
+	--at-apply: flex;
 }
 
 .item p.label {
-    --at-apply
-        min-w-[6.25rem]
-        text-neutral-950;
+	--at-apply: min-w-[6.25rem] text-neutral-950;
 }
 
 .item p.value {
-    --at-apply:
-        text-neutral-1000
-        font-medium ml-2;
+	--at-apply: text-neutral-1000 font-medium ml-2;
 }
 
 .item p.status {
-    --at-apply:
-        text-neutral-1000
-        font-medium
-        border-[1px]
-        border-solid
-        ml-2
-        py-1
-        px-3
-        rounded-full;
+	--at-apply: text-neutral-1000 font-medium border-[1px] border-solid ml-2 py-1 px-3 rounded-full;
 }
 
 /* Comments */
 
 .dialog-comments {
-    --at-apply:
-        flex;
+	--at-apply: flex;
 }
 
 .dialog-comments-list {
-    --at-apply:
-        flex
-        flex-col
-        ml-2
-        gap-2
-        flex-1;
+	--at-apply: flex flex-col ml-2 gap-2 flex-1;
 }
 
 .dialog-comment {
-    --at-apply:
-        bg-neutral-50
-        rounded
-        px-2
-        py-1;
+	--at-apply: bg-neutral-50 rounded px-2 py-1;
 }
 
 .dialog-comment-content {
-    --at-apply:
-        flex
-        items-center
-        justify-between
-        mb-1;
+	--at-apply: flex items-center justify-between mb-1;
 }
 
 .dialog-comment-info {
-    --at-apply:
-        flex
-        items-center
-        gap-2;
+	--at-apply: flex items-center gap-2;
 }
 
 .dialog-comment-info hot-icon {
-    --at-apply:
-        text-[0.8rem]
-        text-primary-600
-        cursor-pointer;
+	--at-apply: text-[0.8rem] text-primary-600 cursor-pointer;
 }
 
 .dialog-comment-info .created-at {
-    --at-apply:
-        text-sm;
+	--at-apply: text-sm;
 }
 
 .dialog-comment-text {
-    --at-apply:
-        font-medium;
+	--at-apply: font-medium;
 }
 
 .dialog-comment-see-all {
-    --at-apply:
-        flex
-        items-center
-        gap-2;
+	--at-apply: flex items-center gap-2;
 }
 
 .dialog-comment-see-all-empty {
-    --at-apply:
-        h-[1px]
-        bg-neutral-200
-        flex
-        flex-1;
+	--at-apply: h-[1px] bg-neutral-200 flex flex-1;
 }
 
 .dialog-comment-see-all-link {
-    --at-apply:
-        text-sm
-        text-neutral-600
-        hover:text-neutral-800
-        cursor-pointer
-        font-light;
+	--at-apply: text-sm text-neutral-600 hover: text-neutral-800 cursor-pointer font-light;
 }
 
 /* Entity */
 
 .entity {
-    --at-apply:
-        flex
-        gap-2;
+	--at-apply: flex gap-2;
 }
 
 .entity-navigate-to {
-    --at-apply:
-        secondary
-        flex-grow;
+	--at-apply: secondary flex-grow;
 }
 
-
 .entity hot-icon {
-    --at-apply:
-        text-[1rem]
-        cursor-pointer
-        duration-200;
+	--at-apply: text-[1rem] cursor-pointer duration-200;
 }
 
 .entity span {
-    --at-apply:
-        font-barlow
-        font-mediumtext-sm;
+	--at-apply: font-barlow font-mediumtext-sm;
 }
 
 .entity sl-button {
-    --at-apply:
-        flex-grow;
+	--at-apply: flex-grow;
 }
 
 .entity-dialog {
-    --at-apply:
-        dialog-overview
-        z-50
-        font-barlow
-        font-regular;
+	--at-apply: dialog-overview z-50 font-barlow font-regular;
 }
 
 .entity-dialog-content {
-    --at-apply:
-        flex 
-        items-start
-        flex-col;
+	--at-apply: flex items-start flex-col;
 }
 
 .entity-dialog-youare {
-    --at-apply:
-        text-base
-        mb-5
-        text-neutral-700;
+	--at-apply: text-base mb-5 text-neutral-700;
 }
 
 .entity-dialog-actions {
-    --at-apply:
-        flex
-        gap-2
-        ml-auto;
+	--at-apply: flex gap-2 ml-auto;
 }
 
 .entity-dialog-actions sl-button {
-    --at-apply:
-        flex-grow;
+	--at-apply: flex-grow;
 }
 
 .entity-dialog-actions sl-button span {
-    --at-apply:
-        font-barlow
-        font-medium
-        text-sm;
+	--at-apply: font-barlow font-medium text-sm;
 }
 
 /* Feature comments */
 
 .feature-comments-dialog {
-    --at-apply:
-        dialog-overview
-        z-50
-        font-barlow
-        font-regular;
+	--at-apply: dialog-overview z-50 font-barlow font-regular;
 }
 
 .feature-comment {
-    --at-apply:
-        bg-neutral-50
-        rounded
-        px-2
-        py-1;
+	--at-apply: bg-neutral-50 rounded px-2 py-1;
 }
 
 .feature-comments {
-    --at-apply:
-        flex
-        flex-col
-        gap-3;
+	--at-apply: flex flex-col gap-3;
 }
 
 .feature-comment-meta {
-    --at-apply:
-        flex
-        items-center
-        justify-between
-        mb-2;
+	--at-apply: flex items-center justify-between mb-2;
 }
 
 .feature-comment-history {
-    --at-apply:
-        flex
-        items-center
-        gap-2;
+	--at-apply: flex items-center gap-2;
 }
 
 .feature-comment-history sl-icon {
-    --at-apply:
-        text-[0.8rem]
-        text-primary-600 
-        cursor-pointer;
+	--at-apply: text-[0.8rem] text-primary-600 cursor-pointer;
 }
 
 .feature-comment-history p {
-    --at-apply:
-        text-sm;
+	--at-apply: text-sm;
 }
 
 .feature-comment-comment {
-    --at-apply:
-        font-medium;
+	--at-apply: font-medium;
 }
-
-
-
-
