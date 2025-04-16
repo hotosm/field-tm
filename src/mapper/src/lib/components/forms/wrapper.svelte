@@ -238,6 +238,7 @@
 						{#key entityId}
 							<iframe
 								class="iframe"
+								style:height="100%"
 								use:handleIframe
 								title="odk-web-forms-wrapper"
 								src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
