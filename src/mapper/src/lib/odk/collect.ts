@@ -2,7 +2,7 @@ import { getAlertStore, getCommonStore } from '$store/common.svelte.ts';
 
 const commonStore = getCommonStore();
 const alertStore = getAlertStore();
-const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
+const enableWebforms = commonStore.config?.enableWebforms || false;
 
 export function openOdkCollectNewFeature(xFormId: string, entityId: string) {
 	if (!xFormId || !entityId) {
