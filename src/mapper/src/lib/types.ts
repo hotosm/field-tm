@@ -43,6 +43,7 @@ export interface ProjectData {
 	tasks: ProjectTask[];
 	geo_restrict_distance_meters: number;
 	geo_restrict_force_error: boolean;
+	use_odk_collect: boolean;
 }
 
 export interface ZoomToTaskEventDetail {

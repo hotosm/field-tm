@@ -285,6 +285,7 @@ CREATE TABLE public.projects (
     ),
     primary_geom_type public.geomtype DEFAULT 'POLYGON',
     new_geom_type public.geomtype DEFAULT 'POLYGON',
+    use_odk_collect boolean DEFAULT false,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );

@@ -59,7 +59,11 @@
 	const selectedEntityId = $derived(entitiesStore.selectedEntity);
 	const latestEvent = $derived(taskStore.latestEvent);
 	const commentMention = $derived(taskStore.commentMention);
-	const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
+
+	// Set useOdkCollect override to disable webforms in app
+	if (data.project.use_odk_collect) {
+		commonStore.setUseOdkCollectOverride(true);
+	}
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
@@ -148,7 +152,7 @@
 		// if project loaded for the first time, set projectSetupStep to 1 else get it from localStorage
 		if (!localStorage.getItem(`project-${data.projectId}-setup`)) {
 			// if webforms enabled, avoid project load in odk step
-			if (enableWebforms) {
+			if (commonStore.enableWebforms) {
 				localStorage.setItem(`project-${data.projectId}-setup`, projectSetupStepEnum['task_selection'].toString());
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['task_selection']);
 			} else {
@@ -427,7 +431,7 @@
 			<sl-tab slot="nav" panel="offline">
 				<hot-icon name="wifi-off"></hot-icon>
 			</sl-tab>
-			{#if (!enableWebforms)}
+			{#if (!commonStore.enableWebforms)}
 				<sl-tab slot="nav" panel="qrcode">
 					<hot-icon name="qr-code"></hot-icon>
 				</sl-tab>

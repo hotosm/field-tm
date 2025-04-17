@@ -1432,6 +1432,7 @@ class DbProject(BaseModel):
     new_geom_type: Optional[DbGeomType] = None  # when new geometries are drawn
     geo_restrict_distance_meters: Optional[PositiveInt] = None
     geo_restrict_force_error: Optional[bool] = None
+    use_odk_collect: Optional[bool] = None
     hashtags: Optional[list[str]] = None
     due_date: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
