@@ -19,7 +19,6 @@
 		projectData: ProjectData;
 		displayWebFormsDrawer: Boolean;
 	};
-
 	function getStatusStyle(status: statusType) {
 		switch (status) {
 			case 'READY':
@@ -54,8 +53,6 @@
 
 	// use Map for quick lookups
 	let entityMap = $derived(new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.entity_id, entity])));
-
-	const enableWebforms = $derived(commonStore.config?.enableWebforms || false);
 
 	const selectedEntityId = $derived(entitiesStore.selectedEntity || '');
 	const selectedEntity = $derived(entityMap.get(selectedEntityId));
@@ -260,7 +257,7 @@
 							<hot-icon slot="prefix" name="direction"></hot-icon>
 							<span>{m['popup.navigate_here']()}</span>
 						</sl-button>
-						{#if enableWebforms === false}
+						{#if commonStore.enableWebforms === false}
 							<sl-button
 								loading={entitiesStore.updateEntityStatusLoading}
 								variant="primary"
@@ -281,7 +278,7 @@
 								<span>{m['popup.map_in_odk']()}</span>
 							</sl-button>
 						{/if}
-						{#if enableWebforms}
+						{#if commonStore.enableWebforms}
 							<sl-button
 								loading={entitiesStore.updateEntityStatusLoading}
 								variant="primary"
