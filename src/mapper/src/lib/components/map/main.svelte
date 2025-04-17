@@ -110,6 +110,7 @@
 		'primary': 'red'
 	};
 
+	let taskCentroidGeojson = $derived({...taskStore.featcol, features: taskStore.featcol?.features?.map(feat => (centroid(feat?.geometry, {properties: feat.properties})))})
 	// use Map for quick lookups
 	let entityMapByEntity = $derived(
 		new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.entity_id, entity])),
@@ -559,6 +560,8 @@
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
+	</GeoJSON>
+	<GeoJSON id="tasks-centroid" data={taskCentroidGeojson} promoteId="fid">
 		<SymbolLayer
 			applyToClusters={false}
 			hoverCursor="pointer"
@@ -571,7 +574,8 @@
 					'LOCKED_FOR_VALIDATION',
 					'',
 				],
-				'icon-allow-overlap': true,
+				"symbol-placement": "point",
+    			"icon-allow-overlap": true
 			}}
 		/>
 	</GeoJSON>
