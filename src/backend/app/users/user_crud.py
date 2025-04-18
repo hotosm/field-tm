@@ -132,6 +132,7 @@ async def send_invitation_osm_message(
     project: DbProject,
     invitee_username: str,
     osm_auth: Auth,
+    invite_url: str,
 ):
     """Send an invitation message to a user to join a project."""
     log.info(f"Sending invitation message to osm user ({invitee_username}).")
@@ -145,7 +146,10 @@ async def send_invitation_osm_message(
     message_content = dedent(f"""
         You have been invited to join the project **{project.name}**.
 
-        Please click this link:
+        To accept the invitation, please click the link below:
+        [Accept Invitation]({invite_url})
+
+        You may use this link after accepting the invitation to view the project:
         [Project]({project_url})
 
         Thank you for being a part of our platform!

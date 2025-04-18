@@ -129,14 +129,48 @@ async def invite_new_user(
     user_in: user_schemas.UserInviteIn,
     osm_auth=Depends(init_osm_auth),
 ):
-    """Invite a new user to a project.
+    """Invite a user to a project.
 
+    If the user already exists, directly assign the role to the user.
+    If the user does not exist, create an invite and send an email or OSM message.
+    The invite URL is user specific with a token that expires after 7 days.
     - Including `osm_username` will send an OSM message notification (including email).
     - Including `email` will send an email to the user.
-    - It's also possible to omit both fields and send the returned invite URL to the
-      user via other means (e.g. mobile message).
+    - It's also possible to send the returned invite URL to the user via other means
+    (e.g. mobile message).
     """
     project = project_user_dict.get("project")
+
+    if user_in.osm_username:
+        if osm_user_exists := await check_osm_user(user_in.osm_username):
+            username = user_in.osm_username
+            signin_type = "osm"
+        else:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"OSM user not found: {user_in.osm_username}",
+            )
+    elif user_in.email and user_in.email.endswith("@gmail.com"):
+        username = user_in.email.split("@")[0]
+        signin_type = "google"
+    else:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Either osm username or google email must be provided.",
+        )
+
+    # The user is unique by username and auth provider
+    if users := await DbUser.all(db, username=username, signin_type=signin_type):
+        user = users[0]
+        latest_role = await DbUserRole.create(db, project.id, user.sub, user_in.role)
+
+        return JSONResponse(
+            status_code=HTTPStatus.CREATED,
+            content={
+                "message": f"User {user.username} already exists. "
+                f"Role Assigned: {latest_role.role.value}."
+            },
+        )
 
     new_invite = await DbUserInvite.create(db, project.id, user_in)
 
@@ -156,22 +190,14 @@ async def invite_new_user(
         invite_url = f"https://{settings.FMTM_DOMAIN}/invite?token={new_invite.token}"
 
     # Notify via OSM message
-    osm_username = user_in.osm_username
-    if osm_username:
-        osm_user_exists = await check_osm_user(osm_username)
-
-        if not osm_user_exists:
-            raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
-                detail=f"User does not exist in OpenStreetMap: {osm_username}",
-            )
-
+    if osm_user_exists:
         background_tasks.add_task(
             send_invitation_osm_message,
             request=request,
             project=project,
-            invitee_username=osm_username,
+            invitee_username=username,
             osm_auth=osm_auth,
+            invite_url=invite_url,
         )
 
     # TODO Notify via email (consider options)
@@ -190,6 +216,14 @@ async def accept_invite(
     if not invite or invite.is_expired():
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Invite has expired (valid 7 days)"
+        )
+
+    if (invite.osm_username and invite.osm_username != current_user.username) or (
+        invite.email and invite.email != current_user.email
+    ):
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN,
+            detail="Invite is not for the current user.",
         )
 
     # Create the role for the user / project
