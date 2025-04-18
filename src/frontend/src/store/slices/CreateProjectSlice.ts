@@ -1,5 +1,5 @@
 import { CreateProjectStateTypes } from '@/store/types/ICreateProject';
-import { task_split_type } from '@/types/enums';
+import { project_visibility, task_split_type } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
@@ -20,6 +20,7 @@ export const initialState: CreateProjectStateTypes = {
     hasCustomTMS: false,
     custom_tms_url: '',
     project_admins: [],
+    visibility: project_visibility.PUBLIC,
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
@@ -80,6 +81,7 @@ const CreateProject = createSlice({
         odk_central_password: '',
         description: '',
         organisation_id: null,
+        visibility: project_visibility.PUBLIC,
       };
       state.totalAreaSelection = null;
       state.taskSplittingMethod = null;

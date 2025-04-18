@@ -21,8 +21,24 @@ import { useIsAdmin } from '@/hooks/usePermissions';
 import { isEmpty } from '@/utilfunctions/commonUtils';
 import AssetModules from '@/shared/AssetModules';
 import Chips from '@/components/common/Chips';
+import { project_visibility } from '@/types/enums';
+import { projectVisibilityOptionsType } from '@/store/types/ICreateProject';
+import RadioButton from '@/components/common/RadioButton';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+const projectVisibilityOptions: projectVisibilityOptionsType[] = [
+  {
+    name: 'project_visibility',
+    value: project_visibility.PUBLIC,
+    label: 'Public',
+  },
+  {
+    name: 'project_visibility',
+    value: project_visibility.PRIVATE,
+    label: 'Private',
+  },
+];
 
 const ProjectDetailsForm = ({ flag }) => {
   useDocumentTitle('Create Project: Project Details');
@@ -36,9 +52,9 @@ const ProjectDetailsForm = ({ flag }) => {
   const organisationListData = useAppSelector((state) => state.createproject.organisationList);
   const organisationListLoading = useAppSelector((state) => state.createproject.organisationListLoading);
   const userList = useAppSelector((state) => state.user.userListForSelect)?.map((user) => ({
-    id: user.id,
+    id: user.sub,
     label: user.username,
-    value: user.id,
+    value: user.sub,
   }));
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
@@ -343,6 +359,19 @@ const ProjectDetailsForm = ({ flag }) => {
               editable={true}
             />
           </div>
+          <RadioButton
+            value={values?.visibility || ''}
+            topic="Project Type"
+            options={projectVisibilityOptions}
+            direction="row"
+            onChangeData={(value) => {
+              handleCustomChange('visibility', value);
+            }}
+            errorMsg={errors.visibility}
+            hoveredOption={() => {
+              dispatch(CreateProjectActions.SetDescriptionToFocus('projectdetails-visibility'));
+            }}
+          />
           <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
             <Button variant="primary-red" type="submit">
               NEXT

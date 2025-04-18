@@ -79,3 +79,8 @@ export enum osm_forms {
   buildings = 'OSM Buildings',
   health = 'OSM Healthcare',
 }
+
+export enum project_visibility {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+}

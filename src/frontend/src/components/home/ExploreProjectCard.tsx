@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import { projectType } from '@/models/home/homeModel';
 import defaultOrgLogo from '@/assets/images/project_icon.png';
+import AssetModules from '@/shared/AssetModules';
 
 export default function ExploreProjectCard({ data, className }: { data: projectType; className?: string }) {
   const navigate = useNavigate();
@@ -23,8 +24,13 @@ export default function ExploreProjectCard({ data, className }: { data: projectT
   return (
     <div
       onClick={handleProjectCardClick}
-      className={`hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
+      className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
     >
+      {data.visibility === 'PRIVATE' && (
+        <Tooltip title="Private Project" arrow>
+          <AssetModules.LockOutlinedIcon className="fmtm-absolute fmtm-top-1 fmtm-right-1 fmtm-text-red-medium !fmtm-text-[19px]" />
+        </Tooltip>
+      )}
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
           {data.organisation_logo ? (

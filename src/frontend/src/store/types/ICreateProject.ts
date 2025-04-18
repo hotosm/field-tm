@@ -1,4 +1,4 @@
-import { task_split_type, MapGeomTypes } from '@/types/enums';
+import { task_split_type, MapGeomTypes, project_visibility } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -115,6 +115,7 @@ export type ProjectDetailsTypes = {
   useMixedGeomTypes: boolean;
   newGeomType: MapGeomTypes;
   project_admins: number[];
+  visibility: project_visibility;
 };
 
 export type FormCategoryListTypes = {
@@ -160,4 +161,10 @@ export type splittedGeojsonType = {
     geometry: { type: 'Polygon'; coordinates: number[][] };
     properties: Record<string, any>;
   }[];
+};
+
+export type projectVisibilityOptionsType = {
+  name: string;
+  value: project_visibility;
+  label: string;
 };
