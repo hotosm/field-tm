@@ -136,10 +136,10 @@ const DataExtract = ({
       dataExtractRequestFormData.append('osm_category', projectDetails.osmFormSelectionName);
     }
     dataExtractRequestFormData.append('geom_type', formValues.primaryGeomType);
-    
-    if (formValues.primaryGeomType == "POINT"){
-    dataExtractRequestFormData.append('centroid', formValues.includeCentroid)
-    };
+
+    if (formValues.primaryGeomType == 'POINT') {
+      dataExtractRequestFormData.append('centroid', formValues.includeCentroid);
+    }
 
     // Set flatgeobuf as loading
     dispatch(CreateProjectActions.SetFgbFetchingStatus(true));
