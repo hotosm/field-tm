@@ -24,10 +24,9 @@ wait_for_s3() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        http_status=$(curl --silent --head --write-out "%{http_code}" --output /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}")
+        http_status=$(curl --silent --head --write-out "%{http_code}" --output /dev/null "${S3_ENDPOINT}/minio/health/live")
 
-        # We allow 400 or 403, as the service is available but likely blocked by proxy
-        if [[ "$http_status" == "200" || "$http_status" == "403" || "$http_status" == "400" ]]; then
+        if [[ "$http_status" == "200" ]]; then
             echo "S3 is available (HTTP $http_status)."
             return 0  # S3 is available, exit successfully
         fi

@@ -97,10 +97,9 @@ wait_for_s3() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        http_status=$(curl --silent --head --write-out "%{http_code}" --output /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}")
+        http_status=$(curl --silent --head --write-out "%{http_code}" --output /dev/null "${S3_ENDPOINT}/minio/health/live")
 
-        # We allow 400 or 403, as the service is available but likely blocked by proxy
-        if [[ "$http_status" == "200" || "$http_status" == "403" || "$http_status" == "400" ]]; then
+        if [[ "$http_status" == "200" ]]; then
             echo "S3 is available (HTTP $http_status)."
             return 0  # S3 is available, exit successfully
         fi
@@ -182,6 +181,10 @@ init_buckets() {
     BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Ensuring S3 bucket ${BUCKET_NAME} exists"
     mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
+
+    mc mb "s3/${S3_BUCKET_NAME}" --ignore-existing
+    mc anonymous set download "s3/${S3_BUCKET_NAME}"
+
     mc mb "s3/${BACKUP_BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BACKUP_BUCKET_NAME}"
 }
