@@ -299,6 +299,17 @@ NO MAXVALUE
 CACHE 1;
 ALTER TABLE public.projects_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
+-- Table field comments
+COMMENT ON COLUMN public.projects.geo_restrict_force_error
+IS 'Prevent users from creating new geometries far away from current location';
+COMMENT ON COLUMN public.projects.geo_restrict_distance_meters
+IS 'Specify how many meters the user can be from new point before error shown';
+COMMENT ON COLUMN public.projects.primary_geom_type IS
+'Main geom type being mapped in this project';
+COMMENT ON COLUMN public.projects.new_geom_type IS
+'Geom type used for drawing new geoms, e.g. existing: polygons, new: points';
+COMMENT ON COLUMN public.projects.use_odk_collect IS
+'Override whether this project uses ODK Collect (vs default webforms)';
 
 
 -- Note we use UUID for interoperability with external databases,
