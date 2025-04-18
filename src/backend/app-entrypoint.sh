@@ -39,11 +39,6 @@ wait_for_s3() {
     exit 1  # Exit with an error code
 }
 
-create_s3_buckets() {
-    echo "Running init_s3_buckets.py script main function"
-    python /opt/app/s3.py
-}
-
 init_project_stats() {
     echo "Initializing project stats materialized view..."
     python /opt/scheduler/project_stats.py
@@ -57,10 +52,5 @@ wait
 
 # Initialize project stats materialized view when the service starts
 init_project_stats
-
-# Skip init S3 if env var present
-if [ "${S3_SKIP_BUCKET_INIT}" != true ]; then
-    create_s3_buckets
-fi
 
 exec "$@"

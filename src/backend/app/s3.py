@@ -1,7 +1,5 @@
 """Initialise the S3 buckets for FMTM to function."""
 
-import json
-import sys
 from io import BytesIO
 from typing import Any
 
@@ -262,35 +260,6 @@ async def delete_all_objs_under_prefix(bucket_name: str, s3_path: str) -> bool:
     return True
 
 
-def create_bucket_if_not_exists(client: Minio, bucket_name: str, is_public: bool):
-    """Checks if a bucket exits, else creates it."""
-    if not client.bucket_exists(bucket_name):
-        log.info(f"Creating S3 bucket: {bucket_name}")
-        client.make_bucket(bucket_name)
-        if is_public:
-            log.info("Setting public (anonymous) download policy")
-            policy = policy = {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect": "Allow",
-                        "Principal": {"AWS": "*"},
-                        "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-                        "Resource": f"arn:aws:s3:::{bucket_name}",
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Principal": {"AWS": "*"},
-                        "Action": "s3:GetObject",
-                        "Resource": f"arn:aws:s3:::{bucket_name}/*",
-                    },
-                ],
-            }
-            client.set_bucket_policy(bucket_name, json.dumps(policy))
-    else:
-        log.debug(f"S3 bucket already exists: {bucket_name}")
-
-
 def strip_presigned_url_for_local_dev(url: str) -> str:
     """Helper for local development handling docker URL + pre-signing.
 
@@ -327,28 +296,3 @@ def is_connection_secure(minio_url: str):
         raise ValueError(err)
 
     return stripped_url, secure
-
-
-def startup_init_buckets():
-    """Wrapper to create defined buckets at startup."""
-    # Logging
-    log.remove()
-    log.add(
-        sys.stderr,
-        level=settings.LOG_LEVEL,
-        format=(
-            "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} "
-            "| {name}:{function}:{line} | {message}"
-        ),
-        colorize=True,
-        backtrace=True,  # More detailed tracebacks
-        catch=True,  # Prevent app crashes
-    )
-
-    # Init S3 Buckets
-    client = s3_client()
-    create_bucket_if_not_exists(client, settings.S3_BUCKET_NAME, is_public=True)
-
-
-if __name__ == "__main__":
-    startup_init_buckets()
