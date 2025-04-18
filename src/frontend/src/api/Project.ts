@@ -59,6 +59,7 @@ export const ProjectById = (projectId: string) => {
             organisation_logo: projectResp?.organisation_logo,
             organisation_name: projectResp?.organisation_name,
             created_at: projectResp?.created_at,
+            visibility: projectResp.visibility,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));

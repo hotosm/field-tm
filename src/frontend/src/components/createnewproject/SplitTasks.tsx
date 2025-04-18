@@ -128,6 +128,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: projectDetails.hashtags,
       custom_tms_url: projectDetails.custom_tms_url,
+      visibility: projectDetails.visibility,
     };
     // Append osm_category if set
     if (projectDetails.osmFormSelectionName) {

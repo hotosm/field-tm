@@ -16,6 +16,7 @@ const ProjectDetails = ({ hoveredSection }: hoveredSectionType) => {
   const { windowSize } = windowDimention();
   const tmsRef = useRef<HTMLDivElement>(null);
   const odkRef = useRef<HTMLDivElement>(null);
+  const visibilityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!hoveredSection || windowSize.width < 1024) return;
@@ -24,6 +25,9 @@ const ProjectDetails = ({ hoveredSection }: hoveredSectionType) => {
     }
     if (hoveredSection === 'projectdetails-odk') {
       odkRef?.current?.scrollIntoView(scrollOptions);
+    }
+    if (hoveredSection === 'projectdetails-visibility') {
+      visibilityRef?.current?.scrollIntoView(scrollOptions);
     }
   }, [hoveredSection]);
 
@@ -75,6 +79,14 @@ const ProjectDetails = ({ hoveredSection }: hoveredSectionType) => {
           OpenAerialMap Documentation
         </a>
         .
+      </div>
+      <div
+        ref={visibilityRef}
+        className={`${hoveredSection === 'projectdetails-visibility' && 'fmtm-text-gray-800'} fmtm-duration-150`}
+      >
+        You can choose the visibility of your project. A <span className="fmtm-font-semibold">public project</span> is
+        accessible to everyone, while a <span className="fmtm-font-semibold">private project</span> is only accessible
+        to invited users and admins.
       </div>
     </div>
   );
