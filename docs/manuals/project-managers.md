@@ -112,7 +112,7 @@ All project manager permissions are granted to the organisation manager.
 
 Go to [fmtm]
 
-1. Setting up your field mapping project needs following the steps below;
+### 1. Create the project details
 
     - Login to fmtm first to see the option of creating the project.
 
@@ -127,9 +127,10 @@ Go to [fmtm]
 
     ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
 
-2. You can draw a freehand polygon on a map interface or you can upload
-    the AOI file.
+### 2. Create a project area
 
+    - You can draw a freehand polygon on a map interface or you can upload
+      the AOI file.
     - Click on Upload file button to upload the AOI file. The file is only
       supported by Geojson format. See [preparing map features](#preparing-map-features).
     - Review the displayed map that corresponds to your selected area and
@@ -142,7 +143,7 @@ Go to [fmtm]
 
     ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
-3. You need to upload a survey that you are going to work on.
+### 3. Upload the survey (or use an existing one)
 
     - You may choose to upload a pre-Configured XLSForm or browse the forms.
       [XLS Form Preparation](#xls-form-preparation)
@@ -152,10 +153,9 @@ Go to [fmtm]
 
     ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
-4. In mapping data we you shall choose the geometry to use by clicking in
-    the button under
-    the heading, what type of geometry
+### 4. Select the geometry type you wish to map
 
+    - Select an option under 'What type of geometry?'
     - If you want to upload your own, click in Upload custom mapdata or else
       go with the default
       one of fetch data from OSM
@@ -164,16 +164,16 @@ Go to [fmtm]
 
     ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
-5. The final step is task splitting which can be performed on three
-    different ways. you
-    can split the task on square of size you want.
+### 5. Task splitting
 
-    - The second option is to choose area as task where you can use single
-      polygon as a task. And the task splitting algorithm which splits
+    - Option 1: Split project into squares.
+    - Option 2: Use the project area created as the task areas.
+      This could be a single task, or multiple task areas if uploaded.
+    - Option 3: The task splitting algorithm which splits
       the tasks with average number of features which is provided by project
       creator.
-    - The task splitting may take few seconds to few minutes considering
-      the feature count and size of AOI. Click on "Submit" to create project.
+      - The task splitting may take few seconds to few minutes considering
+        the feature count and size of AOI. Click on "Submit" to create project.
 
     ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 
