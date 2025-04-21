@@ -210,6 +210,7 @@ Thanks goes to these wonderful people:
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://danieljdufour.com"><img src="https://avatars.githubusercontent.com/u/4313463?v=4?s=100" width="100px;" alt="Daniel J. Dufour"/><br /><sub><b>Daniel J. Dufour</b></sub></a><br /><a href="#ideas-DanielJDufour" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/hotosm/fmtm/commits?author=DanielJDufour" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Joshua-Tihabwangye"><img src="https://avatars.githubusercontent.com/u/143622860?v=4?s=100" width="100px;" alt="Joshua-T-Walker"/><br /><sub><b>Joshua-T-Walker</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Joshua-Tihabwangye" title="Documentation">📖</a></td>
     </tr>
   </tbody>
   <tfoot>
