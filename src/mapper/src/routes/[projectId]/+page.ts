@@ -14,6 +14,8 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	if (projectResponse.status === 401) {
 		// TODO redirect to different error page to handle login
 		throw error(401, { message: `You must log in first` });
+	} else if (projectResponse.status === 403) {
+		throw error(403, { message: `You do not have access to project with ID (${projectId})` });
 	} else if (projectResponse.status === 404) {
 		throw error(404, { message: `Project with ID (${projectId}) not found` });
 	} else if (projectResponse.status === 400) {
