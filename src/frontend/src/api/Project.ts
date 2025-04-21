@@ -70,7 +70,7 @@ export const ProjectById = (projectId: string) => {
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            message: 'Failed to fetch project.',
+            message: error.response.data.detail || 'Failed to fetch project.',
           }),
         );
       }
