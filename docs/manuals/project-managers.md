@@ -30,7 +30,7 @@ detailed maps that can have a variety of use cases. These could be:
 - Understanding the impact of environmental changes on the landscape,
   etc.
 
-## An Overview Of FMTM In Relations With HOT, OSM and ODK
+## An Overview Of FMTM In Relation To HOT, OSM and ODK
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit
 organization that uses open mapping data to support humanitarian and
@@ -103,161 +103,187 @@ Alternatively, request the creation of a new organisation for your team:
    organization and inform you through the email.
    ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
 
+For small organisations, the organisation manager may also be the main project
+manager.
+
+All project manager permissions are granted to the organisation manager.
+
 ## Steps To Create A Project In FMTM
 
-1. Go to [fmtm][2] .
-2. In the header, you'll find two tabs: Explore Projects and Manage Organization.
+Go to [fmtm]
 
-   ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
+1. Setting up your field mapping project needs following the steps below;
 
-3. Start by exploring the projects listed by different nations and world
-   communities for field mapping exercises.
-4. Use the search option to narrow down the project cards or find the project
-   of your choice.
-5. If you are not logged into the system, the "Create new project" button will
-   be disabled.
-6. If you are new then on the top right corner click on Sign up and create an
-   account . Else , Sign in to your existing account .
-7. Once signed in, the "Create new project" button will be enabled. Click on it.
-8. The process of creating a new project involves four steps: Project Details,
-   Uploading the Area, Defining the Task, and Selecting the Form.
-9. Start by filling in the project details, including the organization name,
-   project name, description, and other relevant information.
+    - Login to fmtm first to see the option of creating the project.
 
-   ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+    ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
 
-10. If your organization's name is not listed, you can add it through the
-    "Manage Organization" tab.
-11. Provide the necessary credentials for the ODK (Open Data Kit) central setup,
-    including URL, username, and password.
-12. Proceed to the next step, which is uploading the area for field mapping.
-    Choose the file option and select the AOI (Area of Interest) file in GEOJSON
-    file format.
-    Review the displayed map that corresponds to your selected area and click
-    on "Next".
+    - If you are not logged in, the option of create a new project is
+      not visible not visible.
+    - Start by filling in the project basic information such as the name,
+      description,
+      hashtag, etc. This captures essential information about your project.
+    - Finally click Next to proceed.
+
+    ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+
+2. You can draw a freehand polygon on a map interface or you can upload
+    the AOI file.
+
+    - Click on Upload file button to upload the AOI file. The file is only
+      supported by Geojson format. See [preparing map features](#preparing-map-features).
+    - Review the displayed map that corresponds to your selected area and
+      click on "Next".
+
+    !!! tip
+
+          Confirm the exact area for the survey before creating the project,
+          as the project boundary cannot be edited once the project is created.
 
     ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
-13. Upload your XLSForm. Here you download pre-defined forms from FMTM.
-    Some are specifically designed to work with OpenStreetMap.
-    Click on "Next" to proceed.
+3. You need to upload a survey that you are going to work on.
+
+    - You may choose to upload a pre-Configured XLSForm or browse the forms.
+      [XLS Form Preparation](#xls-form-preparation)
+    - Click the UploadXLSForm if you are uploading the file or download forms
+      by clicking Download form.
+    - Finally click Next to proceed.
 
     ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
-14. In step 4, you can either generate the map features from osm or upload the
-    custom map features.
-    You can also upload additional map feature to have multiple feature
-    selection supported.
+4. In mapping data we you shall choose the geometry to use by clicking in
+    the button under
+    the heading, what type of geometry
+
+    - If you want to upload your own, click in Upload custom mapdata or else
+      go with the default
+      one of fetch data from OSM
+    - You can also upload additional map feature to have multiple feature
+      selection supported.
 
     ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
-15. The final step is task splitting which can be performed on three different
-    ways. You can split the task on square of size you want. The second option
-    is to choose area as task where you can use single polygon as a task. And
-    the task splitting algorithm which splits the tasks with average number of
-    features which is provided by project creator. The task splitting may take
-    few seconds to few minutes considering the feature count and size of AOI.
-    Click on "Submit" to create project.
+5. The final step is task splitting which can be performed on three
+    different ways. you
+    can split the task on square of size you want.
+
+    - The second option is to choose area as task where you can use single
+      polygon as a task. And the task splitting algorithm which splits
+      the tasks with average number of features which is provided by project
+      creator.
+    - The task splitting may take few seconds to few minutes considering
+      the feature count and size of AOI. Click on "Submit" to create project.
 
     ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 
-16. Wait for the system to generate QR codes for each task, which will be used
-    later in the field mapping process.
-17. After the project creation is successful and QR codes are generated, you are
-    redirected to the project details page of the project.
-
-### Guidelines / Common Questions
-
-#### Defining the Project Boundary
-
-- Confirm the exact area for the survey before creating
-  the project, as the project boundary cannot be
-  edited once the project is created.
+### Project Creation Tips
 
 #### Preparing Map Features
 
-- Ensure you have the map features ready for the area
-  you plan to survey before starting project creation.
+- Ensure you have the map features ready for the area you plan to
+  survey before starting project creation.
 - The files should be in GeoJSON format, use the WGS coordinate
-  system with EPSG 4326, and must not include
-  a Z-coordinate. The map feature file should follow the
-  osm tags structure.
+  system with EPSG 4326, and must not include a Z-coordinate.
+  The map feature file should follow the osm tags structure.
 - Below is a sample of the required file structure:
 
-```json
-{
-   "type": "Feature",
-   "properties": { "full_id": "r9517874",
-      "osm_id": "9517874",
-      "osm_type": "relation"
-      "tags": {"building": "yes"},
-      "type": "multipolygon",
-      "name": "",
-      "building:levels": "" },
-   "geometry": { "type": "MultiPolygon", "coordinates": [ [ [
-      [ -3.9618848, 5.3041323 ],
-      [ -3.9615121, 5.3041457 ],
-      [ -3.9615028, 5.3038906 ],
-      [ -3.9618755, 5.3038772 ],
-      [ -3.9618848, 5.3041323 ]
-   ],
-   [
-      [ -3.9620167, 5.3042236 ],
-      [ -3.9620143, 5.3041258 ],
-      [ -3.9619839, 5.3041266 ],
-      [ -3.9619757, 5.3037882 ],
-      [ -3.9614038, 5.3038019 ],
-      [ -3.9614144, 5.3042381 ],
-      [ -3.9620167, 5.3042236 ]
-   ] ] ] }
-},
-```
+  !!! example
 
-- You may download features from OpenStreetMap (OSM)
-  by clicking on Fetch data from osm with FMTM project  
-  creation; however, note that FMTM is not responsible  
-  for the data quality of features extracted from OSM.
-- Currently, available types of survey features are Buildings
-  and Healthcare only. We plan to add more types of features moving ahead.
-- Project managers can also upload supporting map features.
-  Note that these secondary features can’t be surveyed but  
-  selected for respective primary features.
+         ```json
+         {
+            "type": "Feature",
+            "properties": { "full_id": "r9517874",
+               "osm_id": "9517874",
+               "osm_type": "relation"
+               "tags": {"building": "yes"},
+               "type": "multipolygon",
+               "name": "",
+               "building:levels": "" },
+            "geometry": { "type": "MultiPolygon", "coordinates": [ [ [
+               [ -3.9618848, 5.3041323 ],
+               [ -3.9615121, 5.3041457 ],
+               [ -3.9615028, 5.3038906 ],
+               [ -3.9618755, 5.3038772 ],
+               [ -3.9618848, 5.3041323 ]
+            ],
+            [
+               [ -3.9620167, 5.3042236 ],
+               [ -3.9620143, 5.3041258 ],
+               [ -3.9619839, 5.3041266 ],
+               [ -3.9619757, 5.3037882 ],
+               [ -3.9614038, 5.3038019 ],
+               [ -3.9614144, 5.3042381 ],
+               [ -3.9620167, 5.3042236 ]
+            ] ] ] }
+         }
+         ```
+
+- You may download features from OpenStreetMap (OSM) by clicking on
+  Fetch data from osm with FMTM project creation; however, note that
+  FMTM is not responsible for the data quality of features extracted
+  from OSM.
+- Currently, available types of survey features are Buildings and
+  Healthcare only. We plan to add more types of features moving ahead.
+- Project managers can also upload supporting map features. Note that
+  these secondary features can’t be surveyed but selected for respective
+  primary features.
 
 #### XLS Form Preparation
 
 - Be prepared with the XLS form for the project.
-- If updates are required to the form, you can edit the  
-  XLS form even after the project is created.
-- Note that a few fields in the beginning and end of  
-  the form will be injected to ask for some feature verification.
-- So project managers are requested to fill up the  
-  form through odk or download the form after the project  
-  is created to know about the field injected. You can also  
-  get the fields injected from our documentation  
-  [Here](https://docs.fmtm.dev/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form)
-
-Also read carefully the overview in the left section of
-each step to understand the details of the functionalities.
+- If updates are required to the form, you can edit the XLS form even
+  after the project is created.
+- Note that a few fields in the beginning and end of the form will be
+  injected to ask for some feature verification.
+- So project managers are requested to fill up the form through odk
+  or download the form after the project is created to know about the
+  field injected. You can also get the fields injected from our documentation
+  [here][2]
+- Also read carefully the overview in the left section of each step to
+  understand the details of the functionalities.
 
 #### Uploading Custom Imagery
 
-If you have custom imagery that you want to use as basemap
-during field mapping activity, then you have to add the  
-TMS link of that imagery during the first step of project creation.
+- If you have custom imagery that you want to use as basemap during field
+  mapping activity, then you have to add the TMS link of that imagery
+  during the first step of project creation.
 
-- Click on _I would like to include my own imagery layer  
-  for reference_ in the first step to add TMS URL. You can  
-  get the URL by uploading it in openaerialmap.
+- Click on _I would like to include my own imagery layer for reference_
+  in the first step to add TMS URL. You can get URL by uploading it in
+  openaerialmap.
 
 #### ODK Central Credentials
 
-To store your submissions in ODK Central, you need to  
-have valid ODK Central credentials. You can obtain these  
-by hosting your own ODK Central server. If you don’t have  
-access to a personal ODK Central server, you can use HOT’s  
-server by selecting HOT as your organization.
+- To store your submissions in ODK Central, you need to have valid
+  ODK Central credentials.
+- One option is to use your own organisations ODK server, if available.
+- Another is to request access to use HOT's ODK server, which is free
+  to use for public project creation.
 
-#### During Mapper Training
+## Steps To View Your Submissions and Infographics
+
+1. Go to the respective project. On the bottom left side,
+   you will see the view infographics button.
+2. Click on the button will lead you to the infographics page.
+   ![image](https://github.com/user-attachments/assets/6d48dd40-1be6-4063-9d1c-0276633c6d7a)
+
+3. On the right side there is an icon which will switch the layout to
+   table view, meaning you can see the submissions in table format.
+4. You can see the details of submission and also review the submission
+   and set the submission as accepted, rejected or has issues. Moreover,
+   you can also comment to the submission for mappers.
+   ![image](https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a)
+
+5. Users can also download the submission in Json or CSV format.
+6. The submission can also be uploaded to JOSM. For that, you should
+   have JOSM software installed in your device and should have your remote
+   control enabled.
+   ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
+
+### Mapper Training
+
+#### During Training
 
 1. Make sure mapper has downloaded custom odk collect from  
    FMTM website. You can also share the apk file if mappers
@@ -290,27 +316,7 @@ server by selecting HOT as your organization.
    ![odk_image](image.png)
 
 To get more info about project management in odk collect  
-follow the guide [Here](https://docs.getodk.org/collect-using/).
-
-## Steps To View Your Submissions and Infographics
-
-1. Go to the respective project. On the bottom left side,
-   you will see the view infographics button.
-2. Click on the button will lead you to the infographics page.
-   ![image](https://github.com/user-attachments/assets/6d48dd40-1be6-4063-9d1c-0276633c6d7a)
-
-3. On the right side there is an icon which will switch the layout to
-   table view, meaning you can see the submissions in table format.
-4. You can see the details of submission and also review the submission
-   and set the submission as accepted, rejected or has issues. Moreover,
-   you can also comment to the submission for mappers.
-   ![image](https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a)
-
-5. Users can also download the submission in Json or CSV format.
-6. The submission can also be uploaded to JOSM. For that, you should
-   have JOSM software installed in your device and should have your remote
-   control enabled.
-   ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
+follow the guide [Here][5].
 
 ### Connecting The Data To External Applications
 
@@ -365,6 +371,7 @@ the following resources:
 - Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][4]
 
 [1]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
-[2]: https://fmtm.hotosm.org/ "fmtm"
+[2]: https://docs.fmtm.dev/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form "injected fields"
 [3]: https://docs.fmtm.dev/faq "FAQs"
 [4]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
+[5]: https://docs.getodk.org/collect-using "Using Collect"
