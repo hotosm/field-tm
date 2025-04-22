@@ -57,7 +57,7 @@ async def process_inactive_users(
             async with db.cursor(row_factory=class_row(DbUser)) as cur:
                 await cur.execute(
                     """
-                    SELECT id, username, last_login_at
+                    SELECT sub, username, last_login_at
                     FROM users
                     WHERE last_login_at < %(warning_date)s
                     AND last_login_at >= %(next_warning_date)s;
@@ -85,7 +85,7 @@ async def process_inactive_users(
         async with db.cursor(row_factory=class_row(DbUser)) as cur:
             await cur.execute(
                 """
-                SELECT id, username
+                SELECT sub, username
                 FROM users
                 WHERE last_login_at < %(deletion_threshold)s;
                 """,
