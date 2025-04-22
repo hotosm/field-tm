@@ -139,7 +139,7 @@ async def unlock_old_locked_tasks(db, project_id):
     """Unlock tasks locked for more than 3 days."""
     unlock_query = """
         WITH svc_user AS (
-            SELECT id AS svc_user_sub, username AS svc_username
+            SELECT sub, username
             FROM users
             WHERE username = 'svcfmtm'
         ),
@@ -181,10 +181,10 @@ async def unlock_old_locked_tasks(db, project_id):
             fe.task_id,
             fe.project_id,
             'RESET'::taskevent,
-            svc.svc_user_sub,
+            svc.sub,
             'UNLOCKED_TO_MAP'::mappingstate,
             NOW(),
-            svc.svc_username
+            svc.username
         FROM filtered_events fe
         CROSS JOIN svc_user svc;
     """

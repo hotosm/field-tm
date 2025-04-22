@@ -68,36 +68,111 @@ coverage:
   docker compose run --rm --entrypoint='sh -c' api \
     'coverage run -m pytest && coverage report -m'
 
-# Load prod data into current database (WARNING: deletes local db data)
+# Copy prod data into current database (WARNING: deletes local db data)
 [no-cd]
-load-prod-data:
+init-prod-data:
   #!/usr/bin/env sh
-  cd {{justfile_directory()}}
+  # cd {{justfile_directory()}}
 
-  docker compose up --wait
-  # We cannot have electric using a logical replication slot though
-  docker compose down electric
+  # If ODK S3 vars not present, skip
+  just test _check-odk-s3-env-vars || exit 1
 
+  echo "Deleting local db data"
+  docker compose down -v
+  echo "Starting S3 and local databases only"
+  # Note cannot start electric as the logical replication slot cannot be used
+  docker compose up -d s3 fmtm-db central-db
+
+  # Set Minio aliases for connection (no creds needed for prod backup download currently)
+  docker compose exec --no-TTY s3 mc alias set fmtm-prod https://s3.fmtm.hotosm.org "" ""
+  docker compose exec --no-TTY s3 mc alias set local "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
+  docker compose exec --no-TTY s3 mc alias set odk-prod \
+    "$CENTRAL_BACKUP_S3_ENDPOINT" "$CENTRAL_BACKUP_S3_ACCESS_KEY" "$CENTRAL_BACKUP_S3_SECRET_KEY"
+  # We also need to create the fmtm-data bucket, as the migration service has not ran
+  docker compose exec --no-TTY s3 mc mb "local/${S3_BUCKET_NAME}" --ignore-existing
+  docker compose exec --no-TTY s3 mc anonymous set download "local/${S3_BUCKET_NAME}"
+
+  # Load database data
+  just test _load-prod-db-data fmtm-prod/fmtm-db-backups/fmtm fmtm-db ${FMTM_DB_NAME} ${FMTM_DB_USER} ${FMTM_DB_PASSWORD}
+  just test _load-prod-db-data odk-prod/odkbackup central-db ${CENTRAL_DB_NAME} ${CENTRAL_DB_USER} ${CENTRAL_DB_PASSWORD}
+
+  # Copy S3 data to local
+  just test _mirror-s3-bucket fmtm-prod/fmtm-data local/fmtm-data
+  # We skip the hotosm-odk-uploads as it could be large >10GB in prod
+  # just test _mirror-s3-bucket odk-prod/hotosm-odk-uploads local/fmtm-odk-media
+
+  just test _print-post-data-load-instructions
+
+[no-cd]
+[no-exit-message]
+_check-odk-s3-env-vars:
+  #!/usr/bin/env sh
+  just config _dotenv-check CENTRAL_BACKUP_S3_ENDPOINT || exit 1
+  just config _dotenv-check CENTRAL_BACKUP_S3_DB_BUCKET_NAME || exit 1
+  just config _dotenv-check CENTRAL_BACKUP_S3_BLOB_BUCKET_NAME || exit 1
+  just config _dotenv-check CENTRAL_BACKUP_S3_ACCESS_KEY || exit 1
+  just config _dotenv-check CENTRAL_BACKUP_S3_SECRET_KEY || exit 1
+
+[no-cd]
+_mirror-s3-bucket source target:
+  #!/usr/bin/env sh
+  docker compose exec --no-TTY s3 \
+    mc mirror --overwrite --summary {{ source }} {{ target }}
+
+  just _echo-blue "S3 mirroring from {{ source }} to {{ target }} done."
+
+[no-cd]
+_load-prod-db-data s3_root db_host db_name db_user db_pass:
+  #!/usr/bin/env sh
   # Get latest db dump filename
-  docker compose exec --no-TTY s3 mc alias set prod https://s3.fmtm.hotosm.org "" ""
-  latest_file=$(docker compose exec --no-TTY s3 mc ls prod/fmtm-db-backups/fmtm \
+  latest_file=$(docker compose exec --no-TTY s3 mc ls {{ s3_root }} \
     | awk '{print $NF}' | sort | tail -n 1)
   echo "Latest backup file: $latest_file"
 
   # Copy file to current machine
   docker compose exec --no-TTY s3 \
-    mc cp prod/fmtm-db-backups/fmtm/"$latest_file" /tmp/"$latest_file"
+    mc cp {{ s3_root }}/"$latest_file" /tmp/"$latest_file"
   docker compose cp s3:/tmp/"$latest_file" /tmp/"$latest_file"
 
-  echo "Dropping existing database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
-  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
-    dropdb --echo --if-exists --force -U ${FMTM_DB_USER}  ${FMTM_DB_NAME}
+  echo "Dropping existing database {{ db_name }} as user {{ db_user }}"
+  docker compose exec --no-TTY -e PGPASSWORD={{ db_pass }} {{ db_host }} \
+    dropdb --echo --if-exists --force -U {{ db_user }} {{ db_name }}
 
-  echo "Creating new database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
-  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
-    createdb --echo -U ${FMTM_DB_USER} -O ${FMTM_DB_USER} ${FMTM_DB_NAME}
+  echo "Creating new database {{ db_name }} as user {{ db_user }}"
+  docker compose exec --no-TTY -e PGPASSWORD={{ db_pass }} {{ db_host }} \
+    createdb --echo -U {{ db_user }} -O {{ db_user }} {{ db_name }}
 
-  echo "Loading data into database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
+  echo "Loading data into database {{ db_name }} as user {{ db_user }}"
   gunzip -c /tmp/"$latest_file" | \
-  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
-    pg_restore --verbose -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+  docker compose exec --no-TTY -e PGPASSWORD={{ db_pass }} {{ db_host }} \
+    pg_restore --verbose -U {{ db_user }} -d {{ db_name }}
+
+  just _echo-blue "Data load for {{ db_host }} done."
+
+[no-cd]
+_print-post-data-load-instructions:
+  #!/usr/bin/env sh
+  echo
+  just _echo-yellow " ############################################################################"
+  echo
+  echo " Data loading done!"
+  echo
+  just _echo-blue " Please update the 'ENCRYPTION_KEY' in '.env' to match production"
+  echo
+  echo " Then restart all services using:"
+  echo
+  just _echo-blue "     docker compose down"
+  just _echo-blue "     docker compose up -d"
+  echo
+  just _echo-yellow " ############################################################################"
+  echo
+
+# Run load test on backend API (e.g. just test load projects/62/minimal)
+[no-cd]
+load url_path:
+  docker run --rm -it  \
+
+# load url_path:
+#   docker compose \
+#     -f contrib/load_testing/compose.yaml \
+#     run --rm k6 run /load-test.js -e url_path={{ url_path }}

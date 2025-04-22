@@ -159,7 +159,7 @@ COPY scheduler/ /opt/scheduler/
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs \
     && chown -R appuser:appuser /opt /home/appuser \
-    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
+    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh /opt/scheduler/*.py
 # Add log volume for persistence
 VOLUME /opt/logs
 # Change to non-root user

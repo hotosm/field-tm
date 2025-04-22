@@ -16,6 +16,16 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Check if a dotenv variable is present
+[no-cd]
+[no-exit-message]
+_dotenv-check key:
+  #!/usr/bin/env sh
+  if [ -z "${{ key }}" ]; then
+      echo "Environment variable {{ key }} is not set."
+      exit 1
+  fi
+
 # Update a variable in the .env file
 [no-cd]
 dotenv-update key value:

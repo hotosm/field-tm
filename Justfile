@@ -92,3 +92,15 @@ mount-s3:
   else
       echo "Local FMTM S3 is already mounted"
   fi
+
+# Echo to terminal with blue colour
+[no-cd]
+_echo-blue text:
+  #!/usr/bin/env sh
+  printf "\033[0;34m%s\033[0m\n" "{{ text }}"
+
+# Echo to terminal with yellow colour
+[no-cd]
+_echo-yellow text:
+  #!/usr/bin/env sh
+  printf "\033[0;33m%s\033[0m\n" "{{ text }}"
