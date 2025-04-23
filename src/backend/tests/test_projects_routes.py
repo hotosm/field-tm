@@ -559,7 +559,7 @@ async def test_update_and_download_project_form(client, project):
         "app.central.central_deps.read_xlsform", return_value=xls_file
     ) and patch("app.central.central_crud.update_project_xform", return_value=None):
         response = await client.post(
-            f"projects/update-form?project_id={project.id}",
+            f"central/update-form?project_id={project.id}",
             data={"xform_id": "test-xform-id"},
             files={
                 "xlsform": (
@@ -576,7 +576,7 @@ async def test_update_and_download_project_form(client, project):
         )
 
         # Test downloading the updated XLSForm
-        response = await client.get(f"projects/download-form/{project.id}")
+        response = await client.get(f"central/download-form?project_id={project.id}")
 
         assert response.status_code == 200
         assert (
@@ -630,7 +630,7 @@ async def test_add_new_project_manager(client, project, new_mapper_user):
     )
 
 
-async def test_create_entity(client, db, odk_project, tasks):
+async def test_create_entity(client, db, project, tasks):
     """Test creating an entity and verifying task_id matching within task boundary."""
     # Sample GeoJSON with a point that would lie inside a task boundary
     geojson = {
@@ -638,7 +638,7 @@ async def test_create_entity(client, db, odk_project, tasks):
         "features": [
             {
                 "type": "Feature",
-                "properties": {"project_id": odk_project.id},
+                "properties": {"project_id": project.id},
                 "geometry": {"type": "Point", "coordinates": [85.30125, 27.7122]},
             }
         ],
@@ -646,7 +646,7 @@ async def test_create_entity(client, db, odk_project, tasks):
     project_task_index_list = [task.project_task_index for task in tasks]
 
     response = await client.post(
-        f"projects/{odk_project.id}/create-entity", json=geojson
+        f"central/entity?project_id={project.id}", json=geojson
     )
     assert response.status_code == 200
     data = response.json()

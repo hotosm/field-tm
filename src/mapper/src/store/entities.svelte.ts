@@ -170,7 +170,7 @@ function getEntitiesStatusStore() {
 
 	async function createEntity(projectId: number, payload: FeatureCollection) {
 		try {
-			const resp = await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/create-entity`, {
+			const resp = await fetch(`${import.meta.env.VITE_API_URL}/central/entity?project_id=${projectId}`, {
 				method: 'POST',
 				body: JSON.stringify(payload),
 				headers: {

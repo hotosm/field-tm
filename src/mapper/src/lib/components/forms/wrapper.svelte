@@ -30,7 +30,7 @@
 	let odkForm: any;
 	let startDate: string | undefined;
 
-	const formXmlPromise = fetchBlobUrl(`${API_URL}/projects/${projectId}/form-xml`);
+	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
 
 	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
 

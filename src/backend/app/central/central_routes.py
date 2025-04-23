@@ -17,15 +17,18 @@
 #
 """Routes to relay requests to ODK Central server."""
 
+import json
 from io import BytesIO
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response, StreamingResponse
+from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
+from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -34,6 +37,7 @@ from app.central import central_crud, central_deps
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
+from app.db.postgis_utils import add_required_geojson_properties
 from app.projects.project_schemas import ProjectUpdate
 
 router = APIRouter(
@@ -114,6 +118,64 @@ async def validate_form(
             status_code=HTTPStatus.OK,
             content={"message": "Your form is valid"},
         )
+
+
+@router.post("/update-form")
+async def update_project_form(
+    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    xform_id: str = Form(...),
+    # FIXME add back in capability to update osm_category
+    # osm_category: XLSFormType = Form(...),
+):
+    """Update the XForm data in ODK Central & FMTM DB."""
+    project = project_user_dict["project"]
+
+    # Update ODK Central form data
+    await central_crud.update_project_xform(
+        xform_id,
+        project.odkid,
+        xlsform,
+        project.odk_credentials,
+    )
+
+    sql = """
+        UPDATE projects
+        SET
+            xlsform_content = %(xls_data)s
+        WHERE
+            id = %(project_id)s
+        RETURNING id, hashtags;
+    """
+    async with db.cursor() as cur:
+        await cur.execute(
+            sql,
+            {
+                "xls_data": xlsform.getvalue(),
+                "project_id": project.id,
+            },
+        )
+        await db.commit()
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={"message": f"Successfully updated the form for project {project.id}"},
+    )
+
+
+@router.get("/download-form")
+async def download_form(
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+):
+    """Download the XLSForm for a project."""
+    project = project_user.get("project")
+
+    headers = {
+        "Content-Disposition": f"attachment; filename={project.id}_xlsform.xlsx",
+        "Content-Type": "application/media",
+    }
+    return Response(content=project.xlsform_content, headers=headers)
 
 
 @router.post("/refresh-appuser-token")
@@ -238,3 +300,99 @@ async def get_form_media(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
+
+
+@router.post("/entity")
+async def add_new_entity(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
+    geojson: FeatureCollection,
+):
+    """Create an Entity for the project in ODK.
+
+    NOTE a FeatureCollection must be uploaded.
+    """
+    try:
+        project = project_user_dict.get("project")
+        project_odk_id = project.odkid
+        project_odk_creds = project.odk_credentials
+
+        featcol_dict = geojson.model_dump()
+        features = featcol_dict.get("features")
+        if not features or not isinstance(features, list):
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail="Invalid GeoJSON format"
+            )
+
+        # Add required properties and extract entity data
+        featcol = add_required_geojson_properties(featcol_dict)
+        featcol["features"][0]["properties"]["project_id"] = project.id
+
+        # Get task_id of the feature if inside task boundary
+        async with db.cursor(row_factory=dict_row) as cur:
+            await cur.execute(
+                """
+                SELECT t.project_task_index AS task_id
+                FROM tasks t
+                WHERE t.project_id = %s
+                AND ST_Within(
+                    ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326),
+                    t.outline
+                )
+                LIMIT 1;
+                """,
+                (project.id, json.dumps(features[0].get("geometry"))),
+            )
+            result = await cur.fetchone()
+
+        task_id = ""
+        if result and (task_id := result.get("task_id")):
+            featcol["features"][0]["properties"]["task_id"] = task_id
+
+        entities_list = await central_crud.task_geojson_dict_to_entity_values(
+            {task_id: featcol}
+        )
+
+        if not entities_list:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail="No valid entities found"
+            )
+
+        # Create entity in ODK
+        return await central_crud.create_entity(
+            project_odk_creds,
+            project_odk_id,
+            properties=list(featcol["features"][0]["properties"].keys()),
+            entity=entities_list[0],
+            dataset_name="features",
+        )
+
+    except HTTPException as http_err:
+        log.error(f"HTTP error: {http_err.detail}")
+        raise
+    except Exception as e:
+        log.debug(e)
+        log.exception("Unexpected error during entity creation")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Entity creation failed",
+        ) from e
+
+
+@router.get("/form-xml")
+async def get_project_form_xml_route(
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+) -> str:
+    """Get the raw XML from ODK Central for a project."""
+    project = project_user.get("project")
+    odk_creds = project.odk_credentials
+    odkid = project.odkid
+    odk_form_id = project.odk_form_id
+    # Run separate thread in event loop to avoid blocking with sync code
+    form_xml = await run_in_threadpool(
+        central_crud.get_project_form_xml,
+        odk_creds,
+        odkid,
+        odk_form_id,
+    )
+    return Response(content=form_xml, media_type="application/xml")
