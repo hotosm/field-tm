@@ -940,6 +940,7 @@ async def add_new_entity(
         log.error(f"HTTP error: {http_err.detail}")
         raise
     except Exception as e:
+        log.debug(e)
         log.exception("Unexpected error during entity creation")
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
