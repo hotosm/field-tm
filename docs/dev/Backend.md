@@ -304,3 +304,189 @@ project creation. The QRCode should now work in ODK Collect.
 > The credentials for the local ODK Central instance are:
 > Username: <admin@hotosm.org>
 > Password: Password1234
+
+### Creating projects via the API
+
+FieldTM supports API Keys, meaning in theory an external system could be used
+to create projects and call API endpoints, using the key.
+
+#### 1. Create an API key
+
+- Log into FieldTM as you the user you wish to use.
+- The user must have organization manager permission for creating new projects.
+- Generate an API key by accessing the following endpoint in the same browser
+  you logged in as:
+
+  `/integrations/api-key`
+
+- Save the API key somewhere safe! The key can access all your data in FieldTM!
+- For any API call you make in the next section, ensure to set the `x-api-key`
+  header. See the example in the next section!
+
+#### 2. Create project metadata
+
+The metadata for a project must be created first.
+
+!!! note
+This step assumes you already have an organization and connected ODK
+Central server configured. See [here](../manuals/project-managers.md)
+
+- To create a project you will need the following:
+
+  - Project name, description, instructions.
+  - The ID of the organization you manage.
+    - Visit `/auth/me` while logged in to retrieve this.
+  - A GeoJSON of the area you wish to map.
+
+- See further details of the exact endpoint requirements
+  [here](https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json#/projects/create_project_projects_post)
+
+- Post the JSON data to the following endpoint: `/projects?org_id=xxx`
+
+  ```python
+  import os
+  import requests
+
+  FMTM_API_DOMAIN = os.getenv("FMTM_API_DOMAIN")
+  FMTM_API_KEY = os.getenv("FMTM_API_KEY")
+
+  response = requests.get(
+    f"{FMTM_API_DOMAIN}/auth/me",
+    headers={"x-api-key": FMTM_API_KEY},
+  )
+  org_id = response.json()["orgs_managed"][-1]
+
+  project_data = {
+    "name": "your new project",
+    "short_description": "short details here",
+    "description": "long details here",
+    "per_task_instructions": "user mapping instructions here",
+    "outline": {
+        "coordinates": [
+            [
+                [85.317028828, 27.7052522097],
+                [85.317028828, 27.7041424888],
+                [85.318844411, 27.7041424888],
+                [85.318844411, 27.7052522097],
+                [85.317028828, 27.7052522097],
+            ]
+        ],
+        "type": "Polygon",
+    },
+    "primary_geom_type": "POINT",
+    "new_geom_type": "POINT",
+    "task_split_type": "CHOOSE_AREA_AS_TASK",
+    "hashtags": ["hashtag1", "hashtag2"],
+    "visibility": "PRIVATE",
+  }
+
+  response = requests.post(
+    f"{FMTM_API_DOMAIN}/projects?org_id={org_id}",
+    headers={"x-api-key": FMTM_API_KEY},
+    json=project_data,
+  )
+
+  project_id = response.json().id
+  print(project_id)
+  ```
+
+- A successful POST will return a project_id, which you should save for
+  later steps.
+
+#### 3. Populate the tasks
+
+- Task splitting can be done via multiple APIs.
+  - By square: `/projects/split-by-square`.
+  - By splitting algorithm: `/projects/split-by-sql`.
+- For projects that require no task splitting, simply pass the AOI
+  as the task area: `/projects/xxx/upload-task-boundaries`
+
+  ```python
+  import json
+
+  task_geojson = json.dumps(
+    {
+      "coordinates": [
+          [
+              [85.317028828, 27.7052522097],
+              [85.317028828, 27.7041424888],
+              [85.318844411, 27.7041424888],
+              [85.318844411, 27.7052522097],
+              [85.317028828, 27.7052522097],
+          ]
+      ],
+      "type": "Polygon",
+    }
+  ).encode("utf-8")
+
+  task_geojson_file = {
+      "task_geojson": (
+          "file.geojson",
+          BytesIO(task_geojson).read(),
+      )
+  }
+
+  response = requests.post(
+      f"{FMTM_API_DOMAIN}/projects/{project_id}/upload-task-boundaries",
+      headers={"x-api-key": FMTM_API_KEY},
+      files=task_geojson_file,
+  )
+
+  print(response.json())
+  ```
+
+#### 4. Submit the data you wish to map (optional)
+
+```python
+from io import BytesIO
+
+with open("/path/to/your/data.geojson", "rb") as f:
+    data_extracts = BytesIO(json.dumps(json.load(f)))
+
+    data_extract_file = {
+        "data_extract_file": (
+            "file.geojson",
+            data_extracts.read(),
+        )
+    }
+
+response = requests.post(
+    f"{FMTM_API_DOMAIN}/projects/{project_id}/upload-data-extract",
+    headers={"x-api-key": FMTM_API_KEY},
+    files=data_extract_file,
+)
+
+print(response.json())
+```
+
+#### 5. Generate the final project data
+
+- For this step you need the XLSForm you wish to use for the survey.
+  - Validate the form via this
+    [link](https://api.fmtm.hotosm.org/docs#/projects/validate_form_projects_validate_form_post)
+    first.
+
+```python
+from io import BytesIO
+from pathlib import Path
+
+xlsform_file = Path("/path/to/your/form.xls")
+with open(xlsform_file, "rb") as xlsform_data:
+    xlsform_obj = BytesIO(xlsform_data.read())
+
+xform_file = {
+    "xlsform": (
+        "form.xls",
+        xlsform_obj,
+    )
+}
+response = requests.post(
+    f"{FMTM_API_DOMAIN}/projects/{project_id}/generate-project-data",
+    headers={"x-api-key": FMTM_API_KEY},
+    files=xform_file,
+)
+```
+
+You should have a project you can now access at:
+
+`https://the.field.tm.domain/projects/{project_id}`
