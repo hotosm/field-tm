@@ -27,7 +27,8 @@
 		"enable_geolocation_got_it": "Entendi!",
 		"exit_navigation": "Sair da navegação",
 		"click_on_a_task": "CLIQUE EM UMA TAREFA PARA SELECIONAR UM RECURSO PARA MAPEAR",
-		"click_on_the_map": "Clique no mapa para criar um novo ponto"
+		"click_on_the_map": "Clique no mapa para criar um novo ponto",
+		"geometry_correct_place": "A geometria está no local correto?"
 	},
 	"popup": {
 		"task": "Tarefa",
