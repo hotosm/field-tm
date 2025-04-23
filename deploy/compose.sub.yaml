@@ -101,6 +101,9 @@ services:
       # We need this to allow for client-side routing in the SPA (from index.html)
       ${FMTM_DOMAIN}_ERRORS: 404=/index.html
       mapper.${FMTM_DOMAIN}_ERRORS: 404=/index.html
+      mapper.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
+      mapper.${FMTM_DOMAIN}_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
       # CORS for the backend is configured by FastAPI
       api.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       api.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
