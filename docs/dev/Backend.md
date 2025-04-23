@@ -327,13 +327,15 @@ to create projects and call API endpoints, using the key.
 
 The metadata for a project must be created first.
 
+<!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 
-    !!! note
+  !!! note
         This step assumes you already have an organization and connected ODK
         Central server configured. See [here](../manuals/project-managers.md)
 
 <!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
 
 - To create a project you will need the following:
 
