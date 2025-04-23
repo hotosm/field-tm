@@ -50,7 +50,6 @@
 	};
 
 	let sidebarMenuItems = $derived(commonStore.config?.sidebarItemsOverride.length > 0 ? commonStore.config?.sidebarItemsOverride : defaultDrawerItems)
-	console.log(sidebarMenuItems)
 
 	onMount(() => {
 		// Handle locale change
