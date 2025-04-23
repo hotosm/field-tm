@@ -65,6 +65,6 @@ enable-webforms:
 # Merge in translations from weblate
 [no-cd]
 merge-translations:
-  git remote add weblate https://hosted.weblate.org/git/hotosm/fieldtm || true
+  git remote add weblate https://hosted.weblate.org/git/hotosm/fieldtm-mapper-ui || true
   git fetch weblate
   git merge weblate/development
