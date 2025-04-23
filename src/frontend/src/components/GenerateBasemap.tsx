@@ -227,19 +227,19 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
             <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-center sm:fmtm-justify-end fmtm-mr-4 fmtm-gap-4 fmtm-h-full">
               {/* Generate Button */}
               <div>
-                <CoreModules.LoadingButton
+                <CoreModules.Button
                   variant="contained"
                   loading={generateProjectTilesLoading}
                   color="error"
                   onClick={() => generateProjectTiles()}
                 >
                   Generate
-                </CoreModules.LoadingButton>
+                </CoreModules.Button>
               </div>
 
               {/* Refresh Button */}
               <div>
-                <CoreModules.LoadingButton
+                <CoreModules.Button
                   variant="outlined"
                   loading={generateProjectTilesLoading}
                   color="error"
@@ -248,7 +248,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
                   }}
                 >
                   Refresh
-                </CoreModules.LoadingButton>
+                </CoreModules.Button>
               </div>
             </div>
           </CoreModules.Grid>
