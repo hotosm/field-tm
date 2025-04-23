@@ -164,6 +164,10 @@ _print-post-data-load-instructions:
   just _echo-blue "     docker compose down"
   just _echo-blue "     docker compose up -d"
   echo
+  just _echo-yellow " **WARNING**: this will use production ODK!"
+  just _echo-yellow " If creating a new project, be sure to update the HOTOSM organisation"
+  just _echo-yellow " in the database to use the local ODK!"
+  echo
   just _echo-yellow " ############################################################################"
   echo
 
