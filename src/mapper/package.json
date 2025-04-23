@@ -15,7 +15,8 @@
 		"lint": "prettier --plugin prettier-plugin-svelte --check . && eslint .",
 		"format": "prettier --plugin prettier-plugin-svelte --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"cleanup": "pnpm dlx knip"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.0.0-beta.26",

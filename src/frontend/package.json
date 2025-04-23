@@ -15,7 +15,8 @@
     "test:e2e-debug": "playwright test --debug",
     "test:e2e-interactive": "playwright open http://fmtm.dev.test",
     "test:e2e-install-deps": "playwright install-deps",
-    "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx src"
+    "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx src",
+    "cleanup": "pnpm dlx knip"
   },
   "license": "(AGPL-3.0-only OR CC-BY-4.0)",
   "author": {
