@@ -837,7 +837,7 @@
 		<LayerSwitcher
 			{map}
 			styles={allBaseLayers}
-			sourcesIdToReAdd={['tasks', 'entities', 'geolocation']}
+			sourcesIdToReAdd={['tasks', 'entities', 'geolocation', 'tasks-centroid']}
 			selectedStyleName={selectedBaselayer}
 			{selectedStyleUrl}
 			setSelectedStyleUrl={(style) => (selectedStyleUrl = style)}
