@@ -25,6 +25,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.update_xlsform import append_mandatory_fields
 from osm_fieldwork.xlsforms import buildings, healthcare
+from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 
 
 async def test_merge_mandatory_fields():
@@ -47,12 +48,7 @@ async def test_merge_mandatory_fields():
 
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
-
-    # Check if translations were matched correctly
-    # FIXME enable once code fixed
-    # translation_found, label_field_found = check_translation_fields(workbook)
-    # assert not translation_found, "Translation fields should have been removed during merge."
-    # assert label_field_found, "The 'label' field should be present after merge."
+    check_translation_fields(workbook)
 
 
 async def test_add_extra_select_from_file():
@@ -81,9 +77,7 @@ async def test_buildings_xlsform():
     xform_convert(updated_form)
 
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
-    translation_found, label_field_found = check_translation_fields(workbook)
-    assert translation_found, "'label::english(en)' field not found in the survey sheet."
-    assert not label_field_found, "'label' field should not be present after merging translations."
+    check_translation_fields(workbook)
 
 
 async def test_healthcare_xlsform():
@@ -126,23 +120,26 @@ def check_form_title(workbook: Workbook) -> None:
 
 
 def check_translation_fields(workbook: Workbook):
-    """Check if translation fields were correctly matched."""
+    """Check if translation fields for all included languages were correctly matched."""
     survey_sheet = workbook["survey"]
-    translation_found = False
-    label_field_found = False
+    translation_found = {lang: False for lang in list(INCLUDED_LANGUAGES.keys())}
 
     # Iterate through the survey sheet columns and rows
     for row in survey_sheet.iter_rows(min_row=1, max_col=survey_sheet.max_column):
         for cell in row:
-            # Check if the English translation label exists
-            if cell.value == "label::english(en)":
-                translation_found = True
+            # Check if the label field matches a translation field for each language
+            for lang, code in INCLUDED_LANGUAGES.items():
+                lang_label = f"label::{lang}({code})"
+                if cell.value == lang_label:
+                    translation_found[lang] = True
 
             # Ensure that the base 'label' field is no longer present
             if cell.value == "label":
-                label_field_found = True
+                assert False, "The label field should be replaced by translated fields"
 
-    return translation_found, label_field_found
+    # Check that all translations for the languages are present
+    missing_translations = [lang for lang, found in translation_found.items() if not found]
+    assert not missing_translations
 
 
 def get_sheet(workbook: Workbook, sheet_name: str) -> worksheet.worksheet.Worksheet:

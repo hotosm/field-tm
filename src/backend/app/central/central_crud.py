@@ -282,6 +282,8 @@ async def append_fields_to_user_xlsform(
     form_name: str = "buildings",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
+    need_verification_fields: bool = True,
+    use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory FMTM fields to XLSForm")
@@ -290,6 +292,8 @@ async def append_fields_to_user_xlsform(
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        use_odk_collect=use_odk_collect,
     )
 
 

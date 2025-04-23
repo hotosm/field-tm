@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright (c) 2020, 2021, 2022, 2023, 2024 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of OSM-Fieldwork.
 #
@@ -25,69 +25,61 @@ capturing any issues with digitization, and adding additional notes or
 images if required. The fields include logic for relevance, mandatory
 requirements, and conditions based on user responses.
 
+NOTE the fields are omitted if need_verification_fields=False is
+NOTE passed to update_xlsform.
+
 Returns:
     pd.DataFrame: A DataFrame containing the digitization-related fields.
 """
 
 import pandas as pd
+from osm_fieldwork.form_components.translations import add_label_translations
 
 digitisation_fields = [
-    {
+    add_label_translations({
         "type": "begin group",
         "name": "verification",
-        "label::english(en)": "Verification",
-        "label::swahili(sw)": ["Uthibitishaji"],
-        "label::french(fr)": ["Vérification"],
-        "label::spanish(es)": ["Verificación"],
-        "label::nepali(ne)": "प्रमाणीकरण",
-        "label::portuguese(pt-BR)": "Verificação",
-        "relevant": "(${new_feature} != '') or (${building_exists} = 'yes')",
-    },
-    {
+        "relevant": "${feature_exists} = 'yes'",
+    }),
+    add_label_translations({
         "type": "select_one yes_no",
         "name": "digitisation_correct",
-        "label::english(en)": "Is the digitized location for this feature correct?",
-        "label::nepali(ne)": "के यो डिजिटाइज गरिएको स्थान सही छ?",
-        "label::portuguese(pt-BR)": "O local digitalizado para esse recurso está correto?",
-        "relevant": "(${new_feature} != '') or (${building_exists} = 'yes')",
-        "calculation": "once(if(${new_feature} != '', 'yes', ''))",
-        "read_only": "${new_feature} != ''",
         "required": "yes",
-    },
-    {
+    }),
+    add_label_translations({
         "type": "select_one digitisation_problem",
         "name": "digitisation_problem",
-        "label::english(en)": "What is wrong with the digitization?",
-        "label::nepali(en)": "डिजिटलाइजेशनमा के गल्ती छ?",
-        "label::portuguese(pt-BR)": "O que há de errado com a digitalização?",
         "relevant": "${digitisation_correct}='no'",
-    },
-    {
+    }),
+    add_label_translations({
         "type": "text",
         "name": "digitisation_problem_other",
-        "label::english(en)": "You said “Other.” Please tell us what went wrong with the digitization!",
-        "label::nepali(ne)": "तपाईंले 'अरू' भन्नुभयो। डिजिटलाइजेशनमा के गल्ती भयो! कृपया हामीलाई भन्न सक्नुहुन्छ?",
-        "label::portuguese(pt-BR)": "Você disse “Outro”. Diga-nos o que deu errado com a digitalização!",
         "relevant": "${digitisation_problem}='other' ",
-    },
+    }),
     {"type": "end group"},
-    {
-        "type": "image",
-        "name": "image",
-        "label::english(en)": "Take a Picture",
-        "label::nepali(ne)": "तस्विर लिनुहोस्",
-        "label::portuguese(pt-BR)": "Tire uma foto",
-        "apperance": "minimal",
-        "parameters": "max-pixels=1000",
-    },
-    {
+    add_label_translations({
         "type": "note",
         "name": "end_note",
-        "label::english(en)": "You can't proceed with data acquisition, if the building doesn't exist.",
-        "label::nepali(ne)": "यदि भवन अवस्थित छैन भने, तपाईं डाटा लिन अगाडि बढ्न सक्नुहुन्न।",
-        "label::portuguese(pt-BR)": "Não é possível prosseguir com a aquisição de dados se o edifício não existir.",
-        "relevant": "${building_exists} = 'no'",
-    },
+        "relevant": "${feature_exists} = 'no'",
+    }),
 ]
 
 digitisation_df = pd.DataFrame(digitisation_fields)
+
+
+digitisation_choices = [
+    add_label_translations({
+        "list_name": "digitisation_problem",
+        "name": "lumped",
+    }),
+    add_label_translations({
+        "list_name": "digitisation_problem",
+        "name": "split",
+    }),
+    add_label_translations({
+        "list_name": "digitisation_problem",
+        "name": "other",
+    }),
+]
+
+digitisation_choices_df = pd.DataFrame(digitisation_choices)

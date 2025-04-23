@@ -1,0 +1,17 @@
+{
+  "yes": "Sim",
+  "no": "Não",
+  "survey_questions": "Perguntas da pesquisa",
+  "image": "Tire uma foto",
+  "feature": "Geometria",
+  "new_feature": "Por favor, desenhe uma nova geometria",
+  "feature_exists": "Esse recurso existe?",
+  "verification": "Verificação",
+  "digitisation_correct": "O local digitalizado para esse recurso está correto?",
+  "digitisation_problem": "O que há de errado com a digitalização?",
+  "digitisation_problem_other": "Você disse “Outro”. Diga-nos o que deu errado com a digitalização!",
+  "end_note": "Não é possível prosseguir com a aquisição de dados se o edifício não existir.",
+  "lumped": "Agrupado - um polígono (mais de um edifício digitalizado como um só)",
+  "split": "Split - um edifício (um edifício digitalizado como mais de um polígono)",
+  "other": "OUTROS"
+}

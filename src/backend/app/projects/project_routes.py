@@ -1004,6 +1004,9 @@ async def generate_files(
     project_id = project.id
     new_geom_type = project.new_geom_type
 
+    # Project requirement if they need to use odk-collect
+    use_odk_collect = project.use_odk_collect
+
     log.debug(f"Generating additional files for project: {project.id}")
 
     form_name = f"FMTM_Project_{project.id}"
@@ -1017,11 +1020,14 @@ async def generate_files(
     )
     xlsform = xlsform_upload
 
+    project_contains_existing_feature = True if combined_features_count else False
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform,
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
+        need_verification_fields=project_contains_existing_feature,
+        use_odk_collect=use_odk_collect,
     )
     # Write XLS form content to db
     xlsform_bytes = project_xlsform.getvalue()
