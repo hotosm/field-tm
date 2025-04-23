@@ -64,7 +64,7 @@ If more details are required, check out the
     - [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
     - [Set Up Monitoring (Optional)](#set-up-monitoring-optional)
     - [Check Authentication (Optional)](#check-authentication-optional)
-    - [Configure Custom Branding](#configure-custom-branding-optional)
+    - [Configure Custom Branding](#configure-custom-branding)
 
 ### Clone the FMTM repository
 
@@ -251,26 +251,84 @@ Once you have deployed, you will need to check that you can properly authenticat
 4. If you see an error instead, double check your credentials and
    redirect URL in the openstreetmap.org settings.
 
-### Configure Custom Branding (Optional)
+### Frontend Customization (Optional)
 
-- It's possible to replace the HOTOSM logo and change the colour scheme for your
-  deployment.
-- By default the `config.json` configuration is:
+- It's possible to tailor the mapper portion of FieldTM to your needs (the main app
+  that users will see).
+- There is a `config.json` file that is used to dynamically modify the frontend
+  deployment:
 
   ```json
   {
     "logoUrl": "/favicon.svg",
     "logoText": "Humanitarian OpenStreetMap Team",
-    "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css"
+    "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css",
+    "enableWebforms": false,
+    "loginProviders": {
+      "osm": true,
+      "google": true
+    },
+    "sidebarItemsOverride": []
   }
   ```
 
-- To change the logo and styling, upload your logo and custom CSS file to a publicly
-  accessible URL (uploading to the bundle Minio S3 bucket is a good choice).
-- Then update the `config.json` values and upload this file to the location:
-  `https://s3.{YOUR_FIELDTM_DOMAIN}/fmtm-data/frontend/config.json`.
+- This is read from the bundled Minio S3 bucket called `fmtm-data`:
+  `https://s3.{YOUR_FIELDTM_DOMAIN}/fmtm-data/frontend/config.json`
+- Under the `fmtm-data/frontend` path you can modify the `config.json`,
+  and also upload things like CSS files and logos.
+
+### Configure Custom Branding
+
+- It's possible to replace the HOTOSM logo and change the colour scheme for your
+  deployment.
 - This file will be automatically picked up and used to style your application.
   By default, FieldTM will fallback to the bundled `config.json`.
+
+  ```json
+  {
+      ...
+      "logoUrl": "/favicon.svg",
+      "logoText": "Humanitarian OpenStreetMap Team",
+      "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css"
+  }
+  ```
+
+### Configure Custom Sidebar Elements
+
+- By default FieldTM has a few items in the sidebar, like a link to a support
+  page, and other resources.
+- These links can be overridden using the `sidebarItemsOverride` parameter in
+  the `config.json`, which expects format:
+
+  ```json
+  {
+      ...
+      "sidebarItemsOverride": [
+          {
+              "name": "Your Website",
+              "path": "https://yourwebsite.com"
+          },
+          {
+              "name": "Support",
+              "path": "https://docs.fmtm.dev/about/about/"
+          }
+      ]
+  }
+  ```
+
+### Enabled / Disable Auth Providers
+
+- We are continually adding new OAuth provider options.
+
+  ```json
+  {
+    ...
+      "loginProviders": {
+          "osm": true,
+          "google": true
+      }
+  }
+  ```
 
 That's it, you have successfully set up FieldTM!!
 

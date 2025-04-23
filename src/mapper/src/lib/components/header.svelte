@@ -14,7 +14,7 @@
 	import { m } from '$translations/messages.js';
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
-	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
+	import { defaultDrawerItems } from '$constants/drawerItems.ts';
 	import { revokeCookies } from '$lib/utils/login';
 	import { getAlertStore } from '$store/common.svelte';
 	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
@@ -49,11 +49,15 @@
 		setParaglideLocale(selectedItem.value); // paraglide function for UI changes (causes reload)
 	};
 
+	let sidebarMenuItems = $derived(commonStore.config?.sidebarItemsOverride.length > 0 ? commonStore.config?.sidebarItemsOverride : defaultDrawerItems)
+	console.log(sidebarMenuItems)
+
 	onMount(() => {
 		// Handle locale change
 		const container = document.querySelector('.locale-selection');
 		const dropdown = container?.querySelector('sl-dropdown');
 		dropdown?.addEventListener('sl-select', handleLocaleSelect);
+
 	});
 
 	onDestroy(() => {
@@ -178,12 +182,12 @@
 				</sl-menu>
 			</sl-dropdown>
 		</div>
-		{#each menuItems as menu}
+		{#each sidebarMenuItems as item}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href={menu.path}
-				class="menu-item">{menu.name}</a
+				href={item.path}
+				class="menu-item">{item.name}</a
 			>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
