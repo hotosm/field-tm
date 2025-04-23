@@ -543,54 +543,6 @@ async def task_split(
     return features
 
 
-@router.post("/validate-form")
-async def validate_form(
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    debug: bool = False,
-    use_odk_collect: bool = False,
-    need_verification_fields: bool = True,
-):
-    """Basic validity check for uploaded XLSForm.
-
-    Parses the form using ODK pyxform to check that it is valid.
-
-    If the `debug` param is used, the form is returned for inspection.
-    NOTE that this debug form has additional fields appended and should
-        not be used for FMTM project creation.
-
-    NOTE this provides a basic sanity check, some fields are omitted
-    so the form is not usable in production:
-        - additional_entities
-        - new_geom_type
-    """
-    if debug:
-        xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
-            xlsform,
-            need_verification_fields=need_verification_fields,
-            use_odk_collect=use_odk_collect,
-        )
-        return StreamingResponse(
-            updated_form,
-            media_type=(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            ),
-            headers={"Content-Disposition": f"attachment; filename={xform_id}.xlsx"},
-        )
-    else:
-        await central_crud.validate_and_update_user_xlsform(
-            xlsform,
-            need_verification_fields=need_verification_fields,
-            use_odk_collect=use_odk_collect,
-        )
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={"message": "Your form is valid"},
-        )
-
-
 @router.post("/preview-split-by-square", response_model=FeatureCollection)
 async def preview_split_by_square(
     # NOTE we do not set any roles on this endpoint yet
