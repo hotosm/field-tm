@@ -61,3 +61,10 @@ enable-webforms:
 
   # Upload updated config to S3
   docker exec "$CONTAINER" mc cp "$CONTAINER_CONFIG_PATH" s3/fmtm-data/frontend/config.json
+
+# Merge in translations from weblate
+[no-cd]
+merge-translations:
+  git remote add weblate https://hosted.weblate.org/git/hotosm/fieldtm || true
+  git fetch weblate
+  git merge weblate/development
