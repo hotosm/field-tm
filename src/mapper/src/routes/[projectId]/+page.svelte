@@ -301,7 +301,7 @@
 	{#if newFeatureGeom}
 		<div class="proceed-dialog">
 			<div class="proceed-dialog-content">
-				<p>Is the geometry in the correct place?</p>
+				<p>{m['map.geometry_correct_place']()}</p>
 				<div class="buttons">
 					<sl-button
 						onclick={() => {
