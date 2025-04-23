@@ -31,7 +31,7 @@ import geojson
 from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
-from osm_fieldwork.update_xlsform import append_mandatory_fields
+from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import Connection
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
@@ -287,7 +287,7 @@ async def append_fields_to_user_xlsform(
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory FMTM fields to XLSForm")
-    return await append_mandatory_fields(
+    return await append_field_mapping_fields(
         xlsform,
         form_name=form_name,
         additional_entities=additional_entities,
@@ -302,6 +302,8 @@ async def validate_and_update_user_xlsform(
     form_name: str = "buildings",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
+    need_verification_fields: bool = True,
+    use_odk_collect: bool = False,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
@@ -309,6 +311,8 @@ async def validate_and_update_user_xlsform(
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        use_odk_collect=use_odk_collect,
     )
 
     # Validate and return the form
