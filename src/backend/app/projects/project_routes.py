@@ -550,6 +550,8 @@ async def validate_form(
     current_user: Annotated[AuthUser, Depends(login_required)],
     xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     debug: bool = False,
+    use_odk_collect: bool = False,
+    need_verification_fields: bool = True,
 ):
     """Basic validity check for uploaded XLSForm.
 
@@ -567,6 +569,8 @@ async def validate_form(
     if debug:
         xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
             xlsform,
+            need_verification_fields=need_verification_fields,
+            use_odk_collect=use_odk_collect,
         )
         return StreamingResponse(
             updated_form,
@@ -578,6 +582,8 @@ async def validate_form(
     else:
         await central_crud.validate_and_update_user_xlsform(
             xlsform,
+            need_verification_fields=need_verification_fields,
+            use_odk_collect=use_odk_collect,
         )
         return JSONResponse(
             status_code=HTTPStatus.OK,
@@ -1006,11 +1012,13 @@ async def generate_files(
     new_geom_type = project.new_geom_type
 
     # Project requirement if they need to use odk-collect
-    use_odk_collect = project.use_odk_collect
+    use_odk_collect = project.use_odk_collect or False
 
     log.debug(f"Generating additional files for project: {project.id}")
 
     form_name = f"FMTM_Project_{project.id}"
+
+    project_contains_existing_feature = True if combined_features_count else False
 
     # Validate uploaded form
     await central_crud.validate_and_update_user_xlsform(
@@ -1018,12 +1026,13 @@ async def generate_files(
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
+        # If we are only mapping new features, then verification is irrelevant
+        need_verification_fields=project_contains_existing_feature,
+        use_odk_collect=use_odk_collect,
     )
-    xlsform = xlsform_upload
 
-    project_contains_existing_feature = True if combined_features_count else False
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-        xlsform=xlsform,
+        xlsform=xlsform_upload,
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,

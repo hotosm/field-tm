@@ -127,23 +127,6 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
     return xlsform
 
 
-def create_survey_group(need_verification: bool=False) -> dict[str, pd.DataFrame]:
-    """Helper function to create a begin and end group for XLSForm."""
-    begin_group = pd.DataFrame(
-        add_label_translations({
-            "type": ["begin group"],
-            "name": ["survey_questions"],
-            "relevant": "${feature_exists} = 'yes'" if need_verification else "",
-        })
-    )
-    end_group = pd.DataFrame(
-        {
-            "type": ["end group"],
-        }
-    )
-    return {"begin": begin_group, "end": end_group}
-
-
 def normalize_with_meta(row, meta_df):
     """Replace metadata in user_question_df with metadata from meta_df of mandatory fields if exists."""
     matching_meta = meta_df[meta_df["type"] == row[TYPE_COLUMN]]
@@ -158,7 +141,7 @@ def merge_dataframes(
         user_question_df: pd.DataFrame, 
         digitisation_df: Optional[pd.DataFrame] = None,
         photo_collection_df: Optional[pd.DataFrame] = None,
-        need_verification: Optional[bool] = None
+        need_verification: Optional[bool] = True,
     ) -> pd.DataFrame:
     """
     Merge multiple Pandas dataframes together, removing duplicate fields.
@@ -168,7 +151,7 @@ def merge_dataframes(
         user_question_df: DataFrame containing user-specified questions
         digitisation_df: Optional DataFrame with digitisation fields
         photo_collection_df: Optional DataFrame with photo collection fields
-        meta_df: Optional metadata DataFrame used for normalization
+        need_verification: Include geom verifiction questions
     
     Returns:
         pd.DataFrame: Merged DataFrame with duplicates removed
@@ -205,9 +188,35 @@ def merge_dataframes(
         (~user_question_df[NAME_COLUMN].isin(duplicate_fields)) | is_end_group
     ]
     
-    survey_group = create_survey_group() if need_verification else create_survey_group(need_verification=False)
+    # We wrap the survey question in a group to easily disable all questions if the
+    # feature does not exist. If we don't have the `feature_exists` question, then
+    # wrapping in the group is unnecessary (all groups are flattened in processing anyway)
+    print("")
+    print("")
+    print("")
+    print(need_verification)
+    print("")
+    print("")
+
+    if need_verification:
+        survey_group = {
+            "begin": (
+                pd.DataFrame(
+                    add_label_translations({
+                        "type": ["begin group"],
+                        "name": ["survey_questions"],
+                        "relevant": "${feature_exists} = 'yes'",
+                    })
+                )
+            ),
+            "end": pd.DataFrame({"type": ["end group"]}
+        )}
+
+    else:
+        # Do not include the survey group wrapper (empty dataframes)
+        survey_group = {"begin": pd.DataFrame(), "end": pd.DataFrame()}
+
     
-    # Create and combine all frames
     frames = [
         mandatory_df,
         survey_group["begin"],
@@ -260,7 +269,7 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
     return pd.concat([top_df, additional_row, coordinates_row, bottom_df], ignore_index=True)
 
 
-async def append_mandatory_fields(
+async def append_field_mapping_fields(
     custom_form: BytesIO,
     form_name: str = f"fmtm_{uuid4()}",
     additional_entities: list[str] = None,
@@ -277,8 +286,10 @@ async def append_mandatory_fields(
             reference additional Entity lists (sets of geometries). Defaults to None.
         new_geom_type (DbGeomType): The type of geometry required when collecting
             new geometry data: point, line, polygon. Defaults to DbGeomType.POINT.
-        need_verification_fields (bool): Whether to include verification fields. Defaults to True.
-        use_odk_collect (bool): Whether to use ODK Collect-specific components. Defaults to False.
+        need_verification_fields (bool): Whether to include verification fields.
+            Defaults to True.
+        use_odk_collect (bool): Whether to use ODK Collect-specific components.
+            Defaults to False.
 
     Returns:
         tuple[str, BytesIO]: The xFormId and the updated XLSForm wrapped in BytesIO.
@@ -305,6 +316,7 @@ async def append_mandatory_fields(
         form_components["survey_df"],
         form_components["digitisation_df"] if need_verification_fields else None,
         form_components["photo_collection_df"],
+        need_verification=need_verification_fields,
     )
     
     # Process choices sheet
@@ -364,6 +376,7 @@ def _process_survey_sheet(
         survey_df: pd.DataFrame, 
         digitisation_df: pd.DataFrame,
         photo_collection_df: pd.DataFrame,
+        need_verification: Optional[bool] = True,
     ) -> pd.DataFrame:
     """Process and merge survey sheets."""
     log.debug("Merging survey sheet XLSForm data")
@@ -371,7 +384,8 @@ def _process_survey_sheet(
         survey_df,
         existing_survey,
         digitisation_df=digitisation_df,
-        photo_collection_df=photo_collection_df
+        photo_collection_df=photo_collection_df,
+        need_verification=need_verification,
     )
 
 
@@ -516,7 +530,7 @@ async def main():
     with open(input_file, "rb") as file_handle:
         input_xlsform = BytesIO(file_handle.read())
 
-    form_id, form_bytes = await append_mandatory_fields(
+    form_id, form_bytes = await append_field_mapping_fields(
         custom_form=input_xlsform,
         form_name=f"fmtm_{uuid4()}",
         additional_entities=args.additional_dataset_names,
