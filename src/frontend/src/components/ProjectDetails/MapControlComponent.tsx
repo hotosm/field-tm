@@ -32,11 +32,6 @@ const btnList = [
     title: 'Zoom Out',
   },
   {
-    id: 'currentLocation',
-    icon: <AssetModules.MyLocationIcon className="!fmtm-text-[1rem]" />,
-    title: 'My Location',
-  },
-  {
     id: 'taskBoundries',
     icon: <AssetModules.CropFreeIcon className="!fmtm-text-[1rem]" />,
     title: 'Zoom to Project',
@@ -44,19 +39,12 @@ const btnList = [
 ];
 
 const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlComponentType) => {
-  const dispatch = useAppDispatch();
-  const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
-  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
-
   const handleOnClick = (btnId) => {
     const actualZoom = map.getView().getZoom();
     if (btnId === 'add') {
       map.getView().setZoom(actualZoom + 1);
     } else if (btnId === 'minus') {
       map.getView().setZoom(actualZoom - 1);
-    } else if (btnId === 'currentLocation') {
-      setToggleCurrentLoc(!toggleCurrentLoc);
-      dispatch(ProjectActions.ToggleGeolocationStatus(!geolocationStatus));
     } else if (btnId === 'taskBoundries') {
       const layers = map.getAllLayers();
       let extent;
@@ -80,9 +68,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlCom
       {btnList.map((btn) => (
         <Tooltip title={btn.title} placement="left" arrow key={btn.title}>
           <div
-            className={`fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-6 fmtm-h-6 fmtm-min-h-6 fmtm-min-w-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-t fmtm-border-blue-light ${
-              geolocationStatus && btn.id === 'currentLocation' ? 'fmtm-text-primaryRed' : ''
-            }`}
+            className="fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-6 fmtm-h-6 fmtm-min-h-6 fmtm-min-w-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-t fmtm-border-blue-light"
             onClick={() => handleOnClick(btn.id)}
           >
             {btn.icon}
