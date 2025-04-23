@@ -1,0 +1,17 @@
+{
+  "yes": "Ndiyo",
+  "no": "Hapana",
+  "survey_questions": "Maswali ya utafiti",
+  "image": "Piga picha",
+  "feature": "Jiometri",
+  "new_feature": "Tafadhali chora jiometri mpya",
+  "feature_exists": "Je, kipengele hiki kipo?",
+  "verification": "Uhakiki",
+  "digitisation_correct": "Je, eneo lililodigitalishwa kwa kipengele hiki ni sahihi?",
+  "digitisation_problem": "Ni nini kibaya na uakisi wa kidijitali?",
+  "digitisation_problem_other": "Umesema 'Nyingine'. Tafadhali tuambie ni nini kilikwenda vibaya katika uakisi wa kidijitali!",
+  "end_note": "Huwezi kuendelea na ukusanyaji wa data ikiwa jengo halipo.",
+  "lumped": "Imeunganishwa - poligoni moja (majengo mengi yameakisiwa kama moja)",
+  "split": "Imetenganishwa - jengo moja (jengo moja limeakisiwa kama poligoni nyingi)",
+  "other": "NYINGINE"
+}

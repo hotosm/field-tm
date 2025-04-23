@@ -541,7 +541,11 @@ async def generate_project_files(
             )
         return True
     except Exception as e:
-        log.error(f"Error generating project files for project {project_id}: {e}")
+        log.debug(str(format_exc()))
+        log.exception(
+            f"Error generating project files for project {project_id}: {e}",
+            stack_info=True,
+        )
         return False
 
 

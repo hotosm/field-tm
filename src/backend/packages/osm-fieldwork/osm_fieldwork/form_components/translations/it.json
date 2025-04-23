@@ -1,0 +1,17 @@
+{
+  "yes": "Sì",
+  "no": "No",
+  "survey_questions": "Domande del sondaggio",
+  "image": "Scatta una foto",
+  "feature": "Geometria",
+  "new_feature": "Si prega di disegnare una nuova geometria",
+  "feature_exists": "Questa caratteristica esiste?",
+  "verification": "Verifica",
+  "digitisation_correct": "La posizione digitalizzata di questa caratteristica è corretta?",
+  "digitisation_problem": "Qual è il problema con la digitalizzazione?",
+  "digitisation_problem_other": "Hai indicato 'Altro'. Per favore, dicci cosa è andato storto con la digitalizzazione!",
+  "end_note": "Non puoi procedere con la raccolta dei dati se l'edificio non esiste.",
+  "lumped": "Raggruppato - un poligono (più edifici digitalizzati come uno solo)",
+  "split": "Diviso - un edificio (un edificio digitalizzato come più poligoni)",
+  "other": "ALTRO"
+}
