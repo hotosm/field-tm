@@ -630,8 +630,10 @@ async def test_add_new_project_manager(client, project, new_mapper_user):
     )
 
 
-async def test_create_entity(client, db, project, tasks):
+async def test_create_entity(client, db, project, odk_project, tasks):
     """Test creating an entity and verifying task_id matching within task boundary."""
+    # NOTE here we need odk_project fixture to ensure the project exists
+
     # Sample GeoJSON with a point that would lie inside a task boundary
     geojson = {
         "type": "FeatureCollection",
