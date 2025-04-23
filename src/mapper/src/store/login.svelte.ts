@@ -1,5 +1,5 @@
 type authDetailsType = {
-	id: number;
+	sub: number;
 	username: string;
 	email_address?: string;
 	picture: string;

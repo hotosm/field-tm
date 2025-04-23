@@ -4,6 +4,7 @@
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { ProjectData } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getLoginStore } from '$store/login.svelte';
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
@@ -13,11 +14,16 @@
 		clickMapNewFeature: () => void;
 	};
 
-	const taskStore = getTaskStore();
 	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, clickMapNewFeature }: Props = $props();
+
+	const taskStore = getTaskStore();
+	const loginStore = getLoginStore();
+	
+	const authDetails = $derived(loginStore.getAuthDetails)
+	const selectedTask = $derived(taskStore.selectedTask)
 </script>
 
-{#if taskStore.selectedTaskId && selectedTab === 'map' && isTaskActionModalOpen && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}
+{#if taskStore.selectedTaskId && selectedTab === 'map' && isTaskActionModalOpen && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING' || (taskStore.selectedTaskState === 'UNLOCKED_TO_VALIDATE' && authDetails && selectedTask?.actioned_by_uid === authDetails?.sub))}
 	<div class="dialog-task-actions">
 		<div class="content">
 			<div class="icon">
@@ -55,47 +61,89 @@
 				</div>
 			</div>
 
-			{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
-				<p class="unlock-selected">{m['popup.start_mapping_task']({taskId: taskStore.selectedTaskIndex})}</p>
-				<div class="unlock-actions">
-					<sl-button
-						size="small"
-						variant="default"
-						class="secondary"
-						onclick={() => toggleTaskActionModal(false)}
-						outline
-						onkeydown={(e: KeyboardEvent) => {
-							if (e.key === 'Enter') {
-								toggleTaskActionModal(false);
-							}
-						}}
-						role="button"
-						tabindex="0"
-					>
-						<span>{m['popup.cancel']()}</span>
-					</sl-button>
-					<sl-button
-						variant="primary"
-						size="small"
-						onclick={() => {
-							if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
-						}}
-						onkeydown={(e: KeyboardEvent) => {
-							if (e.key === 'Enter') {
+				{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
+					<p class="unlock-selected">{m['popup.start_mapping_task']({taskId: taskStore.selectedTaskIndex})}</p>
+					<div class="unlock-actions">
+						<sl-button
+							size="small"
+							variant="default"
+							class="secondary"
+							onclick={() => toggleTaskActionModal(false)}
+							outline
+							onkeydown={(e: KeyboardEvent) => {
+								if (e.key === 'Enter') {
+									toggleTaskActionModal(false);
+								}
+							}}
+							role="button"
+							tabindex="0"
+						>
+							<span>{m['popup.cancel']()}</span>
+						</sl-button>
+						<sl-button
+							variant="primary"
+							size="small"
+							onclick={() => {
 								if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
-							}
-						}}
-						role="button"
-						tabindex="0"
-					>
-						<hot-icon slot="prefix" name="location"
-						></hot-icon>
-						<span>{m['popup.start_mapping']()}</span>
-					</sl-button>
-				</div>
-			{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
-				<p class="lock-selected">{m['dialog_task_actions.task']()} #{taskStore.selectedTaskIndex} {m['dialog_task_actions.locked_is_complete']()} </p>
-				<div class="lock-actions">
+							}}
+							onkeydown={(e: KeyboardEvent) => {
+								if (e.key === 'Enter') {
+									if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
+								}
+							}}
+							role="button"
+							tabindex="0"
+						>
+							<hot-icon slot="prefix" name="location"
+							></hot-icon>
+							<span>{m['popup.start_mapping']()}</span>
+						</sl-button>
+					</div>
+				{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
+					<p class="lock-selected">{m['dialog_task_actions.task']()} #{taskStore.selectedTaskIndex} {m['dialog_task_actions.locked_is_complete']()} </p>
+					<div class="lock-actions">
+						<sl-button
+							onclick={() => {
+								if (taskStore.selectedTaskId) resetTask(projectData?.id, taskStore.selectedTaskId);
+							}}
+							variant="default"
+							outline
+							size="small"
+							class="secondary"
+							onkeydown={(e: KeyboardEvent) => {
+								if (e.key === 'Enter') {
+									if (taskStore.selectedTaskId) resetTask(projectData?.id, taskStore.selectedTaskId);
+								}
+							}}
+							role="button"
+							tabindex="0"
+						>
+							<hot-icon
+								slot="prefix"
+								name="close"
+							></hot-icon>
+							<span>{m['popup.cancel_mapping']()}</span>
+						</sl-button>
+						<sl-button
+							onclick={() => {
+								if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
+							}}
+							variant="default"
+							size="small"
+							class="green"
+							onkeydown={(e: KeyboardEvent) => {
+								if (e.key === 'Enter') {
+									if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
+								}
+							}}
+							role="button"
+							tabindex="0"
+						>
+							<hot-icon slot="prefix" name="check"></hot-icon>
+							<span>{m['dialog_task_actions.complete_mapping']()}</span>
+						</sl-button>
+					</div>
+				{:else if taskStore.selectedTaskState === 'UNLOCKED_TO_VALIDATE'}
 					<sl-button
 						onclick={() => {
 							if (taskStore.selectedTaskId) resetTask(projectData?.id, taskStore.selectedTaskId);
@@ -118,26 +166,7 @@
 						></hot-icon>
 						<span>{m['popup.cancel_mapping']()}</span>
 					</sl-button>
-					<sl-button
-						onclick={() => {
-							if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
-						}}
-						variant="default"
-						size="small"
-						class="green"
-						onkeydown={(e: KeyboardEvent) => {
-							if (e.key === 'Enter') {
-								if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
-							}
-						}}
-						role="button"
-						tabindex="0"
-					>
-						<hot-icon slot="prefix" name="check"></hot-icon>
-						<span>{m['dialog_task_actions.complete_mapping']()}</span>
-					</sl-button>
-				</div>
-			{/if}
+				{/if}
 		</div>
 	</div>
 {/if}

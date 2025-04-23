@@ -1497,6 +1497,24 @@ class DbProject(BaseModel):
         # Simpler query without additional metadata
         if minimal:
             sql = """
+                WITH latest_status_per_task AS (
+                    SELECT DISTINCT ON (task_id)
+                        th.task_id,
+                        th.event,
+                        th.state,
+                        th.created_at,
+                        th.user_sub,
+                        u.username AS username
+                    FROM
+                        task_events th
+                    LEFT JOIN
+                        users u ON u.sub = th.user_sub
+                    WHERE
+                        th.event != 'COMMENT'
+                    ORDER BY
+                        th.task_id, th.created_at DESC
+                )
+
                 SELECT
                     p.*,
                     project_org.name AS organisation_name,
@@ -1509,7 +1527,12 @@ class DbProject(BaseModel):
                                 'project_id', t.project_id,
                                 'project_task_index', t.project_task_index,
                                 'outline', ST_AsGeoJSON(t.outline)::jsonb,
-                                'feature_count', t.feature_count
+                                'task_state', COALESCE(
+                                    latest_status_per_task.state,
+                                    'UNLOCKED_TO_MAP'
+                                ),
+                                'actioned_by_uid', latest_status_per_task.user_sub,
+                                'actioned_by_username', latest_status_per_task.username
                             )
                         ) FILTER (WHERE t.id IS NOT NULL), '[]'::json
                     ) AS tasks
@@ -1519,14 +1542,15 @@ class DbProject(BaseModel):
                     tasks t ON t.project_id = %(project_id)s
                 LEFT JOIN
                     organisations project_org ON p.organisation_id = project_org.id
+                LEFT JOIN
+                    latest_status_per_task ON latest_status_per_task.task_id = t.id
                 WHERE
                     p.id = %(project_id)s AND (
-                        t.project_id = %(project_id)s
-                            -- Also required to return a project with if tasks
-                            OR t.project_id IS NULL
+                        t.project_id = %(project_id)s OR t.project_id IS NULL
                     )
-                GROUP BY p.id, project_org.name;
-            """
+                GROUP BY
+                    p.id, project_org.name;
+        """
 
         # Full query with all additional calculated fields
         else:
