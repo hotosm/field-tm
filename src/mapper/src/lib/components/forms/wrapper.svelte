@@ -8,8 +8,6 @@
 
 	import type { Action } from 'svelte/action';
 
-	const CUSTOM_UPLOAD_ELEMENT_ID = '95c6807c-82b4-4208-b5df-5a3e795227b0';
-
 	const API_URL = import.meta.env.VITE_API_URL;
 	type Props = {
 		display: Boolean;
@@ -32,56 +30,21 @@
 	let odkForm: any;
 	let startDate: string | undefined;
 
-	let pic: any;
-
 	const formXmlPromise = fetchBlobUrl(`${API_URL}/projects/${projectId}/form-xml`);
 
 	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
-	function handleMutation(iframe: HTMLIFrameElement) {
-		if (!iframe.contentDocument) return;
-		if (!odkForm) return;
-		if (!webFormsRef) return;
-
-		// check if we've already added the custom upload input
-		if (iframe.contentDocument.getElementById(CUSTOM_UPLOAD_ELEMENT_ID)) return;
-
-		const uploadControl = odkForm.getChildren().find((n: any) => n.constructor.name === 'UploadControl');
-		const uploadControlNode = webFormsRef.querySelector(`[id='${uploadControl.nodeId}_container']`);
-		if (!uploadControlNode) return;
-
-		const controlText = iframe.contentDocument.createElement('div');
-		controlText.id = CUSTOM_UPLOAD_ELEMENT_ID;
-		controlText.className = 'control-text';
-		controlText.style.marginBottom = '.75rem';
-
-		const label = iframe.contentDocument.createElement('label');
-		label.style.fontWeight = '400';
-		label.style.lineHeight = '1.8rem';
-		const span = iframe.contentDocument.createElement('span');
-		span.textContent = uploadControl.engineState.label.chunks.map((chunk: any) => chunk.asString).join(' ');
-		label.appendChild(span);
-		controlText.appendChild(label);
-		const inputWrapper = iframe.contentDocument.createElement('div');
-		const input = iframe.contentDocument.createElement('input');
-		input.id = CUSTOM_UPLOAD_ELEMENT_ID;
-		input.addEventListener('change', () => {
-			pic = input.files?.[0];
-		});
-		input.type = 'file';
-		inputWrapper.appendChild(input);
-
-		uploadControlNode.innerHTML = '';
-		uploadControlNode.appendChild(controlText);
-		uploadControlNode.appendChild(inputWrapper);
-	}
 	function handleSubmit(payload: any) {
 		(async () => {
 			if (!payload.detail) return;
 
-			let submission_xml = await payload.detail[0].data.instanceFile.text();
+			const { instanceFile, attachments = [] } = await payload.detail[0].data[0];
+			let submission_xml = await instanceFile.text();
+
+			// missing start, end, today, phonenumber, deviceid, username, email, instruction
+			// included xid, xlocation, task_id, status,image number
 
 			// entity id isn't included in the payload by default because we marked it as not relevant earlier
 			// (in order to hide it from the user's display)
@@ -99,10 +62,6 @@
 				submission_xml = submission_xml.replace('<email/>', `<email>${authDetails?.email_address}</email>`);
 			}
 
-			if (pic && pic?.name) {
-				submission_xml = submission_xml.replace('<image/>', `<image>${pic?.name}</image>`);
-			}
-
 			if (entitiesStore.userLocationCoord) {
 				const [longitude, latitude] = entitiesStore.userLocationCoord as [number, number];
 				// add 0.0 for altitude and 10.0 for accuracy as defaults
@@ -112,9 +71,9 @@
 			const url = `${API_URL}/submission?project_id=${projectId}`;
 			var data = new FormData();
 			data.append('submission_xml', submission_xml);
-			if (pic && pic?.name) {
-				data.append('submission_files', pic);
-			}
+			attachments.forEach((attachment: File) => {
+				data.append('submission_files', attachment);
+			});
 			// Submit the XML + any submission media
 			await fetch(url, {
 				method: 'POST',
@@ -135,8 +94,13 @@
 	function handleOdkForm(evt: any) {
 		if (evt?.detail?.[0]) {
 			odkForm = evt.detail[0];
+
 			// over-write default language
-			setFormLanguage(commonStore.locale);
+			const target = `(${commonStore.locale.toLowerCase()})`;
+			const lang = odkForm.languages.find((it: any) => it?.language.toLowerCase().includes(target));
+			if (lang) {
+				odkForm?.setLanguage(lang);
+			}
 
 			const nodes = odkForm.getChildren();
 
@@ -163,15 +127,7 @@
 			}
 		}
 	}
-	const setFormLanguage = (newLocale: string) => {
-		if (odkForm) {
-			const target = `(${newLocale.toLowerCase()})`;
-			const match = odkForm.languages.find((it: any) => it?.language.toLowerCase().includes(target));
-			if (match) {
-				odkForm?.setLanguage(match);
-			}
-		}
-	};
+
 	$effect(() => {
 		// making sure we re-run whenever one of the following reactive variables changes
 		display;
@@ -181,32 +137,24 @@
 			startDate = new Date().toISOString();
 		}
 	});
-	$effect(() => {
-		if (commonStore.locale) {
-			setFormLanguage(commonStore.locale);
-		}
-	});
 
 	const handleIframe: Action = (node) => {
 		$effect(() => {
 			const iframe = node as unknown as HTMLIFrameElement;
 
 			// we want to rerun this $effect function whenever a new iframe is rendered
-			const observer = new MutationObserver(() => handleMutation(iframe));
 			const intervalId = setInterval(() => {
 				webFormsRef = iframe?.contentDocument?.querySelector('odk-web-form') || undefined;
 				if (webFormsRef) {
 					clearInterval(intervalId);
 					webFormsRef.addEventListener('submit', handleSubmit);
 					webFormsRef.addEventListener('odkForm', handleOdkForm);
-					observer.observe(webFormsRef, { attributes: true, childList: true, subtree: true });
 				}
 			}, 10);
 
 			// clear interval when re-run
 			return () => {
 				clearInterval(intervalId);
-				observer.disconnect();
 			};
 		});
 	};
@@ -236,13 +184,15 @@
 				{#await formXmlPromise then formXml}
 					{#await formMediaPromise then formMedia}
 						{#key entityId}
-							<iframe
-								class="iframe"
-								style:height="100%"
-								use:handleIframe
-								title="odk-web-forms-wrapper"
-								src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&language=${commonStore.locale}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
-							></iframe>
+							{#key commonStore.locale}
+								<iframe
+									class="iframe"
+									style:height="100%"
+									use:handleIframe
+									title="odk-web-forms-wrapper"
+									src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
+								></iframe>
+							{/key}
 						{/key}
 					{/await}
 				{/await}
