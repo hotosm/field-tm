@@ -20,7 +20,8 @@
 		"support": "सहायताको लागी",
 		"download_custom_odk_collect": "ODK Collect डाउनलोड",
 		"sign_in": "साइन इन",
-		"sign_out": "साइन आउट"
+		"sign_out": "साइन आउट",
+		"translate": "हामीलाई अनुवाद गर्न मद्दत गर्नुहोस्!"
 	},
 	"map": {
 		"enable_geolocation": "उत्कृष्ट अनुभवको लागि, स्थान सक्रिय गर्नुहोस्",
