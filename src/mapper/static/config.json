@@ -6,5 +6,6 @@
 	"loginProviders": {
 		"osm": true,
 		"google": true
-	}
+	},
+	"sidebarItemsOverride": []
 }

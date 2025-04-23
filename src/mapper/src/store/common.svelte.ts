@@ -1,7 +1,7 @@
 import { getLocalStorage, setLocalStorage } from '$lib/fs/local-storage.svelte';
 import type { Basemap } from '$lib/utils/basemaps';
 import { getBasemapList } from '$lib/utils/basemaps';
-
+import type { drawerItemsType } from '$constants/drawerItems';
 import { getLocale as getParaglideLocale, locales } from '$translations/runtime.js';
 
 export const LOGIN_PROVIDER_KEYS = ['osm', 'google'] as const;
@@ -16,6 +16,7 @@ interface ConfigJson {
 	cssFile: string;
 	enableWebforms: boolean;
 	loginProviders: LoginProviders;
+	sidebarItemsOverride: drawerItemsType[];
 }
 
 interface AlertDetails {

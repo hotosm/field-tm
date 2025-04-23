@@ -1,11 +1,11 @@
 import { m } from '$translations/messages.js';
 
-type drawerItemsType = {
+export type drawerItemsType = {
 	name: string;
 	path: string;
 };
 
-export const drawerItems: drawerItemsType[] = [
+export const defaultDrawerItems: drawerItemsType[] = [
 	{
 		name: m['header.about'](),
 		path: 'https://docs.fmtm.dev/about/about/',
