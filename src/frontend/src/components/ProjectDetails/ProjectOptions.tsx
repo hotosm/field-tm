@@ -52,7 +52,9 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
   const handleDownload = (downloadType: downloadTypeType) => {
     switch (downloadType) {
       case 'form':
-        dispatch(DownloadProjectForm(`${VITE_API_URL}/projects/download-form/${projectId}`, downloadType, projectId));
+        dispatch(
+          DownloadProjectForm(`${VITE_API_URL}/central/download-form?project_id=${projectId}`, downloadType, projectId),
+        );
         break;
       case 'geojson':
         dispatch(DownloadProjectForm(`${VITE_API_URL}/projects/${projectId}/download_tasks`, downloadType, projectId));
