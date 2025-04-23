@@ -176,18 +176,25 @@ def _get_mandatory_fields(
             "trigger": f"{NEW_FEATURE}" if use_odk_collect else "",
             "save_to": "status",
         },
-        # {
-        #     "type": "calculate",
-        #     "name": "submission_ids",
-        #     "notes": "Update the submission ids",
-        #     "label::english(en)": "Submission ids",
-        #     "appearance": "minimal",
-        #     "calculation": (
-        #         f"if({INSTANCE_FEATURE}/submission_ids = '', {INSTANCE_ID},"
-        #         f"concat({INSTANCE_FEATURE}/submission_ids, ',', {INSTANCE_ID}))"
-        #     ),
-        #     "save_to": "submission_ids",
-        # },
+        {
+            "type": "calculate",
+            "name": "submission_ids",
+            "notes": "Update the submission ids",
+            "label::english(en)": "Submission ids",
+            "appearance": "minimal",
+            "calculation": (
+                # FIXME why doesn't instanceId work here?
+                # FIXME pyxform.errors.PyXFormError: There has been a problem
+                # FIXME trying to replace ${instanceId} with the XPath to the
+                # FIXME survey element named 'instanceId'. There is no survey
+                # FIXME element with this name.
+                # f"if({INSTANCE_FEATURE}/submission_ids = '', {INSTANCE_ID},"
+                # f"concat({INSTANCE_FEATURE}/submission_ids, ',', {INSTANCE_ID}))"
+                f"if({INSTANCE_FEATURE}/submission_ids = '', 0,"
+                f"concat({INSTANCE_FEATURE}/submission_ids, ',', 0))"
+            ),
+            "save_to": "submission_ids",
+        },
     ])
     if need_verification_fields:
         fields.append(add_label_translations({
