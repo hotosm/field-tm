@@ -23,7 +23,6 @@ const initialState: ProjectStateTypes = {
   entityOsmMapLoading: false,
   updateEntityStateLoading: false,
   projectDashboardLoading: false,
-  geolocationStatus: false,
   projectCommentsList: [],
   projectPostCommentsLoading: false,
   projectGetCommentsLoading: false,
@@ -96,9 +95,6 @@ const ProjectSlice = createSlice({
     },
     SetProjectDashboardLoading(state, action: PayloadAction<boolean>) {
       state.projectDashboardLoading = action.payload;
-    },
-    ToggleGeolocationStatus(state, action: PayloadAction<boolean>) {
-      state.geolocationStatus = action.payload;
     },
     SetProjectCommentsList(state, action) {
       state.projectCommentsList = action.payload;

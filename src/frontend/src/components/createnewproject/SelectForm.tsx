@@ -83,7 +83,7 @@ const SelectForm = ({ flag, _geojsonFile, xlsFormFile, setXlsFormFile }) => {
 
   useEffect(() => {
     if (xlsFormFile && !customFileValidity) {
-      dispatch(ValidateCustomForm(`${VITE_API_URL}/projects/validate-form`, xlsFormFile?.file));
+      dispatch(ValidateCustomForm(`${VITE_API_URL}/central/validate-form`, xlsFormFile?.file));
     }
   }, [xlsFormFile]);
 

@@ -28,7 +28,6 @@ export type ProjectStateTypes = {
   entityOsmMapLoading: boolean;
   updateEntityStateLoading: boolean;
   projectDashboardLoading: boolean;
-  geolocationStatus: boolean;
   projectCommentsList: projectCommentsListTypes[];
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;
