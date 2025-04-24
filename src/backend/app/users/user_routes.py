@@ -140,6 +140,7 @@ async def invite_new_user(
     (e.g. mobile message).
     """
     project = project_user_dict.get("project")
+    osm_user_exists = False
 
     if user_in.osm_username:
         if osm_user_exists := await check_osm_user(user_in.osm_username):
@@ -215,7 +216,7 @@ async def accept_invite(
     invite = await DbUserInvite.one(db, token)
     if not invite or invite.is_expired():
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail="Invite has expired (valid 7 days)"
+            status_code=HTTPStatus.FORBIDDEN, detail="Invite has expired"
         )
 
     if (invite.osm_username and invite.osm_username != current_user.username) or (
