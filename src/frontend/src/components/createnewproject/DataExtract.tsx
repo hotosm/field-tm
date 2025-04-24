@@ -239,10 +239,14 @@ const DataExtract = ({
       setCustomDataExtractUpload(geojsonFromFgbFile);
     }
 
-    validateDataExtractGeojson(extractFeatCol, uploadedFile);
+    validateDataExtractGeojson(extractFeatCol, uploadedFile, fileInputRef);
   };
 
-  const validateDataExtractGeojson = (extractFeatCol: FeatureCollection, uploadedFile: File) => {
+  const validateDataExtractGeojson = (
+    extractFeatCol: FeatureCollection,
+    uploadedFile: File,
+    fileInputRef: React.RefObject<HTMLInputElement | null>,
+  ) => {
     const isGeojsonValid = valid(extractFeatCol, true);
 
     if (isGeojsonValid?.length === 0 && extractFeatCol) {
