@@ -9,6 +9,7 @@ services:
     environment:
       - ADMIN_PASSWORD=pass
       - APPLICATION_URL=localhost:8334
+      - LOG_LEVEL=DEBUG
     # - OFFICE_URL=wopi_server:9980
     # - OFFICE_FILESTASH_URL=app:8334
     # - OFFICE_REWRITE_URL=127.0.0.1:9980
