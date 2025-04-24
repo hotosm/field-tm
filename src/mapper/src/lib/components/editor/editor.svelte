@@ -4,6 +4,9 @@
 	import '$styles/editor.css';
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
+	import Link from '@tiptap/extension-link';
+	import Image from '@tiptap/extension-image';
+
 	import Toolbar from '$lib/components/editor/toolbar.svelte';
 
 	type Props = {
@@ -20,13 +23,21 @@
 	onMount(() => {
 		editor = new Editor({
 			element: element,
-			extensions: [StarterKit],
+			extensions: [
+				StarterKit,
+				Link.configure({
+					validate: (href: string) => /^https?:\/\//.test(href),
+				}),
+				Image.configure({
+					inline: true,
+				}),
+			],
 			content: content,
 			onTransaction: () => {
 				editor = editor;
 			},
 			editable: editable,
-			onUpdate: ({ editor }) => {
+			onUpdate: ({ /** editor **/ }) => {
 				setEditorHtmlContent && setEditorHtmlContent(editor.getHTML());
 			},
 		});
