@@ -93,7 +93,7 @@ function getTaskStore() {
 			// Use the task_id as the key and state as the value
 			currentTaskStates.set(taskData.task_id, {
 				state: taskData.state,
-				actioned_by_uid: taskData.user_sub,
+				actioned_by_uid: taskData.user_id,
 			});
 		}
 

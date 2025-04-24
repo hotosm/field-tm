@@ -106,8 +106,7 @@ export type TaskEventType = {
 	project_id: number;
 	state: TaskStatus | null;
 	task_id: number;
-	team_id: number | null;
-	user_sub: number;
+	user_id: number;
 	username: string;
 };
 
