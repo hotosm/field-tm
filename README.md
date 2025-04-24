@@ -128,8 +128,8 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 🖥️ user role management per project | Expected [v2025.2.0][4] |
 | ✅ | 🖥️ inviting users to projects via invite link | Expected [v2025.2.0][4] |
 | ✅ | 🖥️ optional private projects to restrict access | Expected [v2025.2.0][4] |
-| ✅ | 🖥️ fully translated mapper UI and survey in any language | Expected [v2025.2.0][4] |
-| ✅ | 🖥️ custom FieldTM deployments with updated branding | Expected [v2025.2.0][4] |
+| ✅ | 📱 fully translated mapper UI and survey in any language | Expected [v2025.2.0][4] |
+| ✅ | 📱 custom FieldTM deployments with updated branding | Expected [v2025.2.0][4] |
 | 🔄 | 📱 fully offline field mapping (local-first design) | – |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 📅 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
