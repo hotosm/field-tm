@@ -49,7 +49,7 @@ const EditDetails = ({ projectId }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="fmtm-relative fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden"
+      className="fmtm-relative fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden fmtm-bg-white"
     >
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-flex fmtm-flex-col fmtm-gap-6">
         <InputTextField

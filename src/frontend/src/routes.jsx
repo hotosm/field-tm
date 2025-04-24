@@ -20,6 +20,7 @@ import ManageUsers from '@/views/ManageUsers';
 import DataConflation from '@/views/DataConflation';
 import OrganizationDashboard from '@/views/OrganizationDashboard';
 import ManageOrganization from '@/views/ManageOrganization';
+import Invite from '@/views/Invite';
 
 const routes = createBrowserRouter([
   {
@@ -262,6 +263,18 @@ const routes = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
+      },
+      {
+        path: '/invite',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ErrorBoundary>
+                <Invite />
+              </ErrorBoundary>
+            </Suspense>
+          </ProtectedRoute>
+        ),
       },
     ],
   },

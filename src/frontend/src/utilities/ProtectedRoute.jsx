@@ -8,7 +8,7 @@ import Forbidden from '@/views/Forbidden';
 const ProtectedRoute = ({ children, next }) => {
   const dispatch = CoreModules.useAppDispatch();
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const [isForbidden, setIsForbidden] = React.useState(false);
 
   axios.interceptors.response.use(
@@ -19,6 +19,7 @@ const ProtectedRoute = ({ children, next }) => {
       if (status === 403) {
         setIsForbidden(true);
       }
+      return Promise.reject(error);
     },
   );
 
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ children, next }) => {
 
   if (authDetails == null) {
     dispatch(LoginActions.setLoginModalOpen(true));
-    return <Navigate to="/" replace state={{ from: pathname }} />;
+    return <Navigate to="/" replace state={{ from: `${pathname}${search}` }} />;
   }
 
   return children;

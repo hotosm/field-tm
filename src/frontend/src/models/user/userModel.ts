@@ -1,3 +1,5 @@
+import { project_roles } from '@/types/enums';
+
 export type roleType = 'READ_ONLY' | 'MAPPER' | 'ADMIN';
 
 export type mappingLevelType = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -28,4 +30,15 @@ export type userType = {
   registered_at: string;
   project_roles: Record<string, projectRoleType>;
   orgs_managed: number[];
+};
+
+export type projectUserInvites = {
+  token: string;
+  project_id: number;
+  osm_username: string | null;
+  email: string | null;
+  role: project_roles;
+  expires_at: string;
+  used_at: string | null;
+  created_at: string;
 };

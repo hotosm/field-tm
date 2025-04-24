@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import UserTab from '@/components/ManageProject/UserTab';
+import UserTab from '@/components/ManageProject/User';
 import AssetModules from '@/shared/AssetModules.js';
 import { GetIndividualProjectDetails } from '@/api/CreateProjectService';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
@@ -16,6 +16,7 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 const tabList = [
   { id: 'details', name: 'Details', icon: <AssetModules.InfoIcon className="!fmtm-text-[1.125rem]" /> },
   { id: 'form', name: 'Form', icon: <AssetModules.SubmissionIcon className="!fmtm-text-[1.125rem]" /> },
+  { id: 'users', name: 'Users', icon: <AssetModules.PersonIcon className="!fmtm-text-[1.125rem]" /> },
 ];
 
 const ManageProject = () => {
@@ -57,7 +58,7 @@ const ManageProject = () => {
         />
         <h4 className="fmtm-text-grey-800">Manage Project</h4>
       </div>
-      <div className="sm:fmtm-flex-1 fmtm-flex fmtm-justify-center fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
+      <div className="sm:fmtm-flex-1 fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
         {/* left container */}
         <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl sm:fmtm-w-[17.5rem] fmtm-p-6 fmtm-flex sm:fmtm-flex-col fmtm-flex-wrap sm:fmtm-flex-nowrap fmtm-gap-x-5">
           <div className="fmtm-flex-1 fmtm-flex sm:fmtm-flex-col fmtm-h-fit">
@@ -114,7 +115,9 @@ const ManageProject = () => {
           </Dialog>
         </div>
         {/* right container */}
-        <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl fmtm-w-full fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar">
+        <div
+          className={`fmtm-h-full fmtm-rounded-xl fmtm-w-full ${selectedTab !== 'users' ? 'fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar' : 'md:fmtm-w-[calc(100%-17.5rem)]'}`}
+        >
           {getContent(selectedTab)}
         </div>
       </div>
