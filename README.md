@@ -124,8 +124,12 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 📱 navigation and capability for routing to map features | Since [v2024.5.0][2] |
 | ✅ | 🖥️ organization creation and management | Since [v2024.5.0][2] |
 | ✅ | 📱 better support for mapping **new** points, lines, polygons | Since [v2025.1.0][3] |
-| ✅ | 📱 integrate ODK Web Forms (to avoid switching apps) | Expected [v2025.2.0][4] |
+| ✅ | 📱 seamless mapping in the same app (Web Forms, no ODK Collect) | Expected [v2025.2.0][4] |
 | ✅ | 🖥️ user role management per project | Expected [v2025.2.0][4] |
+| ✅ | 🖥️ inviting users to projects via invite link | Expected [v2025.2.0][4] |
+| ✅ | 🖥️ optional private projects to restrict access | Expected [v2025.2.0][4] |
+| ✅ | 🖥️ fully translated mapper UI and survey in any language | Expected [v2025.2.0][4] |
+| ✅ | 🖥️ custom FieldTM deployments with updated branding | Expected [v2025.2.0][4] |
 | 🔄 | 📱 fully offline field mapping (local-first design) | – |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 📅 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |

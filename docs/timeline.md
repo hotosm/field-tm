@@ -9,6 +9,19 @@ In reverse chronological order, with most recent events first.
 
 > <div class="timeline-container">
 >     <div class="timeline-entry">
+>         <div class="timeline-date">2025-05</div>
+>         <h3>Project: Mapa das Periferias</h3>
+>         💼 Pilot project in Brazil to map favelas country-wide.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
+>         <div class="timeline-date">2025-04</div>
+>         <h3>Web Forms Release</h3>
+>         📱 Release of 'web forms', allowing for mapping entirely
+>         in FieldTM, without having to switch to ODK Collect.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
 >         <div class="timeline-date">2025-01</div>
 >         <h3>Project: KYC, Ghana</h3>
 >         💼 Another SDI project, mapping informal settlements in Ghana.
