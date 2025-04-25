@@ -18,7 +18,7 @@ In reverse chronological order, with most recent events first.
 >         <div class="timeline-date">2025-04</div>
 >         <h3>Web Forms Release</h3>
 >         📱 Release of 'web forms', allowing for mapping entirely
->         in FieldTM, without having to switch to ODK Collect.
+>         in Field-TM, without having to switch to ODK Collect.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
@@ -58,7 +58,7 @@ In reverse chronological order, with most recent events first.
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2024-07</div>
 >         <h3>Community Webinar 2</h3>
->         🎥 Public webinar displaying FMTM's current capabilities and building
+>         🎥 Public webinar displaying Field-TM's current capabilities and building
 >         partnerships.
 >         <div class="timeline-dot"></div>
 >     </div>
@@ -79,7 +79,7 @@ In reverse chronological order, with most recent events first.
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2024-04</div>
 >         <h3>Demo: CLIGEOS, Nepal</h3>
->         🚀 Demo of FMTM within a full E2E workshop.
+>         🚀 Demo of Field-TM within a full E2E workshop.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
@@ -105,8 +105,8 @@ In reverse chronological order, with most recent events first.
 >     </div>
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2023-08</div>
->         <h3>Rapid Development & Iteration of FMTM</h3>
->         🏗️ Growth phase of FMTM with large improvements to the FMTM
+>         <h3>Rapid Development & Iteration of Field-TM</h3>
+>         🏗️ Growth phase of Field-TM with large improvements to the Field-TM
 >         workflow & usability.
 >         <div class="timeline-dot"></div>
 >     </div>
@@ -125,8 +125,8 @@ In reverse chronological order, with most recent events first.
 >     </div>
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2023-03</div>
->         <h3>NAXA Awarded Contract to Assist FMTM Development</h3>
->         💻 HOT's main collaborator on FMTM, NAXA, was contracted to continue
+>         <h3>NAXA Awarded Contract to Assist Field-TM Development</h3>
+>         💻 HOT's main collaborator on Field-TM, NAXA, was contracted to continue
 >         development.
 >         <div class="timeline-dot"></div>
 >     </div>
@@ -140,14 +140,14 @@ In reverse chronological order, with most recent events first.
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2022-12</div>
 >         <h3>Demo: DRC, Kenya, Tanzania</h3>
->         🚀 From Dec 2022 - Jan 2023 initial tests conducted with FMTM
+>         🚀 From Dec 2022 - Jan 2023 initial tests conducted with Field-TM
 >         demonstrate its potential as a project.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2022-11</div>
 >         <h3>Backend API & Mobile Design</h3>
->         📱 The mobile UI was prototyped & first version of FMTM API (server)
+>         📱 The mobile UI was prototyped & first version of Field-TM API (server)
 >         created.
 >         <div class="timeline-dot"></div>
 >     </div>
@@ -160,7 +160,7 @@ In reverse chronological order, with most recent events first.
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2022-09</div>
 >         <h3>Initial Research & Concept</h3>
->         🔬 <a href="https://docs.google.com/document/d/1adG2pXuMXI0wPbR_09ASORMx2gcVn0H6nsCNNGG7tpM/edit#heading=h.k45v77hc1cu1">Concept Note</a> written for a 'Field Mapping Tasking Manager'.
+>         🔬 <a href="https://docs.google.com/document/d/1adG2pXuMXI0wPbR_09ASORMx2gcVn0H6nsCNNGG7tpM/edit#heading=h.k45v77hc1cu1">Concept Note</a> written for a 'Field Tasking Manager'.
 >         <div class="timeline-dot"></div>
 >     </div>
 > </div>

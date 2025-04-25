@@ -2,7 +2,7 @@
 
 ## Context and Problem Statement
 
-When creating an FMTM project, we need a set of geometries to map. This
+When creating an Field-TM project, we need a set of geometries to map. This
 has typically been called the 'data extract'.
 
 Either the user can upload their own geometries in GeoJSON format, or
@@ -33,7 +33,7 @@ candidate. The frontend JS implementation is excellent.
 - GeoParquet support on the frontend was lacking.
 - PMTile usage was still quite nascent. Since then this has been identified
   as another possible solution. However, creation would require additional libs
-  to be bundled in FMTM, and vector tile styling can be a pain.
+  to be bundled in Field-TM, and vector tile styling can be a pain.
 
 Flatgeobuf seems to be most applicable for this use case (a small amount of data).
 

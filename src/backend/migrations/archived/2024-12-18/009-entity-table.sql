@@ -1,5 +1,5 @@
 -- ## Migration to:
--- * Add a new table that syncs the ODK Entity status to FMTM.
+-- * Add a new table that syncs the ODK Entity status to Field-TM.
 -- * Add a primary key for entity_id field.
 -- * Add two indexes on entity_id + project_id / task_id
 

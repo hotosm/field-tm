@@ -105,9 +105,9 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
 
   useEffect(() => {
     if (organizationId) {
-      document.title = 'Edit Organization - Field Mapping Tasking Manager';
+      document.title = 'Edit Organization - Field Tasking Manager';
     } else {
-      document.title = 'Add Organization - Field Mapping Tasking Manager';
+      document.title = 'Add Organization - Field Tasking Manager';
     }
   }, []);
 

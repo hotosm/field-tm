@@ -1,19 +1,19 @@
 # Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Logic for integration routes."""
 
@@ -68,7 +68,7 @@ async def update_entity_status_in_fmtm(
     db: Connection,
     odk_event: OdkCentralWebhookRequest,
 ):
-    """Update the status for an Entity in the FMTM db."""
+    """Update the status for an Entity in the Field-TM db."""
     log.debug(f"Webhook called with event ({odk_event.type.value})")
 
     if odk_event.type == OdkWebhookEvents.UPDATE_ENTITY:
@@ -97,7 +97,7 @@ async def update_entity_status_in_fmtm(
 
         log.debug(
             f"Updating entity ({str(odk_event.id)}) status "
-            f"in FMTM db to ({new_entity_state})"
+            f"in Field-TM db to ({new_entity_state})"
         )
         update_success = await DbOdkEntities.update(
             db,

@@ -1,1 +1,1 @@
-"""FMTM integrations API, for linking to external services."""
+"""Field-TM integrations API, for linking to external services."""

@@ -1,19 +1,19 @@
-# Copyright (c) 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Routes to relay requests to ODK Central server."""
 
@@ -63,7 +63,7 @@ async def get_form_lists(
     current_user: Annotated[AuthUser, Depends(login_required)],
     db: Annotated[Connection, Depends(db_conn)],
 ) -> list:
-    """Get a list of all XLSForms available in FMTM.
+    """Get a list of all XLSForms available in Field-TM.
 
     Returns:
         dict: JSON of {id:title} with each XLSForm record.
@@ -88,7 +88,7 @@ async def validate_form(
 
     If the `debug` param is used, the form is returned for inspection.
     NOTE that this debug form has additional fields appended and should
-        not be used for FMTM project creation.
+        not be used for Field-TM project creation.
 
     NOTE this provides a basic sanity check, some fields are omitted
     so the form is not usable in production:
@@ -129,7 +129,7 @@ async def update_project_form(
     # FIXME add back in capability to update osm_category
     # osm_category: XLSFormType = Form(...),
 ):
-    """Update the XForm data in ODK Central & FMTM DB."""
+    """Update the XForm data in ODK Central & Field-TM DB."""
     project = project_user_dict["project"]
 
     # Update ODK Central form data
@@ -261,7 +261,7 @@ async def upload_form_media(
     except Exception as e:
         log.exception(f"Error: {e}")
         msg = (
-            f"Failed to upload form media for FMTM project ({project_id}) "
+            f"Failed to upload form media for Field-TM project ({project_id}) "
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
         log.error(msg)
@@ -292,7 +292,7 @@ async def get_form_media(
     except Exception as e:
         log.exception(f"Error: {e}")
         msg = (
-            f"Failed to get form media for FMTM project ({project_id}) "
+            f"Failed to get form media for Field-TM project ({project_id}) "
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
         log.error(msg)

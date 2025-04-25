@@ -37,7 +37,7 @@ services:
   #   ports:
   #   - "9980:9980"
 
-  # This service makes the Minio API in the FMTM dev stack accessible on port 9000
+  # This service makes the Minio API in the Field-TM dev stack accessible on port 9000
   # localhost, despite not being bound in the dev compose.yaml file
   port-bind:
     profiles: [bind]

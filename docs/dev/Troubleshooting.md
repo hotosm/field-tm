@@ -1,10 +1,12 @@
 # Troubleshooting 🆘
 
-## Running FMTM standalone
+## Running Field-TM standalone
 
-- Although it's easiest to use Docker, sometimes it may no be feasible, or not preferred.
+- Although it's easiest to use Docker, sometimes it may no be feasible, or
+  not preferred.
 - We use a tool called `uv` to manage dependencies.
-- Be careful when running FMTM you are not accidentally pulling in your system packages.
+- Be careful when running Field-TM you are not accidentally pulling in your
+  system packages.
 
 ### Tips
 

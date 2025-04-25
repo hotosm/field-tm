@@ -46,7 +46,7 @@ const ProjectDetailsForm = ({ flag }) => {
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
   const { hostname } = window.location;
-  const defaultHashtags = ['#FMTM', `#${hostname}-{project_id}`];
+  const defaultHashtags = ['#Field-TM', `#${hostname}-{project_id}`];
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const organisationListData = useAppSelector((state) => state.createproject.organisationList);
@@ -255,7 +255,7 @@ const ProjectDetailsForm = ({ flag }) => {
               onChange={(value: any) => {
                 handleCustomChange('project_admins', value);
               }}
-              placeholder="Search for FMTM users"
+              placeholder="Search for Field-TM users"
               className="naxatw-w-1/5 naxatw-min-w-[9rem]"
               multiple
               checkBox

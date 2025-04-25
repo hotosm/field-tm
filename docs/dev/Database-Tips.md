@@ -127,7 +127,7 @@ Replace "command_name" with the name of the command you want help with.
 ## Migrations
 
 - Migrations are a way to manage changes to the database schema over time.
-- They are handled automatically by a management script when FMTM starts up.
+- They are handled automatically by a management script when Field-TM starts up.
 - Individual SQL migration scripts are placed in the `src/backend/migrations` dir.
   - These should be idempotent, i.e. can run over and over without causing errors.
   - There should also be a commented out SQL script for how to revert the migration.

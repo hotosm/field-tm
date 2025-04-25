@@ -2,9 +2,9 @@
 
 ## General
 
-### What is the Field Mapping Tasking Manager (FMTM)?
+### What is the Field Tasking Manager (Field-TM)?
 
-The Field Mapping Tasking Manager (FMTM) is an online platform that
+The Field Tasking Manager (Field-TM) is an online platform that
 allows contributors to participate in mapping projects related to
 humanitarian and development work.
 
@@ -13,11 +13,12 @@ humanitarian and development work.
 ### What problem does it solve?
 
 There are a few great tools for adding tags to OpenStreetMap in the field
-already. FMTM is not aiming to compete with these tools, but instead has two goals:
+already. Field-TM is not aiming to compete with these tools, but instead
+has two goals:
 
 1. To solve the challenge of effectively coordinating mappers to work together
    when mapping an entire area of interest. It can be difficult to **subdivide tasks**
-   and know **who is working on what tasks.**. FMTM should solve this problem.
+   and know **who is working on what tasks.**. Field-TM should solve this problem.
 
 2. Allow for coordinated field mapping **both inside and outside of OpenStreetMap**.
    Sometimes OpenStreetMap is not an appropriate target for the collected data,
@@ -25,7 +26,7 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
 
 ---
 
-### What makes FMTM unique in this space?
+### What makes Field-TM unique in this space?
 
 - Fully open-source.
 - Manages both **coordination** and **data collection\*** in one framework.
@@ -43,7 +44,7 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
 !!! note
 
       The following is the personal opinion from HOT staff members, and provides
-      some context for the reasoning behind creating the FMTM.
+      some context for the reasoning behind creating the Field-TM.
 
 Generic field mapping:
 
@@ -73,7 +74,7 @@ Field survey-based data collection:
   The history is complex, but at some point Ona had to make their front end
   closed-source. They have a lot of open-source components (like their back end)
   and have done some great work around data management and analytics, however,
-  their main objective is not the same as FieldTM: _coordinating_ field mapping.
+  their main objective is not the same as Field-TM: _coordinating_ field mapping.
 
 - **ODK**: I won't cover much here, as we talk about it a lot elsewhere.
   If you are collected mobile survey data then this is a tool at the forefront
@@ -98,7 +99,7 @@ OpenStreetMap tagging:
 
 - **StreetComplete**: a super simple and intuitive mobile app for improving
   OpenStreetMap. New features can be mapped, in addition to tags, directly
-  uploaded to OSM. While FieldTM definitely wants to be used to update
+  uploaded to OSM. While Field-TM definitely wants to be used to update
   OSM, it's not the only usage mode we need to focus on (often users need
   less public data, such as slum mapping or census data). The app is also
   very much focused on editing as an _individual_, and not about coordinated
@@ -107,12 +108,12 @@ OpenStreetMap tagging:
 - **EveryDoor**: another excellent app in the OSM ecosystem, perhaps focused
   slightly more at power users. It has many similar great features as
   StreetComplete, but also has the same properties that make it not a direct
-  competitor for FieldTM.
+  competitor for Field-TM.
 
 In the long run, these two tools would be excellent candidates for integration
-at the low level of FieldTM. It is conceivable that a field mapping campaign
+at the low level of Field-TM. It is conceivable that a field mapping campaign
 could possibly use **either** ODK, StreetComplete, or EveryDoor to do the
-actual mapping (while FieldTM coordinates).
+actual mapping (while Field-TM coordinates).
 
 Unmaintained projects:
 
@@ -140,22 +141,22 @@ Unmaintained projects:
 
 ---
 
-### So why should I use FMTM over these other tools?
+### So why should I use Field-TM over these other tools?
 
 You might not need to! It depends if you are simply collecting data
 in the field as an individual, or are trying to coordinate amongst
 a team of enumerators.
 
-FMTM does not attempt to compete within the very rich field data
+Field-TM does not attempt to compete within the very rich field data
 collection ecosystem. Instead, it is a higher level tool, aimed at
 **coordination** of enumerators using one of these tools.
 
 ---
 
-### What is the relationship between FMTM and Kobo?
+### What is the relationship between Field-TM and Kobo?
 
-- Kobo is not an FMTM competitor, it's an ODK competitor.
-- FMTM uses ODK underneath for reasons explained above, but due to the popularity
+- Kobo is not an Field-TM competitor, it's an ODK competitor.
+- Field-TM uses ODK underneath for reasons explained above, but due to the popularity
   of Kobo, could (and should) probably support the Kobo data collection app going
   forward.
 - This does raise challenges, as new features integrated in ODK Collect take approx
@@ -188,78 +189,78 @@ collection ecosystem. Instead, it is a higher level tool, aimed at
 
 ## Info For Users
 
-### Do I need to create an account to use the FMTM Web App?
+### Do I need to create an account to use the Field-TM Web App?
 
 Mappers have no requirement to sign up, easing the process of mapping
-for those that are impatient to get started! However, to use the FMTM project
+for those that are impatient to get started! However, to use the Field-TM project
 management site it is recommended to sign in with OSM. This is so data uploaded
 to OSM can be attributed to a user. Notifications are also sent via OpenStreetMap
 messages/emails.
 
 ---
 
-### How do I contribute to a mapping project on the FMTM Web App?
+### How do I contribute to a mapping project on the Field-TM Web App?
 
-To contribute to a mapping project on the FMTM Web App, you can
+To contribute to a mapping project on the Field-TM Web App, you can
 create an account, select a project of interest, and choose a task to
 work on. You can then use the mapping tools provided to complete the
 task.
 
 ---
 
-### Can I work on multiple mapping tasks at the same time on the FMTM Web App?
+### Can I work on multiple mapping tasks at the same time on the Field-TM Web App?
 
 Yes, you can work on multiple mapping tasks at the same time on the
-FMTM Web App, as long as you can commit the necessary time and effort
+Field-TM Web App, as long as you can commit the necessary time and effort
 to each task.
 
 ---
 
-### How do I know if my mapping work on the FMTM Web App is accurate?
+### How do I know if my mapping work on the Field-TM Web App is accurate?
 
-The FMTM Web App has a validation process where other contributors
+The Field-TM Web App has a validation process where other contributors
 review and validate the mapping work. This helps to ensure the
 accuracy of the mapping data.
 
 ---
 
-### Can I provide feedback on a mapping project on the FMTM Web App?
+### Can I provide feedback on a mapping project on the Field-TM Web App?
 
-Yes, you can provide feedback on a mapping project on the FMTM Web
+Yes, you can provide feedback on a mapping project on the Field-TM Web
 App by leaving a comment on the project page or contacting the project
 manager.
 
 ---
 
-### How do I download mapping data from a project on the FMTM Web App?
+### How do I download mapping data from a project on the Field-TM Web App?
 
-To download mapping data from a project on the FMTM Web App, you
+To download mapping data from a project on the Field-TM Web App, you
 can select the project of interest and click on the "Export" button on
 the project page.
 
 ---
 
-### Can I use the mapping data from the FMTM Web App for my own research or projects?
+### Can I use the mapping data from the Field-TM Web App for my own research or projects?
 
-The mapping data on the FMTM Web App is generally open and
+The mapping data on the Field-TM Web App is generally open and
 available for use, but it is important to check the specific project
 requirements and licenses before using the data for your own research
 or projects.
 
 ---
 
-### What are the benefits of contributing to the FMTM?
+### What are the benefits of contributing to the Field-TM?
 
-Contributing to the FMTM allows you to help with important
+Contributing to the Field-TM allows you to help with important
 humanitarian and development work, while also developing your mapping
 skills and knowledge.
 
 ---
 
-### Do I need to have prior mapping experience to contribute to the FMTM?
+### Do I need to have prior mapping experience to contribute to the Field-TM?
 
 No, prior mapping experience is not required to contribute to the
-FMTM. The platform provides training and resources to help new
+Field-TM. The platform provides training and resources to help new
 contributors get started.
 
 ---
@@ -274,7 +275,7 @@ necessary time and effort to each project.
 
 ### How do I get feedback on my mapping work?
 
-The FMTM provides a validation process where other contributors
+The Field-TM provides a validation process where other contributors
 review and provide feedback on mapping work. You can also contact
 project managers or experienced contributors for additional feedback.
 
@@ -289,10 +290,10 @@ an instance of ODK Central (for example, at at organisational level),
 so you may use your own server and credentials.
 
 Please ensure the user credentials have 'Administrator' level permission,
-else FMTM project creation will not work.
+else Field-TM project creation will not work.
 
 The credentials should be provided when requesting the creation of an
-'Organisation' in FMTM.
+'Organisation' in Field-TM.
 
 Alternatively, you may request credentials for the HOT Global
 [ODK Central Instance](https://odk.hotosm.org).
@@ -301,24 +302,24 @@ Alternatively, you may request credentials for the HOT Global
 
 ## Info For Repository Contributors
 
-### How can I become a contributor to the FMTM?
+### How can I become a contributor to the Field-TM?
 
-To become a contributor to the FMTM, you can create an account on
+To become a contributor to the Field-TM, you can create an account on
 Github and contribute to issues, discussions, or pull requests.
 
 ---
 
-### Who can contribute to FMTM?
+### Who can contribute to Field-TM?
 
-Anyone can contribute to FMTM. It is an open-source project, and
+Anyone can contribute to Field-TM. It is an open-source project, and
 contributions from developers, designers, and other contributors are
 always welcome.
 
 ---
 
-### What kind of contributions can I make to FMTM?
+### What kind of contributions can I make to Field-TM?
 
-There are several ways you can contribute to FMTM, including:
+There are several ways you can contribute to Field-TM, including:
 
 **Development**: If you have experience in web development, you can
 contribute by fixing bugs, adding new features, or improving the
@@ -342,17 +343,17 @@ into your language.
 
 ---
 
-### What technologies are used in FMTM?
+### What technologies are used in Field-TM?
 
-FMTM is built using several technologies, including FastAPI,
+Field-TM is built using several technologies, including FastAPI,
 Postgres, React, Svelte, and web components. The codebase is written in
 Python & TypeScript mostly.
 
 ---
 
-### How do I set up FMTM locally?
+### How do I set up Field-TM locally?
 
-To set up FMTM locally, the simplest approach is likely using Docker.
+To set up Field-TM locally, the simplest approach is likely using Docker.
 If you are an advanced user, it is possible to run each service individually too.
 Please follow the instructions in the setup guide on this site.
 
@@ -402,23 +403,23 @@ As an **absolute last resort**, you could try the following:
 
 ---
 
-### How can I report a bug or suggest a new feature for FMTM?
+### How can I report a bug or suggest a new feature for Field-TM?
 
 You can report bugs or suggest new features by opening an issue on
-the FMTM repository on GitHub. Be sure to provide as much detail as
+the Field-TM repository on GitHub. Be sure to provide as much detail as
 possible, including steps to reproduce the bug, screenshots, or
 mockups for new features.
 
 ---
 
-### How can I contribute to FMTM if I'm new to open source or web development?
+### How can I contribute to Field-TM if I'm new to open source or web development?
 
-FMTM welcomes contributions from developers of all levels of
+Field-TM welcomes contributions from developers of all levels of
 experience, including those who are new to open source or web
 development. You can start by exploring the project's codebase and
 documentation, asking questions in the community, and contributing to
 issues labeled as "good first issue." Additionally, you can join the
-FMTM community on Slack to connect with other contributors and get
+Field-TM community on Slack to connect with other contributors and get
 help with your contributions.
 
 ---
@@ -427,7 +428,7 @@ help with your contributions.
 
 ### How can I work with an offline basemap?
 
-- Download MBTiles from FMTM.
+- Download MBTiles from Field-TM.
 - Load MBTiles into ODK Collect via
   [this guide](https://docs.getodk.org/collect-offline-maps)
 
@@ -463,7 +464,7 @@ Yes!
 
 - ODK Collect is an excellent mobile application.
 - We need a slightly modified functionality of the app, so have created
-  a custom version for you to use with FMTM.
+  a custom version for you to use with Field-TM.
 - We maintain a good relationship with the ODK developers and would like
   to get this functionality into the map app (meaning no custom app is required).
 - However, this will take time!
@@ -473,14 +474,14 @@ Yes!
 - Ideally when we open ODK Collect, we want our feature / building to be
   selected already, avoiding the need to open the map and select it manually.
 - We created the custom ODK Collect for exactly this purpose!
-- It also opens the possibility of more advanced map capabilities in FMTM,
+- It also opens the possibility of more advanced map capabilities in Field-TM,
   such as navigation to your chosen feature and directions.
-- Hopefully it provides a more seamless user experience of FMTM, that we
+- Hopefully it provides a more seamless user experience of Field-TM, that we
   can't provide with the default Collect.
 
 ### How do I install the custom ODK Collect app?
 
-- First, open the sidebar on FMTM and click the button to download the
+- First, open the sidebar on Field-TM and click the button to download the
   custom ODK Collect `.apk` file.
 - If you don't have ODK Collect installed already, then you should be able to
   click this file and install as normal.
