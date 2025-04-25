@@ -25,7 +25,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "uvicorn==0.32.0",
+    "uvicorn==0.34.2",
     "uvloop==0.21.0",
     "httptools==0.6.4",
     "fastapi==0.115.3",
@@ -49,7 +49,7 @@ dependencies = [
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",
-    "pg-nearest-city>=0.2.1",
+    "pg-nearest-city==0.2.1",
     "pyodk",
 ]
 readme = "../../README.md"
@@ -64,7 +64,7 @@ dev = [
 test = [
     "pytest==8.3.3",
     "pytest-asyncio==0.24.0",
-    "httpx==0.27.2",
+    "httpx==0.28.1",
     "pyinstrument==5.0.1",
     "coverage==7.6.7",
     "coverage-badge==1.1.2",
