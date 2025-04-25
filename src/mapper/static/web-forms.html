@@ -18,10 +18,43 @@
 			.columns-pack .label-text {
 				display: none;
 			}
+
+			/* css polyfilling for old browsers */
+			[popover] {
+				display: none;
+			}
+			[popover]:popover-open {
+				display: block;
+			}
+
+			[popover] {
+				position: fixed;
+				width: fit-content;
+				height: fit-content;
+				color: canvastext;
+				background-color: canvas;
+				inset: 0px;
+				margin: auto;
+				border-width: initial;
+				border-style: solid;
+				border-color: initial;
+				border-image: initial;
+				padding: 0.25em;
+				overflow: auto;
+			}
 		</style>
 	</head>
 	<body style="height: 100vh; overflow-y: scroll; position: relative">
 		<script type="module">
+			URL.canParse = function (string) {
+				try {
+					new URL(string);
+					return true;
+				} catch (err) {
+					return false;
+				}
+			};
+
 			const odkWebFormUrl = new URL(window.location.href).searchParams.get('odkWebFormUrl');
 			const OdkWebForm = (await import(odkWebFormUrl)).default;
 
