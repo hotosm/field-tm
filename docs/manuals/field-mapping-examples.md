@@ -2,7 +2,7 @@
 
 Users often write their own guides for the team they are working with.
 
-This page provides some links to user-generated guides of FMTM over time.
+This page provides some links to user-generated guides of Field-TM over time.
 
 ## Know Your City Africa: Ghana Slum Mapping
 

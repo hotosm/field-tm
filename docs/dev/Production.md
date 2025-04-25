@@ -1,9 +1,9 @@
 # Deployment for Production
 
-The following instructions are needed to set up FMTM for production on
+The following instructions are needed to set up Field-TM for production on
 your own cloud server.
 
-## Set up the FMTM on a cloud server
+## Set up the Field-TM on a cloud server
 
 ### Set up a server and domain name
 
@@ -56,12 +56,12 @@ Some can be updated manually, as required.
 
 These can point to an externally hosted instance of ODK Central.
 
-Or ODK Central can be started as part of the FMTM docker compose
+Or ODK Central can be started as part of the Field-TM docker compose
 stack, and variables should be set accordingly.
 
 #### Other Domains
 
-If you run FMTM with ODK and Minio (S3) included, then the
+If you run Field-TM with ODK and Minio (S3) included, then the
 domains will default to:
 
 ```dotenv
@@ -99,7 +99,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
 ## Backup Process
 
-- Backup FMTM database:
+- Backup Field-TM database:
 
   ```bash
   GIT_BRANCH=development
@@ -181,7 +181,7 @@ in the database (i.e. if you started the docker
 compose stack & the API ran the migrations!).
 
 In this case you can import into a fresh db, before
-attaching to the FMTM containers:
+attaching to the Field-TM containers:
 
 ```bash
 export GIT_BRANCH=development
@@ -213,7 +213,7 @@ pg_restore --verbose -U fmtm -d fmtm
 docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
 ```
 
-## Help! FMTM Prod Is Broken 😨
+## Help! Field-TM Prod Is Broken 😨
 
 ### Debugging
 

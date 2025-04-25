@@ -137,14 +137,14 @@ echo "Waiting 5 minutes (for migrations) before first backup."
 sleep 600
 
 while true; do
-    ### FMTM Backup ###
-    pretty_echo "### Backup FMTM $(date +%Y-%m-%d_%H:%M:%S) ###"
+    ### Field-TM Backup ###
+    pretty_echo "### Backup Field-TM $(date +%Y-%m-%d_%H:%M:%S) ###"
     check_fmtm_db_vars_present
     wait_for_db "${FMTM_DB_HOST:-fmtm-db}"
     wait_for_s3
     backup_db "${FMTM_DB_HOST:-fmtm-db}" "${FMTM_DB_USER:-fmtm}" \
         "${FMTM_DB_NAME:-fmtm}" "${FMTM_DB_PASSWORD}"
-    pretty_echo "### Backup FMTM Complete ###"
+    pretty_echo "### Backup Field-TM Complete ###"
 
     ### ODK Backup ###
     # Only run ODK Central DB Backups if the database is included in the stack

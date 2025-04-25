@@ -2,7 +2,7 @@
 
 ## Software Requirements
 
-It is recommended to run FMTM on a Linux-based machine.
+It is recommended to run Field-TM on a Linux-based machine.
 
 > This includes MacOS, but some [tools must be substituted][1].
 >
@@ -13,13 +13,13 @@ the following software installed and configured on your system:
 
 > If running Debian/Ubuntu, the install script below does this for you.
 
-[Git][3] to clone the FMTM repository.
+[Git][3] to clone the Field-TM repository.
 
 [Docker][4]
-to run FMTM inside containers.
+to run Field-TM inside containers.
 
 [Docker Compose][5]
-for easy orchestration of the FMTM services.
+for easy orchestration of the Field-TM services.
 
 > This is Docker Compose V2, the official Docker CLI plugin.
 >
@@ -52,7 +52,7 @@ If more details are required, check out the
   - [Easy Install](#easy-install)
   - [Manual Install](#manual-install)
     - [Table of Contents](#table-of-contents)
-    - [Clone the FMTM repository](#clone-the-fmtm-repository)
+    - [Clone the Field-TM repository](#clone-the-field-tm-repository)
     - [Setup Your Local Environment](#setup-your-local-environment)
       - [1. Setup OSM OAUTH 2.0](#1-setup-osm-oauth-20)
       - [2. Create an `.env` File](#2-create-an-env-file)
@@ -66,7 +66,7 @@ If more details are required, check out the
     - [Check Authentication (Optional)](#check-authentication-optional)
     - [Configure Custom Branding](#configure-custom-branding)
 
-### Clone the FMTM repository
+### Clone the Field-TM repository
 
 Clone the repository to your local machine using the following command:
 
@@ -83,9 +83,9 @@ These steps are essential to run and test your code!
 
 #### 1. Setup OSM OAuth 2.0
 
-The FMTM uses OAuth with OSM to authenticate users.
+The Field-TM uses OAuth with OSM to authenticate users.
 
-To properly configure your FMTM project, you will need to create keys for OSM.
+To properly configure your Field-TM project, you will need to create keys for OSM.
 
 1. [Login to OSM][7]
    (_If you do not have an account yet, click the signup
@@ -94,7 +94,7 @@ To properly configure your FMTM project, you will need to create keys for OSM.
    Click the drop down arrow on the top right of the navigation bar
    and select My Settings.
 
-2. Register your FMTM instance to OAuth 2 applications.
+2. Register your Field-TM instance to OAuth 2 applications.
 
    Put your login redirect url as `http://127.0.0.1:7051/osmauth` if running locally,
    or for production replace with https://{YOUR_DOMAIN}/osmauth
@@ -128,19 +128,19 @@ bash scripts/1-environment/gen-env.sh
 > <http://fmtm.localhost:7050,http://some.other.domain>
 >
 > Note: It is possible to generate the auth pub/priv key manually using:
-> openssl genrsa -out fmtm-private.pem 4096
-> openssl rsa -in fmtm-private.pem -pubout -out fmtm-private.pem
+> openssl genrsa -out field-tm-private.pem 4096
+> openssl rsa -in field-tm-private.pem -pubout -out field-tm-private.pem
 
 ### Start the API with Docker
 
-This is the easiest way to get started with FMTM.
+This is the easiest way to get started with Field-TM.
 
 Docker runs each service inside **containers**, fully isolated from your
 host operating system.
 
 #### Select the install type
 
-Determine the what type of FMTM install you would like:
+Determine the what type of Field-TM install you would like:
 
 ```text
 main - the latest production
@@ -208,7 +208,7 @@ http://fmtm.localhost:7050
 
 ### Setup ODK Central User (Optional)
 
-The FMTM uses ODK Central to store ODK data.
+The Field-TM uses ODK Central to store ODK data.
 
 - By default, the docker setup includes a Central server.
 - The credentials should have been provided in your `.env`
@@ -253,8 +253,8 @@ Once you have deployed, you will need to check that you can properly authenticat
 
 ### Frontend Customization (Optional)
 
-- It's possible to tailor the mapper portion of FieldTM to your needs (the main app
-  that users will see).
+- It's possible to tailor the mapper portion of Field-TM to your needs
+  (the main app that users will see).
 - There is a `config.json` file that is used to dynamically modify the frontend
   deployment:
 
@@ -282,7 +282,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 - It's possible to replace the HOTOSM logo and change the colour scheme for your
   deployment.
 - This file will be automatically picked up and used to style your application.
-  By default, FieldTM will fallback to the bundled `config.json`.
+  By default, Field-TM will fallback to the bundled `config.json`.
 
   ```json
   {
@@ -295,7 +295,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 
 ### Configure Custom Sidebar Elements
 
-- By default FieldTM has a few items in the sidebar, like a link to a support
+- By default Field-TM has a few items in the sidebar, like a link to a support
   page, and other resources.
 - These links can be overridden using the `sidebarItemsOverride` parameter in
   the `config.json`, which expects format:
@@ -330,7 +330,7 @@ Once you have deployed, you will need to check that you can properly authenticat
   }
   ```
 
-That's it, you have successfully set up FieldTM!!
+That's it, you have successfully set up Field-TM!!
 
 [1]: ./dev/Setup.md#alternative-operating-systems "MacOS container tools"
 [2]: ./dev/Setup.md#alternative-operating-systems "Windows Subsystem for Linux"

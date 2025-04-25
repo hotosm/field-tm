@@ -66,9 +66,9 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     if (projectInfo.name) {
-      document.title = `${projectInfo.name} - HOT Field Mapping Tasking Manager`;
+      document.title = `${projectInfo.name} - HOT Field Tasking Manager`;
     } else {
-      document.title = 'HOT Field Mapping Tasking Manager';
+      document.title = 'HOT Field Tasking Manager';
     }
   }, [projectInfo.name]);
 

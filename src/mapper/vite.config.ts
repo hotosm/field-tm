@@ -13,8 +13,8 @@ const pwaOptions: Partial<VitePWAOptions> = {
 		enabled: true,
 	},
 	manifest: {
-		name: 'FieldTM',
-		short_name: 'FieldTM',
+		name: 'Field-TM',
+		short_name: 'Field-TM',
 		description: 'Coordinated field mapping for Open Mapping campaigns.',
 		display: 'standalone',
 		theme_color: '#d63f3f',

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The FMTM can be divided into four parts:
+The Field-TM can be divided into four parts:
 
 1. An API backend in FastAPI (code in: `src/backend`)
 2. A desktop-based management frontend website in React (code in: `src/frontend`)
@@ -10,11 +10,11 @@ The FMTM can be divided into four parts:
 4. Supporting services that tie everything together, such as [ODK Central][1]
    for collecting submission data, and an S3 service for storing files.
 
-### FMTM Backend
+### Field-TM Backend
 
 To view more details about the backend click [here][2].
 
-### FMTM Frontend
+### Field-TM Frontend
 
 To view more details about the frontend click [here][3].
 
@@ -38,7 +38,7 @@ before contributing!
 
 Forking creates a copy of the repository in your own GitHub account.
 Go to the
-[Field Mapping Tasking Manager repository][7]
+[Field Tasking Manager repository][7]
 and click the "Fork" button in the top right corner of the page.
 
 ### 3. Navigate to your working directory
@@ -58,7 +58,7 @@ Clone the forked repository to your local machine using the following command:
 
 Make sure to replace `<your-username>` with your GitHub username.
 
-## Setup: Running FMTM
+## Setup: Running Field-TM
 
 See detailed instructions for this step [here][8].
 
@@ -104,12 +104,12 @@ command:
 Go to your forked repository on GitHub and click the "Pull requests" tab,
 then click "Create pull request".
 
-This will open a new pull request in the FMTM repository, where you can:
+This will open a new pull request in the Field-TM repository, where you can:
 
 - Select the branch you wish to merge into `development`.
 - Describe your changes and request that they be merged into the main codebase.
 
-That's it! You've now contributed to the Field Mapping Tasking Manager.
+That's it! You've now contributed to the Field Tasking Manager.
 
 ## Alternative Operating Systems
 
@@ -122,7 +122,7 @@ This will run a Linux machine inside Windows very efficiently.
 To install follow the
 [official instructions][11].
 
-Then continue with the FMTM installation.
+Then continue with the Field-TM installation.
 
 ### MacOS
 
@@ -150,7 +150,7 @@ Run Colima:
 colima start
 ```
 
-Then continue with the FMTM installation.
+Then continue with the Field-TM installation.
 
 > Note: only tagged backend images are multi-architecture, supporting
 > MacOS. The regular images for fast continuous deployment are not:
@@ -158,7 +158,7 @@ Then continue with the FMTM installation.
 
 ### A Note on Docker Desktop
 
-While in theory FMTM should run using Docker-Desktop, it has not
+While in theory Field-TM should run using Docker-Desktop, it has not
 been tested.
 
 The authors opinion is that the official Linux Docker Daemon
@@ -175,7 +175,7 @@ in a Linux operating system!
 
 ## Help and Support
 
-If you encounter any issues or need assistance while using FMTM, you can access
+If you encounter any issues or need assistance while using Field-TM, you can access
 the following resources:
 
 - Check the [FAQs][9].
@@ -184,7 +184,7 @@ the following resources:
 
 Happy coding!
 
-The FMTM Developer Team
+The Field-TM Developer Team
 
 [1]: https://docs.getodk.org/central-intro
 [2]: https://docs.fmtm.dev/dev/Backend

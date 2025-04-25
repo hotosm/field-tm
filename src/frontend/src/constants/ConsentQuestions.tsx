@@ -115,7 +115,7 @@ export const consentQuestions: consentQuestionsType[] = [
         id: 'main_site',
         label: (
           <span>
-            The main Field Mapping Tasking Manager{' '}
+            The main Field Tasking Manager{' '}
             <a
               href="https://fmtm.hotosm.org/"
               className="fmtm-text-primaryRed hover:fmtm-text-red-700 fmtm-cursor-pointer fmtm-w-fit"

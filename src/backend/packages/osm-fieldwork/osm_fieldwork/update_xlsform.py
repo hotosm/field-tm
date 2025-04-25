@@ -277,7 +277,7 @@ async def append_field_mapping_fields(
     need_verification_fields: bool = True,
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
-    """Append mandatory fields to the XLSForm for use in FMTM.
+    """Append mandatory fields to the XLSForm for use in Field-TM.
 
     Args:
         custom_form (BytesIO): The XLSForm data uploaded, wrapped in BytesIO.

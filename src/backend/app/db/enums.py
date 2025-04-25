@@ -1,19 +1,19 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Enum definitions to translate values into human enum strings."""
 
@@ -68,7 +68,7 @@ class ProjectPriority(StrEnum, Enum):
 
 
 class UserRole(StrEnum, Enum):
-    """Available roles assigned to a user site-wide in FMTM.
+    """Available roles assigned to a user site-wide in Field-TM.
 
     Can be used for global user permissions:
         - READ_ONLY = write access blocked (i.e. banned)
@@ -138,7 +138,7 @@ class TaskEvent(StrEnum, Enum):
 
 
 class MappingState(StrEnum, Enum):
-    """State options for tasks in FMTM.
+    """State options for tasks in Field-TM.
 
     NOTE We no longer have states invalidated / bad, and instead rely on the
     EntityState.MARKED_BAD buildings to display red on the map.

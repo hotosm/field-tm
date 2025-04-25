@@ -1,6 +1,6 @@
 # Workflow Diagrams
 
-The super admin workflow covers the flow of FMTM from beginning to
+The super admin workflow covers the flow of Field-TM from beginning to
 end covering almost all functionalities.
 
 [Link](https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fdesign%2Fql3I4DigHvFFbIGZUpEdjv%2FUser-flow-diagram%3Fnode-id%3D1-314%26t%3DvbkyN4gQXVOAnqgF-1)

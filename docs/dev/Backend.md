@@ -1,6 +1,6 @@
 # Backend Deployment for Development
 
-The recommended way to run FMTM is with Docker.
+The recommended way to run Field-TM is with Docker.
 
 You can also develop on your local machine outside of Docker,
 see below.
@@ -14,7 +14,7 @@ Now let's get started :thumbsup:
 ## 1. Start the API with Docker
 
 The easiest way to get up and running is by using the
-FMTM Docker deployment. Docker creates a virtual environment,
+Field-TM Docker deployment. Docker creates a virtual environment,
 isolated from your computer's environment, installs all necessary
 dependencies, and creates a container for each the database, the api,
 and the frontend. These containers talk to each other via the
@@ -24,7 +24,7 @@ URLs defined in the docker-compose file and your env file.
    [Install Docker](https://docs.docker.com/engine/install/)
    and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory
-   of the FMTM project.
+   of the Field-TM project.
 3. From the command line run: `docker compose pull`.
    This will pull the latest container builds from **main** branch.
 4. Make sure you have a `.env` file with all required variables, see
@@ -42,7 +42,7 @@ URLs defined in the docker-compose file and your env file.
 
 ### Bundled ODK Central
 
-- FMTM uses ODK Central to store ODK data.
+- Field-TM uses ODK Central to store ODK data.
 - To facilitate faster development, the Docker setup includes a Central server.
 - The credentials are provided via the `.env` file, and the default URL to
   access Central from within containers is: `https://odkcentral:8443`.
@@ -61,7 +61,7 @@ just start without-central
 
 ## 2. Start the API without Docker
 
-- To run FMTM without Docker, you will need to start the database, then the API.
+- To run Field-TM without Docker, you will need to start the database, then the API.
 - First start a Postgres database running on a port on your machine.
   - The database must have the Postgis extension installed.
 - After starting the database, from the command line:
@@ -126,7 +126,7 @@ just migrate
 
 ### Interactive Debugging
 
-- The `compose.yaml` builds FMTM using the `debug` target in the Dockerfile.
+- The `compose.yaml` builds Field-TM using the `debug` target in the Dockerfile.
 - The debug image contains `debugpy` to assist debugging in the container.
 
 To use it:
@@ -204,13 +204,13 @@ To assess performance of endpoints:
 
 ### Debugging osm-fieldwork
 
-`osm-fieldwork` is an integral package for much of the functionality in FMTM.
+`osm-fieldwork` is an integral package for much of the functionality in Field-TM.
 
 Creating a new release during development may not always be feasible.
 
 - A development version of osm-fieldwork can be mounted into
-  the FMTM container via bind mount.
-- Clone the osm-fieldwork repo to the same root directory as FMTM.
+  the Field-TM container via bind mount.
+- Clone the osm-fieldwork repo to the same root directory as Field-TM.
 - Uncomment the line in compose.yaml
 
 ```yaml
@@ -277,7 +277,7 @@ url=http://s3.fmtm.localhost:7050 0 0`
 
 ### Running JOSM in the dev stack
 
-- Run JOSM with FMTM via Just:
+- Run JOSM with Field-TM via Just:
 
 ```bash
 just start josm
@@ -285,7 +285,8 @@ just start josm
 
 This adds JOSM to the docker compose stack for local development.
 
-You can now call the JOSM API from FMTM and changes will be reflected in the GUI.
+You can now call the JOSM API from Field-TM and changes will be
+reflected in the GUI.
 
 ### Debugging ODK forms when running on localhost
 
@@ -307,19 +308,19 @@ project creation. The QRCode should now work in ODK Collect.
 
 ### Creating projects via the API
 
-FieldTM supports API Keys, meaning in theory an external system could be used
+Field-TM supports API Keys, meaning in theory an external system could be used
 to create projects and call API endpoints, using the key.
 
 #### 1. Create an API key
 
-- Log into FieldTM as you the user you wish to use.
+- Log into Field-TM as you the user you wish to use.
 - The user must have organization manager permission for creating new projects.
 - Generate an API key by accessing the following endpoint in the same browser
   you logged in as:
 
   `/integrations/api-key`
 
-- Save the API key somewhere safe! The key can access all your data in FieldTM!
+- Save the API key somewhere safe! The key can access all your data in Field-TM!
 - For any API call you make in the next section, ensure to set the `x-api-key`
   header. See the example in the next section!
 

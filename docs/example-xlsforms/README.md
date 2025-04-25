@@ -1,6 +1,6 @@
 # Example XLSForms
 
-This directory contains some example XLSForms (surveys) taken from FMTM testing.
+This directory contains some example XLSForms (surveys) taken from Field-TM testing.
 
 The XLSForms were produced via iterative feedback from field teams from various
 organisations.

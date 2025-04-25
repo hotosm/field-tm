@@ -1,7 +1,7 @@
 import type { LoginProviderKey } from '$store/common.svelte';
 
 // The /auth/me endpoint does an UPSERT in the database, ensuring the user
-// exists in the FMTM DB
+// exists in the Field-TM DB
 export const getUserDetailsFromApi = async (fetchClient = fetch) => {
 	try {
 		const response = await fetchClient(`${import.meta.env.VITE_API_URL}/auth/me`, {

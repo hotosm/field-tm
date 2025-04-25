@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import FmtmLogo from '@/assets/images/hotLog.png';
+import hotLogo from '@/assets/images/favicon.svg';
 
 type bottomSheetType = {
   body: React.ReactElement;
@@ -86,7 +86,7 @@ const BottomSheet = ({ body, onClose }: bottomSheetType) => {
         ref={bottomSheetRef}
       >
         <div className={`fmtm-fixed fmtm-left-0`} ref={logoRef}>
-          <img src={FmtmLogo} alt="Hot Fmtm Logo" className="fmtm-ml-2 fmtm-z-10 fmtm-w-[5.2rem]  fmtm-mb-4" />
+          <img src={hotLogo} alt="Hot Fmtm Logo" className="fmtm-ml-2 fmtm-z-10 fmtm-w-[5.2rem]  fmtm-mb-4" />
         </div>
         <div
           ref={sheetContentRef}
