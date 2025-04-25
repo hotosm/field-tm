@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '$styles/dialog-task-actions.css';
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { ProjectData } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
@@ -48,15 +48,13 @@
 					tabindex="0"
 					class="icon"
 				>
-					<hot-icon
-						name="new-window"
-					></hot-icon>
+					<hot-icon name="new-window"></hot-icon>
 					<p class="action">{m['popup.map_new_feature']()}</p>
 				</div>
 			</div>
 
 			{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
-				<p class="unlock-selected">{m['popup.start_mapping_task']({taskId: taskStore.selectedTaskIndex})}</p>
+				<p class="unlock-selected">{m['popup.start_mapping_task']({ taskId: taskStore.selectedTaskIndex })}</p>
 				<div class="unlock-actions">
 					<sl-button
 						size="small"
@@ -88,13 +86,15 @@
 						role="button"
 						tabindex="0"
 					>
-						<hot-icon slot="prefix" name="location"
-						></hot-icon>
+						<hot-icon slot="prefix" name="location"></hot-icon>
 						<span>{m['popup.start_mapping']()}</span>
 					</sl-button>
 				</div>
 			{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
-				<p class="lock-selected">{m['dialog_task_actions.task']()} #{taskStore.selectedTaskIndex} {m['dialog_task_actions.locked_is_complete']()} </p>
+				<p class="lock-selected">
+					{m['dialog_task_actions.task']()} #{taskStore.selectedTaskIndex}
+					{m['dialog_task_actions.locked_is_complete']()}
+				</p>
 				<div class="lock-actions">
 					<sl-button
 						onclick={() => {
@@ -112,10 +112,7 @@
 						role="button"
 						tabindex="0"
 					>
-						<hot-icon
-							slot="prefix"
-							name="close"
-						></hot-icon>
+						<hot-icon slot="prefix" name="close"></hot-icon>
 						<span>{m['popup.cancel_mapping']()}</span>
 					</sl-button>
 					<sl-button
