@@ -39,6 +39,7 @@
 	function handleSubmit(payload: any) {
 		(async () => {
 			if (!payload.detail) return;
+			if (!projectId) return;
 
 			const { instanceFile, attachments = [] } = await payload.detail[0].data[0];
 			let submission_xml = await instanceFile.text();
@@ -80,10 +81,20 @@
 				body: data,
 			});
 
-			// Set the entity status to SURVEY_SUBMITTED (2)
+			let entityStatus = null;
+			if (submission_xml.includes('<feature_exists>no</feature_exists>')) {
+				entityStatus = 6; // MARKED_BAD
+			} else if (submission_xml.includes('<digitisation_correct>no</digitisation_correct>')) {
+				entityStatus = 6; // MARKED_BAD
+			} else if (entitiesStore.newGeomList.features.find((feature) => feature.properties?.entity_id === entityId)) {
+				entityStatus = 3; // NEW_GEOM
+			} else {
+				entityStatus = 2; // SURVEY_SUBMITTED
+			}
+
 			entitiesStore.updateEntityStatus(projectId, {
 				entity_id: selectedEntity?.entity_id,
-				status: 2,
+				status: entityStatus,
 				// NOTE here we don't translate the field as English values are always saved as the Entity label
 				label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
 			});
