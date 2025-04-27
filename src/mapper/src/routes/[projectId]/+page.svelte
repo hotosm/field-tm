@@ -205,7 +205,19 @@
 			});
 			entitiesStore.syncEntityStatus(data.projectId);
 			cancelMapNewFeatureInODK();
-			openOdkCollectNewFeature(data?.project?.odk_form_id, entity.uuid);
+
+			if (commonStore.enableWebforms) {
+				await entitiesStore.setSelectedEntity(entity.uuid);
+				openedActionModal = null;
+				entitiesStore.updateEntityStatus(data.projectId, {
+					entity_id: entity.uuid,
+					status: 1,
+					label: entity?.currentVersion?.label,
+				});
+				displayWebFormsDrawer = true;
+			} else {
+				openOdkCollectNewFeature(data?.project?.odk_form_id, entity.uuid);
+			}
 		} catch (error) {
 			alertStore.setAlert({ message: 'Unable to create entity', variant: 'danger' });
 		} finally {
