@@ -1,6 +1,5 @@
-import { getAlertStore, getCommonStore } from '$store/common.svelte.ts';
+import { getAlertStore } from '$store/common.svelte.ts';
 
-const commonStore = getCommonStore();
 const alertStore = getAlertStore();
 
 export function openOdkCollectNewFeature(xFormId: string, entityId: string) {
@@ -10,10 +9,7 @@ export function openOdkCollectNewFeature(xFormId: string, entityId: string) {
 
 	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-	if (commonStore.enableWebforms) {
-		// TODO can we open the webform directly, instead of needing to click
-		// TODO the 'Collect Data' button?
-	} else if (!isMobile) {
+	if (!isMobile) {
 		alertStore.setAlert({
 			variant: 'warning',
 			message: 'Requires a mobile phone with ODK Collect.',
