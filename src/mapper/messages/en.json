@@ -113,5 +113,8 @@
 		"distance": "Distance"
 	},
 	"scan_qr_code": "Scan this QR code in ODK Collect from another users phone, or download and import it manually",
-	"download": "DOWNLOAD"
+	"download": "DOWNLOAD",
+	"forms": {
+		"default_language_warning": "Displaying form in its default language because there is no English version of the form."
+	}
 }

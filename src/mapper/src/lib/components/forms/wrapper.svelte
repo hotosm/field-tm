@@ -5,6 +5,7 @@
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { fetchBlobUrl, fetchFormMediBlobUrls } from '$lib/utils/fetch.ts';
+	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
 
@@ -16,6 +17,7 @@
 		taskId: number | undefined;
 		webFormsRef: HTMLElement | undefined;
 	};
+
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -29,6 +31,8 @@
 	let drawerRef: SlDrawer;
 	let odkForm: any;
 	let startDate: string | undefined;
+
+	let drawerLabel = $state('');
 
 	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
 
@@ -108,9 +112,34 @@
 
 			// over-write default language
 			const target = `(${commonStore.locale.toLowerCase()})`;
+
+			// language in OdkWebForm corresponding to app language
 			const lang = odkForm.languages.find((it: any) => it?.language.toLowerCase().includes(target));
-			if (lang) {
+
+			// dictionary of languages and the numbers of translations for each
+			const lang_translations = Object.fromEntries(
+				odkForm.languages.map(({ language }: { language: string }) => [
+					language,
+					odkForm.definition.model.itextTranslations
+						.get(language)
+						?.children.filter((node: any) => ![undefined, null, '', '-'].includes(node.children[0].value)).length || 0,
+				]),
+			);
+
+			// the maximum number of text translations for a language
+			// this gives us the upper bound of how much a "fully translated" form should have
+			const maxTranslations = Math.max(...(Object.values(lang_translations) as number[]));
+
+			// only consider languages with at least 50% of translations enough to enable that language for display
+			const displayableLanguages = odkForm.languages.filter(
+				({ language }: { language: string }) => lang_translations[language] / maxTranslations > 0.5,
+			);
+
+			// check if language has enough valid translations to display
+			if (displayableLanguages.includes(lang)) {
 				odkForm?.setLanguage(lang);
+			} else {
+				drawerLabel = m['forms.default_language_warning']() || '';
 			}
 
 			const nodes = odkForm.getChildren();
@@ -196,8 +225,12 @@
 					{#await formMediaPromise then formMedia}
 						{#key entityId}
 							{#key commonStore.locale}
+								<div style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;">
+									{drawerLabel}
+								</div>
 								<iframe
 									class="iframe"
+									style:border="none"
 									style:height="100%"
 									use:handleIframe
 									title="odk-web-forms-wrapper"
