@@ -29,7 +29,7 @@
 	<!-- Text above the QR code -->
 	<div class="title-wrapper">
 		<div class="title">
-			{#key commonStore.locale}<span>{m.scan_qr_code()}</span>{/key}
+			{#key commonStore.locale}<span>{m['odk.scan_qr_code']()}</span>{/key}
 			<sl-tooltip content={m['qrcode.moreinfo']()} placement="bottom">
 				<hot-icon
 					onclick={() => {

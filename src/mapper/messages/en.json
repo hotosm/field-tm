@@ -42,7 +42,10 @@
 		"cancel": "CANCEL",
 		"navigate_here": "NAVIGATE HERE",
 		"map_in_odk": "MAP FEATURE IN ODK",
-		"collect_data": "COLLECT DATA"
+		"collect_data": "COLLECT DATA",
+		"task_complete_total_mapped": "You have mapped {totalMapped} features in the task area.",
+		"task_complete_only_total_mapped": "You have only mapped {totalMapped} features in the task area.",
+		"task_complete_confirm": "Are you sure you wish to mark this task as complete?"
 	},
 	"stack_group": {
 		"project_information": "Project Information",
@@ -54,7 +57,8 @@
 		"features": "Legend (Features)"
 	},
 	"odk": {
-		"open": "Open ODK"
+		"open": "Open ODK",
+		"scan_qr_code": "Scan this QR code in ODK Collect from another users phone, or download and import it manually"
 	},
 	"basemaps": {
 		"manage": "Manage Basemaps",
@@ -97,7 +101,8 @@
 	"dialog_task_actions": {
 		"complete_mapping": "COMPLETE MAPPING",
 		"locked_is_complete": "has been locked. Is the task completely mapped?",
-		"task": "Task"
+		"task": "Task",
+		"continue_mapping": "CONTINUE MAPPING"
 	},
 	"pagination": {
 		"go_to_page": "Go to page"
@@ -112,7 +117,6 @@
 	"geolocation": {
 		"distance": "Distance"
 	},
-	"scan_qr_code": "Scan this QR code in ODK Collect from another users phone, or download and import it manually",
 	"download": "DOWNLOAD",
 	"forms": {
 		"default_language_warning": "Displaying form in its default language because there is no English version of the form."
