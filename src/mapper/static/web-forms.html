@@ -87,7 +87,7 @@
 							const filename = image.textContent.trim().replace('jr://images/', '');
 							if (filename in formMedia) {
 								const imageUrl = formMedia[filename];
-								style.innerHTML += `.columns-pack label.value-option.no-buttons[for$=${value}] { background-image: url("${imageUrl}"); }\n`;
+								style.innerHTML += `.columns-pack label.value-option.no-buttons[for$=${value.toLowerCase()}] { background-image: url("${imageUrl}"); }\n`;
 							}
 						}
 					}
