@@ -13,7 +13,7 @@ For details on how to run the API first, please see:
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/)
    and ensure that it is running on your local machine.
-2. From the command line: navigate to the top level directory of the FMTM project.
+2. From the command line: navigate to the top level directory of the Field-TM project.
 3. From the command line run: `docker compose build ui`
    This is essential, as the development container for the frontend is
    different to production.
@@ -72,7 +72,7 @@ just test frontend
 
 > View the HTML report at: `http://localhost:9323`.
 
-To run the FMTM UI for interactive testing, run:
+To run the Field-TM UI for interactive testing, run:
 
 ```bash
 just test frontend-interactive

@@ -4,7 +4,7 @@ function useDocumentTitle(titleSuffix: string, prevailOnUnmount: boolean = false
   const defaultTitle = useRef(document.title);
 
   useEffect(() => {
-    document.title = `${titleSuffix} - HOT Field Mapping Tasking Manager`;
+    document.title = `${titleSuffix} - HOT Field Tasking Manager`;
   }, [titleSuffix]);
 
   useEffect(

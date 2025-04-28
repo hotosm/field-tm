@@ -1,21 +1,21 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Logic for FMTM project routes."""
+"""Logic for Field-TM project routes."""
 
 import json
 import subprocess
@@ -453,7 +453,7 @@ async def generate_project_files(
     QR code (appuser), ODK XForm, ODK Entities from OSM data extract.
 
     Args:
-        project_id(int): id of the FMTM project.
+        project_id(int): id of the Field-TM project.
         background_task_id (uuid): the task_id of the background task.
         db (Connection): The database connection, newly generated.
 
@@ -509,7 +509,7 @@ async def generate_project_files(
             entity_properties,
         )
         log.debug(
-            f"Setting encrypted odk token for FMTM project ({project_id}) "
+            f"Setting encrypted odk token for Field-TM project ({project_id}) "
             f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15]}...)"
         )
         await DbProject.update(

@@ -22,14 +22,14 @@
 
 For use in data collection and mapping tasks.
 The generated form includes metadata, survey questions, and settings
-required for compatibility with HOT's FMTM tools.
+required for compatibility with HOT's Field-TM tools.
 It programmatically organizes form sections into metadata,
 mandatory fields, and entities, and outputs them in a structured format.
 
 Modules and functionalities:
 - **Metadata Sheet**: Includes default metadata fields
     such as `start`, `end`, `username`, and `deviceid`.
-- **Survey Sheet**: Combines metadata with mandatory fields required for FMTM workflows.
+- **Survey Sheet**: Combines metadata with mandatory fields required for Field-TM workflows.
     - `warmup` for collecting initial location.
     - `feature` for selecting map geometry from predefined options.
     - `new_feature` (ODK Collect only) for capturing GPS coordinates of new features.
@@ -159,7 +159,7 @@ def _get_mandatory_fields(
         {
             "type": "calculate",
             "name": "task_id",
-            "notes": "e.g. FMTM Task ID",
+            "notes": "e.g. Field-TM Task ID",
             "label::english(en)": "Task ID",
             "appearance": "minimal",
             "calculation": f"if({FEATURE} != '', {INSTANCE_FEATURE}/task_id, '')",

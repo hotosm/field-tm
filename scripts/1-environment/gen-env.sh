@@ -195,22 +195,22 @@ check_external_database() {
     if [ "$EXTERNAL_DB" = "True" ]; then
         echo
         echo "Please enter the database host."
-        read -erp "FMTM DB Host: " FMTM_DB_HOST
+        read -erp "Field-TM DB Host: " FMTM_DB_HOST
         echo
         export FMTM_DB_HOST=${FMTM_DB_HOST}
 
         echo "Please enter the database name."
-        read -erp "FMTM DB Name: " FMTM_DB_NAME
+        read -erp "Field-TM DB Name: " FMTM_DB_NAME
         echo
         export FMTM_DB_NAME=${FMTM_DB_NAME}
 
         echo "Please enter the database user."
-        read -erp "FMTM DB User: " FMTM_DB_USER
+        read -erp "Field-TM DB User: " FMTM_DB_USER
         echo
         export FMTM_DB_USER=${FMTM_DB_USER}
 
         echo "Please enter the database password."
-        read -erp "FMTM DB Password: " FMTM_DB_PASSWORD
+        read -erp "Field-TM DB Password: " FMTM_DB_PASSWORD
         echo
         export FMTM_DB_PASSWORD=${FMTM_DB_PASSWORD}
 
@@ -258,11 +258,11 @@ set_minio_s3_creds() {
 }
 
 set_domains() {
-    pretty_echo "FMTM Domain Name"
+    pretty_echo "Field-TM Domain Name"
 
-    echo "To run FMTM you must own a domain name."
+    echo "To run Field-TM you must own a domain name."
     while true; do
-        read -erp "Enter a valid domain name you wish to run FMTM from: " fmtm_domain
+        read -erp "Enter a valid domain name you wish to run Field-TM from: " fmtm_domain
 
         if [ "$fmtm_domain" = "" ]; then
             echo "Invalid input!"
@@ -276,7 +276,7 @@ set_domains() {
     current_ip=$(hostname -I | cut -d' ' -f1)
 
     echo
-    echo "Using $fmtm_domain as your main domain for FMTM."
+    echo "Using $fmtm_domain as your main domain for Field-TM."
     echo
     echo "Please ensure the following DNS entries are set:"
     echo
@@ -289,7 +289,7 @@ set_domains() {
     read -erp "Once these DNS entries are set and valid, press ENTER to continue."
 
     pretty_echo "Certificates"
-    echo "FMTM will automatically generate SSL (HTTPS) certificates for your domain name."
+    echo "Field-TM will automatically generate SSL (HTTPS) certificates for your domain name."
     while true; do
         echo "Enter an email address you wish to use for certificate generation."
         read -erp "This will be used by LetsEncrypt, but for no other purpose: " cert_email
@@ -339,7 +339,7 @@ check_change_port() {
         echo "Using $fmtm_port"
         export FMTM_DEV_PORT="$fmtm_port"
     else
-        echo "Using port 7050 for FMTM."
+        echo "Using port 7050 for Field-TM."
     fi
 }
 
@@ -365,7 +365,7 @@ generate_dotenv() {
 }
 
 prompt_user_gen_dotenv() {
-    pretty_echo "Generate dotenv config for FMTM"
+    pretty_echo "Generate dotenv config for Field-TM"
     check_existing_dotenv
     install_envsubst_if_missing
     check_if_test

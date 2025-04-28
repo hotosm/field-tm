@@ -113,5 +113,8 @@
 		"distance": "Distância"
 	},
 	"scan_qr_code": "Digitalize este código QR no ODK Collect a partir do telefone de outro usuário ou faça o download e importe-o manualmente",
-	"download": "BAIXAR"
+	"download": "BAIXAR",
+	"forms": {
+		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário."
+	}
 }

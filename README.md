@@ -6,7 +6,7 @@
 </p>
 
 <div align="center">
-    <h1>Field Mapping Tasking Manager (FMTM)</h1>
+    <h1>Field Tasking Manager (Field-TM)</h1>
     <p>Coordinated field mapping for Open Mapping campaigns.</p>
     <a href="https://github.com/hotosm/fmtm/releases">
         <img src="https://img.shields.io/github/v/release/hotosm/fmtm?logo=github" alt="Release Version" />
@@ -22,7 +22,7 @@
 | :--- | :--- | :--- |
 | **Tech Stack** | | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Svelte](https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
 | **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com) |
-| **Quality** | | [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/fieldtm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
+| **Quality** | | [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
 | **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) |
 | **Other Info** | | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license-code](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/fmtm/blob/main/src/mapper/messages/LICENSE.md) |
 
@@ -34,11 +34,11 @@
 <!-- prettier-ignore-end -->
 
 Building on the success of HOT's [Tasking Manager](https://tasks.hotosm.org), a tool
-for coordinating remote digitization of map features, the FMTM was conceived with
-the purpose of tagging the features with _field-verified_ information.
+for coordinating remote digitization of map features, the Field-TM was conceived
+with the purpose of tagging the features with _field-verified_ information.
 
 While there are many excellent applications for tagging map features already,
-the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
+the Field-TM aims to solve the problem of **coordinating** field mapping campaigns.
 
 > More details can be found here:
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
@@ -46,7 +46,7 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 > [docs](https://docs.fmtm.dev) page, and the
 > [FAQ](https://docs.fmtm.dev/about/faq).
 
-## How FMTM Works
+## How Field-TM Works
 
 1. Project is created in an area with three things:
    - Data extract: the features you want to map, say building polygons.
@@ -56,7 +56,7 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
    in ODK Collect.
 3. User navigates to the feature and fills out the XLSForm survey, then submits.
 4. The submissions are collected by ODK Central, which feeds the data back into
-   FMTM, for cleaning, conflation with existing data, and pushing back to OSM.
+   Field-TM, for cleaning, conflation with existing data, and pushing back to OSM.
 
 ## Usage of ODK
 
@@ -115,7 +115,7 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 📱 mapping of project via survey in ODK Collect mobile app | Since [v2024.4.0][1] |
 | ✅ | 📱 locking & unlocking of tasks to coordinate mapping | Since [v2024.4.0][1] |
 | ✅ | 📱 download base imagery & geolocation for in the field | Since [v2024.4.0][1] |
-| ✅ | 🖥️ view mapper submissions in the FMTM dashboard | Since [v2024.4.0][1] |
+| ✅ | 🖥️ view mapper submissions in the Field-TM dashboard | Since [v2024.4.0][1] |
 | ✅ | 📢 Beta Release | Since [v2024.4.0][1] |
 | ✅ | 🖥️ & 📱 basic user tutorials and usage guides | Since [v2024.4.0][1] |
 | ✅ | 📱 open ODK Collect with feature already selected | Since [v2024.4.0][1] |
@@ -129,7 +129,7 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 🖥️ inviting users to projects via invite link | Expected [v2025.2.0][4] |
 | ✅ | 🖥️ optional private projects to restrict access | Expected [v2025.2.0][4] |
 | ✅ | 📱 fully translated mapper UI and survey in any language | Expected [v2025.2.0][4] |
-| ✅ | 📱 custom FieldTM deployments with updated branding | Expected [v2025.2.0][4] |
+| ✅ | 📱 custom Field-TM deployments with updated branding | Expected [v2025.2.0][4] |
 | 🔄 | 📱 fully offline field mapping (local-first design) | – |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 📅 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
@@ -235,7 +235,7 @@ Thanks goes to these wonderful people:
 
 ## Repo Activity
 
-![FMTM Repo Activity](https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image")
+![Field-TM Repo Activity](https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image")
 
 [1]: https://github.com/hotosm/fmtm/releases/tag/2024.4.0 "Beta Release"
 [2]: https://github.com/hotosm/fmtm/releases/tag/2024.5.0 "Mapper Frontend"

@@ -24,7 +24,7 @@ DB_URL = settings.FMTM_DB_URL.unicode_string()
 #  - All metrics are isolated subqueries, using indexes efficiently
 #  - No big joins, no GROUP BY, no row explosions
 #  - Each subquery uses narrow filters (WHERE project_id = p.id)
-# NOTE as FieldTM scales and projects increase, we could swap the final
+# NOTE as Field-TM scales and projects increase, we could swap the final
 # NOTE    FROM projects p;
 # NOTE to
 # NOTE    WHERE p.id in (SELECT id FROM projects COUNT xxx);

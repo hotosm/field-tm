@@ -733,7 +733,7 @@
 - Add new user manual
 - Refactor to use an array of database connections, one for each thread to avoid proble
 - Not all data has a timestamp, and it gets set anyone to the current time
-- Major refactoring to support conflation with either postgis or the data extract used for FMTM
+- Major refactoring to support conflation with either postgis or the data extract used for Field-TM
 - keep more tags for the output file
 - add more tags to keep for the output file
 - Add newline after writing </way>
@@ -743,7 +743,7 @@
 - Improve test cases so they can find the test data files under pytest
 - Update test data, and add test case for odk_merge
 - Add section on importing the data into postgres
-- use log so it works in FMTM, get the feature version in SQL queries
+- use log so it works in Field-TM, get the feature version in SQL queries
 - Add support for using a GeoJson data extract as the conflation source
 - Implement writing the OSM XML output file
 - There are weird capitalization in the keywords
@@ -776,7 +776,7 @@
 
 ### Fix
 
-- Convert the currt JSON format as downloaded from FMTM
+- Convert the currt JSON format as downloaded from Field-TM
 - Fix processing of the ignore section
 - Always write the value as a sting
 - Remove the sldes.xls file
@@ -869,7 +869,7 @@
 - Process ODK_CENTRAL_SECURE correctly as the value from the end is a string, but the default is a bool
 - Updates to layout, play with fancy colors
 - Add method to extract the data extract filename, the XLSFOrm ID, and the XLSForm title from the spreadsheet
-- Make default values work so we don't break the FMTM frontend
+- Make default values work so we don't break the Field-TM frontend
 - Add content about name conflicts when using data extracts
 - delete downloaded zip file after extracting the data file
 - Implement uploading to Central

@@ -1,7 +1,7 @@
 apiVersion: v2
 type: application
 name: fmtm
-description: Field Mapping Tasking Manager - coordinated field mapping.
+description: Field Tasking Manager - coordinated field mapping.
 version: "0.1.0"
 appVersion: "2025.1.1"
 maintainers:

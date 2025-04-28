@@ -6,32 +6,17 @@
 	import ProjectInfo from '$lib/components/more/project-info.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { ProjectData, TaskEventType } from '$lib/types';
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
+	import { getCommonStore } from '$store/common.svelte';
 
 	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info';
 
-	const stackGroup: { id: stackType, icon: string; title: string }[] = [
-		{
-			id: 'project-info',
-			icon: 'info-circle',
-			title: m['stack_group.project_information'](),
-		},
-		{
-			id: 'comment',
-			icon: 'chat',
-			title: m['stack_group.comment'](),
-		},
-		{
-			id: 'instructions',
-			icon: 'description',
-			title: m['stack_group.instructions'](),
-		},
-		{
-			id: 'activities',
-			icon: 'list-ul',
-			title: m['stack_group.activities'](),
-		},
-	];
+	type stackGroupType = {
+		id: stackType;
+		icon: string;
+		title: string;
+		show: boolean;
+	};
 
 	type Props = {
 		projectData: ProjectData;
@@ -40,6 +25,34 @@
 
 	let { projectData, zoomToTask }: Props = $props();
 	const taskStore = getTaskStore();
+	const commonStore = getCommonStore();
+
+	const stackGroup: stackGroupType[] = [
+		{
+			id: 'project-info',
+			icon: 'info-circle',
+			title: m['stack_group.project_information'](),
+			show: true,
+		},
+		{
+			id: 'comment',
+			icon: 'chat',
+			title: m['stack_group.comment'](),
+			show: true,
+		},
+		{
+			id: 'instructions',
+			icon: 'description',
+			title: m['stack_group.instructions'](),
+			show: !commonStore.enableWebforms,
+		},
+		{
+			id: 'activities',
+			icon: 'list-ul',
+			title: m['stack_group.activities'](),
+			show: true,
+		},
+	];
 
 	let activeStack: stackType = $state('');
 	let activeStackTitle: string = $state('');
@@ -77,27 +90,29 @@
 <div class={`more ${activeStack === 'comment' ? 'more-comment' : 'more-no-comment'}`}>
 	{#if activeStack === ''}
 		{#each stackGroup as stack}
-			<div
-				class="stack"
-				onclick={() => {
-					activeStack = stack.id;
-					activeStackTitle = stack.title;
-				}}
-				onkeydown={(e) => {
-					if (e.key === 'Enter') {
+			{#if stack?.show}
+				<div
+					class="stack"
+					onclick={() => {
 						activeStack = stack.id;
 						activeStackTitle = stack.title;
-					}
-				}}
-				tabindex="0"
-				role="button"
-			>
-				<div class="icon-title">
-					<hot-icon name={stack.icon} class="icon"></hot-icon>
-					<p>{stack.title}</p>
+					}}
+					onkeydown={(e) => {
+						if (e.key === 'Enter') {
+							activeStack = stack.id;
+							activeStackTitle = stack.title;
+						}
+					}}
+					tabindex="0"
+					role="button"
+				>
+					<div class="icon-title">
+						<hot-icon name={stack.icon} class="icon"></hot-icon>
+						<p>{stack.title}</p>
+					</div>
+					<hot-icon name="chevron-right" class="icon-next"></hot-icon>
 				</div>
-				<hot-icon name="chevron-right" class="icon-next"></hot-icon>
-			</div>
+			{/if}
 		{/each}
 	{/if}
 
@@ -108,13 +123,13 @@
 				name="chevron-left"
 				class="icon"
 				onclick={() => {
-					activeStack = ''; 
-					activeStackTitle = ''
+					activeStack = '';
+					activeStackTitle = '';
 				}}
 				onkeydown={(e: KeyboardEvent) => {
 					if (e.key === 'Enter') {
-						activeStack = ''; 
-						activeStackTitle = ''
+						activeStack = '';
+						activeStackTitle = '';
 					}
 				}}
 				tabindex="0"

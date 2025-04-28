@@ -9,6 +9,7 @@ services:
     environment:
       - ADMIN_PASSWORD=pass
       - APPLICATION_URL=localhost:8334
+      - LOG_LEVEL=DEBUG
     # - OFFICE_URL=wopi_server:9980
     # - OFFICE_FILESTASH_URL=app:8334
     # - OFFICE_REWRITE_URL=127.0.0.1:9980
@@ -36,7 +37,7 @@ services:
   #   ports:
   #   - "9980:9980"
 
-  # This service makes the Minio API in the FMTM dev stack accessible on port 9000
+  # This service makes the Minio API in the Field-TM dev stack accessible on port 9000
   # localhost, despite not being bound in the dev compose.yaml file
   port-bind:
     profiles: [bind]

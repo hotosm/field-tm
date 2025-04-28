@@ -2,15 +2,15 @@
 
 <div align="center">
 
-<h1>The FMTM Team</h1>
+<h1>The Field-TM Team</h1>
 
-<p>FMTM is developed as a collaboration between HOT's Tech Team &
+<p>Field-TM is developed as a collaboration between HOT's Tech Team &
 <a
   href="https://naxa.com.np"
   target="_blank"
 >NAXA</a></p>
 
-<p>The key staff working on FMTM are listed below.</p>
+<p>The key staff working on Field-TM are listed below.</p>
 
 <div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/12103383?v=4" width="100" style="border-radius: 50%;" alt="Ramya">

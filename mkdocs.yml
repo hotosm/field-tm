@@ -1,4 +1,4 @@
-site_name: FMTM
+site_name: Field-TM
 site_description: Coordinated field mapping for Open Mapping campaigns.
 # strict: true
 site_url: "https://docs.fmtm.dev/"
@@ -23,7 +23,7 @@ theme:
   palette:
     primary: custom
   language: en
-  favicon: images/favicon.png
+  favicon: images/favicon.svg
   logo: images/hot_logo.png
 
 extra_css:

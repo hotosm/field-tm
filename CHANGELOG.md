@@ -26,7 +26,7 @@
 - **backend**: add endpoint to create an entity in existing project for new geometry (#2145)
 - **frontend**: update user roles list during project creation (#2135)
 - **frontend**: add table component and manage users page (#2133)
-- **backend**: add central-webhook service for triggering entity status updates in FMTM database (#2130)
+- **backend**: add central-webhook service for triggering entity status updates in Field-TM database (#2130)
 - **backend**: migration to add dataset property to old projects (#2126)
 - **users**: add pagination and search functionality (#2124)
 - **backend**: add endpoint to change global user roles (#2117)
@@ -639,7 +639,7 @@
 - default map background changed to white (#1281)
 - cast osm_id as string for geojson id
 - top level id in geojson Feature as osm_id
-- create odk projects with prepended 'FMTM xxx' to identify
+- create odk projects with prepended 'Field-TM xxx' to identify
 - **frontend**: update qrcode form_update_mode --> match_exactly for sync
 - double wrapped db.execute statement in text()
 - fix passing project id for odk creds proj deletion

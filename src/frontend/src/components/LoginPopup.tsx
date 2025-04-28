@@ -20,7 +20,7 @@ const loginOptions: loginOptionsType[] = [
     id: 'osm_account',
     name: 'Personal OSM Account',
     image: OSMImg,
-    description: 'Edits made in FMTM will be credited to your OSM account.',
+    description: 'Edits made in Field-TM will be credited to your OSM account.',
   },
 ];
 

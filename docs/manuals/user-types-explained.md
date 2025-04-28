@@ -1,4 +1,4 @@
-# Types Of User In FieldTM
+# Types Of User In Field-TM
 
 ## Organisation Managers
 

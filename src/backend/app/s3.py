@@ -1,4 +1,4 @@
-"""Initialise the S3 buckets for FMTM to function."""
+"""Initialise the S3 buckets for Field-TM to function."""
 
 from io import BytesIO
 from typing import Any

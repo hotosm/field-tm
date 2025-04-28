@@ -28,9 +28,9 @@ for field mapping:
 ### Browser Selection
 
 - We recommend using the Chrome browser on your mobile device to access
-  the FMTM platform for optimal performance.
-- If you encounter difficulties using FMTM through the browser, you can
-  add the FMTM browser shortcut to your home screen via the menu.
+  the Field-TM platform for optimal performance.
+- If you encounter difficulties using Field-TM through the browser, you can
+  add the Field-TM browser shortcut to your home screen via the menu.
   ![image](https://github.com/user-attachments/assets/03bd53fb-3879-4a11-a98e-6c8e2651210a)
 
 ## Part (A): Setup For Mapping
@@ -109,7 +109,7 @@ for field mapping:
       The files can be a few 100MB in size.
 
       MBTiles are used for loading into ODK Collect.
-      PMTiles are used for navigating in FMTM.
+      PMTiles are used for navigating in Field-TM.
 
       If you encounter issues with the base imagery, contact your project
       manager.
@@ -157,7 +157,7 @@ Sometimes the feature does not exist on the map yet!
 - Click on a task area: a popup will display.
 - At the top right, there is a button **Map New Feature**.
 - Click on the map to create a new geometry.
-- Once the geometry is drawn on FMTM, save and confirm to be redirected to ODK.
+- Once the geometry is drawn on Field-TM, save and confirm to be redirected to ODK.
 - ODK Collect will then be opened to fill out the survey
   data for the newly created feature.
   ![IMG_20250109_160816](https://github.com/user-attachments/assets/98b70f5a-4db8-46cb-84ae-58bec07c82c1)
@@ -175,7 +175,7 @@ Sometimes the feature does not exist on the map yet!
 
 ### Repeat The Process
 
-- Once the form is submitted, you have to get back to FMTM and select the
+- Once the form is submitted, you have to get back to Field-TM and select the
   another feature for mapping.
 - You also also have to click the **Sync Status** button to see the feature
   turn green.

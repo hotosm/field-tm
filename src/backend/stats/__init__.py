@@ -1,1 +1,1 @@
-"""Scripts using the API to generate FMTM statistics."""
+"""Scripts using the API to generate Field-TM statistics."""

@@ -121,7 +121,7 @@ work flow that a **Field Mapper** has to consider is as follows:
    - <https://fmtm.hotosm.org/>
    - Click in the humberg icon on the top right side of your screen.
    - Click Download Custom ODK Collect.
-4. From the FMTM page, choose a campaign.
+4. From the Field-TM page, choose a campaign.
 5. Select a task from the campaign.
    - Scan the QR code that will be displayed after opening the project for the
      first time before selecting the task.
