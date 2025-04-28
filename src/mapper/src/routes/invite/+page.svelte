@@ -29,9 +29,13 @@
 			const responseData = await response.json();
 
 			// if user not signed in, status is 401. so set inviteUrl path in session storage & show login modal, and after successful sign-in redirect to inviteUrl
-			if (response.status === 401) {
+			if (
+				response.status === 401 ||
+				(response.status === 403 && loginStore?.refreshCookieResponse?.username === 'svcfmtm')
+			) {
 				sessionStorage.setItem('requestedPath', `${location.pathname}${location.search}`);
 				loginStore.toggleLoginModal(true);
+				loginStore.setRefreshCookieResponse({});
 				return;
 			}
 			// throw error besides 401

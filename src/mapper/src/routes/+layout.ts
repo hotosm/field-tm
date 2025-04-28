@@ -18,6 +18,7 @@ export const load: PageLoad = async ({ fetch }) => {
 			Login + user details
 		*/
 		let apiUser = await refreshCookies(fetch);
+		loginStore.setRefreshCookieResponse(apiUser);
 		if (apiUser?.username !== 'svcfmtm') {
 			// Call /auth/me to populate the user details in the header
 			apiUser = await getUserDetailsFromApi(fetch);
