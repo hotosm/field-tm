@@ -48,7 +48,7 @@ from osm_fieldwork.form_components.translations import add_label_translations
 
 NEW_FEATURE = "${new_feature}"
 FEATURE = "${feature}"
-INSTANCE_ID = "${instanceId}"
+INSTANCE_ID = "${instanceID}"
 INSTANCE_FEATURE = "instance('features')/root/item[name=${feature}]"
 
 
@@ -86,6 +86,7 @@ def _get_mandatory_fields(
     Return the mandatory fields data for form creation.
     
     Args:
+        use_odk_collect: Mode of data collection
         new_geom_type: The geometry type (POINT, POLYGON, LINESTRING)
         need_verification_fields: Whether to include verification fields
     
@@ -127,13 +128,13 @@ def _get_mandatory_fields(
         geom_field = geom_type_mapping[new_geom_type]
 
         fields.append(
-            {
+            add_label_translations({
                 "type": geom_field,
                 "name": "new_feature",
                 "appearance": "placement-map",
                 "relevant": "${feature}= ''",
                 "required": "yes",
-            }
+            })
         )
     fields.extend([
         {
@@ -183,15 +184,8 @@ def _get_mandatory_fields(
             "label::english(en)": "Submission ids",
             "appearance": "minimal",
             "calculation": (
-                # FIXME why doesn't instanceId work here?
-                # FIXME pyxform.errors.PyXFormError: There has been a problem
-                # FIXME trying to replace ${instanceId} with the XPath to the
-                # FIXME survey element named 'instanceId'. There is no survey
-                # FIXME element with this name.
-                # f"if({INSTANCE_FEATURE}/submission_ids = '', {INSTANCE_ID},"
-                # f"concat({INSTANCE_FEATURE}/submission_ids, ',', {INSTANCE_ID}))"
-                f"if({INSTANCE_FEATURE}/submission_ids = '', 0,"
-                f"concat({INSTANCE_FEATURE}/submission_ids, ',', 0))"
+                f"if({INSTANCE_FEATURE}/submission_ids = '', {INSTANCE_ID},"
+                f"concat({INSTANCE_FEATURE}/submission_ids, ',', {INSTANCE_ID}))"
             ),
             "save_to": "submission_ids",
         },
