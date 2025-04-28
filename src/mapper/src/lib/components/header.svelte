@@ -15,7 +15,7 @@
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { defaultDrawerItems } from '$constants/drawerItems.ts';
-	import { revokeCookies } from '$lib/utils/login';
+	import { revokeCookies } from '$lib/api/login';
 	import { getAlertStore } from '$store/common.svelte';
 	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';

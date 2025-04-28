@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import '$styles/auth.css';
-	import { getUserDetailsFromApi } from '$lib/utils/login';
+	import { getUserDetailsFromApi } from '$lib/api/login';
 	import { getAlertStore } from '$store/common.svelte';
 	import { getLoginStore } from '$store/login.svelte';
 	import { onMount } from 'svelte';

@@ -11,7 +11,7 @@ type authDetailsType = {
 	// orgs_managed: number[];
 };
 
-import { refreshCookies } from '$lib/utils/login';
+import { refreshCookies } from '$lib/api/login';
 
 let authDetails: authDetailsType | null = $state(null);
 let isLoginModalOpen: boolean = $state(false);

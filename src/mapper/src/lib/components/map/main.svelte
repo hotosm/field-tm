@@ -46,11 +46,11 @@
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
-	import { loadOfflinePmtiles } from '$lib/utils/basemaps.ts';
+	import { loadOfflinePmtiles } from '$lib/map/basemaps.ts';
 	import { projectSetupStep as projectSetupStepEnum, MapGeomTypes } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { clickOutside } from '$lib/utils/clickOutside.ts';
+	import { clickOutside } from '$lib/map/click-outside.ts';
 
 	type bboxType = [number, number, number, number];
 

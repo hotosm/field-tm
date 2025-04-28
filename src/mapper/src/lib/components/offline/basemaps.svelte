@@ -10,9 +10,9 @@
 	import '@shoelace-style/shoelace/dist/components/option/option.js';
 	import '@shoelace-style/shoelace/dist/components/button/button.js';
 
-	import type { Basemap } from '$lib/utils/basemaps';
+	import type { Basemap } from '$lib/map/basemaps';
 	import { getProjectBasemapStore } from '$store/common.svelte.ts';
-	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/utils/basemaps';
+	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/map/basemaps';
 	import { m } from "$translations/messages.js";
 
 	interface Props {

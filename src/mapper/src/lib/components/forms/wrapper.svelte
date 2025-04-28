@@ -4,7 +4,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { fetchBlobUrl, fetchFormMediBlobUrls } from '$lib/utils/fetch.ts';
+	import { fetchBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
