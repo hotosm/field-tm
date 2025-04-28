@@ -46,6 +46,7 @@
 	const handleLocaleSelect = (event: SlSelectEvent) => {
 		const selectedItem = event.detail.item;
 		commonStore.setLocale(selectedItem.value);
+		console.log(selectedItem.value)
 		setParaglideLocale(selectedItem.value); // paraglide function for UI changes (causes reload)
 	};
 

@@ -1,4 +1,4 @@
-import { getLocalStorage, setLocalStorage } from '$lib/fs/local-storage.svelte';
+import { getCookieValue, setCookieValue } from '$lib/fs/cookies';
 import type { Basemap } from '$lib/map/basemaps';
 import { getBasemapList } from '$lib/map/basemaps';
 import type { drawerItemsType } from '$constants/drawerItems';
@@ -35,11 +35,11 @@ let enableWebforms = $derived<boolean>(!useOdkCollectOverride && config?.enableW
 
 function getCommonStore() {
 	function getLocaleFromStorage() {
-		// Priority 1: localStorage (defined previously)
-		const storedLocale = getLocalStorage('locale');
-		if (storedLocale) {
-			setNewLocale(storedLocale);
-			return storedLocale;
+		// Priority 1: cookie (defined previously)
+		const cookieLocale = getCookieValue('PARAGLIDE_LOCALE');
+		if (cookieLocale) {
+			setNewLocale(cookieLocale);
+			return cookieLocale;
 		}
 
 		// Priority 2: browser locale
@@ -63,7 +63,7 @@ function getCommonStore() {
 			console.warn(`Selected locale is not available: ${newLocale}. Setting to default 'en'.`);
 			newLocale = 'en';
 		}
-		setLocalStorage('locale', newLocale);
+		setCookieValue('PARAGLIDE_LOCALE', newLocale);
 	}
 
 	return {
