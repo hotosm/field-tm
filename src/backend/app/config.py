@@ -1,19 +1,19 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Config file for Pydantic and FastAPI, using environment variables."""
 
@@ -148,7 +148,7 @@ class Settings(BaseSettings):
         case_sensitive=True, env_file=".env", extra="allow"
     )
 
-    APP_NAME: str = "FMTM"
+    APP_NAME: str = "Field-TM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     ENCRYPTION_KEY: SecretStr
@@ -190,7 +190,7 @@ class Settings(BaseSettings):
             default_origins.append(f"http://{domain}{local_server_port}")
             default_origins.append(f"http://mapper.{domain}{local_server_port}")
         else:
-            # Add the main FMTM domains (UI + Mapper UI)
+            # Add the main Field-TM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")
             default_origins.append(f"https://mapper.{domain}")
 
@@ -373,7 +373,7 @@ def get_cipher_suite():
     # use for our JWT signing. Ideally this needs 48 characters, but for now
     # we are stuck at 32 char to maintain support with Fernet (reuse the same key).
     #
-    # However this would require a migration for all existing instances of FMTM.
+    # However this would require a migration for all existing instances of Field-TM.
     return Fernet(settings.ENCRYPTION_KEY.get_secret_value())
 
 

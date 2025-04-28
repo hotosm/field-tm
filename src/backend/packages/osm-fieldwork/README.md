@@ -83,7 +83,7 @@ Firefighting](https://www.youtube.com/watch?v=qgk9al1rluE). Much of
 the tech and usage is explained in these [tech
 briefs](https://www.senecass.com/projects/Mapping/tech/). Currently
 these are now part of the backend for the
-[Field Mapping Tasking Manager](https://hotosm.github.io/fmtm) project at
+[Field Tasking Manager](https://hotosm.github.io/fmtm) project at
 [HOT](https://www.hotosm.org).
 
 ## Installation

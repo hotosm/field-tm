@@ -1,19 +1,19 @@
 # Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Pydantic models for parsing database rows.
 
@@ -2022,7 +2022,7 @@ class DbOdkEntities(BaseModel):
             bool: Success or failure.
         """
         log.info(
-            f"Updating FMTM database Entities for project {project_id} "
+            f"Updating Field-TM database Entities for project {project_id} "
             f"with ({len(entities)}) features in batches of {batch_size}"
         )
 
@@ -2078,7 +2078,7 @@ class DbOdkEntities(BaseModel):
     async def update(
         cls, db: Connection, entity_uuid: str, entity_update: "OdkEntitiesUpdate"
     ) -> bool:
-        """Update the entity value in the FMTM db."""
+        """Update the entity value in the Field-TM db."""
         model_dump = dump_and_check_model(entity_update)
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
         sql = f"""
@@ -2233,7 +2233,7 @@ class DbBackgroundTask(BaseModel):
 class DbBasemap(BaseModel):
     """Table tiles_path.
 
-    TODO for now we generate the basemap entry in FMTM.
+    TODO for now we generate the basemap entry in Field-TM.
     TODO In future we will use a basemap generator microservice
     TODO that will handle the basemap generation db entries.
     TODO https://github.com/hotosm/basemap-api

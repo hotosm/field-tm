@@ -1,7 +1,7 @@
-# Project Manager Manual for FMTM
+# Project Manager Manual for Field-TM
 
 This manual is a step by step guide for the project managers on how to get
-started with the Field Mapping Tasking Manager.
+started with the Field Tasking Manager.
 
 ## Introduction
 
@@ -30,21 +30,21 @@ detailed maps that can have a variety of use cases. These could be:
 - Understanding the impact of environmental changes on the landscape,
   etc.
 
-## An Overview Of FMTM In Relation To HOT, OSM and ODK
+## An Overview Of Field-TM In Relation To HOT, OSM and ODK
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit
 organization that uses open mapping data to support humanitarian and
 disaster response efforts around the world. **The Field Mapping Task
-Manager (FMTM)** is one of the tools that **HOT** used to coordinate and
+Manager (Field-TM)** is one of the tools that **HOT** used to coordinate and
 manage mapping projects.
 
-**FMTM** is a software tool that helps project managers to organize and
+**Field-TM** is a software tool that helps project managers to organize and
 manage mapping tasks. It assigns those tasks to volunteers and tracks
 their progress. The tool includes features for collaborative editing,
 data validation, and error detection. This ensures that the data
 collected by volunteers is accurate and reliable.
 
-**FMTM** is designed to be used in conjunction with **Open Data Kit
+**Field-TM** is designed to be used in conjunction with **Open Data Kit
 (ODK)**. **ODK** is a free and open-source set of tools that allows
 users to create, collect, and manage data with mobile devices. The
 **ODK** provides a set of open-source tools that allow users to build
@@ -52,17 +52,17 @@ forms, collect data in the field, and aggregate data on a central
 server. It is commonly used for data collection in research, monitoring
 and evaluation, and other development projects.
 
-Project managers use **FMTM** to manage tasks and assign them to
+Project managers use **Field-TM** to manage tasks and assign them to
 volunteers. The data collected by the volunteer via ODK is typically
 uploaded to **OpenStreetMap (OSM)** where it is used to create more
 detailed and accurate maps of the affected area. **OSM** is a free and
 open-source map of the world that is created and maintained by
 volunteers.
 
-Overall, the **FMTM** tool is an important component of **HOT**'s
+Overall, the **Field-TM** tool is an important component of **HOT**'s
 efforts to support disaster response and humanitarian efforts around the
 world. By coordinating mapping activities and ensuring the accuracy and
-reliability of the data collected by volunteers, **FMTM** helps to
+reliability of the data collected by volunteers, **Field-TM** helps to
 provide critical information that can be used to support decision-making
 and improve the effectiveness of humanitarian efforts.
 
@@ -108,7 +108,7 @@ manager.
 
 All project manager permissions are granted to the organisation manager.
 
-## Steps To Create A Project In FMTM
+## Steps To Create A Project In Field-TM
 
 Go to [fmtm]
 
@@ -220,8 +220,8 @@ Go to [fmtm]
          ```
 
 - You may download features from OpenStreetMap (OSM) by clicking on
-  Fetch data from osm with FMTM project creation; however, note that
-  FMTM is not responsible for the data quality of features extracted
+  Fetch data from osm with Field-TM project creation; however, note that
+  Field-TM is not responsible for the data quality of features extracted
   from OSM.
 - Currently, available types of survey features are Buildings and
   Healthcare only. We plan to add more types of features moving ahead.
@@ -286,7 +286,7 @@ Go to [fmtm]
 #### During Training
 
 1. Make sure mapper has downloaded custom odk collect from  
-   FMTM website. You can also share the apk file if mappers
+   Field-TM website. You can also share the apk file if mappers
    find it difficult to download by themselves.
 2. Share the link of the project for the mapper to reach  
    to the project easily. The URL be:
@@ -321,7 +321,7 @@ follow the guide [Here][5].
 ### Connecting The Data To External Applications
 
 If you want to visualise the submissions and create custom charts
-and diagrams using FMTM submissions, then you can follow the steps
+and diagrams using Field-TM submissions, then you can follow the steps
 below and load the submissions on any data analysis platform using **OData**.
 
 OData endpoints are a standardised way to ingest
@@ -364,7 +364,7 @@ dashboard you need.
 
 ## Help and Support
 
-If you encounter any issues or need assistance while using FMTM, you can access
+If you encounter any issues or need assistance while using Field-TM, you can access
 the following resources:
 
 - Check the [FAQs][3] .

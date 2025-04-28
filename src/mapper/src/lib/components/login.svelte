@@ -20,7 +20,7 @@
 		osm: {
 			name: 'Sign in with OSM',
 			image: OSMLogo,
-			description: 'Edits made in FMTM will be credited to your OSM account.',
+			description: 'Edits made in Field-TM will be credited to your OSM account.',
 		},
 		google: {
 			name: 'Sign in with Google',

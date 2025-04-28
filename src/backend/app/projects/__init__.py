@@ -1,1 +1,1 @@
-"""FMTM projects API."""
+"""Field-TM projects API."""

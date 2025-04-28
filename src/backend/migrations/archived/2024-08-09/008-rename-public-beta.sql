@@ -1,5 +1,5 @@
 -- ## Migration to:
--- * Rename FMTM Public Beta org --> HOTOSM
+-- * Rename Field-TM Public Beta org --> HOTOSM
 
 -- Start a transaction
 BEGIN;

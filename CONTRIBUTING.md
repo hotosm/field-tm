@@ -1,7 +1,7 @@
 # 🤗 Welcome
 
 :+1::tada: First off, We are really glad you're reading this, because we need
-volunteer developers to help improve the Field Mapping Tasking Manager (FMTM)!
+volunteer developers to help improve the Field Tasking Manager (Field-TM)!
 :tada::+1:
 
 We welcome and encourage contributors of all skill levels, and we are committed
@@ -11,11 +11,11 @@ place to start, and we will make sure you are supported every step of the way.
 If you have **any** questions, please ask!
 
 You can see an overview of the project and the process we have gone through in
-developing FMTM so far in these
+developing Field-TM so far in these
 [slides][1]
 
 Furthermore, there are many ways to contribute to the
-**Field Mapping Tasking Manager (FMTM)**, which includes:
+**Field Tasking Manager (Field-TM)**, which includes:
 
 ## Testing
 

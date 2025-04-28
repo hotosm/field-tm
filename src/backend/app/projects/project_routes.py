@@ -1,21 +1,21 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Endpoints for FMTM projects."""
+"""Endpoints for Field-TM projects."""
 
 import json
 import os
@@ -238,7 +238,7 @@ async def get_odk_entities_osm_ids(
 async def get_odk_entities_task_ids(
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ):
-    """Get the ODK entities linked FMTM Task IDs."""
+    """Get the ODK entities linked Field-TM Task IDs."""
     project = project_user.get("project")
     return await central_crud.get_entities_data(
         project.odk_credentials,
@@ -1057,7 +1057,7 @@ async def create_project(
         country_full_name = countries.get(location.country, location.country)
         project_info.location_str = f"{location.city},{country_full_name}"
 
-    # Create the project in the FMTM DB
+    # Create the project in the Field-TM DB
     project_info.odkid = odkproject["id"]
     project_info.author_sub = db_user.sub
     try:
@@ -1093,7 +1093,7 @@ async def delete_project(
     await delete_all_objs_under_prefix(
         settings.S3_BUCKET_NAME, f"/{project.organisation_id}/{project.id}"
     )
-    # Delete FMTM project
+    # Delete Field-TM project
     await DbProject.delete(db, project.id)
 
     log.info(f"Deletion of project {project.id} successful")

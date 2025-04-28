@@ -8,7 +8,7 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { revokeCookies } from '@/utilfunctions/login';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo from '@/assets/images/hotLog.png';
+import logo from '@/assets/images/favicon.svg';
 import LoginPopup from '@/components/LoginPopup';
 import { useAppDispatch } from '@/types/reduxTypes';
 import {
@@ -16,7 +16,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuPortal,
-  DropdownMenuItem,
 } from '@/components/common/Dropdown';
 import { useIsAdmin } from '@/hooks/usePermissions';
 import Button from '@/components/common/Button';
@@ -66,7 +65,7 @@ export default function PrimaryAppBar() {
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
         <img
           src={logo}
-          alt="FMTM Logo"
+          alt="Field-TM Logo"
           onClick={() => navigate('/')}
           className="fmtm-w-[5.188rem] fmtm-min-w-[5.188rem] fmtm-cursor-pointer"
         />

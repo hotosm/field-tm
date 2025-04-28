@@ -1,5 +1,5 @@
 {
-  "name": "fmtm",
+  "name": "field-tm",
   "version": "2025.1.1",
   "scripts": {
     "build": "vite build",

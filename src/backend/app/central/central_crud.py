@@ -1,19 +1,19 @@
-# Copyright (c) 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Logic for interaction with ODK Central & data."""
 
@@ -151,13 +151,13 @@ def create_odk_project(
 ):
     """Create a project on a remote ODK Server.
 
-    Appends FMTM to the project name to help identify on shared servers.
+    Appends Field-TM to the project name to help identify on shared servers.
     """
     project = get_odk_project(odk_central)
 
     try:
-        log.debug(f"Attempting ODKCentral project creation: FMTM {name}")
-        result = project.createProject(f"FMTM {name}")
+        log.debug(f"Attempting ODKCentral project creation: Field-TM {name}")
+        result = project.createProject(f"Field-TM {name}")
 
         # Sometimes createProject returns a list if fails
         if isinstance(result, dict):
@@ -286,7 +286,7 @@ async def append_fields_to_user_xlsform(
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
-    log.debug("Appending mandatory FMTM fields to XLSForm")
+    log.debug("Appending mandatory Field-TM fields to XLSForm")
     return await append_field_mapping_fields(
         xlsform,
         form_name=form_name,

@@ -1,19 +1,19 @@
 # Copyright (c) Humanitarian OpenStreetMap Team
 #
-# This file is part of FMTM.
+# This file is part of Field-TM.
 #
-#     FMTM is free software: you can redistribute it and/or modify
+#     Field-TM is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     FMTM is distributed in the hope that it will be useful,
+#     Field-TM is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Tests for project routes."""
 
@@ -224,10 +224,10 @@ async def test_unsupported_crs(project_data, crs):
 @pytest.mark.parametrize(
     "hashtag_input, expected_output",
     [
-        ("tag1, tag2, tag3", ["#tag1", "#tag2", "#tag3", "#FMTM"]),
-        ("tag1   tag2    tag3", ["#tag1", "#tag2", "#tag3", "#FMTM"]),
-        ("tag1, tag2 tag3    tag4", ["#tag1", "#tag2", "#tag3", "#tag4", "#FMTM"]),
-        ("TAG1, tag2 #TAG3", ["#TAG1", "#tag2", "#TAG3", "#FMTM"]),
+        ("tag1, tag2, tag3", ["#tag1", "#tag2", "#tag3", "#Field-TM"]),
+        ("tag1   tag2    tag3", ["#tag1", "#tag2", "#tag3", "#Field-TM"]),
+        ("tag1, tag2 tag3    tag4", ["#tag1", "#tag2", "#tag3", "#tag4", "#Field-TM"]),
+        ("TAG1, tag2 #TAG3", ["#TAG1", "#tag2", "#TAG3", "#Field-TM"]),
     ],
 )
 async def test_project_hashtags(
@@ -243,7 +243,7 @@ async def test_project_hashtags(
 
 
 async def test_delete_project(client, admin_user, project):
-    """Test deleting a FMTM project, plus ODK Central project."""
+    """Test deleting a Field-TM project, plus ODK Central project."""
     response = await client.delete(f"/projects/{project.id}")
     assert response.status_code == 204
 
@@ -263,8 +263,8 @@ async def test_create_odk_project():
         result = create_odk_project("Test Project", odk_credentials)
 
     assert result == {"status": "success"}
-    # FMTM gets appended to project name by default
-    mock_project.createProject.assert_called_once_with("FMTM Test Project")
+    # Field-TM gets appended to project name by default
+    mock_project.createProject.assert_called_once_with("Field-TM Test Project")
 
 
 async def test_upload_data_extracts(client, project):
@@ -372,7 +372,7 @@ async def test_update_project(client, admin_user, project):
         "short_description": "updated short description",
         "description": "updated description",
         "osm_category": "healthcare",
-        "hashtags": "#FMTM anothertag",
+        "hashtags": "#Field-TM anothertag",
     }
 
     response = await client.patch(f"/projects/{project.id}", json=updated_project_data)
@@ -391,7 +391,7 @@ async def test_update_project(client, admin_user, project):
     assert response_data["osm_category"] == updated_project_data["osm_category"]
     assert sorted(response_data["hashtags"]) == sorted(
         [
-            "#FMTM",
+            "#Field-TM",
             f"#{settings.FMTM_DOMAIN}-{response_data['id']}",
             "#anothertag",
         ]

@@ -1042,7 +1042,7 @@ class OdkAppUser(OdkCentral):
             if set to 'match_exactly', it will attempt sync with Central
 
         - metadata_email: we 'misuse' this field to add additional metadata,
-            in this case a task id from an upstream application (FMTM).
+            in this case a task id from an upstream application (Field-TM).
 
         Args:
             odk_id (int): The ID of the project on ODK Central
