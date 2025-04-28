@@ -22,6 +22,7 @@ type entitiesListType = {
 	osm_id: number;
 	status: number;
 	updated_at: string | null;
+	submission_ids: string;
 };
 
 type entitiesShapeType = {
@@ -44,6 +45,13 @@ type newBadGeomType<T> = {
 	task_id: number;
 };
 
+type taskSubmissionInfoType = {
+	task_id: number;
+	index: number;
+	submission_count: number;
+	feature_count: number;
+};
+
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntity: string | null = $state(null);
 let entitiesShape: Shape;
@@ -57,6 +65,7 @@ let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
 let entitiesList: entitiesListType[] = $state([]);
+let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
 let alertStore = getAlertStore();
 
 function getEntityStatusStream(projectId: number): ShapeStream | undefined {
@@ -83,6 +92,35 @@ function getNewBadGeomStream(projectId: number): ShapeStream | undefined {
 			where: `project_id=${projectId}`,
 		},
 	});
+}
+
+function setTaskSubmissionInfo(entities: entitiesListType[]) {
+	const taskEntityMap = entities?.reduce((acc: Record<number, entitiesListType[]>, item) => {
+		if (!acc[item?.task_id]) {
+			acc[item.task_id] = [];
+		}
+		acc[item.task_id].push(item);
+		return acc;
+	}, {});
+
+	const taskInfo = Object.entries(taskEntityMap).map(([taskId, taskEntities]) => {
+		// Calculate feature_count
+		const featureCount = taskEntities.length;
+		let submissionCount = 0;
+		// Calculate submission_count
+		taskEntities.forEach((entity) => {
+			if (entity.status > 1) {
+				submissionCount++;
+			}
+		});
+		return {
+			task_id: +taskId,
+			index: +taskId,
+			submission_count: submissionCount,
+			feature_count: featureCount,
+		};
+	});
+	taskSubmissionInfo = taskInfo;
 }
 
 function getEntitiesStatusStore() {
@@ -146,6 +184,7 @@ function getEntitiesStatusStore() {
 			const response = await entityStatusResponse.json();
 			entitiesList = response;
 			syncEntityStatusLoading = false;
+			setTaskSubmissionInfo(response);
 		} catch (error) {
 			syncEntityStatusLoading = false;
 		}
@@ -269,6 +308,9 @@ function getEntitiesStatusStore() {
 		},
 		get entitiesList() {
 			return entitiesList;
+		},
+		get taskSubmissionInfo() {
+			return taskSubmissionInfo;
 		},
 	};
 }

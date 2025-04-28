@@ -42,7 +42,10 @@
 		"cancel": "CANCELAR",
 		"navigate_here": "IR ATÉ O PONTO",
 		"map_in_odk": "COLETAR PONTO NO ODK",
-		"collect_data": "PREENCHER FORMULÁRIO"
+		"collect_data": "PREENCHER FORMULÁRIO",
+		"task_complete_total_mapped": "Você mapeou {totalMapped} recursos na área da tarefa.",
+		"task_complete_only_total_mapped": "Você mapeou apenas {totalMapped} recursos na área da tarefa.",
+		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?"
 	},
 	"stack_group": {
 		"project_information": "Informações do projeto",
@@ -54,7 +57,8 @@
 		"features": "Legenda (Pontos)"
 	},
 	"odk": {
-		"open": "Abrir ODK"
+		"open": "Abrir ODK",
+		"scan_qr_code": "Digitalize este código QR no ODK Collect a partir do telefone de outro usuário ou faça o download e importe-o manualmente"
 	},
 	"basemaps": {
 		"manage": "Gerenciar mapas base",
@@ -97,7 +101,8 @@
 	"dialog_task_actions": {
 		"complete_mapping": "CONCLUIR MAPEAMENTO",
 		"locked_is_complete": "foi bloqueado. Você concluiu o mapeamento desse ponto?",
-		"task": "Tarefa"
+		"task": "Tarefa",
+		"continue_mapping": "CONTINUAR MAPEANDO"
 	},
 	"pagination": {
 		"go_to_page": "Ir para a página"
@@ -112,7 +117,6 @@
 	"geolocation": {
 		"distance": "Distância"
 	},
-	"scan_qr_code": "Digitalize este código QR no ODK Collect a partir do telefone de outro usuário ou faça o download e importe-o manualmente",
 	"download": "BAIXAR",
 	"forms": {
 		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário."

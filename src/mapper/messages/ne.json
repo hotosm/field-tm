@@ -42,7 +42,10 @@
 		"cancel": "रद्द गर्नुहोस्",
 		"navigate_here": "यहाँ नेभिगेट गर्नुहोस्",
 		"map_in_odk": "ODK मा फिचर म्याप गर्नुहोस्",
-		"collect_data": "डाटा संकलन गर्नुहोस्"
+		"collect_data": "डाटा संकलन गर्नुहोस्",
+		"task_complete_total_mapped": "तपाईंले कार्य क्षेत्रमा {totalMapped} विशेषताहरू म्याप गर्नुभएको छ।",
+		"task_complete_only_total_mapped": "तपाईंले कार्य क्षेत्रमा मात्र {totalMapped} विशेषताहरू म्याप गर्नुभएको छ।",
+		"task_complete_confirm": "के तपाईं निश्चित रूपमा यो कार्य सम्पन्न भएको रूपमा चिन्हित गर्न चाहनुहुन्छ?"
 	},
 	"stack_group": {
 		"project_information": "परियोजनाको जानकारी",
@@ -54,7 +57,8 @@
 		"features": "फिचरहरूको सङ्केत"
 	},
 	"odk": {
-		"open": "ODK खोल्नुहोस्"
+		"open": "ODK खोल्नुहोस्",
+		"scan_qr_code": "QR कोड ODK Collect मा स्क्यान गर्नुहोस् वा म्यानुअली डाउनलोड गरी इम्पोर्ट गर्नुहोस्"
 	},
 	"basemaps": {
 		"manage": "बेसम्यापहरू व्यवस्थापन गर्नुहोस्",
@@ -97,7 +101,8 @@
 	"dialog_task_actions": {
 		"complete_mapping": "म्यापिङ सम्पन्न गर्नुहोस्",
 		"locked_is_complete": "लक गरिएको छ। के टास्क पूर्ण रूपमा म्याप गरिएको छ?",
-		"task": "टास्क"
+		"task": "टास्क",
+		"continue_mapping": "म्यापिङ जारी राख्नुहोस्"
 	},
 	"pagination": {
 		"go_to_page": "पृष्ठमा जानुहोस्"
@@ -112,7 +117,6 @@
 	"geolocation": {
 		"distance": "दूरी"
 	},
-	"scan_qr_code": "QR कोड ODK Collect मा स्क्यान गर्नुहोस् वा म्यानुअली डाउनलोड गरी इम्पोर्ट गर्नुहोस्",
 	"download": "डाउनलोड",
 	"forms": {
 		"default_language_warning": "फारमको नेपाली संस्करण नभएकोले यसलाई पूर्वनिर्धारित भाषामा प्रदर्शन गर्दै।"

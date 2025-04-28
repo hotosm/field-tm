@@ -93,3 +93,6 @@ chart/charts
 
 # Secrets / keys
 **/**/*.pem
+
+# Paraglide dynamic translation
+src/translations/**/*

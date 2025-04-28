@@ -14,6 +14,18 @@
 	--at-apply: text-[1.5rem] text-neutral-800 cursor-pointer hover: text-primary-600 duration-200;
 }
 
+.task-action-dialog .dialog-text {
+	--at-apply: font-normal text-center text-neutral-800 mb-4;
+}
+
+.task-action-dialog .dialog-text .text-highlight {
+	--at-apply: text-primary-600 font-bold;
+}
+
+.task-action-dialog .button-wrapper {
+	--at-apply: flex items-center justify-center gap-x-3;
+}
+
 .dialog-task-new-feature {
 	--at-apply: flex justify-between items-center;
 }

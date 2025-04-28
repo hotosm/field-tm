@@ -4,6 +4,8 @@
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { ProjectData } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getEntitiesStatusStore } from '$store/entities.svelte';
+	import { unicodeBold } from '$lib/utils/text.ts';
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
@@ -14,7 +16,16 @@
 	};
 
 	const taskStore = getTaskStore();
+	const entitiesStore = getEntitiesStatusStore();
+
 	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, clickMapNewFeature }: Props = $props();
+
+	const taskSubmissionInfo = $derived(entitiesStore.taskSubmissionInfo);
+	const taskSubmission = $derived(
+		taskSubmissionInfo?.find((taskSubmission) => taskSubmission?.task_id === taskStore?.selectedTaskIndex),
+	);
+	let dialogRef;
+	let toggleTaskCompleteConfirmation: boolean = $state(false);
 </script>
 
 {#if taskStore.selectedTaskId && selectedTab === 'map' && isTaskActionModalOpen && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}
@@ -115,16 +126,18 @@
 						<hot-icon slot="prefix" name="close"></hot-icon>
 						<span>{m['popup.cancel_mapping']()}</span>
 					</sl-button>
+					<!-- keep button disabled until the entity statuses are fetched -->
 					<sl-button
+						disabled={entitiesStore.syncEntityStatusLoading}
 						onclick={() => {
-							if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
+							toggleTaskCompleteConfirmation = true;
 						}}
-						variant="default"
+						variant="primary"
 						size="small"
 						class="green"
 						onkeydown={(e: KeyboardEvent) => {
 							if (e.key === 'Enter') {
-								if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
+								toggleTaskCompleteConfirmation = true;
 							}
 						}}
 						role="button"
@@ -139,4 +152,71 @@
 	</div>
 {/if}
 
-<style></style>
+<hot-dialog
+	bind:this={dialogRef}
+	class="task-action-dialog"
+	open={toggleTaskCompleteConfirmation}
+	onsl-hide={() => {
+		toggleTaskCompleteConfirmation = false;
+	}}
+	noHeader
+>
+	<h5 class="dialog-text">
+		{#if taskSubmission}
+			<!-- Subtle difference to include 'only' in the text here -->
+			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
+				{m['popup.task_complete_only_total_mapped']({
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
+				})}
+				<br>
+			{:else}
+				{m['popup.task_complete_total_mapped']({
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
+				})}
+				<br>
+			{/if}
+		{/if}
+		<!--  The confirmation dialog is always displayed -->
+		{m['popup.task_complete_confirm']()}
+	</h5>
+	<div class="button-wrapper">
+		<sl-button
+			onclick={() => {
+				toggleTaskCompleteConfirmation = false;
+			}}
+			variant="default"
+			size="small"
+			class="green"
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') {
+					toggleTaskCompleteConfirmation = false;
+				}
+			}}
+			role="button"
+			tabindex="0"
+		>
+			<span>{m['dialog_task_actions.continue_mapping']()}</span>
+		</sl-button>
+		<sl-button
+			onclick={() => {
+				if (!taskStore.selectedTaskId) return;
+				finishTask(projectData?.id, taskStore.selectedTaskId);
+				toggleTaskCompleteConfirmation = false;
+			}}
+			variant="primary"
+			size="small"
+			class="green"
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') {
+					if (!taskStore.selectedTaskId) return;
+					finishTask(projectData?.id, taskStore.selectedTaskId);
+					toggleTaskCompleteConfirmation = false;
+				}
+			}}
+			role="button"
+			tabindex="0"
+		>
+			<span>{m['dialog_task_actions.complete_mapping']()}</span>
+		</sl-button>
+	</div>
+</hot-dialog>
