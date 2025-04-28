@@ -358,7 +358,7 @@ def _get_form_components(
         # modify digitisation_df to include the `new_feature` field
         # NOTE we set digitisation_correct to 'yes' if the user is drawing a new geometry
         digitisation_correct_col = digitisation_df["name"] == "digitisation_correct"
-        digitisation_df.loc[digitisation_correct_col, "calculation"] = "once(if(${new_feature} != '', 'yes', '')"
+        digitisation_df.loc[digitisation_correct_col, "calculation"] = "once(if(${new_feature} != '', 'yes', ''))"
         digitisation_df.loc[digitisation_correct_col, "read_only"] = "${new_feature} != ''"
 
     return {
