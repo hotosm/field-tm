@@ -5,7 +5,7 @@
 	import { getId, updatedSourceContext, addSource, removeSource } from 'svelte-maplibre';
 	import type { HeaderMeta } from 'flatgeobuf';
 	import type { GeoJSON, Polygon, FeatureCollection } from 'geojson';
-	import { flatgeobufToGeoJson, filterGeomsCentroidsWithin } from '$lib/utils/flatgeobuf';
+	import { flatgeobufToGeoJson, filterGeomsCentroidsWithin } from '$lib/map/flatgeobuf';
 
 	type bboxType = [number, number, number, number];
 	interface Props {

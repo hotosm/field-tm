@@ -1,6 +1,6 @@
 import { getLocalStorage, setLocalStorage } from '$lib/fs/local-storage.svelte';
-import type { Basemap } from '$lib/utils/basemaps';
-import { getBasemapList } from '$lib/utils/basemaps';
+import type { Basemap } from '$lib/map/basemaps';
+import { getBasemapList } from '$lib/map/basemaps';
 import type { drawerItemsType } from '$constants/drawerItems';
 import { getLocale as getParaglideLocale, locales } from '$translations/runtime.js';
 

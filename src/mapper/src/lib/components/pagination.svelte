@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '$styles/pagination.css';
-	import { getPaginationRange, DOTS } from '$lib/utils/getPaginationRange';
+	import { getPaginationRange, DOTS } from '$lib/api/get-pagination-range.ts';
 	import { m } from "$translations/messages.js";
 
 	type propsType = {

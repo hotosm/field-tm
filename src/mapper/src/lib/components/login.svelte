@@ -2,7 +2,7 @@
 	import '$styles/login.css';
 	import OSMLogo from '$assets/images/osm-logo.png';
 	import GoogleLogo from '$assets/images/google-logo.svg';
-	import { loginRedirect } from '$lib/utils/login';
+	import { loginRedirect } from '$lib/api/login';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import type { LoginProviderKey } from '$store/common.svelte.ts';
 	import { getCommonStore } from '$store/common.svelte.ts';

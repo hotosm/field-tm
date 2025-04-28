@@ -5,7 +5,7 @@
 	import MapLibreGlDirections, { LoadingIndicatorControl } from '@maplibre/maplibre-gl-directions';
 
 	import { m } from "$translations/messages.js";
-	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
+	import { GetDeviceRotation } from '$lib/map/get-device-rotation.ts';
 	import { getAlertStore } from '$store/common.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { getCommonStore } from '$store/common.svelte.ts';
