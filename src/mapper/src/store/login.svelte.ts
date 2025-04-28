@@ -15,6 +15,7 @@ import { refreshCookies } from '$lib/utils/login';
 
 let authDetails: authDetailsType | null = $state(null);
 let isLoginModalOpen: boolean = $state(false);
+let refreshCookieResponse: Record<string, any> | null = $state(null);
 
 function getLoginStore() {
 	return {
@@ -23,6 +24,9 @@ function getLoginStore() {
 		},
 		get isLoginModalOpen() {
 			return isLoginModalOpen;
+		},
+		get refreshCookieResponse() {
+			return refreshCookieResponse;
 		},
 		setAuthDetails: (authData: authDetailsType) => {
 			authDetails = authData;
@@ -34,6 +38,9 @@ function getLoginStore() {
 			authDetails = null;
 			// Re-add temp auth cookies
 			await refreshCookies();
+		},
+		setRefreshCookieResponse: (data: Record<string, any>) => {
+			refreshCookieResponse = data;
 		},
 	};
 }
