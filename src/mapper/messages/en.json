@@ -119,6 +119,7 @@
 	},
 	"download": "DOWNLOAD",
 	"forms": {
-		"default_language_warning": "Displaying form in its default language because there is no English version of the form."
+		"default_language_warning": "Displaying form in its default language because there is no English version of the form.",
+		"uploading": "Uploading"
 	}
 }
