@@ -38,6 +38,7 @@ export type projectInfoType = {
   custom_tms_url: string;
   status: string;
   visibility: string;
+  use_odk_collect: boolean;
   total_tasks: number;
   osm_category: string;
   odk_form_id: string;
