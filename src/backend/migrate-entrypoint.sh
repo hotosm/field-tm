@@ -251,8 +251,8 @@ pretty_echo "### Migrations Start ###"
 scripts_to_execute=()
 
 # DB startup
-check_all_db_vars_present
-check_all_s3_vars_present
+check_all_db_vars_present; echo "✓ DB vars check complete"
+check_all_s3_vars_present; echo "✓ S3 vars check complete"
 wait_for_db
 wait_for_s3
 init_buckets
