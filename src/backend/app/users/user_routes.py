@@ -18,7 +18,7 @@
 """Endpoints for users and role."""
 
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import (
     APIRouter,
@@ -79,9 +79,12 @@ async def get_userlist(
     db: Annotated[Connection, Depends(db_conn)],
     _: Annotated[DbUser, Depends(validator)],
     search: str = "",
+    signin_type: Literal["osm", "google"] = Query(
+        "osm", description="Filter by signin type (osm or google)"
+    ),
 ):
     """Get all user list with info such as id and username."""
-    users = await DbUser.all(db, search=search)
+    users = await DbUser.all(db, search=search, signin_type=signin_type)
     if not users:
         return []
     return [
