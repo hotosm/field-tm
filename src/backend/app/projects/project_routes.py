@@ -1119,7 +1119,7 @@ async def read_project(
 async def read_project_minimal(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(public_endpoint)],
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ):
     """Get a specific project by ID, with minimal metadata.
 
