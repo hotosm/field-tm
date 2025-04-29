@@ -47,6 +47,7 @@
 			projectListLoading = true;
 			const response = await fetch(
 				`${API_URL}/projects/summaries?page=${page}&search=${search}&results_per_page=12&minimal=true`,
+				{credentials: 'include'}
 			);
 			const projectResponse = (await response.json()) as { results: projectType[]; pagination: paginationType };
 			projectList = projectResponse.results;
