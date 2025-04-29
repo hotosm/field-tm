@@ -116,6 +116,7 @@ export type ProjectDetailsTypes = {
   newGeomType: MapGeomTypes;
   project_admins: number[];
   visibility: project_visibility;
+  use_odk_collect: boolean;
 };
 
 export type FormCategoryListTypes = {

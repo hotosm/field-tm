@@ -21,6 +21,7 @@ export const initialState: CreateProjectStateTypes = {
     custom_tms_url: '',
     project_admins: [],
     visibility: project_visibility.PUBLIC,
+    use_odk_collect: false,
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
@@ -82,6 +83,7 @@ const CreateProject = createSlice({
         description: '',
         organisation_id: null,
         visibility: project_visibility.PUBLIC,
+        use_odk_collect: false,
       };
       state.totalAreaSelection = null;
       state.taskSplittingMethod = null;

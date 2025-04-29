@@ -372,6 +372,15 @@ const ProjectDetailsForm = ({ flag }) => {
               dispatch(CreateProjectActions.SetDescriptionToFocus('projectdetails-visibility'));
             }}
           />
+          <CustomCheckbox
+            key="use_odk_collect"
+            label="Use ODK Collect Mobile App (instead of Web Forms)"
+            checked={values.use_odk_collect}
+            onCheckedChange={() => {
+              handleCustomChange('use_odk_collect', !values.use_odk_collect);
+            }}
+            className="fmtm-text-black"
+          />
           <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
             <Button variant="primary-red" type="submit">
               NEXT

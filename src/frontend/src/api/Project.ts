@@ -60,6 +60,7 @@ export const ProjectById = (projectId: string) => {
             organisation_name: projectResp?.organisation_name,
             created_at: projectResp?.created_at,
             visibility: projectResp.visibility,
+            use_odk_collect: projectResp.use_odk_collect,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
