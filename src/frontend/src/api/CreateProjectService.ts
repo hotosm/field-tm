@@ -511,7 +511,7 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
   };
 };
 
-const ValidateCustomForm = (url: string, formUpload: any) => {
+const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.ValidateCustomFormLoading(true));
 
@@ -519,6 +519,7 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
       try {
         const formUploadFormData = new FormData();
         formUploadFormData.append('xlsform', formUpload);
+        formUploadFormData.append('use_odk_collect', useOdkCollect.toString());
 
         const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
         const resp = getTaskSplittingResponse.data;
