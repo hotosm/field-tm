@@ -7,8 +7,15 @@ The Field-TM can be divided into four parts:
 1. An API backend in FastAPI (code in: `src/backend`)
 2. A desktop-based management frontend website in React (code in: `src/frontend`)
 3. A mobile-based mapper frontend website in Svelte (code in: `src/mapper`)
-4. Supporting services that tie everything together, such as [ODK Central][1]
-   for collecting submission data, and an S3 service for storing files.
+4. Supporting services that tie everything together:
+
+   - [ODK Central][1] to collect the survey submissions.
+   - [Minio][13] to serve static content via S3.
+   - [Electric-SQL][14] to provide a 'sync-layer' for real-time syncing of
+     content between users.
+   - [Bunkerweb][15] a 'web application firewall' (basically Nginx with
+     additional security), to sit in front of everything and add an extra layer
+     of security and load balancing.
 
 ### Field-TM Backend
 
@@ -198,3 +205,6 @@ The Field-TM Developer Team
 [10]: https://hotosm.slack.com/archives/C04PCBFDEGN
 [11]: https://learn.microsoft.com/en-us/windows/wsl/install "official instructions"
 [12]: https://github.com/abiosoft/colima "Colima"
+[13]: https://min.io
+[14]: https://electric-sql.com
+[15]: https://www.bunkerweb.io
