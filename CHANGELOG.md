@@ -1,5 +1,165 @@
 # Changelog
 
+## 2025.2.0 (2025-04-29)
+
+### Feat
+
+- **users**: add signin type filter to user list retrieval
+- **mapper**: loading spinner when uploading form submission (#2445)
+- **mapper**: default language warning v2 (#2432)
+- **mapper**: auto-open web forms when entity created (#2429)
+- **Details**: project visibility field add to edit project details (#2424)
+- user invite functionality per project (#2391)
+- **mapper**: add sidebar link to help translations via weblate
+- **mapper**: allow configuration of sidebar items
+- **mapper**: web forms image upload question improvements (#2413)
+- **mapper**: allow users to revert mapped task to ready state (#2404)
+- **backend**: allow verification group in form only if there are existing features in the project (#2396)
+- project visibility implementation (#2400)
+- **backend**: enhance user invitation process with user wise invite URL validation (#2399)
+- **mapper**: allow override of using webforms (db var to force OdkCollect)
+- generate data extracts based on the geom type (POINT, LINE, POLYGON) selected (#2382)
+- **backend**: add user invites via URL functionality (#2378)
+- **backend**: add api-key option to all endpoints (respecting auth and user roles) (#2376)
+- **mapper**: make user login methods configurable via config.json
+- **mapper**: added warmup latitude/longitude into form submission (#2372)
+- **frontend**: comment tagging capability, searching list of available users (#2312)
+- delete organisation only if no projects
+- **mapper**: image file choice question image override by css (#2365)
+- **backend**: form media retrieval route (#2354)
+- **mapper**: Nepali language translations & fix more section blank contents issue (#2357)
+- **backend**: role wise access to project summaries (public/private) (#2353)
+- **backend**: allow for download of form media/attachments as list of URLs pt1 (#2348)
+- **mapper**: cache form xml and ODK Web Forms js library across reloads (#2349)
+- **mapper**: hide feature selection question in web forms (as it's prefilled) (#2347)
+- **frontend**: define hashtags as lost of chips for better ux (#2344)
+- add google login option to mapper frontend (#2331)
+- **backend**: trigger s3 upload as soon as submission is made fixes #2339
+- **mapper**: updated stepperLayout to true for webform (#2329)
+- **mapper**: translations for all strings in the mapper app (#2328)
+- **backend**: config to create projects with no existing geoms (new geom only) (#2278)
+- **mapper**: load config from bundled S3, with default fallback (#2323)
+- **mapper**: project summary page if no id specified (#2307)
+- **frontend**: organization dashboard page (#2293)
+- **mapper**: updates to web forms submission image upload (#2292)
+- **backend**: add minimal query option for mapper frontend project summary (#2310)
+- update the version of typescript client to 1.0.0-beta.5
+- **beatend**: enpoint to list the organisation admins
+- **backend**: add org id filter in project summary, calculate total subissions, mapped , bad and validated tasks
+- **backend**: updated pytest related to changes made in backend
+- **migration**: script to move existing raw data api fgb url to fmtm s3 bucket
+- **backend**: return geojson url instead of fgb url, rename upload custom extract to upload data extract
+- **migration**: script to move existing raw data api fgb url to fmtm s3 bucket
+- **backend**: assign users to tasks (+ project team integration) (#2237)
+- **backend**: add endpoint to upload form media such as images, videos, audio (#2275)
+- **mapper**: draft web forms integration via feature flag (#2268)
+- **mapper**: upgrade paraglide for nested translation fields, continue adding translations (#2258)
+- **frontend**: dynamic styling and icons, loaded via config.json (#2255)
+- **backend**: optimise generating project data (#2214)
+- **frontend**: replace file upload button with drop zone (#2259)
+- **mapper**: replace manager frontend PWA with mapper frontend PWA (#2247)
+- **backend**: create separate user endpoints for different purposes (admin, org, project) (#2238)
+- **project**: populate total task field after task creation (#2243)
+- **frontend**: create new feature entities via API prior to ODK collect usage (#2156)
+
+### Fix
+
+- **organisation**: update get_organisation_admins permissions to allow authenticated users
+- **frontend**: disable task splitting if no data extract included
+- **mapper**: issue selecting existing feature (exception handling)
+- **frontend**: logo sizing in primary app bar
+- **frontend**: data extract issue on switching between project in mapper frontend (#2446)
+- **backend**: role wise project visibility in mapper frontend (#2447)
+- **mapper**: set translations via cookie instead of localStorage
+- **mapper**: display confirmation dialog on task marked as completed (#2425)
+- **mapper**: web form images not appearing (#2442)
+- **mapper**: handle login redirect for user svcfmtm on invite (#2436)
+- **backend**: calculate submission ids using instanceID (#2437)
+- **mapper**: send correct entity status when submitting based on survey (#2428)
+- **mapper**: add polyfills for missing browser functionality (#2422)
+- **dialog-task-actions**: prettier fixes
+- **frontend**: fixes #2416 for tiptap markdown render usage
+- **osm-fieldwork**: if no verification fields, omit the survey group in xlsform
+- **mapper**: missing translation for geometry confirm dialog
+- **osm-fieldwork**: add the submission_ids field to the survey, with dummy values for now
+- **frontend**: pass centroid param only if primary geom type is point
+- **mapper**: calculate task centroid to display task lock icon on center (#2398)
+- **mapper**: remove unecessary $derived from collect.ts (not svelte)
+- **mapper**: avoid opening odk collect if web-forms enabled for new features
+- **mapper**: broken web forms appearance / height (#2389)
+- **mapper**: missed colon in css file causing prettier / pre-commit fail
+- **mapper**: add xid and xlocation to web-forms submissions (#2385)
+- **osm-fieldwork**: towards #2369, remove intro note, fix survey questions text
+- **backend**: /users/usernames endpoint requires validator permission, not org manager
+- **backend**: access to odk form media should be mapper permission
+- **backend**: testing pre-signed ODK Central URLs during local dev
+- **frontend**: raise error generated by backend
+- **pre-commit**: raise exception with 'from' clause
+- **mapper**: hide QR tab on webforms enable & fix geolocation prompt offscreen (#2364)
+- **mapper**: minor UI fixes, confirm dialogue at top (#2356)
+- **frontend**: replace user id with user sub id (#2345)
+- **mapper**: web forms enable from config file (#2343)
+- **mapper**: related to #2154, update entity status on webform submission
+- **mapper**: fixes #2324 setting task index as submission task_id value
+- **frontend**: accidental translation key addition to react frontend
+- **migrations**: add foreign key constraint for project_team_users only if id column in user table exists (#2330)
+- **backend**: allow mappers to create new entities
+- **backend**: remove auth requirements from projects/search endpoint (allow loading home page without login)
+- **mapper**: only load flatgeobuf layer if created at project creation (not empty project)
+- **mapper**: update shoelace buttons to use variant for styling over classes
+- **mapper**: allow for webform submissiosn without photo
+- **projectDetails**: update hide/unhide tab & buttons logic (#2320)
+- **frontend**: auth update after backend breaking changes (#2319)
+- **version**: updated version of electric ts client to 1.0.0
+- **deploy**: update the electric-sql version -> 1.0.0-beta.23
+- **backend**: invalid sql when user id is passed due to early closure of sql ';'
+- **backend**: add organisation id to avoid pydantic validation error
+- **frontend**: align task lock icon within task area (#2301)
+- **workflow**: skip backend smoke test
+- Submission details page crashing when fetching photos fails (#2291)
+- **workflow**: increase timeout of smoke test -> 120
+- **backend**: remove un intended extra execute command
+- **mapper**: usage of paraglide in web-form wrapper (languageTag deprecated)
+- **backend**: pass null task id if feature lies outside task outline (#2277)
+- **osm-fieldwork**: correctly get form_id string value during form update
+- add missing findProject osm-fieldwork method back in
+- **backend**: set osm_id property to negative value if it's not valid OSM (#2263)
+- **frontend**: translations set on wrong frontend 😅
+- **backend**: only replace S3 submission photo urls in local dev
+- **frontend**: json serialise fgb --> geojson before upload
+- **frontend**: project creation AOI area calculation correction (#2251)
+- **migration**: add file to populate total tasks for old projects if null (#2246)
+
+### Refactor
+
+- **mapper**: restructure util functions
+- **mapper**: hide basemaps & show info, instructions tab on webforms enable (#2423)
+- rebrand from FMTM --> Field-TM pt1 (#2421)
+- **mapper**: missed console log in mapper frontend
+- move a few central related endpoints projects --> central router
+- **frontend**: remove unused code on react frontend
+- **backend**: move central validate-form endpoint to central router
+- **frontend**: remove geolocation from manager frontend (expected on desktop)
+- **backend**: add extra debug info if entity creation fails
+- **backend**: move s3 bucket init to migration (run once) instead of api (replicas)
+- **mapper**: use css files for all styles, with unocss transformer directives --at-apply (#2387)
+- add translation using Weblate (French) (#2373)
+- remove refs to __pypackages__ as no longer use pdm
+- remove search api and use project summary api (#2332)
+- **createProject**: refactor data extract handling process
+- **frontend**: redesign project details page (#2264)
+- **entitiy**: optimize entity lookup performance using Map for quick entity retrieval (#2287)
+- make S3_xxx env vars mandatory for api startup
+- **backend**: remove logic for fgb extract upload (handled on frontend)
+- **frontend**: project details page component (#2261)
+- **frontend**: entity creation workflow (#2252)
+- **mapper**: remove task 'go to odk' button (#2250)
+
+### Perf
+
+- **backend**: improve performance of project status materialized view + other updates (#2408)
+- **backend**: create materialized view of project stats for summary api (#2322)
+
 ## 2025.1.1 (2025-02-26)
 
 ### Feat
