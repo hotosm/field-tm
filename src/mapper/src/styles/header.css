@@ -11,7 +11,7 @@
 }
 
 .header .logo img {
-	--at-apply: h-[2.2rem] sm: h-[3rem];
+	--at-apply: w-[4.188rem] sm: w-[4.188rem];
 }
 
 .header .logo-text {

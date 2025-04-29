@@ -8,7 +8,7 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { revokeCookies } from '@/utilfunctions/login';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo from '@/assets/images/favicon.svg';
+import hotLogo from '@/assets/images/favicon.svg';
 import LoginPopup from '@/components/LoginPopup';
 import { useAppDispatch } from '@/types/reduxTypes';
 import {
@@ -64,10 +64,10 @@ export default function PrimaryAppBar() {
       />
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
         <img
-          src={logo}
+          src={hotLogo}
           alt="Field-TM Logo"
           onClick={() => navigate('/')}
-          className="fmtm-w-[5.188rem] fmtm-min-w-[5.188rem] fmtm-cursor-pointer"
+          className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
         />
         <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
           <Link
