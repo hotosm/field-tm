@@ -119,6 +119,7 @@
 	},
 	"download": "BAIXAR",
 	"forms": {
-		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário."
+		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário.",
+		"uploading": "carregando"
 	}
 }

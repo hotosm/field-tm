@@ -33,6 +33,9 @@
 	let startDate: string | undefined;
 
 	let drawerLabel = $state('');
+	let uploading = $state(false);
+	let uploadingMessage = $state('');
+
 
 	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
 
@@ -79,11 +82,17 @@
 			attachments.forEach((attachment: File) => {
 				data.append('submission_files', attachment);
 			});
+
+			uploadingMessage = m['forms.uploading']() || "uploading";
+			uploading = true;
+
 			// Submit the XML + any submission media
 			await fetch(url, {
 				method: 'POST',
 				body: data,
 			});
+
+			uploading = false;
 
 			let entityStatus = null;
 			if (submission_xml.includes('<feature_exists>no</feature_exists>')) {
@@ -225,17 +234,26 @@
 					{#await formMediaPromise then formMedia}
 						{#key entityId}
 							{#key commonStore.locale}
-								<div style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;">
-									{drawerLabel}
-								</div>
-								<iframe
-									class="iframe"
-									style:border="none"
-									style:height="100%"
-									use:handleIframe
-									title="odk-web-forms-wrapper"
-									src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
-								></iframe>
+								{#if uploading}
+									<div id="web-forms-uploader">
+										<div id="uploading-inner">
+											<div id="spinner"></div>
+											{uploadingMessage}
+										</div>
+									</div>
+								{:else}
+									<div style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;">
+										{drawerLabel}
+									</div>
+									<iframe
+										class="iframe"
+										style:border="none"
+										style:height="100%"
+										use:handleIframe
+										title="odk-web-forms-wrapper"
+										src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
+									></iframe>								
+								{/if}
 							{/key}
 						{/key}
 					{/await}
@@ -244,3 +262,28 @@
 		{/if}
 	{/await}
 </hot-drawer>
+
+<style>
+	/* from https://www.w3schools.com/howto/howto_css_loader.asp */
+	#spinner {
+		border: 16px solid #f3f3f3; /* Light grey */
+		border-top: 16px solid #3498db; /* Blue */
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+	}
+
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+
+	#uploading-inner {
+		font-size: 30px;
+		left: 50%;
+		position: absolute;
+		transform: translate(-50%, -50%);
+		top: 40%;
+	}
+</style>
