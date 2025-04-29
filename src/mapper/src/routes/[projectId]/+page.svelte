@@ -126,6 +126,7 @@
 
 	onDestroy(() => {
 		taskEventStream?.unsubscribeAll();
+		taskStore.clearTaskStates();
 	});
 
 	$effect(() => {

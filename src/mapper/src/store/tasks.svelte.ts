@@ -117,6 +117,15 @@ function getTaskStore() {
 		commentMention = null;
 	}
 
+	function clearTaskStates() {
+		selectedTask = null;
+		selectedTaskId = null;
+		selectedTaskIndex = null;
+		selectedTaskGeom = null;
+		selectedTaskState = '';
+		taskIdIndexMap = {};
+		featcol = { type: 'FeatureCollection', features: [] };
+	}
 	return {
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
@@ -124,6 +133,7 @@ function getTaskStore() {
 		setSelectedTaskId: setSelectedTaskId,
 		setTaskIdIndexMap: setTaskIdIndexMap,
 		dismissCommentMention: dismissCommentMention,
+		clearTaskStates: clearTaskStates,
 		get featcol() {
 			return featcol;
 		},
