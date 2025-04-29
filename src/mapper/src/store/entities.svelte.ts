@@ -132,6 +132,7 @@ function getEntitiesStatusStore() {
 		entitiesShape = new Shape(entitiesStream);
 
 		// use Map for quick lookups
+		if (!entitiesList) return;
 		const entityMap = new Map(entitiesList.map((entity) => [entity.id, entity.osm_id]));
 
 		entitiesShape.subscribe((entities: ShapeData) => {
@@ -181,10 +182,13 @@ function getEntitiesStatusStore() {
 			const entityStatusResponse = await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
 				credentials: 'include',
 			});
-			const response = await entityStatusResponse.json();
-			entitiesList = response;
+			if (!entityStatusResponse.ok) {
+				throw Error('Failed to get entities for project');
+			}
+			const responseJson = await entityStatusResponse.json();
+			entitiesList = responseJson;
 			syncEntityStatusLoading = false;
-			setTaskSubmissionInfo(response);
+			setTaskSubmissionInfo(responseJson);
 		} catch (error) {
 			syncEntityStatusLoading = false;
 		}

@@ -748,7 +748,7 @@ async def get_entities_data(
         log.exception(f"Error: {e}", stack_info=True)
         msg = f"Getting entity data failed for ODK project ({odk_id})"
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=HTTPStatus.NOT_FOUND,
             detail=msg,
         ) from e
 
