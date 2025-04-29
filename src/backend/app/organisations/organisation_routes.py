@@ -189,12 +189,13 @@ async def add_new_organisation_admin(
 @router.get("/org-admins", response_model=list[OrgManagersOut])
 async def get_organisation_admins(
     db: Annotated[Connection, Depends(db_conn)],
-    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+    organisation: Annotated[DbOrganisation, Depends(org_exists)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Get the list of organisation admins."""
     org_managers = await DbOrganisationManagers.get(
         db,
-        org_user_dict.get("org").id,
+        organisation.id,
     )
     return org_managers
 
