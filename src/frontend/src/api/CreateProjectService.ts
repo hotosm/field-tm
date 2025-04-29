@@ -119,9 +119,9 @@ const CreateProjectService = (
 
       // assign project admins
       if (!isEmpty(projectAdmins)) {
-        const promises = projectAdmins?.map(async (id: any) => {
+        const promises = projectAdmins?.map(async (sub: any) => {
           await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, { id, project_id: projectId as number }),
+            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, { sub, project_id: projectId as number }),
           );
         });
         await Promise.all(promises);
@@ -578,7 +578,7 @@ const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
   };
 };
 
-const AssignProjectManager = (url: string, params: { id: number; project_id: number }) => {
+const AssignProjectManager = (url: string, params: { sub: number; project_id: number }) => {
   return async (dispatch: AppDispatch) => {
     const assignProjectManager = async () => {
       try {
