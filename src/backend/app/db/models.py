@@ -1661,9 +1661,7 @@ class DbProject(BaseModel):
         filters, params = cls._build_query_filters(
             skip, limit, org_id, user_sub, hashtags, search, access_info
         )
-        sql = cls._construct_sql_query(
-            filters, minimal, skip, limit
-        )
+        sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
         # Execute query and return results
         async with db.cursor(row_factory=class_row(cls)) as cur:
