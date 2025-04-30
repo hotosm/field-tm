@@ -590,7 +590,6 @@
 			geojsonUpdateDependency={[entityMapByEntity, entityMapByOsm]}
 		>
 			{#if primaryGeomType === MapGeomTypes.POLYGON}
-				<!-- TODO: colors values should be dynamic -->
 				<FillLayer
 					id="entity-polygon-layer"
 					paint={{
@@ -627,7 +626,6 @@
 					beforeLayerType="symbol"
 					manageHoverState
 				/>
-				<!-- TODO: colors values should be dynamic -->
 				<LineLayer
 					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 					paint={{
@@ -639,7 +637,6 @@
 					manageHoverState
 				/>
 			{:else if primaryGeomType === MapGeomTypes.POINT}
-				<!-- TODO: colors values should be dynamic -->
 				<SymbolLayer
 					id="entity-point-layer"
 					applyToClusters={false}

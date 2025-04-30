@@ -806,15 +806,11 @@ async def generate_files(
     project = project_user_dict.get("project")
     project_id = project.id
     new_geom_type = project.new_geom_type
-
-    # Project requirement if they need to use odk-collect
     use_odk_collect = project.use_odk_collect or False
+    form_name = f"FMTM_Project_{project.id}"
+    project_contains_existing_feature = True if combined_features_count else False
 
     log.debug(f"Generating additional files for project: {project.id}")
-
-    form_name = f"FMTM_Project_{project.id}"
-
-    project_contains_existing_feature = True if combined_features_count else False
 
     # Validate uploaded form
     await central_crud.validate_and_update_user_xlsform(
