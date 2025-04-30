@@ -191,13 +191,6 @@ def merge_dataframes(
     # We wrap the survey question in a group to easily disable all questions if the
     # feature does not exist. If we don't have the `feature_exists` question, then
     # wrapping in the group is unnecessary (all groups are flattened in processing anyway)
-    print("")
-    print("")
-    print("")
-    print(need_verification)
-    print("")
-    print("")
-
     if need_verification:
         survey_group = {
             "begin": (
@@ -352,10 +345,11 @@ def _get_form_components(
         need_verification_fields: bool
     ) -> dict:
     """Select appropriate form components based on target platform."""
+    # only add verification questions if new feature type is Polygon
+    need_verification_fields = new_geom_type == DbGeomType.POLYGON and need_verification_fields
+
     if use_odk_collect:
-        # only add verification questions if new feature type is Polygon
-        need_verification_fields = new_geom_type == DbGeomType.POLYGON and need_verification_fields
-        # modify digitisation_df to include the `new_feature` field
+        # Here we modify digitisation_df to include the `new_feature` field
         # NOTE we set digitisation_correct to 'yes' if the user is drawing a new geometry
         digitisation_correct_col = digitisation_df["name"] == "digitisation_correct"
         digitisation_df.loc[digitisation_correct_col, "calculation"] = "once(if(${new_feature} != '', 'yes', ''))"
