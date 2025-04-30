@@ -160,7 +160,7 @@ services:
       - .env
     ports:
       - "7052-7055:8000"
-    #   - "5678-5679:5678" # Debugger port
+      - "5678-5679:5678"
     networks:
       - fmtm-net
     extra_hosts:
