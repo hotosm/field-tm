@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "name": "Remote - Server Debug",
+      "type": "debugpy",
+      "request": "attach",
+      "host": "localhost",
+      "port": 5678,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/backend/app",
+          "remoteRoot": "/opt/app"
+        },
+        {
+          "localRoot": "${workspaceFolder}/src/backend/packages/osm-fieldwork/osm_fieldwork",
+          "remoteRoot": "/opt/python/lib/python3.12/site-packages/osm_fieldwork"
+        }
+      ],
+      "justMyCode": false
+    }
+  ]
+}

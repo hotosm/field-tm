@@ -126,54 +126,13 @@ just migrate
 
 ### Interactive Debugging
 
-- The `compose.yaml` builds Field-TM using the `debug` target in the Dockerfile.
-- The debug image contains `debugpy` to assist debugging in the container.
-
-To use it:
-
-1. Re-build the docker image `docker compose build api`
-2. Uncomment the debug port in compose.yaml:
-
-   ```yml
-   services:
-     ...
-     api:
-       ...
-       ports:
-         - "7052:8000"
-       #   - "5678:5678" # Debugger port
-   ```
-
-3. Start the docker container `docker compose up -d api`
-4. Connect to the debugger on port **5678**.
-
-You can configure your IDE to do this with the build in debugger.
-
-Example launch.json config for vscode:
-
-```json
-{
-  "configurations": [
-    {
-      "name": "Remote - Server Debug",
-      "type": "python",
-      "request": "attach",
-      "host": "localhost",
-      "port": 5678,
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}/src/backend/app",
-          "remoteRoot": "/opt/app"
-        }
-      ],
-      "justMyCode": false
-    }
-  ]
-}
-```
-
-> Note: either port 5678 needs to be bound to your localhost (default),
-> or the `host` parameter can be set to the container IP address.
+- The local version of the backend API that runs in `compose.yaml` includes the
+  `debugpy` package and a port bind to `5678`.
+- This means you should be able to simply click the 'debugger' toolbar in VSCode,
+  then 'Remote - Server Debug'.
+- When you add breakpoints to the code, the server should pause here to allow
+  you to step through and debug code.
+- The configuration for this is in `.vscode/launch.json`.
 
 ### Running Tests
 
