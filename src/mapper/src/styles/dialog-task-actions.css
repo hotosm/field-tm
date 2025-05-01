@@ -51,8 +51,8 @@
 	--at-apply: my-4 sm: my-6;
 }
 
-.dialog-task-new-feature .unlock-actions {
-	--at-apply: flex justify-center gap-x-2;
+.dialog-task-actions .unlock-actions {
+	--at-apply: flex gap-x-2 mt-4;
 }
 
 .dialog-task-new-feature .unlock-actions span {

@@ -16,7 +16,7 @@
 }
 
 .map .control .sync-button {
-	--at-apply: text-[1.25rem] rotate-90 text-primary-600;
+	--at-apply: text-[1.25rem] rotate-90 text-primary-600 bg-white;
 }
 
 .map .control .basemap-icon {

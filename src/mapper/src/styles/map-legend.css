@@ -14,30 +14,30 @@
 	--at-apply: font-semibold leading-0 text-lg mb-3;
 }
 
-.map-legend .task-status {
+.map-legend .entity-status {
 	--at-apply: flex items-center gap-2;
 }
 
-.map-legend .task-status .color {
+.map-legend .entity-status .color {
 	--at-apply: w-5 h-5 opacity-40 border-solid border-[1px] border-neutral-100;
 }
 
-.map-legend .task-status .label {
+.map-legend .entity-status .label {
 	--at-apply: font-regular text-neutral-800 text-nowrap leading-0;
 }
 
-.map-legend .task-status .ready {
+.map-legend .entity-status .ready {
 	background-color: var(--sl-color-neutral-300);
 }
 
-.map-legend .task-status .opened-in-odk {
+.map-legend .entity-status .opened-in-odk {
 	background-color: var(--sl-color-warning-700);
 }
 
-.map-legend .task-status .submitted {
+.map-legend .entity-status .submitted {
 	background-color: var(--sl-color-success-700);
 }
 
-.map-legend .task-status .bad {
+.map-legend .entity-status .bad {
 	background-color: var(--sl-color-primary-700);
 }

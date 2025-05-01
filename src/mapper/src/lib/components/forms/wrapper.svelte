@@ -266,8 +266,8 @@
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */
 	#spinner {
-		border: 16px solid #f3f3f3; /* Light grey */
-		border-top: 16px solid #3498db; /* Blue */
+		border: 16px solid var(--sl-color-neutral-300); 
+		border-top: 16px solid solid var(--sl-color-primary-700);
 		border-radius: 50%;
 		width: 120px;
 		height: 120px;
