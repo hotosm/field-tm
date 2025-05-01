@@ -23,19 +23,109 @@ from textwrap import dedent
 from typing import Optional
 
 from fastapi import Request
+from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from osm_login_python.core import Auth
 from psycopg import Connection
 from psycopg.rows import class_row
 
+from app.auth.auth_schemas import AuthUser
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
+from app.db.enums import HTTPStatus, UserRole
 from app.db.models import DbProject, DbUser
 from app.projects.project_crud import get_pagination
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
 WARNING_INTERVALS = [21, 14, 7]  # Days before deletion
 INACTIVITY_THRESHOLD = 2 * 365  # 2 years approx
+
+
+async def get_or_create_user(
+    db: Connection,
+    user_data: AuthUser,
+) -> DbUser:
+    """Get user from User table if exists, else create."""
+    try:
+        upsert_sql = """
+            WITH upserted_user AS (
+                INSERT INTO users (
+                    sub,
+                    username,
+                    email_address,
+                    profile_img,
+                    role,
+                    registered_at
+                )
+                VALUES (
+                    %(user_sub)s,
+                    %(username)s,
+                    %(email_address)s,
+                    %(profile_img)s,
+                    %(role)s,
+                    NOW()
+                )
+                ON CONFLICT (sub)
+                DO UPDATE SET
+                    profile_img = EXCLUDED.profile_img,
+                    last_login_at = NOW()
+                RETURNING sub, username, email_address, profile_img, role
+            )
+
+            SELECT
+                u.sub,
+                u.username,
+                u.email_address,
+                u.profile_img,
+                u.role,
+
+                -- Aggregate the organisation IDs managed by the user
+                array_agg(
+                    DISTINCT om.organisation_id
+                ) FILTER (WHERE om.organisation_id IS NOT NULL) AS orgs_managed,
+
+                -- Aggregate project roles for the user, as project:role pairs
+                jsonb_object_agg(
+                    ur.project_id,
+                    COALESCE(ur.role, 'MAPPER')
+                ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
+
+            FROM upserted_user u
+            LEFT JOIN user_roles ur ON u.sub = ur.user_sub
+            LEFT JOIN organisation_managers om ON u.sub = om.user_sub
+            GROUP BY
+                u.sub,
+                u.username,
+                u.email_address,
+                u.profile_img,
+                u.role;
+        """
+
+        async with db.cursor(row_factory=class_row(DbUser)) as cur:
+            await cur.execute(
+                upsert_sql,
+                {
+                    "user_sub": user_data.sub,
+                    "username": user_data.username,
+                    "email_address": user_data.email,
+                    "profile_img": user_data.profile_img or "",
+                    "role": UserRole(user_data.role).name,
+                },
+            )
+            db_user_details = await cur.fetchone()
+
+        if not db_user_details:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User ({user_data.sub}) could not be inserted in db",
+            )
+
+        return db_user_details
+
+    except Exception as e:
+        await db.rollback()
+        log.exception(f"Exception occurred: {e}", stack_info=True)
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e)) from e
 
 
 async def process_inactive_users(

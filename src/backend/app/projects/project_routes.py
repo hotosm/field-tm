@@ -1001,7 +1001,7 @@ async def upload_project_task_boundaries(
 @router.post("", response_model=project_schemas.ProjectOut)
 async def create_project(
     project_info: project_schemas.ProjectIn,
-    org_user_dict: Annotated[AuthUser, Depends(org_admin)],
+    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Create a project in ODK Central and the local database.
