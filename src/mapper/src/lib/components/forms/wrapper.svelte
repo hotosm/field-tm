@@ -36,7 +36,6 @@
 	let uploading = $state(false);
 	let uploadingMessage = $state('');
 
-
 	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
 
 	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
@@ -83,7 +82,7 @@
 				data.append('submission_files', attachment);
 			});
 
-			uploadingMessage = m['forms.uploading']() || "uploading";
+			uploadingMessage = m['forms.uploading']() || 'uploading';
 			uploading = true;
 
 			// Submit the XML + any submission media
@@ -242,17 +241,21 @@
 										</div>
 									</div>
 								{:else}
-									<div style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;">
-										{drawerLabel}
-									</div>
+									{#if drawerLabel}
+										<div
+											style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+										>
+											{drawerLabel}
+										</div>
+									{/if}
 									<iframe
 										class="iframe"
 										style:border="none"
 										style:height="100%"
 										use:handleIframe
 										title="odk-web-forms-wrapper"
-										src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}`}
-									></iframe>								
+										src={`./web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}&cssFile=${commonStore.config?.cssFileWebformsOverride || ''}`}
+									></iframe>
 								{/if}
 							{/key}
 						{/key}
@@ -275,8 +278,12 @@
 	}
 
 	@keyframes spin {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 
 	#uploading-inner {

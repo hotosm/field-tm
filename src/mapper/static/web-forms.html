@@ -8,8 +8,12 @@
 				background-repeat: no-repeat;
 				background-size: contain;
 				position: relative;
-				height: 50px;
-				width: 75px;
+				height: 200px;
+				height: 30vh;
+				width: calc(50% - 20px);
+				margin-bottom: 10px;
+				margin-right: 10px;
+				box-sizing: border-box;
 			}
 			.columns-pack .p-radiobutton.p-component {
 				display: none;
@@ -67,6 +71,15 @@
 			const projectId = new URL(window.location.href).searchParams.get('projectId');
 			const formXml = new URL(window.location.href).searchParams.get('formXml');
 			const formMedia = JSON.parse(new URL(window.location.href).searchParams.get('formMedia'));
+			const cssFile = new URL(window.location.href).searchParams.get('cssFile');
+
+			if (cssFile) {
+				const stylesheet = document.createElement('link');
+				stylesheet.rel = 'stylesheet';
+				stylesheet.type = 'text/css';
+				stylesheet.href = cssFile;
+				document.getElementsByTagName('head')[0].appendChild(stylesheet);
+			}
 
 			const style = document.createElement('style');
 			const formXmlString = await fetch(formXml).then((res) => res.text());

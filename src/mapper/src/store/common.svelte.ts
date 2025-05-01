@@ -14,6 +14,7 @@ interface ConfigJson {
 	logoUrl: string;
 	logoText: string;
 	cssFile: string;
+	cssFileWebforms: string;
 	enableWebforms: boolean;
 	loginProviders: LoginProviders;
 	sidebarItemsOverride: drawerItemsType[];
