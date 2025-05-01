@@ -543,7 +543,6 @@
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
-		<!-- TODO: colors values should be dynamic -->
 		<LineLayer
 			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 			paint={{
@@ -598,29 +597,29 @@
 							'match',
 							['get', 'status'],
 							'READY',
-							'#9c9a9a',
+							cssValue('--sl-color-neutral-300'),
 							'OPENED_IN_ODK',
-							'#fae15f',
+							cssValue('--sl-color-warning-700'),
 							'SURVEY_SUBMITTED',
-							'#71bf86',
+							cssValue('--sl-color-success-700'),
 							'VALIDATED',
-							'#71bf86',
+							cssValue('--sl-color-success-500'),
 							'MARKED_BAD',
-							'#fa1100',
-							'#c5fbf5', // default color if no match is found
+							cssValue('--sl-color-danger-700'),
+							cssValue('--sl-color-primary-700'), // default color if no match is found
 						],
 						'fill-outline-color': [
 							'match',
 							['get', 'status'],
 							'READY',
-							'#000000',
+							cssValue('--sl-color-neutral-1000'),
 							'OPENED_IN_ODK',
-							'#ffd603',
+							cssValue('--sl-color-warning-900'),
 							'SURVEY_SUBMITTED',
-							'#32a852',
+							cssValue('--sl-color-success-900'),
 							'MARKED_BAD',
-							'#fa1100',
-							'#c5fbf5',
+							cssValue('--sl-color-danger-900'),
+							cssValue('--sl-color-primary-700'),
 						],
 					}}
 					beforeLayerType="symbol"
@@ -629,7 +628,7 @@
 				<LineLayer
 					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 					paint={{
-						'line-color': '#fa1100',
+						'line-color': cssValue('--sl-color-primary-700'),
 						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
 						'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
 					}}
@@ -656,7 +655,7 @@
 							'MAP_PIN_BLUE',
 							'MARKED_BAD',
 							'MAP_PIN_RED',
-							'#c5fbf5', // default color if no match is found
+							cssValue('--sl-color-primary-700'), // default color if no match is found
 						],
 						'icon-allow-overlap': true,
 						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],
@@ -667,34 +666,31 @@
 	{/if}
 	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
-			<!-- TODO: colors values should be dynamic -->
 			<FillLayer
 				id="bad-geom-fill-layer"
 				hoverCursor="pointer"
 				paint={{
-					'fill-color': '#fa1100',
+					'fill-color': cssValue('--sl-color-primary-700'),
 					'fill-opacity': 0.3,
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
 			/>
-			<!-- TODO: colors values should be dynamic -->
 			<LineLayer
 				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 				paint={{
-					'line-color': '#fa1100',
+					'line-color': cssValue('--sl-color-primary-700'),
 					'line-width': lineWidth,
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
-			<!-- TODO: colors values should be dynamic -->
 			<CircleLayer
 				id="bad-geom-circle-layer"
 				hoverCursor="pointer"
 				paint={{
-					'circle-color': '#fa1100',
+					'circle-color': cssValue('--sl-color-primary-700'),
 					'circle-opacity': 0.4,
 					'circle-radius': circleRadius,
 					'circle-stroke-opacity': hoverStateFilter(0, 1),
@@ -704,7 +700,6 @@
 	</GeoJSON>
 	<GeoJSON id="new-geoms" data={addStatusToGeojsonProperty(entitiesStore.newGeomList, 'new')}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
-			<!-- TODO: colors values should be dynamic -->
 			<FillLayer
 				id="new-entity-polygon-layer"
 				paint={{
@@ -713,39 +708,38 @@
 						'match',
 						['get', 'status'],
 						'READY',
-						'#9c9a9a',
+						cssValue('--sl-color-neutral-300'),
 						'OPENED_IN_ODK',
-						'#fae15f',
+						cssValue('--sl-color-warning-700'),
 						'SURVEY_SUBMITTED',
-						'#71bf86',
+						cssValue('--sl-color-success-700'),
 						'VALIDATED',
-						'#71bf86',
+						cssValue('--sl-color-success-500'),
 						'MARKED_BAD',
-						'#fa1100',
-						'#c5fbf5',
+						cssValue('--sl-color-danger-700'),
+						cssValue('--sl-color-primary-700'), // default color if no match is found
 					],
 					'fill-outline-color': [
 						'match',
 						['get', 'status'],
 						'READY',
-						'#000000',
+						cssValue('--sl-color-neutral-1000'),
 						'OPENED_IN_ODK',
-						'#ffd603',
+						cssValue('--sl-color-warning-900'),
 						'SURVEY_SUBMITTED',
-						'#32a852',
+						cssValue('--sl-color-success-900'),
 						'MARKED_BAD',
-						'#fa1100',
-						'#c5fbf5',
+						cssValue('--sl-color-danger-900'),
+						cssValue('--sl-color-primary-700'),
 					],
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
 			/>
-			<!-- TODO: colors values should be dynamic -->
 			<LineLayer
 				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 				paint={{
-					'line-color': '#fa1100',
+					'line-color': cssValue('--sl-color-primary-700'),
 					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
 					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
 				}}
@@ -754,7 +748,6 @@
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
 			<!-- id="new-geom-symbol-layer" -->
-			<!-- TODO: colors values should be dynamic -->
 			<SymbolLayer
 				id="new-entity-point-layer"
 				applyToClusters={false}
@@ -774,7 +767,7 @@
 						'MAP_PIN_BLUE',
 						'MARKED_BAD',
 						'MAP_PIN_RED',
-						'#c5fbf5', // default color if no match is found
+						cssValue('--sl-color-primary-700'), // default color if no match is found
 					],
 					'icon-allow-overlap': true,
 					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],

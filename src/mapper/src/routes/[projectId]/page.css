@@ -137,7 +137,7 @@ sl-tab hot-icon {
 }
 
 .dialog-overview .manual-qr-gif {
-	border: 1px solid #ededed;
+	border: 1px solid var(--sl-color-neutral-200);
 }
 
 /* Drawer */
