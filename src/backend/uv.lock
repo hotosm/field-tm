@@ -589,7 +589,7 @@ requires-dist = [
 debug = [{ name = "debugpy", specifier = "==1.8.14" }]
 dev = [
     { name = "commitizen", specifier = "==3.31.0" },
-    { name = "itrm", specifier = "==1.4.15" },
+    { name = "itrm", specifier = "==1.4.21" },
     { name = "pre-commit", specifier = "==4.0.1" },
 ]
 docs = [
@@ -862,14 +862,14 @@ wheels = [
 
 [[package]]
 name = "itrm"
-version = "1.4.15"
+version = "1.4.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/09/35f502bf80e2ccbb9c4948033eb74ca789322ac70d44e3a179c3083b223d/itrm-1.4.15.tar.gz", hash = "sha256:1dd0796ba8f13e92dda8c50e893e609de53cd75e9f7e3cacadc35d332bbad495", size = 63046, upload-time = "2025-01-07T19:31:07.294Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/66/6f67ac3d3dab52a1eccc4bfbbc37c0e7e4decedda27d462a9a1dd590ed68/itrm-1.4.21.tar.gz", hash = "sha256:b007818cab33444da8838c8adf621ad0288a4110f9b9bb27d8c97584623f81a0", size = 49180, upload-time = "2025-04-16T14:43:18.489Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b2/b6/af9aca9a588bd7f2b5d919b56b8963590907e0cf80bfa6a2957ff7f83675/itrm-1.4.15-py3-none-any.whl", hash = "sha256:e2be702c4d1b2c1d20be2414216f4c16784d7403ee3158ca9e8ca4c076a44135", size = 61081, upload-time = "2025-01-07T19:31:04.897Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/de/181d69396edc080cc6f7712d057b21729e67687a5552d1941c8146aa1a5e/itrm-1.4.21-py3-none-any.whl", hash = "sha256:295368cada6ba7672b18e3ea7c6d57e396b034bccc384fab5b4db790e45da28f", size = 49630, upload-time = "2025-04-16T14:43:17.454Z" },
 ]
 
 [[package]]
