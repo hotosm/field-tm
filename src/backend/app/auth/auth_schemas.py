@@ -102,3 +102,13 @@ class FMTMUser(BaseUser):
         if self.profile_img:
             self.picture = self.profile_img
             self.profile_img = None
+
+
+class ExternalUserIn(BaseModel):
+    """Create a FieldTM user from an external platform."""
+
+    id: str
+    platform: str  # the name of the platform, used for sub `platform|id`
+    username: str
+    email: Optional[str] = None
+    picture: Optional[str] = None

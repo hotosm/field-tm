@@ -76,20 +76,20 @@ async def login_required(
     if settings.DEBUG:
         return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
 
-    # Extract access token only from the Field-TM cookie
+    # API Key should take priority if provided
+    if x_api_key:
+        if not db:
+            raise RuntimeError("Database connection is required for API key auth")
+        db_user = await _validate_api_token(db, x_api_key)
+        return AuthUser(**db_user.model_dump())
+
+    # Else, extract access token only from the Field-TM cookie
     extracted_token = access_token or get_cookie_value(
         request,
         settings.cookie_name,  # Field-TM cookie
     )
     if extracted_token:
         return await _authenticate_cookie_token(extracted_token)
-
-    # Else try API token
-    if x_api_key:
-        if not db:
-            raise RuntimeError("Database connection is required for API key auth")
-        db_user = await _validate_api_token(db, x_api_key)
-        return AuthUser(**db_user.model_dump())
 
     raise HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
