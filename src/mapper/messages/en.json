@@ -45,7 +45,9 @@
 		"collect_data": "COLLECT DATA",
 		"task_complete_total_mapped": "You have mapped {totalMapped} features in the task area.",
 		"task_complete_only_total_mapped": "You have only mapped {totalMapped} features in the task area.",
-		"task_complete_confirm": "Are you sure you wish to mark this task as complete?"
+		"task_complete_confirm": "Are you sure you wish to mark this task as complete?",
+		"select_this_feature": "Select This Feature",
+		"map_this_feature": "Map This Feature"
 	},
 	"stack_group": {
 		"project_information": "Project Information",
