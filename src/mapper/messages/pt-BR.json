@@ -45,7 +45,9 @@
 		"collect_data": "PREENCHER FORMULÁRIO",
 		"task_complete_total_mapped": "Você mapeou {totalMapped} recursos na área da tarefa.",
 		"task_complete_only_total_mapped": "Você mapeou apenas {totalMapped} recursos na área da tarefa.",
-		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?"
+		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?",
+		"select_this_feature": "Selecione este recurso",
+		"map_this_feature": "Mapeie este recurso"
 	},
 	"stack_group": {
 		"project_information": "Informações do projeto",

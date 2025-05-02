@@ -35,6 +35,7 @@ const initialState: ProjectStateTypes = {
   badGeomLogList: [],
   getGeomLogLoading: false,
   syncTaskStateLoading: false,
+  selectedEntityId: null,
 };
 
 const ProjectSlice = createSlice({
@@ -166,6 +167,9 @@ const ProjectSlice = createSlice({
     },
     SyncTaskStateLoading(state, action: PayloadAction<boolean>) {
       state.syncTaskStateLoading = action.payload;
+    },
+    SetSelectedEntityId(state, action: PayloadAction<string | null>) {
+      state.selectedEntityId = action.payload;
     },
   },
 });

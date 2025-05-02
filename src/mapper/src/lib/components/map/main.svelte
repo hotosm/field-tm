@@ -18,7 +18,7 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
-	import maplibre from 'maplibre-gl';
+	import maplibre, { type MapGeoJSONFeature } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
@@ -62,7 +62,7 @@
 		setMapRef: (map: maplibregl.Map | undefined) => void;
 		primaryGeomType: MapGeomTypes;
 		draw?: boolean;
-		drawGeomType: MapGeomTypes | undefined;
+		drawGeomType: MapGeomTypes;
 		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void) | null;
 	}
 
@@ -77,6 +77,18 @@
 		drawGeomType,
 		handleDrawnGeom,
 	}: Props = $props();
+
+	const primaryGeomLayerMapping = {
+		POINT: 'entity-point-layer',
+		POLYGON: 'entity-polygon-layer',
+		LINESTRING: 'entity-line-layer',
+	};
+
+	const newGeomLayerMapping = {
+		POINT: 'new-entity-point-layer',
+		POLYGON: 'new-entity-polygon-layer',
+		LINESTRING: 'new-entity-line-layer',
+	};
 
 	const cssValue = (property) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
 
@@ -95,6 +107,7 @@
 	let expanding = true; // Whether the line is expanding
 	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
 	let selectedStyleUrl: string | undefined = $state(undefined);
+	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
 
 	let fillLayerColors = {
 		UNLOCKED_TO_MAP: '#ffffff',
@@ -177,37 +190,32 @@
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
-		let entityLayerName: string;
-		let newEntityLayerName: string;
-		switch (drawGeomType) {
-			case MapGeomTypes.POINT:
-				entityLayerName = 'entity-point-layer';
-				newEntityLayerName = 'new-entity-point-layer';
-				break;
-			case MapGeomTypes.POLYGON:
-				entityLayerName = 'entity-polygon-layer';
-				newEntityLayerName = 'new-entity-polygon-layer';
-				break;
-			case MapGeomTypes.LINESTRING:
-				entityLayerName = 'entity-line-layer';
-				newEntityLayerName = 'new-entity-line-layer';
-				break;
-			default:
-				throw new Error(`Unsupported geometry type: ${drawGeomType}`);
-		}
+		let entityLayerName: string = primaryGeomLayerMapping[primaryGeomType];
+		let newEntityLayerName: string = newGeomLayerMapping[drawGeomType];
+
 		// returns list of features of entity layer present on that clicked point
-		const clickedEntityFeature = map?.queryRenderedFeatures(e.point, {
-			layers: [entityLayerName],
-		});
-		const clickedNewEntityFeature = map?.queryRenderedFeatures(e.point, {
-			layers: [newEntityLayerName],
-		});
+		const clickedEntityFeature =
+			map?.queryRenderedFeatures(e.point, {
+				layers: [entityLayerName],
+			}) || [];
+		const clickedNewEntityFeature =
+			map?.queryRenderedFeatures(e.point, {
+				layers: [newEntityLayerName],
+			}) || [];
+
+		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
+		// if clicked coordinate contain more than multiple entities, assign it to a variable
+		if (clickedFeatures.length > 1) {
+			selectedFeatures = clickedFeatures;
+		}
+
 		// returns list of features of task layer present on that clicked point
 		const clickedTaskFeature = map?.queryRenderedFeatures(e.point, {
 			layers: ['task-fill-layer'],
 		});
-		// if clicked point contains entity then set it's osm id else set null to store
-		if (clickedEntityFeature && clickedEntityFeature?.length > 0) {
+
+		if (clickedEntityFeature && clickedEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
+			// if clicked coordinate contains uploaded entity only
 			const entityCentroid = centroid(clickedEntityFeature[0].geometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntity(clickedEntityId);
@@ -215,7 +223,8 @@
 				entityId: clickedEntityId,
 				coordinate: entityCentroid?.geometry?.coordinates,
 			});
-		} else if (clickedNewEntityFeature && clickedNewEntityFeature?.length > 0) {
+		} else if (clickedNewEntityFeature && clickedNewEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
+			// if clicked coordinate contains new entity only
 			const entityCentroid = centroid(clickedNewEntityFeature[0].geometry);
 			const clickedEntityId = clickedNewEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntity(clickedEntityId);
@@ -224,6 +233,7 @@
 				coordinate: entityCentroid?.geometry?.coordinates,
 			});
 		} else {
+			// if clicked coordinate doesn't contain any entity, clear the entity states
 			entitiesStore.setSelectedEntity(null);
 			entitiesStore.setSelectedEntityCoordinate(null);
 		}
@@ -240,13 +250,19 @@
 		}
 
 		if (
-			(clickedEntityFeature && clickedEntityFeature?.length > 0) ||
-			(clickedNewEntityFeature && clickedNewEntityFeature?.length > 0)
+			((clickedEntityFeature && clickedEntityFeature?.length > 0) ||
+				(clickedNewEntityFeature && clickedNewEntityFeature?.length > 0)) &&
+			clickedFeatures?.length < 2
 		) {
+			// if clicked coordinate contains either one uploaded entity or new entity, open entity actions modal
+			selectedFeatures = [];
 			toggleActionModal('entity-modal');
-		} else if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
+		} else if (clickedTaskFeature && clickedTaskFeature?.length > 0 && clickedFeatures?.length === 0) {
+			// if clicked coordinate doesn't contain any entity but only task, open task actions modal
+			selectedFeatures = [];
 			toggleActionModal('task-modal');
 		} else {
+			// else close the modal
 			toggleActionModal(null);
 		}
 	}
@@ -835,3 +851,86 @@
 		<Legend isOpen={selectedControl === 'legend'} />
 	</div>
 </div>
+
+{#if selectedFeatures?.length > 1}
+	<div class="select-entities-modal">
+		<div class="content">
+			<div class="icon">
+				<hot-icon
+					name="close"
+					onclick={() => (selectedFeatures = [])}
+					onkeydown={(e: KeyboardEvent) => {
+						if (e.key === 'Enter') {
+							selectedFeatures = [];
+						}
+					}}
+					role="button"
+					tabindex="0"
+				></hot-icon>
+			</div>
+
+			<div>
+				{#each selectedFeatures as feature, index}
+					<div class="entity">
+						<div class="header">
+							<h5>{index + 1}. {feature.properties.entity_id}</h5>
+							<p class={`status ${feature.properties.status}`}>{m[`entity_states.${feature.properties.status}`]()}</p>
+						</div>
+						<div class="button-wrapper">
+							{#if entitiesStore.selectedEntity && entitiesStore.selectedEntity === feature.properties.entity_id}
+								<sl-button
+									variant="secondary"
+									size="small"
+									onclick={() => {
+										entitiesStore.setSelectedEntity(null);
+										entitiesStore.setSelectedEntityCoordinate(null);
+									}}
+									onkeydown={() => {}}
+									role="button"
+									tabindex="0"
+								>
+									{m['popup.cancel']()}
+								</sl-button>
+								<sl-button
+									variant="primary"
+									size="small"
+									onclick={() => {
+										selectedFeatures = [];
+										toggleActionModal('entity-modal');
+									}}
+									onkeydown={() => {
+										selectedFeatures = [];
+										toggleActionModal('entity-modal');
+									}}
+									role="button"
+									tabindex="0"
+								>
+									{m['popup.map_this_feature']()}
+								</sl-button>
+							{:else}
+								<sl-button
+									variant="primary"
+									size="small"
+									onclick={() => {
+										const entityCentroid = centroid(feature.geometry);
+										const clickedEntityId = feature?.properties?.entity_id;
+										entitiesStore.setSelectedEntity(clickedEntityId);
+										entitiesStore.setSelectedEntityCoordinate({
+											entityId: clickedEntityId,
+											coordinate: entityCentroid?.geometry?.coordinates,
+										});
+									}}
+									onkeydown={() => {}}
+									role="button"
+									tabindex="0"
+								>
+									{m['popup.select_this_feature']()}
+								</sl-button>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
+{/if}

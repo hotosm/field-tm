@@ -40,6 +40,7 @@ export type ProjectStateTypes = {
   badGeomLogList: geometryLogResponseType[];
   getGeomLogLoading: boolean;
   syncTaskStateLoading: boolean;
+  selectedEntityId: string | null;
 };
 
 type projectCommentsListTypes = {

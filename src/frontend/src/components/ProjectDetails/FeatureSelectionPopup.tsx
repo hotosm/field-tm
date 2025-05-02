@@ -10,11 +10,10 @@ import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
 import { entity_state } from '@/types/enums';
 
 type FeatureSelectionPopupPropType = {
-  taskId: number;
   featureProperties: TaskFeatureSelectionProperties | null;
 };
 
-const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPopupPropType) => {
+const FeatureSelectionPopup = ({ featureProperties }: FeatureSelectionPopupPropType) => {
   const dispatch = useAppDispatch();
   const params = useParams();
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
@@ -48,7 +47,10 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
             <AssetModules.CloseIcon
               style={{ width: '20px' }}
               className="hover:fmtm-text-primaryRed fmtm-cursor-pointer"
-              onClick={() => dispatch(ProjectActions.ToggleTaskModalStatus(false))}
+              onClick={() => {
+                dispatch(ProjectActions.ToggleTaskModalStatus(false));
+                dispatch(ProjectActions.SetSelectedEntityId(null));
+              }}
             />
           </div>
         </div>

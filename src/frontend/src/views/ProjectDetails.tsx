@@ -278,7 +278,7 @@ const ProjectDetails = () => {
           <MobileFooter />
         </div>
       </div>
-      {selectedTaskArea != undefined && selectedTaskFeature === undefined && selectedTask && (
+      {selectedTaskArea && selectedTask && !selectedTaskFeature && (
         <TaskSelectionPopup
           taskId={selectedTask}
           feature={selectedTaskArea}
@@ -289,9 +289,7 @@ const ProjectDetails = () => {
           }
         />
       )}
-      {selectedTaskFeature != undefined && selectedTask && selectedTaskArea && (
-        <FeatureSelectionPopup featureProperties={selectedFeatureProps} taskId={selectedTask} />
-      )}
+      {selectedTaskFeature && <FeatureSelectionPopup featureProperties={selectedFeatureProps} />}
     </div>
   );
 };

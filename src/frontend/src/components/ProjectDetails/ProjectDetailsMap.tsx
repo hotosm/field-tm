@@ -22,6 +22,8 @@ import { entity_state } from '@/types/enums';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { GetEntityStatusList, GetGeometryLog, SyncTaskState } from '@/api/Project';
 import MapLegends from '@/components/MapLegends';
+import isEmpty from '@/utilfunctions/isEmpty';
+import AssetModules from '@/shared/AssetModules';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -45,6 +47,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
 
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
+  const [overlappingEntityFeatures, setOverlappingEntityFeatures] = useState<Record<string, any>[]>([]);
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const mapTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -55,6 +58,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
   const newGeomFeatureCollection = useAppSelector((state) => state.project.newGeomFeatureCollection);
   const customBasemapUrl = useAppSelector((state) => state.project.customBasemapUrl);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  const selectedEntityId = useAppSelector((state) => state.project.selectedEntityId);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
   const entityOsmMapLoading = useAppSelector((state) => state.project.entityOsmMapLoading);
@@ -162,6 +166,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
    */
   const handleFeatureClick = (properties, feature) => {
     // Close task area popup, open task feature popup
+    dispatch(ProjectActions.SetSelectedEntityId(feature.getProperties()?.entity_id || feature.getProperties()?.osm_id));
     setSelectedTaskFeature(feature);
     dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
@@ -199,115 +204,227 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     return null;
   };
 
-  return (
-    <MapComponent
-      ref={mapRef}
-      mapInstance={map}
-      className={`map naxatw-relative naxatw-min-h-full naxatw-w-full fmtm-cursor-grab active:fmtm-cursor-grabbing ${
-        windowSize.width <= 768 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
-      }`}
-    >
-      <MapLegends defaultTheme={defaultTheme} />
-      <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
+  useEffect(() => {
+    if (!map) return;
 
-      {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
-        <VectorLayer
-          geojson={taskBoundariesLayer}
-          viewProperties={{
-            size: map?.getSize(),
-            padding: [50, 50, 50, 50],
-            constrainResolution: true,
-          }}
-          layerProperties={{ name: 'project-area' }}
-          mapOnClick={handleTaskClick}
-          zoomToLayer
-          zIndex={5}
-          style=""
-          getTaskStatusStyle={(feature) => {
-            return getTaskStatusStyle(feature, mapTheme, feature.getProperties()?.actioned_by_uid == authDetails?.sub);
-          }}
-        />
-      )}
-      <VectorLayer
-        geojson={badGeomFeatureCollection}
-        viewProperties={{
-          size: map?.getSize(),
-          padding: [50, 50, 50, 50],
-          constrainResolution: true,
-          duration: 2000,
-        }}
-        layerProperties={{ name: 'bad-entities' }}
-        zIndex={5}
-        style=""
-      />
-      <VectorLayer
-        geojson={newGeomFeatureCollection}
-        viewProperties={{
-          size: map?.getSize(),
-          padding: [50, 50, 50, 50],
-          constrainResolution: true,
-          duration: 2000,
-        }}
-        layerProperties={{ name: 'new-entities' }}
-        zIndex={5}
-        style=""
-        mapOnClick={handleFeatureClick}
-        getTaskStatusStyle={(feature) => {
-          const geomType = feature.getGeometry().getType();
-          const entity = entityOsmMap?.find(
-            (entity) => entity?.id === feature?.getProperties()?.entity_id,
-          ) as EntityOsmMap;
-          const status = entity_state[entity?.status];
-          return getFeatureStatusStyle(geomType, mapTheme, status);
-        }}
-      />
-      {projectInfo.data_extract_url &&
-        isValidUrl(projectInfo.data_extract_url) &&
-        dataExtractExtent &&
-        selectedTask && (
+    const handleClick = (evt) => {
+      // always reset selected entity ID on any map click
+      dispatch(ProjectActions.SetSelectedEntityId(null));
+
+      // get features from layer excluding 'project-area'(task layer) i.e. get feature from data-extract & new-geoms layer
+      const entityFeatures = map.getFeaturesAtPixel(evt.pixel, {
+        layerFilter: (layer) => layer.get('name') !== 'project-area',
+      });
+
+      // if the clicked point contains entity-related features, handle them; otherwise, check for task features
+      if (!isEmpty(entityFeatures)) {
+        // store entities in overlappingEntityFeatures to show selection popup if multiple are present at the clicked point
+        if (entityFeatures.length > 1) {
+          setSelectedTaskArea(undefined);
+          setOverlappingEntityFeatures(entityFeatures);
+          dispatch(ProjectActions.ToggleTaskModalStatus(false));
+        } else {
+          if (overlappingEntityFeatures.length > 1) {
+            setOverlappingEntityFeatures([]);
+          }
+          const feature = entityFeatures[0];
+          handleFeatureClick(feature.getProperties(), feature);
+        }
+      } else {
+        if (overlappingEntityFeatures.length > 1) {
+          setOverlappingEntityFeatures([]);
+        }
+        const taskFeatures = map.getFeaturesAtPixel(evt.pixel, {
+          layerFilter: (layer) => layer.get('name') === 'project-area',
+        });
+        if (isEmpty(taskFeatures)) return;
+        const feature = taskFeatures[0];
+        handleTaskClick(feature.getProperties(), feature);
+      }
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.un('click', handleClick);
+    };
+  }, [map, overlappingEntityFeatures]);
+
+  return (
+    <>
+      <MapComponent
+        ref={mapRef}
+        mapInstance={map}
+        className={`map naxatw-relative naxatw-min-h-full naxatw-w-full fmtm-cursor-grab active:fmtm-cursor-grabbing ${
+          windowSize.width <= 768 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
+        }`}
+      >
+        <MapLegends defaultTheme={defaultTheme} />
+        <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
+
+        {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
           <VectorLayer
-            fgbUrl={projectInfo.data_extract_url}
-            fgbExtent={dataExtractExtent}
-            getTaskStatusStyle={(feature) => {
-              const geomType = feature.getGeometry().getType();
-              const entity = entityOsmMap?.find(
-                (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
-              ) as EntityOsmMap;
-              const status = entity_state[entity?.status];
-              return getFeatureStatusStyle(geomType, mapTheme, status);
-            }}
+            geojson={taskBoundariesLayer}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
               constrainResolution: true,
-              duration: 2000,
             }}
-            style=""
-            mapOnClick={handleFeatureClick}
+            layerProperties={{ name: 'project-area' }}
             zoomToLayer
             zIndex={5}
+            style=""
+            getTaskStatusStyle={(feature) => {
+              return getTaskStatusStyle(
+                feature,
+                mapTheme,
+                feature.getProperties()?.actioned_by_uid == authDetails?.sub,
+              );
+            }}
           />
         )}
-      <AsyncPopup
-        map={map}
-        popupUI={LockedPopup}
-        primaryKey={'actioned_by_uid'}
-        showOnHover="pointermove"
-        popupId="locked-popup"
-        className="fmtm-w-[235px]"
-      />
-      <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-40">
-        <Button
-          variant="primary-red"
-          onClick={syncStatus}
-          disabled={entityOsmMapLoading}
-          isLoading={entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading}
+        <VectorLayer
+          geojson={badGeomFeatureCollection}
+          viewProperties={{
+            size: map?.getSize(),
+            padding: [50, 50, 50, 50],
+            constrainResolution: true,
+            duration: 2000,
+          }}
+          layerProperties={{ name: 'bad-entities' }}
+          zIndex={5}
+          style=""
+        />
+        <VectorLayer
+          geojson={newGeomFeatureCollection}
+          viewProperties={{
+            size: map?.getSize(),
+            padding: [50, 50, 50, 50],
+            constrainResolution: true,
+            duration: 2000,
+          }}
+          layerProperties={{ name: 'new-entities' }}
+          zIndex={5}
+          style=""
+          getTaskStatusStyle={(feature) => {
+            const geomType = feature.getGeometry().getType();
+            const entity = entityOsmMap?.find(
+              (entity) => entity?.id === feature?.getProperties()?.entity_id,
+            ) as EntityOsmMap;
+            const status = entity_state[entity?.status];
+            const isEntitySelected = selectedEntityId === entity?.id;
+            return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+          }}
+        />
+        {projectInfo.data_extract_url &&
+          isValidUrl(projectInfo.data_extract_url) &&
+          dataExtractExtent &&
+          selectedTask && (
+            <VectorLayer
+              fgbUrl={projectInfo.data_extract_url}
+              fgbExtent={dataExtractExtent}
+              getTaskStatusStyle={(feature) => {
+                const geomType = feature.getGeometry().getType();
+                const entity = entityOsmMap?.find(
+                  (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
+                ) as EntityOsmMap;
+                const status = entity_state[entity?.status];
+                const isEntitySelected = selectedEntityId === entity?.osm_id;
+                return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+              }}
+              viewProperties={{
+                size: map?.getSize(),
+                padding: [50, 50, 50, 50],
+                constrainResolution: true,
+                duration: 2000,
+              }}
+              style=""
+              zoomToLayer
+              zIndex={5}
+            />
+          )}
+        <AsyncPopup
+          map={map}
+          popupUI={LockedPopup}
+          primaryKey={'actioned_by_uid'}
+          showOnHover="pointermove"
+          popupId="locked-popup"
+          className="fmtm-w-[235px]"
+        />
+        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-40">
+          <Button
+            variant="primary-red"
+            onClick={syncStatus}
+            disabled={entityOsmMapLoading}
+            isLoading={entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading}
+          >
+            Sync Status
+          </Button>
+        </div>
+        <MapControlComponent map={map} projectName={projectInfo?.name || ''} pmTileLayerUrl={customBasemapUrl} />
+      </MapComponent>
+      {/* show entity selection popup only if multiple features overlap at the clicked point */}
+      {overlappingEntityFeatures.length > 1 && (
+        <div
+          className={`fmtm-z-[10002] fmtm-h-fit fmtm-bg-white fmtm-p-5 fmtm-flex fmtm-flex-col fmtm-bottom-[4.4rem] md:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-fit fmtm-fixed fmtm-rounded-xl fmtm-border-opacity-50`}
         >
-          Sync Status
-        </Button>
-      </div>
-      <MapControlComponent map={map} projectName={projectInfo?.name || ''} pmTileLayerUrl={customBasemapUrl} />
-    </MapComponent>
+          <div title="Close" className="fmtm-ml-auto">
+            <AssetModules.CloseIcon
+              style={{ width: '20px' }}
+              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer"
+              onClick={() => {
+                setOverlappingEntityFeatures([]);
+                dispatch(ProjectActions.SetSelectedEntityId(null));
+              }}
+            />
+          </div>
+          {overlappingEntityFeatures?.map((feature, i) => {
+            const featureProperties = feature.getProperties();
+            const id = featureProperties?.entity_id || featureProperties?.osm_id;
+            return (
+              <div className="fmtm-py-4 fmtm-border-b">
+                <p className="fmtm-font-semibold fmtm-mb-1">
+                  {i + 1}. {id}
+                </p>
+                {selectedEntityId === id ? (
+                  <div className="fmtm-flex fmtm-gap-2 fmtm-w-full">
+                    <Button
+                      className="!fmtm-w-1/2"
+                      variant="primary-grey"
+                      onClick={() => {
+                        dispatch(ProjectActions.SetSelectedEntityId(null));
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="!fmtm-w-1/2"
+                      variant="primary-red"
+                      onClick={() => {
+                        handleFeatureClick(featureProperties, feature);
+                        setOverlappingEntityFeatures([]);
+                      }}
+                    >
+                      Map this feature
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    className="!fmtm-w-full"
+                    variant="primary-red"
+                    onClick={() => {
+                      dispatch(ProjectActions.SetSelectedEntityId(id));
+                    }}
+                  >
+                    Select this feature
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 };
 
