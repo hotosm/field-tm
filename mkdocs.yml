@@ -93,6 +93,7 @@ nav:
       - Troubleshooting: dev/Troubleshooting.md
       - Pre-Commit: https://docs.hotosm.org/dev-guide/repo-management/pre-commit/
       - Versioning: https://docs.hotosm.org/dev-guide/repo-management/version-control/#creating-releases
+      - Tech Decisions: decisions/README.md
       - Class Hierarchy: apidocs/html/inherits.html
       - Code Coverage: coverage.html
   - Utilities:
