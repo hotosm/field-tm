@@ -10,8 +10,6 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.postgis_utils import timestamp
 
-DB_URL = settings.FMTM_DB_URL.unicode_string()
-
 # Create materialized view to store project stats for faster query:
 # Using a CTE to get lastest_task_events first, we then calculate:
 #  - Total number of contributors (task / entity events)
@@ -86,7 +84,9 @@ REFRESH_MATERIALIZED_VIEW_SQL = """
 async def main():
     """Main function for cron execution."""
     try:
-        async with await AsyncConnection.connect(DB_URL, autocommit=True) as db:
+        async with await AsyncConnection.connect(
+            settings.FMTM_DB_URL, autocommit=True
+        ) as db:
             async with db.cursor() as cur:
                 # First ensure the view exists
                 print(f"Creating materialized view for project stats: {timestamp()}")

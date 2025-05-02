@@ -50,7 +50,7 @@ async def upload_basemap_file(
 async def basemap_files_to_s3():
     """Upload basemap file & update the DbBasemap.url field."""
     async with await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string(),
+        settings.FMTM_DB_URL,
     ) as db:
         try:
             projects = await DbProject.all(db)

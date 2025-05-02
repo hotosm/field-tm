@@ -32,9 +32,7 @@ def get_db_connection_pool() -> AsyncConnectionPool:
 
     NOTE the pool connection is opened in the FastAPI server startup (lifespan).
     """
-    return AsyncConnectionPool(
-        conninfo=settings.FMTM_DB_URL.unicode_string(), open=False
-    )
+    return AsyncConnectionPool(conninfo=settings.FMTM_DB_URL, open=False)
 
 
 async def db_conn(request: Request) -> Connection:

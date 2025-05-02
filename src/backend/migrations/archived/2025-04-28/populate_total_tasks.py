@@ -9,9 +9,7 @@ from app.config import settings
 
 async def populate_total_tasks():
     """Populate total_tasks for all projects where it's NULL or 0."""
-    async with await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string()
-    ) as db:
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
         async with db.cursor() as cur:
             sql = """
                 UPDATE projects
