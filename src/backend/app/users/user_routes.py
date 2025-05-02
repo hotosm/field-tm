@@ -34,11 +34,13 @@ from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_deps import AuthUser, login_required
+from app.auth.auth_schemas import OrgUserDict
 from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import (
     ProjectUserDict,
     field_manager,
     mapper,
+    org_admin,
     super_admin,
     validator,
 )
@@ -65,13 +67,16 @@ router = APIRouter(
 @router.get("", response_model=user_schemas.PaginatedUsers)
 async def get_users(
     db: Annotated[Connection, Depends(db_conn)],
-    _: Annotated[DbUser, Depends(super_admin)],
+    _: Annotated[OrgUserDict, Depends(org_admin)],
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
     search: str = "",
+    signin_type: Literal["osm", "google"] = Query(
+        "osm", description="Filter by signin type (osm or google)"
+    ),
 ):
     """Get all user details."""
-    return await get_paginated_users(db, page, results_per_page, search)
+    return await get_paginated_users(db, page, results_per_page, search, signin_type)
 
 
 @router.get("/usernames", response_model=list[user_schemas.Usernames])

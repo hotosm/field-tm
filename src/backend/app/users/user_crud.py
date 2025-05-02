@@ -20,7 +20,7 @@
 import os
 from datetime import datetime, timedelta, timezone
 from textwrap import dedent
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import Request
 from fastapi.exceptions import HTTPException
@@ -259,10 +259,11 @@ async def get_paginated_users(
     page: int,
     results_per_page: int,
     search: Optional[str] = None,
+    signin_type: Literal["osm", "google"] = "osm",
 ) -> dict:
     """Helper function to fetch paginated users with optional filters."""
     # Get subset of users
-    users = await DbUser.all(db, search=search) or []
+    users = await DbUser.all(db, search=search, signin_type=signin_type) or []
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
 
