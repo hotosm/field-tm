@@ -20,6 +20,13 @@
 	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { goto } from '$app/navigation';
+	import { languages } from '$constants/languages';
+
+	type languageListType = {
+		code: string;
+		name: string;
+		flag: string;
+	};
 
 	let drawerRef: SlDrawer | undefined = $state();
 	let drawerOpenButtonRef: SlTooltip | undefined = $state();
@@ -27,6 +34,9 @@
 	const alertStore = getAlertStore();
 	const commonStore = getCommonStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
+	const languageList: languageListType[] = locales.map((locale: string) =>
+		languages.find((language) => language.code === locale),
+	);
 
 	let isFirstLoad = $derived(
 		+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load'],
@@ -46,18 +56,18 @@
 	const handleLocaleSelect = (event: SlSelectEvent) => {
 		const selectedItem = event.detail.item;
 		commonStore.setLocale(selectedItem.value);
-		console.log(selectedItem.value)
 		setParaglideLocale(selectedItem.value); // paraglide function for UI changes (causes reload)
 	};
 
-	let sidebarMenuItems = $derived(commonStore.config?.sidebarItemsOverride.length > 0 ? commonStore.config?.sidebarItemsOverride : defaultDrawerItems)
+	let sidebarMenuItems = $derived(
+		commonStore.config?.sidebarItemsOverride.length > 0 ? commonStore.config?.sidebarItemsOverride : defaultDrawerItems,
+	);
 
 	onMount(() => {
 		// Handle locale change
 		const container = document.querySelector('.locale-selection');
 		const dropdown = container?.querySelector('sl-dropdown');
 		dropdown?.addEventListener('sl-select', handleLocaleSelect);
-
 	});
 
 	onDestroy(() => {
@@ -66,6 +76,7 @@
 		dropdown?.removeEventListener('sl-select', handleLocaleSelect);
 	});
 </script>
+
 <div class="header">
 	<div
 		onclick={() => goto('/')}
@@ -77,7 +88,7 @@
 		class="logo"
 		aria-label="Home"
 	>
-		<img src={commonStore.config?.logoUrl} alt="hot-logo"/>
+		<img src={commonStore.config?.logoUrl} alt="hot-logo" />
 		<span class="logo-text">
 			{commonStore.config?.logoText}
 		</span>
@@ -87,19 +98,10 @@
 		{#if loginStore?.getAuthDetails?.username}
 			<div class="user">
 				{#if !loginStore?.getAuthDetails?.picture}
-					<hot-icon
-						name="person-fill"
-						class=""
-						onclick={() => {}}
-						onkeydown={() => {}}
-						role="button"
-						tabindex="0"
+					<hot-icon name="person-fill" class="" onclick={() => {}} onkeydown={() => {}} role="button" tabindex="0"
 					></hot-icon>
 				{:else}
-					<img
-						src={loginStore?.getAuthDetails?.picture}
-						alt="profile"
-					/>
+					<img src={loginStore?.getAuthDetails?.picture} alt="profile" />
 				{/if}
 				<p class="username">
 					{loginStore?.getAuthDetails?.username}
@@ -171,19 +173,15 @@
 					{commonStore.locale}
 				</hot-button>
 				<sl-menu>
-					{#each locales as locale}
-						<sl-menu-item value={locale}>{locale}</sl-menu-item>
+					{#each languageList as language}
+						<sl-menu-item value={language.code}><span slot="prefix">{language.flag}</span> {language.name}</sl-menu-item
+						>
 					{/each}
 				</sl-menu>
 			</sl-dropdown>
 		</div>
 		{#each sidebarMenuItems as item}
-			<a
-				target="_blank"
-				rel="noopener noreferrer"
-				href={item.path}
-				class="menu-item">{item.name}</a
-			>
+			<a target="_blank" rel="noopener noreferrer" href={item.path} class="menu-item">{item.name}</a>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
 			<hot-button
