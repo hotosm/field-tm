@@ -23,9 +23,7 @@ log = logging.getLogger(__name__)
 async def scheduled_process_inactive_users():
     """Process inactive users."""
     try:
-        async with await AsyncConnection.connect(
-            settings.FMTM_DB_URL.unicode_string()
-        ) as db:
+        async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
             log.info("Starting processing inactive users")
             await process_inactive_users(db)
             log.info("Finished processing inactive users")

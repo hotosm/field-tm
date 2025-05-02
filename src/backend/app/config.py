@@ -21,7 +21,7 @@ import base64
 import os
 from enum import Enum
 from functools import lru_cache
-from typing import Annotated, Any, Optional, Union
+from typing import Annotated, Optional, Union
 
 from cryptography.fernet import Fernet
 from pydantic import (
@@ -225,7 +225,7 @@ class Settings(BaseSettings):
 
     @field_validator("FMTM_DB_URL", mode="after")
     @classmethod
-    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> str:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):
             return v
@@ -236,7 +236,7 @@ class Settings(BaseSettings):
             host=info.data.get("FMTM_DB_HOST"),
             path=info.data.get("FMTM_DB_NAME", ""),
         )
-        return pg_url
+        return pg_url.unicode_string()
 
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""

@@ -518,7 +518,7 @@ async def task_split(
     features = await run_in_threadpool(
         lambda: split_by_sql(
             merged_boundary,
-            settings.FMTM_DB_URL.unicode_string(),
+            settings.FMTM_DB_URL,
             num_buildings=no_of_buildings,
             osm_extract=parsed_extract,
         )
@@ -568,7 +568,7 @@ async def preview_split_by_square(
 
     return split_by_square(
         boundary_featcol,
-        settings.FMTM_DB_URL.unicode_string(),
+        settings.FMTM_DB_URL,
         meters=dimension_meters,
         osm_extract=parsed_extract,
     )

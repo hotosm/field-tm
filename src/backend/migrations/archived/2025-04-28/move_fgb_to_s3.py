@@ -20,9 +20,7 @@ async def get_all_existing_fgb_urls() -> List[Tuple[int, int, str]]:
         - organization_id
         - data_extract_url.
     """
-    async with await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string()
-    ) as db:
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
         async with db.cursor() as cur:
             sql = """
                 SELECT
@@ -94,9 +92,7 @@ async def upload_fgb_data_to_s3(project_id: int, org_id: int, fgb_data: bytes) -
     )
 
     # Update the database with the new URL
-    async with await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string()
-    ) as db:
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
         async with db.cursor() as cur:
             sql = """
                 UPDATE projects

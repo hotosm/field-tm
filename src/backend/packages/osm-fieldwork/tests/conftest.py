@@ -55,7 +55,7 @@ test_data_dir = Path(__file__).parent / "test_data"
 # @pytest.fixture(scope="session")
 # def db_engine():
 #     """The SQLAlchemy database engine to init."""
-#     engine = create_engine(settings.FMTM_DB_URL.unicode_string())
+#     engine = create_engine(settings.FMTM_DB_URL)
 #     if not database_exists:
 #         create_database(engine.url)
 

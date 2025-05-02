@@ -51,9 +51,7 @@ async def fetch_projects(db: AsyncConnection) -> list[dict]:
 
 async def add_submission_id():
     """Add dataset property for all projects."""
-    async with await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string()
-    ) as db:
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
         projects = await fetch_projects(db)
 
         if not projects:

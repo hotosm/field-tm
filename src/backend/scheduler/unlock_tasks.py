@@ -24,9 +24,7 @@ log = logging.getLogger(__name__)
 async def scheduled_unlock_inactive_tasks():
     """Process inactive tasks."""
     try:
-        async with await AsyncConnection.connect(
-            settings.FMTM_DB_URL.unicode_string()
-        ) as db:
+        async with await AsyncConnection.connect(settings.FMTM_DB_URL) as db:
             log.info("Starting processing inactive tasks")
             await trigger_unlock_tasks(db)
             log.info("Finished processing inactive tasks")

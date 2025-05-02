@@ -82,7 +82,7 @@ async def app() -> AsyncGenerator[FastAPI, Any]:
 async def db() -> AsyncConnection:
     """The psycopg async database connection using psycopg3."""
     db_conn = await AsyncConnection.connect(
-        settings.FMTM_DB_URL.unicode_string(),
+        settings.FMTM_DB_URL,
     )
     try:
         yield db_conn
