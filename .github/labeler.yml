@@ -4,7 +4,7 @@ bug:
 enhancement:
   - head-branch:
       ["^feature", "feature", "^feat", "feat", "^refactor", "refactor"]
-frontend:manager:
+frontend:management:
   - changed-files:
       - any-glob-to-any-file: src/frontend/**
 frontend:mapper:
