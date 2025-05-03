@@ -345,9 +345,6 @@ def _get_form_components(
         need_verification_fields: bool
     ) -> dict:
     """Select appropriate form components based on target platform."""
-    # only add verification questions if new feature type is Polygon
-    need_verification_fields = new_geom_type == DbGeomType.POLYGON and need_verification_fields
-
     if use_odk_collect:
         # Here we modify digitisation_df to include the `new_feature` field
         # NOTE we set digitisation_correct to 'yes' if the user is drawing a new geometry
