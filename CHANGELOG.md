@@ -1,5 +1,33 @@
 # Changelog
 
+## 2025.2.1 (2025-05-05)
+
+### Feat
+
+- **xlsform**: skip verification question if new feature (#2474)
+- **frontend**: overlapping features selection via ui (#2451)
+- **mapper**: display user-friendly translation names with corresponding country flags (#2469)
+- **users**: add signin_type filter to user retrieval endpoints and allow org admin access (#2468)
+- **backend**: add capability to create new users via api key (#2467)
+- **backend**: add capability to create new users via api key
+- **mapper**: resize image buttons for web form questions (#2452)
+- **backend**: default organization settings and logo handling from env (#2441)
+- **frontend**: add toggle to use odk collect during project creation
+
+### Fix
+
+- **mapper**: add font and move css over-ride to bottom of web-forms iframe body (#2473)
+- **xlsform**: allow verification questions for every geom type (#2471)
+- **mapper**: incorrect styling for buttons, backround color, spacing (#2460)
+- **frontend**: error handling for invalid geojson data extract upload
+- **backend**: remove user_roles join to avoid multiple projects result
+- **frontend**: pass use_odk_collect through to validate-form endpoint
+
+### Refactor
+
+- **backend**: export FMTM_DB_URL as string directly from config
+- minor refactors, remove print statements
+
 ## 2025.2.0 (2025-04-29)
 
 ### Feat
