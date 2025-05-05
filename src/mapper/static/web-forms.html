@@ -78,7 +78,9 @@
 				stylesheet.rel = 'stylesheet';
 				stylesheet.type = 'text/css';
 				stylesheet.href = cssFile;
-				document.getElementsByTagName('head')[0].appendChild(stylesheet);
+				// we append to the body and not the head in order that the css file
+				// more easily over-rides other styles that Web Forms injects into the head
+				document.getElementsByTagName('body')[0].appendChild(stylesheet);
 			}
 
 			const style = document.createElement('style');
