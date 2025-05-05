@@ -338,7 +338,11 @@ const DataExtract = ({
                     )}
                   </div>
                 ))}
+                {errors.primaryGeomType && (
+                  <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.primaryGeomType}</p>
+                )}
               </div>
+
               <CustomCheckbox
                 key="newFeatureType"
                 label="I want to use a mix of geometry types"
