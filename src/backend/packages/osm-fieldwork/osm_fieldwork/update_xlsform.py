@@ -198,7 +198,8 @@ def merge_dataframes(
                     add_label_translations({
                         "type": ["begin group"],
                         "name": ["survey_questions"],
-                        "relevant": "${feature_exists} = 'yes'",
+                        # Status 3 means collecting new feature
+                        "relevant": "(${feature_exists} = 'yes') or (${status} != '3')",
                     })
                 )
             ),
@@ -340,8 +341,8 @@ async def append_field_mapping_fields(
 
 
 def _get_form_components(
-        use_odk_collect: bool, 
-        new_geom_type: DbGeomType, 
+        use_odk_collect: bool,
+        new_geom_type: DbGeomType,
         need_verification_fields: bool
     ) -> dict:
     """Select appropriate form components based on target platform."""
