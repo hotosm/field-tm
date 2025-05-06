@@ -11,7 +11,6 @@
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { mapTask } from '$lib/db/events';
 
-	type statusType = 'READY' | 'OPENED_IN_ODK' | 'SURVEY_SUBMITTED' | 'MARKED_BAD' | 'VALIDATED';
 	type Props = {
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
@@ -146,10 +145,16 @@
 			<div class="icon">
 				<hot-icon
 					name="close"
-					onclick={() => toggleTaskActionModal(false)}
+					onclick={() => {
+						toggleTaskActionModal(false);
+						entitiesStore.setSelectedEntity(null);
+						entitiesStore.setSelectedEntityCoordinate(null);
+					}}
 					onkeydown={(e: KeyboardEvent) => {
 						if (e.key === 'Enter') {
 							toggleTaskActionModal(false);
+							entitiesStore.setSelectedEntity(null);
+							entitiesStore.setSelectedEntityCoordinate(null);
 						}
 					}}
 					role="button"
