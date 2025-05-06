@@ -1,3 +1,9 @@
+## 0.22.0 (2025-05-06)
+
+### Feat
+
+- Improve XLSForm handling logic.
+
 ## 0.21.1 (2025-03-05)
 
 ### Fix
