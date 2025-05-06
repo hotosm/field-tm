@@ -50,7 +50,7 @@
 }
 
 .map-control-container {
-	--at-apply: font-barlow flex justify-center w-[100vw] absolute left-0 z-20 duration-400;
+	--at-apply: font-barlow flex justify-center w-[100vw] absolute left-0 z-20 duration-400 pointer-events-none;
 }
 
 .map-control-container.selected {
@@ -58,11 +58,11 @@
 }
 
 .map-control-container.not-selected {
-	--at-apply: -bottom-[100%] pointer-events-none;
+	--at-apply: -bottom-[100%];
 }
 
 .map-control-container .wrapper {
-	--at-apply: bg-white w-full font-regular md: max-w-[580px] px-4 py-3 sm: py-4 rounded-t-3xl;
+	--at-apply: bg-white w-full font-regular md: max-w-[580px] px-4 py-3 sm: py-4 rounded-t-3xl pointer-events-auto;
 }
 
 .map-control-container .icon-container {

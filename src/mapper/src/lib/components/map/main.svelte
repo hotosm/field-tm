@@ -90,7 +90,7 @@
 		LINESTRING: 'new-entity-line-layer',
 	};
 
-	const cssValue = (property) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+	const cssValue = (property: string) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
 
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -108,16 +108,6 @@
 	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
-
-	let fillLayerColors = {
-		UNLOCKED_TO_MAP: '#ffffff',
-		LOCKED_FOR_MAPPING: '#008099',
-		UNLOCKED_TO_VALIDATE: '#ade6ef',
-		LOCKED_FOR_VALIDATION: '#fceca4',
-		UNLOCKED_DONE: '#40ac8c',
-		default: '#c5fbf5',
-		primary: 'red',
-	};
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,
@@ -382,30 +372,6 @@
 	}
 
 	onMount(async () => {
-		// Give the browser a tick to apply all styles
-		requestAnimationFrame(() => {
-			setTimeout(() => {
-				// Load color from CSS variables
-				const unlockedToMapColor = cssValue('--sl-color-neutral-300');
-				const lockedForMappingColor = cssValue('--sl-color-warning-700');
-				const unlockedToValidateColor = cssValue('--sl-color-primary-400');
-				const lockedForValidationColor = cssValue('--sl-color-success-700');
-				const unlockedDoneColor = cssValue('--sl-color-success-700');
-				const primary = cssValue('--sl-color-primary-700');
-
-				// Replace your color variables with the ones fetched from CSS
-				fillLayerColors = {
-					UNLOCKED_TO_MAP: unlockedToMapColor || fillLayerColors['UNLOCKED_TO_MAP'],
-					LOCKED_FOR_MAPPING: lockedForMappingColor || fillLayerColors['LOCKED_FOR_MAPPING'],
-					UNLOCKED_TO_VALIDATE: unlockedToValidateColor || fillLayerColors['UNLOCKED_TO_VALIDATE'],
-					LOCKED_FOR_VALIDATION: lockedForValidationColor || fillLayerColors['LOCKED_FOR_VALIDATION'],
-					UNLOCKED_DONE: unlockedDoneColor || fillLayerColors['UNLOCKED_DONE'],
-					default: fillLayerColors['default'], // Keep default color as is
-					primary: primary || fillLayerColors['primary'],
-				};
-			}, 100);
-		});
-
 		// Register pmtiles protocol
 		if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
 			let protocol = new Protocol();
@@ -505,11 +471,13 @@
 			aria-label="layer switcher"
 			onclick={() => {
 				selectedControl = 'layer-switcher';
+				toggleActionModal(null);
 			}}
 			role="button"
 			onkeydown={(e) => {
 				if (e.key === 'Enter') {
 					selectedControl = 'layer-switcher';
+					toggleActionModal(null);
 				}
 			}}
 			tabindex="0"
@@ -519,11 +487,15 @@
 		<div
 			aria-label="toggle legend"
 			class="toggle-legend"
-			onclick={() => (selectedControl = 'legend')}
+			onclick={() => {
+				selectedControl = 'legend';
+				toggleActionModal(null);
+			}}
 			role="button"
 			onkeydown={(e) => {
 				if (e.key === 'Enter') {
 					selectedControl = 'legend';
+					toggleActionModal(null);
 				}
 			}}
 			tabindex="0"
@@ -543,16 +515,16 @@
 					'match',
 					['get', 'state'],
 					'UNLOCKED_TO_MAP',
-					fillLayerColors['UNLOCKED_TO_MAP'],
+					cssValue('--task-unlocked-to-map'),
 					'LOCKED_FOR_MAPPING',
-					fillLayerColors['LOCKED_FOR_MAPPING'],
+					cssValue('--task-locked-for-mapping'),
 					'UNLOCKED_TO_VALIDATE',
-					fillLayerColors['UNLOCKED_TO_VALIDATE'],
+					cssValue('--task-unlocked-to-validate'),
 					'LOCKED_FOR_VALIDATION',
-					fillLayerColors['LOCKED_FOR_VALIDATION'],
+					cssValue('--task-locked-for-validation'),
 					'UNLOCKED_DONE',
-					fillLayerColors['UNLOCKED_DONE'],
-					fillLayerColors['default'], // default color if no match,
+					cssValue('--task-unlocked-done'),
+					cssValue('--task-unlocked-to-map'), // default color if no match,
 				],
 				'fill-opacity': hoverStateFilter(0.3, 0),
 			}}
@@ -565,8 +537,8 @@
 				'line-color': [
 					'case',
 					['==', ['get', 'fid'], taskStore.selectedTaskId],
-					fillLayerColors['primary'],
-					fillLayerColors['primary'],
+					cssValue('--task-outline-selected'),
+					cssValue('--task-outline'),
 				],
 				'line-width': 3,
 				'line-opacity': ['case', ['==', ['get', 'fid'], taskStore.selectedTaskId], 1, 0.35],
@@ -613,29 +585,16 @@
 							'match',
 							['get', 'status'],
 							'READY',
-							cssValue('--sl-color-neutral-300'),
+							cssValue('--entity-ready'),
 							'OPENED_IN_ODK',
-							cssValue('--sl-color-warning-700'),
+							cssValue('--entity-opened-in-odk'),
 							'SURVEY_SUBMITTED',
-							cssValue('--sl-color-success-700'),
+							cssValue('--entity-survey-submitted'),
 							'VALIDATED',
-							cssValue('--sl-color-success-500'),
+							cssValue('--entity-validated'),
 							'MARKED_BAD',
-							cssValue('--sl-color-danger-700'),
-							cssValue('--sl-color-primary-700'), // default color if no match is found
-						],
-						'fill-outline-color': [
-							'match',
-							['get', 'status'],
-							'READY',
-							cssValue('--sl-color-neutral-1000'),
-							'OPENED_IN_ODK',
-							cssValue('--sl-color-warning-900'),
-							'SURVEY_SUBMITTED',
-							cssValue('--sl-color-success-900'),
-							'MARKED_BAD',
-							cssValue('--sl-color-danger-900'),
-							cssValue('--sl-color-primary-700'),
+							cssValue('--entity-marked-bad'),
+							cssValue('--entity-ready'), // default color if no match is found
 						],
 					}}
 					beforeLayerType="symbol"
@@ -644,9 +603,14 @@
 				<LineLayer
 					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 					paint={{
-						'line-color': cssValue('--sl-color-primary-700'),
-						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
-						'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+						'line-color': [
+							'case',
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''],
+							cssValue('--entity-outline-selected'),
+							cssValue('--entity-outline'),
+						],
+						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.7],
+						'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 1],
 					}}
 					beforeLayerType="symbol"
 					manageHoverState
@@ -724,29 +688,16 @@
 						'match',
 						['get', 'status'],
 						'READY',
-						cssValue('--sl-color-neutral-300'),
+						cssValue('--entity-ready'),
 						'OPENED_IN_ODK',
-						cssValue('--sl-color-warning-700'),
+						cssValue('--entity-opened-in-odk'),
 						'SURVEY_SUBMITTED',
-						cssValue('--sl-color-success-700'),
+						cssValue('--entity-survey-submitted'),
 						'VALIDATED',
-						cssValue('--sl-color-success-500'),
+						cssValue('--entity-validated'),
 						'MARKED_BAD',
-						cssValue('--sl-color-danger-700'),
-						cssValue('--sl-color-primary-700'), // default color if no match is found
-					],
-					'fill-outline-color': [
-						'match',
-						['get', 'status'],
-						'READY',
-						cssValue('--sl-color-neutral-1000'),
-						'OPENED_IN_ODK',
-						cssValue('--sl-color-warning-900'),
-						'SURVEY_SUBMITTED',
-						cssValue('--sl-color-success-900'),
-						'MARKED_BAD',
-						cssValue('--sl-color-danger-900'),
-						cssValue('--sl-color-primary-700'),
+						cssValue('--entity-marked-bad'),
+						cssValue('--entity-ready'), // default color if no match is found
 					],
 				}}
 				beforeLayerType="symbol"
@@ -755,9 +706,14 @@
 			<LineLayer
 				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 				paint={{
-					'line-color': cssValue('--sl-color-primary-700'),
-					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
-					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+					'line-color': [
+						'case',
+						['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''],
+						cssValue('--entity-outline-selected'),
+						cssValue('--entity-outline'),
+					],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.7],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 1],
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
