@@ -16,7 +16,7 @@
 
 .layer-card {
 	border: 2px solid white;
-	--at-apply: h-[3.75rem] relative overflow-hidden rounded-md cursor-pointer hover: border-red-600;
+	--at-apply: h-[3.75rem] relative overflow-hidden rounded-md cursor-pointer;
 }
 .layer-card:hover {
 	border-color: var(--sl-color-primary-600);

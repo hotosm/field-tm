@@ -1,5 +1,26 @@
 :root {
 	--nav-height: 4rem;
+
+	/* task color */
+	--task-unlocked-to-map: #ffffff;
+	--task-locked-for-mapping: #008099;
+	--task-unlocked-to-validate: #ade6ef;
+	--task-locked-for-validation: #fceca4;
+	--task-unlocked-done: #40ac8c;
+	--task-default: #ffffff;
+
+	/* entity color */
+	--entity-ready: #9c9a9a;
+	--entity-opened-in-odk: #fae15f;
+	--entity-survey-submitted: #71bf86;
+	--entity-validated: #71bf86;
+	--entity-marked-bad: #fa1100;
+
+	/* task entity outline */
+	--task-outline: #0fffff;
+	--task-outline-selected: red;
+	--entity-outline: #ffffff;
+	--entity-outline-selected: red;
 }
 
 /* Main page*/
