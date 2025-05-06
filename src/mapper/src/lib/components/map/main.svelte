@@ -877,56 +877,26 @@
 							<p class={`status ${feature.properties.status}`}>{m[`entity_states.${feature.properties.status}`]()}</p>
 						</div>
 						<div class="button-wrapper">
-							{#if entitiesStore.selectedEntity && entitiesStore.selectedEntity === feature.properties.entity_id}
-								<sl-button
-									variant="secondary"
-									size="small"
-									onclick={() => {
-										entitiesStore.setSelectedEntity(null);
-										entitiesStore.setSelectedEntityCoordinate(null);
-									}}
-									onkeydown={() => {}}
-									role="button"
-									tabindex="0"
-								>
-									{m['popup.cancel']()}
-								</sl-button>
-								<sl-button
-									variant="primary"
-									size="small"
-									onclick={() => {
-										selectedFeatures = [];
-										toggleActionModal('entity-modal');
-									}}
-									onkeydown={() => {
-										selectedFeatures = [];
-										toggleActionModal('entity-modal');
-									}}
-									role="button"
-									tabindex="0"
-								>
-									{m['popup.map_this_feature']()}
-								</sl-button>
-							{:else}
-								<sl-button
-									variant="primary"
-									size="small"
-									onclick={() => {
-										const entityCentroid = centroid(feature.geometry);
-										const clickedEntityId = feature?.properties?.entity_id;
-										entitiesStore.setSelectedEntity(clickedEntityId);
-										entitiesStore.setSelectedEntityCoordinate({
-											entityId: clickedEntityId,
-											coordinate: entityCentroid?.geometry?.coordinates,
-										});
-									}}
-									onkeydown={() => {}}
-									role="button"
-									tabindex="0"
-								>
-									{m['popup.select_this_feature']()}
-								</sl-button>
-							{/if}
+							<sl-button
+								variant="primary"
+								size="small"
+								onclick={() => {
+									const entityCentroid = centroid(feature.geometry);
+									const clickedEntityId = feature?.properties?.entity_id;
+									entitiesStore.setSelectedEntity(clickedEntityId);
+									entitiesStore.setSelectedEntityCoordinate({
+										entityId: clickedEntityId,
+										coordinate: entityCentroid?.geometry?.coordinates,
+									});
+									selectedFeatures = [];
+									toggleActionModal('entity-modal');
+								}}
+								onkeydown={() => {}}
+								role="button"
+								tabindex="0"
+							>
+								{m['popup.select_this_feature']()}
+							</sl-button>
 						</div>
 					</div>
 				{/each}

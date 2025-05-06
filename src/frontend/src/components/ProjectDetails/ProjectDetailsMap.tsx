@@ -386,39 +386,16 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
                 <p className="fmtm-font-semibold fmtm-mb-1">
                   {i + 1}. {id}
                 </p>
-                {selectedEntityId === id ? (
-                  <div className="fmtm-flex fmtm-gap-2 fmtm-w-full">
-                    <Button
-                      className="!fmtm-w-1/2"
-                      variant="primary-grey"
-                      onClick={() => {
-                        dispatch(ProjectActions.SetSelectedEntityId(null));
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      className="!fmtm-w-1/2"
-                      variant="primary-red"
-                      onClick={() => {
-                        handleFeatureClick(featureProperties, feature);
-                        setOverlappingEntityFeatures([]);
-                      }}
-                    >
-                      Map this feature
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    className="!fmtm-w-full"
-                    variant="primary-red"
-                    onClick={() => {
-                      dispatch(ProjectActions.SetSelectedEntityId(id));
-                    }}
-                  >
-                    Select this feature
-                  </Button>
-                )}
+                <Button
+                  className="!fmtm-w-full"
+                  variant="primary-red"
+                  onClick={() => {
+                    handleFeatureClick(featureProperties, feature);
+                    setOverlappingEntityFeatures([]);
+                  }}
+                >
+                  Select this feature
+                </Button>
               </div>
             );
           })}
