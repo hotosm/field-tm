@@ -10,6 +10,7 @@ import NoAccessComponent from './NoAccessComponent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import InputTextField from '@/components/common/InputTextField';
 import ManageAdmins from '@/components/ManageOrganization/ManageAdmins';
+import AddOrganizationAdminModal from '@/components/ManageOrganization/AddOrganizationAdminModal';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,12 +55,15 @@ const ManageOrganization = () => {
   return (
     <>
       <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-py-3 fmtm-gap-5">
-        <div className="fmtm-flex fmtm-items-center">
-          <AssetModules.ChevronLeftIcon
-            className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer fmtm-text-grey-800"
-            onClick={() => navigate(`/organization/${organizationId}`)}
-          />
-          <h4 className="fmtm-text-grey-800">Manage Organization</h4>
+        <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
+          <div className="fmtm-flex fmtm-items-center">
+            <AssetModules.ChevronLeftIcon
+              className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer fmtm-text-grey-800"
+              onClick={() => navigate(`/organization/${organizationId}`)}
+            />
+            <h4 className="fmtm-text-grey-800">Manage Organization</h4>
+          </div>
+          <AddOrganizationAdminModal />
         </div>
         <div className="sm:fmtm-flex-1 fmtm-flex fmtm-justify-center fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
           {/* left container */}

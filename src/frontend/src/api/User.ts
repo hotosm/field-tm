@@ -79,9 +79,9 @@ export const GetUserListForSelect = (
   };
 };
 
-export const GetUserNames = (url: string, params: { project_id: number; search: string }) => {
+export const GetUserNames = (url: string, params: { org_id?: number; project_id?: number; search: string }) => {
   return async (dispatch: AppDispatch) => {
-    const getUserNames = async (url: string, params: { project_id: number }) => {
+    const getUserNames = async (url: string, params: { org_id?: number; project_id?: number }) => {
       try {
         dispatch(UserActions.GetUserNamesLoading(true));
         const response: AxiosResponse<Pick<userType, 'sub' | 'username'>[]> = await axios.get(url, { params });

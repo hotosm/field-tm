@@ -23,4 +23,6 @@ export interface IOrganisationState {
   organisationFormDataLoading: boolean;
   getOrganizationAdminsLoading: boolean;
   organizationAdmins: OrganizationAdminsModel[];
+  deleteOrganizationAdminPending: boolean;
+  addOrganizationAdminPending: boolean;
 }

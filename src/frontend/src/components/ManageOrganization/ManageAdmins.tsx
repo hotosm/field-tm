@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import Button from '@/components/common/Button';
-import { GetOrganizationAdminsService } from '@/api/OrganisationService';
+import { DeleteOrganizationAdminService, GetOrganizationAdminsService } from '@/api/OrganisationService';
 import { useParams } from 'react-router-dom';
 import { OrganizationAdminsModel } from '@/models/organisation/organisationModel';
 
@@ -17,6 +17,7 @@ const ManageAdmins = () => {
   const organizationId = params.id;
   const organizationAdmins = useAppSelector((state) => state.organisation.organizationAdmins);
   const organizationAdminsLoading = useAppSelector((state) => state.organisation.getOrganizationAdminsLoading);
+  const deleteOrganizationAdminPending = useAppSelector((state) => state.organisation.deleteOrganizationAdminPending);
 
   const [toggleDeleteOrgModal, setToggleDeleteOrgModal] = useState(false);
   const [adminToRemove, setAdminToRemove] = useState<OrganizationAdminsModel | null>(null);
@@ -63,7 +64,7 @@ const ManageAdmins = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Delete Organization?</DialogTitle>
+                  <DialogTitle>Remove Organization Admin?</DialogTitle>
                 </DialogHeader>
                 <div>
                   <p className="fmtm-body-lg fmtm-mb-1">
@@ -75,7 +76,7 @@ const ManageAdmins = () => {
                     </Button>
                     <Button
                       variant="primary-red"
-                      isLoading={false}
+                      isLoading={deleteOrganizationAdminPending}
                       onClick={() => {
                         adminToRemove && removeOrgAdmin(adminToRemove?.user_sub);
                       }}
@@ -97,8 +98,19 @@ const ManageAdmins = () => {
     dispatch(GetOrganizationAdminsService(`${VITE_API_URL}/organisation/org-admins`, { org_id: +organizationId }));
   }, [organizationId]);
 
-  const removeOrgAdmin = (user_sub: string) => {
-    // TODO: implement remove org admin
+  const removeOrgAdmin = async (user_sub: string) => {
+    if (!organizationId) return;
+    await dispatch(
+      DeleteOrganizationAdminService(
+        `${VITE_API_URL}/organisation/org-admin/${user_sub}`,
+        {
+          org_id: +organizationId,
+        },
+        user_sub,
+        organizationAdmins,
+      ),
+    );
+    setToggleDeleteOrgModal(false);
   };
 
   return (

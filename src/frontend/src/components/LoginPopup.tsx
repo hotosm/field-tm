@@ -12,7 +12,6 @@ type loginOptionsType = {
   name: string;
   icon?: React.ReactNode;
   image?: string;
-  description: string;
 };
 
 const loginOptions: loginOptionsType[] = [
@@ -20,7 +19,6 @@ const loginOptions: loginOptionsType[] = [
     id: 'osm_account',
     name: 'Personal OSM Account',
     image: OSMImg,
-    description: 'Edits made in Field-TM will be credited to your OSM account.',
   },
 ];
 
@@ -47,15 +45,12 @@ const LoginPopup = () => {
             <div
               key={option.id}
               onClick={() => handleSignIn(option.id)}
-              className="fmtm-bg-[#F5F5F5] fmtm-border-gray-300 fmtm-text-gray-700 fmtm-w-full fmtm-py-3 fmtm-px-4 fmtm-rounded-md fmtm-duration-300 hover:fmtm-border-primaryRed hover:fmtm-text-primaryRed fmtm-border-[1px] fmtm-cursor-pointer fmtm-text-sm fmtm-flex fmtm-items-start fmtm-gap-3 fmtm-group"
+              className="fmtm-bg-[#F5F5F5] fmtm-border-gray-300 fmtm-text-gray-700 fmtm-w-full fmtm-py-3 fmtm-px-4 fmtm-rounded-md fmtm-duration-300 hover:fmtm-border-primaryRed hover:fmtm-text-primaryRed fmtm-border-[1px] fmtm-cursor-pointer fmtm-text-sm fmtm-flex fmtm-items-center fmtm-gap-3 fmtm-group"
             >
               <div className="fmtm-w-10 fmtm-max-w-10 fmtm-min-w-10">
                 {option?.image ? <img src={option?.image} className="fmtm-w-full" /> : option?.icon}
               </div>
-              <div className="fmtm-flex fmtm-flex-col">
-                <div className="fmtm-text-lg">{option.name}</div>
-                <div className="">{option.description}</div>
-              </div>
+              <div className="fmtm-text-lg">{option.name}</div>
             </div>
           ))}
         </div>

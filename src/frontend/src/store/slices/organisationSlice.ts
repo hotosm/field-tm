@@ -26,6 +26,8 @@ export const initialState: IOrganisationState = {
   organisationFormDataLoading: false,
   getOrganizationAdminsLoading: false,
   organizationAdmins: [],
+  deleteOrganizationAdminPending: false,
+  addOrganizationAdminPending: false,
 };
 
 const OrganisationSlice = createSlice({
@@ -82,6 +84,12 @@ const OrganisationSlice = createSlice({
     },
     SetOrganizationAdmins(state, action: PayloadAction<IOrganisationState['organizationAdmins']>) {
       state.organizationAdmins = action.payload;
+    },
+    SetDeleteOrganizationAdminPending(state, action: PayloadAction<boolean>) {
+      state.deleteOrganizationAdminPending = action.payload;
+    },
+    SetAddOrganizationAdminPending(state, action: PayloadAction<boolean>) {
+      state.addOrganizationAdminPending = action.payload;
     },
   },
 });
