@@ -32,7 +32,7 @@ const OrganizationAdminList = () => {
                 style={{ objectFit: 'cover', width: '100%', height: '100%', borderRadius: '50%' }}
               />
             ) : (
-              <div className="fmtm-bg-[#757575] fmtm-flex fmtm-justify-center fmtm-items-center">
+              <div className="fmtm-bg-[#757575] fmtm-flex fmtm-justify-center fmtm-items-center fmtm-w-full fmtm-h-full">
                 <p className="fmtm-text-white fmtm-font-semibold">
                   {user.username
                     .split(' ')

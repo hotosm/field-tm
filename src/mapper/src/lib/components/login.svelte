@@ -14,18 +14,16 @@
 		id: LoginProviderKey;
 		name: string;
 		image: string;
-		description?: string;
 	};
 	const ALL_LOGIN_PROVIDERS: Record<LoginProviderKey, Omit<LoginOption, 'id'>> = {
 		osm: {
 			name: 'Sign in with OSM',
 			image: OSMLogo,
-			description: 'Edits made in Field-TM will be credited to your OSM account.',
 		},
 		google: {
 			name: 'Sign in with Google',
 			image: GoogleLogo,
-		}
+		},
 	};
 	// Determine enabled providers from config (default enabled, unless disabled)
 	const loginOptions: LoginOption[] = Object.entries(ALL_LOGIN_PROVIDERS)
