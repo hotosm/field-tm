@@ -99,7 +99,7 @@ Alternatively, request the creation of a new organisation for your team:
    organization, type of organization etc.
    ![image](https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d)
 
-3. Now submit the form. The request will reach the Admin who will create your
+3. Now submit the form. The request will reach the Admin who will approve your
    organization and inform you through the email.
    ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
 
@@ -110,7 +110,10 @@ All project manager permissions are granted to the organisation manager.
 
 ## Steps To Create A Project In Field-TM
 
-Go to [fmtm]
+Project creation access is provided to users who have organisation admin or
+higher level of permission.
+
+Go to [fmtm] <https://fmtm.hotosm.org/>
 
 ### 1. Create the project details
 
@@ -118,11 +121,19 @@ Go to [fmtm]
 
     ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
 
-    - If you are not logged in, the option of create a new project is
-      not visible not visible.
     - Start by filling in the project basic information such as the name,
       description,
       hashtag, etc. This captures essential information about your project.
+
+    - If you want to use drone imagery or any other high resolution base imagery,
+    you can add the TMS layer from this step.
+
+    - You can also choose whether you want to create public or private project
+      in Field-TM.
+    - You can also choose the option whether you want mappers to use ODK collect
+      mobile application or webform during this step. By default, webform will be
+      used.
+
     - Finally click Next to proceed.
 
     ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
@@ -157,8 +168,9 @@ Go to [fmtm]
 
     - Select an option under 'What type of geometry?'
     - If you want to upload your own, click in Upload custom mapdata or else
-      go with the default
-      one of fetch data from OSM
+      go with the default one of fetch data from OSM.
+    - You can also go for 'no existing data' option, if you want to collect map
+      features as well in field.
     - You can also upload additional map feature to have multiple feature
       selection supported.
 
@@ -352,7 +364,9 @@ Step 4: Preview the data
 Step 5: Transform data as needed, load into charts, graphs, etc, to create the
 dashboard you need.
 
-## Steps to Edit Project Details
+## Manage project and users
+
+### Steps to Edit Project Details
 
 1. Users can also edit a few fields after project creation like basic
    details like name, description, instructions as well as XLS form.
@@ -361,6 +375,22 @@ dashboard you need.
    manage button to edit basic details and XLS form.
 
    ![image](https://github.com/user-attachments/assets/a3225885-c6cd-4fa9-9352-ccd4a8709eff)
+
+### Invite Users
+
+You can invite users (mappers and project managers to your project).
+If the user already exists in Feild-TM, they will be directly assigned role.
+
+If they are not registered on Field-TM,, the email invitation will
+be sent, following which users can get necessary permission to that project.
+You can invite users either through osm username or gmail.
+
+1. Choose the mode of invitation, either through osm or gmail.
+2. Provide respective osm username or email address. You can invite
+   multiple users at a time.
+3. Assign the role to users and click on invite.
+4. In case of gmail invitation, copy the link and share to that user
+   through other media.
 
 ## Help and Support
 
