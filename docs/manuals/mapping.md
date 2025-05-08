@@ -33,7 +33,13 @@ for field mapping:
   add the Field-TM browser shortcut to your home screen via the menu.
   ![image](https://github.com/user-attachments/assets/03bd53fb-3879-4a11-a98e-6c8e2651210a)
 
-## Part (A): Setup For Mapping
+## Part (A): Setup For Mapping Via ODK
+
+!!! note
+
+    You can skip steps 1 & 3 belo if you prefer to map using WebForms
+    (the default).
+    Using WebForms requires no external application or usage of QRCodes.
 
 ### Step 1: Install The Custom ODK Collect Mobile App
 
@@ -121,7 +127,7 @@ This will allow you to access your live location, making navigation easier.
 
 You may either map an **existing feature** OR map a **new feature**.
 
-### Select An Existing Feature
+### Select An Existing Feature via ODK Collect
 
 In most cases we are submitting a survey about a feature that already exists.
 
@@ -150,6 +156,25 @@ In most cases we are submitting a survey about a feature that already exists.
 
       ![legend](https://github.com/user-attachments/assets/280fd927-b71e-4336-a89a-1672e8de687b)
 
+### Select An Existing Feature via WebForms
+
+Webform is the new functionality added on FMTM, where mappers can directly
+fill up and upload form via same browser without installing ODK Collect
+mobile application.
+
+- Click on a task area: the features within will be displayed.
+- Now click on a feature you wish to map: a popup will appear.
+- Click on 'Collect Data' which will open the form directly on the same browser.
+- Complete the survey and Upload.
+
+  ![image](https://github.com/user-attachments/assets/b4a6901b-5c9e-4c45-b25d-ceb4dc299eae)
+
+!!!note
+
+    Currently, we need to have stable internet connection to upload the survey.
+    We expect offline saving of form on local and sync when
+    internet is available functionality on next release.
+
 ### Mapping A New Feature
 
 Sometimes the feature does not exist on the map yet!
@@ -157,9 +182,11 @@ Sometimes the feature does not exist on the map yet!
 - Click on a task area: a popup will display.
 - At the top right, there is a button **Map New Feature**.
 - Click on the map to create a new geometry.
-- Once the geometry is drawn on Field-TM, save and confirm to be redirected to ODK.
-- ODK Collect will then be opened to fill out the survey
-  data for the newly created feature.
+- Once drawn, accept the dialog to confirm the geometry is correct.
+- If you are using ODK Collect, you will be redirected to ODK Collect to fill
+  out the survey data for the newly created feature.
+  -If you are using WebForms used for that project, form will be opened on
+  the same browser and you can fill out the survey for that feature.
   ![IMG_20250109_160816](https://github.com/user-attachments/assets/98b70f5a-4db8-46cb-84ae-58bec07c82c1)
 
 !!! note
@@ -175,8 +202,10 @@ Sometimes the feature does not exist on the map yet!
 
 ### Repeat The Process
 
-- Once the form is submitted, you have to get back to Field-TM and select the
-  another feature for mapping.
+- After ODK collect based form submission, you have to get back to
+  Field-TM and select the another feature for mapping.
+- After WebForm based form submission, you will automatically get back to mapper's
+  page where you can select another feature for mapping.
 - You also also have to click the **Sync Status** button to see the feature
   turn green.
 
@@ -193,4 +222,4 @@ Sometimes the feature does not exist on the map yet!
 
 ## Upcoming improvements
 
-Refer the milestone: <https://github.com/hotosm/fmtm/milestone/50>
+Refer the milestone: <https://github.com/hotosm/fmtm/milestone/49>
