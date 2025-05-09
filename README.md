@@ -46,6 +46,8 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 > [docs](https://docs.fmtm.dev) page, and the
 > [FAQ](https://docs.fmtm.dev/about/faq).
 
+![fmtm-splash][6]
+
 ## How Field-TM Works
 
 1. Project is created in an area with three things:
@@ -235,9 +237,11 @@ Thanks goes to these wonderful people:
 
 ## Repo Activity
 
-![Field-TM Repo Activity](https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image")
+![Field-TM Repo Activity][5]
 
 [1]: https://github.com/hotosm/fmtm/releases/tag/2024.4.0 "Beta Release"
 [2]: https://github.com/hotosm/fmtm/releases/tag/2024.5.0 "Mapper Frontend"
 [3]: https://github.com/hotosm/fmtm/releases/tag/2025.1.0 "New Geoms"
 [4]: https://github.com/hotosm/fmtm/releases/tag/2025.2.0 "Web Forms"
+[5]: https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image"
+[6]: https://raw.githubusercontent.com/hotosm/fmtm/development/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"

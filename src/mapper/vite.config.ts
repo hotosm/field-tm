@@ -42,6 +42,13 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				purpose: 'maskable',
 			},
 		],
+		screenshots: [
+			{
+				src: 'screenshot-mapper.jpeg',
+				sizes: '1280x720',
+				type: 'image/jpeg',
+			},
+		],
 	},
 };
 
