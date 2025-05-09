@@ -10,10 +10,11 @@ import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
 import { entity_state } from '@/types/enums';
 
 type FeatureSelectionPopupPropType = {
+  taskId: number | null;
   featureProperties: TaskFeatureSelectionProperties | null;
 };
 
-const FeatureSelectionPopup = ({ featureProperties }: FeatureSelectionPopupPropType) => {
+const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPopupPropType) => {
   const dispatch = useAppDispatch();
   const params = useParams();
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
