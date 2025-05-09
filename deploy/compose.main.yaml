@@ -59,6 +59,7 @@ services:
       # General
       BUNKERWEB_INSTANCES: proxy:5000
       LOG_LEVEL: notice
+      UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
