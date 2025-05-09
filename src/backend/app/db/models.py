@@ -1993,6 +1993,8 @@ class DbOdkEntities(BaseModel):
     status: EntityState
     project_id: int
     task_id: int
+    osm_id: int
+    submission_ids: str
 
     @classmethod
     async def upsert(
@@ -2024,7 +2026,7 @@ class DbOdkEntities(BaseModel):
             batch = entities[batch_start : batch_start + batch_size]
             sql = """
                 INSERT INTO public.odk_entities
-                    (entity_id, status, project_id, task_id)
+                    (entity_id, status, project_id, task_id, osm_id, submission_ids)
                 VALUES
             """
 
@@ -2037,20 +2039,26 @@ class DbOdkEntities(BaseModel):
                     f"(%({entity_index}_entity_id)s, "
                     f"%({entity_index}_status)s, "
                     f"%({entity_index}_project_id)s, "
-                    f"%({entity_index}_task_id)s)"
+                    f"%({entity_index}_task_id)s,"
+                    f"%({entity_index}_osm_id)s,"
+                    f"%({entity_index}_submission_ids)s)"
                 )
                 data[f"{entity_index}_entity_id"] = entity["id"]
                 data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
                 data[f"{entity_index}_project_id"] = project_id
                 task_id = entity["task_id"]
                 data[f"{entity_index}_task_id"] = int(task_id) if task_id else None
+                data[f"{entity_index}_osm_id"] = entity["osm_id"]
+                data[f"{entity_index}_submission_ids"] = entity["submission_ids"]
 
             sql += (
                 ", ".join(values)
                 + """
                 ON CONFLICT (entity_id) DO UPDATE SET
                     status = EXCLUDED.status,
-                    task_id = EXCLUDED.task_id
+                    task_id = EXCLUDED.task_id,
+                    osm_id = EXCLUDED.osm_id,
+                    submission_ids = EXCLUDED.submission_ids
                 RETURNING True;
             """
             )

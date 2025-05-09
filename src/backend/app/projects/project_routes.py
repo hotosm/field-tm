@@ -203,9 +203,6 @@ async def get_odk_entities_mapping_statuses(
         project.odk_credentials,
         project.odkid,
     )
-    # First update the Entity statuses in the db
-    # FIXME this is a hack and in the long run should be replaced
-    # https://github.com/hotosm/fmtm/issues/1841
     await DbOdkEntities.upsert(db, project.id, entities)
     return entities
 

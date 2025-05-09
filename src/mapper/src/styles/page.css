@@ -22,3 +22,16 @@ p,
 h5 {
 	margin: 0px;
 }
+
+.spinner-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex: 1;
+	min-height: 100%;
+}
+
+.loading-spinner {
+	font-size: 5rem;
+	--track-width: 1rem;
+}

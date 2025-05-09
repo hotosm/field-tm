@@ -1,4 +1,4 @@
-FROM docker.io/node:22-slim
+FROM docker.io/node:22-slim AS build
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -6,6 +6,10 @@ RUN set -ex \
           "openssl" \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+# The migrations go in a separate dir to prevent overwrite on /app bind mount
+COPY backend/migrations /migrations
+# NOTE 'code' is an additional_context for the build
+# NOTE we need it to be dynamic for 'frontend' and 'mapper' options
 COPY --from=code ./package.json ./pnpm-lock.yaml ./
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -15,3 +19,10 @@ RUN npm install -g corepack@0.31.0
 RUN corepack enable && corepack install
 RUN pnpm install
 ENTRYPOINT ["pnpm", "run", "dev"]
+
+
+# Test code for initialising PGLite db and creating tar dump
+# FROM build AS init-db
+# COPY --from=code ./src/lib/db/init.js ./src/lib/db/init.js
+# RUN pnpm run init-db
+# RUN cp pgdata.tar.gz /migrations/init/

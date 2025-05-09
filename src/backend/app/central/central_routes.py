@@ -36,7 +36,7 @@ from app.auth.roles import mapper, project_manager
 from app.central import central_crud, central_deps
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.db.models import DbProject
+from app.db.models import DbOdkEntities, DbProject
 from app.db.postgis_utils import add_required_geojson_properties
 from app.projects.project_schemas import ProjectUpdate
 
@@ -307,10 +307,11 @@ async def add_new_entity(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
     geojson: FeatureCollection,
-):
+) -> dict:
     """Create an Entity for the project in ODK.
 
     NOTE a FeatureCollection must be uploaded.
+    Returns the entity details response from Central, including 'uuid' field.
     """
     try:
         project = project_user_dict.get("project")
@@ -359,13 +360,21 @@ async def add_new_entity(
             )
 
         # Create entity in ODK
-        return await central_crud.create_entity(
+        new_entity = await central_crud.create_entity(
             project_odk_creds,
             project_odk_id,
             properties=list(featcol["features"][0]["properties"].keys()),
             entity=entities_list[0],
             dataset_name="features",
         )
+
+        # Sync ODK entities in our database
+        project_entities = await central_crud.get_entities_data(
+            project_odk_creds, project_odk_id
+        )
+        await DbOdkEntities.upsert(db, project.id, project_entities)
+
+        return new_entity
 
     except HTTPException as http_err:
         log.error(f"HTTP error: {http_err.detail}")
