@@ -128,7 +128,7 @@
 					</sl-button>
 					<!-- keep button disabled until the entity statuses are fetched -->
 					<sl-button
-						disabled={entitiesStore.syncEntityStatusLoading}
+						disabled={entitiesStore.syncEntityStatusManuallyLoading}
 						onclick={() => {
 							toggleTaskCompleteConfirmation = true;
 						}}

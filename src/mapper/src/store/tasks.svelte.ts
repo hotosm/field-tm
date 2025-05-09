@@ -1,14 +1,14 @@
-import { ShapeStream, Shape } from '@electric-sql/client';
-import type { ShapeData, Row } from '@electric-sql/client';
+import type { PGliteWithSync } from '@electric-sql/pglite-sync';
+import type { ShapeStream, ShapeData, Row, Value, FetchError } from '@electric-sql/client';
 import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 
-import type { ProjectTask, TaskEventType } from '$lib/types';
+import type { ProjectTask, TaskEventType, TaskStatus } from '$lib/types';
 import { getLoginStore } from '$store/login.svelte.ts';
 import { getTimeDiff } from '$lib/utils/datetime';
 
 const loginStore = getLoginStore();
 
-let taskEventShape: Shape;
+let eventsUnsubscribe: (() => void) | null = $state(null);
 let featcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
 let latestEvent: TaskEventType | null = $state(null);
 let events: TaskEventType[] = $state([]);
@@ -18,55 +18,79 @@ let selectedTaskId: number | null = $state(null);
 let selectedTaskIndex: number | null = $state(null);
 
 let selectedTask: any = $state(null);
-let selectedTaskState: string = $state('');
+let selectedTaskState: TaskStatus | null = $state(null);
 let selectedTaskGeom: GeoJSON | null = $state(null);
 let taskIdIndexMap: Record<number, number> = $state({});
 let commentMention: TaskEventType | null = $state(null);
 
 let userDetails = $derived(loginStore.getAuthDetails);
-
-function getTaskEventStream(projectId: number): ShapeStream | undefined {
-	if (!projectId) {
-		return;
-	}
-	return new ShapeStream({
-		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-		params: {
-			table: 'task_events',
-			where: `project_id=${projectId}`,
-		},
-	});
-}
+let taskEventSync: any = $state(undefined);
 
 function getTaskStore() {
-	async function subscribeToTaskEvents(taskEventStream: ShapeStream | undefined) {
-		if (!taskEventStream) return;
-		taskEventShape = new Shape(taskEventStream);
-		taskEventShape.subscribe((taskEvent: ShapeData) => {
-			const rows: Row[] = taskEvent.rows;
-			if (rows && Array.isArray(rows)) {
-				latestEvent = rows?.slice(-1)?.[0];
+	async function getTaskEventStream(db: PGliteWithSync, projectId: number): Promise<ShapeStream | undefined> {
+		if (!db || !projectId) {
+			return;
+		}
 
-				// if the logged in user is tagged, add mentioned comment to the state
-				if (
-					latestEvent?.event === 'COMMENT' &&
-					latestEvent?.comment?.includes(`@${userDetails?.username}`) &&
-					latestEvent.comment?.startsWith('#submissionId:uuid:') &&
-					getTimeDiff(new Date(latestEvent?.created_at)) < 120
-				) {
-					commentMention = latestEvent;
-				}
-				for (const newEvent of rows) {
-					if (newEvent.task_id === selectedTaskId) {
-						selectedTaskState = newEvent.state;
+		taskEventSync = await db.electric.syncShapeToTable({
+			shape: {
+				url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
+				params: {
+					table: 'task_events',
+					where: `project_id=${projectId}`,
+				},
+			},
+			table: 'task_events',
+			primaryKey: ['event_id'],
+			shapeKey: 'task_events',
+			initialInsertMethod: 'csv', // performance boost on initial sync
+		});
+
+		eventsUnsubscribe = taskEventSync?.stream.subscribe(
+			(taskEvent: ShapeData[]) => {
+				// Filter only rows that have a .value (actual data changes)
+				const rows: TaskEventType[] = taskEvent
+					.filter((item): item is { value: TaskEventType } => 'value' in item && item.value !== null)
+					.map((item) => item.value);
+
+				if (rows.length) {
+					latestEvent = rows.at(-1) ?? null;
+
+					if (
+						latestEvent?.event === 'COMMENT' &&
+						typeof latestEvent?.comment === 'string' &&
+						latestEvent.comment.includes(`@${userDetails?.username}`) &&
+						latestEvent.comment.startsWith('#submissionId:uuid:') &&
+						getTimeDiff(new Date(latestEvent.created_at)) < 120
+					) {
+						commentMention = latestEvent;
+					}
+
+					for (const newEvent of rows) {
+						if (newEvent.task_id === selectedTaskId) {
+							selectedTaskState = newEvent.state;
+						}
 					}
 				}
-			}
-		});
+			},
+			(error: FetchError) => {
+				console.error('taskEvent sync error', error);
+			},
+		);
+
+		return taskEventSync;
 	}
 
-	async function appendTaskStatesToFeatcol(projectTasks: ProjectTask[]) {
-		const latestTaskStates = await getLatestStatePerTask();
+	function unsubscribeEventStream() {
+		if (eventsUnsubscribe) {
+			taskEventSync.unsubscribe();
+			eventsUnsubscribe();
+			eventsUnsubscribe = null;
+		}
+	}
+
+	async function appendTaskStatesToFeatcol(db: PGliteWithSync, projectId: number, projectTasks: ProjectTask[]) {
+		const latestTaskStates = await getLatestStatePerTask(db, projectId);
 		const features: Feature[] = projectTasks.map((task) => ({
 			type: 'Feature',
 			geometry: task.outline,
@@ -81,9 +105,9 @@ function getTaskStore() {
 		featcol = { type: 'FeatureCollection', features };
 	}
 
-	async function getLatestStatePerTask() {
-		const taskEventData: ShapeData = await taskEventShape.value;
-		const taskEventRows = Array.from(taskEventData.values()) as TaskEventType[];
+	async function getLatestStatePerTask(db: PGliteWithSync, projectId: number) {
+		const taskEvents = await db.query('SELECT * FROM task_events WHERE project_id = $1', [projectId]);
+		const taskEventRows = Array.from(taskEvents.rows.values()) as TaskEventType[];
 		// Update the events in taskStore
 		events = taskEventRows;
 
@@ -100,11 +124,15 @@ function getTaskStore() {
 		return currentTaskStates;
 	}
 
-	async function setSelectedTaskId(taskId: number | null, taskIndex: number | null) {
+	async function setSelectedTaskId(db: PGliteWithSync, taskId: number | null, taskIndex: number | null) {
 		selectedTaskId = taskId;
 		selectedTaskIndex = taskIndex;
-		const allTasksCurrentStates = await getLatestStatePerTask();
-		selectedTask = allTasksCurrentStates.get(taskId);
+
+		const tasks = await db.query('SELECT * FROM task_events WHERE task_id = $1', [taskId]);
+		const taskRows = Array.from(tasks.rows.values()) as TaskEventType[];
+		if (!taskRows) return;
+
+		selectedTask = taskRows[0];
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
 		selectedTaskGeom = featcol.features.find((x) => x?.properties?.fid === taskId)?.geometry || null;
 	}
@@ -122,14 +150,15 @@ function getTaskStore() {
 		selectedTaskId = null;
 		selectedTaskIndex = null;
 		selectedTaskGeom = null;
-		selectedTaskState = '';
+		selectedTaskState = null;
 		taskIdIndexMap = {};
 		featcol = { type: 'FeatureCollection', features: [] };
 	}
 	return {
+		getTaskEventStream: getTaskEventStream,
+		unsubscribeEventStream: unsubscribeEventStream,
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
-		subscribeToEvents: subscribeToTaskEvents,
 		setSelectedTaskId: setSelectedTaskId,
 		setTaskIdIndexMap: setTaskIdIndexMap,
 		dismissCommentMention: dismissCommentMention,
@@ -170,4 +199,4 @@ function getTaskStore() {
 	};
 }
 
-export { getTaskStore, getTaskEventStream };
+export { getTaskStore };

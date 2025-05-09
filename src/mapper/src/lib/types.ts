@@ -99,15 +99,15 @@ export type NewEvent = {
 };
 
 export type TaskEventType = {
-	comment: string | null;
-	created_at: string;
-	event: TaskEvent | 'COMMENT';
 	event_id: string;
-	project_id: number;
+	event: TaskEvent | 'COMMENT';
 	state: TaskStatus | null;
+	project_id: number;
 	task_id: number;
 	user_id: number;
 	username: string;
+	comment: string | null;
+	created_at: string;
 };
 
 export type projectType = {
@@ -139,5 +139,39 @@ export type paginationType = {
 export type EntityStatusPayload = {
 	entity_id: UUID;
 	status: number;
-	// label: string, // label is now automatically determined
+	label: string; // there is no easy way to automatically determine this
+};
+
+export type entityStatusOptions =
+	| 'READY'
+	| 'OPENED_IN_ODK'
+	| 'SURVEY_SUBMITTED'
+	| 'NEW_GEOM'
+	| 'MARKED_BAD'
+	| 'VALIDATED';
+export const EntityStatusNameMap: Record<number, entityStatusOptions> = {
+	0: 'READY',
+	1: 'OPENED_IN_ODK',
+	2: 'SURVEY_SUBMITTED',
+	3: 'NEW_GEOM',
+	5: 'VALIDATED',
+	6: 'MARKED_BAD',
+};
+
+export type entitiesApiResponse = {
+	id: string;
+	task_id: number;
+	osm_id: number;
+	status: number;
+	updated_at: string | null;
+	submission_ids: string;
+};
+
+export type DbEntity = {
+	entity_id: string;
+	status: entityStatusOptions;
+	project_id: number;
+	task_id: number;
+	osm_id: number;
+	submission_ids: string;
 };

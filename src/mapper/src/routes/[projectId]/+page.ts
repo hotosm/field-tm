@@ -1,10 +1,10 @@
-import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
+import { error } from '@sveltejs/kit';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
-	// const { db } = await parent();
+	const { db } = await parent();
 	const { projectId } = params;
 
 	/*
@@ -27,6 +27,6 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	return {
 		project: await projectResponse.json(),
 		projectId: parseInt(projectId),
-		// db: db,
+		db: db,
 	};
 };

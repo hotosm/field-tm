@@ -44,6 +44,7 @@
 	import Geolocation from '$lib/components/map/geolocation.svelte';
 	import FlatGeobuf from '$lib/components/map/flatgeobuf-layer.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
 	import { loadOfflinePmtiles } from '$lib/map/basemaps.ts';
@@ -92,6 +93,8 @@
 
 	const cssValue = (property: string) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
 
+	const commonStore = getCommonStore();
+	const { db } = commonStore;
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -113,11 +116,6 @@
 		...taskStore.featcol,
 		features: taskStore.featcol?.features?.map((feat) => centroid(feat?.geometry, { properties: feat.properties })),
 	});
-	// use Map for quick lookups
-	let entityMapByEntity = $derived(
-		new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.entity_id, entity])),
-	);
-	let entityMapByOsm = $derived(new Map(entitiesStore.entitiesStatusList.map((entity) => [entity.osmid, entity])));
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
 		projectBasemapStore.projectPmtilesUrl
@@ -208,7 +206,7 @@
 			// if clicked coordinate contains uploaded entity only
 			const entityCentroid = centroid(clickedEntityFeature[0].geometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
-			entitiesStore.setSelectedEntity(clickedEntityId);
+			entitiesStore.setSelectedEntityId(clickedEntityId);
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
 				coordinate: entityCentroid?.geometry?.coordinates,
@@ -217,14 +215,14 @@
 			// if clicked coordinate contains new entity only
 			const entityCentroid = centroid(clickedNewEntityFeature[0].geometry);
 			const clickedEntityId = clickedNewEntityFeature[0]?.properties?.entity_id;
-			entitiesStore.setSelectedEntity(clickedEntityId);
+			entitiesStore.setSelectedEntityId(clickedEntityId);
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
 				coordinate: entityCentroid?.geometry?.coordinates,
 			});
 		} else {
 			// if clicked coordinate doesn't contain any entity, clear the entity states
-			entitiesStore.setSelectedEntity(null);
+			entitiesStore.setSelectedEntityId(null);
 			entitiesStore.setSelectedEntityCoordinate(null);
 		}
 
@@ -232,7 +230,7 @@
 		if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
 			taskAreaClicked = true;
 			const clickedTaskId = clickedTaskFeature[0]?.properties?.fid;
-			taskStore.setSelectedTaskId(clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
+			taskStore.setSelectedTaskId(db, clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
 			if (+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['task_selection']) {
 				localStorage.setItem(`project-${projectId}-setup`, projectSetupStepEnum['complete_setup']);
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['complete_setup']);
@@ -251,9 +249,12 @@
 			// if clicked coordinate doesn't contain any entity but only task, open task actions modal
 			selectedFeatures = [];
 			toggleActionModal('task-modal');
-		} else {
-			// else close the modal
+		} else if (clickedFeatures?.length > 1) {
+			// if multiple entities present
 			toggleActionModal(null);
+		} else {
+			// clear task states i.e. unselect task and it's extract if clicked coordinate doesn't contain any entity or task
+			taskStore.setSelectedTaskId(db, null, null);
 		}
 	}
 
@@ -329,40 +330,6 @@
 		}
 	});
 
-	function addStatusToGeojsonProperty(geojsonData: FeatureCollection, entityType: '' | 'new'): FeatureCollection {
-		if (entityType === 'new') {
-			return {
-				...geojsonData,
-				features: geojsonData.features.map((feature) => {
-					const entity = entityMapByEntity.get(feature?.properties?.entity_id);
-					return {
-						...feature,
-						properties: {
-							...feature.properties,
-							status: entity?.status,
-							entity_id: entity?.entity_id,
-						},
-					};
-				}),
-			};
-		} else {
-			return {
-				...geojsonData,
-				features: geojsonData.features.map((feature) => {
-					const entity = entityMapByOsm.get(feature?.properties?.osm_id);
-					return {
-						...feature,
-						properties: {
-							...feature.properties,
-							status: entity?.status,
-							entity_id: entity?.entity_id,
-						},
-					};
-				}),
-			};
-		}
-	}
-
 	function zoomToProject() {
 		const taskBuffer = buffer(taskStore.featcol, 5, { units: 'meters' });
 		if (taskBuffer && map) {
@@ -424,10 +391,9 @@
 	on:click={(_e) => {
 		// deselect everything on click, to allow for re-selection
 		// if the user clicks on a feature layer directly (on:click)
-		taskStore.setSelectedTaskId(null, null);
 		taskAreaClicked = false;
 		toggleActionModal(null);
-		entitiesStore.setSelectedEntity(null);
+		entitiesStore.setSelectedEntityId(null);
 	}}
 	images={[
 		{ id: 'MAP_PIN_GREY', url: MapPinGrey },
@@ -457,11 +423,11 @@
 			<sl-icon-button
 				name="arrow-repeat"
 				label="Settings"
-				disabled={entitiesStore.syncEntityStatusLoading}
-				class={`sync-button ${entitiesStore.syncEntityStatusLoading && 'animate-spin'}`}
-				onclick={async () => await entitiesStore.syncEntityStatus(projectId)}
+				disabled={entitiesStore.syncEntityStatusManuallyLoading}
+				class={`sync-button ${entitiesStore.syncEntityStatusManuallyLoading && 'animate-spin'}`}
+				onclick={async () => await entitiesStore.syncEntityStatusManually(db, projectId)}
 				onkeydown={async (e: KeyboardEvent) => {
-					e.key === 'Enter' && (await entitiesStore.syncEntityStatus(projectId));
+					e.key === 'Enter' && (await entitiesStore.syncEntityStatusManually(db, projectId));
 				}}
 				role="button"
 				tabindex="0"
@@ -573,8 +539,8 @@
 			extent={taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
-			processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData, '')}
-			geojsonUpdateDependency={[entityMapByEntity, entityMapByOsm]}
+			processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData, '')}
+			geojsonUpdateDependency={[entitiesStore.entitiesList]}
 		>
 			{#if primaryGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
@@ -605,12 +571,12 @@
 					paint={{
 						'line-color': [
 							'case',
-							['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''],
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
 							cssValue('--entity-outline-selected'),
 							cssValue('--entity-outline'),
 						],
-						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.7],
-						'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 1],
+						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.7],
+						'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 1],
 					}}
 					beforeLayerType="symbol"
 					manageHoverState
@@ -635,16 +601,16 @@
 							'MAP_PIN_BLUE',
 							'MARKED_BAD',
 							'MAP_PIN_RED',
-							cssValue('--sl-color-primary-700'), // default color if no match is found
+							'MAP_PIN_GREY', // default color if no match is found
 						],
 						'icon-allow-overlap': true,
-						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],
+						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
 					}}
 				/>
 			{/if}
 		</FlatGeobuf>
 	{/if}
-	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
+	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomFeatcol}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
 			<FillLayer
 				id="bad-geom-fill-layer"
@@ -678,10 +644,11 @@
 			/>
 		{/if}
 	</GeoJSON>
-	<GeoJSON id="new-geoms" data={addStatusToGeojsonProperty(entitiesStore.newGeomList, 'new')}>
+	<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol, 'new')}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
 			<FillLayer
 				id="new-entity-polygon-layer"
+				hoverCursor="pointer"
 				paint={{
 					'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
 					'fill-color': [
@@ -691,7 +658,11 @@
 						cssValue('--entity-ready'),
 						'OPENED_IN_ODK',
 						cssValue('--entity-opened-in-odk'),
+						// For mapped new geometries, we have NEW_GEOM status instead,
+						// but for legacy projects we also check SURVEY_SUBMITTED
 						'SURVEY_SUBMITTED',
+						cssValue('--entity-survey-submitted'),
+						'NEW_GEOM',
 						cssValue('--entity-survey-submitted'),
 						'VALIDATED',
 						cssValue('--entity-validated'),
@@ -708,12 +679,12 @@
 				paint={{
 					'line-color': [
 						'case',
-						['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''],
+						['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
 						cssValue('--entity-outline-selected'),
 						cssValue('--entity-outline'),
 					],
-					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.7],
-					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 1],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.7],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 1],
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
@@ -733,16 +704,20 @@
 						'MAP_PIN_GREY',
 						'OPENED_IN_ODK',
 						'MAP_PIN_YELLOW',
+						// For mapped new geometries, we have NEW_GEOM status instead,
+						// but for legacy projects we also check SURVEY_SUBMITTED
 						'SURVEY_SUBMITTED',
+						'MAP_PIN_GREEN',
+						'NEW_GEOM',
 						'MAP_PIN_GREEN',
 						'VALIDATED',
 						'MAP_PIN_BLUE',
 						'MARKED_BAD',
 						'MAP_PIN_RED',
-						cssValue('--sl-color-primary-700'), // default color if no match is found
+						'MAP_PIN_GREY', // default color if no match is found
 					],
 					'icon-allow-overlap': true,
-					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],
+					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
 				}}
 			/>
 		{/if}
@@ -839,7 +814,7 @@
 								onclick={() => {
 									const entityCentroid = centroid(feature.geometry);
 									const clickedEntityId = feature?.properties?.entity_id;
-									entitiesStore.setSelectedEntity(clickedEntityId);
+									entitiesStore.setSelectedEntityId(clickedEntityId);
 									entitiesStore.setSelectedEntityCoordinate({
 										entityId: clickedEntityId,
 										coordinate: entityCentroid?.geometry?.coordinates,

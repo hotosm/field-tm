@@ -16,7 +16,8 @@
 		"format": "prettier --plugin prettier-plugin-svelte --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
-		"cleanup": "pnpm dlx knip"
+		"cleanup": "pnpm dlx knip",
+		"init-db": "node src/lib/db/init.js"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.0.12",
@@ -46,23 +47,23 @@
 		"vitest": "^2.1.6"
 	},
 	"dependencies": {
-		"@electric-sql/client": "1.0.2",
-		"@electric-sql/pglite": "^0.2.17",
+		"@electric-sql/client": "1.0.4",
+		"@electric-sql/pglite": "^0.3.0",
+		"@electric-sql/pglite-sync": "^0.3.2",
 		"@hotosm/ui": "0.2.0-b5",
 		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@shoelace-style/shoelace": "2.17.1",
 		"@tiptap/core": "^2.11.7",
-		"@tiptap/pm": "^2.11.7",
-		"@tiptap/starter-kit": "^2.11.7",
 		"@tiptap/extension-image": "^2.11.7",
 		"@tiptap/extension-link": "^2.11.7",
+		"@tiptap/pm": "^2.11.7",
+		"@tiptap/starter-kit": "^2.11.7",
 		"@turf/bbox": "^7.1.0",
 		"@turf/buffer": "^7.1.0",
 		"@turf/centroid": "^7.1.0",
 		"@turf/distance": "^7.2.0",
 		"@turf/helpers": "^7.1.0",
 		"@watergis/maplibre-gl-terradraw": "^0.8.1",
-		"drizzle-orm": "^0.35.3",
 		"flatgeobuf": "^3.36.0",
 		"maplibre-gl": "^4.7.1",
 		"pako": "^2.1.0",

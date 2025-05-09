@@ -125,8 +125,11 @@ create_db_schema_if_missing() {
     else
         echo "No data found in the database."
         pretty_echo "Creating schema."
-        psql "$db_url" -f "/opt/migrations/init/fmtm_base_schema.sql"
+        # We must cd into the dir for relative modular script imports
+        cd /opt/migrations/init
+        psql "$db_url" -f "./0-main.sql"
         pretty_echo "Schema created successfully."
+        cd /opt
         return 0
     fi
 }

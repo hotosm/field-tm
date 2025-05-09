@@ -34,6 +34,7 @@ const config = {
 		$styles: 'styles',
 		$assets: 'assets',
 		$translations: 'src/translations',
+		$migrations: '/migrations',
 	},
 };
 

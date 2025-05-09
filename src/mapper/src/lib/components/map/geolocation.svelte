@@ -214,7 +214,7 @@
 	});
 
 	function exitNavigationMode() {
-		entitiesStore.setSelectedEntity(null);
+		entitiesStore.setSelectedEntityId(null);
 		entitiesStore.setSelectedEntityCoordinate(null);
 		entitiesStore.setEntityToNavigate(null);
 		directions.clear();
@@ -293,7 +293,7 @@
 				role="button"
 				tabindex="0"
 				size="small"
-				disabled={entitiesStore.syncEntityStatusLoading}
+				disabled={entitiesStore.syncEntityStatusManuallyLoading}
 			>
 				<span>{m['map.exit_navigation']()}</span>
 			</sl-button>
