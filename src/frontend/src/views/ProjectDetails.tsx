@@ -289,7 +289,7 @@ const ProjectDetails = () => {
           }
         />
       )}
-      {selectedTaskFeature && <FeatureSelectionPopup featureProperties={selectedFeatureProps} />}
+      {selectedTaskFeature && <FeatureSelectionPopup featureProperties={selectedFeatureProps} taskId={selectedTask} />}
     </div>
   );
 };
