@@ -41,7 +41,7 @@
 	let displayWebFormsDrawer = $state(false);
 
 	let maplibreMap: maplibregl.Map | undefined = $state(undefined);
-	let tabGroup: SlTabGroup;
+	let tabGroup: SlTabGroup | undefined = $state(undefined);
 	let openedActionModal: 'entity-modal' | 'task-modal' | null = $state(null);
 	let infoDialogRef: SlDialog | null = $state(null);
 	let isDrawEnabled: boolean = $state(false);
