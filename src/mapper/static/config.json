@@ -8,5 +8,6 @@
 		"osm": true,
 		"google": true
 	},
-	"sidebarItemsOverride": []
+	"sidebarItemsOverride": [],
+	"cacheName": "bff5ecdd-daed-4798-911d-fea6ea30ae07"
 }
