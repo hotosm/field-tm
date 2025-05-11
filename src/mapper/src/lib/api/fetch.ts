@@ -1,5 +1,21 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
+const DEFAULT_CACHE_NAME = 'c488ea01-8c52-4a18-a93e-934bc77f1eb8';
+
+export async function fetchCachedBlobUrl(url: string, cacheName: string): Promise<string> {
+	const cacheStorage = await caches.open(cacheName || DEFAULT_CACHE_NAME);
+	const response = await cacheStorage.match(url);
+	if (response) {
+		const blob = await response.blob();
+		return URL.createObjectURL(blob);
+	} else {
+		const response = await fetch(url);
+		cacheStorage.put(url, response);
+		const blob = await response.blob();
+		return URL.createObjectURL(blob);
+	}
+}
+
 /**
  * @name fetchBlobUrl
  * @param url - url to a web resource like a script or xml file

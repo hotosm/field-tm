@@ -4,7 +4,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { fetchBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
+	import { fetchBlobUrl, fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
@@ -35,7 +35,10 @@
 
 	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
 
-	const odkWebFormPromise = fetchBlobUrl('https://hotosm.github.io/web-forms/odk-web-form.js');
+	const odkWebFormPromise = fetchCachedBlobUrl(
+		'https://hotosm.github.io/web-forms/odk-web-form.js',
+		commonStore.config.cacheName,
+	);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
