@@ -254,7 +254,13 @@ async def upload_form_media(
             user=project_odk_creds.odk_central_user,
             passwd=project_odk_creds.odk_central_password,
         ) as odk_central:
-            await odk_central.s3_sync()
+            try:
+                await odk_central.s3_sync()
+            except Exception:
+                log.warning(
+                    "Fails to sync media to S3 - is the linked ODK Central "
+                    "instance correctly configured?"
+                )
 
         return Response(status_code=HTTPStatus.OK)
 
