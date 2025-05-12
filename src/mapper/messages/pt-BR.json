@@ -123,5 +123,11 @@
 	"forms": {
 		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário.",
 		"uploading": "carregando"
+	},
+	"offline": {
+		"features": "recursos",
+		"basemaps": "mapas base",
+		"store_features_offline": "armazenar recursos off-line",
+		"features_offline_info": "Extratos de recursos já armazenados offline"
 	}
 }

@@ -16,7 +16,7 @@
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import QRCodeComponent from '$lib/components/qrcode.svelte';
-	import BasemapComponent from '$lib/components/offline/basemaps.svelte';
+	import OfflineComponent from '$lib/components/offline/index.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
 	import OdkWebFormsWrapper from '$lib/components/forms/wrapper.svelte';
@@ -29,6 +29,8 @@
 	import { getProjectSetupStepStore, getCommonStore, getAlertStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import Editor from '$lib/components/editor/editor.svelte';
+	import { readFileFromOPFS } from '$lib/fs/opfs';
+	import { loadOfflineExtract, writeOfflineExtract } from '$lib/map/extracts';
 
 	interface Props {
 		data: PageData;
@@ -47,6 +49,7 @@
 	let isDrawEnabled: boolean = $state(false);
 	let latestEventTime: string = $state('');
 	let isGeometryCreationLoading: boolean = $state(false);
+	let timeout: NodeJS.Timeout | undefined = $state();
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -114,6 +117,21 @@
 		tabGroup.show('map');
 	}
 
+	// if the content-length is less than 2MB, download
+	const storeFgbExtractOffline = async () => {
+		const response = await fetch(project.data_extract_url, {
+			method: 'HEAD',
+		});
+		const contentLength = response.headers.get('Content-Length');
+		if (!contentLength) return;
+
+		const maxAutoDownloadSize = 2 * 1024 * 1024; // 2MB
+		const fileSize = parseInt(contentLength, 10);
+		if (fileSize <= maxAutoDownloadSize) {
+			writeOfflineExtract(projectId, project.data_extract_url);
+		}
+	};
+
 	onMount(async () => {
 		taskEventStream = await taskStore.getTaskEventStream(db, projectId);
 		entityStatusStream = await entitiesStore.getEntityStatusStream(db, projectId);
@@ -121,7 +139,19 @@
 
 		// Note we need this for now, as the task outlines are from API, while task
 		// events are from pglite / sync. We pass through the task outlines.
-		await taskStore.appendTaskStatesToFeatcol(db, projectId, project.tasks);
+		taskStore.appendTaskStatesToFeatcol(db, projectId, project.tasks);
+
+		// check if Fgb extract exists in OPFS
+		const offlineExtractFile = await readFileFromOPFS(`${projectId}/extract.fgb`);
+		if (offlineExtractFile) {
+			loadOfflineExtract(projectId);
+			return;
+		}
+
+		// 30s delay to avoid race conditions
+		timeout = setTimeout(() => {
+			storeFgbExtractOffline();
+		}, 30000);
 	});
 
 	onDestroy(() => {
@@ -130,6 +160,9 @@
 		newBadGeomStore.unsubscribeNewBadGeomStream();
 
 		taskStore.clearTaskStates();
+		entitiesStore.setFgbOpfsUrl('');
+
+		if (timeout) clearTimeout(timeout);
 	});
 
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -286,7 +319,7 @@
 			openedActionModal = value;
 		}}
 		projectOutlineCoords={project.outline.coordinates}
-		projectId={projectId}
+		{projectId}
 		entitiesUrl={project.data_extract_url}
 		primaryGeomType={project.primary_geom_type}
 		draw={isDrawEnabled}
@@ -365,7 +398,7 @@
 				<More projectData={project} zoomToTask={(taskId) => zoomToTask(taskId)}></More>
 			{/if}
 			{#if commonStore.selectedTab === 'offline'}
-				<BasemapComponent projectId={project.id}></BasemapComponent>
+				<OfflineComponent projectId={project.id} {project} />
 			{/if}
 			{#if commonStore.selectedTab === 'qrcode'}
 				<QRCodeComponent class="map-qr" {infoDialogRef} projectName={project.name} projectOdkToken={project.odk_token}>
@@ -449,7 +482,7 @@
 	<OdkWebFormsWrapper
 		bind:webFormsRef
 		bind:display={displayWebFormsDrawer}
-		projectId={projectId}
+		{projectId}
 		entityId={entitiesStore.selectedEntityId || undefined}
 		taskId={taskStore.selectedTaskIndex || undefined}
 	/>

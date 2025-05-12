@@ -1,21 +1,29 @@
-.more {
+.offline {
 	--at-apply: font-barlow font-medium;
 }
 
-.more .stack {
+.offline-comment {
+	--at-apply: h-full;
+}
+
+.offline-no-comment {
+	--at-apply: h-fit;
+}
+
+.offline .stack {
 	--at-apply: group flex items-center justify-between hover: bg-neutral-50 rounded-md p-2 duration-200 cursor-pointer
 		mb-2;
 }
 
-.more .stack .icon-title {
+.offline .stack .icon-title {
 	--at-apply: flex items-center gap-3;
 }
 
-.more .stack .icon-title .icon {
+.offline .stack .icon-title .icon {
 	--at-apply: text-[1.25rem];
 }
 
-.more .stack .icon-next {
+.offline .stack .icon-next {
 	--at-apply: text-[1rem] group-hover: translate-x-1 duration-200;
 }
 
@@ -36,4 +44,8 @@
 
 .active-stack-instructions p {
 	--at-apply: text-neutral-900 text-base;
+}
+
+.offline .extract {
+	--at-apply: flex flex-col gap-2 mt-5 rounded-md mr-1;
 }

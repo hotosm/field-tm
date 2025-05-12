@@ -535,7 +535,7 @@
 	{#if entitiesUrl}
 		<FlatGeobuf
 			id="entities"
-			url={entitiesUrl}
+			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
 			extent={taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
