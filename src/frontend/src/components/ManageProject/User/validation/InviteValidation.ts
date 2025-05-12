@@ -9,7 +9,7 @@ type ValidationErrors = {
   role?: string;
 };
 
-const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function InviteValidation(values: InviteValues) {
   const errors: ValidationErrors = {};
@@ -19,7 +19,7 @@ function InviteValidation(values: InviteValues) {
   } else if (
     values.user.length > 0 &&
     values.inviteVia === 'gmail' &&
-    values.user.some((email) => !gmailPattern.test(email))
+    values.user.some((email) => !emailPattern.test(email))
   ) {
     errors.user = 'Entered emails must be a Gmail account';
   }
