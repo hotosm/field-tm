@@ -1,1 +1,1 @@
-<h1>The URL must have a project ID</h1>
+<h1>Error loading home page</h1>

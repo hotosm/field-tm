@@ -10,34 +10,12 @@ CREATE TYPE public.backgroundtaskstatus AS ENUM (
 );
 ALTER TYPE public.backgroundtaskstatus OWNER TO fmtm;
 
-CREATE TYPE public.mappinglevel AS ENUM (
-    'BEGINNER',
-    'INTERMEDIATE',
-    'ADVANCED'
-);
-ALTER TYPE public.mappinglevel OWNER TO fmtm;
-
 CREATE TYPE public.organisationtype AS ENUM (
     'FREE',
     'DISCOUNTED',
     'FULL_FEE'
 );
 ALTER TYPE public.organisationtype OWNER TO fmtm;
-
-CREATE TYPE public.projectpriority AS ENUM (
-    'MEDIUM',
-    'LOW',
-    'HIGH',
-    'URGENT'
-);
-ALTER TYPE public.projectpriority OWNER TO fmtm;
-
-CREATE TYPE public.projectstatus AS ENUM (
-    'ARCHIVED',
-    'PUBLISHED',
-    'DRAFT'
-);
-ALTER TYPE public.projectstatus OWNER TO fmtm;
 
 CREATE TYPE public.userrole AS ENUM (
     'READ_ONLY',
@@ -55,13 +33,6 @@ CREATE TYPE public.projectrole AS ENUM (
 );
 ALTER TYPE public.projectrole OWNER TO fmtm;
 
-CREATE TYPE public.projectvisibility AS ENUM (
-    'PUBLIC',
-    'PRIVATE',
-    'INVITE_ONLY'
-);
-ALTER TYPE public.projectvisibility OWNER TO fmtm;
-
 CREATE TYPE public.tasksplittype AS ENUM (
     'DIVIDE_ON_SQUARE',
     'CHOOSE_AREA_AS_TASK',
@@ -77,10 +48,3 @@ CREATE TYPE public.communitytype AS ENUM (
     'OTHER'
 );
 ALTER TYPE public.communitytype OWNER TO fmtm;
-
-CREATE TYPE public.geomtype AS ENUM (
-    'POINT',
-    'POLYLINE',
-    'POLYGON'
-);
-ALTER TYPE public.geomtype OWNER TO fmtm;

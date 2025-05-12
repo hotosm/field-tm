@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
+import type { RouteMatchCallbackOptions } from 'workbox-core';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
@@ -8,10 +9,32 @@ import UnoCSS from 'unocss/vite';
 import extractorSvelte from '@unocss/extractor-svelte';
 
 const pwaOptions: Partial<VitePWAOptions> = {
-	registerType: 'autoUpdate',
+	registerType: 'prompt',
+	injectRegister: 'auto',
 	devOptions: {
 		enabled: true,
 	},
+	// // cache all the imports, including favicon
+	workbox: {
+		navigateFallback: 'index.html', // when the user refreshes, we go back to this page
+		globPatterns: ['**/*.{js,css,html,wasm,ico,svg,png,jpg,jpeg,gif,webmanifest}'],
+		runtimeCaching: [
+			{
+				urlPattern: ({ url }: RouteMatchCallbackOptions) => url.origin === self.location.origin,
+				handler: 'CacheFirst',
+				options: {
+					cacheName: 'field-tm-static-assets',
+					expiration: {
+						maxEntries: 300,
+						maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+					},
+				},
+			},
+		],
+		// maximumFileSizeToCacheInBytes: 3000000,
+	},
+	// cache all the static assets in the static folder
+	includeAssets: ['**/*'],
 	manifest: {
 		name: 'Field-TM',
 		short_name: 'Field-TM',
@@ -47,6 +70,8 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				src: 'screenshot-mapper.jpeg',
 				sizes: '1280x720',
 				type: 'image/jpeg',
+				form_factor: 'wide',
+				label: 'Mapper App',
 			},
 		],
 	},

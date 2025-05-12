@@ -10,17 +10,7 @@
 		"sourceMap": true,
 		"strict": true,
 		"moduleResolution": "bundler",
-		"types": ["vite-plugin-pwa/client", "vite-plugin-pwa/info"],
-		"paths": {
-			"$lib/*": ["./src/lib/*"],
-			"$components/*": ["./src/components/*"],
-			"$store/*": ["./src/store/*"],
-			"$routes/*": ["./src/routes/*"],
-			"$constants/*": ["./src/constants/*"],
-			"$static/*": ["./static"],
-			"$styles/*": ["./src/styles/*"],
-			"$assets/*": ["./src/assets/*"]
-		},
+		"types": ["vite-plugin-pwa/svelte", "vite-plugin-pwa/info"],
 		"allowImportingTsExtensions": true
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias

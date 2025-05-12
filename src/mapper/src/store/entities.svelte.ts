@@ -1,5 +1,5 @@
 import type { PGliteWithSync } from '@electric-sql/pglite-sync';
-import { ShapeStream, Shape, FetchError } from '@electric-sql/client';
+import type { ShapeStream, FetchError } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { LngLatLike } from 'svelte-maplibre';

@@ -194,8 +194,18 @@ class Settings(BaseSettings):
                 if dev_port and dev_port.lower() not in ("0", "no", "false")
                 else ""
             )
+            # Manager frontend via proxy
             default_origins.append(f"http://{domain}{local_server_port}")
+            # Mapper frontend via proxy
             default_origins.append(f"http://mapper.{domain}{local_server_port}")
+            # Manager frontend direct port access
+            default_origins.append("http://localhost:7051")
+            # we also include next port, in case already bound by docker
+            default_origins.append("http://localhost:7052")
+            # Mapper frontend direct port access
+            default_origins.append("http://localhost:7057")
+            # we also include next port, in case already bound by docker
+            default_origins.append("http://localhost:7058")
         else:
             # Add the main Field-TM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")

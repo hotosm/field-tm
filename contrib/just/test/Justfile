@@ -62,6 +62,18 @@ frontend-interactive:
     -f contrib/playwright/compose.yaml \
   run --rm ui-test 'npm run test:e2e-interactive'
 
+# Test mapper frontend build for offline testing
+[no-cd]
+mapper-preview:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/mapper
+  pnpm install
+  VITE_API_URL=http://api.fmtm.localhost:7050 \
+    VITE_SYNC_URL=http://sync.fmtm.localhost:7050 \
+    VITE_S3_URL=http://s3.fmtm.localhost:7050 \
+    pnpm run build
+  pnpm run preview
+
 # Check coverage for backend tests
 [no-cd]
 coverage:
