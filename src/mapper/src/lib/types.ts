@@ -10,27 +10,14 @@ export type ProjectTask = {
 	outline: Polygon;
 };
 
-export interface ProjectData {
+export interface APIProject {
 	id: number;
-	odkid: number;
 	name: string;
 	short_description: string;
 	description: string;
 	per_task_instructions: string;
-	outline: {
-		type: string;
-		geometry: {
-			type: string;
-			coordinates: [];
-		};
-		properties: {
-			id: number;
-			bbox: [number, number, number, number];
-		};
-		id: number;
-	};
+	priority: number;
 	location_str: string;
-	osm_category: string;
 	odk_form_id: string;
 	data_extract_url: string;
 	odk_token: string;
@@ -111,18 +98,19 @@ export type TaskEventType = {
 };
 
 export type projectType = {
-	centroid: Point;
-	hashtags: string[];
 	id: number;
-	location_str: string | null;
 	name: string;
-	num_contributors: number;
-	organisation_id: number;
-	organisation_logo: string | null;
-	outline: Polygon;
-	priority: number;
 	short_description: string;
-	total_tasks: string;
+	organisation_id?: number;
+	organisation_logo: string | null;
+	priority: number;
+	outline?: Polygon;
+	centroid?: Point;
+	location_str: string | null;
+	hashtags: string[];
+	total_tasks?: string;
+	num_contributors?: number;
+	total_submissions?: number;
 };
 
 export type paginationType = {

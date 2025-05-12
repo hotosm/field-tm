@@ -5,7 +5,7 @@
 	import Activities from '$lib/components/more/activities.svelte';
 	import ProjectInfo from '$lib/components/more/project-info.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
-	import type { ProjectData, TaskEventType } from '$lib/types';
+	import type { APIProject, TaskEventType } from '$lib/types';
 	import { m } from '$translations/messages.js';
 	import { getCommonStore } from '$store/common.svelte';
 
@@ -19,7 +19,7 @@
 	};
 
 	type Props = {
-		projectData: ProjectData;
+		projectData: APIProject;
 		zoomToTask: (taskId: number) => void;
 	};
 

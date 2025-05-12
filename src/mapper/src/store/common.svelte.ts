@@ -24,10 +24,11 @@ interface ConfigJson {
 interface AlertDetails {
 	variant: 'success' | 'default' | 'warning' | 'danger';
 	message: string;
+	duration?: number;
 }
 
 let db: PGliteWithSync;
-let alert: AlertDetails = $state({ variant: 'default', message: '' });
+let alert: AlertDetails = $state({ variant: 'default', message: '', duration: 4000 });
 let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
@@ -99,8 +100,12 @@ function getAlertStore() {
 			return alert;
 		},
 		setAlert: (alertDetails: AlertDetails) =>
-			(alert = { variant: alertDetails.variant, message: alertDetails.message }),
-		clearAlert: (alertDetails: AlertDetails) => (alert = { variant: 'default', message: '' }),
+			(alert = {
+				variant: alertDetails.variant,
+				message: alertDetails.message,
+				duration: alertDetails.duration || 4000,
+			}),
+		clearAlert: (alertDetails: AlertDetails) => (alert = { variant: 'default', message: '', duration: 4000 }),
 	};
 }
 

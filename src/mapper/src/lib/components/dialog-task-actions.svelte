@@ -2,7 +2,7 @@
 	import '$styles/dialog-task-actions.css';
 	import { m } from '$translations/messages.js';
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
-	import type { ProjectData } from '$lib/types';
+	import type { APIProject } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte';
 	import { unicodeBold } from '$lib/utils/text.ts';
@@ -11,7 +11,7 @@
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
-		projectData: ProjectData;
+		projectData: APIProject;
 		clickMapNewFeature: () => void;
 	};
 

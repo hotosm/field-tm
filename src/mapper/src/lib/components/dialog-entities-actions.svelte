@@ -5,7 +5,7 @@
 	import type { SlDialog, SlDrawer } from '@shoelace-style/shoelace';
 
 	import { m } from '$translations/messages.js';
-	import { TaskStatusEnum, type ProjectData } from '$lib/types';
+	import { TaskStatusEnum, type APIProject } from '$lib/types';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { getAlertStore, getCommonStore } from '$store/common.svelte.ts';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
@@ -15,7 +15,7 @@
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
-		projectData: ProjectData;
+		projectData: APIProject;
 		displayWebFormsDrawer: Boolean;
 	};
 

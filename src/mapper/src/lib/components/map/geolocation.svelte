@@ -51,7 +51,8 @@
 					sensitiveAltRoutelineLayers: ['maplibre-gl-directions-alt-routeline'],
 				});
 				directions.interactive = false;
-				map.addControl(new LoadingIndicatorControl(directions));
+				const loadingIndicator = new LoadingIndicatorControl(directions);
+				map.addControl(loadingIndicator);
 				directions.clear();
 
 				directions.on('fetchroutesend', (ev) => {
