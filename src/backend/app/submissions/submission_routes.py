@@ -24,6 +24,7 @@ from typing import Annotated, Optional
 import geojson
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
+from loguru import logger as log
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission as CentralSubmissionOut
@@ -98,7 +99,13 @@ async def create_submission(
         user=project.odk_credentials.odk_central_user,
         passwd=project.odk_credentials.odk_central_password,
     ) as odk_central:
-        await odk_central.s3_sync()
+        try:
+            await odk_central.s3_sync()
+        except Exception:
+            log.warning(
+                "Fails to sync media to S3 - is the linked ODK Central "
+                "instance correctly configured?"
+            )
 
     return new_submission
 
