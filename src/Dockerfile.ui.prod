@@ -33,7 +33,7 @@ COPY mapper/ .
 # RUN pnpm run init-db
 # # Copy to required location for build
 # RUN cp pgdata.tar.gz /migrations/init/
-# RUN pnpm run build
+RUN pnpm run build
 
 
 
