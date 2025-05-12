@@ -156,7 +156,7 @@ async def invite_new_user(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail=f"OSM user not found: {user_in.osm_username}",
             )
-    elif user_in.email and user_in.email.endswith("@gmail.com"):
+    elif user_in.email:
         username = user_in.email.split("@")[0]
         signin_type = "google"
     else:

@@ -5,7 +5,6 @@ import useForm from '@/hooks/useForm';
 import { InviteNewUser } from '@/api/User';
 import Button from '@/components/common/Button';
 import Chips from '@/components/common/Chips.js';
-import InputTextField from '@/components/common/InputTextField.js';
 import Select2 from '@/components/common/Select2.js';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { project_roles } from '@/types/enums';
@@ -16,6 +15,7 @@ import InviteTable from './InviteTable';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { UserActions } from '@/store/slices/UserSlice';
+import TextArea from '@/components/common/TextArea';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -111,26 +111,34 @@ const InviteTab = ({ roleList }: propType) => {
             }}
           />
           <div className="fmtm-w-full">
-            <div className="fmtm-flex fmtm-gap-2 fmtm-mb-2">
-              <InputTextField
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-mb-2">
+              <TextArea
                 id="name"
                 name="name"
                 label="Invite User"
                 value={user}
-                onChange={(e) => setUser(e.target.value)}
-                fieldType="text"
-                classNames="fmtm-flex-grow"
-                placeholder={values.inviteVia === 'osm' ? 'Enter Username' : 'Enter Gmail'}
+                onChange={(e) => setUser(e.target.value.replace(/[\r\n]+/g, ' ').replace(/\t/g, ' '))}
+                placeholder={
+                  values.inviteVia === 'osm'
+                    ? 'Enter Username (To assign multiple users, separate osm usernames with space)'
+                    : 'Enter Gmail (To assign multiple users, separate gmail addresses with space)'
+                }
+                rows={5}
+                required
               />
-              <AssetModules.AddIcon
+              <Button
                 disabled={!user}
-                className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-mt-9"
+                variant="secondary-grey"
                 onClick={() => {
                   if (!user) return;
-                  handleCustomChange('user', [...values.user, user]);
+                  handleCustomChange('user', [...values.user, ...user.split(' ')]);
                   setUser('');
                 }}
-              />
+                className="fmtm-ml-auto"
+              >
+                <AssetModules.AddIcon className="!fmtm-text-base" />
+                Add
+              </Button>
             </div>
             {values.user.length > 0 && (
               <Chips
@@ -147,7 +155,9 @@ const InviteTab = ({ roleList }: propType) => {
             {errors?.user && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm">{errors.user}</p>}
           </div>
           <div>
-            <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent`}>Assign as</p>
+            <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent`}>
+              Assign as <span className="fmtm-text-red-500 fmtm-text-[1.2rem] fmtm-font-normal">*</span>
+            </p>
             <Select2
               options={roleList || []}
               value={values.role}
