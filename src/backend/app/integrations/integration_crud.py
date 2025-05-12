@@ -69,47 +69,51 @@ async def update_entity_status_in_fmtm(
     odk_event: OdkCentralWebhookRequest,
 ):
     """Update the status for an Entity in the Field-TM db."""
-    log.debug(f"Webhook called with event ({odk_event.type.value})")
-
-    if odk_event.type == OdkWebhookEvents.UPDATE_ENTITY:
-        # insert state into db
-        new_state = odk_event.data.get("status")
-
-        if new_state is None:
-            log.warning(f"Missing entity state in webhook event: {odk_event.data}")
-            return HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail="Missing entity state property",
-            )
-
-        try:
-            new_state_int = int(new_state)
-            # the string name is inserted in the db
-            new_entity_state = EntityState(new_state_int).name
-        except (ValueError, TypeError):
-            log.warning(
-                f"Invalid entity state '{new_state}' in webhook event: {odk_event.data}"
-            )
-            return HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail="Invalid entity state",
-            )
-
-        log.debug(
-            f"Updating entity ({str(odk_event.id)}) status "
-            f"in Field-TM db to ({new_entity_state})"
+    if odk_event.type != OdkWebhookEvents.UPDATE_ENTITY:
+        log.error(
+            "Attempted entity status update, but the "
+            f"event type was wrong: {odk_event.type}"
         )
-        update_success = await DbOdkEntities.update(
-            db,
-            str(odk_event.id),
-            OdkEntitiesUpdate(status=new_entity_state),
+        return
+
+    # Insert state into db
+    new_state = odk_event.data.get("status")
+
+    if new_state is None:
+        log.warning(f"Missing entity state in webhook event: {odk_event.data}")
+        return HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Missing entity state property",
         )
-        if not update_success:
-            raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                detail=f"Error updating entity with UUID ({str(odk_event.id)})",
-            )
-        return Response(status_code=HTTPStatus.OK)
+
+    try:
+        new_state_int = int(new_state)
+        # the string name is inserted in the db
+        new_entity_state = EntityState(new_state_int).name
+    except (ValueError, TypeError):
+        log.warning(
+            f"Invalid entity state '{new_state}' in webhook event: {odk_event.data}"
+        )
+        return HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Invalid entity state",
+        )
+
+    log.debug(
+        f"Updating entity ({str(odk_event.id)}) status "
+        f"in Field-TM db to ({new_entity_state})"
+    )
+    update_success = await DbOdkEntities.update(
+        db,
+        str(odk_event.id),
+        OdkEntitiesUpdate(status=new_entity_state),
+    )
+    if not update_success:
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Error updating entity with UUID ({str(odk_event.id)})",
+        )
+    return Response(status_code=HTTPStatus.OK)
 
 
 # async def update_entity_status_in_odk(
