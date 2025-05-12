@@ -54,6 +54,7 @@ let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
 let alertStore = getAlertStore();
 let entitiesSync: any = $state(undefined);
 let newBadGeomSync: any = $state(undefined);
+let fgbOpfsUrl: string = $state('');
 
 function getEntitiesStatusStore() {
 	async function getEntityStatusStream(db: PGliteWithSync, projectId: number): Promise<ShapeStream | undefined> {
@@ -306,6 +307,10 @@ function getEntitiesStatusStore() {
 		return entityMap.get(entityId)?.osm_id;
 	}
 
+	function setFgbOpfsUrl(url: string) {
+		fgbOpfsUrl = url;
+	}
+
 	return {
 		getEntityStatusStream: getEntityStatusStream,
 		unsubscribeEntitiesStream: unsubscribeEntitiesStream,
@@ -316,6 +321,7 @@ function getEntitiesStatusStore() {
 		setEntityToNavigate: setEntityToNavigate,
 		setToggleGeolocation: setToggleGeolocation,
 		setUserLocationCoordinate: setUserLocationCoordinate,
+		setFgbOpfsUrl: setFgbOpfsUrl,
 		get selectedEntityId() {
 			return selectedEntityId;
 		},
@@ -362,6 +368,9 @@ function getEntitiesStatusStore() {
 		},
 		get taskSubmissionInfo() {
 			return taskSubmissionInfo;
+		},
+		get fgbOpfsUrl() {
+			return fgbOpfsUrl;
 		},
 	};
 }

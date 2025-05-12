@@ -123,5 +123,11 @@
 	"forms": {
 		"default_language_warning": "Displaying form in its default language because there is no English version of the form.",
 		"uploading": "Uploading"
+	},
+	"offline": {
+		"features": "Features",
+		"basemaps": "Basemaps",
+		"store_features_offline": "Store Features Offline",
+		"features_offline_info": "Feauture extracts already stored offline"
 	}
 }
