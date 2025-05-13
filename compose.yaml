@@ -343,7 +343,7 @@ services:
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
     image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
-    command: -c 'max_connections=300' -c 'wal_level=logical'
+    command: -c 'wal_level=logical'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
