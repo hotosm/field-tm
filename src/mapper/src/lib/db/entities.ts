@@ -1,8 +1,8 @@
 import type { PGliteWithSync } from '@electric-sql/pglite-sync';
-import type { DbEntity } from '$lib/types';
+import type { DbEntityType } from '$lib/types';
 import { applyDataToTableWithCsvCopy } from '$lib/db/helpers';
 
-export async function updateLocalEntityStatus(db: PGliteWithSync, entity: DbEntity) {
+async function update(db: PGliteWithSync, entity: DbEntityType) {
 	await db.query(
 		`UPDATE odk_entities
          SET status = $2
@@ -11,7 +11,7 @@ export async function updateLocalEntityStatus(db: PGliteWithSync, entity: DbEnti
 	);
 }
 
-export async function createLocalEntity(db: PGliteWithSync, entity: DbEntity) {
+async function create(db: PGliteWithSync, entity: DbEntityType) {
 	await db.query(
 		`INSERT INTO odk_entities (
             entity_id,
@@ -27,7 +27,7 @@ export async function createLocalEntity(db: PGliteWithSync, entity: DbEntity) {
 }
 
 // An optimised insert for multiple geom records in bulk
-export async function createLocalEntities(db: PGliteWithSync, entities: DbEntity[]) {
+async function bulkCreate(db: PGliteWithSync, entities: DbEntityType[]) {
 	// The entities are already in Record format, however we ensure all undefined or empty strings are set to null for insert
 	const dataObj = entities.map((entity) => ({
 		entity_id: entity.entity_id,
@@ -40,3 +40,9 @@ export async function createLocalEntities(db: PGliteWithSync, entities: DbEntity
 
 	await applyDataToTableWithCsvCopy(db, 'odk_entities', dataObj);
 }
+
+export const DbEntity = {
+	create,
+	update,
+	bulkCreate,
+};

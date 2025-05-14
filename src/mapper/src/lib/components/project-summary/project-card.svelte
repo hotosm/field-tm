@@ -1,11 +1,11 @@
 <script lang="ts">
 	import '$styles/project-summary.css';
-	import type { projectType } from '$lib/types';
+	import type { DbProjectType } from '$lib/types';
 	import OsmLogo from '$assets/images/osm-logo.png';
 	import { goto } from '$app/navigation';
 
 	type propType = {
-		project: projectType;
+		project: DbProjectType;
 	};
 
 	const { project }: propType = $props();

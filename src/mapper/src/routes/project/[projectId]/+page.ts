@@ -1,8 +1,8 @@
 import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { online } from 'svelte/reactivity/window';
-import { fetchProjectFromLocalDB, upsertLocalDbProjectData } from '$lib/db/projects.ts';
-import type { projectType } from '$lib/types';
+import { DbProject } from '$lib/db/projects.ts';
+import type { DbProjectType } from '$lib/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,10 +18,10 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	const db = await dbPromise;
 
 	const { projectId } = params;
-	let project: projectType | undefined;
+	let project: DbProjectType | undefined;
 
 	if (!online.current) {
-		project = await fetchProjectFromLocalDB(db, projectId);
+		project = await DbProject.one(db, projectId);
 
 		if (!project) {
 			throw error(404, `Project with ID (${projectId}) not found in local storage`);
@@ -41,7 +41,7 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 
 		if (!project) return;
 		// Ensure the local database has the extra metadata needed
-		await upsertLocalDbProjectData(db, project);
+		await DbProject.upsert(db, project);
 	}
 
 	return {
