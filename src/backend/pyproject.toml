@@ -51,6 +51,7 @@ dependencies = [
     "fmtm-splitter==2.0.0",
     "pg-nearest-city==0.2.1",
     "pyodk",
+    "aiosmtplib>=4.0.1",
 ]
 readme = "../../README.md"
 license = {text = "AGPL-3.0-only"}

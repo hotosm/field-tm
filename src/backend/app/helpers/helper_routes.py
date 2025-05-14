@@ -19,12 +19,14 @@
 
 import csv
 import json
+from email.message import EmailMessage
 from io import BytesIO, StringIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Annotated
 from uuid import uuid4
 
+import aiosmtplib
 import requests
 from fastapi import (
     APIRouter,
@@ -333,3 +335,32 @@ async def send_test_osm_message(
         return HTTPException(status_code=HTTPStatus.CONFLICT, detail=msg)
 
     return Response(status_code=HTTPStatus.OK)
+
+
+@router.post("/send-test-email")
+async def send_test_email():
+    """Sends a test email using real SMTP settings."""
+    if not settings.emails_enabled:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_IMPLEMENTED,
+            detail="An SMTP server has not been configured.",
+        )
+    message = EmailMessage()
+    message["Subject"] = "Test email from Field-TM"
+    message.set_content("This is a test email sent from Field-TM.")
+
+    log.info("Sending test email to recipients")
+    await aiosmtplib.send(
+        message,
+        sender=settings.SMTP_USER,
+        # NOTE this is a test email, so use your own email address to receive it
+        recipients=[],  # List of recipient email addresses
+        hostname=settings.SMTP_HOST,
+        port=settings.SMTP_PORT,
+        username=settings.SMTP_USER,
+        password=settings.SMTP_PASSWORD,
+    )
+
+    return Response(
+        status_code=HTTPStatus.OK,
+    )
