@@ -34,8 +34,8 @@ gen_current_env() {
         done < <(grep -vE '^\s*#|^\s*$' .env)
     fi
 
-    # Generate compose file (note this is currently only for development branch)
-    export GIT_BRANCH=development
+    # Generate compose file (default development, but can be overridden)
+    export GIT_BRANCH="${GIT_BRANCH:-development}"
     echo ""
     echo "Generated compose file:"
     echo ""
