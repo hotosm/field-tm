@@ -51,7 +51,7 @@ from app.users import user_schemas
 from app.users.user_crud import (
     get_paginated_users,
     process_inactive_users,
-    send_invitation_osm_message,
+    send_invitation_message,
 )
 from app.users.user_deps import get_user
 
@@ -145,12 +145,12 @@ async def invite_new_user(
     (e.g. mobile message).
     """
     project = project_user_dict.get("project")
-    osm_user_exists = False
 
     if user_in.osm_username:
-        if osm_user_exists := await check_osm_user(user_in.osm_username):
+        if await check_osm_user(user_in.osm_username):
             username = user_in.osm_username
             signin_type = "osm"
+            domain = settings.FMTM_DOMAIN
         else:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
@@ -159,6 +159,9 @@ async def invite_new_user(
     elif user_in.email:
         username = user_in.email.split("@")[0]
         signin_type = "google"
+        # We use different domain for non OSM users since they can't access the
+        # management interface
+        domain = f"mapper.{settings.FMTM_DOMAIN}"
     else:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -178,36 +181,26 @@ async def invite_new_user(
             },
         )
 
+    # Generate invite URL
     new_invite = await DbUserInvite.create(db, project.id, user_in)
 
-    # Generate invite URL
-    # TODO create frontend page to handle /invite
-    # TODO save token from URL in localStorage
-    # TODO ask user to login to Field-TM first, present options
-    # TODO once logged in and redirected back to frontend
-    # TODO read the localStorage `invite` key, and call the
-    # TODO /users/invite/{token} endpoint.
     if settings.DEBUG:
         invite_url = (
-            f"http://{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
-            f"/invite?token={new_invite.token}"
+            f"http://{domain}:{settings.FMTM_DEV_PORT}/invite?token={new_invite.token}"
         )
     else:
-        invite_url = f"https://{settings.FMTM_DOMAIN}/invite?token={new_invite.token}"
+        invite_url = f"https://{domain}/invite?token={new_invite.token}"
 
-    # Notify via OSM message
-    if osm_user_exists:
-        background_tasks.add_task(
-            send_invitation_osm_message,
-            request=request,
-            project=project,
-            invitee_username=username,
-            osm_auth=osm_auth,
-            invite_url=invite_url,
-        )
-
-    # TODO Notify via email (consider options)
-
+    background_tasks.add_task(
+        send_invitation_message,
+        request=request,
+        project=project,
+        invitee_username=username,
+        osm_auth=osm_auth,
+        invite_url=invite_url,
+        user_email=user_in.email,
+        signin_type=signin_type,
+    )
     return JSONResponse(status_code=HTTPStatus.OK, content={"invite_url": invite_url})
 
 

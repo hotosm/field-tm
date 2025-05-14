@@ -19,9 +19,12 @@
 
 import os
 from datetime import datetime, timedelta, timezone
+from email.message import EmailMessage
 from textwrap import dedent
 from typing import Literal, Optional
 
+import aiosmtplib
+import markdown
 from fastapi import Request
 from fastapi.exceptions import HTTPException
 from loguru import logger as log
@@ -217,41 +220,78 @@ async def send_warning_email_or_osm(
     log.info(f"Sent warning to {username}: {days_remaining} days remaining.")
 
 
-async def send_invitation_osm_message(
+async def send_mail(
+    user_email: str,
+    title: str,
+    message_content: str,
+):
+    """Sends an email."""
+    if not settings.emails_enabled:
+        log.info("An SMTP server has not been configured.")
+        return
+    message = EmailMessage()
+    message["Subject"] = title
+    message.set_content(message_content)
+    html_content = markdown.markdown(message_content)
+    message.add_alternative(html_content, subtype="html")
+
+    await aiosmtplib.send(
+        message,
+        sender=settings.SMTP_USER,
+        recipients=[user_email],
+        hostname=settings.SMTP_HOST,
+        port=settings.SMTP_PORT,
+        username=settings.SMTP_USER,
+        password=settings.SMTP_PASSWORD,
+    )
+
+
+async def send_invitation_message(
     request: Request,
     project: DbProject,
     invitee_username: str,
     osm_auth: Auth,
     invite_url: str,
+    user_email: str,
+    signin_type: str,
 ):
     """Send an invitation message to a user to join a project."""
-    log.info(f"Sending invitation message to osm user ({invitee_username}).")
-
-    osm_token = get_osm_token(request, osm_auth)
-
     project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
     if not project_url.startswith("http"):
         project_url = f"https://{project_url}"
 
+    title = f"You have been invited to join the project {project.name}"
     message_content = dedent(f"""
         You have been invited to join the project **{project.name}**.
 
         To accept the invitation, please click the link below:
         [Accept Invitation]({invite_url})
 
-        You may use this link after accepting the invitation to view the project:
+        You may use this link after accepting the invitation to view the project if you
+        have access:
         [Project]({project_url})
 
         Thank you for being a part of our platform!
     """)
 
-    send_osm_message(
-        osm_token=osm_token,
-        osm_username=invitee_username,
-        title=f"You have been invited to join the project {project.name}",
-        body=message_content,
-    )
-    log.info(f"Invitation message sent to osm user ({invitee_username}).")
+    if signin_type == "osm":
+        osm_token = get_osm_token(request, osm_auth)
+
+        send_osm_message(
+            osm_token=osm_token,
+            osm_username=invitee_username,
+            title=title,
+            body=message_content,
+        )
+        log.info(f"Invitation message sent to osm user ({invitee_username}).")
+
+    elif signin_type == "google":
+        await send_mail(
+            user_email=user_email,
+            title=title,
+            message_content=message_content,
+        )
+        log.info(f"Invitation message sent to email user ({user_email}).")
 
 
 async def get_paginated_users(
