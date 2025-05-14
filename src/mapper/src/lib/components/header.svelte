@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '$styles/header.css';
 	import { onMount, onDestroy } from 'svelte';
+	import { online } from 'svelte/reactivity/window';
 	import type { SlDrawer, SlTooltip } from '@shoelace-style/shoelace';
 	// FIXME this is a workaround to re-import, as using sl-dropdown
 	// and sl-menu prevents selection of values!
@@ -77,7 +78,7 @@
 	});
 </script>
 
-<div class="header">
+<div class="header" class:offline-bg-color={!online.current}>
 	<div
 		onclick={() => goto('/')}
 		onkeydown={(e) => {
@@ -93,6 +94,9 @@
 			{commonStore.config?.logoText}
 		</span>
 	</div>
+	{#if !online.current}
+		<hot-icon name="wifi-off"></hot-icon>
+	{/if}
 	<div class="nav">
 		<!-- profile image and username display -->
 		{#if loginStore?.getAuthDetails?.username}

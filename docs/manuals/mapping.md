@@ -220,6 +220,30 @@ Sometimes the feature does not exist on the map yet!
       In a future release, this process will be handled seamlessly
       without user interaction.
 
+## Working Offline
+
+It is possible to work entirely offline, once FieldTM has been loaded
+while internet is available.
+
+To achieve this:
+
+- Visit [https://mapper.fmtm.hotosm.org](https://mapper.fmtm.hotosm.org)
+  once from the phone you wish to map with.
+  - This will cache the 12 most recent projects on your device.
+  - To cache a different set of projects, use the search or
+    next/previous page functionality.
+- For best results, 'Install' the webpage on your device, creating
+  a shortcut on your home screen.
+- Click on the project you wish to map offline.
+  - The project details will be stored entirely offline.
+  - You may also go to the 'Offline' tab, to download additional
+    offline data such as base map imagery.
+- Upon opening the installed app, you should be able to browse
+  the cached versions of your projects (note they will not update
+  while offline).
+- Submissions can be made while offline & they will since when
+  connectivity is restored.
+
 ## Upcoming improvements
 
 Refer the milestone: <https://github.com/hotosm/fmtm/milestone/49>

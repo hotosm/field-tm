@@ -12,9 +12,9 @@
 </script>
 
 <div
-	onclick={() => goto(`/${project.id}`)}
+	onclick={() => goto(`/project/${project.id}`)}
 	onkeydown={(e: KeyboardEvent) => {
-		if (e.key === 'Enter') goto(`/${project.id}`);
+		if (e.key === 'Enter') goto(`/project/${project.id}`);
 	}}
 	role="button"
 	tabindex="0"

@@ -18,7 +18,7 @@ RUN npm install -g corepack@0.31.0
 # FIXME delete this line after fixed upstream
 RUN corepack enable && corepack install
 RUN pnpm install
-ENTRYPOINT ["pnpm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
 
 # Test code for initialising PGLite db and creating tar dump

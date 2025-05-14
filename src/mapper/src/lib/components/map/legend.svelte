@@ -18,7 +18,7 @@
 </script>
 
 <div class={`map-legend ${isOpen ? 'open' : 'closed'}`}>
-	<p class="title">{m['legend.features']()}</p>
+	<p class="title">{m['map.legend_features']()}</p>
 	{#each entityStatuses as entityStatus}
 		<div class="entity-status">
 			<div
