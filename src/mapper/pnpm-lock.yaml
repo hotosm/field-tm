@@ -12,11 +12,11 @@ importers:
         specifier: 1.0.4
         version: 1.0.4
       '@electric-sql/pglite':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.3.1
+        version: 0.3.1
       '@electric-sql/pglite-sync':
-        specifier: ^0.3.2
-        version: 0.3.2(@electric-sql/pglite@0.3.0)
+        specifier: ^0.3.3
+        version: 0.3.3(@electric-sql/pglite@0.3.1)
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
@@ -675,13 +675,13 @@ packages:
     peerDependencies:
       '@electric-sql/client': 1.0.0
 
-  '@electric-sql/pglite-sync@0.3.2':
-    resolution: {integrity: sha512-MUyIYMUzn7hN2QDshlmsfHLbOP5g/a+DrzLUbMljsXGsiUHbwqh2Sr8gKEkl/GDjQfHy7lIoFv2fAVjC6txmhQ==}
+  '@electric-sql/pglite-sync@0.3.3':
+    resolution: {integrity: sha512-tzktg+aLu+CcwHNpkjaoxWzU0+X3GXqhnRryOWB9q5FlwvA4Fu+1DOzdXaXY1REKsobSdmleuhYi0Z2lQynV5Q==}
     peerDependencies:
-      '@electric-sql/pglite': 0.3.0
+      '@electric-sql/pglite': 0.3.1
 
-  '@electric-sql/pglite@0.3.0':
-    resolution: {integrity: sha512-ou1PA24kStSNpQVGdzDg1FGRzO7AQ3O6OX5FryupMdHkSfSswG2ZVXjCzzJKK88KLk+Q4QinKjZIUtmMeec5rg==}
+  '@electric-sql/pglite@0.3.1':
+    resolution: {integrity: sha512-Kpbd2FMXnM5I56ZpMnGKZhv+h31ipeimgyJVb1C+nWFTikp33z0TTwmksEtHpPinuqKiMJblH2OJM0RubKvJgg==}
 
   '@esbuild/aix-ppc64@0.23.1':
     resolution: {integrity: sha512-6VhYk1diRqrhBAqpJEdjASR/+WVRtfjpqKuNw11cLiaWpAT/Uu+nokB+UJnevzy/P9C/ty6AOe0dwueMrGh/iQ==}
@@ -4581,13 +4581,13 @@ snapshots:
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.28.0
 
-  '@electric-sql/pglite-sync@0.3.2(@electric-sql/pglite@0.3.0)':
+  '@electric-sql/pglite-sync@0.3.3(@electric-sql/pglite@0.3.1)':
     dependencies:
       '@electric-sql/client': 1.0.0
       '@electric-sql/experimental': 1.0.0(@electric-sql/client@1.0.0)
-      '@electric-sql/pglite': 0.3.0
+      '@electric-sql/pglite': 0.3.1
 
-  '@electric-sql/pglite@0.3.0': {}
+  '@electric-sql/pglite@0.3.1': {}
 
   '@esbuild/aix-ppc64@0.23.1':
     optional: true

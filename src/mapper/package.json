@@ -48,8 +48,8 @@
 	},
 	"dependencies": {
 		"@electric-sql/client": "1.0.4",
-		"@electric-sql/pglite": "^0.3.0",
-		"@electric-sql/pglite-sync": "^0.3.2",
+		"@electric-sql/pglite": "^0.3.1",
+		"@electric-sql/pglite-sync": "^0.3.3",
 		"@hotosm/ui": "0.2.0-b5",
 		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@shoelace-style/shoelace": "2.17.1",
