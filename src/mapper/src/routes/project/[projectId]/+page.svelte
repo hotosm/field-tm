@@ -4,6 +4,7 @@
 	import './page.css';
 	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
+	import { online } from 'svelte/reactivity/window';
 	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
@@ -37,7 +38,7 @@
 	}
 
 	const { data }: Props = $props();
-	const { project, projectId } = data;
+	const { project, projectId, db } = data;
 
 	let webFormsRef: HTMLElement | undefined = $state();
 	let displayWebFormsDrawer = $state(false);
@@ -55,16 +56,18 @@
 	const entitiesStore = getEntitiesStatusStore();
 	const newBadGeomStore = getNewBadGeomStore();
 	const commonStore = getCommonStore();
-	// Destructure and get the db variable from commonStore
-	const { db } = commonStore;
 	const alertStore = getAlertStore();
 
 	let taskEventStream: ShapeStream | undefined;
 	let entityStatusStream: ShapeStream | undefined;
 	let newBadGeomStream: ShapeStream | undefined;
+	let lastOnlineStatus: boolean | null = $state(null);
+	let subscribeDebounce: ReturnType<typeof setTimeout> | null = $state(null);
 
 	const latestEvent = $derived(taskStore.latestEvent);
 	const commentMention = $derived(taskStore.commentMention);
+	// Make db accessible via store
+	commonStore.setDb(db);
 	commonStore.setUseOdkCollectOverride(project.use_odk_collect);
 
 	// Update the geojson task states when a new event is added
@@ -132,10 +135,17 @@
 		}
 	};
 
-	onMount(async () => {
+	async function subscribeToAllStreams() {
+		// Ensure unsubscribed first
+		unsubscribeFromAllStreams();
+
 		taskEventStream = await taskStore.getTaskEventStream(db, projectId);
 		entityStatusStream = await entitiesStore.getEntityStatusStream(db, projectId);
 		newBadGeomStream = await newBadGeomStore.getNewBadGeomStream(db, projectId);
+	}
+
+	onMount(async () => {
+		await subscribeToAllStreams();
 
 		// Note we need this for now, as the task outlines are from API, while task
 		// events are from pglite / sync. We pass through the task outlines.
@@ -148,21 +158,49 @@
 			return;
 		}
 
-		// 30s delay to avoid race conditions
+		// 30s delay to defer saving data until after initial page load
 		timeout = setTimeout(() => {
 			storeFgbExtractOffline();
 		}, 30000);
 	});
 
-	onDestroy(() => {
+	async function unsubscribeFromAllStreams() {
 		taskStore.unsubscribeEventStream();
 		entitiesStore.unsubscribeEntitiesStream();
 		newBadGeomStore.unsubscribeNewBadGeomStream();
+	}
+
+	onDestroy(() => {
+		unsubscribeFromAllStreams();
 
 		taskStore.clearTaskStates();
 		entitiesStore.setFgbOpfsUrl('');
 
 		if (timeout) clearTimeout(timeout);
+	});
+
+	// Subscribe / unsubscribe from streams based on connectivity
+	// note: the effect rune can't accept async, but this is fine
+	// note: we also need to debounce this to prevent infinite loop
+	$effect(() => {
+		const isOnline = online.current;
+
+		// Prevent running unnecessarily
+		if (isOnline === lastOnlineStatus) return;
+		lastOnlineStatus = isOnline;
+
+		if (subscribeDebounce) {
+			clearTimeout(subscribeDebounce);
+			subscribeDebounce = null;
+		}
+
+		subscribeDebounce = setTimeout(() => {
+			if (isOnline) {
+				subscribeToAllStreams();
+			} else {
+				unsubscribeFromAllStreams();
+			}
+		}, 200);
 	});
 
 	const projectSetupStepStore = getProjectSetupStepStore();

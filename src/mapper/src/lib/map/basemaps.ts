@@ -2,6 +2,7 @@ import type { UUID } from 'crypto';
 
 import { getAlertStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 import { readFileFromOPFS, writeBinaryToOPFS } from '$lib/fs/opfs';
+import { m } from '$translations/messages.js';
 
 export interface Basemap {
 	id: UUID;
@@ -32,7 +33,7 @@ export async function getBasemapList(projectId: number): Promise<Basemap[]> {
 		console.error('Error refreshing basemaps:', error);
 		alertStore.setAlert({
 			variant: 'danger',
-			message: 'Error fetching basemaps list.',
+			message: m['error_downloading'](),
 		});
 		return [];
 	}
@@ -80,7 +81,7 @@ async function downloadBasemap(url: string | undefined): Promise<ArrayBuffer> {
 		console.error('Error downloading basemaps:', error);
 		alertStore.setAlert({
 			variant: 'danger',
-			message: 'Error downloading basemap file.',
+			message: m['error_downloading'](),
 		});
 	} finally {
 		return basemapData;

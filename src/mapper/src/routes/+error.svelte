@@ -1,1 +1,2 @@
-<h1>Error loading home page</h1>
+<!-- This is the page shown if no URL match -->
+<h1>Error loading page</h1>

@@ -1,6 +1,7 @@
 import { readFileFromOPFS, writeBinaryToOPFS } from '$lib/fs/opfs';
 import { getAlertStore } from '$store/common.svelte';
 import { getEntitiesStatusStore } from '$store/entities.svelte';
+import { m } from '$translations/messages.js';
 
 const alertStore = getAlertStore();
 const entitiesStore = getEntitiesStatusStore();
@@ -38,7 +39,7 @@ async function downloadExtract(url: string | undefined): Promise<ArrayBuffer> {
 	} catch (error) {
 		alertStore.setAlert({
 			variant: 'danger',
-			message: 'Error downloading extract file.',
+			message: m['error_downloading'](),
 		});
 	} finally {
 		return extractData;

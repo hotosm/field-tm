@@ -76,3 +76,7 @@
 .header .sign-out span {
 	--at-apply: font-barlow font-medium text-base;
 }
+
+.header.offline-bg-color {
+	background-color: var(--sl-color-primary-100);
+}

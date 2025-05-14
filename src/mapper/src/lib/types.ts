@@ -33,6 +33,77 @@ export interface APIProject {
 	use_odk_collect: boolean;
 }
 
+export interface DbProject {
+	id: number;
+	organisation_id?: number;
+	name?: string;
+	short_description?: string;
+	description?: string;
+	per_task_instructions?: string;
+	location_str?: string;
+	status: string; // e.g., 'DRAFT' | 'ACTIVE' | ...
+	total_tasks?: number;
+	odk_form_id?: string;
+	visibility: string; // e.g., 'PUBLIC' | 'PRIVATE'
+	mapper_level: string; // e.g., 'BEGINNER' | 'INTERMEDIATE'
+	priority?: string; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
+	featured?: boolean;
+	odk_token?: string;
+	data_extract_url?: string;
+	hashtags?: string[];
+	custom_tms_url?: string;
+	geo_restrict_force_error?: boolean;
+	geo_restrict_distance_meters?: number;
+	primary_geom_type?: string; // e.g., 'POLYGON'
+	new_geom_type?: string;
+	use_odk_collect?: boolean;
+	created_at: string; // ISO timestamp
+	updated_at?: string;
+
+	// API-calculated or client-side only fields
+	organisation_logo?: string;
+	outline?: any;
+	centroid?: any;
+	tasks?: ProjectTask[];
+	num_contributors?: number;
+	total_submissions?: number;
+}
+
+// This should match the frontend-only/schema.sql fields
+export const DB_PROJECT_COLUMNS = new Set([
+	'id',
+	'organisation_id',
+	'name',
+	'short_description',
+	'description',
+	'per_task_instructions',
+	'location_str',
+	'status',
+	'total_tasks',
+	'odk_form_id',
+	'visibility',
+	'mapper_level',
+	'priority',
+	'featured',
+	'odk_token',
+	'data_extract_url',
+	'hashtags',
+	'custom_tms_url',
+	'geo_restrict_force_error',
+	'geo_restrict_distance_meters',
+	'primary_geom_type',
+	'new_geom_type',
+	'use_odk_collect',
+	'created_at',
+	'updated_at',
+	'organisation_logo',
+	'outline',
+	'centroid',
+	'tasks',
+	'num_contributors',
+	'total_submissions',
+]);
+
 export interface ZoomToTaskEventDetail {
 	taskId: number;
 }

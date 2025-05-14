@@ -9,6 +9,7 @@
 -- sync the `outline` field of type Geometry (PGLite does not support
 -- PostGIS yet).
 
+-- Tables
 CREATE TABLE public.projects (
     id integer NOT NULL,
     organisation_id integer,
@@ -44,4 +45,14 @@ CREATE TABLE public.projects (
     tasks JSONB,
     num_contributors integer,
     total_submissions integer
+);
+
+-- Constraints
+ALTER TABLE ONLY public.projects
+ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
+
+-- Indexes (we do not index on geometry field, as no postgis)
+CREATE INDEX idx_projects_organisation_id
+ON public.projects USING btree (
+    organisation_id
 );

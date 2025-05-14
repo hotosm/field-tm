@@ -14,7 +14,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectT
       // Redirect to mapper frontend on mobile
       // (we hardcode mapper.xxx for now - open an issue if more flexibility is needed)
       const { protocol, hostname, port } = window.location;
-      window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/${data.id}`;
+      window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/project/${data.id}`;
     } else {
       // Else view project via manager frontend (desktop)
       navigate(`/project/${data.id}`);

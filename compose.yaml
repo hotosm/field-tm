@@ -214,6 +214,7 @@ services:
       - /app/.svelte-kit/
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
+      - TEST_PWA=${TEST_PWA:-false}
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
@@ -222,6 +223,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    command: >
+      sh -c "if [ \"$TEST_PWA\" = \"true\" ]; then pnpm run build && pnpm run preview; else pnpm run dev; fi"
 
   central:
     profiles: ["", "central"]
@@ -385,6 +388,7 @@ services:
   central-db:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    command: -c 'max_connections=300' -c 'wal_level=logical'
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:

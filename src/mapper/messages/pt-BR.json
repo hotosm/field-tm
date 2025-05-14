@@ -29,7 +29,10 @@
 		"exit_navigation": "Sair da navegação",
 		"click_on_a_task": "CLIQUE EM UM PONTO PARA INICIAR MAPEAMENTO",
 		"click_on_the_map": "Clique no mapa para criar um novo ponto",
-		"geometry_correct_place": "A geometria está no local correto?"
+		"geometry_correct_place": "A geometria está no local correto?",
+		"distance": "Distância",
+		"no_orientation_sensors": "Não é possível lidar com a orientação do dispositivo. Seu navegador não é compatível com sensores de orientação do dispositivo.",
+		"legend_features": "Legenda (Pontos)"
 	},
 	"popup": {
 		"task": "Tarefa",
@@ -54,9 +57,6 @@
 		"comment": "Comentário",
 		"instructions": "Instruções",
 		"activities": "Histórico de atividades"
-	},
-	"legend": {
-		"features": "Legenda (Pontos)"
 	},
 	"odk": {
 		"open": "Abrir ODK",
@@ -116,10 +116,8 @@
 	"index": {
 		"no_instructions": "Sem instruções"
 	},
-	"geolocation": {
-		"distance": "Distância"
-	},
 	"download": "BAIXAR",
+	"error_downloading": "Erro no download.",
 	"forms": {
 		"default_language_warning": "Exibindo o formulário no idioma padrão porque não há uma versão em português do formulário.",
 		"uploading": "carregando"
@@ -128,6 +126,8 @@
 		"features": "recursos",
 		"basemaps": "mapas base",
 		"store_features_offline": "armazenar recursos off-line",
-		"features_offline_info": "Extratos de recursos já armazenados offline"
+		"features_offline_info": "Extratos de recursos já armazenados offline",
+		"fetch_projects_offline": "Você está off-line e não pode buscar projetos extras",
+		"ready_offline": "Pronto para uso off-line."
 	}
 }

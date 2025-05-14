@@ -25,5 +25,5 @@ docker compose up -d
 - The UI runs behind the same Nginx proxy, under the domain:
 
 ```html
-https://mapper.fmtm.localhost:7050/{projectId}
+https://mapper.fmtm.localhost:7050/project/{projectId}
 ```

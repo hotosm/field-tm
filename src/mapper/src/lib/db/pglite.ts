@@ -12,7 +12,7 @@ import enums from '$migrations/init/shared/1-enums.sql?raw';
 import tables from '$migrations/init/shared/2-tables.sql?raw';
 import constraints from '$migrations/init/shared/3-constraints.sql?raw';
 import indexes from '$migrations/init/shared/4-indexes.sql?raw';
-import frontendOnlyTables from '$migrations/init/frontend-only/2-tables.sql?raw';
+import frontendOnlySchema from '$migrations/init/frontend-only/schema.sql?raw';
 
 // To prevent loading the PGLite database twice, we wrap the
 // initDb function in a top-level singleton that guarantees
@@ -140,6 +140,7 @@ const initDb = async (): Promise<PGlite> => {
 		extensions: {
 			electric: electricSync(),
 		},
+		// debug: 2,
 	});
 
 	await finalDb.exec(`
@@ -147,7 +148,7 @@ const initDb = async (): Promise<PGlite> => {
 		${tables}
 		${constraints}
 		${indexes}
-		${frontendOnlyTables}
+		${frontendOnlySchema}
 	`);
 
 	return finalDb;
