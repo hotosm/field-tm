@@ -4,10 +4,10 @@ import type { ShapeData } from '@electric-sql/client';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { LngLatLike } from 'svelte-maplibre';
 
-import type { DbEntity, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
+import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
 import { EntityStatusNameMap } from '$lib/types';
 import { getAlertStore } from './common.svelte';
-import { createLocalEntities, updateLocalEntityStatus } from '$lib/db/entities';
+import { DbEntity } from '$lib/db/entities';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,8 +36,8 @@ let newBadGeomUnsubscribe: (() => void) | null = $state(null);
 
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntityId: string | null = $state(null);
-let entitiesList: DbEntity[] = $state([]);
-let selectedEntity: DbEntity | null = $derived(
+let entitiesList: DbEntityType[] = $state([]);
+let selectedEntity: DbEntityType | null = $derived(
 	entitiesList.find((entity) => entity.entity_id === selectedEntityId) ?? null,
 );
 // Map each entity_id to the entity data, for faster lookup in map
@@ -83,8 +83,8 @@ function getEntitiesStatusStore() {
 		entitiesUnsubscribe = entitiesSync?.stream.subscribe(
 			async (entities: ShapeData[]) => {
 				// Create map for faster lookup
-				const rows: DbEntity[] = entities
-					.filter((item): item is { value: DbEntity } => 'value' in item && item.value !== null)
+				const rows: DbEntityType[] = entities
+					.filter((item): item is { value: DbEntityType } => 'value' in item && item.value !== null)
 					.map((item) => item.value);
 
 				// Map current list for faster lookups
@@ -97,7 +97,7 @@ function getEntitiesStatusStore() {
 					};
 					entityMapClone.set(entity.entity_id, updatedEntity);
 					// Store value in local db for persistence across restarts
-					await updateLocalEntityStatus(db, entity);
+					await DbEntity.update(db, entity);
 				}
 
 				// Set the reactive store var for updates
@@ -123,7 +123,7 @@ function getEntitiesStatusStore() {
 
 	async function getInitialEntities(db: PGliteWithSync, projectId: number) {
 		const dbEntities = await db.query(`SELECT * FROM odk_entities WHERE project_id = $1;`, [projectId]);
-		entitiesList = dbEntities.rows.map((entity: DbEntity) => ({
+		entitiesList = dbEntities.rows.map((entity: DbEntityType) => ({
 			entity_id: entity.entity_id,
 			status: entity.status,
 			project_id: projectId,
@@ -178,7 +178,7 @@ function getEntitiesStatusStore() {
 			{} as Record<entityStatusOptions, number>,
 		);
 
-		const taskEntityMap = entitiesList?.reduce((acc: Record<number, DbEntity[]>, item) => {
+		const taskEntityMap = entitiesList?.reduce((acc: Record<number, DbEntityType[]>, item) => {
 			if (!acc[item?.task_id]) {
 				acc[item.task_id] = [];
 			}
@@ -224,7 +224,7 @@ function getEntitiesStatusStore() {
 
 			const responseJson: entitiesApiResponse[] = await entityStatusResponse.json();
 			// Convert API response into our internal entity shape
-			const newEntitiesList: DbEntity[] = responseJson.map((entity: entitiesApiResponse) => ({
+			const newEntitiesList: DbEntityType[] = responseJson.map((entity: entitiesApiResponse) => ({
 				entity_id: entity.id,
 				status: EntityStatusNameMap[entity.status],
 				project_id: projectId,
@@ -239,7 +239,7 @@ function getEntitiesStatusStore() {
 
 			// Clear odk_entities table first in local db, then re-add data
 			await db.query(`DELETE FROM odk_entities WHERE project_id = $1;`, [projectId]);
-			await createLocalEntities(db, newEntitiesList);
+			await DbEntity.bulkCreate(db, newEntitiesList);
 			_calculateTaskSubmissionCounts();
 		} catch (error) {
 			syncEntityStatusManuallyLoading = false;
@@ -299,7 +299,7 @@ function getEntitiesStatusStore() {
 		userLocationCoord = coordinate;
 	}
 
-	function getEntityByOsmId(osmId: number): DbEntity | undefined {
+	function getEntityByOsmId(osmId: number): DbEntityType | undefined {
 		return entitiesList.find((entity) => entity.osm_id === osmId);
 	}
 

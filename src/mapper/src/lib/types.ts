@@ -33,40 +33,40 @@ export interface APIProject {
 	use_odk_collect: boolean;
 }
 
-export interface DbProject {
+export interface DbProjectType {
 	id: number;
-	organisation_id?: number;
-	name?: string;
-	short_description?: string;
-	description?: string;
-	per_task_instructions?: string;
-	location_str?: string;
+	organisation_id?: string | null;
+	name?: string | null;
+	short_description?: string | null;
+	description?: string | null;
+	per_task_instructions?: string | null;
+	location_str?: string | null;
 	status: string; // e.g., 'DRAFT' | 'ACTIVE' | ...
-	total_tasks?: number;
-	odk_form_id?: string;
+	total_tasks?: string | null;
+	odk_form_id?: string | null;
 	visibility: string; // e.g., 'PUBLIC' | 'PRIVATE'
 	mapper_level: string; // e.g., 'BEGINNER' | 'INTERMEDIATE'
-	priority?: string; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
-	featured?: boolean;
-	odk_token?: string;
-	data_extract_url?: string;
-	hashtags?: string[];
-	custom_tms_url?: string;
-	geo_restrict_force_error?: boolean;
-	geo_restrict_distance_meters?: number;
-	primary_geom_type?: string; // e.g., 'POLYGON'
-	new_geom_type?: string;
-	use_odk_collect?: boolean;
+	priority?: string | null; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
+	featured?: string | null;
+	odk_token?: string | null;
+	data_extract_url?: string | null;
+	hashtags?: string[] | null;
+	custom_tms_url?: string | null;
+	geo_restrict_force_error?: boolean | null;
+	geo_restrict_distance_meters?: number | null;
+	primary_geom_type?: string | null; // e.g., 'POLYGON'
+	new_geom_type?: string | null;
+	use_odk_collect?: boolean | null;
 	created_at: string; // ISO timestamp
-	updated_at?: string;
+	updated_at?: string | null;
 
 	// API-calculated or client-side only fields
-	organisation_logo?: string;
-	outline?: any;
-	centroid?: any;
-	tasks?: ProjectTask[];
-	num_contributors?: number;
-	total_submissions?: number;
+	organisation_logo?: string | null;
+	outline?: any | null;
+	centroid?: any | null;
+	tasks?: ProjectTask[] | null;
+	num_contributors?: number | null;
+	total_submissions?: number | null;
 }
 
 // This should match the frontend-only/schema.sql fields
@@ -168,22 +168,6 @@ export type TaskEventType = {
 	created_at: string;
 };
 
-export type projectType = {
-	id: number;
-	name: string;
-	short_description: string;
-	organisation_id?: number;
-	organisation_logo: string | null;
-	priority: number;
-	outline?: Polygon;
-	centroid?: Point;
-	location_str: string | null;
-	hashtags: string[];
-	total_tasks?: string;
-	num_contributors?: number;
-	total_submissions?: number;
-};
-
 export type paginationType = {
 	has_next: boolean;
 	has_prev: boolean;
@@ -226,7 +210,7 @@ export type entitiesApiResponse = {
 	submission_ids: string;
 };
 
-export type DbEntity = {
+export type DbEntityType = {
 	entity_id: string;
 	status: entityStatusOptions;
 	project_id: number;

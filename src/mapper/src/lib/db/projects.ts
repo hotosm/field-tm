@@ -1,16 +1,22 @@
 import { PGlite } from '@electric-sql/pglite';
-import type { projectType, DbProject } from '$lib/types';
+import type { DbProjectType } from '$lib/types';
 import { DB_PROJECT_COLUMNS } from '$lib/types';
 
-export async function fetchProjectFromLocalDB(db: PGlite, projectId: string): Promise<projectType | undefined> {
+async function all(db: PGlite): Promise<DbProjectType[] | null> {
+	if (!db) return null;
+
+	const query = await db.query(`SELECT * FROM projects;`);
+	return (query.rows as DbProjectType[]) ?? [];
+}
+
+async function one(db: PGlite, projectId: string): Promise<DbProjectType | undefined> {
 	if (!db) return;
 
 	const response = await db.query(`SELECT * FROM projects WHERE id = $1;`, [projectId]);
-	const localProject = response.rows.at(-1) ?? null;
-	return localProject;
+	return response.rows.at(-1) as DbProjectType | undefined;
 }
 
-export async function upsertLocalDbProjectData(db: PGlite, projectData: Partial<DbProject>): Promise<void> {
+async function upsert(db: PGlite, projectData: Partial<DbProjectType>): Promise<void> {
 	if (!db || !projectData || !projectData.id) return;
 
 	// Filter keys to only include those present in the actual DB schema
@@ -18,7 +24,7 @@ export async function upsertLocalDbProjectData(db: PGlite, projectData: Partial<
 	if (columns.length === 0) return;
 
 	const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
-	const values = columns.map((key) => projectData[key as keyof DbProject]);
+	const values = columns.map((key) => projectData[key as keyof DbProjectType]);
 
 	const updateClause = columns
 		.filter((col) => col !== 'id') // Don't update ID
@@ -33,3 +39,21 @@ export async function upsertLocalDbProjectData(db: PGlite, projectData: Partial<
 
 	await db.query(sql, values);
 }
+
+// This isn't super efficient, but as we only insert 12 at a time, it's not terrible
+// We want to do this instead of DELETE then bulk COPY, as we don't want to lose the
+// project data already loaded if the user went to a project details page.
+async function bulkUpsert(db: PGlite, projects: Partial<DbProjectType>[]): Promise<void> {
+	if (!db || !projects.length) return;
+
+	for (const project of projects) {
+		await DbProject.upsert(db, project);
+	}
+}
+
+export const DbProject = {
+	one,
+	all,
+	upsert,
+	bulkUpsert,
+};
