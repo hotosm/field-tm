@@ -8,7 +8,7 @@ wait_for_db() {
 
     for ((i = 0; i < max_retries; i++)); do
         if </dev/tcp/"${FMTM_DB_HOST:-fmtm-db}"/5432; then
-            echo "Database is available."
+            echo "✓ Database is available."
             return 0  # Database is available, exit successfully
         fi
         echo "Database is not yet available. Retrying in ${retry_interval} seconds..."
@@ -23,6 +23,9 @@ wait_for_s3() {
     max_retries=10
     retry_interval=5
 
+    # First wait a few seconds for Minio
+    sleep 5
+    echo "Testing S3 connection to ${S3_ENDPOINT}"
     for ((i = 0; i < max_retries; i++)); do
         http_status=$(curl --silent --head --write-out "%{http_code}" --output /dev/null "${S3_ENDPOINT}/minio/health/live")
 
