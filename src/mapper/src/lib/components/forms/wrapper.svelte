@@ -6,6 +6,7 @@
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { fetchBlobUrl, fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/device.ts';
+	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa.ts';
 	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
@@ -24,6 +25,7 @@
 	const entitiesStore = getEntitiesStatusStore();
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 	const selectedEntityCoordinate = $derived(entitiesStore.selectedEntityCoordinate);
+	const selectedEntityGeometry = $derived(entitiesStore.selectedEntityGeometry);
 
 	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, taskId }: Props = $props();
 	let drawerRef: SlDrawer;
@@ -171,10 +173,8 @@
 			}
 
 			if (selectedEntityCoordinate) {
-				const [longitude, latitude] = selectedEntityCoordinate.coordinate as unknown as [number, number];
-				nodes
-					.find((it: any) => it.definition.nodeset === '/data/xlocation')
-					?.setValueState(`${latitude} ${longitude} 0.0 0.0`);
+				const xlocation = geojsonGeomToJavarosa(selectedEntityGeometry.geometry);
+				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(xlocation);
 			}
 		}
 	}

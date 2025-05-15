@@ -204,9 +204,14 @@
 
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
 			// if clicked coordinate contains uploaded entity only
-			const entityCentroid = centroid(clickedEntityFeature[0].geometry);
+			const entityGeometry = clickedEntityFeature[0].geometry;
+			const entityCentroid = centroid(entityGeometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntityId(clickedEntityId);
+			entitiesStore.setSelectedEntityGeometry({
+				entityId: clickedEntityId,
+				geometry: entityGeometry,
+			});
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
 				coordinate: entityCentroid?.geometry?.coordinates,
