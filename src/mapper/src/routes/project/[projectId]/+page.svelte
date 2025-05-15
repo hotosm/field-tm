@@ -501,9 +501,11 @@
 			<sl-tab slot="nav" panel="offline">
 				<hot-icon name="wifi-off"></hot-icon>
 			</sl-tab>
-			<sl-tab slot="nav" panel="qrcode">
-				<hot-icon name="qr-code"></hot-icon>
-			</sl-tab>
+			{#if !commonStore.enableWebforms}
+				<sl-tab slot="nav" panel="qrcode">
+					<hot-icon name="qr-code"></hot-icon>
+				</sl-tab>
+			{/if}
 			<sl-tab slot="nav" panel="events">
 				<hot-icon name="three-dots"></hot-icon>
 			</sl-tab>
