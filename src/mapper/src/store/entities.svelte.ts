@@ -1,7 +1,7 @@
 import type { PGliteWithSync } from '@electric-sql/pglite-sync';
 import type { ShapeStream, FetchError } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, Geometry } from 'geojson';
 import type { LngLatLike } from 'svelte-maplibre';
 
 import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
@@ -14,6 +14,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 type entityIdCoordinateMapType = {
 	entityId: string;
 	coordinate: [number, number];
+};
+
+type entityIdGeometryMapType = {
+	entityId: string;
+	coordinate: Geometry;
 };
 
 type newBadGeomType<T> = {
@@ -48,6 +53,7 @@ let newGeomFeatcol: FeatureCollection = $state({ type: 'FeatureCollection', feat
 let syncEntityStatusManuallyLoading: boolean = $state(false);
 let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
+let selectedEntityGeometry: entityIdGeometryMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
 let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
@@ -353,6 +359,12 @@ function getEntitiesStatusStore() {
 		},
 		setSelectedEntityCoordinate(newEntityCoordinate: entityIdCoordinateMapType | null) {
 			selectedEntityCoordinate = newEntityCoordinate;
+		},
+		get selectedEntityGeometry() {
+			return selectedEntityGeometry;
+		},
+		setSelectedEntityGeometry(newEntityGeometry: entityIdGeometryMapType | null) {
+			selectedEntityGeometry = newEntityGeometry;
 		},
 		get entityToNavigate() {
 			return entityToNavigate;
