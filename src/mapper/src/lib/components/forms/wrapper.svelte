@@ -5,6 +5,7 @@
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { fetchBlobUrl, fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
+	import { getDeviceId } from '$lib/utils/device.ts';
 	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
@@ -74,6 +75,8 @@
 				// add 0.0 for altitude and 10.0 for accuracy as defaults
 				submission_xml = submission_xml.replace('<warmup/>', `<warmup>${latitude} ${longitude} 0.0 0.0</warmup>`);
 			}
+
+			submission_xml = submission_xml.replace('<deviceid/>', `<deviceid>${getDeviceId()}</deviceid>`);
 
 			const url = `${API_URL}/submission?project_id=${projectId}`;
 			var data = new FormData();
