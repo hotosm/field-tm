@@ -275,7 +275,7 @@ async def set_odk_entities_mapping_status(
     entity_details must be a JSON body with params:
     {
         "entity_id": "string",
-        "label": "Task <TASK_ID> Feature <FEATURE_ID>",
+        "label": "Feature <FEATURE_ID>",
         "status": 0
     }
     """

@@ -71,3 +71,26 @@ export async function writeBinaryToOPFS(filePath: string, data: Blob | BufferSou
 	await writable.close();
 	console.log(`Finished write to OPFS file: ${filePath}`);
 }
+
+export async function clearAllOPFS(): Promise<void> {
+	console.warn('🧨 Clearing all OPFS storage...');
+
+	const opfsRoot = await navigator.storage.getDirectory();
+
+	// Recursively delete everything in a given directory
+	async function deleteRecursively(dir: FileSystemDirectoryHandle): Promise<void> {
+		for await (const [name, handle] of dir.entries()) {
+			if (handle.kind === 'file') {
+				await dir.removeEntry(name);
+				console.log(`🗑️ Deleted file: ${name}`);
+			} else if (handle.kind === 'directory') {
+				await deleteRecursively(handle);
+				await dir.removeEntry(name, { recursive: true });
+				console.log(`🗑️ Deleted directory: ${name}`);
+			}
+		}
+	}
+
+	await deleteRecursively(opfsRoot);
+	console.log('✅ OPFS cleared.');
+}

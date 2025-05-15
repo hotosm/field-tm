@@ -445,7 +445,7 @@ async def test_set_entity_mapping_status(client, odk_project, entities):
         json={
             "entity_id": entity["id"],
             "status": new_status,
-            "label": f"Task {entity['task_id']} Feature {entity['osm_id']}",
+            "label": f"Feature {entity['osm_id']}",
         },
     )
     response_entity = response.json()
@@ -647,8 +647,10 @@ async def test_create_entity(client, db, project, odk_project, tasks):
     }
     project_task_index_list = [task.project_task_index for task in tasks]
 
+    entity_uuid = uuid4()
     response = await client.post(
-        f"central/entity?project_id={project.id}", json=geojson
+        f"central/entity?project_id={project.id}&entity_uuid={entity_uuid}",
+        json=geojson,
     )
     assert response.status_code == 200
     data = response.json()

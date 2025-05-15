@@ -1,0 +1,90 @@
+import type { PGlite } from '@electric-sql/pglite';
+import type { DbApiSubmissionType } from '$lib/types.ts';
+
+async function create(
+	db: PGlite,
+	data: {
+		url: string;
+		method: DbApiSubmissionType['method'];
+		content_type?: DbApiSubmissionType['content_type'];
+		payload?: any;
+		headers?: Record<string, string> | null;
+	},
+): Promise<DbApiSubmissionType | undefined> {
+	if (!db) return;
+
+	const {
+		url,
+		method,
+		content_type = 'application/json', // default
+		payload = null,
+		headers = null,
+	} = data;
+
+	const result = await db.query(
+		`INSERT INTO api_submissions
+			(url, method, content_type, payload, headers, status, retry_count, error, queued_at)
+		 VALUES
+			($1, $2, $3, $4, $5, 'PENDING', 0, NULL, now())
+		 RETURNING *`,
+		[url, method, content_type, payload, headers],
+	);
+
+	return result.rows.at(-1) as DbApiSubmissionType | undefined;
+}
+
+async function count(db: PGlite): Promise<number> {
+	if (!db) return 0;
+
+	const dbData = await db.query(`SELECT COUNT(*) as count FROM api_submissions WHERE status = 'PENDING'`);
+	const countStr = dbData.rows.at(-1)?.count;
+	return countStr ? Number(countStr) : 0;
+}
+
+async function next(db: PGlite): Promise<DbApiSubmissionType | undefined> {
+	if (!db) return;
+
+	// NOTE we allow 2 retries when calling the API
+	const dbData = await db.query<DbApiSubmissionType>(
+		`SELECT * FROM api_submissions
+		 WHERE status = 'PENDING' OR (status = 'FAILED' AND retry_count < 2)
+		 ORDER BY queued_at ASC
+		 LIMIT 1`,
+	);
+	return dbData.rows.at(-1) as DbApiSubmissionType | undefined;
+}
+
+async function update(
+	db: PGlite,
+	id: number,
+	status: 'RECEIVED' | 'PENDING' | 'FAILED',
+	error: string | null = null,
+): Promise<void> {
+	if (!db) return;
+
+	await db.query(
+		`UPDATE api_submissions
+		 SET
+			status = $1,
+			error = $2,
+			last_attempt_at = now(),
+			success_at = CASE WHEN $3 = 'RECEIVED' THEN now() ELSE NULL END,
+			retry_count = CASE WHEN $4 = 'FAILED' THEN retry_count + 1 ELSE retry_count END
+		 WHERE id = $5`,
+		// We have to send status as multiple vars, else type inference throws errors
+		[status, error, status, status, id],
+	);
+}
+
+async function clear(db: PGlite): Promise<void> {
+	if (!db) return;
+	await db.query(`DELETE FROM api_submissions;`);
+}
+
+export const DbApiSubmission = {
+	create,
+	update,
+	count,
+	next,
+	clear,
+};

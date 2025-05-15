@@ -126,7 +126,7 @@ async def reset_entities_status(db, project_id, filter_date):
             project.odk_credentials,
             project.odkid,
             entity["id"],
-            f"Task {entity['task_id']} Feature {entity['osm_id']}",
+            f"Feature {entity['osm_id']}",
             str(EntityState.READY),
         )
 
