@@ -10,7 +10,8 @@ export async function fetchCachedBlobUrl(url: string, cacheName: string): Promis
 		return URL.createObjectURL(blob);
 	} else {
 		const response = await fetch(url);
-		cacheStorage.put(url, response);
+		// clone the response stream as it can only be consumed again
+		cacheStorage.put(url, response.clone());
 		const blob = await response.blob();
 		return URL.createObjectURL(blob);
 	}
