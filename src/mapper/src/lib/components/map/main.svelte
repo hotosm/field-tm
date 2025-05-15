@@ -64,7 +64,8 @@
 		primaryGeomType: MapGeomTypes;
 		draw?: boolean;
 		drawGeomType: MapGeomTypes;
-		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void) | null;
+		syncButtonTrigger: (() => void);
+		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void);
 	}
 
 	let {
@@ -76,6 +77,7 @@
 		primaryGeomType,
 		draw = false,
 		drawGeomType,
+		syncButtonTrigger,
 		handleDrawnGeom,
 	}: Props = $props();
 
@@ -424,21 +426,27 @@
 		</ControlGroup></Control
 	>
 	<Control class="control" position="bottom-right">
+		{#if commonStore.offlineSyncPercentComplete}
+			<div class="offline-sync-percent">{commonStore.offlineSyncPercentComplete}%</div>
+		{/if}
 		<div class="content">
 			<sl-icon-button
 				name="arrow-repeat"
-				label="Settings"
-				disabled={entitiesStore.syncEntityStatusManuallyLoading}
-				class={`sync-button ${entitiesStore.syncEntityStatusManuallyLoading && 'animate-spin'}`}
-				onclick={async () => await entitiesStore.syncEntityStatusManually(db, projectId)}
+				label="Sync"
+				disabled={entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing}
+				class={`sync-button ${
+					(entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing) && 'animate-spin'
+				}`}
+				onclick={async () => syncButtonTrigger()}
 				onkeydown={async (e: KeyboardEvent) => {
-					e.key === 'Enter' && (await entitiesStore.syncEntityStatusManually(db, projectId));
+					e.key === 'Enter' && (syncButtonTrigger());
 				}}
 				role="button"
 				tabindex="0"
 			></sl-icon-button>
 		</div>
 		<div
+			class="layer-switcher"
 			aria-label="layer switcher"
 			onclick={() => {
 				selectedControl = 'layer-switcher';

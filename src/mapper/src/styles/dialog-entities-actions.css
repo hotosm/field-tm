@@ -121,7 +121,7 @@
 	--at-apply: flex items-start flex-col;
 }
 
-.entity-dialog-youare {
+.entity-dialog-distance-confirm {
 	--at-apply: text-base mb-5 text-neutral-700;
 }
 

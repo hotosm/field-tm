@@ -18,6 +18,7 @@
 
 """ODK Central dependency wrappers."""
 
+from asyncio import get_running_loop
 from contextlib import asynccontextmanager
 from io import BytesIO
 from pathlib import Path
@@ -26,9 +27,33 @@ from typing import Optional
 from fastapi import UploadFile
 from fastapi.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
+from pyodk._utils.config import CentralConfig
+from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentralDecrypted
 from app.db.enums import HTTPStatus
+
+
+@asynccontextmanager
+async def pyodk_client(odk_creds: ODKCentralDecrypted):
+    """Async-compatible context manager for pyodk.Client.
+
+    Offloads blocking Client(...) and client.__exit__ to a separate thread,
+    and avoids blocking the async event loop in the endpoint.
+    """
+    pyodk_config = CentralConfig(
+        base_url=odk_creds.odk_central_url,
+        username=odk_creds.odk_central_user,
+        password=odk_creds.odk_central_password,
+    )
+
+    loop = get_running_loop()
+    client = await loop.run_in_executor(None, Client, pyodk_config)
+
+    try:
+        yield client
+    finally:
+        await loop.run_in_executor(None, client.__exit__, None, None, None)
 
 
 @asynccontextmanager

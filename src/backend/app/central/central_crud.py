@@ -25,7 +25,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional, Union
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import geojson
 from fastapi import HTTPException
@@ -33,8 +33,7 @@ from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import Connection
-from pyodk._utils.config import CentralConfig
-from pyodk.client import Client
+from pyodk._endpoints.entities import Entity
 from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
@@ -520,9 +519,8 @@ async def feature_geojson_to_entity_dict(
         entity_label = f"Additional Feature {uuid4()}"
     else:
         properties["status"] = "0"
-        task_id = properties.get("task_id", None)
         feature_id = feature.get("id", None)
-        entity_label = f"Task {task_id} Feature {feature_id}"
+        entity_label = f"Feature {feature_id}"
 
     return {
         "label": entity_label,
@@ -586,11 +584,12 @@ async def create_entity_list(
 
 async def create_entity(
     odk_creds: central_schemas.ODKCentralDecrypted,
+    entity_uuid: UUID,
     odk_id: int,
     properties: list[str],
     entity: central_schemas.EntityDict,
     dataset_name: str = "features",
-) -> dict:
+) -> Entity:
     """Create a new Entity in ODK."""
     log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
     try:
@@ -603,8 +602,15 @@ async def create_entity(
             log.error("Missing required entity fields: 'label' or 'data'")
             raise ValueError("Entity must contain 'label' and 'data' fields")
 
-        async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-            response = await odk_central.createEntity(odk_id, dataset_name, label, data)
+        async with central_deps.pyodk_client(odk_creds) as client:
+            response = client.entities.create(
+                label=label,
+                data=data,
+                entity_list_name=dataset_name,
+                project_id=odk_id,
+                uuid=str(entity_uuid),  # pyodk only accepts string UUID
+            )
+
         log.info(f"Entity '{label}' successfully created in ODK")
         return response
 
@@ -766,7 +772,7 @@ async def get_entities_data(
 
 
 def entity_to_flat_dict(
-    entity: Optional[dict],
+    entity: dict,
     odk_id: int,
     entity_uuid: str,
     dataset_name: str = "features",
@@ -781,8 +787,11 @@ def entity_to_flat_dict(
             ),
         )
 
-    # Remove dataReceived prior to flatten to avoid conflict with currentVersion
-    entity.get("currentVersion", {}).pop("dataReceived")
+    # Remove dataReceived if present to avoid conflict with currentVersion
+    current_version = entity.get("currentVersion")
+    if isinstance(current_version, dict):
+        current_version.pop("dataReceived", None)
+
     flattened_dict = {}
     flatten_json(entity, flattened_dict)
 
@@ -844,17 +853,20 @@ async def update_entity_mapping_status(
     Returns:
         dict: All Entity data in OData JSON format.
     """
-    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-        entity = await odk_central.updateEntity(
-            odk_id,
-            dataset_name,
+    async with central_deps.pyodk_client(odk_creds) as client:
+        updated_entity = client.entities.update(
             entity_uuid,
+            entity_list_name=dataset_name,
+            project_id=odk_id,
             label=label,
             data={
                 "status": status,
             },
+            # We don't know the current entity version, so we need this
+            force=True,
         )
-    return entity_to_flat_dict(entity, odk_id, entity_uuid, dataset_name)
+        entity_dict = updated_entity.model_dump()
+    return entity_to_flat_dict(entity_dict, odk_id, entity_uuid, dataset_name)
 
 
 # FIXME replace osm_fieldwork.CSVDump with osm_fieldwork.ODKParsers
@@ -988,12 +1000,7 @@ async def upload_form_media(
                 temp_file.write(file_data.getvalue())
             attachment_filepaths.append(temp_path)
 
-        pyodk_config = CentralConfig(
-            base_url=odk_credentials.odk_central_url,
-            username=odk_credentials.odk_central_user,
-            password=odk_credentials.odk_central_password,
-        )
-        with Client(pyodk_config) as client:
+        async with central_deps.pyodk_client(odk_credentials) as client:
             return client.forms.update(
                 project_id=project_odk_id,
                 form_id=xform_id,

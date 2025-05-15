@@ -28,14 +28,12 @@ from fastapi import HTTPException, Response
 from loguru import logger as log
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission
-from pyodk._utils.config import CentralConfig
-from pyodk.client import Client
 
 from app.central import central_schemas
 from app.central.central_crud import (
     get_odk_form,
 )
-from app.central.central_deps import get_async_odk_form
+from app.central.central_deps import get_async_odk_form, pyodk_client
 
 # from osm_fieldwork.json2osm import json2osm
 from app.config import settings
@@ -228,12 +226,7 @@ async def create_new_submission(
                 temp_file.write(file_data.getvalue())
             attachment_filepaths.append(temp_path)
 
-        pyodk_config = CentralConfig(
-            base_url=odk_credentials.odk_central_url,
-            username=odk_credentials.odk_central_user,
-            password=odk_credentials.odk_central_password,
-        )
-        with Client(pyodk_config) as client:
+        async with pyodk_client(odk_credentials) as client:
             return client.submissions.create(
                 project_id=odk_project_id,
                 form_id=odk_form_id,

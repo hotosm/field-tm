@@ -19,6 +19,7 @@
 
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional, Self, TypedDict
 
 from geojson_pydantic import Feature, FeatureCollection
@@ -254,14 +255,19 @@ class EntityTaskID(BaseModel):
 class EntityMappingStatus(EntityOsmID, EntityTaskID):
     """The status for mapping an Entity/feature."""
 
-    updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
+    updatedAt: Optional[str | datetime] = Field(exclude=True)  # noqa: N815
     status: Optional[EntityState] = None
     submission_ids: Optional[str] = None
 
     @computed_field
     @property
-    def updated_at(self) -> Optional[str]:
+    def updated_at(self) -> Optional[str | datetime]:
         """Convert updatedAt field to updated_at."""
+        if isinstance(self.updatedAt, datetime):
+            # In format 2022-01-31T23:59:59.999Z
+            return self.updatedAt.isoformat(timespec="milliseconds").replace(
+                "+00:00", "Z"
+            )
         return self.updatedAt
 
 

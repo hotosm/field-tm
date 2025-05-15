@@ -47,9 +47,60 @@ CREATE TABLE public.projects (
     total_submissions integer
 );
 
+CREATE TABLE public.api_submissions (
+    id integer NOT NULL,
+    url character varying NOT NULL,
+    method character varying DEFAULT 'POST' CHECK (
+        method IN (
+            'HEAD',
+            'GET',
+            'POST',
+            'PATCH',
+            'PUT',
+            'DELETE'
+        )
+    ),
+    content_type character varying DEFAULT 'application/json' CHECK (
+        content_type IN (
+            'application/json',
+            'multipart/form-data',
+            'application/xml',
+            'text/plain'
+        )
+    ),
+    payload JSONB,
+    headers JSONB,
+    status character varying DEFAULT 'PENDING' CHECK (
+        status IN ('PENDING', 'RECEIVED', 'FAILED')
+    ),
+    retry_count integer DEFAULT 0,
+    error character varying,
+    queued_at timestamp with time zone DEFAULT now(),
+    last_attempt_at timestamp with time zone,
+    success_at timestamp with time zone
+);
+-- As we don't copy data in, need to autoincrement the id
+CREATE SEQUENCE public.api_submissions_seq
+AS integer
+START WITH 1
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+CACHE 1;
+ALTER TABLE public.api_submissions_seq OWNER TO fmtm;
+ALTER SEQUENCE public.api_submissions_seq OWNED BY public.api_submissions.id;
+-- Autoincrement PK
+ALTER TABLE ONLY public.api_submissions ALTER COLUMN id SET DEFAULT nextval(
+    'public.api_submissions_seq'::regclass
+);
+
+
 -- Constraints
 ALTER TABLE ONLY public.projects
 ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.api_submissions
+ADD CONSTRAINT api_submissions_pkey PRIMARY KEY (id);
 
 -- Indexes (we do not index on geometry field, as no postgis)
 CREATE INDEX idx_projects_organisation_id

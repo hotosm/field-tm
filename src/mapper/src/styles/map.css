@@ -15,6 +15,10 @@
 		border-solid border-primary-600 bg-primary-50;
 }
 
+.map .control .offline-sync-percent {
+	--at-apply: flex items-center justify-center border-1 border-solid border-primary-600 bg-white text-primary-600;
+}
+
 .map .control .sync-button {
 	--at-apply: text-[1.25rem] rotate-90 text-primary-600 bg-white;
 }
@@ -26,6 +30,10 @@
 
 .map .control .toggle-legend {
 	--at-apply: group text-nowrap cursor-pointer;
+}
+
+.map .control .layer-switcher {
+	--at-apply: cursor-pointer;
 }
 
 .map .control .toggle-legend .icon {

@@ -2,6 +2,7 @@ import 'virtual:uno.css';
 import type { LayoutLoad } from './$types';
 
 import { getDbOnce } from '$lib/db/pglite';
+import { clearAllDevCaches } from '$lib/utils/dev-reset';
 
 // NOTE we can't prerender as we are using dynamic routing [projectId]
 export const prerender = false;
@@ -22,6 +23,11 @@ export const load: LayoutLoad = async ({ fetch }) => {
 		console.warn('Falling back to local config:', error);
 		const localResponse = await fetch('/config.json');
 		config = await localResponse.json();
+	}
+
+	if (import.meta.env.DEV) {
+		// We need this because we have pretty aggressive caching for offline mode
+		await clearAllDevCaches();
 	}
 
 	return {

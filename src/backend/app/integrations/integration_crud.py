@@ -130,8 +130,7 @@ async def update_entity_status_in_fmtm(
 #         log.debug(f"Submission ({odk_event.id}) reviewed and marked 'approved'")
 #         return Response(status_code=HTTPStatus.OK)
 
-#     new_entity_label = f"Task {odk_event.data.get("task_id")} "
-#     new_entity_label += f"Feature {odk_event.data.get("osm_id")}"
+#     new_entity_label = f"Feature {odk_event.data.get("osm_id")}"
 
 #     # We parse as EntityMappingStatusIn to ensure the status
 #     # emoji is appended to the label

@@ -218,3 +218,18 @@ export type DbEntityType = {
 	osm_id: number;
 	submission_ids: string;
 };
+
+export type DbApiSubmissionType = {
+	id: number;
+	url: string;
+	method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'HEAD';
+	content_type: 'application/json' | 'multipart/form-data' | 'application/xml' | 'text/plain';
+	payload: any; // JSONB in Postgres maps to any
+	headers: Record<string, string> | null;
+	status: 'PENDING' | 'RECEIVED' | 'FAILED';
+	retry_count: number;
+	error: string | null;
+	queued_at: string; // or Date if you parse it
+	last_attempt_at: string | null;
+	success_at: string | null;
+};

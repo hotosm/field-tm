@@ -20,6 +20,7 @@
 import json
 from io import BytesIO
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.concurrency import run_in_threadpool
@@ -29,6 +30,7 @@ from loguru import logger as log
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 from psycopg.rows import dict_row
+from pyodk._endpoints.entities import Entity
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -312,12 +314,13 @@ async def get_form_media(
 async def add_new_entity(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
+    entity_uuid: UUID,
     geojson: FeatureCollection,
-) -> dict:
+) -> Entity:
     """Create an Entity for the project in ODK.
 
     NOTE a FeatureCollection must be uploaded.
-    Returns the entity details response from Central, including 'uuid' field.
+    NOTE response time is reasonably slow ~500ms due to Central round trip.
     """
     try:
         project = project_user_dict.get("project")
@@ -368,13 +371,14 @@ async def add_new_entity(
         # Create entity in ODK
         new_entity = await central_crud.create_entity(
             project_odk_creds,
+            entity_uuid,
             project_odk_id,
             properties=list(featcol["features"][0]["properties"].keys()),
             entity=entities_list[0],
             dataset_name="features",
         )
 
-        # Sync ODK entities in our database
+        # Sync ODK entities from Central --> FieldTM database (trigger electric sync)
         project_entities = await central_crud.get_entities_data(
             project_odk_creds, project_odk_id
         )

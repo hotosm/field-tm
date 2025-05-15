@@ -113,7 +113,7 @@
 				entity_id: selectedEntity?.entity_id,
 				status: entityStatus,
 				// NOTE here we don't translate the field as English values are always saved as the Entity label
-				label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osm_id}`,
+				label: `Feature ${selectedEntity?.osm_id}`,
 			});
 
 			display = false;
