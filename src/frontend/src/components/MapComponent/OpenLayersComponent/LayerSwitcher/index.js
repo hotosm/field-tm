@@ -40,15 +40,9 @@ const bingMaps = (visible) =>
     visible: visible === 'satellite',
     source: new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      minZoom: 0,
+      maxZoom: 18, // still only request tiles up to 18
     }),
-    // source: new BingMaps({
-    //   key: 'AoTlmaazzog43ImdKts9HVztFzUI4PEOT0lmo2V4q7f20rfVorJGAgDREKmfQAgd',
-    //   imagerySet: 'Aerial',
-    //   // use maxZoom 19 to see stretched tiles instead of the BingMaps
-    //   // "no photos at this zoom level" tiles
-    //   maxZoom: 19,
-    //   crossOrigin: 'Anonymous',
-    // }),
   });
 
 const mapboxMap = (visible) =>
