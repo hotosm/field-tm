@@ -37,7 +37,7 @@ let config: ConfigJson | null = $state(null);
 let useOdkCollectOverride: boolean = $state(false);
 let enableWebforms = $derived<boolean>(!useOdkCollectOverride && config?.enableWebforms ? true : false);
 let offlineDataIsSyncing: boolean = $state(false);
-let offlineSyncPercentComplete: number | null = $state(10);
+let offlineSyncPercentComplete: number | null = $state(null);
 
 function getCommonStore() {
 	function getLocaleFromStorage() {

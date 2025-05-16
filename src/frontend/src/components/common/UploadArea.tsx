@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import AssetModules from '@/shared/AssetModules';
 import { useAppDispatch } from '@/types/reduxTypes';
@@ -50,7 +49,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
     if (!files) return;
     const fileList = Object.values(files).map((fileItem) => {
       const file = fileItem;
-      const id = uuidv4();
+      const id = crypto.randomUUID();
       return { id, file: file, previewURL: URL.createObjectURL(file) };
     });
     onUploadFile(fileList, fileInputRef);
@@ -89,11 +88,11 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
               const file = item;
               const fileType = file.name.split('.')?.pop();
               if (acceptedInput === 'all') {
-                const id = uuidv4();
+                const id = crypto.randomUUID();
                 return fileList.push({ id, file, previewURL: URL.createObjectURL(file) });
               }
               if (fileType && acceptedInput.includes(fileType)) {
-                const id = uuidv4();
+                const id = crypto.randomUUID();
                 return fileList.push({ id, file, previewURL: URL.createObjectURL(file) });
               }
               dispatch(

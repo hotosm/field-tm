@@ -269,7 +269,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
 
 
 def get_project_form_xml(
-    odk_creds: central_schemas.ODKCentralDecrypted, odkid: str, odk_form_id: str
+    odk_creds: central_schemas.ODKCentralDecrypted, odkid: int, odk_form_id: str
 ) -> str:
     """Get the XForm from ODK Central as raw XML."""
     xform = get_odk_form(odk_creds)
@@ -619,6 +619,28 @@ async def create_entity(
         raise
 
 
+async def delete_entity(
+    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_id: int,
+    entity_uuid: UUID,
+    dataset_name: str = "features",
+) -> bool:
+    """Delete an Entity in ODK."""
+    log.info(f"Deleting ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
+    try:
+        async with central_deps.pyodk_client(odk_creds) as client:
+            client.entities.delete(
+                uuid=str(entity_uuid),
+                entity_list_name=dataset_name,
+                project_id=odk_id,
+            )
+        log.info(f"Entity {entity_uuid} successfully deleted from ODK")
+
+    except Exception as e:
+        log.exception(f"Failed to delete entity {entity_uuid} in ODK: {str(e)}")
+        raise
+
+
 async def get_entities_geojson(
     odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
@@ -716,7 +738,9 @@ async def get_entities_data(
     odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str = "features",
-    fields: str = "__system/updatedAt, osm_id, status, task_id, submission_ids",
+    fields: str = (
+        "__system/updatedAt, osm_id, status, task_id, submission_ids, is_new, geometry"
+    ),
     filter_date: Optional[datetime] = None,
 ) -> list:
     """Get all the entity mapping statuses.

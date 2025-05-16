@@ -35,7 +35,6 @@ from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
     BackgroundTaskStatus,
-    GeomStatus,
     ProjectPriority,
     ProjectVisibility,
 )
@@ -47,31 +46,6 @@ from app.db.models import (
     slugify,
 )
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
-
-
-class GeometryLogIn(BaseModel):
-    """Geometry log insert."""
-
-    id: Optional[UUID] = None
-    status: GeomStatus
-    geojson: dict
-    project_id: Optional[int] = None
-    task_id: Optional[int] = None
-
-    @field_validator("geojson", mode="before")
-    @classmethod
-    def parse_input_geometry(
-        cls,
-        value: FeatureCollection | Feature | MultiPolygon | Polygon,
-    ) -> Optional[dict]:
-        """Parse any format geojson into featurecollection.
-
-        Return geometry only.
-        """
-        if value is None:
-            return None
-        featcol = geojson_to_featcol(value)
-        return featcol.get("features")[0]
 
 
 class ProjectInBase(DbProject):

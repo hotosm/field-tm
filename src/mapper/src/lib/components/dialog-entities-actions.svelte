@@ -31,6 +31,7 @@
 	const alertStore = getAlertStore();
 	const commonStore = getCommonStore();
 	const taskStore = getTaskStore();
+	const { db } = commonStore;
 
 	let dialogRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
@@ -61,7 +62,7 @@
 		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 		if (isMobile) {
 			if (selectedEntity?.status === 'READY') {
-				entitiesStore.updateEntityStatus(projectData.id, {
+				entitiesStore.updateEntityStatus(db, projectData.id, {
 					entity_id: entityUuid,
 					status: 1,
 					// NOTE here we don't translate the field as English values are always saved as the Entity label
@@ -266,7 +267,7 @@
 								size="small"
 								onclick={() => {
 									toggleTaskActionModal(false);
-									entitiesStore.updateEntityStatus(projectData.id, {
+									entitiesStore.updateEntityStatus(db, projectData.id, {
 										entity_id: selectedEntity?.entity_id,
 										status: 1,
 										// NOTE here we don't translate the field as English values are always saved as the Entity label
@@ -277,7 +278,7 @@
 								onkeydown={(e: KeyboardEvent) => {
 									if (e.key === 'Enter') {
 										toggleTaskActionModal(false);
-										entitiesStore.updateEntityStatus(projectData.id, {
+										entitiesStore.updateEntityStatus(db, projectData.id, {
 											entity_id: selectedEntity?.entity_id,
 											status: 1,
 											// NOTE here we don't translate the field as English values are always saved as the Entity label

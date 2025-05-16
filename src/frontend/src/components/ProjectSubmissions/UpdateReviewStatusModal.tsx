@@ -3,13 +3,12 @@ import Mentions from 'rc-mentions';
 import { Modal } from '@/components/common/Modal';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
-import { DeleteGeometry, PostGeometry, UpdateReviewStateService } from '@/api/SubmissionService';
+import { UpdateReviewStateService } from '@/api/SubmissionService';
 import Button from '@/components/common/Button';
-import { GetGeometryLog, PostProjectComments, UpdateEntityState } from '@/api/Project';
+import { PostProjectComments, UpdateEntityState } from '@/api/Project';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
-import { featureType } from '@/store/types/ISubmissions';
 import '@/styles/rc-mentions.css';
 import { GetUserNames } from '@/api/User';
 import { UserActions } from '@/store/slices/UserSlice';
@@ -25,7 +24,6 @@ const initialReviewState = {
   taskUid: null,
   entity_id: null,
   label: null,
-  feature: null,
 };
 
 // Note these id values must be camelCase to match what ODK Central requires
@@ -54,7 +52,6 @@ const UpdateReviewStatusModal = () => {
 
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
   const updateReviewStateLoading = useAppSelector((state) => state.submission.updateReviewStateLoading);
-  const badGeomLogList = useAppSelector((state) => state.project.badGeomLogList);
   const userNames = useAppSelector((state) => state.user.userNames);
   const getUserNamesLoading = useAppSelector((state) => state.user.getUserNamesLoading);
 
@@ -81,11 +78,6 @@ const UpdateReviewStatusModal = () => {
     setReviewStatus(updateReviewStatusModal.reviewState);
   }, [updateReviewStatusModal.reviewState]);
 
-  useEffect(() => {
-    if (!updateReviewStatusModal.projectId) return;
-    dispatch(GetGeometryLog(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`));
-  }, [updateReviewStatusModal.projectId]);
-
   const handleStatusUpdate = async () => {
     if (
       !updateReviewStatusModal.instanceId ||
@@ -107,41 +99,6 @@ const UpdateReviewStatusModal = () => {
           },
         ),
       );
-
-      // post bad geometry if submission is marked as hasIssues
-      if (reviewStatus === 'hasIssues') {
-        const badFeature = {
-          ...(updateReviewStatusModal.feature as featureType),
-          properties: {
-            entity_id: updateReviewStatusModal.entity_id,
-            task_id: updateReviewStatusModal.taskUid,
-            instance_id: updateReviewStatusModal.instanceId,
-          },
-        };
-
-        dispatch(
-          PostGeometry(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`, {
-            status: 'BAD',
-            geojson: badFeature,
-            project_id: updateReviewStatusModal.projectId,
-            task_id: +updateReviewStatusModal.taskUid,
-          }),
-        );
-      }
-
-      // delete bad geometry if the entity previously has rejected submission and current submission is marked as approved
-      if (reviewStatus === 'approved') {
-        const badGeomId = badGeomLogList.find(
-          (geom) => geom.geojson.properties.entity_id === updateReviewStatusModal.entity_id,
-        )?.id;
-        if (badGeomId) {
-          dispatch(
-            DeleteGeometry(
-              `${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records/${badGeomId}`,
-            ),
-          );
-        }
-      }
 
       dispatch(
         UpdateEntityState(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/entity/status`, {

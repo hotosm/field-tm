@@ -28,22 +28,6 @@ export type reviewListType = {
 export type formSubmissionType = { date: string; count: number; label: string };
 export type validatedMappedType = { date: string; Validated: number; Mapped: number; label: string };
 
-type featureType = {
-  type: 'Feature';
-  geometry: Partial<{
-    type: string;
-    coordinates: any[];
-  }>;
-  properties: Record<string, any>;
-};
-
-export type geometryLogType = {
-  status: 'NEW' | 'BAD';
-  geojson: featureType;
-  project_id: number;
-  task_id: number;
-};
-
 export type updateReviewStateType = {
   instanceId: string;
   submitterId: number;

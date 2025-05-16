@@ -37,8 +37,8 @@ async function count(db: PGlite): Promise<number> {
 	if (!db) return 0;
 
 	const dbData = await db.query(`SELECT COUNT(*) as count FROM api_submissions WHERE status = 'PENDING'`);
-	const countStr = dbData.rows.at(-1)?.count;
-	return countStr ? Number(countStr) : 0;
+	const row = dbData.rows.at(-1) as { count: number } | undefined;
+	return row?.count ?? 0;
 }
 
 async function next(db: PGlite): Promise<DbApiSubmissionType | undefined> {
@@ -76,6 +76,11 @@ async function update(
 	);
 }
 
+async function deleteById(db: PGlite, id: number): Promise<void> {
+	if (!db) return;
+	await db.query(`DELETE FROM api_submissions WHERE id = $1;`, [id]);
+}
+
 async function clear(db: PGlite): Promise<void> {
 	if (!db) return;
 	await db.query(`DELETE FROM api_submissions;`);
@@ -86,5 +91,6 @@ export const DbApiSubmission = {
 	update,
 	count,
 	next,
+	deleteById,
 	clear,
 };

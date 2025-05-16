@@ -332,6 +332,7 @@ def add_required_geojson_properties(
                 or properties.get("fid")  # fid is typical from tools like QGIS
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
+                # 0 to 1073741823
                 or getrandbits(30)
             )
 
@@ -349,6 +350,7 @@ def add_required_geojson_properties(
         properties.setdefault("changeset", 1)
         properties.setdefault("timestamp", str(current_date))
         properties.setdefault("submission_ids", "")
+        properties.setdefault("is_new", "")
 
         feature["properties"] = properties
 

@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { TaskEventEnum } from '$lib/types';
 import type { TaskEvent, TaskEventResponse, NewEvent } from '$lib/types';
 
@@ -13,9 +12,8 @@ async function add_event(
 	comment: string | null = null,
 	// ): Promise<void> {
 ): Promise<TaskEventResponse | false> {
-	// const eventId = uuidv4()
 	const newEvent: NewEvent = {
-		event_id: uuidv4(),
+		event_id: crypto.randomUUID(),
 		event: eventType,
 		task_id: taskId,
 		comment: comment,
@@ -40,7 +38,7 @@ async function add_event(
 	// // Uncomment this for local first approach
 	// await db.task_events.create({
 	// 	data: {
-	// 		event_id: uuidv4(),
+	// 		event_id: crypto.randomUUID(),
 	// 		project_id: projectId,
 	// 		task_id: taskId,
 	// 		event: action,

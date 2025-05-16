@@ -130,6 +130,8 @@ ENTITY_FIELDS: list[NameTypeMapping] = [
     NameTypeMapping(name="changeset", type="string"),
     NameTypeMapping(name="timestamp", type="datetime"),
     NameTypeMapping(name="status", type="string"),
+    NameTypeMapping(name="submission_ids", type="string"),
+    NameTypeMapping(name="is_new", type="string"),
 ]
 
 RESERVED_KEYS = {
@@ -196,6 +198,7 @@ class EntityProperties(BaseModel):
     changeset: Optional[str] = None
     timestamp: Optional[str] = None
     status: Optional[str] = None
+    is_new: Optional[str] = None
 
     @computed_field
     @property
@@ -226,7 +229,7 @@ class EntityOsmID(BaseModel):
     @classmethod
     def convert_osm_id(cls, value):
         """Set osm_id to None if empty or invalid."""
-        if value in ("", " "):  # Treat empty strings as None
+        if value in ("", " ", None, "None"):  # Treat empty strings as None
             return None
         try:
             return int(value)  # Convert to integer if possible
@@ -238,13 +241,14 @@ class EntityTaskID(BaseModel):
     """Map of Entity UUID to Field-TM Task ID."""
 
     id: str
+    # Parse as integer
     task_id: Optional[int] = None
 
     @field_validator("task_id", mode="before")
     @classmethod
-    def convert_task_id(cls, value):
+    def convert_task_id_to_int(cls, value: str | None):
         """Set task_id to None if empty or invalid."""
-        if value in ("", " "):  # Treat empty strings as None
+        if value in ("", " ", None, "None"):  # Treat empty strings as None
             return None
         try:
             return int(value)  # Convert to integer if possible
@@ -258,6 +262,8 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
     updatedAt: Optional[str | datetime] = Field(exclude=True)  # noqa: N815
     status: Optional[EntityState] = None
     submission_ids: Optional[str] = None
+    is_new: Optional[bool] = None
+    geometry: Optional[str] = None
 
     @computed_field
     @property
@@ -269,6 +275,14 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
                 "+00:00", "Z"
             )
         return self.updatedAt
+
+    @field_validator("is_new", mode="before")
+    @classmethod
+    def emoji_to_bool(cls, value: str, info: ValidationInfo) -> bool:
+        """Convert ✅ emoji to True values."""
+        if value == "✅":
+            return True
+        return False
 
 
 class EntityMappingStatusIn(BaseModel):

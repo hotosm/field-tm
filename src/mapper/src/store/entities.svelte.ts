@@ -1,14 +1,18 @@
+import type { PGlite } from '@electric-sql/pglite';
 import type { PGliteWithSync } from '@electric-sql/pglite-sync';
 import type { ShapeStream, FetchError } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
+import { online } from 'svelte/reactivity/window';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
+import type { UUID } from 'crypto';
 import type { LngLatLike } from 'svelte-maplibre';
-import type { UUIDTypes } from 'uuid';
 
 import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
 import { EntityStatusNameMap } from '$lib/types';
 import { getAlertStore } from './common.svelte';
 import { DbEntity } from '$lib/db/entities';
+import { DbApiSubmission } from '$lib/db/api-submissions';
+import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,14 +26,6 @@ type entityIdGeometryMapType = {
 	coordinate: Geometry;
 };
 
-type newBadGeomType<T> = {
-	geojson: Feature;
-	id: number;
-	project_id: number;
-	status: T;
-	task_id: number;
-};
-
 type taskSubmissionInfoType = {
 	task_id: number;
 	index: number;
@@ -38,8 +34,6 @@ type taskSubmissionInfoType = {
 };
 
 let entitiesUnsubscribe: (() => void) | null = $state(null);
-let newBadGeomUnsubscribe: (() => void) | null = $state(null);
-
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntityId: string | null = $state(null);
 let entitiesList: DbEntityType[] = $state([]);
@@ -49,8 +43,22 @@ let selectedEntity: DbEntityType | null = $derived(
 // Map each entity_id to the entity data, for faster lookup in map
 let entityMap = $derived(new Map(entitiesList.map((entity) => [entity.entity_id, entity])));
 
-let badGeomFeatcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
-let newGeomFeatcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
+// Derive new and bad geoms to display as an overlay
+let badGeomFeatcol: FeatureCollection = $derived({
+	type: 'FeatureCollection',
+	features: entitiesList
+		.filter((e) => e.status === 'MARKED_BAD')
+		.map(DbEntity.toGeojsonFeature)
+		.filter(Boolean),
+});
+let newGeomFeatcol: FeatureCollection = $derived({
+	type: 'FeatureCollection',
+	features: entitiesList
+		.filter((e) => e.is_new)
+		.map(DbEntity.toGeojsonFeature)
+		.filter(Boolean),
+});
+
 let syncEntityStatusManuallyLoading: boolean = $state(false);
 let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
@@ -60,7 +68,6 @@ let toggleGeolocation: boolean = $state(false);
 let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
 let alertStore = getAlertStore();
 let entitiesSync: any = $state(undefined);
-let newBadGeomSync: any = $state(undefined);
 let fgbOpfsUrl: string = $state('');
 
 function getEntitiesStatusStore() {
@@ -84,7 +91,7 @@ function getEntitiesStatusStore() {
 		});
 
 		// Populate initial entity statuses
-		await getInitialEntities(db, projectId);
+		await setEntitiesListFromDbRecords(db, projectId);
 		_calculateTaskSubmissionCounts();
 
 		entitiesUnsubscribe = entitiesSync?.stream.subscribe(
@@ -128,7 +135,7 @@ function getEntitiesStatusStore() {
 		}
 	}
 
-	async function getInitialEntities(db: PGliteWithSync, projectId: number) {
+	async function setEntitiesListFromDbRecords(db: PGliteWithSync, projectId: number) {
 		const dbEntities = await db.query(`SELECT * FROM odk_entities WHERE project_id = $1;`, [projectId]);
 		entitiesList = dbEntities.rows.map((entity: DbEntityType) => ({
 			entity_id: entity.entity_id,
@@ -137,41 +144,26 @@ function getEntitiesStatusStore() {
 			task_id: entity.task_id,
 			osm_id: entity.osm_id,
 			submission_ids: entity.submission_ids,
+			is_new: entity.is_new,
+			geometry: entity.geometry,
 		}));
 	}
 
-	function addStatusToGeojsonProperty(geojsonData: FeatureCollection, entityType: '' | 'new'): FeatureCollection {
-		if (entityType === 'new') {
-			return {
-				...geojsonData,
-				features: geojsonData.features.map((feature) => {
-					const entity = entityMap.get(feature?.properties?.entity_id);
-					return {
-						...feature,
-						properties: {
-							...feature.properties,
-							status: entity?.status,
-							entity_id: entity?.entity_id,
-						},
-					};
-				}),
-			};
-		} else {
-			return {
-				...geojsonData,
-				features: geojsonData.features.map((feature) => {
-					const entity = getEntityByOsmId(feature?.properties?.osm_id);
-					return {
-						...feature,
-						properties: {
-							...feature.properties,
-							status: entity?.status,
-							entity_id: entity?.entity_id,
-						},
-					};
-				}),
-			};
-		}
+	function addStatusToGeojsonProperty(geojsonData: FeatureCollection): FeatureCollection {
+		return {
+			...geojsonData,
+			features: geojsonData.features.map((feature) => {
+				const entity = getEntityByOsmId(feature?.properties?.osm_id);
+				return {
+					...feature,
+					properties: {
+						...feature.properties,
+						status: entity?.status,
+						entity_id: entity?.entity_id,
+					},
+				};
+			}),
+		};
 	}
 
 	function _calculateTaskSubmissionCounts() {
@@ -219,7 +211,7 @@ function getEntitiesStatusStore() {
 	}
 
 	// Manually sync the entity status via button (if local db gets out of sync with backend)
-	async function syncEntityStatusManually(db: PGliteWithSync, projectId: number) {
+	async function syncEntityStatusManually(db: PGlite, projectId: number) {
 		try {
 			syncEntityStatusManuallyLoading = true;
 			const entityStatusResponse = await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
@@ -238,6 +230,8 @@ function getEntitiesStatusStore() {
 				task_id: entity.task_id,
 				submission_ids: entity.submission_ids,
 				osm_id: entity.osm_id,
+				is_new: entity.is_new,
+				geometry: entity.geometry,
 			}));
 			syncEntityStatusManuallyLoading = false;
 
@@ -253,41 +247,173 @@ function getEntitiesStatusStore() {
 		}
 	}
 
-	async function updateEntityStatus(projectId: number, payload: EntityStatusPayload) {
-		try {
-			updateEntityStatusLoading = true;
-			await fetch(`${API_URL}/projects/${projectId}/entity/status`, {
-				method: 'POST',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-type': 'application/json',
-				},
-				credentials: 'include',
+	async function updateEntityStatus(db: PGlite, projectId: number, payload: EntityStatusPayload) {
+		const entityRequestUrl = `${API_URL}/projects/${projectId}/entity/status`;
+		const entityRequestMethod = 'POST';
+		const entityRequestPayload = JSON.stringify(payload);
+		const entityRequestContentType = 'application/json';
+
+		if (online.current) {
+			try {
+				updateEntityStatusLoading = true;
+				const resp = await fetch(entityRequestUrl, {
+					method: entityRequestMethod,
+					body: entityRequestPayload,
+					headers: {
+						'Content-type': entityRequestContentType,
+					},
+					credentials: 'include',
+				});
+				if (!resp.ok) {
+					const errorData = await resp.json();
+					throw new Error(errorData.detail);
+				}
+				updateEntityStatusLoading = false;
+			} catch (error: any) {
+				updateEntityStatusLoading = false;
+				alertStore.setAlert({
+					variant: 'danger',
+					message: error.message || 'Failed to update entity',
+				});
+				throw new Error(error);
+			}
+		} else {
+			// Save for later submission + add entity update to local db
+			await DbApiSubmission.create(db, {
+				url: entityRequestUrl,
+				method: entityRequestMethod,
+				content_type: entityRequestContentType,
+				payload: entityRequestPayload,
 			});
-			updateEntityStatusLoading = false;
-		} catch (error) {
-			updateEntityStatusLoading = false;
+
+			// Update entity in localdb
+			await DbEntity.update(db, {
+				entity_id: payload.entity_id,
+				status: EntityStatusNameMap[payload.status],
+			});
+			// Reuse function to get records from db and set svelte store
+			await setEntitiesListFromDbRecords(db, projectId);
 		}
 	}
 
-	async function createEntity(projectId: number, entityUuid: UUIDTypes, payload: FeatureCollection) {
-		try {
-			const resp = await fetch(`${API_URL}/central/entity?project_id=${projectId}&entity_uuid=${entityUuid}`, {
-				method: 'POST',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-type': 'application/json',
-				},
-				credentials: 'include',
-			});
-			if (!resp.ok) {
-				const errorData = await resp.json();
-				throw new Error(errorData.detail);
+	async function createEntity(db: PGlite, projectId: number, entityUuid: UUID, featcol: FeatureCollection) {
+		const entityRequestUrl = `${API_URL}/central/entity?project_id=${projectId}&entity_uuid=${entityUuid}`;
+		const entityRequestMethod = 'POST';
+		const entityRequestPayload = JSON.stringify(featcol);
+		const entityRequestContentType = 'application/json';
+
+		if (online.current) {
+			try {
+				const resp = await fetch(entityRequestUrl, {
+					method: entityRequestMethod,
+					body: entityRequestPayload,
+					headers: {
+						'Content-type': entityRequestContentType,
+					},
+					credentials: 'include',
+				});
+				if (!resp.ok) {
+					const errorData = await resp.json();
+					throw new Error(errorData.detail);
+				}
+			} catch (error: any) {
+				alertStore.setAlert({
+					variant: 'danger',
+					message: error.message || 'Failed to create entity',
+				});
+				throw new Error(error);
 			}
-		} catch (error: any) {
-			alertStore.setAlert({
-				variant: 'danger',
-				message: error.message || 'Failed to create entity',
+		} else {
+			const javarosaGeom = geojsonGeomToJavarosa(featcol.features[0].geometry);
+			if (!javarosaGeom) {
+				throw Error('Could not convert geometry.');
+			}
+
+			// Save for later submission + add entity entry to local db
+			await DbApiSubmission.create(db, {
+				url: entityRequestUrl,
+				method: entityRequestMethod,
+				content_type: entityRequestContentType,
+				payload: entityRequestPayload,
+			});
+
+			// Add to localdb
+			await DbEntity.create(db, {
+				entity_id: entityUuid.toString(),
+				status: 'READY',
+				project_id: projectId,
+				task_id: featcol.features[0].properties?.task_id,
+				submission_ids: '',
+				osm_id: featcol.features[0].properties?.osm_id,
+				is_new: true,
+				geometry: javarosaGeom,
+			});
+			// Reuse function to get records from db and set svelte store
+			await setEntitiesListFromDbRecords(db, projectId);
+		}
+	}
+
+	function _fileToBase64(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result as string);
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	}
+
+	async function createNewSubmission(db: PGlite, projectId: number, submissionXml: string, attachments: File[]) {
+		const entityRequestUrl = `${API_URL}/submission?project_id=${projectId}`;
+		const entityRequestMethod = 'POST';
+		const entityRequestContentType = 'multipart/form-data';
+
+		const form = new FormData();
+		form.append('submission_xml', submissionXml);
+		attachments.forEach((file) => {
+			form.append('submission_files', file);
+		});
+
+		if (online.current) {
+			try {
+				const resp = await fetch(entityRequestUrl, {
+					method: entityRequestMethod,
+					body: form,
+					credentials: 'include',
+				});
+				if (!resp.ok) {
+					const errorData = await resp.json();
+					throw new Error(errorData.detail);
+				}
+			} catch (error: any) {
+				alertStore.setAlert({
+					variant: 'danger',
+					message: error.message || 'Failed to submit',
+				});
+				throw new Error(error);
+			}
+		} else {
+			// Save for offline sync
+			const submissionFilesPayload = await Promise.all(
+				attachments.map(async (file) => {
+					const base64 = await _fileToBase64(file);
+					return {
+						name: file.name,
+						type: file.type,
+						base64,
+					};
+				}),
+			);
+
+			await DbApiSubmission.create(db, {
+				url: entityRequestUrl,
+				method: entityRequestMethod,
+				content_type: entityRequestContentType,
+				payload: {
+					form: {
+						submission_xml: submissionXml,
+						submission_files: submissionFilesPayload,
+					},
+				},
 			});
 		}
 	}
@@ -321,8 +447,9 @@ function getEntitiesStatusStore() {
 		unsubscribeEntitiesStream: unsubscribeEntitiesStream,
 		syncEntityStatusManually: syncEntityStatusManually,
 		addStatusToGeojsonProperty: addStatusToGeojsonProperty,
-		updateEntityStatus: updateEntityStatus,
 		createEntity: createEntity,
+		updateEntityStatus: updateEntityStatus,
+		createNewSubmission: createNewSubmission,
 		setEntityToNavigate: setEntityToNavigate,
 		setToggleGeolocation: setToggleGeolocation,
 		setUserLocationCoordinate: setUserLocationCoordinate,
@@ -386,112 +513,4 @@ function getEntitiesStatusStore() {
 	};
 }
 
-function getNewBadGeomStore() {
-	async function getNewBadGeomStream(db: PGliteWithSync, projectId: number): Promise<ShapeStream | undefined> {
-		if (!db || !projectId) {
-			return;
-		}
-
-		newBadGeomSync = await db.electric.syncShapeToTable({
-			shape: {
-				url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-				params: {
-					table: 'geometrylog',
-					where: `project_id=${projectId}`,
-				},
-			},
-			table: 'geometrylog',
-			primaryKey: ['id'],
-			shapeKey: 'geometrylog',
-			initialInsertMethod: 'csv', // performance boost on initial sync
-		});
-
-		// Set initial state of newGeom and badGeom from db
-		await getInitialGeomRecords(db, projectId);
-
-		// Append new geoms created to the existing state
-		newBadGeomUnsubscribe = newBadGeomSync.stream.subscribe(
-			(geoms: ShapeData[]) => {
-				const rows: newBadGeomType<'NEW' | 'BAD'>[] = geoms
-					.filter((item): item is { value: newBadGeomType<'NEW' | 'BAD'> } => 'value' in item && item.value !== null)
-					.map((item) => item.value);
-
-				const badRows = rows.filter((row) => row.status === 'BAD').map((row) => row.geojson);
-				const newRows = rows.filter((row) => row.status === 'NEW').map((row) => row.geojson);
-
-				// Append new or bad geom to existing featcol overlay
-				badGeomFeatcol = {
-					...badGeomFeatcol,
-					features: [...badGeomFeatcol.features, ...badRows],
-				};
-				newGeomFeatcol = {
-					...newGeomFeatcol,
-					features: [...newGeomFeatcol.features, ...newRows],
-				};
-			},
-			(error: FetchError) => {
-				console.error('geom sync error', error);
-			},
-		);
-
-		return newBadGeomSync;
-	}
-
-	function unsubscribeNewBadGeomStream() {
-		if (newBadGeomUnsubscribe) {
-			newBadGeomSync?.unsubscribe();
-			newBadGeomUnsubscribe();
-			newBadGeomUnsubscribe = null;
-		}
-	}
-
-	async function getInitialGeomRecords(db: PGliteWithSync, projectId: number) {
-		const dbNewGeoms = await db.query(`SELECT * FROM geometrylog WHERE project_id = $1 AND status = 'NEW';`, [
-			projectId,
-		]);
-		const existingNewGeoms = dbNewGeoms.rows.map((row: newBadGeomType<'NEW'>) => row.geojson);
-		newGeomFeatcol = {
-			type: 'FeatureCollection',
-			features: existingNewGeoms,
-		};
-
-		const dbBadGeoms = await db.query(`SELECT * FROM geometrylog WHERE project_id = $1 AND status = 'BAD';`, [
-			projectId,
-		]);
-		const existingBadGeoms = dbBadGeoms.rows.map((row: newBadGeomType<'BAD'>) => row.geojson);
-		badGeomFeatcol = {
-			type: 'FeatureCollection',
-			features: existingBadGeoms,
-		};
-	}
-
-	async function createGeomRecord(projectId: number, payload: Record<string, any>) {
-		try {
-			const resp = await fetch(`${API_URL}/projects/${projectId}/geometry/records`, {
-				method: 'POST',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-type': 'application/json',
-				},
-				credentials: 'include',
-			});
-			if (!resp.ok) {
-				const errorData = await resp.json();
-				throw new Error(errorData.detail);
-			}
-		} catch (error: any) {
-			alertStore.setAlert({
-				variant: 'danger',
-				message: error.message || 'Failed to create geometry record',
-			});
-		}
-	}
-
-	return {
-		getNewBadGeomStream: getNewBadGeomStream,
-		unsubscribeNewBadGeomStream: unsubscribeNewBadGeomStream,
-		createGeomRecord: createGeomRecord,
-	};
-}
-
-export { getEntitiesStatusStore, getNewBadGeomStore };
+export { getEntitiesStatusStore };

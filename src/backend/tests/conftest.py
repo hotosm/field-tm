@@ -41,7 +41,6 @@ from app.config import encrypt_value, settings
 from app.db.database import db_conn
 from app.db.enums import CommunityType, OrganisationType, TaskEvent, UserRole
 from app.db.models import (
-    DbGeometryLog,
     DbOrganisation,
     DbProject,
     DbProjectTeam,
@@ -54,7 +53,7 @@ from app.main import get_application
 from app.organisations.organisation_deps import get_organisation
 from app.organisations.organisation_schemas import OrganisationIn
 from app.projects import project_crud
-from app.projects.project_schemas import GeometryLogIn, ProjectIn, ProjectTeamIn
+from app.projects.project_schemas import ProjectIn, ProjectTeamIn
 from app.tasks.task_schemas import TaskEventIn
 from app.users.user_crud import get_or_create_user
 from app.users.user_deps import get_user
@@ -546,43 +545,6 @@ async def project_data():
     data.update(**odk_creds_decrypted.model_dump())
 
     return data
-
-
-@pytest_asyncio.fixture(scope="function")
-async def geom_log_data(project, tasks):
-    """Sample data for creating a geom log."""
-    task = tasks[0]
-    geom_log_data = {
-        "geojson": {
-            "type": "Feature",
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [85.3012091, 27.7122369],
-                        [85.3012129, 27.7121403],
-                        [85.3013408, 27.7121442],
-                        [85.3013371, 27.7122408],
-                        [85.3012441, 27.712238],
-                        [85.3012091, 27.7122369],
-                    ]
-                ],
-            },
-            "properties": {"osm_id": 650958368},
-        },
-        "status": "NEW",
-        "project_id": project.id,
-        "task_id": task.id,
-    }
-    return geom_log_data
-
-
-@pytest_asyncio.fixture(scope="function")
-async def geom_log(db, geom_log_data):
-    """A test organisation."""
-    geom_log = GeometryLogIn(**geom_log_data)
-    geometry_log = await DbGeometryLog.create(db, geom_log)
-    return geometry_log
 
 
 @pytest_asyncio.fixture(scope="function")
