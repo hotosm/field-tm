@@ -22,5 +22,3 @@ CREATE INDEX idx_entities_task_id
 ON public.odk_entities USING btree (
     entity_id, task_id
 );
-CREATE INDEX idx_geometrylog_geojson
-ON public.geometrylog USING gin (geojson);

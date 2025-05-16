@@ -9,7 +9,6 @@
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import { v4 as uuidv4 } from 'uuid';
 	import type SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
@@ -21,10 +20,11 @@
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
-	import { getEntitiesStatusStore, getNewBadGeomStore } from '$store/entities.svelte.ts';
+	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { getProjectSetupStepStore, getCommonStore, getAlertStore } from '$store/common.svelte.ts';
 	import { readFileFromOPFS } from '$lib/fs/opfs';
 	import { loadOfflineExtract, writeOfflineExtract } from '$lib/map/extracts';
+	import { getNewOsmId } from '$lib/utils/random';
 
 	import ImportQrGif from '$assets/images/importQr.gif';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
@@ -58,13 +58,11 @@
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
-	const newBadGeomStore = getNewBadGeomStore();
 	const commonStore = getCommonStore();
 	const alertStore = getAlertStore();
 
 	let taskEventStream: ShapeStream | undefined;
 	let entityStatusStream: ShapeStream | undefined;
-	let newBadGeomStream: ShapeStream | undefined;
 	let lastOnlineStatus: boolean | null = $state(null);
 	let subscribeDebounce: ReturnType<typeof setTimeout> | null = $state(null);
 
@@ -145,7 +143,6 @@
 
 		taskEventStream = await taskStore.getTaskEventStream(db, projectId);
 		entityStatusStream = await entitiesStore.getEntityStatusStream(db, projectId);
-		newBadGeomStream = await newBadGeomStore.getNewBadGeomStream(db, projectId);
 	}
 
 	onMount(async () => {
@@ -171,7 +168,6 @@
 	async function unsubscribeFromAllStreams() {
 		taskStore.unsubscribeEventStream();
 		entitiesStore.unsubscribeEntitiesStream();
-		newBadGeomStore.unsubscribeNewBadGeomStream();
 	}
 
 	onDestroy(() => {
@@ -195,18 +191,15 @@
 	 * 
 	 * Syncing status is tracked via `commonStore.offlineDataIsSyncing` and alerts are shown after each attempt.
 	 */
-	async function iterateAndSendOfflineSubmissions() {
-		if (!db) return;
+	 async function iterateAndSendOfflineSubmissions(): Promise<boolean> {
+		if (!db) return false;
 
 		let sent = 0;
 		let failed = 0;
 
 		// Count remaining pending submissions
 		const total = await DbApiSubmission.count(db);
-		if (total === 0) {
-			// Nothing to be done
-			return;
-		}
+		if (total === 0) return true; // Nothing to be done
 
 		commonStore.setOfflineDataIsSyncing(true);
 		alertStore.setAlert({
@@ -215,19 +208,70 @@
 		});
 
 		let processed = 0; // how many attempts made (success + fail)
+
 		while (true) {
-			const result = await sendNextQueuedSubmissionToApi(db);
-			if (!result) break; // No more pending entries
+			const row = await DbApiSubmission.first(db);
+			if (!row) break; // No more pending entries
+
+			let success = false;
+
+			try {
+				let options: RequestInit;
+
+				// Handle JSON POSTs
+				if (row.content_type === 'application/json') {
+					options = {
+						method: row.method,
+						body: JSON.stringify(row.payload.body),
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						credentials: 'include'
+					};
+				// Handle multipart FormData posts (base64 encoded attachments)
+				} else if (row.content_type === 'multipart/form-data') {
+					const form = new FormData();
+					form.append('submission_xml', row.payload.form.submission_xml);
+
+					for (const f of row.payload.form.submission_files) {
+						const byteString = atob(f.base64.split(',')[1]);
+						const arrayBuffer = new Uint8Array(byteString.length);
+						for (let i = 0; i < byteString.length; i++) {
+							arrayBuffer[i] = byteString.charCodeAt(i);
+						}
+						const blob = new Blob([arrayBuffer], { type: f.type });
+						const file = new File([blob], f.name, { type: f.type });
+						form.append('submission_files', file);
+					}
+
+					options = {
+						method: row.method,
+						body: form,
+						credentials: 'include'
+					};
+				} else {
+					throw new Error(`Unsupported content_type: ${row.content_type}`);
+				}
+
+				const res = await fetch(row.url, options);
+
+				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				success = true;
+			} catch (err) {
+				console.error('Offline send failed:', err);
+				success = false;
+			}
 
 			processed++;
 
-			if (result.success) {
+			if (success) {
 				sent++;
 				// This is bad ux if multiple send in quick succession
 				// alertStore.setAlert({
 				// 	message: `Successfully sent offline data ${sent}/${total} to API`,
 				// 	variant: 'success'
 				// });
+				await DbApiSubmission.deleteById(db, row.id);
 			} else {
 				failed++;
 				alertStore.setAlert({
@@ -241,6 +285,9 @@
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
 
+		commonStore.setOfflineSyncPercentComplete(null);
+		commonStore.setOfflineDataIsSyncing(false);
+
 		if (failed < 1) {
 			alertStore.setAlert({
 				message: `Finished sending offline data.`,
@@ -248,19 +295,21 @@
 			});
 			// Clear the table if all sent successfully
 			await DbApiSubmission.clear(db);
+			return true;
 		} else {
 			alertStore.setAlert({
-				message: `Offline sync: (${sent - failed} succeeded, ${failed} failed).`,
+				message: `Offline sync: (${sent} succeeded, ${failed} failed).`,
 				variant: 'warning'
 			});
+			return false;
 		}
-		commonStore.setOfflineSyncPercentComplete(null);
-		commonStore.setOfflineDataIsSyncing(false);
 	}
 
 	async function triggerOfflineDataSync() {
 		if (!db) return;
-		await iterateAndSendOfflineSubmissions();
+		const success = await iterateAndSendOfflineSubmissions();
+		// Return immediately if there were submission failures, to prevent overwriting entities below
+		if (!success) return;
 
 		// Wait 3 seconds for everything to process on the backend, before requesting new data
 		// + we need to set spinner again, as set false once offline sync done.
@@ -346,15 +395,19 @@
 		}
 		try {
 			isGeometryCreationLoading = true;
-			const entityUuid = uuidv4();
-			await entitiesStore.createEntity(projectId, entityUuid, {
+			const entityUuid = crypto.randomUUID();
+			const newOsmId = getNewOsmId();
+			// NOTE here the top level 'id' field is also required for the backend processing
+			// NOTE the id field is the osm_id, not the entity id!
+			await entitiesStore.createEntity(db, projectId, entityUuid, {
 				type: 'FeatureCollection',
-				features: [{ type: 'Feature', geometry: newFeatureGeom, properties: {} }],
-			});
-			await newBadGeomStore.createGeomRecord(projectId, {
-				status: 'NEW',
-				geojson: { type: 'Feature', geometry: newFeatureGeom, properties: { entity_id: entityUuid } },
-				project_id: projectId,
+				features: [{ type: 'Feature', id: newOsmId, geometry: newFeatureGeom, properties: {
+					project_id: projectId,
+					osm_id: newOsmId,
+					task_id: taskStore.selectedTaskIndex || '',
+					is_new: '✅', // NOTE usage of an emoji is valid here
+					status: '0', // TODO update this to use the enum / mapping
+				}}],
 			});
 			cancelMapNewFeatureInODK();
 
@@ -362,7 +415,7 @@
 				await entitiesStore.setSelectedEntityId(entityUuid);
 				openedActionModal = null;
 				const entityOsmId = entitiesStore.getOsmIdByEntityId(entityUuid);
-				entitiesStore.updateEntityStatus(projectId, {
+				entitiesStore.updateEntityStatus(db, projectId, {
 					entity_id: entityUuid,
 					status: 1,
 					label: `Feature ${entityOsmId}`
@@ -372,6 +425,7 @@
 				openOdkCollectNewFeature(project?.odk_form_id, entityUuid);
 			}
 		} catch (error) {
+			console.error(error);
 			alertStore.setAlert({ message: 'Unable to create entity', variant: 'danger' });
 		} finally {
 			isGeometryCreationLoading = false;
@@ -617,6 +671,7 @@
 		bind:webFormsRef
 		bind:display={displayWebFormsDrawer}
 		{projectId}
+		formXml={project.odk_form_xml}
 		entityId={entitiesStore.selectedEntityId || undefined}
 		taskId={taskStore.selectedTaskIndex || undefined}
 	/>

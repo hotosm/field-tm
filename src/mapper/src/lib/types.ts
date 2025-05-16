@@ -19,6 +19,7 @@ export interface APIProject {
 	priority: number;
 	location_str: string;
 	odk_form_id: string;
+	odk_form_xml: string;
 	data_extract_url: string;
 	odk_token: string;
 	organisation_id: number;
@@ -44,6 +45,7 @@ export interface DbProjectType {
 	status: string; // e.g., 'DRAFT' | 'ACTIVE' | ...
 	total_tasks?: string | null;
 	odk_form_id?: string | null;
+	odk_form_xml?: string | null;
 	visibility: string; // e.g., 'PUBLIC' | 'PRIVATE'
 	mapper_level: string; // e.g., 'BEGINNER' | 'INTERMEDIATE'
 	priority?: string | null; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
@@ -81,6 +83,7 @@ export const DB_PROJECT_COLUMNS = new Set([
 	'status',
 	'total_tasks',
 	'odk_form_id',
+	'odk_form_xml',
 	'visibility',
 	'mapper_level',
 	'priority',
@@ -185,18 +188,11 @@ export type EntityStatusPayload = {
 	label: string; // there is no easy way to automatically determine this
 };
 
-export type entityStatusOptions =
-	| 'READY'
-	| 'OPENED_IN_ODK'
-	| 'SURVEY_SUBMITTED'
-	| 'NEW_GEOM'
-	| 'MARKED_BAD'
-	| 'VALIDATED';
+export type entityStatusOptions = 'READY' | 'OPENED_IN_ODK' | 'SURVEY_SUBMITTED' | 'MARKED_BAD' | 'VALIDATED';
 export const EntityStatusNameMap: Record<number, entityStatusOptions> = {
 	0: 'READY',
 	1: 'OPENED_IN_ODK',
 	2: 'SURVEY_SUBMITTED',
-	3: 'NEW_GEOM',
 	5: 'VALIDATED',
 	6: 'MARKED_BAD',
 };
@@ -208,6 +204,8 @@ export type entitiesApiResponse = {
 	status: number;
 	updated_at: string | null;
 	submission_ids: string;
+	is_new: boolean;
+	geometry: string | null;
 };
 
 export type DbEntityType = {
@@ -217,6 +215,8 @@ export type DbEntityType = {
 	task_id: number;
 	osm_id: number;
 	submission_ids: string;
+	is_new: boolean;
+	geometry: string | null;
 };
 
 export type DbApiSubmissionType = {

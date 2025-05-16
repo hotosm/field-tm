@@ -32,7 +32,7 @@ from loguru import logger as log
 
 from app.central.central_crud import create_odk_project
 from app.config import settings
-from app.db.enums import EntityState, HTTPStatus, MappingState, ProjectRole
+from app.db.enums import EntityState, HTTPStatus, MappingState
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import check_crs
 from app.projects import project_crud
@@ -555,9 +555,14 @@ async def test_update_and_download_project_form(client, project):
     xls_file = BytesIO(updated_xls_content)
     xls_file.name = "form.xlsx"
 
-    with patch(
-        "app.central.central_deps.read_xlsform", return_value=xls_file
-    ) and patch("app.central.central_crud.update_project_xform", return_value=None):
+    with (
+        patch("app.central.central_deps.read_xlsform", return_value=xls_file),
+        patch("app.central.central_crud.update_project_xform", return_value=None),
+        patch(
+            "app.central.central_crud.get_project_form_xml",
+            return_value="<fake-xml></fake-xml>",
+        ),
+    ):
         response = await client.post(
             f"central/update-form?project_id={project.id}",
             data={"xform_id": "test-xform-id"},
@@ -700,62 +705,6 @@ async def test_download_task_boundaries(client, project, tasks):
         assert "properties" in feature
         assert "task_id" in feature["properties"]
         assert feature["properties"]["task_id"] in project_task_index_list
-
-
-@pytest.mark.parametrize(
-    "status,role,expected_status",
-    [
-        ("NEW", ProjectRole.MAPPER, HTTPStatus.OK),
-        ("BAD", ProjectRole.PROJECT_MANAGER, HTTPStatus.OK),
-        ("BAD", ProjectRole.MAPPER, HTTPStatus.FORBIDDEN),
-        ("INVALID", ProjectRole.MAPPER, HTTPStatus.UNPROCESSABLE_ENTITY),
-    ],
-)
-async def test_create_geom_log(
-    client, status, role, expected_status, geom_log_data, admin_user
-):
-    """Test creating geometry log entries with different statuses and roles."""
-    geom_log_data["status"] = status
-    project_id = geom_log_data["project_id"]
-    with patch("app.projects.project_routes.check_access") as mock_check_access:
-        mock_check_access.return_value = (
-            admin_user if role == ProjectRole.PROJECT_MANAGER else None
-        )
-        response = await client.post(
-            f"/projects/{project_id}/geometry/records",
-            json=geom_log_data,
-        )
-        assert response.status_code == expected_status
-
-        if expected_status == HTTPStatus.OK:
-            data = response.json()
-            assert data["status"] == status
-            assert data["project_id"] == project_id
-            assert "id" in data
-
-
-async def test_read_geom_logs(client, project, geom_log):
-    """Test retrieving all geometry logs for a project."""
-    response = await client.get(f"/projects/{project.id}/geometry/records")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) >= 1
-
-    matching_logs = [log for log in data if log["project_id"] == project.id]
-    assert len(matching_logs) >= 1
-
-
-async def test_delete_geom_log(client, project, geom_log):
-    """Test deleting a geometry log entry."""
-    response = await client.delete(
-        f"/projects/{project.id}/geometry/records/{geom_log.id}"
-    )
-    assert response.status_code == HTTPStatus.NO_CONTENT
-
-    response = await client.delete(f"/projects/{project.id}/geometry/records/{uuid4()}")
-    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 if __name__ == "__main__":

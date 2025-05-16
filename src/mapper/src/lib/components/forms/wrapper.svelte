@@ -4,8 +4,8 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { fetchBlobUrl, fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
-	import { getDeviceId } from '$lib/utils/device.ts';
+	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
+	import { getDeviceId } from '$lib/utils/random';
 	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa.ts';
 	import { m } from '$translations/messages.js';
 
@@ -16,6 +16,7 @@
 		display: Boolean;
 		entityId: string | undefined;
 		projectId: number | undefined;
+		formXml: string | undefined;
 		taskId: number | undefined;
 		webFormsRef: HTMLElement | undefined;
 	};
@@ -23,11 +24,13 @@
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
+	const { db } = commonStore;
+
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 	const selectedEntityCoordinate = $derived(entitiesStore.selectedEntityCoordinate);
 	const selectedEntityGeometry = $derived(entitiesStore.selectedEntityGeometry);
 
-	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, taskId }: Props = $props();
+	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, formXml, taskId }: Props = $props();
 	let drawerRef: SlDrawer;
 	let odkForm: any;
 	let startDate: string | undefined;
@@ -36,8 +39,6 @@
 	let uploading = $state(false);
 	let uploadingMessage = $state('');
 
-	const formXmlPromise = fetchBlobUrl(`${API_URL}/central/form-xml?project_id=${projectId}`);
-
 	const odkWebFormPromise = fetchCachedBlobUrl(
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
@@ -45,80 +46,78 @@
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
+	function insertExtraMetadataIntoSubmissionXml(submissionXml: string): string {
+		// missing start, end, today, phonenumber, deviceid, username, email, instruction
+		// included xid, xlocation, task_id, status,image number
+
+		// entity id isn't included in the payload by default because we marked it as not relevant earlier
+		// (in order to hide it from the user's display)
+		submissionXml = submissionXml.replace('<warmup/>', `<warmup/><feature>${entityId}</feature>`);
+
+		submissionXml = submissionXml.replace('<start/>', `<start>${startDate}</start>`);
+		submissionXml = submissionXml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
+
+		const authDetails = loginStore?.getAuthDetails;
+		if (authDetails?.username) {
+			submissionXml = submissionXml.replace('<username/>', `<username>${authDetails?.username}</username>`);
+		}
+
+		if (authDetails?.email_address) {
+			submissionXml = submissionXml.replace('<email/>', `<email>${authDetails?.email_address}</email>`);
+		}
+
+		if (entitiesStore.userLocationCoord) {
+			const [longitude, latitude] = entitiesStore.userLocationCoord as [number, number];
+			// add 0.0 for altitude and 10.0 for accuracy as defaults
+			submissionXml = submissionXml.replace('<warmup/>', `<warmup>${latitude} ${longitude} 0.0 0.0</warmup>`);
+		}
+
+		submissionXml = submissionXml.replace('<deviceid/>', `<deviceid>${getDeviceId()}</deviceid>`);
+
+		return submissionXml;
+	}
+
+	// We need this as ODK Central does not seem to automatically update the entity status based on submitted data
+	// Using ODK Collect this works, but something in the web-forms workflow is broken to not allow this for now
+	function updateEntityStatusBasedOnSubmissionXml(submissionXml: string) {
+		let entityStatus = null;
+		if (submissionXml.includes('<feature_exists>no</feature_exists>')) {
+			entityStatus = 6; // MARKED_BAD
+		} else if (submissionXml.includes('<digitisation_correct>no</digitisation_correct>')) {
+			entityStatus = 6; // MARKED_BAD
+		} else {
+			entityStatus = 2; // SURVEY_SUBMITTED
+		}
+
+		entitiesStore.updateEntityStatus(db, projectId, {
+			entity_id: selectedEntity?.entity_id,
+			status: entityStatus,
+			// NOTE here we don't translate the field as English values are always saved as the Entity label
+			label: `Feature ${selectedEntity?.osm_id}`,
+		});
+	}
+
 	function handleSubmit(payload: any) {
 		(async () => {
 			if (!payload.detail) return;
 			if (!projectId) return;
 
 			const { instanceFile, attachments = [] } = await payload.detail[0].data[0];
-			let submission_xml = await instanceFile.text();
-
-			// missing start, end, today, phonenumber, deviceid, username, email, instruction
-			// included xid, xlocation, task_id, status,image number
-
-			// entity id isn't included in the payload by default because we marked it as not relevant earlier
-			// (in order to hide it from the user's display)
-			submission_xml = submission_xml.replace('<warmup/>', `<warmup/><feature>${entityId}</feature>`);
-
-			submission_xml = submission_xml.replace('<start/>', `<start>${startDate}</start>`);
-			submission_xml = submission_xml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
-
-			const authDetails = loginStore?.getAuthDetails;
-			if (authDetails?.username) {
-				submission_xml = submission_xml.replace('<username/>', `<username>${authDetails?.username}</username>`);
-			}
-
-			if (authDetails?.email_address) {
-				submission_xml = submission_xml.replace('<email/>', `<email>${authDetails?.email_address}</email>`);
-			}
-
-			if (entitiesStore.userLocationCoord) {
-				const [longitude, latitude] = entitiesStore.userLocationCoord as [number, number];
-				// add 0.0 for altitude and 10.0 for accuracy as defaults
-				submission_xml = submission_xml.replace('<warmup/>', `<warmup>${latitude} ${longitude} 0.0 0.0</warmup>`);
-			}
-
-			submission_xml = submission_xml.replace('<deviceid/>', `<deviceid>${getDeviceId()}</deviceid>`);
-
-			const url = `${API_URL}/submission?project_id=${projectId}`;
-			var data = new FormData();
-			data.append('submission_xml', submission_xml);
-			attachments.forEach((attachment: File) => {
-				data.append('submission_files', attachment);
-			});
+			let submissionXml = await instanceFile.text();
+			submissionXml = insertExtraMetadataIntoSubmissionXml(submissionXml);
 
 			uploadingMessage = m['forms.uploading']() || 'uploading';
 			uploading = true;
 
 			// Submit the XML + any submission media
-			await fetch(url, {
-				method: 'POST',
-				body: data,
-			});
+			await entitiesStore.createNewSubmission(db, projectId, submissionXml, attachments);
 
 			uploading = false;
-
-			let entityStatus = null;
-			if (submission_xml.includes('<feature_exists>no</feature_exists>')) {
-				entityStatus = 6; // MARKED_BAD
-			} else if (submission_xml.includes('<digitisation_correct>no</digitisation_correct>')) {
-				entityStatus = 6; // MARKED_BAD
-			} else if (entitiesStore.newGeomFeatcol.features.find((feature) => feature.properties?.entity_id === entityId)) {
-				entityStatus = 3; // NEW_GEOM
-			} else {
-				entityStatus = 2; // SURVEY_SUBMITTED
-			}
-
-			entitiesStore.updateEntityStatus(projectId, {
-				entity_id: selectedEntity?.entity_id,
-				status: entityStatus,
-				// NOTE here we don't translate the field as English values are always saved as the Entity label
-				label: `Feature ${selectedEntity?.osm_id}`,
-			});
-
+			updateEntityStatusBasedOnSubmissionXml(submissionXml);
 			display = false;
 		})();
 	}
+
 	function handleOdkForm(evt: any) {
 		if (evt?.detail?.[0]) {
 			odkForm = evt.detail[0];
@@ -232,37 +231,35 @@
 	{#await odkWebFormPromise then odkWebFormUrl}
 		{#if entityId}
 			{#key projectId}
-				{#await formXmlPromise then formXml}
-					{#await formMediaPromise then formMedia}
-						{#key entityId}
-							{#key commonStore.locale}
-								{#if uploading}
-									<div id="web-forms-uploader">
-										<div id="uploading-inner">
-											<div id="spinner"></div>
-											{uploadingMessage}
-										</div>
+				{#await formMediaPromise then formMedia}
+					{#key entityId}
+						{#key commonStore.locale}
+							{#if uploading}
+								<div id="web-forms-uploader">
+									<div id="uploading-inner">
+										<div id="spinner"></div>
+										{uploadingMessage}
 									</div>
-								{:else}
-									{#if drawerLabel}
-										<div
-											style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
-										>
-											{drawerLabel}
-										</div>
-									{/if}
-									<iframe
-										class="iframe"
-										style:border="none"
-										style:height="100%"
-										use:handleIframe
-										title="odk-web-forms-wrapper"
-										src={`/web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}&cssFile=${commonStore.config?.cssFileWebformsOverride || ''}`}
-									></iframe>
+								</div>
+							{:else}
+								{#if drawerLabel}
+									<div
+										style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+									>
+										{drawerLabel}
+									</div>
 								{/if}
-							{/key}
+								<iframe
+									class="iframe"
+									style:border="none"
+									style:height="100%"
+									use:handleIframe
+									title="odk-web-forms-wrapper"
+									src={`/web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}&cssFile=${commonStore.config?.cssFileWebformsOverride || ''}`}
+								></iframe>
+							{/if}
 						{/key}
-					{/await}
+					{/key}
 				{/await}
 			{/key}
 		{/if}

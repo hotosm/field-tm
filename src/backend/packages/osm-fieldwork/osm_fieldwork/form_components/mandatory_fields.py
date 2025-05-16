@@ -189,6 +189,8 @@ def _get_mandatory_fields(
             ),
             "save_to": "submission_ids",
         },
+        # FIXME probably add logic to take `new_feature` field
+        # and set the is_new entity property if not null?
     ])
     if need_verification_fields:
         fields.append(add_label_translations({

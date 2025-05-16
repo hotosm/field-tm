@@ -41,3 +41,39 @@ export function geojsonGeomToJavarosa(geometry: GeoJSONGeometry) {
 	// Must append a final ; to finish the geom
 	return `${javarosaGeometry};`;
 }
+
+export function javarosaToGeojsonGeom(javarosa: string | null): GeoJSONGeometry | null {
+	if (!javarosa || !javarosa.trim()) return null;
+
+	const coordinateSets = javarosa
+		.trim()
+		.split(';')
+		.filter(Boolean)
+		.map((point) => {
+			const [lat, lon] = point.split(' ').slice(0, 2).map(parseFloat);
+			return [lon, lat]; // GeoJSON expects [lon, lat]
+		});
+
+	if (coordinateSets.length === 1) {
+		return {
+			type: 'Point',
+			coordinates: coordinateSets[0],
+		};
+	}
+
+	if (
+		coordinateSets.length > 2 &&
+		coordinateSets[0][0] === coordinateSets[coordinateSets.length - 1][0] &&
+		coordinateSets[0][1] === coordinateSets[coordinateSets.length - 1][1]
+	) {
+		return {
+			type: 'Polygon',
+			coordinates: [coordinateSets],
+		};
+	}
+
+	return {
+		type: 'LineString',
+		coordinates: coordinateSets,
+	};
+}

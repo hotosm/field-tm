@@ -162,7 +162,6 @@ class EntityState(IntEnum, Enum):
     READY = 0
     OPENED_IN_ODK = 1
     SURVEY_SUBMITTED = 2
-    NEW_GEOM = 3
     VALIDATED = 5
     MARKED_BAD = 6
 
@@ -254,13 +253,6 @@ class XLSFormType(StrEnum, Enum):
     # religious = "religious"
     # landusage = "landusage"
     # waterways = "waterways"
-
-
-class GeomStatus(StrEnum, Enum):
-    """Geometry status."""
-
-    NEW = "NEW"
-    BAD = "BAD"
 
 
 class SubmissionDownloadType(StrEnum, Enum):

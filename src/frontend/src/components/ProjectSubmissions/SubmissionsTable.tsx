@@ -30,7 +30,6 @@ import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/Submi
 import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { convertCoordinateStringToFeature } from '@/utilfunctions/extractGeojsonFromObject';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -480,7 +479,6 @@ const SubmissionsTable = ({ toggleView }) => {
                             reviewState: row?.__system?.reviewState,
                             entity_id: row?.feature,
                             label: row?.meta?.entity?.label,
-                            feature: convertCoordinateStringToFeature('xlocation', row?.xlocation),
                             taskUid: taskUid?.toString() || null,
                           }),
                         );

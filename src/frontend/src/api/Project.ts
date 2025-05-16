@@ -5,7 +5,6 @@ import CoreModules from '@/shared/CoreModules';
 import { task_state, task_event } from '@/types/enums';
 import {
   EntityOsmMap,
-  geometryLogResponseType,
   projectDashboardDetailTypes,
   projectInfoType,
   projectTaskBoundriesType,
@@ -13,6 +12,7 @@ import {
 } from '@/models/project/projectModel';
 import { TaskActions } from '@/store/slices/TaskSlice';
 import { AppDispatch } from '@/store/Store';
+import { featureType } from '@/store/types/IProject';
 
 export const ProjectById = (projectId: string) => {
   return async (dispatch: AppDispatch) => {
@@ -317,24 +317,6 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
   };
 };
 
-export const GetGeometryLog = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    const getProjectActivity = async (url: string) => {
-      try {
-        dispatch(ProjectActions.SetGeometryLogLoading(true));
-        const response: AxiosResponse<geometryLogResponseType[]> = await axios.get(url);
-        dispatch(ProjectActions.SetGeometryLog(response.data));
-      } catch (error) {
-        // error means no geometry log present for the project
-        dispatch(ProjectActions.SetGeometryLog([]));
-      } finally {
-        dispatch(ProjectActions.SetGeometryLogLoading(false));
-      }
-    };
-    await getProjectActivity(url);
-  };
-};
-
 export const SyncTaskState = (
   url: string,
   params: { project_id: string },
@@ -375,5 +357,22 @@ export const SyncTaskState = (
       }
     };
     await syncTaskState();
+  };
+};
+
+export const GetOdkEntitiesGeojson = (url: string) => {
+  return async (dispatch: AppDispatch) => {
+    const getProjectActivity = async (url: string) => {
+      try {
+        dispatch(ProjectActions.SetOdkEntitiesGeojsonLoading(true));
+        const response: AxiosResponse<{ type: 'FeatureCollection'; features: featureType[] }> = await axios.get(url);
+        dispatch(ProjectActions.SetOdkEntitiesGeojson(response.data));
+      } catch (error) {
+        dispatch(ProjectActions.SetOdkEntitiesGeojson({ type: 'FeatureCollection', features: [] }));
+      } finally {
+        dispatch(ProjectActions.SetOdkEntitiesGeojsonLoading(false));
+      }
+    };
+    await getProjectActivity(url);
   };
 };

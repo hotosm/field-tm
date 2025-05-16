@@ -10,16 +10,19 @@ export const convertCoordinateStringToFeature = (key: string, coordinateString: 
 
   // if feature is Polygon in JavaRosa format it contains string of array separated by ';'
   if (coordinateString?.includes(';')) {
-    let coordinates = coordinateString?.split(';')?.map((coord) => {
-      let coordinate = coord
-        .trim()
-        .split(' ')
-        .slice(0, 2)
-        .map((value: string) => {
-          return parseFloat(value);
-        });
-      return [coordinate[1], coordinate[0]];
-    });
+    let coordinates = coordinateString
+      ?.replace(/;$/, '')
+      ?.split(';')
+      ?.map((coord) => {
+        let coordinate = coord
+          .trim()
+          .split(' ')
+          .slice(0, 2)
+          .map((value: string) => {
+            return parseFloat(value);
+          });
+        return [coordinate[1], coordinate[0]];
+      });
     // if initial and last coordinates are same, it's a Polygon else LineString
     if (coordinates?.[0]?.toString() === coordinates?.[coordinates?.length - 1]?.toString()) {
       feature = { ...feature, geometry: { type: 'Polygon', coordinates: [coordinates] }, properties: { label: key } };

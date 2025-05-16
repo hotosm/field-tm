@@ -31,6 +31,7 @@ import geojson
 import geojson_pydantic
 from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
 from osm_login_python.core import Auth
 from osm_rawdata.postgres import PostgresClient
@@ -474,9 +475,10 @@ async def generate_project_files(
 
         if first_feature and "properties" in first_feature:  # Check if properties exist
             # FIXME perhaps this should be done in the SQL code?
-            entity_properties = list(first_feature["properties"].keys()) + [
-                "submission_ids"
-            ]
+            entity_properties = list(first_feature["properties"].keys())
+            for field in ["submission_ids", "is_new"]:
+                if field not in entity_properties:
+                    entity_properties.append(field)
 
             log.debug("Splitting data extract per task area")
             # TODO in future this splitting could be removed if the task_id is
@@ -508,6 +510,15 @@ async def generate_project_files(
             task_extract_dict,
             entity_properties,
         )
+        # Run separate thread in event loop to avoid blocking with sync code
+        # Copy the parsed form XML into the FieldTM db for easy easy
+        form_xml = await run_in_threadpool(
+            central_crud.get_project_form_xml,
+            project_odk_creds,
+            project_odk_id,
+            project_odk_form_id,
+        )
+
         log.debug(
             f"Setting encrypted odk token for Field-TM project ({project_id}) "
             f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15]}...)"
@@ -517,6 +528,7 @@ async def generate_project_files(
             project_id,
             project_schemas.ProjectUpdate(
                 odk_token=odk_token,
+                odk_form_xml=form_xml,
             ),
         )
         task_feature_counts = [

@@ -46,7 +46,6 @@ from app.db.enums import (
     CommunityType,
     DbGeomType,
     EntityState,
-    GeomStatus,
     HTTPStatus,
     MappingLevel,
     MappingState,
@@ -75,7 +74,6 @@ if TYPE_CHECKING:
         BackgroundTaskUpdate,
         BasemapIn,
         BasemapUpdate,
-        GeometryLogIn,
         ProjectIn,
         ProjectTeamIn,
         ProjectUpdate,
@@ -1427,6 +1425,7 @@ class DbProject(BaseModel):
     visibility: Optional[ProjectVisibility] = None
     osm_category: Optional[str] = None
     odk_form_id: Optional[str] = None
+    odk_form_xml: Optional[str] = None
     xlsform_content: Optional[bytes] = None
     mapper_level: Optional[MappingLevel] = None
     priority: Optional[ProjectPriority] = None
@@ -1992,9 +1991,11 @@ class DbOdkEntities(BaseModel):
     entity_id: UUID
     status: EntityState
     project_id: int
-    task_id: int
+    task_id: Optional[int]
     osm_id: int
     submission_ids: str
+    is_new: bool
+    geometry: str
 
     @classmethod
     async def upsert(
@@ -2026,7 +2027,8 @@ class DbOdkEntities(BaseModel):
             batch = entities[batch_start : batch_start + batch_size]
             sql = """
                 INSERT INTO public.odk_entities
-                    (entity_id, status, project_id, task_id, osm_id, submission_ids)
+                    (entity_id, status, project_id, task_id,
+                    osm_id, submission_ids, is_new, geometry)
                 VALUES
             """
 
@@ -2039,17 +2041,30 @@ class DbOdkEntities(BaseModel):
                     f"(%({entity_index}_entity_id)s, "
                     f"%({entity_index}_status)s, "
                     f"%({entity_index}_project_id)s, "
-                    f"%({entity_index}_task_id)s,"
-                    f"%({entity_index}_osm_id)s,"
-                    f"%({entity_index}_submission_ids)s)"
+                    f"%({entity_index}_task_id)s, "
+                    f"%({entity_index}_osm_id)s, "
+                    f"%({entity_index}_submission_ids)s, "
+                    f"%({entity_index}_is_new)s, "
+                    f"%({entity_index}_geometry)s)"
                 )
                 data[f"{entity_index}_entity_id"] = entity["id"]
                 data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
                 data[f"{entity_index}_project_id"] = project_id
                 task_id = entity["task_id"]
-                data[f"{entity_index}_task_id"] = int(task_id) if task_id else None
+                data[f"{entity_index}_task_id"] = (
+                    int(task_id) if task_id not in (None, "", "None") else None
+                )
                 data[f"{entity_index}_osm_id"] = entity["osm_id"]
                 data[f"{entity_index}_submission_ids"] = entity["submission_ids"]
+                data[f"{entity_index}_is_new"] = (
+                    True if entity["is_new"] == "✅" else False
+                )
+                # Only copy geometry if new geom, or marked bad
+                data[f"{entity_index}_geometry"] = (
+                    entity["geometry"]
+                    if entity["status"] == "6" or entity["is_new"] == "✅"
+                    else ""
+                )
 
             sql += (
                 ", ".join(values)
@@ -2058,7 +2073,9 @@ class DbOdkEntities(BaseModel):
                     status = EXCLUDED.status,
                     task_id = EXCLUDED.task_id,
                     osm_id = EXCLUDED.osm_id,
-                    submission_ids = EXCLUDED.submission_ids
+                    submission_ids = EXCLUDED.submission_ids,
+                    is_new = EXCLUDED.is_new,
+                    geometry = EXCLUDED.geometry
                 RETURNING True;
             """
             )
@@ -2101,6 +2118,26 @@ class DbOdkEntities(BaseModel):
             return False
 
         return True
+
+    @classmethod
+    async def delete(
+        cls,
+        db: Connection,
+        uuid: str,
+    ):
+        """Delete an entity."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM odk_entities WHERE entity_id = %(uuid)s;
+            """,
+                {"uuid": uuid},
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=HTTPStatus.NOT_FOUND,
+                    detail=f"Entity with UUID {uuid} not found in database.",
+                )
 
 
 class DbBackgroundTask(BaseModel):
@@ -2400,90 +2437,3 @@ def slugify(name: Optional[str]) -> Optional[str]:
     # Remove consecutive hyphens
     slug = sub(r"[-\s]+", "-", slug)
     return slug
-
-
-class DbGeometryLog(BaseModel):
-    """Table geometry log."""
-
-    id: Optional[UUID] = None
-    geojson: dict
-    status: GeomStatus
-    project_id: Optional[int] = None
-    task_id: Optional[int] = None
-
-    @classmethod
-    async def create(
-        cls,
-        db: Connection,
-        geometry_log_in: "GeometryLogIn",
-    ) -> Self:
-        """Creates a new geometry log with its status."""
-        model_dump = dump_and_check_model(geometry_log_in)
-        columns = []
-        value_placeholders = []
-
-        for key in model_dump.keys():
-            columns.append(key)
-            if key == "geojson":
-                value_placeholders.append(f"%({key})s::jsonb")
-                # Must be string json for db input
-                model_dump[key] = json.dumps(model_dump[key])
-            else:
-                value_placeholders.append(f"%({key})s")
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                f"""
-                INSERT INTO geometrylog
-                    ({", ".join(columns)})
-                VALUES
-                    ({", ".join(value_placeholders)})
-                RETURNING
-                    *
-            """,
-                model_dump,
-            )
-            new_geomlog = await cur.fetchone()
-        return new_geomlog
-
-    @classmethod
-    async def all(cls, db: Connection, project_id: int) -> Optional[list[Self]]:
-        """Retrieve geometry logs from a project."""
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                """
-                SELECT * FROM geometrylog WHERE project_id=%(project_id)s;
-            """,
-                {"project_id": project_id},
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(
-                    status_code=HTTPStatus.NOT_FOUND,
-                    detail=f"""
-                    No geometry log with project_id {project_id}
-                    """,
-                )
-            return await cur.fetchall()
-
-    @classmethod
-    async def delete(
-        cls,
-        db: Connection,
-        project_id: int,
-        id: str,
-    ) -> bool:
-        """Delete a geometry."""
-        async with db.cursor() as cur:
-            await cur.execute(
-                """
-                DELETE FROM geometrylog WHERE project_id=%(project_id)s AND id = %(id)s;
-            """,
-                {"project_id": project_id, "id": id},
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(
-                    status_code=HTTPStatus.NOT_FOUND,
-                    detail=f"""
-                    Geometry log with project_id {project_id}
-                    and geom_id {id} not found.
-                    """,
-                )

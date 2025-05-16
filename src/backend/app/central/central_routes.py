@@ -141,11 +141,18 @@ async def update_project_form(
         xlsform,
         project.odk_credentials,
     )
+    form_xml = await run_in_threadpool(
+        central_crud.get_project_form_xml,
+        project.odk_credentials,
+        project.odkid,
+        xform_id,
+    )
 
     sql = """
         UPDATE projects
         SET
-            xlsform_content = %(xls_data)s
+            xlsform_content = %(xls_data)s,
+            odk_form_xml = %(form_xml)s
         WHERE
             id = %(project_id)s
         RETURNING id, hashtags;
@@ -155,6 +162,7 @@ async def update_project_form(
             sql,
             {
                 "xls_data": xlsform.getvalue(),
+                "form_xml": form_xml,
                 "project_id": project.id,
             },
         )
@@ -336,31 +344,32 @@ async def add_new_entity(
 
         # Add required properties and extract entity data
         featcol = add_required_geojson_properties(featcol_dict)
-        featcol["features"][0]["properties"]["project_id"] = project.id
 
-        # Get task_id of the feature if inside task boundary
-        async with db.cursor(row_factory=dict_row) as cur:
-            await cur.execute(
-                """
-                SELECT t.project_task_index AS task_id
-                FROM tasks t
-                WHERE t.project_id = %s
-                AND ST_Within(
-                    ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326),
-                    t.outline
+        # Get task_id of the feature if inside task boundary and not set already
+        # NOTE this should come from the frontend, but might have failed
+        if featcol["features"][0]["properties"].get("task_id", None) is None:
+            async with db.cursor(row_factory=dict_row) as cur:
+                await cur.execute(
+                    """
+                    SELECT t.project_task_index AS task_id
+                    FROM tasks t
+                    WHERE t.project_id = %s
+                    AND ST_Within(
+                        ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326),
+                        t.outline
+                    )
+                    LIMIT 1;
+                    """,
+                    (project.id, json.dumps(features[0].get("geometry"))),
                 )
-                LIMIT 1;
-                """,
-                (project.id, json.dumps(features[0].get("geometry"))),
-            )
-            result = await cur.fetchone()
-
-        task_id = ""
-        if result and (task_id := result.get("task_id")):
-            featcol["features"][0]["properties"]["task_id"] = task_id
+                result = await cur.fetchone()
+            if result:
+                featcol["features"][0]["properties"]["task_id"] = result.get(
+                    "task_id", ""
+                )
 
         entities_list = await central_crud.task_geojson_dict_to_entity_values(
-            {task_id: featcol}
+            {featcol["features"][0]["properties"]["task_id"]: featcol}
         )
 
         if not entities_list:
@@ -396,22 +405,3 @@ async def add_new_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity creation failed",
         ) from e
-
-
-@router.get("/form-xml")
-async def get_project_form_xml_route(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-) -> str:
-    """Get the raw XML from ODK Central for a project."""
-    project = project_user.get("project")
-    odk_creds = project.odk_credentials
-    odkid = project.odkid
-    odk_form_id = project.odk_form_id
-    # Run separate thread in event loop to avoid blocking with sync code
-    form_xml = await run_in_threadpool(
-        central_crud.get_project_form_xml,
-        odk_creds,
-        odkid,
-        odk_form_id,
-    )
-    return Response(content=form_xml, media_type="application/xml")

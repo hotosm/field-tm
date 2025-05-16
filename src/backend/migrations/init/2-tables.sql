@@ -85,6 +85,7 @@ CREATE TABLE public.projects (
     osm_category character varying,
     xlsform_content bytea,
     odk_form_id character varying,
+    odk_form_xml xml,
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     mapper_level public.mappinglevel NOT NULL DEFAULT 'INTERMEDIATE',
     priority public.projectpriority DEFAULT 'MEDIUM',

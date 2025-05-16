@@ -28,16 +28,9 @@ CREATE TABLE public.odk_entities (
     project_id integer NOT NULL,
     task_id integer,
     osm_id integer,
-    submission_ids character varying
+    submission_ids character varying,
+    is_new boolean DEFAULT false,
+    -- This a javarosa geom string
+    geometry character varying
 );
 ALTER TABLE public.odk_entities OWNER TO fmtm;
-
-
-CREATE TABLE public.geometrylog (
-    id UUID NOT NULL DEFAULT gen_random_uuid(),
-    geojson JSONB NOT NULL,
-    status public.geomstatus,
-    project_id int,
-    task_id int
-);
-ALTER TABLE public.geometrylog OWNER TO fmtm;
