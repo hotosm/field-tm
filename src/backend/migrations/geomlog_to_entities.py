@@ -81,12 +81,6 @@ async def insert_into_entities(
             client.entities.list, project_id=odk_id, entity_list_name="features"
         )
         odk_entities = await loop.run_in_executor(None, update_fn)
-        print("")
-        print("")
-        print("")
-        print(odk_entities)
-        print("")
-        print("")
         existing_entity_ids = {e.uuid for e in odk_entities}
 
         for entity_id, data in geomlog.items():
