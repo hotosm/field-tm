@@ -304,14 +304,11 @@ async def get_form_media(
             project_odk_id,
             project_odk_creds,
         )
-
     except Exception as e:
-        log.exception(f"Error: {e}")
         msg = (
-            f"Failed to get form media for Field-TM project ({project_id}) "
+            f"Failed to get all form media for Field-TM project ({project_id}) "
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
-        log.error(msg)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=msg,
