@@ -150,7 +150,10 @@
 	}
 
 	onMount(async () => {
-		await subscribeToAllStreams();
+		if (online.current) {
+			// Only subscribe if currently online
+			subscribeToAllStreams();
+		}
 
 		// Note we need this for now, as the task outlines are from API, while task
 		// events are from pglite / sync. We pass through the task outlines.
@@ -309,7 +312,7 @@
 		}
 	}
 
-	async function triggerOfflineDataSync() {
+	async function triggerManualOfflineDataSync() {
 		if (!db) return;
 		const success = await iterateAndSendOfflineSubmissions();
 		// Return immediately if there were submission failures, to prevent overwriting entities below
@@ -326,13 +329,25 @@
 		await entitiesStore.syncEntityStatusManually(db, projectId)
 	}
 
+	async function handleOnlineSync() {
+		// Also send any pending submissions first
+		const success = await iterateAndSendOfflineSubmissions();
+
+		// Once done, subscribe to electric ShapeStreams
+		if (success) {
+			subscribeToAllStreams();
+		} else {
+			console.warn("Offline sync failed; subscribing to latest ShapeStreams anyway...");
+			subscribeToAllStreams();
+		}
+	}
+
 	// Subscribe / unsubscribe from streams based on connectivity
 	// note: the effect rune can't accept async, but this is fine
 	// note: we also need to debounce this to prevent infinite loop
 	$effect(() => {
 		const isOnline = online.current;
 
-		// Prevent running unnecessarily
 		if (isOnline === lastOnlineStatus) return;
 		lastOnlineStatus = isOnline;
 
@@ -343,9 +358,10 @@
 
 		subscribeDebounce = setTimeout(() => {
 			if (isOnline) {
-				subscribeToAllStreams();
-				// Also send any pending submissions (no awaiting required)
-				iterateAndSendOfflineSubmissions();
+				// Delay initial sync and subscriptions by 5 seconds after load (reduce memory spike)
+				setTimeout(() => {
+					handleOnlineSync();
+				}, 5000);
 			} else {
 				unsubscribeFromAllStreams();
 			}
@@ -525,7 +541,7 @@
 			newFeatureDrawInstance.setMode('select');
 		}}
 		syncButtonTrigger={async () => {
-			await triggerOfflineDataSync();
+			await triggerManualOfflineDataSync();
 		}}
 	></MapComponent>
 

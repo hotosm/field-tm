@@ -60,7 +60,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
 					cacheName: 'field-tm-static-assets',
 					expiration: {
 						maxEntries: 300,
-						maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+						maxAgeSeconds: 60 * 60 * 24 * 14, // 14 days
 					},
 				},
 			},
