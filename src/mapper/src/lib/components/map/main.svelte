@@ -210,10 +210,6 @@
 			const entityCentroid = centroid(entityGeometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntityId(clickedEntityId);
-			entitiesStore.setSelectedEntityGeometry({
-				entityId: clickedEntityId,
-				geometry: entityGeometry,
-			});
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
 				coordinate: entityCentroid?.geometry?.coordinates,
