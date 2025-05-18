@@ -44,6 +44,10 @@
 	const { data }: Props = $props();
 	const { project, projectId, db } = data;
 
+	const { odk_form_xml } = project;
+	const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
+	const formXmlUrl = URL.createObjectURL(formXmlBlob);
+
 	let webFormsRef: HTMLElement | undefined = $state();
 	let displayWebFormsDrawer = $state(false);
 
@@ -671,7 +675,7 @@
 		bind:webFormsRef
 		bind:display={displayWebFormsDrawer}
 		{projectId}
-		formXml={project.odk_form_xml}
+		formXml={formXmlUrl}
 		entityId={entitiesStore.selectedEntityId || undefined}
 		taskId={taskStore.selectedTaskIndex || undefined}
 	/>
