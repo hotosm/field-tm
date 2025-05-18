@@ -6,12 +6,10 @@
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/random';
-	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa.ts';
 	import { m } from '$translations/messages.js';
 
 	import type { Action } from 'svelte/action';
 
-	const API_URL = import.meta.env.VITE_API_URL;
 	type Props = {
 		display: Boolean;
 		entityId: string | undefined;
@@ -27,8 +25,6 @@
 	const { db } = commonStore;
 
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
-	const selectedEntityCoordinate = $derived(entitiesStore.selectedEntityCoordinate);
-	const selectedEntityGeometry = $derived(entitiesStore.selectedEntityGeometry);
 
 	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, formXml, taskId }: Props = $props();
 	let drawerRef: SlDrawer;
@@ -171,9 +167,8 @@
 				nodes.find((it: any) => it.definition.nodeset === '/data/xid')?.setValueState(`${selectedEntity?.osm_id}`);
 			}
 
-			if (selectedEntityCoordinate) {
-				const xlocation = geojsonGeomToJavarosa(selectedEntityGeometry.geometry);
-				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(xlocation);
+			if (selectedEntity?.geometry) {
+				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(selectedEntity?.geometry);
 			}
 		}
 	}
