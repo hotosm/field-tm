@@ -16,7 +16,7 @@
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { m } from '$translations/messages.js';
 	import { DbApiSubmission } from '$lib/db/api-submissions.ts';
-	import { sendNextQueuedSubmissionToApi } from '$lib/api/fetch';
+	import { sendNextQueuedSubmissionToApi, getSubmissionFetchOptions } from '$lib/api/fetch';
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
@@ -166,10 +166,10 @@
 			return;
 		}
 
-		// 20s delay to defer saving data until after initial page load
+		// 12s delay to defer saving data until after initial page load
 		timeout = setTimeout(() => {
 			storeFgbExtractOffline();
-		}, 20000);
+		}, 12000);
 	});
 
 	async function unsubscribeFromAllStreams() {
@@ -186,6 +186,26 @@
 		if (timeout) clearTimeout(timeout);
 	});
 
+	function wait(ms: number) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	async function trySendingSubmission(row: DbApiSubmissionType): Promise<boolean> {
+		try {
+			const options = await getSubmissionFetchOptions(row);
+			const res = await fetch(row.url, options);
+
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+			await DbApiSubmission.update(db, row.id, 'RECEIVED');
+			return true;
+		} catch (err) {
+			console.error('Offline send failed:', err);
+			await DbApiSubmission.update(db, row.id, 'FAILED', String(err));
+			return false;
+		}
+	}
+		
 	/**
 	 * Iterate and attempt to send all pending API submissions from the local database.
 	 * 
@@ -201,9 +221,6 @@
 	 async function iterateAndSendOfflineSubmissions(): Promise<boolean> {
 		if (!db) return false;
 
-		let sent = 0;
-		let failed = 0;
-
 		// Count remaining pending submissions
 		const total = await DbApiSubmission.count(db);
 		if (total === 0) return true; // Nothing to be done
@@ -214,98 +231,57 @@
 			variant: 'default'
 		});
 
-		let processed = 0; // how many attempts made (success + fail)
+		let sent = 0;
+		let failed = 0;
+		let processed = 0; // How many attempts made (success + fail)
 
+		// Use `while (true)` for continued iteration, as we manually break loop below
+		// It's safer than `while (processed < total)` in this dynamic context
 		while (true) {
-			const row = await DbApiSubmission.first(db);
+			const row = await DbApiSubmission.next(db);
 			if (!row) break; // No more pending entries
 
-			let success = false;
-
-			try {
-				let options: RequestInit;
-
-				// Handle JSON POSTs
-				if (row.content_type === 'application/json') {
-					options = {
-						method: row.method,
-						body: JSON.stringify(row.payload.body),
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						credentials: 'include'
-					};
-				// Handle multipart FormData posts (base64 encoded attachments)
-				} else if (row.content_type === 'multipart/form-data') {
-					const form = new FormData();
-					form.append('submission_xml', row.payload.form.submission_xml);
-
-					for (const f of row.payload.form.submission_files) {
-						const byteString = atob(f.base64.split(',')[1]);
-						const arrayBuffer = new Uint8Array(byteString.length);
-						for (let i = 0; i < byteString.length; i++) {
-							arrayBuffer[i] = byteString.charCodeAt(i);
-						}
-						const blob = new Blob([arrayBuffer], { type: f.type });
-						const file = new File([blob], f.name, { type: f.type });
-						form.append('submission_files', file);
-					}
-
-					options = {
-						method: row.method,
-						body: form,
-						credentials: 'include'
-					};
-				} else {
-					throw new Error(`Unsupported content_type: ${row.content_type}`);
-				}
-
-				const res = await fetch(row.url, options);
-
-				if (!res.ok) throw new Error(`HTTP ${res.status}`);
-				success = true;
-			} catch (err) {
-				console.error('Offline send failed:', err);
-				success = false;
-			}
-
-			processed++;
+			const success = await trySendingSubmission(row);
 
 			if (success) {
 				sent++;
-				// This is bad ux if multiple send in quick succession
+				// Commented, as this is bad ux if multiple send in quick succession
 				// alertStore.setAlert({
 				// 	message: `Successfully sent offline data ${sent}/${total} to API`,
 				// 	variant: 'success'
 				// });
 				await DbApiSubmission.deleteById(db, row.id);
+				commonStore.setOfflineSyncPercentComplete((sent / total) * 100);
+				// Wait 1 second until next API call
+				await wait(1000);
 			} else {
-				failed++;
 				alertStore.setAlert({
-					message: `Failed to send offline data ${processed}/${total} to API (Failures: ${failed})`,
+					message: `Failed to send offline data ${sent + 1}/${total} to API — stopping sync.`,
 					variant: 'danger'
 				});
+				// 🔴 Stop iteration on first failure, as subsequent API calls may require
+				// the previous data to be available on the server
+				// FIXME in future we need to allow the user configuration to skip this
+				// or some way to get around broken POST. If the error response is
+				// genuine, we currently have no way to allow submissions to continue
+				break;
 			}
-
-			commonStore.setOfflineSyncPercentComplete((processed / total) * 100);
-			// Wait 1 second until next API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
 
 		commonStore.setOfflineSyncPercentComplete(null);
 		commonStore.setOfflineDataIsSyncing(false);
 
-		if (failed < 1) {
+		if (sent === total) {
 			alertStore.setAlert({
 				message: `Finished sending offline data.`,
 				variant: 'success'
 			});
-			// Clear the table if all sent successfully
+			// We should have already deleted row-by-row above, but this is an extra check...
 			await DbApiSubmission.clear(db);
 			return true;
 		} else {
 			alertStore.setAlert({
-				message: `Offline sync: (${sent} succeeded, ${failed} failed).`,
+				message: `Offline sync incomplete: ${sent}/${total} submissions sent.`,
 				variant: 'warning'
 			});
 			return false;
