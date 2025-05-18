@@ -1044,6 +1044,13 @@ async def get_form_media(
             xform_id,
         )
 
+    # Remove any entries where the value is None
+    form_attachment_urls = {
+        filename: url
+        for filename, url in form_attachment_urls.items()
+        if url is not None
+    }
+
     if settings.DEBUG:
         form_attachment_urls = {
             filename: strip_presigned_url_for_local_dev(url)

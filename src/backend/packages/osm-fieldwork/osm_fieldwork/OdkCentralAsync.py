@@ -256,60 +256,67 @@ class OdkForm(OdkCentral):
         self,
         projectId: int,
         xform: str,
-    ) -> dict[str, str]:
-        """Get a dictionary of form attachment names and their pre-signed URLs.
+    ) -> dict[str, Optional[str | bytes]]:
+        """Get a dictionary of form attachment names to pre-signed S3 URLs or raw binary content.
 
         Args:
             projectId (int): The ID of the project on ODK Central.
             xform (str): The XForm ID to get attachments from.
 
         Returns:
-            dict[str, str]: A dictionary mapping attachment names to URLs.
+            dict[str, Optional[Union[str, bytes]]]: A mapping from attachment names to either:
+                - a pre-signed S3 URL (str), or
+                - raw bytes (if file was returned directly),
+                - or None if the attachment couldn't be fetched.
         """
         attachments = await self.listFormAttachments(projectId, xform)
         if not attachments:
             return {}
 
-        async def fetch_url(attachment: dict) -> tuple[str, Optional[str]]:
-            """Fetch the pre-signed URL for a given form attachment filename."""
+        # Filter out dataset attachments
+        filtered_attachments = [
+            att for att in attachments if not att.get("datasetExists")
+        ]
+
+        async def fetch_url(attachment: dict) -> tuple[str, Optional[str | bytes]]:
             filename = attachment["name"]
             url = f"{self.base}projects/{projectId}/forms/{xform}/attachments/{filename}"
-            result = await self.session.get(url, ssl=self.verify, allow_redirects=False)
 
-            if result.status in (301, 302, 303, 307, 308):  # is a redirect to the S3 URL
-                s3_url = result.headers.get("Location")
-                if not s3_url:
-                    try:
-                        text_body = await result.text()
-                    except UnicodeDecodeError:
-                        text_body = "[Binary data]"
-                    log.error(
-                        f"No 'Location' response header for form attachment {filename} from Central: "
-                        f"{text_body}"
+            try:
+                result = await self.session.get(url, ssl=self.verify, allow_redirects=False)
+
+                if result.status >= 400:
+                    log.warning(
+                        f"Failed to fetch form attachment '{filename}' "
+                        f"(status {result.status}) from form '{xform}' (project {projectId})"
                     )
                     return filename, None
 
-            else:
-                try:
-                    log.error(
-                        f"Incorrect response code for form attachment {filename} from Central: "
-                        f"{await result.text()}"
-                    )
-                except UnicodeDecodeError:
-                    log.error(f"Central response code: {result.status}")
-                    log.error(
-                        "Central appears to be returning the binary data instead "
-                        "of the S3 URL. Is Central configured to use S3 storage? "
-                        "Or perhaps the file is simply not uploaded to S3 yet."
-                    )
+                s3_url = result.headers.get("Location")
+                if s3_url:
+                    return filename, s3_url
 
+                # If not a redirect, assume raw binary data is returned
+                try:
+                    content = await result.read()
+                except Exception as read_err:
+                    log.warning(
+                        f"Failed to read binary data for attachment '{filename}' "
+                        f"on form '{xform}' (project {projectId}): {read_err}"
+                    )
+                    return filename, None
+
+                return filename, content
+
+            except Exception as e:
+                log.warning(
+                    f"Exception while fetching form attachment '{filename}' "
+                    f"from form '{xform}' (project {projectId}): {e}"
+                )
                 return filename, None
 
-            return filename, s3_url
-
-        urls = await gather(*(fetch_url(attachment) for attachment in attachments))
-        
-        return {filename: url for filename, url in urls if url is not None}
+        urls = await gather(*(fetch_url(att) for att in filtered_attachments))
+        return {filename: url_or_bytes for filename, url_or_bytes in urls}
 
     async def listSubmissions(self, projectId: int, xform: str):
         """Fetch a list of submission instances for a given form.
