@@ -15,6 +15,7 @@
 	import type { ProjectTask } from '$lib/types';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { m } from '$translations/messages.js';
+	import { DbProject } from '$lib/db/projects.ts';
 	import { DbApiSubmission } from '$lib/db/api-submissions.ts';
 	import { sendNextQueuedSubmissionToApi, getSubmissionFetchOptions } from '$lib/api/fetch';
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
@@ -42,7 +43,9 @@
 	}
 
 	const { data }: Props = $props();
-	const { project, projectId, db } = data;
+	const { project: initialProject, projectId, dbPromise } = data;
+	let db: PGlite | undefined;
+	let project: DbProjectType | undefined = initialProject;
 
 	const { odk_form_xml } = project;
 	const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
@@ -72,13 +75,10 @@
 
 	const latestEvent = $derived(taskStore.latestEvent);
 	const commentMention = $derived(taskStore.commentMention);
-	// Make db accessible via store
-	commonStore.setDb(db);
-	commonStore.setUseOdkCollectOverride(project.use_odk_collect);
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
-		if (latestEvent) {
+		if (db && latestEvent) {
 			taskStore.appendTaskStatesToFeatcol(db, projectId, project.tasks);
 		}
 	});
@@ -150,10 +150,26 @@
 	}
 
 	onMount(async () => {
+		// Get db and make accessible via store
+		db = await dbPromise;
+		commonStore.setDb(db);
 		if (online.current) {
-			// Only subscribe if currently online
+			// If we got project from API in +page.ts (online),
+			// insert full project details into database
+			await DbProject.upsert(db, project);
+
+			// Only subscribe if currently online (no need to await)
 			subscribeToAllStreams();
+		} else {
+			// Else attempt to get project from localdb
+			project = await DbProject.one(db, projectId);
+			if (!project) {
+				throw error(404, `Project with ID (${projectId}) not found in local storage`);
+			}
 		}
+
+		// Set vars that require upstream project details set (and are not reactive)
+		commonStore.setUseOdkCollectOverride(project.use_odk_collect);
 
 		// Note we need this for now, as the task outlines are from API, while task
 		// events are from pglite / sync. We pass through the task outlines.
@@ -178,12 +194,12 @@
 	}
 
 	onDestroy(() => {
-		unsubscribeFromAllStreams();
-
 		taskStore.clearTaskStates();
 		entitiesStore.setFgbOpfsUrl('');
 
 		if (timeout) clearTimeout(timeout);
+
+		unsubscribeFromAllStreams();
 	});
 
 	function wait(ms: number) {

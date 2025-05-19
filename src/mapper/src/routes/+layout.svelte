@@ -2,7 +2,7 @@
 	import '$styles/page.css';
 	import '@hotosm/ui/dist/hotosm-ui';
 
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
 	import { error } from '@sveltejs/kit';
 	import type { PageProps } from './$types';
@@ -119,6 +119,11 @@
 			linkElement.href = data.config.cssFile;
 			document.head.appendChild(linkElement);
 		}
+	});
+
+	onDestroy(async() => {
+		const db = await dbPromise();
+		db.close()
 	});
 </script>
 

@@ -50,7 +50,7 @@ function getProjectStore() {
 		}
 	}
 
-	function _parseProjectList(projects: DbProjectType[] | APIProject[]): DbProjectType[] {
+	function _parseProjectList(projects: DbProjectType[] | APIProject[]): Partial<DbProjectType>[] {
 		return projects.map((project) => ({
 			id: project.id,
 			name: project.name,

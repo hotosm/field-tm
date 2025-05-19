@@ -1,14 +1,15 @@
 <script lang="ts">
 	import '$styles/forms.css';
+	import type { Action } from 'svelte/action';
+	import type { PGlite } from '@electric-sql/pglite';
 	import type { SlDrawer } from '@shoelace-style/shoelace';
+
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/random';
 	import { m } from '$translations/messages.js';
-
-	import type { Action } from 'svelte/action';
 
 	type Props = {
 		display: Boolean;
@@ -24,7 +25,7 @@
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
-	const { db } = commonStore;
+	let db: PGlite | undefined = $derived(commonStore.db);
 
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 
