@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$styles/page.css';
 	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
 	import type { PGlite } from '@electric-sql/pglite';
 	import type { SlInputEvent } from '@shoelace-style/shoelace';
@@ -18,10 +18,7 @@
 	}
 
 	let db: PGlite | undefined;
-	let dbLoaded = $state(false);
 	const { data }: Props = $props();
-	const { dbPromise } = data;
-
 	const commonStore = getCommonStore();
 	const projectStore = getProjectStore();
 
@@ -42,10 +39,6 @@
 		return () => clearTimeout(timeoutId);
 	});
 
-	$effect(() => {
-		projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
-	});
-
 	onMount(async () => {
 		// if requestedPath set, redirect to the desired path (in our case we have requestedPath set to invite url)
 		const requestedPath = sessionStorage.getItem('requestedPath');
@@ -54,11 +47,12 @@
 		}
 
 		// Get db and make accessible via store
-		db = await dbPromise;
+		db = await data.dbPromise;
 		commonStore.setDb(db);
-		dbLoaded = true;
 
-		if (db && !online.current) {
+		if (online.current) {
+			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
+		} else {
 			await projectStore.fetchProjectsFromLocalDB(db);
 		}
 	});
@@ -79,7 +73,7 @@
 		<div
 			class="overflow-y-scroll grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:fmtm-grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 pb-2"
 		>
-			{#if !dbLoaded | projectStore.projectListLoading}
+			{#if projectStore.projectListLoading}
 				{#each Array.from({ length: 12 }) as itr}
 					<ProjectCardSkeleton />
 				{/each}

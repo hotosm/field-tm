@@ -18,6 +18,7 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
+	import type { PGlite } from '@electric-sql/pglite';
 	import maplibre, { type MapGeoJSONFeature } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
@@ -96,12 +97,12 @@
 	const cssValue = (property: string) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
 
 	const commonStore = getCommonStore();
-	const { db } = commonStore;
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
 	const entitiesStore = getEntitiesStatusStore();
 	const projectBasemapStore = getProjectBasemapStore();
 
+	let db: PGlite | undefined = $derived(commonStore.db);
 	let map: maplibregl.Map | undefined = $state();
 	let loaded: boolean = $state(false);
 	let selectedBaselayer: string = $state('OSM');

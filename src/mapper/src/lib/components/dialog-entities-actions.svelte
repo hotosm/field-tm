@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '$styles/dialog-entities-actions.css';
+	import type { PGlite } from '@electric-sql/pglite';
 	import { distance } from '@turf/distance';
 	import type { Coord } from '@turf/helpers';
 	import type { SlDialog, SlDrawer } from '@shoelace-style/shoelace';
@@ -31,8 +32,8 @@
 	const alertStore = getAlertStore();
 	const commonStore = getCommonStore();
 	const taskStore = getTaskStore();
-	const { db } = commonStore;
 
+	let db: PGlite | undefined = $derived(commonStore.db);
 	let dialogRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
 	let showCommentsPopup: boolean = $state(false);

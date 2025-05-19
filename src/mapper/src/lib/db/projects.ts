@@ -21,20 +21,24 @@ async function upsert(db: PGlite, projectData: Partial<DbProjectType>): Promise<
 
 	// Filter keys to only include those present in the actual DB schema
 	const columns = Object.keys(projectData).filter((key) => DB_PROJECT_COLUMNS.has(key));
-	if (columns.length === 0) return;
+	if (columns.length === 0) {
+		console.warn('Project upsert skipped: no valid columns provided');
+		return;
+	}
 
 	const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
 	const values = columns.map((key) => projectData[key as keyof DbProjectType]);
 
 	const updateClause = columns
 		.filter((col) => col !== 'id') // Don't update ID
-		.map((col, i) => `${col} = excluded.${col}`)
+		.map((col) => `${col} = excluded.${col}`)
 		.join(', ');
 
 	const sql = `
 		INSERT INTO projects (${columns.join(', ')})
 		VALUES (${placeholders})
-		ON CONFLICT(id) DO UPDATE SET ${updateClause};
+		ON CONFLICT(id)
+		${updateClause ? `DO UPDATE SET ${updateClause}` : `DO NOTHING`};
 	`;
 
 	await db.query(sql, values);
