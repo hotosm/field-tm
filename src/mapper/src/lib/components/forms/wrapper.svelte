@@ -19,6 +19,8 @@
 		webFormsRef: HTMLElement | undefined;
 	};
 
+	const WEB_FORMS_IFRAME_ID = "7f86f661-efd6-4cc6-b068-48dd7eb53dbb";
+
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -39,6 +41,8 @@
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
 	);
+
+	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
@@ -224,40 +228,50 @@
 	class="forms-wrapper-drawer"
 >
 	{#await odkWebFormPromise then odkWebFormUrl}
-		{#if entityId}
-			{#key projectId}
-				{#await formMediaPromise then formMedia}
-					{#key entityId}
-						{#key commonStore.locale}
-							{#if uploading}
-								<div id="web-forms-uploader">
-									<div id="uploading-inner">
-										<div id="spinner"></div>
-										{uploadingMessage}
+		{#await webFormPagePromise then webFormPageUrl}
+			{#if entityId}
+				{#key projectId}
+					{#await formMediaPromise then formMedia}
+						{#key entityId}
+							{#key commonStore.locale}
+								{#if uploading}
+									<div id="web-forms-uploader">
+										<div id="uploading-inner">
+											<div id="spinner"></div>
+											{uploadingMessage}
+										</div>
 									</div>
-								</div>
-							{:else}
-								{#if drawerLabel}
-									<div
-										style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
-									>
-										{drawerLabel}
-									</div>
+								{:else}
+									{#if drawerLabel}
+										<div
+											style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+										>
+											{drawerLabel}
+										</div>
+									{/if}
+									<iframe
+										class="iframe"
+										style:border="none"
+										style:height="100%"
+										use:handleIframe
+										title="odk-web-forms-wrapper"
+										id={WEB_FORMS_IFRAME_ID}
+										name={WEB_FORMS_IFRAME_ID}
+										src={`${webFormPageUrl}`}
+										data-project-id={projectId}
+										data-entity-id={entityId}
+										data-form-xml={formXml}
+										data-odk-web-form-url={odkWebFormUrl}
+										data-form-media={encodeURIComponent(JSON.stringify(formMedia))}
+										data-css-file={commonStore.config?.cssFileWebformsOverride || ''}
+									></iframe>
 								{/if}
-								<iframe
-									class="iframe"
-									style:border="none"
-									style:height="100%"
-									use:handleIframe
-									title="odk-web-forms-wrapper"
-									src={`/web-forms.html?projectId=${projectId}&entityId=${entityId}&formXml=${formXml}&odkWebFormUrl=${odkWebFormUrl}&formMedia=${encodeURIComponent(JSON.stringify(formMedia))}&cssFile=${commonStore.config?.cssFileWebformsOverride || ''}`}
-								></iframe>
-							{/if}
+							{/key}
 						{/key}
-					{/key}
-				{/await}
-			{/key}
-		{/if}
+					{/await}
+				{/key}
+			{/if}
+		{/await}
 	{/await}
 </hot-drawer>
 
