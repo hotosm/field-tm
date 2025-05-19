@@ -28,6 +28,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
 	workbox: {
 		// Don't fallback on document based (e.g. `/some-page`) requests
 		// Even though this says `null` by default, I had to set this specifically to `null` to make it work
+		// We can do this because we are explicitly handling all navigation routes via runtimeCaching
 		navigateFallback: null,
 
 		// Cache all imports
@@ -40,11 +41,15 @@ const pwaOptions: Partial<VitePWAOptions> = {
 			{
 				urlPattern: ({ request }: RouteMatchCallbackOptions) => request.mode === 'navigate',
 				// Try to get fresh version; fallback when offline
-				// handler: 'StaleWhileRevalidate',
 				handler: 'NetworkFirst',
+				// // NOTE the below doesn't work yet, so we use NetworkFirst above
+				// // This will load the cached version instantly, then update the cache in the
+				// // background. On next refresh, the updated app will be loaded.
+				// // This is a good tradeoff, as slightly outdated content is only shown temporarily.
+				// handler: 'StaleWhileRevalidate',
 				options: {
 					cacheName: 'field-tm-html-pages',
-					networkTimeoutSeconds: 5,
+					networkTimeoutSeconds: 5, // Setting only valid for NetworkFirst, else errors
 					expiration: {
 						maxEntries: 50,
 						maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days

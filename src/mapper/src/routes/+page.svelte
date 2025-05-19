@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
+	import type { PGlite } from '@electric-sql/pglite';
 	import type { SlInputEvent } from '@shoelace-style/shoelace';
 
 	import { goto } from '$app/navigation';
@@ -16,14 +17,13 @@
 		data: PageData;
 	}
 
+	let db: PGlite | undefined;
+	let dbLoaded = $state(false);
 	const { data }: Props = $props();
-	const { db } = data;
+	const { dbPromise } = data;
 
 	const commonStore = getCommonStore();
 	const projectStore = getProjectStore();
-
-	// Make db accessible via store
-	commonStore.setDb(db);
 
 	let paginationPage = $state(1);
 	let search = $state('');
@@ -53,7 +53,12 @@
 			goto(requestedPath);
 		}
 
-		if (!online.current) {
+		// Get db and make accessible via store
+		db = await dbPromise;
+		commonStore.setDb(db);
+		dbLoaded = true;
+
+		if (db && !online.current) {
 			await projectStore.fetchProjectsFromLocalDB(db);
 		}
 	});
@@ -74,7 +79,7 @@
 		<div
 			class="overflow-y-scroll grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:fmtm-grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 pb-2"
 		>
-			{#if projectStore.projectListLoading}
+			{#if !dbLoaded | projectStore.projectListLoading}
 				{#each Array.from({ length: 12 }) as itr}
 					<ProjectCardSkeleton />
 				{/each}
