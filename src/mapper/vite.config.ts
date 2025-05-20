@@ -154,7 +154,10 @@ export default defineConfig({
 		},
 	},
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['./tests/**/*.{test,spec}.{js,ts}'],
+		// Required to use browser APIs in testing
+		environment: 'jsdom',
+		setupFiles: ['./tests/setup.ts'],
 	},
 	// assetsInclude: ['**/*.tar.gz'],
 	optimizeDeps: {

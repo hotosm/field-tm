@@ -75,5 +75,5 @@ just test frontend
 To run the Field-TM UI for interactive testing, run:
 
 ```bash
-just test frontend-interactive
+just test frontend-e2e-interactive
 ```

@@ -190,6 +190,7 @@ services:
       additional_contexts:
         - code=src/frontend
       dockerfile: Dockerfile.ui.debug
+      target: build
     volumes:
       - ./src/frontend:/app
       - /app/node_modules/
@@ -208,6 +209,7 @@ services:
       additional_contexts:
         - code=src/mapper
       dockerfile: Dockerfile.ui.debug
+      target: init-db
     volumes:
       - ./src/mapper:/app
       - /app/node_modules/
