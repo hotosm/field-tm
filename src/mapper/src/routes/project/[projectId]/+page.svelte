@@ -5,6 +5,7 @@
 	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
+	import type { PGlite } from '@electric-sql/pglite';
 	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
@@ -12,12 +13,10 @@
 	import type SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
-	import type { ProjectTask } from '$lib/types';
+	import type { ProjectTask, DbProjectType } from '$lib/types';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { m } from '$translations/messages.js';
 	import { DbProject } from '$lib/db/projects.ts';
-	import { DbApiSubmission } from '$lib/db/api-submissions.ts';
-	import { sendNextQueuedSubmissionToApi, getSubmissionFetchOptions } from '$lib/api/fetch';
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
@@ -26,6 +25,7 @@
 	import { readFileFromOPFS } from '$lib/fs/opfs';
 	import { loadOfflineExtract, writeOfflineExtract } from '$lib/map/extracts';
 	import { getNewOsmId } from '$lib/utils/random';
+	import { iterateAndSendOfflineSubmissions } from '$lib/api/offline';
 
 	import ImportQrGif from '$assets/images/importQr.gif';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
@@ -47,10 +47,7 @@
 	let db: PGlite | undefined;
 	let project: DbProjectType | undefined = initialProject;
 
-	const { odk_form_xml } = project;
-	const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
-	const formXmlUrl = URL.createObjectURL(formXmlBlob);
-
+	let formXmlUrl: string | null = $state(null);
 	let webFormsRef: HTMLElement | undefined = $state();
 	let displayWebFormsDrawer = $state(false);
 
@@ -169,7 +166,12 @@
 		}
 
 		// Set vars that require upstream project details set (and are not reactive)
-		commonStore.setUseOdkCollectOverride(project.use_odk_collect);
+		if (project) {
+			commonStore.setUseOdkCollectOverride(project.use_odk_collect);
+			const { odk_form_xml }: DbProjectType = project;
+			const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
+			formXmlUrl = URL.createObjectURL(formXmlBlob);
+		}
 
 		// Note we need this for now, as the task outlines are from API, while task
 		// events are from pglite / sync. We pass through the task outlines.
@@ -201,112 +203,10 @@
 
 		unsubscribeFromAllStreams();
 	});
-
-	function wait(ms: number) {
-		return new Promise((resolve) => setTimeout(resolve, ms));
-	}
-
-	async function trySendingSubmission(row: DbApiSubmissionType): Promise<boolean> {
-		try {
-			const options = await getSubmissionFetchOptions(row);
-			const res = await fetch(row.url, options);
-
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-			await DbApiSubmission.update(db, row.id, 'RECEIVED');
-			return true;
-		} catch (err) {
-			console.error('Offline send failed:', err);
-			await DbApiSubmission.update(db, row.id, 'FAILED', String(err));
-			return false;
-		}
-	}
-		
-	/**
-	 * Iterate and attempt to send all pending API submissions from the local database.
-	 * 
-	 * This function is triggered in two scenarios:
-	 *  - Automatically when coming back online (debounced via $effect)
-	 *  - Manually via the sync button in the map UI
-	 * 
-	 * Each submission is sent sequentially. If the API acknowledges receipt (status becomes 'RECEIVED'),
-	 * it is considered a success. Failures are logged but not retried immediately (they remain in 'PENDING').
-	 * 
-	 * Syncing status is tracked via `commonStore.offlineDataIsSyncing` and alerts are shown after each attempt.
-	 */
-	 async function iterateAndSendOfflineSubmissions(): Promise<boolean> {
-		if (!db) return false;
-
-		// Count remaining pending submissions
-		const total = await DbApiSubmission.count(db);
-		if (total === 0) return true; // Nothing to be done
-
-		commonStore.setOfflineDataIsSyncing(true);
-		alertStore.setAlert({
-			message: `Found ${total} offline submissions.`,
-			variant: 'default'
-		});
-
-		let sent = 0;
-		let failed = 0;
-		let processed = 0; // How many attempts made (success + fail)
-
-		// Use `while (true)` for continued iteration, as we manually break loop below
-		// It's safer than `while (processed < total)` in this dynamic context
-		while (true) {
-			const row = await DbApiSubmission.next(db);
-			if (!row) break; // No more pending entries
-
-			const success = await trySendingSubmission(row);
-
-			if (success) {
-				sent++;
-				// Commented, as this is bad ux if multiple send in quick succession
-				// alertStore.setAlert({
-				// 	message: `Successfully sent offline data ${sent}/${total} to API`,
-				// 	variant: 'success'
-				// });
-				await DbApiSubmission.deleteById(db, row.id);
-				commonStore.setOfflineSyncPercentComplete((sent / total) * 100);
-				// Wait 1 second until next API call
-				await wait(1000);
-			} else {
-				alertStore.setAlert({
-					message: `Failed to send offline data ${sent + 1}/${total} to API — stopping sync.`,
-					variant: 'danger'
-				});
-				// 🔴 Stop iteration on first failure, as subsequent API calls may require
-				// the previous data to be available on the server
-				// FIXME in future we need to allow the user configuration to skip this
-				// or some way to get around broken POST. If the error response is
-				// genuine, we currently have no way to allow submissions to continue
-				break;
-			}
-		}
-
-		commonStore.setOfflineSyncPercentComplete(null);
-		commonStore.setOfflineDataIsSyncing(false);
-
-		if (sent === total) {
-			alertStore.setAlert({
-				message: `Finished sending offline data.`,
-				variant: 'success'
-			});
-			// We should have already deleted row-by-row above, but this is an extra check...
-			await DbApiSubmission.clear(db);
-			return true;
-		} else {
-			alertStore.setAlert({
-				message: `Offline sync incomplete: ${sent}/${total} submissions sent.`,
-				variant: 'warning'
-			});
-			return false;
-		}
-	}
-
+	
 	async function triggerManualOfflineDataSync() {
 		if (!db) return;
-		const success = await iterateAndSendOfflineSubmissions();
+		const success = await iterateAndSendOfflineSubmissions(db);
 		// Return immediately if there were submission failures, to prevent overwriting entities below
 		if (!success) return;
 
@@ -323,7 +223,7 @@
 
 	async function handleOnlineSync() {
 		// Also send any pending submissions first
-		const success = await iterateAndSendOfflineSubmissions();
+		const success = await iterateAndSendOfflineSubmissions(db);
 
 		// Once done, subscribe to electric ShapeStreams
 		if (success) {

@@ -37,6 +37,7 @@ services:
       additional_contexts:
         - code=./contrib/tunnel/button
       dockerfile: Dockerfile.ui.debug
+      target: build
     volumes:
       - ./contrib/tunnel/button:/app
       - /app/node_modules/

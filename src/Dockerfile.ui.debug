@@ -21,8 +21,8 @@ RUN pnpm install
 CMD ["pnpm", "run", "dev"]
 
 
-# Test code for initialising PGLite db and creating tar dump
-# FROM build AS init-db
-# COPY --from=code ./src/lib/db/init.js ./src/lib/db/init.js
-# RUN pnpm run init-db
-# RUN cp pgdata.tar.gz /backend/migrations/init/
+# Initialising PGLite db and creating tar dump (used during tests)
+FROM build AS init-db
+COPY --from=code ./src/lib/db/init.js ./src/lib/db/init.js
+RUN pnpm run init-db
+RUN cp pgdata.tar.gz /backend/migrations/init/

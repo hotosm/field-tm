@@ -47,69 +47,6 @@ async function fetchFormMediBlobUrls(projectId: number): Promise<{ [filename: st
 	return formMediaBlobs;
 }
 
-type SubmissionResult = { id: number; success: boolean } | undefined;
-
-async function sendNextQueuedSubmissionToApi(db: PGlite): Promise<SubmissionResult | null> {
-	const nextSubmission = await DbApiSubmission.next(db);
-	if (!nextSubmission) return null;
-
-	try {
-		const fetchOptions = buildFetchOptions(nextSubmission);
-		const response = await fetch(nextSubmission.url, fetchOptions);
-
-		await DbApiSubmission.update(
-			db,
-			nextSubmission.id,
-			response.ok ? 'RECEIVED' : 'FAILED',
-			response.ok ? null : `HTTP ${response.status}`,
-		);
-
-		return { id: nextSubmission.id, success: response.ok };
-	} catch (err: any) {
-		await DbApiSubmission.update(db, nextSubmission.id, 'FAILED', String(err));
-		return { id: nextSubmission.id, success: false };
-	}
-}
-
-function isBlob(value: unknown): value is Blob {
-	return typeof Blob !== 'undefined' && value instanceof Blob;
-}
-
-function buildFetchOptions(submission: DbApiSubmissionType): RequestInit {
-	const { method, content_type, payload, headers } = submission;
-
-	const combinedHeaders: Record<string, string> = {
-		'Content-Type': content_type,
-		...(headers || {}),
-	};
-
-	const fetchOptions: RequestInit = {
-		method,
-		headers: combinedHeaders,
-	};
-
-	if (method !== 'GET' && method !== 'HEAD') {
-		if (content_type === 'application/json') {
-			fetchOptions.body = JSON.stringify(payload);
-		} else if (content_type === 'application/xml' || content_type === 'text/plain') {
-			fetchOptions.body = typeof payload === 'string' ? payload : '';
-		} else if (content_type === 'multipart/form-data') {
-			const form = new FormData();
-			Object.entries(payload || {}).forEach(([key, value]) => {
-				if (typeof value === 'string' || isBlob(value)) {
-					form.append(key, value);
-				} else {
-					form.append(key, JSON.stringify(value));
-				}
-			});
-			fetchOptions.body = form;
-			delete combinedHeaders['Content-Type']; // Let FormData handle this
-		}
-	}
-
-	return fetchOptions;
-}
-
 function decodeBase64File(base64: string, name: string, type: string): File {
 	const byteString = atob(base64.split(',')[1]);
 	const arrayBuffer = new Uint8Array(byteString.length);
@@ -151,10 +88,20 @@ async function getSubmissionFetchOptions(row: DbApiSubmissionType): Promise<Requ
 	throw new Error(`Unsupported content_type: ${row.content_type}`);
 }
 
-export {
-	fetchCachedBlobUrl,
-	fetchBlobUrl,
-	fetchFormMediBlobUrls,
-	sendNextQueuedSubmissionToApi,
-	getSubmissionFetchOptions,
-};
+async function trySendingSubmission(db: PGlite, row: DbApiSubmissionType): Promise<boolean> {
+	try {
+		const options = await getSubmissionFetchOptions(row);
+		const res = await fetch(row.url, options);
+
+		if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+		await DbApiSubmission.update(db, row.id, 'RECEIVED');
+		return true;
+	} catch (err) {
+		console.error('Offline send failed:', err);
+		await DbApiSubmission.update(db, row.id, 'FAILED', String(err));
+		return false;
+	}
+}
+
+export { fetchCachedBlobUrl, fetchBlobUrl, fetchFormMediBlobUrls, trySendingSubmission };

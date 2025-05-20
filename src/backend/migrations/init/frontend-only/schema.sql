@@ -95,6 +95,9 @@ ALTER TABLE ONLY public.api_submissions ALTER COLUMN id SET DEFAULT nextval(
     'public.api_submissions_seq'::regclass
 );
 
+-- Replica of the api_submissions to store failed submissions
+CREATE TABLE api_failures (LIKE api_submissions INCLUDING ALL);
+
 
 -- Constraints
 ALTER TABLE ONLY public.projects
@@ -102,6 +105,7 @@ ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.api_submissions
 ADD CONSTRAINT api_submissions_pkey PRIMARY KEY (id);
+
 
 -- Indexes (we do not index on geometry field, as no postgis)
 CREATE INDEX idx_projects_organisation_id

@@ -81,16 +81,38 @@ async function deleteById(db: PGlite, id: number): Promise<void> {
 	await db.query(`DELETE FROM api_submissions WHERE id = $1;`, [id]);
 }
 
-async function clear(db: PGlite): Promise<void> {
+async function allQueued(db: PGlite): Promise<DbApiSubmissionType[] | null> {
+	if (!db) return null;
+
+	const query = await db.query(`SELECT * FROM api_submissions;`);
+	return (query.rows as DbApiSubmissionType[]) ?? [];
+}
+
+async function moveToFailedTable(db: PGlite, id: number): Promise<void> {
 	if (!db) return;
-	await db.query(`DELETE FROM api_submissions;`);
+	await db.query(
+		`INSERT INTO api_failures
+		 SELECT * FROM api_submissions
+		 WHERE id = $1;`,
+		[id],
+	);
+	await deleteById(db, id);
+}
+
+async function allFailed(db: PGlite): Promise<DbApiSubmissionType[] | null> {
+	if (!db) return null;
+
+	const query = await db.query(`SELECT * FROM api_failures;`);
+	return (query.rows as DbApiSubmissionType[]) ?? [];
 }
 
 export const DbApiSubmission = {
+	allQueued,
 	create,
 	update,
 	count,
 	next,
 	deleteById,
-	clear,
+	moveToFailedTable,
+	allFailed,
 };
