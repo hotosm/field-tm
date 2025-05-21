@@ -292,7 +292,7 @@ async def append_field_mapping_fields(
         ValueError: If required sheets are missing from the XLSForm.
     """
     log.info("Appending field mapping questions to XLSForm")
-    
+
     custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
     if "survey" not in custom_sheets:
         msg = "Survey sheet is required in XLSForm!"
@@ -300,7 +300,7 @@ async def append_field_mapping_fields(
         raise ValueError(msg)
     
     custom_sheets = standardize_xlsform_sheets(custom_sheets)
-    
+
     # Select appropriate form components based on target platform
     form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields)
     
@@ -319,11 +319,10 @@ async def append_field_mapping_fields(
         form_components["choices_df"],
         form_components["digitisation_choices_df"],
     )
-    
+
     # Process entities and settings sheets
     custom_sheets["entities"] = form_components["entities_df"]
     _validate_required_sheet(custom_sheets, "entities")
-    _validate_required_sheet(custom_sheets, "settings")
     
     # Configure form settings
     xform_id = _configure_form_settings(custom_sheets, form_name)
@@ -409,18 +408,38 @@ def _validate_required_sheet(
         raise ValueError(msg)
 
 
-def _configure_form_settings(
-        custom_sheets: dict, form_name: str
-    ) -> str:
-    """Configure form settings and extract/set form ID."""
+def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
+    """Configure form settings and extract/set form ID.
+    
+    Args:
+        custom_sheets: Dictionary containing dataframes for each sheet
+        form_name: Name of the form to be used as form_title
+        
+    Returns:
+        str: The form ID (xform_id)
+    """
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Check if settings sheet exists and create if needed
+    if "settings" not in custom_sheets or custom_sheets["settings"].empty:
+        custom_sheets["settings"] = pd.DataFrame([{
+            "form_id": str(uuid4()),
+            "version": current_datetime,
+            "form_title": form_name,
+            "allow_choice_duplicates": "yes",
+            "default_language": "en"
+        }])
+        
+        log.debug(f"Created default settings with form_id: {xform_id}")
+        return xform_id
+    
+    # Work with existing settings
     settings = custom_sheets["settings"]
     
     # Extract existing form id if present, else set to random uuid
     xform_id = settings["form_id"].iloc[0] if "form_id" in settings else str(uuid4())
     log.debug(f"Using form_id: {xform_id}")
-    
+
     # Update settings
-    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log.debug(f"Setting xFormId = {xform_id} | version = {current_datetime} | form_name = {form_name}")
     
     settings["version"] = current_datetime
@@ -429,7 +448,7 @@ def _configure_form_settings(
     
     if "default_language" not in settings:
         settings["default_language"] = "en"
-        
+    
     return xform_id
 
 
