@@ -32,7 +32,12 @@ def get_db_connection_pool() -> AsyncConnectionPool:
 
     NOTE the pool connection is opened in the FastAPI server startup (lifespan).
     """
-    return AsyncConnectionPool(conninfo=settings.FMTM_DB_URL, open=False)
+    return AsyncConnectionPool(
+        conninfo=settings.FMTM_DB_URL,
+        open=False,
+        max_size=10,  # max 10 concurrent DB connections (less than max_connections)
+        timeout=30.0,  # how long to wait if all connections are busy
+    )
 
 
 async def db_conn(request: Request) -> Connection:
