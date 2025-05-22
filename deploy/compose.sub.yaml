@@ -292,7 +292,7 @@ services:
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
-    command: -c 'max_connections=16' -c 'wal_level=logical'
+    command: -c 'max_connections=64' -c 'wal_level=logical'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -334,7 +334,7 @@ services:
 
   central-db:
     image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
-    command: -c 'max_connections=16'
+    command: -c 'max_connections=64'
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
