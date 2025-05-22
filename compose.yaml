@@ -359,7 +359,10 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    command: -c 'max_connections=300' -c 'wal_level=logical'
+    # Low max_connections for better performance.
+    # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
+    # and other sources online. Approx (cores * 4)
+    command: -c 'max_connections=16' -c 'wal_level=logical'
     healthcheck:
       test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
       start_period: 5s
@@ -401,8 +404,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    # Not really required during local dev - enable if testing issues
-    # command: -c 'max_connections=300'
+    # Optimise to a low number of connections, see fmtm-db service
+    command: -c 'max_connections=16'
     healthcheck:
       test: pg_isready -U ${CENTRAL_DB_USER:-odk} -d ${CENTRAL_DB_NAME:-odk}
       start_period: 5s
