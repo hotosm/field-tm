@@ -12,11 +12,11 @@ importers:
         specifier: 1.0.4
         version: 1.0.4
       '@electric-sql/pglite':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.3.2
+        version: 0.3.2
       '@electric-sql/pglite-sync':
-        specifier: ^0.3.3
-        version: 0.3.3(@electric-sql/pglite@0.3.1)
+        specifier: ^0.3.5
+        version: 0.3.5(@electric-sql/pglite@0.3.2)
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
@@ -60,8 +60,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
       flatgeobuf:
-        specifier: ^3.36.0
-        version: 3.36.0
+        specifier: ^3.38.0
+        version: 3.38.0
       maplibre-gl:
         specifier: ^4.7.1
         version: 4.7.1
@@ -69,8 +69,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       pmtiles:
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.3.0
+        version: 4.3.0
       svelte-maplibre:
         specifier: ^0.9.14
         version: 0.9.14(svelte@5.28.2)
@@ -79,8 +79,8 @@ importers:
         version: 7.3.0
     devDependencies:
       '@inlang/paraglide-js':
-        specifier: ^2.0.12
-        version: 2.0.12
+        specifier: ^2.0.13
+        version: 2.0.13
       '@playwright/test':
         specifier: ^1.49.0
         version: 1.49.0
@@ -706,13 +706,13 @@ packages:
     peerDependencies:
       '@electric-sql/client': 1.0.0
 
-  '@electric-sql/pglite-sync@0.3.3':
-    resolution: {integrity: sha512-tzktg+aLu+CcwHNpkjaoxWzU0+X3GXqhnRryOWB9q5FlwvA4Fu+1DOzdXaXY1REKsobSdmleuhYi0Z2lQynV5Q==}
+  '@electric-sql/pglite-sync@0.3.5':
+    resolution: {integrity: sha512-YXoGNiZ0qK9PrwiD5bf0zpQGbUZP3ZfOeRMSmlBWYylHgCFjC2PGvk2mgbSi+Cg6JNiT9mAD75Sg/+lQv8aHVg==}
     peerDependencies:
-      '@electric-sql/pglite': 0.3.1
+      '@electric-sql/pglite': 0.3.2
 
-  '@electric-sql/pglite@0.3.1':
-    resolution: {integrity: sha512-Kpbd2FMXnM5I56ZpMnGKZhv+h31ipeimgyJVb1C+nWFTikp33z0TTwmksEtHpPinuqKiMJblH2OJM0RubKvJgg==}
+  '@electric-sql/pglite@0.3.2':
+    resolution: {integrity: sha512-zfWWa+V2ViDCY/cmUfRqeWY1yLto+EpxjXnZzenB1TyxsTiXaTWeZFIZw6mac52BsuQm0RjCnisjBtdBaXOI6w==}
 
   '@esbuild/aix-ppc64@0.23.1':
     resolution: {integrity: sha512-6VhYk1diRqrhBAqpJEdjASR/+WVRtfjpqKuNw11cLiaWpAT/Uu+nokB+UJnevzy/P9C/ty6AOe0dwueMrGh/iQ==}
@@ -1075,8 +1075,8 @@ packages:
   '@iconify/utils@2.1.33':
     resolution: {integrity: sha512-jP9h6v/g0BIZx0p7XGJJVtkVnydtbgTgt9mVNcGDYwaa7UhdHdI9dvoq+gKj9sijMSJKxUPEG2JyjsgXjxL7Kw==}
 
-  '@inlang/paraglide-js@2.0.12':
-    resolution: {integrity: sha512-DL8yZ7Kh35+kRwfj/bZF0OAAHGpPBbj6Ku8JxGc/nOKYw7LKCMrRa5byqQcdM0tTBq0C6WCAVFxUu/vi83oJzQ==}
+  '@inlang/paraglide-js@2.0.13':
+    resolution: {integrity: sha512-8tccsLzGa9uw0rufFqbHSM6GDF8+X1BgfBOyjG7PweBF2zGhN5fMu/nVNbsZiVKpXyR7lcfMxajIBwKhZ/zGKw==}
     hasBin: true
 
   '@inlang/recommend-sherlock@0.2.1':
@@ -2417,11 +2417,11 @@ packages:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
 
-  flatbuffers@24.3.25:
-    resolution: {integrity: sha512-3HDgPbgiwWMI9zVB7VYBHaMrbOO7Gm0v+yD2FV/sCKj+9NDeVL7BOBYUuhWAQGKWOzBo8S9WdMvV0eixO233XQ==}
+  flatbuffers@24.12.23:
+    resolution: {integrity: sha512-dLVCAISd5mhls514keQzmEG6QHmUUsNuWsb4tFafIUwvvgDjXhtfAYSKOzt5SWOy+qByV5pbsDZ+Vb7HUOBEdA==}
 
-  flatgeobuf@3.36.0:
-    resolution: {integrity: sha512-vSKhQpClrZdguVLmD6QhVw4aKnqvcpEpeR5yBMTJmnRpBPBD1GLEE1MtGpBlBwdBfh3AzSnlcB3TS2MHelRwlQ==}
+  flatgeobuf@3.38.0:
+    resolution: {integrity: sha512-2BLAF81ZT19t3cVRxiNAU2LUrwfMUo4ASBvRtguPUAUJjmyPpnlkBDCrSyswYBg5MrC+ByhdE9SvZIPAgYhwgA==}
 
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
@@ -3143,8 +3143,8 @@ packages:
   pmtiles@3.2.1:
     resolution: {integrity: sha512-3R4fBwwoli5mw7a6t1IGwOtfmcSAODq6Okz0zkXhS1zi9sz1ssjjIfslwPvcWw5TNhdjNBUg9fgfPLeqZlH6ng==}
 
-  pmtiles@4.0.1:
-    resolution: {integrity: sha512-YS4uj/v179kA6tDd2E8d7ikOIEHy8ahtXN+u4joZYGkG2EwTkC2DUwgNmYLipyl60Vzf3FnIccIuDZB6bmdKmg==}
+  pmtiles@4.3.0:
+    resolution: {integrity: sha512-wnzQeSiYT/MyO63o7AVxwt7+uKqU0QUy2lHrivM7GvecNy0m1A4voVyGey7bujnEW5Hn+ZzLdvHPoFaqrOzbPA==}
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -4759,13 +4759,13 @@ snapshots:
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.28.0
 
-  '@electric-sql/pglite-sync@0.3.3(@electric-sql/pglite@0.3.1)':
+  '@electric-sql/pglite-sync@0.3.5(@electric-sql/pglite@0.3.2)':
     dependencies:
       '@electric-sql/client': 1.0.0
       '@electric-sql/experimental': 1.0.0(@electric-sql/client@1.0.0)
-      '@electric-sql/pglite': 0.3.1
+      '@electric-sql/pglite': 0.3.2
 
-  '@electric-sql/pglite@0.3.1': {}
+  '@electric-sql/pglite@0.3.2': {}
 
   '@esbuild/aix-ppc64@0.23.1':
     optional: true
@@ -4996,7 +4996,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@inlang/paraglide-js@2.0.12':
+  '@inlang/paraglide-js@2.0.13':
     dependencies:
       '@inlang/recommend-sherlock': 0.2.1
       '@inlang/sdk': 2.4.8
@@ -6620,12 +6620,12 @@ snapshots:
       flatted: 3.3.2
       keyv: 4.5.4
 
-  flatbuffers@24.3.25: {}
+  flatbuffers@24.12.23: {}
 
-  flatgeobuf@3.36.0:
+  flatgeobuf@3.38.0:
     dependencies:
       '@repeaterjs/repeater': 3.0.6
-      flatbuffers: 24.3.25
+      flatbuffers: 24.12.23
       slice-source: 0.4.1
     optionalDependencies:
       ol: 10.3.0
@@ -7365,7 +7365,7 @@ snapshots:
       '@types/leaflet': 1.9.14
       fflate: 0.8.2
 
-  pmtiles@4.0.1:
+  pmtiles@4.3.0:
     dependencies:
       fflate: 0.8.2
 
