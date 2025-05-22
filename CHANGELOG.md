@@ -1,5 +1,56 @@
 # Changelog
 
+## 2025.3.0 (2025-05-22)
+
+### Feat
+
+- **mapper**: fffline entity creation and webform submissions pt2 (#2525)
+- **mapper**: offline entity creation and webform submissions sync when online (#2517)
+- **mapper**: use geom javarosa format for xlocation (#2524)
+- **mapper**: added deviceid to web form submission (#2519)
+- **dependencies**: add markdown package with version >=3.8 to project dependencies (#2509)
+- **backend**: SMTP email functionality and send invite emails to non OSM users (#2503)
+- **mapper**: make project detail data available from local db fallback when offline (#2505)
+- **mapper**: add offline banner notificiation + load project summaries from PGLite first (#2495)
+- **mapper**: load fgb extract offline via opfs (#2502)
+- **mapper**: added caching of odk web forms script (#2498)
+- **mapper**: implement PGLite for local-first database in mapper frontend (#2427)
+
+### Fix
+
+- **update_xlsform**: auto add form settings configuration if not present (#2541)
+- **mapper**: fix #2518 dbPromise loading order and spinners (better ux)
+- **mapper**: partial fix for #2518, home page loading spinner
+- **mapper**: selected entity geometry is a javarosa string by default
+- **backend**: correctly handle exceptions on get form media method
+- **mapper**: sending of offline submissions when connection restored #2530
+- remove unecessary print from geomlog_to_entities migration
+- **fetch**: clone the response stream so that it can be consumed again (#2523)
+- satellite imagery zoom error & remove qr code tab (#2521)
+- **mapper**: DbProject merge types, do upsert on getting project summaries (no delete)
+- **mapper**: ensure web-forms.html is loaded from url root, not relative to project
+- **backend**: correctly catch exception on failed Central s3 sync
+- **frontend**: bulk user assign per project (#2501)
+- **mapper**: build warning about SLTabGroup init
+- **mapper**: add screenshot image for pwa manifest
+- **mapper**: project specific ODK collect vs webforms config (#2492)
+- **proxy**: disable the bunkerweb ui wizard to prevent unauthorized admin access
+- **frontend**: show validation error if primary geom type not selected
+
+### Refactor
+
+- **mapper**: add offline tab back, load all submission photo file types (#2513)
+- **backend**: minor tweak to integrations crud entity receive
+- set enableWebforms frontend config var to default true
+- **frontend**: Manage Organization & user roles  (#2367)
+- **mapper**: task/entities color CSS vars & other fixes (#2482)
+- **mapper**: skip polygon selection confirmation step (#2481)
+
+### Perf
+
+- tweak postgres max_connections and utilise pooling for performance
+- **mapper**: attempt to slightly reduce memory spike on first project detail page load
+
 ## 2025.2.1 (2025-05-05)
 
 ### Feat
