@@ -41,9 +41,10 @@
 	const odkWebFormPromise = fetchCachedBlobUrl(
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
+		true // clean old cache entries
 	);
 
-	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName);
+	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName, true);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
