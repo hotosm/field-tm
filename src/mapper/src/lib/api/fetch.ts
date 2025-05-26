@@ -6,7 +6,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const DEFAULT_CACHE_NAME = 'c488ea01-8c52-4a18-a93e-934bc77f1eb8';
 
-async function fetchCachedBlobUrl(url: string, cacheName: string): Promise<string> {
+async function fetchCachedBlobUrl(url: string, cacheName: string, clean: boolean): Promise<string> {
+	// delete old cache entries
+	if (clean) await clearCacheStorage(url, cacheName);
+
 	const cacheStorage = await caches.open(cacheName || DEFAULT_CACHE_NAME);
 	const response = await cacheStorage.match(url);
 	if (response) {
@@ -18,6 +21,22 @@ async function fetchCachedBlobUrl(url: string, cacheName: string): Promise<strin
 		cacheStorage.put(url, response.clone());
 		const blob = await response.blob();
 		return URL.createObjectURL(blob);
+	}
+}
+
+/**
+ *
+ * @param url - url to look for
+ * @param keep - skip checking this cache
+ */
+async function clearCacheStorage(url: string, skip: string) {
+	const keys = await caches.keys();
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i];
+		if (key !== skip) {
+			const cacheStorage = await caches.open(key);
+			await cacheStorage.delete(url);
+		}
 	}
 }
 
