@@ -45,7 +45,7 @@ let db: Awaited<ReturnType<typeof loadDbFromDump>>;
 let commonStore: ReturnType<typeof getCommonStore>;
 let alertStore: ReturnType<typeof getAlertStore>;
 
-const dbDumpPath = path.resolve(__dirname, '../../backend/migrations/init/pgdata.tar.gz');
+const dbDumpPath = path.resolve(__dirname, '../../migrations/init/pgdata.tar.gz');
 const fileBuffer = await fs.readFile(dbDumpPath);
 if (fileBuffer.length === 0) {
 	throw new Error('pgdata.tar.gz was empty or not read properly');

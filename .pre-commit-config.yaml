@@ -87,10 +87,10 @@ repos:
     rev: 3.4.0
     hooks:
       - id: sqlfluff-lint
-        files: ^src/backend/migrations/.*\.sql$
+        files: ^src/migrations/.*\.sql$
         types: [sql]
       - id: sqlfluff-fix
-        files: ^src/backend/migrations/.*\.sql$
+        files: ^src/migrations/.*\.sql$
         types: [sql]
 
   # Lint: Bash scripts
