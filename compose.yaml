@@ -124,7 +124,8 @@ services:
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
     build:
-      context: src/backend
+      context: src
+      dockerfile: backend/Dockerfile
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"

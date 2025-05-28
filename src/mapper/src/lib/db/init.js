@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { PGlite } from '@electric-sql/pglite';
 
-const MIGRATIONS_PATH = path.resolve('/backend/migrations/init/');
+const MIGRATIONS_PATH = path.resolve('/migrations/init/');
 const MIGRATION_FILENAMES = [
 	'shared/1-enums.sql',
 	'shared/2-tables.sql',
