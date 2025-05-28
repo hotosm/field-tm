@@ -25,7 +25,7 @@ devops:
           - ./**/Justfile
 migration:
   - changed-files:
-      - any-glob-to-any-file: src/backend/migrations/**
+      - any-glob-to-any-file: src/migrations/**
 docs:
   - changed-files:
       - any-glob-to-any-file:

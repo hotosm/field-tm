@@ -84,11 +84,16 @@ and improve the effectiveness of humanitarian efforts.
 
 <https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8>
 
-## Steps to Join An Organisation
+## Steps to Join An Organization
 
-You may request to join an existing organisation.
+You may request to join an existing organization.
 
-Alternatively, request the creation of a new organisation for your team:
+Alternatively, request the creation of a new organization for your team:
+
+!!! note
+
+        If you are already an organization manager, the button to do this will be
+        hidden. Please contact the administrator to create a second organization.
 
 1. Go to the Manage organization tab. You can see the number of organizations.
    On the top, there is a New button, clicking on which you can request

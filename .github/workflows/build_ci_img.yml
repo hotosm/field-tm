@@ -18,7 +18,8 @@ jobs:
   backend-ci-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.0
     with:
-      context: src/backend
+      context: src
+      dockerfile: backend/Dockerfile
       build_target: ci
       image_tags: |
         "ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}"

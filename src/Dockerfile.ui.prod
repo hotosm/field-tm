@@ -23,7 +23,7 @@ RUN pnpm run build
 
 FROM base AS mapper-frontend
 # The migrations go in a separate dir to prevent overwrite on /app bind mount
-COPY backend/migrations /backend/migrations
+COPY migrations /migrations
 COPY mapper/package.json mapper/pnpm-lock.yaml ./
 RUN corepack enable && corepack install
 RUN pnpm install

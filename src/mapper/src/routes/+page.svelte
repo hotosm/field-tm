@@ -49,11 +49,13 @@
 		// Get db and make accessible via store
 		db = await data.dbPromise;
 		commonStore.setDb(db);
+	});
 
+	$effect(() => {
 		if (online.current) {
 			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
 		} else {
-			await projectStore.fetchProjectsFromLocalDB(db);
+			projectStore.fetchProjectsFromLocalDB(db);
 		}
 	});
 </script>

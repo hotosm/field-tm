@@ -154,6 +154,8 @@ function getEntitiesStatusStore() {
 						...feature.properties,
 						status: entity?.status,
 						entity_id: entity?.entity_id,
+						// osm_id is BigInt, which doesn't work with svelte-maplibre layers
+						osm_id: feature?.properties?.osm_id.toString(),
 					},
 				};
 			}),

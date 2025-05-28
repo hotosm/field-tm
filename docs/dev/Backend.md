@@ -80,12 +80,12 @@ The API should now be accessible at: <http://api.fmtm.localhost:7050/docs>
 
 #### Creating Migration Files
 
-- Migrations can be written to `src/backend/migrations`.
+- Migrations can be written to `src/migrations`.
 - Each file must be an SQL script that is:
   - Idempotent: can be run multiple times without consequence.
   - Atomic: Run within a BEGIN/COMMIT transaction.
 - Migrations must also include an equivalent revert migration under:
-  `src/backend/migrations/revert`
+  `src/migrations/revert`
 
 #### Applying Migrations
 

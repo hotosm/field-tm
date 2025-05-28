@@ -13,6 +13,7 @@ import tables from '$migrations/init/shared/2-tables.sql?raw';
 import constraints from '$migrations/init/shared/3-constraints.sql?raw';
 import indexes from '$migrations/init/shared/4-indexes.sql?raw';
 import frontendOnlySchema from '$migrations/init/frontend-only/schema.sql?raw';
+const migrationFiles = import.meta.glob('$migrations/*.sql', { as: 'raw', eager: true });
 
 // To prevent loading the PGLite database twice, we wrap the
 // initDb function in a top-level singleton that guarantees
@@ -61,7 +62,7 @@ export async function loadDbFromDump(dbUrl: string = DB_URL, dbDumpData: string 
 // Try to open existing DB and test schema, else initialise schema from scratch.
 // The tradeoff is slower performance on, first load but then better performance
 // every time after.
-export const getDb = async (): Promise<PGlite> => {
+const getDb = async (): Promise<PGlite> => {
 	if (dbPromise) {
 		return dbPromise; // Return the existing promise if already in progress
 	}
@@ -96,6 +97,8 @@ export const getDb = async (): Promise<PGlite> => {
 				throw new Error('Database schema is not initialised yet. Re-creating.');
 			}
 
+			await applyMigrations(db);
+
 			return db;
 		} catch (e) {
 			// return loadDbFromDump();
@@ -105,6 +108,16 @@ export const getDb = async (): Promise<PGlite> => {
 
 	return dbPromise;
 };
+
+async function applyMigrations(db: PGlite): Promise<void> {
+	const sorted = Object.entries(migrationFiles)
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(([, sql]) => sql);
+
+	for (const sql of sorted) {
+		await db.exec(sql);
+	}
+}
 
 async function cleanupIndexedDb(dbName: string): Promise<boolean> {
 	return new Promise((resolve) => {
@@ -164,6 +177,8 @@ const initDb = async (): Promise<PGlite> => {
 		${indexes}
 		${frontendOnlySchema}
 	`);
+
+	await applyMigrations(finalDb);
 
 	return finalDb;
 };
