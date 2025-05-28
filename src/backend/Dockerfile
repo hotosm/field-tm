@@ -89,8 +89,8 @@ RUN apt-get update --quiet \
         "git" \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /usr/local/bin/uv
-COPY pyproject.toml uv.lock /_lock/
-COPY packages /_lock/packages
+COPY backend/pyproject.toml backend/uv.lock /_lock/
+COPY backend/packages /_lock/packages
 # Ensure caching & install with or without monitoring, depending on flag
 RUN --mount=type=cache,target=/root/.cache <<EOT
     uv sync \
@@ -145,16 +145,16 @@ COPY --from=minio /usr/bin/mc /usr/local/bin/
 COPY --from=basemap-bins /usr/bin/tilepack /usr/local/bin/
 COPY --from=basemap-bins /usr/bin/pmtiles /usr/local/bin/
 COPY --from=supercronic /supercronic /usr/local/bin/
-COPY *-entrypoint.sh /
+COPY backend/*-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
 COPY --from=build /opt/python /opt/python
 WORKDIR /opt
 # Add app code
-COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
-COPY stats/ /opt/stats/
-COPY scheduler/ /opt/scheduler/
+COPY backend/app/ /opt/app/
+COPY backend/stats/ /opt/stats/
+COPY backend/scheduler/ /opt/scheduler/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs \
@@ -191,8 +191,8 @@ RUN update-ca-certificates
 FROM add-odk-certs AS debug
 USER appuser
 COPY --from=uv /uv /usr/local/bin/uv
-COPY pyproject.toml uv.lock /_lock/
-COPY packages /_lock/packages
+COPY backend/pyproject.toml backend/uv.lock /_lock/
+COPY backend/packages /_lock/packages
 RUN --mount=type=cache,target=/root/.cache <<EOT
     uv sync \
         --project /_lock \

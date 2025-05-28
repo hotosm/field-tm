@@ -32,7 +32,7 @@ const config = {
 			$assets: 'src/assets',
 			$translations: 'src/translations',
 			$static: 'static',
-			$migrations: '../backend/migrations',
+			$migrations: '../migrations',
 		},
 	},
 };

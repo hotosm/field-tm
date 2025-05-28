@@ -9,9 +9,15 @@ In reverse chronological order, with most recent events first.
 
 > <div class="timeline-container">
 >     <div class="timeline-entry">
->         <div class="timeline-date">2025-05</div>
+>         <div class="timeline-date">2025-06</div>
 >         <h3>Project: Mapa das Periferias</h3>
 >         💼 Pilot project in Brazil to map favelas country-wide.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
+>         <div class="timeline-date">2025-05</div>
+>         <h3>Project: Suryodaya, Nepal</h3>
+>         💼 First mapping project with up to 450 mappers!
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">

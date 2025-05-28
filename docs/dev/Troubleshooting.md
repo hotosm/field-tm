@@ -41,7 +41,7 @@ just start backend-no-docker
 
 - Migrations are a way to manage changes to the database schema over time.
 - They are handled automatically by a management script when Field-TM starts up.
-- Individual SQL migration scripts are placed in the `src/backend/migrations` dir.
+- Individual SQL migration scripts are placed in the `src/migrations` dir.
   - These should be idempotent, i.e. can run over and over without causing errors.
   - There should also be a commented out SQL script for how to revert the migration.
   - Scripts should be named sequentially,

@@ -41,9 +41,10 @@
 	const odkWebFormPromise = fetchCachedBlobUrl(
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
+		true // clean old cache entries
 	);
 
-	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName);
+	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName, true);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
@@ -54,6 +55,13 @@
 		// entity id isn't included in the payload by default because we marked it as not relevant earlier
 		// (in order to hide it from the user's display)
 		submissionXml = submissionXml.replace('<warmup/>', `<warmup/><feature>${entityId}</feature>`);
+
+		// feature exists question isn't in the payload if it was intentionally hidden because it's a new feature
+		// the verification question is also hidden because it depends on the feature_exists question
+		if (!submissionXml.includes("<feature_exists>") && selectedEntity.is_new) {
+			submissionXml = submissionXml.replace('<survey_questions>', `<feature_exists>yes</feature_exists><survey_questions>`);
+			submissionXml = submissionXml.replace('</survey_questions>', `</survey_questions><verification><digitisation_correct>yes</digitisation_correct></verification>`);
+		}
 
 		submissionXml = submissionXml.replace('<start/>', `<start>${startDate}</start>`);
 		submissionXml = submissionXml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
@@ -175,6 +183,14 @@
 			if (selectedEntity?.geometry) {
 				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(selectedEntity?.geometry);
 			}
+
+			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
+			if (featureExistsNode && selectedEntity.is_new) {
+				featureExistsNode?.setValueState("yes");
+
+				// hide this node because we don't need to see it after setting the value
+				featureExistsNode.state.clientState.relevant = false;
+			}
 		}
 	}
 
@@ -279,8 +295,8 @@
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */
 	#spinner {
-		border: 16px solid var(--sl-color-neutral-300); 
-		border-top: 16px solid solid var(--sl-color-primary-700);
+		border: 16px solid var(--sl-color-neutral-300);
+		border-top: 16px solid var(--sl-color-primary-700);
 		border-radius: 50%;
 		width: 120px;
 		height: 120px;
