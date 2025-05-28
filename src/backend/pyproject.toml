@@ -143,10 +143,6 @@ version_files = [
 changelog_file = "../../CHANGELOG.md"
 update_changelog_on_bump = true
 
-[tool.sqlfluff.core]
-dialect = "postgres"
-exclude_rules = "CP05, RF02"  # Avoid capitalisation of enums
-
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*"
 ignore-words-list = "ProjectIn"
