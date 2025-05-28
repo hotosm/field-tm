@@ -61,35 +61,68 @@ export async function loadOfflinePmtiles(projectId: number) {
 	basemapStore.setProjectPmtilesUrl(pmtilesUrl);
 }
 
-async function downloadBasemap(url: string | undefined): Promise<ArrayBuffer> {
-	let basemapData: ArrayBuffer = new ArrayBuffer(0);
-
-	if (!url) return basemapData;
+async function downloadBasemap(url: string | undefined, onProgress?: (percent: number) => void): Promise<ArrayBuffer> {
+	if (!url) return new ArrayBuffer(0);
 
 	try {
-		const downloadResponse = await fetch(url);
+		const response = await fetch(url);
 
-		if (!downloadResponse.ok) {
-			throw new Error('Failed to download mbtiles');
+		if (!response.ok || !response.body) {
+			throw new Error('Failed to download basemap');
 		}
 
-		basemapData = await downloadResponse.arrayBuffer();
-		if (!basemapData) {
-			throw new Error('Basemap contained no data');
+		const contentLengthHeader = response.headers.get('Content-Length');
+		const contentLength = contentLengthHeader ? parseInt(contentLengthHeader, 10) : null;
+
+		const reader = response.body.getReader();
+
+		const chunks: Uint8Array[] = [];
+		let receivedLength = 0;
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			if (value) {
+				chunks.push(value);
+				receivedLength += value.length;
+
+				if (onProgress) {
+					if (contentLength) {
+						onProgress((receivedLength / contentLength) * 100);
+					} else {
+						// Fallback: unknown total size
+						onProgress(0); // Or indeterminate state
+					}
+				}
+			}
 		}
+
+		const result = new Uint8Array(receivedLength);
+		let position = 0;
+		for (const chunk of chunks) {
+			result.set(chunk, position);
+			position += chunk.length;
+		}
+		return result.buffer;
 	} catch (error) {
 		console.error('Error downloading basemaps:', error);
 		alertStore.setAlert({
 			variant: 'danger',
 			message: m['error_downloading'](),
 		});
-	} finally {
-		return basemapData;
+		return new ArrayBuffer(0);
 	}
 }
 
-export async function writeOfflinePmtiles(projectId: number, url: string | undefined) {
-	const data = await downloadBasemap(url);
+export async function writeOfflinePmtiles(
+	projectId: number,
+	url: string | undefined,
+	onProgress?: (percent: number) => void,
+) {
+	const data = await downloadBasemap(url, onProgress);
+
+	// Ensure final update to 100% in case it wasn't hit exactly
+	if (onProgress) onProgress(100);
 
 	// Copy to OPFS filesystem for offline use
 	const filePath = `${projectId}/basemap.pmtiles`;

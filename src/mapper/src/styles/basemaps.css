@@ -40,3 +40,8 @@
 .basemaps .button span {
 	--at-apply: font-barlow font-medium text-base uppercase;
 }
+
+.basemaps .progress-container {
+	width: 80%;
+	margin-top: 0.5rem;
+}
