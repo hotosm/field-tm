@@ -61,11 +61,21 @@ export async function loadOfflinePmtiles(projectId: number) {
 	basemapStore.setProjectPmtilesUrl(pmtilesUrl);
 }
 
-async function downloadBasemap(url: string | undefined, onProgress?: (percent: number) => void): Promise<ArrayBuffer> {
+async function downloadBasemap(
+	url: string | undefined,
+	onProgress?: (percent: number) => void,
+	// default to 10 minutes, as firefox sets 60s, chrome 300s
+	timeoutMs = 10 * 60 * 1000,
+): Promise<ArrayBuffer> {
 	if (!url) return new ArrayBuffer(0);
 
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, { signal: controller.signal });
+
+		clearTimeout(timeout);
 
 		if (!response.ok || !response.body) {
 			throw new Error('Failed to download basemap');
@@ -75,7 +85,6 @@ async function downloadBasemap(url: string | undefined, onProgress?: (percent: n
 		const contentLength = contentLengthHeader ? parseInt(contentLengthHeader, 10) : null;
 
 		const reader = response.body.getReader();
-
 		const chunks: Uint8Array[] = [];
 		let receivedLength = 0;
 
@@ -91,7 +100,7 @@ async function downloadBasemap(url: string | undefined, onProgress?: (percent: n
 						onProgress((receivedLength / contentLength) * 100);
 					} else {
 						// Fallback: unknown total size
-						onProgress(0); // Or indeterminate state
+						onProgress(0); // Unknown progress
 					}
 				}
 			}
@@ -104,12 +113,18 @@ async function downloadBasemap(url: string | undefined, onProgress?: (percent: n
 			position += chunk.length;
 		}
 		return result.buffer;
-	} catch (error) {
-		console.error('Error downloading basemaps:', error);
+	} catch (error: any) {
+		if (error.name === 'AbortError') {
+			console.warn('Timeout downloading basemap', error);
+		} else {
+			console.error('Error downloading basemaps:', error);
+		}
+
 		alertStore.setAlert({
 			variant: 'danger',
 			message: m['error_downloading'](),
 		});
+
 		return new ArrayBuffer(0);
 	}
 }
