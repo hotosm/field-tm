@@ -9,12 +9,12 @@
 	import '@shoelace-style/shoelace/dist/components/select/select.js';
 	import '@shoelace-style/shoelace/dist/components/option/option.js';
 	import '@shoelace-style/shoelace/dist/components/button/button.js';
+	// import '@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js';
 
 	import type { Basemap } from '$lib/map/basemaps';
 	import { getProjectBasemapStore } from '$store/common.svelte.ts';
 	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/map/basemaps';
 	import { m } from '$translations/messages.js';
-	import type { ProjectData } from '$lib/types';
 
 	interface Props {
 		projectId: number;
@@ -24,9 +24,18 @@
 	let { projectId, children }: Props = $props();
 	const basemapStore = getProjectBasemapStore();
 	let selectedBasemap: Basemap | null = $state(null);
+	let pmtilesDownloadProgress = $state(0);
 
 	// Reactive variables
 	let basemapsAvailable: boolean = $derived(basemapStore.projectBasemaps && basemapStore.projectBasemaps.length > 0);
+
+	function downloadPmtilesWithProgress() {
+		pmtilesDownloadProgress = 0;
+
+		writeOfflinePmtiles(projectId, selectedBasemap?.url, (percent) => {
+			pmtilesDownloadProgress = percent;
+		})
+	}
 
 	onMount(() => {
 		basemapStore.refreshBasemaps(projectId);
@@ -56,8 +65,7 @@
 				{#each basemapStore.projectBasemaps as basemap}
 					{#if basemap.status === 'SUCCESS'}
 						<sl-option value={basemap.id}>
-							{basemap.tile_source}
-							{basemap.format}
+							{basemap.tile_source} {basemap.format}
 						</sl-option>
 					{/if}
 				{/each}
@@ -87,9 +95,9 @@
 		</hot-button>
 
 		<hot-button
-			onclick={() => writeOfflinePmtiles(projectId, selectedBasemap?.url)}
+			onclick={() => downloadPmtilesWithProgress()}
 			onkeydown={(e: KeyboardEvent) => {
-				e.key === 'Enter' && writeOfflinePmtiles(projectId, selectedBasemap?.url);
+				if (e.key === 'Enter') downloadPmtilesWithProgress();
 			}}
 			role="button"
 			tabindex="0"
@@ -99,6 +107,11 @@
 			<hot-icon slot="prefix" name="download" class="icon"></hot-icon>
 			<span>{m['basemaps.store_offline']()}</span>
 		</hot-button>
+
+		<!-- Offline download progress bar -->
+		<div class="progress-container">
+			<hot-progress-bar value={pmtilesDownloadProgress}></hot-progress-bar>
+		</div>
 
 		<!-- Download Mbtiles Button -->
 	{:else if selectedBasemap && selectedBasemap.format === 'mbtiles'}
