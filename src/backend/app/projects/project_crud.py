@@ -762,7 +762,6 @@ def generate_project_basemap(
             "mbtiles",  # options: mbtiles or disk
             "-mbtiles-format",
             f"{tile_format}",
-            "-ensure-gzip=false",  # gzip is only used for pbf vector tiles
             "-tileset-name",
             f"fmtm_{project_id}_{source}tiles",
         ]
