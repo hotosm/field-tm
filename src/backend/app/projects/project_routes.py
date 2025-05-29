@@ -50,7 +50,7 @@ from psycopg import Connection
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.providers.osm import init_osm_auth
-from app.auth.roles import mapper, org_admin, project_manager
+from app.auth.roles import Mapper, ProjectManager, org_admin
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
@@ -172,7 +172,7 @@ async def read_project_summaries(
     "/{project_id}/entities", response_model=central_schemas.EntityFeatureCollection
 )
 async def get_odk_entities_geojson(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     minimal: bool = False,
 ):
     """Get the ODK entities for a project in GeoJSON format.
@@ -194,7 +194,7 @@ async def get_odk_entities_geojson(
     response_model=list[central_schemas.EntityMappingStatus],
 )
 async def get_odk_entities_mapping_statuses(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the ODK entities mapping statuses, i.e. in progress or complete."""
@@ -212,7 +212,7 @@ async def get_odk_entities_mapping_statuses(
     response_model=list[central_schemas.EntityOsmID],
 )
 async def get_odk_entities_osm_ids(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get the ODK entities linked OSM IDs.
 
@@ -233,7 +233,7 @@ async def get_odk_entities_osm_ids(
     response_model=list[central_schemas.EntityTaskID],
 )
 async def get_odk_entities_task_ids(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get the ODK entities linked Field-TM Task IDs."""
     project = project_user.get("project")
@@ -250,7 +250,7 @@ async def get_odk_entities_task_ids(
 )
 async def get_odk_entity_mapping_status(
     entity_id: str,
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the ODK entity mapping status, i.e. in progress or complete."""
@@ -267,7 +267,7 @@ async def get_odk_entity_mapping_status(
     response_model=central_schemas.EntityMappingStatus,
 )
 async def set_odk_entities_mapping_status(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
     entity_details: central_schemas.EntityMappingStatusIn,
 ):
     """Set the ODK entities mapping status, i.e. in progress or complete.
@@ -295,7 +295,7 @@ async def set_odk_entities_mapping_status(
 )
 async def tiles_list(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Returns the list of tiles for a project.
 
@@ -320,7 +320,7 @@ async def tiles_list(
 # async def download_tiles(
 #     tile_id: UUID,
 #     db: Annotated[Connection, Depends(db_conn)],
-#     project_user: Annotated[ProjectUserDict, Depends(mapper)],
+#     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 # ):
 #     """Download the basemap tile archive for a project."""
 #     log.debug("Getting basemap path from DB")
@@ -371,7 +371,7 @@ async def get_categories(current_user: Annotated[AuthUser, Depends(login_require
 @router.get("/features/download")
 async def download_features(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     task_id: Optional[int] = None,
 ):
     """Downloads the features of a project as a GeoJSON file.
@@ -455,7 +455,7 @@ async def get_task_status(
 @router.get("/contributors/{project_id}")
 async def get_contributors(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get contributors of a project.
 
@@ -627,7 +627,7 @@ async def get_data_extract(
 @router.get("/data-extract-url")
 async def get_or_set_data_extract(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     url: Optional[str] = None,
 ):
     """Get or set the data extract URL for a project."""
@@ -643,7 +643,7 @@ async def get_or_set_data_extract(
 @router.post("/upload-data-extract")
 async def upload_data_extract(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     data_extract_file: UploadFile = File(...),
 ):
     """Upload a data extract geojson for a project.
@@ -722,7 +722,7 @@ async def add_new_project_manager(
 @router.get("/{project_id}/users", response_model=list[UserRolesOut])
 async def get_project_users(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[DbUser, Depends(project_manager)],
+    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
 ):
     """Get project users and their project role."""
     project = project_user_dict.get("project")
@@ -735,7 +735,7 @@ async def get_project_users(
 @router.post("/{project_id}/additional-entity")
 async def add_additional_entity_list(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     geojson: UploadFile = File(...),
 ):
     """Add an additional Entity list for the project in ODK.
@@ -769,7 +769,7 @@ async def add_additional_entity_list(
 @router.post("/{project_id}/generate-project-data")
 async def generate_files(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
     xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     additional_entities: Annotated[Optional[list[str]], None] = None,
@@ -900,7 +900,7 @@ async def generate_files(
 async def generate_project_basemap(
     # NOTE we do not set the correct role on this endpoint yet
     # FIXME once stub project creation implemented, this should be manager only
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     background_tasks: BackgroundTasks,
     db: Annotated[Connection, Depends(db_conn)],
     basemap_in: project_schemas.BasemapGenerate,
@@ -949,7 +949,9 @@ async def generate_basemap(
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     new_data: project_schemas.ProjectUpdate,
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Partial update an existing project."""
@@ -960,7 +962,7 @@ async def update_project(
 @router.post("/{project_id}/upload-task-boundaries")
 async def upload_project_task_boundaries(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     task_geojson: UploadFile = File(...),
 ):
     """Set project task boundaries using split GeoJSON from frontend.
@@ -1102,7 +1104,7 @@ async def delete_project(
 
 @router.get("/{project_id}", response_model=project_schemas.ProjectOut)
 async def read_project(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get a specific project by ID."""
     return project_user.get("project")
@@ -1112,7 +1114,7 @@ async def read_project(
 async def read_project_minimal(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get a specific project by ID, with minimal metadata.
 
@@ -1133,7 +1135,7 @@ async def read_project_minimal(
 
 @router.get("/{project_id}/download")
 async def download_project_boundary(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ) -> StreamingResponse:
     """Downloads the boundary of a project as a GeoJSON file."""
     project = project_user.get("project")
@@ -1150,7 +1152,7 @@ async def download_project_boundary(
 @router.get("/{project_id}/download_tasks")
 async def download_task_boundaries(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Downloads the boundary of the tasks for a project as a GeoJSON file.
 
@@ -1176,7 +1178,9 @@ async def download_task_boundaries(
 @router.get("/{project_id}/teams", response_model=List[project_schemas.ProjectTeam])
 async def get_project_teams(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Get the teams associated with a project."""
     project_id = project_user.get("project").id
@@ -1188,7 +1192,9 @@ async def get_project_teams(
 async def create_project_team(
     team: project_schemas.ProjectTeamIn,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Create a new team for a project."""
     return await DbProjectTeam.create(db, team)
@@ -1198,7 +1204,7 @@ async def create_project_team(
 async def get_team(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
 ):
     """Get the teams associated with a project."""
     team = await DbProjectTeam.one(db, team.team_id)
@@ -1212,7 +1218,9 @@ async def update_project_team(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
     team_update: project_schemas.ProjectTeamIn,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Get the teams associated with a project."""
     team = await DbProjectTeam.update(db, team.team_id, team_update)
@@ -1223,7 +1231,9 @@ async def update_project_team(
 async def delete_project_team(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Get the teams associated with a project."""
     team = await DbProjectTeam.delete(db, team.team_id)
@@ -1235,7 +1245,9 @@ async def add_team_users(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
     user_subs: List[str],
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Add users to a team."""
     # Assign mapper user roles to the project
@@ -1255,7 +1267,9 @@ async def remove_team_users(
     team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
     user_subs: List[str],
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Add users to a team."""
     await DbProjectTeamUser.delete(db, team.team_id, user_subs)
@@ -1265,7 +1279,7 @@ async def remove_team_users(
 @router.delete("/entity/{entity_uuid}")
 async def delete_entity(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(Mapper())],
     entity_uuid: UUID,
     dataset_name: str = "features",
 ):

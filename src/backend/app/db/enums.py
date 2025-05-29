@@ -48,6 +48,7 @@ class ProjectStatus(StrEnum, Enum):
     DRAFT = "DRAFT"
     PUBLISHED = "PUBLISHED"
     ARCHIVED = "ARCHIVED"
+    COMPLETED = "COMPLETED"
 
 
 class OrganisationType(StrEnum, Enum):

@@ -30,7 +30,7 @@ from psycopg import Connection
 from pyodk._endpoints.submissions import Submission as CentralSubmissionOut
 
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import mapper, project_contributors, project_manager
+from app.auth.roles import Mapper, ProjectManager, project_contributors
 from app.central import central_crud
 from app.db import postgis_utils
 from app.db.database import db_conn
@@ -49,7 +49,7 @@ router = APIRouter(
 
 @router.get("")
 async def read_submissions(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ) -> list[dict]:
     """Get all submissions made for a project.
 
@@ -63,7 +63,7 @@ async def read_submissions(
 
 @router.post("", response_model=CentralSubmissionOut)
 async def create_submission(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
     submission_xml: Annotated[str, Body(embed=True)],
     device_id: Annotated[Optional[str], Body(embed=True)] = None,
     submission_attachments: Annotated[
@@ -189,7 +189,7 @@ async def download_submission(
 
 @router.get("/get-submission-count")
 async def get_submission_count(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get the submission count for a project."""
     project = project_user.get("project")
@@ -300,7 +300,7 @@ async def get_submission_count(
 
 @router.get("/submission-form-fields")
 async def get_submission_form_fields(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Retrieves the submission form for a specific project.
 
@@ -314,7 +314,7 @@ async def get_submission_form_fields(
 
 @router.get("/submission-table")
 async def submission_table(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
     task_id: Optional[int] = None,
@@ -390,7 +390,9 @@ async def submission_table(
 )
 async def update_review_state(
     post_data: submission_schemas.ReviewStateIn,
-    current_user: Annotated[ProjectUserDict, Depends(project_manager)],
+    current_user: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
 ):
     """Updates the review state of a project submission."""
     try:
@@ -420,7 +422,7 @@ async def update_review_state(
 @router.get("/conflate-submission-geojson")
 async def conflate_geojson(
     db_task: Annotated[DbTask, Depends(get_task)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     remove_conflated: Annotated[
         bool,
         Query(
@@ -474,7 +476,7 @@ async def conflate_geojson(
 @router.get("/{submission_id}/photos", response_model=dict[str, str])
 async def submission_photos(
     submission_id: str,
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """This api returns the submission detail of individual submission.
 
@@ -505,7 +507,7 @@ async def submission_photos(
     "/{project_id}/dashboard", response_model=submission_schemas.SubmissionDashboard
 )
 async def project_submission_dashboard(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the project dashboard details."""
@@ -522,7 +524,7 @@ async def project_submission_dashboard(
 @router.get("/{submission_id}")
 async def submission_detail(
     submission_id: str,
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ) -> dict:
     """This api returns the submission detail of individual submission."""
     project = project_user.get("project")

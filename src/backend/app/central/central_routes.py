@@ -34,7 +34,7 @@ from pyodk._endpoints.entities import Entity
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
-from app.auth.roles import mapper, project_manager
+from app.auth.roles import Mapper, ProjectManager
 from app.central import central_crud, central_deps
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
@@ -126,7 +126,9 @@ async def validate_form(
 async def update_project_form(
     xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    project_user_dict: Annotated[
+        ProjectUserDict, Depends(ProjectManager(check_completed=True))
+    ],
     xform_id: str = Form(...),
     # FIXME add back in capability to update osm_category
     # osm_category: XLSFormType = Form(...),
@@ -176,7 +178,7 @@ async def update_project_form(
 
 @router.get("/download-form")
 async def download_form(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Download the XLSForm for a project."""
     project = project_user.get("project")
@@ -190,7 +192,7 @@ async def download_form(
 
 @router.post("/refresh-appuser-token")
 async def refresh_appuser_token(
-    current_user: Annotated[AuthUser, Depends(project_manager)],
+    current_user: Annotated[AuthUser, Depends(ProjectManager())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Refreshes the token for the app user associated with a specific project.
@@ -239,7 +241,7 @@ async def refresh_appuser_token(
 
 @router.post("/upload-form-media")
 async def upload_form_media(
-    current_user: Annotated[AuthUser, Depends(project_manager)],
+    current_user: Annotated[AuthUser, Depends(ProjectManager())],
     media_attachments: Annotated[
         dict[str, BytesIO], Depends(central_deps.read_form_media)
     ],
@@ -289,7 +291,7 @@ async def upload_form_media(
 
 @router.post("/get-form-media", response_model=dict[str, str])
 async def get_form_media(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Return the project form attachments as a list of files."""
     project = project_user.get("project")
@@ -318,8 +320,10 @@ async def get_form_media(
 @router.post("/entity")
 async def add_new_entity(
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(mapper)],
     entity_uuid: UUID,
+    project_user_dict: Annotated[
+        ProjectUserDict, Depends(Mapper(check_completed=True))
+    ],
     geojson: FeatureCollection,
 ) -> Entity:
     """Create an Entity for the project in ODK.
@@ -402,3 +406,22 @@ async def add_new_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity creation failed",
         ) from e
+
+
+@router.get("/form-xml")
+async def get_project_form_xml_route(
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+) -> str:
+    """Get the raw XML from ODK Central for a project."""
+    project = project_user.get("project")
+    odk_creds = project.odk_credentials
+    odkid = project.odkid
+    odk_form_id = project.odk_form_id
+    # Run separate thread in event loop to avoid blocking with sync code
+    form_xml = await run_in_threadpool(
+        central_crud.get_project_form_xml,
+        odk_creds,
+        odkid,
+        odk_form_id,
+    )
+    return Response(content=form_xml, media_type="application/xml")
