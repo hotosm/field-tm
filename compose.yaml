@@ -264,9 +264,13 @@ services:
       - EMAIL_USER=${EMAIL_USER:-''}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
       - OIDC_ENABLED=${OIDC_ENABLED:-false}
+      - OIDC_ISSUER_URL=${OIDC_ISSUER_URL:-https://getodk.org}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID:-xxx}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET:-xxx}
       - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
+      - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
       # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
       - S3_SERVER="http://s3:9000"
       - S3_BUCKET_NAME=${S3_ODK_BUCKET_NAME:-"fmtm-odk-media"}
