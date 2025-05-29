@@ -18,7 +18,7 @@
 # An image to copy the built ODK Central dist into an rclone
 # container for copying to nginx at runtime
 
-ARG ODK_CENTRAL_TAG=v2024.3.1
+ARG ODK_CENTRAL_TAG
 FROM ghcr.io/getodk/central-nginx:$ODK_CENTRAL_TAG AS frontend
 
 
