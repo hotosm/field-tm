@@ -406,22 +406,3 @@ async def add_new_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity creation failed",
         ) from e
-
-
-@router.get("/form-xml")
-async def get_project_form_xml_route(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-) -> str:
-    """Get the raw XML from ODK Central for a project."""
-    project = project_user.get("project")
-    odk_creds = project.odk_credentials
-    odkid = project.odkid
-    odk_form_id = project.odk_form_id
-    # Run separate thread in event loop to avoid blocking with sync code
-    form_xml = await run_in_threadpool(
-        central_crud.get_project_form_xml,
-        odk_creds,
-        odkid,
-        odk_form_id,
-    )
-    return Response(content=form_xml, media_type="application/xml")
