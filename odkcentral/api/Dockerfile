@@ -34,7 +34,7 @@ RUN apt-get update --quiet \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
 WORKDIR /repo
-RUN git clone --depth 1 --branch feat/s3-sync-api-2024.3.1 https://github.com/spwoodcock/central-backend.git
+RUN git clone --depth 1 --branch feat/s3-sync-api-2025.1.1 https://github.com/spwoodcock/central-backend.git
 
 
 FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG}
