@@ -11,7 +11,8 @@ ALTER TYPE public.projectpriority OWNER TO fmtm;
 CREATE TYPE public.projectstatus AS ENUM (
     'ARCHIVED',
     'PUBLISHED',
-    'DRAFT'
+    'DRAFT',
+    'COMPLETED'
 );
 ALTER TYPE public.projectstatus OWNER TO fmtm;
 
