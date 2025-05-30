@@ -1,5 +1,5 @@
 {
-  "projectName": "field-tm",
+  "projectName": "fmtm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -380,6 +380,15 @@
       "profile": "https://github.com/Joshua-Tihabwangye",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "mapconcierge",
+      "name": "Taichi FURUHASHI",
+      "avatar_url": "https://avatars.githubusercontent.com/u/416977?v=4",
+      "profile": "http://mapconcierge.com",
+      "contributions": [
+        "translation"
       ]
     }
   ],
