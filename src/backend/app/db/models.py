@@ -1656,7 +1656,11 @@ class DbProject(BaseModel):
         minimal: bool = False,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
-        access_info = await cls._get_user_access_level(db, current_user)
+        if current_user:
+            access_info = await cls._get_user_access_level(db, current_user)
+        else:
+            access_info = None
+
         filters, params = cls._build_query_filters(
             skip, limit, org_id, user_sub, hashtags, search, access_info
         )
@@ -1690,7 +1694,7 @@ class DbProject(BaseModel):
         user_sub: Optional[str],
         hashtags: Optional[list[str]],
         search: Optional[str],
-        access_info: dict,
+        access_info: Optional[dict] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
         # Build basic filters
@@ -1721,20 +1725,31 @@ class DbProject(BaseModel):
                 "hashtags": hashtags,
                 "search": f"%{search}%" if search else None,
             }.items()
-            if value
+            if value is not None
         }
 
-        params["current_user_sub"] = access_info["user_sub"]
-        if access_info["managed_org_ids"]:
-            params["managed_org_ids"] = access_info["managed_org_ids"]
+        if access_info:
+            params["current_user_sub"] = access_info["user_sub"]
+            if access_info["managed_org_ids"]:
+                params["managed_org_ids"] = access_info["managed_org_ids"]
 
         return filters, params
 
     @classmethod
-    def _build_visibility_filter(cls, access_info: dict) -> Optional[str]:
+    def _build_visibility_filter(
+        cls, access_info: Optional[dict] = None
+    ) -> Optional[str]:
         """Build visibility filter based on user context."""
+        # Not logged in, so return public projects only
+        if access_info is None:
+            return """
+            (
+                p.visibility = 'PUBLIC'
+            )
+            """
+
         if access_info["is_superadmin"]:
-            # Superadmin sees everything
+            # Superadmin sees everything, no filters
             return None
 
         if access_info["managed_org_ids"]:
