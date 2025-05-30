@@ -200,6 +200,12 @@ class ProjectOut(DbProject):
 # Models for specific endpoints
 
 
+class ProjectOutNoXml(ProjectOut):
+    """For reading all projects, it's overly verbose including XML."""
+
+    odk_form_xml: Annotated[Optional[str], Field(exclude=True)] = None
+
+
 class ProjectSummary(BaseModel):
     """Project summaries."""
 

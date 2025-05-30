@@ -102,7 +102,7 @@ async def read_projects_to_featcol(
     return await project_crud.get_projects_featcol(db, bbox)
 
 
-@router.get("", response_model=list[project_schemas.ProjectOut])
+@router.get("", response_model=list[project_schemas.ProjectOutNoXml])
 async def read_projects(
     current_user: Annotated[AuthUser, Depends(login_required)],
     db: Annotated[Connection, Depends(db_conn)],
