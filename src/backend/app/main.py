@@ -24,8 +24,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, AsyncIterator
 
-from fastapi import Depends, FastAPI, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
@@ -208,30 +207,6 @@ def get_logger():
 
 
 api = get_api()
-
-
-@api.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,  # dead: disable
-    exc: RequestValidationError,
-):
-    """Exception handler for more descriptive logging and traces."""
-    status_code = 500
-    errors = []
-    for error in exc.errors():
-        # TODO Handle this properly
-        if error["msg"] in ["Invalid input", "field required"]:
-            status_code = HTTPStatus.UNPROCESSABLE_ENTITY
-        else:
-            status_code = HTTPStatus.BAD_REQUEST
-        errors.append(
-            {
-                "loc": error["loc"],
-                "msg": error["msg"],
-                "error": error["msg"] + str([x for x in error["loc"]]),
-            }
-        )
-    return JSONResponse(status_code=status_code, content={"errors": errors})
 
 
 @api.get("/")

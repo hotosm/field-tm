@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { API } from '@/api';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import {
@@ -32,73 +32,70 @@ const CreateProjectService = (
 
     let projectId: null | number = null;
     try {
-      // halt project creation if any api call fails
-      let hasAPISuccess = false;
+      let hasAPISuccess = false; // set to true if any of the APIs fails
+      let postNewProjectDetails: AxiosResponse<ProjectDetailsModel> | null = null;
 
-      const postNewProjectDetails = await API.post(url, projectData);
-      hasAPISuccess = isStatusSuccess(postNewProjectDetails.status);
+      // 1. post project details
+      try {
+        postNewProjectDetails = await API.post(url, projectData);
+      } catch (error) {
+        const errorResponse = error?.response?.data?.detail;
+        const errorMessage =
+          typeof errorResponse === 'string'
+            ? errorResponse || 'Something went wrong. Please try again.'
+            : `Following errors occurred while creating project: ${errorResponse?.map((err) => `\n${err?.msg}`)}`;
 
-      const projectCreateResp: ProjectDetailsModel = postNewProjectDetails.data;
-      await dispatch(CreateProjectActions.PostProjectDetails(projectCreateResp));
-
-      if (!hasAPISuccess) {
-        const msg = `Request failed with status ${projectCreateResp.status}`;
-        console.error(msg);
-        throw new Error(msg);
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: errorMessage,
+          }),
+        );
       }
-      projectId = projectCreateResp.id;
 
-      // Submit task boundaries
+      hasAPISuccess = !!postNewProjectDetails; // postNewProjectDetails is null if post project request fails
+      if (!hasAPISuccess) throw new Error();
+
+      const projectCreateResp: ProjectDetailsModel = postNewProjectDetails?.data!;
+      projectId = projectCreateResp.id;
+      dispatch(CreateProjectActions.PostProjectDetails(projectCreateResp));
+
+      // 2. post task boundaries
       hasAPISuccess = await dispatch(
         UploadTaskAreasService(`${VITE_API_URL}/projects/${projectId}/upload-task-boundaries`, taskAreaGeojson),
       );
+      if (!hasAPISuccess) throw new Error();
 
-      if (!hasAPISuccess) {
-        const msg = `Request failed`;
-        console.error(msg);
-        throw new Error(msg);
-      }
-
-      // Upload data extract
-      let extractResponse;
+      // 3. upload data extract
       if (isEmptyDataExtract) {
-        // Manually set response as we don't call an API
-        extractResponse = { status: 200 };
+        // manually set response as we don't call an API
       } else if (dataExtractFile) {
-        const dataExtractFormData = new FormData();
-        dataExtractFormData.append('data_extract_file', dataExtractFile);
-        extractResponse = await API.post(
-          `${VITE_API_URL}/projects/upload-data-extract?project_id=${projectId}`,
-          dataExtractFormData,
+        hasAPISuccess = await dispatch(
+          UploadDataExtractService(
+            `${VITE_API_URL}/projects/upload-data-extract?project_id=${projectId}`,
+            dataExtractFile,
+          ),
         );
+        if (!hasAPISuccess) throw new Error();
       } else {
-        const msg = 'No dataExtractFile or EmptyDataExtractwas set';
-        console.error(msg);
-        throw new Error(msg);
-      }
-      hasAPISuccess = isStatusSuccess(extractResponse.status);
-
-      if (!hasAPISuccess) {
-        const msg = `Request failed with status ${extractResponse.status}`;
-        console.error(msg);
-        throw new Error(msg);
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: 'No dataExtractFile or EmptyDataExtractwas set',
+          }),
+        );
+        throw new Error();
       }
 
-      // post additional feature if available
+      // 4. post additional feature if available
       if (additionalFeature) {
         const postAdditionalFeature = await dispatch(
           PostAdditionalFeatureService(`${VITE_API_URL}/projects/${projectId}/additional-entity`, additionalFeature),
         );
 
         hasAPISuccess = postAdditionalFeature;
-        if (!hasAPISuccess) {
-          const msg = `Request failed`;
-          console.error(msg);
-          throw new Error(msg);
-        }
+        if (!hasAPISuccess) throw new Error();
       }
 
-      // generate project files
+      // 5. upload form
       const generateProjectFile = await dispatch(
         GenerateProjectFilesService(
           `${VITE_API_URL}/projects/${projectId}/generate-project-data`,
@@ -111,13 +108,9 @@ const CreateProjectService = (
       );
 
       hasAPISuccess = generateProjectFile;
-      if (!hasAPISuccess) {
-        const msg = `Request failed`;
-        console.error(msg);
-        throw new Error(msg);
-      }
+      if (!hasAPISuccess) throw new Error();
 
-      // assign project admins
+      // 6. assign project admins
       if (!isEmpty(projectAdmins)) {
         const promises = projectAdmins?.map(async (sub: any) => {
           await dispatch(
@@ -126,21 +119,15 @@ const CreateProjectService = (
         });
         await Promise.all(promises);
       }
+
       dispatch(CreateProjectActions.GenerateProjectError(false));
-      // dispatch(CreateProjectActions.CreateProjectLoading(false));
     } catch (error: any) {
       if (projectId) {
         await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`));
       }
-
-      await dispatch(CreateProjectActions.GenerateProjectError(true));
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong. Please try again.',
-        }),
-      );
-      dispatch(CreateProjectActions.CreateProjectLoading(false));
+      dispatch(CreateProjectActions.GenerateProjectError(true));
     } finally {
+      dispatch(CreateProjectActions.CreateProjectLoading(false));
       dispatch(CommonActions.SetLoading(false));
     }
   };
@@ -189,7 +176,7 @@ const UploadTaskAreasService = (url: string, filePayload: any) => {
         await dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
-            message: JSON.stringify(error?.response?.data?.detail) || 'Something Went Wrong.',
+            message: JSON.stringify(error?.response?.data?.detail) || 'Upload task area failed',
           }),
         );
       }
@@ -197,6 +184,33 @@ const UploadTaskAreasService = (url: string, filePayload: any) => {
     };
 
     return await postUploadArea(url, filePayload);
+  };
+};
+
+const UploadDataExtractService = (url: string, file: any) => {
+  return async (dispatch: AppDispatch) => {
+    const postUploadDataExtract = async (url: string, file: any) => {
+      let isAPISuccess = true;
+      try {
+        const dataExtractFormData = new FormData();
+        dataExtractFormData.append('data_extract_file', file);
+        await axios.post(url, dataExtractFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } catch (error: any) {
+        isAPISuccess = false;
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: JSON.stringify(error?.response?.data?.detail) || 'Upload data extract failed',
+          }),
+        );
+      }
+      return isAPISuccess;
+    };
+
+    return await postUploadDataExtract(url, file);
   };
 };
 
