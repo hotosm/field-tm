@@ -102,7 +102,7 @@ async def add_new_task_event(
     request: Request,
     task: Annotated[DbTask, Depends(task_deps.get_task)],
     new_event: task_schemas.TaskEventIn,
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
     db: Annotated[Connection, Depends(db_conn)],
     osm_auth: Annotated[Auth, Depends(init_osm_auth)],
     team: Annotated[Optional[DbProjectTeam], Depends(project_deps.get_project_team)],
