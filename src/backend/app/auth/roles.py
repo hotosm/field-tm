@@ -272,15 +272,6 @@ async def wrap_check_access(
     check_completed: bool = False,
 ) -> ProjectUserDict:
     """Wrap check_access call with HTTPException."""
-    if check_completed and project.status in [
-        ProjectStatus.COMPLETED,
-        ProjectStatus.ARCHIVED,
-    ]:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail=f"Project is locked since it is in {project.status.value} state.",
-        )
-
     db_user = await check_access(
         user_data,
         db,
@@ -390,6 +381,16 @@ class Mapper:
         FIXME ?project_id=xxx for another project, then won't this
         FIXME given them permission when they shouldn't have it?
         """
+        if self.check_completed and project.status in [
+            ProjectStatus.COMPLETED,
+            ProjectStatus.ARCHIVED,
+        ]:
+            raise HTTPException(
+                status_code=HTTPStatus.FORBIDDEN,
+                detail=f"Project is locked since it is in {project.status.value} "
+                "state.",
+            )
+
         # If project is public, skip permission check
         if project.visibility == ProjectVisibility.PUBLIC:
             return {
