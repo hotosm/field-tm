@@ -421,8 +421,9 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # Check if settings sheet exists and create if needed
     if "settings" not in custom_sheets or custom_sheets["settings"].empty:
+        xform_id = str(uuid4())
         custom_sheets["settings"] = pd.DataFrame([{
-            "form_id": str(uuid4()),
+            "form_id": xform_id,
             "version": current_datetime,
             "form_title": form_name,
             "allow_choice_duplicates": "yes",
