@@ -63,6 +63,13 @@ const initialState: themeStateType = {
         marked_bad: 'rgba(250, 17, 0, 0.3)',
         validated: 'rgba(0, 123, 255, 0.3)',
       },
+      lineEntityStatusColors: {
+        ready: 'rgba(156,154,154,0.8)',
+        opened_in_odk: 'rgb(252,236,164,1)',
+        survey_submitted: 'rgba(64,172,140,0.8)',
+        marked_bad: 'rgba(250,17,0,0.8)',
+        validated: 'rgba(0,123,255,0.8)',
+      },
     },
     statusTextTheme: {
       UNLOCKED_TO_MAP: '#a3a2a2',

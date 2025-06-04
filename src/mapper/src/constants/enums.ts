@@ -11,5 +11,5 @@ export enum projectSetupStep {
 export enum MapGeomTypes {
 	POINT = 'POINT',
 	POLYGON = 'POLYGON',
-	LINESTRING = 'LINESTRING',
+	POLYLINE = 'POLYLINE',
 }

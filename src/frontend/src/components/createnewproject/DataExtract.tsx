@@ -27,13 +27,13 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 const primaryGeomOptions = [
   { name: 'primary_geom_type', value: 'POLYGON', label: 'Polygons (e.g. buildings)' },
   { name: 'primary_geom_type', value: 'POINT', label: 'Points (e.g. POIs)' },
-  { name: 'primary_geom_type', value: 'LINESTRING', label: 'Lines (e.g. roads, rivers)' },
+  { name: 'primary_geom_type', value: 'POLYLINE', label: 'Lines (e.g. roads, rivers)' },
 ];
 
 const newGeomOptions = [
   { name: 'new_geom_type', value: 'POLYGON', label: 'Polygons' },
   { name: 'new_geom_type', value: 'POINT', label: 'Points' },
-  { name: 'new_geom_type', value: 'LINESTRING', label: 'Lines' },
+  { name: 'new_geom_type', value: 'POLYLINE', label: 'Lines' },
 ];
 
 const dataExtractOptions = [

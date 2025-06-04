@@ -234,7 +234,7 @@ class DbGeomType(StrEnum, Enum):
 
     POINT = "POINT"
     POLYGON = "POLYGON"
-    LINESTRING = "LINESTRING"
+    POLYLINE = "POLYLINE"
 
 
 class XLSFormType(StrEnum, Enum):

@@ -65,8 +65,8 @@
 		primaryGeomType: MapGeomTypes;
 		draw?: boolean;
 		drawGeomType: MapGeomTypes;
-		syncButtonTrigger: (() => void);
-		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void);
+		syncButtonTrigger: () => void;
+		handleDrawnGeom?: (drawInstance: any, geojson: GeoJSONGeometry) => void;
 	}
 
 	let {
@@ -85,13 +85,13 @@
 	const primaryGeomLayerMapping = {
 		POINT: 'entity-point-layer',
 		POLYGON: 'entity-polygon-layer',
-		LINESTRING: 'entity-line-layer',
+		POLYLINE: 'entity-line-layer',
 	};
 
 	const newGeomLayerMapping = {
 		POINT: 'new-entity-point-layer',
 		POLYGON: 'new-entity-polygon-layer',
-		LINESTRING: 'new-entity-line-layer',
+		POLYLINE: 'new-entity-line-layer',
 	};
 
 	const cssValue = (property: string) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
@@ -160,7 +160,12 @@
 	// })
 	let displayDrawHelpText: boolean = $state(false);
 	type DrawModeOptions = 'point' | 'linestring' | 'delete-selection' | 'polygon';
-	const currentDrawMode: DrawModeOptions = drawGeomType ? (drawGeomType.toLowerCase() as DrawModeOptions) : 'point';
+	const currentDrawMode: DrawModeOptions =
+		drawGeomType === 'POLYLINE'
+			? 'linestring'
+			: drawGeomType
+				? (drawGeomType.toLowerCase() as DrawModeOptions)
+				: 'point';
 	const drawControl = new MaplibreTerradrawControl({
 		modes: [currentDrawMode, 'select', 'delete'],
 		// Note We do not open the toolbar options, allowing the user
@@ -358,7 +363,7 @@
 		}
 
 		const interval = setInterval(() => {
-			if (drawGeomType === MapGeomTypes.POLYGON) {
+			if (drawGeomType === MapGeomTypes.POLYGON || drawGeomType === MapGeomTypes.POLYLINE) {
 				if (expanding) {
 					lineWidth += 0.3;
 					if (lineWidth >= 4) expanding = false; // Maximum width
@@ -436,7 +441,7 @@
 				}`}
 				onclick={async () => syncButtonTrigger()}
 				onkeydown={async (e: KeyboardEvent) => {
-					e.key === 'Enter' && (syncButtonTrigger());
+					e.key === 'Enter' && syncButtonTrigger();
 				}}
 				role="button"
 				tabindex="0"
@@ -617,6 +622,37 @@
 						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
 					}}
 				/>
+			{:else if primaryGeomType === MapGeomTypes.POLYLINE}
+				<LineLayer
+					id="entity-line-layer"
+					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+					paint={{
+						'line-color': [
+							'match',
+							['get', 'status'],
+							'READY',
+							cssValue('--entity-ready'),
+							'OPENED_IN_ODK',
+							cssValue('--entity-opened-in-odk'),
+							'SURVEY_SUBMITTED',
+							cssValue('--entity-survey-submitted'),
+							'VALIDATED',
+							cssValue('--entity-validated'),
+							'MARKED_BAD',
+							cssValue('--entity-marked-bad'),
+							cssValue('--entity-ready'), // default color if no match is found
+						],
+						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
+						'line-opacity': [
+							'case',
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+							1,
+							0.8,
+						],
+					}}
+					beforeLayerType="symbol"
+					manageHoverState
+				/>
 			{/if}
 		</FlatGeobuf>
 	{/if}
@@ -651,6 +687,16 @@
 					'circle-radius': circleRadius,
 					'circle-stroke-opacity': hoverStateFilter(0, 1),
 				}}
+			/>
+		{:else if drawGeomType === MapGeomTypes.POLYLINE}
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': cssValue('--sl-color-primary-700'),
+					'line-width': lineWidth,
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
 			/>
 		{/if}
 	</GeoJSON>
@@ -696,7 +742,6 @@
 				manageHoverState
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
-			<!-- id="new-geom-symbol-layer" -->
 			<SymbolLayer
 				id="new-entity-point-layer"
 				applyToClusters={false}
@@ -721,6 +766,32 @@
 					'icon-allow-overlap': true,
 					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
 				}}
+			/>
+		{:else if drawGeomType === MapGeomTypes.POLYLINE}
+			<LineLayer
+				id="new-entity-line-layer"
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						cssValue('--entity-ready'),
+						'OPENED_IN_ODK',
+						cssValue('--entity-opened-in-odk'),
+						'SURVEY_SUBMITTED',
+						cssValue('--entity-survey-submitted'),
+						'VALIDATED',
+						cssValue('--entity-validated'),
+						'MARKED_BAD',
+						cssValue('--entity-marked-bad'),
+						cssValue('--entity-ready'), // default color if no match is found
+					],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.8],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
 			/>
 		{/if}
 	</GeoJSON>
