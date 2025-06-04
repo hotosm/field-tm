@@ -88,47 +88,6 @@ export const consentQuestions: consentQuestionsType[] = [
     ],
   },
   {
-    id: 'log_into',
-    type: 'checkbox',
-    required: true,
-    question: 'Also, please log-into...?',
-    description:
-      'You do not have to map/take any action - logging in adds your username to the TM database for permissions, etc.',
-    options: [
-      {
-        id: 'staging_site',
-        label: (
-          <span>
-            The staging site{' '}
-            <a
-              href="https://stage.fmtm.hotosm.org/"
-              className="fmtm-text-primaryRed hover:fmtm-text-red-700 fmtm-cursor-pointer fmtm-w-fit"
-              target="_"
-            >
-              {' '}
-              https://stage.fmtm.hotosm.org/
-            </a>
-          </span>
-        ),
-      },
-      {
-        id: 'main_site',
-        label: (
-          <span>
-            The main Field Tasking Manager{' '}
-            <a
-              href="https://fmtm.hotosm.org/"
-              className="fmtm-text-primaryRed hover:fmtm-text-red-700 fmtm-cursor-pointer fmtm-w-fit"
-              target="_"
-            >
-              https://fmtm.hotosm.org/
-            </a>
-          </span>
-        ),
-      },
-    ],
-  },
-  {
     id: 'participated_in',
     type: 'checkbox',
     required: false,
