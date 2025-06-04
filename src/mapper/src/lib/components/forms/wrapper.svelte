@@ -65,6 +65,7 @@
 
 		submissionXml = submissionXml.replace('<start/>', `<start>${startDate}</start>`);
 		submissionXml = submissionXml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
+		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split("T")[0]}</today>`);
 
 		const authDetails = loginStore?.getAuthDetails;
 		if (authDetails?.username) {
