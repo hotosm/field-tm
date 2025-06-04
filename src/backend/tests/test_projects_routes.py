@@ -161,18 +161,6 @@ async def test_create_project_with_dup(client, organisation, project_data):
                 }
             ],
         },
-    ],
-)
-async def test_valid_geojson_types(client, organisation, project_data, geojson_type):
-    """Test valid geojson types."""
-    project_data["outline"] = geojson_type
-    response_data = await create_project(client, organisation.id, project_data)
-    assert "id" in response_data
-
-
-@pytest.mark.parametrize(
-    "geojson_type",
-    [
         {
             "type": "LineString",
             "coordinates": [
@@ -186,6 +174,18 @@ async def test_valid_geojson_types(client, organisation, project_data, geojson_t
                 [[85.317028828, 27.7052522097], [85.318844411, 27.7041424888]]
             ],
         },
+    ],
+)
+async def test_valid_geojson_types(client, organisation, project_data, geojson_type):
+    """Test valid geojson types."""
+    project_data["outline"] = geojson_type
+    response_data = await create_project(client, organisation.id, project_data)
+    assert "id" in response_data
+
+
+@pytest.mark.parametrize(
+    "geojson_type",
+    [
         {"type": "Point", "coordinates": [85.317028828, 27.7052522097]},
         {
             "type": "MultiPoint",

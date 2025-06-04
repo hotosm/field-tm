@@ -33,6 +33,7 @@ ALTER TYPE public.mappinglevel OWNER TO fmtm;
 CREATE TYPE public.geomtype AS ENUM (
     'POINT',
     'POLYLINE',
+    'MULTIPOLYLINE',
     'POLYGON'
 );
 ALTER TYPE public.geomtype OWNER TO fmtm;

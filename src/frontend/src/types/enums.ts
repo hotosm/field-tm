@@ -57,13 +57,13 @@ export enum project_roles {
 export type MapGeomTypes = {
   POINT: 'POINT';
   POLYGON: 'POLYGON';
-  LINESTRING: 'LINESTRING';
+  POLYLINE: 'POLYLINE';
 };
 
 export enum GeoGeomTypesEnum {
   POINT = 'Point',
   POLYGON = 'Polygon',
-  LINESTRING = 'LineString',
+  POLYLINE = 'POLYLINE',
 }
 
 export enum submission_status {
