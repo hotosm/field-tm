@@ -268,8 +268,7 @@
 									{/if}
 									<iframe
 										class="iframe"
-										style:border="none"
-										style:height="100%"
+										style="border: none; height: 100%; height: -webkit-fill-available;"
 										use:handleIframe
 										title="odk-web-forms-wrapper"
 										id={WEB_FORMS_IFRAME_ID}
