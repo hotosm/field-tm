@@ -5,7 +5,7 @@ export type UserStateTypes = {
   userList: { results: userType[]; pagination: paginationType };
   userListLoading: boolean;
   updateUserRoleLoading: boolean;
-  userListForSelect: userType[];
+  userListForSelect: { sub: string; username: string }[];
   userListForSelectLoading: boolean;
   getUserNamesLoading: boolean;
   userNames: Pick<userType, 'sub' | 'username'>[];
