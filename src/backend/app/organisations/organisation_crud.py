@@ -36,6 +36,7 @@ from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
 from app.organisations.organisation_schemas import OrganisationIn, OrganisationOut
+from app.users.user_crud import send_mail
 from app.users.user_schemas import UserIn
 
 
@@ -173,3 +174,50 @@ async def send_approval_message(
         body=message_content,
     )
     log.info(f"Approval message sent to organisation creator ({creator_sub}).")
+
+
+async def send_organisation_approval_request(
+    organisation: DbOrganisation,
+    requester: str,
+    primary_organisation: DbOrganisation,
+    request_odk_server: bool,
+):
+    """Notify primary organisation about new organisation's creation."""
+    if settings.DEBUG:
+        organisation_url = f"http://{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}/organization/{organisation.id}"
+    else:
+        organisation_url = (
+            f"https://{settings.FMTM_DOMAIN}/organization/{organisation.id}"
+        )
+
+    title = f"Creation of a new organization {organisation.name} was requested"
+    message_content = dedent(f"""
+        A new organisation **{organisation.name}** has been created by **{requester}**.
+
+        You can view the organisation details here:
+        - [{organisation.name}]({organisation_url}).
+
+        The organisation is currently pending approval.
+        Please review the organisation details and approve or reject it as soon as
+        possible.
+        The organisation's associated email is: {organisation.associated_email} if you
+        need to contact them.
+    """)
+
+    if request_odk_server:
+        message_content += (
+            f"\nThe organisation creator has requested access to the "
+            f"{primary_organisation.name} ODK server at "
+            f"{primary_organisation.odk_central_url}. "
+            "Please arrange setup.\n"
+        )
+
+    await send_mail(
+        user_email=primary_organisation.associated_email,
+        title=title,
+        message_content=message_content,
+    )
+    log.info(
+        "Notification about organisation creation sent at "
+        f"{primary_organisation.associated_email}."
+    )

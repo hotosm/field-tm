@@ -595,6 +595,16 @@ class DbOrganisation(BaseModel):
         return db_org
 
     @classmethod
+    async def primary_org(cls, db: Connection) -> Self:
+        """Fetch the first organisation (lowest ID)."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute("SELECT * FROM organisations ORDER BY id LIMIT 1;")
+            db_org = await cur.fetchone()
+            if db_org is None:
+                raise KeyError("No organisations found.")
+        return db_org
+
+    @classmethod
     async def all(
         cls, db: Connection, current_user_sub: str = ""
     ) -> Optional[list[Self]]:

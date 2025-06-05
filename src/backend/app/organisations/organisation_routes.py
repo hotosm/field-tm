@@ -67,11 +67,13 @@ async def get_organisations(
 
 @router.post("", response_model=OrganisationOut)
 async def create_organisation(
+    background_tasks: BackgroundTasks,
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(login_required)],
     # Depends required below to allow logo upload
     org_in: OrganisationIn = Depends(parse_organisation_input),
     logo: Optional[UploadFile] = File(None),
+    request_odk_server: bool = False,
 ) -> OrganisationOut:
     """Create an organisation with the given details.
 
@@ -83,7 +85,17 @@ async def create_organisation(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="The `name` is required to create an organisation.",
         )
-    return await DbOrganisation.create(db, org_in, current_user.sub, logo)
+    organisation = await DbOrganisation.create(db, org_in, current_user.sub, logo)
+
+    primary_organisation = await DbOrganisation.primary_org(db)
+    background_tasks.add_task(
+        organisation_crud.send_organisation_approval_request,
+        organisation=organisation,
+        requester=current_user.username,
+        primary_organisation=primary_organisation,
+        request_odk_server=request_odk_server,
+    )
+    return organisation
 
 
 @router.get("/my-organisations", response_model=list[OrganisationOut])
