@@ -20,7 +20,10 @@
 		webFormsRef: HTMLElement | undefined;
 	};
 
-	const WEB_FORMS_IFRAME_ID = "7f86f661-efd6-4cc6-b068-48dd7eb53dbb";
+	const WEB_FORMS_IFRAME_ID = '7f86f661-efd6-4cc6-b068-48dd7eb53dbb';
+
+	// example: convert mapper.fmtm.localhost to fmtm.localhost
+	const FMTM_DOMAIN = window.location.hostname.replace('mapper.', '');
 
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
@@ -82,7 +85,7 @@
 			submissionXml = submissionXml.replace('<warmup/>', `<warmup>${latitude} ${longitude} 0.0 0.0</warmup>`);
 		}
 
-		submissionXml = submissionXml.replace('<deviceid/>', `<deviceid>${getDeviceId()}</deviceid>`);
+		submissionXml = submissionXml.replace('<deviceid/>', `<deviceid>${FMTM_DOMAIN}:${getDeviceId()}</deviceid>`);
 
 		return submissionXml;
 	}
