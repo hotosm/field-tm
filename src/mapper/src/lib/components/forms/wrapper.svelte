@@ -102,11 +102,19 @@
 			entityStatus = 2; // SURVEY_SUBMITTED
 		}
 
+		const submissionIdMatch = submissionXml.match(/<submission_ids>(.*?)<\/submission_ids>/);
+		let submissionIds = submissionIdMatch?.[1] ?? '';
+		
+		if (selectedEntity?.submission_ids) {
+			submissionIds = `${selectedEntity.submission_ids},${submissionIds}`;
+		}
+
 		entitiesStore.updateEntityStatus(db, projectId, {
 			entity_id: selectedEntity?.entity_id,
 			status: entityStatus,
 			// NOTE here we don't translate the field as English values are always saved as the Entity label
 			label: `Feature ${selectedEntity?.osm_id}`,
+			submission_ids: submissionIds,
 		});
 	}
 
@@ -298,7 +306,7 @@
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */
 	#spinner {
-		border: 16px solid var(--sl-color-neutral-300);
+		border: 16px solid var(--sl-color-neutral-300); 
 		border-top: 16px solid var(--sl-color-primary-700);
 		border-radius: 50%;
 		width: 120px;

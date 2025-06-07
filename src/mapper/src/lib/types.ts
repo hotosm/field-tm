@@ -186,6 +186,7 @@ export type EntityStatusPayload = {
 	entity_id: UUID;
 	status: number;
 	label: string; // there is no easy way to automatically determine this
+	submission_ids?: string;
 };
 
 export type entityStatusOptions = 'READY' | 'OPENED_IN_ODK' | 'SURVEY_SUBMITTED' | 'MARKED_BAD' | 'VALIDATED';
