@@ -860,6 +860,7 @@ async def update_entity_mapping_status(
     entity_uuid: str,
     label: str,
     status: EntityState,
+    submission_ids: Optional[str] = None,
     dataset_name: str = "features",
 ) -> dict:
     """Update the Entity mapping status.
@@ -872,6 +873,7 @@ async def update_entity_mapping_status(
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
         status (EntityState): New EntityState to assign, in string form.
+        submission_ids (str): UUID (instanceID) of each submission.
         dataset_name (str): Override the default dataset / Entity list name 'features'.
 
     Returns:
@@ -883,7 +885,9 @@ async def update_entity_mapping_status(
             entity_list_name=dataset_name,
             project_id=odk_id,
             label=label,
-            data={
+            data={"status": status, "submission_ids": submission_ids}
+            if submission_ids
+            else {
                 "status": status,
             },
             # We don't know the current entity version, so we need this

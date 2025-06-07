@@ -286,6 +286,7 @@ async def set_odk_entities_mapping_status(
         entity_details.entity_id,
         entity_details.label,
         entity_details.status,
+        entity_details.submission_ids,
     )
 
 
