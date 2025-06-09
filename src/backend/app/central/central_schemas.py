@@ -291,7 +291,7 @@ class EntityMappingStatusIn(BaseModel):
     entity_id: str
     status: EntityState
     label: str
-    submission_ids: Optional[str] = (None,)
+    submission_ids: Optional[str] = None
 
     @field_validator("label", mode="before")
     @classmethod
