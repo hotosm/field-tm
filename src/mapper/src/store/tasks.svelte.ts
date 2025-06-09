@@ -132,7 +132,7 @@ function getTaskStore() {
 		const taskRows = Array.from(tasks.rows.values()) as TaskEventType[];
 		if (!taskRows) return;
 
-		selectedTask = taskRows[0];
+		selectedTask = taskRows.slice(-1)?.[0];
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
 		selectedTaskGeom = featcol.features.find((x) => x?.properties?.fid === taskId)?.geometry || null;
 	}
