@@ -67,7 +67,13 @@ async def process_entities(
             project_id=odk_id,
             entity_list_name="features",
         )
-        odk_entities = await loop.run_in_executor(None, get_entity_fn)
+        try:
+            odk_entities = await loop.run_in_executor(None, get_entity_fn)
+        except Exception as e:
+            if "404" in str(e):
+                print(f"⚠️ Entities endpoint not found for project {odk_id}, skipping...")
+                return True  # skip if project not found.
+            raise
         new_feat_entity_ids = {e.get("__id") for e in odk_entities.get("value", {}) if e.get("is_new") == "✅"}
 
         for entity_id in new_feat_entity_ids:
