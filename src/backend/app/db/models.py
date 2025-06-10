@@ -2019,8 +2019,11 @@ class DbOdkEntities(BaseModel):
     task_id: Optional[int]
     osm_id: int
     submission_ids: str
-    is_new: bool
+    # NOTE geometry is only set if the geom is 'new' or 'bad'
     geometry: str
+    # NOTE previous we had field is_new, replaced by created_by
+    # NOTE as is_new is implicitly true if created_by is set
+    created_by: str
 
     @classmethod
     async def upsert(
@@ -2053,7 +2056,7 @@ class DbOdkEntities(BaseModel):
             sql = """
                 INSERT INTO public.odk_entities
                     (entity_id, status, project_id, task_id,
-                    osm_id, submission_ids, is_new, geometry)
+                    osm_id, submission_ids, geometry, created_by)
                 VALUES
             """
 
@@ -2069,8 +2072,8 @@ class DbOdkEntities(BaseModel):
                     f"%({entity_index}_task_id)s, "
                     f"%({entity_index}_osm_id)s, "
                     f"%({entity_index}_submission_ids)s, "
-                    f"%({entity_index}_is_new)s, "
-                    f"%({entity_index}_geometry)s)"
+                    f"%({entity_index}_geometry)s, "
+                    f"%({entity_index}_created_by)s)"
                 )
                 data[f"{entity_index}_entity_id"] = entity["id"]
                 data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
@@ -2081,15 +2084,15 @@ class DbOdkEntities(BaseModel):
                 )
                 data[f"{entity_index}_osm_id"] = entity["osm_id"]
                 data[f"{entity_index}_submission_ids"] = entity["submission_ids"]
-                data[f"{entity_index}_is_new"] = (
-                    True if entity["is_new"] == "✅" else False
+                data[f"{entity_index}_osm_id"] = entity["osm_id"]
+                # Only copy geometry if new geom (created_by), or marked bad
+                should_include_geom = (
+                    entity["status"] == "6" or entity["created_by"] != ""
                 )
-                # Only copy geometry if new geom, or marked bad
                 data[f"{entity_index}_geometry"] = (
-                    entity["geometry"]
-                    if entity["status"] == "6" or entity["is_new"] == "✅"
-                    else ""
+                    entity["geometry"] if should_include_geom else ""
                 )
+                data[f"{entity_index}_created_by"] = entity["created_by"]
 
             sql += (
                 ", ".join(values)
@@ -2099,8 +2102,8 @@ class DbOdkEntities(BaseModel):
                     task_id = EXCLUDED.task_id,
                     osm_id = EXCLUDED.osm_id,
                     submission_ids = EXCLUDED.submission_ids,
-                    is_new = EXCLUDED.is_new,
-                    geometry = EXCLUDED.geometry
+                    geometry = EXCLUDED.geometry,
+                    created_by = EXCLUDED.created_by
                 RETURNING True;
             """
             )
