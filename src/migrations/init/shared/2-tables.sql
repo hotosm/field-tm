@@ -29,8 +29,8 @@ CREATE TABLE public.odk_entities (
     task_id integer,
     osm_id bigint,
     submission_ids character varying,
-    is_new boolean DEFAULT false,
     -- This a javarosa geom string
-    geometry character varying
+    geometry character varying,
+    created_by character varying
 );
 ALTER TABLE public.odk_entities OWNER TO fmtm;

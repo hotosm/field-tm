@@ -63,7 +63,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlCom
   };
 
   return (
-    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
+    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[45] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
       <LayerSwitchMenu map={map} pmTileLayerUrl={pmTileLayerUrl} />
       {btnList.map((btn) => (
         <Tooltip title={btn.title} placement="left" arrow key={btn.title}>

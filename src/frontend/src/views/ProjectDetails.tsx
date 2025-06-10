@@ -289,7 +289,13 @@ const ProjectDetails = () => {
           }
         />
       )}
-      {selectedTaskFeature && <FeatureSelectionPopup featureProperties={selectedFeatureProps} taskId={selectedTask} />}
+      {selectedTaskFeature && (
+        <FeatureSelectionPopup
+          featureProperties={selectedFeatureProps}
+          taskId={selectedTask}
+          setSelectedTaskFeature={setSelectedTaskFeature}
+        />
+      )}
     </div>
   );
 };

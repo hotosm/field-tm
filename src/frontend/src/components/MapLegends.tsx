@@ -70,7 +70,7 @@ const MapLegends = ({ defaultTheme }: { defaultTheme: any }) => {
   };
 
   return (
-    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-3 fmtm-z-50">
+    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-3 fmtm-z-[45]">
       <DropdownMenu modal={false} open={toggleLegend}>
         <DropdownMenuTrigger className="fmtm-outline-none" onClick={() => setToggleLegend(true)}>
           <Tooltip title="Legend" placement="right" arrow>
@@ -81,28 +81,26 @@ const MapLegends = ({ defaultTheme }: { defaultTheme: any }) => {
             </div>
           </Tooltip>
         </DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent
-            className="fmtm-border-none fmtm-z-[60] fmtm-bg-white fmtm-p-2"
-            align="start"
-            sideOffset={-25}
-          >
-            <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
-              <p className="fmtm-body-sm-semibold fmtm-mb-2">Legend</p>
-              <div
-                className="fmtm-p-1 hover:fmtm-bg-grey-200 fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-duration-200"
-                onClick={() => setToggleLegend(false)}
-              >
-                <AssetModules.ExpandMoreIcon className="!fmtm-text-sm fmtm-cursor-pointer" />
-              </div>
+        <DropdownMenuContent
+          className="fmtm-border-none fmtm-bg-white fmtm-p-2 fmtm-z-[45]"
+          align="start"
+          sideOffset={-25}
+        >
+          <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
+            <p className="fmtm-body-sm-semibold fmtm-mb-2">Legend</p>
+            <div
+              className="fmtm-p-1 hover:fmtm-bg-grey-200 fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-duration-200"
+              onClick={() => setToggleLegend(false)}
+            >
+              <AssetModules.ExpandMoreIcon className="!fmtm-text-sm fmtm-cursor-pointer" />
             </div>
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-              {MapDetails.map((data, index) => {
-                return <LegendListItem data={data} key={index} />;
-              })}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
+          </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            {MapDetails.map((data, index) => {
+              return <LegendListItem data={data} key={index} />;
+            })}
+          </div>
+        </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );

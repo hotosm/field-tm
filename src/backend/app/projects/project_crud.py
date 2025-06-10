@@ -476,7 +476,7 @@ async def generate_project_files(
         if first_feature and "properties" in first_feature:  # Check if properties exist
             # FIXME perhaps this should be done in the SQL code?
             entity_properties = list(first_feature["properties"].keys())
-            for field in ["submission_ids", "is_new"]:
+            for field in ["submission_ids", "created_by"]:
                 if field not in entity_properties:
                     entity_properties.append(field)
 

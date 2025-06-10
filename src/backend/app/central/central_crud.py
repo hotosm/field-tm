@@ -739,7 +739,8 @@ async def get_entities_data(
     odk_id: int,
     dataset_name: str = "features",
     fields: str = (
-        "__system/updatedAt, osm_id, status, task_id, submission_ids, is_new, geometry"
+        "__system/updatedAt, osm_id, status, task_id, submission_ids, "
+        "geometry, created_by"
     ),
     filter_date: Optional[datetime] = None,
 ) -> list:

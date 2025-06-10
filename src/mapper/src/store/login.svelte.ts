@@ -2,6 +2,7 @@ import { refreshCookies } from '$lib/api/login';
 
 type authDetailsType = {
 	id: number;
+	sub: string;
 	username: string;
 	email_address?: string;
 	picture: string;
