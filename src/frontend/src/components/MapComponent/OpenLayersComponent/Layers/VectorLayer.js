@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { get } from 'ol/proj';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -59,7 +59,9 @@ const VectorLayer = ({
   getAOIArea,
   processGeojson,
 }) => {
+  const latestFgbRequestIdRef = useRef(0);
   const [vectorLayer, setVectorLayer] = useState(null);
+
   useEffect(() => {
     if (map && vectorLayer) {
       return () => map.removeLayer(vectorLayer);
@@ -185,9 +187,12 @@ const VectorLayer = ({
   }
 
   async function loadFgbRemote(filterExtent = true, extractGeomCol = true) {
+    const fgbRequestIdRef = ++latestFgbRequestIdRef.current;
     this.clear();
     let filteredFeatures = [];
     for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtent.getExtent()))) {
+      if (fgbRequestIdRef !== latestFgbRequestIdRef.current) return; // only process latest response
+
       if (extractGeomCol && feature.geometry.type === 'GeometryCollection') {
         // Extract first geom from geomcollection
         feature = {
