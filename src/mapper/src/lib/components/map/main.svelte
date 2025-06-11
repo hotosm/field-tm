@@ -53,6 +53,7 @@
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/map/click-outside.ts';
+	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
 
 	type bboxType = [number, number, number, number];
 
@@ -189,6 +190,9 @@
 		let entityLayerName: string = primaryGeomLayerMapping[primaryGeomType];
 		let newEntityLayerName: string = newGeomLayerMapping[drawGeomType];
 
+		// reset selected entity geom
+		entitiesStore.setSelectedEntityJavaRosaGeom(null);
+
 		// returns list of features of entity layer present on that clicked point
 		const clickedEntityFeature =
 			map?.queryRenderedFeatures(e.point, {
@@ -213,6 +217,7 @@
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
 			// if clicked coordinate contains uploaded entity only
 			const entityGeometry = clickedEntityFeature[0].geometry;
+			entitiesStore.setSelectedEntityJavaRosaGeom(geojsonGeomToJavarosa(entityGeometry));
 			const entityCentroid = centroid(entityGeometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntityId(clickedEntityId);
