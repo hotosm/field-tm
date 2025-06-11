@@ -32,7 +32,14 @@
 
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 
-	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, formXml, taskId }: Props = $props();
+	let {
+		display = $bindable(false),
+		entityId,
+		webFormsRef = $bindable(undefined),
+		projectId,
+		formXml,
+		taskId,
+	}: Props = $props();
 	let drawerRef: SlDrawer;
 	let odkForm: any;
 	let startDate: string | undefined;
@@ -44,10 +51,10 @@
 	const odkWebFormPromise = fetchCachedBlobUrl(
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
-		true // clean old cache entries
+		true, // clean old cache entries
 	);
 
-	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName, true);
+	const webFormPagePromise = fetchCachedBlobUrl('/web-forms.html', commonStore.config.cacheName, true);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
@@ -61,14 +68,20 @@
 
 		// feature exists question isn't in the payload if it was intentionally hidden because it's a new feature
 		// the verification question is also hidden because it depends on the feature_exists question
-		if (!submissionXml.includes("<feature_exists>") && selectedEntity.is_new) {
-			submissionXml = submissionXml.replace('<survey_questions>', `<feature_exists>yes</feature_exists><survey_questions>`);
-			submissionXml = submissionXml.replace('</survey_questions>', `</survey_questions><verification><digitisation_correct>yes</digitisation_correct></verification>`);
+		if (!submissionXml.includes('<feature_exists>') && selectedEntity.is_new) {
+			submissionXml = submissionXml.replace(
+				'<survey_questions>',
+				`<feature_exists>yes</feature_exists><survey_questions>`,
+			);
+			submissionXml = submissionXml.replace(
+				'</survey_questions>',
+				`</survey_questions><verification><digitisation_correct>yes</digitisation_correct></verification>`,
+			);
 		}
 
 		submissionXml = submissionXml.replace('<start/>', `<start>${startDate}</start>`);
 		submissionXml = submissionXml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
-		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split("T")[0]}</today>`);
+		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split('T')[0]}</today>`);
 
 		const authDetails = loginStore?.getAuthDetails;
 		if (authDetails?.username) {
@@ -104,7 +117,7 @@
 
 		const submissionIdMatch = submissionXml.match(/<submission_ids>(.*?)<\/submission_ids>/);
 		let submissionIds = submissionIdMatch?.[1] ?? '';
-		
+
 		if (selectedEntity?.submission_ids) {
 			submissionIds = `${selectedEntity.submission_ids},${submissionIds}`;
 		}
@@ -191,14 +204,15 @@
 			if (selectedEntity?.osm_id) {
 				nodes.find((it: any) => it.definition.nodeset === '/data/xid')?.setValueState(`${selectedEntity?.osm_id}`);
 			}
-
-			if (selectedEntity?.geometry) {
-				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(selectedEntity?.geometry);
+			if (entitiesStore.selectedEntityJavaRosaGeom || selectedEntity?.geometry) {
+				nodes
+					.find((it: any) => it.definition.nodeset === '/data/xlocation')
+					?.setValueState(entitiesStore.selectedEntityJavaRosaGeom || selectedEntity?.geometry);
 			}
 
 			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
 			if (featureExistsNode && selectedEntity.is_new) {
-				featureExistsNode?.setValueState("yes");
+				featureExistsNode?.setValueState('yes');
 
 				// hide this node because we don't need to see it after setting the value
 				featureExistsNode.state.clientState.relevant = false;
@@ -306,7 +320,7 @@
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */
 	#spinner {
-		border: 16px solid var(--sl-color-neutral-300); 
+		border: 16px solid var(--sl-color-neutral-300);
 		border-top: 16px solid var(--sl-color-primary-700);
 		border-radius: 50%;
 		width: 120px;
