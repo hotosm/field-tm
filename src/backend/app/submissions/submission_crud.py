@@ -165,8 +165,18 @@ async def get_submission_by_project(
 
     """
     hashtags = project.hashtags
-    xform = get_odk_form(project.odk_credentials)
-    data = xform.listSubmissions(project.odkid, project.odk_form_id, filters)
+    async with pyodk_client(project.odk_credentials) as client:
+        data = client.submissions.get_table(
+            project_id=project.odkid,
+            form_id=project.odk_form_id,
+            table_name="Submissions",
+            skip=filters.get("$skip"),
+            top=filters.get("$top"),
+            count=filters.get("$count"),
+            wkt=filters.get("$wkt"),
+            filter=filters.get("$filter"),
+            expand="*",
+        )
 
     def add_hashtags(item):
         item["hashtags"] = hashtags

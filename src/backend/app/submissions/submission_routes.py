@@ -337,29 +337,29 @@ async def submission_table(
         "$wkt": True,
     }
 
+    filter_clauses = []
+
     if submitted_date_range:
         start_date, end_date = submitted_date_range.split(",")
-        filters["$filter"] = (
-            "__system/submissionDate ge {}T00:00:00+00:00 "
-            "and __system/submissionDate le {}T23:59:59.999+00:00"
-        ).format(start_date, end_date)
-
-    if review_state and review_state != "received":
-        review_filter = f"__system/reviewState eq '{review_state}'"
-        filters["$filter"] = (
-            f"{filters['$filter']} and {review_filter}"
-            if "$filter" in filters
-            else review_filter
+        filter_clauses.append(
+            f"__system/submissionDate ge {start_date}T00:00:00+00:00 "
+            f"and __system/submissionDate le {end_date}T23:59:59.999+00:00"
         )
 
+    if review_state and review_state != "received":
+        filter_clauses.append(f"__system/reviewState eq '{review_state}'")
+
+    if filter_clauses:
+        filters["$filter"] = " and ".join(filter_clauses)
+
     data = await submission_crud.get_submission_by_project(project, filters)
-    total_count = data.get("@odata.count", 0)
+
     submissions = data.get("value", [])
+
     if review_state == "received":
         submissions = [
             sub for sub in submissions if sub["__system"].get("reviewState") is None
         ]
-        total_count = len(submissions)
 
     if task_id:
         submissions = [sub for sub in submissions if sub.get("task_id") == str(task_id)]
@@ -369,6 +369,7 @@ async def submission_table(
             sub for sub in submissions if sub.get("username") == submitted_by
         ]
 
+    total_count = len(submissions)
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
     paginated_submissions = submissions[start_index:end_index]
@@ -376,12 +377,11 @@ async def submission_table(
     pagination = await project_crud.get_pagination(
         page, len(submissions), results_per_page, total_count
     )
-    response = submission_schemas.PaginatedSubmissions(
+
+    return submission_schemas.PaginatedSubmissions(
         results=paginated_submissions,
         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
-
-    return response
 
 
 @router.post(
