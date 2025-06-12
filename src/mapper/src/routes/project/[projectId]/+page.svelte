@@ -326,7 +326,8 @@
 							osm_id: newOsmId,
 							task_id: taskStore.selectedTaskIndex || '',
 							status: '0', // TODO update this to use the enum / mapping
-							created_by: loginStore.getAuthDetails?.sub,
+							// NOTE: 'osm|20386219' is the service user 'svcfmtm' (not a logged-in user).
+							created_by: loginStore.getAuthDetails?.sub || 'osm|20386219',
 						},
 					},
 				],
