@@ -1,5 +1,5 @@
 import React from 'react';
-import { Skeleton } from '@/components/common/Skeleton';
+import { Skeleton } from '@/components/Skeletons';
 
 // Skeleton card main purpose is to perform loading in case of any delay in retrieving project
 const ProjectCardSkeleton = ({ className }: { className?: string }) => {

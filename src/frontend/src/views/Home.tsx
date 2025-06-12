@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import { HomeSummaryService } from '@/api/HomeService';
-import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
+import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
 import HomePageFilters from '@/components/home/HomePageFilters';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import { projectType } from '@/models/home/homeModel';

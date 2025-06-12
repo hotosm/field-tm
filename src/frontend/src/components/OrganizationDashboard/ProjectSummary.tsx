@@ -8,7 +8,7 @@ import Switch from '@/components/common/Switch';
 import ExploreProjectCard from '../home/ExploreProjectCard';
 import Pagination from '@/components/common/Pagination';
 import ProjectSummaryMap from '@/components/OrganizationDashboard/ProjectSummaryMap';
-import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
+import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 

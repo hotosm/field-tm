@@ -4,10 +4,10 @@ import InputTextField from '@/components/common/InputTextField';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
-import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import TaskCardSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/TaskCardSkeleton';
 
 const TaskSubmissions = () => {
   const params = useParams();
@@ -114,7 +114,7 @@ const TaskSubmissions = () => {
           {taskLoading ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
               {Array.from({ length: 10 }).map((_, i) => (
-                <TaskCardSkeletonLoader key={i} />
+                <TaskCardSkeleton key={i} />
               ))}
             </div>
           ) : filteredTaskInfo?.length > 0 ? (
