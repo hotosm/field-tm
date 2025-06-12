@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DeleteProjectService } from '@/api/CreateProjectService';
 import EditDetails from '@/components/ManageProject/Details';
 import FormUpdate from '@/components/ManageProject/Form';
+import ManageProjectSkeleton from '@/components/Skeletons/ManageProject';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +28,7 @@ const ManageProject = () => {
 
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
+  const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
 
   const [selectedTab, setSelectedTab] = useState('details');
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
@@ -58,69 +60,73 @@ const ManageProject = () => {
         />
         <h4 className="fmtm-text-grey-800">Manage Project</h4>
       </div>
-      <div className="sm:fmtm-flex-1 fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
-        {/* left container */}
-        <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl sm:fmtm-w-[17.5rem] fmtm-p-6 fmtm-flex sm:fmtm-flex-col fmtm-flex-wrap sm:fmtm-flex-nowrap fmtm-gap-x-5">
-          <div className="fmtm-flex-1 fmtm-flex sm:fmtm-flex-col fmtm-h-fit">
-            {tabList.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedTab(tab.id)}
-                className={`fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-px-5 fmtm-py-3 fmtm-rounded fmtm-duration-200 ${
-                  selectedTab === tab.id ? 'fmtm-text-red-medium fmtm-bg-red-light' : 'hover:fmtm-text-red-medium'
-                }`}
-              >
-                {tab.icon} {tab.name}
-              </button>
-            ))}
-          </div>
-          <Dialog open={toggleDeleteModal} onOpenChange={setToggleDeleteModal}>
-            <DialogTrigger>
-              <Button
-                variant="link-grey"
-                onClick={() => {
-                  setToggleDeleteModal(true);
-                }}
-                className="fmtm-mx-auto"
-              >
-                <AssetModules.DeleteIcon className="!fmtm-text-[1.125rem]" /> Delete Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete Project?</DialogTitle>
-              </DialogHeader>
-              <div>
-                <p className="fmtm-body-lg fmtm-mb-1">Please type the project name to confirm.</p>
-                <InputTextField
-                  fieldType="text"
-                  value={confirmProjectName}
-                  onChange={(e) => setConfirmProjectName(e.target.value)}
-                />
-                <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
-                  <Button variant="link-grey" onClick={() => setToggleDeleteModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="primary-red"
-                    isLoading={isProjectDeletePending}
-                    disabled={confirmProjectName !== editProjectDetails?.name}
-                    onClick={() => dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate))}
-                  >
-                    Delete
-                  </Button>
+      {projectDetailsLoading ? (
+        <ManageProjectSkeleton />
+      ) : (
+        <div className="sm:fmtm-flex-1 fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
+          {/* left container */}
+          <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl sm:fmtm-w-[17.5rem] fmtm-p-6 fmtm-flex sm:fmtm-flex-col fmtm-flex-wrap sm:fmtm-flex-nowrap fmtm-gap-x-5">
+            <div className="fmtm-flex-1 fmtm-flex sm:fmtm-flex-col fmtm-h-fit">
+              {tabList.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedTab(tab.id)}
+                  className={`fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-px-5 fmtm-py-3 fmtm-rounded fmtm-duration-200 ${
+                    selectedTab === tab.id ? 'fmtm-text-red-medium fmtm-bg-red-light' : 'hover:fmtm-text-red-medium'
+                  }`}
+                >
+                  {tab.icon} {tab.name}
+                </button>
+              ))}
+            </div>
+            <Dialog open={toggleDeleteModal} onOpenChange={setToggleDeleteModal}>
+              <DialogTrigger>
+                <Button
+                  variant="link-grey"
+                  onClick={() => {
+                    setToggleDeleteModal(true);
+                  }}
+                  className="fmtm-mx-auto"
+                >
+                  <AssetModules.DeleteIcon className="!fmtm-text-[1.125rem]" /> Delete Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Delete Project?</DialogTitle>
+                </DialogHeader>
+                <div>
+                  <p className="fmtm-body-lg fmtm-mb-1">Please type the project name to confirm.</p>
+                  <InputTextField
+                    fieldType="text"
+                    value={confirmProjectName}
+                    onChange={(e) => setConfirmProjectName(e.target.value)}
+                  />
+                  <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
+                    <Button variant="link-grey" onClick={() => setToggleDeleteModal(false)}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary-red"
+                      isLoading={isProjectDeletePending}
+                      disabled={confirmProjectName !== editProjectDetails?.name}
+                      onClick={() => dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate))}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
+          {/* right container */}
+          <div
+            className={`fmtm-h-full fmtm-rounded-xl fmtm-w-full ${selectedTab !== 'users' ? 'fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar' : 'md:fmtm-w-[calc(100%-17.5rem)]'}`}
+          >
+            {getContent(selectedTab)}
+          </div>
         </div>
-        {/* right container */}
-        <div
-          className={`fmtm-h-full fmtm-rounded-xl fmtm-w-full ${selectedTab !== 'users' ? 'fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar' : 'md:fmtm-w-[calc(100%-17.5rem)]'}`}
-        >
-          {getContent(selectedTab)}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

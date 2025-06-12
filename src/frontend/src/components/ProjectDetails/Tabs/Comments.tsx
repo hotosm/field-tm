@@ -5,9 +5,9 @@ import { PostProjectComments, GetProjectComments } from '@/api/Project';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
-import { ProjectCommentsSekeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import ProjectCommentsSekeleton from '@/components/Skeletons/ProjectDetails/ProjectCommentsSekeleton';
 
 const Comments = () => {
   const dispatch = useAppDispatch();
@@ -69,7 +69,7 @@ const Comments = () => {
         {projectGetCommentsLoading ? (
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-mb-1">
             {Array.from({ length: 8 }).map((_, i) => (
-              <ProjectCommentsSekeletonLoader key={i} />
+              <ProjectCommentsSekeleton key={i} />
             ))}
           </div>
         ) : (

@@ -14,7 +14,6 @@ import { CustomSelect } from '@/components/common/Select.js';
 import DateRangePicker from '@/components/common/DateRangePicker';
 import Table, { TableHeader } from '@/components/common/CustomTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader.js';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
@@ -30,6 +29,7 @@ import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/Submi
 import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import SubmissionsTableSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/SubmissionsTableSkeleton';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -410,7 +410,7 @@ const SubmissionsTable = ({ toggleView }) => {
         </div>
       </div>
       {submissionTableDataLoading || submissionFormFieldsLoading ? (
-        <SubmissionsTableSkeletonLoader />
+        <SubmissionsTableSkeleton />
       ) : (
         <Table data={submissionTableData?.results || []} flag="dashboard" onRowClick={() => {}} isLoading={false}>
           <TableHeader

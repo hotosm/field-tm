@@ -5,11 +5,11 @@ import { MyOrganisationDataService, OrganisationDataService } from '@/api/Organi
 import { user_roles } from '@/types/enums';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
 import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
-import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
+import OrganizationCardSkeleton from '@/components/Skeletons/Organization/OrganizationCardSkeleton';
 
 const Organisation = () => {
   useDocumentTitle('Organizations');
@@ -196,23 +196,11 @@ const Organisation = () => {
       </CoreModules.Box>
       {activeTab === 0 ? (
         organisationDataLoading ? (
-          <CoreModules.Stack
-            sx={{
-              display: {
-                xs: 'flex',
-                sm: 'flex',
-                md: 'flex',
-                lg: 'flex',
-                xl: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'left',
-                width: '100%',
-                gap: 10,
-              },
-            }}
-          >
-            <OrganisationCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
-          </CoreModules.Stack>
+          <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <OrganizationCardSkeleton key={i} />
+            ))}
+          </div>
         ) : (
           <OrganisationGridCard
             filteredData={filteredBySearch(organisationData, searchKeyword)}
@@ -221,24 +209,12 @@ const Organisation = () => {
         )
       ) : null}
       {activeTab === 1 ? (
-        myOrganisationDataLoading ? (
-          <CoreModules.Stack
-            sx={{
-              display: {
-                xs: 'flex',
-                sm: 'flex',
-                md: 'flex',
-                lg: 'flex',
-                xl: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'left',
-                width: '100%',
-                gap: 10,
-              },
-            }}
-          >
-            <OrganisationCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
-          </CoreModules.Stack>
+        organisationDataLoading ? (
+          <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <OrganizationCardSkeleton key={i} />
+            ))}
+          </div>
         ) : (
           <OrganisationGridCard
             filteredData={filteredBySearch(myOrganisationData, searchKeyword)}

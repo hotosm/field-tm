@@ -330,9 +330,7 @@ const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>
         dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: true }));
         dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: false }));
         dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       } catch (error) {
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       }
@@ -361,12 +359,10 @@ const GetIndividualProjectDetails = (url: string) => {
         };
 
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(CommonActions.SetProjectNotFound(true));
         }
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       }
@@ -411,7 +407,6 @@ const TaskSplittingPreviewService = (
             message: 'Task generation failed. Please try again',
           }),
         );
-        dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       } finally {
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       }
@@ -430,7 +425,6 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         dispatch(CreateProjectActions.SetPatchProjectDetails(resp));
-        dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Project Successfully Edited',
@@ -438,7 +432,6 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
           }),
         );
       } catch (error) {
-        dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Failed. Do you have permission to edit?',
@@ -469,7 +462,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
         const resp: { message: string } = postFormUpdateResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
-        dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: resp.message,
@@ -482,7 +474,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
             message: error?.response?.data?.detail || 'Failed to update Form',
           }),
         );
-        dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
       }
@@ -507,7 +498,6 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
         const resp: unknown = postBoundaryUpdateResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
-        dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Project Boundary Successfully Updated',
@@ -515,7 +505,6 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
           }),
         );
       } catch (error) {
-        dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
       }
@@ -537,7 +526,6 @@ const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean
 
         const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
         const resp = getTaskSplittingResponse.data;
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: JSON.stringify(resp.message),
@@ -551,7 +539,6 @@ const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean
             message: error?.response?.data?.detail || 'Something Went Wrong',
           }),
         );
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(CreateProjectActions.SetCustomFileValidity(false));
       } finally {
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));

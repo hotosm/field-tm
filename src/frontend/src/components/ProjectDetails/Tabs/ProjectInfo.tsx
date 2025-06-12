@@ -5,8 +5,8 @@ import ProjectIcon from '@/assets/images/project_icon.png';
 import { useAppSelector } from '@/types/reduxTypes';
 import { entity_state } from '@/types/enums';
 import { EntityOsmMap } from '@/models/project/projectModel';
-import { ProjectInfoSkeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import CoreModules from '@/shared/CoreModules';
+import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';
 
 const ProjectInfo: React.FC = () => {
   const params = useParams();
@@ -56,10 +56,9 @@ const ProjectInfo: React.FC = () => {
     }
   }, [projectInfo, paraRef.current]);
 
-  if (projectDetailsLoading) return <ProjectInfoSkeletonLoader />;
+  if (projectDetailsLoading) return <ProjectInfoSkeleton />;
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-overflow-y-scroll scrollbar fmtm-pr-1 fmtm-pb-6">
-      {/* <ProjectInfoSkeletonLoader /> */}
       <div>
         <p className="fmtm-button fmtm-text-red-medium">Description</p>
         <div>
