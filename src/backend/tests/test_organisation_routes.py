@@ -27,11 +27,15 @@ from app.db.models import DbOrganisationManagers
 
 async def test_create_organisation(client, organisation_data, organisation_logo):
     """Test creating an organisation."""
-    response = await client.post(
-        "/organisation",
-        data=organisation_data,
-        files={"logo": organisation_logo},
-    )
+    with patch(
+        "app.organisations.organisation_crud.send_organisation_approval_request",
+        return_value=None,
+    ):
+        response = await client.post(
+            "/organisation",
+            data=organisation_data,
+            files={"logo": organisation_logo},
+        )
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["name"] == organisation_data["name"]
