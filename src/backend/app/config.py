@@ -161,7 +161,7 @@ class Settings(BaseSettings):
 
     DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
     DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
-    DEFAULT_ORG_EMAIL: Optional[str] = "syadmin@hotosm.org"
+    DEFAULT_ORG_EMAIL: Optional[str] = "sysadmin@hotosm.org"
     DEFAULT_ORG_LOGO_URL: Optional[str] = (
         "https://raw.githubusercontent.com/hotosm/fmtm/refs/heads/development/src/frontend/public/hot-org-logo.png"
     )

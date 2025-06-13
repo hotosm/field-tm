@@ -254,6 +254,7 @@ class DbUser(BaseModel):
         search: Optional[str] = None,
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
+        role: Optional[UserRole] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
         filters = []
@@ -270,6 +271,10 @@ class DbUser(BaseModel):
         if signin_type:
             filters.append("sub LIKE %(signin_type)s")
             params["signin_type"] = f"{signin_type}|%"
+
+        if role:
+            filters.append("role = %(role)s")
+            params["role"] = role
 
         sql = f"""
             SELECT * FROM users
