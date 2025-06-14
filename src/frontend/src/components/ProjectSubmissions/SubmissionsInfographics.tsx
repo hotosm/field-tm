@@ -45,7 +45,7 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
     updatedEntityLastNDays?.map((entity) => {
       if (submissions?.find((submission) => submission.label === getMonthDate(entity.updated_at))) {
         const index = submissions.findIndex((submission) => submission.label === getMonthDate(entity.updated_at));
-        submissions[index].count += 1;
+        submissions[index].count += entity?.submission_ids?.split(',')?.length;
       } else {
         submissions.push({
           date: entity.updated_at?.split('T')[0],

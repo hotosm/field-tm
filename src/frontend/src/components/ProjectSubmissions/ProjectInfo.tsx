@@ -3,8 +3,13 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
+import { EntityOsmMap } from '@/models/project/projectModel';
 
-const ProjectInfo = ({ entities }) => {
+type propType = {
+  entities: EntityOsmMap[];
+};
+
+const ProjectInfo = ({ entities }: propType) => {
   const navigate = useNavigate();
   const params = CoreModules.useParams();
   const projectId = params.projectId;
@@ -25,6 +30,10 @@ const ProjectInfo = ({ entities }) => {
     ?.toISOString();
 
   const updatedDateTime = latestDateSorted ? latestDateSorted?.split('T')[0] : '-';
+  const submissionCount = entities?.reduce((total, entity) => {
+    const entitySubmissionCount = entity?.submission_ids?.split(',')?.length || 0;
+    return total + entitySubmissionCount;
+  }, 0);
 
   const dataCard = [
     {
@@ -39,7 +48,7 @@ const ProjectInfo = ({ entities }) => {
     },
     {
       title: 'Submissions',
-      count: entities?.length,
+      count: submissionCount,
       icon: <AssetModules.SubmissionIcon sx={{ color: 'white', fontSize: { xs: '35px', xl: '40px' } }} />,
     },
   ];

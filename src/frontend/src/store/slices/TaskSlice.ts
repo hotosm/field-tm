@@ -46,7 +46,8 @@ const TaskSlice = createSlice({
         let lastSubmission: string | null = null;
         items.forEach((item) => {
           if (item.status > 1) {
-            submissionCount++;
+            const entitySubmissionCount = item?.submission_ids?.split(',')?.length || 0;
+            submissionCount += entitySubmissionCount;
           }
           if (item.updated_at && (!lastSubmission || item.updated_at > lastSubmission)) {
             lastSubmission = item.updated_at;
