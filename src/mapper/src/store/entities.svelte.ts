@@ -32,11 +32,9 @@ let entitiesUnsubscribe: (() => void) | null = $state(null);
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntityId: string | null = $state(null);
 let entitiesList: DbEntityType[] = $state([]);
-let selectedEntity: DbEntityType | null = $derived(
-	entitiesList.find((entity) => entity.entity_id === selectedEntityId) ?? null,
-);
 // Map each entity_id to the entity data, for faster lookup in map
 let entityMap = $derived(new Map(entitiesList.map((entity) => [entity.entity_id, entity])));
+let selectedEntity: DbEntityType | null = $derived(entityMap.get(selectedEntityId || '') ?? null);
 
 // Derive new and bad geoms to display as an overlay
 let badGeomFeatcol: FeatureCollection = $derived({
