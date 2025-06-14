@@ -33,7 +33,7 @@ export interface GetOrganisationDataModel {
   odk_central_url: string | null;
 }
 
-export type organizationTypeOptionsType = {
+export type radioOptionsType = {
   name: string;
   value: string;
   label: string;

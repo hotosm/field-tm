@@ -9,20 +9,25 @@ import OrganizationDetailsValidation from '@/components/CreateEditOrganization/v
 import RadioButton from '@/components/common/RadioButton';
 import { PatchOrganizationDataService, PostOrganisationDataService } from '@/api/OrganisationService';
 import { diffObject } from '@/utilfunctions/compareUtils';
-import { CustomCheckbox } from '@/components/common/Checkbox';
-import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
+import { radioOptionsType } from '@/models/organisation/organisationModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { CustomCheckbox } from '@/components/common/Checkbox';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const organizationTypeOptions: organizationTypeOptionsType[] = [
+const organizationTypeOptions: radioOptionsType[] = [
   { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
   { name: 'company', value: 'COMPANY', label: 'Company' },
   { name: 'non_profit', value: 'NON_PROFIT', label: 'Non-profit' },
   { name: 'university', value: 'UNIVERSITY', label: 'University' },
   { name: 'other', value: 'OTHER', label: 'Other' },
+];
+
+const odkTypeOptions: radioOptionsType[] = [
+  { name: 'odk_server_type', value: 'OWN', label: 'Use your own ODK server' },
+  { name: 'odk_server_type', value: 'HOT', label: "Request HOT's ODK server" },
 ];
 
 const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
@@ -35,15 +40,16 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
 
   const submission = () => {
     if (!organizationId) {
-      const { fillODKCredentials, ...filteredValues } = values;
+      const { ...filteredValues } = values;
+      const request_odk_server = filteredValues.odk_server_type === 'HOT';
       dispatch(
-        PostOrganisationDataService(`${API_URL}/organisation`, {
+        PostOrganisationDataService(`${API_URL}/organisation?request_odk_server=${request_odk_server}`, {
           ...filteredValues,
           logo: filteredValues.logo ? filteredValues.logo?.[0].file : null,
         }),
       );
     } else {
-      const { fillODKCredentials, ...filteredValues } = values;
+      const { ...filteredValues } = values;
       let changedValues = diffObject(organisationFormData, filteredValues);
       if (changedValues.logo) {
         changedValues = {
@@ -92,16 +98,12 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   }, [postOrganisationData]);
 
   useEffect(() => {
-    if (!values?.fillODKCredentials) {
+    if (values?.odk_server_type === 'HOT') {
       handleCustomChange('odk_central_url', '');
       handleCustomChange('odk_central_user', '');
       handleCustomChange('odk_central_password', '');
     }
-  }, [values?.fillODKCredentials]);
-
-  useEffect(() => {
-    handleCustomChange('fillODKCredentials', false);
-  }, []);
+  }, [values?.odk_server_type]);
 
   useEffect(() => {
     if (organizationId) {
@@ -163,16 +165,30 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
             required
             errorMsg={errors.description}
           />
-          <CustomCheckbox
-            key="fillODKCredentials"
-            label="Fill ODK credentials now"
-            checked={values.fillODKCredentials}
-            onCheckedChange={() => {
-              handleCustomChange('fillODKCredentials', !values.fillODKCredentials);
-            }}
-            className="fmtm-text-black"
-          />
-          {values?.fillODKCredentials && (
+          {!organizationId && (
+            <RadioButton
+              topic="ODK Server Type"
+              options={odkTypeOptions}
+              direction="column"
+              value={values.odk_server_type}
+              onChangeData={(value) => {
+                handleCustomChange('odk_server_type', value);
+              }}
+              className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
+              errorMsg={errors.odk_server_type}
+              required
+            />
+          )}
+          {organizationId && (
+            <CustomCheckbox
+              label="Update ODK Credentials"
+              checked={values?.update_odk_credentials}
+              onCheckedChange={(checked) => {
+                handleCustomChange('update_odk_credentials', checked);
+              }}
+            />
+          )}
+          {(values?.odk_server_type === 'OWN' || values?.update_odk_credentials) && (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
               <InputTextField
                 id="odk_central_url"
