@@ -3,11 +3,11 @@ import ApproveOrganizationHeader from '@/components/ApproveOrganization/ApproveO
 import OrganizationForm from '@/components/ApproveOrganization/OrganizationForm';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useIsAdmin } from '@/hooks/usePermissions';
-import NoAccessComponent from '@/views/NoAccessComponent';
+import Forbidden from '@/views/Forbidden';
 
 const ApproveOrganization = () => {
   const isAdmin = useIsAdmin();
-  if (!isAdmin) return <NoAccessComponent />;
+  if (!isAdmin) return <Forbidden />;
 
   useDocumentTitle('Approve Organization');
   return (

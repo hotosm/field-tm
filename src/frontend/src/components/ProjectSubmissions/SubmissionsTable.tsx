@@ -30,6 +30,7 @@ import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import SubmissionsTableSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/SubmissionsTableSkeleton';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -69,6 +70,9 @@ const SubmissionsTable = ({ toggleView }) => {
     })?.[0],
   };
   const taskList = projectData[projectIndex]?.taskBoundries;
+
+  const isProjectManager = useIsProjectManager(projectId as string);
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as null | number);
 
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string | null>(null);
@@ -465,26 +469,30 @@ const SubmissionsTable = ({ toggleView }) => {
                       <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
                     </Tooltip>
                   </Link>
-                  <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
-                  <Tooltip arrow placement="bottom" title="Update Review Status">
-                    <AssetModules.CheckOutlinedIcon
-                      className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
-                      onClick={() => {
-                        dispatch(
-                          SubmissionActions.SetUpdateReviewStatusModal({
-                            toggleModalStatus: true,
-                            instanceId: row?.meta?.instanceID,
-                            taskId: row?.task_id,
-                            projectId: projectId,
-                            reviewState: row?.__system?.reviewState,
-                            entity_id: row?.feature,
-                            label: row?.meta?.entity?.label,
-                            taskUid: taskUid?.toString() || null,
-                          }),
-                        );
-                      }}
-                    />
-                  </Tooltip>
+                  {(isProjectManager || isOrganizationAdmin) && (
+                    <>
+                      <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
+                      <Tooltip arrow placement="bottom" title="Update Review Status">
+                        <AssetModules.CheckOutlinedIcon
+                          className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                          onClick={() => {
+                            dispatch(
+                              SubmissionActions.SetUpdateReviewStatusModal({
+                                toggleModalStatus: true,
+                                instanceId: row?.meta?.instanceID,
+                                taskId: row?.task_id,
+                                projectId: projectId,
+                                reviewState: row?.__system?.reviewState,
+                                entity_id: row?.feature,
+                                label: row?.meta?.entity?.label,
+                                taskUid: taskUid?.toString() || null,
+                              }),
+                            );
+                          }}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
               );
             }}

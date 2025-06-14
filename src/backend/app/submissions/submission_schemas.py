@@ -72,6 +72,7 @@ class SubmissionDashboard(BaseModel):
     organisation_name: str
     total_tasks: int
     created_at: AwareDatetime
+    organisation_id: Optional[int] = None
     organisation_logo: Optional[str] = None
     total_submissions: Optional[int] = None
     total_contributors: Optional[int] = None

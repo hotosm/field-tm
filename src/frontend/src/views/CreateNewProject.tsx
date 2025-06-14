@@ -12,11 +12,11 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import Prompt from '@/hooks/Prompt';
 import { useHasManagedAnyOrganization } from '@/hooks/usePermissions';
-import NoAccessComponent from '@/views/NoAccessComponent';
+import Forbidden from '@/views/Forbidden';
 
 const CreateNewProject = () => {
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-  if (!hasManagedAnyOrganization) return <NoAccessComponent />;
+  if (!hasManagedAnyOrganization) return <Forbidden />;
 
   const location = useLocation();
   const dispatch = useAppDispatch();

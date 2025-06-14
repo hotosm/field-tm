@@ -28,6 +28,8 @@ import boltIcon from '@/assets/icons/boltIcon.svg';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/RadixComponents/Resizable';
 import TaskList from '@/components/ProjectDetails/Tabs/TaskList';
 import { Tooltip } from '@mui/material';
+import { Skeleton } from '@/components/Skeletons';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -63,6 +65,9 @@ const ProjectDetails = () => {
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const projectDetailsLoading = useAppSelector((state) => state.project.projectDetailsLoading);
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
+
+  const isProjectManager = useIsProjectManager(projectId as string);
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
 
   useEffect(() => {
     if (projectInfo.name) {
@@ -234,18 +239,32 @@ const ProjectDetails = () => {
                 </div>
                 {selectedTab !== 'comments' && (
                   <div className="fmtm-flex fmtm-gap-[0.625rem]">
-                    <Link to={`/manage/project/${params?.id}`} className="!fmtm-w-1/2">
-                      <Button variant="secondary-grey" className="fmtm-w-full">
-                        <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
-                        Manage Project
-                      </Button>
-                    </Link>
-                    <Link to={`/project-submissions/${projectId}`} className="!fmtm-w-1/2">
-                      <Button variant="secondary-grey" className="fmtm-w-full">
-                        <AssetModules.BarChartOutlinedIcon className="!fmtm-text-[1.125rem]" />
-                        View Statistics
-                      </Button>
-                    </Link>
+                    {projectDetailsLoading ? (
+                      <>
+                        <Skeleton className="fmtm-w-1/2 fmtm-h-[2.4rem]" />
+                        <Skeleton className="fmtm-w-1/2 fmtm-h-[2.4rem]" />
+                      </>
+                    ) : (
+                      <>
+                        {(isProjectManager || isOrganizationAdmin) && (
+                          <Link to={`/manage/project/${params?.id}`} className="!fmtm-w-1/2">
+                            <Button variant="secondary-grey" className="fmtm-w-full">
+                              <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
+                              Manage Project
+                            </Button>
+                          </Link>
+                        )}
+                        <Link
+                          to={`/project-submissions/${projectId}`}
+                          className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                        >
+                          <Button variant="secondary-grey" className="fmtm-w-full">
+                            <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
+                            View Statistics
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
