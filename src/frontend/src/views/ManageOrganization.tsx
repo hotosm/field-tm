@@ -6,7 +6,7 @@ import { DeleteOrganizationService, GetIndividualOrganizationService } from '@/a
 import Button from '@/components/common/Button';
 import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
 import { useIsOrganizationAdmin } from '@/hooks/usePermissions';
-import NoAccessComponent from './NoAccessComponent';
+import Forbidden from '@/views/Forbidden';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import InputTextField from '@/components/common/InputTextField';
 import ManageAdmins from '@/components/ManageOrganization/ManageAdmins';
@@ -28,7 +28,7 @@ const ManageOrganization = () => {
   const organizationId = params.id;
 
   const isOrganizationAdmin = useIsOrganizationAdmin(+(organizationId as string));
-  if (organizationId && !isOrganizationAdmin) return <NoAccessComponent />;
+  if (organizationId && !isOrganizationAdmin) return <Forbidden />;
 
   const organization = useAppSelector((state) => state.organisation.organisationFormData);
   const organizationDeleteLoading = useAppSelector((state) => state.organisation.organizationDeleteLoading);

@@ -35,6 +35,7 @@ const AddOrganizationAdminModal = () => {
       GetUserNames(`${VITE_API_URL}/users/usernames`, {
         org_id: +organizationId,
         search: searchTxt,
+        signin_type: 'osm',
       }),
     );
   };

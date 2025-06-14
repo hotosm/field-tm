@@ -12,7 +12,7 @@ export function useHasManagedAnyOrganization() {
   return authDetails?.role === user_roles.ADMIN || orgs_managed?.length > 0;
 }
 
-export function useIsOrganizationAdmin(id: number) {
+export function useIsOrganizationAdmin(id: number | null) {
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   return (
     authDetails?.role === user_roles.ADMIN || (authDetails?.orgs_managed && authDetails?.orgs_managed?.includes(id))

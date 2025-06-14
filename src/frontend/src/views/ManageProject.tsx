@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DeleteProjectService } from '@/api/CreateProjectService';
 import EditDetails from '@/components/ManageProject/Details';
 import FormUpdate from '@/components/ManageProject/Form';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import Forbidden from '@/views/Forbidden';
 import ManageProjectSkeleton from '@/components/Skeletons/ManageProject';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -29,6 +31,9 @@ const ManageProject = () => {
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
   const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
+
+  const isProjectManager = useIsProjectManager(projectId as string);
+  const isOrganizationAdmin = useIsOrganizationAdmin(editProjectDetails.organisation_id as null | number);
 
   const [selectedTab, setSelectedTab] = useState('details');
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
@@ -50,6 +55,8 @@ const ManageProject = () => {
   useEffect(() => {
     dispatch(GetIndividualProjectDetails(`${VITE_API_URL}/projects/${projectId}?project_id=${projectId}`));
   }, [projectId]);
+
+  if (!projectDetailsLoading && !isProjectManager && !isOrganizationAdmin) return <Forbidden />;
 
   return (
     <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-py-3 fmtm-gap-5">

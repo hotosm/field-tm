@@ -89,6 +89,7 @@ export type projectDashboardDetailTypes = {
   organisation_name: string;
   total_tasks: number;
   created_at: string;
+  organisation_id: number;
   organisation_logo: string;
   total_submissions: number | null;
   total_contributors: number | null;
