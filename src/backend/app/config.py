@@ -151,6 +151,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Field-TM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    PYODK_LOG_LEVEL: str = "CRITICAL"
     ENCRYPTION_KEY: SecretStr
     # NOTE HS384 is used for simplicity of implementation and compatibility with
     # existing Fernet based database value encryption
