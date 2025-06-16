@@ -51,7 +51,7 @@ CREATE_MATERIALIZED_VIEW_SQL = """
             SELECT COUNT(DISTINCT entity_id)
             FROM odk_entities
             WHERE project_id = p.id
-            AND status = 'SURVEY_SUBMITTED'
+            AND status IN ('SURVEY_SUBMITTED', 'MARKED_BAD', 'VALIDATED')
         ) AS total_submissions,
         (
             SELECT COUNT(*)
