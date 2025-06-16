@@ -7,7 +7,7 @@ import AssetModules from '@/shared/AssetModules';
 import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
-import { entity_state } from '@/types/enums';
+import { entity_state, project_status } from '@/types/enums';
 import { DeleteEntity } from '@/api/Project';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
@@ -141,38 +141,41 @@ const FeatureSelectionPopup = ({
               </div>
             </div>
           )}
-          {(!submissionIds || submissionIds?.length !== 0) && entity && entity_state[entity.status] !== 'VALIDATED' && (
-            <div className="fmtm-px-2 sm:fmtm-px-5 fmtm-py-3 fmtm-border-t fmtm-flex fmtm-flex-col fmtm-gap-3">
-              {submissionIds?.length > 1 ? (
-                <>
-                  {submissionIds?.map((submissionId, index) => (
-                    <div
-                      key={submissionId}
-                      className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row md:fmtm-flex-col sm:fmtm-justify-between sm:fmtm-items-end md:fmtm-items-stretch fmtm-gap-1"
-                    >
-                      <div>
-                        <p className="fmtm-border-b fmtm-w-fit fmtm-border-primaryRed fmtm-leading-5 fmtm-mb-1">
-                          Submission #{index + 1}
-                        </p>
-                        <p className="">ID: {submissionId?.replace('uuid:', '')}</p>
+          {(!submissionIds || submissionIds?.length !== 0) &&
+            entity &&
+            entity_state[entity.status] !== 'VALIDATED' &&
+            projectInfo.status === project_status.PUBLISHED && (
+              <div className="fmtm-px-2 sm:fmtm-px-5 fmtm-py-3 fmtm-border-t fmtm-flex fmtm-flex-col fmtm-gap-3">
+                {submissionIds?.length > 1 ? (
+                  <>
+                    {submissionIds?.map((submissionId, index) => (
+                      <div
+                        key={submissionId}
+                        className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row md:fmtm-flex-col sm:fmtm-justify-between sm:fmtm-items-end md:fmtm-items-stretch fmtm-gap-1"
+                      >
+                        <div>
+                          <p className="fmtm-border-b fmtm-w-fit fmtm-border-primaryRed fmtm-leading-5 fmtm-mb-1">
+                            Submission #{index + 1}
+                          </p>
+                          <p className="">ID: {submissionId?.replace('uuid:', '')}</p>
+                        </div>
+                        <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionId}`}>
+                          <Button variant="secondary-red" className="!fmtm-w-full">
+                            VALIDATE THIS FEATURE
+                          </Button>
+                        </Link>
                       </div>
-                      <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionId}`}>
-                        <Button variant="secondary-red" className="!fmtm-w-full">
-                          VALIDATE THIS FEATURE
-                        </Button>
-                      </Link>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionIds}`}>
-                  <Button variant="secondary-red" className="!fmtm-w-full">
-                    VALIDATE THIS FEATURE
-                  </Button>
-                </Link>
-              )}
-            </div>
-          )}
+                    ))}
+                  </>
+                ) : (
+                  <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionIds}`}>
+                    <Button variant="secondary-red" className="!fmtm-w-full">
+                      VALIDATE THIS FEATURE
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
         </div>
       </div>
     </>

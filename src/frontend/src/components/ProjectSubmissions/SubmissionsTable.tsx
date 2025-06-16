@@ -18,7 +18,7 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateRevie
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { task_state, task_event, entity_state } from '@/types/enums';
+import { task_state, task_event, entity_state, project_status } from '@/types/enums';
 import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
@@ -469,7 +469,7 @@ const SubmissionsTable = ({ toggleView }) => {
                       <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
                     </Tooltip>
                   </Link>
-                  {(isProjectManager || isOrganizationAdmin) && (
+                  {(isProjectManager || isOrganizationAdmin) && projectInfo.status === project_status.PUBLISHED && (
                     <>
                       <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
                       <Tooltip arrow placement="bottom" title="Update Review Status">

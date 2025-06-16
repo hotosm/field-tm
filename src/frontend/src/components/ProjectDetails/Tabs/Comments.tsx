@@ -8,8 +8,13 @@ import AssetModules from '@/shared/AssetModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import ProjectCommentsSekeleton from '@/components/Skeletons/ProjectDetails/ProjectCommentsSekeleton';
+import { project_status } from '@/types/enums';
 
-const Comments = () => {
+type propType = {
+  projectStatus: project_status;
+};
+
+const Comments = ({ projectStatus }: propType) => {
   const dispatch = useAppDispatch();
   const params = useParams();
   const projectId: any = params.id;
@@ -118,35 +123,37 @@ const Comments = () => {
           </div>
         )}
       </div>
-      <div className="fmtm-pt-2">
-        <RichTextEditor
-          editorHtmlContent={comment}
-          setEditorHtmlContent={(content) => setComment(content)}
-          editable={true}
-          isEditorEmpty={(status) => setIsEditorEmpty(status)}
-          className="sm:fmtm-h-[235px] fmtm-overflow-scroll scrollbar"
-        />
-        <div className="fmtm-mt-2 fmtm-w-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-gap-4">
-          <Button
-            variant="secondary-grey"
-            onClick={() => {
-              clearComment();
-              dispatch(ProjectActions.SetMobileFooterSelection(''));
-            }}
-            className="!fmtm-w-1/2"
-          >
-            Clear Comment
-          </Button>
-          <Button
-            variant="primary-grey"
-            onClick={handleComment}
-            className="!fmtm-w-1/2"
-            isLoading={projectPostCommentsLoading}
-          >
-            Save Comment
-          </Button>
+      {projectStatus === project_status.PUBLISHED && (
+        <div className="fmtm-pt-2">
+          <RichTextEditor
+            editorHtmlContent={comment}
+            setEditorHtmlContent={(content) => setComment(content)}
+            editable={true}
+            isEditorEmpty={(status) => setIsEditorEmpty(status)}
+            className="sm:fmtm-h-[235px] fmtm-overflow-scroll scrollbar"
+          />
+          <div className="fmtm-mt-2 fmtm-w-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-gap-4">
+            <Button
+              variant="secondary-grey"
+              onClick={() => {
+                clearComment();
+                dispatch(ProjectActions.SetMobileFooterSelection(''));
+              }}
+              className="!fmtm-w-1/2"
+            >
+              Clear Comment
+            </Button>
+            <Button
+              variant="primary-grey"
+              onClick={handleComment}
+              className="!fmtm-w-1/2"
+              isLoading={projectPostCommentsLoading}
+            >
+              Save Comment
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

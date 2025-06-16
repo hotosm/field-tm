@@ -23,7 +23,7 @@ from typing import Optional
 from pydantic import AwareDatetime, BaseModel
 from pydantic.functional_serializers import field_serializer
 
-from app.db.enums import ReviewStateEnum
+from app.db.enums import ProjectStatus, ReviewStateEnum
 from app.db.postgis_utils import timestamp
 
 
@@ -77,6 +77,7 @@ class SubmissionDashboard(BaseModel):
     total_submissions: Optional[int] = None
     total_contributors: Optional[int] = None
     last_active: Optional[AwareDatetime] = None
+    status: Optional[ProjectStatus] = None
 
     @field_serializer("last_active")
     def get_last_active(self, last_active: Optional[AwareDatetime]) -> str:

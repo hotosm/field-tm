@@ -6,6 +6,7 @@ import {
   projectTaskBoundriesType,
   tileType,
 } from '@/models/project/projectModel';
+import { project_status } from '@/types/enums';
 
 export type ProjectStateTypes = {
   projectTaskBoundries: projectTaskBoundriesType[];
@@ -74,4 +75,10 @@ export type featureType = {
   type: 'Feature';
   geometry: { type: string; coordinates: number[][][] };
   properties: Record<string, any>;
+};
+
+export type projectStatusOptionsType = {
+  name: string;
+  value: project_status;
+  label: string;
 };

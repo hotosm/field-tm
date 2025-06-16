@@ -30,6 +30,7 @@ import TaskList from '@/components/ProjectDetails/Tabs/TaskList';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@/components/Skeletons';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { project_status } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -132,7 +133,7 @@ const ProjectDetails = () => {
       case 'task_activity':
         return <TaskActivity params={params} state={projectTaskBoundries} defaultTheme={defaultTheme} map={map} />;
       case 'comments':
-        return <Comments />;
+        return <Comments projectStatus={projectInfo?.status as project_status} />;
       case 'instructions':
         return <Instructions instructions={projectInfo?.instructions} />;
       case 'task_list':

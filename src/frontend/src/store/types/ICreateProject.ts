@@ -1,4 +1,4 @@
-import { task_split_type, MapGeomTypes, project_visibility } from '@/types/enums';
+import { task_split_type, MapGeomTypes, project_visibility, project_status } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -77,7 +77,7 @@ type EditProjectResponseTypes = {
   name: string;
   short_description: string;
   description: string;
-  status: number;
+  status: project_status;
   outline: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
   osm_category: string;
@@ -117,6 +117,7 @@ export type ProjectDetailsTypes = {
   project_admins: number[];
   visibility: project_visibility;
   use_odk_collect: boolean;
+  status: project_status;
 };
 
 export type FormCategoryListTypes = {

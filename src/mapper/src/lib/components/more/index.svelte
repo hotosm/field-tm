@@ -7,7 +7,6 @@
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { APIProject, TaskEventType } from '$lib/types';
 	import { m } from '$translations/messages.js';
-	import { getCommonStore } from '$store/common.svelte';
 
 	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info';
 
@@ -24,7 +23,6 @@
 
 	let { projectData, zoomToTask }: Props = $props();
 	const taskStore = getTaskStore();
-	const commonStore = getCommonStore();
 
 	const stackGroup: stackGroupType[] = [
 		{
@@ -134,7 +132,7 @@
 
 	<!-- body -->
 	{#if activeStack === 'comment'}
-		<Comment {comments} projectId={projectData?.id} />
+		<Comment {comments} projectId={projectData?.id} projectStatus={projectData.status} />
 	{/if}
 	{#if activeStack === 'instructions'}
 		{#if projectData?.per_task_instructions}

@@ -12,6 +12,7 @@
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { mapTask } from '$lib/db/events';
 	import { getLoginStore } from '$store/login.svelte.ts';
+	import { projectStatus } from '$constants/enums';
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
@@ -274,54 +275,56 @@
 						</div>
 					{/if}
 				</div>
-				<div class="entity">
-					<sl-button
-						disabled={entityToNavigate?.entityId === selectedEntity?.entity_id}
-						variant="default"
-						size="small"
-						class="entity-button-to"
-						onclick={() => navigateToEntity()}
-						onkeydown={(e: KeyboardEvent) => {
-							if (e.key === 'Enter') navigateToEntity();
-						}}
-						role="button"
-						tabindex="0"
-					>
-						<hot-icon slot="prefix" name="direction"></hot-icon>
-						<span>{m['popup.navigate_here']()}</span>
-					</sl-button>
-					{#if !commonStore.enableWebforms}
+				{#if projectData.status === projectStatus.PUBLISHED}
+					<div class="entity">
 						<sl-button
-							loading={entitiesStore.updateEntityStatusLoading}
-							variant="primary"
+							disabled={entityToNavigate?.entityId === selectedEntity?.entity_id}
+							variant="default"
 							size="small"
-							onclick={() => handleMapFeature()}
+							class="entity-button-to"
+							onclick={() => navigateToEntity()}
 							onkeydown={(e: KeyboardEvent) => {
-								if (e.key === 'Enter') handleMapFeature();
+								if (e.key === 'Enter') navigateToEntity();
 							}}
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="location"></hot-icon>
-							<span>{m['popup.map_in_odk']()}</span>
+							<hot-icon slot="prefix" name="direction"></hot-icon>
+							<span>{m['popup.navigate_here']()}</span>
 						</sl-button>
-					{:else}
-						<sl-button
-							loading={entitiesStore.updateEntityStatusLoading}
-							variant="primary"
-							size="small"
-							onclick={() => handleMapFeature()}
-							onkeydown={(e: KeyboardEvent) => {
-								if (e.key === 'Enter') handleMapFeature();
-							}}
-							role="button"
-							tabindex="0"
-						>
-							<hot-icon slot="prefix" name="location"></hot-icon>
-							<span>{m['dialog_entities_actions.collect_data']()}</span>
-						</sl-button>
-					{/if}
-				</div>
+						{#if !commonStore.enableWebforms}
+							<sl-button
+								loading={entitiesStore.updateEntityStatusLoading}
+								variant="primary"
+								size="small"
+								onclick={() => handleMapFeature()}
+								onkeydown={(e: KeyboardEvent) => {
+									if (e.key === 'Enter') handleMapFeature();
+								}}
+								role="button"
+								tabindex="0"
+							>
+								<hot-icon slot="prefix" name="location"></hot-icon>
+								<span>{m['popup.map_in_odk']()}</span>
+							</sl-button>
+						{:else}
+							<sl-button
+								loading={entitiesStore.updateEntityStatusLoading}
+								variant="primary"
+								size="small"
+								onclick={() => handleMapFeature()}
+								onkeydown={(e: KeyboardEvent) => {
+									if (e.key === 'Enter') handleMapFeature();
+								}}
+								role="button"
+								tabindex="0"
+							>
+								<hot-icon slot="prefix" name="location"></hot-icon>
+								<span>{m['dialog_entities_actions.collect_data']()}</span>
+							</sl-button>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
