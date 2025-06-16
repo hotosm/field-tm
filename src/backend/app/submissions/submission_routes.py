@@ -519,6 +519,7 @@ async def project_submission_dashboard(
     details["created_at"] = project.created_at
     details["organisation_logo"] = project.organisation_logo
     details["last_active"] = project.last_active
+    details["status"] = project.status
     return details
 
 

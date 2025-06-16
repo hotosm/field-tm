@@ -4,14 +4,16 @@
 	import { commentTask } from '$lib/db/events';
 	import type { TaskEventType } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
+	import { projectStatus as projectStatusType } from '$constants/enums';
 
 	interface Props {
 		comments: TaskEventType[];
 		projectId: any;
+		projectStatus: projectStatusType;
 	}
 
-	const { comments, projectId }: Props = $props();
+	const { comments, projectId, projectStatus }: Props = $props();
 
 	let currentComment: string = $state('');
 	let editorRef: any = $state(undefined);
@@ -20,30 +22,26 @@
 </script>
 
 <div class="comments">
-	<div
-		class={`comments-content ${taskStore.selectedTaskIndex ? 'selected' : 'not-selected'}`}
-	>
+	<div class={`comments-content ${taskStore.selectedTaskIndex ? 'selected' : 'not-selected'}`}>
 		{#if comments?.length === 0}
 			<div class="no-comments">
 				<p>
-					{taskStore?.selectedTaskIndex ? `${m['comment.no_comments_yet_on_task']()} ${taskStore?.selectedTaskIndex}` : m['comment.no_comments_yet']()}
+					{taskStore?.selectedTaskIndex
+						? `${m['comment.no_comments_yet_on_task']()} ${taskStore?.selectedTaskIndex}`
+						: m['comment.no_comments_yet']()}
 				</p>
 			</div>
 		{:else}
 			{#each comments as comment (comment?.event_id)}
 				<div class="comment">
 					<div class="wrapper">
-						<hot-icon
-							name="person-fill"
-							class="icon"
-						></hot-icon>
+						<hot-icon name="person-fill" class="icon"></hot-icon>
 						<div class="details">
 							<p class="username">{comment?.username}</p>
 							<div class="meta">
 								<p class="task-id">#{comment?.task_id}</p>
 								<div class="history">
-									<hot-icon name="clock-history" class="icon"
-									></hot-icon>
+									<hot-icon name="clock-history" class="icon"></hot-icon>
 									<p class="created-at">
 										<span>
 											{comment?.created_at?.split(' ')[0]}
@@ -61,7 +59,7 @@
 			{/each}
 		{/if}
 	</div>
-	{#if taskStore.selectedTaskId}
+	{#if taskStore.selectedTaskId && projectStatus === projectStatusType.PUBLISHED}
 		<div class="add-comment">
 			<Editor
 				editable={true}
@@ -83,8 +81,9 @@
 					tabindex="0"
 					variant="default"
 					size="small"
-					class="button-clear">
-						<span>{m['comment.clear']()}</span>
+					class="button-clear"
+				>
+					<span>{m['comment.clear']()}</span>
 				</sl-button>
 				<sl-button
 					variant="primary"

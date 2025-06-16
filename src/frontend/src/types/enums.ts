@@ -83,3 +83,10 @@ export enum project_visibility {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
 }
+
+export enum project_status {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+  COMPLETED = 'COMPLETED',
+}

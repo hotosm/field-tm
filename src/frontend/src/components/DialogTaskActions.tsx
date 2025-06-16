@@ -4,7 +4,7 @@ import { CreateTaskEvent } from '@/api/TaskEvent';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { task_event as taskEventEnum, task_state as taskStateEnum, task_event } from '@/types/enums';
+import { project_status, task_event as taskEventEnum, task_state as taskStateEnum, task_event } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
@@ -177,37 +177,41 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
         }
         className=""
       />
-      {list_of_task_actions?.length > 0 && (
-        <div
-          className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
-            list_of_task_actions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
-          }`}
-        >
-          {list_of_task_actions?.map((data, index) => {
-            return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
-              <Button
-                key={index}
-                variant={data.btnType}
-                btnId={data.value}
-                btnTestId="StartMapping"
-                onClick={(e) => {
-                  if (
-                    data.key === 'Mark as fully mapped' &&
-                    currentTaskInfo &&
-                    currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
-                  ) {
-                    setToggleMappedConfirmationModal(true);
-                  } else {
-                    handleOnClick(e);
-                  }
-                }}
-                className="!fmtm-w-full"
-              >
-                {data.key.toUpperCase()}
-              </Button>
-            ) : null;
-          })}
-        </div>
+      {projectInfo.status === project_status.PUBLISHED && (
+        <>
+          {list_of_task_actions?.length > 0 && (
+            <div
+              className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
+                list_of_task_actions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
+              }`}
+            >
+              {list_of_task_actions?.map((data, index) => {
+                return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
+                  <Button
+                    key={index}
+                    variant={data.btnType}
+                    btnId={data.value}
+                    btnTestId="StartMapping"
+                    onClick={(e) => {
+                      if (
+                        data.key === 'Mark as fully mapped' &&
+                        currentTaskInfo &&
+                        currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
+                      ) {
+                        setToggleMappedConfirmationModal(true);
+                      } else {
+                        handleOnClick(e);
+                      }
+                    }}
+                    className="!fmtm-w-full"
+                  >
+                    {data.key.toUpperCase()}
+                  </Button>
+                ) : null;
+              })}
+            </div>
+          )}
+        </>
       )}
       {task_state !== taskStateEnum.UNLOCKED_TO_MAP && task_state !== taskStateEnum.LOCKED_FOR_MAPPING && (
         <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">

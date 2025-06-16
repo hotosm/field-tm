@@ -15,7 +15,8 @@ import AssetModules from '@/shared/AssetModules';
 import Chips from '@/components/common/Chips';
 import RadioButton from '@/components/common/RadioButton';
 import { projectVisibilityOptionsType } from '@/store/types/ICreateProject';
-import { project_visibility } from '@/types/enums';
+import { project_status, project_visibility } from '@/types/enums';
+import { projectStatusOptionsType } from '@/store/types/IProject';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -29,6 +30,19 @@ const projectVisibilityOptions: projectVisibilityOptionsType[] = [
     name: 'project_visibility',
     value: project_visibility.PRIVATE,
     label: 'Private',
+  },
+];
+
+const projectStatusOptions: projectStatusOptionsType[] = [
+  {
+    name: 'project_status',
+    value: project_status.PUBLISHED,
+    label: 'Published',
+  },
+  {
+    name: 'project_status',
+    value: project_status.COMPLETED,
+    label: 'Completed',
   },
 ];
 
@@ -68,6 +82,15 @@ const EditDetails = ({ projectId }) => {
       className="fmtm-relative fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden fmtm-bg-white"
     >
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-flex fmtm-flex-col fmtm-gap-6">
+        <RadioButton
+          value={values?.status || ''}
+          topic="Project Status"
+          options={projectStatusOptions}
+          direction="column"
+          onChangeData={(value) => {
+            handleCustomChange('status', value);
+          }}
+        />
         <InputTextField
           id="name"
           name="name"
@@ -154,9 +177,6 @@ const EditDetails = ({ projectId }) => {
             handleCustomChange('visibility', value);
           }}
           errorMsg={errors.visibility}
-          hoveredOption={() => {
-            dispatch(CreateProjectActions.SetDescriptionToFocus('projectdetails-visibility'));
-          }}
         />
       </div>
       <div className="fmtm-py-2 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-shadow-2xl fmtm-z-50">

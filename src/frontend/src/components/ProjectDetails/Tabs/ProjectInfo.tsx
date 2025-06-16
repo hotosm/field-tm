@@ -77,11 +77,15 @@ const ProjectInfo: React.FC = () => {
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project ID</p>
-        <p className="fmtm-body-md fmtm-text-grey-800">#{projectInfo?.id}</p>
+        <p className="fmtm-body-md fmtm-text-grey-800">#{projectInfo.id}</p>
+      </div>
+      <div>
+        <p className="fmtm-button fmtm-text-grey-900">Project Status</p>
+        <p className="fmtm-body-md fmtm-text-grey-800 fmtm-capitalize">{projectInfo.status?.toLocaleLowerCase()}</p>
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project Area</p>
-        <p className="fmtm-body-md fmtm-text-grey-800">{projectInfo?.location_str || '-'}</p>
+        <p className="fmtm-body-md fmtm-text-grey-800">{projectInfo.location_str || '-'}</p>
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Last Contribution</p>

@@ -13,7 +13,7 @@ import Accordion from '@/components/common/Accordion';
 import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
 import { extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
-import { submission_status } from '@/types/enums';
+import { project_status, submission_status } from '@/types/enums';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 function removeNullValues(obj: Record<string, any>) {
@@ -193,30 +193,32 @@ const SubmissionDetails = () => {
                   </h2>
                 </div>
               )}
-              {!projectDashboardLoading && (isProjectManager || isOrganizationAdmin) && (
-                <div className="fmtm-mt-8">
-                  <Button
-                    variant="primary-red"
-                    onClick={() => {
-                      dispatch(
-                        SubmissionActions.SetUpdateReviewStatusModal({
-                          toggleModalStatus: true,
-                          instanceId: paramsInstanceId,
-                          projectId: projectId,
-                          taskId: taskId,
-                          reviewState: restSubmissionDetails?.__system?.reviewState,
-                          taskUid: taskUid,
-                          entity_id: restSubmissionDetails?.feature,
-                          label: restSubmissionDetails?.meta?.entity?.label,
-                        }),
-                      );
-                    }}
-                    disabled={submissionDetailsLoading}
-                  >
-                    Update Review Status
-                  </Button>
-                </div>
-              )}
+              {!projectDashboardLoading &&
+                (isProjectManager || isOrganizationAdmin) &&
+                projectDashboardDetail?.status === project_status.PUBLISHED && (
+                  <div className="fmtm-mt-8">
+                    <Button
+                      variant="primary-red"
+                      onClick={() => {
+                        dispatch(
+                          SubmissionActions.SetUpdateReviewStatusModal({
+                            toggleModalStatus: true,
+                            instanceId: paramsInstanceId,
+                            projectId: projectId,
+                            taskId: taskId,
+                            reviewState: restSubmissionDetails?.__system?.reviewState,
+                            taskUid: taskUid,
+                            entity_id: restSubmissionDetails?.feature,
+                            label: restSubmissionDetails?.meta?.entity?.label,
+                          }),
+                        );
+                      }}
+                      disabled={submissionDetailsLoading}
+                    >
+                      Update Review Status
+                    </Button>
+                  </div>
+                )}
             </div>
 
             {/* start, end, today, deviceid values */}

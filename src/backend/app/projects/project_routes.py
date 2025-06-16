@@ -950,9 +950,7 @@ async def generate_basemap(
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     new_data: project_schemas.ProjectUpdate,
-    project_user_dict: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Partial update an existing project."""
