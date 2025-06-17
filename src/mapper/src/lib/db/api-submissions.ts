@@ -5,6 +5,7 @@ async function create(
 	db: PGlite,
 	data: {
 		url: string;
+		user_sub?: string | undefined;
 		method: DbApiSubmissionType['method'];
 		content_type?: DbApiSubmissionType['content_type'];
 		payload?: any;
@@ -15,6 +16,7 @@ async function create(
 
 	const {
 		url,
+		user_sub = null, // default
 		method,
 		content_type = 'application/json', // default
 		payload = null,
@@ -23,11 +25,11 @@ async function create(
 
 	const result = await db.query(
 		`INSERT INTO api_submissions
-			(url, method, content_type, payload, headers, status, retry_count, error, queued_at)
+			(url, user_sub, method, content_type, payload, headers, status, retry_count, error, queued_at)
 		 VALUES
-			($1, $2, $3, $4, $5, 'PENDING', 0, NULL, now())
+			($1, $2, $3, $4, $5, $6, 'PENDING', 0, NULL, now())
 		 RETURNING *`,
-		[url, method, content_type, payload, headers],
+		[url, user_sub, method, content_type, payload, headers],
 	);
 
 	return result.rows.at(-1) as DbApiSubmissionType | undefined;

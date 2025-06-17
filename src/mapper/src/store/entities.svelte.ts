@@ -9,6 +9,7 @@ import type { LngLatLike } from 'svelte-maplibre';
 
 import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
 import { EntityStatusNameMap } from '$lib/types';
+import { getLoginStore } from './login.svelte';
 import { getAlertStore } from './common.svelte';
 import { DbEntity } from '$lib/db/entities';
 import { DbApiSubmission } from '$lib/db/api-submissions';
@@ -52,13 +53,15 @@ let newGeomFeatcol: FeatureCollection = $derived({
 		.filter(Boolean),
 });
 
+const alertStore = getAlertStore();
+const loginStore = getLoginStore();
+
 let syncEntityStatusManuallyLoading: boolean = $state(false);
 let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
 let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
-let alertStore = getAlertStore();
 let entitiesSync: any = $state(undefined);
 let fgbOpfsUrl: string = $state('');
 let geomDeleteLoading: boolean = $state(false);
@@ -277,6 +280,7 @@ function getEntitiesStatusStore() {
 			// Save for later submission + add entity update to local db
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: entityRequestPayload,
@@ -328,6 +332,7 @@ function getEntitiesStatusStore() {
 			// Save for later submission + add entity entry to local db
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: entityRequestPayload,
@@ -402,6 +407,7 @@ function getEntitiesStatusStore() {
 
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: {

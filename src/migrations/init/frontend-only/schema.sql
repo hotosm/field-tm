@@ -50,6 +50,7 @@ CREATE TABLE public.projects (
 
 CREATE TABLE public.api_submissions (
     id integer NOT NULL,
+    user_sub character varying,
     url character varying NOT NULL,
     method character varying DEFAULT 'POST' CHECK (
         method IN (
