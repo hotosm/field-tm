@@ -147,9 +147,9 @@ export const InviteNewUser = (
             const payload: Record<string, any> = { project_id: projectId, role };
 
             if (inviteVia === 'osm') {
-              payload.osm_username = user;
+              payload.osm_username = user.trim();
             } else {
-              payload.email = user;
+              payload.email = user.trim();
             }
 
             const response = await axios.post(url, payload, { params: { project_id: projectId } });
