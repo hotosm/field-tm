@@ -136,11 +136,15 @@
 		"uploading": "carregando"
 	},
 	"offline": {
-		"features": "recursos",
-		"basemaps": "mapas base",
-		"store_features_offline": "armazenar recursos off-line",
+		"features": "Recursos",
+		"basemaps": "Mapas base",
+		"data": "Exibir dados off-line",
+		"store_features_offline": "Armazenar recursos off-line",
 		"features_offline_info": "Extratos de recursos já armazenados offline",
 		"fetch_projects_offline": "Você está off-line e não pode buscar projetos extras",
-		"ready_offline": "Pronto para uso off-line."
+		"ready_offline": "Pronto para uso off-line.",
+		"total_offline_submissions": "Total de envios off-line",
+		"total_failed_submissions": "Total de envios com falha",
+		"download_csv": "Baixar como CSV"
 	}
 }
