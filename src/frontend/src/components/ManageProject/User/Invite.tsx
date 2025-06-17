@@ -117,10 +117,16 @@ const InviteTab = ({ roleList }: propType) => {
                 name="name"
                 label="Invite User"
                 value={user}
-                onChange={(e) => setUser(e.target.value.replace(/[\r\n]+/g, ' ').replace(/\t/g, ' '))}
+                onChange={(e) => {
+                  if (values.inviteVia === 'osm') {
+                    setUser(e.target.value.replace(/[\r\n]+/g, ', '));
+                  } else {
+                    setUser(e.target.value.replace(/[\r\n]+/g, ' ').replace(/\t/g, ' '));
+                  }
+                }}
                 placeholder={
                   values.inviteVia === 'osm'
-                    ? 'Enter Username (To assign multiple users, separate osm usernames with space)'
+                    ? 'Enter Username (To assign multiple users, separate osm usernames with commas)'
                     : 'Enter Gmail (To assign multiple users, separate gmail addresses with space)'
                 }
                 rows={5}
@@ -131,7 +137,11 @@ const InviteTab = ({ roleList }: propType) => {
                 variant="secondary-grey"
                 onClick={() => {
                   if (!user) return;
-                  handleCustomChange('user', [...values.user, ...user.split(' ')]);
+                  if (values.inviteVia === 'osm') {
+                    handleCustomChange('user', [...values.user, ...user.split(',')]);
+                  } else {
+                    handleCustomChange('user', [...values.user, ...user.split(' ')]);
+                  }
                   setUser('');
                 }}
                 className="fmtm-ml-auto"
