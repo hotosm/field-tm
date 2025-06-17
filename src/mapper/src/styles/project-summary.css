@@ -71,3 +71,24 @@
 .project-card .meta2 .project-short-desc {
 	--at-apply: text-[0.875rem] leading-normal font-normal capitalize line-clamp-3 text-neutral-950 min-h-[3.2rem];
 }
+
+.project-card .meta0 {
+	--at-apply: flex justify-between;
+}
+
+.project-card .meta0 .project-status {
+	--at-apply: px-3 py-1 rounded-full text-[0.75rem] font-semibold;
+}
+
+.project-card .meta0 .project-status.DRAFT {
+	--at-apply: text-[#616161] border-[1px] border-solid border-[#616161];
+}
+.project-card .project-status.PUBLISHED {
+	--at-apply: text-[#417EC9] border-[1px] border-solid border-[#417EC9];
+}
+.project-card .project-status.COMPLETED {
+	--at-apply: text-[#80D89F] border-[1px] border-solid border-[#80D89F];
+}
+.project-card .project-status.ARCHIVED {
+	--at-apply: text-[#C61231] border-[1px] border-solid border-[#C61231];
+}

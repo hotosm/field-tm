@@ -59,6 +59,7 @@ function getProjectStore() {
 			priority: project.priority,
 			location_str: project.location_str,
 			hashtags: project.hashtags,
+			status: project.status,
 		}));
 	}
 

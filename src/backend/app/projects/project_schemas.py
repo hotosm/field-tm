@@ -36,6 +36,7 @@ from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
     BackgroundTaskStatus,
     ProjectPriority,
+    ProjectStatus,
     ProjectVisibility,
 )
 from app.db.models import (
@@ -219,6 +220,7 @@ class ProjectSummary(BaseModel):
     hashtags: Optional[list[str]]
     location_str: Optional[str] = None
     short_description: Optional[str] = None
+    status: Optional[ProjectStatus] = None
     visibility: Optional[ProjectVisibility] = None
 
     # Calculated
