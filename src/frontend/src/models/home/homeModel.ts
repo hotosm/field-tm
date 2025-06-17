@@ -1,4 +1,4 @@
-import { project_visibility } from '@/types/enums';
+import { project_status, project_visibility } from '@/types/enums';
 
 export interface HomeProjectCardModel {
   id: number;
@@ -30,4 +30,5 @@ export type projectType = {
   tasks_bad: number;
   total_submissions: number;
   visibility: project_visibility;
+  status: project_status;
 };

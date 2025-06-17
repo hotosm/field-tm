@@ -4,6 +4,12 @@
 		"yes": "Yes",
 		"no": "No"
 	},
+	"project_states": {
+		"DRAFT": "Rascunho",
+		"PUBLISHED": "Publicado",
+		"ARCHIVED": "Arquivado",
+		"COMPLETED": "Concluído"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "Pronto para coleta",
 		"LOCKED_FOR_MAPPING": "Bloqueado para mapeamento",

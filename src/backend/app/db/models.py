@@ -1834,6 +1834,7 @@ class DbProject(BaseModel):
                 fp.name,
                 fp.location_str,
                 fp.short_description,
+                fp.status,
                 project_org.logo AS organisation_logo
             FROM
                 filtered_projects fp

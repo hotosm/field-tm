@@ -4,6 +4,12 @@
 		"yes": "हो",
 		"no": "No"
 	},
+	"project_states": {
+		"DRAFT": "ड्राफ्ट",
+		"PUBLISHED": "प्रकाशित",
+		"ARCHIVED": "अर्काइव",
+		"COMPLETED": "पूर्ण"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "तयार",
 		"LOCKED_FOR_MAPPING": "नक्साङ्कनको लागि लक",

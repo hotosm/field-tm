@@ -3,10 +3,18 @@ import { useParams } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import { useAppSelector } from '@/types/reduxTypes';
-import { entity_state } from '@/types/enums';
+import { entity_state, project_status } from '@/types/enums';
 import { EntityOsmMap } from '@/models/project/projectModel';
 import CoreModules from '@/shared/CoreModules';
 import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';
+import StatusChip from '@/components/common/StatusChip';
+
+const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
+  [project_status.DRAFT]: 'default',
+  [project_status.PUBLISHED]: 'info',
+  [project_status.COMPLETED]: 'success',
+  [project_status.ARCHIVED]: 'error',
+};
 
 const ProjectInfo: React.FC = () => {
   const params = useParams();
@@ -44,9 +52,7 @@ const ProjectInfo: React.FC = () => {
   }, null);
 
   const projectTotalFeatures: number = projectEntities.length;
-  const projectMappedFeatures: number = projectEntities.filter(
-    (entity: EntityOsmMap) => entity.status === entity_state.SURVEY_SUBMITTED,
-  ).length;
+  const projectMappedFeatures: number = projectEntities.filter((entity: EntityOsmMap) => entity.status > 1).length;
 
   useEffect(() => {
     if (paraRef.current) {
@@ -81,7 +87,10 @@ const ProjectInfo: React.FC = () => {
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project Status</p>
-        <p className="fmtm-body-md fmtm-text-grey-800 fmtm-capitalize">{projectInfo.status?.toLocaleLowerCase()}</p>
+        <StatusChip
+          label={projectInfo.status?.toLowerCase() || ''}
+          status={projectStatusVariantMap[projectInfo.status as project_status]}
+        />
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project Area</p>
