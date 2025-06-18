@@ -93,3 +93,7 @@ chart/charts
 
 # Paraglide dynamic translation
 src/translations/**/*
+
+# Favicon for inject into frontends
+./favicon.ico
+./favicon.svg
