@@ -36,13 +36,7 @@ const newGeomOptions = [
   { name: 'new_geom_type', value: 'POLYLINE', label: 'Lines' },
 ];
 
-const DataExtract = ({
-  flag,
-  customDataExtractUpload,
-  setCustomDataExtractUpload,
-  additionalFeature,
-  setAdditionalFeature,
-}) => {
+const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload }) => {
   useDocumentTitle('Create Project: Map Data');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -52,7 +46,6 @@ const DataExtract = ({
   const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
-  const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
   useEffect(() => {
     // Creating project without data extract, allow to continue
@@ -91,7 +84,7 @@ const DataExtract = ({
     }
 
     setDisableNextButton(false);
-  }, [dataExtractGeojson, additionalFeatureGeojson, extractType, isFgbFetching]);
+  }, [dataExtractGeojson, extractType, isFgbFetching]);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
@@ -212,12 +205,6 @@ const DataExtract = ({
     dispatch(CreateProjectActions.setDataExtractGeojson(null));
   };
 
-  const resetAdditionalMapDataFile = () => {
-    setAdditionalFeature(null);
-    handleCustomChange('additionalFeature', null);
-    dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
-  };
-
   const changeMapDataFileHandler = async (file: fileType, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
     if (!file) {
       resetMapDataFile();
@@ -260,35 +247,6 @@ const DataExtract = ({
       dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
     } else {
       resetMapDataFile();
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,
-          duration: 10000,
-        }),
-      );
-    }
-  };
-
-  const changeAdditionalMapDataFileHandler = async (
-    file: fileType,
-    fileInputRef: React.RefObject<HTMLInputElement | null>,
-  ) => {
-    if (!file) {
-      resetAdditionalMapDataFile();
-      return;
-    }
-
-    const uploadedFile = file?.file;
-    const additionalFeatureGeojson = await convertFileToGeojson(uploadedFile);
-    const isGeojsonValid = valid(additionalFeatureGeojson, true);
-
-    if (isGeojsonValid?.length === 0) {
-      setAdditionalFeature(file);
-      handleCustomChange('additionalFeature', uploadedFile);
-      dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(additionalFeatureGeojson));
-    } else {
-      resetAdditionalMapDataFile();
       if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
@@ -425,54 +383,6 @@ const DataExtract = ({
                 Total number of features:{' '}
                 <span className="fmtm-font-bold">{dataExtractGeojson?.features?.length || 0}</span>
               </p>
-              {extractType && (
-                <>
-                  <div
-                    onMouseOver={() => {
-                      dispatch(CreateProjectActions.SetDescriptionToFocus('mapfeatures-additional'));
-                    }}
-                    onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
-                  >
-                    <CustomCheckbox
-                      key="uploadAdditionalFeature"
-                      label="Upload Supporting Datasets"
-                      checked={formValues?.hasAdditionalFeature}
-                      onCheckedChange={(status) => {
-                        handleCustomChange('hasAdditionalFeature', status);
-                        handleCustomChange('additionalFeature', null);
-                        dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
-                        setAdditionalFeature(null);
-                      }}
-                      className="fmtm-text-black"
-                      labelClickable
-                    />
-                  </div>
-                  {formValues?.hasAdditionalFeature && (
-                    <>
-                      <UploadArea
-                        title="Upload Supporting Datasets"
-                        label="The supported file formats are .geojson"
-                        data={additionalFeature ? [additionalFeature] : []}
-                        onUploadFile={(updatedFiles, fileInputRef) => {
-                          changeAdditionalMapDataFileHandler(updatedFiles?.[0] as fileType, fileInputRef);
-                        }}
-                        acceptedInput=".geojson"
-                      />
-                      {errors.additionalFeature && (
-                        <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">
-                          {errors.additionalFeature}
-                        </p>
-                      )}
-                    </>
-                  )}
-                  {additionalFeatureGeojson && (
-                    <p className="fmtm-text-gray-500 fmtm-mt-1">
-                      Total number of additional features:{' '}
-                      <span className="fmtm-font-bold">{additionalFeatureGeojson?.features?.length || 0}</span>
-                    </p>
-                  )}
-                </>
-              )}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
               <Button variant="secondary-grey" onClick={() => toggleStep(3, '/upload-survey')}>
@@ -487,7 +397,6 @@ const DataExtract = ({
             <NewDefineAreaMap
               uploadedOrDrawnGeojsonFile={projectAoiGeojson}
               buildingExtractedGeojson={dataExtractGeojson}
-              additionalFeatureGeojson={additionalFeatureGeojson}
             />
           </div>
         </div>

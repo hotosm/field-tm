@@ -35,7 +35,6 @@ export type CreateProjectStateTypes = {
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  additionalFeatureGeojson: GeoJSONFeatureTypes | null;
   descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
@@ -110,7 +109,6 @@ export type ProjectDetailsTypes = {
   custom_tms_url: string;
   hasCustomTMS: boolean;
   xlsFormFileUpload: any;
-  hasAdditionalFeature: boolean;
   primaryGeomType: MapGeomTypes;
   useMixedGeomTypes: boolean;
   newGeomType: MapGeomTypes;

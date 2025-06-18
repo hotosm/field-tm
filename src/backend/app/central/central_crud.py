@@ -279,7 +279,6 @@ def get_project_form_xml(
 async def append_fields_to_user_xlsform(
     xlsform: BytesIO,
     form_name: str = "buildings",
-    additional_entities: Optional[list[str]] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
     use_odk_collect: bool = False,
@@ -289,7 +288,6 @@ async def append_fields_to_user_xlsform(
     return await append_field_mapping_fields(
         xlsform,
         form_name=form_name,
-        additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         use_odk_collect=use_odk_collect,
@@ -299,7 +297,6 @@ async def append_fields_to_user_xlsform(
 async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
     form_name: str = "buildings",
-    additional_entities: Optional[list[str]] = None,
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
     use_odk_collect: bool = False,
@@ -308,7 +305,6 @@ async def validate_and_update_user_xlsform(
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
         xlsform,
         form_name=form_name,
-        additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         use_odk_collect=use_odk_collect,

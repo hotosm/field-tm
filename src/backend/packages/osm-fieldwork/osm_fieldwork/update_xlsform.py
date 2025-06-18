@@ -266,7 +266,7 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
 async def append_field_mapping_fields(
     custom_form: BytesIO,
     form_name: str = f"fmtm_{uuid4()}",
-    additional_entities: list[str] = None,
+    additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
     use_odk_collect: bool = False,
