@@ -8,8 +8,6 @@ interface ProjectValues {
   data_extractFile: object;
   data_extract_options: string;
   customDataExtractUpload: string;
-  hasAdditionalFeature: boolean;
-  additionalFeature: File;
 }
 interface ValidationErrors {
   primaryGeomType?: string;
@@ -18,7 +16,6 @@ interface ValidationErrors {
   data_extractFile?: string;
   data_extract_options?: string;
   customDataExtractUpload?: string;
-  additionalFeature?: string;
 }
 
 function DataExtractValidation(values: ProjectValues) {
@@ -38,10 +35,6 @@ function DataExtractValidation(values: ProjectValues) {
 
   if (values.dataExtractType && values.dataExtractType === 'custom_data_extract' && !values.customDataExtractUpload) {
     errors.customDataExtractUpload = 'A GeoJSON file is required.';
-  }
-
-  if (values.hasAdditionalFeature && !values.additionalFeature) {
-    errors.additionalFeature = 'Supporting Dataset is Required.';
   }
 
   return errors;

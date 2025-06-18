@@ -783,7 +783,6 @@ async def generate_files(
     project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
     xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    additional_entities: Annotated[Optional[list[str]], None] = None,
     combined_features_count: Annotated[int, Form()] = 0,
 ):
     """Generate additional content to initialise the project.
@@ -800,8 +799,6 @@ async def generate_files(
 
     Args:
         xlsform_upload (UploadFile): The XLSForm for the project data collection.
-        additional_entities (list[str]): If additional Entity lists need to be
-            created (i.e. the project form references multiple geometries).
         combined_features_count (int): Total count of features to be mapped, plus
             additional dataset features, determined by frontend.
         db (Connection): The database connection.
@@ -824,7 +821,6 @@ async def generate_files(
     await central_crud.validate_and_update_user_xlsform(
         xlsform=xlsform_upload,
         form_name=form_name,
-        additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         # If we are only mapping new features, then verification is irrelevant
         need_verification_fields=project_contains_existing_feature,
@@ -834,7 +830,6 @@ async def generate_files(
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform_upload,
         form_name=form_name,
-        additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         need_verification_fields=project_contains_existing_feature,
         use_odk_collect=use_odk_collect,

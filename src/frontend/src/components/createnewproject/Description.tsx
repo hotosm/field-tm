@@ -183,15 +183,11 @@ const UploadSurvey = ({ hoveredSection }: hoveredSectionType) => {
 const MapFeature = ({ hoveredSection }: hoveredSectionType) => {
   const { windowSize } = windowDimention();
   const osmFeaturesRef = useRef<HTMLDivElement>(null);
-  const additionalFeaturesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!hoveredSection || windowSize.width < 1024) return;
     if (hoveredSection === 'mapfeatures-osm') {
       osmFeaturesRef?.current?.scrollIntoView(scrollOptions);
-    }
-    if (hoveredSection === 'mapfeatures-additional') {
-      additionalFeaturesRef?.current?.scrollIntoView(scrollOptions);
     }
   }, [hoveredSection]);
 
@@ -210,15 +206,6 @@ const MapFeature = ({ hoveredSection }: hoveredSectionType) => {
           select the feature to collect data for.
         </span>{' '}
       </div>
-      <span
-        ref={additionalFeaturesRef}
-        className={`${hoveredSection === 'mapfeatures-additional' && 'fmtm-text-gray-800'} fmtm-duration-150`}
-      >
-        Additional datasets might be important if your survey consists of more than one feature to select. For example,
-        selecting a building as the primary feature, with an associated road, or nearby hospital. In this case, the
-        roads or hospital features would be uploaded separately. Note that these features will not be factored in when
-        dividing the primary features into task areas.
-      </span>
     </div>
   );
 };

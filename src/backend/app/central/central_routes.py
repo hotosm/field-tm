@@ -94,7 +94,6 @@ async def validate_form(
 
     NOTE this provides a basic sanity check, some fields are omitted
     so the form is not usable in production:
-        - additional_entities
         - new_geom_type
     """
     if debug:
