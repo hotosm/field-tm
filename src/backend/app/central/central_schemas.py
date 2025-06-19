@@ -329,3 +329,4 @@ class OdkEntitiesUpdate(BaseModel):
     """A small base model to update the OdkEntity status field only."""
 
     status: str  # this must be the str representation of the db enum
+    submission_ids: Optional[str] = None
