@@ -4,6 +4,7 @@
 	import OsmLogo from '$assets/images/osm-logo.png';
 	import { goto } from '$app/navigation';
 	import { m } from '$translations/messages.js';
+	import { projectStatus } from '$constants/enums';
 
 	type propType = {
 		project: DbProjectType;
@@ -29,7 +30,9 @@
 				{:else}
 					<img src={OsmLogo} class="logo" alt="default organization logo" />
 				{/if}
-				<span class={`project-status ${project.status}`}>{m[`project_states.${project.status}`]()}</span>
+				{#if projectStatus.COMPLETED === project.status}
+					<span class={`project-status ${project.status}`}>{m[`project_states.${project.status}`]()}</span>
+				{/if}
 			</div>
 			<div class="meta1">
 				<p class="project-id">
