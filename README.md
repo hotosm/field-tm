@@ -219,6 +219,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Joshua-Tihabwangye"><img src="https://avatars.githubusercontent.com/u/143622860?v=4?s=100" width="100px;" alt="Joshua-T-Walker"/><br /><sub><b>Joshua-T-Walker</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Joshua-Tihabwangye" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://mapconcierge.com"><img src="https://avatars.githubusercontent.com/u/416977?v=4?s=100" width="100px;" alt="Taichi FURUHASHI"/><br /><sub><b>Taichi FURUHASHI</b></sub></a><br /><a href="#translation-mapconcierge" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ajvs"><img src="https://avatars.githubusercontent.com/u/16050172?v=4?s=100" width="100px;" alt="Ajee"/><br /><sub><b>Ajee</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=ajvs" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://spotter.ngo"><img src="https://avatars.githubusercontent.com/u/15286128?v=4?s=100" width="100px;" alt="Jiří Podhorecký"/><br /><sub><b>Jiří Podhorecký</b></sub></a><br /><a href="#translation-trendspotter" title="Translation">🌍</a></td>
     </tr>
   </tbody>
   <tfoot>
