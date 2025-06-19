@@ -239,7 +239,7 @@ services:
       retries: 10
 
   central-webhook:
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.1}"
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.2.0}"
     depends_on:
       central:
         condition: service_healthy
