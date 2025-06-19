@@ -43,7 +43,10 @@ export default function ExploreProjectCard({ data, className }: { data: projectT
             ) : (
               <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
             )}
-            <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
+
+            {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
+              <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
+            )}
           </div>
           <div className="fmtm-my-3">
             <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mb-1">
