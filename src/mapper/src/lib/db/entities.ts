@@ -8,9 +8,9 @@ import { javarosaToGeojsonGeom } from '$lib/odk/javarosa';
 async function update(db: PGlite, entity: Partial<DbEntityType>) {
 	await db.query(
 		`UPDATE odk_entities
-         SET status = $2
+         SET status = $2, submission_ids = $3
          WHERE entity_id = $1`,
-		[entity.entity_id, entity.status],
+		[entity.entity_id, entity.status, entity.submission_ids],
 	);
 }
 
