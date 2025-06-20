@@ -234,4 +234,5 @@ export type DbApiSubmissionType = {
 	queued_at: string; // or Date if you parse it
 	last_attempt_at: string | null;
 	success_at: string | null;
+	user_sub: string | null;
 };

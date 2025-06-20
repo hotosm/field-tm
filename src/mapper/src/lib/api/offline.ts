@@ -1,11 +1,13 @@
 import type { PGlite } from '@electric-sql/pglite';
 
 import { DbApiSubmission } from '$lib/db/api-submissions.ts';
-import { getCommonStore, getAlertStore } from '$store/common.svelte.ts';
 import { trySendingSubmission } from '$lib/api/fetch.ts';
+import { getCommonStore, getAlertStore } from '$store/common.svelte.ts';
+import { getLoginStore } from '$store/login.svelte';
 
 const commonStore = getCommonStore();
 const alertStore = getAlertStore();
+const loginStore = getLoginStore();
 
 function wait(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,6 +31,20 @@ async function iterateAndSendOfflineSubmissions(db: PGlite): Promise<boolean> {
 	// Count remaining pending submissions
 	const total = await DbApiSubmission.count(db);
 	if (total === 0) return true; // Nothing to be done
+
+	const queuedSubmissions = await DbApiSubmission.allQueued(db);
+	const hasUserSub = queuedSubmissions?.some((row) => !!row?.user_sub);
+	const authDetails = loginStore.getAuthDetails;
+
+	// if user made offline submissions while logged in and not logged in during online sync, prompt them to log in before before uploading submissions
+	if (hasUserSub && !authDetails) {
+		alertStore.setAlert({
+			message: 'You must be logged in to send offline data.',
+			variant: 'danger',
+		});
+		loginStore.toggleLoginModal(true);
+		return false;
+	}
 
 	commonStore.setOfflineDataIsSyncing(true);
 	alertStore.setAlert({
