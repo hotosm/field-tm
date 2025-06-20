@@ -192,6 +192,10 @@ const ProjectSlice = createSlice({
         features: state.newGeomFeatureCollection.features.filter((feature) => feature?.id !== action.payload),
       };
     },
+    ClearProjectFeatures(state) {
+      state.newGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
+      state.badGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
+    },
   },
 });
 
