@@ -1,4 +1,4 @@
-import { Fill, Icon, Stroke, Style } from 'ol/style';
+import { Fill, Icon, Stroke, Style, Circle } from 'ol/style';
 import { asArray } from 'ol/color';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
@@ -16,6 +16,23 @@ function createPolygonStyle(fillColor: string, strokeColor: string) {
       color: fillColor,
     }),
     zIndex: 10,
+  });
+}
+
+function createPointStyle(fillColor: string, strokeColor: string) {
+  return new Style({
+    image: new Circle({
+      fill: new Fill({
+        color: fillColor,
+      }),
+      stroke: new Stroke({
+        color: strokeColor,
+        width: 1,
+      }),
+      radius: 8,
+      declutterMode: 'obstacle',
+    }),
+    zIndex: 5,
   });
 }
 
@@ -51,6 +68,7 @@ function createIconStyle(iconSrc: string, scale: number = 0.8, color: any = 'red
       src: iconSrc,
       color: color,
       opacity: 1,
+      declutterMode: 'obstacle',
     }),
     geometry: function (feature) {
       const polygonCoord = getFeatureGeojson(feature, {});
@@ -126,36 +144,30 @@ export const getFeatureStatusStyle = (
   isEntitySelected: boolean,
 ) => {
   let geojsonStyles;
-
-  if (geomType === GeoGeomTypesEnum.POINT) {
+  if (geomType === 'Point') {
     geojsonStyles = {
-      READY: createIconStyle(
-        AssetModules.MapPinGrey,
-        isEntitySelected ? 2 : 1,
-        updateRbgAlpha(mapTheme.palette.entityStatusColors.ready, 1),
+      READY: createPointStyle(
+        mapTheme.palette.entityStatusColors.ready,
+        isEntitySelected ? 'rgb(224,10,7,1)' : 'rgb(255,255,255,1)',
       ),
-      OPENED_IN_ODK: createIconStyle(
-        AssetModules.MapPinGrey,
-        isEntitySelected ? 2 : 1,
-        updateRbgAlpha(mapTheme.palette.entityStatusColors.opened_in_odk, 1),
+      OPENED_IN_ODK: createPointStyle(
+        mapTheme.palette.entityStatusColors.opened_in_odk,
+        isEntitySelected ? 'rgb(224,10,7,1)' : 'rgb(255,255,255,1)',
       ),
-      SURVEY_SUBMITTED: createIconStyle(
-        AssetModules.MapPinGrey,
-        isEntitySelected ? 2 : 1,
-        updateRbgAlpha(mapTheme.palette.entityStatusColors.survey_submitted, 1),
+      SURVEY_SUBMITTED: createPointStyle(
+        mapTheme.palette.entityStatusColors.survey_submitted,
+        isEntitySelected ? 'rgb(224,10,7,1)' : 'rgb(255,255,255,1)',
       ),
-      MARKED_BAD: createIconStyle(
-        AssetModules.MapPinGrey,
-        isEntitySelected ? 2 : 1,
-        updateRbgAlpha(mapTheme.palette.entityStatusColors.marked_bad, 1),
+      MARKED_BAD: createPointStyle(
+        mapTheme.palette.entityStatusColors.marked_bad,
+        isEntitySelected ? 'rgb(224,10,7,1)' : 'rgb(255,255,255,1)',
       ),
-      VALIDATED: createIconStyle(
-        AssetModules.MapPinGrey,
-        isEntitySelected ? 1.5 : 1,
-        updateRbgAlpha(mapTheme.palette.entityStatusColors.validated, 1),
+      VALIDATED: createPointStyle(
+        mapTheme.palette.entityStatusColors.validated,
+        isEntitySelected ? 'rgb(224,10,7,1)' : 'rgb(255,255,255,1)',
       ),
     };
-  } else if (geomType === GeoGeomTypesEnum.POLYGON) {
+  } else if (geomType === 'Polygon') {
     geojsonStyles = {
       READY: createFeaturePolygonStyle(
         mapTheme.palette.entityStatusColors.ready,

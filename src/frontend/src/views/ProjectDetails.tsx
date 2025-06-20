@@ -124,6 +124,10 @@ const ProjectDetails = () => {
   useEffect(() => {
     getEntityStatusList();
     getOdkEntitiesGeojson();
+
+    return () => {
+      dispatch(ProjectActions.ClearProjectFeatures());
+    };
   }, []);
 
   const getTabContent = (tabState: tabType) => {

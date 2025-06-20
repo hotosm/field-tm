@@ -61,8 +61,8 @@ export type MapGeomTypes = {
 };
 
 export enum GeoGeomTypesEnum {
-  POINT = 'Point',
-  POLYGON = 'Polygon',
+  POINT = 'POINT',
+  POLYGON = 'POLYGON',
   POLYLINE = 'POLYLINE',
 }
 

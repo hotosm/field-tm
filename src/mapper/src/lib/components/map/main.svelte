@@ -30,11 +30,6 @@
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
-	import MapPinGrey from '$assets/images/map-pin-grey.png';
-	import MapPinRed from '$assets/images/map-pin-red.png';
-	import MapPinYellow from '$assets/images/map-pin-yellow.png';
-	import MapPinGreen from '$assets/images/map-pin-green.png';
-	import MapPinBlue from '$assets/images/map-pin-blue.png';
 	import BlackLockImg from '$assets/images/black-lock.png';
 	import RedLockImg from '$assets/images/red-lock.png';
 	import Arrow from '$assets/images/arrow.png';
@@ -410,11 +405,6 @@
 		entitiesStore.setSelectedEntityId(null);
 	}}
 	images={[
-		{ id: 'MAP_PIN_GREY', url: MapPinGrey },
-		{ id: 'MAP_PIN_RED', url: MapPinRed },
-		{ id: 'MAP_PIN_BLUE', url: MapPinBlue },
-		{ id: 'MAP_PIN_YELLOW', url: MapPinYellow },
-		{ id: 'MAP_PIN_GREEN', url: MapPinGreen },
 		{ id: 'LOCKED_FOR_MAPPING', url: BlackLockImg },
 		{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
 		{ id: 'locationArc', url: LocationArcImg },
@@ -602,31 +592,36 @@
 					manageHoverState
 				/>
 			{:else if primaryGeomType === MapGeomTypes.POINT}
-				<SymbolLayer
+				<CircleLayer
 					id="entity-point-layer"
 					applyToClusters={false}
 					hoverCursor="pointer"
-					manageHoverState
-					layout={{
-						'icon-image': [
+					paint={{
+						'circle-color': [
 							'match',
 							['get', 'status'],
 							'READY',
-							'MAP_PIN_GREY',
+							cssValue('--entity-ready'),
 							'OPENED_IN_ODK',
-							'MAP_PIN_YELLOW',
+							cssValue('--entity-opened-in-odk'),
 							'SURVEY_SUBMITTED',
-							'MAP_PIN_GREEN',
+							cssValue('--entity-survey-submitted'),
 							'VALIDATED',
-							'MAP_PIN_BLUE',
+							cssValue('--entity-validated'),
 							'MARKED_BAD',
-							'MAP_PIN_RED',
-							'MAP_PIN_GREY', // default color if no match is found
+							cssValue('--entity-marked-bad'),
+							cssValue('--entity-ready'),
 						],
-						'icon-allow-overlap': true,
-						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
+						'circle-radius': 8,
+						'circle-stroke-width': 1,
+						'circle-stroke-color': [
+							'case',
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+							cssValue('--entity-outline-selected'),
+							cssValue('--entity-outline'),
+						],
 					}}
-				/>
+				></CircleLayer>
 			{:else if primaryGeomType === MapGeomTypes.POLYLINE}
 				<LineLayer
 					id="entity-line-layer"
@@ -684,7 +679,17 @@
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
 			<CircleLayer
-				id="bad-geom-circle-layer"
+				id="bad-geom-circle-point-layer"
+				hoverCursor="pointer"
+				paint={{
+					'circle-color': cssValue('--entity-marked-bad'),
+					'circle-radius': 8,
+					'circle-stroke-width': 1,
+					'circle-stroke-color': cssValue('--entity-outline'),
+				}}
+			/>
+			<CircleLayer
+				id="bad-geom-circle-highlight-layer"
 				hoverCursor="pointer"
 				paint={{
 					'circle-color': cssValue('--sl-color-primary-700'),
@@ -747,31 +752,36 @@
 				manageHoverState
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
-			<SymbolLayer
+			<CircleLayer
 				id="new-entity-point-layer"
 				applyToClusters={false}
 				hoverCursor="pointer"
-				manageHoverState
-				layout={{
-					'icon-image': [
+				paint={{
+					'circle-color': [
 						'match',
 						['get', 'status'],
 						'READY',
-						'MAP_PIN_GREY',
+						cssValue('--entity-ready'),
 						'OPENED_IN_ODK',
-						'MAP_PIN_YELLOW',
+						cssValue('--entity-opened-in-odk'),
 						'SURVEY_SUBMITTED',
-						'MAP_PIN_GREEN',
+						cssValue('--entity-survey-submitted'),
 						'VALIDATED',
-						'MAP_PIN_BLUE',
+						cssValue('--entity-validated'),
 						'MARKED_BAD',
-						'MAP_PIN_RED',
-						'MAP_PIN_GREY', // default color if no match is found
+						cssValue('--entity-marked-bad'),
+						cssValue('--entity-ready'),
 					],
-					'icon-allow-overlap': true,
-					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
+					'circle-radius': 8,
+					'circle-stroke-width': 1,
+					'circle-stroke-color': [
+						'case',
+						['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+						cssValue('--entity-outline-selected'),
+						cssValue('--entity-outline'),
+					],
 				}}
-			/>
+			></CircleLayer>
 		{:else if drawGeomType === MapGeomTypes.POLYLINE}
 			<LineLayer
 				id="new-entity-line-layer"
