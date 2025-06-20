@@ -22,9 +22,12 @@
 						{ credentials: 'include' },
 					);
 				} else {
-					response = await fetch(`${import.meta.env.VITE_API_URL}/auth/callback/osm/mapper?code=${authCode}&state=${state}`, {
-						credentials: 'include',
-					});
+					response = await fetch(
+						`${import.meta.env.VITE_API_URL}/auth/callback/osm/mapper?code=${authCode}&state=${state}`,
+						{
+							credentials: 'include',
+						},
+					);
 				}
 
 				if (!response.ok) {
@@ -32,7 +35,8 @@
 				}
 				const apiUser = await getUserDetailsFromApi(fetch);
 				loginStore.setAuthDetails(apiUser);
-				goto('/');
+				goto(sessionStorage.getItem('requestedPath') || '/');
+				sessionStorage.removeItem('requestedPath');
 			} catch (err) {
 				alert.setAlert({
 					variant: 'danger',
