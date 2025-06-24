@@ -7,7 +7,8 @@ export const isInputEmpty = (text: string): boolean => {
 };
 
 export const camelToFlat = (word: string): string => (
-  (word = word.replace(/[A-Z]/g, ' $&')), word[0].toUpperCase() + word.slice(1)
+  (word = word.replace(/[A-Z]/g, ' $&')),
+  word[0].toUpperCase() + word.slice(1)
 );
 
 export const isStatusSuccess = (status: number): boolean => {

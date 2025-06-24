@@ -298,7 +298,6 @@ The metadata for a project must be created first.
 <!-- prettier-ignore-end -->
 
 - To create a project you will need the following:
-
   - Project name, description, instructions.
   - The ID of the organization you manage.
     - Visit `/auth/me` while logged in to retrieve this.

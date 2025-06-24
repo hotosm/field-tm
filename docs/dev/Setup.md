@@ -8,7 +8,6 @@ The Field-TM can be divided into four parts:
 2. A desktop-based management frontend website in React (code in: `src/frontend`)
 3. A mobile-based mapper frontend website in Svelte (code in: `src/mapper`)
 4. Supporting services that tie everything together:
-
    - [ODK Central][1] to collect the survey submissions.
    - [Minio][13] to serve static content via S3.
    - [Electric-SQL][14] to provide a 'sync-layer' for real-time syncing of

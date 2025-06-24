@@ -105,7 +105,6 @@ To properly configure your Field-TM project, you will need to create keys for OS
    ![image][8]
 
 3. Add required permissions:
-
    - 'Read user preferences' (`read_prefs`)
    - 'Send private messages to other users' (`send_messages`)
 
