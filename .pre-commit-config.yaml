@@ -60,7 +60,6 @@ repos:
             "!chart/**",
             "!CHANGELOG.md",
             "!.all-contributorsrc",
-            "!CHANGELOG.md",
             "!src/frontend/pnpm-lock.yaml",
             "!src/mapper/pnpm-lock.yaml",
             "!src/mapper/src/lib/migrations/**",
