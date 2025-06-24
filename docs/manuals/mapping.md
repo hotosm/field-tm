@@ -109,7 +109,6 @@ for field mapping:
 
 - **Option 2:** Download the QR code and import it into ODK Collect to
   load the project. Follow the steps below:
-
   1. Open ODK Collect.
   2. Click the project name in the top right corner.
   3. Tap the **menu** icon (three horizontal dots).

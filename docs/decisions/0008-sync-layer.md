@@ -22,7 +22,6 @@ client-side database that integrates smoothly into our stack.
 ## Considered Options
 
 - ElectricSQL
-
   - Syncs a remote PostgreSQL instance with a local embedded Postgres (pglite)
     in the browser.
   - Offers a strong local-first story, full SQL support, and CRDT-based
@@ -34,14 +33,12 @@ client-side database that integrates smoothly into our stack.
     infrastructure such as proxy caching and load balancing systems.
 
 - Replicache
-
   - Uses a custom sync engine and local IndexedDB storage. Well-designed for
     reactivity and performance.
   - Not SQL-based—requires writing a custom sync protocol and a client-side
     data model.
 
 - PowerSync
-
   - Syncs PostgreSQL to SQLite via a WebSocket-based protocol.
   - Lightweight and performant, syncing to SQLite in-browser.
   - Recently open-sourced their sync layer to self-host.
