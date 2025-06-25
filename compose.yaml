@@ -231,11 +231,11 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
     build:
       context: odkcentral/api
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.1.1}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.2.0}
     depends_on:
       proxy:
         condition: service_healthy
@@ -298,11 +298,11 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
     build:
       context: odkcentral/ui
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.1.1}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.2.0}
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -310,7 +310,7 @@ services:
 
   central-webhook:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.2.0}"
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.3.0}"
     depends_on:
       central:
         condition: service_healthy
