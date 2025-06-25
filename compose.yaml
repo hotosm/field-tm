@@ -465,6 +465,9 @@ services:
         # Run project stats script every 10 mins
         echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
 
+        # Upload and update project submissions to s3 every 6 hours
+        echo '0 */6 * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
+
         exec /usr/local/bin/supercronic ./crontab
       "
     restart: "unless-stopped"
