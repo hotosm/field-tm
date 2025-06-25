@@ -135,6 +135,8 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 📱 fully offline field mapping (local-first design) | Since [v2025.3.0][7] |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
+| 📅 | 🖥️ editing of submissions marked bad by the project manager | – |
+| 📅 | 🖥️ reduced resource usage of FieldTM on mobile devices | – |
 | 📅 | 🖥️ integration with other mobile apps: EveryDoor, StreetComplete | – |
 | 📅 | 🖥️ integration with other ODK server types: Ona.io, Kobo | – |
 | 📅 | 🖥️ multiple approaches to task splitting algorithm | – |
