@@ -40,6 +40,14 @@ Some can be updated manually, as required.
 > is served under, e.g. /api on the domain.
 > However, this isn't the recommended approach, and testing is minimal.
 
+##### CENTRAL_WEBHOOK_API_KEY
+
+- This variable allows central-webhook to make requests to the backend API.
+- We use this to update the feature/entity colours after mapping events occur.
+- Create an API Key for user `svcfmtm`, which will add the key to the database.
+- Set the key for the `CENTRAL_WEBHOOK_API_KEY` variable, and this should
+  allow the webhook to work.
+
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided
