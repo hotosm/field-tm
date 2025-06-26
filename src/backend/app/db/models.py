@@ -1776,10 +1776,11 @@ class DbProject(BaseModel):
                 )
             """
 
-        # Regular users see public projects and private ones they have access to
+        # All users see public, sensitive, and invite-only projects.
+        # Private projects are only visible to users who have access.
         return """
             (
-                p.visibility = 'PUBLIC'
+                p.visibility != 'PRIVATE'
                 OR (
                     p.visibility = 'PRIVATE'
                     AND EXISTS (
