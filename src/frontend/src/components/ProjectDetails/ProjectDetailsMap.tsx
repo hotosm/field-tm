@@ -397,7 +397,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             Sync Status
           </Button>
         </div>
-        <MapControlComponent map={map} projectName={projectInfo?.name || ''} pmTileLayerUrl={customBasemapUrl} />
+        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
       </MapComponent>
       {/* show entity selection popup only if multiple features overlap at the clicked point */}
       {overlappingEntityFeatures.length > 1 && (

@@ -200,8 +200,6 @@ const SubmissionsTable = ({ toggleView }) => {
       if (path === 'start' || path === 'end') {
         // start & end date is static
         value = `${value[item]?.split('T')[0]} ${value[item]?.split('T')[1]}`;
-      } else if (path === 'status') {
-        value = entity_state[value[item]].replaceAll('_', ' ');
       } else if (
         value &&
         value[item] &&

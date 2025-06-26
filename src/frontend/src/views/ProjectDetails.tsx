@@ -212,7 +212,7 @@ const ProjectDetails = () => {
                   toggle ? 'fmtm-right-0 fmtm-top-[3rem]' : '-fmtm-right-[15rem] fmtm-top-[3rem]'
                 }`}
               >
-                <ProjectOptions projectName={projectInfo?.name as string} />
+                <ProjectOptions />
               </div>
             </div>
           </div>
