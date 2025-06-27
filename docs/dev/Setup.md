@@ -198,7 +198,7 @@ The Field-TM Developer Team
 [4]: https://docs.fmtm.dev/INSTALL/#software-requirements
 [5]: https://docs.fmtm.dev/CONTRIBUTING
 [6]: https://docs.hotosm.org/code-of-conduct
-[7]: https://github.com/hotosm/fmtm
+[7]: https://github.com/hotosm/field-tm
 [8]: https://docs.fmtm.dev/INSTALL/#setup-your-local-environment
 [9]: https://docs.fmtm.dev/faq
 [10]: https://hotosm.slack.com/archives/C04PCBFDEGN

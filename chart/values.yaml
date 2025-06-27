@@ -7,7 +7,7 @@ replicaCount: 1
 domain: fmtm.localhost
 
 image:
-  repository: ghcr.io/hotosm/fmtm
+  repository: ghcr.io/hotosm/field-tm
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

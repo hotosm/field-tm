@@ -71,7 +71,7 @@ If more details are required, check out the
 Clone the repository to your local machine using the following command:
 
 ```bash
-git clone https://github.com/hotosm/fmtm.git
+git clone https://github.com/hotosm/field-tm.git
 
 # If you wish to deploy for production, change to the main branch
 git checkout main

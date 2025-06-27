@@ -17,7 +17,7 @@ options:
 
 ```bash
 cat /path/to/your/qrcode.png | \
-    docker run -i --rm ghcr.io/hotosm/fmtm/qrcodes:latest --read
+    docker run -i --rm ghcr.io/hotosm/field-tm/qrcodes:latest --read
 ```
 
 This will output the JSON data to terminal.
@@ -26,7 +26,7 @@ This will output the JSON data to terminal.
 
 ```bash
 cat file.json | \
-docker run -i --rm ghcr.io/hotosm/fmtm/qrcodes:latest --write > qr.png
+docker run -i --rm ghcr.io/hotosm/field-tm/qrcodes:latest --write > qr.png
 ```
 
 Alternatively pipe from STDIN on the command line:
@@ -45,7 +45,7 @@ echo '{
     "name": "task qrcode conversion"
   },
   "admin": {}
-}' | docker run -i --rm ghcr.io/hotosm/fmtm/qrcodes:latest --write \
+}' | docker run -i --rm ghcr.io/hotosm/field-tm/qrcodes:latest --write \
 > qr.png
 ```
 

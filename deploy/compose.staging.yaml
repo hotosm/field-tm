@@ -183,7 +183,7 @@ services:
       service: scheduler
 
   backups:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     depends_on:
       proxy:
         condition: service_healthy
