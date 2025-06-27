@@ -163,25 +163,14 @@ To assess performance of endpoints:
 
 ### Debugging osm-fieldwork
 
-`osm-fieldwork` is an integral package for much of the functionality in Field-TM.
-
-Creating a new release during development may not always be feasible.
-
-- A development version of osm-fieldwork can be mounted into
-  the Field-TM container via bind mount.
-- Clone the osm-fieldwork repo to the same root directory as Field-TM.
-- Uncomment the line in compose.yaml
-
-```yaml
-- ../osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork
-```
-
-- Run the docker container with your local version of osm-fieldwork.
-- Code changes to osm-fieldwork should be reflected immediately.
-  If they are not, run:
-  `docker compose restart api`.
-
-> Note: this is useful for debugging features during active development.
+- `osm-fieldwork` is an integral package for much of the functionality in Field-TM.
+- The package is stored in this monorepo under:
+  `src/backend/packages/osm-fieldwork`
+- This directory is mounted inside the backend by default
+  during local development with `compose.yaml`.
+- If you modify the code in the package, the container must be restarted
+  to reflect this:
+  `docker compose restart api`
 
 ### Accessing S3 Files use s3fs
 
