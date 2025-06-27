@@ -19,29 +19,29 @@ name: fmtm-development
 
 volumes:
   fmtm_frontend:
-    name: fmtm-frontend-${GIT_BRANCH}
+    name: fmtm-frontend-development
   fmtm_mapper_frontend:
-    name: fmtm-mapper-frontend-${GIT_BRANCH}
+    name: fmtm-mapper-frontend-development
   fmtm_db_data:
-    name: fmtm-db-data-${GIT_BRANCH}
+    name: fmtm-db-data-development
   fmtm_data:
-    name: fmtm-s3-data-${GIT_BRANCH}
+    name: fmtm-s3-data-development
   fmtm_logs:
-    name: fmtm-logs-${GIT_BRANCH}
+    name: fmtm-logs-development
   fmtm_images:
-    name: fmtm-images-${GIT_BRANCH}
+    name: fmtm-images-development
   fmtm_tiles:
-    name: fmtm-tiles-${GIT_BRANCH}
+    name: fmtm-tiles-development
   certs:
-    name: fmtm-certs-${GIT_BRANCH}
+    name: fmtm-certs-development
   central_db_data:
-    name: fmtm-central-db-data-${GIT_BRANCH}
+    name: fmtm-central-db-data-development
   central_frontend:
-    name: fmtm-central-frontend-${GIT_BRANCH}
+    name: fmtm-central-frontend-development
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH}
+    name: fmtm-development
     ipam:
       driver: default
       config:

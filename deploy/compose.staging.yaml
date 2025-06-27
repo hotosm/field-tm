@@ -19,29 +19,29 @@ name: fmtm-stage
 
 volumes:
   fmtm_frontend:
-    name: fmtm-frontend-${GIT_BRANCH}
+    name: fmtm-frontend-staging
   fmtm_mapper_frontend:
-    name: fmtm-mapper-frontend-${GIT_BRANCH}
+    name: fmtm-mapper-frontend-staging
   fmtm_db_data:
-    name: fmtm-db-data-${GIT_BRANCH}
+    name: fmtm-db-data-staging
   fmtm_data:
-    name: fmtm-s3-data-${GIT_BRANCH}
+    name: fmtm-s3-data-staging
   fmtm_logs:
-    name: fmtm-logs-${GIT_BRANCH}
+    name: fmtm-logs-staging
   fmtm_images:
-    name: fmtm-images-${GIT_BRANCH}
+    name: fmtm-images-staging
   fmtm_tiles:
-    name: fmtm-tiles-${GIT_BRANCH}
+    name: fmtm-tiles-staging
   certs:
-    name: fmtm-certs-${GIT_BRANCH}
+    name: fmtm-certs-staging
   central_db_data:
-    name: fmtm-central-db-data-${GIT_BRANCH}
+    name: fmtm-central-db-data-staging
   central_frontend:
-    name: fmtm-central-frontend-${GIT_BRANCH}
+    name: fmtm-central-frontend-staging
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH}
+    name: fmtm-staging
     ipam:
       driver: default
       config:
