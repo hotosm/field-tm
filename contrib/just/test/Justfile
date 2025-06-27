@@ -204,6 +204,7 @@ backend-coverage:
   #!/usr/bin/env sh
   set -eux
 
+  export TAG_OVERRIDE=ci-dev
   just build backend
   docker compose up -d
 
