@@ -20,7 +20,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.1
     with:
       environment: "test"
-      command: "test backend-with-coverage"
+      command: "test backend-with-coverage-upload"
     secrets: inherit
 
   frontend-unit-test:
