@@ -207,15 +207,20 @@ backend-coverage:
   just build backend
   docker compose up -d
 
-  docker compose run --rm \
-    --volume $PWD/coverage:/tmp/coverage \
+  docker rm --force backend-coverage-run 
+  docker compose run \
+    --name backend-coverage-run \
     --entrypoint="sh -c" \
-    api pytest \
+    api \
     "coverage run -m pytest \
       && coverage report && coverage html \
-      && coverage-badge -o coverage.svg \
-      && mv htmlcov/index.html /tmp/coverage/coverage.html \
-      && mv coverage.svg /tmp/coverage/coverage.svg"
+      && coverage-badge -o coverage.svg"
+
+  # Copy generated coverage files out
+  mkdir -p coverage
+  docker cp backend-coverage-run:/opt/htmlcov/index.html coverage/coverage.html
+  docker cp backend-coverage-run:/opt/coverage.svg coverage/coverage.svg
+  docker rm backend-coverage-run
 
 # Upload coverage report to gh-pages
 [no-cd]
