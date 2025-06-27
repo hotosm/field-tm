@@ -78,6 +78,7 @@ def test_create_qrcode(appuser, appuser_details):
     )
     qrcode_file = Path("test project.png")
     assert qrcode_file.exists()
+    qrcode_file.unlink()
 
 
 def test_create_form_delete(project, odk_form):
