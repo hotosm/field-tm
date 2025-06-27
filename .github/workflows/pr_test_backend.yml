@@ -26,5 +26,4 @@ jobs:
       cache_extra_imgs: |
         "ghcr.io/hotosm/postgis:${{ vars.POSTGIS_TAG }}"
         "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
-      debug_override: true
     secrets: inherit

@@ -28,7 +28,7 @@ volumes:
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH:-local}
+    name: fmtm-local
     ipam:
       driver: default
       config:
@@ -147,7 +147,7 @@ services:
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
     environment:
-      DEBUG: ${DEBUG_OVERRIDE:-false}
+      DEBUG: ${DEBUG:-True}
     depends_on:
       proxy:
         condition: service_healthy
