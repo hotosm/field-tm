@@ -17,19 +17,19 @@ on:
 
 jobs:
   backend-test:
-    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.1
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
     with:
       environment: "test"
       command: "test backend-with-coverage-upload"
     secrets: inherit
 
   frontend-unit-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@3.3.1
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@3.3.2
     with:
       working_dir: src/frontend
 
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.1
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     needs: [backend-test]
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
@@ -39,7 +39,7 @@ jobs:
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.1
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     needs: [frontend-unit-test]
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
@@ -151,7 +151,7 @@ jobs:
       # - smoke-test-backend
       - backend-build
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.3.1
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.3.2
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       docker_compose_file: "deploy/compose.${{ github.ref_name }}.yaml"
