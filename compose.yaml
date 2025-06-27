@@ -129,6 +129,9 @@ services:
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
+      cache_from:
+        - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}-cache
+        - type=gha
     # Uncomment these to debug with a terminal debugger like pdb
     # Then `docker attach fmtm_api` to debug
     # stdin_open: true

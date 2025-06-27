@@ -23,8 +23,50 @@ all: backend frontend
 # Test all backend code (including packages)
 [no-cd]
 backend:
+  just build backend
   docker compose up -d
   docker compose run --rm api pytest
+
+# Check coverage for backend tests
+[no-cd]
+backend-with-coverage:
+  #!/usr/bin/env sh
+  set -eux
+  just build backend
+  docker compose up -d
+  docker compose run --rm \
+    --volume $PWD/coverage:/tmp/coverage \
+    --entrypoint="sh -c" \
+    api pytest \
+    "coverage run -m pytest \
+      && coverage report && coverage html \
+      && coverage-badge -o coverage.svg \
+      && mv htmlcov/index.html /tmp/coverage/coverage.html \
+      && mv coverage.svg /tmp/coverage/coverage.svg"
+
+# Upload coverage report to gh-pages
+[no-cd]
+upload-coverage:
+  #!/usr/bin/env sh
+  set -eux
+
+  : "${GITHUB_TOKEN:?GITHUB_TOKEN  environment variable must be set}"
+
+  rm -rf tmp_pages
+  mkdir tmp_pages
+  cd tmp_pages
+
+  git init --initial-branch=gh-pages
+  git config user.name "svchot"
+  git config user.email "sysadmin@hotosm.org"
+  git pull "https://x-access-token:${GITHUB_TOKEN}@github.com/hotosm/field-tm.git" gh-pages || echo "No remote branch yet"
+
+  # Copy coverage.svg and coverage.html from main repo
+  cp ../coverage/* .
+
+  git add .
+  git commit -m "docs: update coverage summary and badge" || echo "Nothing to commit"
+  git push --set-upstream "https://x-access-token:${GITHUB_TOKEN}@github.com/hotosm/field-tm.git" HEAD:gh-pages
 
 # Test backend API only
 [no-cd]
@@ -86,12 +128,6 @@ mapper-preview:
     VITE_S3_URL=http://s3.fmtm.localhost:7050 \
     pnpm run build
   pnpm run preview
-
-# Check coverage for backend tests
-[no-cd]
-coverage:
-  docker compose run --rm --entrypoint='sh -c' api \
-    'coverage run -m pytest && coverage report -m'
 
 # Copy prod data into current database (WARNING: deletes local db data)
 [no-cd]
