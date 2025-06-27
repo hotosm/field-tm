@@ -4,7 +4,7 @@
       "ref": "feat/some-new-thing"
     },
     "base": {
-      "ref": "development"
+      "ref": "dev"
     }
   }
 }

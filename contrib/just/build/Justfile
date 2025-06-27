@@ -28,7 +28,7 @@ backend:
 # Build backend development server container
 [no-cd]
 backend-dev:
-  TARGET_OVERRIDE=prod TAG_OVERRIDE=development \
+  TARGET_OVERRIDE=prod TAG_OVERRIDE=dev \
     docker compose build api
 
 # Build frontend container

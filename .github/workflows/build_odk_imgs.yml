@@ -4,7 +4,7 @@ on:
   # Push includes PR merge
   push:
     branches:
-      - development
+      - dev
     paths:
       # Workflow is triggered only if odkcentral dir changes
       - "odkcentral/**"

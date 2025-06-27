@@ -70,7 +70,7 @@ Chart values can be overridden using `values.yaml` or the `--set` flag.
 
 ```bash
 helm upgrade --install fmtm . \
-  --set image.tag=development \
+  --set image.tag=dev \
   --set image.pullPolicy="Always" \
   --set domain="some.new.domain"
 ```

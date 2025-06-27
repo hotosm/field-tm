@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - docs/**
-    branches: [development]
+    branches: [dev]
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
