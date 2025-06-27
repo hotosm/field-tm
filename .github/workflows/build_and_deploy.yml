@@ -39,6 +39,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.3
     # needs: [backend-test]
     with:
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
       dockerfile: backend/Dockerfile
       build_target: prod
@@ -48,6 +49,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.3
     needs: [frontend-unit-test]
     with:
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
       dockerfile: Dockerfile.ui.prod
       build_target: prod
