@@ -120,7 +120,7 @@ def get_application() -> FastAPI:
         version=__version__,
         license_info={
             "name": "AGPL-3.0-only",
-            "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE.md",
+            "url": "https://raw.githubusercontent.com/hotosm/field-tm/main/LICENSE.md",
         },
         debug=settings.DEBUG,
         lifespan=lifespan,
@@ -233,7 +233,7 @@ async def deployment_details():
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={
-            "source": "https://github.com/hotosm/fmtm",
+            "source": "https://github.com/hotosm/field-tm",
             "version": __version__,
             "commit": commit or "/app/version.json not found",
             "build": build or "/app/version.json not found",

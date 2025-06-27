@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME=ghcr.io/hotosm/fmtm/basemap-generator:0.4.0
+IMAGE_NAME=ghcr.io/hotosm/field-tm/basemap-generator:0.4.0
 
 echo "Building ${IMAGE_NAME}"
 docker build . --tag "${IMAGE_NAME}"

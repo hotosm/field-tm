@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/hotosm/fmtm/main/docs/images/hot_logo.png" style="width: 200px;" alt="HOT"></a>
+  <img src="https://raw.githubusercontent.com/hotosm/field-tm/main/docs/images/hot_logo.png" style="width: 200px;" alt="HOT"></a>
 </p>
 <p align="center">
   <em>Processing field data from ODK to OpenStreetMap format, and other field utils.</em>
@@ -14,7 +14,7 @@
   <a href="https://pypistats.org/packages/osm-fieldwork" target="_blank">
       <img src="https://img.shields.io/pypi/dm/osm-fieldwork.svg" alt="Downloads">
   </a>
-  <a href="https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork/LICENSE.md" target="_blank">
+  <a href="https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork/LICENSE.md" target="_blank">
       <img src="https://img.shields.io/badge/license-GPL%203.0-orange.svg" alt="License">
   </a>
 </p>
@@ -23,7 +23,7 @@
 
 📖 **Documentation**: <a href="https://hotosm.github.io/osm-fieldwork/" target="_blank">https://hotosm.github.io/osm-fieldwork/</a>
 
-🖥️ **Source Code**: <a href="https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork" target="_blank">https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork</a>
+🖥️ **Source Code**: <a href="https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork" target="_blank">https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork</a>
 
 ---
 
@@ -99,7 +99,7 @@ pip install osm-fieldwork
 - Directly from the latest development code:
 
 ```bash
-pip install git+https://github.com/hotosm/fmtm.git#subdirectory=src/backend/packages/osm-fieldwork
+pip install git+https://github.com/hotosm/field-tm.git#subdirectory=src/backend/packages/osm-fieldwork
 ```
 
 ## Configure

@@ -30,7 +30,7 @@ Notes for the reviewer. How to test this change?
 
 ## Checklist before requesting a review
 
-- 📖 Read the Field-TM Contributing Guide: <https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md>
+- 📖 Read the Field-TM Contributing Guide: <https://github.com/hotosm/field-tm/blob/main/CONTRIBUTING.md>
 - 📖 Read the HOT Code of Conduct: <https://docs.hotosm.org/code-of-conduct>
 - 👷‍♀️ Create small PRs. In most cases, this will be possible.
 - ✅ Provide tests for your changes.

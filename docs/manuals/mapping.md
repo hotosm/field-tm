@@ -246,4 +246,4 @@ To achieve this:
 
 ## Upcoming improvements
 
-Refer the milestone: <https://github.com/hotosm/fmtm/milestone/49>
+Refer the milestone: <https://github.com/hotosm/field-tm/milestone/49>

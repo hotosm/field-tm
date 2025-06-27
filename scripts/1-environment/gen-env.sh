@@ -354,7 +354,7 @@ generate_dotenv() {
     else
         echo "Downloading .env.example from repo."
         echo
-        curl -LO "https://raw.githubusercontent.com/hotosm/fmtm/${BRANCH_NAME:-dev}/.env.example"
+        curl -LO "https://raw.githubusercontent.com/hotosm/field-tm/${BRANCH_NAME:-dev}/.env.example"
 
         echo "substituting variables from .env.example --> ${DOTENV_NAME}"
         ./envsubst < .env.example > ${DOTENV_NAME}

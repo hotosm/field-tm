@@ -7,7 +7,7 @@ appVersion: "2025.3.1"
 maintainers:
 - email: sam.woodcock@hotosm.org
   name: Sam Woodcock
-home: https://github.com/hotosm/fmtm/tree/main/chart
+home: https://github.com/hotosm/field-tm/tree/main/chart
 icon: https://fmtm.hotosm.org/favicon.ico
 dependencies:
   - name: postgresql

@@ -3,8 +3,8 @@ site_description: Coordinated field mapping for Open Mapping campaigns.
 # strict: true
 site_url: "https://docs.fmtm.dev/"
 
-repo_name: "hotosm/fmtm"
-repo_url: "https://github.com/hotosm/fmtm/"
+repo_name: "hotosm/field-tm"
+repo_url: "https://github.com/hotosm/field-tm/"
 edit_uri: "edit/main/docs/"
 
 extra:

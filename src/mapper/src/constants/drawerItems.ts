@@ -16,7 +16,7 @@ export const defaultDrawerItems: drawerItemsType[] = [
 	},
 	{
 		name: m['header.support'](),
-		path: 'https://github.com/hotosm/fmtm/issues/',
+		path: 'https://github.com/hotosm/field-tm/issues/',
 	},
 	{
 		name: m['header.translate'](),

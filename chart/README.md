@@ -63,7 +63,7 @@ kubectl
 ## Deployment
 
 ```bash
-helm upgrade --install fmtm oci://ghcr.io/hotosm/fmtm --namespace fmtm
+helm upgrade --install fmtm oci://ghcr.io/hotosm/field-tm --namespace fmtm
 ```
 
 Chart values can be overridden using `values.yaml` or the `--set` flag.

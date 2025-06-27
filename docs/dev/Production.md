@@ -150,7 +150,7 @@ docker run --rm -i --entrypoint=tar \
 -u 0:0 \
 -v $PWD:/backups -v \
 fmtm-s3-data-${GIT_BRANCH}:/mnt/data \
-ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH} \
 -cvzf "/backups/$backup_filename" /mnt/data/
 ```
 
@@ -180,7 +180,7 @@ backup_filename=fmtm-s3-${GIT_BRANCH}-XXXX-XX-XX.tar.gz
 docker run --rm -i --entrypoint=tar \
 -u 0:0 --working-dir=/ \
 -v $backup_filename:/$backup_filename -v \
-ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH} \
 -xvzf "$backup_filename"
 ```
 

@@ -164,7 +164,7 @@ class Settings(BaseSettings):
     DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
     DEFAULT_ORG_EMAIL: Optional[str] = "sysadmin@hotosm.org"
     DEFAULT_ORG_LOGO_URL: Optional[str] = (
-        "https://raw.githubusercontent.com/hotosm/fmtm/refs/heads/dev/src/frontend/public/hot-org-logo.png"
+        "https://raw.githubusercontent.com/hotosm/field-tm/refs/heads/dev/src/frontend/public/hot-org-logo.png"
     )
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None

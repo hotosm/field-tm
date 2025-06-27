@@ -136,7 +136,7 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     volumes:
       - fmtm_logs:/opt/logs
     depends_on:
@@ -172,7 +172,7 @@ services:
   ui:
     # This service simply builds both frontends to volumes
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-dev}"
+    image: "ghcr.io/hotosm/field-tm/frontend:${GIT_BRANCH:-dev}"
     build:
       context: ../src
       dockerfile: Dockerfile.ui.prod
@@ -188,7 +188,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
     depends_on:
       proxy:
         condition: service_healthy
@@ -262,7 +262,7 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -359,7 +359,7 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     depends_on:
       proxy:
         condition: service_healthy
@@ -378,4 +378,4 @@ services:
     extends:
       file: ../compose.yaml
       service: scheduler
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"

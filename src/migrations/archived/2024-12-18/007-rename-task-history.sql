@@ -1,6 +1,6 @@
 -- ## Migration to:
 -- * Rename table task_history --> task_events.
--- * Rename columns https://github.com/hotosm/fmtm/issues/1610
+-- * Rename columns https://github.com/hotosm/field-tm/issues/1610
 
 -- Start a transaction
 BEGIN;

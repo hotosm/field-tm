@@ -10,5 +10,5 @@ With these, we can generate an mbtiles file from TMS, then also convert to PMTil
 ## Usage
 
 ```bash
-docker run --rm ghcr.io/hotosm/fmtm/basemap-generator:0.4.0 --help
+docker run --rm ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 --help
 ```

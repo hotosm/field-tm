@@ -24,7 +24,7 @@ and outsource to object storage like S3.
 
 ## Decision Outcome
 
-<https://github.com/hotosm/fmtm/pull/1047>
+<https://github.com/hotosm/field-tm/pull/1047>
 
 At the time of implementation (Dec 2023), `flatgeobuf` was selected as the best
 candidate. The frontend JS implementation is excellent.
