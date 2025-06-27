@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-odkcentral:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.3
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.0
     with:
       context: odkcentral/api
       image_tags: |
@@ -24,7 +24,7 @@ jobs:
       multi_arch: true
 
   build-odkcentral-ui:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.3
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.0
     with:
       context: odkcentral/ui
       image_tags: |
