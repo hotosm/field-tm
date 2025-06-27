@@ -14,7 +14,7 @@ on:
 
 jobs:
   pytest:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@3.3.0
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@3.3.1
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src
