@@ -15,7 +15,7 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-name: fmtm-dev
+name: fmtm-development
 
 volumes:
   fmtm_frontend:
