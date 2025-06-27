@@ -90,6 +90,7 @@ nav:
           - Pre-Commit: https://docs.hotosm.org/dev-guide/repo-management/pre-commit/
           - Versioning: https://docs.hotosm.org/dev-guide/repo-management/version-control/#creating-releases
           - Troubleshooting: dev/Troubleshooting.md
+          - Release Checklist: dev/release-checklist.md
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
