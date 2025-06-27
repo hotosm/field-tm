@@ -17,17 +17,10 @@ on:
 
 jobs:
   backend-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@3.3.0
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.0
     with:
-      image_name: ghcr.io/${{ github.repository }}/backend
-      build_context: src
-      build_dockerfile: backend/Dockerfile
-      pre_command: docker compose up -d && docker compose exec api /app-entrypoint.sh
-      compose_file: "compose.yaml"
-      compose_service: api
-      compose_command: pytest
-      tag_override: ci-${{ github.ref_name }}
-      coverage: true
+      environment: "test"
+      command: "test backend-with-coverage"
     secrets: inherit
 
   frontend-unit-test:
