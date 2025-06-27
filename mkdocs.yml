@@ -100,9 +100,6 @@ nav:
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: example-xlsforms/README.md
-  - Roadmap:
-      - User: https://github.com/hotosm/fmtm?tab=readme-ov-file#roadmap
-      - Development: https://roadmap.fmtm.dev
-      - Task Board: https://github.com/orgs/hotosm/projects/22/views/1?sliceBy%5BcolumnId%5D=Milestone
+  - Roadmap: https://roadmap.fmtm.dev
   - Timeline: timeline.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json
