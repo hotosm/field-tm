@@ -30,7 +30,7 @@ jobs:
 
   backend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.1
-    # needs: [backend-test]
+    needs: [backend-test]
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
