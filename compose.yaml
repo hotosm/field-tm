@@ -146,6 +146,8 @@ services:
       # External package mounts (testing)
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
+    environment:
+      DEBUG: ${DEBUG_OVERRIDE:-false}
     depends_on:
       proxy:
         condition: service_healthy
