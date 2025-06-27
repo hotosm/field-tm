@@ -135,51 +135,51 @@ services:
 
   api:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: api
   ui:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: ui
   central:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: central
   central-webhook:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: central-webhook
   pyxform:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: pyxform
   central-ui:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: central-ui
   s3:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: s3
   fmtm-db:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: fmtm-db
   electric:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: electric
   central-db:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: central-db
   migrations:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: migrations
   scheduler:
     extends:
-      file: compose.development.yaml
+      file: compose.dev.yaml
       service: scheduler
 
   backups:

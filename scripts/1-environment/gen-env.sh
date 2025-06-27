@@ -107,7 +107,7 @@ set_deploy_env() {
 
         case "$environment" in
             dev)
-                export BRANCH_NAME="development"
+                export BRANCH_NAME="dev"
                 break
                 ;;
             staging)
@@ -354,7 +354,7 @@ generate_dotenv() {
     else
         echo "Downloading .env.example from repo."
         echo
-        curl -LO "https://raw.githubusercontent.com/hotosm/fmtm/${BRANCH_NAME:-development}/.env.example"
+        curl -LO "https://raw.githubusercontent.com/hotosm/fmtm/${BRANCH_NAME:-dev}/.env.example"
 
         echo "substituting variables from .env.example --> ${DOTENV_NAME}"
         ./envsubst < .env.example > ${DOTENV_NAME}

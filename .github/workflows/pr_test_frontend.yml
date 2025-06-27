@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
     # Workflow is triggered only if src/frontend changes
     paths:
       - src/frontend/**

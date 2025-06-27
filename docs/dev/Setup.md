@@ -112,7 +112,7 @@ then click "Create pull request".
 
 This will open a new pull request in the Field-TM repository, where you can:
 
-- Select the branch you wish to merge into `development`.
+- Select the branch you wish to merge into `dev`.
 - Describe your changes and request that they be merged into the main codebase.
 
 That's it! You've now contributed to the Field Tasking Manager.
@@ -160,7 +160,7 @@ Then continue with the Field-TM installation.
 
 > Note: only tagged backend images are multi-architecture, supporting
 > MacOS. The regular images for fast continuous deployment are not:
-> `backend:development`, `backend:staging`, `backend:main`.
+> `backend:dev`, `backend:staging`, `backend:main`.
 
 ### A Note on Docker Desktop
 

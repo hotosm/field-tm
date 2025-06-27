@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
     paths:
       # Workflow is triggered only if deps change
       - "src/backend/pyproject.toml"

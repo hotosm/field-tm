@@ -371,7 +371,7 @@ One option to reduce the amount of content that needs to be downloaded
 is to do a shallow clone:
 
     ```bash
-    # Shallow clone only the `development` branch
+    # Shallow clone only the `dev` branch
     git clone --depth 1 --no-single-branch https://github.com/hotosm/fmtm.git
     ```
 

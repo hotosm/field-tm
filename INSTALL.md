@@ -144,8 +144,8 @@ Determine the what type of Field-TM install you would like:
 ```text
 main - the latest production
 staging - the latest staging
-development - the latest development (warning: may be unstable)
-local test - used during development, or to start a test version
+dev - the latest development (warning: may be unstable)
+local dev - used during development, or to start a test version
 ```
 
 The corresponding docker-compose files are:
@@ -153,7 +153,7 @@ The corresponding docker-compose files are:
 ```text
 main - deploy/compose.main.yaml
 staging - deploy/compose.staging.yaml
-development - deploy/compose.development.yaml
+dev - deploy/compose.dev.yaml
 local test - compose.yaml
 ```
 
@@ -163,7 +163,7 @@ Set your selection to a terminal variable to make the next step easier:
 export COMPOSE_FILE={your_selection}
 
 # E.g.
-export COMPOSE_FILE=deploy/compose.development.yaml
+export COMPOSE_FILE=deploy/compose.dev.yaml
 ```
 
 #### Pull the Images

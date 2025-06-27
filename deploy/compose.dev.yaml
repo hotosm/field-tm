@@ -172,7 +172,7 @@ services:
   ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-development}"
+    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-dev}"
     build:
       context: ../src
       dockerfile: Dockerfile.ui.prod
