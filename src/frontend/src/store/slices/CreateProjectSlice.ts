@@ -22,6 +22,7 @@ export const initialState: CreateProjectStateTypes = {
     project_admins: [],
     visibility: project_visibility.PUBLIC,
     use_odk_collect: false,
+    includeCentroid: false,
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
