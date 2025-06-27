@@ -57,7 +57,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   needs: [backend-build]
   #   environment:
-  #     name: ${{ github.ref_name }}
+  #     name: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
 
   #   steps:
   #     - name: Checkout repository
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [frontend-build]
     environment:
-      name: ${{ github.ref_name }}
+      name: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
 
     steps:
       - name: Checkout repository
@@ -158,6 +158,6 @@ jobs:
       - smoke-test-frontend
     uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.2.2
     with:
-      environment: ${{ github.ref_name }}
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       docker_compose_file: "deploy/compose.${{ github.ref_name }}.yaml"
     secrets: inherit
