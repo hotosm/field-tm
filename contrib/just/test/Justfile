@@ -32,8 +32,10 @@ backend:
 backend-with-coverage:
   #!/usr/bin/env sh
   set -eux
+
   just build backend
   docker compose up -d
+
   docker compose run --rm \
     --volume $PWD/coverage:/tmp/coverage \
     --entrypoint="sh -c" \
