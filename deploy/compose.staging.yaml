@@ -200,7 +200,7 @@ services:
     entrypoint: ["/backup-entrypoint.sh"]
     restart: "on-failure:2"
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+      test: pg_isready -h fmtm-db
       start_period: 5s
       interval: 10s
       timeout: 5s
