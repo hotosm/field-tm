@@ -292,6 +292,12 @@ Once you have deployed, you will need to check that you can properly authenticat
   }
   ```
 
+### Configure Custom Favicon
+
+- During deploy, place your `favicon.svg` in the root of the repo.
+- Run the deployment script, and the favicon + generated PNG version
+  will be used in your frontend deployment automatically.
+
 ### Configure Custom Sidebar Elements
 
 - By default Field-TM has a few items in the sidebar, like a link to a support

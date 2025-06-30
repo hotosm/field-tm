@@ -93,9 +93,3 @@ chart/charts
 
 # Paraglide dynamic translation
 src/translations/**/*
-
-# Favicon for inject into frontends
-src/frontend/public/favicon.svg
-src/frontend/public/favicon.png
-src/mapper/static/favicon.svg
-src/mapper/static/favicon.png
