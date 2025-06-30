@@ -24,6 +24,15 @@ default:
   cd {{justfile_directory()}}
   docker compose up -d
 
+# Production deploy, depending which branch on current
+[no-cd]
+prod:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  bash deploy/gen-and-deploy.sh
+
 # Start backend API only
 [no-cd]
 backend:
