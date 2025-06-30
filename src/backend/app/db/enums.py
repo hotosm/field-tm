@@ -167,14 +167,6 @@ class EntityState(IntEnum, Enum):
     MARKED_BAD = 6
 
 
-class TaskType(StrEnum, Enum):
-    """Task type."""
-
-    BUILDINGS = "BUILDINGS"
-    AMENITIES = "AMENITIES"
-    OTHER = "OTHER"
-
-
 class ProjectSplitStrategy(StrEnum, Enum):
     """Task splitting type."""
 
@@ -261,7 +253,7 @@ class XLSFormType(StrEnum, Enum):
     """
 
     buildings = "OSM Buildings"
-    # highways = "highways"
+    highways = "OSM Highways"
     health = "OSM Healthcare"
     # toilets = "toilets"
     # religious = "religious"
