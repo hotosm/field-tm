@@ -84,7 +84,8 @@ pull_and_rebuild_frontends() {
 deploy() {
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
-        docker compose -f - up -d)
+        docker compose -f - up --detach \
+        --remove-orphans --force-recreate)
 }
 
 install_envsubst_if_missing
