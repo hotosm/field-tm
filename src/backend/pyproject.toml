@@ -150,7 +150,7 @@ write-changes = true
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
-pyodk = { git = "https://github.com/hotosm/pyodk", rev = "master-modified" }
+pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
 
 [tool.uv.workspace]
 members = ["packages/*"]
