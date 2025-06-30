@@ -24,6 +24,7 @@ mod build 'contrib/just/build/Justfile'
 mod test 'contrib/just/test/Justfile'
 mod config 'contrib/just/config/Justfile'
 mod stats 'contrib/just/stats/Justfile'
+mod manage 'contrib/just/manage/Justfile'
 
 # Run the help script
 default:
