@@ -45,6 +45,9 @@ gen_current_env() {
 handle_favicon_override() {
     # Copy favicon to required directories, if present
     if [ -f favicon.svg ]; then
+        echo ""
+        echo "Found favicon.svg in repo root - bundling in frontend build"
+        echo ""
         # Pull ImageMagick container if not already present
         docker pull dpokidov/imagemagick:7.1.1-47
 
@@ -64,6 +67,8 @@ handle_favicon_override() {
         git update-index --assume-unchanged src/frontend/public/favicon.png
         git update-index --assume-unchanged src/mapper/static/favicon.svg
         git update-index --assume-unchanged src/mapper/static/favicon.png
+
+        echo "Successfully added custom favicon.svg and favicon.png to frontend"
     fi
 }
 
