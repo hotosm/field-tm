@@ -63,6 +63,11 @@ upgrade-db:
   cd {{justfile_directory()}}
   export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+  # If branch is 'dev', override to 'development'
+  if [ "$GIT_BRANCH" = "dev" ]; then
+    GIT_BRANCH="development"
+  fi
+
   just manage _install_envsubst
 
   export VOLUME_NAME=fmtm-db-data-${GIT_BRANCH}
