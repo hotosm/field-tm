@@ -16,7 +16,7 @@ importers:
         version: 0.3.4
       '@electric-sql/pglite-sync':
         specifier: ^0.3.5
-        version: 0.3.5(@electric-sql/pglite@0.3.4)
+        version: 0.3.7(@electric-sql/pglite@0.3.4)
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
@@ -706,10 +706,10 @@ packages:
     peerDependencies:
       '@electric-sql/client': 1.0.0
 
-  '@electric-sql/pglite-sync@0.3.5':
-    resolution: {integrity: sha512-YXoGNiZ0qK9PrwiD5bf0zpQGbUZP3ZfOeRMSmlBWYylHgCFjC2PGvk2mgbSi+Cg6JNiT9mAD75Sg/+lQv8aHVg==}
+  '@electric-sql/pglite-sync@0.3.7':
+    resolution: {integrity: sha512-sMlt3Y338VdhRUtbP3Vm/O6h6O9uqsSxwE52lHfOgRmeUv1zAymqgaeHzDztzpcEs2svfQbnKXetI/97mqqbEA==}
     peerDependencies:
-      '@electric-sql/pglite': 0.3.2
+      '@electric-sql/pglite': 0.3.4
 
   '@electric-sql/pglite@0.3.4':
     resolution: {integrity: sha512-h5hoL2GuxcWN8Q3+jtesIRem14iIvAZVEsTeUF6eO9RiUb6ar73QVIEW9t+Ud58iXAcAE2dFMtWqw3W2Oo4LDw==}
@@ -1283,6 +1283,11 @@ packages:
 
   '@rollup/rollup-darwin-arm64@4.28.0':
     resolution: {integrity: sha512-lmKx9yHsppblnLQZOGxdO66gT77bvdBtr/0P+TPOseowE7D9AJoBw8ZDULRasXRWf1Z86/gcOdpBrV6VDUY36Q==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@rollup/rollup-darwin-arm64@4.44.1':
+    resolution: {integrity: sha512-fM/xPesi7g2M7chk37LOnmnSTHLG/v2ggWqKj3CCA1rMA4mm5KVBT1fNoswbo1JhPuNNZrVwpTvlCVggv8A2zg==}
     cpu: [arm64]
     os: [darwin]
 
@@ -4821,7 +4826,7 @@ snapshots:
 
   '@electric-sql/client@1.0.0':
     optionalDependencies:
-      '@rollup/rollup-darwin-arm64': 4.28.0
+      '@rollup/rollup-darwin-arm64': 4.44.1
 
   '@electric-sql/client@1.0.5':
     dependencies:
@@ -4833,9 +4838,9 @@ snapshots:
     dependencies:
       '@electric-sql/client': 1.0.0
     optionalDependencies:
-      '@rollup/rollup-darwin-arm64': 4.28.0
+      '@rollup/rollup-darwin-arm64': 4.44.1
 
-  '@electric-sql/pglite-sync@0.3.5(@electric-sql/pglite@0.3.4)':
+  '@electric-sql/pglite-sync@0.3.7(@electric-sql/pglite@0.3.4)':
     dependencies:
       '@electric-sql/client': 1.0.0
       '@electric-sql/experimental': 1.0.0(@electric-sql/client@1.0.0)
@@ -5293,6 +5298,9 @@ snapshots:
     optional: true
 
   '@rollup/rollup-darwin-arm64@4.28.0':
+    optional: true
+
+  '@rollup/rollup-darwin-arm64@4.44.1':
     optional: true
 
   '@rollup/rollup-darwin-x64@4.28.0':
