@@ -287,7 +287,7 @@
 								{:else}
 									{#if drawerLabel}
 										<div
-											style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+											style="background: white; font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
 										>
 											{drawerLabel}
 										</div>
