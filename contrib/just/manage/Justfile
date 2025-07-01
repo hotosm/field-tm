@@ -16,6 +16,28 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Install envsubst
+[no-cd]
+[no-exit-message]
+_install_envsubst:
+  #!/usr/bin/env bash
+  if ! command -v curl &> /dev/null; then
+      sudo apt-get update
+      sudo apt-get install -y curl
+  fi
+
+  echo
+  # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+  # Use local version, as envsubst may be installed on system already
+  if [ -f ./envsubst ]; then
+      echo "envsubst already exists. Continuing."
+  else
+      echo "Downloading a8m/envsubst"
+      echo
+      curl -L "https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-$(uname -s)-$(uname -m)" -o envsubst
+      chmod +x envsubst
+  fi
+
 # Rename docker volume
 [no-cd]
 rename-volume oldname newname:
@@ -32,3 +54,18 @@ rename-volume oldname newname:
   echo ""
   echo "Renamed {{oldname}} to {{newname}}"
   echo "You can now safely delete {{oldname}}"
+
+# Upgrade Postgres 14 --> 16
+[no-cd]
+upgrade-db:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+  just manage _install_envsubst
+
+  export VOLUME_NAME=fmtm-db-data-${GIT_BRANCH}
+
+  ./envsubst -i contrib/pg-upgrade/compose.yaml | \
+    docker compose -f - up --abort-on-container-failure
