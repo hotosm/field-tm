@@ -35,8 +35,8 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
+from app.helpers.helper_crud import send_email
 from app.organisations.organisation_schemas import OrganisationIn, OrganisationOut
-from app.users.user_crud import send_mail
 from app.users.user_schemas import UserIn
 
 
@@ -201,6 +201,11 @@ async def send_organisation_approval_request(
         )
 
     admins = await DbUser.all(db, role=UserRole.ADMIN)
+    if not admins:
+        msg = "No instance admins configured!"
+        log.error(msg)
+        raise Exception(msg)
+
     admin_usernames = [admin.username for admin in admins]
     title = f"Creation of a new organization {organisation.name} was requested"
     message_content = dedent(f"""
@@ -226,11 +231,12 @@ async def send_organisation_approval_request(
 
     # Send email notification to primary organisation through their associated email
     # This was included because the primary organisation admins may not be OSM users
-    await send_mail(
-        user_emails=[primary_organisation.associated_email],
-        title=title,
-        message_content=message_content,
-    )
+    if primary_organisation.associated_email:
+        await send_email(
+            user_emails=[primary_organisation.associated_email],
+            title=title,
+            message_content=message_content,
+        )
 
     # Send OSM messages to all admins
     for username in admin_usernames:
