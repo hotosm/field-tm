@@ -28,6 +28,6 @@ jobs:
       cache_extra_imgs: |
         "ghcr.io/hotosm/postgis:14-3.5-alpine"
         "ghcr.io/hotosm/postgis:16-3.5-alpine"
-        "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
-        "mcr.microsoft.com/playwright:${{ vars.PLAYWRIGHT_TAG }}"
+        "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
+        "mcr.microsoft.com/playwright:v1.48.1"
     secrets: inherit

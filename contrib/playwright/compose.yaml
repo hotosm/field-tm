@@ -58,7 +58,7 @@ services:
   #     timeout: 5s
 
   ui-test:
-    image: "mcr.microsoft.com/playwright:${PLAYWRIGHT_TAG:-v1.48.1}"
+    image: "mcr.microsoft.com/playwright:v1.48.1"
     depends_on:
       # Starts the proxy and all other services
       proxy:
