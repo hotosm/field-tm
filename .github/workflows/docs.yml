@@ -13,6 +13,13 @@ on:
 jobs:
   # TODO need to also publish osm-fieldwork docs somewhere...
 
+  backend-test:
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
+    with:
+      environment: "test"
+      command: "test backend-with-coverage-upload"
+    secrets: inherit
+
   build_openapi_json:
     uses: hotosm/gh-workflows/.github/workflows/openapi_build.yml@3.3.2
     with:
