@@ -49,7 +49,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-1.6.2-rc1}"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -188,7 +188,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/field-tm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
     depends_on:
       proxy:
         condition: service_healthy
@@ -239,7 +239,7 @@ services:
       retries: 10
 
   central-webhook:
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.3.0}"
+    image: "ghcr.io/hotosm/central-webhook:0.3.0"
     depends_on:
       central:
         condition: service_healthy
@@ -262,14 +262,14 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
     volumes:
       - central_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
+    image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
     depends_on:
       proxy:
         condition: service_started
@@ -317,7 +317,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.12}"
+    image: "electricsql/electric:1.0.21"
     depends_on:
       proxy:
         condition: service_started
