@@ -19,14 +19,12 @@
 
 import csv
 import json
-from email.message import EmailMessage
 from io import BytesIO, StringIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Annotated
 from uuid import uuid4
 
-import aiosmtplib
 import requests
 from fastapi import (
     APIRouter,
@@ -58,6 +56,7 @@ from app.db.postgis_utils import (
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
+from app.helpers.helper_crud import send_email
 
 router = APIRouter(
     prefix="/helper",
@@ -338,29 +337,14 @@ async def send_test_osm_message(
 
 
 @router.post("/send-test-email")
-async def send_test_email():
+async def send_test_email(user_emails: list[str]):
     """Sends a test email using real SMTP settings."""
-    if not settings.emails_enabled:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_IMPLEMENTED,
-            detail="An SMTP server has not been configured.",
-        )
-    message = EmailMessage()
-    message["Subject"] = "Test email from Field-TM"
-    message.set_content("This is a test email sent from Field-TM.")
-
-    log.info("Sending test email to recipients")
-    await aiosmtplib.send(
-        message,
-        sender=settings.SMTP_USER,
-        # NOTE this is a test email, so use your own email address to receive it
-        recipients=[],  # List of recipient email addresses
-        hostname=settings.SMTP_HOST,
-        port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD,
+    log.info(f"Sending test email to recipients: {user_emails}")
+    await send_email(
+        user_emails=user_emails,
+        title="Test email from Field-TM",
+        message_content="This is a test email sent from Field-TM.",
     )
-
     return Response(
         status_code=HTTPStatus.OK,
     )

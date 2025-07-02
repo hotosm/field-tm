@@ -369,20 +369,17 @@ class Settings(BaseSettings):
         return None
 
     # SMTP Configurations
-    SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
-    SMTP_PORT: int = 587
     SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: Optional[str] = None
-    EMAILS_FROM_NAME: Optional[str] = "Field-TM"
+    SMTP_FROM_NAME: Optional[str] = "Field-TM"
 
     @computed_field
     @property
     def emails_enabled(self) -> bool:
         """Check if email settings are configured."""
-        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
+        return bool(self.SMTP_HOST and self.SMTP_USER)
 
 
 @lru_cache
