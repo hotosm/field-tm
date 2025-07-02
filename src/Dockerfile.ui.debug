@@ -13,9 +13,6 @@ COPY migrations /migrations
 COPY --from=code ./package.json ./pnpm-lock.yaml ./
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-# FIXME this npm install is a workaround due to https://github.com/nodejs/corepack/issues/627
-RUN npm install -g corepack@0.31.0
-# FIXME delete this line after fixed upstream
 RUN corepack enable && corepack install
 RUN pnpm install
 CMD ["pnpm", "run", "dev"]

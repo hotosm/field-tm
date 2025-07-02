@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Stroke, Style } from 'ol/style';
+import { Circle, Fill, Stroke, Style } from 'ol/style';
 import MapStyles from '@/hooks/MapStyles';
 import { MapContainer as MapComponent, useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
@@ -18,7 +18,7 @@ import getTaskStatusStyle, { getFeatureStatusStyle } from '@/utilfunctions/getTa
 import Button from '@/components/common/Button';
 import { EntityOsmMap } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { entity_state } from '@/types/enums';
+import { entity_state, GeoGeomTypesEnum } from '@/types/enums';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { GetEntityStatusList, GetOdkEntitiesGeojson, SyncTaskState } from '@/api/Project';
 import MapLegends from '@/components/MapLegends';
@@ -113,11 +113,30 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       }
 
       // apply style to the layer
-      layer?.setStyle(
-        new Style({
-          stroke: new Stroke({ color: 'rgb(215,63,62,1)', width: width }),
-        }),
-      );
+      if (projectInfo.primary_geom_type === 'POINT') {
+        layer?.setStyle(
+          new Style({
+            image: new Circle({
+              fill: new Fill({
+                color: 'rgba(250,17,0,0.4)',
+              }),
+              stroke: new Stroke({
+                color: 'rgba(250,17,0,0.4)',
+                width: width * 4,
+              }),
+              radius: 8,
+              declutterMode: 'obstacle',
+            }),
+            zIndex: 1,
+          }),
+        );
+      } else {
+        layer?.setStyle(
+          new Style({
+            stroke: new Stroke({ color: 'rgb(215,63,62,1)', width: width }),
+          }),
+        );
+      }
     }, 50);
 
     return () => clearInterval(interval);
@@ -213,7 +232,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
 
       // get features from layer excluding 'project-area'(task layer) i.e. get feature from data-extract & new-geoms layer
       const entityFeatures = map.getFeaturesAtPixel(evt.pixel, {
-        layerFilter: (layer) => layer.get('name') !== 'project-area',
+        layerFilter: (layer) => !['bad-entities-point', 'bad-entities', 'project-area'].includes(layer.get('name')),
       });
 
       // if the clicked point contains entity-related features, handle them; otherwise, check for task features
@@ -310,6 +329,25 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
               zIndex={5}
             />
           )}
+        {(projectInfo.primary_geom_type === GeoGeomTypesEnum.POINT ||
+          projectInfo.new_geom_type === GeoGeomTypesEnum.POINT) && (
+          <VectorLayer
+            geojson={badGeomFeatureCollection}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            layerProperties={{ name: 'bad-entities-point' }}
+            zIndex={5}
+            style=""
+            getTaskStatusStyle={(feature) => {
+              const geomType = feature.getGeometry().getType();
+              return getFeatureStatusStyle(geomType, mapTheme, 'MARKED_BAD', false);
+            }}
+          />
+        )}
         <VectorLayer
           geojson={badGeomFeatureCollection}
           viewProperties={{
@@ -339,7 +377,6 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             const status = entity_state[+featureProperty?.status];
             const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
             return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
-            return;
           }}
         />
         <AsyncPopup
@@ -360,7 +397,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             Sync Status
           </Button>
         </div>
-        <MapControlComponent map={map} projectName={projectInfo?.name || ''} pmTileLayerUrl={customBasemapUrl} />
+        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
       </MapComponent>
       {/* show entity selection popup only if multiple features overlap at the clicked point */}
       {overlappingEntityFeatures.length > 1 && (

@@ -32,7 +32,7 @@ _run_stats_script script_name:
   docker run --rm -d --name fmtm-stats \
     --network "$network" \
     -e DEBUG=True --env-file=./.env \
-    ghcr.io/hotosm/fmtm/backend:debug
+    ghcr.io/hotosm/field-tm/backend:debug
 
   docker exec fmtm-stats python /opt/stats/{{script_name}}
 

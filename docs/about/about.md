@@ -77,66 +77,14 @@ the [HOT Tasking Manager][5], which allows remote
 mappers to choose well-defined small "task" areas, ensuring full coverage
 of the project area and no unintended duplication of tasks.
 
-## Users
+## More Info
 
-There are three main user roles for using ODK's Select From Map feature:
-campaign managers, field mappers, and validators.
-
-### Campaign managers
-
-Campaign managers select an Area of Interest (AOI) and organize field mappers
-to go out and collect data. They need to:
-
-<img
-  align="right"
-  width="400px"
-  src="https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3"
-  alt="campaign-managers"
-/>
-
-- Select an AOI polygon by creating a GeoJSON or by tracing a polygon
-  in a Web map
-- Choose a task division scheme (number of features or area per task,
-  and possible variations on what features to use as the preferred splitting lines)
-- Provide specific instructions and guidance for field mappers on the project.
-- Provide a URL to a mobile-friendly Web page where field mappers can, from
-  their mobile phone, select a task that is not already "checked out"
-  (or possibly simply allocate areas to the field mappers).
-- See the status of tasks (open, "checked out", completed but not validated,
-  requires to rework, validated, etc) in the Web browser on their computer
-
-### Field mappers
-
-Field mappers select (or are allocated) individual tasks within a project AOI
-and use the ODK mobile app to gather data in those areas. They need to:
-
-- Visit a mobile-friendly Web page where they can see available tasks on a map
-- Choose an area and launch ODK Collect with the form corresponding to their
-  allocated area pre-loaded
-
-### Validators
-
-Validators review the data collected by field mappers and assess its quality.
-If the data is good, the validators merge the portion of the data that
-belongs in OpenStreetMap to OSM. If it requires more work, the validators
-either fix it themselves (for minor stuff like spelling or capitalization
-mistakes that don't seem to be systematic) or inform the field mappers
-that they need to fix it. They need to:
-
-- Access completed data sets of "submissions" as Comma Separated Values
-  and/or OSM XML so that they can review them.
-- Mark areas as validated or requiring rework
-- Communicate with field mappers if rework is necessary
-- Merge good-quality data into OSM (probably from JOSM).
-- Mark areas as completed and merged.
-
-## Info for developers
-
-For this visit the [Getting Started Page][6]
+For more information about FieldTM, see the [FAQ][6] and [Timeline][7].
 
 [1]: https://www.youtube.com/watch?v=GiLKRZpbtrc&\ab_channel=HumanitarianOpenStreetMapTeam
 [2]: https://hotosm.github.io/osm-fieldwork/
 [3]: https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk
 [4]: https://docs.fmtm.dev/CONTRIBUTING/
 [5]: https://tasks.hotosm.org/
-[6]: https://docs.fmtm.dev/dev/Setup/
+[6]: ./faq.md
+[7]: ../timeline.md

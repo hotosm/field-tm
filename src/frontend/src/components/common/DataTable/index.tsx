@@ -3,7 +3,7 @@ import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, useReactTa
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/RadixComponents/Table';
 import { paginationType } from '@/store/types/ICommon';
 import DataTablePagination from './DataTablePagination';
-import TableSkeleton from './DataTableSkeleton';
+import TableSkeleton from '@/components/Skeletons/common/DataTableSkeleton';
 
 export interface ColumnData {
   header: string;

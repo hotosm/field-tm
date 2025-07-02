@@ -6,6 +6,13 @@ labels: bug
 assignees: ""
 ---
 
+**Which server**
+
+- [ ] Dev
+- [ ] Stage
+- [ ] Prod
+- [ ] Other (please specify)
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

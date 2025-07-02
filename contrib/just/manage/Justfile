@@ -1,0 +1,76 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+#
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# Install envsubst
+[no-cd]
+[no-exit-message]
+_install_envsubst:
+  #!/usr/bin/env bash
+  if ! command -v curl &> /dev/null; then
+      sudo apt-get update
+      sudo apt-get install -y curl
+  fi
+
+  echo
+  # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+  # Use local version, as envsubst may be installed on system already
+  if [ -f ./envsubst ]; then
+      echo "envsubst already exists. Continuing."
+  else
+      echo "Downloading a8m/envsubst"
+      echo
+      curl -L "https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-$(uname -s)-$(uname -m)" -o envsubst
+      chmod +x envsubst
+  fi
+
+# Rename docker volume
+[no-cd]
+rename-volume oldname newname:
+  #!/usr/bin/env sh
+
+  docker volume create {{newname}}
+
+  docker run --rm \
+    -i \
+    -v {{oldname}}:/from \
+    -v {{newname}}:/to \
+    alpine ash -c "cd /from && cp -a . /to"
+
+  echo ""
+  echo "Renamed {{oldname}} to {{newname}}"
+  echo "You can now safely delete {{oldname}}"
+
+# Upgrade Postgres 14 --> 16
+[no-cd]
+upgrade-db:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+  # If branch is 'dev', override to 'development'
+  if [ "$GIT_BRANCH" = "dev" ]; then
+    GIT_BRANCH="development"
+  fi
+
+  just manage _install_envsubst
+
+  export VOLUME_NAME=fmtm-db-data-${GIT_BRANCH}
+
+  ./envsubst -i contrib/pg-upgrade/compose.yaml | \
+    docker compose -f - up --abort-on-container-failure

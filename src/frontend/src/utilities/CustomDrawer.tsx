@@ -57,7 +57,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'Support',
-      ref: 'https://github.com/hotosm/fmtm/issues/',
+      ref: 'https://github.com/hotosm/field-tm/issues/',
       isExternalLink: true,
       isActive: true,
     },

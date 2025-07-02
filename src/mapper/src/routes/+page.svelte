@@ -49,9 +49,8 @@
 		// Get db and make accessible via store
 		db = await data.dbPromise;
 		commonStore.setDb(db);
-	});
 
-	$effect(() => {
+		// Get the project summaries on load, depending if online or offline
 		if (online.current) {
 			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
 		} else {

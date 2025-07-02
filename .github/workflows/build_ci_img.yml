@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
     paths:
       # Workflow is triggered only if deps change
       - "src/backend/pyproject.toml"
@@ -16,7 +16,7 @@ on:
 
 jobs:
   backend-ci-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
       context: src
       dockerfile: backend/Dockerfile

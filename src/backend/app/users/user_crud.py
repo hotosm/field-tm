@@ -221,7 +221,7 @@ async def send_warning_email_or_osm(
 
 
 async def send_mail(
-    user_email: str,
+    user_emails: list[str],
     title: str,
     message_content: str,
 ):
@@ -235,10 +235,11 @@ async def send_mail(
     html_content = markdown.markdown(message_content)
     message.add_alternative(html_content, subtype="html")
 
+    log.debug(f"Sending email to {', '.join(user_emails)}")
     await aiosmtplib.send(
         message,
         sender=settings.SMTP_USER,
-        recipients=[user_email],
+        recipients=user_emails,
         hostname=settings.SMTP_HOST,
         port=settings.SMTP_PORT,
         username=settings.SMTP_USER,
@@ -287,7 +288,7 @@ async def send_invitation_message(
 
     elif signin_type == "google":
         await send_mail(
-            user_email=user_email,
+            user_emails=[user_email],
             title=title,
             message_content=message_content,
         )

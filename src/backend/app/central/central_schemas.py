@@ -131,7 +131,7 @@ ENTITY_FIELDS: list[NameTypeMapping] = [
     NameTypeMapping(name="timestamp", type="datetime"),
     NameTypeMapping(name="status", type="string"),
     NameTypeMapping(name="submission_ids", type="string"),
-    NameTypeMapping(name="is_new", type="string"),
+    NameTypeMapping(name="created_by", type="string"),
 ]
 
 RESERVED_KEYS = {
@@ -198,7 +198,7 @@ class EntityProperties(BaseModel):
     changeset: Optional[str] = None
     timestamp: Optional[str] = None
     status: Optional[str] = None
-    is_new: Optional[str] = None
+    created_by: Optional[str] = None
 
     @computed_field
     @property
@@ -262,8 +262,8 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
     updatedAt: Optional[str | datetime] = Field(exclude=True)  # noqa: N815
     status: Optional[EntityState] = None
     submission_ids: Optional[str] = None
-    is_new: Optional[bool] = None
     geometry: Optional[str] = None
+    created_by: Optional[str] = None
 
     @computed_field
     @property
@@ -276,14 +276,6 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
             )
         return self.updatedAt
 
-    @field_validator("is_new", mode="before")
-    @classmethod
-    def emoji_to_bool(cls, value: str, info: ValidationInfo) -> bool:
-        """Convert ✅ emoji to True values."""
-        if value == "✅":
-            return True
-        return False
-
 
 class EntityMappingStatusIn(BaseModel):
     """Update the mapping status for an Entity."""
@@ -291,6 +283,7 @@ class EntityMappingStatusIn(BaseModel):
     entity_id: str
     status: EntityState
     label: str
+    submission_ids: Optional[str] = None
 
     @field_validator("label", mode="before")
     @classmethod
@@ -336,3 +329,4 @@ class OdkEntitiesUpdate(BaseModel):
     """A small base model to update the OdkEntity status field only."""
 
     status: str  # this must be the str representation of the db enum
+    submission_ids: Optional[str] = None

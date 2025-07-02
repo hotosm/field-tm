@@ -371,8 +371,8 @@ One option to reduce the amount of content that needs to be downloaded
 is to do a shallow clone:
 
     ```bash
-    # Shallow clone only the `development` branch
-    git clone --depth 1 --no-single-branch https://github.com/hotosm/fmtm.git
+    # Shallow clone only the `dev` branch
+    git clone --depth 1 --no-single-branch https://github.com/hotosm/field-tm.git
     ```
 
 To pull additional branches as you need them (for example, to work on them):

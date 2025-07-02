@@ -11,14 +11,16 @@ ALTER TYPE public.projectpriority OWNER TO fmtm;
 CREATE TYPE public.projectstatus AS ENUM (
     'ARCHIVED',
     'PUBLISHED',
-    'DRAFT'
+    'DRAFT',
+    'COMPLETED'
 );
 ALTER TYPE public.projectstatus OWNER TO fmtm;
 
 CREATE TYPE public.projectvisibility AS ENUM (
     'PUBLIC',
     'PRIVATE',
-    'INVITE_ONLY'
+    'INVITE_ONLY',
+    'SENSITIVE'
 );
 ALTER TYPE public.projectvisibility OWNER TO fmtm;
 
@@ -32,6 +34,7 @@ ALTER TYPE public.mappinglevel OWNER TO fmtm;
 CREATE TYPE public.geomtype AS ENUM (
     'POINT',
     'POLYLINE',
+    'MULTIPOLYLINE',
     'POLYGON'
 );
 ALTER TYPE public.geomtype OWNER TO fmtm;

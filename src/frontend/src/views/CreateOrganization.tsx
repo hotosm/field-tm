@@ -5,7 +5,7 @@ import CreateEditOrganizationForm from '@/components/CreateEditOrganization/Crea
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
-import NoAccessComponent from '@/views/NoAccessComponent';
+import Forbidden from '@/views/Forbidden';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 
 const CreateOrganization = () => {
@@ -13,7 +13,7 @@ const CreateOrganization = () => {
   const isAdmin = useIsAdmin();
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
 
-  if (hasManagedAnyOrganization && !isAdmin) return <NoAccessComponent />;
+  if (hasManagedAnyOrganization && !isAdmin) return <Forbidden />;
 
   const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 

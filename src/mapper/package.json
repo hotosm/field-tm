@@ -1,6 +1,6 @@
 {
 	"name": "field-tm-mapper",
-	"version": "2025.3.0",
+	"version": "2025.3.1",
 	"type": "module",
 	"license": "(AGPL-3.0-only OR CC-BY-4.0)",
 	"private": true,
@@ -31,7 +31,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.16.0",
 		"@typescript-eslint/parser": "^8.16.0",
 		"@unocss/extractor-svelte": "^66.1.1",
-		"@unocss/transformer-directives": "66.1.1",
+		"@unocss/transformer-directives": "66.1.3",
 		"@vite-pwa/sveltekit": "^1.0.0",
 		"eslint": "^9.16.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -48,7 +48,7 @@
 		"vitest": "^2.1.6"
 	},
 	"dependencies": {
-		"@electric-sql/client": "1.0.4",
+		"@electric-sql/client": "1.0.5",
 		"@electric-sql/pglite": "^0.3.2",
 		"@electric-sql/pglite-sync": "^0.3.5",
 		"@hotosm/ui": "0.2.0-b5",

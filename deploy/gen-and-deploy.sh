@@ -34,12 +34,42 @@ gen_current_env() {
         done < <(grep -vE '^\s*#|^\s*$' .env)
     fi
 
-    # Generate compose file (default development, but can be overridden)
-    export GIT_BRANCH="${GIT_BRANCH:-development}"
+    # Generate compose file (default dev, but can be overridden)
+    export GIT_BRANCH="${GIT_BRANCH:-dev}"
     echo ""
     echo "Generated compose file:"
     echo ""
     ./envsubst -i deploy/compose.sub.yaml
+}
+
+handle_favicon_override() {
+    # Copy favicon to required directories, if present
+    if [ -f favicon.svg ]; then
+        echo ""
+        echo "Found favicon.svg in repo root - bundling in frontend build"
+        echo ""
+        # Pull ImageMagick container if not already present
+        docker pull dpokidov/imagemagick:7.1.1-47
+
+        # Convert SVG to PNG (32x32, aspect ratio preserved, transparent padding)
+        docker run --rm -v "$PWD":/repo --workdir /repo --entrypoint=/bin/sh \
+            dpokidov/imagemagick:7.1.1-47 \
+            -c "magick favicon.svg -resize 32x32 -background none -gravity center -extent 32x32 favicon.png"
+
+        # Copy to frontend and mapper static content
+        cp favicon.svg src/frontend/public/favicon.svg
+        cp favicon.svg src/mapper/static/favicon.svg
+        cp favicon.png src/frontend/public/favicon.png
+        cp favicon.png src/mapper/static/favicon.png
+
+        # Then prevent tracking of the changes once overridden
+        git update-index --assume-unchanged src/frontend/public/favicon.svg
+        git update-index --assume-unchanged src/frontend/public/favicon.png
+        git update-index --assume-unchanged src/mapper/static/favicon.svg
+        git update-index --assume-unchanged src/mapper/static/favicon.png
+
+        echo "Successfully added custom favicon.svg and favicon.png to frontend"
+    fi
 }
 
 pull_and_rebuild_frontends() {
@@ -47,6 +77,8 @@ pull_and_rebuild_frontends() {
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
         docker compose -f - pull)
+
+    handle_favicon_override
 
     # Rebuild frontends (required to have correct API vars)
     (export COMPOSE_BAKE=true && cd deploy &&
@@ -57,7 +89,8 @@ pull_and_rebuild_frontends() {
 deploy() {
     (cd deploy &&
         ../envsubst -i compose.sub.yaml | \
-        docker compose -f - up -d)
+        docker compose -f - up --detach \
+        --remove-orphans --force-recreate)
 }
 
 install_envsubst_if_missing

@@ -10,6 +10,16 @@ import {
 } from '@/api/OrganisationService';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import RadioButton from '@/components/common/RadioButton';
+import { radioOptionsType } from '@/models/organisation/organisationModel';
+import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+const odkTypeOptions: radioOptionsType[] = [
+  { name: 'odk_server_type', value: 'OWN', label: 'Own ODK server' },
+  { name: 'odk_server_type', value: 'HOT', label: "HOT's ODK server" },
+];
 
 const OrganizationForm = () => {
   const dispatch = useAppDispatch();
@@ -26,25 +36,27 @@ const OrganizationForm = () => {
   const organizationApprovalSuccess = useAppSelector(
     (state) => state.organisation.organizationApprovalStatus.isSuccess,
   );
+  const organisationFormDataLoading = useAppSelector((state) => state.organisation.organisationFormDataLoading);
 
   useEffect(() => {
     if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`));
+      dispatch(GetIndividualOrganizationService(`${VITE_API_URL}/organisation/${organizationId}`));
     }
   }, [organizationId]);
 
   const approveOrganization = () => {
     if (organizationId) {
       dispatch(
-        ApproveOrganizationService(
-          `${import.meta.env.VITE_API_URL}/organisation/approve?org_id=${parseInt(organizationId)}`,
-        ),
+        ApproveOrganizationService(`${VITE_API_URL}/organisation/approve`, {
+          org_id: +organizationId,
+          set_primary_org_odk_server: !organisationFormData?.odk_central_url,
+        }),
       );
     }
   };
 
   const rejectOrganization = () => {
-    dispatch(RejectOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/${organizationId}`));
+    dispatch(RejectOrganizationService(`${VITE_API_URL}/organisation/unapproved/${organizationId}`));
   };
 
   // redirect to manage-organization page after approve/reject success
@@ -55,6 +67,13 @@ const OrganizationForm = () => {
       navigate('/organization');
     }
   }, [organizationApprovalSuccess]);
+
+  if (organisationFormDataLoading)
+    return (
+      <div className="fmtm-bg-white fmtm-p-5">
+        <FormFieldSkeletonLoader count={8} />
+      </div>
+    );
 
   return (
     <div className="fmtm-max-w-[50rem] fmtm-bg-white fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-mx-auto">
@@ -100,15 +119,25 @@ const OrganizationForm = () => {
           onChange={() => {}}
           disabled
         />
-        <InputTextField
-          id="odk_central_url"
-          name="odk_central_url"
-          label="ODK Central URL "
-          value={organisationFormData?.odk_central_url}
-          onChange={() => {}}
-          fieldType="text"
-          disabled
+        <RadioButton
+          topic="ODK Server Type"
+          options={odkTypeOptions}
+          direction="column"
+          value={organisationFormData?.odk_central_url ? 'OWN' : 'HOT'}
+          onChangeData={() => {}}
+          className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
         />
+        {organisationFormData?.odk_central_url && (
+          <InputTextField
+            id="odk_central_url"
+            name="odk_central_url"
+            label="ODK Central URL "
+            value={organisationFormData?.odk_central_url}
+            onChange={() => {}}
+            fieldType="text"
+            disabled
+          />
+        )}
         <InputTextField
           id="url"
           name="url"

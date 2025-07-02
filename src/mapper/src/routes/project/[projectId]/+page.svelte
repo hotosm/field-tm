@@ -20,6 +20,7 @@
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { getProjectSetupStepStore, getCommonStore, getAlertStore } from '$store/common.svelte.ts';
 	import { readFileFromOPFS } from '$lib/fs/opfs';
@@ -60,6 +61,7 @@
 	let isGeometryCreationLoading: boolean = $state(false);
 	let timeout: NodeJS.Timeout | undefined = $state();
 
+	const loginStore = getLoginStore();
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
 	const commonStore = getCommonStore();
@@ -75,7 +77,8 @@
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
-		if (db && latestEvent) {
+		latestEvent;
+		if (db) {
 			taskStore.appendTaskStatesToFeatcol(db, projectId, project.tasks);
 		}
 	});
@@ -203,7 +206,7 @@
 
 		unsubscribeFromAllStreams();
 	});
-	
+
 	async function triggerManualOfflineDataSync() {
 		if (!db) return;
 		const success = await iterateAndSendOfflineSubmissions(db);
@@ -218,7 +221,7 @@
 		commonStore.setOfflineDataIsSyncing(false);
 
 		// This call has it's own loading param
-		await entitiesStore.syncEntityStatusManually(db, projectId)
+		await entitiesStore.syncEntityStatusManually(db, projectId);
 	}
 
 	async function handleOnlineSync() {
@@ -229,7 +232,7 @@
 		if (success) {
 			subscribeToAllStreams();
 		} else {
-			console.warn("Offline sync failed; subscribing to latest ShapeStreams anyway...");
+			console.warn('Offline sync failed; subscribing to latest ShapeStreams anyway...');
 			subscribeToAllStreams();
 		}
 	}
@@ -313,13 +316,21 @@
 			// NOTE the id field is the osm_id, not the entity id!
 			await entitiesStore.createEntity(db, projectId, entityUuid, {
 				type: 'FeatureCollection',
-				features: [{ type: 'Feature', id: newOsmId, geometry: newFeatureGeom, properties: {
-					project_id: projectId,
-					osm_id: newOsmId,
-					task_id: taskStore.selectedTaskIndex || '',
-					is_new: '✅', // NOTE usage of an emoji is valid here
-					status: '0', // TODO update this to use the enum / mapping
-				}}],
+				features: [
+					{
+						type: 'Feature',
+						id: newOsmId,
+						geometry: newFeatureGeom,
+						properties: {
+							project_id: projectId,
+							osm_id: newOsmId,
+							task_id: taskStore.selectedTaskIndex || '',
+							status: '0', // TODO update this to use the enum / mapping
+							// NOTE: 'osm|20386219' is the service user 'svcfmtm' (not a logged-in user).
+							created_by: loginStore.getAuthDetails?.sub || 'osm|20386219',
+						},
+					},
+				],
 			});
 			cancelMapNewFeatureInODK();
 
@@ -330,7 +341,7 @@
 				entitiesStore.updateEntityStatus(db, projectId, {
 					entity_id: entityUuid,
 					status: 1,
-					label: `Feature ${entityOsmId}`
+					label: `Feature ${entityOsmId}`,
 				});
 				displayWebFormsDrawer = true;
 			} else {
@@ -469,7 +480,7 @@
 						variant="primary"
 						loading={isGeometryCreationLoading}
 					>
-						<span>PROCEED</span>
+						<span>{m['popup.proceed']()}</span>
 					</sl-button>
 				</div>
 			</div>

@@ -3,7 +3,7 @@
 -- * Remove NOT NULL constraint from author_id in projects.
 
 -- Related issues:
--- https://github.com/hotosm/fmtm/issues/1999
+-- https://github.com/hotosm/field-tm/issues/1999
 
 -- Start a transaction
 

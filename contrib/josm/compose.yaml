@@ -20,7 +20,7 @@ networks:
 
 services:
   josm:
-    image: "ghcr.io/hotosm/fmtm/josm:latest"
+    image: "ghcr.io/hotosm/field-tm/josm:latest"
     build:
       context: contrib/josm
     container_name: josm
@@ -36,7 +36,7 @@ services:
     restart: "unless-stopped"
 
   josm-novnc:
-    image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
+    image: "ghcr.io/hotosm/field-tm/josm-novnc:latest"
     build:
       context: contrib/josm/novnc
     container_name: josm_novnc

@@ -57,13 +57,13 @@ export enum project_roles {
 export type MapGeomTypes = {
   POINT: 'POINT';
   POLYGON: 'POLYGON';
-  LINESTRING: 'LINESTRING';
+  POLYLINE: 'POLYLINE';
 };
 
 export enum GeoGeomTypesEnum {
-  POINT = 'Point',
-  POLYGON = 'Polygon',
-  LINESTRING = 'LineString',
+  POINT = 'POINT',
+  POLYGON = 'POLYGON',
+  POLYLINE = 'POLYLINE',
 }
 
 export enum submission_status {
@@ -82,4 +82,11 @@ export enum osm_forms {
 export enum project_visibility {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
+}
+
+export enum project_status {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+  COMPLETED = 'COMPLETED',
 }

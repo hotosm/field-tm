@@ -1,7 +1,7 @@
 repos:
   # Versioning: Commit messages & changelog
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.7.0
+    rev: v4.8.3
     hooks:
       - id: commitizen
         stages: [commit-msg]
@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.11.9"
+    rev: "v0.12.1"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.3
+    rev: 0.7.17
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -29,7 +29,7 @@ repos:
 
   # Upgrade: upgrade Python syntax
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1
+    rev: v3.20.0
     hooks:
       - id: pyupgrade
 
@@ -50,7 +50,7 @@ repos:
 
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pycontribs/mirrors-prettier
-    rev: v3.5.3
+    rev: v3.6.2
     hooks:
       - id: prettier
         args:
@@ -60,7 +60,6 @@ repos:
             "!chart/**",
             "!CHANGELOG.md",
             "!.all-contributorsrc",
-            "!CHANGELOG.md",
             "!src/frontend/pnpm-lock.yaml",
             "!src/mapper/pnpm-lock.yaml",
             "!src/mapper/src/lib/migrations/**",
@@ -84,7 +83,7 @@ repos:
 
   # Lint & Autoformat: SQL
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.0
+    rev: 3.4.1
     hooks:
       - id: sqlfluff-lint
         files: ^src/migrations/.*\.sql$
@@ -112,7 +111,7 @@ repos:
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.44.0
+    rev: v0.45.0
     hooks:
       - id: markdownlint
         args:
@@ -120,6 +119,8 @@ repos:
             --fix,
             --disable,
             MD033,
+            --disable,
+            MD059,
             --ignore,
             CHANGELOG.md,
             --ignore,

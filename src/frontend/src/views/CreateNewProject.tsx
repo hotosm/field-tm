@@ -12,11 +12,11 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import Prompt from '@/hooks/Prompt';
 import { useHasManagedAnyOrganization } from '@/hooks/usePermissions';
-import NoAccessComponent from '@/views/NoAccessComponent';
+import Forbidden from '@/views/Forbidden';
 
 const CreateNewProject = () => {
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-  if (!hasManagedAnyOrganization) return <NoAccessComponent />;
+  if (!hasManagedAnyOrganization) return <Forbidden />;
 
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -28,7 +28,6 @@ const CreateNewProject = () => {
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customDataExtractUpload, setCustomDataExtractUpload] = useState(null);
   const [xlsFormFile, setXlsFormFile] = useState(null);
-  const [additionalFeature, setAdditionalFeature] = useState(null);
 
   useEffect(() => {
     if (location.pathname !== '/create-project' && !projectDetails.name && !projectDetails.odk_central_url) {
@@ -71,7 +70,6 @@ const CreateNewProject = () => {
             geojsonFile={geojsonFile}
             setGeojsonFile={setGeojsonFile}
             setCustomDataExtractUpload={setCustomDataExtractUpload}
-            setAdditionalFeature={setAdditionalFeature}
           />
         );
       case '/upload-survey':
@@ -89,8 +87,6 @@ const CreateNewProject = () => {
             flag="create_project"
             customDataExtractUpload={customDataExtractUpload}
             setCustomDataExtractUpload={setCustomDataExtractUpload}
-            additionalFeature={additionalFeature}
-            setAdditionalFeature={setAdditionalFeature}
           />
         );
       case '/split-tasks':
@@ -99,7 +95,6 @@ const CreateNewProject = () => {
             flag="create_project"
             setGeojsonFile={setGeojsonFile}
             customDataExtractUpload={customDataExtractUpload}
-            additionalFeature={additionalFeature}
             xlsFormFile={xlsFormFile}
           />
         );

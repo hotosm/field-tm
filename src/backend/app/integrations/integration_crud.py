@@ -78,6 +78,7 @@ async def update_entity_status_in_fmtm(
 
     # Insert state into db
     new_state = odk_event.data.get("status")
+    submission_ids = odk_event.data.get("submission_ids", "")
 
     if new_state is None:
         log.warning(f"Missing entity state in webhook event: {odk_event.data}")
@@ -106,7 +107,7 @@ async def update_entity_status_in_fmtm(
     update_success = await DbOdkEntities.update(
         db,
         str(odk_event.id),
-        OdkEntitiesUpdate(status=new_entity_state),
+        OdkEntitiesUpdate(status=new_entity_state, submission_ids=submission_ids),
     )
     if not update_success:
         raise HTTPException(

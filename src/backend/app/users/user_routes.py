@@ -37,9 +37,9 @@ from app.auth.auth_deps import AuthUser, login_required
 from app.auth.auth_schemas import OrgUserDict
 from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import (
+    Mapper,
     ProjectUserDict,
     field_manager,
-    mapper,
     super_admin,
 )
 from app.config import settings
@@ -95,7 +95,7 @@ async def get_userlist(
 
 
 @router.get("/user-role-options")
-async def get_user_roles(_: Annotated[DbUser, Depends(mapper)]):
+async def get_user_roles(_: Annotated[DbUser, Depends(Mapper())]):
     """Check for available user role options."""
     user_roles = {}
     for role in UserRoleEnum:

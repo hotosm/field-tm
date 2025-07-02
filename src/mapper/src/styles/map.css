@@ -114,21 +114,21 @@
 }
 
 .select-entities-modal .header .status.READY {
-	--at-apply: bg-gray-200 text-gray-600;
+	color: var(--entity-ready);
 }
 
 .select-entities-modal .header .status.OPENED_IN_ODK {
-	--at-apply: bg-yellow-100 text-yellow-600;
+	color: var(--entity-opened-in-odk);
 }
 
 .select-entities-modal .header .status.SURVEY_SUBMITTED {
-	--at-apply: bg-green-100 text-green-600;
+	color: var(--entity-survey-submitted);
 }
 
 .select-entities-modal .header .status.MARKED_BAD {
-	--at-apply: bg-red-100 text-red-600;
+	color: var(--entity-marked-bad);
 }
 
 .select-entities-modal .header .status.VALIDATED {
-	--at-apply: bg-blue-100 text-blue-600;
+	color: var(--entity-validated);
 }

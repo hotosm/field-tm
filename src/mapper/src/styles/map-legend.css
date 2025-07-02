@@ -27,17 +27,17 @@
 }
 
 .map-legend .entity-status .ready {
-	background-color: var(--sl-color-neutral-300);
+	background-color: var(--entity-ready);
 }
 
 .map-legend .entity-status .opened-in-odk {
-	background-color: var(--sl-color-warning-700);
+	background-color: var(--entity-opened-in-odk);
 }
 
 .map-legend .entity-status .submitted {
-	background-color: var(--sl-color-success-700);
+	background-color: var(--entity-validated);
 }
 
 .map-legend .entity-status .bad {
-	background-color: var(--sl-color-primary-700);
+	background-color: var(--entity-marked-bad);
 }

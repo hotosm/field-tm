@@ -12,8 +12,9 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Accordion from '@/components/common/Accordion';
 import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
-import { convertCoordinateStringToFeature, extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
-import { submission_status } from '@/types/enums';
+import { extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
+import { project_status, submission_status } from '@/types/enums';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 function removeNullValues(obj: Record<string, any>) {
   const newObj = {};
@@ -48,6 +49,9 @@ const SubmissionDetails = () => {
   const taskId = submissionDetails?.task_id ? submissionDetails?.task_id : '-';
   const submissionPhotosLoading = useAppSelector((state) => state.submission.submissionPhotosLoading);
   const submissionPhotos = useAppSelector((state) => state.submission.submissionPhotos);
+
+  const isProjectManager = useIsProjectManager(projectId as string);
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectDashboardDetail?.organisation_id as number);
 
   const { start, end, today, deviceid, new_feature, ...restSubmissionDetails } = submissionDetails || {};
   const dateDeviceDetails = { start, end, today, deviceid };
@@ -189,28 +193,32 @@ const SubmissionDetails = () => {
                   </h2>
                 </div>
               )}
-              <div className="fmtm-mt-8">
-                <Button
-                  variant="primary-red"
-                  onClick={() => {
-                    dispatch(
-                      SubmissionActions.SetUpdateReviewStatusModal({
-                        toggleModalStatus: true,
-                        instanceId: paramsInstanceId,
-                        projectId: projectId,
-                        taskId: taskId,
-                        reviewState: restSubmissionDetails?.__system?.reviewState,
-                        taskUid: taskUid,
-                        entity_id: restSubmissionDetails?.feature,
-                        label: restSubmissionDetails?.meta?.entity?.label,
-                      }),
-                    );
-                  }}
-                  disabled={submissionDetailsLoading}
-                >
-                  Update Review Status
-                </Button>
-              </div>
+              {!projectDashboardLoading &&
+                (isProjectManager || isOrganizationAdmin) &&
+                projectDashboardDetail?.status === project_status.PUBLISHED && (
+                  <div className="fmtm-mt-8">
+                    <Button
+                      variant="primary-red"
+                      onClick={() => {
+                        dispatch(
+                          SubmissionActions.SetUpdateReviewStatusModal({
+                            toggleModalStatus: true,
+                            instanceId: paramsInstanceId,
+                            projectId: projectId,
+                            taskId: taskId,
+                            reviewState: restSubmissionDetails?.__system?.reviewState,
+                            taskUid: taskUid,
+                            entity_id: restSubmissionDetails?.feature,
+                            label: restSubmissionDetails?.meta?.entity?.label,
+                          }),
+                        );
+                      }}
+                      disabled={submissionDetailsLoading}
+                    >
+                      Update Review Status
+                    </Button>
+                  </div>
+                )}
             </div>
 
             {/* start, end, today, deviceid values */}

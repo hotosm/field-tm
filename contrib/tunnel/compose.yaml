@@ -31,7 +31,7 @@ services:
     command: tunnel --url http://central:8383
 
   button:
-    image: "ghcr.io/hotosm/fmtm/frontend:button"
+    image: "ghcr.io/hotosm/field-tm/frontend:button"
     build:
       context: ./src
       additional_contexts:

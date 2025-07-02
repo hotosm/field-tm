@@ -3,10 +3,18 @@ import { useParams } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import { useAppSelector } from '@/types/reduxTypes';
-import { entity_state } from '@/types/enums';
+import { entity_state, project_status } from '@/types/enums';
 import { EntityOsmMap } from '@/models/project/projectModel';
-import { ProjectInfoSkeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import CoreModules from '@/shared/CoreModules';
+import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';
+import StatusChip from '@/components/common/StatusChip';
+
+const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
+  [project_status.DRAFT]: 'default',
+  [project_status.PUBLISHED]: 'info',
+  [project_status.COMPLETED]: 'success',
+  [project_status.ARCHIVED]: 'error',
+};
 
 const ProjectInfo: React.FC = () => {
   const params = useParams();
@@ -44,9 +52,7 @@ const ProjectInfo: React.FC = () => {
   }, null);
 
   const projectTotalFeatures: number = projectEntities.length;
-  const projectMappedFeatures: number = projectEntities.filter(
-    (entity: EntityOsmMap) => entity.status === entity_state.SURVEY_SUBMITTED,
-  ).length;
+  const projectMappedFeatures: number = projectEntities.filter((entity: EntityOsmMap) => entity.status > 1).length;
 
   useEffect(() => {
     if (paraRef.current) {
@@ -56,10 +62,9 @@ const ProjectInfo: React.FC = () => {
     }
   }, [projectInfo, paraRef.current]);
 
-  if (projectDetailsLoading) return <ProjectInfoSkeletonLoader />;
+  if (projectDetailsLoading) return <ProjectInfoSkeleton />;
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-overflow-y-scroll scrollbar fmtm-pr-1 fmtm-pb-6">
-      {/* <ProjectInfoSkeletonLoader /> */}
       <div>
         <p className="fmtm-button fmtm-text-red-medium">Description</p>
         <div>
@@ -78,11 +83,18 @@ const ProjectInfo: React.FC = () => {
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project ID</p>
-        <p className="fmtm-body-md fmtm-text-grey-800">#{projectInfo?.id}</p>
+        <p className="fmtm-body-md fmtm-text-grey-800">#{projectInfo.id}</p>
+      </div>
+      <div>
+        <p className="fmtm-button fmtm-text-grey-900">Project Status</p>
+        <StatusChip
+          label={projectInfo.status?.toLowerCase() || ''}
+          status={projectStatusVariantMap[projectInfo.status as project_status]}
+        />
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Project Area</p>
-        <p className="fmtm-body-md fmtm-text-grey-800">{projectInfo?.location_str || '-'}</p>
+        <p className="fmtm-body-md fmtm-text-grey-800">{projectInfo.location_str || '-'}</p>
       </div>
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Last Contribution</p>

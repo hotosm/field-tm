@@ -31,25 +31,21 @@ to drive dashboards, analytics, task assignments, and reactive sync through Elec
 ## Considered Options
 
 1. Polling Central API
-
    - **Pros**: Supported today; no custom development needed.
    - **Cons**: Inefficient, introduces latency, doesn’t scale well for
      real-time updates.
 
 2. Direct database access
-
    - **Pros**: Real-time access; no API limitations.
    - **Cons**: Requires FieldTM and Central to be co-deployed; tightly couples
      services and prevents usage with remote/shared instances.
 
 3. Existing middleware/integration tools (e.g. OpenHIM, Zapier, Activepieces)
-
    - **Pros**: Off-the-shelf options; little code.
    - **Cons**: Complex setup or limited flexibility; often still require polling;
      not a good fit for our lightweight infra.
 
 4. Custom webhook service using ODK audit logs (chosen)
-
    - **Pros**: Fully decoupled; real-time-ish with small footprint; extendable.
    - **Cons**: Requires ongoing maintenance; relies on parsing Central
      audit logs (not officially a webhook API).

@@ -6,6 +6,7 @@ import {
   projectTaskBoundriesType,
   tileType,
 } from '@/models/project/projectModel';
+import { project_status } from '@/types/enums';
 
 export type ProjectStateTypes = {
   projectTaskBoundries: projectTaskBoundriesType[];
@@ -39,6 +40,7 @@ export type ProjectStateTypes = {
   badGeomFeatureCollection: FeatureCollectionType;
   newGeomFeatureCollection: FeatureCollectionType;
   OdkEntitiesGeojsonLoading: boolean;
+  isEntityDeleting: Record<string, boolean>;
 };
 
 type projectCommentsListTypes = {
@@ -69,7 +71,14 @@ export type FeatureCollectionType = {
 };
 
 export type featureType = {
+  id?: string;
   type: 'Feature';
   geometry: { type: string; coordinates: number[][][] };
   properties: Record<string, any>;
+};
+
+export type projectStatusOptionsType = {
+  name: string;
+  value: project_status;
+  label: string;
 };

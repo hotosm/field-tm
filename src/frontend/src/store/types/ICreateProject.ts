@@ -1,4 +1,4 @@
-import { task_split_type, MapGeomTypes, project_visibility } from '@/types/enums';
+import { task_split_type, MapGeomTypes, project_visibility, project_status } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -35,7 +35,6 @@ export type CreateProjectStateTypes = {
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  additionalFeatureGeojson: GeoJSONFeatureTypes | null;
   descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
@@ -77,7 +76,7 @@ type EditProjectResponseTypes = {
   name: string;
   short_description: string;
   description: string;
-  status: number;
+  status: project_status;
   outline: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
   osm_category: string;
@@ -110,13 +109,14 @@ export type ProjectDetailsTypes = {
   custom_tms_url: string;
   hasCustomTMS: boolean;
   xlsFormFileUpload: any;
-  hasAdditionalFeature: boolean;
   primaryGeomType: MapGeomTypes;
+  includeCentroid: boolean;
   useMixedGeomTypes: boolean;
   newGeomType: MapGeomTypes;
   project_admins: number[];
   visibility: project_visibility;
   use_odk_collect: boolean;
+  status: project_status;
 };
 
 export type FormCategoryListTypes = {

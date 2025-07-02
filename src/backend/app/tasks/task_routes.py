@@ -31,7 +31,7 @@ from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.providers.osm import init_osm_auth
-from app.auth.roles import mapper, super_admin
+from app.auth.roles import Mapper, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, TaskEvent
 from app.db.models import DbProjectTeam, DbTask, DbTaskEvent, DbUser
@@ -49,7 +49,7 @@ router = APIRouter(
 async def read_tasks(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get all task details for a project."""
     return await DbTask.all(db, project_id)
@@ -67,7 +67,7 @@ async def get_tasks_near_me(
 async def task_activity(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     days: int = 10,
 ):
     """Get the number of mapped or validated tasks on each day.
@@ -88,7 +88,7 @@ async def task_activity(
 async def get_specific_task(
     task_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
     """Get a specific task by it's ID."""
     try:
@@ -102,7 +102,7 @@ async def add_new_task_event(
     request: Request,
     task: Annotated[DbTask, Depends(task_deps.get_task)],
     new_event: task_schemas.TaskEventIn,
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
     db: Annotated[Connection, Depends(db_conn)],
     osm_auth: Annotated[Auth, Depends(init_osm_auth)],
     team: Annotated[Optional[DbProjectTeam], Depends(project_deps.get_project_team)],
@@ -146,7 +146,7 @@ async def add_new_task_event(
 async def get_task_event_history(
     task_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     days: int = 10,
     comments: bool = False,
 ):

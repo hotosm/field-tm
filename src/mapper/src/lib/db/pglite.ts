@@ -13,7 +13,11 @@ import tables from '$migrations/init/shared/2-tables.sql?raw';
 import constraints from '$migrations/init/shared/3-constraints.sql?raw';
 import indexes from '$migrations/init/shared/4-indexes.sql?raw';
 import frontendOnlySchema from '$migrations/init/frontend-only/schema.sql?raw';
-const migrationFiles = import.meta.glob('$migrations/*.sql', { as: 'raw', eager: true });
+const migrationFiles = import.meta.glob('$migrations/*.sql', {
+	query: '?raw',
+	import: 'default',
+	eager: true,
+});
 
 // To prevent loading the PGLite database twice, we wrap the
 // initDb function in a top-level singleton that guarantees

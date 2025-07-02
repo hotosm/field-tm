@@ -34,7 +34,7 @@ classifiers = [
 [project.urls]
 homepage = "https://hotosm.github.io/osm-fieldwork"
 documentation = "https://hotosm.github.io/osm-fieldwork"
-repository = "https://github.com/hotosm/fmtm/blob/main/src/backend/packages/osm-fieldwork"
+repository = "https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork"
 
 [dependency-groups]
 docs = [

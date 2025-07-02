@@ -93,3 +93,7 @@ chart/charts
 
 # Paraglide dynamic translation
 src/translations/**/*
+
+# Favicon overrides
+favicon.svg
+favicon.png

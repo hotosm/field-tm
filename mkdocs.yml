@@ -3,8 +3,8 @@ site_description: Coordinated field mapping for Open Mapping campaigns.
 # strict: true
 site_url: "https://docs.fmtm.dev/"
 
-repo_name: "hotosm/fmtm"
-repo_url: "https://github.com/hotosm/fmtm/"
+repo_name: "hotosm/field-tm"
+repo_url: "https://github.com/hotosm/field-tm/"
 edit_uri: "edit/main/docs/"
 
 extra:
@@ -77,7 +77,7 @@ nav:
       - Mapper Guide: manuals/mapping.md
       - Project Manager Guide: manuals/project-managers.md
       - Video Guides: manuals/videos.md
-      - User Types Explanation: manuals/user-types-explained.md
+      - FieldTM Roles: manuals/user-types-explained.md
       - Workflow Diagrams: manuals/workflow-diagrams.md
       - XLSForm Design: manuals/xlsform-design.md
       - Field Mapping Examples: manuals/field-mapping-examples.md
@@ -90,6 +90,7 @@ nav:
           - Pre-Commit: https://docs.hotosm.org/dev-guide/repo-management/pre-commit/
           - Versioning: https://docs.hotosm.org/dev-guide/repo-management/version-control/#creating-releases
           - Troubleshooting: dev/Troubleshooting.md
+          - Release Checklist: dev/release-checklist.md
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
@@ -100,9 +101,6 @@ nav:
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: example-xlsforms/README.md
-  - Roadmap:
-      - User: https://github.com/hotosm/fmtm?tab=readme-ov-file#roadmap
-      - Development: https://roadmap.fmtm.dev
-      - Task Board: https://github.com/orgs/hotosm/projects/22/views/1?sliceBy%5BcolumnId%5D=Milestone
+  - Roadmap: https://roadmap.fmtm.dev
   - Timeline: timeline.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json

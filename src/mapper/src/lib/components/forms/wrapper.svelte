@@ -20,7 +20,10 @@
 		webFormsRef: HTMLElement | undefined;
 	};
 
-	const WEB_FORMS_IFRAME_ID = "7f86f661-efd6-4cc6-b068-48dd7eb53dbb";
+	const WEB_FORMS_IFRAME_ID = '7f86f661-efd6-4cc6-b068-48dd7eb53dbb';
+
+	// example: convert mapper.fmtm.localhost to fmtm.localhost
+	const FMTM_DOMAIN = window.location.hostname.replace('mapper.', '');
 
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
@@ -29,7 +32,14 @@
 
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 
-	let { display = $bindable(false), entityId, webFormsRef = $bindable(undefined), projectId, formXml, taskId }: Props = $props();
+	let {
+		display = $bindable(false),
+		entityId,
+		webFormsRef = $bindable(undefined),
+		projectId,
+		formXml,
+		taskId,
+	}: Props = $props();
 	let drawerRef: SlDrawer;
 	let odkForm: any;
 	let startDate: string | undefined;
@@ -41,10 +51,10 @@
 	const odkWebFormPromise = fetchCachedBlobUrl(
 		'https://hotosm.github.io/web-forms/odk-web-form.js',
 		commonStore.config.cacheName,
-		true // clean old cache entries
+		true, // clean old cache entries
 	);
 
-	const webFormPagePromise = fetchCachedBlobUrl("/web-forms.html", commonStore.config.cacheName, true);
+	const webFormPagePromise = fetchCachedBlobUrl('/web-forms.html', commonStore.config.cacheName, true);
 
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
@@ -58,13 +68,20 @@
 
 		// feature exists question isn't in the payload if it was intentionally hidden because it's a new feature
 		// the verification question is also hidden because it depends on the feature_exists question
-		if (!submissionXml.includes("<feature_exists>") && selectedEntity.is_new) {
-			submissionXml = submissionXml.replace('<survey_questions>', `<feature_exists>yes</feature_exists><survey_questions>`);
-			submissionXml = submissionXml.replace('</survey_questions>', `</survey_questions><verification><digitisation_correct>yes</digitisation_correct></verification>`);
+		if (!submissionXml.includes('<feature_exists>') && selectedEntity.is_new) {
+			submissionXml = submissionXml.replace(
+				'<survey_questions>',
+				`<feature_exists>yes</feature_exists><survey_questions>`,
+			);
+			submissionXml = submissionXml.replace(
+				'</survey_questions>',
+				`</survey_questions><verification><digitisation_correct>yes</digitisation_correct></verification>`,
+			);
 		}
 
 		submissionXml = submissionXml.replace('<start/>', `<start>${startDate}</start>`);
 		submissionXml = submissionXml.replace('<end/>', `<end>${new Date().toISOString()}</end>`);
+		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split('T')[0]}</today>`);
 
 		const authDetails = loginStore?.getAuthDetails;
 		if (authDetails?.username) {
@@ -81,7 +98,7 @@
 			submissionXml = submissionXml.replace('<warmup/>', `<warmup>${latitude} ${longitude} 0.0 0.0</warmup>`);
 		}
 
-		submissionXml = submissionXml.replace('<deviceid/>', `<deviceid>${getDeviceId()}</deviceid>`);
+		submissionXml = submissionXml.replace('<deviceid/>', `<deviceid>${FMTM_DOMAIN}:${getDeviceId()}</deviceid>`);
 
 		return submissionXml;
 	}
@@ -98,11 +115,19 @@
 			entityStatus = 2; // SURVEY_SUBMITTED
 		}
 
+		const submissionIdMatch = submissionXml.match(/<submission_ids>(.*?)<\/submission_ids>/);
+		let submissionIds = submissionIdMatch?.[1] ?? '';
+
+		if (selectedEntity?.submission_ids) {
+			submissionIds = `${selectedEntity.submission_ids},${submissionIds}`;
+		}
+
 		entitiesStore.updateEntityStatus(db, projectId, {
 			entity_id: selectedEntity?.entity_id,
 			status: entityStatus,
 			// NOTE here we don't translate the field as English values are always saved as the Entity label
 			label: `Feature ${selectedEntity?.osm_id}`,
+			submission_ids: submissionIds,
 		});
 	}
 
@@ -179,14 +204,15 @@
 			if (selectedEntity?.osm_id) {
 				nodes.find((it: any) => it.definition.nodeset === '/data/xid')?.setValueState(`${selectedEntity?.osm_id}`);
 			}
-
-			if (selectedEntity?.geometry) {
-				nodes.find((it: any) => it.definition.nodeset === '/data/xlocation')?.setValueState(selectedEntity?.geometry);
+			if (entitiesStore.selectedEntityJavaRosaGeom || selectedEntity?.geometry) {
+				nodes
+					.find((it: any) => it.definition.nodeset === '/data/xlocation')
+					?.setValueState(entitiesStore.selectedEntityJavaRosaGeom || selectedEntity?.geometry);
 			}
 
 			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
 			if (featureExistsNode && selectedEntity.is_new) {
-				featureExistsNode?.setValueState("yes");
+				featureExistsNode?.setValueState('yes');
 
 				// hide this node because we don't need to see it after setting the value
 				featureExistsNode.state.clientState.relevant = false;
@@ -261,15 +287,14 @@
 								{:else}
 									{#if drawerLabel}
 										<div
-											style="font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+											style="background: white; font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
 										>
 											{drawerLabel}
 										</div>
 									{/if}
 									<iframe
 										class="iframe"
-										style:border="none"
-										style:height="100%"
+										style="border: none; height: 100%; height: -webkit-fill-available;"
 										use:handleIframe
 										title="odk-web-forms-wrapper"
 										id={WEB_FORMS_IFRAME_ID}

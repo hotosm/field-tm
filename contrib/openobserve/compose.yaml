@@ -17,7 +17,7 @@
 
 volumes:
   fmtm_monitoring_data:
-    name: fmtm-monitoring-data-${GIT_BRANCH:-local}
+    name: fmtm-monitoring-data-local
 
 networks:
   fmtm-net:

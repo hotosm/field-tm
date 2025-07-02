@@ -57,11 +57,18 @@ const initialState: themeStateType = {
         UNLOCKED_DONE: 'rgba(64, 172, 140, 0.3)',
       },
       entityStatusColors: {
-        ready: 'rgba(255,255,255, 0.3)',
-        opened_in_odk: 'rgb(252,236,164,0.3)',
-        survey_submitted: 'rgba(64, 172, 140, 0.8)',
-        marked_bad: 'rgba(250, 17, 0, 0.3)',
-        validated: 'rgba(0, 123, 255, 0.3)',
+        ready: 'rgba(156,154,154,1)',
+        opened_in_odk: 'rgb(252,236,164,1)',
+        survey_submitted: 'rgba(64,172,140,1)',
+        marked_bad: 'rgba(250,17,0,1)',
+        validated: 'rgba(0,123,255,1)',
+      },
+      lineEntityStatusColors: {
+        ready: 'rgba(156,154,154,0.8)',
+        opened_in_odk: 'rgb(252,236,164,1)',
+        survey_submitted: 'rgba(64,172,140,0.8)',
+        marked_bad: 'rgba(250,17,0,0.8)',
+        validated: 'rgba(0,123,255,0.8)',
       },
     },
     statusTextTheme: {

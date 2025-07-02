@@ -14,14 +14,14 @@ import { TaskActions } from '@/store/slices/TaskSlice';
 import { AppDispatch } from '@/store/Store';
 import { featureType } from '@/store/types/IProject';
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
 export const ProjectById = (projectId: string) => {
   return async (dispatch: AppDispatch) => {
     const fetchProjectById = async (projectId: string) => {
       try {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
-        const project = await CoreModules.axios.get(
-          `${import.meta.env.VITE_API_URL}/projects/${projectId}?project_id=${projectId}`,
-        );
+        const project = await CoreModules.axios.get(`${VITE_API_URL}/projects/${projectId}?project_id=${projectId}`);
         const projectResp: projectInfoType = project.data;
         const persistingValues = projectResp.tasks.map((data) => {
           return {
@@ -61,6 +61,9 @@ export const ProjectById = (projectId: string) => {
             created_at: projectResp?.created_at,
             visibility: projectResp.visibility,
             use_odk_collect: projectResp.use_odk_collect,
+            primary_geom_type: projectResp.primary_geom_type,
+            new_geom_type: projectResp.new_geom_type,
+            status: projectResp.status,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
@@ -162,7 +165,7 @@ export const GenerateProjectTiles = (url: string, projectId: string, data: objec
     const generateProjectTiles = async (url: string, projectId: string) => {
       try {
         await CoreModules.axios.post(url, data);
-        dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${projectId}/tiles`));
+        dispatch(GetTilesList(`${VITE_API_URL}/projects/${projectId}/tiles`));
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
       } catch (error) {
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
@@ -314,6 +317,45 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
       }
     };
     await updateEntityState(url, payload);
+  };
+};
+
+export const GetGeometryLog = (url: string) => {
+  return async (dispatch: AppDispatch) => {
+    const getProjectActivity = async (url: string) => {
+      try {
+        dispatch(ProjectActions.SetGeometryLogLoading(true));
+        const response: AxiosResponse<geometryLogResponseType[]> = await axios.get(url);
+        dispatch(ProjectActions.SetGeometryLog(response.data));
+      } catch (error) {
+        // error means no geometry log present for the project
+        dispatch(ProjectActions.SetGeometryLog([]));
+      } finally {
+        dispatch(ProjectActions.SetGeometryLogLoading(false));
+      }
+    };
+    await getProjectActivity(url);
+  };
+};
+
+export const DeleteEntity = (url: string, project_id: number, entity_id: string) => {
+  return async (dispatch: AppDispatch) => {
+    const deleteEntity = async () => {
+      try {
+        dispatch(ProjectActions.SetIsEntityDeleting({ [entity_id]: true }));
+        await axios.delete(url, { params: { project_id } });
+        dispatch(ProjectActions.RemoveNewEntity(entity_id));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to delete entity',
+          }),
+        );
+      } finally {
+        dispatch(ProjectActions.SetIsEntityDeleting({ [entity_id]: false }));
+      }
+    };
+    await deleteEntity();
   };
 };
 

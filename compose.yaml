@@ -28,7 +28,7 @@ volumes:
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH:-local}
+    name: fmtm-local
     ipam:
       driver: default
       config:
@@ -122,13 +122,19 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     build:
       context: src
       dockerfile: backend/Dockerfile
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
+      cache_to:
+        - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+        - type=gha
+      cache_from:
+        - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+        - type=gha
     # Uncomment these to debug with a terminal debugger like pdb
     # Then `docker attach fmtm_api` to debug
     # stdin_open: true
@@ -146,6 +152,8 @@ services:
       # External package mounts (testing)
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
+    environment:
+      DEBUG: ${DEBUG:-True}
     depends_on:
       proxy:
         condition: service_healthy
@@ -185,7 +193,7 @@ services:
           memory: 100M
 
   ui:
-    image: "ghcr.io/hotosm/fmtm/frontend:debug"
+    image: "ghcr.io/hotosm/field-tm/frontend:debug"
     build:
       context: src
       additional_contexts:
@@ -204,7 +212,7 @@ services:
     restart: "unless-stopped"
 
   ui-mapper:
-    image: "ghcr.io/hotosm/fmtm/frontend:mapper"
+    image: "ghcr.io/hotosm/field-tm/frontend:mapper"
     build:
       context: src
       additional_contexts:
@@ -231,11 +239,11 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2024.3.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
     build:
       context: odkcentral/api
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2024.3.1}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.2.0}
     depends_on:
       proxy:
         condition: service_healthy
@@ -264,9 +272,13 @@ services:
       - EMAIL_USER=${EMAIL_USER:-''}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
       - OIDC_ENABLED=${OIDC_ENABLED:-false}
+      - OIDC_ISSUER_URL=${OIDC_ISSUER_URL:-https://getodk.org}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID:-xxx}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET:-xxx}
       - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
+      - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
       # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
       - S3_SERVER="http://s3:9000"
       - S3_BUCKET_NAME=${S3_ODK_BUCKET_NAME:-"fmtm-odk-media"}
@@ -294,11 +306,11 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2024.3.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
     build:
       context: odkcentral/ui
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2024.3.1}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.2.0}
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -306,7 +318,7 @@ services:
 
   central-webhook:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.1}"
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.3.0}"
     depends_on:
       central:
         condition: service_healthy
@@ -348,7 +360,7 @@ services:
 
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-16-3.5-alpine}"
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -416,7 +428,7 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -438,7 +450,7 @@ services:
       test: ["NONE"] # Set the health check test to NONE to disable it
 
   scheduler:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -460,6 +472,9 @@ services:
 
         # Run project stats script every 10 mins
         echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
+
+        # Upload and update project submissions to s3 every 6 hours
+        echo '0 */6 * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
 
         exec /usr/local/bin/supercronic ./crontab
       "

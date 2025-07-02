@@ -5,6 +5,7 @@ import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 import type { ProjectTask, TaskEventType, TaskStatus } from '$lib/types';
 import { getLoginStore } from '$store/login.svelte.ts';
 import { getTimeDiff } from '$lib/utils/datetime';
+import type { taskStatus } from '$constants/enums';
 
 const loginStore = getLoginStore();
 
@@ -18,7 +19,7 @@ let selectedTaskId: number | null = $state(null);
 let selectedTaskIndex: number | null = $state(null);
 
 let selectedTask: any = $state(null);
-let selectedTaskState: TaskStatus | null = $state(null);
+let selectedTaskState: taskStatus | null = $state(null);
 let selectedTaskGeom: GeoJSON | null = $state(null);
 let taskIdIndexMap: Record<number, number> = $state({});
 let commentMention: TaskEventType | null = $state(null);
@@ -132,7 +133,7 @@ function getTaskStore() {
 		const taskRows = Array.from(tasks.rows.values()) as TaskEventType[];
 		if (!taskRows) return;
 
-		selectedTask = taskRows[0];
+		selectedTask = taskRows.slice(-1)?.[0];
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
 		selectedTaskGeom = featcol.features.find((x) => x?.properties?.fid === taskId)?.geometry || null;
 	}

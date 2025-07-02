@@ -202,3 +202,19 @@ These questions include:
    Below is the sample of injected fields.
 
 [mandatory_fields (3).xls](https://github.com/user-attachments/files/17975369/mandatory_fields.3.xls)
+
+### Entity Properties
+
+- Entities can have any arbitrary properties added to them.
+- All properties stored a **text** data, even if the underlying data
+  may be a number, e.g. "2".
+- There are a few special properties that that can be added and recognized by
+  the system:
+  - `geometry`: used to display the entity geometry in Collect / Web Forms.
+  - `marker-color`: the colour of a marker symbol, in hex, e.g. #aaccee.
+  - `marker-symbol`: point data symbol to use, can be an emoji.
+  - `stroke`: the colour of polygon / polyline lines.
+  - `stroke-width`: the width of the polygon / polyline lines.
+  - `fill`: fill colour used for polygons.
+- These properties can be updated within forms, enabling dynamic workflows
+  that change entity colours on the map (e.g. green = submitted).
