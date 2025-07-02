@@ -360,7 +360,7 @@ services:
 
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-16-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -406,7 +406,7 @@ services:
 
   central-db:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:

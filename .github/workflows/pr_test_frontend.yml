@@ -26,7 +26,8 @@ jobs:
       compose_file: compose.yaml -f contrib/playwright/compose.yaml
       compose_service: ui-test
       cache_extra_imgs: |
-        "ghcr.io/hotosm/postgis:${{ vars.POSTGIS_TAG }}"
+        "ghcr.io/hotosm/postgis:14-3.5-alpine"
+        "ghcr.io/hotosm/postgis:16-3.5-alpine"
         "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
         "mcr.microsoft.com/playwright:${{ vars.PLAYWRIGHT_TAG }}"
     secrets: inherit
