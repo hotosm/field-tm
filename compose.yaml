@@ -240,6 +240,7 @@ services:
   central:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
     build:
       context: odkcentral/api
       args:

@@ -581,7 +581,7 @@ async def get_data_extract(
     current_user: Annotated[AuthUser, Depends(login_required)],
     geojson_file: UploadFile = File(...),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
-    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
+    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.highways,
     centroid: Annotated[bool, Form()] = False,
     geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
 ):
@@ -611,19 +611,21 @@ async def get_data_extract(
         }
 
         config["from"] = data_config.get((geom_type, centroid))
-        # Serialize to YAML string
-        yaml_str = yaml.safe_dump(config, sort_keys=False)
 
-        # Encode to bytes and wrap in BytesIO
-        extract_config = BytesIO(yaml_str.encode("utf-8"))
+        # Convert to JSON string
+        json_str = json.dumps(config, indent=2)
 
-    geojson_url = await project_crud.generate_data_extract(
+        # If you need it as a dictionary (parsed JSON), you can use:
+        parsed_json = config
+
+
+    return await project_crud.generate_data_extract(
         clean_boundary_geojson,
-        extract_config,
+        json_str,
         centroid,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
+    # return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_result["download_url"]})
 
 
 @router.get("/data-extract-url")
