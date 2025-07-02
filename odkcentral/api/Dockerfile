@@ -19,7 +19,7 @@
 # to init an admin user at startup
 
 ARG ODK_CENTRAL_TAG
-ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}
+ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 

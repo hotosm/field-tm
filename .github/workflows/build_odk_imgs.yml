@@ -17,10 +17,10 @@ jobs:
     with:
       context: odkcentral/api
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.0"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
+        ODK_CENTRAL_TAG=v2025.2.0
       multi_arch: true
 
   build-odkcentral-ui:
@@ -28,10 +28,10 @@ jobs:
     with:
       context: odkcentral/ui
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral-ui:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.0"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
+        ODK_CENTRAL_TAG=v2025.2.0
       multi_arch: true
       # Allow usage of ADD directive in this specific use case
       skip_cve: "CKV_DOCKER_8,CKV_DOCKER_2,CKV_DOCKER_3,CKV_DOCKER_5,CKV_DOCKER_4"
