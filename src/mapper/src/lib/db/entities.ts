@@ -8,9 +8,9 @@ import { javarosaToGeojsonGeom } from '$lib/odk/javarosa';
 async function update(db: PGlite, entity: Partial<DbEntityType>) {
 	await db.query(
 		`UPDATE odk_entities
-         SET status = $2
+         SET status = $2, submission_ids = $3
          WHERE entity_id = $1`,
-		[entity.entity_id, entity.status],
+		[entity.entity_id, entity.status, entity.submission_ids],
 	);
 }
 
@@ -25,8 +25,8 @@ async function create(db: PGlite, entity: DbEntityType) {
             task_id,
             submission_ids,
             osm_id,
-            is_new,
-			geometry
+			geometry,
+			created_by
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 		[
@@ -36,8 +36,8 @@ async function create(db: PGlite, entity: DbEntityType) {
 			entity.task_id,
 			entity.submission_ids,
 			entity.osm_id,
-			entity.is_new,
 			entity.geometry,
+			entity.created_by,
 		],
 	);
 }
@@ -52,8 +52,8 @@ async function bulkCreate(db: PGlite, entities: DbEntityType[]) {
 		task_id: entity.task_id,
 		osm_id: entity.osm_id,
 		submission_ids: entity.submission_ids === '' ? null : entity.submission_ids,
-		is_new: entity.is_new,
 		geometry: entity.geometry === '' ? null : entity.geometry,
+		created_by: entity.created_by,
 	}));
 
 	await applyDataToTableWithCsvCopy(db, 'odk_entities', dataObj);
@@ -74,7 +74,7 @@ function toGeojsonFeature(entity: DbEntityType): Feature | null {
 			task_id: entity.task_id,
 			osm_id: entity.osm_id,
 			submission_ids: entity.submission_ids,
-			is_new: entity.is_new,
+			created_by: entity.created_by,
 		},
 	};
 }

@@ -1,0 +1,16 @@
+{
+  "survey_questions": "調査項目",
+  "image": "写真撮影",
+  "feature": "ジオメトリ",
+  "new_feature": "新しいジオメトリを描いてください",
+  "feature_exists": "この地物は実在しますか？",
+  "verification": "検証",
+  "digitisation_problem": "そのデジタイジングにはどんな問題がありますか？",
+  "end_note": "建物が存在しないと、データ取得は不可能です",
+  "lumped": "一括化（複数の建物を1つのポリゴンとしてデジタイズ）",
+  "split": "分割（1つの建物を複数のポリゴンに分離）",
+  "other": "その他",
+  "digitisation_correct": "デジタイジングした地物の位置は正しいですか？",
+  "yes": "はい",
+  "no": "いいえ"
+}

@@ -3,6 +3,8 @@
 ### Feat
 
 - Improve XLSForm handling logic.
+- Added highways category back in.
+- Replace osm-fieldwork createEntity with pyodk, set UUID in frontend.
 
 ## 0.21.1 (2025-03-05)
 

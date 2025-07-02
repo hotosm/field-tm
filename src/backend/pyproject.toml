@@ -18,7 +18,7 @@
 
 [project]
 name = "fmtm"
-version = "2025.3.0"
+version = "2025.3.1"
 description = "Field Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
@@ -67,7 +67,7 @@ test = [
     "pytest==8.3.5",
     "pytest-asyncio==0.24.0",
     "httpx==0.28.1",
-    "pyinstrument==5.0.1",
+    "pyinstrument==5.0.2",
     "coverage==7.6.7",
     "coverage-badge==1.1.2",
 ]
@@ -88,10 +88,10 @@ monitoring = [
     #"opentelemetry-sdk==1.27.0",
     #"opentelemetry-api==1.27.0",
     #"opentelemetry-exporter-otlp==1.27.0",
-    "opentelemetry-instrumentation-fastapi==0.49b1",
-    "opentelemetry-instrumentation-logging==0.49b1",
-    "opentelemetry-instrumentation-psycopg2==0.49b1",
-    "opentelemetry-instrumentation-requests==0.49b1",
+    "opentelemetry-instrumentation-fastapi==0.49b2",
+    "opentelemetry-instrumentation-logging==0.49b2",
+    "opentelemetry-instrumentation-psycopg2==0.49b2",
+    "opentelemetry-instrumentation-requests==0.49b2",
 ]
 
 [tool.ruff]
@@ -132,7 +132,7 @@ asyncio_default_fixture_loop_scope="session"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2025.3.0"
+version = "2025.3.1"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
@@ -150,7 +150,7 @@ write-changes = true
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
-pyodk = { git = "https://github.com/hotosm/pyodk", rev = "master-modified" }
+pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
 
 [tool.uv.workspace]
 members = ["packages/*"]

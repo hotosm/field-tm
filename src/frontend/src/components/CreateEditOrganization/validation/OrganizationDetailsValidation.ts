@@ -13,8 +13,9 @@ interface OrganisationValues {
   odk_central_password: string;
   osm_profile: string;
   community_type: string;
-  fillODKCredentials: boolean;
   associated_email: string;
+  odk_server_type: string;
+  update_odk_credentials?: boolean;
 }
 interface ValidationErrors {
   logo?: string;
@@ -27,8 +28,9 @@ interface ValidationErrors {
   odk_central_password?: string;
   osm_profile?: string;
   community_type?: string;
-  fillODKCredentials?: boolean;
   associated_email?: string;
+  odk_server_type?: string;
+  update_odk_credentials?: string;
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,26 +57,37 @@ function OrganizationDetailsValidation(values: OrganisationValues) {
     }
   }
 
-  if (values?.odk_central_url && !isValidUrl(values.odk_central_url)) {
-    errors.odk_central_url = 'Invalid URL.';
-  }
-
   if (isInputEmpty(values?.associated_email)) {
     errors.associated_email = 'Email is Required.';
   } else if (!emailPattern.test(values?.associated_email)) {
     errors.associated_email = 'Invalid Email.';
   }
 
-  if (values?.fillODKCredentials && isInputEmpty(values.odk_central_url)) {
-    errors.odk_central_url = 'ODK central URL is Required.';
+  if (!values?.odk_server_type && !values?.id) {
+    errors.odk_server_type = 'ODK Server Type is Required.';
   }
 
-  if (values?.fillODKCredentials && isInputEmpty(values.odk_central_user)) {
-    errors.odk_central_user = 'ODK central URL is Required.';
+  if (
+    (values?.odk_server_type === 'OWN' || values?.update_odk_credentials) &&
+    values?.odk_central_url &&
+    !isValidUrl(values.odk_central_url)
+  ) {
+    errors.odk_central_url = 'Invalid URL.';
   }
 
-  if (values?.fillODKCredentials && isInputEmpty(values.odk_central_password)) {
-    errors.odk_central_password = 'ODK central URL is Required.';
+  if ((values?.odk_server_type === 'OWN' || values?.update_odk_credentials) && isInputEmpty(values.odk_central_url)) {
+    errors.odk_central_url = 'ODK Central URL is Required.';
+  }
+
+  if ((values?.odk_server_type === 'OWN' || values?.update_odk_credentials) && isInputEmpty(values.odk_central_user)) {
+    errors.odk_central_user = 'ODK Central Email is Required.';
+  }
+
+  if (
+    (values?.odk_server_type === 'OWN' || values?.update_odk_credentials) &&
+    isInputEmpty(values.odk_central_password)
+  ) {
+    errors.odk_central_password = 'ODK Central Password is Required.';
   }
 
   return errors;

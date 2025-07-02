@@ -36,6 +36,7 @@ from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
     BackgroundTaskStatus,
     ProjectPriority,
+    ProjectStatus,
     ProjectVisibility,
 )
 from app.db.models import (
@@ -200,6 +201,12 @@ class ProjectOut(DbProject):
 # Models for specific endpoints
 
 
+class ProjectOutNoXml(ProjectOut):
+    """For reading all projects, it's overly verbose including XML."""
+
+    odk_form_xml: Annotated[Optional[str], Field(exclude=True)] = None
+
+
 class ProjectSummary(BaseModel):
     """Project summaries."""
 
@@ -213,6 +220,7 @@ class ProjectSummary(BaseModel):
     hashtags: Optional[list[str]]
     location_str: Optional[str] = None
     short_description: Optional[str] = None
+    status: Optional[ProjectStatus] = None
     visibility: Optional[ProjectVisibility] = None
 
     # Calculated

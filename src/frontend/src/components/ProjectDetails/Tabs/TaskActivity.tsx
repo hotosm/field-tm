@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
-import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import { useAppSelector } from '@/types/reduxTypes';
 import { projectTaskActivity } from '@/store/types/IProject';
 import { projectTaskBoundriesType } from '@/models/project/projectModel';
 import { task_state_labels } from '@/types/enums';
+import ActivitiesCardSkeleton from '@/components/Skeletons/ProjectDetails/ActivitiesCardSkeleton';
+import ShowingCountSkeleton from '@/components/Skeletons/ProjectDetails/ShowingCountSkeleton';
 
 type taskActivityType = {
   defaultTheme: any;
@@ -120,7 +121,7 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
           />
         </div>
         {projectActivityLoading ? (
-          <ShowingCountSkeletonLoader />
+          <ShowingCountSkeleton />
         ) : (
           <p className="fmtm-text-[#A8A6A6] fmtm-text-base fmtm-my-1">
             showing {taskHistories?.length} of {allActivities} activities
@@ -131,13 +132,17 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
         {projectActivityLoading ? (
           <div>
             {Array.from({ length: 10 }).map((_, i) => (
-              <ActivitiesCardSkeletonLoader key={i} />
+              <ActivitiesCardSkeleton key={i} />
             ))}
           </div>
         ) : taskHistories?.length === 0 ? (
           <p className="fmtm-mt-5 fmtm-text-center fmtm-text-xl fmtm-text-gray-400">No Task History!</p>
         ) : (
-          <div>{taskHistories?.map((taskEvent) => <ActivitiesCard taskEvent={taskEvent} />)}</div>
+          <div>
+            {taskHistories?.map((taskEvent) => (
+              <ActivitiesCard taskEvent={taskEvent} />
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -1,5 +1,60 @@
 # Changelog
 
+## 2025.3.1 (2025-06-17)
+
+### Feat
+
+- add status chip to project card & details section (#2623)
+- Project Completed Workflow (#2618)
+- **frontend**: request HOT's ODK server workflow (#2595)
+- **backend**: update submission retrieval to use pyodk except in submission detail page (#2599)
+- roadways mapping support
+- **Backend**: Ensure form_id generated is returned
+- **backend**: add project complete status to set it to read only (#2478)
+- migration added to update osm_id type from int to bigint (#2552)
+
+### Fix
+
+- **backend**: submission count in project card and detail page (#2616)
+- **mapper**: disable upload image preview (#2622)
+- **backend**: suppress invalid error from pyodk about cache file  (#2614)
+- **mapper**: mapping feature for a second time (#2601)
+- **frontend**: submission count on project submissions page (#2612)
+- **mapper**: allow creating entity even without login (#2607)
+- **vectorLayer**: prevent stale FlatGeobuf response to be processed (#2605)
+- **mapper**: pass xlocation to submission xml (#2600)
+- **migration**: skip if no project found in odk central (#2597)
+- **mapper**: task state update updating (#2593)
+- **backend**: removed precommit changes in central schema
+- **mapper**: submission_ids of the entity after submission (#2591)
+- **mapper**: add domain to device id (#2592)
+- **backend**: implement organisation approval request notification along with odk server request when applicable (#2589)
+- **frontend**: user search 403 (#2587)
+- **webforms**: add today to odk xml submission (#2585)
+- **webforms**: tweak iframe height (#2583)
+- **frontend**: organization creation related issues (#2580)
+- **mapper**: use defined CSS var for entity status (#2579)
+- ensure form_id generated is returned
+- **mapper**: only load project summaries once (non-reactive)
+- **backend**: hide odk xml from reading all projects response (verbose)
+- **backend**: getting project if not logged in (mapper frontend)
+- **mapper**: increase timeout downloading offline pmtile basemap
+- **mapper**: add progress bar for offline basemap storage (user feedback)
+- **mapper**: bigint handling in geojson properties, convert to string
+- **frontend**: update URL validation logic (#2557)
+- **mapper**: hide feature_exists question if mapping an existing entity #2430 (#2549)
+- **mapper**: distorted loading spinner CSS on submit #2477 (#2548)
+- **mapper**: clear old CacheStorage entries for webform scripts (#2547)
+- **+page**: shift handle fetch project to effect block to reflect pagination (#2545)
+
+### Refactor
+
+- **userInvite**: invite multiple osm user by comma seperated value (#2621)
+- **frontend**: user role access components (#2611)
+- **frontend**: dedicated skeleton loader folder, reduce dup (#2609)
+- **frontend**: project creation error handling (#2562)
+- remove centra/form-xml endpoint (xml is in fieldtm db now)
+
 ## 2025.3.0 (2025-05-22)
 
 ### Feat

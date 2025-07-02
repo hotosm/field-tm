@@ -136,11 +136,9 @@ const ProjectDetailsForm = ({ flag }) => {
     }
 
     dispatch(
-      GetUserListForSelect(`${VITE_API_URL}/users`, {
+      GetUserListForSelect(`${VITE_API_URL}/users/usernames`, {
         search: userSearchText,
-        page: 1,
-        results_per_page: 30,
-        org_id: values.organisation_id,
+        signin_type: 'osm',
       }),
     );
   }, [userSearchText]);
@@ -232,7 +230,7 @@ const ProjectDetailsForm = ({ flag }) => {
             {hasODKCredentials && (
               <CustomCheckbox
                 key="useDefaultODKCredentials"
-                label="Use default ODK credentials"
+                label="Use default or requested ODK credentials"
                 checked={values.useDefaultODKCredentials}
                 onCheckedChange={() => {
                   handleCustomChange('useDefaultODKCredentials', !values.useDefaultODKCredentials);

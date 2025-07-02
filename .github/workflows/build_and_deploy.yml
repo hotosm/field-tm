@@ -8,7 +8,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
     paths:
       # Workflow is triggered only if src changes
       - src/**
@@ -17,37 +17,32 @@ on:
 
 jobs:
   backend-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
     with:
-      image_name: ghcr.io/${{ github.repository }}/backend
-      build_context: src
-      build_dockerfile: backend/Dockerfile
-      pre_command: docker compose up -d && docker compose exec api /app-entrypoint.sh
-      compose_file: "compose.yaml"
-      compose_service: api
-      compose_command: pytest
-      tag_override: ci-${{ github.ref_name }}
-      coverage: true
+      environment: "test"
+      command: "test backend-with-coverage-upload"
     secrets: inherit
 
   frontend-unit-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@3.3.2
     with:
       working_dir: src/frontend
 
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     needs: [backend-test]
     with:
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
       dockerfile: backend/Dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     needs: [frontend-unit-test]
     with:
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
       dockerfile: Dockerfile.ui.prod
       build_target: prod
@@ -57,7 +52,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   needs: [backend-build]
   #   environment:
-  #     name: ${{ github.ref_name }}
+  #     name: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
 
   #   steps:
   #     - name: Checkout repository
@@ -119,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [frontend-build]
     environment:
-      name: ${{ github.ref_name }}
+      name: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
 
     steps:
       - name: Checkout repository
@@ -156,8 +151,8 @@ jobs:
       # - smoke-test-backend
       - backend-build
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.3.2
     with:
-      environment: ${{ github.ref_name }}
+      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       docker_compose_file: "deploy/compose.${{ github.ref_name }}.yaml"
     secrets: inherit

@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
     # Workflow is triggered only if src/backend changes
     paths:
       - src/backend/**
@@ -14,16 +14,8 @@ on:
 
 jobs:
   pytest:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
     with:
-      image_name: ghcr.io/${{ github.repository }}/backend
-      build_context: src
-      build_dockerfile: backend/Dockerfile
-      pre_command: docker compose up -d && docker compose exec api /app-entrypoint.sh
-      compose_file: "compose.yaml"
-      compose_service: api
-      compose_command: pytest
-      cache_extra_imgs: |
-        "ghcr.io/hotosm/postgis:${{ vars.POSTGIS_TAG }}"
-        "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
+      environment: "test"
+      command: "test backend"
     secrets: inherit

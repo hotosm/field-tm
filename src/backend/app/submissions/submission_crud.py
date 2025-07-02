@@ -17,8 +17,10 @@
 #
 """Functions for task submissions."""
 
+import asyncio
 import json
 import uuid
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -29,7 +31,7 @@ from loguru import logger as log
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission
 
-from app.central import central_schemas
+from app.central import central_crud, central_schemas
 from app.central.central_crud import (
     get_odk_form,
 )
@@ -37,10 +39,13 @@ from app.central.central_deps import get_async_odk_form, pyodk_client
 
 # from osm_fieldwork.json2osm import json2osm
 from app.config import settings
-from app.db.enums import HTTPStatus
+from app.db.enums import HTTPStatus, ProjectStatus
 from app.db.models import DbProject
 from app.projects import project_crud
-from app.s3 import strip_presigned_url_for_local_dev
+from app.s3 import (
+    add_obj_to_bucket,
+    strip_presigned_url_for_local_dev,
+)
 
 # async def convert_json_to_osm(file_path):
 #     """Wrapper for osm-fieldwork json2osm."""
@@ -165,8 +170,18 @@ async def get_submission_by_project(
 
     """
     hashtags = project.hashtags
-    xform = get_odk_form(project.odk_credentials)
-    data = xform.listSubmissions(project.odkid, project.odk_form_id, filters)
+    async with pyodk_client(project.odk_credentials) as client:
+        data = client.submissions.get_table(
+            project_id=project.odkid,
+            form_id=project.odk_form_id,
+            table_name="Submissions",
+            skip=filters.get("$skip"),
+            top=filters.get("$top"),
+            count=filters.get("$count"),
+            wkt=filters.get("$wkt"),
+            filter=filters.get("$filter"),
+            expand="*",
+        )
 
     def add_hashtags(item):
         item["hashtags"] = hashtags
@@ -278,3 +293,68 @@ async def get_dashboard_detail(db: Connection, project: DbProject):
         "total_tasks": len(project.tasks),
         "total_contributors": len(contributors_dict),
     }
+
+
+async def get_project_submission_geojson(project, filters):
+    """Fetch submissions and convert to GeoJSON."""
+    data = await get_submission_by_project(project, filters)
+    submission_json = data.get("value", [])
+
+    return await central_crud.convert_odk_submission_json_to_geojson(submission_json)
+
+
+async def upload_submission_geojson_to_s3(project, submission_geojson):
+    """Handles submission GeoJSON generation and upload to S3 for a single project."""
+    # FIXME Maybe upload the skipped projects to S3 in private buckets in the future?
+    if project.visibility not in ["PUBLIC", "INVITE_ONLY"] or project.status in [
+        ProjectStatus.COMPLETED,
+        ProjectStatus.ARCHIVED,
+    ]:
+        log.info(
+            f"Skipping submission upload for project {project.id} with visibility "
+            f"{project.visibility} and status {project.status}"
+        )
+        return
+    submission_s3_path = f"{project.organisation_id}/{project.id}/submission.geojson"
+    log.debug(f"Uploading submission to S3 path: {submission_s3_path}")
+    submission_geojson_bytes = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
+
+    add_obj_to_bucket(
+        settings.S3_BUCKET_NAME,
+        submission_geojson_bytes,
+        submission_s3_path,
+        content_type="application/geo+json",
+    )
+    log.info(
+        f"Uploaded submission geojson of project {project.id} to S3: "
+        f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{submission_s3_path}"
+    )
+
+
+async def trigger_upload_submissions(
+    db: Connection,
+):
+    """Upload the submission geojson to S3.
+
+    Returns the S3 path.
+    """
+    all_projects_query = "SELECT id FROM projects;"
+    async with db.cursor() as cur:
+        await cur.execute(all_projects_query)
+        active_projects = await cur.fetchall()
+
+    time_now = datetime.now(timezone.utc)
+    threedaysago = (time_now - timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    for (project_id,) in active_projects:
+        await asyncio.sleep(0.5)
+        log.info(f"Processing project {project_id} for submission upload to S3")
+        project = await DbProject.one(db, project_id, True)
+        recent_entities = await central_crud.get_entities_data(
+            project.odk_credentials,
+            project.odkid,
+            filter_date=threedaysago,
+        )
+        if recent_entities:
+            submission_geojson = await get_project_submission_geojson(project, {})
+            await upload_submission_geojson_to_s3(project, submission_geojson)

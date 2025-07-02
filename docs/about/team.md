@@ -33,13 +33,7 @@
   <br>
   <i>Tech Lead for the development team</i>
 </div>
-<div style="margin-bottom: 20px;">
-  <img src="https://avatars.githubusercontent.com/u/109404840?v=4" width="100" style="border-radius: 50%;" alt="Sujan Adhikari">
-  <br>
-  <b>Sujan Adhikari</b>
-  <br>
-  <i>Primary backend developer</i>
-</div>
+
 <div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/81785002?v=4" width="100" style="border-radius: 50%;" alt="Nishit Suwal">
   <br>
@@ -51,6 +45,13 @@
   <img src="https://avatars.githubusercontent.com/u/84966248?v=4" width="100" style="border-radius: 50%;" alt="Anuj Gupta">
   <br>
   <b>Anuj Gupta</b>
+  <br>
+  <i>Primary backend developer</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/76505195?v=4" width="100" style="border-radius: 50%;" alt="Sujan Basnet">
+  <br>
+  <b>Sujan Basnet</b>
   <br>
   <i>Support backend developer</i>
 </div>
@@ -75,10 +76,17 @@
   <br>
   <i>Frontend development advisory role</i>
 </div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/109404840?v=4" width="100" style="border-radius: 50%;" alt="Sujan Adhikari">
+  <br>
+  <b>Sujan Adhikari</b>
+  <br>
+  <i>Primary backend developer 2023-2025</i>
+</div>
 
 <p>To see a list of all our contributors and their roles, please see our
 <a
-  href="https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-"
+  href="https://github.com/hotosm/field-tm#contributors-"
   target="_blank"
 >contributors</a>
 list in the README.md file.</p>

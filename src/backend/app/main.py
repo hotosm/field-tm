@@ -24,8 +24,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, AsyncIterator
 
-from fastapi import Depends, FastAPI, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
@@ -121,7 +120,7 @@ def get_application() -> FastAPI:
         version=__version__,
         license_info={
             "name": "AGPL-3.0-only",
-            "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE.md",
+            "url": "https://raw.githubusercontent.com/hotosm/field-tm/main/LICENSE.md",
         },
         debug=settings.DEBUG,
         lifespan=lifespan,
@@ -177,6 +176,9 @@ def get_logger():
         if logger_name == "urllib3":
             # Don't hook urllib3, called on each OTEL trace
             continue
+        if logger_name == "pyodk._utils.config":
+            # Set pyodk logger level to CRITICAL to avoid noise
+            logging.getLogger("pyodk._utils.config").setLevel(settings.PYODK_LOG_LEVEL)
         if "." not in logger_name:
             logging.getLogger(logger_name).addHandler(InterceptHandler())
 
@@ -210,30 +212,6 @@ def get_logger():
 api = get_api()
 
 
-@api.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,  # dead: disable
-    exc: RequestValidationError,
-):
-    """Exception handler for more descriptive logging and traces."""
-    status_code = 500
-    errors = []
-    for error in exc.errors():
-        # TODO Handle this properly
-        if error["msg"] in ["Invalid input", "field required"]:
-            status_code = HTTPStatus.UNPROCESSABLE_ENTITY
-        else:
-            status_code = HTTPStatus.BAD_REQUEST
-        errors.append(
-            {
-                "loc": error["loc"],
-                "msg": error["msg"],
-                "error": error["msg"] + str([x for x in error["loc"]]),
-            }
-        )
-    return JSONResponse(status_code=status_code, content={"errors": errors})
-
-
 @api.get("/")
 async def home():
     """Redirect home to docs."""
@@ -255,7 +233,7 @@ async def deployment_details():
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={
-            "source": "https://github.com/hotosm/fmtm",
+            "source": "https://github.com/hotosm/field-tm",
             "version": __version__,
             "commit": commit or "/app/version.json not found",
             "build": build or "/app/version.json not found",

@@ -9,7 +9,7 @@ export const convertCoordinateStringToFeature = (key: string, coordinateString: 
   };
 
   // if feature is Polygon in JavaRosa format it contains string of array separated by ';'
-  if (coordinateString?.includes(';')) {
+  if (coordinateString?.replace(/;$/, '')?.includes(';')) {
     let coordinates = coordinateString
       ?.replace(/;$/, '')
       ?.split(';')

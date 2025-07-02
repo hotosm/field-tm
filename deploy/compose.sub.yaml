@@ -136,7 +136,7 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     volumes:
       - fmtm_logs:/opt/logs
     depends_on:
@@ -172,7 +172,7 @@ services:
   ui:
     # This service simply builds both frontends to volumes
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-development}"
+    image: "ghcr.io/hotosm/field-tm/frontend:${GIT_BRANCH:-dev}"
     build:
       context: ../src
       dockerfile: Dockerfile.ui.prod
@@ -188,7 +188,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2024.3.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:${ODK_CENTRAL_TAG:-v2025.2.0}"
     depends_on:
       proxy:
         condition: service_healthy
@@ -217,9 +217,13 @@ services:
       - EMAIL_USER=${EMAIL_USER:-''}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
       - OIDC_ENABLED=${OIDC_ENABLED:-false}
+      - OIDC_ISSUER_URL=${OIDC_ISSUER_URL:-https://getodk.org}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID:-xxx}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET:-xxx}
       - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
+      - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
       - S3_SERVER=${S3_ENDPOINT}
       - S3_BUCKET_NAME=${S3_ODK_BUCKET_NAME:-"fmtm-odk-media"}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
@@ -235,7 +239,7 @@ services:
       retries: 10
 
   central-webhook:
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.1}"
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.3.0}"
     depends_on:
       central:
         condition: service_healthy
@@ -258,7 +262,7 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2024.3.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.2.0}"
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -288,7 +292,7 @@ services:
       timeout: 5s
 
   fmtm-db:
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-16-3.5-alpine}"
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
@@ -355,7 +359,7 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     depends_on:
       proxy:
         condition: service_healthy
@@ -374,4 +378,4 @@ services:
     extends:
       file: ../compose.yaml
       service: scheduler
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"

@@ -254,6 +254,7 @@ class DbUser(BaseModel):
         search: Optional[str] = None,
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
+        role: Optional[UserRole] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
         filters = []
@@ -270,6 +271,10 @@ class DbUser(BaseModel):
         if signin_type:
             filters.append("sub LIKE %(signin_type)s")
             params["signin_type"] = f"{signin_type}|%"
+
+        if role:
+            filters.append("role = %(role)s")
+            params["role"] = role
 
         sql = f"""
             SELECT * FROM users
@@ -592,6 +597,16 @@ class DbOrganisation(BaseModel):
 
             if db_org is None:
                 raise KeyError(f"Organisation ({org_identifier}) not found.")
+        return db_org
+
+    @classmethod
+    async def primary_org(cls, db: Connection) -> Self:
+        """Fetch the first organisation (lowest ID)."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute("SELECT * FROM organisations ORDER BY id LIMIT 1;")
+            db_org = await cur.fetchone()
+            if db_org is None:
+                raise KeyError("No organisations found.")
         return db_org
 
     @classmethod
@@ -1656,7 +1671,11 @@ class DbProject(BaseModel):
         minimal: bool = False,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
-        access_info = await cls._get_user_access_level(db, current_user)
+        if current_user:
+            access_info = await cls._get_user_access_level(db, current_user)
+        else:
+            access_info = None
+
         filters, params = cls._build_query_filters(
             skip, limit, org_id, user_sub, hashtags, search, access_info
         )
@@ -1690,7 +1709,7 @@ class DbProject(BaseModel):
         user_sub: Optional[str],
         hashtags: Optional[list[str]],
         search: Optional[str],
-        access_info: dict,
+        access_info: Optional[dict] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
         # Build basic filters
@@ -1721,20 +1740,31 @@ class DbProject(BaseModel):
                 "hashtags": hashtags,
                 "search": f"%{search}%" if search else None,
             }.items()
-            if value
+            if value is not None
         }
 
-        params["current_user_sub"] = access_info["user_sub"]
-        if access_info["managed_org_ids"]:
-            params["managed_org_ids"] = access_info["managed_org_ids"]
+        if access_info:
+            params["current_user_sub"] = access_info["user_sub"]
+            if access_info["managed_org_ids"]:
+                params["managed_org_ids"] = access_info["managed_org_ids"]
 
         return filters, params
 
     @classmethod
-    def _build_visibility_filter(cls, access_info: dict) -> Optional[str]:
+    def _build_visibility_filter(
+        cls, access_info: Optional[dict] = None
+    ) -> Optional[str]:
         """Build visibility filter based on user context."""
+        # Not logged in, so return public projects only
+        if access_info is None:
+            return """
+            (
+                p.visibility = 'PUBLIC'
+            )
+            """
+
         if access_info["is_superadmin"]:
-            # Superadmin sees everything
+            # Superadmin sees everything, no filters
             return None
 
         if access_info["managed_org_ids"]:
@@ -1746,10 +1776,11 @@ class DbProject(BaseModel):
                 )
             """
 
-        # Regular users see public projects and private ones they have access to
+        # All users see public, sensitive, and invite-only projects.
+        # Private projects are only visible to users who have access.
         return """
             (
-                p.visibility = 'PUBLIC'
+                p.visibility != 'PRIVATE'
                 OR (
                     p.visibility = 'PRIVATE'
                     AND EXISTS (
@@ -1804,6 +1835,7 @@ class DbProject(BaseModel):
                 fp.name,
                 fp.location_str,
                 fp.short_description,
+                fp.status,
                 project_org.logo AS organisation_logo
             FROM
                 filtered_projects fp
@@ -1994,8 +2026,11 @@ class DbOdkEntities(BaseModel):
     task_id: Optional[int]
     osm_id: int
     submission_ids: str
-    is_new: bool
+    # NOTE geometry is only set if the geom is 'new' or 'bad'
     geometry: str
+    # NOTE previous we had field is_new, replaced by created_by
+    # NOTE as is_new is implicitly true if created_by is set
+    created_by: str
 
     @classmethod
     async def upsert(
@@ -2028,7 +2063,7 @@ class DbOdkEntities(BaseModel):
             sql = """
                 INSERT INTO public.odk_entities
                     (entity_id, status, project_id, task_id,
-                    osm_id, submission_ids, is_new, geometry)
+                    osm_id, submission_ids, geometry, created_by)
                 VALUES
             """
 
@@ -2044,8 +2079,8 @@ class DbOdkEntities(BaseModel):
                     f"%({entity_index}_task_id)s, "
                     f"%({entity_index}_osm_id)s, "
                     f"%({entity_index}_submission_ids)s, "
-                    f"%({entity_index}_is_new)s, "
-                    f"%({entity_index}_geometry)s)"
+                    f"%({entity_index}_geometry)s, "
+                    f"%({entity_index}_created_by)s)"
                 )
                 data[f"{entity_index}_entity_id"] = entity["id"]
                 data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
@@ -2056,15 +2091,15 @@ class DbOdkEntities(BaseModel):
                 )
                 data[f"{entity_index}_osm_id"] = entity["osm_id"]
                 data[f"{entity_index}_submission_ids"] = entity["submission_ids"]
-                data[f"{entity_index}_is_new"] = (
-                    True if entity["is_new"] == "✅" else False
+                data[f"{entity_index}_osm_id"] = entity["osm_id"]
+                # Only copy geometry if new geom (created_by), or marked bad
+                should_include_geom = (
+                    entity["status"] == "6" or entity["created_by"] != ""
                 )
-                # Only copy geometry if new geom, or marked bad
                 data[f"{entity_index}_geometry"] = (
-                    entity["geometry"]
-                    if entity["status"] == "6" or entity["is_new"] == "✅"
-                    else ""
+                    entity["geometry"] if should_include_geom else ""
                 )
+                data[f"{entity_index}_created_by"] = entity["created_by"]
 
             sql += (
                 ", ".join(values)
@@ -2074,8 +2109,8 @@ class DbOdkEntities(BaseModel):
                     task_id = EXCLUDED.task_id,
                     osm_id = EXCLUDED.osm_id,
                     submission_ids = EXCLUDED.submission_ids,
-                    is_new = EXCLUDED.is_new,
-                    geometry = EXCLUDED.geometry
+                    geometry = EXCLUDED.geometry,
+                    created_by = EXCLUDED.created_by
                 RETURNING True;
             """
             )

@@ -1,5 +1,15 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"common": {
+		"yes": "हो",
+		"no": "No"
+	},
+	"project_states": {
+		"DRAFT": "ड्राफ्ट",
+		"PUBLISHED": "प्रकाशित",
+		"ARCHIVED": "अर्काइव",
+		"COMPLETED": "पूर्ण"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "तयार",
 		"LOCKED_FOR_MAPPING": "नक्साङ्कनको लागि लक",
@@ -50,7 +60,9 @@
 		"task_complete_only_total_mapped": "तपाईंले कार्य क्षेत्रमा मात्र {totalMapped} विशेषताहरू म्याप गर्नुभएको छ।",
 		"task_complete_confirm": "के तपाईं निश्चित रूपमा यो कार्य सम्पन्न भएको रूपमा चिन्हित गर्न चाहनुहुन्छ?",
 		"select_this_feature": "यो फिचर चयन गर्नुहोस्",
-		"map_this_feature": "यो फिचर फिचर म्याप गर्नुहोस्"
+		"map_this_feature": "यो फिचर फिचर म्याप गर्नुहोस्",
+		"proceed": "अगाडि बढ्नुहोस्",
+		"delete_feature": "यो फिचर मेटाउनुहोस्"
 	},
 	"stack_group": {
 		"project_information": "परियोजनाको जानकारी",
@@ -97,7 +109,9 @@
 		"status": "स्थिति",
 		"comments": "टिप्पणीहरू",
 		"entity_uuid": "Entity UUID",
-		"collect_data": "डाटा संकलन गर्नुहोस्"
+		"collect_data": "डाटा संकलन गर्नुहोस्",
+		"entity_delete_confirmation": "के तपाईं यो फिचर मेटाउन निश्चित हुनुहुन्छ?",
+		"contact_pm_for_entity_deletion": "सिर्जनाकर्ताले मात्र यो फिचर मेटाउन सक्छ। कृपया परियोजना प्रबन्धकलाई सम्पर्क गर्नुहोस्।"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "म्यापिङ सम्पन्न गर्नुहोस्",
@@ -124,9 +138,13 @@
 	"offline": {
 		"features": "फिचरहरू",
 		"basemaps": "बेसम्याप",
+		"data": "अफलाइन डेटा हेर्नुहोस्",
 		"store_features_offline": "फिचर अफलाइन भण्डारण गर्नुहोस्",
 		"features_offline_info": "फिचर पहिले नै अफलाइन भण्डारण गरिएका छन्",
 		"fetch_projects_offline": "तपाईं अफलाइन हुनुहुन्छ र अतिरिक्त परियोजनाहरू ल्याउन सक्नुहुन्न।",
-		"ready_offline": "अफलाइन प्रयोगको लागि तयार।"
+		"ready_offline": "अफलाइन प्रयोगको लागि तयार।",
+		"total_offline_submissions": "कुल अफलाइन सबमिशनहरू",
+		"total_failed_submissions": "कुल असफल पेसहरू",
+		"download_csv": "CSV को रूपमा डाउनलोड गर्नुहोस्"
 	}
 }

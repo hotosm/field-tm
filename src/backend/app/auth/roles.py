@@ -34,7 +34,7 @@ from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_logic import get_uid
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus, ProjectRole, ProjectVisibility
+from app.db.enums import HTTPStatus, ProjectRole, ProjectStatus, ProjectVisibility
 from app.db.models import DbProject, DbUser
 from app.organisations.organisation_deps import get_organisation
 from app.projects.project_deps import get_project, get_project_by_id
@@ -46,6 +46,7 @@ async def check_access(
     org_id: Optional[int] = None,
     project_id: Optional[int] = None,
     role: Optional[ProjectRole] = None,
+    check_completed: bool = False,
 ) -> Optional[DbUser]:
     """Check if the user has access to a project or organisation.
 
@@ -64,6 +65,7 @@ async def check_access(
         org_id (Optional[int]): Org ID for organisation-specific access.
         project_id (Optional[int]): Project ID for project-specific access.
         role (Optional[ProjectRole]): Role to check for project-specific access.
+        check_completed (bool): If True, check if project is completed.
 
     Returns:
         Optional[DbUser]: The user details if access is granted,
@@ -89,42 +91,57 @@ async def check_access(
                     WHEN role = 'ADMIN'::public.userrole THEN true
                     WHEN role = 'READ_ONLY'::public.userrole THEN false
                     ELSE
-
-                        -- Check to see if user is org admin
-                        EXISTS (
-                            SELECT 1
-                            FROM organisation_managers
-                            WHERE organisation_managers.user_sub = %(user_sub)s
-                            AND organisation_managers.organisation_id = %(org_id)s
-                        )
-
-                        -- Check to see if user has equal or greater than project role
-                        OR EXISTS (
-                            SELECT 1
-                            FROM user_roles
-                            JOIN role_hierarchy AS user_role_h
-                                ON user_roles.role::public.projectrole
-                                    = user_role_h.role::public.projectrole
-                            JOIN role_hierarchy AS required_role_h
-                                ON %(role)s::public.projectrole
-                                    = required_role_h.role::public.projectrole
-                            WHERE user_roles.user_sub = %(user_sub)s
-                            AND user_roles.project_id = %(project_id)s
-                            AND user_role_h.level >= required_role_h.level
-                        )
-
-                        -- Extract organisation id from project,
-                        -- then check to see if user is org admin
-                        OR (
-                            %(org_id)s IS NULL
+                        -- Check if project is completed and check_completed is true
+                        NOT (
+                            %(check_completed)s
                             AND EXISTS (
                                 SELECT 1
+                                FROM projects
+                                WHERE id = %(project_id)s
+                                    AND status IN (
+                                            'COMPLETED'::public.projectstatus,
+                                            'ARCHIVED'::public.projectstatus
+                                        )
+                                    )
+                        )
+                        AND (
+                            -- Check to see if user is org admin
+                            EXISTS (
+                                SELECT 1
                                 FROM organisation_managers
-                                JOIN projects
-                                    ON projects.organisation_id =
-                                        organisation_managers.organisation_id
                                 WHERE organisation_managers.user_sub = %(user_sub)s
-                                AND projects.id = %(project_id)s
+                                AND organisation_managers.organisation_id = %(org_id)s
+                            )
+
+                            -- Check to see if user has equal or greater than project
+                            -- role
+                            OR EXISTS (
+                                SELECT 1
+                                FROM user_roles
+                                JOIN role_hierarchy AS user_role_h
+                                    ON user_roles.role::public.projectrole
+                                        = user_role_h.role::public.projectrole
+                                JOIN role_hierarchy AS required_role_h
+                                    ON %(role)s::public.projectrole
+                                        = required_role_h.role::public.projectrole
+                                WHERE user_roles.user_sub = %(user_sub)s
+                                AND user_roles.project_id = %(project_id)s
+                                AND user_role_h.level >= required_role_h.level
+                            )
+
+                            -- Extract organisation id from project,
+                            -- then check to see if user is org admin
+                            OR (
+                                %(org_id)s IS NULL
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM organisation_managers
+                                    JOIN projects
+                                        ON projects.organisation_id =
+                                            organisation_managers.organisation_id
+                                    WHERE organisation_managers.user_sub = %(user_sub)s
+                                    AND projects.id = %(project_id)s
+                                )
                             )
                         )
                 END
@@ -139,6 +156,7 @@ async def check_access(
                 "project_id": project_id,
                 "org_id": org_id,
                 "role": getattr(role, "name", None),
+                "check_completed": check_completed,
             },
         )
         db_user = await cur.fetchone()
@@ -251,6 +269,7 @@ async def wrap_check_access(
     db: Connection,
     user_data: AuthUser,
     role: ProjectRole,
+    check_completed: bool = False,
 ) -> ProjectUserDict:
     """Wrap check_access call with HTTPException."""
     db_user = await check_access(
@@ -258,6 +277,7 @@ async def wrap_check_access(
         db,
         project_id=project.id,
         role=role,
+        check_completed=check_completed,
     )
 
     if not db_user:
@@ -272,21 +292,30 @@ async def wrap_check_access(
     }
 
 
-async def project_manager(
-    project_id: int,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-) -> ProjectUserDict:
-    """A project manager for a specific project."""
-    # NOTE here we get the project manually to avoid warnings before the project
-    # if fully created yet (about odk_token not existing)
-    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
-    return await wrap_check_access(
-        project,
-        db,
-        current_user,
-        ProjectRole.PROJECT_MANAGER,
-    )
+class ProjectManager:
+    """A wrapper for the project manager to restrict access if project is completed."""
+
+    def __init__(self, check_completed: bool = False):
+        """Initialize the project manager with check_completed flag."""
+        self.check_completed = check_completed
+
+    async def __call__(
+        self,
+        project_id: int,
+        db: Annotated[Connection, Depends(db_conn)],
+        current_user: Annotated[AuthUser, Depends(login_required)],
+    ) -> ProjectUserDict:
+        """A project manager for a specific project."""
+        # NOTE here we get the project manually to avoid warnings before the project
+        # if fully created yet (about odk_token not existing)
+        project = await DbProject.one(db, project_id, warn_on_missing_token=False)
+        return await wrap_check_access(
+            project,
+            db,
+            current_user,
+            ProjectRole.PROJECT_MANAGER,
+            check_completed=self.check_completed,
+        )
 
 
 async def associate_project_manager(
@@ -331,29 +360,54 @@ async def validator(
     )
 
 
-async def mapper(
-    project: Annotated[DbProject, Depends(get_project)],
-    db: Annotated[Connection, Depends(db_conn)],
-    # Here temp auth token/cookie is allowed
-    current_user: Annotated[AuthUser, Depends(public_endpoint)],
-) -> ProjectUserDict:
-    """A mapper for a specific project."""
-    # If project is public, skip permission check
-    if project.visibility == ProjectVisibility.PUBLIC:
-        return {
-            "user": await DbUser.one(db, current_user.sub),
-            "project": project,
-        }
+class Mapper:
+    """A wrapper for the mapper to restrict access if project is completed."""
 
-    # As the default user for temp auth (svcfmtm) does not have valid permissions
-    # on any project, this will block access for temp login users on projects
-    # that are not public
-    return await wrap_check_access(
-        project,
-        db,
-        current_user,
-        ProjectRole.MAPPER,
-    )
+    def __init__(self, check_completed: bool = False):
+        """Initialize the mapper with check_completed flag."""
+        self.check_completed = check_completed
+
+    async def __call__(
+        self,
+        project: Annotated[DbProject, Depends(get_project)],
+        db: Annotated[Connection, Depends(db_conn)],
+        # Here temp auth token/cookie is allowed
+        current_user: Annotated[AuthUser, Depends(public_endpoint)],
+    ) -> ProjectUserDict:
+        """A mapper for a specific project.
+
+        FIXME is this approach flawed?
+        FIXME if the user accesses a /tasks/ endpoint but provides a
+        FIXME ?project_id=xxx for another project, then won't this
+        FIXME given them permission when they shouldn't have it?
+        """
+        if self.check_completed and project.status in [
+            ProjectStatus.COMPLETED,
+            ProjectStatus.ARCHIVED,
+        ]:
+            raise HTTPException(
+                status_code=HTTPStatus.FORBIDDEN,
+                detail=f"Project is locked since it is in {project.status.value} "
+                "state.",
+            )
+
+        # If project is public, skip permission check
+        if project.visibility == ProjectVisibility.PUBLIC:
+            return {
+                "user": await DbUser.one(db, current_user.sub),
+                "project": project,
+            }
+
+        # As the default user for temp auth (svcfmtm) does not have valid permissions
+        # on any project, this will block access for temp login users on projects
+        # that are not public
+        return await wrap_check_access(
+            project,
+            db,
+            current_user,
+            ProjectRole.MAPPER,
+            check_completed=self.check_completed,
+        )
 
 
 async def project_contributors(
@@ -363,42 +417,52 @@ async def project_contributors(
 ) -> ProjectUserDict:
     """A contributor to a specific project."""
     user_sub = current_user.sub
-    project_id = project.id
     org_id = project.organisation_id
 
     query = """
         SELECT * FROM users
         WHERE sub = %(user_sub)s
             AND (
-                CASE WHEN role = 'ADMIN' THEN true
-                ELSE
-                    EXISTS (
+                CASE
+                WHEN %(visibility)s IN ('SENSITIVE', 'PRIVATE') THEN
+                    CASE
+                    WHEN role = 'ADMIN' THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM organisation_managers
                         WHERE organisation_managers.user_sub = %(user_sub)s
-                          AND organisation_managers.organisation_id = %(org_id)s
-                    )
-                    OR EXISTS (
+                            AND organisation_managers.organisation_id = %(org_id)s
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM user_roles
                         WHERE user_roles.user_sub = %(user_sub)s
-                          AND user_roles.project_id = %(project_id)s
-                          AND user_roles.role = 'PROJECT_MANAGER'
-                    )
-                    OR EXISTS (
+                            AND user_roles.project_id = %(project_id)s
+                            AND user_roles.role = 'PROJECT_MANAGER'
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM projects
                         WHERE projects.author_sub = %(user_sub)s
-                    )
-                    OR EXISTS (
+                            AND projects.id = %(project_id)s
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM task_events
                         WHERE task_events.user_sub = %(user_sub)s
-                          AND task_events.project_id = %(project_id)s
-                    )
+                            AND task_events.project_id = %(project_id)s
+                    ) THEN true
+                    ELSE false
+                    END
+                ELSE true
                 END
             );
     """
     async with db.cursor() as cur:
         await cur.execute(
             query,
-            {"user_sub": user_sub, "project_id": project_id, "org_id": org_id},
+            {
+                "user_sub": user_sub,
+                "project_id": project.id,
+                "org_id": org_id,
+                "visibility": project.visibility,
+            },
         )
         db_user = await cur.fetchone()
 

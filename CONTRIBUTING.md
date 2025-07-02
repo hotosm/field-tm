@@ -126,8 +126,8 @@ please visit [this page](https://docs.hotosm.org/dev-practices)
 
 [1]: https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0 "slides"
 [2]: https://github.com/orgs/hotosm/projects/22 "Our latest task board"
-[3]: https://github.com/hotosm/fmtm/issues "issue queue"
-[4]: https://github.com/hotosm/fmtm/labels "label categories"
+[3]: https://github.com/hotosm/field-tm/issues "issue queue"
+[4]: https://github.com/hotosm/field-tm/labels "label categories"
 [5]: https://help.github.com/articles/about-pull-requests/ "About Pull Requests"
 [6]: https://www.markdownguide.org/ "Markdown format"
 [7]: https://docs.hotosm.org/dev-guide/repo-management/pre-commit "Pre-commit"

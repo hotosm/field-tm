@@ -32,7 +32,15 @@ from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
-from shapely.geometry import MultiPolygon, Point, Polygon, mapping, shape
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    MultiPolygon,
+    Point,
+    Polygon,
+    mapping,
+    shape,
+)
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
@@ -332,9 +340,12 @@ def add_required_geojson_properties(
                 or properties.get("fid")  # fid is typical from tools like QGIS
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
-                # 0 to 1073741823
+                # 0 to 1073741823 (collision chance is extremely low for ≤20k entities)
                 or getrandbits(30)
             )
+
+            if isinstance(osm_id, str) and "/" in osm_id:
+                osm_id = osm_id.split("/")[0]
 
             # Ensure negative osm_id if it's derived
             # NOTE this is important to denote the geom is not from OSM
@@ -350,7 +361,7 @@ def add_required_geojson_properties(
         properties.setdefault("changeset", 1)
         properties.setdefault("timestamp", str(current_date))
         properties.setdefault("submission_ids", "")
-        properties.setdefault("is_new", "")
+        properties.setdefault("created_by", "")
 
         feature["properties"] = properties
 
@@ -692,9 +703,10 @@ def merge_polygons(
     featcol: geojson.FeatureCollection,
     dissolve_polygon: bool = False,
 ) -> geojson.FeatureCollection:
-    """Merge multiple Polygons or MultiPolygons into a single Polygon.
+    """Merge multiple polygons, multipolygons, or linestrings into a single polygon.
 
-    It is used to create a single polygon boundary.
+    It is used to create a single polygon boundary. LineStrings are converted to
+    Polygons using buffer.
 
     Args:
         featcol: a FeatureCollection containing geometries.
@@ -711,19 +723,42 @@ def merge_polygons(
 
         for feature in features:
             properties = feature["properties"]
-            polygon = shape(feature["geometry"])
-            if isinstance(polygon, MultiPolygon):
+            geom = shape(feature["geometry"])
+
+            if isinstance(geom, (LineString, MultiLineString)):
+                if isinstance(geom, MultiLineString):
+                    for line in geom.geoms:
+                        buffered = line.buffer(0.0001)
+                        if buffered.is_valid:
+                            geom_list.append(buffered)
+                else:
+                    buffered = geom.buffer(0.0001)
+                    if buffered.is_valid:
+                        geom_list.append(buffered)
+                continue
+
+            # Handle Polygon geometries
+            if isinstance(geom, MultiPolygon):
                 # Remove holes in each polygon
-                polygons_without_holes = [remove_holes(poly) for poly in polygon.geoms]
+                polygons_without_holes = [remove_holes(poly) for poly in geom.geoms]
                 valid_polygons = [
                     ensure_right_hand_rule(poly) for poly in polygons_without_holes
                 ]
             else:
-                polygon_without_holes = remove_holes(polygon)
+                polygon_without_holes = remove_holes(geom)
                 valid_polygons = [ensure_right_hand_rule(polygon_without_holes)]
             geom_list.extend(valid_polygons)
 
+        if not geom_list:
+            raise ValueError("No valid geometries found in the FeatureCollection")
+
+        # Merge all geometries into a single polygon
         merged_geom = create_single_polygon(MultiPolygon(geom_list), dissolve_polygon)
+
+        # Ensure we have a valid polygon
+        if not merged_geom.is_valid:
+            merged_geom = merged_geom.buffer(0)  # Clean the geometry
+
         merged_geojson = mapping(merged_geom)
 
         # Create FeatureCollection
@@ -733,7 +768,7 @@ def merge_polygons(
     except Exception as e:
         raise HTTPException(
             HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=f"Couldn't merge the multipolygon to polygon: {str(e)}",
+            detail=f"Couldn't merge the geometries into a polygon: {str(e)}",
         ) from e
 
 

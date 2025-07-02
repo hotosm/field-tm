@@ -1,5 +1,15 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"common": {
+		"yes": "Yes",
+		"no": "No"
+	},
+	"project_states": {
+		"DRAFT": "Draft",
+		"PUBLISHED": "Published",
+		"ARCHIVED": "Archived",
+		"COMPLETED": "Completed"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "Ready",
 		"LOCKED_FOR_MAPPING": "Locked For Mapping",
@@ -50,7 +60,9 @@
 		"task_complete_only_total_mapped": "You have only mapped {totalMapped} features in the task area.",
 		"task_complete_confirm": "Are you sure you wish to mark this task as complete?",
 		"select_this_feature": "Select This Feature",
-		"map_this_feature": "Map This Feature"
+		"map_this_feature": "Map This Feature",
+		"proceed": "PROCEED",
+		"delete_feature": "Delete This Feature"
 	},
 	"stack_group": {
 		"project_information": "Project Information",
@@ -97,7 +109,9 @@
 		"status": "Status",
 		"comments": "Comments",
 		"entity_uuid": "Entity Uuid",
-		"collect_data": "COLLECT DATA"
+		"collect_data": "COLLECT DATA",
+		"entity_delete_confirmation": "Are you sure you want to delete this feature?",
+		"contact_pm_for_entity_deletion": "Only the creator can delete this feature. Please contact the project manager"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "COMPLETE MAPPING",
@@ -124,9 +138,13 @@
 	"offline": {
 		"features": "Features",
 		"basemaps": "Basemaps",
+		"data": "View Offline Data",
 		"store_features_offline": "Store Features Offline",
 		"features_offline_info": "Feauture extracts already stored offline",
 		"fetch_projects_offline": "You are offline and cannot fetch extra projects",
-		"ready_offline": "Ready for offline use."
+		"ready_offline": "Ready for offline use.",
+		"total_offline_submissions": "Total offline submissions",
+		"total_failed_submissions": "Total failed submissions",
+		"download_csv": "Download as CSV"
 	}
 }

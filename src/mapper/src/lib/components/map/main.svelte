@@ -30,11 +30,6 @@
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
-	import MapPinGrey from '$assets/images/map-pin-grey.png';
-	import MapPinRed from '$assets/images/map-pin-red.png';
-	import MapPinYellow from '$assets/images/map-pin-yellow.png';
-	import MapPinGreen from '$assets/images/map-pin-green.png';
-	import MapPinBlue from '$assets/images/map-pin-blue.png';
 	import BlackLockImg from '$assets/images/black-lock.png';
 	import RedLockImg from '$assets/images/red-lock.png';
 	import Arrow from '$assets/images/arrow.png';
@@ -53,6 +48,7 @@
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/map/click-outside.ts';
+	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
 
 	type bboxType = [number, number, number, number];
 
@@ -65,8 +61,8 @@
 		primaryGeomType: MapGeomTypes;
 		draw?: boolean;
 		drawGeomType: MapGeomTypes;
-		syncButtonTrigger: (() => void);
-		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void);
+		syncButtonTrigger: () => void;
+		handleDrawnGeom?: (drawInstance: any, geojson: GeoJSONGeometry) => void;
 	}
 
 	let {
@@ -85,13 +81,13 @@
 	const primaryGeomLayerMapping = {
 		POINT: 'entity-point-layer',
 		POLYGON: 'entity-polygon-layer',
-		LINESTRING: 'entity-line-layer',
+		POLYLINE: 'entity-line-layer',
 	};
 
 	const newGeomLayerMapping = {
 		POINT: 'new-entity-point-layer',
 		POLYGON: 'new-entity-polygon-layer',
-		LINESTRING: 'new-entity-line-layer',
+		POLYLINE: 'new-entity-line-layer',
 	};
 
 	const cssValue = (property: string) => getComputedStyle(document.documentElement).getPropertyValue(property).trim();
@@ -160,7 +156,12 @@
 	// })
 	let displayDrawHelpText: boolean = $state(false);
 	type DrawModeOptions = 'point' | 'linestring' | 'delete-selection' | 'polygon';
-	const currentDrawMode: DrawModeOptions = drawGeomType ? (drawGeomType.toLowerCase() as DrawModeOptions) : 'point';
+	const currentDrawMode: DrawModeOptions =
+		drawGeomType === 'POLYLINE'
+			? 'linestring'
+			: drawGeomType
+				? (drawGeomType.toLowerCase() as DrawModeOptions)
+				: 'point';
 	const drawControl = new MaplibreTerradrawControl({
 		modes: [currentDrawMode, 'select', 'delete'],
 		// Note We do not open the toolbar options, allowing the user
@@ -183,6 +184,9 @@
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
 		let entityLayerName: string = primaryGeomLayerMapping[primaryGeomType];
 		let newEntityLayerName: string = newGeomLayerMapping[drawGeomType];
+
+		// reset selected entity geom
+		entitiesStore.setSelectedEntityJavaRosaGeom(null);
 
 		// returns list of features of entity layer present on that clicked point
 		const clickedEntityFeature =
@@ -208,6 +212,7 @@
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
 			// if clicked coordinate contains uploaded entity only
 			const entityGeometry = clickedEntityFeature[0].geometry;
+			entitiesStore.setSelectedEntityJavaRosaGeom(geojsonGeomToJavarosa(entityGeometry));
 			const entityCentroid = centroid(entityGeometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntityId(clickedEntityId);
@@ -358,7 +363,7 @@
 		}
 
 		const interval = setInterval(() => {
-			if (drawGeomType === MapGeomTypes.POLYGON) {
+			if (drawGeomType === MapGeomTypes.POLYGON || drawGeomType === MapGeomTypes.POLYLINE) {
 				if (expanding) {
 					lineWidth += 0.3;
 					if (lineWidth >= 4) expanding = false; // Maximum width
@@ -400,11 +405,6 @@
 		entitiesStore.setSelectedEntityId(null);
 	}}
 	images={[
-		{ id: 'MAP_PIN_GREY', url: MapPinGrey },
-		{ id: 'MAP_PIN_RED', url: MapPinRed },
-		{ id: 'MAP_PIN_BLUE', url: MapPinBlue },
-		{ id: 'MAP_PIN_YELLOW', url: MapPinYellow },
-		{ id: 'MAP_PIN_GREEN', url: MapPinGreen },
 		{ id: 'LOCKED_FOR_MAPPING', url: BlackLockImg },
 		{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
 		{ id: 'locationArc', url: LocationArcImg },
@@ -436,7 +436,7 @@
 				}`}
 				onclick={async () => syncButtonTrigger()}
 				onkeydown={async (e: KeyboardEvent) => {
-					e.key === 'Enter' && (syncButtonTrigger());
+					e.key === 'Enter' && syncButtonTrigger();
 				}}
 				role="button"
 				tabindex="0"
@@ -592,30 +592,66 @@
 					manageHoverState
 				/>
 			{:else if primaryGeomType === MapGeomTypes.POINT}
-				<SymbolLayer
+				<CircleLayer
 					id="entity-point-layer"
 					applyToClusters={false}
 					hoverCursor="pointer"
-					manageHoverState
-					layout={{
-						'icon-image': [
+					paint={{
+						'circle-color': [
 							'match',
 							['get', 'status'],
 							'READY',
-							'MAP_PIN_GREY',
+							cssValue('--entity-ready'),
 							'OPENED_IN_ODK',
-							'MAP_PIN_YELLOW',
+							cssValue('--entity-opened-in-odk'),
 							'SURVEY_SUBMITTED',
-							'MAP_PIN_GREEN',
+							cssValue('--entity-survey-submitted'),
 							'VALIDATED',
-							'MAP_PIN_BLUE',
+							cssValue('--entity-validated'),
 							'MARKED_BAD',
-							'MAP_PIN_RED',
-							'MAP_PIN_GREY', // default color if no match is found
+							cssValue('--entity-marked-bad'),
+							cssValue('--entity-ready'),
 						],
-						'icon-allow-overlap': true,
-						'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
+						'circle-radius': 8,
+						'circle-stroke-width': 1,
+						'circle-stroke-color': [
+							'case',
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+							cssValue('--entity-outline-selected'),
+							cssValue('--entity-outline'),
+						],
 					}}
+				></CircleLayer>
+			{:else if primaryGeomType === MapGeomTypes.POLYLINE}
+				<LineLayer
+					id="entity-line-layer"
+					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+					paint={{
+						'line-color': [
+							'match',
+							['get', 'status'],
+							'READY',
+							cssValue('--entity-ready'),
+							'OPENED_IN_ODK',
+							cssValue('--entity-opened-in-odk'),
+							'SURVEY_SUBMITTED',
+							cssValue('--entity-survey-submitted'),
+							'VALIDATED',
+							cssValue('--entity-validated'),
+							'MARKED_BAD',
+							cssValue('--entity-marked-bad'),
+							cssValue('--entity-ready'), // default color if no match is found
+						],
+						'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
+						'line-opacity': [
+							'case',
+							['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+							1,
+							0.8,
+						],
+					}}
+					beforeLayerType="symbol"
+					manageHoverState
 				/>
 			{/if}
 		</FlatGeobuf>
@@ -643,7 +679,17 @@
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
 			<CircleLayer
-				id="bad-geom-circle-layer"
+				id="bad-geom-circle-point-layer"
+				hoverCursor="pointer"
+				paint={{
+					'circle-color': cssValue('--entity-marked-bad'),
+					'circle-radius': 8,
+					'circle-stroke-width': 1,
+					'circle-stroke-color': cssValue('--entity-outline'),
+				}}
+			/>
+			<CircleLayer
+				id="bad-geom-circle-highlight-layer"
 				hoverCursor="pointer"
 				paint={{
 					'circle-color': cssValue('--sl-color-primary-700'),
@@ -651,6 +697,16 @@
 					'circle-radius': circleRadius,
 					'circle-stroke-opacity': hoverStateFilter(0, 1),
 				}}
+			/>
+		{:else if drawGeomType === MapGeomTypes.POLYLINE}
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': cssValue('--sl-color-primary-700'),
+					'line-width': lineWidth,
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
 			/>
 		{/if}
 	</GeoJSON>
@@ -696,31 +752,61 @@
 				manageHoverState
 			/>
 		{:else if drawGeomType === MapGeomTypes.POINT}
-			<!-- id="new-geom-symbol-layer" -->
-			<SymbolLayer
+			<CircleLayer
 				id="new-entity-point-layer"
 				applyToClusters={false}
 				hoverCursor="pointer"
-				manageHoverState
-				layout={{
-					'icon-image': [
+				paint={{
+					'circle-color': [
 						'match',
 						['get', 'status'],
 						'READY',
-						'MAP_PIN_GREY',
+						cssValue('--entity-ready'),
 						'OPENED_IN_ODK',
-						'MAP_PIN_YELLOW',
+						cssValue('--entity-opened-in-odk'),
 						'SURVEY_SUBMITTED',
-						'MAP_PIN_GREEN',
+						cssValue('--entity-survey-submitted'),
 						'VALIDATED',
-						'MAP_PIN_BLUE',
+						cssValue('--entity-validated'),
 						'MARKED_BAD',
-						'MAP_PIN_RED',
-						'MAP_PIN_GREY', // default color if no match is found
+						cssValue('--entity-marked-bad'),
+						cssValue('--entity-ready'),
 					],
-					'icon-allow-overlap': true,
-					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1.6, 1],
+					'circle-radius': 8,
+					'circle-stroke-width': 1,
+					'circle-stroke-color': [
+						'case',
+						['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+						cssValue('--entity-outline-selected'),
+						cssValue('--entity-outline'),
+					],
 				}}
+			></CircleLayer>
+		{:else if drawGeomType === MapGeomTypes.POLYLINE}
+			<LineLayer
+				id="new-entity-line-layer"
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						cssValue('--entity-ready'),
+						'OPENED_IN_ODK',
+						cssValue('--entity-opened-in-odk'),
+						'SURVEY_SUBMITTED',
+						cssValue('--entity-survey-submitted'),
+						'VALIDATED',
+						cssValue('--entity-validated'),
+						'MARKED_BAD',
+						cssValue('--entity-marked-bad'),
+						cssValue('--entity-ready'), // default color if no match is found
+					],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.8],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
 			/>
 		{/if}
 	</GeoJSON>

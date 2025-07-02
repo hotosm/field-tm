@@ -19,7 +19,7 @@ ARG UV_IMG_TAG=0.5.2
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
-FROM ghcr.io/hotosm/fmtm/basemap-generator:0.3.0 AS basemap-bins
+FROM ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 AS basemap-bins
 
 
 # Includes all labels and timezone info to extend from
@@ -133,11 +133,16 @@ RUN apt-get update --quiet \
         "gettext-base" \
         "libpcre3" \
         "mime-support" \
-        "postgresql-client" \
+        "postgresql-common" \
         "libglib2.0-0" \
         "libspatialindex-c6" \
         "libproj25" \
         "libgeos-c1v5" \
+    # Temp until Debian supports Postgres v16 by default
+    && yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh \
+    && DEBIAN_FRONTEND=noninteractive \
+       apt-get install -y --quiet --no-install-recommends \
+       "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/

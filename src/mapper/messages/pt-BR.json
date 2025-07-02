@@ -1,5 +1,15 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"common": {
+		"yes": "Yes",
+		"no": "No"
+	},
+	"project_states": {
+		"DRAFT": "Rascunho",
+		"PUBLISHED": "Publicado",
+		"ARCHIVED": "Arquivado",
+		"COMPLETED": "Concluído"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "Pronto para coleta",
 		"LOCKED_FOR_MAPPING": "Bloqueado para mapeamento",
@@ -50,7 +60,9 @@
 		"task_complete_only_total_mapped": "Você mapeou apenas {totalMapped} recursos na área da tarefa.",
 		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?",
 		"select_this_feature": "Selecione este recurso",
-		"map_this_feature": "Mapeie este recurso"
+		"map_this_feature": "Mapeie este recurso",
+		"proceed": "prosseguir",
+		"delete_feature": "Excluir este recurso"
 	},
 	"stack_group": {
 		"project_information": "Informações do projeto",
@@ -97,7 +109,9 @@
 		"status": "Status",
 		"comments": "Comentários",
 		"entity_uuid": "UUID da entidade",
-		"collect_data": "PREENCHER FORMULÁRIO"
+		"collect_data": "PREENCHER FORMULÁRIO",
+		"entity_delete_confirmation": "Tem certeza de que deseja excluir este recurso?",
+		"contact_pm_for_entity_deletion": "Somente o criador pode excluir este recurso. Entre em contato com o gerente do projeto."
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "CONCLUIR MAPEAMENTO",
@@ -122,11 +136,15 @@
 		"uploading": "carregando"
 	},
 	"offline": {
-		"features": "recursos",
-		"basemaps": "mapas base",
-		"store_features_offline": "armazenar recursos off-line",
+		"features": "Recursos",
+		"basemaps": "Mapas base",
+		"data": "Exibir dados off-line",
+		"store_features_offline": "Armazenar recursos off-line",
 		"features_offline_info": "Extratos de recursos já armazenados offline",
 		"fetch_projects_offline": "Você está off-line e não pode buscar projetos extras",
-		"ready_offline": "Pronto para uso off-line."
+		"ready_offline": "Pronto para uso off-line.",
+		"total_offline_submissions": "Total de envios off-line",
+		"total_failed_submissions": "Total de envios com falha",
+		"download_csv": "Baixar como CSV"
 	}
 }

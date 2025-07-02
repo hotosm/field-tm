@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import AssetModules from '@/shared/AssetModules';
 // @ts-ignore
 import VectorLayer from 'ol/layer/Vector';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectOptions from '@/components/ProjectDetails/ProjectOptions';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { Tooltip } from '@mui/material';
@@ -16,7 +14,6 @@ import {
 
 type mapControlComponentType = {
   map: any;
-  projectName: string;
   pmTileLayerUrl: any;
 };
 
@@ -38,7 +35,7 @@ const btnList = [
   },
 ];
 
-const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlComponentType) => {
+const MapControlComponent = ({ map, pmTileLayerUrl }: mapControlComponentType) => {
   const handleOnClick = (btnId) => {
     const actualZoom = map.getView().getZoom();
     if (btnId === 'add') {
@@ -63,7 +60,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlCom
   };
 
   return (
-    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
+    <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[45] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
       <LayerSwitchMenu map={map} pmTileLayerUrl={pmTileLayerUrl} />
       {btnList.map((btn) => (
         <Tooltip title={btn.title} placement="left" arrow key={btn.title}>
@@ -89,7 +86,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlCom
             alignOffset={200}
             sideOffset={-25}
           >
-            <ProjectOptions projectName={projectName} />
+            <ProjectOptions />
           </DropdownMenuContent>
         </DropdownMenuPortal>
       </DropdownMenu>

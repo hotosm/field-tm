@@ -184,13 +184,15 @@ def _get_mandatory_fields(
             "label::english(en)": "Submission ids",
             "appearance": "minimal",
             "calculation": (
-                f"if({INSTANCE_FEATURE}/submission_ids = '', {INSTANCE_ID},"
-                f"concat({INSTANCE_FEATURE}/submission_ids, ',', {INSTANCE_ID}))"
+                f"if({INSTANCE_FEATURE}/submission_ids,"
+                f"concat({INSTANCE_FEATURE}/submission_ids, ',',{INSTANCE_ID}),"
+                f"{INSTANCE_ID})"
             ),
             "save_to": "submission_ids",
         },
         # FIXME probably add logic to take `new_feature` field
-        # and set the is_new entity property if not null?
+        # and set the created_by entity property to the injected
+        # username field?
     ])
     if need_verification_fields:
         fields.append(add_label_translations({
@@ -230,8 +232,8 @@ def create_entity_df(use_odk_collect: bool) -> pd.DataFrame:
         {
             "list_name": "features",
             "entity_id": f"coalesce({FEATURE}, uuid())",
-            "create_if": f"if({NEW_FEATURE}, true(), false())" if use_odk_collect else "",
-            "update_if": f"if({NEW_FEATURE}, false(), true())" if use_odk_collect else "",
+            "create_if": f"if({NEW_FEATURE}, true(), false())" if use_odk_collect else "false()",
+            "update_if": f"if({NEW_FEATURE}, false(), true())" if use_odk_collect else "true()",
             "label": status_label_expr,
         }
     ]

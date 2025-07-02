@@ -37,6 +37,7 @@
 	let dialogRef;
 
 	const handleSignIn = async (selectedOption: LoginProviderKey) => {
+		sessionStorage.setItem('requestedPath', window.location.pathname);
 		loginRedirect(selectedOption);
 	};
 </script>

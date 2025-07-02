@@ -14,10 +14,10 @@ FROM docker.io/alpine/curl:8.11.1 AS base
 # - https://github.com/tilezen/go-tilepacks/pull/36
 # - https://github.com/tilezen/go-tilepacks/pull/38
 FROM base AS tilepack
-ENV GO_TILEPACK_URL=https://github.com/spwoodcock/go-tilepacks/releases/download/0.3.0/tilepack_0.3.0_linux_amd64.tar.gz \
-    TILEPACK_SHA1SUM=6b7269735e9fb431de3457c8e2b6aa6d3f3ee49e
+ENV GO_TILEPACK_URL=https://github.com/spwoodcock/go-tilepacks/releases/download/0.4.0/tilepack_0.4.0_linux_amd64.tar.gz \
+    TILEPACK_SHA1SUM=fcccfbdfbb06f3826192dd3898ce5e44b0bc241c
 RUN curl -fsSLO "$GO_TILEPACK_URL" \
-    && tar -xvzf tilepack_0.3.0_linux_amd64.tar.gz \
+    && tar -xvzf tilepack_0.4.0_linux_amd64.tar.gz \
     && echo "${TILEPACK_SHA1SUM}  tilepack" | sha1sum -c - \
     && chmod +x tilepack \
     && mv tilepack /tilepack
