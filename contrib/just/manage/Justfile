@@ -55,6 +55,18 @@ rename-volume oldname newname:
   echo "Renamed {{oldname}} to {{newname}}"
   echo "You can now safely delete {{oldname}}"
 
+# Upgrade Postgres 14 --> 16 (local dev)
+[no-cd]
+upgrade-dev-db:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+
+  just manage _install_envsubst
+
+  ./envsubst -i contrib/pg-upgrade/compose.yaml | \
+    docker compose -f - up --abort-on-container-failure
+
 # Upgrade Postgres 14 --> 16
 [no-cd]
 upgrade-db:
