@@ -42,7 +42,7 @@ async def send_email(
 
     message = EmailMessage()
     # NOTE isn't no longer possible to have different login user & FROM header
-    # message["From"] = settings.SMTP_FROM_EMAIL
+    message["From"] = settings.SMTP_USER
     message["Subject"] = title
     message.set_content(message_content)
     html_content = markdown(message_content)
