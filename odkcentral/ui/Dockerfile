@@ -19,7 +19,7 @@
 # container for copying to nginx at runtime
 
 ARG ODK_CENTRAL_TAG
-FROM ghcr.io/getodk/central-nginx:$ODK_CENTRAL_TAG AS frontend
+FROM ghcr.io/getodk/central-nginx:v2025.2.0 AS frontend
 
 
 FROM docker.io/rclone/rclone:1 AS prod
