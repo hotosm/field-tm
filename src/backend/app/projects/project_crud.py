@@ -34,7 +34,7 @@ from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
 from osm_login_python.core import Auth
-from app.osm_rawdata.postgres import PostgresClient
+from osm_data_client import get_osm_data, RawDataOutputOptions, RawDataResult
 from psycopg import Connection, sql
 from psycopg.rows import class_row
 
@@ -125,9 +125,10 @@ async def get_projects_featcol(
 
 async def generate_data_extract(
     aoi: geojson.FeatureCollection | geojson.Feature | dict,
-    extract_config=None,
+    geom_type: str,
+    config_json=None,
     centroid: bool = False,
-) -> str:
+) -> RawDataResult:
     """Request a new data extract in flatgeobuf format.
 
     Args:
@@ -145,13 +146,12 @@ async def generate_data_extract(
         str:
             URL for the geojson data extract.
     """
-    if not extract_config:
+    if not config_json:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="To generate a new data extract a extract_config must be specified.",
         )
-    print("extract_config-=======", extract_config)
-    from app.osm_data_client import get_osm_data, RawDataOutputOptions
+    filters = json.loads(config_json)
 
     result = await get_osm_data(
         aoi,
@@ -159,44 +159,13 @@ async def generate_data_extract(
         output_options= RawDataOutputOptions(
         download_file=False),
         outputType="geojson",
-        geometryType=["line"],
+        geometryType=[geom_type],
         bind_zip=False,
-        # yaml_path=extract_config,
-        filters=json.loads(extract_config),
+        centroid=centroid,
+        use_st_within=False if geom_type=="line" else True,
+        filters=filters
     )
     return result
-
-    # pg = PostgresClient(
-    #     "underpass",
-    #     extract_config,
-    #     auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
-    #     if settings.RAW_DATA_API_AUTH_TOKEN
-    #     else None,
-    # )
-    # geojson_url = pg.execQuery(
-    #     aoi,
-    #     extra_params={
-    #         "fileName": (
-    #             f"fmtm/{settings.FMTM_DOMAIN}/data_extract"
-    #             if settings.RAW_DATA_API_AUTH_TOKEN
-    #             else "fmtm_extract"
-    #         ),
-    #         "outputType": "geojson",
-    #         "bind_zip": False,
-    #         "useStWithin": False,
-    #         "centroid": centroid,
-    #     },
-    # )
-
-    # if not geojson_url:
-    #     msg = "Could not get download URL for data extract. Did the API change?"
-    #     log.error(msg)
-    #     raise HTTPException(
-    #         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-    #         detail=msg,
-    #     )
-
-    # return geojson_url
 
 
 # ---------------------------

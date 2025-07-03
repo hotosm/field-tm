@@ -581,7 +581,7 @@ async def get_data_extract(
     current_user: Annotated[AuthUser, Depends(login_required)],
     geojson_file: UploadFile = File(...),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
-    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.highways,
+    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
     centroid: Annotated[bool, Form()] = False,
     geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
 ):
@@ -595,7 +595,6 @@ async def get_data_extract(
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
-    extract_config = None
     if osm_category:
         config_filename = XLSFormType(osm_category).name
         data_model = f"{data_models_path}/{config_filename}.yaml"
@@ -607,25 +606,24 @@ async def get_data_extract(
             ("polygon", False): ["ways_poly"],
             ("point", True): ["ways_poly", "nodes"],
             ("point", False): ["nodes"],
-            ("linestring", False): ["ways_line"],
+            ("polyline", False): ["ways_line"],
         }
 
         config["from"] = data_config.get((geom_type, centroid))
+        if osm_category.name=="highways":
+            geom_type="line" # line is recognized as a geomtype in raw-data-api
 
         # Convert to JSON string
-        json_str = json.dumps(config, indent=2)
+        config_json = json.dumps(config, indent=2)
 
-        # If you need it as a dictionary (parsed JSON), you can use:
-        parsed_json = config
-
-
-    return await project_crud.generate_data_extract(
+    result =  await project_crud.generate_data_extract(
         clean_boundary_geojson,
-        json_str,
+        geom_type,
+        config_json,
         centroid,
     )
 
-    # return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_result["download_url"]})
+    return JSONResponse(status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")})
 
 
 @router.get("/data-extract-url")
