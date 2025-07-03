@@ -610,20 +610,22 @@ async def get_data_extract(
         }
 
         config["from"] = data_config.get((geom_type, centroid))
-        if osm_category.name=="highways":
-            geom_type="line" # line is recognized as a geomtype in raw-data-api
+        if osm_category.name == "highways":
+            geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
         # Convert to JSON string
         config_json = json.dumps(config, indent=2)
 
-    result =  await project_crud.generate_data_extract(
+    result = await project_crud.generate_data_extract(
         clean_boundary_geojson,
         geom_type,
         config_json,
         centroid,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")})
+    return JSONResponse(
+        status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")}
+    )
 
 
 @router.get("/data-extract-url")

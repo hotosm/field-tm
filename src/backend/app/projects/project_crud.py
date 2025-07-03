@@ -33,8 +33,8 @@ from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
+from osm_data_client import RawDataOutputOptions, RawDataResult, get_osm_data
 from osm_login_python.core import Auth
-from osm_data_client import get_osm_data, RawDataOutputOptions, RawDataResult
 from psycopg import Connection, sql
 from psycopg.rows import class_row
 
@@ -156,14 +156,13 @@ async def generate_data_extract(
     result = await get_osm_data(
         aoi,
         fileName="fmtm_data_extract",
-        output_options= RawDataOutputOptions(
-        download_file=False),
+        output_options=RawDataOutputOptions(download_file=False),
         outputType="geojson",
         geometryType=[geom_type],
         bind_zip=False,
         centroid=centroid,
-        use_st_within=False if geom_type=="line" else True,
-        filters=filters
+        use_st_within=False if geom_type == "line" else True,
+        filters=filters,
     )
     return result
 
