@@ -54,6 +54,7 @@
 				type: 'FeatureCollection',
 				features: [],
 			};
+		// For Polygon geoms, only display if the centroid is within specified extent
 		} else if (extent && 'type' in extent && extent.type === 'Polygon') {
 			const filteredGeojsonData = filterGeomsCentroidsWithin(featcol, extent);
 			if (processGeojson) {
@@ -61,6 +62,7 @@
 			} else {
 				geojsonData = filteredGeojsonData;
 			}
+		// Else display Point and Polyline geoms if they intersect the extent
 		} else {
 			if (processGeojson) {
 				geojsonData = processGeojson(featcol);

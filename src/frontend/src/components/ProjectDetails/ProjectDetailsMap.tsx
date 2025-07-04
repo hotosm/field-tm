@@ -46,7 +46,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
   const projectId: string | undefined = params.id;
 
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
-  const [dataExtractExtent, setDataExtractExtent] = useState(null);
+  const [taskAreaExtent, setTaskAreaExtent] = useState(null);
   const [overlappingEntityFeatures, setOverlappingEntityFeatures] = useState<Record<string, any>[]>([]);
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
@@ -155,7 +155,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     setSelectedTaskArea(feature);
 
     let extent = properties.geometry.getExtent();
-    setDataExtractExtent(properties.geometry);
+    setTaskAreaExtent(properties.geometry);
 
     mapRef.current?.scrollIntoView({
       block: 'center',
@@ -302,33 +302,32 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             }}
           />
         )}
-        {projectInfo.data_extract_url &&
-          isValidUrl(projectInfo.data_extract_url) &&
-          dataExtractExtent &&
-          selectedTask && (
-            <VectorLayer
-              fgbUrl={projectInfo.data_extract_url}
-              fgbExtent={dataExtractExtent}
-              getTaskStatusStyle={(feature) => {
-                const geomType = feature.getGeometry().getType();
-                const entity = entityOsmMap?.find(
-                  (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
-                ) as EntityOsmMap;
-                const status = entity_state[entity?.status];
-                const isEntitySelected = selectedEntityId === entity?.osm_id;
-                return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
-              }}
-              viewProperties={{
-                size: map?.getSize(),
-                padding: [50, 50, 50, 50],
-                constrainResolution: true,
-                duration: 2000,
-              }}
-              style=""
-              zoomToLayer
-              zIndex={5}
-            />
-          )}
+        {projectInfo.data_extract_url && isValidUrl(projectInfo.data_extract_url) && taskAreaExtent && selectedTask && (
+          <VectorLayer
+            fgbUrl={projectInfo.data_extract_url}
+            // For POLYLINE, show all geoms, else filter by clicked task area (not working)
+            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? new GeoJSON().readFeatures(projectInfo.outline)[0].getGeometry() : taskAreaExtent}
+            fgbExtentFilter={taskAreaExtent}
+            getTaskStatusStyle={(feature) => {
+              const geomType = feature.getGeometry().getType();
+              const entity = entityOsmMap?.find(
+                (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
+              ) as EntityOsmMap;
+              const status = entity_state[entity?.status];
+              const isEntitySelected = selectedEntityId === entity?.osm_id;
+              return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+            }}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            style=""
+            zoomToLayer
+            zIndex={5}
+          />
+        )}
         {(projectInfo.primary_geom_type === GeoGeomTypesEnum.POINT ||
           projectInfo.new_geom_type === GeoGeomTypesEnum.POINT) && (
           <VectorLayer
