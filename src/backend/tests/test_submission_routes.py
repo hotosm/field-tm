@@ -49,7 +49,6 @@ async def test_download_submission_json(client, submission):
     """Test downloading submissions as JSON."""
     odk_project = submission["project"]
 
-    print(submission["submission_data"].get("createdAt"))
     date = datetime.strptime(
         submission["submission_data"].get("createdAt"), "%Y-%m-%dT%H:%M:%S.%fZ"
     ).strftime("%Y-%m-%d")
