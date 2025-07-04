@@ -37,6 +37,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
+from psycopg import Connection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
@@ -48,10 +49,12 @@ from app.central.central_crud import (
 )
 from app.central.central_schemas import ODKCentral
 from app.config import settings
+from app.db.database import db_conn
 from app.db.enums import HTTPStatus, XLSFormType
 from app.db.postgis_utils import (
     add_required_geojson_properties,
     featcol_keep_single_geom_type,
+    flatgeobuf_to_featcol,
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
@@ -76,6 +79,48 @@ async def download_template(
         return FileResponse(xlsform_path, filename=f"{form_filename}.xls")
     else:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")
+
+
+@router.get("/convert-fgb-to-geojson")
+async def convert_fgb_to_geojson(
+    url: str,
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
+):
+    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
+
+    Helper endpoint to test data extracts during project creation.
+    Required as the flatgeobuf files wrapped in GeometryCollection
+    cannot be read in QGIS or other tools.
+
+    Args:
+        url (str): URL to the flatgeobuf file.
+        db (Connection): The database connection.
+        current_user (AuthUser): Check if user is logged in.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+    with requests.get(url) as response:
+        if not response.ok:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="Download failed for data extract",
+            )
+        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
+
+    if not data_extract_geojson:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=("Failed to convert flatgeobuf --> geojson"),
+        )
+
+    headers = {
+        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=json.dumps(data_extract_geojson), headers=headers)
 
 
 @router.post("/append-geojson-properties")
