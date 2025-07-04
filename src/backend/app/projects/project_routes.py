@@ -24,7 +24,6 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-import requests
 import yaml
 from fastapi import (
     APIRouter,
@@ -70,7 +69,6 @@ from app.db.models import (
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
-    flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
@@ -393,48 +391,6 @@ async def download_features(
     }
 
     return Response(content=json.dumps(feature_collection), headers=headers)
-
-
-@router.get("/convert-fgb-to-geojson")
-async def convert_fgb_to_geojson(
-    url: str,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
-
-    Helper endpoint to test data extracts during project creation.
-    Required as the flatgeobuf files wrapped in GeometryCollection
-    cannot be read in QGIS or other tools.
-
-    Args:
-        url (str): URL to the flatgeobuf file.
-        db (Connection): The database connection.
-        current_user (AuthUser): Check if user is logged in.
-
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
-    """
-    with requests.get(url) as response:
-        if not response.ok:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Download failed for data extract",
-            )
-        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
-
-    if not data_extract_geojson:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=("Failed to convert flatgeobuf --> geojson"),
-        )
-
-    headers = {
-        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
-        "Content-Type": "application/media",
-    }
-
-    return Response(content=json.dumps(data_extract_geojson), headers=headers)
 
 
 @router.get(
