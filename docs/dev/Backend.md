@@ -45,7 +45,7 @@ URLs defined in the docker-compose file and your env file.
 - Field-TM uses ODK Central to store ODK data.
 - To facilitate faster development, the Docker setup includes a Central server.
 - The credentials are provided via the `.env` file, and the default URL to
-  access Central from within containers is: `https://odkcentral:8443`.
+  access Central from within containers is: `http://central:8383`.
 
 > Alternatively, you may provide credentials to an external Central server
 > in the `.env`.
