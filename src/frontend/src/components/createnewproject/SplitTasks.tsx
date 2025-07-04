@@ -164,7 +164,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, xlsFormFile
       name: 'define_tasks',
       value: task_split_type.DIVIDE_ON_SQUARE,
       label: 'Divide into square tasks',
-      disabled: formValues.primaryGeomType !== 'POLYLINE',
+      disabled: formValues.primaryGeomType === 'POLYLINE',
     },
     {
       name: 'define_tasks',
