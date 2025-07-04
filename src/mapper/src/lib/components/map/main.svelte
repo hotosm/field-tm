@@ -546,7 +546,7 @@
 		<FlatGeobuf
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
-			extent={taskStore.selectedTaskGeom}
+			extent={primaryGeomType === MapGeomTypes.POLYLINE ? polygon(projectOutlineCoords).geometry : taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
 			processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
