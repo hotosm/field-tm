@@ -372,7 +372,7 @@ class Settings(BaseSettings):
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
-    SMTP_PASSWORD: Optional[str] = None
+    SMTP_PASSWORD: Optional[SecretStr] = None
     SMTP_FROM_NAME: Optional[str] = "Field-TM"
 
     @computed_field
