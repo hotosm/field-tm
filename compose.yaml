@@ -106,16 +106,8 @@ services:
       # buffer requests, but not responses, so streaming out works
       odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
       odk.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # Service for local development only to facilitate https odkcentral
-      odkcentral_REVERSE_PROXY_HOST: http://central:8383
-      odkcentral_REVERSE_PROXY_URL: ~ ^/v\d
-      odkcentral_REVERSE_PROXY_BUFFERING: no
-      odkcentral_MAX_CLIENT_SIZE: 1G
-      # Custom cert only for local development
-      odkcentral_USE_CUSTOM_SSL: yes
-      odkcentral_AUTO_REDIRECT_HTTP_TO_HTTPS: no
-      odkcentral_CUSTOM_SSL_CERT_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUI5RENDQVhtZ0F3SUJBZ0lVWXFyb0dWRVdsK204eU9OY2pUU2pCWThkckN3d0NnWUlLb1pJemowRUF3SXcKRlRFVE1CRUdBMVVFQXd3S2IyUnJZMlZ1ZEhKaGJEQWdGdzB5TkRBM01qTXhNakF6TVRWYUdBOHlNVEkwTURZeQpPVEV5TURNeE5Wb3dGVEVUTUJFR0ExVUVBd3dLYjJSclkyVnVkSEpoYkRCMk1CQUdCeXFHU000OUFnRUdCU3VCCkJBQWlBMklBQktSZmpOQVFzWUI0ekNXckdETHdKNEVIRDRTNW5rL1Z3aG00TmYwN203c0RTai9RTzlYK0JnNjIKeWlMbWVzT1ZMRExHRklpZXZ2aHIrZkxNY0YwUDQwN0FWKytER1o5bXZ6VmNwMVdZMlE5NllpTVVuelM3MWx0RQo4K3BXbFBmanRLT0JoekNCaERBZEJnTlZIUTRFRmdRVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dId1lEClZSMGpCQmd3Rm9BVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXgKQmdOVkhSRUVLakFvZ2dwdlpHdGpaVzUwY21Gc2doUXFMbTlrYXk1bWJYUnRMbXh2WTJGc2FHOXpkSWNFQ2hRZQpNakFLQmdncWhrak9QUVFEQWdOcEFEQm1BakVBb2xuOGRubmlQN0dKSEJPQW4rTHVCV0ZhaUY1NHFZRmpTYyt1Clpia1cwY1pyNWw2VnZ6WVlBdGdWbUtOdTB5WWRBakVBMWlvT2JRTERYdDV3S1JPWjV5VUtmbys2T21IbTV1NWkKQU5LUHd2MExqc2ZIYk5hbzJMWnduK0VxTjNtdUpPNXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-      odkcentral_CUSTOM_SSL_KEY_DATA: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JRzJBZ0VBTUJBR0J5cUdTTTQ5QWdFR0JTdUJCQUFpQklHZU1JR2JBZ0VCQkRCc21pQjBmUU5hR1VobEdpWnMKNks1YVo1K1hUOVM1cFdlWkhZc05SVXRlK2FRZ1hIK0pTSmpwRnFqRnNLN21abldoWkFOaUFBU2tYNHpRRUxHQQplTXdscXhneThDZUJCdytFdVo1UDFjSVp1RFg5TzV1N0Ewby8wRHZWL2dZT3Rzb2k1bnJEbFN3eXhoU0lucjc0CmEvbnl6SEJkRCtOT3dGZnZneG1mWnI4MVhLZFZtTmtQZW1JakZKODB1OVpiUlBQcVZwVDM0N1E9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+      # Override X-Forwarded-Proto during local dev to allow auth over http
+      odk.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http"
     networks:
       fmtm-net:
         ipv4_address: 10.20.30.50
@@ -173,8 +165,6 @@ services:
       - "5678-5679:5678"
     networks:
       - fmtm-net
-    extra_hosts:
-      odkcentral: 10.20.30.50
     restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]

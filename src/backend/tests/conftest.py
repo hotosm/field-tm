@@ -36,6 +36,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.central import central_crud, central_schemas
+from app.central.central_deps import pyodk_client
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
 from app.db.database import db_conn
@@ -398,28 +399,14 @@ async def submission(client, odk_project):
     """Set up a submission for a project in ODK Central."""
     fmtm_project_id = odk_project.id
     odk_project_id = odk_project.odkid
-    odk_credentials = odk_project.odk_credentials
-    odk_creds = odk_credentials.model_dump()
-    base_url = odk_creds["odk_central_url"]
-    auth = (
-        odk_creds["odk_central_user"],
-        odk_creds["odk_central_password"],
-    )
+    odk_creds = odk_project.odk_credentials
 
-    async def forms(base_url, auth, pid):
-        """Fetch a list of forms in a project."""
-        async with AsyncClient(auth=auth) as client_httpx:
-            url = f"{base_url}/v1/projects/{pid}/forms"
-            response = await client_httpx.get(url)
-            response.raise_for_status()
-            return response
+    async with pyodk_client(odk_creds) as pyodk_client_obj:
+        forms = pyodk_client_obj.forms.list(project_id=odk_project_id)
 
-    forms_response = await forms(base_url, auth, odk_project_id)
-    assert forms_response.status_code == 200, "Failed to fetch forms from ODK Central"
-    forms = forms_response.json()
     assert forms, "No forms found in ODK Central project"
-    odk_form_id = forms[0]["xmlFormId"]
-    odk_form_version = forms[0]["version"]
+    odk_form_id = forms[0].xmlFormId
+    odk_form_version = forms[0].version
 
     submission_id = str(uuid.uuid4())
     photo_file_name = "submission_photo.jpg"
