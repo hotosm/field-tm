@@ -12,10 +12,10 @@ importers:
         specifier: 1.0.5
         version: 1.0.5
       '@electric-sql/pglite':
-        specifier: ^0.3.2
+        specifier: ^0.3.4
         version: 0.3.4
       '@electric-sql/pglite-sync':
-        specifier: ^0.3.5
+        specifier: ^0.3.7
         version: 0.3.7(@electric-sql/pglite@0.3.4)
       '@hotosm/ui':
         specifier: 0.2.0-b5
