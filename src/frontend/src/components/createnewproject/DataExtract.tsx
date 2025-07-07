@@ -106,7 +106,7 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
       name: 'data_extract',
       value: 'osm_data_extract',
       label: 'Fetch data from OSM',
-      disabled: formValues.primaryGeomType === 'POLYLINE',
+      // disabled: formValues.primaryGeomType === 'POLYLINE',
     },
     { name: 'data_extract', value: 'custom_data_extract', label: 'Upload custom map data' },
     { name: 'data_extract', value: 'no_data_extract', label: 'No existing data' },
@@ -130,8 +130,8 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
     const dataExtractRequestFormData = new FormData();
     const projectAoiGeojsonFile = getFileFromGeojson(projectAoiGeojson);
     dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
-    if (projectDetails.osmFormSelectionName) {
-      dataExtractRequestFormData.append('osm_category', projectDetails.osmFormSelectionName);
+    if (formValues.formExampleSelection) {
+      dataExtractRequestFormData.append('osm_category', formValues.formExampleSelection);
     }
     dataExtractRequestFormData.append('geom_type', formValues.primaryGeomType);
 
