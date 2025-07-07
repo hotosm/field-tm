@@ -125,6 +125,7 @@ async def get_projects_featcol(
 
 async def generate_data_extract(
     aoi: geojson.FeatureCollection | geojson.Feature | dict,
+    project_id: int,
     extract_config: Optional[BytesIO] = None,
     centroid: bool = False,
 ) -> str:
@@ -133,6 +134,7 @@ async def generate_data_extract(
     Args:
         aoi (geojson.FeatureCollection | geojson.Feature | dict]):
             Area of interest for data extraction.
+        project_id (int): The ID of the project.
         extract_config (Optional[BytesIO], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
@@ -162,9 +164,9 @@ async def generate_data_extract(
         aoi,
         extra_params={
             "fileName": (
-                f"fmtm/{settings.FMTM_DOMAIN}/data_extract"
+                f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
                 if settings.RAW_DATA_API_AUTH_TOKEN
-                else "fmtm_extract"
+                else f"fmtm_extract_{project_id}"
             ),
             "outputType": "geojson",
             "bind_zip": False,
