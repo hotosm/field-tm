@@ -10,7 +10,7 @@ import DefineTaskValidation from '@/components/createnewproject/validation/Defin
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import {
-  CreateProjectService,
+  CreateProjectServiceDeprecated,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
 } from '@/api/CreateProjectService';
@@ -131,7 +131,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, xlsFormFile
     const taskAreaGeojsonFile = new File([taskAreaBlob], 'data.json', { type: 'application/json' });
 
     dispatch(
-      CreateProjectService(
+      CreateProjectServiceDeprecated(
         `${import.meta.env.VITE_API_URL}/projects?org_id=${projectDetails.organisation_id}`,
         projectData,
         taskAreaGeojsonFile,
