@@ -74,9 +74,9 @@ if TYPE_CHECKING:
         BackgroundTaskUpdate,
         BasemapIn,
         BasemapUpdate,
-        ProjectIn,
         ProjectTeamIn,
         ProjectUpdate,
+        StubProjectIn,
     )
     from app.tasks.task_schemas import TaskEventIn
     from app.users.user_schemas import (
@@ -1871,7 +1871,7 @@ class DbProject(BaseModel):
         """
 
     @classmethod
-    async def create(cls, db: Connection, project_in: "ProjectIn") -> Self:
+    async def create(cls, db: Connection, project_in: "StubProjectIn") -> Self:
         """Create a new project in the database."""
         model_dump = dump_and_check_model(project_in)
         columns = []
@@ -2003,6 +2003,12 @@ class DbProject(BaseModel):
             await cur.execute(
                 """
                 DELETE FROM tasks WHERE project_id = %(project_id)s;
+            """,
+                {"project_id": project_id},
+            )
+            await cur.execute(
+                """
+                DELETE FROM user_invites WHERE project_id = %(project_id)s;
             """,
                 {"project_id": project_id},
             )
