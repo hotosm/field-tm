@@ -566,7 +566,7 @@ async def get_data_extract(
         }
 
         config["from"] = data_config.get((geom_type, centroid))
-        if osm_category.name == "highways":
+        if geom_type == "polyline":
             geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
         # Convert to JSON string

@@ -134,7 +134,7 @@ async def generate_data_extract(
     Args:
         aoi (geojson.FeatureCollection | geojson.Feature | dict]):
             Area of interest for data extraction.
-        extract_config (Optional[BytesIO], optional):
+        config_json (Optional[json], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
 
