@@ -1,16 +1,16 @@
 {
-    "common": {
-        "yes": "Ano",
-        "no": "Ne"
-    },
-    "project_states": {
-        "DRAFT": "Koncept",
-        "PUBLISHED": "Zveřejněno",
-        "ARCHIVED": "Archivováno",
-        "COMPLETED": "Dokončeno"
-    },
-    "$schema": "https://inlang.com/schema/inlang-message-format",
-    "task_states": {
-        "UNLOCKED_TO_MAP": "Připraveno"
-    }
+	"common": {
+		"yes": "Ano",
+		"no": "Ne"
+	},
+	"project_states": {
+		"DRAFT": "Koncept",
+		"PUBLISHED": "Zveřejněno",
+		"ARCHIVED": "Archivováno",
+		"COMPLETED": "Dokončeno"
+	},
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"task_states": {
+		"UNLOCKED_TO_MAP": "Připraveno"
+	}
 }
