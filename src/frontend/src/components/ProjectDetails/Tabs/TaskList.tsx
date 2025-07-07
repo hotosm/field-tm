@@ -15,16 +15,19 @@ import useDebouncedInput from '@/hooks/useDebouncedInput';
 import isEmpty from '@/utilfunctions/isEmpty';
 import Select2 from '@/components/common/Select2';
 import { taskStatusList } from '@/constants/taskStatusListConstants';
+import { outlineType } from '@/models/project/projectModel';
 
 type taskListPropType = { map: any; setSelectedTab: (tab: 'task_activity') => void };
 
 type taskListType = {
-  task_state: string | undefined;
-  task_id: string;
-  index: string;
-  submission_count: number;
-  last_submission: string | null;
+  actioned_by_uid: number | null;
+  actioned_by_username: string | null;
   feature_count: number;
+  id: number;
+  index: number;
+  outline: outlineType;
+  submission_count: number;
+  task_state: string;
 };
 
 const TaskList = ({ map, setSelectedTab }: taskListPropType) => {
@@ -51,12 +54,16 @@ const TaskList = ({ map, setSelectedTab }: taskListPropType) => {
   const taskBoundaries = projectTaskBoundries.find((project) => project.id.toString() === projectId)?.taskBoundries;
 
   useEffect(() => {
-    if (taskInfo?.length === 0 || taskBoundaries?.length === 0) return;
-    const updatedTaskList = taskInfo?.map((task) => ({
-      ...task,
-      task_state: taskBoundaries?.find((taskBound) => taskBound?.index === +task?.index)?.task_state,
-    }));
-    setTaskList(updatedTaskList);
+    if (taskBoundaries?.length === 0) return;
+    const taskFeatureMap = taskBoundaries?.map((task) => {
+      const taskFeature = taskInfo?.find((taskInfo) => +taskInfo.index === task.index);
+      return {
+        ...task,
+        feature_count: taskFeature?.feature_count || 0,
+        submission_count: taskFeature?.submission_count || 0,
+      };
+    }) as taskListType[];
+    setTaskList(taskFeatureMap);
   }, [projectTaskBoundries, taskInfo]);
 
   useEffect(() => {
@@ -65,7 +72,7 @@ const TaskList = ({ map, setSelectedTab }: taskListPropType) => {
     if (filter.search || filter.status) {
       const filteredList = taskList?.filter((task) => {
         const matchesStatus = filter.status ? task?.task_state === filter.status : true;
-        const matchesSearch = filter.search ? task?.task_id?.toString().includes(filter.search.toString()) : true;
+        const matchesSearch = filter.search ? task?.index?.toString().includes(filter.search.toString()) : true;
 
         return matchesStatus && matchesSearch;
       });
