@@ -233,6 +233,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       // get features from layer excluding 'project-area'(task layer) i.e. get feature from data-extract & new-geoms layer
       const entityFeatures = map.getFeaturesAtPixel(evt.pixel, {
         layerFilter: (layer) => !['bad-entities-point', 'bad-entities', 'project-area'].includes(layer.get('name')),
+        hitTolerance: 5,
       });
 
       // if the clicked point contains entity-related features, handle them; otherwise, check for task features
