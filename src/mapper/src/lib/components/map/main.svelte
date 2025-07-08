@@ -182,6 +182,9 @@
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
+		// if new feature draw mode is active then return
+		if (draw) return;
+
 		let entityLayerName: string = primaryGeomLayerMapping[primaryGeomType];
 		let newEntityLayerName: string = newGeomLayerMapping[drawGeomType];
 
@@ -546,7 +549,9 @@
 		<FlatGeobuf
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
-			extent={primaryGeomType === MapGeomTypes.POLYLINE ? polygon(projectOutlineCoords).geometry : taskStore.selectedTaskGeom}
+			extent={primaryGeomType === MapGeomTypes.POLYLINE
+				? polygon(projectOutlineCoords).geometry
+				: taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
 			processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
