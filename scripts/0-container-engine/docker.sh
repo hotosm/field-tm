@@ -157,6 +157,9 @@ check_user_not_root() {
 }
 
 update_to_rootless() {
+    pretty_echo "Enabling nf_tables via modprobe"
+    sudo modprobe nf_tables
+
     pretty_echo "Disabling docker service if running"
     sudo systemctl disable --now docker.service docker.socket
 
