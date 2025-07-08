@@ -5,10 +5,13 @@ import { getUserDetailsFromApi } from '@/utilfunctions/login';
 import { useAppDispatch } from '@/types/reduxTypes';
 import { Loader2 } from 'lucide-react';
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
 function OsmAuth() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestedPath = sessionStorage.getItem('requestedPath');
@@ -31,10 +34,9 @@ function OsmAuth() {
       if (authCode) {
         try {
           setIsSigningIn(true);
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/callback/osm?code=${authCode}&state=${state}`,
-            { credentials: 'include' },
-          );
+          const response = await fetch(`${VITE_API_URL}/auth/callback/osm?code=${authCode}&state=${state}`, {
+            credentials: 'include',
+          });
 
           if (!response.ok) {
             throw new Error(`Callback request failed with status ${response.status}`);
@@ -44,21 +46,16 @@ function OsmAuth() {
 
           if (requestedPath) {
             sessionStorage.removeItem('requestedPath');
-            const { protocol, hostname, port } = window.location;
-            if (hostname.startsWith('mapper.')) {
-              // redirect to mapper frontend (navigate doesn't work as it's on svelte)
-              window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/${requestedPath}`;
+
+            // Call /auth/me to populate the user details in the header
+            const apiUser = await getUserDetailsFromApi();
+            if (apiUser) {
+              dispatch(LoginActions.setAuthDetails(apiUser));
             } else {
-              // Call /auth/me to populate the user details in the header
-              const apiUser = await getUserDetailsFromApi();
-              if (apiUser) {
-                dispatch(LoginActions.setAuthDetails(apiUser));
-              } else {
-                console.error('Failed to fetch user details after cookie refresh.');
-              }
-              // Then navigate to the originally requested url
-              navigate(`${requestedPath}`);
+              console.error('Failed to fetch user details after cookie refresh.');
             }
+            // Then navigate to the originally requested url
+            navigate(`${requestedPath}`);
           }
         } catch (err) {
           console.error('Error during callback:', err);
