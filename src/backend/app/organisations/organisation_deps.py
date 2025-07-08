@@ -26,10 +26,12 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from psycopg import Connection
 
+from app.auth.auth_deps import login_required
+from app.auth.auth_schemas import AuthUser
 from app.central import central_schemas
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
-from app.db.models import DbOrganisation, DbProject
+from app.db.enums import HTTPStatus, UserRole
+from app.db.models import DbOrganisation, DbOrganisationManagers, DbProject
 from app.projects.project_deps import get_project
 
 
@@ -127,3 +129,51 @@ async def org_from_project(
 ) -> DbOrganisation:
     """Get an organisation from a project id."""
     return await get_organisation(db, project.organisation_id)
+
+
+async def org_or_project_manager(
+    org_id: int,
+    db: Connection = Depends(db_conn),
+    current_user: AuthUser = Depends(login_required),
+):
+    """Authorize user if they are an admin, org manager, or project manager in the org.
+
+    Args:
+        org_id (int): Organisation ID.
+        db (Connection): Database connection.
+        current_user (AuthUser): Authenticated user.
+
+    Returns:
+        dict: Contains the user and organisation.
+
+    Raises:
+        HTTPException: If the user lacks required permissions.
+    """
+    # Check if user is admin
+    if current_user.role == UserRole.ADMIN:
+        org = await DbOrganisation.one(db, org_id)
+        return {"user": current_user, "org": org}
+    # Check if user is org manager
+    org_managers = await DbOrganisationManagers.get(db, org_id, current_user.sub)
+    if org_managers:
+        org = await DbOrganisation.one(db, org_id)
+        return {"user": current_user, "org": org}
+    # Check if user is project manager for any project in the org
+    sql = """
+        SELECT 1 FROM user_roles ur
+        JOIN projects p ON ur.project_id = p.id
+        WHERE ur.user_sub = %(user_sub)s
+        AND ur.role = 'PROJECT_MANAGER'
+        AND p.organisation_id = %(org_id)s
+        LIMIT 1
+    """
+    async with db.cursor() as cur:
+        await cur.execute(sql, {"user_sub": current_user.sub, "org_id": org_id})
+        if await cur.fetchone():
+            org = await DbOrganisation.one(db, org_id)
+            return {"user": current_user, "org": org}
+    raise HTTPException(
+        status_code=HTTPStatus.FORBIDDEN,
+        detail="""You must be an admin, organisation manager, or
+        project manager to access this resource.""",
+    )

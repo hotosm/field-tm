@@ -17,6 +17,7 @@
 #
 """Routes for organisation management."""
 
+from datetime import date
 from typing import Annotated, Optional
 
 from fastapi import (
@@ -40,12 +41,17 @@ from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbOrganisation, DbOrganisationManagers
 from app.organisations import organisation_crud
-from app.organisations.organisation_deps import get_org_odk_creds, org_exists
+from app.organisations.organisation_deps import (
+    get_org_odk_creds,
+    org_exists,
+    org_or_project_manager,
+)
 from app.organisations.organisation_schemas import (
     OrganisationIn,
     OrganisationOut,
     OrganisationUpdate,
     OrgManagersOut,
+    StatsResponse,
     parse_organisation_input,
 )
 
@@ -299,3 +305,39 @@ async def remove_organisation_admin(
 
     await DbOrganisationManagers.delete(db, user_sub)
     return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@router.get("/{org_id}/stats", response_model=StatsResponse)
+async def get_stats(
+    org_id: int,
+    org_user_dict: dict = Depends(org_or_project_manager),
+    db: Connection = Depends(db_conn),
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+):
+    """Get mapping and submission statistics for an organisation.
+
+    Returns:
+        StatsResponse: Aggregated statistics including tasks, activity, and submissions.
+    """
+    return await organisation_crud.get_organisation_stats(
+        db, org_id, start_date, end_date
+    )
+
+
+@router.get("/{org_id}/submissions/download")
+async def download_organisation_submissions_route(
+    org_id: int,
+    file_type: str = "csv",
+    submitted_date_range: str = None,
+    org_user_dict: dict = Depends(org_or_project_manager),
+    db: Connection = Depends(db_conn),
+):
+    """Download all submissions for an organisation across projects.
+
+    Returns:
+        StreamingResponse: CSV or GeoJSON file containing submission data.
+    """
+    return await organisation_crud.download_organisation_submissions(
+        db, org_id, file_type, submitted_date_range
+    )
