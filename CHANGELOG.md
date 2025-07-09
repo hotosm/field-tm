@@ -1,5 +1,53 @@
 # Changelog
 
+## 2025.4.0 (2025-07-09)
+
+### Feat
+
+- **backend**: add highways xlsform for #2630
+- **backend**: implement scheduled upload of project submissions to S3 (#2643)
+- **backend**: add 'SENSITIVE' project and allow public access to public and invite only projects (#2653)
+- **mapper**: display offline submissions in offline tab for debugging (+csv) (#2543)
+- add status chip to project card & details section (#2623)
+- Project Completed Workflow (#2618)
+- **frontend**: request HOT's ODK server workflow (#2595)
+
+### Fix
+
+- **backend**: missing From header in smtp email send config
+- **mapper**: display css overlay with locale warning in web-forms (#2665)
+- **deps**: update dependency @electric-sql/pglite-sync to v0.3.7 (#2669)
+- **deps**: update dependency @electric-sql/pglite to v0.3.4 (#2668)
+- **deps**: update dependency @electric-sql/client to v1.0.5 (#2667)
+- **backend**: add a check to get-form-media to avoid returning bytes
+- **ci**: allow e2e workflow on forks (#2644)
+- **frontend**: ensure 'include centroids' param included in osm exports (#2660)
+- **backend**: update visibility logic for project access permissions (#2658)
+- **frontend**: project qr option & submission table (#2657)
+- **mapper**: prompt login before sending offline submission if made by logged out user (#2641)
+- **mapper**: conditionally render status badges on project card (#2635)
+- **mapper**: allow multiple submission id's tracked via entity property (#2634)
+- **mapper**: add user_sub to api_submissions table via migration / login
+- **backend**: submission count in project card and detail page (#2616)
+- **mapper**: disable upload image preview (#2622)
+- **backend**: suppress invalid error from pyodk about cache file  (#2614)
+- **mapper**: mapping feature for a second time (#2601)
+- **frontend**: submission count on project submissions page (#2612)
+
+### Refactor
+
+- **backend**: tweak SMTP vars for rollout dev/stage/prod, related #2458
+- **backend**: update to latest pyodk, removing custom code, towards #2210
+- update highways.xlsx --> highways.xls for consistency
+- rename repo fmtm --> field-tm & update all links
+- rename development branch --> dev
+- improve the icon used for point data in both frontends (#2640)
+- remove additional_feature entity functionality from fieldtm (#2633)
+- add favicon.ico and favicon.svg in root to gitignore
+- **userInvite**: invite multiple osm user by comma seperated value (#2621)
+- **frontend**: user role access components (#2611)
+- **frontend**: dedicated skeleton loader folder, reduce dup (#2609)
+
 ## 2025.3.1 (2025-06-17)
 
 ### Feat
