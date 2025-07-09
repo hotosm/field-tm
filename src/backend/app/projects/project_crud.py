@@ -42,7 +42,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
+from app.db.models import DbBackgroundTask, DbBasemap, DbOrganisation, DbProject, DbUser
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -51,9 +51,10 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
-from app.organisations.organisation_deps import get_default_odk_creds
+from app.organisations.organisation_deps import get_default_odk_creds, get_org_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
+from app.submissions.submission_crud import get_submission_by_project
 
 
 async def get_projects_featcol(
@@ -945,7 +946,7 @@ async def get_paginated_projects(
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
-    """Get the users and their contributions for a project.
+    """Get the users and their number of submissions for a project.
 
     Args:
         db (Connection): The database connection.
@@ -953,27 +954,47 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
 
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing
-            the username and the number of contributions made by each user
+            the username and the number of submissions made by each user
             for the specified project.
     """
-    query = """
-        SELECT
-            u.username as user,
-            COUNT(th.user_sub) as contributions
-        FROM
-            users u
-        JOIN
-            task_events th ON u.sub = th.user_sub
-        WHERE
-            th.project_id = %(project_id)s
-        GROUP BY u.username
-        ORDER BY contributions DESC
-    """
-    async with db.cursor(
-        row_factory=class_row(project_schemas.ProjectUserContributions)
-    ) as cur:
-        await cur.execute(query, {"project_id": project_id})
-        return await cur.fetchall()
+    try:
+        project = await DbProject.one(db, project_id, minimal=True)
+
+        # Ensure odk_credentials is set
+        if not (
+            project.odk_central_url
+            and project.odk_central_user
+            and project.odk_central_password
+        ):
+            org = await DbOrganisation.one(db, project.organisation_id)
+            odk_creds = await get_org_odk_creds(org)
+            project.odk_central_url = odk_creds.odk_central_url
+            project.odk_central_user = odk_creds.odk_central_user
+            project.odk_central_password = odk_creds.odk_central_password
+            project.odk_credentials = odk_creds
+
+        # Fetch all submissions for the project
+        data = await get_submission_by_project(project, {})
+        submissions = data.get("value", [])
+
+        # Count submissions per user
+        submission_counts = {}
+        for sub in submissions:
+            username = sub.get("username")
+            if username:
+                submission_counts[username] = submission_counts.get(username, 0) + 1
+
+        # Format as list of dicts, sorted by count desc
+        result = [
+            {"user": user, "submissions": count}
+            for user, count in sorted(
+                submission_counts.items(), key=lambda x: x[1], reverse=True
+            )
+        ]
+        return result
+    except Exception as e:
+        log.error(f"Error in get_project_users_plus_contributions: {e}")
+        return []
 
 
 async def send_project_manager_message(
