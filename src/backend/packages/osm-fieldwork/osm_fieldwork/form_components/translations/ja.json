@@ -1,6 +1,9 @@
 {
   "survey_questions": "調査項目",
   "image": "写真撮影",
+  "mapping_mode": "既存の地物をマッピングしますか、それとも新しい地物を作成しますか？",
+  "existing": "既存の地物",
+  "new": "新しい地物",
   "feature": "ジオメトリ",
   "new_feature": "新しいジオメトリを描いてください",
   "feature_exists": "この地物は実在しますか？",

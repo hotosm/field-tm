@@ -50,6 +50,8 @@ NEW_FEATURE = "${new_feature}"
 FEATURE = "${feature}"
 INSTANCE_ID = "${instanceID}"
 INSTANCE_FEATURE = "instance('features')/root/item[name=${feature}]"
+USERNAME = "${username}"
+RANDOM_NEG_ID = "int(-1 * random() * 1073741823)"
 
 
 meta_df = pd.DataFrame(
@@ -98,44 +100,48 @@ def _get_mandatory_fields(
         status_field_calculation += "if(${feature_exists} = 'no', 6, "
         status_field_calculation += "if(${digitisation_correct} = 'no', 6, "
     if use_odk_collect:
-        status_field_calculation += f"if({NEW_FEATURE} != '', 3, 6)"
+        status_field_calculation += f"if({NEW_FEATURE} != '', 2, 6)"
     else:
         status_field_calculation += "6"
     if need_verification_fields:
         status_field_calculation += "))"
     status_field_calculation += ")"
 
+    # Map geometry types to field types
+    geom_type_mapping = {
+        DbGeomType.POINT: "geopoint",
+        DbGeomType.POLYGON: "geoshape",
+        DbGeomType.LINESTRING: "geotrace"
+    }
+    
+    # Get the correct field type or raise error if not supported
+    if new_geom_type not in geom_type_mapping:
+        raise ValueError(f"Unsupported geometry type: {new_geom_type}")
+
+    geom_field = geom_type_mapping[new_geom_type]
+
     fields = [
         {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
+        add_label_translations({
+            "type": "select_one mapping_mode",
+            "name": "mapping_mode",
+            "required": "yes",
+        }),
         add_label_translations({
             "type": "select_one_from_file features.csv",
             "name": "feature",
             "appearance": "map",
+            "relevant": "${mapping_mode} = 'existing'",
+            "required": "yes",
+        }),
+        add_label_translations({
+            "type": geom_field,
+            "name": "new_feature",
+            "appearance": "placement-map",
+            "relevant": "${mapping_mode} = 'new'",
+            "required": "yes",
         })
     ]
-    if use_odk_collect:
-        # Map geometry types to field types
-        geom_type_mapping = {
-            DbGeomType.POINT: "geopoint",
-            DbGeomType.POLYGON: "geoshape",
-            DbGeomType.LINESTRING: "geotrace"
-        }
-        
-        # Get the correct field type or raise error if not supported
-        if new_geom_type not in geom_type_mapping:
-            raise ValueError(f"Unsupported geometry type: {new_geom_type}")
-
-        geom_field = geom_type_mapping[new_geom_type]
-
-        fields.append(
-            add_label_translations({
-                "type": geom_field,
-                "name": "new_feature",
-                "appearance": "placement-map",
-                "relevant": "${feature}= ''",
-                "required": "yes",
-            })
-        )
     fields.extend([
         {
             "type": "calculate",
@@ -143,7 +149,13 @@ def _get_mandatory_fields(
             "notes": "e.g. OSM ID",
             "label::english(en)": "Feature ID",
             "appearance": "minimal",
-            "calculation": f"if({FEATURE} != '', {INSTANCE_FEATURE}/osm_id, '')",
+            "calculation": (
+                f"if({FEATURE} != '', {INSTANCE_FEATURE}/osm_id, "
+                f"if({NEW_FEATURE} != '', {RANDOM_NEG_ID}, ''))"
+                if use_odk_collect
+                else f"if({FEATURE} != '', {INSTANCE_FEATURE}/osm_id, '')"
+            ),
+            "save_to": "osm_id",
         },
         {
             "type": "calculate",
@@ -152,8 +164,8 @@ def _get_mandatory_fields(
             "label::english(en)": "Feature Geometry",
             "appearance": "minimal",
             "calculation": (
-                f"if({NEW_FEATURE} != '', {NEW_FEATURE}, '')" if use_odk_collect
-                else f"if({FEATURE} != '', {INSTANCE_FEATURE}/geometry, '')"
+                f"if({FEATURE} != '', {INSTANCE_FEATURE}/geometry, "
+                f"if({NEW_FEATURE} != '', {NEW_FEATURE}, ''))"
             ),
             "save_to": "geometry",
         },
@@ -190,9 +202,15 @@ def _get_mandatory_fields(
             ),
             "save_to": "submission_ids",
         },
-        # FIXME probably add logic to take `new_feature` field
-        # and set the created_by entity property to the injected
-        # username field?
+        {
+            "type": "calculate",
+            "name": "created_by",
+            "notes": "Update the created_by field",
+            "label::english(en)": "Created by",
+            "appearance": "minimal",
+            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, '')",
+            "save_to": "created_by",
+        },
     ])
     if need_verification_fields:
         fields.append(add_label_translations({
