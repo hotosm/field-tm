@@ -383,3 +383,10 @@ class ProjectTeamIn(ProjectTeamOne):
 
     # Exclude, as the uuid is generated in the database
     team_id: Annotated[Optional[UUID], Field(exclude=True)] = None
+
+
+class ProjectContributor(BaseModel):
+    """A single project contributor and their submission count."""
+
+    user: str
+    submissions: int
