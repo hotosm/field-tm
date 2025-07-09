@@ -182,6 +182,9 @@
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
+		// if new feature draw mode is active then return
+		if (draw) return;
+
 		let entityLayerName: string = primaryGeomLayerMapping[primaryGeomType];
 		let newEntityLayerName: string = newGeomLayerMapping[drawGeomType];
 
