@@ -19,7 +19,7 @@
 		CircleLayer,
 	} from 'svelte-maplibre';
 	import type { PGlite } from '@electric-sql/pglite';
-	import maplibre, { type MapGeoJSONFeature } from 'maplibre-gl';
+	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
@@ -188,13 +188,33 @@
 		// reset selected entity geom
 		entitiesStore.setSelectedEntityJavaRosaGeom(null);
 
+		// Add a 5px spatial buffer around the clicked point to ease feature selection
+		let entityPoint: PointLike | [PointLike, PointLike];
+		let newEntityPoint: PointLike | [PointLike, PointLike];
+		if (primaryGeomType === MapGeomTypes.POLYLINE) {
+			entityPoint = [
+				[e.point.x - 5, e.point.y - 5],
+				[e.point.x + 5, e.point.y + 5],
+			];
+		} else {
+			entityPoint = e.point;
+		}
+		if (drawGeomType === MapGeomTypes.POLYLINE) {
+			newEntityPoint = [
+				[e.point.x - 5, e.point.y - 5],
+				[e.point.x + 5, e.point.y + 5],
+			];
+		} else {
+			newEntityPoint = e.point;
+		}
+
 		// returns list of features of entity layer present on that clicked point
 		const clickedEntityFeature =
-			map?.queryRenderedFeatures(e.point, {
+			map?.queryRenderedFeatures(entityPoint, {
 				layers: [entityLayerName],
 			}) || [];
 		const clickedNewEntityFeature =
-			map?.queryRenderedFeatures(e.point, {
+			map?.queryRenderedFeatures(newEntityPoint, {
 				layers: [newEntityLayerName],
 			}) || [];
 
@@ -546,7 +566,9 @@
 		<FlatGeobuf
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
-			extent={primaryGeomType === MapGeomTypes.POLYLINE ? polygon(projectOutlineCoords).geometry : taskStore.selectedTaskGeom}
+			extent={primaryGeomType === MapGeomTypes.POLYLINE
+				? polygon(projectOutlineCoords).geometry
+				: taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
 			processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
