@@ -174,6 +174,9 @@ restart_docker_rootless() {
     systemctl --user daemon-reload
     systemctl --user restart docker
     echo
+    echo "Ensuring the service remains running after log out"
+    sudo loginctl enable-linger "$(whoami)"
+    echo
     echo "Done."
 }
 
