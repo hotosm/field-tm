@@ -107,41 +107,52 @@ def _get_mandatory_fields(
         status_field_calculation += "))"
     status_field_calculation += ")"
 
-    # Map geometry types to field types
-    geom_type_mapping = {
-        DbGeomType.POINT: "geopoint",
-        DbGeomType.POLYGON: "geoshape",
-        DbGeomType.LINESTRING: "geotrace"
-    }
-    
-    # Get the correct field type or raise error if not supported
-    if new_geom_type not in geom_type_mapping:
-        raise ValueError(f"Unsupported geometry type: {new_geom_type}")
+    if use_odk_collect:
+        # Map geometry types to field types
+        geom_type_mapping = {
+            DbGeomType.POINT: "geopoint",
+            DbGeomType.POLYGON: "geoshape",
+            DbGeomType.LINESTRING: "geotrace"
+        }
+        
+        # Get the correct field type or raise error if not supported
+        if new_geom_type not in geom_type_mapping:
+            raise ValueError(f"Unsupported geometry type: {new_geom_type}")
 
-    geom_field = geom_type_mapping[new_geom_type]
+        geom_field = geom_type_mapping[new_geom_type]
 
-    fields = [
-        {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
-        add_label_translations({
-            "type": "select_one mapping_mode",
-            "name": "mapping_mode",
-            "required": "yes",
-        }),
-        add_label_translations({
-            "type": "select_one_from_file features.csv",
-            "name": "feature",
-            "appearance": "map",
-            "relevant": "${mapping_mode} = 'existing'",
-            "required": "yes",
-        }),
-        add_label_translations({
-            "type": geom_field,
-            "name": "new_feature",
-            "appearance": "placement-map",
-            "relevant": "${mapping_mode} = 'new'",
-            "required": "yes",
-        })
-    ]
+        fields = [
+            {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
+            add_label_translations({
+                "type": "select_one mapping_mode",
+                "name": "mapping_mode",
+                "required": "yes",
+            }),
+            add_label_translations({
+                "type": "select_one_from_file features.csv",
+                "name": "feature",
+                "appearance": "map",
+                "relevant": "${mapping_mode} = 'existing'",
+                "required": "yes",
+            }),
+            add_label_translations({
+                "type": geom_field,
+                "name": "new_feature",
+                "appearance": "placement-map",
+                "relevant": "${mapping_mode} = 'new'",
+                "required": "yes",
+            })
+        ]
+    else:
+        fields = [
+            {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
+            add_label_translations({
+                "type": "select_one_from_file features.csv",
+                "name": "feature",
+                "appearance": "map",
+            })
+        ]
+
     fields.extend([
         {
             "type": "calculate",
