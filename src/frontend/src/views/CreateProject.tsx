@@ -67,6 +67,10 @@ const CreateProject = () => {
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
   const basicProjectDetailsLoading = useAppSelector((state) => state.createproject.basicProjectDetailsLoading);
 
+  const resetReduxState = () => {
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
+  };
+
   useEffect(() => {
     if (step < 1 || step > 5 || !values.formExampleSelection) {
       setSearchParams({ step: '1' });
@@ -74,6 +78,7 @@ const CreateProject = () => {
   }, []);
 
   useEffect(() => {
+    resetReduxState();
     if (!projectId) return;
     dispatch(GetBasicProjectDetails(`${VITE_API_URL}/projects/${projectId}/minimal`));
   }, [projectId]);
