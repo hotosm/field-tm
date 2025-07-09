@@ -1,6 +1,6 @@
 {
   "name": "field-tm",
-  "version": "2025.3.1",
+  "version": "2025.4.0",
   "scripts": {
     "build": "vite build",
     "build:dev": "vite build --mode development",
