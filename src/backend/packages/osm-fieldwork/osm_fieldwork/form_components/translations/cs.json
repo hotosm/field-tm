@@ -1,0 +1,16 @@
+{
+  "lumped": "Seskupené – jeden polygon (více než jedna budova digitalizovaná jako jedna)",
+  "image": "Udělejte fotku",
+  "yes": "Ano",
+  "no": "Ne",
+  "survey_questions": "Otázky průzkumu",
+  "feature": "Geometrie",
+  "new_feature": "Nakreslete novou geometrii",
+  "feature_exists": "Existuje tato funkce?",
+  "verification": "Ověření",
+  "digitisation_problem": "Co je špatného na digitalizaci?",
+  "end_note": "Pokud budova neexistuje, nelze pokračovat v získávání dat",
+  "other": "OSTATNÍ",
+  "digitisation_correct": "Je digitalizovaná poloha této funkce správná?",
+  "split": "Rozdělení – jedna budova (jedna budova digitalizovaná jako více než jeden polygon)"
+}

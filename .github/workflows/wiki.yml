@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - docs/**
-    branches: [development]
+    branches: [dev]
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
 jobs:
   publish-docs-to-wiki:
-    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@3.2.0
+    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@3.3.2
     with:
       homepage_path: "wiki_redirect.md"

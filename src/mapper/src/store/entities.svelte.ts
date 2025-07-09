@@ -9,6 +9,7 @@ import type { LngLatLike } from 'svelte-maplibre';
 
 import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
 import { EntityStatusNameMap } from '$lib/types';
+import { getLoginStore } from './login.svelte';
 import { getAlertStore } from './common.svelte';
 import { DbEntity } from '$lib/db/entities';
 import { DbApiSubmission } from '$lib/db/api-submissions';
@@ -32,11 +33,9 @@ let entitiesUnsubscribe: (() => void) | null = $state(null);
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntityId: string | null = $state(null);
 let entitiesList: DbEntityType[] = $state([]);
-let selectedEntity: DbEntityType | null = $derived(
-	entitiesList.find((entity) => entity.entity_id === selectedEntityId) ?? null,
-);
 // Map each entity_id to the entity data, for faster lookup in map
 let entityMap = $derived(new Map(entitiesList.map((entity) => [entity.entity_id, entity])));
+let selectedEntity: DbEntityType | null = $derived(entityMap.get(selectedEntityId || '') ?? null);
 
 // Derive new and bad geoms to display as an overlay
 let badGeomFeatcol: FeatureCollection = $derived({
@@ -54,17 +53,21 @@ let newGeomFeatcol: FeatureCollection = $derived({
 		.filter(Boolean),
 });
 
+const alertStore = getAlertStore();
+const loginStore = getLoginStore();
+
 let syncEntityStatusManuallyLoading: boolean = $state(false);
 let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
 let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
-let alertStore = getAlertStore();
 let entitiesSync: any = $state(undefined);
 let fgbOpfsUrl: string = $state('');
 let geomDeleteLoading: boolean = $state(false);
 let selectedEntityJavaRosaGeom: string | null = $state(null);
+let isProcessing = false;
+const entityQueue: ShapeData[][] = [];
 
 function getEntitiesStatusStore() {
 	async function getEntityStatusStream(db: PGliteWithSync, projectId: number): Promise<ShapeStream | undefined> {
@@ -92,28 +95,10 @@ function getEntitiesStatusStore() {
 
 		entitiesUnsubscribe = entitiesSync?.stream.subscribe(
 			async (entities: ShapeData[]) => {
-				// Create map for faster lookup
-				const rows: DbEntityType[] = entities
-					.filter((item): item is { value: DbEntityType } => 'value' in item && item.value !== null)
-					.map((item) => item.value);
-
-				// Map current list for faster lookups
-				const entityMapClone = new Map(entitiesList.map((e) => [e.entity_id, e]));
-
-				for (const entity of rows) {
-					const updatedEntity = {
-						...entityMapClone.get(entity.entity_id), // fallback to existing data
-						...entity, // overwrite with new status
-					};
-					entityMapClone.set(entity.entity_id, updatedEntity);
-					// Store value in local db for persistence across restarts
-					await DbEntity.update(db, entity);
-				}
-
-				// Set the reactive store var for updates
-				entitiesList = Array.from(entityMapClone.values());
-
-				_calculateTaskSubmissionCounts();
+				// Add incoming data to the queue
+				entityQueue.push(entities);
+				// Trigger processing if not already running
+				processQueue(db);
 			},
 			(error: FetchError) => {
 				console.error('entity sync error', error);
@@ -130,6 +115,55 @@ function getEntitiesStatusStore() {
 			entitiesUnsubscribe = null;
 		}
 	}
+
+	const processQueue = async (db: PGliteWithSync) => {
+		// If a batch is already being processed, do nothing.
+		// The current process will handle the next item in the queue in the finally block.
+		// This prevents multiple concurrent processes from running.
+		if (isProcessing) return;
+		// If no items in the queue, exit
+		if (entityQueue.length === 0) return;
+
+		isProcessing = true;
+
+		// Get the next batch of entities from the front of the queue
+		const entities = entityQueue.shift()!;
+
+		try {
+			// --- Your original logic is now safely inside the processor ---
+			const rows: DbEntityType[] = entities
+				.filter((item): item is { value: DbEntityType } => 'value' in item && item.value !== null)
+				.map((item) => item.value);
+
+			// Map current list for faster lookups
+			let entityMapClone = new Map(entitiesList.map((e) => [e.entity_id, e]));
+
+			for (const entity of rows) {
+				const updatedEntity = {
+					...(entityMapClone.get(entity.entity_id) || {}), // fallback to existing data
+					...entity, // overwrite with new status
+				};
+
+				entityMapClone.set(entity.entity_id, updatedEntity);
+				// Store value in local db for persistence across restarts
+				await DbEntity.update(db, updatedEntity);
+			}
+
+			// Set the reactive store var for updates
+			entitiesList = Array.from(entityMapClone.values());
+
+			_calculateTaskSubmissionCounts();
+			// --- End of original logic ---
+		} catch (error) {
+			console.error('Failed to process entity batch:', error);
+		} finally {
+			isProcessing = false;
+			// If there are more items in the queue, process them
+			if (entityQueue.length > 0) {
+				processQueue(db);
+			}
+		}
+	};
 
 	async function setEntitiesListFromDbRecords(db: PGliteWithSync, projectId: number) {
 		const dbEntities = await db.query(`SELECT * FROM odk_entities WHERE project_id = $1;`, [projectId]);
@@ -156,6 +190,7 @@ function getEntitiesStatusStore() {
 						...feature.properties,
 						status: entity?.status,
 						entity_id: entity?.entity_id,
+						submission_ids: entity?.submission_ids,
 						// osm_id is BigInt, which doesn't work with svelte-maplibre layers
 						osm_id: feature?.properties?.osm_id.toString(),
 					},
@@ -279,6 +314,7 @@ function getEntitiesStatusStore() {
 			// Save for later submission + add entity update to local db
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: entityRequestPayload,
@@ -330,6 +366,7 @@ function getEntitiesStatusStore() {
 			// Save for later submission + add entity entry to local db
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: entityRequestPayload,
@@ -404,6 +441,7 @@ function getEntitiesStatusStore() {
 
 			await DbApiSubmission.create(db, {
 				url: entityRequestUrl,
+				user_sub: loginStore.getAuthDetails?.sub,
 				method: entityRequestMethod,
 				content_type: entityRequestContentType,
 				payload: {

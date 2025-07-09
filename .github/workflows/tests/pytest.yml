@@ -7,7 +7,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      - dev
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
 
       - name: Vars and Secrets to Env
         env:
-          TAG_OVERRIDE: ${{ env.TAG_OVERRIDE || 'ci-development' }}
+          TAG_OVERRIDE: ${{ env.TAG_OVERRIDE || 'ci-dev' }}
           TARGET_OVERRIDE: ${{ env.TARGET_OVERRIDE || 'ci' }}
           GIT_BRANCH: ${{ github.ref_name }}
           VARS_CONTEXT: ${{ toJson(vars) }}

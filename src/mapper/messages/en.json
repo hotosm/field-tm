@@ -4,6 +4,12 @@
 		"yes": "Yes",
 		"no": "No"
 	},
+	"project_states": {
+		"DRAFT": "Draft",
+		"PUBLISHED": "Published",
+		"ARCHIVED": "Archived",
+		"COMPLETED": "Completed"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "Ready",
 		"LOCKED_FOR_MAPPING": "Locked For Mapping",
@@ -132,9 +138,13 @@
 	"offline": {
 		"features": "Features",
 		"basemaps": "Basemaps",
+		"data": "View Offline Data",
 		"store_features_offline": "Store Features Offline",
 		"features_offline_info": "Feauture extracts already stored offline",
 		"fetch_projects_offline": "You are offline and cannot fetch extra projects",
-		"ready_offline": "Ready for offline use."
+		"ready_offline": "Ready for offline use.",
+		"total_offline_submissions": "Total offline submissions",
+		"total_failed_submissions": "Total failed submissions",
+		"download_csv": "Download as CSV"
 	}
 }

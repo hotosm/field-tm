@@ -22,7 +22,7 @@ from io import BytesIO
 from typing import Annotated, Optional
 
 import geojson
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
 from loguru import logger as log
 from osm_fieldwork.OdkCentralAsync import OdkCentral
@@ -38,6 +38,7 @@ from app.db.enums import HTTPStatus, SubmissionDownloadType
 from app.db.models import DbTask
 from app.projects import project_crud
 from app.submissions import submission_crud, submission_deps, submission_schemas
+from app.submissions.submission_crud import upload_submission_geojson_to_s3
 from app.tasks.task_deps import get_task
 
 router = APIRouter(
@@ -112,6 +113,7 @@ async def create_submission(
 
 @router.get("/download")
 async def download_submission(
+    background_tasks: BackgroundTasks,
     project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
     file_type: SubmissionDownloadType,
     submitted_date_range: Optional[str] = Query(
@@ -147,11 +149,11 @@ async def download_submission(
         return Response(file_content, headers=headers)
 
     # Else is GeoJSON download
-    data = await submission_crud.get_submission_by_project(project, filters)
-    submission_json = data.get("value", [])
-
-    submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
-        submission_json
+    submission_geojson = await submission_crud.get_project_submission_geojson(
+        project, filters
+    )
+    background_tasks.add_task(
+        upload_submission_geojson_to_s3, project, submission_geojson
     )
     submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
 
@@ -514,10 +516,12 @@ async def project_submission_dashboard(
     project = project_user.get("project")
     details = await submission_crud.get_dashboard_detail(db, project)
     details["slug"] = project.slug
+    details["organisation_id"] = project.organisation_id
     details["organisation_name"] = project.organisation_name
     details["created_at"] = project.created_at
     details["organisation_logo"] = project.organisation_logo
     details["last_active"] = project.last_active
+    details["status"] = project.status
     return details
 
 

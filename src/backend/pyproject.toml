@@ -18,7 +18,7 @@
 
 [project]
 name = "fmtm"
-version = "2025.3.1"
+version = "2025.4.0"
 description = "Field Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
@@ -132,7 +132,7 @@ asyncio_default_fixture_loop_scope="session"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2025.3.1"
+version = "2025.4.0"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
@@ -150,7 +150,7 @@ write-changes = true
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
-pyodk = { git = "https://github.com/hotosm/pyodk", rev = "master-modified" }
+pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
 
 [tool.uv.workspace]
 members = ["packages/*"]

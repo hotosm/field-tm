@@ -4,8 +4,9 @@
 	import { m } from '$translations/messages.js';
 	import Basemaps from './basemaps.svelte';
 	import FgbExtract from './fgb-extract.svelte';
+	import OfflineData from './offline-data.svelte';
 
-	type stackType = '' | 'basemaps' | 'fgb-extract';
+	type stackType = '' | 'basemaps' | 'fgb-extract' | 'offline-data';
 
 	type stackGroupType = {
 		id: stackType;
@@ -20,6 +21,7 @@
 	const stackGroup: stackGroupType[] = [
 		{ id: 'basemaps', title: m['offline.basemaps']() },
 		{ id: 'fgb-extract', title: m['offline.features']() },
+		{ id: 'offline-data', title: m['offline.data']() },
 	];
 
 	const { projectId, project }: Props = $props();
@@ -77,7 +79,10 @@
 			</div>
 		{/each}
 	{:else if activeStack === 'basemaps'}
-		<Basemaps projectId={project.id}></Basemaps>
+		<Basemaps projectId={projectId}></Basemaps>
 	{:else if activeStack === 'fgb-extract'}
-		<FgbExtract {projectId} extract_url={project.data_extract_url} />{/if}
+		<FgbExtract {projectId} extract_url={project.data_extract_url} />
+	{:else if activeStack === 'offline-data'}
+		<OfflineData />
+	{/if}
 </div>

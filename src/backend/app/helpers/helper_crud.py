@@ -16,3 +16,58 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Logic for helper routes."""
+
+from email.message import EmailMessage
+
+from aiosmtplib import SMTP, SMTPException
+from fastapi.exceptions import HTTPException
+from loguru import logger as log
+from markdown import markdown
+
+from app.config import settings
+from app.db.enums import HTTPStatus
+
+
+async def send_email(
+    user_emails: list[str],
+    title: str,
+    message_content: str,
+):
+    """Send an email to a list of email addresses."""
+    if not settings.emails_enabled:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_IMPLEMENTED,
+            detail="An SMTP server has not been configured.",
+        )
+
+    message = EmailMessage()
+    # NOTE isn't no longer possible to have different login user & FROM header
+    message["From"] = settings.SMTP_USER
+    message["Subject"] = title
+    message.set_content(message_content)
+    html_content = markdown(message_content)
+    message.add_alternative(html_content, subtype="html")
+
+    smtp_client = SMTP(
+        hostname=settings.SMTP_HOST,
+        port=settings.SMTP_PORT,
+        username=settings.SMTP_USER,
+        password=settings.SMTP_PASSWORD,
+        # start_tls=None,  # by default, the connection is upgraded by server
+    )
+
+    log.debug(f"Sending email to {', '.join(user_emails)}")
+    try:
+        async with smtp_client:
+            recipient_errors, response = await smtp_client.send_message(
+                message, recipients=user_emails
+            )
+
+            if recipient_errors:
+                log.error(f"Some recipients were refused: {recipient_errors}")
+
+            return response
+    except SMTPException as e:
+        log.error(e)
+        log.error(f"Failed to send email to {', '.join(user_emails)}")
+        raise

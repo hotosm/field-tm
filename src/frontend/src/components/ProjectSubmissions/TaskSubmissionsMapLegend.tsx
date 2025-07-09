@@ -20,7 +20,9 @@ const TaskSubmissionsMapLegend = ({ legendColorArray }: { legendColorArray: lege
   return (
     <div className="fmtm-py-3">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 sm:fmtm-gap-4">
-        {legendColorArray?.reverse()?.map((code) => <LegendListItem key={code.color} code={code} />)}
+        {legendColorArray?.reverse()?.map((code) => (
+          <LegendListItem key={code.color} code={code} />
+        ))}
       </div>
     </div>
   );

@@ -1,67 +1,44 @@
-# Mapper Page Documentation
+# Field Mappers
 
 The **Mapper Page** was developed to provide a simpler, more intuitive
-mapping experience.
+mapping experience for field mappers.
 
 ## Prerequisites
 
 ### Device Requirements
 
-Ensure you have an Android device for field mapping activities, as ODK is
-not supported on iOS devices.
-
 Verify that your mobile device meets the minimum specifications required
 for field mapping:
 
-- Minimum RAM: 4GB
-- Storage: Ensure sufficient storage space is available (1GB should be enough).
-- Operating System: ODK recommends using Android 10 or higher for
-  the best security and performance.
+- **RAM**: 3GB
+- **Storage**: Generally 1GB should be enough, but if using many large basemaps,
+  more may be required.
+- **Operating System**: Android 10 or higher for the best security and
+  performance.
 
-#### Checking Device Specifications
+  !!! tip
 
-- Go to the file manager or "My Files" on your mobile device to see
-  the device storage.
-- Check your phone settings for information about device settings
-  such as RAM and processors.
+        Go to the file manager or "My Files" on your mobile device to see
+        the device storage.
 
-### Browser Selection
+        Check your phone settings for information about device settings
+        such as RAM and processors.
 
-- We recommend using the Chrome browser on your mobile device to access
+### Install FieldTM
+
+- We recommend using Chrome-based browsers on your mobile device to access
   the Field-TM platform for optimal performance.
-- If you encounter difficulties using Field-TM through the browser, you can
-  add the Field-TM browser shortcut to your home screen via the menu.
+- It is best to **install** the web application (not via the app store, but through
+  your web browser). This can be done through the browser menu, often written as
+  'Add to home screen':
   ![image](https://github.com/user-attachments/assets/03bd53fb-3879-4a11-a98e-6c8e2651210a)
 
-## Part (A): Setup For Mapping Via ODK
+## Part (A): Setup For Mapping
 
-!!! note
-
-    You can skip steps 1 & 3 belo if you prefer to map using WebForms
-    (the default).
-    Using WebForms requires no external application or usage of QRCodes.
-
-### Step 1: Install The Custom ODK Collect Mobile App
-
-- The first time you load the project, you should be prompted to download
-  the custom ODK `.apk` from the sidebar.
-- Once downloaded, you should install the custom ODK Collect application.
-
-  ![highlighted-sidebar](https://github.com/user-attachments/assets/53de2d80-2709-45b0-bb82-32f0190c7859)
-  ![download-custom-odk](https://github.com/user-attachments/assets/22501751-4962-4cd7-ace1-7587269ae16c)
-
-!!! tip
-
-      If you already have ODK Collect installed, you may have to uninstall
-      it first.
-
-      You may have to enable installing from unknown sources in your device
-      settings too.
-
-### Step 2: Access the Mapper Page
+### Step 1: Access the Mapper Page
 
 - **Option 1:** Click on the project cards from your mobile device
-- **Option 3:** Go to `https://mapper.fmtm.hotosm.org/<project_id>` to open
+- **Option 2:** Go to `https://mapper.fmtm.hotosm.org/<project_id>` to open
   the Mapper Page for a specific project.
 
 !!! note
@@ -78,26 +55,7 @@ for field mapping:
       If you do not log in, a generic account will be used to record your
       edits and data collection.
 
-### Step 3: Configure ODK Collect (once only)
-
-- **Option 1:** Scan the QR code displayed on the Mapper page using
-  the custom ODK Collect mobile application.
-
-- **Option 2:** Download the QR code and import it into ODK Collect to
-  load the project. Follow the steps below:
-
-  1. Open ODK Collect.
-  2. Click the project name in the top right corner.
-  3. Tap the **menu** icon (three horizontal dots).
-  4. Select **Import QR Code**.
-  5. Browse to the downloaded QR image and load the project.
-
-!!! tip
-
-      For a demonstration of the process above, click the **i** info icon
-      on the QR Code tab of the mapper page.
-
-### Step 4: Load Imagery (optional)
+### Step 2: Load Imagery (optional)
 
 - You can load the base imagery by clicking on offline mode option
   (second tab on bottom navigation bar).
@@ -119,6 +77,48 @@ for field mapping:
 
       If you encounter issues with the base imagery, contact your project
       manager.
+
+### Step 3: Install The Custom ODK Collect Mobile App
+
+!!! note
+
+    It is recommended to not use ODK Collect in most, but instead use the
+    automatically configured WebForms.
+
+    If you must use ODK Collect, then configuration via QRCodes will be required.
+
+- The first time you load the project, you should be prompted to download
+  the custom ODK `.apk` from the sidebar.
+- Once downloaded, you should install the custom ODK Collect application.
+
+  ![highlighted-sidebar](https://github.com/user-attachments/assets/53de2d80-2709-45b0-bb82-32f0190c7859)
+  ![download-custom-odk](https://github.com/user-attachments/assets/22501751-4962-4cd7-ace1-7587269ae16c)
+
+!!! tip
+
+      If you already have ODK Collect installed, you may have to uninstall
+      it first.
+
+      You may have to enable installing from unknown sources in your device
+      settings too.
+
+### Step 4: Configure ODK Collect (once only)
+
+- **Option 1:** Scan the QR code displayed on the Mapper page using
+  the custom ODK Collect mobile application.
+
+- **Option 2:** Download the QR code and import it into ODK Collect to
+  load the project. Follow the steps below:
+  1. Open ODK Collect.
+  2. Click the project name in the top right corner.
+  3. Tap the **menu** icon (three horizontal dots).
+  4. Select **Import QR Code**.
+  5. Browse to the downloaded QR image and load the project.
+
+!!! tip
+
+      For a demonstration of the process above, click the **i** info icon
+      on the QR Code tab of the mapper page.
 
 ## Part (B): Mapping Features
 
@@ -246,4 +246,4 @@ To achieve this:
 
 ## Upcoming improvements
 
-Refer the milestone: <https://github.com/hotosm/fmtm/milestone/49>
+Refer the milestone: <https://github.com/hotosm/field-tm/milestone/49>

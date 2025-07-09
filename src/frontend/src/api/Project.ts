@@ -61,6 +61,9 @@ export const ProjectById = (projectId: string) => {
             created_at: projectResp?.created_at,
             visibility: projectResp.visibility,
             use_odk_collect: projectResp.use_odk_collect,
+            primary_geom_type: projectResp.primary_geom_type,
+            new_geom_type: projectResp.new_geom_type,
+            status: projectResp.status,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));

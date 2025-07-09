@@ -4,6 +4,12 @@
 		"yes": "हो",
 		"no": "No"
 	},
+	"project_states": {
+		"DRAFT": "ड्राफ्ट",
+		"PUBLISHED": "प्रकाशित",
+		"ARCHIVED": "अर्काइव",
+		"COMPLETED": "पूर्ण"
+	},
 	"task_states": {
 		"UNLOCKED_TO_MAP": "तयार",
 		"LOCKED_FOR_MAPPING": "नक्साङ्कनको लागि लक",
@@ -132,9 +138,13 @@
 	"offline": {
 		"features": "फिचरहरू",
 		"basemaps": "बेसम्याप",
+		"data": "अफलाइन डेटा हेर्नुहोस्",
 		"store_features_offline": "फिचर अफलाइन भण्डारण गर्नुहोस्",
 		"features_offline_info": "फिचर पहिले नै अफलाइन भण्डारण गरिएका छन्",
 		"fetch_projects_offline": "तपाईं अफलाइन हुनुहुन्छ र अतिरिक्त परियोजनाहरू ल्याउन सक्नुहुन्न।",
-		"ready_offline": "अफलाइन प्रयोगको लागि तयार।"
+		"ready_offline": "अफलाइन प्रयोगको लागि तयार।",
+		"total_offline_submissions": "कुल अफलाइन सबमिशनहरू",
+		"total_failed_submissions": "कुल असफल पेसहरू",
+		"download_csv": "CSV को रूपमा डाउनलोड गर्नुहोस्"
 	}
 }

@@ -120,7 +120,7 @@ def get_application() -> FastAPI:
         version=__version__,
         license_info={
             "name": "AGPL-3.0-only",
-            "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE.md",
+            "url": "https://raw.githubusercontent.com/hotosm/field-tm/main/LICENSE.md",
         },
         debug=settings.DEBUG,
         lifespan=lifespan,
@@ -176,6 +176,9 @@ def get_logger():
         if logger_name == "urllib3":
             # Don't hook urllib3, called on each OTEL trace
             continue
+        if logger_name == "pyodk._utils.config":
+            # Set pyodk logger level to CRITICAL to avoid noise
+            logging.getLogger("pyodk._utils.config").setLevel(settings.PYODK_LOG_LEVEL)
         if "." not in logger_name:
             logging.getLogger(logger_name).addHandler(InterceptHandler())
 
@@ -230,7 +233,7 @@ async def deployment_details():
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={
-            "source": "https://github.com/hotosm/fmtm",
+            "source": "https://github.com/hotosm/field-tm",
             "version": __version__,
             "commit": commit or "/app/version.json not found",
             "build": build or "/app/version.json not found",

@@ -254,6 +254,7 @@ class DbUser(BaseModel):
         search: Optional[str] = None,
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
+        role: Optional[UserRole] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
         filters = []
@@ -270,6 +271,10 @@ class DbUser(BaseModel):
         if signin_type:
             filters.append("sub LIKE %(signin_type)s")
             params["signin_type"] = f"{signin_type}|%"
+
+        if role:
+            filters.append("role = %(role)s")
+            params["role"] = role
 
         sql = f"""
             SELECT * FROM users
@@ -1771,10 +1776,11 @@ class DbProject(BaseModel):
                 )
             """
 
-        # Regular users see public projects and private ones they have access to
+        # All users see public, sensitive, and invite-only projects.
+        # Private projects are only visible to users who have access.
         return """
             (
-                p.visibility = 'PUBLIC'
+                p.visibility != 'PRIVATE'
                 OR (
                     p.visibility = 'PRIVATE'
                     AND EXISTS (
@@ -1829,6 +1835,7 @@ class DbProject(BaseModel):
                 fp.name,
                 fp.location_str,
                 fp.short_description,
+                fp.status,
                 project_org.logo AS organisation_logo
             FROM
                 filtered_projects fp

@@ -138,6 +138,7 @@ const ProjectDetailsForm = ({ flag }) => {
     dispatch(
       GetUserListForSelect(`${VITE_API_URL}/users/usernames`, {
         search: userSearchText,
+        signin_type: 'osm',
       }),
     );
   }, [userSearchText]);
@@ -229,7 +230,7 @@ const ProjectDetailsForm = ({ flag }) => {
             {hasODKCredentials && (
               <CustomCheckbox
                 key="useDefaultODKCredentials"
-                label="Use default ODK credentials"
+                label="Use default or requested ODK credentials"
                 checked={values.useDefaultODKCredentials}
                 onCheckedChange={() => {
                   handleCustomChange('useDefaultODKCredentials', !values.useDefaultODKCredentials);

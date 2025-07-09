@@ -22,6 +22,7 @@ export const initialState: CreateProjectStateTypes = {
     project_admins: [],
     visibility: project_visibility.PUBLIC,
     use_odk_collect: false,
+    includeCentroid: false,
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
@@ -54,7 +55,6 @@ export const initialState: CreateProjectStateTypes = {
   isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
-  additionalFeatureGeojson: null,
   descriptionToFocus: null,
   isProjectDeletePending: false,
 };
@@ -98,7 +98,6 @@ const CreateProject = createSlice({
       state.generateProjectWarning = null;
       state.generateProjectError = false;
       state.drawToggle = false;
-      state.additionalFeatureGeojson = null;
     },
     GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
       state.formCategoryLoading = action.payload;
@@ -213,9 +212,6 @@ const CreateProject = createSlice({
     },
     SetCustomFileValidity(state, action: PayloadAction<boolean>) {
       state.customFileValidity = action.payload;
-    },
-    SetAdditionalFeatureGeojson(state, action) {
-      state.additionalFeatureGeojson = action.payload;
     },
     SetDescriptionToFocus(state, action: PayloadAction<CreateProjectStateTypes['descriptionToFocus']>) {
       state.descriptionToFocus = action.payload;

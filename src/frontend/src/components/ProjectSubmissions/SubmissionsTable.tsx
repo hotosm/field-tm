@@ -14,12 +14,11 @@ import { CustomSelect } from '@/components/common/Select.js';
 import DateRangePicker from '@/components/common/DateRangePicker';
 import Table, { TableHeader } from '@/components/common/CustomTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader.js';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { task_state, task_event, entity_state } from '@/types/enums';
+import { task_state, task_event, entity_state, project_status } from '@/types/enums';
 import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
@@ -30,6 +29,8 @@ import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/Submi
 import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import SubmissionsTableSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/SubmissionsTableSkeleton';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -69,6 +70,9 @@ const SubmissionsTable = ({ toggleView }) => {
     })?.[0],
   };
   const taskList = projectData[projectIndex]?.taskBoundries;
+
+  const isProjectManager = useIsProjectManager(projectId as string);
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as null | number);
 
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string | null>(null);
@@ -408,7 +412,7 @@ const SubmissionsTable = ({ toggleView }) => {
         </div>
       </div>
       {submissionTableDataLoading || submissionFormFieldsLoading ? (
-        <SubmissionsTableSkeletonLoader />
+        <SubmissionsTableSkeleton />
       ) : (
         <Table data={submissionTableData?.results || []} flag="dashboard" onRowClick={() => {}} isLoading={false}>
           <TableHeader
@@ -463,26 +467,30 @@ const SubmissionsTable = ({ toggleView }) => {
                       <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
                     </Tooltip>
                   </Link>
-                  <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
-                  <Tooltip arrow placement="bottom" title="Update Review Status">
-                    <AssetModules.CheckOutlinedIcon
-                      className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
-                      onClick={() => {
-                        dispatch(
-                          SubmissionActions.SetUpdateReviewStatusModal({
-                            toggleModalStatus: true,
-                            instanceId: row?.meta?.instanceID,
-                            taskId: row?.task_id,
-                            projectId: projectId,
-                            reviewState: row?.__system?.reviewState,
-                            entity_id: row?.feature,
-                            label: row?.meta?.entity?.label,
-                            taskUid: taskUid?.toString() || null,
-                          }),
-                        );
-                      }}
-                    />
-                  </Tooltip>
+                  {(isProjectManager || isOrganizationAdmin) && projectInfo.status === project_status.PUBLISHED && (
+                    <>
+                      <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
+                      <Tooltip arrow placement="bottom" title="Update Review Status">
+                        <AssetModules.CheckOutlinedIcon
+                          className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                          onClick={() => {
+                            dispatch(
+                              SubmissionActions.SetUpdateReviewStatusModal({
+                                toggleModalStatus: true,
+                                instanceId: row?.meta?.instanceID,
+                                taskId: row?.task_id,
+                                projectId: projectId,
+                                reviewState: row?.__system?.reviewState,
+                                entity_id: row?.feature,
+                                label: row?.meta?.entity?.label,
+                                taskUid: taskUid?.toString() || null,
+                              }),
+                            );
+                          }}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
               );
             }}

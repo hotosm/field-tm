@@ -94,7 +94,6 @@ async def validate_form(
 
     NOTE this provides a basic sanity check, some fields are omitted
     so the form is not usable in production:
-        - additional_entities
         - new_geom_type
     """
     if debug:
@@ -301,11 +300,21 @@ async def get_form_media(
     project_odk_creds = project.odk_credentials
 
     try:
-        return await central_crud.get_form_media(
+        form_media = await central_crud.get_form_media(
             project_xform_id,
             project_odk_id,
             project_odk_creds,
         )
+
+        if form_media and not all(isinstance(v, str) for v in form_media.values()):
+            msg = f"Form attachments for project {project_id} may not be uploaded yet!"
+            log.warning(msg)
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
+
+        return form_media
     except Exception as e:
         msg = (
             f"Failed to get all form media for Field-TM project ({project_id}) "

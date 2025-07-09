@@ -42,7 +42,7 @@ const uploadAreaOptions: uploadAreaOptionsType[] = [
   },
 ];
 
-const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload, setAdditionalFeature }) => {
+const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload }) => {
   useDocumentTitle('Create Project: Project Area');
 
   const dispatch = useAppDispatch();
@@ -161,10 +161,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     setCustomDataExtractUpload(null);
     handleCustomChange('uploadedAreaFile', null);
     handleCustomChange('drawnGeojson', null);
-    setAdditionalFeature(null);
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
-    dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
     dispatch(CreateProjectActions.ClearProjectStepState({ ...formValues, uploadedAreaFile: null, drawnGeojson: null }));
   };
 

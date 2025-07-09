@@ -5,8 +5,9 @@ import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules';
 import { GetIndividualOrganizationService, GetOrganizationAdminsService } from '@/api/OrganisationService';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { OrganizationInfoSkeleton, UserListSkeleton } from '@/components/OrganizationDashboard/SkeletonLoader';
 import { useIsOrganizationAdmin } from '@/hooks/usePermissions';
+import UserListSkeleton from '@/components/Skeletons/OrganizationDashboard/UserListSkeleton';
+import OrganizationInfoSkeleton from '@/components/Skeletons/OrganizationDashboard/OrganizationInfoSkeleton';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,7 +20,7 @@ const OrganizationAdminList = () => {
   return (
     <div className="fmtm-flex fmtm-items-center">
       {organizationAdmins.slice(0, 5).map((user, index) => (
-        <Tooltip key={user.user_id} title={user.username} arrow>
+        <Tooltip key={user.user_sub} title={user.username} arrow>
           <div
             style={{ zIndex: organizationAdmins.length - index }}
             className="fmtm-border fmtm-rounded-full fmtm-h-[1.688rem] fmtm-w-[1.688rem] fmtm-relative fmtm-mr-[-0.5rem] fmtm-bg-white fmtm-overflow-hidden fmtm-cursor-pointer"
@@ -49,7 +50,7 @@ const OrganizationAdminList = () => {
           title={
             <ul>
               {organizationAdmins.slice(5).map((user) => (
-                <li key={user.id}>{user.username}</li>
+                <li key={user.user_sub}>{user.username}</li>
               ))}
             </ul>
           }

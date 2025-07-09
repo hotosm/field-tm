@@ -151,6 +151,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Field-TM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    PYODK_LOG_LEVEL: str = "CRITICAL"
     ENCRYPTION_KEY: SecretStr
     # NOTE HS384 is used for simplicity of implementation and compatibility with
     # existing Fernet based database value encryption
@@ -161,9 +162,9 @@ class Settings(BaseSettings):
 
     DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
     DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
-    DEFAULT_ORG_EMAIL: Optional[str] = "syadmin@hotosm.org"
+    DEFAULT_ORG_EMAIL: Optional[str] = "sysadmin@hotosm.org"
     DEFAULT_ORG_LOGO_URL: Optional[str] = (
-        "https://raw.githubusercontent.com/hotosm/fmtm/refs/heads/development/src/frontend/public/hot-org-logo.png"
+        "https://raw.githubusercontent.com/hotosm/field-tm/refs/heads/dev/src/frontend/public/hot-org-logo.png"
     )
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
@@ -368,20 +369,17 @@ class Settings(BaseSettings):
         return None
 
     # SMTP Configurations
-    SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
-    SMTP_PORT: int = 587
     SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: Optional[str] = None
-    EMAILS_FROM_NAME: Optional[str] = "Field-TM"
+    SMTP_FROM_NAME: Optional[str] = "Field-TM"
 
     @computed_field
     @property
     def emails_enabled(self) -> bool:
         """Check if email settings are configured."""
-        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
+        return bool(self.SMTP_HOST and self.SMTP_USER)
 
 
 @lru_cache

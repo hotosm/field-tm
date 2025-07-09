@@ -56,7 +56,7 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
   };
 };
 
-export const GetUserListForSelect = (url: string, params: { search: string }) => {
+export const GetUserListForSelect = (url: string, params: { search: string; signin_type?: 'osm' | 'google' }) => {
   return async (dispatch: AppDispatch) => {
     dispatch(UserActions.SetUserListForSelectLoading(true));
 
@@ -76,7 +76,10 @@ export const GetUserListForSelect = (url: string, params: { search: string }) =>
   };
 };
 
-export const GetUserNames = (url: string, params: { org_id?: number; project_id?: number; search: string }) => {
+export const GetUserNames = (
+  url: string,
+  params: { org_id?: number; project_id?: number; search: string; signin_type?: 'osm' | 'google' },
+) => {
   return async (dispatch: AppDispatch) => {
     const getUserNames = async (url: string, params: { org_id?: number; project_id?: number }) => {
       try {
@@ -144,9 +147,9 @@ export const InviteNewUser = (
             const payload: Record<string, any> = { project_id: projectId, role };
 
             if (inviteVia === 'osm') {
-              payload.osm_username = user;
+              payload.osm_username = user.trim();
             } else {
-              payload.email = user;
+              payload.email = user.trim();
             }
 
             const response = await axios.post(url, payload, { params: { project_id: projectId } });

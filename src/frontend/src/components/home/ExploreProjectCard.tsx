@@ -4,6 +4,15 @@ import { Tooltip } from '@mui/material';
 import { projectType } from '@/models/home/homeModel';
 import defaultOrgLogo from '@/assets/images/project_icon.png';
 import AssetModules from '@/shared/AssetModules';
+import StatusChip from '@/components/common/StatusChip';
+import { project_status } from '@/types/enums';
+
+const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
+  [project_status.DRAFT]: 'default',
+  [project_status.PUBLISHED]: 'info',
+  [project_status.COMPLETED]: 'success',
+  [project_status.ARCHIVED]: 'error',
+};
 
 export default function ExploreProjectCard({ data, className }: { data: projectType; className?: string }) {
   const navigate = useNavigate();
@@ -26,20 +35,28 @@ export default function ExploreProjectCard({ data, className }: { data: projectT
       onClick={handleProjectCardClick}
       className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
     >
-      {data.visibility === 'PRIVATE' && (
-        <Tooltip title="Private Project" arrow>
-          <AssetModules.LockOutlinedIcon className="fmtm-absolute fmtm-top-1 fmtm-right-1 fmtm-text-red-medium !fmtm-text-[19px]" />
-        </Tooltip>
-      )}
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
-          {data.organisation_logo ? (
-            <img src={data.organisation_logo} className="fmtm-h-7 fmtm-max-h-7" alt="organization logo" />
-          ) : (
-            <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
-          )}
+          <div className="fmtm-flex fmtm-justify-between fmtm-items-start">
+            {data.organisation_logo ? (
+              <img src={data.organisation_logo} className="fmtm-h-7 fmtm-max-h-7" alt="organization logo" />
+            ) : (
+              <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
+            )}
+
+            {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
+              <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
+            )}
+          </div>
           <div className="fmtm-my-3">
-            <p className="fmtm-body-sm-semibold fmtm-text-[#706E6E] fmtm-mb-1">ID: #{data.id}</p>
+            <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mb-1">
+              <p className="fmtm-body-sm-semibold fmtm-text-[#706E6E]">ID: #{data.id}</p>
+              {data.visibility === 'PRIVATE' && (
+                <Tooltip title="Private Project" arrow>
+                  <AssetModules.LockOutlinedIcon className="fmtm-text-red-medium !fmtm-text-[12px]" />
+                </Tooltip>
+              )}
+            </div>
             <p
               className="fmtm-capitalize fmtm-body-sm fmtm-line-clamp-1 fmtm-text-[#7A7676]"
               title={data?.location_str}

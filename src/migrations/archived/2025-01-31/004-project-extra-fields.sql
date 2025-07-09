@@ -4,9 +4,9 @@
 -- * Add associated_email to organisations.
 
 -- Related issues:
--- https://github.com/hotosm/fmtm/issues/1985#issuecomment-2577342507
--- https://github.com/hotosm/fmtm/issues/1979
--- https://github.com/hotosm/fmtm/issues/2066
+-- https://github.com/hotosm/field-tm/issues/1985#issuecomment-2577342507
+-- https://github.com/hotosm/field-tm/issues/1979
+-- https://github.com/hotosm/field-tm/issues/2066
 
 -- Start a transaction
 

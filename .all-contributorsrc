@@ -7,7 +7,7 @@
     "README.md"
   ],
   "imageSize": 100,
-  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/HOTOSM-Thanks%20for%20contributing!-red/github/all-contributors/hotosm/fmtm?color=red&style=flat-square)](#contributors)",
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/HOTOSM-Thanks%20for%20contributing!-red/github/all-contributors/hotosm/field-tm?color=red&style=flat-square)](#contributors)",
   "commit": true,
   "commitConvention": "angular",
   "contributors": [
@@ -387,6 +387,24 @@
       "name": "Taichi FURUHASHI",
       "avatar_url": "https://avatars.githubusercontent.com/u/416977?v=4",
       "profile": "http://mapconcierge.com",
+      "contributions": [
+        "translation"
+      ]
+    },
+    {
+      "login": "ajvs",
+      "name": "Ajee",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16050172?v=4",
+      "profile": "https://github.com/ajvs",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "trendspotter",
+      "name": "Jiří Podhorecký",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15286128?v=4",
+      "profile": "https://spotter.ngo",
       "contributions": [
         "translation"
       ]

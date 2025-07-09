@@ -19,12 +19,9 @@
 
 import os
 from datetime import datetime, timedelta, timezone
-from email.message import EmailMessage
 from textwrap import dedent
 from typing import Literal, Optional
 
-import aiosmtplib
-import markdown
 from fastapi import Request
 from fastapi.exceptions import HTTPException
 from loguru import logger as log
@@ -37,6 +34,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
 from app.db.enums import HTTPStatus, UserRole
 from app.db.models import DbProject, DbUser
+from app.helpers.helper_crud import send_email
 from app.projects.project_crud import get_pagination
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
@@ -220,32 +218,6 @@ async def send_warning_email_or_osm(
     log.info(f"Sent warning to {username}: {days_remaining} days remaining.")
 
 
-async def send_mail(
-    user_email: str,
-    title: str,
-    message_content: str,
-):
-    """Sends an email."""
-    if not settings.emails_enabled:
-        log.info("An SMTP server has not been configured.")
-        return
-    message = EmailMessage()
-    message["Subject"] = title
-    message.set_content(message_content)
-    html_content = markdown.markdown(message_content)
-    message.add_alternative(html_content, subtype="html")
-
-    await aiosmtplib.send(
-        message,
-        sender=settings.SMTP_USER,
-        recipients=[user_email],
-        hostname=settings.SMTP_HOST,
-        port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD,
-    )
-
-
 async def send_invitation_message(
     request: Request,
     project: DbProject,
@@ -286,8 +258,8 @@ async def send_invitation_message(
         log.info(f"Invitation message sent to osm user ({invitee_username}).")
 
     elif signin_type == "google":
-        await send_mail(
-            user_email=user_email,
+        await send_email(
+            user_emails=[user_email],
             title=title,
             message_content=message_content,
         )

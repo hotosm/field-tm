@@ -21,7 +21,6 @@ const CreateProjectService = (
   taskAreaGeojson: any,
   formUpload: any,
   dataExtractFile: File,
-  additionalFeature: any,
   projectAdmins: number[],
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -85,23 +84,11 @@ const CreateProjectService = (
         throw new Error();
       }
 
-      // 4. post additional feature if available
-      if (additionalFeature) {
-        const postAdditionalFeature = await dispatch(
-          PostAdditionalFeatureService(`${VITE_API_URL}/projects/${projectId}/additional-entity`, additionalFeature),
-        );
-
-        hasAPISuccess = postAdditionalFeature;
-        if (!hasAPISuccess) throw new Error();
-      }
-
-      // 5. upload form
+      // 4. upload form
       const generateProjectFile = await dispatch(
         GenerateProjectFilesService(
           `${VITE_API_URL}/projects/${projectId}/generate-project-data`,
-          additionalFeature
-            ? { ...projectData, additional_entities: [additionalFeature?.name?.split('.')?.[0]] }
-            : projectData,
+          projectData,
           formUpload,
           combinedFeaturesCount,
         ),
@@ -110,7 +97,7 @@ const CreateProjectService = (
       hasAPISuccess = generateProjectFile;
       if (!hasAPISuccess) throw new Error();
 
-      // 6. assign project admins
+      // 5. assign project admins
       if (!isEmpty(projectAdmins)) {
         const promises = projectAdmins?.map(async (sub: any) => {
           await dispatch(
@@ -222,12 +209,6 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
     try {
       const formData = new FormData();
 
-      // Append additional_entities if they exist
-      const additionalEntities = projectData?.additional_entities?.map((e: string) => e.replaceAll(' ', '_')) ?? [];
-      if (additionalEntities.length > 0) {
-        formData.append('additional_entities', additionalEntities);
-      }
-
       // Append xlsform
       formData.append('xlsform', formUpload);
 
@@ -267,36 +248,6 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
   };
 };
 
-const PostAdditionalFeatureService = (url: string, file: File) => {
-  return async (dispatch: AppDispatch) => {
-    const PostAdditionalFeature = async (url, file) => {
-      let isAPISuccess = true;
-
-      try {
-        const additionalFeatureFormData = new FormData();
-        additionalFeatureFormData.append('geojson', file);
-
-        const response = await axios.post(url, additionalFeatureFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        isAPISuccess = isStatusSuccess(response.status);
-      } catch (error: any) {
-        isAPISuccess = false;
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: JSON.stringify(error?.response?.data?.detail),
-          }),
-        );
-      }
-      return isAPISuccess;
-    };
-    return await PostAdditionalFeature(url, file);
-  };
-};
-
 const OrganisationService = (url: string) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.GetOrganisationListLoading(true));
@@ -330,9 +281,7 @@ const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>
         dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: true }));
         dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: false }));
         dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       } catch (error) {
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       }
@@ -361,12 +310,10 @@ const GetIndividualProjectDetails = (url: string) => {
         };
 
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(CommonActions.SetProjectNotFound(true));
         }
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       }
@@ -411,7 +358,6 @@ const TaskSplittingPreviewService = (
             message: 'Task generation failed. Please try again',
           }),
         );
-        dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       } finally {
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       }
@@ -430,7 +376,6 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         dispatch(CreateProjectActions.SetPatchProjectDetails(resp));
-        dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Project Successfully Edited',
@@ -438,7 +383,6 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
           }),
         );
       } catch (error) {
-        dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Failed. Do you have permission to edit?',
@@ -469,7 +413,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
         const resp: { message: string } = postFormUpdateResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
-        dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: resp.message,
@@ -482,7 +425,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
             message: error?.response?.data?.detail || 'Failed to update Form',
           }),
         );
-        dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
       }
@@ -507,7 +449,6 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
         const resp: unknown = postBoundaryUpdateResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
-        dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Project Boundary Successfully Updated',
@@ -515,7 +456,6 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
           }),
         );
       } catch (error) {
-        dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
       }
@@ -537,7 +477,6 @@ const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean
 
         const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
         const resp = getTaskSplittingResponse.data;
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: JSON.stringify(resp.message),
@@ -551,7 +490,6 @@ const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean
             message: error?.response?.data?.detail || 'Something Went Wrong',
           }),
         );
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(CreateProjectActions.SetCustomFileValidity(false));
       } finally {
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));

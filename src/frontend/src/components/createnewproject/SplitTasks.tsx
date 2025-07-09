@@ -19,7 +19,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
 import DescriptionSection from '@/components/createnewproject/Description';
 
-const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, xlsFormFile }) => {
+const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, xlsFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -43,7 +43,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
   const isTasksSplit = useAppSelector((state) => state.createproject.isTasksSplit);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
   const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
-  const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
   const usesDataExtract = !!dataExtractGeojson?.features?.length;
 
@@ -52,11 +51,11 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
   const dataExtractGeojsonFile = new File([dataExtractBlob], 'outline.json', { type: 'application/json' });
 
   useEffect(() => {
-    const featureCount =
-      (dataExtractGeojson?.features?.length ?? 0) + (additionalFeatureGeojson?.features?.length ?? 0);
+    const featureCount = dataExtractGeojson?.features?.length ?? 0;
     // Set combined feature count to send to backend for hard limits
+    // NOTE that was called 'combined' as previously we added extra features
     setCombinedFeaturesCount(featureCount);
-  }, [dataExtractGeojson, additionalFeatureGeojson]);
+  }, [dataExtractGeojson]);
 
   const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
@@ -111,6 +110,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
       custom_tms_url: projectDetails.custom_tms_url,
       visibility: projectDetails.visibility,
       use_odk_collect: projectDetails.use_odk_collect,
+      status: 'PUBLISHED',
     };
     // Append osm_category if set
     if (projectDetails.osmFormSelectionName) {
@@ -137,7 +137,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         taskAreaGeojsonFile,
         xlsFormFile?.file,
         customDataExtractUpload?.file || dataExtractGeojsonFile,
-        additionalFeature?.file,
         projectDetails.project_admins as number[],
         combinedFeaturesCount,
         projectDetails.dataExtractType === 'no_data_extract',
@@ -415,7 +414,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                   }
                   // toggleSplittedGeojsonEdit
                   hasEditUndo
-                  additionalFeatureGeojson={additionalFeatureGeojson}
                 />
               </div>
             </div>

@@ -187,12 +187,15 @@ export const PatchOrganizationDataService = (url: string, payload: any) => {
   };
 };
 
-export const ApproveOrganizationService = (url: string) => {
+export const ApproveOrganizationService = (
+  url: string,
+  params: { org_id: number; set_primary_org_odk_server: boolean },
+) => {
   return async (dispatch: AppDispatch) => {
     const approveOrganization = async (url: string) => {
       try {
         dispatch(OrganisationAction.SetOrganizationApproving(true));
-        await axios.post(url);
+        await axios.post(url, {}, { params });
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Organization approved successfully.',

@@ -72,18 +72,6 @@ and improve the effectiveness of humanitarian efforts.
 - Basic bnowledge of field mapping. If you are new to mapping we suggest you
   read [this][1].
 
-## Video Tutorial
-
-<https://github.com/user-attachments/assets/963e7b22-5752-4158-b12d-e67c643235b8>
-
-<https://github.com/user-attachments/assets/969e87e1-581c-4f76-93a7-0b4524b2db3a>
-
-<https://github.com/user-attachments/assets/82b200bc-620a-4712-8d2e-3dcc4c553230>
-
-<https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed>
-
-<https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8>
-
 ## Steps to Join An Organization
 
 You may request to join an existing organization.
@@ -122,75 +110,75 @@ Go to [fmtm] <https://fmtm.hotosm.org/>
 
 ### 1. Create the project details
 
-    - Login to fmtm first to see the option of creating the project.
+- Login to fmtm first to see the option of creating the project.
 
-    ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
+  ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
 
-    - Start by filling in the project basic information such as the name,
-      description,
-      hashtag, etc. This captures essential information about your project.
+- Start by filling in the project basic information such as the name,
+  description,
+  hashtag, etc. This captures essential information about your project.
 
-    - If you want to use drone imagery or any other high resolution base imagery,
-    you can add the TMS layer from this step.
+- If you want to use drone imagery or any other high resolution base imagery,
+  you can add the TMS layer from this step.
 
-    - You can also choose whether you want to create public or private project
-      in Field-TM.
-    - You can also choose the option whether you want mappers to use ODK collect
-      mobile application or webform during this step. By default, webform will be
-      used.
+- You can also choose whether you want to create public or private project
+  in Field-TM.
+- You can also choose the option whether you want mappers to use ODK collect
+  mobile application or webform during this step. By default, webform will be
+  used.
 
-    - Finally click Next to proceed.
+- Finally click Next to proceed.
 
-    ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+  ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
 
 ### 2. Create a project area
 
-    - You can draw a freehand polygon on a map interface or you can upload
-      the AOI file.
-    - Click on Upload file button to upload the AOI file. The file is only
-      supported by Geojson format. See [preparing map features](#preparing-map-features).
-    - Review the displayed map that corresponds to your selected area and
-      click on "Next".
+- You can draw a freehand polygon on a map interface or you can upload
+  the AOI file.
+- Click on Upload file button to upload the AOI file. The file is only
+  supported by Geojson format. See [preparing map features](#preparing-map-features).
+- Review the displayed map that corresponds to your selected area and
+  click on "Next".
 
-    !!! tip
+      !!! tip
 
-          Confirm the exact area for the survey before creating the project,
-          as the project boundary cannot be edited once the project is created.
+            Confirm the exact area for the survey before creating the project,
+            as the project boundary cannot be edited once the project is created.
 
-    ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
+      ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
 ### 3. Upload the survey (or use an existing one)
 
-    - You may choose to upload a pre-Configured XLSForm or browse the forms.
-      [XLS Form Preparation](#xls-form-preparation)
-    - Click the UploadXLSForm if you are uploading the file or download forms
-      by clicking Download form.
-    - Finally click Next to proceed.
+- You may choose to upload a pre-Configured XLSForm or browse the forms.
+  [XLS Form Preparation](#xls-form-preparation)
+- Click the UploadXLSForm if you are uploading the file or download forms
+  by clicking Download form.
+- Finally click Next to proceed.
 
-    ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
+  ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
 ### 4. Select the geometry type you wish to map
 
-    - Select an option under 'What type of geometry?'
-    - If you want to upload your own, click in Upload custom mapdata or else
-      go with the default one of fetch data from OSM.
-    - You can also go for 'no existing data' option, if you want to collect map
-      features as well in field.
-    - You can also upload additional map feature to have multiple feature
-      selection supported.
+- Select an option under 'What type of geometry?'
+- If you want to upload your own, click in Upload custom mapdata or else
+  go with the default one of fetch data from OSM.
+- You can also go for 'no existing data' option, if you want to collect map
+  features as well in field.
+- You can also upload additional map feature to have multiple feature
+  selection supported.
 
-    ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
+  ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
 ### 5. Task splitting
 
-    - Option 1: Split project into squares.
-    - Option 2: Use the project area created as the task areas.
-      This could be a single task, or multiple task areas if uploaded.
-    - Option 3: The task splitting algorithm which splits
-      the tasks with average number of features which is provided by project
-      creator.
-      - The task splitting may take few seconds to few minutes considering
-        the feature count and size of AOI. Click on "Submit" to create project.
+- Option 1: Split project into squares.
+- Option 2: Use the project area created as the task areas.
+  This could be a single task, or multiple task areas if uploaded.
+- Option 3: The task splitting algorithm which splits
+  the tasks with average number of features which is provided by project
+  creator.
+  - The task splitting may take few seconds to few minutes considering
+    the feature count and size of AOI. Click on "Submit" to create project.
 
     ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 

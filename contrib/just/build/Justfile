@@ -23,12 +23,13 @@ all: backend frontend
 # Build backend container
 [no-cd]
 backend:
-  docker compose build api
+  COMPOSE_BAKE=true docker compose build api
 
 # Build backend development server container
 [no-cd]
 backend-dev:
-  TARGET_OVERRIDE=prod TAG_OVERRIDE=development \
+  COMPOSE_BAKE=true \
+  TARGET_OVERRIDE=prod TAG_OVERRIDE=dev \
     docker compose build api
 
 # Build frontend container

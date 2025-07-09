@@ -1,4 +1,4 @@
-import { MapGeomTypes } from '@/types/enums';
+import { project_status, GeoGeomTypesEnum } from '@/types/enums';
 
 export type osmTag = {
   string: string;
@@ -63,6 +63,8 @@ export type projectInfoType = {
   last_active: string;
   num_contributors: number | null;
   instructions: string;
+  primary_geom_type: GeoGeomTypesEnum;
+  new_geom_type: GeoGeomTypesEnum;
 };
 
 export type taskType = {
@@ -89,10 +91,12 @@ export type projectDashboardDetailTypes = {
   organisation_name: string;
   total_tasks: number;
   created_at: string;
+  organisation_id: number;
   organisation_logo: string;
   total_submissions: number | null;
   total_contributors: number | null;
   last_active: string;
+  status: project_status;
 };
 
 export type projectTaskBoundriesType = {

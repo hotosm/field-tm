@@ -1,6 +1,7 @@
 import type { UUID } from 'crypto';
-import type { Point, Polygon } from 'geojson';
+import type { Polygon } from 'geojson';
 import { m } from '$translations/messages.js';
+import type { projectStatus } from '$constants/enums';
 
 export type ProjectTask = {
 	id: number;
@@ -26,7 +27,7 @@ export interface APIProject {
 	organisation_logo: string;
 	author_id: number;
 	custom_tms_url: string;
-	status: number;
+	status: projectStatus;
 	hashtags: string[];
 	tasks: ProjectTask[];
 	geo_restrict_distance_meters: number;
@@ -233,4 +234,5 @@ export type DbApiSubmissionType = {
 	queued_at: string; // or Date if you parse it
 	last_attempt_at: string | null;
 	success_at: string | null;
+	user_sub: string | null;
 };

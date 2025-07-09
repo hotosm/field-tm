@@ -499,7 +499,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/3e/0d/424de6e5612f1399f
 
 [[package]]
 name = "fmtm"
-version = "2025.3.1"
+version = "2025.4.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiosmtplib" },
@@ -588,7 +588,7 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=master-modified" },
+    { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=feat%2Fenv-var-config" },
     { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.12" },
     { name = "pyxform", specifier = "==2.1.1" },
@@ -1887,8 +1887,8 @@ wheels = [
 
 [[package]]
 name = "pyodk"
-version = "1.1.0"
-source = { git = "https://github.com/hotosm/pyodk?rev=master-modified#888c16efe357bd33e539b4ddc6a9671dbf2d0684" }
+version = "1.2.1"
+source = { git = "https://github.com/hotosm/pyodk?rev=feat%2Fenv-var-config#d8614a34008346e67f8d49d1cb9cc647cf28fc40" }
 dependencies = [
     { name = "pydantic" },
     { name = "requests" },
