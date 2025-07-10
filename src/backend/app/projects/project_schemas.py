@@ -267,10 +267,10 @@ class PaginatedProjectSummaries(BaseModel):
 
 
 class ProjectUserContributions(BaseModel):
-    """Users for a project, plus contribution count."""
+    """A single project contributor and their submission count."""
 
     user: str
-    contributions: int
+    submissions: int
 
 
 class BasemapGenerate(BaseModel):
@@ -383,10 +383,3 @@ class ProjectTeamIn(ProjectTeamOne):
 
     # Exclude, as the uuid is generated in the database
     team_id: Annotated[Optional[UUID], Field(exclude=True)] = None
-
-
-class ProjectContributor(BaseModel):
-    """A single project contributor and their submission count."""
-
-    user: str
-    submissions: int
