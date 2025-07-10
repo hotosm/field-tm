@@ -6,8 +6,7 @@
 	import { online } from 'svelte/reactivity/window';
 	import { error } from '@sveltejs/kit';
 	import type { PageProps } from './$types';
-	// import { pwaInfo } from 'virtual:pwa-info';
-	import { useRegisterSW } from 'virtual:pwa-register/svelte';
+	import { pwaInfo } from 'virtual:pwa-info';
 	import type { RegisterSWOptions } from 'vite-plugin-pwa/types';
 
 	import { getCommonStore, getAlertStore } from '$store/common.svelte.ts';
@@ -27,41 +26,6 @@
 	let dbPromise = data.dbPromise;
 	let lastOnlineStatus: boolean | null = $state(null);
 	let loginDebounce: ReturnType<typeof setTimeout> | null = $state(null);
-
-	// Required for PWA to work with svelte
-	// const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
-    const { registerSW, offlineReady, needRefresh, updateServiceWorker }: RegisterSWOptions = useRegisterSW({
-        onRegistered(swr: any) {
-            console.log(`SW registered: ${swr}`);
-        },
-        onRegisterError(error: any) {
-            console.log('SW registration error', error);
-        },
-        onOfflineReady() {
-            console.log('SW ready for offline')
-			alertStore.setAlert({ message: m['offline.ready_offline'](), variant: 'default', duration: 2000 });
-        },
-		// // TODO consider enabling this at some point once functionality is more stable?
-		// // We wouldn't want to clear projects during active mapping campaign where we
-		// // are pushing regular updates
-		//
-		// async onNeedRefresh() {
-		// 	console.log('SW update available');
-
-		// 	alertStore.setAlert({
-		// 		message: 'New version available. Refreshing...',
-		// 		variant: 'default',
-		// 		duration: 2000
-		// 	});
-
-		// 	// Run db project cleanup
-		// 	const db = await dbPromise;
-		// 	db.query('DELETE FROM projects;').then(() => {
-		// 		console.log('Old projects cleared due to version update.');
-		// 		updateServiceWorker(); // Then update SW
-		// 	});
-		// }
-    });
 
 	async function refreshCookiesAndLogin() {
 		try {
@@ -126,10 +90,6 @@
 		db.close()
 	});
 </script>
-
-<!-- <svelte:head>
-	{@html webManifestLink}
-</svelte:head> -->
 
 <main class="flex flex-col h-screen overflow-hidden font-barlow">
 	<Header></Header>
