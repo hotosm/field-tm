@@ -42,7 +42,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbOrganisation, DbProject, DbUser
+from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -51,7 +51,7 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
-from app.organisations.organisation_deps import get_default_odk_creds, get_org_odk_creds
+from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
 from app.submissions.submission_crud import get_submission_by_project
@@ -958,20 +958,7 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
             for the specified project.
     """
     try:
-        project = await DbProject.one(db, project_id, minimal=True)
-
-        # Ensure odk_credentials is set
-        if not (
-            project.odk_central_url
-            and project.odk_central_user
-            and project.odk_central_password
-        ):
-            org = await DbOrganisation.one(db, project.organisation_id)
-            odk_creds = await get_org_odk_creds(org)
-            project.odk_central_url = odk_creds.odk_central_url
-            project.odk_central_user = odk_creds.odk_central_user
-            project.odk_central_password = odk_creds.odk_central_password
-            project.odk_credentials = odk_creds
+        project = await DbProject.one(db, project_id, minimal=False)
 
         # Fetch all submissions for the project
         data = await get_submission_by_project(project, {})

@@ -187,7 +187,7 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
                 />
 
                 <TableHeader
-                  dataField="OSMID"
+                  dataField="User"
                   headerClassName="codeHeader"
                   rowClassName="codeRow"
                   dataFormat={(row) => (
