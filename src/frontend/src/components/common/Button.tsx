@@ -13,6 +13,8 @@ interface IButton {
   disabled?: boolean;
   btnId?: string;
   btnTestId?: string;
+  ref?: React.Ref<HTMLButtonElement> | null;
+  shouldFocus?: boolean;
 }
 
 const variantStyle = {
@@ -48,13 +50,16 @@ const Button = ({
   btnId,
   btnTestId,
   children,
+  ref,
+  shouldFocus = false,
 }: IButton) => (
   <button
+    ref={ref}
     data-btnid={btnId}
     data-testid={btnTestId}
     type={type}
     onClick={onClick}
-    className={`fmtm-button fmtm-group fmtm-flex fmtm-justify-center fmtm-items-center fmtm-gap-2 fmtm-outline-none fmtm-w-fit fmtm-duration-200 fmtm-whitespace-nowrap ${btnStyle(variant)} ${className} ${(disabled || isLoading) && 'fmtm-cursor-not-allowed'}`}
+    className={`fmtm-button fmtm-group fmtm-flex fmtm-justify-center fmtm-items-center fmtm-gap-2 fmtm-outline-none fmtm-w-fit fmtm-duration-200 fmtm-whitespace-nowrap ${shouldFocus && 'focus:fmtm-border-[#D73F37] focus:fmtm-ring-[#D73F37]/50 focus:fmtm-ring-[3px]'} ${btnStyle(variant)} ${className} ${(disabled || isLoading) && 'fmtm-cursor-not-allowed'}`}
     disabled={disabled || isLoading}
   >
     <>
