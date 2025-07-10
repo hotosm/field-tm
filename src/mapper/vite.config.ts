@@ -142,8 +142,8 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 export default defineConfig({
-	// Ensure the base is not '/project/xxx', but always '/',
-	// else registration of sw and manifest can fail
+	// Ensure the base is not '/project/xxx', but always '/', else
+	// registration of sw and manifest can fail under /project
 	base: '/',
 	plugins: [
 		sveltekit(),
