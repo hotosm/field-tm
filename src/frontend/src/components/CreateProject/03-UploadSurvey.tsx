@@ -71,7 +71,7 @@ const UploadSurvey = () => {
         <FieldLabel label="What are you surveying?" astric />
         <Controller
           control={control}
-          name="formExampleSelection"
+          name="osm_category"
           render={({ field }) => (
             <Select2
               options={sortedFormExampleList || []}
@@ -86,9 +86,7 @@ const UploadSurvey = () => {
             />
           )}
         />
-        {errors?.formExampleSelection?.message && (
-          <ErrorMessage message={errors.formExampleSelection.message as string} />
-        )}
+        {errors?.osm_category?.message && <ErrorMessage message={errors.osm_category.message as string} />}
 
         <p className="fmtm-body-sm fmtm-text-[#9B9999]">
           Selecting a form based on OpenStreetMap{' '}
@@ -104,16 +102,12 @@ const UploadSurvey = () => {
       </div>
 
       <div>
-        <Tooltip
-          arrow
-          placement="bottom"
-          title={!values.formExampleSelection ? 'Please select a form category first' : ''}
-        >
+        <Tooltip arrow placement="bottom" title={!values.osm_category ? 'Please select a form category first' : ''}>
           <div className="fmtm-w-fit">
             <a
-              href={`${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.formExampleSelection}`}
+              href={`${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
               target="_"
-              className={`fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline fmtm-w-fit ${!values.formExampleSelection && 'fmtm-opacity-70 fmtm-pointer-events-none'}`}
+              className={`fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline fmtm-w-fit ${!values.osm_category && 'fmtm-opacity-70 fmtm-pointer-events-none'}`}
             >
               Download Form
             </a>
@@ -121,7 +115,7 @@ const UploadSurvey = () => {
         </Tooltip>
         <p className="fmtm-mt-1">
           <a
-            href={`https://xlsforms.fmtm.dev?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.formExampleSelection}`}
+            href={`https://xlsforms.fmtm.dev?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
             target="_"
             className="fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
           >

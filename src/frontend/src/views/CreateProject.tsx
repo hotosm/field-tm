@@ -84,7 +84,7 @@ const CreateProject = () => {
   const isProjectManager = useIsProjectManager(projectId);
 
   useEffect(() => {
-    if (step < 1 || step > 5 || !values.formExampleSelection) {
+    if (step < 1 || step > 5 || !values.osm_category) {
       setSearchParams({ step: '1' });
     }
   }, []);
@@ -163,17 +163,17 @@ const CreateProject = () => {
       custom_tms_url: data.custom_tms_url,
       per_task_instructions: data.per_task_instructions,
       use_odk_collect: data.use_odk_collect,
-      osm_category: data.formExampleSelection,
-      primary_geom_type: data.primaryGeomType,
-      new_geom_type: data.newGeomType ? data.newGeomType : data.primaryGeomType,
+      osm_category: data.osm_category,
+      primary_geom_type: data.primary_geom_type,
+      new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
       task_split_type: data.task_split_type,
       status: 'PUBLISHED',
     };
 
     if (data.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
-      projectData.task_num_buildings = data.average_buildings_per_task;
+      projectData.task_num_buildings = data.task_num_buildings;
     } else {
-      projectData.task_split_dimension = data.dimension;
+      projectData.task_split_dimension = data.task_split_dimension;
     }
 
     const taskSplitGeojsonFile = convertGeojsonToJsonFile(

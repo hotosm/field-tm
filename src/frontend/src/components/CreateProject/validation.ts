@@ -107,7 +107,7 @@ export const projectDetailsValidationSchema = z
 
 export const uploadSurveyValidationSchema = z
   .object({
-    formExampleSelection: z.string().min(1, 'Form Category is must be selected'),
+    osm_category: z.string().min(1, 'Form Category is must be selected'),
     xlsFormFile: z.any().optional(),
     isXlsFormFileValid: z.boolean(),
   })
@@ -133,7 +133,7 @@ export const uploadSurveyValidationSchema = z
 
 export const mapDataValidationSchema = z
   .object({
-    primaryGeomType: z
+    primary_geom_type: z
       .enum(GeoGeomTypesEnum)
       .nullable()
       .refine((val) => val !== null, {
@@ -141,7 +141,7 @@ export const mapDataValidationSchema = z
       }),
     includeCentroid: z.boolean(),
     useMixedGeomTypes: z.boolean(),
-    newGeomType: z.union([z.enum(GeoGeomTypesEnum), z.null()]).optional(),
+    new_geom_type: z.union([z.enum(GeoGeomTypesEnum), z.null()]).optional(),
     dataExtractType: z
       .enum(data_extract_type)
       .nullable()
@@ -154,10 +154,10 @@ export const mapDataValidationSchema = z
   .check((ctx) => {
     const values = ctx.value;
 
-    if (values.useMixedGeomTypes && !values.newGeomType) {
+    if (values.useMixedGeomTypes && !values.new_geom_type) {
       ctx.issues.push({
-        input: values.newGeomType,
-        path: ['newGeomType'],
+        input: values.new_geom_type,
+        path: ['new_geom_type'],
         message: 'New Geometry Type must be selected',
         code: 'custom',
       });
@@ -180,13 +180,13 @@ export const mapDataValidationSchema = z
     }
     if (
       values.dataExtractGeojson?.id &&
-      values.primaryGeomType !== values.dataExtractGeojson?.id &&
+      values.primary_geom_type !== values.dataExtractGeojson?.id &&
       !values.customDataExtractFile
     ) {
       ctx.issues.push({
         input: values.dataExtractGeojson,
         path: ['dataExtractGeojson'],
-        message: `Please generate data extract for ${values.primaryGeomType?.toLowerCase()}`,
+        message: `Please generate data extract for ${values.primary_geom_type?.toLowerCase()}`,
         code: 'custom',
       });
     }
@@ -208,8 +208,8 @@ export const splitTasksValidationSchema = z
       .refine((val) => val !== null, {
         message: 'Task Split Type is Required',
       }),
-    dimension: z.number().optional(),
-    average_buildings_per_task: z.number().optional(),
+    task_split_dimension: z.number().optional(),
+    task_num_buildings: z.number().optional(),
     splitGeojsonBySquares: z.any().optional(),
     splitGeojsonByAlgorithm: z.any().optional(),
     dividedTaskGeojson: z.any().optional(),
@@ -219,28 +219,28 @@ export const splitTasksValidationSchema = z
 
     if (
       values.task_split_type === task_split_type.DIVIDE_ON_SQUARE &&
-      values.dimension !== undefined &&
-      values.dimension < 10
+      values.task_split_dimension !== undefined &&
+      values.task_split_dimension < 10
     ) {
       ctx.issues.push({
         minimum: 10,
         message: 'Dimension must be at least 10',
-        input: values.dimension,
+        input: values.task_split_dimension,
         code: 'custom',
-        path: ['dimension'],
+        path: ['task_split_dimension'],
       });
     }
     if (
       values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM &&
-      values.average_buildings_per_task !== undefined &&
-      values.average_buildings_per_task < 1
+      values.task_num_buildings !== undefined &&
+      values.task_num_buildings < 1
     ) {
       ctx.issues.push({
         minimum: 1,
         message: 'Average buildings per task must be greater than 0',
-        input: values.average_buildings_per_task,
+        input: values.task_num_buildings,
         code: 'custom',
-        path: ['average_buildings_per_task'],
+        path: ['task_num_buildings'],
       });
     }
     if (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.splitGeojsonBySquares) {
