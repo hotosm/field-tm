@@ -157,6 +157,9 @@ check_user_not_root() {
 }
 
 update_to_rootless() {
+    pretty_echo "Enabling nf_tables via modprobe"
+    sudo modprobe nf_tables
+
     pretty_echo "Disabling docker service if running"
     sudo systemctl disable --now docker.service docker.socket
 
@@ -170,6 +173,9 @@ restart_docker_rootless() {
     sleep 5
     systemctl --user daemon-reload
     systemctl --user restart docker
+    echo
+    echo "Ensuring the service remains running after log out"
+    sudo loginctl enable-linger "$(whoami)"
     echo
     echo "Done."
 }

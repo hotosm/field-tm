@@ -39,7 +39,7 @@ const HomePageFilters = ({ searchText, onSearch }: homePageFiltersPropType) => {
           />
         </div>
         {hasManagedAnyOrganization && (
-          <Link to={'/create-project'}>
+          <Link to={'/create-project?step=1'}>
             <Button variant="primary-red">
               <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />
               <p>New Project</p>

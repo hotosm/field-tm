@@ -53,12 +53,13 @@ from app.auth.roles import Mapper, ProjectManager, org_admin
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, XLSFormType
+from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
     DbBasemap,
     DbOdkEntities,
+    DbOrganisation,
     DbProject,
     DbProjectTeam,
     DbProjectTeamUser,
@@ -532,9 +533,7 @@ async def preview_split_by_square(
 @router.post("/generate-data-extract")
 async def get_data_extract(
     # config_file: Optional[str] = Form(None),
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     geojson_file: UploadFile = File(...),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
     osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
@@ -548,6 +547,7 @@ async def get_data_extract(
     """
     boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
+    project = project_user_dict.get("project")
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
@@ -853,9 +853,7 @@ async def generate_files(
 
 @router.post("/{project_id}/tiles-generate")
 async def generate_project_basemap(
-    # NOTE we do not set the correct role on this endpoint yet
-    # FIXME once stub project creation implemented, this should be manager only
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
     db: Annotated[Connection, Depends(db_conn)],
     basemap_in: project_schemas.BasemapGenerate,
@@ -950,13 +948,13 @@ async def upload_project_task_boundaries(
 ####################
 
 
-@router.post("", response_model=project_schemas.ProjectOut)
-async def create_project(
-    project_info: project_schemas.ProjectIn,
+@router.post("/stub", response_model=project_schemas.ProjectOut)
+async def create_stub_project(
+    project_info: project_schemas.StubProjectIn,
     org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
-    """Create a project in ODK Central and the local database.
+    """Create a project in the local database.
 
     The org_id and project_id params are inherited from the org_admin permission.
     Either param can be passed to determine if the user has admin permission
@@ -965,36 +963,13 @@ async def create_project(
     db_user = org_user_dict["user"]
     db_org = org_user_dict["org"]
     project_info.organisation_id = db_org.id
+    project_info.status = ProjectStatus.DRAFT
 
     log.info(
         f"User {db_user.username} attempting creation of project "
         f"{project_info.name} in organisation ({db_org.id})"
     )
-
-    # Must decrypt ODK password & connect to ODK Central before proj created
-    # cannot use project.odk_credentials helper as no project set yet
-    # FIXME this can be updated once we have incremental project creation
-    if project_info.odk_central_url:
-        odk_creds_decrypted = central_schemas.ODKCentralDecrypted(
-            odk_central_url=project_info.odk_central_url,
-            odk_central_user=project_info.odk_central_user,
-            odk_central_password=project_info.odk_central_password,
-        )
-    else:
-        # Else use default org credentials if none passed
-        log.debug(
-            "No ODK credentials passed during project creation. "
-            "Defaulting to organisation credentials."
-        )
-        odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
-
     await project_deps.check_project_dup_name(db, project_info.name)
-
-    # Create project in ODK Central
-    # NOTE runs in separate thread using run_in_threadpool
-    odkproject = await run_in_threadpool(
-        lambda: central_crud.create_odk_project(project_info.name, odk_creds_decrypted)
-    )
 
     # Get the location_str via reverse geocode
     async with AsyncNearestCity(db) as geocoder:
@@ -1006,7 +981,6 @@ async def create_project(
         project_info.location_str = f"{location.city},{country_full_name}"
 
     # Create the project in the Field-TM DB
-    project_info.odkid = odkproject["id"]
     project_info.author_sub = db_user.sub
     try:
         project = await DbProject.create(db, project_info)
@@ -1046,6 +1020,52 @@ async def delete_project(
 
     log.info(f"Deletion of project {project.id} successful")
     return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@router.patch("", response_model=project_schemas.ProjectOut)
+async def create_project(
+    project_info: project_schemas.ProjectIn,
+    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
+    db: Annotated[Connection, Depends(db_conn)],
+):
+    """Create a project in ODK Central and update the local stub project.
+
+    The org_id and project_id params are inherited from the org_admin permission.
+    Either param can be passed to determine if the user has admin permission
+    to the organisation (or organisation associated with a project).
+    """
+    project_id = project_user.get("project").id
+    org_id = project_user.get("project").organisation_id
+    db_org = await DbOrganisation.one(db, org_id)
+    project = await DbProject.one(db, project_id)
+
+    if project_info.name:
+        await project_deps.check_project_dup_name(db, project_info.name)
+    if project_info.odk_credentials:
+        odk_creds_decrypted = project_info.odk_credentials
+    else:
+        log.debug(
+            "No ODK credentials passed during project creation. "
+            "Defaulting to organisation credentials."
+        )
+        odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
+
+    # Create project in ODK Central
+    # NOTE runs in separate thread using run_in_threadpool
+    odkproject = await run_in_threadpool(
+        lambda: central_crud.create_odk_project(project.name, odk_creds_decrypted)
+    )
+    project_info.odkid = odkproject["id"]
+
+    try:
+        project = await DbProject.update(db, project.id, project_info)
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Project update failed.",
+        ) from e
+
+    return project
 
 
 ###############################

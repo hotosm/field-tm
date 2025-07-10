@@ -95,6 +95,7 @@ nav:
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
       - Production Deployment: dev/Production.md
+      - Mobile Apps: dev/building-mobile-apps.md
       - Code Coverage: coverage.html
   - Utilities:
       - XLSForm Converter: https://getodk.org/xlsform/
