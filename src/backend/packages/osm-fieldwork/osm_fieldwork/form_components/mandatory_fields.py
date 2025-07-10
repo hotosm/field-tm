@@ -177,6 +177,8 @@ def _get_mandatory_fields(
             "calculation": (
                 f"if({FEATURE} != '', {INSTANCE_FEATURE}/geometry, "
                 f"if({NEW_FEATURE} != '', {NEW_FEATURE}, ''))"
+                if use_odk_collect
+                else f"if({FEATURE} != '', {INSTANCE_FEATURE}/geometry, '')"
             ),
             "save_to": "geometry",
         },
@@ -219,7 +221,7 @@ def _get_mandatory_fields(
             "notes": "Update the created_by field",
             "label::english(en)": "Created by",
             "appearance": "minimal",
-            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, '')",
+            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, '')" if use_odk_collect else "",
             "save_to": "created_by",
         },
     ])
