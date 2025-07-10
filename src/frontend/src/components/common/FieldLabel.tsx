@@ -31,7 +31,7 @@ export default function FieldLabel({
         {astric && <span className="fmtm-text-red-medium fmtm-button">&nbsp;*</span>}
       </div>
       {tooltipMessage && (
-        <Tooltip title={tooltipMessage} placement="right" arrow>
+        <Tooltip title={tooltipMessage} placement="right" arrow className="fmtm-cursor-pointer">
           <AssetModules.InfoOutlineIcon className="fmtm-text-grey-600 !fmtm-text-sm" />
         </Tooltip>
       )}
