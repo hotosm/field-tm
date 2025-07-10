@@ -613,7 +613,8 @@ async def test_update_and_download_project_form(client, project):
         assert response.content == b"updated xlsform data"
 
 
-async def test_get_contributors(client, project, task_events, admin_user):
+# NOTE we need odk_project and task_events fixture to populate data
+async def test_get_contributors(client, project, odk_project, task_events, admin_user):
     """Test fetching contributors of a project."""
     response = await client.get(f"projects/contributors/{project.id}")
     assert response.status_code == 200
