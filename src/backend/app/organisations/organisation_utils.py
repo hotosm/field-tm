@@ -17,59 +17,40 @@
 #
 """Utils for download organisation submissions."""
 
+import asyncio
 import csv
 import io
 
-from app.organisations.organisation_deps import get_org_odk_creds
+from app.organisations.organisation_deps import get_project_or_org_odk_creds
 from app.submissions import submission_crud
 
 
-async def populate_odk_credentials_for_projects(projects, org):
-    """Fill in missing ODK credentials for each project."""
-    odk_creds = await get_org_odk_creds(org)
-    for project in projects:
-        if not (
-            project.odk_central_url
-            and project.odk_central_user
-            and project.odk_central_password
-        ):
-            project.odk_central_url = odk_creds.odk_central_url
-            project.odk_central_user = odk_creds.odk_central_user
-            project.odk_central_password = odk_creds.odk_central_password
-            project.odk_credentials = odk_creds  # Needed by pyodk client
+async def fetch_project_submissions(project, org, filters):
+    """Get the correct ODK credentials for this project."""
+    odk_creds = await get_project_or_org_odk_creds(project, org)
+    project.odk_credentials = odk_creds
+    data = await submission_crud.get_submission_by_project(project, filters)
+    values = data.get("value", []) or []
+    for sub in values:
+        sub["project_id"] = project.id
+        sub["project_name"] = project.name
+    return values
 
 
-def build_submission_filters(submitted_date_range: str):
-    """Create a filter dictionary for date range to be applied to submissions API."""
-    filters = {}
-    if submitted_date_range:
-        try:
-            start_date, end_date = submitted_date_range.split(",")
-            filters["$filter"] = (
-                f"__system/submissionDate ge {start_date}T00:00:00+00:00 and "
-                f"__system/submissionDate le {end_date}T23:59:59.999+00:00"
-            )
-        except ValueError:
-            pass  # Gracefully skip if format is invalid
-    return filters
+async def _fetch_with_semaphore(semaphore, project, org, filters):
+    """Fetch submissions with concurrency limit of 10 projects."""
+    async with semaphore:
+        return await fetch_project_submissions(project, org, filters)
 
 
-async def collect_all_submissions(projects, filters):
-    """Fetch all submissions for each project and enrich them with project metadata.
-
-    Logs count per project to help debug missing results.
-    """
-    all_submissions = []
-
-    for project in projects:
-        data = await submission_crud.get_submission_by_project(project, filters)
-        values = data.get("value", []) or []
-
-        for sub in values:
-            sub["project_id"] = project.id
-            sub["project_name"] = project.name
-            all_submissions.append(sub)
-
+async def collect_all_submissions(projects, org, filters, concurrency_limit=10):
+    """Aggregate all submissions from all projects within an organisation."""
+    semaphore = asyncio.Semaphore(concurrency_limit)
+    tasks = [
+        _fetch_with_semaphore(semaphore, project, org, filters) for project in projects
+    ]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    all_submissions = [sub for project_subs in results for sub in project_subs]
     return all_submissions
 
 
@@ -128,3 +109,18 @@ def generate_geojson_dict(submissions: list) -> dict:
         "type": "FeatureCollection",
         "features": features,
     }
+
+
+def build_submission_filters(submitted_date_range: str):
+    """Create a filter dictionary for date range to be applied to submissions API."""
+    filters = {}
+    if submitted_date_range:
+        try:
+            start_date, end_date = submitted_date_range.split(",")
+            filters["$filter"] = (
+                f"__system/submissionDate ge {start_date}T00:00:00+00:00 and "
+                f"__system/submissionDate le {end_date}T23:59:59.999+00:00"
+            )
+        except ValueError:
+            pass
+    return filters
