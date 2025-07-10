@@ -458,8 +458,10 @@ async def conflate_geojson(
         )
         osm_category = project.osm_category
         input_features = submission_geojson["features"]
-        
-        osm_features = await postgis_utils.get_osm_geometries(osm_category, task_geojson)
+
+        osm_features = await postgis_utils.get_osm_geometries(
+            osm_category, task_geojson
+        )
         conflated_features = postgis_utils.conflate_features(
             input_features, osm_features.get("features", []), remove_conflated
         )
