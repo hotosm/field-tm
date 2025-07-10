@@ -6,7 +6,7 @@
 	import { online } from 'svelte/reactivity/window';
 	import { error } from '@sveltejs/kit';
 	import type { PageProps } from './$types';
-	import { pwaInfo } from 'virtual:pwa-info';
+	// import { pwaInfo } from 'virtual:pwa-info';
 	import { useRegisterSW } from 'virtual:pwa-register/svelte';
 	import type { RegisterSWOptions } from 'vite-plugin-pwa/types';
 
@@ -29,7 +29,7 @@
 	let loginDebounce: ReturnType<typeof setTimeout> | null = $state(null);
 
 	// Required for PWA to work with svelte
-	const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
+	// const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
     const { registerSW, offlineReady, needRefresh, updateServiceWorker }: RegisterSWOptions = useRegisterSW({
         onRegistered(swr: any) {
             console.log(`SW registered: ${swr}`);
@@ -127,9 +127,9 @@
 	});
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
 	{@html webManifestLink}
-</svelte:head>
+</svelte:head> -->
 
 <main class="flex flex-col h-screen overflow-hidden font-barlow">
 	<Header></Header>

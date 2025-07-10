@@ -27,12 +27,12 @@
 		<!-- Register the PWA manifest and service worker -->
 		<!-- Note this didn't work using the default vite-pwa config -->
 		<!-- We need to ensure that when loading /project/xxx we still register correctly -->
-		<!-- <link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="manifest" href="/manifest.webmanifest" />
 		<script>
 			if ('serviceWorker' in navigator) {
 				navigator.serviceWorker.register('/sw.js');
 			}
-		</script> -->
+		</script>
 
 		%sveltekit.head%
 	</head>

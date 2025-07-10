@@ -11,7 +11,7 @@ import extractorSvelte from '@unocss/extractor-svelte';
 const pwaOptions: Partial<VitePWAOptions> = {
 	// This ensures that caches are invalidated when the app is updated
 	registerType: 'autoUpdate',
-	injectRegister: 'auto',
+	injectRegister: false,
 	strategies: 'generateSW',
 
 	// Important to ensure the PWA runs on the **entire** website
