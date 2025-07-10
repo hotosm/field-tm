@@ -13,13 +13,11 @@ type propsType = {
   splittedGeojson?: GeoJSONFeatureTypes | null;
   uploadedOrDrawnGeojsonFile: DrawnGeojsonTypes | null;
   buildingExtractedGeojson?: GeoJSONFeatureTypes | null;
-  lineExtractedGeojson?: GeoJSONFeatureTypes;
   onDraw?: ((geojson: any, area: string) => void) | null;
   onModify?: ((geojson: any, area: string) => void) | null;
-  hasEditUndo?: boolean;
   getAOIArea?: ((area?: string) => void) | null;
-  toggleEdit?: boolean;
-  setToggleEdit?: (value: boolean) => void;
+  toggleEdit: boolean;
+  setToggleEdit: (value: boolean) => void;
 };
 
 const Map = ({
@@ -27,10 +25,8 @@ const Map = ({
   uploadedOrDrawnGeojsonFile,
   splittedGeojson,
   buildingExtractedGeojson,
-  lineExtractedGeojson,
   onDraw,
   onModify,
-  hasEditUndo,
   getAOIArea,
   toggleEdit,
   setToggleEdit,
@@ -54,7 +50,7 @@ const Map = ({
         }}
       >
         <LayerSwitcherControl visible={'osm'} />
-        <MapControls hasEditUndo={hasEditUndo} toggleEdit={toggleEdit} setToggleEdit={setToggleEdit} />
+        <MapControls map={map} toggleEdit={toggleEdit} setToggleEdit={setToggleEdit} />
 
         {isDrawOrGeojsonFile && !splittedGeojson && (
           <VectorLayer
@@ -98,19 +94,6 @@ const Map = ({
             }}
             zoomToLayer
             style={{ ...defaultStyles, lineColor: '#1a2fa2', fillOpacity: 30, lineOpacity: 50 }}
-          />
-        )}
-
-        {lineExtractedGeojson && (
-          <VectorLayer
-            geojson={lineExtractedGeojson}
-            viewProperties={{
-              size: map?.getSize(),
-              padding: [50, 50, 50, 50],
-              constrainResolution: true,
-              duration: 500,
-            }}
-            zoomToLayer
           />
         )}
       </MapComponent>

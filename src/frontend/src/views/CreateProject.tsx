@@ -299,14 +299,14 @@ const CreateProject = () => {
             onDraw={
               values.outline || values.uploadAreaSelection === 'upload_file'
                 ? null
-                : (geojson, area) => {
+                : (geojson) => {
                     setValue('outline', JSON.parse(geojson));
                     setValue('uploadedAOIFile', undefined);
                   }
             }
             onModify={
               toggleEdit && values.outline && step === 1
-                ? (geojson, area) => {
+                ? (geojson) => {
                     setValue('outline', JSON.parse(geojson));
 
                     if (values.customDataExtractFile) setValue('customDataExtractFile', null);
