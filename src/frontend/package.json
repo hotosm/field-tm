@@ -1,6 +1,6 @@
 {
   "name": "field-tm",
-  "version": "2025.3.1",
+  "version": "2025.4.0",
   "scripts": {
     "build": "vite build",
     "build:dev": "vite build --mode development",
@@ -45,6 +45,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@hotosm/ui": "0.2.0-b4",
     "@mui/base": "5.0.0-beta.70",
     "@mui/icons-material": "^6.4.11",
@@ -84,6 +85,7 @@
     "react": "^19.1.0",
     "react-datepicker": "^8.3.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.58.1",
     "react-lazy-load-image-component": "^1.6.3",
     "react-loading-skeleton": "^3.5.0",
     "react-redux": "^9.2.0",
@@ -94,7 +96,8 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "tailwind-merge": "2.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.67"
   },
   "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

@@ -199,7 +199,8 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerUrl = null }) =
       location.pathname.includes('upload-survey') ||
       location.pathname.includes('map-data') ||
       location.pathname.includes('split-tasks') ||
-      location.pathname.includes('project-submissions')
+      location.pathname.includes('project-submissions') ||
+      location.pathname.includes('create')
     ) {
       const olZoom = document.querySelector('.ol-zoom');
       if (olZoom) {
