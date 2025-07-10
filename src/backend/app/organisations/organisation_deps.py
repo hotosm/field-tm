@@ -26,12 +26,11 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from psycopg import Connection
 
-from app.auth.auth_deps import login_required
-from app.auth.auth_schemas import AuthUser
 from app.central import central_schemas
+from app.central.central_schemas import ODKCentralDecrypted
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus, UserRole
-from app.db.models import DbOrganisation, DbOrganisationManagers, DbProject
+from app.db.enums import HTTPStatus
+from app.db.models import DbOrganisation, DbProject
 from app.projects.project_deps import get_project
 
 
@@ -131,49 +130,37 @@ async def org_from_project(
     return await get_organisation(db, project.organisation_id)
 
 
-async def org_or_project_manager(
-    org_id: int,
-    db: Connection = Depends(db_conn),
-    current_user: AuthUser = Depends(login_required),
-):
-    """Authorize user if they are an admin, org manager, or project manager in the org.
+async def get_project_or_org_odk_creds(
+    project: DbProject,
+    org: DbOrganisation,
+) -> ODKCentralDecrypted:
+    """Get ODK creds for a project, falling back to org creds.
 
-    Args:
-        org_id (int): Organisation ID.
-        db (Connection): Database connection.
-        current_user (AuthUser): Authenticated user.
-
-    Returns:
-        dict: Contains the user and organisation.
-
-    Raises:
-        HTTPException: If the user lacks required permissions.
+    Returns an ODKCentralDecrypted object.
     """
-    # Check if user is admin
-    if current_user.role == UserRole.ADMIN:
-        org = await DbOrganisation.one(db, org_id)
-        return {"user": current_user, "org": org}
-    # Check if user is org manager
-    org_managers = await DbOrganisationManagers.get(db, org_id, current_user.sub)
-    if org_managers:
-        org = await DbOrganisation.one(db, org_id)
-        return {"user": current_user, "org": org}
-    # Check if user is project manager for any project in the org
-    sql = """
-        SELECT 1 FROM user_roles ur
-        JOIN projects p ON ur.project_id = p.id
-        WHERE ur.user_sub = %(user_sub)s
-        AND ur.role = 'PROJECT_MANAGER'
-        AND p.organisation_id = %(org_id)s
-        LIMIT 1
-    """
-    async with db.cursor() as cur:
-        await cur.execute(sql, {"user_sub": current_user.sub, "org_id": org_id})
-        if await cur.fetchone():
-            org = await DbOrganisation.one(db, org_id)
-            return {"user": current_user, "org": org}
-    raise HTTPException(
-        status_code=HTTPStatus.FORBIDDEN,
-        detail="""You must be an admin, organisation manager, or
-        project manager to access this resource.""",
-    )
+    url = getattr(project, "odk_central_url", None)
+    user = getattr(project, "odk_central_user", None)
+    password = getattr(project, "odk_central_password", None)
+
+    # Ensure all are strings and not dicts
+    if all(isinstance(x, str) and x for x in [url, user, password]):
+        return ODKCentralDecrypted(
+            odk_central_url=url,
+            odk_central_user=user,
+            odk_central_password=password,
+        )
+    else:
+        # Fallback to org, and ensure org values are strings
+        org_url = getattr(org, "odk_central_url", None)
+        org_user = getattr(org, "odk_central_user", None)
+        org_password = getattr(org, "odk_central_password", None)
+        if all(isinstance(x, str) and x for x in [org_url, org_user, org_password]):
+            return ODKCentralDecrypted(
+                odk_central_url=org_url,
+                odk_central_user=org_user,
+                odk_central_password=org_password,
+            )
+        else:
+            raise ValueError(
+                "No valid ODK Central credentials found for project or organisation."
+            )

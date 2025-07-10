@@ -47,10 +47,10 @@ from app.organisations.organisation_utils import (
     collect_all_submissions,
     generate_csv_string,
     generate_geojson_dict,
-    populate_odk_credentials_for_projects,
 )
 from app.projects.project_crud import DbProject
-from app.users.user_crud import send_mail
+
+# from app.users.user_crud import send_mail
 from app.users.user_schemas import UserIn
 
 
@@ -501,7 +501,7 @@ async def download_organisation_submissions(
 
     try:
         org = await DbOrganisation.one(db, org_id)
-        projects = await DbProject.all(db, org_id=org_id)
+        projects = await DbProject.all(db, org_id=org_id, minimal=False)
 
         if not projects:
             log.warning(f"No projects found for organisation {org_id}")
@@ -509,8 +509,8 @@ async def download_organisation_submissions(
 
         log.info(f"Found {len(projects)} project(s) for organisation {org_id}")
 
-        # Set ODK credentials on projects if missing
-        await populate_odk_credentials_for_projects(projects, org)
+        # Set ODK credentials on each project
+        # await get_project_or_org_odk_creds(projects, org)
 
         # Parse and apply filters
         filters = build_submission_filters(submitted_date_range)
@@ -519,8 +519,8 @@ async def download_organisation_submissions(
                 f"Applied filters for submission date range: {submitted_date_range}"
             )
 
-        # Fetch submissions
-        all_submissions = await collect_all_submissions(projects, filters)
+        # Fetch submissions of all projects
+        all_submissions = await collect_all_submissions(projects, org, filters)
         if not all_submissions:
             log.warning(f"No submissions found for organisation {org_id}")
             return {"message": f"No submissions found for organisation {org_id}"}

@@ -44,7 +44,6 @@ from app.organisations import organisation_crud
 from app.organisations.organisation_deps import (
     get_org_odk_creds,
     org_exists,
-    org_or_project_manager,
 )
 from app.organisations.organisation_schemas import (
     OrganisationIn,
@@ -310,7 +309,9 @@ async def remove_organisation_admin(
 @router.get("/{org_id}/stats", response_model=StatsResponse)
 async def get_stats(
     org_id: int,
-    org_user_dict: dict = Depends(org_or_project_manager),
+    org_user_dict: dict = Depends(
+        org_admin
+    ),  # admin or organisation admin can only access
     db: Connection = Depends(db_conn),
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
@@ -328,9 +329,11 @@ async def get_stats(
 @router.get("/{org_id}/submissions/download")
 async def download_organisation_submissions_route(
     org_id: int,
-    file_type: str = "csv",
+    file_type: str = "geojson",
     submitted_date_range: str = None,
-    org_user_dict: dict = Depends(org_or_project_manager),
+    org_user_dict: dict = Depends(
+        org_admin
+    ),  # admin or organisation admin can only access
     db: Connection = Depends(db_conn),
 ):
     """Download all submissions for an organisation across projects.
