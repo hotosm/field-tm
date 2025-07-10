@@ -556,7 +556,7 @@ async def get_data_extract(
         data_model = f"{data_models_path}/{config_filename}.yaml"
 
         with open(data_model) as f:
-            config = yaml.safe_load(f)
+            config_json = yaml.safe_load(f)
 
         data_config = {
             ("polygon", False): ["ways_poly"],
@@ -565,14 +565,12 @@ async def get_data_extract(
             ("polyline", False): ["ways_line"],
         }
 
-        config["from"] = data_config.get((geom_type, centroid))
+        config_json["from"] = data_config.get((geom_type, centroid))
         if geom_type == "polyline":
             geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
-        # Convert to JSON string
-        config_json = json.dumps(config, indent=2)
-
     result = await project_crud.generate_data_extract(
+        project.id,
         clean_boundary_geojson,
         geom_type,
         config_json,

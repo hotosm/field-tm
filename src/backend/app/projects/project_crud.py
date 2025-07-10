@@ -124,6 +124,7 @@ async def get_projects_featcol(
 
 
 async def generate_data_extract(
+    project_id: int,
     aoi: geojson.FeatureCollection | geojson.Feature | dict,
     geom_type: str,
     config_json=None,
@@ -132,6 +133,7 @@ async def generate_data_extract(
     """Request a new data extract in flatgeobuf format.
 
     Args:
+        project_id (int): Id (primary key) of the project.
         aoi (geojson.FeatureCollection | geojson.Feature | dict]):
             Area of interest for data extraction.
         geom_type (str): Type of geometry to extract.
@@ -152,19 +154,23 @@ async def generate_data_extract(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="To generate a new data extract a extract_config must be specified.",
         )
-    filters = json.loads(config_json)
 
     result = await get_osm_data(
-        aoi,
-        fileName="fmtm_data_extract",
+        geometry=aoi,
+        fileName=(
+                f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
+                if settings.RAW_DATA_API_AUTH_TOKEN
+                else f"fmtm_extract_{project_id}"
+            ),
         output_options=RawDataOutputOptions(download_file=False),
         outputType="geojson",
         geometryType=[geom_type],
-        bind_zip=False,
+        bindZip=False,
         centroid=centroid,
         use_st_within=False if geom_type == "line" else True,
-        filters=filters,
+        filters=config_json,
     )
+    
     return result
 
 
