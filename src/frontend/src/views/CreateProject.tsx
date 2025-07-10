@@ -8,7 +8,12 @@ import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
+import {
+  useHasManagedAnyOrganization,
+  useIsAdmin,
+  useIsOrganizationAdmin,
+  useIsProjectManager,
+} from '@/hooks/usePermissions';
 
 import Forbidden from '@/views/Forbidden';
 import Stepper from '@/components/CreateProject/Stepper';
@@ -49,22 +54,13 @@ const validationSchema = {
 };
 
 const CreateProject = () => {
-  const isAdmin = useIsAdmin();
-  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-
-  if (!hasManagedAnyOrganization) return <Forbidden />;
-
   const dispatch = useAppDispatch();
-  const params = useParams();
   const navigate = useNavigate();
+  const params = useParams();
+  const projectId = params.id ? +params.id : null;
   const [searchParams, setSearchParams] = useSearchParams();
   const step = Number(searchParams.get('step'));
 
-  const projectId = params.id ? +params.id : null;
-  const [toggleEdit, setToggleEdit] = useState(false);
-  const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
-  const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
-  const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
   const basicProjectDetailsLoading = useAppSelector((state) => state.createproject.basicProjectDetailsLoading);
 
   const resetReduxState = () => {
@@ -72,16 +68,26 @@ const CreateProject = () => {
   };
 
   useEffect(() => {
-    if (step < 1 || step > 5 || !values.formExampleSelection) {
-      setSearchParams({ step: '1' });
-    }
-  }, []);
-
-  useEffect(() => {
     resetReduxState();
     if (!projectId) return;
     dispatch(GetBasicProjectDetails(`${VITE_API_URL}/projects/${projectId}/minimal`));
   }, [projectId]);
+
+  const [toggleEdit, setToggleEdit] = useState(false);
+  const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
+  const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
+  const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
+
+  const isAdmin = useIsAdmin();
+  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
+  const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
+  const isProjectManager = useIsProjectManager(projectId);
+
+  useEffect(() => {
+    if (step < 1 || step > 5 || !values.formExampleSelection) {
+      setSearchParams({ step: '1' });
+    }
+  }, []);
 
   useEffect(() => {
     if (!basicProjectDetails || !projectId) return;
@@ -170,10 +176,10 @@ const CreateProject = () => {
       projectData.task_split_dimension = data.dimension;
     }
 
-    const taskSplitGeojsonFile = convertGeojsonToJsonFile(
-      data.splitGeojsonByAlgorithm || data.splitGeojsonBySquares || data.outline,
-      'task',
-    );
+    const taskSplitGeojsonFile =
+      data.outline.type === 'FeatureCollection' && data.outline?.features.length > 1
+        ? null
+        : convertGeojsonToJsonFile(data.splitGeojsonByAlgorithm || data.splitGeojsonBySquares || data.outline, 'task');
     const dataExtractGeojsonFile = convertGeojsonToJsonFile(data.dataExtractGeojson, 'extract');
 
     const file = { taskSplitGeojsonFile, dataExtractGeojsonFile, xlsFormFile: data.xlsFormFile?.file };
@@ -202,6 +208,12 @@ const CreateProject = () => {
 
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
   };
+
+  if (
+    (!projectId && !hasManagedAnyOrganization) ||
+    (projectId && !basicProjectDetailsLoading && !(isProjectManager || isOrganizationAdmin))
+  )
+    return <Forbidden />;
 
   return (
     <div className="fmtm-w-full fmtm-h-full">
