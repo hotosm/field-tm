@@ -318,7 +318,7 @@ const CreateProject = () => {
                 : null
             }
             toggleEdit={toggleEdit}
-            setToggleEdit={setToggleEdit}
+            setToggleEdit={step === 1 && !projectId ? setToggleEdit : undefined}
             getAOIArea={(area) => {
               if (values.outline && area !== values.outlineArea) setValue('outlineArea', area);
             }}

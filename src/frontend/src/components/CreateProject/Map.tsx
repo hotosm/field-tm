@@ -16,8 +16,8 @@ type propsType = {
   onDraw?: ((geojson: any, area: string) => void) | null;
   onModify?: ((geojson: any, area: string) => void) | null;
   getAOIArea?: ((area?: string) => void) | null;
-  toggleEdit: boolean;
-  setToggleEdit: (value: boolean) => void;
+  toggleEdit?: boolean;
+  setToggleEdit?: (value: boolean) => void;
 };
 
 const Map = ({
