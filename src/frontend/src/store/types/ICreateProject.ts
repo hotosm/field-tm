@@ -5,7 +5,7 @@ export type CreateProjectStateTypes = {
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
-  createDraftProjectLoading: boolean;
+  createDraftProjectLoading: { loading: boolean; continue: boolean };
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;

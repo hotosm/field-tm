@@ -54,7 +54,7 @@ export const CreateDraftProjectService = (
 ) => {
   return async (dispatch: AppDispatch) => {
     try {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(true));
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
       const response: AxiosResponse = await axios.post(url, payload, { params });
 
       if (!isEmpty(project_admins)) {
@@ -84,7 +84,7 @@ export const CreateDraftProjectService = (
         }),
       );
     } finally {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(false));
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: false, continue: false }));
     }
   };
 };

@@ -250,42 +250,35 @@ const CreateProject = () => {
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
               )}
-              {createDraftProjectLoading ? (
-                <div className="fmtm-w-full fmtm-flex fmtm-justify-center">
-                  <Button
-                    variant="secondary-grey"
-                    disabled={createProjectLoading}
-                    isLoading={createDraftProjectLoading}
-                  >
-                    Saving as Draft
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  {step === 1 &&
-                    (!projectId ? (
-                      <Button
-                        variant="secondary-grey"
-                        onClick={() => createDraftProject(false)}
-                        isLoading={createDraftProjectLoading}
-                        disabled={createProjectLoading || basicProjectDetailsLoading}
-                      >
-                        Save as Draft
-                      </Button>
-                    ) : (
-                      <span></span>
-                    ))}
-                  <Button
-                    variant="primary-grey"
-                    type="submit"
-                    disabled={createDraftProjectLoading || basicProjectDetailsLoading}
-                    isLoading={createDraftProjectLoading || createProjectLoading}
-                  >
-                    {step === 5 ? 'Submit' : 'Next'}
-                    <AssetModules.ArrowForwardIosIcon className="!fmtm-text-sm !fmtm-ml-auto" />
-                  </Button>
-                </>
-              )}
+              <>
+                {step === 1 &&
+                  (!projectId ? (
+                    <Button
+                      variant="secondary-grey"
+                      onClick={() => createDraftProject(false)}
+                      isLoading={createDraftProjectLoading.loading && !createDraftProjectLoading.continue}
+                      disabled={createDraftProjectLoading.loading && createDraftProjectLoading.continue}
+                    >
+                      Save & Exit
+                    </Button>
+                  ) : (
+                    <span></span>
+                  ))}
+                <Button
+                  variant="primary-grey"
+                  type="submit"
+                  disabled={
+                    (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
+                    basicProjectDetailsLoading
+                  }
+                  isLoading={
+                    (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading
+                  }
+                >
+                  {step === 5 ? 'Submit' : step === 1 && !projectId ? 'Save & Continue' : 'Next'}
+                  <AssetModules.ArrowForwardIosIcon className="!fmtm-text-sm !fmtm-ml-auto" />
+                </Button>
+              </>
             </div>
           </form>
         </FormProvider>
