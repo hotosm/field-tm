@@ -40,7 +40,6 @@
 	});
 
 	function getPaginatedProjects() {
-		console.log('here')
 		if (online.current) {
 			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
 		} else {
