@@ -158,10 +158,10 @@ async def generate_data_extract(
     result = await get_osm_data(
         geometry=aoi,
         fileName=(
-                f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
-                if settings.RAW_DATA_API_AUTH_TOKEN
-                else f"fmtm_extract_{project_id}"
-            ),
+            f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
+            if settings.RAW_DATA_API_AUTH_TOKEN
+            else f"fmtm_extract_{project_id}"
+        ),
         output_options=RawDataOutputOptions(download_file=False),
         outputType="geojson",
         geometryType=[geom_type],
@@ -170,7 +170,7 @@ async def generate_data_extract(
         use_st_within=False if geom_type == "line" else True,
         filters=config_json,
     )
-    
+
     return result
 
 
