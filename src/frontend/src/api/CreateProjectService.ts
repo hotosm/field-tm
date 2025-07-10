@@ -93,6 +93,7 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
+  project_admins,
   file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -151,6 +152,19 @@ export const CreateProjectService = (
           combinedFeaturesCount,
         ),
       );
+
+      // 5. assign project managers
+      if (!isEmpty(project_admins)) {
+        const promises = project_admins?.map(async (sub: any) => {
+          await dispatch(
+            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+              sub,
+              project_id: id as number,
+            }),
+          );
+        });
+        await Promise.all(promises);
+      }
 
       dispatch(
         CommonActions.SetSnackBar({

@@ -191,6 +191,7 @@ const CreateProject = () => {
         `${VITE_API_URL}/projects?project_id=${projectId}`,
         data.id as number,
         projectData,
+        data.project_admins,
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,

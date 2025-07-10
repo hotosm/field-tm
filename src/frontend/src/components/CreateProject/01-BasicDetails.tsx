@@ -200,35 +200,33 @@ const BasicDetails = () => {
         </>
       )}
 
-      {!values.id && (
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Assign Project Admin" astric />
-          <Controller
-            control={control}
-            name="project_admins"
-            render={({ field }) => (
-              <Select2
-                options={userList || []}
-                value={field.value}
-                onChange={(value: any) => field.onChange(value)}
-                placeholder="Search for Field-TM users"
-                multiple
-                checkBox
-                isLoading={userListLoading}
-                handleApiSearch={(value) => {
-                  if (value) {
-                    setUserSearchText(value);
-                  } else {
-                    dispatch(UserActions.SetUserListForSelect([]));
-                  }
-                }}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.project_admins?.message && <ErrorMessage message={errors.project_admins.message as string} />}
-        </div>
-      )}
+      <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+        <FieldLabel label="Assign Project Admin" />
+        <Controller
+          control={control}
+          name="project_admins"
+          render={({ field }) => (
+            <Select2
+              options={userList || []}
+              value={field.value}
+              onChange={(value: any) => field.onChange(value)}
+              placeholder="Search for Field-TM users"
+              multiple
+              checkBox
+              isLoading={userListLoading}
+              handleApiSearch={(value) => {
+                if (value) {
+                  setUserSearchText(value);
+                } else {
+                  dispatch(UserActions.SetUserListForSelect([]));
+                }
+              }}
+              ref={field.ref}
+            />
+          )}
+        />
+        {errors?.project_admins?.message && <ErrorMessage message={errors.project_admins.message as string} />}
+      </div>
 
       {!values.id && (
         <>

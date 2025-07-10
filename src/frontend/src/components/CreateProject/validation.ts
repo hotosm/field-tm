@@ -74,14 +74,6 @@ export const basicDetailsValidationSchema = z
         code: 'custom',
       });
     }
-    if (!values.id && values.project_admins?.length === 0) {
-      ctx.issues.push({
-        input: values.project_admins,
-        path: ['project_admins'],
-        message: 'At least one Project Admin shall be selected',
-        code: 'custom',
-      });
-    }
     if (!values.uploadAreaSelection && !values.id) {
       ctx.issues.push({
         input: values.uploadAreaSelection,
