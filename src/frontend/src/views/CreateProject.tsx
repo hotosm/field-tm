@@ -293,9 +293,9 @@ const CreateProject = () => {
         <div className="fmtm-col-span-12 sm:fmtm-col-span-5 lg:fmtm-col-span-4 fmtm-h-[20rem] sm:fmtm-h-full fmtm-rounded-xl fmtm-bg-white fmtm-overflow-hidden">
           <Map
             drawToggle={values.uploadAreaSelection === 'draw' && step === 1}
-            uploadedOrDrawnGeojsonFile={values.outline}
-            buildingExtractedGeojson={values.dataExtractGeojson}
-            splittedGeojson={values.splitGeojsonBySquares || values.splitGeojsonByAlgorithm}
+            aoiGeojson={values.outline}
+            extractGeojson={values.dataExtractGeojson}
+            splitGeojson={values.splitGeojsonBySquares || values.splitGeojsonByAlgorithm}
             onDraw={
               values.outline || values.uploadAreaSelection === 'upload_file'
                 ? null
