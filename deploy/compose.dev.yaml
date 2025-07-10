@@ -105,7 +105,6 @@ services:
       mapper.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
       # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
       mapper.dev.fmtm.hotosm.org_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
-      mapper.dev.fmtm.hotosm.org_CUSTOM_HEADER: "Service-Worker-Allowed: '/'"
       # CORS for the backend is configured by FastAPI
       api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
       api.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
