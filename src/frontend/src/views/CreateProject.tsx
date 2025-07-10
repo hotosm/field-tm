@@ -176,10 +176,10 @@ const CreateProject = () => {
       projectData.task_split_dimension = data.dimension;
     }
 
-    const taskSplitGeojsonFile =
-      data.outline.type === 'FeatureCollection' && data.outline?.features.length > 1
-        ? null
-        : convertGeojsonToJsonFile(data.splitGeojsonByAlgorithm || data.splitGeojsonBySquares || data.outline, 'task');
+    const taskSplitGeojsonFile = convertGeojsonToJsonFile(
+      data.splitGeojsonByAlgorithm || data.splitGeojsonBySquares || data.outline,
+      'task',
+    );
     const dataExtractGeojsonFile = convertGeojsonToJsonFile(data.dataExtractGeojson, 'extract');
 
     const file = { taskSplitGeojsonFile, dataExtractGeojsonFile, xlsFormFile: data.xlsFormFile?.file };
