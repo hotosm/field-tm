@@ -19,17 +19,16 @@
 
 import json
 import logging
-import yaml
 from datetime import datetime, timezone
-from io import BytesIO
 from random import getrandbits
 from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
+import yaml
 from fastapi import HTTPException
+from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
-from osm_data_client import get_osm_data, RawDataOutputOptions
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
@@ -45,7 +44,6 @@ from shapely.geometry import (
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from app.config import settings
 from app.db.enums import HTTPStatus, XLSFormType
 
 log = logging.getLogger(__name__)
@@ -618,7 +616,9 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     if len(coordinates) == 1:
         geom_type = "Point"
         coordinates = coordinates[0]  # Flatten for Point
-    elif coordinates[0] == coordinates[-1] and len(coordinates) >= 4:  # Check if closed loop
+    elif (
+        coordinates[0] == coordinates[-1] and len(coordinates) >= 4
+    ):  # Check if closed loop
         geom_type = "Polygon"
         coordinates = [coordinates]  # Wrap in extra list for Polygon
     else:
@@ -798,7 +798,7 @@ async def get_osm_geometries(osm_category, geometry):
     data_model = f"{data_models_path}/{config_filename}.yaml"
     geom_type = "polygon"
 
-    if config_filename=="highways":
+    if config_filename == "highways":
         geom_type = "line"
 
     with open(data_model) as f:
@@ -806,12 +806,12 @@ async def get_osm_geometries(osm_category, geometry):
 
     return await get_osm_data(
         geometry=geometry,
-        outputType = "geojson",
+        outputType="geojson",
         output_options=RawDataOutputOptions(download_file=False),
         geometryType=[geom_type],
-        bindZip = True,
-        use_st_within= False,
-        filters=config_json
+        bindZip=True,
+        use_st_within=False,
+        filters=config_json,
     )
 
 
