@@ -3,6 +3,8 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	base: '/',
+
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
@@ -18,7 +20,7 @@ const config = {
 			assets: 'build',
 			// This fallback is required to compile as SPA
 			// as we don't have any server side rendering here
-			fallback: 'index.html',
+			fallback: 'app.html',
 			precompress: false,
 			strict: true,
 		}),
@@ -33,6 +35,10 @@ const config = {
 			$translations: 'src/translations',
 			$static: 'static',
 			$migrations: '../migrations',
+		},
+		// Important! Config below required for vite-pwa to work
+		serviceWorker: {
+			register: false,
 		},
 	},
 };
