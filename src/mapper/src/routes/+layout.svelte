@@ -41,26 +41,6 @@
             console.log('SW ready for offline')
 			alertStore.setAlert({ message: m['offline.ready_offline'](), variant: 'default', duration: 2000 });
         },
-		// // TODO consider enabling this at some point once functionality is more stable?
-		// // We wouldn't want to clear projects during active mapping campaign where we
-		// // are pushing regular updates
-		//
-		// async onNeedRefresh() {
-		// 	console.log('SW update available');
-
-		// 	alertStore.setAlert({
-		// 		message: 'New version available. Refreshing...',
-		// 		variant: 'default',
-		// 		duration: 2000
-		// 	});
-
-		// 	// Run db project cleanup
-		// 	const db = await dbPromise;
-		// 	db.query('DELETE FROM projects;').then(() => {
-		// 		console.log('Old projects cleared due to version update.');
-		// 		updateServiceWorker(); // Then update SW
-		// 	});
-		// }
     });
 
 	async function refreshCookiesAndLogin() {
