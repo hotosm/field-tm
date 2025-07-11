@@ -49,7 +49,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
