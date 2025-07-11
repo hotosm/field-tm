@@ -36,6 +36,14 @@ from osm_fieldwork.form_components.translations import add_label_translations
 # Define the choices sheet
 choices_data = [
     add_label_translations({
+        "list_name": "mapping_mode",
+        "name": "existing",
+    }),
+    add_label_translations({
+        "list_name": "mapping_mode",
+        "name": "new",
+    }),
+    add_label_translations({
         "list_name": "yes_no",
         "name": "yes",
     }),
