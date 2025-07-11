@@ -46,7 +46,7 @@ export type CreateProjectStateTypes = {
   basicProjectDetails:
     | ({ id: number } & Pick<
         ProjectDetailsTypes,
-        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline'
+        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
       >)
     | null;
 };
