@@ -20,4 +20,6 @@ setup.skip('authenticate', async ({ browserName, page }) => {
 
   // Save authentication state
   await page.context().storageState({ path: authFile });
+
+  // for testing issue 1775
 });

@@ -260,3 +260,6 @@ async def heartbeat_plus_db(db: Annotated[Connection, Depends(db_conn)]):
 async def simple_heartbeat():
     """Simple ping/pong API response."""
     return Response(status_code=HTTPStatus.OK)
+
+
+# for testing issue 1775
