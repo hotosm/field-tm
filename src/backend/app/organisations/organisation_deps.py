@@ -27,6 +27,7 @@ from loguru import logger as log
 from psycopg import Connection
 
 from app.central import central_schemas
+from app.central.central_schemas import ODKCentralDecrypted
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbOrganisation, DbProject
@@ -127,3 +128,39 @@ async def org_from_project(
 ) -> DbOrganisation:
     """Get an organisation from a project id."""
     return await get_organisation(db, project.organisation_id)
+
+
+async def get_project_or_org_odk_creds(
+    project: DbProject,
+    org: DbOrganisation,
+) -> ODKCentralDecrypted:
+    """Get ODK creds for a project, falling back to org creds.
+
+    Returns an ODKCentralDecrypted object.
+    """
+    url = getattr(project, "odk_central_url", None)
+    user = getattr(project, "odk_central_user", None)
+    password = getattr(project, "odk_central_password", None)
+
+    # Ensure all are strings and not dicts
+    if all(isinstance(x, str) and x for x in [url, user, password]):
+        return ODKCentralDecrypted(
+            odk_central_url=url,
+            odk_central_user=user,
+            odk_central_password=password,
+        )
+    else:
+        # Fallback to org, and ensure org values are strings
+        org_url = getattr(org, "odk_central_url", None)
+        org_user = getattr(org, "odk_central_user", None)
+        org_password = getattr(org, "odk_central_password", None)
+        if all(isinstance(x, str) and x for x in [org_url, org_user, org_password]):
+            return ODKCentralDecrypted(
+                odk_central_url=org_url,
+                odk_central_user=org_user,
+                odk_central_password=org_password,
+            )
+        else:
+            raise ValueError(
+                "No valid ODK Central credentials found for project or organisation."
+            )
