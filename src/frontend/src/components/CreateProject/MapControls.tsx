@@ -50,7 +50,7 @@ const MapControls = ({ map, toggleEdit, setToggleEdit }: mapControlComponentType
     <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-right-3 fmtm-z-[45] fmtm-flex fmtm-flex-col fmtm-border-[1px]  fmtm-border-grey-300 fmtm-rounded fmtm-overflow-hidden">
       <LayerSwitchMenu map={map} />
       {btnList.map((btn) => (
-        <div className={`${!btn.show && 'fmtm-hidden'}`}>
+        <div key={btn.id} className={`${!btn.show && 'fmtm-hidden'}`}>
           <Tooltip title={btn.title} placement="left" arrow key={btn.title}>
             <div
               className="fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-6 fmtm-h-6 fmtm-min-h-6 fmtm-min-w-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-t fmtm-border-blue-light"
