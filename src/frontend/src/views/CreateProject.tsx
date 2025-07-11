@@ -220,10 +220,24 @@ const CreateProject = () => {
     <div className="fmtm-w-full fmtm-h-full">
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
         <h5>CREATE NEW PROJECT</h5>
-        <AssetModules.CloseIcon className="!fmtm-text-xl hover:fmtm-text-red-medium" />
+        <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
+          {step > 1 && (
+            <Button
+              variant="secondary-grey"
+              onClick={() => {}}
+              disabled={createProjectLoading || basicProjectDetailsLoading}
+            >
+              <AssetModules.SaveIcon className="!fmtm-text-base" />
+              Save as Draft
+            </Button>
+          )}
+          <AssetModules.CloseIcon className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer" />
+        </div>
       </div>
 
-      <div className="sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full fmtm-h-[calc(100%-2.344rem)] fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-3">
+      <div
+        className={`sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full ${step > 1 ? 'fmtm-h-[calc(100%-2.8rem)]' : 'fmtm-h-[calc(100%-2rem)]'} fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-2`}
+      >
         {/* stepper container */}
         <div className="fmtm-col-span-12 lg:fmtm-col-span-3 fmtm-h-fit lg:fmtm-h-full fmtm-bg-white fmtm-rounded-xl">
           <Stepper step={step} toggleStep={(value) => setSearchParams({ step: value.toString() })} />
