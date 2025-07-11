@@ -28,23 +28,23 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   use_odk_collect: false,
 
   // 03 Upload Survey
-  formExampleSelection: '',
+  osm_category: '',
   xlsFormFile: null,
   isXlsFormFileValid: false,
 
   // 04 Map Data
-  primaryGeomType: null,
+  primary_geom_type: null,
   includeCentroid: false,
   useMixedGeomTypes: false,
-  newGeomType: null,
+  new_geom_type: null,
   dataExtractType: null,
   customDataExtractFile: null,
   dataExtractGeojson: null,
 
   // 05 Split Tasks
   task_split_type: null,
-  dimension: 10,
-  average_buildings_per_task: 1,
+  task_split_dimension: 10,
+  task_num_buildings: 1,
   splitGeojsonBySquares: null,
   splitGeojsonByAlgorithm: null,
 };

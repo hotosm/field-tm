@@ -8,7 +8,12 @@ import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
+import {
+  useHasManagedAnyOrganization,
+  useIsAdmin,
+  useIsOrganizationAdmin,
+  useIsProjectManager,
+} from '@/hooks/usePermissions';
 
 import Forbidden from '@/views/Forbidden';
 import Stepper from '@/components/CreateProject/Stepper';
@@ -49,34 +54,40 @@ const validationSchema = {
 };
 
 const CreateProject = () => {
-  const isAdmin = useIsAdmin();
-  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-
-  if (!hasManagedAnyOrganization) return <Forbidden />;
-
   const dispatch = useAppDispatch();
-  const params = useParams();
   const navigate = useNavigate();
+  const params = useParams();
+  const projectId = params.id ? +params.id : null;
   const [searchParams, setSearchParams] = useSearchParams();
   const step = Number(searchParams.get('step'));
 
-  const projectId = params.id ? +params.id : null;
+  const basicProjectDetailsLoading = useAppSelector((state) => state.createproject.basicProjectDetailsLoading);
+
+  const resetReduxState = () => {
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
+  };
+
+  useEffect(() => {
+    resetReduxState();
+    if (!projectId) return;
+    dispatch(GetBasicProjectDetails(`${VITE_API_URL}/projects/${projectId}/minimal`));
+  }, [projectId]);
+
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
-  const basicProjectDetailsLoading = useAppSelector((state) => state.createproject.basicProjectDetailsLoading);
+
+  const isAdmin = useIsAdmin();
+  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
+  const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
+  const isProjectManager = useIsProjectManager(projectId);
 
   useEffect(() => {
-    if (step < 1 || step > 5 || !values.formExampleSelection) {
+    if (step < 1 || step > 5 || !values.osm_category) {
       setSearchParams({ step: '1' });
     }
   }, []);
-
-  useEffect(() => {
-    if (!projectId) return;
-    dispatch(GetBasicProjectDetails(`${VITE_API_URL}/projects/${projectId}/minimal`));
-  }, [projectId]);
 
   useEffect(() => {
     if (!basicProjectDetails || !projectId) return;
@@ -152,17 +163,17 @@ const CreateProject = () => {
       custom_tms_url: data.custom_tms_url,
       per_task_instructions: data.per_task_instructions,
       use_odk_collect: data.use_odk_collect,
-      osm_category: data.formExampleSelection,
-      primary_geom_type: data.primaryGeomType,
-      new_geom_type: data.newGeomType ? data.newGeomType : data.primaryGeomType,
+      osm_category: data.osm_category,
+      primary_geom_type: data.primary_geom_type,
+      new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
       task_split_type: data.task_split_type,
       status: 'PUBLISHED',
     };
 
     if (data.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
-      projectData.task_num_buildings = data.average_buildings_per_task;
+      projectData.task_num_buildings = data.task_num_buildings;
     } else {
-      projectData.task_split_dimension = data.dimension;
+      projectData.task_split_dimension = data.task_split_dimension;
     }
 
     const taskSplitGeojsonFile = convertGeojsonToJsonFile(
@@ -180,6 +191,7 @@ const CreateProject = () => {
         `${VITE_API_URL}/projects?project_id=${projectId}`,
         data.id as number,
         projectData,
+        data.project_admins,
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,
@@ -198,14 +210,34 @@ const CreateProject = () => {
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
   };
 
+  if (
+    (!projectId && !hasManagedAnyOrganization) ||
+    (projectId && !basicProjectDetailsLoading && !(isProjectManager || isOrganizationAdmin))
+  )
+    return <Forbidden />;
+
   return (
     <div className="fmtm-w-full fmtm-h-full">
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
         <h5>CREATE NEW PROJECT</h5>
-        <AssetModules.CloseIcon className="!fmtm-text-xl hover:fmtm-text-red-medium" />
+        <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
+          {step > 1 && (
+            <Button
+              variant="secondary-grey"
+              onClick={() => {}}
+              disabled={createProjectLoading || basicProjectDetailsLoading}
+            >
+              <AssetModules.SaveIcon className="!fmtm-text-base" />
+              Save as Draft
+            </Button>
+          )}
+          <AssetModules.CloseIcon className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer" />
+        </div>
       </div>
 
-      <div className="sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full fmtm-h-[calc(100%-2.344rem)] fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-3">
+      <div
+        className={`sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full ${step > 1 ? 'fmtm-h-[calc(100%-2.8rem)]' : 'fmtm-h-[calc(100%-2rem)]'} fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-2`}
+      >
         {/* stepper container */}
         <div className="fmtm-col-span-12 lg:fmtm-col-span-3 fmtm-h-fit lg:fmtm-h-full fmtm-bg-white fmtm-rounded-xl">
           <Stepper step={step} toggleStep={(value) => setSearchParams({ step: value.toString() })} />
@@ -232,42 +264,35 @@ const CreateProject = () => {
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
               )}
-              {createDraftProjectLoading ? (
-                <div className="fmtm-w-full fmtm-flex fmtm-justify-center">
-                  <Button
-                    variant="secondary-grey"
-                    disabled={createProjectLoading}
-                    isLoading={createDraftProjectLoading}
-                  >
-                    Saving as Draft
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  {step === 1 &&
-                    (!projectId ? (
-                      <Button
-                        variant="secondary-grey"
-                        onClick={() => createDraftProject(false)}
-                        isLoading={createDraftProjectLoading}
-                        disabled={createProjectLoading || basicProjectDetailsLoading}
-                      >
-                        Save as Draft
-                      </Button>
-                    ) : (
-                      <span></span>
-                    ))}
-                  <Button
-                    variant="primary-grey"
-                    type="submit"
-                    disabled={createDraftProjectLoading || basicProjectDetailsLoading}
-                    isLoading={createDraftProjectLoading || createProjectLoading}
-                  >
-                    {step === 5 ? 'Submit' : 'Next'}
-                    <AssetModules.ArrowForwardIosIcon className="!fmtm-text-sm !fmtm-ml-auto" />
-                  </Button>
-                </>
-              )}
+              <>
+                {step === 1 &&
+                  (!projectId ? (
+                    <Button
+                      variant="secondary-grey"
+                      onClick={() => createDraftProject(false)}
+                      isLoading={createDraftProjectLoading.loading && !createDraftProjectLoading.continue}
+                      disabled={createDraftProjectLoading.loading && createDraftProjectLoading.continue}
+                    >
+                      Save & Exit
+                    </Button>
+                  ) : (
+                    <span></span>
+                  ))}
+                <Button
+                  variant="primary-grey"
+                  type="submit"
+                  disabled={
+                    (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
+                    basicProjectDetailsLoading
+                  }
+                  isLoading={
+                    (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading
+                  }
+                >
+                  {step === 5 ? 'Submit' : step === 1 && !projectId ? 'Save & Continue' : 'Next'}
+                  <AssetModules.ArrowForwardIosIcon className="!fmtm-text-sm !fmtm-ml-auto" />
+                </Button>
+              </>
             </div>
           </form>
         </FormProvider>
@@ -276,20 +301,20 @@ const CreateProject = () => {
         <div className="fmtm-col-span-12 sm:fmtm-col-span-5 lg:fmtm-col-span-4 fmtm-h-[20rem] sm:fmtm-h-full fmtm-rounded-xl fmtm-bg-white fmtm-overflow-hidden">
           <Map
             drawToggle={values.uploadAreaSelection === 'draw' && step === 1}
-            uploadedOrDrawnGeojsonFile={values.outline}
-            buildingExtractedGeojson={values.dataExtractGeojson}
-            splittedGeojson={values.splitGeojsonBySquares || values.splitGeojsonByAlgorithm}
+            aoiGeojson={values.outline}
+            extractGeojson={values.dataExtractGeojson}
+            splitGeojson={values.splitGeojsonBySquares || values.splitGeojsonByAlgorithm}
             onDraw={
               values.outline || values.uploadAreaSelection === 'upload_file'
                 ? null
-                : (geojson, area) => {
+                : (geojson) => {
                     setValue('outline', JSON.parse(geojson));
                     setValue('uploadedAOIFile', undefined);
                   }
             }
             onModify={
               toggleEdit && values.outline && step === 1
-                ? (geojson, area) => {
+                ? (geojson) => {
                     setValue('outline', JSON.parse(geojson));
 
                     if (values.customDataExtractFile) setValue('customDataExtractFile', null);
@@ -301,7 +326,7 @@ const CreateProject = () => {
                 : null
             }
             toggleEdit={toggleEdit}
-            setToggleEdit={setToggleEdit}
+            setToggleEdit={step === 1 && !projectId ? setToggleEdit : undefined}
             getAOIArea={(area) => {
               if (values.outline && area !== values.outlineArea) setValue('outlineArea', area);
             }}

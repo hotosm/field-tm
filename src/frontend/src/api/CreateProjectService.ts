@@ -21,7 +21,7 @@ export const GetBasicProjectDetails = (url: string) => {
     try {
       dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(true));
       const response: AxiosResponse<{ id: number } & ProjectDetailsTypes> = await axios.get(url);
-      const { id, name, short_description, description, organisation_id, outline } = response.data;
+      const { id, name, short_description, description, organisation_id, outline, hashtags } = response.data;
       dispatch(
         CreateProjectActions.SetBasicProjectDetails({
           id,
@@ -30,6 +30,7 @@ export const GetBasicProjectDetails = (url: string) => {
           description,
           organisation_id,
           outline,
+          hashtags,
         }),
       );
     } catch (error) {
@@ -54,7 +55,7 @@ export const CreateDraftProjectService = (
 ) => {
   return async (dispatch: AppDispatch) => {
     try {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(true));
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
       const response: AxiosResponse = await axios.post(url, payload, { params });
 
       if (!isEmpty(project_admins)) {
@@ -84,7 +85,7 @@ export const CreateDraftProjectService = (
         }),
       );
     } finally {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(false));
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: false, continue: false }));
     }
   };
 };
@@ -93,6 +94,7 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
+  project_admins,
   file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -151,6 +153,19 @@ export const CreateProjectService = (
           combinedFeaturesCount,
         ),
       );
+
+      // 5. assign project managers
+      if (!isEmpty(project_admins)) {
+        const promises = project_admins?.map(async (sub: any) => {
+          await dispatch(
+            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+              sub,
+              project_id: id as number,
+            }),
+          );
+        });
+        await Promise.all(promises);
+      }
 
       dispatch(
         CommonActions.SetSnackBar({

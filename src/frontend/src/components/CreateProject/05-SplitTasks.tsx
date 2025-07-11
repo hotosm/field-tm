@@ -48,7 +48,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.TASK_SPLITTING_ALGORITHM,
       label: 'Task Splitting Algorithm',
-      disabled: !values.dataExtractGeojson?.features?.length || values.primaryGeomType === 'POLYLINE',
+      disabled: !values.dataExtractGeojson?.features?.length || values.primary_geom_type === 'POLYLINE',
     },
   ];
 
@@ -69,7 +69,7 @@ const SplitTasks = () => {
         GetDividedTaskFromGeojson(`${VITE_API_URL}/projects/preview-split-by-square`, {
           geojson: drawnGeojsonFile,
           extract_geojson: values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
-          dimension: values?.dimension,
+          dimension: values?.task_split_dimension,
         }),
       );
     } else if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
@@ -77,7 +77,7 @@ const SplitTasks = () => {
         TaskSplittingPreviewService(
           `${VITE_API_URL}/projects/task-split`,
           drawnGeojsonFile,
-          values?.average_buildings_per_task as number,
+          values?.task_num_buildings as number,
           values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
         ),
       );
@@ -143,9 +143,15 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Dimension of square in metres:" />
-            <Input {...register('dimension', { valueAsNumber: true })} className="!fmtm-w-20" type="number" />
+            <Input
+              {...register('task_split_dimension', { valueAsNumber: true })}
+              className="!fmtm-w-20"
+              type="number"
+            />
           </div>
-          {errors?.dimension?.message && <ErrorMessage message={errors.dimension.message as string} />}
+          {errors?.task_split_dimension?.message && (
+            <ErrorMessage message={errors.task_split_dimension.message as string} />
+          )}
         </div>
       )}
 
@@ -153,10 +159,10 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Average number of buildings per task:" />
-            <Input {...register('average_buildings_per_task', { valueAsNumber: true })} className="!fmtm-w-20" />
+            <Input {...register('task_num_buildings', { valueAsNumber: true })} className="!fmtm-w-20" />
           </div>
-          {errors?.average_buildings_per_task?.message && (
-            <ErrorMessage message={errors.average_buildings_per_task.message as string} />
+          {errors?.task_num_buildings?.message && (
+            <ErrorMessage message={errors.task_num_buildings.message as string} />
           )}
         </div>
       )}
@@ -172,9 +178,8 @@ const SplitTasks = () => {
               isLoading={dividedTaskLoading || taskSplittingGeojsonLoading}
               onClick={generateTaskBasedOnSelection}
               disabled={
-                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.dimension) ||
-                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM &&
-                  !values.average_buildings_per_task)
+                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.task_split_dimension) ||
+                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM && !values.task_num_buildings)
                   ? true
                   : false
               }

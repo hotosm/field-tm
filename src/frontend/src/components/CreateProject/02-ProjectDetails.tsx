@@ -16,7 +16,6 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 
 const ProjectDetails = () => {
   const { hostname } = window.location;
-  const defaultHashtags = ['#Field-TM', `#${hostname}-{project_id}`];
   const [hashtag, setHashtag] = useState('');
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
@@ -45,7 +44,7 @@ const ProjectDetails = () => {
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
         <FieldLabel
           label="Hashtags"
-          tooltipMessage={`Hashtags relate to what is being mapped. By default ${defaultHashtags} is included. Hashtags are sometimes
+          tooltipMessage={`Hashtags relate to what is being mapped. By default ${['#Field-TM', `#${hostname}-${values.id}`]} is included. Hashtags are sometimes
           used for analysis later, but should be human informative and not overused, #group #event`}
         />
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
@@ -63,16 +62,9 @@ const ProjectDetails = () => {
             <AssetModules.AddIcon className="!fmtm-text-lg" />
           </Button>
         </div>
-        <div className="fmtm-flex fmtm-items-center fmtm-flex-wrap fmtm-gap-2 fmtm-my-2">
-          {defaultHashtags.map((tag, i) => (
-            <div
-              key={i}
-              className="fmtm-body-md fmtm-px-2 fmtm-border-[1px] fmtm-bg-grey-100 fmtm-rounded-[40px] fmtm-flex fmtm-w-fit fmtm-items-center fmtm-gap-1"
-            >
-              <p>{tag}</p>
-            </div>
-          ))}
+        <div>
           <Chips
+            className="fmtm-my-2 fmtm-flex-wrap"
             data={values.hashtags}
             clearChip={(i) =>
               setValue(

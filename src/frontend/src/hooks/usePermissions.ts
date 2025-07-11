@@ -19,7 +19,7 @@ export function useIsOrganizationAdmin(id: number | null) {
   );
 }
 
-export function useIsProjectManager(id: string | number) {
+export function useIsProjectManager(id: string | number | null) {
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   return authDetails?.role === user_roles.ADMIN || authDetails?.project_roles?.[id] === project_roles.PROJECT_MANAGER;
 }
