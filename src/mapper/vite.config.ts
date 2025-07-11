@@ -14,6 +14,19 @@ const pwaOptions: Partial<VitePWAOptions> = {
 	injectRegister: 'auto',
 	strategies: 'generateSW',
 
+	// Important to ensure the PWA runs on the **entire** website
+	// For example, it's possible to have `scope: '/project'` for a PWA
+	// on only part of the website
+	scope: '/',
+
+	// Required for sveltekit
+	kit: {
+		adapterFallback: 'index.html',
+		spa: {
+			fallbackMapping: '/',
+		},
+	},
+
 	// Allow testing the PWA during local development
 	devOptions: {
 		enabled: true,
@@ -84,11 +97,14 @@ const pwaOptions: Partial<VitePWAOptions> = {
 		short_name: 'Field-TM',
 		description: 'Coordinated field mapping for Open Mapping campaigns.',
 		categories: ['mapping', 'humanitarian', 'hotosm', 'field', 'odk'],
+		scope: '/',
 		start_url: '/',
 		orientation: 'portrait',
 		dir: 'auto',
 		display: 'standalone',
-		launch_handler: 'auto',
+		launch_handler: {
+			client_mode: 'auto',
+		},
 		theme_color: '#d63f3f',
 		background_color: '#d63f3f',
 		icons: [
@@ -134,6 +150,9 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 export default defineConfig({
+	// Ensure the base is not '/project/xxx', but always '/', else
+	// registration of sw and manifest can fail under /project
+	base: '/',
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA(pwaOptions),
