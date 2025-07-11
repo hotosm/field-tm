@@ -426,7 +426,7 @@ async def submission(client, odk_project):
         <end>2024-11-15T12:29:00.876Z</end>
         <today>2024-11-15</today>
         <phonenumber/>
-        <username>testuser</username>
+        <username>localadmin</username>
         <instructions/>
         <warmup/>
         <feature/>
