@@ -222,6 +222,7 @@
 			}) || [];
 
 		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
+		console.log('clickedFeatures', clickedFeatures);
 		// if clicked coordinate contain more than multiple entities, assign it to a variable
 		if (clickedFeatures.length > 1) {
 			selectedFeatures = clickedFeatures;
@@ -231,6 +232,7 @@
 		const clickedTaskFeature = map?.queryRenderedFeatures(e.point, {
 			layers: ['task-fill-layer'],
 		});
+		console.log('clickedTaskFeature', clickedTaskFeature);
 
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0 && clickedFeatures?.length < 2) {
 			// if clicked coordinate contains uploaded entity only
@@ -257,6 +259,7 @@
 			entitiesStore.setSelectedEntityId(null);
 			entitiesStore.setSelectedEntityCoordinate(null);
 		}
+		console.log('entityId', entitiesStore.selectedEntityId);
 
 		// if clicked point contains task layer
 		if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
@@ -275,19 +278,24 @@
 			clickedFeatures?.length < 2
 		) {
 			// if clicked coordinate contains either one uploaded entity or new entity, open entity actions modal
+			console.log('first');
 			selectedFeatures = [];
 			toggleActionModal('entity-modal');
 		} else if (clickedTaskFeature && clickedTaskFeature?.length > 0 && clickedFeatures?.length === 0) {
 			// if clicked coordinate doesn't contain any entity but only task, open task actions modal
+			console.log('second');
 			selectedFeatures = [];
 			toggleActionModal('task-modal');
 		} else if (clickedFeatures?.length > 1) {
 			// if multiple entities present
+			console.log('third');
 			toggleActionModal(null);
 		} else {
 			// clear task states i.e. unselect task and it's extract if clicked coordinate doesn't contain any entity or task
+			console.log('forth');
 			taskStore.setSelectedTaskId(db, null, null);
 		}
+		console.log('fifth');
 	}
 
 	$effect(() => {
@@ -925,9 +933,9 @@
 								variant="primary"
 								size="small"
 								onclick={() => {
-									const entityCentroid = centroid(feature.geometry);
 									const clickedEntityId = feature?.properties?.entity_id;
 									entitiesStore.setSelectedEntityId(clickedEntityId);
+									const entityCentroid = centroid(feature.geometry);
 									entitiesStore.setSelectedEntityCoordinate({
 										entityId: clickedEntityId,
 										coordinate: entityCentroid?.geometry?.coordinates,
