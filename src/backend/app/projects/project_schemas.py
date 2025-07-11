@@ -267,10 +267,10 @@ class PaginatedProjectSummaries(BaseModel):
 
 
 class ProjectUserContributions(BaseModel):
-    """Users for a project, plus contribution count."""
+    """A single project contributor and their submission count."""
 
     user: str
-    contributions: int
+    submissions: int
 
 
 class BasemapGenerate(BaseModel):
