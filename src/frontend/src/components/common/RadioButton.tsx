@@ -11,25 +11,27 @@ interface IRadioButton {
 interface RadioButtonProps {
   topic?: string;
   options: IRadioButton[];
-  direction: 'row' | 'column';
+  direction?: 'row' | 'column';
   onChangeData: (value: string) => void;
   value: string;
   errorMsg?: string;
   className?: string;
   required?: boolean;
   hoveredOption?: (option: string | null) => void;
+  ref?: React.Ref<HTMLInputElement> | null;
 }
 
 const RadioButton: React.FC<RadioButtonProps> = ({
   topic,
   options,
-  direction,
+  direction = 'column',
   onChangeData,
   value,
   errorMsg,
   className,
   required,
   hoveredOption,
+  ref,
 }) => (
   <div>
     {topic && (
@@ -39,8 +41,10 @@ const RadioButton: React.FC<RadioButtonProps> = ({
         </p>
       </div>
     )}
-    <div className={`fmtm-flex ${direction === 'column' ? 'fmtm-flex-col' : 'fmtm-flex-wrap fmtm-gap-x-16'}`}>
-      {options.map((option) => {
+    <div
+      className={`fmtm-flex ${direction === 'column' ? 'fmtm-flex-col fmtm-gap-y-1' : 'fmtm-flex-wrap fmtm-gap-x-16'}`}
+    >
+      {options.map((option, i) => {
         return (
           <div
             onMouseOver={() => hoveredOption && hoveredOption(option.value)}
@@ -51,11 +55,12 @@ const RadioButton: React.FC<RadioButtonProps> = ({
             }`}
           >
             <input
+              ref={i === 0 ? ref : null}
               type="radio"
               id={option.label?.toString()}
               name={option.name}
               value={option.value}
-              className={`fmtm-accent-primaryRed fmtm-cursor-pointer ${
+              className={`fmtm-outline-none fmtm-accent-primaryRed fmtm-cursor-pointer focus:fmtm-border-[#D73F37] focus:fmtm-ring-[#D73F37]/50 focus:fmtm-ring-[3px] ${
                 option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''
               }`}
               onChange={(e) => {
@@ -66,7 +71,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
             />
             <label
               htmlFor={option.label?.toString()}
-              className={`fmtm-text-base fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2  ${className}`}
+              className={`fmtm-text-sm fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2  ${className}`}
             >
               <p className={`${option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''}`}>{option.label}</p>
               <div>{option.icon && option.icon}</div>

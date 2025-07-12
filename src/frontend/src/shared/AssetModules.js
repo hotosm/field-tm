@@ -51,6 +51,7 @@ import {
   ListAlt as ListAltIcon,
   Map as MapIcon,
   FilterAltOutlined as FilterAltOutlinedIcon,
+  ArrowForwardIos as ArrowForwardIosIcon,
   ArrowBackIos as ArrowBackIosIcon,
   VisibilityOutlined as VisibilityOutlinedIcon,
   CheckOutlined as CheckOutlinedIcon,
@@ -103,6 +104,7 @@ import {
   HistoryOutlined as HistoryOutlinedIcon,
   LockOutlined as LockOutlinedIcon,
   ContentCopy as ContentCopyIcon,
+  InfoOutlined as InfoOutlineIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -168,6 +170,7 @@ export default {
   ListAltIcon,
   MapIcon,
   FilterAltOutlinedIcon,
+  ArrowForwardIosIcon,
   ArrowBackIosIcon,
   VisibilityOutlinedIcon,
   CheckOutlinedIcon,
@@ -220,4 +223,5 @@ export default {
   HistoryOutlinedIcon,
   LockOutlinedIcon,
   ContentCopyIcon,
+  InfoOutlineIcon,
 };

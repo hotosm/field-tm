@@ -64,7 +64,6 @@ let toggleGeolocation: boolean = $state(false);
 let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
 let entitiesSync: any = $state(undefined);
 let fgbOpfsUrl: string = $state('');
-let geomDeleteLoading: boolean = $state(false);
 let selectedEntityJavaRosaGeom: string | null = $state(null);
 let isProcessing = false;
 const entityQueue: ShapeData[][] = [];
@@ -74,6 +73,10 @@ function getEntitiesStatusStore() {
 		if (!db || !projectId) {
 			return;
 		}
+
+		// Populate initial entity statuses from existing records
+		await setEntitiesListFromDbRecords(db, projectId);
+		_calculateTaskSubmissionCounts();
 
 		entitiesSync = await db.electric.syncShapeToTable({
 			shape: {
@@ -88,10 +91,6 @@ function getEntitiesStatusStore() {
 			shapeKey: 'odk_entities',
 			initialInsertMethod: 'csv', // performance boost on initial sync
 		});
-
-		// Populate initial entity statuses
-		await setEntitiesListFromDbRecords(db, projectId);
-		_calculateTaskSubmissionCounts();
 
 		entitiesUnsubscribe = entitiesSync?.stream.subscribe(
 			async (entities: ShapeData[]) => {
@@ -456,7 +455,6 @@ function getEntitiesStatusStore() {
 
 	async function deleteNewEntity(db: PGlite, project_id: number, entity_id: string) {
 		try {
-			geomDeleteLoading = true;
 			const geomDeleteResponse = await fetch(`${API_URL}/projects/entity/${entity_id}?project_id=${project_id}`, {
 				method: 'DELETE',
 				credentials: 'include',
@@ -472,8 +470,6 @@ function getEntitiesStatusStore() {
 				variant: 'danger',
 				message: error.message,
 			});
-		} finally {
-			geomDeleteLoading = false;
 		}
 	}
 

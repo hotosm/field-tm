@@ -39,10 +39,10 @@ from app.projects import project_crud
 from tests.test_data import test_data_path
 
 
-async def create_project(client, organisation_id, project_data):
+async def create_stub_project(client, organisation_id, stub_project_data):
     """Create a new project."""
     response = await client.post(
-        f"/projects?org_id={organisation_id}", json=project_data
+        f"/projects/stub?org_id={organisation_id}", json=stub_project_data
     )
     assert response.status_code == HTTPStatus.OK
     return response.json()
@@ -52,7 +52,7 @@ async def test_create_project_invalid(client, organisation, project_data):
     """Test project creation endpoint, duplicate checker."""
     project_data["task_split_type"] = "invalid"
     project_data["priority"] = "invalid"
-    response_invalid = await client.post(
+    response_invalid = await client.patch(
         f"/projects?org_id={organisation.id}", json=project_data
     )
     assert response_invalid.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -72,11 +72,11 @@ async def test_create_project_invalid(client, organisation, project_data):
             assert error["ctx"]["expected"] == expected_errors[field_name]
 
 
-async def test_create_project_with_dup(client, organisation, project_data):
+async def test_create_project_with_dup(client, organisation, stub_project_data):
     """Test project creation endpoint, duplicate checker."""
-    project_name = project_data["name"]
+    project_name = stub_project_data["name"]
 
-    new_project = await create_project(client, organisation.id, project_data)
+    new_project = await create_stub_project(client, organisation.id, stub_project_data)
     assert "id" in new_project
     assert isinstance(new_project["id"], int)
     assert isinstance(new_project["slug"], str)
@@ -85,7 +85,7 @@ async def test_create_project_with_dup(client, organisation, project_data):
 
     # Duplicate response to test error condition: project name already exists
     response_duplicate = await client.post(
-        f"/projects?org_id={organisation.id}", json=project_data
+        f"/projects/stub?org_id={organisation.id}", json=stub_project_data
     )
 
     assert response_duplicate.status_code == HTTPStatus.CONFLICT
@@ -199,7 +199,7 @@ async def test_valid_geojson_types(client, organisation, project_data, geojson_t
 async def test_invalid_geojson_types(client, organisation, project_data, geojson_type):
     """Test invalid geojson types."""
     project_data["outline"] = geojson_type
-    response = await client.post(
+    response = await client.patch(
         f"/projects?org_id={organisation.id}", json=project_data
     )
     assert response.status_code == 422
@@ -213,12 +213,21 @@ async def test_invalid_geojson_types(client, organisation, project_data, geojson
         {"type": "name", "properties": {"name": "NAD27"}},
     ],
 )
-async def test_unsupported_crs(project_data, crs):
+async def test_unsupported_crs(stub_project_data, crs):
     """Test unsupported CRS in GeoJSON."""
-    project_data["outline"]["crs"] = crs
+    stub_project_data["outline"]["crs"] = crs
     with pytest.raises(HTTPException) as exc_info:
-        await check_crs(project_data["outline"])
+        await check_crs(stub_project_data["outline"])
     assert exc_info.value.status_code == 400
+
+
+async def create_project(client, organisation_id, stub_project_data):
+    """Create a new project."""
+    response = await client.post(
+        f"/projects/stub?org_id={organisation_id}", json=stub_project_data
+    )
+    assert response.status_code == HTTPStatus.OK
+    return response.json()
 
 
 @pytest.mark.parametrize(
@@ -231,13 +240,24 @@ async def test_unsupported_crs(project_data, crs):
     ],
 )
 async def test_project_hashtags(
-    client, organisation, project_data, hashtag_input, expected_output
+    client,
+    organisation,
+    project_data,
+    stub_project_data,
+    hashtag_input,
+    expected_output,
 ):
     """Test hashtag parsing."""
     project_data["hashtags"] = hashtag_input
-    response_data = await create_project(client, organisation.id, project_data)
+    response_data = await create_stub_project(
+        client, organisation.id, stub_project_data
+    )
     project_id = response_data["id"]
     assert "id" in response_data
+    response = await client.patch(
+        f"/projects?project_id={project_id}", json=project_data
+    )
+    response_data = response.json()
     assert response_data["hashtags"][:-1] == expected_output
     assert response_data["hashtags"][-1] == f"#{settings.FMTM_DOMAIN}-{project_id}"
 

@@ -90,3 +90,9 @@ export enum project_status {
   ARCHIVED = 'ARCHIVED',
   COMPLETED = 'COMPLETED',
 }
+
+export enum data_extract_type {
+  OSM = 'osm_data_extract',
+  CUSTOM = 'custom_data_extract',
+  NONE = 'no_data_extract',
+}

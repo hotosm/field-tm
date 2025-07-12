@@ -41,7 +41,7 @@ const VectorLayer = ({
   map,
   geojson,
   fgbUrl,
-  fgbExtent,
+  fgbExtentFilter,
   style = { ...defaultStyles },
   zIndex = 0,
   zoomToLayer = false,
@@ -190,7 +190,7 @@ const VectorLayer = ({
     const fgbRequestIdRef = ++latestFgbRequestIdRef.current;
     this.clear();
     let filteredFeatures = [];
-    for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtent.getExtent()))) {
+    for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtentFilter.getExtent()))) {
       if (fgbRequestIdRef !== latestFgbRequestIdRef.current) return; // only process latest response
 
       if (extractGeomCol && feature.geometry.type === 'GeometryCollection') {
@@ -207,7 +207,7 @@ const VectorLayer = ({
 
       // Clip geoms to another geometry (i.e. ST_Within)
       if (filterExtent) {
-        if (geomWithin(extractGeom.getGeometry(), fgbExtent)) {
+        if (geomWithin(extractGeom.getGeometry(), fgbExtentFilter)) {
           filteredFeatures.push(extractGeom);
         }
       } else {
@@ -299,7 +299,7 @@ const VectorLayer = ({
       setVectorLayer(null);
       map.un('click', handleClick);
     };
-  }, [fgbUrl, fgbExtent]);
+  }, [fgbUrl, fgbExtentFilter]);
 
   useEffect(() => {
     if (!map || !vectorLayer) return;

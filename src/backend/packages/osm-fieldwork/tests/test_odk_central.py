@@ -229,7 +229,7 @@ def test_invalid_connection_sync():
         OdkCentral("https://somerandominvalidurl546456546.xyz", "test@hotosm.org", "Password1234")
 
     with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
-        OdkCentral("https://odkcentral:8443", "thisuser@notexist.org", "Password1234")
+        OdkCentral("http://central:8383", "thisuser@notexist.org", "Password1234")
 
 
 async def test_invalid_connection_async():
@@ -239,5 +239,5 @@ async def test_invalid_connection_async():
             pass
 
     with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
-        async with OdkCentralAsync("https://odkcentral:8443", "thisuser@notexist.org", "Password1234"):
+        async with OdkCentralAsync("http://central:8383", "thisuser@notexist.org", "Password1234"):
             pass

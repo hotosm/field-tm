@@ -5,6 +5,8 @@ export type CreateProjectStateTypes = {
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
+  createDraftProjectLoading: boolean;
+  createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
   formExampleList: FormCategoryListTypes[];
@@ -19,7 +21,6 @@ export type CreateProjectStateTypes = {
   dividedTaskGeojson: null | splittedGeojsonType;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  taskSplittingGeojson: splittedGeojsonType | null;
   updateBoundaryLoading: boolean;
   drawnGeojson: DrawnGeojsonTypes | null;
   drawToggle: boolean;
@@ -39,6 +40,15 @@ export type CreateProjectStateTypes = {
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;
+  splitGeojsonBySquares: splittedGeojsonType | null;
+  splitGeojsonByAlgorithm: splittedGeojsonType | null;
+  basicProjectDetailsLoading: boolean;
+  basicProjectDetails:
+    | ({ id: number } & Pick<
+        ProjectDetailsTypes,
+        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline'
+      >)
+    | null;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -91,16 +101,16 @@ export type ProjectDetailsTypes = {
   no_of_buildings: number;
   odk_central_user?: string;
   odk_central_password?: string;
-  organisation?: number;
+  organisation: number;
   odk_central_url?: string;
-  name?: string;
-  hashtags?: string[];
-  short_description?: string;
-  description?: string;
+  name: string;
+  hashtags: string[];
+  short_description: string;
+  description: string;
   task_split_type?: number;
   osm_category?: string;
   data_extract_options?: string;
-  organisation_id?: number | null;
+  organisation_id: number | null;
   formExampleSelection?: string;
   osmFormSelectionName?: string;
   average_buildings_per_task?: number;
@@ -117,6 +127,7 @@ export type ProjectDetailsTypes = {
   visibility: project_visibility;
   use_odk_collect: boolean;
   status: project_status;
+  outline: splittedGeojsonType;
 };
 
 export type FormCategoryListTypes = {
