@@ -570,7 +570,7 @@
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
 			extent={primaryGeomType === MapGeomTypes.POLYLINE
-				? null
+				? undefined
 				: taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
