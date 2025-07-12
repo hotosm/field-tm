@@ -76,6 +76,7 @@ from app.db.postgis_utils import (
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
+from app.projects.project_schemas import ProjectUserContributions
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
@@ -411,15 +412,12 @@ async def get_task_status(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
 
-@router.get("/contributors/{project_id}")
+@router.get("/contributors/{project_id}", response_model=list[ProjectUserContributions])
 async def get_contributors(
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
-    """Get contributors of a project.
-
-    TODO use a pydantic model for return type
-    """
+    """Get contributors of a project."""
     project = project_user.get("project")
     return await project_crud.get_project_users_plus_contributions(db, project.id)
 
