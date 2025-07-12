@@ -7,7 +7,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
+	import { fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/random';
 	import { m } from '$translations/messages.js';
 
@@ -48,14 +48,8 @@
 	let uploading = $state(false);
 	let uploadingMessage = $state('');
 
-	const odkWebFormPromise = fetchCachedBlobUrl(
-		'https://hotosm.github.io/web-forms/odk-web-form.js',
-		commonStore.config.cacheName,
-		true, // clean old cache entries
-	);
-
-	const webFormPagePromise = fetchCachedBlobUrl('/web-forms.html', commonStore.config.cacheName, true);
-
+	const odkWebFormUrl = 'https://hotosm.github.io/web-forms/odk-web-form.js';
+	const webFormPageUrl = '/web-forms.html';
 	const formMediaPromise = fetchFormMediBlobUrls(projectId!);
 
 	function insertExtraMetadataIntoSubmissionXml(submissionXml: string): string {
@@ -270,51 +264,47 @@
 	placement="start"
 	class="forms-wrapper-drawer"
 >
-	{#await odkWebFormPromise then odkWebFormUrl}
-		{#await webFormPagePromise then webFormPageUrl}
-			{#if entityId}
-				{#key projectId}
-					{#await formMediaPromise then formMedia}
-						{#key entityId}
-							{#key commonStore.locale}
-								{#if uploading}
-									<div id="web-forms-uploader">
-										<div id="uploading-inner">
-											<div id="spinner"></div>
-											{uploadingMessage}
-										</div>
-									</div>
-								{:else}
-									{#if drawerLabel}
-										<div
-											style="background: white; font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
-										>
-											{drawerLabel}
-										</div>
-									{/if}
-									<iframe
-										class="iframe"
-										style="border: none; height: 100%; height: -webkit-fill-available;"
-										use:handleIframe
-										title="odk-web-forms-wrapper"
-										id={WEB_FORMS_IFRAME_ID}
-										name={WEB_FORMS_IFRAME_ID}
-										src={`${webFormPageUrl}`}
-										data-project-id={projectId}
-										data-entity-id={entityId}
-										data-form-xml={formXml}
-										data-odk-web-form-url={odkWebFormUrl}
-										data-form-media={encodeURIComponent(JSON.stringify(formMedia))}
-										data-css-file={commonStore.config?.cssFileWebformsOverride || ''}
-									></iframe>
-								{/if}
-							{/key}
-						{/key}
-					{/await}
+	{#if entityId}
+		{#key projectId}
+			{#await formMediaPromise then formMedia}
+				{#key entityId}
+					{#key commonStore.locale}
+						{#if uploading}
+							<div id="web-forms-uploader">
+								<div id="uploading-inner">
+									<div id="spinner"></div>
+									{uploadingMessage}
+								</div>
+							</div>
+						{:else}
+							{#if drawerLabel}
+								<div
+									style="background: white; font-size: 10pt; left: 0; padding: 10px; position: absolute; right: 0; text-align: center;"
+								>
+									{drawerLabel}
+								</div>
+							{/if}
+							<iframe
+								class="iframe"
+								style="border: none; height: 100%; height: -webkit-fill-available;"
+								use:handleIframe
+								title="odk-web-forms-wrapper"
+								id={WEB_FORMS_IFRAME_ID}
+								name={WEB_FORMS_IFRAME_ID}
+								src={`${webFormPageUrl}`}
+								data-project-id={projectId}
+								data-entity-id={entityId}
+								data-form-xml={formXml}
+								data-odk-web-form-url={odkWebFormUrl}
+								data-form-media={encodeURIComponent(JSON.stringify(formMedia))}
+								data-css-file={commonStore.config?.cssFileWebformsOverride || ''}
+							></iframe>
+						{/if}
+					{/key}
 				{/key}
-			{/if}
-		{/await}
-	{/await}
+			{/await}
+		{/key}
+	{/if}
 </hot-drawer>
 
 <style>
