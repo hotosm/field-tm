@@ -307,7 +307,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           <VectorLayer
             fgbUrl={projectInfo.data_extract_url}
             // For POLYLINE, show all geoms, else filter by clicked task area (not working)
-            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? new GeoJSON().readFeatures(projectInfo.outline)[0].getGeometry() : taskAreaExtent}
+            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
             fgbExtentFilter={taskAreaExtent}
             getTaskStatusStyle={(feature) => {
               const geomType = feature.getGeometry().getType();
