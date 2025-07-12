@@ -187,7 +187,7 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
                 />
 
                 <TableHeader
-                  dataField="OSMID"
+                  dataField="User"
                   headerClassName="codeHeader"
                   rowClassName="codeRow"
                   dataFormat={(row) => (
@@ -200,15 +200,15 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
                   )}
                 />
                 <TableHeader
-                  dataField="Contributions"
+                  dataField="Submissions"
                   headerClassName="codeHeader"
                   rowClassName="codeRow"
                   dataFormat={(row) => (
                     <div
                       className="fmtm-w-[7rem] fmtm-max-w-[7rem] fmtm-overflow-hidden fmtm-truncate"
-                      title={row?.contributions}
+                      title={row?.submissions}
                     >
-                      <span className="fmtm-text-[15px]">{row?.contributions}</span>
+                      <span className="fmtm-text-[15px]">{row?.submissions}</span>
                     </div>
                   )}
                 />
