@@ -258,7 +258,7 @@ const TaskSubmissionsMap = () => {
           <VectorLayer
             fgbUrl={dataExtractUrl}
             // For POLYLINE, show all geoms, else filter by clicked task area (not working)
-            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? new GeoJSON().readFeatures(projectInfo.outline)[0].getGeometry() : taskAreaExtent}
+            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
             fgbExtentFilter={taskAreaExtent}
             zIndex={15}
           />
