@@ -11,6 +11,9 @@
     },
     "$schema": "https://inlang.com/schema/inlang-message-format",
     "task_states": {
-        "UNLOCKED_TO_MAP": "Připraveno"
+        "UNLOCKED_TO_MAP": "Připraveno",
+        "LOCKED_FOR_MAPPING": "Zamčeno pro mapování",
+        "UNLOCKED_TO_VALIDATE": "Připraveno k validaci",
+        "LOCKED_FOR_VALIDATION": "Uzamčeno pro validaci"
     }
 }
