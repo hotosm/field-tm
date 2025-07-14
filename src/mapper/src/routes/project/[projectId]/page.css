@@ -27,7 +27,7 @@
 
 .main-page {
 	position: relative;
-	--at-apply: h-[calc(100svh-3.699rem)] sm: h-[calc(100svh-4.625rem)] font-barlow;
+	--at-apply: h-[calc(100svh-3.699rem)] sm: h-[calc(100svh-4.625rem)] font-primary;
 }
 
 /* Tags */
@@ -95,7 +95,7 @@ sl-tab hot-icon {
 }
 
 .alert-msg sl-button span {
-	--at-apply: font-barlow font-medium text-xs uppercase;
+	--at-apply: font-primary font-medium text-xs uppercase;
 }
 
 /* Proceed Dialog */
@@ -121,7 +121,7 @@ sl-tab hot-icon {
 }
 
 .proceed-dialog .button span {
-	--at-apply: font-barlow font-medium text-xs uppercase;
+	--at-apply: font-primary font-medium text-xs uppercase;
 }
 
 /* QR Code */
@@ -131,7 +131,7 @@ sl-tab hot-icon {
 }
 
 .map-qr sl-button span {
-	--at-apply: font-barlow font-medium text-base uppercase;
+	--at-apply: font-primary font-medium text-base uppercase;
 }
 
 /* Dialogs */
@@ -154,7 +154,7 @@ sl-tab hot-icon {
 }
 
 .dialog-overview .content button span {
-	--at-apply: font-barlow font-medium text-SM uppercase;
+	--at-apply: font-primary font-medium text-SM uppercase;
 }
 
 .dialog-overview .manual-qr-gif {

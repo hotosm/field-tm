@@ -63,7 +63,7 @@
 	});
 </script>
 
-<div class="font-barlow h-full overflow-y-hidden bg-[#f5f5f5]">
+<div class="font-primary h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
 		<div class="flex items-center justify-between">
 			<h3>PROJECTS</h3>

@@ -131,7 +131,7 @@
 	{@html webManifestLink}
 </svelte:head>
 
-<main class="flex flex-col h-screen overflow-hidden font-barlow">
+<main class="flex flex-col h-screen overflow-hidden font-primary">
 	<Header></Header>
 	<Toast></Toast>
 

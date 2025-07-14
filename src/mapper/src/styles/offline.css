@@ -1,5 +1,5 @@
 .offline {
-	--at-apply: font-barlow font-medium;
+	--at-apply: font-primary font-medium;
 }
 
 .offline-comment {

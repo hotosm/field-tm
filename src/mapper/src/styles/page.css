@@ -1,6 +1,5 @@
-/* font barlow */
-.font-barlow {
-	font-family: 'Barlow', system-ui;
+.font-primary {
+	font-family: var(--font-primary);
 }
 
 /* override default scrollbar */

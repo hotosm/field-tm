@@ -1,5 +1,5 @@
 .qr-code {
-	--at-apply: font-barlow flex flex-col items-center p-4 space-y-4;
+	--at-apply: font-primary flex flex-col items-center p-4 space-y-4;
 }
 
 .qr-code .title-wrapper {
@@ -35,5 +35,5 @@
 }
 
 .qr-code .download-button span {
-	--at-apply: font-barlow font-medium text-base uppercase;
+	--at-apply: font-primary font-medium text-base uppercase;
 }
