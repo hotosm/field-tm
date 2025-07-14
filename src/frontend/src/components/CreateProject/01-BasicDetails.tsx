@@ -231,7 +231,27 @@ const BasicDetails = () => {
       {!values.id && (
         <>
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="Project Area" astric />
+            <FieldLabel
+              label="Project Area"
+              astric
+              tooltipMessage={
+                <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+                  <div>
+                    <p>Draw:</p>
+                    <p>You can draw a freehand polygon on map interface.</p>{' '}
+                    <p>Click on the reset button to redraw the AOI.</p>
+                  </div>
+                  <div>
+                    <p>Upload:</p>
+                    <p>You may also choose to upload the AOI. Note: The file upload only supports .geojson format. </p>
+                  </div>
+                  <p>The total area of the AOI is also calculated and displayed on the screen.</p>
+                  <p>
+                    <b>Note:</b> The uploaded geojson should be in EPSG:4326 coordinate system.
+                  </p>
+                </div>
+              }
+            />
             <Controller
               control={control}
               name="uploadAreaSelection"

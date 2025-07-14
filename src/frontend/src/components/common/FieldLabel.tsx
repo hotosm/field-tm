@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import AssetModules from '@/shared/AssetModules';
 import { Tooltip } from '@mui/material';
 
 interface IFieldLabelProps {
   label: string | undefined;
-  tooltipMessage?: string;
+  tooltipMessage?: string | ReactNode;
   astric?: boolean;
   id?: string;
   disabled?: boolean;
