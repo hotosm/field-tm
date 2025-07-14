@@ -2,7 +2,7 @@ import { z } from 'zod/v4';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { data_extract_type, GeoGeomTypesEnum, project_visibility, task_split_type } from '@/types/enums';
 
-export const basicDetailsValidationSchema = z
+export const projectOverviewValidationSchema = z
   .object({
     id: z.number().optional(),
     name: z
@@ -262,7 +262,7 @@ export const splitTasksValidationSchema = z
   });
 
 export const createProjectValidationSchema = z.object({
-  ...basicDetailsValidationSchema.shape,
+  ...projectOverviewValidationSchema.shape,
   ...projectDetailsValidationSchema.shape,
   ...uploadSurveyValidationSchema.shape,
   ...mapDataValidationSchema.shape,

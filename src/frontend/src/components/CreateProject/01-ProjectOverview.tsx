@@ -26,7 +26,7 @@ import isEmpty from '@/utilfunctions/isEmpty';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-const BasicDetails = () => {
+const ProjectOverview = () => {
   const dispatch = useAppDispatch();
   const isAdmin = useIsAdmin();
 
@@ -310,4 +310,4 @@ const BasicDetails = () => {
   );
 };
 
-export default BasicDetails;
+export default ProjectOverview;

@@ -3,7 +3,7 @@ import { createProjectValidationSchema } from '../validation';
 import { project_visibility } from '@/types/enums';
 
 export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
-  // 01 Basic Details
+  // 01 Project Overview
   name: '',
   short_description: '',
   description: '',

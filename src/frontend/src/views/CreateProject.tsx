@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import BasicDetails from '@/components/CreateProject/01-BasicDetails';
+import ProjectOverview from '@/components/CreateProject/01-ProjectOverview';
 import ProjectDetails from '@/components/CreateProject/02-ProjectDetails';
 import UploadSurvey from '@/components/CreateProject/03-UploadSurvey';
 import MapData from '@/components/CreateProject/04-MapData';
@@ -22,7 +22,7 @@ import AssetModules from '@/shared/AssetModules';
 import Map from '@/components/CreateProject/Map';
 import {
   createProjectValidationSchema,
-  basicDetailsValidationSchema,
+  projectOverviewValidationSchema,
   mapDataValidationSchema,
   projectDetailsValidationSchema,
   splitTasksValidationSchema,
@@ -49,7 +49,7 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const validationSchema = {
-  1: basicDetailsValidationSchema,
+  1: projectOverviewValidationSchema,
   2: projectDetailsValidationSchema,
   3: uploadSurveyValidationSchema,
   4: mapDataValidationSchema,
@@ -110,7 +110,7 @@ const CreateProject = () => {
 
   const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
     defaultValues: defaultValues,
-    resolver: zodResolver(validationSchema?.[step] || basicDetailsValidationSchema),
+    resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
   });
 
   const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
@@ -118,7 +118,7 @@ const CreateProject = () => {
   const values = watch();
 
   const form = {
-    1: <BasicDetails />,
+    1: <ProjectOverview />,
     2: <ProjectDetails />,
     3: <UploadSurvey />,
     4: <MapData />,
@@ -180,7 +180,7 @@ const CreateProject = () => {
     const data = getValues();
     const { name, description, short_description } = data;
 
-    // retrieve updated fields from basic details
+    // retrieve updated fields from project overview
     const dirtyValues = getDirtyFieldValues({ name, description, short_description }, dirtyFields);
 
     const projectData = {
