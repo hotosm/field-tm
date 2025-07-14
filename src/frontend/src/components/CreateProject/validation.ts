@@ -23,7 +23,7 @@ export const basicDetailsValidationSchema = z
     odk_central_url: z.string().optional(),
     odk_central_user: z.string().optional(),
     odk_central_password: z.string().optional(),
-    project_admins: z.array(z.string()).optional(),
+    project_admins: z.array(z.string()),
     uploadAreaSelection: z.enum(['draw', 'upload_file']).nullable(),
     uploadedAOIFile: z.any().optional(),
     outline: z.any().refine((val) => val !== undefined, {
