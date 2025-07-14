@@ -4,6 +4,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	base: '/',
+	relative: false,
 
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
@@ -36,7 +37,7 @@ const config = {
 			$static: 'static',
 			$migrations: '../migrations',
 		},
-		// Important! Avoids conflict with vite-pwa
+		// Important! Config below required for vite-pwa to work
 		serviceWorker: {
 			register: false,
 		},

@@ -19,6 +19,14 @@ const pwaOptions: Partial<VitePWAOptions> = {
 	// on only part of the website
 	scope: '/',
 
+	// Required for sveltekit
+	kit: {
+		adapterFallback: 'index.html',
+		spa: {
+			fallbackMapping: '/',
+		},
+	},
+
 	// Allow testing the PWA during local development
 	devOptions: {
 		enabled: true,
