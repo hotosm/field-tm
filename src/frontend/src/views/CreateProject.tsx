@@ -33,6 +33,7 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import {
   CreateDraftProjectService,
   CreateProjectService,
+  DeleteProjectService,
   GetBasicProjectDetails,
   OrganisationService,
 } from '@/api/CreateProjectService';
@@ -42,6 +43,8 @@ import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkel
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
 import { data_extract_type, task_split_type } from '@/types/enums';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
+import { DialogTrigger } from '@radix-ui/react-dialog';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -76,6 +79,7 @@ const CreateProject = () => {
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
+  const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
 
   const isAdmin = useIsAdmin();
@@ -172,8 +176,6 @@ const CreateProject = () => {
     );
   };
 
-  // const saveProject = () => {};
-
   const createProject = async () => {
     const data = getValues();
     const { name, description, short_description } = data;
@@ -225,6 +227,13 @@ const CreateProject = () => {
     );
   };
 
+  // const saveProject = () => {};
+
+  const deleteProject = async () => {
+    if (!projectId) return;
+    await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate));
+  };
+
   const onSubmit = () => {
     if (step === 1 && !projectId) {
       createDraftProject(true);
@@ -246,11 +255,34 @@ const CreateProject = () => {
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
         <h5>CREATE NEW PROJECT</h5>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
+          {projectId && (
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="link-grey" isLoading={isProjectDeletePending}>
+                  <AssetModules.DeleteIcon className="!fmtm-text-base" />
+                  Delete Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Do you want to delete this draft project?</DialogTitle>
+                </DialogHeader>
+                <Button
+                  variant="primary-red"
+                  className="fmtm-ml-auto fmtm-mt-5"
+                  onClick={deleteProject}
+                  isLoading={isProjectDeletePending}
+                >
+                  Delete
+                </Button>
+              </DialogContent>
+            </Dialog>
+          )}
           {/* {step > 1 && (
             <Button
               variant="secondary-grey"
               onClick={saveProject}
-              disabled={createProjectLoading || basicProjectDetailsLoading}
+              disabled={createProjectLoading || basicProjectDetailsLoading || isProjectDeletePending}
             >
               <AssetModules.SaveIcon className="!fmtm-text-base" />
               Save
@@ -287,7 +319,7 @@ const CreateProject = () => {
                 <Button
                   variant="link-grey"
                   onClick={() => setSearchParams({ step: (step - 1).toString() })}
-                  disabled={createProjectLoading || basicProjectDetailsLoading}
+                  disabled={createProjectLoading || basicProjectDetailsLoading || isProjectDeletePending}
                 >
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
@@ -299,7 +331,10 @@ const CreateProject = () => {
                       variant="secondary-grey"
                       onClick={() => createDraftProject(false)}
                       isLoading={createDraftProjectLoading.loading && !createDraftProjectLoading.continue}
-                      disabled={createDraftProjectLoading.loading && createDraftProjectLoading.continue}
+                      disabled={
+                        (createDraftProjectLoading.loading && createDraftProjectLoading.continue) ||
+                        isProjectDeletePending
+                      }
                     >
                       Save & Exit
                     </Button>
@@ -311,7 +346,8 @@ const CreateProject = () => {
                   type="submit"
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
-                    basicProjectDetailsLoading
+                    basicProjectDetailsLoading ||
+                    isProjectDeletePending
                   }
                   isLoading={
                     (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading
