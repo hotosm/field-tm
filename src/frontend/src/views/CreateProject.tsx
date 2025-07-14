@@ -125,8 +125,20 @@ const CreateProject = () => {
     const isValidationSuccess = await trigger(undefined, { shouldFocus: true });
 
     if (!isValidationSuccess) return;
-    const { name, short_description, description, organisation_id, project_admins, outline, uploadedAOIFile } = values;
-    const payload = {
+    const {
+      name,
+      short_description,
+      description,
+      organisation_id,
+      project_admins,
+      outline,
+      uploadedAOIFile,
+      odk_central_url,
+      odk_central_user,
+      odk_central_password,
+    } = values;
+
+    const projectPayload = {
       name,
       short_description,
       description,
@@ -134,15 +146,26 @@ const CreateProject = () => {
       outline,
       uploadedAOIFile,
     };
-    const params = {
-      org_id: organisation_id,
-    };
+
+    let odkPayload: Pick<
+      z.infer<typeof createProjectValidationSchema>,
+      'odk_central_url' | 'odk_central_user' | 'odk_central_password'
+    > | null = null;
+
+    if (values.useDefaultODKCredentials) {
+      odkPayload = null;
+    } else {
+      odkPayload = {
+        odk_central_url,
+        odk_central_user,
+        odk_central_password,
+      };
+    }
+
     dispatch(
       CreateDraftProjectService(
         `${VITE_API_URL}/projects/stub`,
-        payload,
-        project_admins as string[],
-        params,
+        { projectPayload, odkPayload, project_admins },
         navigate,
         continueToNextStep,
       ),

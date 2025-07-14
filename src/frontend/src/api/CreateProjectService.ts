@@ -47,27 +47,50 @@ export const GetBasicProjectDetails = (url: string) => {
 
 export const CreateDraftProjectService = (
   url: string,
-  payload: Record<string, any>,
-  project_admins: string[],
-  params: Record<string, any>,
+  payload: { projectPayload: Record<string, any>; odkPayload: Record<string, any> | null; project_admins: string[] },
   navigate: NavigateFunction,
   continueToNextStep: boolean,
 ) => {
   return async (dispatch: AppDispatch) => {
+    let projectId: number | null = null;
     try {
       dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
-      const response: AxiosResponse = await axios.post(url, payload, { params });
 
+      const { projectPayload, odkPayload, project_admins } = payload;
+
+      // 1. Create draft project
+      const response: AxiosResponse = await axios.post(url, projectPayload, {
+        params: { org_id: projectPayload.organisation_id },
+      });
+
+      projectId = response.data.id;
+
+      // 2. Add ODK details if custom ODK creds provided
+      if (odkPayload) {
+        await axios.patch(`${VITE_API_URL}/projects`, odkPayload, {
+          params: { project_id: projectId as number },
+        });
+      }
+
+      // 3. Add project admins
       if (!isEmpty(project_admins)) {
-        const promises = project_admins?.map(async (sub: any) => {
-          await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-              sub,
-              project_id: response.data.id as number,
+        try {
+          const promises = project_admins?.map(async (sub: any) => {
+            await dispatch(
+              AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+                sub,
+                project_id: projectId as number,
+              }),
+            );
+          });
+          await Promise.all(promises);
+        } catch (error) {
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: error?.response?.data?.detail || 'Failed to add project admin',
             }),
           );
-        });
-        await Promise.all(promises);
+        }
       }
 
       dispatch(
@@ -76,7 +99,7 @@ export const CreateDraftProjectService = (
           message: 'Draft project created successfully',
         }),
       );
-      const redirectTo = continueToNextStep ? `/create-project/${response.data.id}?step=2` : `/`;
+      const redirectTo = continueToNextStep ? `/create-project/${projectId}?step=2` : `/`;
       navigate(redirectTo);
     } catch (error) {
       dispatch(
@@ -84,6 +107,10 @@ export const CreateDraftProjectService = (
           message: error?.response?.data?.detail || 'Failed to create draft project',
         }),
       );
+
+      if (projectId) {
+        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`));
+      }
     } finally {
       dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: false, continue: false }));
     }
@@ -684,13 +711,15 @@ const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
       try {
         dispatch(CreateProjectActions.SetProjectDeletePending(true));
         await API.delete(url);
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: `Project deleted`,
-            variant: 'success',
-          }),
-        );
-        if (navigate) navigate('/');
+        if (navigate) {
+          navigate('/');
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: `Project deleted`,
+              variant: 'success',
+            }),
+          );
+        }
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(
