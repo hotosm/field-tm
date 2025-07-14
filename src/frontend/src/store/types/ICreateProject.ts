@@ -30,13 +30,10 @@ export type CreateProjectStateTypes = {
   taskSplittingMethod: task_split_type | null;
   dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
-  isUnsavedChanges: boolean;
-  canSwitchCreateProjectSteps: boolean;
   isTasksSplit: Record<string, any>;
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;

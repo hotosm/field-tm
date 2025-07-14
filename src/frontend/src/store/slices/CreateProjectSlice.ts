@@ -52,12 +52,10 @@ export const initialState: CreateProjectStateTypes = {
   dataExtractGeojson: null,
   createProjectValidations: {},
   isUnsavedChanges: false,
-  canSwitchCreateProjectSteps: false,
   isTasksSplit: { divide_on_square: false, task_splitting_algorithm: false },
   isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
-  descriptionToFocus: null,
   isProjectDeletePending: false,
   splitGeojsonBySquares: null,
   splitGeojsonByAlgorithm: null,
@@ -99,7 +97,6 @@ const CreateProject = createSlice({
       state.dataExtractGeojson = null;
       state.taskSplittingGeojson = null;
       state.drawnGeojson = null;
-      state.isUnsavedChanges = false;
       state.uploadAreaSelection = null;
       state.dividedTaskGeojson = null;
       state.dividedTaskLoading = false;
@@ -113,9 +110,6 @@ const CreateProject = createSlice({
     },
     GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formExampleList']>) {
       state.formExampleList = action.payload;
-    },
-    SetIndividualProjectDetailsData(state, action) {
-      state.projectDetails = action.payload;
     },
     GenerateProjectLoading(state, action: PayloadAction<boolean>) {
       state.generateProjectLoading = action.payload;
@@ -190,12 +184,6 @@ const CreateProject = createSlice({
     setDataExtractGeojson(state, action) {
       state.dataExtractGeojson = action.payload;
     },
-    SetIsUnsavedChanges(state, action: PayloadAction<boolean>) {
-      state.isUnsavedChanges = action.payload;
-    },
-    SetCanSwitchCreateProjectSteps(state, action: PayloadAction<boolean>) {
-      state.canSwitchCreateProjectSteps = action.payload;
-    },
     SetIsTasksSplit(
       state,
       action: PayloadAction<{
@@ -222,9 +210,6 @@ const CreateProject = createSlice({
     },
     SetCustomFileValidity(state, action: PayloadAction<boolean>) {
       state.customFileValidity = action.payload;
-    },
-    SetDescriptionToFocus(state, action: PayloadAction<CreateProjectStateTypes['descriptionToFocus']>) {
-      state.descriptionToFocus = action.payload;
     },
     SetProjectDeletePending(state, action: PayloadAction<boolean>) {
       state.isProjectDeletePending = action.payload;
