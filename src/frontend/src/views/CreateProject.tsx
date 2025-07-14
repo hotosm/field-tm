@@ -296,7 +296,7 @@ const CreateProject = () => {
       </div>
 
       <div
-        className={`sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full ${step > 1 ? 'fmtm-h-[calc(100%-2.8rem)]' : 'fmtm-h-[calc(100%-2rem)]'} fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-2`}
+        className={`sm:fmtm-grid fmtm-grid-rows-[auto_1fr] lg:fmtm-grid-rows-1 fmtm-grid-cols-12 fmtm-w-full ${step > 1 || projectId ? 'fmtm-h-[calc(100%-2.8rem)]' : 'fmtm-h-[calc(100%-2rem)]'} fmtm-gap-2 lg:fmtm-gap-5 fmtm-mt-2`}
       >
         {/* stepper container */}
         <div className="fmtm-col-span-12 lg:fmtm-col-span-3 fmtm-h-fit lg:fmtm-h-full fmtm-bg-white fmtm-rounded-xl">
