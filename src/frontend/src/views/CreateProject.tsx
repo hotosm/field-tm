@@ -149,6 +149,8 @@ const CreateProject = () => {
     );
   };
 
+  // const saveProject = () => {};
+
   const createProject = async () => {
     const data = getValues();
     const { name, description, short_description } = data;
@@ -221,17 +223,20 @@ const CreateProject = () => {
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
         <h5>CREATE NEW PROJECT</h5>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
-          {step > 1 && (
+          {/* {step > 1 && (
             <Button
               variant="secondary-grey"
-              onClick={() => {}}
+              onClick={saveProject}
               disabled={createProjectLoading || basicProjectDetailsLoading}
             >
               <AssetModules.SaveIcon className="!fmtm-text-base" />
-              Save as Draft
+              Save
             </Button>
-          )}
-          <AssetModules.CloseIcon className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer" />
+          )} */}
+          <AssetModules.CloseIcon
+            className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer"
+            onClick={() => navigate('/')}
+          />
         </div>
       </div>
 
