@@ -1,0 +1,65 @@
+{
+    "select": {
+        "nodes": [],
+        "ways_poly": [],
+        "ways_line": [
+            {
+                "osm_id": "id"
+            },
+            {
+                "version": []
+            },
+            {
+                "name": []
+            },
+            {
+                "highway": []
+            },
+            {
+                "smoothness": []
+            },
+            {
+                "surface": []
+            },
+            {
+                "tracktype": []
+            },
+            {
+                "width": []
+            },
+            {
+                "ref": []
+            },
+            {
+                "ref:usfs": []
+            }
+        ],
+        "relations": []
+    },
+    "tables": [
+        "ways_line"
+    ],
+    "where": {
+        "nodes": [],
+        "ways_poly": [],
+        "ways_line": [
+            {
+                "highway": [
+                    "not null"
+                ],
+                "op": "or"
+            }
+        ],
+        "relations": []
+    },
+    "keep": [
+        "name",
+        "highway",
+        "smoothness",
+        "surface",
+        "tracktype",
+        "width",
+        "ref",
+        "ref:usfs"
+    ]
+}

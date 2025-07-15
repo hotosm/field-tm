@@ -1,0 +1,104 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      },
+      {
+        "leisure": []
+      },
+      {
+        "backcountry": []
+      },
+      {
+        "fee": []
+      },
+      {
+        "capacity:persons": []
+      },
+      {
+        "reservation": []
+      },
+      {
+        "capacity:caravans": []
+      },
+      {
+        "access": []
+      },
+      {
+        "tourism": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      },
+      {
+        "leisure": []
+      },
+      {
+        "backcountry": []
+      },
+      {
+        "fee": []
+      },
+      {
+        "capacity:persons": []
+      },
+      {
+        "reservation": []
+      },
+      {
+        "capacity:caravans": []
+      },
+      {
+        "access": []
+      },
+      {
+        "tourism": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": [
+    "ways_poly",
+    "nodes"
+  ],
+  "where": {
+    "nodes": [
+      {
+        "tourism": [
+          [
+            "camp_site",
+            "camp_pitch"
+          ]
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "tourism": [
+          [
+            "camp_site",
+            "camp_pitch"
+          ]
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": [
+    "leisure",
+    "backcountry",
+    "fee",
+    "capacity:persons",
+    "reservation",
+    "capacity:caravans",
+    "access",
+    "tourism"
+  ]
+}
