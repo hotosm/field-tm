@@ -35,7 +35,7 @@ def get_choices():
     json_data_file = os.path.join(data_models_path, "category.json")
 
     if os.path.exists(json_data_file):
-        with open(json_data_file, "r", encoding="utf-8") as f:
+        with open(json_data_file, encoding="utf-8") as f:
             contents = json.load(f)
             for entry in contents:
                 if isinstance(entry, dict) and len(entry) == 1:

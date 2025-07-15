@@ -9,26 +9,16 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly"
-  ],
+  "tables": ["ways_poly"],
   "where": {
     "nodes": [],
     "ways_poly": [
       {
-        "amenity": [
-          [
-            "grave_yard"
-          ]
-        ],
+        "amenity": [["grave_yard"]],
         "op": "or"
       },
       {
-        "landuse": [
-          [
-            "cemetery"
-          ]
-        ],
+        "landuse": [["cemetery"]],
         "op": "or"
       }
     ],

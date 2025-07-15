@@ -9,16 +9,12 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly"
-  ],
+  "tables": ["ways_poly"],
   "where": {
     "nodes": [],
     "ways_poly": [
       {
-        "landuse": [
-          "not null"
-        ],
+        "landuse": ["not null"],
         "op": "or"
       }
     ],

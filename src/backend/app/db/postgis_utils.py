@@ -25,7 +25,6 @@ from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
-import yaml
 from fastapi import HTTPException
 from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
@@ -801,7 +800,7 @@ async def get_osm_geometries(osm_category, geometry):
     if config_filename == "highways":
         geom_type = "line"
 
-    with open(data_model, 'r', encoding="utf-8") as f:
+    with open(data_model, encoding="utf-8") as f:
         config_json = json.load(f)
 
     return await get_osm_data(

@@ -13,84 +13,57 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {
-        "amenity": [
-          "not null"
-        ],
+        "amenity": ["not null"],
         "op": "or"
       },
       {
-        "toilets:access": [
-          "not null"
-        ],
+        "toilets:access": ["not null"],
         "op": "or"
       },
       {
-        "toilets:disposal": [
-          "not null"
-        ],
+        "toilets:disposal": ["not null"],
         "op": "or"
       },
       {
-        "toilets:position": [
-          "not null"
-        ],
+        "toilets:position": ["not null"],
         "op": "or"
       },
       {
-        "toilets:unisex": [
-          "not null"
-        ],
+        "toilets:unisex": ["not null"],
         "op": "or"
       },
       {
-        "toilets:wheelchair": [
-          "not null"
-        ],
+        "toilets:wheelchair": ["not null"],
         "op": "or"
       }
     ],
     "ways_poly": [
       {
-        "amenity": [
-          "not null"
-        ],
+        "amenity": ["not null"],
         "op": "or"
       },
       {
-        "toilets:access": [
-          "not null"
-        ],
+        "toilets:access": ["not null"],
         "op": "or"
       },
       {
-        "toilets:disposal": [
-          "not null"
-        ],
+        "toilets:disposal": ["not null"],
         "op": "or"
       },
       {
-        "toilets:position": [
-          "not null"
-        ],
+        "toilets:position": ["not null"],
         "op": "or"
       },
       {
-        "toilets:unisex": [
-          "not null"
-        ],
+        "toilets:unisex": ["not null"],
         "op": "or"
       },
       {
-        "toilets:wheelchair": [
-          "not null"
-        ],
+        "toilets:wheelchair": ["not null"],
         "op": "or"
       }
     ],

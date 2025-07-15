@@ -24,7 +24,6 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-import yaml
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -548,14 +547,14 @@ async def get_data_extract(
     boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
     project = project_user_dict.get("project")
-    
+
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
     if osm_category:
         config_filename = XLSFormType(osm_category).name
         data_model = f"{data_models_path}/{config_filename}.json"
 
-        with open(data_model, 'r', encoding="utf-8") as f:
+        with open(data_model, encoding="utf-8") as f:
             config_data = json.load(f)
 
         data_config = {
