@@ -795,14 +795,14 @@ async def get_osm_geometries(osm_category, geometry):
         dict: The JSON response containing the snapshot data.
     """
     config_filename = XLSFormType(osm_category).name
-    data_model = f"{data_models_path}/{config_filename}.yaml"
+    data_model = f"{data_models_path}/{config_filename}.json"
     geom_type = "polygon"
 
     if config_filename == "highways":
         geom_type = "line"
 
-    with open(data_model) as f:
-        config_json = yaml.safe_load(f)
+    with open(data_model, 'r', encoding="utf-8") as f:
+        config_json = json.load(f)
 
     return await get_osm_data(
         geometry=geometry,

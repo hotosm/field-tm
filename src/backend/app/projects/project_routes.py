@@ -42,7 +42,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path, get_choices
+from osm_fieldwork.json_data_models import data_models_path, get_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -548,15 +548,15 @@ async def get_data_extract(
     boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
     project = project_user_dict.get("project")
-
+    
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
     if osm_category:
         config_filename = XLSFormType(osm_category).name
-        data_model = f"{data_models_path}/{config_filename}.yaml"
+        data_model = f"{data_models_path}/{config_filename}.json"
 
-        with open(data_model) as f:
-            config_json = yaml.safe_load(f)
+        with open(data_model, 'r', encoding="utf-8") as f:
+            config_data = json.load(f)
 
         data_config = {
             ("polygon", False): ["ways_poly"],
@@ -565,7 +565,7 @@ async def get_data_extract(
             ("polyline", False): ["ways_line"],
         }
 
-        config_json["from"] = data_config.get((geom_type, centroid))
+        config_data["from"] = data_config.get((geom_type, centroid))
         if geom_type == "polyline":
             geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
@@ -573,7 +573,7 @@ async def get_data_extract(
         project.id,
         clean_boundary_geojson,
         geom_type,
-        config_json,
+        config_data,
         centroid,
     )
 
