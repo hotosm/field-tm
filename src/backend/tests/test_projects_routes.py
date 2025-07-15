@@ -620,7 +620,6 @@ async def test_get_contributors(client, project, odk_project, submission, admin_
     response = await client.get(f"projects/contributors/{project.id}")
     assert response.status_code == 200
     data = response.json()
-    print("dataaa", data)
     assert isinstance(data, list)
     assert len(data) > 0
     assert all(
@@ -628,7 +627,6 @@ async def test_get_contributors(client, project, odk_project, submission, admin_
     )
 
     contributor = data[0]
-    print("contributor",contributor)
     assert contributor["user"] == admin_user.username
     assert contributor["submissions"] == 1
 
