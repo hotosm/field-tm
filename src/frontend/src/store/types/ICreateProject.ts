@@ -1,4 +1,4 @@
-import { task_split_type, MapGeomTypes, project_visibility, project_status } from '@/types/enums';
+import { MapGeomTypes, project_visibility, project_status } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -11,32 +11,15 @@ export type CreateProjectStateTypes = {
   editProjectDetailsLoading: boolean;
   formExampleList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
-  generateProjectLoading: boolean;
-  generateProjectSuccess: boolean;
-  generateProjectWarning: string | null;
-  generateProjectError: boolean;
+  GenerateProjectFilesLoading: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
   dividedTaskLoading: boolean;
-  dividedTaskGeojson: null | splittedGeojsonType;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  updateBoundaryLoading: boolean;
-  drawnGeojson: DrawnGeojsonTypes | null;
-  drawToggle: boolean;
   validateCustomFormLoading: boolean;
-  uploadAreaSelection: 'upload_file' | 'draw' | null;
-  totalAreaSelection: string | null;
-  taskSplittingMethod: task_split_type | null;
-  dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
-  isUnsavedChanges: boolean;
-  canSwitchCreateProjectSteps: boolean;
-  isTasksSplit: Record<string, any>;
-  isFgbFetching: boolean;
-  toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;

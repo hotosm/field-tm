@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/RadixComponents/Dialog';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules';
 import Select2 from '@/components/common/Select2';
@@ -68,19 +68,13 @@ const AddOrganizationAdminModal = () => {
     <Dialog open={toggleModal} onOpenChange={setToggleModal}>
       <DialogTrigger className="fmtm-w-fit">
         <Button variant="secondary-red">
-          <AssetModules.AddIcon
-            onClick={() => {
-              setToggleModal(true);
-            }}
-          />
+          <AssetModules.AddIcon />
           Add Admin
         </Button>
       </DialogTrigger>
       <DialogContent>
+        <DialogTitle>Assign Organization Admin</DialogTitle>
         <div>
-          <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent">
-            Assign Organization Admin
-          </p>
           <Select2
             name="org_admins"
             options={userNames?.filter((user) => user.label?.includes(searchText)) || []}

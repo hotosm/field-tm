@@ -21,7 +21,7 @@ export type ProjectStateTypes = {
   downloadDataExtractLoading: boolean;
   taskModalStatus: boolean;
   toggleGenerateMbTilesModal: boolean;
-  mobileFooterSelection: '' | 'projectInfo' | 'activities' | 'comment';
+  mobileFooterSelection: '' | 'projectInfo' | 'activities' | 'comment' | 'instructions' | 'infographics';
   projectDetailsLoading: boolean;
   projectDashboardDetail: projectDashboardDetailTypes | null;
   entityOsmMap: EntityOsmMap[];
