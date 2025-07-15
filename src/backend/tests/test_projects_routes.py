@@ -615,14 +615,12 @@ async def test_update_and_download_project_form(client, project):
 
 # NOTE we need odk_project and task_events fixture to populate data
 # NOTE we need odk_project and task_events fixture to populate data
-async def test_get_contributors(
-    client, project, odk_project, task_events, submissions, admin_user
-):
+async def test_get_contributors(client, project, odk_project, submission, admin_user):
     """Test fetching contributors of a project."""
     response = await client.get(f"projects/contributors/{project.id}")
     assert response.status_code == 200
     data = response.json()
-
+    print("dataaa", data)
     assert isinstance(data, list)
     assert len(data) > 0
     assert all(
@@ -630,6 +628,7 @@ async def test_get_contributors(
     )
 
     contributor = data[0]
+    print("contributor",contributor)
     assert contributor["user"] == admin_user.username
     assert contributor["submissions"] == 1
 
