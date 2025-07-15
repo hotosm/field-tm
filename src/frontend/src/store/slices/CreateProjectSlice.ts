@@ -45,11 +45,9 @@ export const initialState: CreateProjectStateTypes = {
   updateBoundaryLoading: false,
   validateCustomFormLoading: false,
   taskSplittingMethod: null,
-  dataExtractGeojson: null,
   createProjectValidations: {},
   isUnsavedChanges: false,
   isTasksSplit: { divide_on_square: false, task_splitting_algorithm: false },
-  isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
   isProjectDeletePending: false,
@@ -136,9 +134,6 @@ const CreateProject = createSlice({
     SetTaskSplittingMethod(state, action: PayloadAction<task_split_type>) {
       state.taskSplittingMethod = action.payload;
     },
-    setDataExtractGeojson(state, action) {
-      state.dataExtractGeojson = action.payload;
-    },
     SetIsTasksSplit(
       state,
       action: PayloadAction<{
@@ -150,9 +145,6 @@ const CreateProject = createSlice({
         ...state.isTasksSplit,
         [action.payload.key]: action.payload.value,
       };
-    },
-    SetFgbFetchingStatus(state, action: PayloadAction<boolean>) {
-      state.isFgbFetching = action.payload;
     },
     SetToggleSplittedGeojsonEdit(state, action: PayloadAction<boolean>) {
       state.toggleSplittedGeojsonEdit = action.payload;

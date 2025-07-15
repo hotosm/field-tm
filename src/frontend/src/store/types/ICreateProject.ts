@@ -24,10 +24,8 @@ export type CreateProjectStateTypes = {
   updateBoundaryLoading: boolean;
   validateCustomFormLoading: boolean;
   taskSplittingMethod: task_split_type | null;
-  dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
   isTasksSplit: Record<string, any>;
-  isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
   task_num_buildings: number | null;
