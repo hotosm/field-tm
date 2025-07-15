@@ -18,24 +18,17 @@
     ],
     "relations": []
   },
-  "tables": [
-    "ways_line"
-  ],
+  "tables": ["ways_line"],
   "where": {
     "nodes": [],
     "ways_poly": [],
     "ways_line": [
       {
-        "waterway": [
-          "not null"
-        ],
+        "waterway": ["not null"],
         "op": "or"
       }
     ],
     "relations": []
   },
-  "keep": [
-    "name",
-    "intermittent"
-  ]
+  "keep": ["name", "intermittent"]
 }

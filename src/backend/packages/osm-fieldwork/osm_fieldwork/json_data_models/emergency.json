@@ -13,36 +13,25 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {
-        "emergency": [
-          "not null"
-        ],
+        "emergency": ["not null"],
         "op": "or"
       },
       {
-        "fire_hydrant:type": [
-          "not null"
-        ],
+        "fire_hydrant:type": ["not null"],
         "op": "or"
       }
     ],
     "ways_poly": [
       {
-        "emergency": [
-          "not null"
-        ],
+        "emergency": ["not null"],
         "op": "or"
       },
       {
-        "fire_hydrant:type": [
-          "not null"
-        ],
+        "fire_hydrant:type": ["not null"],
         "op": "or"
       }
     ],

@@ -13,10 +13,7 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {
@@ -33,39 +30,27 @@
         "op": "or"
       },
       {
-        "waste": [
-          "not null"
-        ],
+        "waste": ["not null"],
         "op": "or"
       },
       {
-        "recycling_type": [
-          "not null"
-        ],
+        "recycling_type": ["not null"],
         "op": "or"
       },
       {
-        "recycling": [
-          "not null"
-        ],
+        "recycling": ["not null"],
         "op": "or"
       },
       {
-        "recycling:aluminum": [
-          "not null"
-        ],
+        "recycling:aluminum": ["not null"],
         "op": "or"
       },
       {
-        "recycling:glass": [
-          "not null"
-        ],
+        "recycling:glass": ["not null"],
         "op": "or"
       },
       {
-        "recycling:hazardous_waste": [
-          "not null"
-        ],
+        "recycling:hazardous_waste": ["not null"],
         "op": "or"
       }
     ],
@@ -84,39 +69,27 @@
         "op": "or"
       },
       {
-        "waste": [
-          "not null"
-        ],
+        "waste": ["not null"],
         "op": "or"
       },
       {
-        "recycling_type": [
-          "not null"
-        ],
+        "recycling_type": ["not null"],
         "op": "or"
       },
       {
-        "recycling": [
-          "not null"
-        ],
+        "recycling": ["not null"],
         "op": "or"
       },
       {
-        "recycling:aluminum": [
-          "not null"
-        ],
+        "recycling:aluminum": ["not null"],
         "op": "or"
       },
       {
-        "recycling:glass": [
-          "not null"
-        ],
+        "recycling:glass": ["not null"],
         "op": "or"
       },
       {
-        "recycling:hazardous_waste": [
-          "not null"
-        ],
+        "recycling:hazardous_waste": ["not null"],
         "op": "or"
       }
     ],
