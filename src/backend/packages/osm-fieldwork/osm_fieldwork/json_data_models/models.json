@@ -1,0 +1,1022 @@
+{
+  "amenity": [
+    "shelter",
+    "social_facility"
+  ],
+  "landuse": [
+    "allotments",
+    "aquaculture",
+    "basin",
+    "brownfield",
+    "cemetery",
+    "commercial",
+    "construction",
+    "depot",
+    "education",
+    "farmland",
+    "farmyard",
+    "forest",
+    "industrial",
+    "landfill",
+    "meadow",
+    "military",
+    "orchard",
+    "plant_nursery",
+    "quarry",
+    "recreation",
+    "reservoir",
+    "residential",
+    "retail",
+    "salt_pond",
+    "vineyard"
+  ],
+  "waste": [
+    "cigarettes",
+    "dog_excrement",
+    "drugs",
+    "oil",
+    "organic",
+    "rubble",
+    "trash"
+  ],
+  "fee": [
+    "yes, no"
+  ],
+  "management": [
+    "overflowing",
+    "recycling",
+    "waste_burning"
+  ],
+  "recycling_type": [
+    "container",
+    "centre"
+  ],
+  "recycling": [
+    "yes, no"
+  ],
+  "recycling:aluminum": [
+    "yes, no"
+  ],
+  "recycling:glass": [
+    "yes, no"
+  ],
+  "recycling:hazardous_waste": [
+    "yes, no"
+  ],
+  "waterway": [
+    "canal",
+    "dam",
+    "ditch",
+    "drain",
+    "river",
+    "riverbank",
+    "stream"
+  ],
+  "intermittent": [
+    "yes, no",
+    "True"
+  ],
+  "drain_type": [
+    "culvert",
+    "decommissioned",
+    "ditch",
+    "drain"
+  ],
+  "distance_from_road": [
+    "<integer>"
+  ],
+  "profile_open": [
+    "elliptical",
+    "open_retangular",
+    "tabulated",
+    "trapezoid",
+    "trapezoid_elliptical"
+  ],
+  "profile_closed": [
+    "round",
+    "boxed_rectangular",
+    "other"
+  ],
+  "multiple_channels": [
+    "yes, no"
+  ],
+  "number_channels": [
+    "<integer>"
+  ],
+  "covered": [
+    "yes, no",
+    "yes, no"
+  ],
+  "cover_type": [
+    "concrete",
+    "grating",
+    "other",
+    "wood"
+  ],
+  "depth": [
+    "<integer>"
+  ],
+  "width_boxed": [
+    "<integer>"
+  ],
+  "bottom_width": [
+    "<integer>"
+  ],
+  "top_width": [
+    "<integer>"
+  ],
+  "diameter": [
+    "<integer>",
+    "None"
+  ],
+  "elliptical_portion_depth": [
+    "<integer>"
+  ],
+  "width": [
+    "<integer>",
+    "(in meters of street width)"
+  ],
+  "material": [
+    "asphalt",
+    "concrete",
+    "other",
+    "plastic",
+    "rock",
+    "steel"
+  ],
+  "concrete_smoothness": [
+    "normal",
+    "rough",
+    "very rough"
+  ],
+  "steel_type": [
+    "corrugated",
+    "flat"
+  ],
+  "Image": [
+    "image"
+  ],
+  "indoor": [
+    "True"
+  ],
+  "outdoor": [
+    "True"
+  ],
+  "shop": [
+    "bakery",
+    "butcher",
+    "charity",
+    "convenience",
+    "department_store",
+    "farm",
+    "general",
+    "hardware",
+    "kiosk",
+    "laundry",
+    "mall",
+    "money lender",
+    "supermarket",
+    "True"
+  ],
+  "toilets:access": [
+    "customers",
+    "public",
+    "staff only",
+    "yes, no"
+  ],
+  "female": [
+    "yes, no"
+  ],
+  "male": [
+    "yes, no"
+  ],
+  "unisex": [
+    "yes, no"
+  ],
+  "toilets:handwashing": [
+    "yes, no"
+  ],
+  "operational_status": [
+    "closed",
+    "needs_maintenance",
+    "non_operational",
+    "operational",
+    "under_construction",
+    "unknown"
+  ],
+  "wheelchair": [
+    "yes, no",
+    "limited"
+  ],
+  "changing_table": [
+    "yes, no",
+    "limited",
+    "True"
+  ],
+  "toilets:position": [
+    "seated",
+    "squat",
+    "urinal"
+  ],
+  "toilets:disposal": [
+    "bucket",
+    "chemical",
+    "dry_toilet",
+    "flush",
+    "pitlatrine"
+  ],
+  "noname": [
+    "True"
+  ],
+  "operator:type": [
+    "combination",
+    "community",
+    "government",
+    "ngo",
+    "public",
+    "religious"
+  ],
+  "flood_prone": [
+    "yes, no"
+  ],
+  "toilets:num_chambers": [
+    "<integer>"
+  ],
+  "lit": [
+    "yes, no"
+  ],
+  "water_source": [
+    "groundwater",
+    "groundwater",
+    "lake",
+    "main",
+    "manual_pump",
+    "pond",
+    "powered_pump",
+    "powered_pump",
+    "rain",
+    "rain␣fed",
+    "river",
+    "stream",
+    "tap",
+    "tube_well",
+    "water_tank",
+    "water_works",
+    "water_works",
+    "well",
+    "well"
+  ],
+  "natural": [
+    "beach",
+    "creek",
+    "glacier",
+    "grassland",
+    "heath",
+    "reef",
+    "scrub",
+    "spring",
+    "stream",
+    "water",
+    "water",
+    "water",
+    "water",
+    "wetland",
+    "wood"
+  ],
+  "water": [
+    "basin",
+    "canal",
+    "ditch",
+    "drain",
+    "lagoon",
+    "lake",
+    "oxbow",
+    "pond",
+    "rapids",
+    "river",
+    "stream",
+    "stream_pool",
+    "wastewater"
+  ],
+  "man_made": [
+    "basin",
+    "borehole",
+    "clarifier",
+    "communications_tower",
+    "mast",
+    "monitoring_station",
+    "oxidation_ditch",
+    "pipeline",
+    "pipeline",
+    "protected_spring",
+    "pumping_station",
+    "pumping_station",
+    "reservoir_covered",
+    "reservoir_covered",
+    "storage_tank",
+    "tower",
+    "wastewater_plant",
+    "wastewater_plant",
+    "water_catchment",
+    "water_tank",
+    "water_tap",
+    "water_tower",
+    "water_well",
+    "water_works",
+    "wildlife_crossing",
+    "True"
+  ],
+  "pump": [
+    "manual",
+    "False",
+    "powered"
+  ],
+  "opening_hours": [
+    "<integers>"
+  ],
+  "drought_prone": [
+    "yes, no"
+  ],
+  "content": [
+    "drinking_water",
+    "sewage",
+    "wastewater",
+    "water"
+  ],
+  "capacity": [
+    "<integer>",
+    "boys",
+    "girls"
+  ],
+  "building": [
+    "Office",
+    "apartment",
+    "cabin",
+    "cathedral",
+    "chapel",
+    "church",
+    "commercial",
+    "construction",
+    "ger",
+    "hut",
+    "industrial",
+    "mosque",
+    "public",
+    "pumping_station",
+    "residential",
+    "roof",
+    "shed",
+    "shrine",
+    "static_caravan",
+    "temple",
+    "tent",
+    "warehouse",
+    "True"
+  ],
+  "elevation": [
+    "<integer>"
+  ],
+  "capacity:pump": [
+    "<integer>"
+  ],
+  "building:levels": [
+    "<integer>",
+    "<number>"
+  ],
+  "building:structure": [
+    "bamboo_frame",
+    "confined_masonry",
+    "steel_frame",
+    "wood_frame"
+  ],
+  "building:material": [
+    "bamboo",
+    "brick",
+    "cement_block",
+    "concrete",
+    "glass",
+    "metal/zinc",
+    "stone",
+    "wood"
+  ],
+  "floor:material": [
+    "ceramics",
+    "concrete",
+    "ground",
+    "tekhel",
+    "wood"
+  ],
+  "roof:material": [
+    "concrete",
+    "eternit",
+    "tile",
+    "tin"
+  ],
+  "access:roof": [
+    "yes, no"
+  ],
+  "backup_generator": [
+    "yes, no"
+  ],
+  "substance": [
+    "water"
+  ],
+  "location": [
+    "overground",
+    "surface",
+    "underground"
+  ],
+  "phone": [
+    "<phone number>"
+  ],
+  "grades": [
+    "<text >"
+  ],
+  "isced:level": [
+    "<text>"
+  ],
+  "school:gender": [
+    "female",
+    "male",
+    "mixed",
+    "other",
+    "separated"
+  ],
+  "religion": [
+    "<other>",
+    "baha’i",
+    "buddhist",
+    "christian",
+    "christianity",
+    "islam",
+    "muslim"
+  ],
+  "min_age": [
+    "<integer>"
+  ],
+  "temporary": [
+    "True"
+  ],
+  "toilets": [
+    "yes, no"
+  ],
+  "staff_count:teachers": [
+    "<integer>"
+  ],
+  "pedagogy": [
+    "freinet",
+    "hybrid",
+    "mainstream",
+    "montessori",
+    "outdoor",
+    "sudbury",
+    "user defined",
+    "waldorf"
+  ],
+  "generator:source": [
+    "biomass",
+    "coal",
+    "gas",
+    "oil"
+  ],
+  "water_supply": [
+    "borehole",
+    "pipeline",
+    "pump",
+    "water_well"
+  ],
+  "social_facility": [
+    "ambulatory_care",
+    "assisted_living",
+    "clothing_bank",
+    "community_centre",
+    "dairy_kitchen",
+    "day_care",
+    "distribution",
+    "food_bank",
+    "food_bank",
+    "group_home",
+    "nursing_home",
+    "outreach",
+    "outreach",
+    "reception_centre",
+    "reception_centre",
+    "shelter",
+    "soup_kitchen",
+    "soup_kitchen",
+    "transit_centre",
+    "transit_centre",
+    "workshop",
+    "workshop."
+  ],
+  "leisure": [
+    "garden",
+    "nature_preserve",
+    "nature_reserve",
+    "park",
+    "park",
+    "park",
+    "pitch",
+    "pitch",
+    "playground",
+    "sport_centre",
+    "stadium"
+  ],
+  "healthcare": [
+    "alternative",
+    "birthing_center",
+    "blood_donation",
+    "clinic",
+    "counselling",
+    "dialysis",
+    "hospice",
+    "laboratory",
+    "midwife",
+    "midwife",
+    "nurse",
+    "nutrition_counselling",
+    "optometrist",
+    "pediatrics",
+    "physiotherapist",
+    "psychotherapist",
+    "rehabilitation",
+    "sample_collection",
+    "speech_therapist",
+    "vaccination_centre"
+  ],
+  "healthcare:speciality": [
+    "abortion",
+    "biology",
+    "blood_check",
+    "clinical_pathology",
+    "diagnostic_radiology",
+    "fertility_clinic",
+    "medical_engineering",
+    "medical_physics",
+    "radiology"
+  ],
+  "contact:phone": [
+    "<integer>"
+  ],
+  "beds": [
+    "<integer>"
+  ],
+  "staff_count:doctors": [
+    "<integer>"
+  ],
+  "staff_count:nurses": [
+    "<integer>"
+  ],
+  "dispensing": [
+    "yes, no"
+  ],
+  "insurance:health": [
+    "False",
+    "private",
+    "public",
+    "unknown"
+  ],
+  "electricity": [
+    "generator",
+    "generator",
+    "grid",
+    "grid",
+    "None",
+    "None",
+    "other",
+    "other",
+    "solar"
+  ],
+  "emergency": [
+    "ambulance_station",
+    "assembly_point",
+    "defibrillator",
+    "drinking_water",
+    "dry_riser_inlet",
+    "fire_alarm_box",
+    "fire_equipment",
+    "fire_extinguisher",
+    "fire_hose",
+    "fire_hydrant",
+    "fire_lookout",
+    "fire_water_pond",
+    "first_aid_kit",
+    "landing_site",
+    "life_ring",
+    "lifeguard",
+    "mountain_rescue",
+    "phone",
+    "siren",
+    "suction_point",
+    "water_tank",
+    "fire_point_stand",
+    "sprinkler_connection",
+    "True"
+  ],
+  "lifeguard": [
+    "tower"
+  ],
+  "fire_hydrant:type": [
+    "pillar",
+    "pond",
+    "underground",
+    "wall"
+  ],
+  "assembly_point:fire": [
+    "yes, no"
+  ],
+  "office": [
+    "financial"
+  ],
+  "polling_station": [
+    "True"
+  ],
+  "amenity_vending_machine:vending": [
+    "feminine_hygiene"
+  ],
+  "hazard": [
+    "animal crossing",
+    "avalanche",
+    "children",
+    "contamination",
+    "falling rocks",
+    "frail pedestrians",
+    "frost heave",
+    "ice",
+    "landslide",
+    "washout"
+  ],
+  "capacity:disabled": [
+    "yes, no",
+    "number"
+  ],
+  "evacuation_center": [
+    "True"
+  ],
+  "social_facility:for": [
+    "abused",
+    "child",
+    "community",
+    "dementia",
+    "diseased",
+    "displaced",
+    "drug_addicted",
+    "homeless",
+    "juvenile",
+    "mental_health",
+    "migrant",
+    "orphan",
+    "overseas_fil_worker",
+    "refugees",
+    "refugees / Refugee",
+    "senior",
+    "terminally_ill",
+    "underprivileged",
+    "unemployed",
+    "veteran",
+    "victim",
+    "woman"
+  ],
+  "assembly_point:earthquake": [
+    "True"
+  ],
+  "assembly_point:flood": [
+    "True"
+  ],
+  "assembly_point:landslide": [
+    "True"
+  ],
+  "assembly_point:tornado": [
+    "True"
+  ],
+  "assembly_point:tsunami": [
+    "True"
+  ],
+  "highway": [
+    "bus_stop",
+    "busway",
+    "crossing",
+    "cycleway",
+    "emergency_access_point",
+    "footway",
+    "living_street",
+    "motorway",
+    "path",
+    "pedestrian",
+    "primary",
+    "residential",
+    "secondary",
+    "service",
+    "steps",
+    "street_lamp",
+    "tertiary",
+    "track",
+    "trunk",
+    "unclassified"
+  ],
+  "surface": [
+    "asphalt",
+    "cobblestone",
+    "compacted",
+    "concrete",
+    "dirt",
+    "gravel",
+    "paved",
+    "sand",
+    "unpaved"
+  ],
+  "smoothness": [
+    "bad",
+    "good",
+    "intermediate",
+    "very bad"
+  ],
+  "oneway": [
+    "yes, no"
+  ],
+  "layer": [
+    "<integer>",
+    "<number>"
+  ],
+  "elevation_from_road": [
+    "<integer>"
+  ],
+  "Bicycle": [
+    "True"
+  ],
+  "cycleway": [
+    "lane",
+    "track"
+  ],
+  "bicycle_road": [
+    "True"
+  ],
+  "footway": [
+    "sidewalk",
+    "crossing"
+  ],
+  "sac_scale": [
+    "t1-t5"
+  ],
+  "trail_visibility": [
+    "False",
+    "bad, Intermediate, good,  excellent"
+  ],
+  "sidewalk": [
+    "both",
+    "left",
+    "right",
+    "False"
+  ],
+  "railway": [
+    "crossing",
+    "funicular",
+    "light_rail",
+    "monorail",
+    "rail",
+    "signal",
+    "station",
+    "subway",
+    "subway_entrance",
+    "tram",
+    "tram_stop"
+  ],
+  "station": [
+    "subway"
+  ],
+  "bridge": [
+    "aqueduct",
+    "covered",
+    "low_water_crossing",
+    "movable",
+    "trestle",
+    "True"
+  ],
+  "bridge:material": [
+    "concrete",
+    "iron",
+    "masonry",
+    "steel",
+    "wood",
+    "mixed"
+  ],
+  "ford": [
+    "True"
+  ],
+  "bridge:structure": [
+    "arch",
+    "beam",
+    "cable-stayed",
+    "floating",
+    "humpback",
+    "simple-suspension",
+    "suspension",
+    "truss"
+  ],
+  "bridge:support": [
+    "lift_pier",
+    "pier, abutment",
+    "pivot_pier"
+  ],
+  "seasonal": [
+    "autumn",
+    "dry_season",
+    "spring",
+    "summer",
+    "wet_season",
+    "winter",
+    "True"
+  ],
+  "traffic_sign": [
+    "hazard"
+  ],
+  "bus_bay": [
+    "both",
+    "left",
+    "right"
+  ],
+  "public_transport": [
+    "platform",
+    "station",
+    "stop_position"
+  ],
+  "bus": [
+    "True"
+  ],
+  "route": [
+    "ferry"
+  ],
+  "aeroway": [
+    "aerodrome",
+    "airstrip",
+    "helipad",
+    "runway"
+  ],
+  "winter_road": [
+    "True"
+  ],
+  "tunnel": [
+    "True"
+  ],
+  "phone number": [
+    "<phone number>"
+  ],
+  "police": [
+    "barracks",
+    "car_pound",
+    "checkpoint",
+    "detention",
+    "naval_base"
+  ],
+  "military": [
+    "airfield",
+    "barracks",
+    "checkpoint",
+    "office",
+    "training_area"
+  ],
+  "government": [
+    "register_office"
+  ],
+  "studio": [
+    "audio",
+    "radio",
+    "television",
+    "video"
+  ],
+  "tower:type": [
+    "communication",
+    "lighting"
+  ],
+  "power": [
+    "generator",
+    "line",
+    "plant",
+    "substation",
+    "tower",
+    "transformer"
+  ],
+  "substation": [
+    "transmission"
+  ],
+  "generator:method": [
+    "combustion",
+    "stream",
+    "wind_turbine"
+  ],
+  "atm": [
+    "yes, no"
+  ],
+  "crop": [
+    "grass",
+    "wheat",
+    "cassava",
+    "coffee"
+  ],
+  "produce": [
+    "fish",
+    "live_animal"
+  ],
+  "animal": [
+    "buffalo",
+    "cattle",
+    "goat",
+    "horse",
+    "pig",
+    "sheep"
+  ],
+  "access": [
+    "True",
+    "permissive"
+  ],
+  "place": [
+    "<other>",
+    "city",
+    "hamlet",
+    "square",
+    "suburb",
+    "town",
+    "village"
+  ],
+  "population": [
+    "<number>"
+  ],
+  "building:flats": [
+    "<number>"
+  ],
+  "building:prefabricated": [
+    "yes, no"
+  ],
+  "destroyed:building": [
+    "True"
+  ],
+  "tourism": [
+    "Hostel",
+    "artwork",
+    "attraction",
+    "camp_site",
+    "caravan_site",
+    "gallery",
+    "guest_house",
+    "hotel",
+    "museum",
+    "True",
+    "zoo"
+  ],
+  "rooms": [
+    "number"
+  ],
+  "historic": [
+    "building",
+    "archaeological site",
+    "monument",
+    "<text, yes>"
+  ],
+  "ruins": [
+    "True"
+  ],
+  "artwork_type": [
+    "bust",
+    "graffiti",
+    "installation",
+    "mural",
+    "relief",
+    "sculpture",
+    "statue",
+    "stone",
+    "stone"
+  ],
+  "heritage": [
+    "<1-10>",
+    "True"
+  ],
+  "denomination": [
+    "protestant",
+    "catholic",
+    "orthodox",
+    "pentecostal",
+    "shia",
+    "sufi",
+    "sunni"
+  ],
+  "garden:type": [
+    "community",
+    "residential",
+    "roof_garden"
+  ],
+  "boundary": [
+    "protected_area"
+  ],
+  "protect_class": [
+    "<integer>"
+  ],
+  "wetland": [
+    "bog",
+    "fen",
+    "mangrove",
+    "marsh",
+    "swamp",
+    "tidal flat <other>",
+    "wet_meadow"
+  ]
+}
