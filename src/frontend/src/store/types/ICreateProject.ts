@@ -5,7 +5,7 @@ export type CreateProjectStateTypes = {
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
-  createDraftProjectLoading: boolean;
+  createDraftProjectLoading: { loading: boolean; continue: boolean };
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
@@ -29,7 +29,7 @@ export type CreateProjectStateTypes = {
   basicProjectDetails:
     | ({ id: number } & Pick<
         ProjectDetailsTypes,
-        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline'
+        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
       >)
     | null;
 };
