@@ -22,11 +22,7 @@ export type CreateProjectStateTypes = {
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
   updateBoundaryLoading: boolean;
-  drawnGeojson: DrawnGeojsonTypes | null;
-  drawToggle: boolean;
   validateCustomFormLoading: boolean;
-  uploadAreaSelection: 'upload_file' | 'draw' | null;
-  totalAreaSelection: string | null;
   taskSplittingMethod: task_split_type | null;
   dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};

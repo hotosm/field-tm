@@ -43,11 +43,7 @@ export const initialState: CreateProjectStateTypes = {
   taskSplittingGeojsonLoading: false,
   taskSplittingGeojson: null,
   updateBoundaryLoading: false,
-  drawnGeojson: null,
-  drawToggle: false,
   validateCustomFormLoading: false,
-  uploadAreaSelection: null,
-  totalAreaSelection: null,
   taskSplittingMethod: null,
   dataExtractGeojson: null,
   createProjectValidations: {},
@@ -76,35 +72,6 @@ const CreateProject = createSlice({
     PostProjectDetails(state, action) {
       state.projectDetailsResponse = action.payload;
     },
-    ClearCreateProjectFormData(state) {
-      // state.projectDetailsResponse = null
-      state.projectDetails = {
-        dimension: 10,
-        no_of_buildings: 5,
-        hashtags: [],
-        name: '',
-        short_description: '',
-        odk_central_url: '',
-        odk_central_user: '',
-        odk_central_password: '',
-        description: '',
-        organisation_id: null,
-        visibility: project_visibility.PUBLIC,
-        use_odk_collect: false,
-      };
-      state.totalAreaSelection = null;
-      state.taskSplittingMethod = null;
-      state.dataExtractGeojson = null;
-      state.taskSplittingGeojson = null;
-      state.drawnGeojson = null;
-      state.uploadAreaSelection = null;
-      state.dividedTaskGeojson = null;
-      state.dividedTaskLoading = false;
-      state.generateProjectSuccess = false;
-      state.generateProjectWarning = null;
-      state.generateProjectError = false;
-      state.drawToggle = false;
-    },
     GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
       state.formCategoryLoading = action.payload;
     },
@@ -132,9 +99,6 @@ const CreateProject = createSlice({
     SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['dividedTaskGeojson']>) {
       state.dividedTaskGeojson = action.payload;
       state.splitGeojsonBySquares = action.payload;
-    },
-    SetDrawnGeojson(state, action) {
-      state.drawnGeojson = action.payload;
     },
     SetDividedTaskFromGeojsonLoading(state, action: PayloadAction<boolean>) {
       state.dividedTaskLoading = action.payload;
@@ -166,17 +130,8 @@ const CreateProject = createSlice({
     SetEditProjectBoundaryServiceLoading(state, action: PayloadAction<boolean>) {
       state.updateBoundaryLoading = action.payload;
     },
-    SetDrawToggle(state, action: PayloadAction<boolean>) {
-      state.drawToggle = action.payload;
-    },
     ValidateCustomFormLoading(state, action: PayloadAction<boolean>) {
       state.validateCustomFormLoading = action.payload;
-    },
-    SetUploadAreaSelection(state, action: PayloadAction<'upload_file' | 'draw'>) {
-      state.uploadAreaSelection = action.payload;
-    },
-    SetTotalAreaSelection(state, action: PayloadAction<string | null>) {
-      state.totalAreaSelection = action.payload;
     },
     SetTaskSplittingMethod(state, action: PayloadAction<task_split_type>) {
       state.taskSplittingMethod = action.payload;
@@ -198,12 +153,6 @@ const CreateProject = createSlice({
     },
     SetFgbFetchingStatus(state, action: PayloadAction<boolean>) {
       state.isFgbFetching = action.payload;
-    },
-    ClearProjectStepState(state, action) {
-      state.dividedTaskGeojson = null;
-      state.taskSplittingMethod = null;
-      state.dataExtractGeojson = null;
-      state.projectDetails = { ...action.payload, customLineUpload: null, customPolygonUpload: null };
     },
     SetToggleSplittedGeojsonEdit(state, action: PayloadAction<boolean>) {
       state.toggleSplittedGeojsonEdit = action.payload;
