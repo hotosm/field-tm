@@ -198,8 +198,7 @@ def merge_dataframes(
                     add_label_translations({
                         "type": ["begin group"],
                         "name": ["survey_questions"],
-                        # Status 3 means collecting new feature
-                        "relevant": "(${feature_exists} = 'yes') or (${status} != '3')",
+                        "relevant": "(${feature_exists} = 'yes')",
                     })
                 )
             ),
@@ -338,7 +337,8 @@ async def append_field_mapping_fields(
     output.seek(0)
     return (xform_id, output)
 
-
+# webform ma new feature ko lagi does feature exist sodhiraxa
+# odk collect ma new feature ko lagi question skip vairaxa
 def _get_form_components(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
