@@ -77,8 +77,8 @@ const MobileFooter = () => {
       >
         <div
           className={`fmtm-w-full fmtm-flex fmtm-justify-center fmtm-py-1 fmtm-rounded-3xl fmtm-mb-1 fmtm-duration-300 ${
-            mobileFooterSelection === item?.id
-              ? 'fmtm-bg-red-100' && mobileFooterSelection !== 'infographics'
+            mobileFooterSelection === item?.id && mobileFooterSelection !== 'infographics'
+              ? 'fmtm-bg-red-100'
               : 'group-hover:fmtm-bg-gray-200'
           }`}
         >
