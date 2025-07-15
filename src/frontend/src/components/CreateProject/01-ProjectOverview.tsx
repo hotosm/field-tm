@@ -22,10 +22,11 @@ import Button from '@/components/common/Button';
 import RadioButton from '@/components/common/RadioButton';
 import UploadAreaComponent from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import isEmpty from '@/utilfunctions/isEmpty';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-const BasicDetails = () => {
+const ProjectOverview = () => {
   const dispatch = useAppDispatch();
   const isAdmin = useIsAdmin();
 
@@ -42,6 +43,13 @@ const BasicDetails = () => {
   }));
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
 
+  const organisationList = organisationListData.map((org) => ({
+    id: org.id,
+    label: org.name,
+    value: org.id,
+    hasODKCredentials: !!org?.odk_central_url,
+  }));
+
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
   const { errors } = formState;
@@ -57,6 +65,14 @@ const BasicDetails = () => {
       }),
     );
   }, [userSearchText]);
+
+  useEffect(() => {
+    if (!authDetails || isEmpty(organisationList) || isAdmin || authDetails?.orgs_managed?.length > 1 || !!values.id)
+      return;
+
+    setValue('organisation_id', authDetails?.orgs_managed[0]);
+    handleOrganizationChange(authDetails?.orgs_managed[0]);
+  }, [authDetails, organisationListData]);
 
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
@@ -99,13 +115,6 @@ const BasicDetails = () => {
     if (values.customDataExtractFile) setValue('customDataExtractFile', null);
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
   };
-
-  const organisationList = organisationListData.map((org) => ({
-    id: org.id,
-    label: org.name,
-    value: org.id,
-    hasODKCredentials: !!org?.odk_central_url,
-  }));
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
@@ -191,40 +200,58 @@ const BasicDetails = () => {
         </>
       )}
 
-      {!values.id && (
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Assign Project Admin" astric />
-          <Controller
-            control={control}
-            name="project_admins"
-            render={({ field }) => (
-              <Select2
-                options={userList || []}
-                value={field.value}
-                onChange={(value: any) => field.onChange(value)}
-                placeholder="Search for Field-TM users"
-                multiple
-                checkBox
-                isLoading={userListLoading}
-                handleApiSearch={(value) => {
-                  if (value) {
-                    setUserSearchText(value);
-                  } else {
-                    dispatch(UserActions.SetUserListForSelect([]));
-                  }
-                }}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.project_admins?.message && <ErrorMessage message={errors.project_admins.message as string} />}
-        </div>
-      )}
+      <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+        <FieldLabel label="Assign Project Admin" />
+        <Controller
+          control={control}
+          name="project_admins"
+          render={({ field }) => (
+            <Select2
+              options={userList || []}
+              value={field.value}
+              onChange={(value: any) => field.onChange(value)}
+              placeholder="Search for Field-TM users"
+              multiple
+              checkBox
+              isLoading={userListLoading}
+              handleApiSearch={(value) => {
+                if (value) {
+                  setUserSearchText(value);
+                } else {
+                  dispatch(UserActions.SetUserListForSelect([]));
+                }
+              }}
+              ref={field.ref}
+            />
+          )}
+        />
+        {errors?.project_admins?.message && <ErrorMessage message={errors.project_admins.message as string} />}
+      </div>
 
       {!values.id && (
         <>
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="Project Area" astric />
+            <FieldLabel
+              label="Project Area"
+              astric
+              tooltipMessage={
+                <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+                  <div>
+                    <p>Draw:</p>
+                    <p>You can draw a freehand polygon on map interface.</p>{' '}
+                    <p>Click on the reset button to redraw the AOI.</p>
+                  </div>
+                  <div>
+                    <p>Upload:</p>
+                    <p>You may also choose to upload the AOI. Note: The file upload only supports .geojson format. </p>
+                  </div>
+                  <p>The total area of the AOI is also calculated and displayed on the screen.</p>
+                  <p>
+                    <b>Note:</b> The uploaded geojson should be in EPSG:4326 coordinate system.
+                  </p>
+                </div>
+              }
+            />
             <Controller
               control={control}
               name="uploadAreaSelection"
@@ -283,4 +310,4 @@ const BasicDetails = () => {
   );
 };
 
-export default BasicDetails;
+export default ProjectOverview;

@@ -25,7 +25,7 @@ export const initialState: CreateProjectStateTypes = {
     includeCentroid: false,
   },
   projectDetailsResponse: null,
-  createDraftProjectLoading: false,
+  createDraftProjectLoading: { loading: false, continue: false },
   createProjectLoading: false,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
@@ -53,7 +53,7 @@ const CreateProject = createSlice({
   name: 'createproject',
   initialState: initialState,
   reducers: {
-    CreateDraftProjectLoading(state, action: PayloadAction<boolean>) {
+    CreateDraftProjectLoading(state, action: PayloadAction<CreateProjectStateTypes['createDraftProjectLoading']>) {
       state.createDraftProjectLoading = action.payload;
     },
     CreateProjectLoading(state, action: PayloadAction<boolean>) {
@@ -121,7 +121,7 @@ const CreateProject = createSlice({
       action: PayloadAction<
         | ({ id: number } & Pick<
             ProjectDetailsTypes,
-            'name' | 'short_description' | 'description' | 'organisation_id' | 'outline'
+            'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
           >)
         | null
       >,

@@ -40,7 +40,7 @@ const MapData = () => {
       name: 'data_extract',
       value: data_extract_type.OSM,
       label: 'Fetch data from OSM',
-      disabled: values.primaryGeomType === 'POLYLINE',
+      disabled: values.primary_geom_type === 'POLYLINE',
     },
     { name: 'data_extract', value: data_extract_type.CUSTOM, label: 'Upload custom map data' },
     { name: 'data_extract', value: data_extract_type.NONE, label: 'No existing data' },
@@ -96,7 +96,7 @@ const MapData = () => {
   ) => {
     const isGeojsonValid = valid(extractFeatCol, true);
     if (isGeojsonValid?.length === 0 && extractFeatCol) {
-      setValue('dataExtractGeojson', { ...extractFeatCol, id: values.primaryGeomType });
+      setValue('dataExtractGeojson', { ...extractFeatCol, id: values.primary_geom_type });
     } else {
       resetMapDataFile();
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -121,9 +121,9 @@ const MapData = () => {
     const projectAoiGeojsonFile = getFileFromGeojson(values.outline);
 
     dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
-    dataExtractRequestFormData.append('osm_category', values.formExampleSelection);
-    dataExtractRequestFormData.append('geom_type', values.primaryGeomType as GeoGeomTypesEnum);
-    if (values.primaryGeomType == GeoGeomTypesEnum.POINT)
+    dataExtractRequestFormData.append('osm_category', values.osm_category);
+    dataExtractRequestFormData.append('geom_type', values.primary_geom_type as GeoGeomTypesEnum);
+    if (values.primary_geom_type == GeoGeomTypesEnum.POINT)
       dataExtractRequestFormData.append('centroid', values.includeCentroid ? 'true' : 'false');
 
     setFetchingOSMData(true);
@@ -138,7 +138,7 @@ const MapData = () => {
       const geojsonExtractFile = await fetch(dataExtractGeojsonUrl);
       const geojsonExtract = await geojsonExtractFile.json();
       if ((geojsonExtract && (geojsonExtract as dataExtractGeojsonType))?.features?.length > 0) {
-        setValue('dataExtractGeojson', { ...geojsonExtract, id: values.primaryGeomType });
+        setValue('dataExtractGeojson', { ...geojsonExtract, id: values.primary_geom_type });
       } else {
         dispatch(
           CommonActions.SetSnackBar({
@@ -167,7 +167,7 @@ const MapData = () => {
         <FieldLabel label="What type of geometry do you wish to map?" astric />
         <Controller
           control={control}
-          name="primaryGeomType"
+          name="primary_geom_type"
           render={({ field }) => (
             <RadioButton
               value={field.value || ''}
@@ -180,10 +180,10 @@ const MapData = () => {
             />
           )}
         />
-        {errors?.primaryGeomType?.message && <ErrorMessage message={errors.primaryGeomType.message as string} />}
+        {errors?.primary_geom_type?.message && <ErrorMessage message={errors.primary_geom_type.message as string} />}
       </div>
 
-      {values.primaryGeomType === GeoGeomTypesEnum.POINT && (
+      {values.primary_geom_type === GeoGeomTypesEnum.POINT && (
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
           <FieldLabel label="Include polygon centroids" />
           <Controller
@@ -207,7 +207,7 @@ const MapData = () => {
               checked={field.value}
               onCheckedChange={(value) => {
                 field.onChange(value);
-                setValue('newGeomType', null);
+                setValue('new_geom_type', null);
               }}
               className=""
             />
@@ -220,7 +220,7 @@ const MapData = () => {
           <FieldLabel label="New geometries collected should be of type" astric />
           <Controller
             control={control}
-            name="newGeomType"
+            name="new_geom_type"
             render={({ field }) => (
               <RadioButton
                 value={field.value || ''}
@@ -230,13 +230,28 @@ const MapData = () => {
               />
             )}
           />
-          {errors?.newGeomType?.message && <ErrorMessage message={errors.newGeomType.message as string} />}
+          {errors?.new_geom_type?.message && <ErrorMessage message={errors.new_geom_type.message as string} />}
         </div>
       )}
 
-      {values.primaryGeomType && (
+      {values.primary_geom_type && (
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Upload your own map data or use OSM" astric />
+          <FieldLabel
+            label="Upload your own map data or use OSM"
+            astric
+            tooltipMessage={
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+                <p>You may either choose to use OSM data, or upload your own data for the mapping project.</p>
+                <div>
+                  <p>The relevant map data that exist on OSM are imported based on the select map area.</p>
+                  <p>
+                    You can use these map data to use the &apos;select from map&apos; functionality from ODK that allows
+                    you to select the feature to collect data for.
+                  </p>
+                </div>
+              </div>
+            }
+          />
           <Controller
             control={control}
             name="dataExtractType"
