@@ -38,17 +38,13 @@ export const initialState: CreateProjectStateTypes = {
   organisationList: [],
   organisationListLoading: false,
   dividedTaskLoading: false,
-  dividedTaskGeojson: null,
   formUpdateLoading: false,
   taskSplittingGeojsonLoading: false,
   taskSplittingGeojson: null,
   updateBoundaryLoading: false,
   validateCustomFormLoading: false,
-  taskSplittingMethod: null,
   createProjectValidations: {},
   isUnsavedChanges: false,
-  isTasksSplit: { divide_on_square: false, task_splitting_algorithm: false },
-  toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
   isProjectDeletePending: false,
   splitGeojsonBySquares: null,
@@ -94,10 +90,6 @@ const CreateProject = createSlice({
     GetOrganisationListLoading(state, action: PayloadAction<boolean>) {
       state.organisationListLoading = action.payload;
     },
-    SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['dividedTaskGeojson']>) {
-      state.dividedTaskGeojson = action.payload;
-      state.splitGeojsonBySquares = action.payload;
-    },
     SetDividedTaskFromGeojsonLoading(state, action: PayloadAction<boolean>) {
       state.dividedTaskLoading = action.payload;
     },
@@ -121,8 +113,7 @@ const CreateProject = createSlice({
     GetTaskSplittingPreviewLoading(state, action: PayloadAction<boolean>) {
       state.taskSplittingGeojsonLoading = action.payload;
     },
-    GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['dividedTaskGeojson']>) {
-      state.dividedTaskGeojson = action.payload;
+    GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonByAlgorithm']>) {
       state.splitGeojsonByAlgorithm = action.payload;
     },
     SetEditProjectBoundaryServiceLoading(state, action: PayloadAction<boolean>) {
@@ -130,24 +121,6 @@ const CreateProject = createSlice({
     },
     ValidateCustomFormLoading(state, action: PayloadAction<boolean>) {
       state.validateCustomFormLoading = action.payload;
-    },
-    SetTaskSplittingMethod(state, action: PayloadAction<task_split_type>) {
-      state.taskSplittingMethod = action.payload;
-    },
-    SetIsTasksSplit(
-      state,
-      action: PayloadAction<{
-        key: 'divide_on_square' | 'task_splitting_algorithm';
-        value: boolean;
-      }>,
-    ) {
-      state.isTasksSplit = {
-        ...state.isTasksSplit,
-        [action.payload.key]: action.payload.value,
-      };
-    },
-    SetToggleSplittedGeojsonEdit(state, action: PayloadAction<boolean>) {
-      state.toggleSplittedGeojsonEdit = action.payload;
     },
     SetCustomFileValidity(state, action: PayloadAction<boolean>) {
       state.customFileValidity = action.payload;

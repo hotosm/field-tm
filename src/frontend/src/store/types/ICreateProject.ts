@@ -1,4 +1,4 @@
-import { task_split_type, MapGeomTypes, project_visibility, project_status } from '@/types/enums';
+import { MapGeomTypes, project_visibility, project_status } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -18,15 +18,11 @@ export type CreateProjectStateTypes = {
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
   dividedTaskLoading: boolean;
-  dividedTaskGeojson: null | splittedGeojsonType;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
   updateBoundaryLoading: boolean;
   validateCustomFormLoading: boolean;
-  taskSplittingMethod: task_split_type | null;
   createProjectValidations: {};
-  isTasksSplit: Record<string, any>;
-  toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
