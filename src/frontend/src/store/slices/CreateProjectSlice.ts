@@ -31,17 +31,13 @@ export const initialState: CreateProjectStateTypes = {
   editProjectDetailsLoading: false,
   formExampleList: [],
   formCategoryLoading: false,
-  generateProjectLoading: false,
-  generateProjectSuccess: false,
-  generateProjectWarning: null,
-  generateProjectError: false,
+  GenerateProjectFilesLoading: false,
   organisationList: [],
   organisationListLoading: false,
   dividedTaskLoading: false,
   formUpdateLoading: false,
   taskSplittingGeojsonLoading: false,
   taskSplittingGeojson: null,
-  updateBoundaryLoading: false,
   validateCustomFormLoading: false,
   createProjectValidations: {},
   isUnsavedChanges: false,
@@ -72,17 +68,8 @@ const CreateProject = createSlice({
     GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formExampleList']>) {
       state.formExampleList = action.payload;
     },
-    GenerateProjectLoading(state, action: PayloadAction<boolean>) {
-      state.generateProjectLoading = action.payload;
-    },
-    GenerateProjectSuccess(state, action: PayloadAction<boolean>) {
-      state.generateProjectSuccess = action.payload;
-    },
-    GenerateProjectWarning(state, action: PayloadAction<string>) {
-      state.generateProjectWarning = action.payload;
-    },
-    GenerateProjectError(state, action: PayloadAction<boolean>) {
-      state.generateProjectError = action.payload;
+    GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
+      state.GenerateProjectFilesLoading = action.payload;
     },
     GetOrganisationList(state, action: PayloadAction<CreateProjectStateTypes['organisationList']>) {
       state.organisationList = action.payload;
@@ -90,11 +77,12 @@ const CreateProject = createSlice({
     GetOrganisationListLoading(state, action: PayloadAction<boolean>) {
       state.organisationListLoading = action.payload;
     },
+    SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonBySquares']>) {
+      state.splitGeojsonBySquares = action.payload;
+    },
     SetDividedTaskFromGeojsonLoading(state, action: PayloadAction<boolean>) {
       state.dividedTaskLoading = action.payload;
     },
-    //EDIT Project
-
     SetIndividualProjectDetails(state, action) {
       state.editProjectDetails = action.payload;
     },
@@ -115,9 +103,6 @@ const CreateProject = createSlice({
     },
     GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonByAlgorithm']>) {
       state.splitGeojsonByAlgorithm = action.payload;
-    },
-    SetEditProjectBoundaryServiceLoading(state, action: PayloadAction<boolean>) {
-      state.updateBoundaryLoading = action.payload;
     },
     ValidateCustomFormLoading(state, action: PayloadAction<boolean>) {
       state.validateCustomFormLoading = action.payload;

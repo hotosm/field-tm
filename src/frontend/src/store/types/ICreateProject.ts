@@ -11,16 +11,12 @@ export type CreateProjectStateTypes = {
   editProjectDetailsLoading: boolean;
   formExampleList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
-  generateProjectLoading: boolean;
-  generateProjectSuccess: boolean;
-  generateProjectWarning: string | null;
-  generateProjectError: boolean;
+  GenerateProjectFilesLoading: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
   dividedTaskLoading: boolean;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  updateBoundaryLoading: boolean;
   validateCustomFormLoading: boolean;
   createProjectValidations: {};
   customFileValidity: boolean;
