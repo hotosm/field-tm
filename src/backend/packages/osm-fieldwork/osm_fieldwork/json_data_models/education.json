@@ -73,10 +73,7 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {

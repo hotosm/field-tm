@@ -61,30 +61,17 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {
-        "tourism": [
-          [
-            "camp_site",
-            "camp_pitch"
-          ]
-        ],
+        "tourism": [["camp_site", "camp_pitch"]],
         "op": "or"
       }
     ],
     "ways_poly": [
       {
-        "tourism": [
-          [
-            "camp_site",
-            "camp_pitch"
-          ]
-        ],
+        "tourism": [["camp_site", "camp_pitch"]],
         "op": "or"
       }
     ],

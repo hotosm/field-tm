@@ -115,48 +115,33 @@
     "ways_line": [],
     "relations": []
   },
-  "tables": [
-    "ways_poly",
-    "nodes"
-  ],
+  "tables": ["ways_poly", "nodes"],
   "where": {
     "nodes": [
       {
-        "healthcare": [
-          "not null"
-        ],
+        "healthcare": ["not null"],
         "op": "or"
       },
       {
-        "social_facility": [
-          "not null"
-        ],
+        "social_facility": ["not null"],
         "op": "or"
       },
       {
-        "healthcare:speciality": [
-          "not null"
-        ],
+        "healthcare:speciality": ["not null"],
         "op": "or"
       }
     ],
     "ways_poly": [
       {
-        "healthcare": [
-          "not null"
-        ],
+        "healthcare": ["not null"],
         "op": "or"
       },
       {
-        "social_facility": [
-          "not null"
-        ],
+        "social_facility": ["not null"],
         "op": "or"
       },
       {
-        "healthcare:speciality": [
-          "not null"
-        ],
+        "healthcare:speciality": ["not null"],
         "op": "or"
       }
     ],
