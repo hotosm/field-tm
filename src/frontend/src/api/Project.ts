@@ -320,24 +320,6 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
   };
 };
 
-export const GetGeometryLog = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    const getProjectActivity = async (url: string) => {
-      try {
-        dispatch(ProjectActions.SetGeometryLogLoading(true));
-        const response: AxiosResponse<geometryLogResponseType[]> = await axios.get(url);
-        dispatch(ProjectActions.SetGeometryLog(response.data));
-      } catch (error) {
-        // error means no geometry log present for the project
-        dispatch(ProjectActions.SetGeometryLog([]));
-      } finally {
-        dispatch(ProjectActions.SetGeometryLogLoading(false));
-      }
-    };
-    await getProjectActivity(url);
-  };
-};
-
 export const DeleteEntity = (url: string, project_id: number, entity_id: string) => {
   return async (dispatch: AppDispatch) => {
     const deleteEntity = async () => {
