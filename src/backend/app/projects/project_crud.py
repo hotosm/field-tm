@@ -167,7 +167,7 @@ async def generate_data_extract(
         geometryType=[geom_type],
         bindZip=False,
         centroid=centroid,
-        use_st_within=False if geom_type == "line" else True,
+        use_st_within=(False if geom_type == "line" else True),
         filters=config_json,
     )
 
