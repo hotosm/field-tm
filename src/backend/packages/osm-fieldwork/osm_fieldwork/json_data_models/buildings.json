@@ -1,0 +1,97 @@
+{
+    "select": {
+        "nodes": [],
+        "ways_poly": [
+            {
+                "osm_id": "id"
+            },
+            {
+                "version": []
+            },
+            {
+                "building": []
+            },
+            {
+                "building:levels": []
+            },
+            {
+                "building:material": []
+            },
+            {
+                "roof:material": []
+            },
+            {
+                "roof:shape": []
+            },
+            {
+                "roof:levels": []
+            },
+            {
+                "cuisine": []
+            },
+            {
+                "amenity": []
+            },
+            {
+                "convenience": []
+            },
+            {
+                "diesel": []
+            },
+            {
+                "version": []
+            },
+            {
+                "name": []
+            },
+            {
+                "name:en": []
+            }
+        ],
+        "ways_line": [],
+        "relations": []
+    },
+    "tables": [
+        "ways_poly"
+    ],
+    "where": {
+        "nodes": [],
+        "ways_poly": [
+            {
+                "building": [
+                    "not null"
+                ],
+                "op": "or"
+            },
+            {
+                "amenity": [
+                    "not null"
+                ],
+                "op": "or"
+            },
+            {
+                "tourism": [
+                    "not null"
+                ],
+                "op": "or"
+            }
+        ],
+        "ways_line": [],
+        "relations": []
+    },
+    "keep": [
+        "building",
+        "building:levels",
+        "building:material",
+        "roof:material",
+        "roof:shape",
+        "roof:levels",
+        "cuisine",
+        "amenity",
+        "convenience",
+        "diesel",
+        "version",
+        "name",
+        "name:en"
+    ]
+}

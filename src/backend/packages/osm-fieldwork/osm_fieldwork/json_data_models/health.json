@@ -1,0 +1,185 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      },
+      {
+        "healthcare:type": []
+      },
+      {
+        "healthcare": []
+      },
+      {
+        "wheelchair": []
+      },
+      {
+        "toilets:wheelchair": []
+      },
+      {
+        "building:ownership": []
+      },
+      {
+        "building:roof_type": []
+      },
+      {
+        "email": []
+      },
+      {
+        "healthcare:speciality": []
+      },
+      {
+        "roof:material": []
+      },
+      {
+        "phone": []
+      },
+      {
+        "facility:ventilator": []
+      },
+      {
+        "facility:icu": []
+      },
+      {
+        "facility:operating_theatre": []
+      },
+      {
+        "facility:x-ray": []
+      },
+      {
+        "addr:city": []
+      },
+      {
+        "building:level": []
+      },
+      {
+        "pharmacy": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      },
+      {
+        "healthcare:type": []
+      },
+      {
+        "healthcare": []
+      },
+      {
+        "wheelchair": []
+      },
+      {
+        "toilets:wheelchair": []
+      },
+      {
+        "building:ownership": []
+      },
+      {
+        "building:roof_type": []
+      },
+      {
+        "email": []
+      },
+      {
+        "healthcare:speciality": []
+      },
+      {
+        "roof:material": []
+      },
+      {
+        "phone": []
+      },
+      {
+        "facility:ventilator": []
+      },
+      {
+        "facility:icu": []
+      },
+      {
+        "facility:operating_theatre": []
+      },
+      {
+        "facility:x-ray": []
+      },
+      {
+        "addr:city": []
+      },
+      {
+        "building:level": []
+      },
+      {
+        "pharmacy": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": [
+    "ways_poly",
+    "nodes"
+  ],
+  "where": {
+    "nodes": [
+      {
+        "healthcare": [
+          "not null"
+        ],
+        "op": "or"
+      },
+      {
+        "social_facility": [
+          "not null"
+        ],
+        "op": "or"
+      },
+      {
+        "healthcare:speciality": [
+          "not null"
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "healthcare": [
+          "not null"
+        ],
+        "op": "or"
+      },
+      {
+        "social_facility": [
+          "not null"
+        ],
+        "op": "or"
+      },
+      {
+        "healthcare:speciality": [
+          "not null"
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": [
+    "healthcare:type",
+    "healthcare",
+    "wheelchair",
+    "toilets:wheelchair",
+    "building:ownership",
+    "building:roof_type",
+    "email",
+    "healthcare:speciality",
+    "roof:material",
+    "phone",
+    "facility:ventilator",
+    "facility:icu",
+    "facility:operating_theatre",
+    "facility:x-ray",
+    "addr:city",
+    "building:level",
+    "pharmacy"
+  ]
+}

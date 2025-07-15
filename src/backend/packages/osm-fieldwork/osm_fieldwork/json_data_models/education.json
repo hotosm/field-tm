@@ -1,0 +1,126 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      },
+      {
+        "wheelchar": []
+      },
+      {
+        "religion": []
+      },
+      {
+        "toilets:wheelchair": []
+      },
+      {
+        "place_of_worship": []
+      },
+      {
+        "building:levels": []
+      },
+      {
+        "roof:material": []
+      },
+      {
+        "building:condition": []
+      },
+      {
+        "building:lateral:system": []
+      },
+      {
+        "building:lateral:material": []
+      },
+      {
+        "building:levels:underground": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      },
+      {
+        "wheelchar": []
+      },
+      {
+        "religion": []
+      },
+      {
+        "toilets:wheelchair": []
+      },
+      {
+        "place_of_worship": []
+      },
+      {
+        "building:levels": []
+      },
+      {
+        "roof:material": []
+      },
+      {
+        "building:condition": []
+      },
+      {
+        "building:lateral:system": []
+      },
+      {
+        "building:lateral:material": []
+      },
+      {
+        "building:levels:underground": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": [
+    "ways_poly",
+    "nodes"
+  ],
+  "where": {
+    "nodes": [
+      {
+        "amenity": [
+          [
+            "college",
+            "indergarten",
+            "school",
+            "music_school",
+            "language_school",
+            "university"
+          ]
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "amenity": [
+          [
+            "college",
+            "indergarten",
+            "school",
+            "music_school",
+            "language_school",
+            "university"
+          ]
+        ],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": [
+    "wheelchar",
+    "religion",
+    "toilets:wheelchair",
+    "place_of_worship",
+    "building:levels",
+    "roof:material",
+    "building:condition",
+    "building:lateral:system",
+    "building:lateral:material",
+    "building:levels:underground"
+  ]
+}
