@@ -1,5 +1,5 @@
 import { CreateProjectStateTypes, ProjectDetailsTypes } from '@/store/types/ICreateProject';
-import { project_visibility, task_split_type } from '@/types/enums';
+import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
