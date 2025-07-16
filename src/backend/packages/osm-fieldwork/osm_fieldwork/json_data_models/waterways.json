@@ -1,0 +1,34 @@
+{
+  "select": {
+    "nodes": [],
+    "ways_poly": [],
+    "ways_line": [
+      {
+        "osm_id": "id"
+      },
+      {
+        "version": []
+      },
+      {
+        "name": []
+      },
+      {
+        "intermittent": []
+      }
+    ],
+    "relations": []
+  },
+  "tables": ["ways_line"],
+  "where": {
+    "nodes": [],
+    "ways_poly": [],
+    "ways_line": [
+      {
+        "waterway": ["not null"],
+        "op": "or"
+      }
+    ],
+    "relations": []
+  },
+  "keep": ["name", "intermittent"]
+}
