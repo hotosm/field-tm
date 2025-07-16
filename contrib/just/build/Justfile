@@ -23,6 +23,13 @@ all: backend frontend
 # Build backend container
 [no-cd]
 backend:
+  # Consider caching
+  # cache_to:
+  #   - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+  #   - type=gha
+  # cache_from:
+  #   - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+  #   - type=gha
   COMPOSE_BAKE=true docker compose build api
 
 # Build backend development server container
