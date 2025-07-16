@@ -1,0 +1,29 @@
+{
+  "select": {
+    "nodes": [],
+    "ways_poly": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": ["ways_poly"],
+  "where": {
+    "nodes": [],
+    "ways_poly": [
+      {
+        "amenity": [["grave_yard"]],
+        "op": "or"
+      },
+      {
+        "landuse": [["cemetery"]],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": []
+}

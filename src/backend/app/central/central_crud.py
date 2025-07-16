@@ -764,7 +764,6 @@ async def get_entities_data(
             filters.append(f"__system/updatedAt gt {filter_date}")
         if filters:
             url_params += f"&$filter={' and '.join(filters)}"
-
         async with central_deps.get_odk_dataset(odk_creds) as odk_central:
             entities = await odk_central.getEntityData(
                 odk_id,

@@ -24,7 +24,6 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-import yaml
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -42,7 +41,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path, get_choices
+from osm_fieldwork.json_data_models import data_models_path, get_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -549,36 +548,35 @@ async def get_data_extract(
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
-    extract_config = None
     if osm_category:
         config_filename = XLSFormType(osm_category).name
-        data_model = f"{data_models_path}/{config_filename}.yaml"
+        data_model = f"{data_models_path}/{config_filename}.json"
 
-        with open(data_model) as f:
-            config = yaml.safe_load(f)
+        with open(data_model, encoding="utf-8") as f:
+            config_data = json.load(f)
 
         data_config = {
             ("polygon", False): ["ways_poly"],
             ("point", True): ["ways_poly", "nodes"],
             ("point", False): ["nodes"],
-            ("linestring", False): ["ways_line"],
+            ("polyline", False): ["ways_line"],
         }
 
-        config["from"] = data_config.get((geom_type, centroid))
-        # Serialize to YAML string
-        yaml_str = yaml.safe_dump(config, sort_keys=False)
+        config_data["from"] = data_config.get((geom_type, centroid))
+        if geom_type == "polyline":
+            geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
-        # Encode to bytes and wrap in BytesIO
-        extract_config = BytesIO(yaml_str.encode("utf-8"))
-
-    geojson_url = await project_crud.generate_data_extract(
-        clean_boundary_geojson,
+    result = await project_crud.generate_data_extract(
         project.id,
-        extract_config,
+        clean_boundary_geojson,
+        geom_type,
+        config_data,
         centroid,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
+    return JSONResponse(
+        status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")}
+    )
 
 
 @router.get("/data-extract-url")
