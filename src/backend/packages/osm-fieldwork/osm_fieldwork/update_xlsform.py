@@ -198,7 +198,7 @@ def merge_dataframes(
                     add_label_translations({
                         "type": ["begin group"],
                         "name": ["survey_questions"],
-                        "relevant": "(${feature_exists} = 'yes')",
+                        "relevant": "(${feature_exists} = 'yes') or (${status} = '2')",
                     })
                 )
             ),
