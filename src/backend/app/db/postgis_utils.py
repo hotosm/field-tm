@@ -20,15 +20,14 @@
 import json
 import logging
 from datetime import datetime, timezone
-from io import BytesIO
 from random import getrandbits
 from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
 from fastapi import HTTPException
+from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
-from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
@@ -44,7 +43,6 @@ from shapely.geometry import (
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from app.config import settings
 from app.db.enums import HTTPStatus, XLSFormType
 
 log = logging.getLogger(__name__)
@@ -591,22 +589,35 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     Returns:
         dict: A geojson geometry.
     """
-    if javarosa_geom_string is None:
+    if not javarosa_geom_string or not isinstance(javarosa_geom_string, str):
         return {}
 
-    # Split by semicolon to get coordinate sets
-    coordinate_sets = javarosa_geom_string.strip().split(";")
-    # Convert coordinates to [lon, lat] pairs
-    coordinates = [
-        [float(coord) for coord in reversed(point.split()[:2])]
-        for point in coordinate_sets
-    ]
+    coordinates = []
+
+    for point_str in javarosa_geom_string.strip().split(";"):
+        parts = point_str.strip().split()
+
+        # Expect at least lat and lon
+        if len(parts) < 2:
+            continue
+
+        try:
+            lat = float(parts[0])
+            lon = float(parts[1])
+            coordinates.append([lon, lat])
+        except ValueError:
+            continue  # Skip if conversion fails
+
+    if not coordinates:
+        return {}
 
     # Determine geometry type
     if len(coordinates) == 1:
         geom_type = "Point"
         coordinates = coordinates[0]  # Flatten for Point
-    elif coordinates[0] == coordinates[-1]:  # Check if closed loop
+    elif (
+        coordinates[0] == coordinates[-1] and len(coordinates) >= 4
+    ):  # Check if closed loop
         geom_type = "Polygon"
         coordinates = [coordinates]  # Wrap in extra list for Polygon
     else:
@@ -772,7 +783,7 @@ def merge_polygons(
         ) from e
 
 
-def get_osm_geometries(osm_category, geometry):
+async def get_osm_geometries(osm_category, geometry):
     """Request a snapshot based on the provided geometry.
 
     Args:
@@ -783,25 +794,23 @@ def get_osm_geometries(osm_category, geometry):
         dict: The JSON response containing the snapshot data.
     """
     config_filename = XLSFormType(osm_category).name
-    data_model = f"{data_models_path}/{config_filename}.yaml"
+    data_model = f"{data_models_path}/{config_filename}.json"
+    geom_type = "polygon"
 
-    with open(data_model, "rb") as data_model_yaml:
-        extract_config = BytesIO(data_model_yaml.read())
+    if config_filename == "highways":
+        geom_type = "line"
 
-    pg = PostgresClient(
-        "underpass",
-        extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
-        if settings.RAW_DATA_API_AUTH_TOKEN
-        else None,
-    )
-    return pg.execQuery(
-        geometry,
-        extra_params={
-            "outputType": "geojson",
-            "bind_zip": True,
-            "useStWithin": False,
-        },
+    with open(data_model, encoding="utf-8") as f:
+        config_json = json.load(f)
+
+    return await get_osm_data(
+        geometry=geometry,
+        outputType="geojson",
+        output_options=RawDataOutputOptions(download_file=False),
+        geometryType=[geom_type],
+        bindZip=True,
+        use_st_within=False,
+        filters=config_json,
     )
 
 
