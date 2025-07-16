@@ -33,7 +33,7 @@ from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
-from osm_data_client import RawDataOutputOptions, RawDataResult, get_osm_data
+from osm_data_client import RawDataOutputOptions, RawDataResult, RawDataClientConfig, RawDataClient
 from osm_login_python.core import Auth
 from psycopg import Connection, sql
 from psycopg.rows import class_row
@@ -155,21 +155,29 @@ async def generate_data_extract(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="To generate a new data extract a extract_config must be specified.",
         )
-
-    result = await get_osm_data(
-        geometry=aoi,
-        fileName=(
+    config= RawDataClientConfig(
+        access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
+        if settings.RAW_DATA_API_AUTH_TOKEN
+        else None
+    )
+    extra_params={
+        "fileName":(
             f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
             if settings.RAW_DATA_API_AUTH_TOKEN
             else f"fmtm_extract_{project_id}"
         ),
+        
+        "outputType":"geojson",
+        "geometryType":[geom_type],
+        "bindZip":False,
+        "centroid":centroid,
+        "use_st_within":(False if geom_type == "line" else True),
+        "filters":config_json,
+    }
+    result = await RawDataClient(config).get_osm_data(
+        aoi,
         output_options=RawDataOutputOptions(download_file=False),
-        outputType="geojson",
-        geometryType=[geom_type],
-        bindZip=False,
-        centroid=centroid,
-        use_st_within=(False if geom_type == "line" else True),
-        filters=config_json,
+        **extra_params
     )
 
     return result
