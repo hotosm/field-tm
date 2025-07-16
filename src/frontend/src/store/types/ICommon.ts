@@ -4,11 +4,6 @@ export type CommonStateTypes = {
   snackbar: snackbarTypes;
   loading: boolean;
   postOrganisationLoading: boolean;
-  currentStepFormStep: {
-    create_project: {
-      step: number;
-    };
-  };
   projectNotFound: boolean;
   previousSelectedOptions: Record<string, selectOptionsType[]>;
 };
