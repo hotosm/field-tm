@@ -167,7 +167,7 @@ async def generate_data_extract(
     )
     extra_params = {
         "fileName": (
-            f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
+            f"fmtm_{settings.FMTM_DOMAIN}_data_extract_{project_id}"
             if settings.RAW_DATA_API_AUTH_TOKEN
             else f"fmtm_extract_{project_id}"
         ),
