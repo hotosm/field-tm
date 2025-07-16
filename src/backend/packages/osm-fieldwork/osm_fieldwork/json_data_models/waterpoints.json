@@ -1,0 +1,50 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": ["ways_poly", "nodes"],
+  "where": {
+    "nodes": [
+      {
+        "drinking_water": ["not null"],
+        "op": "or"
+      },
+      {
+        "amenity": [["drinking_water", "water_point"]],
+        "op": "or"
+      },
+      {
+        "man_made": ["water_tap"],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "drinking_water": ["not null"],
+        "op": "or"
+      },
+      {
+        "amenity": [["drinking_water", "water_point"]],
+        "op": "or"
+      },
+      {
+        "man_made": ["water_tap"],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": []
+}

@@ -1,0 +1,100 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": ["ways_poly", "nodes"],
+  "where": {
+    "nodes": [
+      {
+        "amenity": [
+          [
+            "waste_disposal",
+            "waste_dump_site",
+            "waste_transfer_station",
+            "waste_basket",
+            "recycling",
+            "landfill"
+          ]
+        ],
+        "op": "or"
+      },
+      {
+        "waste": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling_type": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:aluminum": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:glass": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:hazardous_waste": ["not null"],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "amenity": [
+          [
+            "waste_disposal",
+            "waste_dump_site",
+            "waste_transfer_station",
+            "waste_basket",
+            "recycling",
+            "landfill"
+          ]
+        ],
+        "op": "or"
+      },
+      {
+        "waste": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling_type": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:aluminum": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:glass": ["not null"],
+        "op": "or"
+      },
+      {
+        "recycling:hazardous_waste": ["not null"],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": []
+}
