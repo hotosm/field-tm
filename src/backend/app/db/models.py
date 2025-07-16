@@ -59,10 +59,7 @@ from app.db.enums import (
     UserRole,
     XLSFormType,
 )
-from app.db.postgis_utils import (
-    javarosa_to_geojson_geom,
-    timestamp,
-)
+from app.db.postgis_utils import timestamp
 from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 
 # Avoid cyclical dependencies when only type checking
@@ -2105,11 +2102,9 @@ class DbOdkEntities(BaseModel):
                 should_include_geom = (
                     entity["status"] == "6" or entity["created_by"] != ""
                 )
-                if should_include_geom:
-                    geom_dict = await javarosa_to_geojson_geom(entity["geometry"])
-                    data[f"{entity_index}_geometry"] = json.dumps(geom_dict)
-                else:
-                    data[f"{entity_index}_geometry"] = ""
+                data[f"{entity_index}_geometry"] = (
+                    entity["geometry"] if should_include_geom else ""
+                )
                 data[f"{entity_index}_created_by"] = entity["created_by"]
 
             sql += (
