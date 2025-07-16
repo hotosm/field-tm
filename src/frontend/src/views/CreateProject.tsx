@@ -215,7 +215,7 @@ const CreateProject = () => {
 
     dispatch(
       CreateProjectService(
-        `${VITE_API_URL}/projects?project_id=${projectId}`,
+        `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
         data.project_admins,
