@@ -21,6 +21,7 @@ export const initialState: UserStateTypes = {
   userListForSelect: [],
   userListForSelectLoading: false,
   userNames: [],
+  getProjectUserInvitesLoading: false,
   projectUserInvitesList: [],
   getUserNamesLoading: false,
   inviteNewUserPending: false,

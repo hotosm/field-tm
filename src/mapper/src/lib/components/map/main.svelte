@@ -222,6 +222,7 @@
 			}) || [];
 
 		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
+		console.log(clickedFeatures);
 		// if clicked coordinate contain more than multiple entities, assign it to a variable
 		if (clickedFeatures.length > 1) {
 			selectedFeatures = clickedFeatures;
@@ -925,9 +926,9 @@
 								variant="primary"
 								size="small"
 								onclick={() => {
-									const entityCentroid = centroid(feature.geometry);
 									const clickedEntityId = feature?.properties?.entity_id;
 									entitiesStore.setSelectedEntityId(clickedEntityId);
+									const entityCentroid = centroid(feature.geometry);
 									entitiesStore.setSelectedEntityCoordinate({
 										entityId: clickedEntityId,
 										coordinate: entityCentroid?.geometry?.coordinates,

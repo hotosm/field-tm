@@ -68,7 +68,6 @@ import {
 import { Provider } from 'react-redux';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
-import LoadingBar from '@/components/createnewproject/LoadingBar';
 import { TaskActions } from '@/store/slices/TaskSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import CustomizedModal from '@/utilities/CustomizedModal';
@@ -138,7 +137,6 @@ export default {
   Tooltip,
   Breadcrumbs,
   CardMedia,
-  LoadingBar,
   TaskActions,
   useAppDispatch,
   useAppSelector,

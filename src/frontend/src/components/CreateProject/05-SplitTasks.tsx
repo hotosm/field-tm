@@ -48,7 +48,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.TASK_SPLITTING_ALGORITHM,
       label: 'Task Splitting Algorithm',
-      disabled: !values.dataExtractGeojson?.features?.length || values.primaryGeomType === 'POLYLINE',
+      disabled: !values.dataExtractGeojson?.features?.length || values.primary_geom_type === 'POLYLINE',
     },
   ];
 
@@ -69,7 +69,7 @@ const SplitTasks = () => {
         GetDividedTaskFromGeojson(`${VITE_API_URL}/projects/preview-split-by-square`, {
           geojson: drawnGeojsonFile,
           extract_geojson: values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
-          dimension: values?.dimension,
+          dimension: values?.task_split_dimension,
         }),
       );
     } else if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
@@ -77,7 +77,7 @@ const SplitTasks = () => {
         TaskSplittingPreviewService(
           `${VITE_API_URL}/projects/task-split`,
           drawnGeojsonFile,
-          values?.average_buildings_per_task as number,
+          values?.task_num_buildings as number,
           values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
         ),
       );
@@ -110,7 +110,21 @@ const SplitTasks = () => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="Select an option to split your project area" astric />
+        <FieldLabel
+          label="Select an option to split your project area"
+          astric
+          tooltipMessage={
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+              <p>You may choose how to divide an area into tasks for field mapping:</p>
+              <p>i) Divide area on squares split the AOI into squares based on user’s input in dimensions</p>
+              <p>ii) Choose area as task creates the number of tasks based on number of polygons in AOI</p>
+              <p>
+                iii) Task splitting algorithm splits an entire AOI into smallers tasks based on linear networks (road,
+                river) followed by taking into account the input of number of average buildings per task
+              </p>
+            </div>
+          }
+        />
         <Controller
           control={control}
           name="task_split_type"
@@ -143,9 +157,15 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Dimension of square in metres:" />
-            <Input {...register('dimension', { valueAsNumber: true })} className="!fmtm-w-20" type="number" />
+            <Input
+              {...register('task_split_dimension', { valueAsNumber: true })}
+              className="!fmtm-w-20"
+              type="number"
+            />
           </div>
-          {errors?.dimension?.message && <ErrorMessage message={errors.dimension.message as string} />}
+          {errors?.task_split_dimension?.message && (
+            <ErrorMessage message={errors.task_split_dimension.message as string} />
+          )}
         </div>
       )}
 
@@ -153,10 +173,10 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Average number of buildings per task:" />
-            <Input {...register('average_buildings_per_task', { valueAsNumber: true })} className="!fmtm-w-20" />
+            <Input {...register('task_num_buildings', { valueAsNumber: true })} className="!fmtm-w-20" />
           </div>
-          {errors?.average_buildings_per_task?.message && (
-            <ErrorMessage message={errors.average_buildings_per_task.message as string} />
+          {errors?.task_num_buildings?.message && (
+            <ErrorMessage message={errors.task_num_buildings.message as string} />
           )}
         </div>
       )}
@@ -172,9 +192,8 @@ const SplitTasks = () => {
               isLoading={dividedTaskLoading || taskSplittingGeojsonLoading}
               onClick={generateTaskBasedOnSelection}
               disabled={
-                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.dimension) ||
-                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM &&
-                  !values.average_buildings_per_task)
+                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.task_split_dimension) ||
+                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM && !values.task_num_buildings)
                   ? true
                   : false
               }

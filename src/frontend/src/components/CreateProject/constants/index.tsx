@@ -11,7 +11,7 @@ export const createProjectSteps: ICreateProjectSteps[] = [
   {
     step: 1,
     label: '01',
-    name: 'Basic Details',
+    name: 'Project Overview',
   },
   {
     step: 2,
