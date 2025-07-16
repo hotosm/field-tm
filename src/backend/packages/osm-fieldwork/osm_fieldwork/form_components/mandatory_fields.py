@@ -221,7 +221,7 @@ def _get_mandatory_fields(
             "notes": "Update the created_by field",
             "label::english(en)": "Created by",
             "appearance": "minimal",
-            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, '')" if use_odk_collect else "''",
+            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, 'svcfmtm')" if use_odk_collect else "''",
             "save_to": "created_by",
         },
     ])
