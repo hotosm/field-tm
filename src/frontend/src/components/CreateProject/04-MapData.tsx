@@ -40,7 +40,6 @@ const MapData = () => {
       name: 'data_extract',
       value: data_extract_type.OSM,
       label: 'Fetch data from OSM',
-      disabled: values.primary_geom_type === 'POLYLINE',
     },
     { name: 'data_extract', value: data_extract_type.CUSTOM, label: 'Upload custom map data' },
     { name: 'data_extract', value: data_extract_type.NONE, label: 'No existing data' },
