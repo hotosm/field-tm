@@ -90,7 +90,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
   const status = feature.getProperties().task_state;
 
   const isTaskStatusLocked = ['LOCKED_FOR_MAPPING', 'LOCKED_FOR_VALIDATION'].includes(status);
-  const borderStrokeColor = isTaskStatusLocked && taskLockedByUser ? secondaryStrokeColor : strokeColor;
+  const borderStrokeColor = 'rgb(15, 255, 255, 0.4)';
 
   const lockedPolygonStyle = createPolygonStyle(
     mapTheme.palette.mapFeatureColors.LOCKED_FOR_MAPPING,

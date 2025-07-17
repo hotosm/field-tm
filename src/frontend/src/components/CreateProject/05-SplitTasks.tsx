@@ -36,7 +36,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.DIVIDE_ON_SQUARE,
       label: 'Divide into square tasks',
-      disabled: false,
+      disabled: values.primary_geom_type === 'POLYLINE',
     },
     {
       name: 'define_tasks',

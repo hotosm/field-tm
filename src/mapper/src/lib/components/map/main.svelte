@@ -566,12 +566,21 @@
 		/>
 	</GeoJSON>
 	<!-- The features / entities -->
+	<!-- For LINE, show all geoms (pass global extent), else filter by clicked task area (not working) -->
 	{#if entitiesUrl}
 		<FlatGeobuf
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
 			extent={primaryGeomType === MapGeomTypes.POLYLINE
-				? undefined
+				? polygon([
+						[
+							[-180, -90],
+							[-180, 90],
+							[180, 90],
+							[180, -90],
+							[-180, -90],
+						],
+					]).geometry
 				: taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"

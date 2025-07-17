@@ -24,6 +24,7 @@ import { GetEntityStatusList, GetOdkEntitiesGeojson, SyncTaskState } from '@/api
 import MapLegends from '@/components/MapLegends';
 import isEmpty from '@/utilfunctions/isEmpty';
 import AssetModules from '@/shared/AssetModules';
+import { Polygon } from 'ol/geom';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -306,9 +307,20 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
         {projectInfo.data_extract_url && isValidUrl(projectInfo.data_extract_url) && taskAreaExtent && selectedTask && (
           <VectorLayer
             fgbUrl={projectInfo.data_extract_url}
-            // For POLYLINE, show all geoms, else filter by clicked task area (not working)
-            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
-            fgbExtentFilter={taskAreaExtent}
+            // For POLYLINE, show all geoms (pass global extent), else filter by clicked task area (not working)
+            fgbExtentFilter={
+              projectInfo.primary_geom_type === 'POLYLINE'
+                ? new Polygon([
+                    [
+                      [-180, -90],
+                      [-180, 90],
+                      [180, 90],
+                      [180, -90],
+                      [-180, -90],
+                    ],
+                  ]).transform('EPSG:4326', 'EPSG:3857')
+                : taskAreaExtent
+            }
             getTaskStatusStyle={(feature) => {
               const geomType = feature.getGeometry().getType();
               const entity = entityOsmMap?.find(
