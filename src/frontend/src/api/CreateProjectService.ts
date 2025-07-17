@@ -65,12 +65,10 @@ export const CreateDraftProjectService = (
 
       projectId = response.data.id;
 
-      // 2. Add ODK details if custom ODK creds provided
-      if (odkPayload) {
-        await axios.patch(`${VITE_API_URL}/projects`, odkPayload, {
-          params: { project_id: projectId as number },
-        });
-      }
+      // 2. Add ODK details (to create project in ODK  patch createProject even if default ODK creds used)
+      await axios.patch(`${VITE_API_URL}/projects`, odkPayload || {}, {
+        params: { project_id: projectId as number },
+      });
 
       // 3. Add project admins
       if (!isEmpty(project_admins)) {
