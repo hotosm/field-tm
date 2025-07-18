@@ -111,6 +111,7 @@ export type ProjectDetailsTypes = {
   use_odk_collect: boolean;
   status: project_status;
   outline: splittedGeojsonType;
+  organisation_name: string;
 };
 
 export type FormCategoryListTypes = {

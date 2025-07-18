@@ -87,6 +87,15 @@ const CreateProject = () => {
   const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
   const isProjectManager = useIsProjectManager(projectId);
 
+  const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
+    defaultValues: defaultValues,
+    resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
+  });
+
+  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
+  const { dirtyFields } = formState;
+  const values = watch();
+
   useEffect(() => {
     if (step < 1 || step > 5 || !values.osm_category) {
       setSearchParams({ step: '1' });
@@ -103,19 +112,11 @@ const CreateProject = () => {
   }, [basicProjectDetails]);
 
   useEffect(() => {
+    if (projectId) return;
     dispatch(
       OrganisationService(isAdmin ? `${VITE_API_URL}/organisation` : `${VITE_API_URL}/organisation/my-organisations`),
     );
-  }, []);
-
-  const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
-    defaultValues: defaultValues,
-    resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
-  });
-
-  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
-  const { dirtyFields } = formState;
-  const values = watch();
+  }, [projectId]);
 
   const form = {
     1: <ProjectOverview />,

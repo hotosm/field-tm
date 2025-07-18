@@ -21,7 +21,8 @@ export const GetBasicProjectDetails = (url: string) => {
     try {
       dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(true));
       const response: AxiosResponse<{ id: number } & ProjectDetailsTypes> = await axios.get(url);
-      const { id, name, short_description, description, organisation_id, outline, hashtags } = response.data;
+      const { id, name, short_description, description, organisation_id, outline, hashtags, organisation_name } =
+        response.data;
       dispatch(
         CreateProjectActions.SetBasicProjectDetails({
           id,
@@ -31,6 +32,7 @@ export const GetBasicProjectDetails = (url: string) => {
           organisation_id,
           outline,
           hashtags,
+          organisation_name,
         }),
       );
     } catch (error) {

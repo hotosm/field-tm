@@ -43,18 +43,27 @@ const ProjectOverview = () => {
   }));
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
 
-  const organisationList = organisationListData.map((org) => ({
-    id: org.id,
-    label: org.name,
-    value: org.id,
-    hasODKCredentials: !!org?.odk_central_url,
-  }));
-
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
   const { errors } = formState;
-
   const values = watch();
+
+  // if draft project created, then instead of calling organisation endpoint populate organisation list with project minimal response data
+  const organisationList = values?.id
+    ? [
+        {
+          id: values.organisation_id,
+          label: values.organisation_name,
+          value: values.organisation_id,
+          hasODKCredentials: true,
+        },
+      ]
+    : organisationListData.map((org) => ({
+        id: org.id,
+        label: org.name,
+        value: org.id,
+        hasODKCredentials: !!org?.odk_central_url,
+      }));
 
   useEffect(() => {
     if (!userSearchText) return;

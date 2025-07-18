@@ -30,6 +30,7 @@ export const projectOverviewValidationSchema = z
       message: 'Project AOI is required',
     }),
     outlineArea: z.string().optional(),
+    organisation_name: z.string(),
   })
   .check((ctx) => {
     const values = ctx.value;

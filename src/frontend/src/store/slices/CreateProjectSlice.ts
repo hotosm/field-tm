@@ -121,7 +121,13 @@ const CreateProject = createSlice({
       action: PayloadAction<
         | ({ id: number } & Pick<
             ProjectDetailsTypes,
-            'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
+            | 'name'
+            | 'short_description'
+            | 'description'
+            | 'organisation_id'
+            | 'outline'
+            | 'hashtags'
+            | 'organisation_name'
           >)
         | null
       >,
