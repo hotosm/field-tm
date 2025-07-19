@@ -222,6 +222,7 @@
 			}) || [];
 
 		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
+		console.log(clickedFeatures);
 		// if clicked coordinate contain more than multiple entities, assign it to a variable
 		if (clickedFeatures.length > 1) {
 			selectedFeatures = clickedFeatures;
@@ -565,12 +566,21 @@
 		/>
 	</GeoJSON>
 	<!-- The features / entities -->
+	<!-- For LINE, show all geoms (pass global extent), else filter by clicked task area (not working) -->
 	{#if entitiesUrl}
 		<FlatGeobuf
 			id="entities"
 			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
 			extent={primaryGeomType === MapGeomTypes.POLYLINE
-				? undefined
+				? polygon([
+						[
+							[-180, -90],
+							[-180, 90],
+							[180, 90],
+							[180, -90],
+							[-180, -90],
+						],
+					]).geometry
 				: taskStore.selectedTaskGeom}
 			extractGeomCols={true}
 			promoteId="id"
@@ -925,9 +935,9 @@
 								variant="primary"
 								size="small"
 								onclick={() => {
-									const entityCentroid = centroid(feature.geometry);
 									const clickedEntityId = feature?.properties?.entity_id;
 									entitiesStore.setSelectedEntityId(clickedEntityId);
+									const entityCentroid = centroid(feature.geometry);
 									entitiesStore.setSelectedEntityCoordinate({
 										entityId: clickedEntityId,
 										coordinate: entityCentroid?.geometry?.coordinates,
