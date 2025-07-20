@@ -1,7 +1,7 @@
 /* Header */
 
 .header {
-	--at-apply: p-3 flex items-center justify-between font-barlow;
+	--at-apply: p-3 flex items-center justify-between font-primary;
 }
 
 /* Logo */
@@ -50,7 +50,7 @@
 }
 
 .header .login-link span {
-	--at-apply: font-barlow font-medium text-base;
+	--at-apply: font-primary font-medium text-base;
 }
 
 .header .drawer-icon {
@@ -66,7 +66,7 @@
 }
 
 .menu-item {
-	--at-apply: hover: text-primary-600 cursor-pointer duration-200 decoration-none text-black font-barlow;
+	--at-apply: hover: text-primary-600 cursor-pointer duration-200 decoration-none text-black font-primary;
 }
 
 .header .sign-out {
@@ -74,7 +74,7 @@
 }
 
 .header .sign-out span {
-	--at-apply: font-barlow font-medium text-base;
+	--at-apply: font-primary font-medium text-base;
 }
 
 .header.offline-bg-color {

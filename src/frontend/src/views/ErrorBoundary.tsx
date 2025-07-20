@@ -40,7 +40,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               <img src={SomethingWentWrongImage} alt="Something Went Wrong Photo" />
             </div>
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
-              <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-primaryRed fmtm-font-barlow fmtm-font-bold fmtm-text-center">
+              <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-primaryRed fmtm-font-primary fmtm-font-bold fmtm-text-center">
                 OH NO, SOMETHING WENT WRONG!!
               </h2>
               <p className="fmtm-text-sm sm:fmtm-text-base fmtm-font-extralight fmtm-text-center fmtm-text-[#68707F]">
