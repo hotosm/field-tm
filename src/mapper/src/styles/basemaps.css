@@ -1,5 +1,5 @@
 .basemaps {
-	--at-apply: flex flex-col items-center p-4 space-y-4 font-barlow;
+	--at-apply: flex flex-col items-center p-4 space-y-4 font-primary;
 }
 
 .basemaps .text-above {
@@ -38,7 +38,7 @@
 }
 
 .basemaps .button span {
-	--at-apply: font-barlow font-medium text-base uppercase;
+	--at-apply: font-primary font-medium text-base uppercase;
 }
 
 .basemaps .progress-container {
