@@ -10,7 +10,7 @@ import { UserActions } from '@/store/slices/UserSlice';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { fileType } from '@/store/types/ICommon';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { createProjectValidationSchema } from './validation';
+import { createProjectValidationSchema, odkCredentialsValidationSchema } from './validation';
 
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import FieldLabel from '@/components/common/FieldLabel';
@@ -23,6 +23,9 @@ import RadioButton from '@/components/common/RadioButton';
 import UploadAreaComponent from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import isEmpty from '@/utilfunctions/isEmpty';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
+import { ValidateODKCredentials } from '@/api/CreateProjectService';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,6 +34,21 @@ const ProjectOverview = () => {
   const isAdmin = useIsAdmin();
 
   const [userSearchText, setUserSearchText] = useState('');
+  const [showODKCredsModal, setShowODKCredsModal] = useState(false);
+  const [odkCreds, setOdkCreds] = useState({
+    odk_central_url: '',
+    odk_central_user: '',
+    odk_central_password: '',
+  });
+  const [odkCredsError, setOdkCredsError] = useState<{
+    odk_central_url?: string;
+    odk_central_user?: string;
+    odk_central_password?: string;
+  }>({
+    odk_central_url: '',
+    odk_central_user: '',
+    odk_central_password: '',
+  });
 
   //@ts-ignore
   const authDetails = useAppSelector((state) => state.login.authDetails);
@@ -42,6 +60,8 @@ const ProjectOverview = () => {
     value: user.sub,
   }));
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
+  const isODKCredentialsValid = useAppSelector((state) => state.createproject.isODKCredentialsValid);
+  const ODKCredentialsValidating = useAppSelector((state) => state.createproject.ODKCredentialsValidating);
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
@@ -83,6 +103,16 @@ const ProjectOverview = () => {
     handleOrganizationChange(authDetails?.orgs_managed[0]);
   }, [authDetails, organisationListData]);
 
+  // set odk creds to form state only after validating if the creds are available
+  useEffect(() => {
+    if (!isODKCredentialsValid) return;
+    setValue('odk_central_url', odkCreds.odk_central_url);
+    setValue('odk_central_user', odkCreds.odk_central_user);
+    setValue('odk_central_password', odkCreds.odk_central_password);
+
+    setShowODKCredsModal(false);
+  }, [isODKCredentialsValid]);
+
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
     if (!orgIdInt) return;
@@ -123,6 +153,22 @@ const ProjectOverview = () => {
 
     if (values.customDataExtractFile) setValue('customDataExtractFile', null);
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
+  };
+
+  const validateODKCredentials = async () => {
+    const valid = odkCredentialsValidationSchema.safeParse(odkCreds);
+
+    let errors = {};
+    if (valid.success) {
+      errors = {};
+      dispatch(CreateProjectActions.SetODKCredentialsValid(false));
+      dispatch(ValidateODKCredentials(`${VITE_API_URL}/helper/odk-credentials-test`, odkCreds));
+    } else {
+      valid.error.issues.forEach((issue) => {
+        errors[issue.path[0]] = issue.message;
+      });
+    }
+    setOdkCredsError(errors);
   };
 
   return (
@@ -181,33 +227,71 @@ const ProjectOverview = () => {
           checked={values.useDefaultODKCredentials}
           onCheckedChange={(value) => {
             setValue('useDefaultODKCredentials', value);
+            if (!value) setShowODKCredsModal(true);
           }}
           className="fmtm-text-black fmtm-button fmtm-text-sm"
           labelClickable={values.useDefaultODKCredentials}
         />
       )}
 
-      {values.organisation_id && !values.useDefaultODKCredentials && !values.id && (
-        <>
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="ODK Central URL" astric />
-            <Input {...register('odk_central_url')} />
-            {errors?.odk_central_url?.message && <ErrorMessage message={errors.odk_central_url.message as string} />}
+      <Dialog
+        open={showODKCredsModal}
+        onOpenChange={(open) => {
+          setShowODKCredsModal(open);
+          if (!open)
+            setOdkCreds({
+              odk_central_url: values.odk_central_url || '',
+              odk_central_user: values.odk_central_user || '',
+              odk_central_password: values.odk_central_password || '',
+            });
+        }}
+      >
+        {values.organisation_id && !values.useDefaultODKCredentials && (
+          <DialogTrigger className="fmtm-w-fit">
+            <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
+              Set ODK Credentials
+            </Button>
+          </DialogTrigger>
+        )}
+        <DialogContent>
+          <DialogTitle>Set ODK Credentials</DialogTitle>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="ODK Central URL" astric />
+              <Input
+                value={odkCreds.odk_central_url}
+                onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_url: e.target.value })}
+              />
+              {odkCredsError.odk_central_url && <ErrorMessage message={odkCredsError.odk_central_url as string} />}
+            </div>
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="ODK Central Email" astric />
+              <Input
+                value={odkCreds.odk_central_user}
+                onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_user: e.target.value })}
+              />
+              {odkCredsError.odk_central_user && <ErrorMessage message={odkCredsError.odk_central_user} />}
+            </div>
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="ODK Central Password" astric />
+              <Input
+                value={odkCreds.odk_central_password}
+                onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_password: e.target.value })}
+                type="password"
+              />
+              {odkCredsError.odk_central_password && <ErrorMessage message={odkCredsError.odk_central_password} />}
+            </div>
           </div>
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="ODK Central Email" astric />
-            <Input {...register('odk_central_user')} />
-            {errors?.odk_central_user?.message && <ErrorMessage message={errors.odk_central_user.message as string} />}
+          <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
+            <Button variant="link-grey" onClick={() => setShowODKCredsModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary-red" isLoading={ODKCredentialsValidating} onClick={validateODKCredentials}>
+              Confirm
+            </Button>
           </div>
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="ODK Central Password" astric />
-            <Input {...register('odk_central_password')} />
-            {errors?.odk_central_password?.message && (
-              <ErrorMessage message={errors.odk_central_password.message as string} />
-            )}
-          </div>
-        </>
-      )}
+        </DialogContent>
+      </Dialog>
 
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
         <FieldLabel label="Assign Project Admin" />

@@ -47,6 +47,8 @@ export const initialState: CreateProjectStateTypes = {
   splitGeojsonByAlgorithm: null,
   basicProjectDetailsLoading: false,
   basicProjectDetails: null,
+  isODKCredentialsValid: false,
+  ODKCredentialsValidating: false,
 };
 
 const CreateProject = createSlice({
@@ -133,6 +135,12 @@ const CreateProject = createSlice({
       >,
     ) {
       state.basicProjectDetails = action.payload;
+    },
+    SetODKCredentialsValid(state, action: PayloadAction<boolean>) {
+      state.isODKCredentialsValid = action.payload;
+    },
+    SetODKCredentialsValidating(state, action: PayloadAction<boolean>) {
+      state.ODKCredentialsValidating = action.payload;
     },
   },
 });
