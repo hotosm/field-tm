@@ -131,7 +131,7 @@ export const CreateProjectService = (
     try {
       dispatch(CreateProjectActions.CreateProjectLoading(true));
 
-      // 1. post project details
+      // 1. patch project details
       try {
         await API.patch(url, projectData);
       } catch (error) {
@@ -212,6 +212,11 @@ export const CreateProjectService = (
           message: error?.response?.data?.detail || 'Something went wrong. Please try again.',
         }),
       );
+
+      // revert project status to draft if any error arises during project generation
+      await API.patch(url, {
+        status: 'DRAFT',
+      });
     } finally {
       dispatch(CreateProjectActions.CreateProjectLoading(false));
     }
@@ -603,6 +608,32 @@ const AssignProjectManager = (url: string, params: { sub: number; project_id: nu
     };
 
     return await assignProjectManager();
+  };
+};
+
+export const ValidateODKCredentials = (
+  url: string,
+  params: { odk_central_url: string; odk_central_user: string; odk_central_password: string },
+) => {
+  return async (dispatch: AppDispatch) => {
+    const validateCustomForm = async () => {
+      try {
+        dispatch(CreateProjectActions.SetODKCredentialsValidating(true));
+        await axios.post(url, {}, { params });
+        dispatch(CreateProjectActions.SetODKCredentialsValid(true));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to validate ODK Credentials',
+          }),
+        );
+        dispatch(CreateProjectActions.SetODKCredentialsValid(false));
+      } finally {
+        dispatch(CreateProjectActions.SetODKCredentialsValidating(false));
+      }
+    };
+
+    await validateCustomForm();
   };
 };
 
