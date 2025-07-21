@@ -163,13 +163,17 @@ class DbUserRole(BaseModel):
         cls,
         db: Connection,
         project_id: Optional[int] = None,
+        role: Optional[ProjectRole] = None,
     ) -> Optional[list[Self]]:
-        """Fetch all project user roles."""
+        """Fetch all project user roles, optionally filtered by role."""
         filters = []
         params = {}
         if project_id:
-            filters.append(f"project_id = {project_id}")
+            filters.append("project_id = %(project_id)s")
             params["project_id"] = project_id
+        if role:
+            filters.append("role = %(role)s")
+            params["role"] = role if isinstance(role, str) else role.name
 
         sql = f"""
             SELECT * FROM user_roles
@@ -178,8 +182,59 @@ class DbUserRole(BaseModel):
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
                 sql,
+                params if params else None,
             )
             return await cur.fetchall()
+
+    @classmethod
+    async def delete(
+        cls,
+        db: Connection,
+        project_id: int,
+        user_sub: str,
+    ) -> bool:
+        """Delete a user's role from a specific project (unassign user from project)."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM user_roles WHERE project_id = %(project_id)s
+                AND user_sub = %(user_sub)s;
+                """,
+                {"project_id": project_id, "user_sub": user_sub},
+            )
+        return True
+
+    @classmethod
+    async def get(
+        cls,
+        db: Connection,
+        project_id: Optional[int] = None,
+        user_sub: Optional[str] = None,
+    ) -> Optional[Self]:
+        """Fetch a user's role for a project.
+
+        filtered by any combination of user_sub and project_id.
+        """
+        filters = []
+        params = {}
+
+        if user_sub:
+            filters.append("user_sub = %(user_sub)s")
+            params["user_sub"] = str(user_sub)
+
+        if project_id is not None:
+            filters.append("project_id = %(project_id)s")
+            params["project_id"] = int(project_id)
+
+        sql = f"""
+            SELECT * FROM user_roles
+            {"WHERE " + " AND ".join(filters) if filters else ""}
+            LIMIT 1
+        """
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, params if params else None)
+            return await cur.fetchone()
 
 
 class DbUser(BaseModel):

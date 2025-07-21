@@ -678,10 +678,11 @@ async def add_new_project_manager(
 async def get_project_users(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    role: Optional[str] = None,
 ):
     """Get project users and their project role."""
     project = project_user_dict.get("project")
-    users = await DbUserRole.all(db, project.id)
+    users = await DbUserRole.all(db, project.id, role=role)
     if not users:
         return []
     return users
@@ -1278,3 +1279,15 @@ async def delete_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity deletion failed",
         ) from e
+
+
+@router.delete("/{project_id}/users/{user_sub}")
+async def unassign_user_from_project(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    user_sub: str,
+):
+    """Unassign a user from a project (remove their role)."""
+    project = project_user_dict.get("project")
+    await project_crud.unassign_user_from_project(db, project.id, user_sub)
+    return {"message": f"User {user_sub} unassigned from project {project.id}."}
