@@ -12,7 +12,7 @@ const ProjectNotFound = () => {
           <img src={NoFileImage} alt="Project Not Found Photo" className="lg:fmtm-w-[7.688rem]" />
         </div>
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-3">
-          <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-[#4F4F4F] fmtm-font-barlow fmtm-font-bold fmtm-text-center">
+          <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-[#4F4F4F] fmtm-font-primary fmtm-font-bold fmtm-text-center">
             PROJECT NOT FOUND
           </h2>
           <p className="fmtm-text-sm sm:fmtm-text-base fmtm-text-center fmtm-text-[#4F4F4F] fmtm-uppercase fmtm-font-semibold">
