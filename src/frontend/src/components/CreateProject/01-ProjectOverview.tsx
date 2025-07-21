@@ -62,6 +62,10 @@ const ProjectOverview = () => {
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const isODKCredentialsValid = useAppSelector((state) => state.createproject.isODKCredentialsValid);
   const ODKCredentialsValidating = useAppSelector((state) => state.createproject.ODKCredentialsValidating);
+  const projectManagers = useAppSelector((state) => state.project.projectUsers);
+  const projectUsersLoading = useAppSelector((state) => state.project.projectUsersLoading);
+  const unassigningUserFromProject = useAppSelector((state) => state.project.unassigningUserFromProject);
+  const userToRemoveFromProject = useAppSelector((state) => state.project.userToRemoveFromProject);
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;

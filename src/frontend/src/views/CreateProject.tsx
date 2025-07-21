@@ -42,9 +42,10 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
-import { data_extract_type, task_split_type } from '@/types/enums';
+import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
+import { GetProjectUsers } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -116,6 +117,11 @@ const CreateProject = () => {
     dispatch(
       OrganisationService(isAdmin ? `${VITE_API_URL}/organisation` : `${VITE_API_URL}/organisation/my-organisations`),
     );
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    dispatch(GetProjectUsers(`${VITE_API_URL}/projects/${projectId}/users`, { role: project_roles.PROJECT_MANAGER }));
   }, [projectId]);
 
   const form = {

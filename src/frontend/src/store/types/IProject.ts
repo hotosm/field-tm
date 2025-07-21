@@ -6,7 +6,7 @@ import {
   projectTaskBoundriesType,
   tileType,
 } from '@/models/project/projectModel';
-import { project_status } from '@/types/enums';
+import { project_status, user_roles } from '@/types/enums';
 
 export type ProjectStateTypes = {
   projectTaskBoundries: projectTaskBoundriesType[];
@@ -41,6 +41,10 @@ export type ProjectStateTypes = {
   newGeomFeatureCollection: FeatureCollectionType;
   OdkEntitiesGeojsonLoading: boolean;
   isEntityDeleting: Record<string, boolean>;
+  projectUsers: { user_sub: string; project_id: number; role: user_roles }[];
+  projectUsersLoading: boolean;
+  unassigningUserFromProject: boolean;
+  userToRemoveFromProject: string | null;
 };
 
 type projectCommentsListTypes = {
