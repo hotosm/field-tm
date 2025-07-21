@@ -47,7 +47,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
+from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -1012,3 +1012,33 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
+
+
+async def unassign_user_from_project(db, project_id, user_sub):
+    """Unassigns a user from a project by removing their role.
+
+    Args:
+        db: Database session or connection.
+        project_id: ID of the project.
+        user_sub: Unique user identifier.
+
+    Returns:
+        bool: True if the user was successfully unassigned.
+
+    Raises:
+        HTTPException (404): If the user is not associated with the project.
+    """
+    try:
+        user_role = await DbUserRole.get(db, project_id, user_sub)
+        if not user_role:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User {user_sub} is not associated with project {project_id}.",
+            )
+        return await DbUserRole.delete(db, project_id, user_sub)
+    except Exception as e:
+        log.exception(f"Failed to unassign user {user_sub} from project {project_id}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Failed to unassign user {user_sub} from project {project_id}",
+        ) from e
