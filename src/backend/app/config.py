@@ -183,7 +183,7 @@ class Settings(BaseSettings):
     ) -> list[str]:
         """Build and validate CORS origins list."""
         # Initialize default origins
-        default_origins = ["https://xlsforms.fmtm.dev"]
+        default_origins = ["https://xlsform-editor.fmtm.hotosm.org"]
 
         # Handle localhost/testing scenario
         domain = info.data.get("FMTM_DOMAIN", "fmtm.localhost")
