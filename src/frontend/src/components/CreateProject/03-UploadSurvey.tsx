@@ -12,6 +12,7 @@ import Select2 from '@/components/common/Select2';
 import FieldLabel from '@/components/common/FieldLabel';
 import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -37,17 +38,12 @@ const UploadSurvey = () => {
     dispatch(FormCategoryService(`${VITE_API_URL}/central/list-forms`));
   }, []);
 
-  // validate form file when on upload
-  useEffect(() => {
-    if (values.xlsFormFile && !values.isXlsFormFileValid) {
-      dispatch(
-        ValidateCustomForm(`${VITE_API_URL}/central/validate-form`, values.xlsFormFile?.file, values.use_odk_collect),
-      );
-    }
-  }, [values.xlsFormFile]);
+  const validateFormFile = (file) => {
+    dispatch(ValidateCustomForm(`${VITE_API_URL}/central/validate-form`, file?.file, values.use_odk_collect));
+  };
 
   useEffect(() => {
-    if (customFileValidity !== values.isXlsFormFileValid) setValue('isXlsFormFileValid', customFileValidity);
+    setValue('isXlsFormFileValid', customFileValidity);
   }, [customFileValidity]);
 
   const changeFileHandler = (file): void => {
@@ -57,12 +53,13 @@ const UploadSurvey = () => {
     }
 
     setValue('xlsFormFile', file);
-    setValue('isXlsFormFileValid', false);
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
+    validateFormFile(file);
   };
 
   const resetFile = (): void => {
     setValue('xlsFormFile', null);
-    setValue('isXlsFormFileValid', false);
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
   };
 
   return (

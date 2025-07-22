@@ -109,6 +109,7 @@ class DbUserRole(BaseModel):
     user_sub: str
     project_id: int
     role: ProjectRole
+    username: Optional[str] = None
 
     @classmethod
     async def create(
@@ -165,20 +166,23 @@ class DbUserRole(BaseModel):
         project_id: Optional[int] = None,
         role: Optional[ProjectRole] = None,
     ) -> Optional[list[Self]]:
-        """Fetch all project user roles, optionally filtered by role."""
+        """Fetch all project user roles, along with username."""
         filters = []
         params = {}
         if project_id:
-            filters.append("project_id = %(project_id)s")
+            filters.append("ur.project_id = %(project_id)s")
             params["project_id"] = project_id
         if role:
-            filters.append("role = %(role)s")
+            filters.append("ur.role = %(role)s")
             params["role"] = role if isinstance(role, str) else role.name
 
         sql = f"""
-            SELECT * FROM user_roles
-            {"WHERE " + " AND ".join(filters) if filters else ""}
-        """
+                SELECT ur.*, u.username
+                FROM user_roles ur
+                JOIN users u ON ur.user_sub = u.sub
+                {"WHERE " + " AND ".join(filters) if filters else ""}
+            """
+
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
                 sql,
