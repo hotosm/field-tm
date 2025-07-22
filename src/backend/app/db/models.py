@@ -109,7 +109,7 @@ class DbUserRole(BaseModel):
     user_sub: str
     project_id: int
     role: ProjectRole
-    username: Optional[str]
+    username: Optional[str] = None
 
     @classmethod
     async def create(
