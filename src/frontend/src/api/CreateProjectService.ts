@@ -13,6 +13,7 @@ import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { ProjectDetailsTypes } from '@/store/types/ICreateProject';
+import { UnassignUserFromProject } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -121,7 +122,7 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
-  project_admins,
+  project_admins: { projectAdminToRemove: string[]; projectAdminToAssign: string[] },
   file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -181,18 +182,19 @@ export const CreateProjectService = (
         ),
       );
 
-      // 5. assign project managers
-      if (!isEmpty(project_admins)) {
-        const promises = project_admins?.map(async (sub: any) => {
-          await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-              sub,
-              project_id: id as number,
-            }),
-          );
-        });
-        await Promise.all(promises);
-      }
+      // 5. assign & remove project managers
+      const addAdminPromises = project_admins.projectAdminToAssign?.map(async (sub: any) => {
+        await dispatch(
+          AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+            sub,
+            project_id: id as number,
+          }),
+        );
+      });
+      const removeAdminPromises = project_admins.projectAdminToRemove?.map(async (sub: any) => {
+        await dispatch(UnassignUserFromProject(`${VITE_API_URL}/projects/${id}/users/${sub}`));
+      });
+      await Promise.all([addAdminPromises, removeAdminPromises]);
 
       dispatch(
         CommonActions.SetSnackBar({

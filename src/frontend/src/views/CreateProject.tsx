@@ -82,6 +82,7 @@ const CreateProject = () => {
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
+  const projectManagers = useAppSelector((state) => state.project.projectUsers);
 
   const isAdmin = useIsAdmin();
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
@@ -220,12 +221,21 @@ const CreateProject = () => {
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
+    // Project admins that are already assigned during draft project creation
+    const assignedPMs = projectManagers.map((pm) => pm.user_sub);
+
+    // Identify Project Admins to remove: those who are currently assigned but not included in the new list
+    const pmToRemove = assignedPMs.filter((pm) => !data.project_admins.includes(pm));
+
+    // Identify Project Admins to assign: those in the new list who are not yet assigned to the project
+    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs.includes(pm));
+
     dispatch(
       CreateProjectService(
         `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
-        data.project_admins,
+        { projectAdminToRemove: pmToRemove, projectAdminToAssign: pmToAssign },
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,
@@ -246,6 +256,7 @@ const CreateProject = () => {
       createDraftProject(true);
       return;
     }
+
     if (step === 5) createProject();
 
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
