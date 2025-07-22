@@ -112,7 +112,7 @@ const UploadSurvey = () => {
         </Tooltip>
         <p className="fmtm-mt-1">
           <a
-            href={`https://xlsforms.fmtm.dev?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
+            href={`https://xlsform-editor.fmtm.hotosm.org?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
             target="_"
             className="fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
           >
