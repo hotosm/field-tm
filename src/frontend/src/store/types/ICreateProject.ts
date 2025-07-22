@@ -32,6 +32,8 @@ export type CreateProjectStateTypes = {
         'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
       >)
     | null;
+  isODKCredentialsValid: boolean;
+  ODKCredentialsValidating: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -111,6 +113,7 @@ export type ProjectDetailsTypes = {
   use_odk_collect: boolean;
   status: project_status;
   outline: splittedGeojsonType;
+  organisation_name: string;
 };
 
 export type FormCategoryListTypes = {

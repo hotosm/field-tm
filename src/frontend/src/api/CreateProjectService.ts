@@ -13,6 +13,7 @@ import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { ProjectDetailsTypes } from '@/store/types/ICreateProject';
+import { UnassignUserFromProject } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,7 +22,8 @@ export const GetBasicProjectDetails = (url: string) => {
     try {
       dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(true));
       const response: AxiosResponse<{ id: number } & ProjectDetailsTypes> = await axios.get(url);
-      const { id, name, short_description, description, organisation_id, outline, hashtags } = response.data;
+      const { id, name, short_description, description, organisation_id, outline, hashtags, organisation_name } =
+        response.data;
       dispatch(
         CreateProjectActions.SetBasicProjectDetails({
           id,
@@ -31,6 +33,7 @@ export const GetBasicProjectDetails = (url: string) => {
           organisation_id,
           outline,
           hashtags,
+          organisation_name,
         }),
       );
     } catch (error) {
@@ -119,7 +122,7 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
-  project_admins,
+  project_admins: { projectAdminToRemove: string[]; projectAdminToAssign: string[] },
   file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -129,7 +132,7 @@ export const CreateProjectService = (
     try {
       dispatch(CreateProjectActions.CreateProjectLoading(true));
 
-      // 1. post project details
+      // 1. patch project details
       try {
         await API.patch(url, projectData);
       } catch (error) {
@@ -179,18 +182,19 @@ export const CreateProjectService = (
         ),
       );
 
-      // 5. assign project managers
-      if (!isEmpty(project_admins)) {
-        const promises = project_admins?.map(async (sub: any) => {
-          await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-              sub,
-              project_id: id as number,
-            }),
-          );
-        });
-        await Promise.all(promises);
-      }
+      // 5. assign & remove project managers
+      const addAdminPromises = project_admins.projectAdminToAssign?.map(async (sub: any) => {
+        await dispatch(
+          AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+            sub,
+            project_id: id as number,
+          }),
+        );
+      });
+      const removeAdminPromises = project_admins.projectAdminToRemove?.map(async (sub: any) => {
+        await dispatch(UnassignUserFromProject(`${VITE_API_URL}/projects/${id}/users/${sub}`));
+      });
+      await Promise.all([addAdminPromises, removeAdminPromises]);
 
       dispatch(
         CommonActions.SetSnackBar({
@@ -210,6 +214,11 @@ export const CreateProjectService = (
           message: error?.response?.data?.detail || 'Something went wrong. Please try again.',
         }),
       );
+
+      // revert project status to draft if any error arises during project generation
+      await API.patch(url, {
+        status: 'DRAFT',
+      });
     } finally {
       dispatch(CreateProjectActions.CreateProjectLoading(false));
     }
@@ -601,6 +610,32 @@ const AssignProjectManager = (url: string, params: { sub: number; project_id: nu
     };
 
     return await assignProjectManager();
+  };
+};
+
+export const ValidateODKCredentials = (
+  url: string,
+  params: { odk_central_url: string; odk_central_user: string; odk_central_password: string },
+) => {
+  return async (dispatch: AppDispatch) => {
+    const validateCustomForm = async () => {
+      try {
+        dispatch(CreateProjectActions.SetODKCredentialsValidating(true));
+        await axios.post(url, {}, { params });
+        dispatch(CreateProjectActions.SetODKCredentialsValid(true));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to validate ODK Credentials',
+          }),
+        );
+        dispatch(CreateProjectActions.SetODKCredentialsValid(false));
+      } finally {
+        dispatch(CreateProjectActions.SetODKCredentialsValidating(false));
+      }
+    };
+
+    await validateCustomForm();
   };
 };
 

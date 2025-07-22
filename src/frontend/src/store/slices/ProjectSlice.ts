@@ -35,6 +35,9 @@ const initialState: ProjectStateTypes = {
   newGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
   OdkEntitiesGeojsonLoading: false,
   isEntityDeleting: {},
+  projectUsers: [],
+  projectUsersLoading: false,
+  unassigningUserFromProject: false,
 };
 
 const ProjectSlice = createSlice({
@@ -181,6 +184,15 @@ const ProjectSlice = createSlice({
     ClearProjectFeatures(state) {
       state.newGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
       state.badGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
+    },
+    SetProjectUsers(state, action: PayloadAction<ProjectStateTypes['projectUsers']>) {
+      state.projectUsers = action.payload;
+    },
+    SetProjectUsersLoading(state, action: PayloadAction<boolean>) {
+      state.projectUsersLoading = action.payload;
+    },
+    UnassigningUserFromProject(state, action: PayloadAction<boolean>) {
+      state.unassigningUserFromProject = action.payload;
     },
   },
 });
