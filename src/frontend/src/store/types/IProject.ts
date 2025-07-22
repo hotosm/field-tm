@@ -41,10 +41,9 @@ export type ProjectStateTypes = {
   newGeomFeatureCollection: FeatureCollectionType;
   OdkEntitiesGeojsonLoading: boolean;
   isEntityDeleting: Record<string, boolean>;
-  projectUsers: { user_sub: string; project_id: number; role: user_roles }[];
+  projectUsers: { user_sub: string; project_id: number; role: user_roles; username: string }[];
   projectUsersLoading: boolean;
   unassigningUserFromProject: boolean;
-  userToRemoveFromProject: string | null;
 };
 
 type projectCommentsListTypes = {

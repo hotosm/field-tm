@@ -38,7 +38,6 @@ const initialState: ProjectStateTypes = {
   projectUsers: [],
   projectUsersLoading: false,
   unassigningUserFromProject: false,
-  userToRemoveFromProject: null,
 };
 
 const ProjectSlice = createSlice({
@@ -194,9 +193,6 @@ const ProjectSlice = createSlice({
     },
     UnassigningUserFromProject(state, action: PayloadAction<boolean>) {
       state.unassigningUserFromProject = action.payload;
-    },
-    SetUserToRemoveFromProject(state, action: PayloadAction<string | null>) {
-      state.userToRemoveFromProject = action.payload;
     },
   },
 });
