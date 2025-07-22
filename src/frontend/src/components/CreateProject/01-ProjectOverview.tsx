@@ -62,11 +62,8 @@ const ProjectOverview = () => {
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const isODKCredentialsValid = useAppSelector((state) => state.createproject.isODKCredentialsValid);
   const ODKCredentialsValidating = useAppSelector((state) => state.createproject.ODKCredentialsValidating);
-  const projectManagers = useAppSelector((state) => state.project.projectUsers);
+  const projectAdmins = useAppSelector((state) => state.project.projectUsers);
   const projectUsersLoading = useAppSelector((state) => state.project.projectUsersLoading);
-  const unassigningUserFromProject = useAppSelector((state) => state.project.unassigningUserFromProject);
-  const userToRemoveFromProject = useAppSelector((state) => state.project.userToRemoveFromProject);
-
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
   const { errors } = formState;
@@ -116,6 +113,25 @@ const ProjectOverview = () => {
 
     setShowODKCredsModal(false);
   }, [isODKCredentialsValid]);
+
+  // setup project admin select options if project admins are available
+  useEffect(() => {
+    if (!values?.id || isEmpty(projectAdmins)) return;
+
+    const projectAdminOptions = projectAdmins.map((admin) => ({
+      id: admin.user_sub,
+      label: admin.username,
+      value: admin.user_sub,
+    }));
+    const project_admins = projectAdmins.map((admin) => admin.user_sub);
+    dispatch(
+      CommonActions.SetPreviousSelectedOptions({
+        key: 'project_admins',
+        options: projectAdminOptions,
+      }),
+    );
+    setValue('project_admins', project_admins);
+  }, [projectAdmins, values?.id]);
 
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
@@ -304,6 +320,7 @@ const ProjectOverview = () => {
           name="project_admins"
           render={({ field }) => (
             <Select2
+              name="project_admins"
               options={userList || []}
               value={field.value}
               onChange={(value: any) => field.onChange(value)}
@@ -319,6 +336,7 @@ const ProjectOverview = () => {
                 }
               }}
               ref={field.ref}
+              disabled={projectUsersLoading}
             />
           )}
         />
