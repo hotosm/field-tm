@@ -211,25 +211,27 @@ async def flatgeobuf_to_featcol(
 
 
 async def split_geojson_by_task_areas(
-    db: Connection,
-    featcol: geojson.FeatureCollection,
-    project_id: int,
+    db: Connection, featcol: geojson.FeatureCollection, project_id: int, geom_type: str
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
 
     NOTE batch inserts feature.properties.osm_id as feature.id for each feature.
-    NOTE ST_Within used on polygon centroids to correctly capture the geoms per task.
+    NOTE ST_Within used on polygon centroids and ST_Intersects used on linear features
+    to correctly capture the geoms per task.
 
     Args:
         db (Connection): Database connection.
-        featcol (bytes): Data extract feature collection.
+        featcol (geojson.FeatureCollection): Data extract feature collection.
         project_id (int): The project ID for associated tasks.
+        geom_type (str): The geometry type of the features.
 
     Returns:
         dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
     """
     try:
         features = featcol["features"]
+        use_st_intersects = geom_type == "POLYLINE"
+
         feature_ids = []
         feature_properties = []
         feature_geometries = []
@@ -239,42 +241,49 @@ async def split_geojson_by_task_areas(
             feature_properties.append(Json(f["properties"]))
             feature_geometries.append(json.dumps(f["geometry"]))
 
+        # Choose spatial join logic based on geometry type
+        spatial_join_condition = (
+            "ST_Intersects(f.geom, t.outline)"
+            if use_st_intersects
+            else "ST_Within(ST_Centroid(f.geom), t.outline)"
+        )
+
         async with db.cursor(row_factory=dict_row) as cur:
             await cur.execute(
-                """
-            WITH feature_data AS (
-                SELECT DISTINCT ON (geom)
-                    unnest(%s::TEXT[]) AS id,
-                    unnest(%s::JSONB[]) AS properties,
-                    ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
-            ),
-            task_features AS (
+                f"""
+                WITH feature_data AS (
+                    SELECT DISTINCT ON (geom)
+                        unnest(%s::TEXT[]) AS id,
+                        unnest(%s::JSONB[]) AS properties,
+                        ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
+                ),
+                task_features AS (
+                    SELECT
+                        t.project_task_index AS task_id,
+                        jsonb_build_object(
+                            'type', 'Feature',
+                            'id', f.id,
+                            'geometry', ST_AsGeoJSON(f.geom)::jsonb,
+                            'properties', jsonb_set(
+                                jsonb_set(
+                                    f.properties,
+                                    '{{task_id}}',
+                                    to_jsonb(t.project_task_index)
+                                ),
+                                '{{project_id}}', to_jsonb(%s)
+                            )
+                        ) AS feature
+                    FROM tasks t
+                    JOIN feature_data f
+                    ON {spatial_join_condition}
+                    WHERE t.project_id = %s
+                )
                 SELECT
-                    t.project_task_index AS task_id,
-                    jsonb_build_object(
-                        'type', 'Feature',
-                        'id', f.id,
-                        'geometry', ST_AsGeoJSON(f.geom)::jsonb,
-                        'properties', jsonb_set(
-                            jsonb_set(
-                                f.properties,
-                                '{task_id}',
-                                to_jsonb(t.project_task_index)
-                            ),
-                            '{project_id}', to_jsonb(%s)
-                        )
-                    ) AS feature
-                FROM tasks t
-                JOIN feature_data f
-                ON ST_Within(ST_Centroid(f.geom), t.outline)
-                WHERE t.project_id = %s
-            )
-            SELECT
-                task_id,
-                jsonb_agg(feature) AS features
-            FROM task_features
-            GROUP BY task_id;
-            """,
+                    task_id,
+                    jsonb_agg(feature) AS features
+                FROM task_features
+                GROUP BY task_id;
+                """,
                 (
                     feature_ids,
                     feature_properties,
@@ -304,7 +313,7 @@ async def split_geojson_by_task_areas(
                 )
                 log.warning(msg)
                 return None
-        return result_dict
+            return result_dict
 
     except ProgrammingError as e:
         log.error(e)
