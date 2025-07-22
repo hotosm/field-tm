@@ -144,7 +144,7 @@ function Select2({
                   {Array.isArray(value) && value.length > 0 ? (
                     value.length === 1 ? (
                       <span className="fmtm-body-sm fmtm-line-clamp-1 fmtm-text-start">
-                        {options?.find((option) => option[choose as keyof selectOptionsType] === value[0])?.label ||
+                        {options?.find((option) => option?.[choose as keyof selectOptionsType] === value[0])?.label ||
                           '1 Selected'}
                       </span>
                     ) : (
@@ -216,8 +216,8 @@ function Select2({
                           dispatch(
                             CommonActions.SetPreviousSelectedOptions({
                               key: name,
-                              options: previousSelectedOptions[name]
-                                ? [...previousSelectedOptions[name], option]
+                              options: previousSelectedOptions?.[name]
+                                ? [...previousSelectedOptions?.[name], option]
                                 : [option],
                             }),
                           );
@@ -270,7 +270,7 @@ function Select2({
             >
               <p className="fmtm-text-xs">
                 {handleApiSearch && name
-                  ? [...previousSelectedOptions[name as string], ...options]?.find((option) => option.value === val)
+                  ? [...previousSelectedOptions?.[name as string], ...options]?.find((option) => option.value === val)
                       ?.label
                   : options.find((option) => option.value === val)?.label}
               </p>

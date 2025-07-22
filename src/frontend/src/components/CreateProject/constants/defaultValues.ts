@@ -18,6 +18,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   uploadedAOIFile: undefined,
   outline: undefined,
   outlineArea: undefined,
+  organisation_name: '',
 
   // 02 Project Details
   visibility: project_visibility.PUBLIC,

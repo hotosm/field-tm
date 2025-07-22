@@ -2,6 +2,51 @@ import { z } from 'zod/v4';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { data_extract_type, GeoGeomTypesEnum, project_visibility, task_split_type } from '@/types/enums';
 
+const validateODKCreds = (ctx: any, values: Record<string, any>) => {
+  if (!values.odk_central_url?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_url,
+      path: ['odk_central_url'],
+      message: 'ODK URL is Required',
+      code: 'custom',
+    });
+  } else if (!isValidUrl(values.odk_central_url)) {
+    ctx.issues.push({
+      input: values.odk_central_url,
+      path: ['odk_central_url'],
+      message: 'Invalid URL',
+      code: 'custom',
+    });
+  }
+  if (!values.odk_central_user?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_user,
+      path: ['odk_central_user'],
+      message: 'ODK Central User is Required',
+      code: 'custom',
+    });
+  }
+  if (!values.odk_central_password?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_password,
+      path: ['odk_central_password'],
+      message: 'ODK Central Password is Required',
+      code: 'custom',
+    });
+  }
+};
+
+export const odkCredentialsValidationSchema = z
+  .object({
+    odk_central_url: z.string(),
+    odk_central_user: z.string().optional(),
+    odk_central_password: z.string().optional(),
+  })
+  .check((ctx) => {
+    const values = ctx.value;
+    validateODKCreds(ctx, values);
+  });
+
 export const projectOverviewValidationSchema = z
   .object({
     id: z.number().optional(),
@@ -30,41 +75,12 @@ export const projectOverviewValidationSchema = z
       message: 'Project AOI is required',
     }),
     outlineArea: z.string().optional(),
+    organisation_name: z.string(),
   })
   .check((ctx) => {
     const values = ctx.value;
     if (values.hasODKCredentials && !values.useDefaultODKCredentials) {
-      if (!values.odk_central_url?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_url,
-          path: ['odk_central_url'],
-          message: 'ODK URL is Required',
-          code: 'custom',
-        });
-      } else if (!isValidUrl(values.odk_central_url)) {
-        ctx.issues.push({
-          input: values.odk_central_url,
-          path: ['odk_central_url'],
-          message: 'Invalid URL',
-          code: 'custom',
-        });
-      }
-      if (!values.odk_central_user?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_user,
-          path: ['odk_central_user'],
-          message: 'ODK Central User is Required',
-          code: 'custom',
-        });
-      }
-      if (!values.odk_central_password?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_password,
-          path: ['odk_central_password'],
-          message: 'ODK Central Password is Required',
-          code: 'custom',
-        });
-      }
+      validateODKCreds(ctx, values);
     }
     if (values.uploadAreaSelection === 'upload_file' && !values.uploadedAOIFile) {
       ctx.issues.push({

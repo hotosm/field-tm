@@ -42,9 +42,10 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
-import { data_extract_type, task_split_type } from '@/types/enums';
+import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
+import { GetProjectUsers } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -81,11 +82,21 @@ const CreateProject = () => {
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
+  const projectManagers = useAppSelector((state) => state.project.projectUsers);
 
   const isAdmin = useIsAdmin();
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
   const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
   const isProjectManager = useIsProjectManager(projectId);
+
+  const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
+    defaultValues: defaultValues,
+    resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
+  });
+
+  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
+  const { dirtyFields } = formState;
+  const values = watch();
 
   useEffect(() => {
     if (step < 1 || step > 5 || !values.osm_category) {
@@ -103,19 +114,16 @@ const CreateProject = () => {
   }, [basicProjectDetails]);
 
   useEffect(() => {
+    if (projectId) return;
     dispatch(
       OrganisationService(isAdmin ? `${VITE_API_URL}/organisation` : `${VITE_API_URL}/organisation/my-organisations`),
     );
-  }, []);
+  }, [projectId]);
 
-  const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
-    defaultValues: defaultValues,
-    resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
-  });
-
-  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
-  const { dirtyFields } = formState;
-  const values = watch();
+  useEffect(() => {
+    if (!projectId) return;
+    dispatch(GetProjectUsers(`${VITE_API_URL}/projects/${projectId}/users`, { role: project_roles.PROJECT_MANAGER }));
+  }, [projectId]);
 
   const form = {
     1: <ProjectOverview />,
@@ -213,12 +221,21 @@ const CreateProject = () => {
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
+    // Project admins that are already assigned during draft project creation
+    const assignedPMs = projectManagers.map((pm) => pm.user_sub);
+
+    // Identify Project Admins to remove: those who are currently assigned but not included in the new list
+    const pmToRemove = assignedPMs.filter((pm) => !data.project_admins.includes(pm));
+
+    // Identify Project Admins to assign: those in the new list who are not yet assigned to the project
+    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs.includes(pm));
+
     dispatch(
       CreateProjectService(
         `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
-        data.project_admins,
+        { projectAdminToRemove: pmToRemove, projectAdminToAssign: pmToAssign },
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,
@@ -239,6 +256,7 @@ const CreateProject = () => {
       createDraftProject(true);
       return;
     }
+
     if (step === 5) createProject();
 
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
