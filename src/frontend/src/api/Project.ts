@@ -414,6 +414,7 @@ export const GetProjectUsers = (url: string, params: { role: project_roles }) =>
             message: error?.response?.data?.detail || 'Failed to retrieve project users',
           }),
         );
+        dispatch(ProjectActions.SetProjectUsers([]));
       } finally {
         dispatch(ProjectActions.SetProjectUsersLoading(false));
       }
