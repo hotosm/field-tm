@@ -67,6 +67,15 @@ These can point to an externally hosted instance of ODK Central.
 Or ODK Central can be started as part of the Field-TM docker compose
 stack, and variables should be set accordingly.
 
+##### Changing The Default Organisation
+
+```dotenv
+DEFAULT_ORG_NAME=MdP
+DEFAULT_ORG_URL=https://mapadasperiferias.cidades.gov.br
+DEFAULT_ORG_EMAIL=snp.gab@cidades.gov.br
+DEFAULT_ORG_LOGO_URL=https://www.gov.br/cidades/pt-br/logo.png
+```
+
 #### Other Domains
 
 If you run Field-TM with ODK and Minio (S3) included, then the
