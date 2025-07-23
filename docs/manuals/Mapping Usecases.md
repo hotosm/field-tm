@@ -31,16 +31,22 @@
 
 - In forth step, Choose line as geometry to map.
 - If you wish to include other related features like bridges as new feature, You can
-  enable "I want to use a mix of geometry type" and select which type of new geometry feature you will map in field.
-- If you are drawing lines for new feature encountered in field then you can disable the option and move ahead.
-- Select "Fetch data from OSM", if you want to download highway within the project area from OSM.
-- If you already have Highway data as geojson file, you can select "Fetch data from OSM" and upload the file. Refer [HERE](https://docs.fmtm.dev/manuals/project-managers/#project-creation-tips) for project creation Tips
-- If you are collecting features directly on field, then you can choose "No existing feature" and move ahead.
+  enable "I want to use a mix of geometry type" and select which type of new
+  geometry feature you will map in field.
+- If you are drawing lines for new feature encountered in field then you can
+   disable the option and move ahead.
+- Select "Fetch data from OSM", if you want to download highway within the
+  project area from OSM.
+- If you already have Highway data as geojson file, you can select "Fetch data from OSM"
+   and upload the file. Refer [HERE](https://docs.fmtm.dev/manuals/project-managers/#project-creation-tips)
+  for project creation Tips
+- If you are collecting features directly on field, then you can choose
+  "No existing feature" and move ahead.
 
 <img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/a183eb30-c629-4f61-b82c-74b9634bde95" />
 
 - For linear features survey, we suggest to use "Use uploaded AOI as task areas" rather than
-  creating multiple tasks. Hence other options of dividing area into square tasks and tasks splitting
-  algorithms are disabled in this case.
+  creating multiple tasks. Hence other options of dividing area into square tasks and
+  tasks splitting algorithms are disabled in this case.
 
   <img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/d31282f0-c3e6-47ef-958b-db8473e62c89" />
