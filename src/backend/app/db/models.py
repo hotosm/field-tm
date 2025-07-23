@@ -1838,21 +1838,19 @@ class DbProject(BaseModel):
 
         # Regular users see:
         # 1. Public non-draft projects
-        # 2. Private projects they have access to (if they're a project manager,
-        # they can see drafts)
+        # 2. Projects they have access to:
+        #    - If Any user is assigned as a project manager in any project,
+        # can see public projects and assigned project even it is draft
         return """
         (
             (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
-            OR (
-                p.visibility = 'PRIVATE'
-                AND EXISTS (
-                    SELECT 1 FROM user_roles ur
-                    WHERE ur.project_id = p.id
-                    AND ur.user_sub = %(current_user_sub)s
-                    AND (
-                        ur.role = 'PROJECT_MANAGER'
-                        OR p.status != 'DRAFT'
-                    )
+            OR EXISTS (
+                SELECT 1 FROM user_roles ur
+                WHERE ur.project_id = p.id
+                AND ur.user_sub = %(current_user_sub)s
+                AND (
+                    ur.role = 'PROJECT_MANAGER'
+                    OR p.status != 'DRAFT'
                 )
             )
         )
@@ -2392,6 +2390,7 @@ class DbBasemap(BaseModel):
     created_at: Optional[AwareDatetime] = None
 
     # Calculated
+
     bbox: Optional[list[float]] = None
 
     @classmethod
