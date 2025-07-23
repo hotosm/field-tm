@@ -3,15 +3,10 @@
 ## project creation
 
 - Admin who has permission to create project should create a project
-  by filling all necessary data.
+by filling all necessary data.
 - Fill basic information like project name and descriptions.
 - Select organisation and project managers.
 - Draw or Upload project boundary and create draft project.
-
-> Tips:
-> We accept both polygon and multipolygon for project boundary. But the
-> multipolygon is merged and accepted as single polygon moving forward. So
-> if you have disjoint polygons, we suggest to create multiple projects]
 
 <img width="800" height="500" alt="FireShot Capture 1470 - project creation test - HOT Field Tasking Manager -  dev fmtm hotosm org" src="https://github.com/user-attachments/assets/ba189993-9283-48c2-8495-80164e5c1d2b" />
 
@@ -34,11 +29,11 @@
   enable "I want to use a mix of geometry type" and select which type of new
   geometry feature you will map in field.
 - If you are drawing lines for new feature encountered in field then you can
-   disable the option and move ahead.
+  disable the option and move ahead.
 - Select "Fetch data from OSM", if you want to download highway within the
   project area from OSM.
 - If you already have Highway data as geojson file, you can select "Fetch data from OSM"
-   and upload the file. Refer [HERE](https://docs.fmtm.dev/manuals/project-managers/#project-creation-tips)
+  and upload the file. Refer [HERE](https://docs.fmtm.dev/manuals/project-managers/#project-creation-tips)
   for project creation Tips
 - If you are collecting features directly on field, then you can choose
   "No existing feature" and move ahead.
