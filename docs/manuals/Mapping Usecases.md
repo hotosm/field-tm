@@ -23,7 +23,7 @@
 <img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/e73bf417-70fa-49b2-9974-ca876cdbf1e1" />
 
 - Select OSM Highway as survey category under
-   "what are you surveying category".
+  "what are you surveying category".
 - When selected, download form option is enabled. Click to
   download highway xls form.
 - Modify the form as your project need or upload the file as it is.
