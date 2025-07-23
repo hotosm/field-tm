@@ -133,14 +133,6 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     dispatch(
-      SubmissionFormFieldsService(
-        `${import.meta.env.VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`,
-      ),
-    );
-  }, []);
-
-  useEffect(() => {
-    dispatch(
       SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,

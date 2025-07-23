@@ -7,7 +7,13 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
+import {
+  ProjectContributorsService,
+  MappedVsValidatedTaskService,
+  SubmissionFormFieldsService,
+} from '@/api/SubmissionService';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectSubmissions = () => {
   const dispatch = useAppDispatch();
@@ -44,22 +50,24 @@ const ProjectSubmissions = () => {
   // for hot fix to display task-list and show option of task-list for submission table filter
   // better solution needs to be researched
   useEffect(() => {
-    dispatch(GetEntityStatusList(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
+    dispatch(GetEntityStatusList(`${VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
   useEffect(() => {
-    dispatch(ProjectContributorsService(`${import.meta.env.VITE_API_URL}/projects/contributors/${projectId}`));
+    dispatch(ProjectContributorsService(`${VITE_API_URL}/projects/contributors/${projectId}`));
   }, []);
 
   useEffect(() => {
-    dispatch(
-      MappedVsValidatedTaskService(`${import.meta.env.VITE_API_URL}/tasks/activity?project_id=${projectId}&days=30`),
-    );
+    dispatch(MappedVsValidatedTaskService(`${VITE_API_URL}/tasks/activity?project_id=${projectId}&days=30`));
+  }, []);
+
+  useEffect(() => {
+    dispatch(SubmissionFormFieldsService(`${VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`));
   }, []);
 
   useEffect(() => {
     if (!searchParams.get('tab')) {
-      setSearchParams({ tab: 'infographics' });
+      setSearchParams({ tab: 'table' });
     }
   }, []);
 
