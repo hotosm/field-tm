@@ -68,3 +68,29 @@ merge-translations:
   git remote add weblate https://hosted.weblate.org/git/hotosm/field-tm-mapper-ui || true
   git fetch weblate
   git merge weblate/dev
+
+# Create a `.env` from .env.example
+create-env-file:
+  #!/usr/bin/env sh
+  EXAMPLE_DOTENV=".env.example"
+  EXAMPLE_DOTENV_PATH="../../../${EXAMPLE_DOTENV}"
+  export DEBUG=True
+  echo "Checking if ${EXAMPLE_DOTENV} exists"
+  if [ -f ${EXAMPLE_DOTENV_PATH} ]; then
+    # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+    echo "${EXAMPLE_DOTENV} found. Downloading envsubst"
+    curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+    if [ $? -ne 0 ]; then
+        echo "Failed to download envsubst"
+        exit 1
+    fi
+    chmod +x envsubst
+    echo "Substituting variables from ${EXAMPLE_DOTENV} --> .env"
+    ./envsubst < "${EXAMPLE_DOTENV_PATH}" > .env
+  else
+    echo "${EXAMPLE_DOTENV} not found, creating empty .env"
+    touch .env
+  fi
+
+  echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
+  echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> .env
