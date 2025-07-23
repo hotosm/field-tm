@@ -1814,42 +1814,49 @@ class DbProject(BaseModel):
         cls, access_info: Optional[dict] = None
     ) -> Optional[str]:
         """Build visibility filter based on user context."""
-        # Not logged in, so return public projects only
+        # Not logged in, so return public projects only, excluding drafts
         if access_info is None:
             return """
-            (
-                p.visibility = 'PUBLIC'
-            )
-            """
+        (
+            p.visibility = 'PUBLIC'
+            AND p.status != 'DRAFT'
+        )
+        """
 
         if access_info["is_superadmin"]:
             # Superadmin sees everything, no filters
             return None
 
         if access_info["managed_org_ids"]:
-            # Org managers see all projects in their orgs
+            # Org managers see all projects in their orgs including drafts
             return """
-                (
-                    p.visibility = 'PUBLIC'
-                    OR p.organisation_id = ANY(%(managed_org_ids)s)
-                )
-            """
-
-        # All users see public, sensitive, and invite-only projects.
-        # Private projects are only visible to users who have access.
-        return """
             (
-                p.visibility != 'PRIVATE'
-                OR (
-                    p.visibility = 'PRIVATE'
-                    AND EXISTS (
-                        SELECT 1 FROM user_roles ur
-                        WHERE ur.project_id = p.id
-                        AND ur.user_sub = %(current_user_sub)s
+                p.visibility = 'PUBLIC'
+                OR p.organisation_id = ANY(%(managed_org_ids)s)
+            )
+        """
+
+        # Regular users see:
+        # 1. Public non-draft projects
+        # 2. Private projects they have access to (if they're a project manager,
+        # they can see drafts)
+        return """
+        (
+            (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
+            OR (
+                p.visibility = 'PRIVATE'
+                AND EXISTS (
+                    SELECT 1 FROM user_roles ur
+                    WHERE ur.project_id = p.id
+                    AND ur.user_sub = %(current_user_sub)s
+                    AND (
+                        ur.role = 'PROJECT_MANAGER'
+                        OR p.status != 'DRAFT'
                     )
                 )
             )
-        """
+        )
+    """
 
     @classmethod
     def _construct_sql_query(
