@@ -623,6 +623,12 @@ export const ValidateODKCredentials = (
         dispatch(CreateProjectActions.SetODKCredentialsValidating(true));
         await axios.post(url, {}, { params });
         dispatch(CreateProjectActions.SetODKCredentialsValid(true));
+        dispatch(
+          CommonActions.SetSnackBar({
+            variant: 'success',
+            message: 'ODK Credentials Valid',
+          }),
+        );
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
