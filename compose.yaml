@@ -186,8 +186,16 @@ services:
       dockerfile: Dockerfile.ui.debug
       target: build
     volumes:
-      - ./src/frontend:/app
-      - /app/node_modules/
+      - ./src/frontend/e2e:/app/e2e
+      - ./src/frontend/public:/app/public
+      - ./src/frontend/src:/app/src
+      - ./src/frontend/tests:/app/tests
+      - ./src/frontend/index.html:/app/index.html
+      - ./src/frontend/package.json:/app/package.json
+      - ./src/frontend/playwright.config.ts:/app/playwright.config.ts
+      - ./src/frontend/postcss.config.js:/app/postcss.config.js
+      - ./src/frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./src/frontend/vite.config.ts:/app/vite.config.ts
     environment:
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     ports:
@@ -205,9 +213,16 @@ services:
       dockerfile: Dockerfile.ui.debug
       target: init-db
     volumes:
-      - ./src/mapper:/app
-      - /app/node_modules/
-      - /app/.svelte-kit/
+      - ./src/mapper/messages:/app/messages
+      - ./src/mapper/project.inlang:/app/project.inlang
+      - ./src/mapper/src:/app/src
+      - ./src/mapper/static:/app/static
+      - ./src/mapper/tests:/app/tests
+      - ./src/mapper/package.json:/app/package.json
+      - ./src/mapper/playwright.config.ts:/app/playwright.config.ts
+      - ./src/mapper/svelte.config.js:/app/svelte.config.js
+      - ./src/mapper/uno.config.ts:/app/uno.config.ts
+      - ./src/mapper/vite.config.ts:/app/vite.config.ts
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
       - TEST_PWA=${TEST_PWA:-false}
