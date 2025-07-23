@@ -110,7 +110,7 @@ async def read_projects(
     limit: int = 100,
 ):
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, user_sub)
+    projects = await DbProject.all(db, skip, limit, current_user, user_sub)
     return projects
 
 
