@@ -1844,7 +1844,8 @@ class DbProject(BaseModel):
         return """
         (
             (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
-            OR EXISTS (
+            OR
+            EXISTS (
                 SELECT 1 FROM user_roles ur
                 WHERE ur.project_id = p.id
                 AND ur.user_sub = %(current_user_sub)s
