@@ -151,6 +151,11 @@
 							<span>{m['dialog_task_actions.complete_mapping']()}</span>
 						</sl-button>
 					</div>
+				{:else}
+					<div>
+						This task was marked as fully mapped. If you wish to unlock it and continue mapping, please contact the
+						project manager.
+					</div>
 				{/if}
 			{/if}
 		</div>
