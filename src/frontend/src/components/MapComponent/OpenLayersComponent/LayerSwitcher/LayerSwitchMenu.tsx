@@ -3,12 +3,7 @@ import osmImg from '@/assets/images/osmLayer.png';
 import satelliteImg from '@/assets/images/satelliteLayer.png';
 import { useAppSelector } from '@/types/reduxTypes';
 import { useLocation } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuPortal,
-} from '@/components/common/Dropdown';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { Tooltip } from '@mui/material';
 
 export const layerIcons = {
@@ -117,7 +112,7 @@ const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayer
   };
 
   return (
-    <div className="fmtm-w-6 fmtm-h-6 fmtm-max-w-6 fmtm-max-h-6">
+    <div className="fmtm-w-8 fmtm-h-8 fmtm-max-w-8 fmtm-max-h-8 fmtm-rounded-full fmtm-overflow-hidden fmtm-border-[2px] fmtm-border-red-medium">
       <DropdownMenu modal={false} onOpenChange={(status) => setIsLayerMenuOpen(status)}>
         <DropdownMenuTrigger className="fmtm-outline-none">
           <Tooltip title="Base Maps" placement={isLayerMenuOpen ? 'bottom' : 'left'} arrow>
@@ -126,49 +121,45 @@ const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayer
                 backgroundImage: activeLayer === 'None' ? 'none' : `url(${layerIcons[activeLayer] || satelliteImg})`,
                 backgroundColor: 'white',
               }}
-              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-6 fmtm-h-6 fmtm-max-w-6 fmtm-max-h-6 fmtm-cursor-pointer fmtm-bg-contain ${
-                activeLayer === 'None' ? '!fmtm-border-primaryRed' : ''
-              }`}
+              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-8 fmtm-h-8 fmtm-cursor-pointer fmtm-bg-contain`}
             ></div>
           </Tooltip>
         </DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent
-            className="!fmtm-p-0 fmtm-border-none fmtm-z-[60px]"
-            align="end"
-            alignOffset={100}
-            sideOffset={-42}
-          >
-            <div className="fmtm-bg-white  fmtm-max-h-[20rem] fmtm-overflow-y-scroll scrollbar fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-pt-1 fmtm-rounded-lg fmtm-p-3">
+        <DropdownMenuContent
+          className="!fmtm-p-0 fmtm-border-none fmtm-z-[45] fmtm-shadow-[0px_10px_10px_10px_rgba(0,0,0,0.1)]"
+          align="end"
+          alignOffset={160}
+          sideOffset={-30}
+        >
+          <div className="fmtm-bg-white  fmtm-max-h-[20rem] fmtm-overflow-y-scroll scrollbar fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-pt-1 fmtm-rounded-lg fmtm-p-3">
+            <div>
+              <h6 className="fmtm-body-sm-semibold fmtm-mb-2">Base Maps</h6>
+              <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-4">
+                {baseLayers.map((layer) => (
+                  <LayerCard
+                    key={layer}
+                    layer={layer}
+                    changeBaseLayerHandler={changeBaseLayer}
+                    active={layer === activeLayer}
+                  />
+                ))}
+              </div>
+            </div>
+            {hasPMTile && (
               <div>
-                <h6 className="fmtm-body-sm-semibold fmtm-mb-2">Base Maps</h6>
-                <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-4">
-                  {baseLayers.map((layer) => (
-                    <LayerCard
-                      key={layer}
-                      layer={layer}
-                      changeBaseLayerHandler={changeBaseLayer}
-                      active={layer === activeLayer}
-                    />
-                  ))}
+                <h6 className="fmtm-body-sm-semibold fmtm-mb-1">Tiles</h6>
+                <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-y-2">
+                  <LayerCard
+                    key="Custom"
+                    layer="Custom"
+                    changeBaseLayerHandler={() => toggleTileLayer('Custom')}
+                    active={'Custom' === activeTileLayer}
+                  />
                 </div>
               </div>
-              {hasPMTile && (
-                <div>
-                  <h6 className="fmtm-body-sm-semibold fmtm-mb-1">Tiles</h6>
-                  <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-y-2">
-                    <LayerCard
-                      key="Custom"
-                      layer="Custom"
-                      changeBaseLayerHandler={() => toggleTileLayer('Custom')}
-                      active={'Custom' === activeTileLayer}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
+            )}
+          </div>
+        </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
