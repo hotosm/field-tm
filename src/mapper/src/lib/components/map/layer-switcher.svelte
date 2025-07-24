@@ -36,14 +36,12 @@ map = new Map({
 		styles: maplibregl.StyleSpecification[];
 		selectedStyleName?: string | undefined;
 		map: maplibregl.Map | undefined;
-		sourcesIdToReAdd: string[];
 		selectedStyleUrl: string | undefined;
 		setSelectedStyleUrl: (url: string | undefined) => void;
 		isOpen: boolean;
 	};
 
-	const { styles, selectedStyleName, map, sourcesIdToReAdd, selectedStyleUrl, setSelectedStyleUrl, isOpen }: Props =
-		$props();
+	const { styles, selectedStyleName, map, selectedStyleUrl, setSelectedStyleUrl, isOpen }: Props = $props();
 
 	let allStyles: MapLibreStylePlusMetadata[] | [] = $state([]);
 	// This variable is used for updating the prop selectedStyleName dynamically
@@ -147,31 +145,7 @@ map = new Map({
 
 		setSelectedStyleUrl(style.metadata.thumbnail);
 
-		// Apply the selected style to the map
-		// being sure to save sources and layers to add back on top
-		const reAddLayers = currentMapStyle?.layers?.filter((layer) => sourcesIdToReAdd.includes(layer.source));
-		const reAddSources = Object.entries(currentMapStyle?.sources || {})
-			.filter(([key]) => sourcesIdToReAdd.includes(key))
-			.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
 		map?.setStyle(style);
-
-		// Re-add sources and layers
-		if (reAddSources) {
-			Object.entries(reAddSources).forEach(([id, source]) => {
-				if (!map?.getStyle().sources[id]) {
-					map?.addSource(id, source);
-				}
-			});
-		}
-
-		if (reAddLayers) {
-			reAddLayers.forEach((layer) => {
-				if (!map?.getStyle().layers.find((l) => l.id === layer.id)) {
-					map?.addLayer(layer);
-				}
-			});
-		}
 	}
 	onDestroy(() => {
 		allStyles = [];
@@ -198,4 +172,3 @@ map = new Map({
 		{/each}
 	</div>
 </div>
-

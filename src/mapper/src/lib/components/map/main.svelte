@@ -110,6 +110,7 @@
 	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
+	let toggleLayer = $state(true);
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,
@@ -505,91 +506,262 @@
 	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->
 	<Geolocation {map}></Geolocation>
-	<!-- The task area geojson -->
-	<GeoJSON id="tasks" data={taskStore.featcol} promoteId="fid">
-		<FillLayer
-			id="task-fill-layer"
-			hoverCursor="pointer"
-			paint={{
-				'fill-color': [
-					'match',
-					['get', 'state'],
-					'UNLOCKED_TO_MAP',
-					cssValue('--task-unlocked-to-map'),
-					'LOCKED_FOR_MAPPING',
-					cssValue('--task-locked-for-mapping'),
-					'UNLOCKED_TO_VALIDATE',
-					cssValue('--task-unlocked-to-validate'),
-					'LOCKED_FOR_VALIDATION',
-					cssValue('--task-locked-for-validation'),
-					'UNLOCKED_DONE',
-					cssValue('--task-unlocked-done'),
-					cssValue('--task-unlocked-to-map'), // default color if no match,
-				],
-				'fill-opacity': hoverStateFilter(0.3, 0),
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
-		<LineLayer
-			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-			paint={{
-				'line-color': [
-					'case',
-					['==', ['get', 'fid'], taskStore.selectedTaskId],
-					cssValue('--task-outline-selected'),
-					cssValue('--task-outline'),
-				],
-				'line-width': 3,
-				'line-opacity': ['case', ['==', ['get', 'fid'], taskStore.selectedTaskId], 1, 0.35],
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
-	</GeoJSON>
-	<GeoJSON id="tasks-centroid" data={taskCentroidGeojson} promoteId="fid">
-		<SymbolLayer
-			applyToClusters={false}
-			hoverCursor="pointer"
-			layout={{
-				'icon-image': [
-					'case',
-					['==', ['get', 'state'], 'LOCKED_FOR_MAPPING'],
-					'LOCKED_FOR_MAPPING',
-					['==', ['get', 'state'], 'LOCKED_FOR_VALIDATION'],
-					'LOCKED_FOR_VALIDATION',
-					'',
-				],
-				'symbol-placement': 'point',
-				'icon-allow-overlap': true,
-			}}
-		/>
-	</GeoJSON>
-	<!-- The features / entities -->
-	<!-- For LINE, show all geoms (pass global extent), else filter by clicked task area (not working) -->
-	{#if entitiesUrl}
-		<FlatGeobuf
-			id="entities"
-			url={entitiesStore.fgbOpfsUrl || entitiesUrl}
-			extent={primaryGeomType === MapGeomTypes.POLYLINE
-				? polygon([
-						[
-							[-180, -90],
-							[-180, 90],
-							[180, 90],
-							[180, -90],
-							[-180, -90],
-						],
-					]).geometry
-				: taskStore.selectedTaskGeom}
-			extractGeomCols={true}
-			promoteId="id"
-			processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
-			geojsonUpdateDependency={[entitiesStore.entitiesList]}
-		>
-			{#if primaryGeomType === MapGeomTypes.POLYGON}
+	{#if toggleLayer}
+		<!-- The task area geojson -->
+		<GeoJSON id="tasks" data={taskStore.featcol} promoteId="fid">
+			<FillLayer
+				id="task-fill-layer"
+				hoverCursor="pointer"
+				paint={{
+					'fill-color': [
+						'match',
+						['get', 'state'],
+						'UNLOCKED_TO_MAP',
+						cssValue('--task-unlocked-to-map'),
+						'LOCKED_FOR_MAPPING',
+						cssValue('--task-locked-for-mapping'),
+						'UNLOCKED_TO_VALIDATE',
+						cssValue('--task-unlocked-to-validate'),
+						'LOCKED_FOR_VALIDATION',
+						cssValue('--task-locked-for-validation'),
+						'UNLOCKED_DONE',
+						cssValue('--task-unlocked-done'),
+						cssValue('--task-unlocked-to-map'), // default color if no match,
+					],
+					'fill-opacity': hoverStateFilter(0.3, 0),
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': [
+						'case',
+						['==', ['get', 'fid'], taskStore.selectedTaskId],
+						cssValue('--task-outline-selected'),
+						cssValue('--task-outline'),
+					],
+					'line-width': 3,
+					'line-opacity': ['case', ['==', ['get', 'fid'], taskStore.selectedTaskId], 1, 0.35],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+		</GeoJSON>
+		<GeoJSON id="tasks-centroid" data={taskCentroidGeojson} promoteId="fid">
+			<SymbolLayer
+				applyToClusters={false}
+				hoverCursor="pointer"
+				layout={{
+					'icon-image': [
+						'case',
+						['==', ['get', 'state'], 'LOCKED_FOR_MAPPING'],
+						'LOCKED_FOR_MAPPING',
+						['==', ['get', 'state'], 'LOCKED_FOR_VALIDATION'],
+						'LOCKED_FOR_VALIDATION',
+						'',
+					],
+					'symbol-placement': 'point',
+					'icon-allow-overlap': true,
+				}}
+			/>
+		</GeoJSON>
+		<!-- The features / entities -->
+		<!-- For LINE, show all geoms (pass global extent), else filter by clicked task area (not working) -->
+		{#if entitiesUrl}
+			<FlatGeobuf
+				id="entities"
+				url={entitiesStore.fgbOpfsUrl || entitiesUrl}
+				extent={primaryGeomType === MapGeomTypes.POLYLINE
+					? polygon([
+							[
+								[-180, -90],
+								[-180, 90],
+								[180, 90],
+								[180, -90],
+								[-180, -90],
+							],
+						]).geometry
+					: taskStore.selectedTaskGeom}
+				extractGeomCols={true}
+				promoteId="id"
+				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
+				geojsonUpdateDependency={[entitiesStore.entitiesList]}
+			>
+				{#if primaryGeomType === MapGeomTypes.POLYGON}
+					<FillLayer
+						id="entity-polygon-layer"
+						paint={{
+							'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
+							'fill-color': [
+								'match',
+								['get', 'status'],
+								'READY',
+								cssValue('--entity-ready'),
+								'OPENED_IN_ODK',
+								cssValue('--entity-opened-in-odk'),
+								'SURVEY_SUBMITTED',
+								cssValue('--entity-survey-submitted'),
+								'VALIDATED',
+								cssValue('--entity-validated'),
+								'MARKED_BAD',
+								cssValue('--entity-marked-bad'),
+								cssValue('--entity-ready'), // default color if no match is found
+							],
+						}}
+						beforeLayerType="symbol"
+						manageHoverState
+					/>
+					<LineLayer
+						layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+						paint={{
+							'line-color': [
+								'case',
+								['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+								cssValue('--entity-outline-selected'),
+								cssValue('--entity-outline'),
+							],
+							'line-width': [
+								'case',
+								['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+								1,
+								0.7,
+							],
+							'line-opacity': [
+								'case',
+								['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+								1,
+								1,
+							],
+						}}
+						beforeLayerType="symbol"
+						manageHoverState
+					/>
+				{:else if primaryGeomType === MapGeomTypes.POINT}
+					<CircleLayer
+						id="entity-point-layer"
+						applyToClusters={false}
+						hoverCursor="pointer"
+						paint={{
+							'circle-color': [
+								'match',
+								['get', 'status'],
+								'READY',
+								cssValue('--entity-ready'),
+								'OPENED_IN_ODK',
+								cssValue('--entity-opened-in-odk'),
+								'SURVEY_SUBMITTED',
+								cssValue('--entity-survey-submitted'),
+								'VALIDATED',
+								cssValue('--entity-validated'),
+								'MARKED_BAD',
+								cssValue('--entity-marked-bad'),
+								cssValue('--entity-ready'),
+							],
+							'circle-radius': 8,
+							'circle-stroke-width': 1,
+							'circle-stroke-color': [
+								'case',
+								['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+								cssValue('--entity-outline-selected'),
+								cssValue('--entity-outline'),
+							],
+						}}
+					></CircleLayer>
+				{:else if primaryGeomType === MapGeomTypes.POLYLINE}
+					<LineLayer
+						id="entity-line-layer"
+						layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+						paint={{
+							'line-color': [
+								'match',
+								['get', 'status'],
+								'READY',
+								cssValue('--entity-ready'),
+								'OPENED_IN_ODK',
+								cssValue('--entity-opened-in-odk'),
+								'SURVEY_SUBMITTED',
+								cssValue('--entity-survey-submitted'),
+								'VALIDATED',
+								cssValue('--entity-validated'),
+								'MARKED_BAD',
+								cssValue('--entity-marked-bad'),
+								cssValue('--entity-ready'), // default color if no match is found
+							],
+							'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
+							'line-opacity': [
+								'case',
+								['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
+								1,
+								0.8,
+							],
+						}}
+						beforeLayerType="symbol"
+						manageHoverState
+					/>
+				{/if}
+			</FlatGeobuf>
+		{/if}
+		<GeoJSON id="bad-geoms" data={entitiesStore.badGeomFeatcol}>
+			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
-					id="entity-polygon-layer"
+					id="bad-geom-fill-layer"
+					hoverCursor="pointer"
+					paint={{
+						'fill-color': cssValue('--sl-color-primary-700'),
+						'fill-opacity': 0.3,
+					}}
+					beforeLayerType="symbol"
+					manageHoverState
+				/>
+				<LineLayer
+					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+					paint={{
+						'line-color': cssValue('--sl-color-primary-700'),
+						'line-width': lineWidth,
+					}}
+					beforeLayerType="symbol"
+					manageHoverState
+				/>
+			{:else if drawGeomType === MapGeomTypes.POINT}
+				<CircleLayer
+					id="bad-geom-circle-point-layer"
+					hoverCursor="pointer"
+					paint={{
+						'circle-color': cssValue('--entity-marked-bad'),
+						'circle-radius': 8,
+						'circle-stroke-width': 1,
+						'circle-stroke-color': cssValue('--entity-outline'),
+					}}
+				/>
+				<CircleLayer
+					id="bad-geom-circle-highlight-layer"
+					hoverCursor="pointer"
+					paint={{
+						'circle-color': cssValue('--sl-color-primary-700'),
+						'circle-opacity': 0.4,
+						'circle-radius': circleRadius,
+						'circle-stroke-opacity': hoverStateFilter(0, 1),
+					}}
+				/>
+			{:else if drawGeomType === MapGeomTypes.POLYLINE}
+				<LineLayer
+					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+					paint={{
+						'line-color': cssValue('--sl-color-primary-700'),
+						'line-width': lineWidth,
+					}}
+					beforeLayerType="symbol"
+					manageHoverState
+				/>
+			{/if}
+		</GeoJSON>
+		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
+			{#if drawGeomType === MapGeomTypes.POLYGON}
+				<FillLayer
+					id="new-entity-polygon-layer"
+					hoverCursor="pointer"
 					paint={{
 						'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
 						'fill-color': [
@@ -626,9 +798,9 @@
 					beforeLayerType="symbol"
 					manageHoverState
 				/>
-			{:else if primaryGeomType === MapGeomTypes.POINT}
+			{:else if drawGeomType === MapGeomTypes.POINT}
 				<CircleLayer
-					id="entity-point-layer"
+					id="new-entity-point-layer"
 					applyToClusters={false}
 					hoverCursor="pointer"
 					paint={{
@@ -657,9 +829,9 @@
 						],
 					}}
 				></CircleLayer>
-			{:else if primaryGeomType === MapGeomTypes.POLYLINE}
+			{:else if drawGeomType === MapGeomTypes.POLYLINE}
 				<LineLayer
-					id="entity-line-layer"
+					id="new-entity-line-layer"
 					layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 					paint={{
 						'line-color': [
@@ -689,163 +861,8 @@
 					manageHoverState
 				/>
 			{/if}
-		</FlatGeobuf>
+		</GeoJSON>
 	{/if}
-	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomFeatcol}>
-		{#if drawGeomType === MapGeomTypes.POLYGON}
-			<FillLayer
-				id="bad-geom-fill-layer"
-				hoverCursor="pointer"
-				paint={{
-					'fill-color': cssValue('--sl-color-primary-700'),
-					'fill-opacity': 0.3,
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-			<LineLayer
-				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-				paint={{
-					'line-color': cssValue('--sl-color-primary-700'),
-					'line-width': lineWidth,
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-		{:else if drawGeomType === MapGeomTypes.POINT}
-			<CircleLayer
-				id="bad-geom-circle-point-layer"
-				hoverCursor="pointer"
-				paint={{
-					'circle-color': cssValue('--entity-marked-bad'),
-					'circle-radius': 8,
-					'circle-stroke-width': 1,
-					'circle-stroke-color': cssValue('--entity-outline'),
-				}}
-			/>
-			<CircleLayer
-				id="bad-geom-circle-highlight-layer"
-				hoverCursor="pointer"
-				paint={{
-					'circle-color': cssValue('--sl-color-primary-700'),
-					'circle-opacity': 0.4,
-					'circle-radius': circleRadius,
-					'circle-stroke-opacity': hoverStateFilter(0, 1),
-				}}
-			/>
-		{:else if drawGeomType === MapGeomTypes.POLYLINE}
-			<LineLayer
-				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-				paint={{
-					'line-color': cssValue('--sl-color-primary-700'),
-					'line-width': lineWidth,
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-		{/if}
-	</GeoJSON>
-	<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
-		{#if drawGeomType === MapGeomTypes.POLYGON}
-			<FillLayer
-				id="new-entity-polygon-layer"
-				hoverCursor="pointer"
-				paint={{
-					'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
-					'fill-color': [
-						'match',
-						['get', 'status'],
-						'READY',
-						cssValue('--entity-ready'),
-						'OPENED_IN_ODK',
-						cssValue('--entity-opened-in-odk'),
-						'SURVEY_SUBMITTED',
-						cssValue('--entity-survey-submitted'),
-						'VALIDATED',
-						cssValue('--entity-validated'),
-						'MARKED_BAD',
-						cssValue('--entity-marked-bad'),
-						cssValue('--entity-ready'), // default color if no match is found
-					],
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-			<LineLayer
-				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-				paint={{
-					'line-color': [
-						'case',
-						['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
-						cssValue('--entity-outline-selected'),
-						cssValue('--entity-outline'),
-					],
-					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.7],
-					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 1],
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-		{:else if drawGeomType === MapGeomTypes.POINT}
-			<CircleLayer
-				id="new-entity-point-layer"
-				applyToClusters={false}
-				hoverCursor="pointer"
-				paint={{
-					'circle-color': [
-						'match',
-						['get', 'status'],
-						'READY',
-						cssValue('--entity-ready'),
-						'OPENED_IN_ODK',
-						cssValue('--entity-opened-in-odk'),
-						'SURVEY_SUBMITTED',
-						cssValue('--entity-survey-submitted'),
-						'VALIDATED',
-						cssValue('--entity-validated'),
-						'MARKED_BAD',
-						cssValue('--entity-marked-bad'),
-						cssValue('--entity-ready'),
-					],
-					'circle-radius': 8,
-					'circle-stroke-width': 1,
-					'circle-stroke-color': [
-						'case',
-						['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''],
-						cssValue('--entity-outline-selected'),
-						cssValue('--entity-outline'),
-					],
-				}}
-			></CircleLayer>
-		{:else if drawGeomType === MapGeomTypes.POLYLINE}
-			<LineLayer
-				id="new-entity-line-layer"
-				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-				paint={{
-					'line-color': [
-						'match',
-						['get', 'status'],
-						'READY',
-						cssValue('--entity-ready'),
-						'OPENED_IN_ODK',
-						cssValue('--entity-opened-in-odk'),
-						'SURVEY_SUBMITTED',
-						cssValue('--entity-survey-submitted'),
-						'VALIDATED',
-						cssValue('--entity-validated'),
-						'MARKED_BAD',
-						cssValue('--entity-marked-bad'),
-						cssValue('--entity-ready'), // default color if no match is found
-					],
-					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 4, 3],
-					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity?.entity_id || ''], 1, 0.8],
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-		{/if}
-	</GeoJSON>
-
 	<!-- pulse effect layer representing rejected entities -->
 
 	<!-- Offline pmtiles, if present (alternative approach, not baselayer) -->
@@ -896,10 +913,15 @@
 		<LayerSwitcher
 			{map}
 			styles={allBaseLayers}
-			sourcesIdToReAdd={['tasks', 'entities', 'geolocation', 'tasks-centroid', 'bad-geoms', 'new-geoms']}
 			selectedStyleName={selectedBaselayer}
 			{selectedStyleUrl}
-			setSelectedStyleUrl={(style) => (selectedStyleUrl = style)}
+			setSelectedStyleUrl={(style) => {
+				selectedStyleUrl = style;
+				toggleLayer = false;
+				map?.once('styledata', () => {
+					toggleLayer = true;
+				});
+			}}
 			isOpen={selectedControl === 'layer-switcher'}
 		></LayerSwitcher>
 		<Legend isOpen={selectedControl === 'legend'} />
