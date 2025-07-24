@@ -12,6 +12,8 @@ import {
   MappedVsValidatedTaskService,
   SubmissionFormFieldsService,
 } from '@/api/SubmissionService';
+import TableChartViewIcon from '@/components/Icons/TableChartViewIcon';
+import TableIcon from '@/components/Icons/TableIcon';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,6 +23,7 @@ const ProjectSubmissions = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const projectId = params.projectId;
+  const tab = searchParams.get('tab');
 
   const state = useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
@@ -72,28 +75,22 @@ const ProjectSubmissions = () => {
   }, []);
 
   const ToggleView = () => (
-    <div className="fmtm-flex fmtm-justify-end fmtm-gap-3">
-      <div title="Infographics View">
-        <AssetModules.GridViewIcon
-          style={{ fontSize: '30px' }}
-          className={`${
-            searchParams.get('tab') === 'infographics' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
-          } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-          onClick={() => {
-            setSearchParams({ tab: 'infographics' });
-          }}
-        />
+    <div className="fmtm-flex fmtm-border fmtm-border-grey-200 fmtm-rounded-lg fmtm-w-fit fmtm-ml-auto">
+      <div
+        className={`fmtm-p-2 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'infographics' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
+        onClick={() => {
+          setSearchParams({ tab: 'infographics' });
+        }}
+      >
+        <TableChartViewIcon fillColor={`${tab === 'infographics' ? '#D73F37' : '#484848'}`} size={20} />
       </div>
-      <div title="Table View">
-        <AssetModules.ListAltIcon
-          style={{ fontSize: '30px' }}
-          className={`${
-            searchParams.get('tab') === 'table' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
-          } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-          onClick={() => {
-            setSearchParams({ tab: 'table' });
-          }}
-        />
+      <div
+        className={`fmtm-p-2 fmtm-border-l fmtm-border-grey-200 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'table' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
+        onClick={() => {
+          setSearchParams({ tab: 'table' });
+        }}
+      >
+        <TableIcon fillColor={`${tab === 'table' ? '#D73F37' : '#484848'}`} size={20} />
       </div>
     </div>
   );
