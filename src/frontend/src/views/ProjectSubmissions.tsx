@@ -14,6 +14,7 @@ import {
 } from '@/api/SubmissionService';
 import TableChartViewIcon from '@/components/Icons/TableChartViewIcon';
 import TableIcon from '@/components/Icons/TableIcon';
+import { Tooltip } from '@mui/material';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -75,23 +76,27 @@ const ProjectSubmissions = () => {
   }, []);
 
   const ToggleView = () => (
-    <div className="fmtm-flex fmtm-border fmtm-border-grey-200 fmtm-rounded-lg fmtm-w-fit fmtm-ml-auto">
-      <div
-        className={`fmtm-p-2 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'infographics' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
-        onClick={() => {
-          setSearchParams({ tab: 'infographics' });
-        }}
-      >
-        <TableChartViewIcon fillColor={`${tab === 'infographics' ? '#D73F37' : '#484848'}`} size={20} />
-      </div>
-      <div
-        className={`fmtm-p-2 fmtm-border-l fmtm-border-grey-200 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'table' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
-        onClick={() => {
-          setSearchParams({ tab: 'table' });
-        }}
-      >
-        <TableIcon fillColor={`${tab === 'table' ? '#D73F37' : '#484848'}`} size={20} />
-      </div>
+    <div className="fmtm-flex fmtm-border fmtm-border-grey-200 fmtm-rounded-lg fmtm-w-fit fmtm-ml-auto fmtm-overflow-hidden">
+      <Tooltip title="Infographics View" placement="bottom" arrow>
+        <div
+          className={`fmtm-p-2 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'infographics' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
+          onClick={() => {
+            setSearchParams({ tab: 'infographics' });
+          }}
+        >
+          <TableChartViewIcon fillColor={`${tab === 'infographics' ? '#D73F37' : '#484848'}`} size={20} />
+        </div>
+      </Tooltip>
+      <Tooltip title="Table View" placement="bottom" arrow>
+        <div
+          className={`fmtm-p-2 fmtm-border-l fmtm-border-grey-200 fmtm-cursor-pointer hover:fmtm-bg-red-light ${tab === 'table' ? 'fmtm-bg-red-light fmtm-text-red-medium' : 'fmtm-text-grey-800'}`}
+          onClick={() => {
+            setSearchParams({ tab: 'table' });
+          }}
+        >
+          <TableIcon fillColor={`${tab === 'table' ? '#D73F37' : '#484848'}`} size={20} />
+        </div>
+      </Tooltip>
     </div>
   );
 
