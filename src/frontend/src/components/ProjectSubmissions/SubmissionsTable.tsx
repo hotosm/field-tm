@@ -345,7 +345,7 @@ const SubmissionsTable = ({ toggleView }) => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="fmtm-flex fmtm-gap-2">
+          <div className="fmtm-flex fmtm-gap-4">
             {/* comment out button until JOSM is implemented */}
             {/* <Button variant="primary-red" onClick={uploadToJOSM}>
               <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
@@ -353,7 +353,7 @@ const SubmissionsTable = ({ toggleView }) => {
             </Button> */}
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Button variant="primary-red">
+                <Button variant="link-grey">
                   <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
                   DOWNLOAD
                 </Button>
@@ -376,12 +376,12 @@ const SubmissionsTable = ({ toggleView }) => {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              variant="primary-red"
+              variant="link-grey"
               onClick={refreshTable}
               isLoading={(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing}
               disabled={submissionTableDataLoading || submissionFormFieldsLoading}
             >
-              <AssetModules.ReplayIcon className="!fmtm-text-xl" />
+              <AssetModules.RefreshIcon className="!fmtm-text-xl" />
               REFRESH
             </Button>
           </div>
