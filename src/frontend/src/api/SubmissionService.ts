@@ -19,8 +19,8 @@ export const ProjectContributorsService = (url: string) => {
         dispatch(SubmissionActions.SetSubmissionContributorsLoading(true));
         const response: AxiosResponse<submissionContributorsTypes[]> = await CoreModules.axios.get(url);
         dispatch(SubmissionActions.SetSubmissionContributors(response.data));
-        dispatch(SubmissionActions.SetSubmissionContributorsLoading(false));
       } catch (error) {
+      } finally {
         dispatch(SubmissionActions.SetSubmissionContributorsLoading(false));
       }
     };

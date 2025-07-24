@@ -46,6 +46,8 @@ import { data_extract_type, project_roles, task_split_type } from '@/types/enums
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { GetProjectUsers } from '@/api/Project';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import isEmpty from '@/utilfunctions/isEmpty';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -124,6 +126,26 @@ const CreateProject = () => {
     if (!projectId) return;
     dispatch(GetProjectUsers(`${VITE_API_URL}/projects/${projectId}/users`, { role: project_roles.PROJECT_MANAGER }));
   }, [projectId]);
+
+  // setup project admin select options if project admins are available
+  useEffect(() => {
+    // only set project_admins value after basic project details are fetched
+    if (!projectId || isEmpty(projectManagers) || basicProjectDetailsLoading) return;
+
+    const projectAdminOptions = projectManagers.map((admin) => ({
+      id: admin.user_sub,
+      label: admin.username,
+      value: admin.user_sub,
+    }));
+    const project_admins = projectManagers.map((admin) => admin.user_sub);
+    dispatch(
+      CommonActions.SetPreviousSelectedOptions({
+        key: 'project_admins',
+        options: projectAdminOptions,
+      }),
+    );
+    setValue('project_admins', project_admins);
+  }, [projectManagers, projectId, basicProjectDetailsLoading]);
 
   const form = {
     1: <ProjectOverview />,

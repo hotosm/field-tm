@@ -428,8 +428,7 @@ export const UnassignUserFromProject = (url: string) => {
     const unassignUserFromProject = async (url: string) => {
       try {
         dispatch(ProjectActions.UnassigningUserFromProject(true));
-        const response = await axios.delete(url);
-        dispatch(ProjectActions.SetProjectUsers(response.data));
+        await axios.delete(url);
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({

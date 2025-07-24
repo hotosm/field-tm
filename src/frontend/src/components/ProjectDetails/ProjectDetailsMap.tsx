@@ -282,6 +282,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       >
         <MapLegends defaultTheme={defaultTheme} />
         <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
+        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
 
         {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
           <VectorLayer
@@ -399,7 +400,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           popupId="locked-popup"
           className="fmtm-w-[235px]"
         />
-        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-40">
+        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-10">
           <Button
             variant="primary-red"
             onClick={syncStatus}
@@ -409,7 +410,6 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             Sync Status
           </Button>
         </div>
-        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
       </MapComponent>
       {/* show entity selection popup only if multiple features overlap at the clicked point */}
       {overlappingEntityFeatures.length > 1 && (
