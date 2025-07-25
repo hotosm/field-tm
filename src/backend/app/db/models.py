@@ -1831,7 +1831,7 @@ class DbProject(BaseModel):
             # Org managers see all projects in their orgs including drafts
             return """
             (
-                p.visibility = 'PUBLIC'
+                (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
                 OR p.organisation_id = ANY(%(managed_org_ids)s)
             )
         """
