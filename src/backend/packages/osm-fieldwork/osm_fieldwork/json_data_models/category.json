@@ -1,0 +1,56 @@
+[
+  {
+    "landuse": ["landusage.xls"]
+  },
+  {
+    "healthcare": ["health.xls"]
+  },
+  {
+    "natural": ["nature.xls"]
+  },
+  {
+    "historic": ["historical.xls"]
+  },
+  {
+    "highways": ["highways.xls"]
+  },
+  {
+    "waterpoints": ["waterpoints.xls"]
+  },
+  {
+    "buildings": ["buildings.xls"]
+  },
+  {
+    "cemeteries": ["cemeteries.xls"]
+  },
+  {
+    "education": ["education.xls"]
+  },
+  {
+    "places": ["places.xls"]
+  },
+  {
+    "religious": ["religious.xls"]
+  },
+  {
+    "toilets": ["toilets.xls"]
+  },
+  {
+    "transportation": ["transportation.xls"]
+  },
+  {
+    "wastedisposal": ["wastedisposal.xls"]
+  },
+  {
+    "waterways": ["waterways.xls"]
+  },
+  {
+    "camping": ["camping.xls"]
+  },
+  {
+    "amenity": ["amenities.xls"]
+  },
+  {
+    "hotspring": ["hotspring.xls"]
+  }
+]

@@ -15,7 +15,7 @@ const initialState: ProjectStateTypes = {
   downloadDataExtractLoading: false,
   taskModalStatus: false,
   toggleGenerateMbTilesModal: false,
-  mobileFooterSelection: 'explore',
+  mobileFooterSelection: '',
   projectDetailsLoading: true,
   projectDashboardDetail: null,
   entityOsmMap: [],
@@ -35,6 +35,9 @@ const initialState: ProjectStateTypes = {
   newGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
   OdkEntitiesGeojsonLoading: false,
   isEntityDeleting: {},
+  projectUsers: [],
+  projectUsersLoading: false,
+  unassigningUserFromProject: false,
 };
 
 const ProjectSlice = createSlice({
@@ -78,7 +81,7 @@ const ProjectSlice = createSlice({
     ToggleGenerateMbTilesModalStatus(state, action: PayloadAction<boolean>) {
       state.toggleGenerateMbTilesModal = action.payload;
     },
-    SetMobileFooterSelection(state, action: PayloadAction<string>) {
+    SetMobileFooterSelection(state, action: PayloadAction<ProjectStateTypes['mobileFooterSelection']>) {
       state.mobileFooterSelection = action.payload;
     },
     SetProjectDetialsLoading(state, action: PayloadAction<boolean>) {
@@ -152,20 +155,6 @@ const ProjectSlice = createSlice({
       });
       state.projectTaskBoundries = updatedProjectTaskBoundries;
     },
-    SetGeometryLog(state, action: PayloadAction<geometryLogResponseType[]>) {
-      const geomLog = action.payload;
-      const badGeomLog = geomLog.filter((geom) => geom.status === 'BAD');
-      const badGeomLogGeojson = badGeomLog.map((geom) => geom.geojson);
-      const newGeomLogGeojson = geomLog
-        .filter((geom) => geom.status === 'NEW')
-        .map((geom) => ({ ...geom.geojson, properties: { ...geom.geojson.properties, geom_id: geom.id } }));
-      state.badGeomFeatureCollection = { type: 'FeatureCollection', features: badGeomLogGeojson };
-      state.newGeomFeatureCollection = { type: 'FeatureCollection', features: newGeomLogGeojson };
-      state.badGeomLogList = badGeomLog;
-    },
-    SetGeometryLogLoading(state, action: PayloadAction<boolean>) {
-      state.getGeomLogLoading = action.payload;
-    },
     SyncTaskStateLoading(state, action: PayloadAction<boolean>) {
       state.syncTaskStateLoading = action.payload;
     },
@@ -195,6 +184,15 @@ const ProjectSlice = createSlice({
     ClearProjectFeatures(state) {
       state.newGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
       state.badGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
+    },
+    SetProjectUsers(state, action: PayloadAction<ProjectStateTypes['projectUsers']>) {
+      state.projectUsers = action.payload;
+    },
+    SetProjectUsersLoading(state, action: PayloadAction<boolean>) {
+      state.projectUsersLoading = action.payload;
+    },
+    UnassigningUserFromProject(state, action: PayloadAction<boolean>) {
+      state.unassigningUserFromProject = action.payload;
     },
   },
 });

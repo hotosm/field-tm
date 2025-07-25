@@ -24,8 +24,6 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-import requests
-import yaml
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -43,7 +41,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path, get_choices
+from osm_fieldwork.json_data_models import data_models_path, get_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -54,12 +52,13 @@ from app.auth.roles import Mapper, ProjectManager, org_admin
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, XLSFormType
+from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
     DbBasemap,
     DbOdkEntities,
+    DbOrganisation,
     DbProject,
     DbProjectTeam,
     DbProjectTeamUser,
@@ -70,13 +69,13 @@ from app.db.models import (
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
-    flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
+from app.projects.project_schemas import ProjectUserContributions
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
@@ -111,7 +110,7 @@ async def read_projects(
     limit: int = 100,
 ):
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, user_sub)
+    projects = await DbProject.all(db, skip, limit, current_user, user_sub)
     return projects
 
 
@@ -395,48 +394,6 @@ async def download_features(
     return Response(content=json.dumps(feature_collection), headers=headers)
 
 
-@router.get("/convert-fgb-to-geojson")
-async def convert_fgb_to_geojson(
-    url: str,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
-
-    Helper endpoint to test data extracts during project creation.
-    Required as the flatgeobuf files wrapped in GeometryCollection
-    cannot be read in QGIS or other tools.
-
-    Args:
-        url (str): URL to the flatgeobuf file.
-        db (Connection): The database connection.
-        current_user (AuthUser): Check if user is logged in.
-
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
-    """
-    with requests.get(url) as response:
-        if not response.ok:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Download failed for data extract",
-            )
-        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
-
-    if not data_extract_geojson:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=("Failed to convert flatgeobuf --> geojson"),
-        )
-
-    headers = {
-        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
-        "Content-Type": "application/media",
-    }
-
-    return Response(content=json.dumps(data_extract_geojson), headers=headers)
-
-
 @router.get(
     "/task-status/{bg_task_id}",
     response_model=project_schemas.BackgroundTaskStatus,
@@ -454,15 +411,12 @@ async def get_task_status(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
 
-@router.get("/contributors/{project_id}")
+@router.get("/contributors/{project_id}", response_model=list[ProjectUserContributions])
 async def get_contributors(
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
-    """Get contributors of a project.
-
-    TODO use a pydantic model for return type
-    """
+    """Get contributors of a project."""
     project = project_user.get("project")
     return await project_crud.get_project_users_plus_contributions(db, project.id)
 
@@ -576,9 +530,7 @@ async def preview_split_by_square(
 @router.post("/generate-data-extract")
 async def get_data_extract(
     # config_file: Optional[str] = Form(None),
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     geojson_file: UploadFile = File(...),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
     osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
@@ -592,38 +544,39 @@ async def get_data_extract(
     """
     boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
+    project = project_user_dict.get("project")
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
-    extract_config = None
     if osm_category:
         config_filename = XLSFormType(osm_category).name
-        data_model = f"{data_models_path}/{config_filename}.yaml"
+        data_model = f"{data_models_path}/{config_filename}.json"
 
-        with open(data_model) as f:
-            config = yaml.safe_load(f)
+        with open(data_model, encoding="utf-8") as f:
+            config_data = json.load(f)
 
         data_config = {
             ("polygon", False): ["ways_poly"],
             ("point", True): ["ways_poly", "nodes"],
             ("point", False): ["nodes"],
-            ("linestring", False): ["ways_line"],
+            ("polyline", False): ["ways_line"],
         }
 
-        config["from"] = data_config.get((geom_type, centroid))
-        # Serialize to YAML string
-        yaml_str = yaml.safe_dump(config, sort_keys=False)
+        config_data["from"] = data_config.get((geom_type, centroid))
+        if geom_type == "polyline":
+            geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
-        # Encode to bytes and wrap in BytesIO
-        extract_config = BytesIO(yaml_str.encode("utf-8"))
-
-    geojson_url = await project_crud.generate_data_extract(
+    result = await project_crud.generate_data_extract(
+        project.id,
         clean_boundary_geojson,
-        extract_config,
+        geom_type,
+        config_data,
         centroid,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
+    return JSONResponse(
+        status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")}
+    )
 
 
 @router.get("/data-extract-url")
@@ -725,10 +678,11 @@ async def add_new_project_manager(
 async def get_project_users(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    role: Optional[str] = None,
 ):
     """Get project users and their project role."""
     project = project_user_dict.get("project")
-    users = await DbUserRole.all(db, project.id)
+    users = await DbUserRole.all(db, project.id, role=role)
     if not users:
         return []
     return users
@@ -895,9 +849,7 @@ async def generate_files(
 
 @router.post("/{project_id}/tiles-generate")
 async def generate_project_basemap(
-    # NOTE we do not set the correct role on this endpoint yet
-    # FIXME once stub project creation implemented, this should be manager only
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
     db: Annotated[Connection, Depends(db_conn)],
     basemap_in: project_schemas.BasemapGenerate,
@@ -992,13 +944,13 @@ async def upload_project_task_boundaries(
 ####################
 
 
-@router.post("", response_model=project_schemas.ProjectOut)
-async def create_project(
-    project_info: project_schemas.ProjectIn,
+@router.post("/stub", response_model=project_schemas.ProjectOut)
+async def create_stub_project(
+    project_info: project_schemas.StubProjectIn,
     org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
-    """Create a project in ODK Central and the local database.
+    """Create a project in the local database.
 
     The org_id and project_id params are inherited from the org_admin permission.
     Either param can be passed to determine if the user has admin permission
@@ -1007,36 +959,13 @@ async def create_project(
     db_user = org_user_dict["user"]
     db_org = org_user_dict["org"]
     project_info.organisation_id = db_org.id
+    project_info.status = ProjectStatus.DRAFT
 
     log.info(
         f"User {db_user.username} attempting creation of project "
         f"{project_info.name} in organisation ({db_org.id})"
     )
-
-    # Must decrypt ODK password & connect to ODK Central before proj created
-    # cannot use project.odk_credentials helper as no project set yet
-    # FIXME this can be updated once we have incremental project creation
-    if project_info.odk_central_url:
-        odk_creds_decrypted = central_schemas.ODKCentralDecrypted(
-            odk_central_url=project_info.odk_central_url,
-            odk_central_user=project_info.odk_central_user,
-            odk_central_password=project_info.odk_central_password,
-        )
-    else:
-        # Else use default org credentials if none passed
-        log.debug(
-            "No ODK credentials passed during project creation. "
-            "Defaulting to organisation credentials."
-        )
-        odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
-
     await project_deps.check_project_dup_name(db, project_info.name)
-
-    # Create project in ODK Central
-    # NOTE runs in separate thread using run_in_threadpool
-    odkproject = await run_in_threadpool(
-        lambda: central_crud.create_odk_project(project_info.name, odk_creds_decrypted)
-    )
 
     # Get the location_str via reverse geocode
     async with AsyncNearestCity(db) as geocoder:
@@ -1048,7 +977,6 @@ async def create_project(
         project_info.location_str = f"{location.city},{country_full_name}"
 
     # Create the project in the Field-TM DB
-    project_info.odkid = odkproject["id"]
     project_info.author_sub = db_user.sub
     try:
         project = await DbProject.create(db, project_info)
@@ -1088,6 +1016,52 @@ async def delete_project(
 
     log.info(f"Deletion of project {project.id} successful")
     return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@router.patch("", response_model=project_schemas.ProjectOut)
+async def create_project(
+    project_info: project_schemas.ProjectIn,
+    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
+    db: Annotated[Connection, Depends(db_conn)],
+):
+    """Create a project in ODK Central and update the local stub project.
+
+    The org_id and project_id params are inherited from the org_admin permission.
+    Either param can be passed to determine if the user has admin permission
+    to the organisation (or organisation associated with a project).
+    """
+    project_id = project_user.get("project").id
+    org_id = project_user.get("project").organisation_id
+    db_org = await DbOrganisation.one(db, org_id)
+    project = await DbProject.one(db, project_id)
+
+    if project_info.name:
+        await project_deps.check_project_dup_name(db, project_info.name)
+    if project_info.odk_credentials:
+        odk_creds_decrypted = project_info.odk_credentials
+    else:
+        log.debug(
+            "No ODK credentials passed during project creation. "
+            "Defaulting to organisation credentials."
+        )
+        odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
+
+    # Create project in ODK Central
+    # NOTE runs in separate thread using run_in_threadpool
+    odkproject = await run_in_threadpool(
+        lambda: central_crud.create_odk_project(project.name, odk_creds_decrypted)
+    )
+    project_info.odkid = odkproject["id"]
+
+    try:
+        project = await DbProject.update(db, project.id, project_info)
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Project update failed.",
+        ) from e
+
+    return project
 
 
 ###############################
@@ -1305,3 +1279,15 @@ async def delete_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity deletion failed",
         ) from e
+
+
+@router.delete("/{project_id}/users/{user_sub}")
+async def unassign_user_from_project(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    user_sub: str,
+):
+    """Unassign a user from a project (remove their role)."""
+    project = project_user_dict.get("project")
+    await project_crud.unassign_user_from_project(db, project.id, user_sub)
+    return {"message": f"User {user_sub} unassigned from project {project.id}."}

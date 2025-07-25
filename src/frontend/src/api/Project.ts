@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
-import { task_state, task_event } from '@/types/enums';
+import { task_state, task_event, project_roles } from '@/types/enums';
 import {
   EntityOsmMap,
   projectDashboardDetailTypes,
@@ -320,24 +320,6 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
   };
 };
 
-export const GetGeometryLog = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    const getProjectActivity = async (url: string) => {
-      try {
-        dispatch(ProjectActions.SetGeometryLogLoading(true));
-        const response: AxiosResponse<geometryLogResponseType[]> = await axios.get(url);
-        dispatch(ProjectActions.SetGeometryLog(response.data));
-      } catch (error) {
-        // error means no geometry log present for the project
-        dispatch(ProjectActions.SetGeometryLog([]));
-      } finally {
-        dispatch(ProjectActions.SetGeometryLogLoading(false));
-      }
-    };
-    await getProjectActivity(url);
-  };
-};
-
 export const DeleteEntity = (url: string, project_id: number, entity_id: string) => {
   return async (dispatch: AppDispatch) => {
     const deleteEntity = async () => {
@@ -416,5 +398,47 @@ export const GetOdkEntitiesGeojson = (url: string) => {
       }
     };
     await getProjectActivity(url);
+  };
+};
+
+export const GetProjectUsers = (url: string, params: { role: project_roles }) => {
+  return async (dispatch: AppDispatch) => {
+    const getProjectUsers = async (url: string) => {
+      try {
+        dispatch(ProjectActions.SetProjectUsersLoading(true));
+        const response = await axios.get(url, { params });
+        dispatch(ProjectActions.SetProjectUsers(response.data));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to retrieve project users',
+          }),
+        );
+        dispatch(ProjectActions.SetProjectUsers([]));
+      } finally {
+        dispatch(ProjectActions.SetProjectUsersLoading(false));
+      }
+    };
+    await getProjectUsers(url);
+  };
+};
+
+export const UnassignUserFromProject = (url: string) => {
+  return async (dispatch: AppDispatch) => {
+    const unassignUserFromProject = async (url: string) => {
+      try {
+        dispatch(ProjectActions.UnassigningUserFromProject(true));
+        await axios.delete(url);
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to unassign user from project',
+          }),
+        );
+      } finally {
+        dispatch(ProjectActions.UnassigningUserFromProject(false));
+      }
+    };
+    await unassignUserFromProject(url);
   };
 };

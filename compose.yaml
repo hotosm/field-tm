@@ -28,7 +28,7 @@ volumes:
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH:-local}
+    name: fmtm-local
     ipam:
       driver: default
       config:
@@ -36,7 +36,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-1.6.2-rc1}"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -57,6 +57,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -106,23 +107,15 @@ services:
       # buffer requests, but not responses, so streaming out works
       odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
       odk.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # Service for local development only to facilitate https odkcentral
-      odkcentral_REVERSE_PROXY_HOST: http://central:8383
-      odkcentral_REVERSE_PROXY_URL: ~ ^/v\d
-      odkcentral_REVERSE_PROXY_BUFFERING: no
-      odkcentral_MAX_CLIENT_SIZE: 1G
-      # Custom cert only for local development
-      odkcentral_USE_CUSTOM_SSL: yes
-      odkcentral_AUTO_REDIRECT_HTTP_TO_HTTPS: no
-      odkcentral_CUSTOM_SSL_CERT_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUI5RENDQVhtZ0F3SUJBZ0lVWXFyb0dWRVdsK204eU9OY2pUU2pCWThkckN3d0NnWUlLb1pJemowRUF3SXcKRlRFVE1CRUdBMVVFQXd3S2IyUnJZMlZ1ZEhKaGJEQWdGdzB5TkRBM01qTXhNakF6TVRWYUdBOHlNVEkwTURZeQpPVEV5TURNeE5Wb3dGVEVUTUJFR0ExVUVBd3dLYjJSclkyVnVkSEpoYkRCMk1CQUdCeXFHU000OUFnRUdCU3VCCkJBQWlBMklBQktSZmpOQVFzWUI0ekNXckdETHdKNEVIRDRTNW5rL1Z3aG00TmYwN203c0RTai9RTzlYK0JnNjIKeWlMbWVzT1ZMRExHRklpZXZ2aHIrZkxNY0YwUDQwN0FWKytER1o5bXZ6VmNwMVdZMlE5NllpTVVuelM3MWx0RQo4K3BXbFBmanRLT0JoekNCaERBZEJnTlZIUTRFRmdRVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dId1lEClZSMGpCQmd3Rm9BVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXgKQmdOVkhSRUVLakFvZ2dwdlpHdGpaVzUwY21Gc2doUXFMbTlrYXk1bWJYUnRMbXh2WTJGc2FHOXpkSWNFQ2hRZQpNakFLQmdncWhrak9QUVFEQWdOcEFEQm1BakVBb2xuOGRubmlQN0dKSEJPQW4rTHVCV0ZhaUY1NHFZRmpTYyt1Clpia1cwY1pyNWw2VnZ6WVlBdGdWbUtOdTB5WWRBakVBMWlvT2JRTERYdDV3S1JPWjV5VUtmbys2T21IbTV1NWkKQU5LUHd2MExqc2ZIYk5hbzJMWnduK0VxTjNtdUpPNXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-      odkcentral_CUSTOM_SSL_KEY_DATA: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JRzJBZ0VBTUJBR0J5cUdTTTQ5QWdFR0JTdUJCQUFpQklHZU1JR2JBZ0VCQkRCc21pQjBmUU5hR1VobEdpWnMKNks1YVo1K1hUOVM1cFdlWkhZc05SVXRlK2FRZ1hIK0pTSmpwRnFqRnNLN21abldoWkFOaUFBU2tYNHpRRUxHQQplTXdscXhneThDZUJCdytFdVo1UDFjSVp1RFg5TzV1N0Ewby8wRHZWL2dZT3Rzb2k1bnJEbFN3eXhoU0lucjc0CmEvbnl6SEJkRCtOT3dGZnZneG1mWnI4MVhLZFZtTmtQZW1JakZKODB1OVpiUlBQcVZwVDM0N1E9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+      # Override X-Forwarded-Proto during local dev to allow auth over http
+      odk.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http"
     networks:
       fmtm-net:
         ipv4_address: 10.20.30.50
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     build:
       context: src
       dockerfile: backend/Dockerfile
@@ -146,6 +139,8 @@ services:
       # External package mounts (testing)
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
+    environment:
+      DEBUG: ${DEBUG:-True}
     depends_on:
       proxy:
         condition: service_healthy
@@ -165,8 +160,6 @@ services:
       - "5678-5679:5678"
     networks:
       - fmtm-net
-    extra_hosts:
-      odkcentral: 10.20.30.50
     restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
@@ -185,7 +178,7 @@ services:
           memory: 100M
 
   ui:
-    image: "ghcr.io/hotosm/fmtm/frontend:debug"
+    image: "ghcr.io/hotosm/field-tm/frontend:debug"
     build:
       context: src
       additional_contexts:
@@ -193,8 +186,16 @@ services:
       dockerfile: Dockerfile.ui.debug
       target: build
     volumes:
-      - ./src/frontend:/app
-      - /app/node_modules/
+      - ./src/frontend/e2e:/app/e2e
+      - ./src/frontend/public:/app/public
+      - ./src/frontend/src:/app/src
+      - ./src/frontend/tests:/app/tests
+      - ./src/frontend/index.html:/app/index.html
+      - ./src/frontend/package.json:/app/package.json
+      - ./src/frontend/playwright.config.ts:/app/playwright.config.ts
+      - ./src/frontend/postcss.config.js:/app/postcss.config.js
+      - ./src/frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./src/frontend/vite.config.ts:/app/vite.config.ts
     environment:
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     ports:
@@ -204,7 +205,7 @@ services:
     restart: "unless-stopped"
 
   ui-mapper:
-    image: "ghcr.io/hotosm/fmtm/frontend:mapper"
+    image: "ghcr.io/hotosm/field-tm/frontend:mapper"
     build:
       context: src
       additional_contexts:
@@ -212,9 +213,16 @@ services:
       dockerfile: Dockerfile.ui.debug
       target: init-db
     volumes:
-      - ./src/mapper:/app
-      - /app/node_modules/
-      - /app/.svelte-kit/
+      - ./src/mapper/messages:/app/messages
+      - ./src/mapper/project.inlang:/app/project.inlang
+      - ./src/mapper/src:/app/src
+      - ./src/mapper/static:/app/static
+      - ./src/mapper/tests:/app/tests
+      - ./src/mapper/package.json:/app/package.json
+      - ./src/mapper/playwright.config.ts:/app/playwright.config.ts
+      - ./src/mapper/svelte.config.js:/app/svelte.config.js
+      - ./src/mapper/uno.config.ts:/app/uno.config.ts
+      - ./src/mapper/vite.config.ts:/app/vite.config.ts
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
       - TEST_PWA=${TEST_PWA:-false}
@@ -231,11 +239,11 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
     build:
       context: odkcentral/api
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.1.1}
+        ODK_CENTRAL_TAG: v2025.2.0
     depends_on:
       proxy:
         condition: service_healthy
@@ -298,11 +306,11 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
     build:
       context: odkcentral/ui
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2025.1.1}
+        ODK_CENTRAL_TAG: v2025.2.0
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -310,7 +318,7 @@ services:
 
   central-webhook:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.2.0}"
+    image: "ghcr.io/hotosm/central-webhook:0.3.0"
     depends_on:
       central:
         condition: service_healthy
@@ -325,7 +333,7 @@ services:
     restart: "unless-stopped"
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
+    image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
     depends_on:
       proxy:
         condition: service_started
@@ -352,7 +360,7 @@ services:
 
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -377,7 +385,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.12}"
+    image: "electricsql/electric:1.0.22"
     depends_on:
       proxy:
         condition: service_started
@@ -398,7 +406,7 @@ services:
 
   central-db:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
@@ -420,7 +428,7 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -442,7 +450,7 @@ services:
       test: ["NONE"] # Set the health check test to NONE to disable it
 
   scheduler:
-    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -464,6 +472,9 @@ services:
 
         # Run project stats script every 10 mins
         echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
+
+        # Upload and update project submissions to s3 every 6 hours
+        echo '0 */6 * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
 
         exec /usr/local/bin/supercronic ./crontab
       "

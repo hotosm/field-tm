@@ -66,7 +66,7 @@ to meet the distinct performance and UX goals for the mapper experience.
 
 We briefly considered switching the manager frontend to HTMX for improved long-term
 maintainability, but the rewrite cost was prohibitive. This discussion is
-[ongoing](https://github.com/hotosm/fmtm/discussions/1685) and may be revisited.
+[ongoing](https://github.com/hotosm/field-tm/discussions/1685) and may be revisited.
 
 ## Consequences
 

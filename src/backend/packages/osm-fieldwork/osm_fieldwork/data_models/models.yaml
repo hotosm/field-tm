@@ -694,8 +694,7 @@ office:
 polling_station:
     - yes
 
-amenity=vending_machine
-vending:
+amenity_vending_machine:vending:
     - feminine_hygiene
 
 hazard:
@@ -717,7 +716,7 @@ capacity:disabled:
 evacuation_center:
     - yes
 
- amenity:
+amenity:
     - shelter
     - social_facility 
 

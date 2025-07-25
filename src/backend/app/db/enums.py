@@ -167,14 +167,6 @@ class EntityState(IntEnum, Enum):
     MARKED_BAD = 6
 
 
-class TaskType(StrEnum, Enum):
-    """Task type."""
-
-    BUILDINGS = "BUILDINGS"
-    AMENITIES = "AMENITIES"
-    OTHER = "OTHER"
-
-
 class ProjectSplitStrategy(StrEnum, Enum):
     """Task splitting type."""
 
@@ -201,10 +193,23 @@ class TaskSplitType(StrEnum, Enum):
 
 
 class ProjectVisibility(StrEnum, Enum):
-    """Project visibility to end users."""
+    """Project visibility to end users.
+
+    PUBLIC: All data is publicly available to all authenticated users from UI.
+
+    PRIVATE: The project is not visible to any users until they are invited to the
+    project and submissions are only accessible to authenticated users who are
+    contributors to the project.
+
+    SENSITIVE: All data is publicly available to all users, however submissions are only
+    accessible to authenticated users who are contributors to the project.
+
+    INVITE_ONLY: Only invited users can access the project, but access all data.
+    """
 
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
+    SENSITIVE = "SENSITIVE"
     INVITE_ONLY = "INVITE_ONLY"
 
 
@@ -248,7 +253,7 @@ class XLSFormType(StrEnum, Enum):
     """
 
     buildings = "OSM Buildings"
-    # highways = "highways"
+    highways = "OSM Highways"
     health = "OSM Healthcare"
     # toilets = "toilets"
     # religious = "religious"

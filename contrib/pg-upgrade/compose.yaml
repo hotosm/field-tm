@@ -1,0 +1,59 @@
+# The services run in sequential order, via depends_on
+
+volumes:
+  db-data:
+    external: true
+    name: ${VOLUME_NAME:-fmtm_fmtm_db_data}
+
+services:
+  # Do the db upgrade
+  db-upgrade:
+    image: ghcr.io/hotosm/pg-upgrade:16-3.5-alpine
+    build: .
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./contrib/pg-upgrade/postgres-docker-entrypoint.sh:/usr/local/bin/postgres-docker-entrypoint.sh
+    environment:
+      POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
+      POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+      POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+      PGAUTO_ONESHOT: yes
+      # NOTE do not do it like this, or things will fail
+      # POSTGRES_INITDB_ARGS: "-c max_connections=84 -c wal_level=logical"
+    network_mode: none
+    restart: no
+    command: -c 'max_connections=84' -c 'wal_level=logical'
+
+  # Run maintenance tasks
+  db-maintenance:
+    image: postgis/postgis:16-3.5-alpine
+    depends_on:
+      db-upgrade:
+        condition: service_completed_successfully
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
+      POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+      POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+    network_mode: none
+    restart: no
+    entrypoint: /bin/sh -c
+    command:
+      - |
+        gosu postgres pg_ctl start -D /var/lib/postgresql/data -o "-c wal_level=logical"
+
+        # Upgrade PostGIS extension
+        PGPASSWORD=${POSTGRES_PASSWORD:-fmtm} \
+        psql --host=localhost --username=${POSTGRES_USER:-fmtm} \
+        ${POSTGRES_DB:-fmtm} -c '
+          ALTER EXTENSION "postgis" UPDATE;
+        '
+
+        # Rebuild statistics use vacuum
+        PGPASSWORD=${POSTGRES_PASSWORD:-fmtm} \
+        vacuumdb \
+        --host=localhost \
+        --username=${POSTGRES_USER:-fmtm} \
+        --all \
+        --analyze-in-stages

@@ -26,7 +26,7 @@ options:
 ## Encrypt a value
 
 ```bash
-docker run -i --rm ghcr.io/hotosm/fmtm/encrypter:latest \
+docker run -i --rm ghcr.io/hotosm/field-tm/encrypter:latest \
   --encrypt \
   your_encryption_token \
   some_value_to_encrypt
@@ -35,7 +35,7 @@ docker run -i --rm ghcr.io/hotosm/fmtm/encrypter:latest \
 ## Decrypt a value
 
 ```bash
-docker run -i --rm ghcr.io/hotosm/fmtm/encrypter:latest \
+docker run -i --rm ghcr.io/hotosm/field-tm/encrypter:latest \
   --decrypt \
   your_encryption_token \
   some_value_to_encrypt

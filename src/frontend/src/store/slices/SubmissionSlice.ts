@@ -3,10 +3,10 @@ import { SubmissionStateTypes } from '@/store/types/ISubmissions';
 import { updateReviewStateType, validatedMappedType } from '@/models/submission/submissionModel';
 
 const initialState: SubmissionStateTypes = {
-  submissionDetailsLoading: true,
+  submissionDetailsLoading: false,
   submissionDetails: null,
   submissionContributors: [],
-  submissionContributorsLoading: true,
+  submissionContributorsLoading: false,
   submissionFormFields: [],
   submissionTableData: {
     results: [],
@@ -33,7 +33,6 @@ const initialState: SubmissionStateTypes = {
     taskUid: null,
     entity_id: null,
     label: null,
-    feature: null,
   },
   updateReviewStateLoading: false,
   mappedVsValidatedTask: [],

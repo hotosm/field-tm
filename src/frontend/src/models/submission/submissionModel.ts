@@ -26,7 +26,7 @@ export type reviewListType = {
 };
 
 export type formSubmissionType = { date: string; count: number; label: string };
-export type validatedMappedType = { date: string; Validated: number; Mapped: number; label: string };
+export type validatedMappedType = { date: string; validated: number; mapped: number; label: string };
 
 export type updateReviewStateType = {
   instanceId: string;

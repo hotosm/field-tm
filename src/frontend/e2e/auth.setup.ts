@@ -8,7 +8,7 @@ setup.skip('authenticate', async ({ browserName, page }) => {
   // for Firefox and Webkit.
   // This is because Webkit does not respect 'secure' cookies on http contexts.
   // For this to work we would need to configure https for testing
-  // https://github.com/hotosm/fmtm/pull/1920
+  // https://github.com/hotosm/field-tm/pull/1920
   setup.skip(browserName !== 'chromium', 'Test only for chromium!');
 
   // Note this sets a token so we can proceed, but the login will be

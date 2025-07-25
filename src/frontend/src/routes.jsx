@@ -10,7 +10,7 @@ import ApproveOrganization from '@/views/ApproveOrganization';
 import OsmAuth from '@/views/OsmAuth';
 import PlaywrightTempLogin from '@/views/PlaywrightTempLogin';
 import SubmissionDetails from '@/views/SubmissionDetails';
-import CreateNewProject from '@/views/CreateNewProject';
+import CreateProject from '@/views/CreateProject';
 import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetails from '@/views/ProjectDetails';
@@ -101,72 +101,24 @@ const routes = createBrowserRouter([
         ),
       },
       {
+        path: '/create-project/:id',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/create-project',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
               <ErrorBoundary>
-                <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/project-area',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/map-data',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/split-tasks',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/upload-survey',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/basemap-selection',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <CreateNewProject />
+                <CreateProject />
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>

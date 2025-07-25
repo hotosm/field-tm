@@ -40,6 +40,17 @@ Some can be updated manually, as required.
 > is served under, e.g. /api on the domain.
 > However, this isn't the recommended approach, and testing is minimal.
 
+##### CENTRAL_WEBHOOK_API_KEY
+
+- This variable allows central-webhook to make requests to the backend API.
+- We use this to update the feature/entity colours after mapping events occur.
+- Create an API Key for user `svcfmtm`, which will add the key to the database.
+  - To create an API key, first log in as the user to generate a cookie.
+  - Next visit the API docs page, then call endpoint:
+    `/integrations/api-key`, and save the result.
+- Set the key for the `CENTRAL_WEBHOOK_API_KEY` variable.
+- Restart the containers and this should allow the webhook to work.
+
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided
@@ -58,6 +69,15 @@ These can point to an externally hosted instance of ODK Central.
 
 Or ODK Central can be started as part of the Field-TM docker compose
 stack, and variables should be set accordingly.
+
+##### Changing The Default Organisation
+
+```dotenv
+DEFAULT_ORG_NAME=MdP
+DEFAULT_ORG_URL=https://mapadasperiferias.cidades.gov.br
+DEFAULT_ORG_EMAIL=snp.gab@cidades.gov.br
+DEFAULT_ORG_LOGO_URL=https://www.gov.br/cidades/pt-br/logo.png
+```
 
 #### Other Domains
 
@@ -102,7 +122,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 - Backup Field-TM database:
 
   ```bash
-  GIT_BRANCH=development
+  GIT_BRANCH=dev
   backup_filename="fmtm-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
   echo $backup_filename
 
@@ -121,7 +141,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 - Backup ODK Central database:
 
   ```bash
-  GIT_BRANCH=development
+  GIT_BRANCH=dev
   backup_filename="fmtm-odk-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
   echo $backup_filename
 
@@ -134,7 +154,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 - Backup the S3 data:
 
 ```bash
-GIT_BRANCH=development
+GIT_BRANCH=dev
 backup_filename="fmtm-s3-${GIT_BRANCH}-$(date +'%Y-%m-%d').tar.gz"
 echo $backup_filename
 
@@ -142,7 +162,7 @@ docker run --rm -i --entrypoint=tar \
 -u 0:0 \
 -v $PWD:/backups -v \
 fmtm-s3-data-${GIT_BRANCH}:/mnt/data \
-ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH} \
 -cvzf "/backups/$backup_filename" /mnt/data/
 ```
 
@@ -152,7 +172,7 @@ The restore should be as easy as:
 
 ```bash
 # On a different machine (else change the container name)
-GIT_BRANCH=development
+GIT_BRANCH=dev
 backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
 
 cat "$backup_filename" | gunzip | \
@@ -172,7 +192,7 @@ backup_filename=fmtm-s3-${GIT_BRANCH}-XXXX-XX-XX.tar.gz
 docker run --rm -i --entrypoint=tar \
 -u 0:0 --working-dir=/ \
 -v $backup_filename:/$backup_filename -v \
-ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH} \
 -xvzf "$backup_filename"
 ```
 
@@ -184,7 +204,7 @@ In this case you can import into a fresh db, before
 attaching to the Field-TM containers:
 
 ```bash
-export GIT_BRANCH=development
+export GIT_BRANCH=dev
 
 # Shut down the running database & delete the data
 docker compose -f deploy/compose.$GIT_BRANCH.yaml down -v
@@ -239,7 +259,7 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
 
 ### Making a hotfix
 
-- Sometimes fixes just can't wait to go through the development -->
+- Sometimes fixes just can't wait to go through the dev -->
   staging --> production cycle. We need the fix now!
 
 - In this case, a `hotfix` can be made directly to the `main` branch:

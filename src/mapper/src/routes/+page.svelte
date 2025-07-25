@@ -39,6 +39,14 @@
 		return () => clearTimeout(timeoutId);
 	});
 
+	function getPaginatedProjects() {
+		if (online.current) {
+			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
+		} else {
+			projectStore.fetchProjectsFromLocalDB(db);
+		}
+	};
+
 	onMount(async () => {
 		// if requestedPath set, redirect to the desired path (in our case we have requestedPath set to invite url)
 		const requestedPath = sessionStorage.getItem('requestedPath');
@@ -50,16 +58,12 @@
 		db = await data.dbPromise;
 		commonStore.setDb(db);
 
-		// Get the project summaries on load, depending if online or offline
-		if (online.current) {
-			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
-		} else {
-			projectStore.fetchProjectsFromLocalDB(db);
-		}
+		// Get the project summaries on load
+		getPaginatedProjects();
 	});
 </script>
 
-<div class="font-barlow h-full overflow-y-hidden bg-[#f5f5f5]">
+<div class="font-primary h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
 		<div class="flex items-center justify-between">
 			<h3>PROJECTS</h3>
@@ -95,6 +99,7 @@
 		pageSize={projectStore.projectPagination?.per_page}
 		handlePageChange={(page) => {
 			paginationPage = page;
+			getPaginatedProjects();
 		}}
 		className="fixed left-0 w-full shadow-2xl"
 	/>

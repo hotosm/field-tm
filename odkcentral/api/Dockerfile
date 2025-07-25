@@ -19,11 +19,11 @@
 # to init an admin user at startup
 
 ARG ODK_CENTRAL_TAG
-ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}
+ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
-# **TEMP override until PR merged
+# **TEMP override until PR decision made: https://github.com/getodk/central-backend/pull/1494**
 FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG} AS s3-sync
 RUN apt-get update --quiet \
     && DEBIAN_FRONTEND=noninteractive \

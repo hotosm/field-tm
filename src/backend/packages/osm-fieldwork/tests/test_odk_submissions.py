@@ -33,7 +33,7 @@ async def test_list_submission_attachment_urls(odk_submission, pyodk_config):
     odk_id, form_name = odk_submission
 
     async with OdkFormAsync(
-        url="https://odkcentral:8443",
+        url="http://central:8383",
         user="admin@hotosm.org",
         passwd="Password1234",
     ) as form_async:
@@ -127,7 +127,7 @@ async def test_list_submission_attachment_urls(odk_submission, pyodk_config):
     # await asyncio.sleep(5)
 
     # async with OdkFormAsync(
-    #     url="https://odkcentral:8443",
+    #     url="http://central:8383",
     #     user="admin@hotosm.org",
     #     passwd="Password1234",
     # ) as form_async:

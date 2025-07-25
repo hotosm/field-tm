@@ -36,6 +36,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.central import central_crud, central_schemas
+from app.central.central_deps import pyodk_client
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
 from app.db.database import db_conn
@@ -53,7 +54,11 @@ from app.main import get_application
 from app.organisations.organisation_deps import get_organisation
 from app.organisations.organisation_schemas import OrganisationIn
 from app.projects import project_crud
-from app.projects.project_schemas import ProjectIn, ProjectTeamIn
+from app.projects.project_schemas import (
+    ProjectIn,
+    ProjectTeamIn,
+    StubProjectIn,
+)
 from app.tasks.task_schemas import TaskEventIn
 from app.users.user_crud import get_or_create_user
 from app.users.user_deps import get_user
@@ -398,28 +403,14 @@ async def submission(client, odk_project):
     """Set up a submission for a project in ODK Central."""
     fmtm_project_id = odk_project.id
     odk_project_id = odk_project.odkid
-    odk_credentials = odk_project.odk_credentials
-    odk_creds = odk_credentials.model_dump()
-    base_url = odk_creds["odk_central_url"]
-    auth = (
-        odk_creds["odk_central_user"],
-        odk_creds["odk_central_password"],
-    )
+    odk_creds = odk_project.odk_credentials
 
-    async def forms(base_url, auth, pid):
-        """Fetch a list of forms in a project."""
-        async with AsyncClient(auth=auth) as client_httpx:
-            url = f"{base_url}/v1/projects/{pid}/forms"
-            response = await client_httpx.get(url)
-            response.raise_for_status()
-            return response
+    async with pyodk_client(odk_creds) as pyodk_client_obj:
+        forms = pyodk_client_obj.forms.list(project_id=odk_project_id)
 
-    forms_response = await forms(base_url, auth, odk_project_id)
-    assert forms_response.status_code == 200, "Failed to fetch forms from ODK Central"
-    forms = forms_response.json()
     assert forms, "No forms found in ODK Central project"
-    odk_form_id = forms[0]["xmlFormId"]
-    odk_form_version = forms[0]["version"]
+    odk_form_id = forms[0].xmlFormId
+    odk_form_version = forms[0].version
 
     submission_id = str(uuid.uuid4())
     photo_file_name = "submission_photo.jpg"
@@ -435,7 +426,7 @@ async def submission(client, odk_project):
         <end>2024-11-15T12:29:00.876Z</end>
         <today>2024-11-15</today>
         <phonenumber/>
-        <username>testuser</username>
+        <username>localadmin</username>
         <instructions/>
         <warmup/>
         <feature/>
@@ -513,15 +504,14 @@ async def entities(odk_project):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def project_data():
+async def stub_project_data(organisation):
     """Sample data for creating a project."""
     project_name = f"Test Project {uuid4()}"
     data = {
         "name": project_name,
         "short_description": "test",
         "description": "test",
-        "osm_category": "buildings",
-        "hashtags": "testtag",
+        "organisation_id": organisation.id,
         "outline": {
             "coordinates": [
                 [
@@ -535,15 +525,34 @@ async def project_data():
             "type": "Polygon",
         },
     }
+    return data
 
+
+@pytest_asyncio.fixture(scope="function")
+async def stub_project(db, stub_project_data):
+    """A stub project."""
+    stub_project_data = StubProjectIn(**stub_project_data)
+    stub_project = await DbProject.create(
+        db,
+        stub_project_data,
+    )
+    yield stub_project
+
+
+@pytest_asyncio.fixture(scope="function")
+async def project_data(stub_project_data):
+    """Sample data for creating a project."""
     odk_credentials = {
         "odk_central_url": odk_central_url,
         "odk_central_user": odk_central_user,
         "odk_central_password": odk_central_password,
     }
     odk_creds_decrypted = central_schemas.ODKCentralDecrypted(**odk_credentials)
-    data.update(**odk_creds_decrypted.model_dump())
 
+    data = stub_project_data.copy()
+    data.pop("outline")  # Remove outline from copied data
+    data["name"] = "new project name"
+    data.update(**odk_creds_decrypted.model_dump())
     return data
 
 

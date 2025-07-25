@@ -74,9 +74,9 @@ if TYPE_CHECKING:
         BackgroundTaskUpdate,
         BasemapIn,
         BasemapUpdate,
-        ProjectIn,
         ProjectTeamIn,
         ProjectUpdate,
+        StubProjectIn,
     )
     from app.tasks.task_schemas import TaskEventIn
     from app.users.user_schemas import (
@@ -109,6 +109,7 @@ class DbUserRole(BaseModel):
     user_sub: str
     project_id: int
     role: ProjectRole
+    username: Optional[str] = None
 
     @classmethod
     async def create(
@@ -163,23 +164,81 @@ class DbUserRole(BaseModel):
         cls,
         db: Connection,
         project_id: Optional[int] = None,
+        role: Optional[ProjectRole] = None,
     ) -> Optional[list[Self]]:
-        """Fetch all project user roles."""
+        """Fetch all project user roles, along with username."""
         filters = []
         params = {}
         if project_id:
-            filters.append(f"project_id = {project_id}")
+            filters.append("ur.project_id = %(project_id)s")
             params["project_id"] = project_id
+        if role:
+            filters.append("ur.role = %(role)s")
+            params["role"] = role if isinstance(role, str) else role.name
+
+        sql = f"""
+                SELECT ur.*, u.username
+                FROM user_roles ur
+                JOIN users u ON ur.user_sub = u.sub
+                {"WHERE " + " AND ".join(filters) if filters else ""}
+            """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+                params if params else None,
+            )
+            return await cur.fetchall()
+
+    @classmethod
+    async def delete(
+        cls,
+        db: Connection,
+        project_id: int,
+        user_sub: str,
+    ) -> bool:
+        """Delete a user's role from a specific project (unassign user from project)."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM user_roles WHERE project_id = %(project_id)s
+                AND user_sub = %(user_sub)s;
+                """,
+                {"project_id": project_id, "user_sub": user_sub},
+            )
+        return True
+
+    @classmethod
+    async def get(
+        cls,
+        db: Connection,
+        project_id: Optional[int] = None,
+        user_sub: Optional[str] = None,
+    ) -> Optional[Self]:
+        """Fetch a user's role for a project.
+
+        filtered by any combination of user_sub and project_id.
+        """
+        filters = []
+        params = {}
+
+        if user_sub:
+            filters.append("user_sub = %(user_sub)s")
+            params["user_sub"] = str(user_sub)
+
+        if project_id is not None:
+            filters.append("project_id = %(project_id)s")
+            params["project_id"] = int(project_id)
 
         sql = f"""
             SELECT * FROM user_roles
             {"WHERE " + " AND ".join(filters) if filters else ""}
+            LIMIT 1
         """
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                sql,
-            )
-            return await cur.fetchall()
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, params if params else None)
+            return await cur.fetchone()
 
 
 class DbUser(BaseModel):
@@ -1755,41 +1814,48 @@ class DbProject(BaseModel):
         cls, access_info: Optional[dict] = None
     ) -> Optional[str]:
         """Build visibility filter based on user context."""
-        # Not logged in, so return public projects only
+        # Not logged in, so return public projects only, excluding drafts
         if access_info is None:
             return """
-            (
-                p.visibility = 'PUBLIC'
-            )
-            """
+        (
+            p.visibility = 'PUBLIC'
+            AND p.status != 'DRAFT'
+        )
+        """
 
         if access_info["is_superadmin"]:
             # Superadmin sees everything, no filters
             return None
 
         if access_info["managed_org_ids"]:
-            # Org managers see all projects in their orgs
+            # Org managers see all projects in their orgs including drafts
             return """
-                (
-                    p.visibility = 'PUBLIC'
-                    OR p.organisation_id = ANY(%(managed_org_ids)s)
-                )
-            """
-
-        # Regular users see public projects and private ones they have access to
-        return """
             (
                 p.visibility = 'PUBLIC'
-                OR (
-                    p.visibility = 'PRIVATE'
-                    AND EXISTS (
-                        SELECT 1 FROM user_roles ur
-                        WHERE ur.project_id = p.id
-                        AND ur.user_sub = %(current_user_sub)s
-                    )
-                )
+                OR p.organisation_id = ANY(%(managed_org_ids)s)
             )
         """
+
+        # Regular users see:
+        # 1. Public non-draft projects
+        # 2. Projects they have access to:
+        #    - If Any user is assigned as a project manager in any project,
+        # can see public projects and assigned project even it is draft
+        return """
+        (
+            (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
+            OR
+            EXISTS (
+                SELECT 1 FROM user_roles ur
+                WHERE ur.project_id = p.id
+                AND ur.user_sub = %(current_user_sub)s
+                AND (
+                    ur.role = 'PROJECT_MANAGER'
+                    OR p.status != 'DRAFT'
+                )
+            )
+        )
+    """
 
     @classmethod
     def _construct_sql_query(
@@ -1870,7 +1936,7 @@ class DbProject(BaseModel):
         """
 
     @classmethod
-    async def create(cls, db: Connection, project_in: "ProjectIn") -> Self:
+    async def create(cls, db: Connection, project_in: "StubProjectIn") -> Self:
         """Create a new project in the database."""
         model_dump = dump_and_check_model(project_in)
         columns = []
@@ -2002,6 +2068,12 @@ class DbProject(BaseModel):
             await cur.execute(
                 """
                 DELETE FROM tasks WHERE project_id = %(project_id)s;
+            """,
+                {"project_id": project_id},
+            )
+            await cur.execute(
+                """
+                DELETE FROM user_invites WHERE project_id = %(project_id)s;
             """,
                 {"project_id": project_id},
             )
@@ -2319,6 +2391,7 @@ class DbBasemap(BaseModel):
     created_at: Optional[AwareDatetime] = None
 
     # Calculated
+
     bbox: Optional[list[float]] = None
 
     @classmethod

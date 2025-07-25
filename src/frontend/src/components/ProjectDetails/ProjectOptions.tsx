@@ -9,45 +9,46 @@ import { GetProjectQrCode } from '@/api/Files';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-type projectOptionPropTypes = {
-  projectName: string;
-};
 type downloadTypeType = 'form' | 'geojson' | 'extract' | 'submission' | 'qr';
-type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean };
+type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean; show: boolean };
 
-const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
+const ProjectOptions = () => {
   const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
 
   const downloadProjectFormLoading = useAppSelector((state) => state.project.downloadProjectFormLoading);
   const downloadDataExtractLoading = useAppSelector((state) => state.project.downloadDataExtractLoading);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
 
   const downloadButtonList: downloadButtonType[] = [
     {
       downloadType: 'form',
       label: 'FORM',
       isLoading: downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading,
+      show: true,
     },
     {
       downloadType: 'geojson',
       label: 'TASKS',
       isLoading: downloadProjectFormLoading.type === 'geojson' && downloadProjectFormLoading.loading,
+      show: true,
     },
-    { downloadType: 'extract', label: 'MAP FEATURES', isLoading: downloadDataExtractLoading },
+    { downloadType: 'extract', label: 'MAP FEATURES', isLoading: downloadDataExtractLoading, show: true },
     {
       downloadType: 'submission',
       label: 'SUBMISSIONS',
       isLoading: downloadSubmissionLoading.fileType === 'geojson' && downloadSubmissionLoading.loading,
+      show: true,
     },
-    { downloadType: 'qr', label: 'QR CODE', isLoading: false },
+    { downloadType: 'qr', label: 'QR CODE', isLoading: false, show: projectInfo.use_odk_collect || false },
   ];
 
   const projectId: string = params.id;
 
   const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
+  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectInfo.name, authDetails?.username);
 
   const handleDownload = (downloadType: downloadTypeType) => {
     switch (downloadType) {
@@ -64,7 +65,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
         break;
       case 'submission':
         dispatch(
-          DownloadProjectSubmission(`${VITE_API_URL}/submission/download`, projectName, {
+          DownloadProjectSubmission(`${VITE_API_URL}/submission/download`, projectInfo.name as string, {
             project_id: projectId,
             file_type: 'geojson',
             submitted_date_range: null,
@@ -82,17 +83,20 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
 
   return (
     <div className="fmtm-flex fmtm-gap-2 fmtm-flex-col">
-      {downloadButtonList.map((btn) => (
-        <Button
-          key={btn.downloadType}
-          variant="secondary-grey"
-          onClick={() => handleDownload(btn.downloadType)}
-          isLoading={btn.isLoading}
-        >
-          {btn.label}
-          <AssetModules.FileDownloadIcon style={{ fontSize: '20px' }} />
-        </Button>
-      ))}
+      {downloadButtonList.map(
+        (btn) =>
+          btn.show && (
+            <Button
+              key={btn.downloadType}
+              variant="secondary-grey"
+              onClick={() => handleDownload(btn.downloadType)}
+              isLoading={btn.isLoading}
+            >
+              {btn.label}
+              <AssetModules.FileDownloadIcon style={{ fontSize: '20px' }} />
+            </Button>
+          ),
+      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import AssetModules from '@/shared/AssetModules';
 import { useAppSelector } from '@/types/reduxTypes';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import isEmpty from '@/utilfunctions/isEmpty';
 
 export interface selectPropType
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onFocus' | 'onAbort'> {
@@ -26,6 +27,7 @@ export interface selectPropType
   enableSearchbar?: boolean;
   handleApiSearch?: (e: string) => void;
   name?: string;
+  ref?: React.Ref<HTMLButtonElement> | null;
 }
 export type selectOptionsType = {
   label: string;
@@ -54,6 +56,7 @@ function Select2({
   checkBox = false,
   enableSearchbar = true,
   handleApiSearch, // if search is handled on backend
+  ref = null,
 }: selectPropType) {
   const dispatch = useDispatch();
 
@@ -127,9 +130,10 @@ function Select2({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild ref={triggerRef}>
           <button
+            ref={ref}
             disabled={disabled}
             className={cn(
-              'fmtm-group fmtm-flex fmtm-items-center fmtm-justify-between fmtm-gap-2 fmtm-border-[1px] fmtm-border-gray-300 fmtm-h-[2.3rem] fmtm-rounded-md disabled:!fmtm-cursor-not-allowed fmtm-px-3',
+              'fmtm-group fmtm-flex fmtm-items-center fmtm-justify-between fmtm-gap-2 fmtm-border-[1px] fmtm-border-gray-300 fmtm-h-[2.3rem] fmtm-rounded-md disabled:!fmtm-cursor-not-allowed fmtm-px-3 focus:fmtm-border-[#D73F37] focus:fmtm-ring-[#D73F37]/50 focus:fmtm-ring-[3px] fmtm-outline-none',
               className,
             )}
             onClick={() => setOpen(true)}
@@ -140,7 +144,7 @@ function Select2({
                   {Array.isArray(value) && value.length > 0 ? (
                     value.length === 1 ? (
                       <span className="fmtm-body-sm fmtm-line-clamp-1 fmtm-text-start">
-                        {options?.find((option) => option[choose as keyof selectOptionsType] === value[0])?.label ||
+                        {options?.find((option) => option?.[choose as keyof selectOptionsType] === value[0])?.label ||
                           '1 Selected'}
                       </span>
                     ) : (
@@ -212,8 +216,8 @@ function Select2({
                           dispatch(
                             CommonActions.SetPreviousSelectedOptions({
                               key: name,
-                              options: previousSelectedOptions[name]
-                                ? [...previousSelectedOptions[name], option]
+                              options: previousSelectedOptions?.[name]
+                                ? [...previousSelectedOptions?.[name], option]
                                 : [option],
                             }),
                           );
@@ -257,22 +261,22 @@ function Select2({
           </div>
         </PopoverContent>
       </Popover>
-      {multiple && Array.isArray(value) && (
+      {multiple && Array.isArray(value) && !isEmpty(value) && (
         <div className="fmtm-flex fmtm-flex-wrap fmtm-gap-2 fmtm-pt-2">
           {value?.map((val) => (
             <div
               key={val}
               className="fmtm-bg-[#F5F5F5] fmtm-rounded-full fmtm-px-2 fmtm-py-1 fmtm-border-[1px] fmtm-border-[#D7D7D7] fmtm-text-[#484848] fmtm-flex fmtm-items-center fmtm-gap-1"
             >
-              <p>
+              <p className="fmtm-text-xs">
                 {handleApiSearch && name
-                  ? [...previousSelectedOptions[name as string], ...options]?.find((option) => option.value === val)
+                  ? [...previousSelectedOptions?.[name as string], ...options]?.find((option) => option.value === val)
                       ?.label
                   : options.find((option) => option.value === val)?.label}
               </p>
               <AssetModules.CloseIcon
                 onClick={() => handleSelect(val)}
-                className="!fmtm-text-[1.125rem] fmtm-cursor-pointer hover:fmtm-text-red-600"
+                className="!fmtm-text-xs fmtm-cursor-pointer hover:fmtm-text-red-600"
               />
             </div>
           ))}

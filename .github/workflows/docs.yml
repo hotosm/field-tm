@@ -6,22 +6,29 @@ on:
       - docs/**
       - src/**
       - mkdocs.yml
-    branches: [development]
+    branches: [dev]
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
 jobs:
   # TODO need to also publish osm-fieldwork docs somewhere...
 
-  build_openapi_json:
-    uses: hotosm/gh-workflows/.github/workflows/openapi_build.yml@3.2.2
+  backend-test:
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
     with:
-      image: ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}
+      environment: "test"
+      command: "test backend-with-coverage-upload"
+    secrets: inherit
+
+  build_openapi_json:
+    uses: hotosm/gh-workflows/.github/workflows/openapi_build.yml@3.3.2
+    with:
+      image: ghcr.io/${{ github.repository }}/backend:ci-dev
       example_env_file_path: ".env.example"
       output_path: docs/openapi.json
 
   publish_docs:
-    uses: hotosm/gh-workflows/.github/workflows/mkdocs_build.yml@3.2.2
+    uses: hotosm/gh-workflows/.github/workflows/mkdocs_build.yml@3.3.2
     needs:
       - build_openapi_json
     with:

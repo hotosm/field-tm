@@ -45,7 +45,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-1.6.2-rc1}"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -62,6 +62,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -157,7 +158,7 @@ services:
       service: scheduler
 
   backups:
-    image: "ghcr.io/hotosm/fmtm/backend:main"
+    image: "ghcr.io/hotosm/field-tm/backend:main"
     depends_on:
       proxy:
         condition: service_healthy
@@ -172,7 +173,7 @@ services:
     entrypoint: ["/backup-entrypoint.sh"]
     restart: "on-failure:2"
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+      test: pg_isready -h fmtm-db
       start_period: 5s
       interval: 10s
       timeout: 5s

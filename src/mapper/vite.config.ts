@@ -11,8 +11,21 @@ import extractorSvelte from '@unocss/extractor-svelte';
 const pwaOptions: Partial<VitePWAOptions> = {
 	// This ensures that caches are invalidated when the app is updated
 	registerType: 'autoUpdate',
-	injectRegister: 'auto',
+	injectRegister: false,
 	strategies: 'generateSW',
+
+	// Important to ensure the PWA runs on the **entire** website
+	// For example, it's possible to have `scope: '/project'` for a PWA
+	// on only part of the website
+	scope: '/',
+
+	// Required for sveltekit
+	kit: {
+		adapterFallback: 'index.html',
+		spa: {
+			fallbackMapping: '/',
+		},
+	},
 
 	// Allow testing the PWA during local development
 	devOptions: {
@@ -79,10 +92,19 @@ const pwaOptions: Partial<VitePWAOptions> = {
 	includeAssets: ['**/*', 'icons/*.svg'],
 
 	manifest: {
+		id: 'com.hotosm.field-tm',
 		name: 'Field-TM',
 		short_name: 'Field-TM',
 		description: 'Coordinated field mapping for Open Mapping campaigns.',
+		categories: ['mapping', 'humanitarian', 'hotosm', 'field', 'odk'],
+		scope: '/',
+		start_url: '/',
+		orientation: 'portrait',
+		dir: 'auto',
 		display: 'standalone',
+		launch_handler: {
+			client_mode: 'auto',
+		},
 		theme_color: '#d63f3f',
 		background_color: '#d63f3f',
 		icons: [
@@ -90,6 +112,7 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				src: 'pwa-64x64.png',
 				sizes: '64x64',
 				type: 'image/png',
+				purpose: 'any',
 			},
 			{
 				src: 'pwa-192x192.png',
@@ -117,10 +140,19 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				label: 'Mapper App',
 			},
 		],
+		related_applications: [
+			{
+				platform: 'web',
+				url: 'https://fmtm.hotosm.org',
+			},
+		],
 	},
 };
 
 export default defineConfig({
+	// Ensure the base is not '/project/xxx', but always '/', else
+	// registration of sw and manifest can fail under /project
+	base: '/',
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA(pwaOptions),

@@ -45,7 +45,7 @@ URLs defined in the docker-compose file and your env file.
 - Field-TM uses ODK Central to store ODK data.
 - To facilitate faster development, the Docker setup includes a Central server.
 - The credentials are provided via the `.env` file, and the default URL to
-  access Central from within containers is: `https://odkcentral:8443`.
+  access Central from within containers is: `http://central:8383`.
 
 > Alternatively, you may provide credentials to an external Central server
 > in the `.env`.
@@ -163,25 +163,14 @@ To assess performance of endpoints:
 
 ### Debugging osm-fieldwork
 
-`osm-fieldwork` is an integral package for much of the functionality in Field-TM.
-
-Creating a new release during development may not always be feasible.
-
-- A development version of osm-fieldwork can be mounted into
-  the Field-TM container via bind mount.
-- Clone the osm-fieldwork repo to the same root directory as Field-TM.
-- Uncomment the line in compose.yaml
-
-```yaml
-- ../osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork
-```
-
-- Run the docker container with your local version of osm-fieldwork.
-- Code changes to osm-fieldwork should be reflected immediately.
-  If they are not, run:
-  `docker compose restart api`.
-
-> Note: this is useful for debugging features during active development.
+- `osm-fieldwork` is an integral package for much of the functionality in Field-TM.
+- The package is stored in this monorepo under:
+  `src/backend/packages/osm-fieldwork`
+- This directory is mounted inside the backend by default
+  during local development with `compose.yaml`.
+- If you modify the code in the package, the container must be restarted
+  to reflect this:
+  `docker compose restart api`
 
 ### Accessing S3 Files use s3fs
 
@@ -298,7 +287,6 @@ The metadata for a project must be created first.
 <!-- prettier-ignore-end -->
 
 - To create a project you will need the following:
-
   - Project name, description, instructions.
   - The ID of the organization you manage.
     - Visit `/auth/me` while logged in to retrieve this.

@@ -3,12 +3,12 @@ type: application
 name: fmtm
 description: Field Tasking Manager - coordinated field mapping.
 version: "0.1.0"
-appVersion: "2025.3.1"
+appVersion: "2025.4.0"
 maintainers:
 - email: sam.woodcock@hotosm.org
   name: Sam Woodcock
-home: https://github.com/hotosm/fmtm/tree/main/chart
-icon: https://fmtm.hotosm.org/favicon.ico
+home: https://github.com/hotosm/field-tm/tree/main/chart
+icon: https://fmtm.hotosm.org/favicon.png
 dependencies:
   - name: postgresql
     version: 15.2.2

@@ -49,7 +49,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-1.6.2-rc1}"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -69,6 +69,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -136,7 +137,7 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     volumes:
       - fmtm_logs:/opt/logs
     depends_on:
@@ -172,7 +173,7 @@ services:
   ui:
     # This service simply builds both frontends to volumes
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-development}"
+    image: "ghcr.io/hotosm/field-tm/frontend:${GIT_BRANCH:-dev}"
     build:
       context: ../src
       dockerfile: Dockerfile.ui.prod
@@ -188,7 +189,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
     depends_on:
       proxy:
         condition: service_healthy
@@ -239,7 +240,7 @@ services:
       retries: 10
 
   central-webhook:
-    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.2.0}"
+    image: "ghcr.io/hotosm/central-webhook:0.3.0"
     depends_on:
       central:
         condition: service_healthy
@@ -262,14 +263,14 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2025.1.1}"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
     volumes:
       - central_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
+    image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
     depends_on:
       proxy:
         condition: service_started
@@ -292,7 +293,7 @@ services:
       timeout: 5s
 
   fmtm-db:
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
@@ -317,7 +318,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.12}"
+    image: "electricsql/electric:1.0.22"
     depends_on:
       proxy:
         condition: service_started
@@ -338,7 +339,7 @@ services:
     restart: "unless-stopped"
 
   central-db:
-    image: "ghcr.io/hotosm/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
+    image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
     command: -c 'max_connections=64'
     volumes:
       - central_db_data:/var/lib/postgresql/data/
@@ -359,7 +360,7 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     depends_on:
       proxy:
         condition: service_healthy
@@ -378,4 +379,4 @@ services:
     extends:
       file: ../compose.yaml
       service: scheduler
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"

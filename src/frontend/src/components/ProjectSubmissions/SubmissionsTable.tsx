@@ -18,7 +18,7 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateRevie
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { task_state, task_event, entity_state, project_status } from '@/types/enums';
+import { task_state, task_event, project_status } from '@/types/enums';
 import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
@@ -31,6 +31,8 @@ import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import SubmissionsTableSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/SubmissionsTableSkeleton';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -133,15 +135,7 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     dispatch(
-      SubmissionFormFieldsService(
-        `${import.meta.env.VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`,
-      ),
-    );
-  }, []);
-
-  useEffect(() => {
-    dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
+      SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
@@ -153,14 +147,10 @@ const SubmissionsTable = ({ toggleView }) => {
   }, [filter]);
 
   const refreshTable = () => {
-    dispatch(
-      SubmissionFormFieldsService(
-        `${import.meta.env.VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`,
-      ),
-    );
+    dispatch(SubmissionFormFieldsService(`${VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`));
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
+      SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
@@ -200,8 +190,6 @@ const SubmissionsTable = ({ toggleView }) => {
       if (path === 'start' || path === 'end') {
         // start & end date is static
         value = `${value[item]?.split('T')[0]} ${value[item]?.split('T')[1]}`;
-      } else if (path === 'status') {
-        value = entity_state[value[item]].replaceAll('_', ' ');
       } else if (
         value &&
         value[item] &&
@@ -221,18 +209,13 @@ const SubmissionsTable = ({ toggleView }) => {
     return value ? (typeof value === 'object' ? '-' : value) : '-';
   }
 
-  const uploadToJOSM = () => {
-    dispatch(
-      ConvertXMLToJOSM(
-        `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${projectId}`,
-        projectInfo?.outline?.bbox,
-      ),
-    );
-  };
+  // const uploadToJOSM = () => {
+  //   dispatch(ConvertXMLToJOSM(`${VITE_API_URL}/submission/get_osm_xml/${projectId}`, projectInfo?.outline?.bbox));
+  // };
 
   const handleDownload = (downloadType: 'csv' | 'json' | 'geojson') => {
     dispatch(
-      DownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectInfo.name!, {
+      DownloadProjectSubmission(`${VITE_API_URL}/submission/download`, projectInfo.name!, {
         project_id: projectId,
         submitted_date_range: filter?.submitted_date_range,
         file_type: downloadType,
@@ -243,7 +226,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const handleTaskMap = async () => {
     await dispatch(
       CreateTaskEvent(
-        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus.id}/event`,
+        `${VITE_API_URL}/tasks/${currentStatus.id}/event`,
         task_event.GOOD,
         projectId,
         filter?.task_id || '',
@@ -362,14 +345,15 @@ const SubmissionsTable = ({ toggleView }) => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="fmtm-flex fmtm-gap-2">
-            <Button variant="primary-red" onClick={uploadToJOSM}>
+          <div className="fmtm-flex fmtm-gap-4">
+            {/* comment out button until JOSM is implemented */}
+            {/* <Button variant="primary-red" onClick={uploadToJOSM}>
               <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
               UPLOAD TO JOSM
-            </Button>
+            </Button> */}
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Button variant="primary-red">
+                <Button variant="link-grey">
                   <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
                   DOWNLOAD
                 </Button>
@@ -392,12 +376,12 @@ const SubmissionsTable = ({ toggleView }) => {
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              variant="primary-red"
+              variant="link-grey"
               onClick={refreshTable}
               isLoading={(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing}
               disabled={submissionTableDataLoading || submissionFormFieldsLoading}
             >
-              <AssetModules.ReplayIcon className="!fmtm-text-xl" />
+              <AssetModules.RefreshIcon className="!fmtm-text-xl" />
               REFRESH
             </Button>
           </div>

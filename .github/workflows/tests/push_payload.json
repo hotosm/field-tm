@@ -1,4 +1,4 @@
 {
-  "base_ref ": "development",
-  "ref": "refs/heads/development"
+  "base_ref ": "dev",
+  "ref": "refs/heads/dev"
 }

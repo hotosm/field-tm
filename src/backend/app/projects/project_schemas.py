@@ -49,44 +49,19 @@ from app.db.models import (
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
 
 
-class ProjectInBase(DbProject):
-    """Base model for project insert / update (validators)."""
+class StubProjectIn(BaseModel):
+    """Stub project insert."""
 
-    # Override hashtag input to allow a single string input
-    hashtags: Annotated[
-        Optional[list[str] | str],
-        Field(validate_default=True),
-    ] = None
-
-    # Exclude (do not allow update)
-    id: Annotated[Optional[int], Field(exclude=True)] = None
-    outline: Annotated[Optional[dict], Field(exclude=True)] = None
-    # Exclude (calculated fields)
-    centroid: Annotated[Optional[dict], Field(exclude=True)] = None
-    tasks: Annotated[Optional[list], Field(exclude=True)] = None
-    organisation_name: Annotated[Optional[str], Field(exclude=True)] = None
-    organisation_logo: Annotated[Optional[str], Field(exclude=True)] = None
-    bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
-    last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
-    odk_credentials: Annotated[
-        Optional[ODKCentralDecrypted],
-        Field(exclude=True, validate_default=True),
-    ] = None
-
-    # @field_validator("slug", mode="after")
-    # @classmethod
-    # def set_project_slug(
-    #     cls,
-    #     value: Optional[str],
-    #     info: ValidationInfo,
-    # ) -> str:
-    #     """Set the slug attribute from the name.
-
-    #     NOTE this is a bit of a hack.
-    #     """
-    #     if (name := info.data.get("name")) is None:
-    #         return None
-    #     return name.replace(" ", "_").lower()
+    name: str
+    short_description: str
+    description: Optional[str] = None
+    organisation_id: int
+    outline: Polygon
+    location_str: Optional[str] = None
+    status: Optional[ProjectStatus] = None
+    author_sub: Optional[str] = None
+    hashtags: Optional[list[str]] = []
+    slug: Optional[str] = None
 
     @field_validator("hashtags", mode="before")
     @classmethod
@@ -114,14 +89,6 @@ class ProjectInBase(DbProject):
             f"#{hashtag}" if hashtag and not hashtag.startswith("#") else hashtag
             for hashtag in hashtags_list
         ]
-
-    @field_validator("odk_token", mode="after")
-    @classmethod
-    def encrypt_token(cls, value: str) -> Optional[str]:
-        """Encrypt the ODK Token for insertion into the db."""
-        if not value:
-            return None
-        return encrypt_value(value)
 
     @field_validator("outline", mode="before")
     @classmethod
@@ -156,11 +123,56 @@ class ProjectInBase(DbProject):
         return self
 
 
+class ProjectInBase(DbProject, StubProjectIn):
+    """Base model for project insert / update (validators)."""
+
+    # Override hashtag input to allow a single string input
+    hashtags: Annotated[
+        Optional[list[str] | str],
+        Field(validate_default=True),
+    ] = None
+    name: Optional[str] = None
+
+    # Exclude (do not allow update)
+    id: Annotated[Optional[int], Field(exclude=True)] = None
+    outline: Annotated[Optional[dict], Field(exclude=True)] = None
+    # Exclude (calculated fields)
+    centroid: Annotated[Optional[dict], Field(exclude=True)] = None
+    tasks: Annotated[Optional[list], Field(exclude=True)] = None
+    organisation_name: Annotated[Optional[str], Field(exclude=True)] = None
+    organisation_logo: Annotated[Optional[str], Field(exclude=True)] = None
+    bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
+    last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
+
+    # @field_validator("slug", mode="after")
+    # @classmethod
+    # def set_project_slug(
+    #     cls,
+    #     value: Optional[str],
+    #     info: ValidationInfo,
+    # ) -> str:
+    #     """Set the slug attribute from the name.
+
+    #     NOTE this is a bit of a hack.
+    #     """
+    #     if (name := info.data.get("name")) is None:
+    #         return None
+    #     return name.replace(" ", "_").lower()
+
+    @field_validator("odk_token", mode="after")
+    @classmethod
+    def encrypt_token(cls, value: str) -> Optional[str]:
+        """Encrypt the ODK Token for insertion into the db."""
+        if not value:
+            return None
+        return encrypt_value(value)
+
+
 class ProjectIn(ProjectInBase, ODKCentralIn):
     """Upload new project."""
 
     # Ensure geojson_pydantic.Polygon
-    outline: Polygon
+    outline: Optional[Polygon] = None
 
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):
@@ -255,10 +267,10 @@ class PaginatedProjectSummaries(BaseModel):
 
 
 class ProjectUserContributions(BaseModel):
-    """Users for a project, plus contribution count."""
+    """A single project contributor and their submission count."""
 
     user: str
-    contributions: int
+    submissions: int
 
 
 class BasemapGenerate(BaseModel):

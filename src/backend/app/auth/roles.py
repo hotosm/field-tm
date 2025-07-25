@@ -417,42 +417,52 @@ async def project_contributors(
 ) -> ProjectUserDict:
     """A contributor to a specific project."""
     user_sub = current_user.sub
-    project_id = project.id
     org_id = project.organisation_id
 
     query = """
         SELECT * FROM users
         WHERE sub = %(user_sub)s
             AND (
-                CASE WHEN role = 'ADMIN' THEN true
-                ELSE
-                    EXISTS (
+                CASE
+                WHEN %(visibility)s IN ('SENSITIVE', 'PRIVATE') THEN
+                    CASE
+                    WHEN role = 'ADMIN' THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM organisation_managers
                         WHERE organisation_managers.user_sub = %(user_sub)s
-                          AND organisation_managers.organisation_id = %(org_id)s
-                    )
-                    OR EXISTS (
+                            AND organisation_managers.organisation_id = %(org_id)s
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM user_roles
                         WHERE user_roles.user_sub = %(user_sub)s
-                          AND user_roles.project_id = %(project_id)s
-                          AND user_roles.role = 'PROJECT_MANAGER'
-                    )
-                    OR EXISTS (
+                            AND user_roles.project_id = %(project_id)s
+                            AND user_roles.role = 'PROJECT_MANAGER'
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM projects
                         WHERE projects.author_sub = %(user_sub)s
-                    )
-                    OR EXISTS (
+                            AND projects.id = %(project_id)s
+                    ) THEN true
+                    WHEN EXISTS (
                         SELECT 1 FROM task_events
                         WHERE task_events.user_sub = %(user_sub)s
-                          AND task_events.project_id = %(project_id)s
-                    )
+                            AND task_events.project_id = %(project_id)s
+                    ) THEN true
+                    ELSE false
+                    END
+                ELSE true
                 END
             );
     """
     async with db.cursor() as cur:
         await cur.execute(
             query,
-            {"user_sub": user_sub, "project_id": project_id, "org_id": org_id},
+            {
+                "user_sub": user_sub,
+                "project_id": project.id,
+                "org_id": org_id,
+                "visibility": project.visibility,
+            },
         )
         db_user = await cur.fetchone()
 

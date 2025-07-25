@@ -55,7 +55,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Read STDIN data, usage:
-    # $ cat file.png | docker run -i --rm ghcr.io/hotosm/fmtm/qrcodes:latest --write
+    # $ cat file.png | docker run -i --rm ghcr.io/hotosm/field-tm/qrcodes:latest --write
     data_in: bytes = sys.stdin.buffer.read()
     if data_in == b"":
         print("Data must be provided via STDIN.")

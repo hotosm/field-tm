@@ -86,7 +86,7 @@
 
 <p>To see a list of all our contributors and their roles, please see our
 <a
-  href="https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-"
+  href="https://github.com/hotosm/field-tm#contributors-"
   target="_blank"
 >contributors</a>
 list in the README.md file.</p>

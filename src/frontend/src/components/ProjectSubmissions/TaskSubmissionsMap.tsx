@@ -78,7 +78,7 @@ const TaskSubmissionsMap = () => {
 
   const [taskBoundaries, setTaskBoundaries] = useState<taskBoundariesType | null>(null);
   const [dataExtractUrl, setDataExtractUrl] = useState<string | null>(null);
-  const [dataExtractExtent, setDataExtractExtent] = useState(null);
+  const [taskAreaExtent, setTaskAreaExtent] = useState(null);
 
   const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const projectTaskBoundries: projectTaskBoundriesType[] = CoreModules.useAppSelector(
@@ -137,7 +137,7 @@ const TaskSubmissionsMap = () => {
     });
     const extent = vectorSource.getExtent();
 
-    setDataExtractExtent(vectorSource.getFeatures()[0]?.getGeometry());
+    setTaskAreaExtent(vectorSource.getFeatures()[0]?.getGeometry());
     setDataExtractUrl(projectInfo.data_extract_url);
 
     map.getView().fit(extent, {
@@ -255,7 +255,13 @@ const TaskSubmissionsMap = () => {
         </div>
         {taskInfo?.length > 0 && <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="fid" />}
         {dataExtractUrl && isValidUrl(dataExtractUrl) && (
-          <VectorLayer fgbUrl={dataExtractUrl} fgbExtent={dataExtractExtent} zIndex={15} />
+          <VectorLayer
+            fgbUrl={dataExtractUrl}
+            // For POLYLINE, show all geoms, else filter by clicked task area (not working)
+            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
+            fgbExtentFilter={taskAreaExtent}
+            zIndex={15}
+          />
         )}
       </MapComponent>
     </CoreModules.Box>

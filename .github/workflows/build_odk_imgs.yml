@@ -4,7 +4,7 @@ on:
   # Push includes PR merge
   push:
     branches:
-      - development
+      - dev
     paths:
       # Workflow is triggered only if odkcentral dir changes
       - "odkcentral/**"
@@ -13,25 +13,25 @@ on:
 
 jobs:
   build-odkcentral:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
       context: odkcentral/api
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.0"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
+        ODK_CENTRAL_TAG=v2025.2.0
       multi_arch: true
 
   build-odkcentral-ui:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
       context: odkcentral/ui
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral-ui:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.0"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
+        ODK_CENTRAL_TAG=v2025.2.0
       multi_arch: true
       # Allow usage of ADD directive in this specific use case
       skip_cve: "CKV_DOCKER_8,CKV_DOCKER_2,CKV_DOCKER_3,CKV_DOCKER_5,CKV_DOCKER_4"

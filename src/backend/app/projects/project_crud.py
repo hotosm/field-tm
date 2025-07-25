@@ -33,8 +33,13 @@ from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
+from osm_data_client import (
+    RawDataClient,
+    RawDataClientConfig,
+    RawDataOutputOptions,
+    RawDataResult,
+)
 from osm_login_python.core import Auth
-from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, sql
 from psycopg.rows import class_row
 
@@ -42,7 +47,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
+from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -54,6 +59,7 @@ from app.db.postgis_utils import (
 from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
+from app.submissions.submission_crud import get_submission_by_project
 
 
 async def get_projects_featcol(
@@ -124,16 +130,20 @@ async def get_projects_featcol(
 
 
 async def generate_data_extract(
+    project_id: int,
     aoi: geojson.FeatureCollection | geojson.Feature | dict,
-    extract_config: Optional[BytesIO] = None,
+    geom_type: str,
+    config_json=None,
     centroid: bool = False,
-) -> str:
+) -> RawDataResult:
     """Request a new data extract in flatgeobuf format.
 
     Args:
+        project_id (int): Id (primary key) of the project.
         aoi (geojson.FeatureCollection | geojson.Feature | dict]):
             Area of interest for data extraction.
-        extract_config (Optional[BytesIO], optional):
+        geom_type (str): Type of geometry to extract.
+        config_json (Optional[json], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
 
@@ -145,43 +155,34 @@ async def generate_data_extract(
         str:
             URL for the geojson data extract.
     """
-    if not extract_config:
+    if not config_json:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="To generate a new data extract a extract_config must be specified.",
         )
-
-    pg = PostgresClient(
-        "underpass",
-        extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
+    config = RawDataClientConfig(
+        access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
         if settings.RAW_DATA_API_AUTH_TOKEN
-        else None,
+        else None
     )
-    geojson_url = pg.execQuery(
-        aoi,
-        extra_params={
-            "fileName": (
-                f"fmtm/{settings.FMTM_DOMAIN}/data_extract"
-                if settings.RAW_DATA_API_AUTH_TOKEN
-                else "fmtm_extract"
-            ),
-            "outputType": "geojson",
-            "bind_zip": False,
-            "useStWithin": False,
-            "centroid": centroid,
-        },
+    extra_params = {
+        "fileName": (
+            f"fmtm_{settings.FMTM_DOMAIN}_data_extract_{project_id}"
+            if settings.RAW_DATA_API_AUTH_TOKEN
+            else f"fmtm_extract_{project_id}"
+        ),
+        "outputType": "geojson",
+        "geometryType": [geom_type],
+        "bindZip": False,
+        "centroid": centroid,
+        "use_st_within": (False if geom_type == "line" else True),
+        "filters": config_json,
+    }
+    result = await RawDataClient(config).get_osm_data(
+        aoi, output_options=RawDataOutputOptions(download_file=False), **extra_params
     )
 
-    if not geojson_url:
-        msg = "Could not get download URL for data extract. Did the API change?"
-        log.error(msg)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=msg,
-        )
-
-    return geojson_url
+    return result
 
 
 # ---------------------------
@@ -463,6 +464,7 @@ async def generate_project_files(
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
+        geom_type = project.primary_geom_type
         log.info(f"Starting generate_project_files for project {project_id}")
 
         # Extract data extract from flatgeobuf
@@ -484,7 +486,7 @@ async def generate_project_files(
             # TODO in future this splitting could be removed if the task_id is
             # no longer used in the XLSForm for the map filter
             task_extract_dict = await split_geojson_by_task_areas(
-                db, feature_collection, project_id
+                db, feature_collection, project_id, geom_type
             )
         else:
             # NOTE the entity properties are generated by the form `save_to` field
@@ -607,6 +609,7 @@ async def get_project_features_geojson(
 ) -> geojson.FeatureCollection:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
+    geom_type = db_project.primary_geom_type
 
     data_extract_url = db_project.data_extract_url
 
@@ -650,7 +653,7 @@ async def get_project_features_geojson(
     # Split by task areas if task_id provided
     if task_id:
         split_extract_dict = await split_geojson_by_task_areas(
-            db, data_extract_geojson, project_id
+            db, data_extract_geojson, project_id, geom_type
         )
         return split_extract_dict[task_id]
 
@@ -943,7 +946,7 @@ async def get_paginated_projects(
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
-    """Get the users and their contributions for a project.
+    """Get the users and their number of submissions for a project.
 
     Args:
         db (Connection): The database connection.
@@ -951,27 +954,34 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
 
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing
-            the username and the number of contributions made by each user
+            the username and the number of submissions made by each user
             for the specified project.
     """
-    query = """
-        SELECT
-            u.username as user,
-            COUNT(th.user_sub) as contributions
-        FROM
-            users u
-        JOIN
-            task_events th ON u.sub = th.user_sub
-        WHERE
-            th.project_id = %(project_id)s
-        GROUP BY u.username
-        ORDER BY contributions DESC
-    """
-    async with db.cursor(
-        row_factory=class_row(project_schemas.ProjectUserContributions)
-    ) as cur:
-        await cur.execute(query, {"project_id": project_id})
-        return await cur.fetchall()
+    try:
+        project = await DbProject.one(db, project_id, minimal=False)
+
+        # Fetch all submissions for the project
+        data = await get_submission_by_project(project, {})
+        submissions = data.get("value", [])
+
+        # Count submissions per user
+        submission_counts = {}
+        for sub in submissions:
+            username = sub.get("username")
+            if username:
+                submission_counts[username] = submission_counts.get(username, 0) + 1
+
+        # Format as list of dicts, sorted by count desc
+        result = [
+            {"user": user, "submissions": count}
+            for user, count in sorted(
+                submission_counts.items(), key=lambda x: x[1], reverse=True
+            )
+        ]
+        return result
+    except Exception as e:
+        log.error(f"Error in get_project_users_plus_contributions: {e}")
+        return []
 
 
 async def send_project_manager_message(
@@ -1004,3 +1014,33 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
+
+
+async def unassign_user_from_project(db, project_id, user_sub):
+    """Unassigns a user from a project by removing their role.
+
+    Args:
+        db: Database session or connection.
+        project_id: ID of the project.
+        user_sub: Unique user identifier.
+
+    Returns:
+        bool: True if the user was successfully unassigned.
+
+    Raises:
+        HTTPException (404): If the user is not associated with the project.
+    """
+    try:
+        user_role = await DbUserRole.get(db, project_id, user_sub)
+        if not user_role:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User {user_sub} is not associated with project {project_id}.",
+            )
+        return await DbUserRole.delete(db, project_id, user_sub)
+    except Exception as e:
+        log.exception(f"Failed to unassign user {user_sub} from project {project_id}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Failed to unassign user {user_sub} from project {project_id}",
+        ) from e

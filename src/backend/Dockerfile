@@ -16,10 +16,10 @@
 #
 ARG PYTHON_IMG_TAG=3.12
 ARG UV_IMG_TAG=0.5.2
-ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}
+ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
-FROM ghcr.io/hotosm/fmtm/basemap-generator:0.4.0 AS basemap-bins
+FROM ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 AS basemap-bins
 
 
 # Includes all labels and timezone info to extend from
@@ -133,11 +133,16 @@ RUN apt-get update --quiet \
         "gettext-base" \
         "libpcre3" \
         "mime-support" \
-        "postgresql-client" \
+        "postgresql-common" \
         "libglib2.0-0" \
         "libspatialindex-c6" \
         "libproj25" \
         "libgeos-c1v5" \
+    # Temp until Debian supports Postgres v16 by default
+    && yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh \
+    && DEBIAN_FRONTEND=noninteractive \
+       apt-get install -y --quiet --no-install-recommends \
+       "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/
@@ -166,29 +171,8 @@ VOLUME /opt/logs
 USER appuser
 
 
-# Add certificates to use ODK Central over SSL (HTTPS, required)
-FROM runtime AS add-odk-certs
-USER root
-# Add the SSL cert for local odkcentral install (debugging only)
-RUN echo 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUI5RENDQVhtZ0F3SUJBZ0lVWXFyb\
-0dWRVdsK204eU9OY2pUU2pCWThkckN3d0NnWUlLb1pJemowRUF3SXcKRlRFVE1CRUdBMVVFQXd3S2Iy\
-UnJZMlZ1ZEhKaGJEQWdGdzB5TkRBM01qTXhNakF6TVRWYUdBOHlNVEkwTURZeQpPVEV5TURNeE5Wb3d\
-GVEVUTUJFR0ExVUVBd3dLYjJSclkyVnVkSEpoYkRCMk1CQUdCeXFHU000OUFnRUdCU3VCCkJBQWlBMk\
-lBQktSZmpOQVFzWUI0ekNXckdETHdKNEVIRDRTNW5rL1Z3aG00TmYwN203c0RTai9RTzlYK0JnNjIKe\
-WlMbWVzT1ZMRExHRklpZXZ2aHIrZkxNY0YwUDQwN0FWKytER1o5bXZ6VmNwMVdZMlE5NllpTVVuelM3\
-MWx0RQo4K3BXbFBmanRLT0JoekNCaERBZEJnTlZIUTRFRmdRVWNVekZsNUpWN1dUM045VUhxbmhSRHl\
-WT3ZjY3dId1lEClZSMGpCQmd3Rm9BVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dEd1lEVlIwVE\
-FRSC9CQVV3QXdFQi96QXgKQmdOVkhSRUVLakFvZ2dwdlpHdGpaVzUwY21Gc2doUXFMbTlrYXk1bWJYU\
-nRMbXh2WTJGc2FHOXpkSWNFQ2hRZQpNakFLQmdncWhrak9QUVFEQWdOcEFEQm1BakVBb2xuOGRubmlQ\
-N0dKSEJPQW4rTHVCV0ZhaUY1NHFZRmpTYyt1Clpia1cwY1pyNWw2VnZ6WVlBdGdWbUtOdTB5WWRBakV\
-BMWlvT2JRTERYdDV3S1JPWjV5VUtmbys2T21IbTV1NWkKQU5LUHd2MExqc2ZIYk5hbzJMWnduK0VxTj\
-NtdUpPNXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=' \
-| base64 -d > /usr/local/share/ca-certificates/central.crt
-RUN update-ca-certificates
-
-
 # Stage to use during local development
-FROM add-odk-certs AS debug
+FROM runtime AS debug
 USER appuser
 COPY --from=uv /uv /usr/local/bin/uv
 COPY backend/pyproject.toml backend/uv.lock /_lock/

@@ -71,7 +71,7 @@ If more details are required, check out the
 Clone the repository to your local machine using the following command:
 
 ```bash
-git clone https://github.com/hotosm/fmtm.git
+git clone https://github.com/hotosm/field-tm.git
 
 # If you wish to deploy for production, change to the main branch
 git checkout main
@@ -105,7 +105,6 @@ To properly configure your Field-TM project, you will need to create keys for OS
    ![image][8]
 
 3. Add required permissions:
-
    - 'Read user preferences' (`read_prefs`)
    - 'Send private messages to other users' (`send_messages`)
 
@@ -145,8 +144,8 @@ Determine the what type of Field-TM install you would like:
 ```text
 main - the latest production
 staging - the latest staging
-development - the latest development (warning: may be unstable)
-local test - used during development, or to start a test version
+dev - the latest development (warning: may be unstable)
+local dev - used during development, or to start a test version
 ```
 
 The corresponding docker-compose files are:
@@ -154,7 +153,7 @@ The corresponding docker-compose files are:
 ```text
 main - deploy/compose.main.yaml
 staging - deploy/compose.staging.yaml
-development - deploy/compose.development.yaml
+dev - deploy/compose.dev.yaml
 local test - compose.yaml
 ```
 
@@ -164,7 +163,7 @@ Set your selection to a terminal variable to make the next step easier:
 export COMPOSE_FILE={your_selection}
 
 # E.g.
-export COMPOSE_FILE=deploy/compose.development.yaml
+export COMPOSE_FILE=deploy/compose.dev.yaml
 ```
 
 #### Pull the Images
@@ -292,6 +291,12 @@ Once you have deployed, you will need to check that you can properly authenticat
       "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css"
   }
   ```
+
+### Configure Custom Favicon
+
+- During deploy, place your `favicon.svg` in the root of the repo.
+- Run the deployment script, and the favicon + generated PNG version
+  will be used in your frontend deployment automatically.
 
 ### Configure Custom Sidebar Elements
 

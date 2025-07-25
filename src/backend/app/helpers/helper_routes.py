@@ -19,14 +19,12 @@
 
 import csv
 import json
-from email.message import EmailMessage
 from io import BytesIO, StringIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Annotated
 from uuid import uuid4
 
-import aiosmtplib
 import requests
 from fastapi import (
     APIRouter,
@@ -39,6 +37,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
+from psycopg import Connection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
@@ -50,14 +49,17 @@ from app.central.central_crud import (
 )
 from app.central.central_schemas import ODKCentral
 from app.config import settings
+from app.db.database import db_conn
 from app.db.enums import HTTPStatus, XLSFormType
 from app.db.postgis_utils import (
     add_required_geojson_properties,
     featcol_keep_single_geom_type,
+    flatgeobuf_to_featcol,
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
+from app.helpers.helper_crud import odk_credentials_test, send_email
 
 router = APIRouter(
     prefix="/helper",
@@ -77,6 +79,48 @@ async def download_template(
         return FileResponse(xlsform_path, filename=f"{form_filename}.xls")
     else:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")
+
+
+@router.get("/convert-fgb-to-geojson")
+async def convert_fgb_to_geojson(
+    url: str,
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
+):
+    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
+
+    Helper endpoint to test data extracts during project creation.
+    Required as the flatgeobuf files wrapped in GeometryCollection
+    cannot be read in QGIS or other tools.
+
+    Args:
+        url (str): URL to the flatgeobuf file.
+        db (Connection): The database connection.
+        current_user (AuthUser): Check if user is logged in.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+    with requests.get(url) as response:
+        if not response.ok:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="Download failed for data extract",
+            )
+        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
+
+    if not data_extract_geojson:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=("Failed to convert flatgeobuf --> geojson"),
+        )
+
+    headers = {
+        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=json.dumps(data_extract_geojson), headers=headers)
 
 
 @router.post("/append-geojson-properties")
@@ -338,29 +382,23 @@ async def send_test_osm_message(
 
 
 @router.post("/send-test-email")
-async def send_test_email():
+async def send_test_email(user_emails: list[str]):
     """Sends a test email using real SMTP settings."""
-    if not settings.emails_enabled:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_IMPLEMENTED,
-            detail="An SMTP server has not been configured.",
-        )
-    message = EmailMessage()
-    message["Subject"] = "Test email from Field-TM"
-    message.set_content("This is a test email sent from Field-TM.")
-
-    log.info("Sending test email to recipients")
-    await aiosmtplib.send(
-        message,
-        sender=settings.SMTP_USER,
-        # NOTE this is a test email, so use your own email address to receive it
-        recipients=[],  # List of recipient email addresses
-        hostname=settings.SMTP_HOST,
-        port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD,
+    log.info(f"Sending test email to recipients: {user_emails}")
+    await send_email(
+        user_emails=user_emails,
+        title="Test email from Field-TM",
+        message_content="This is a test email sent from Field-TM.",
     )
-
     return Response(
         status_code=HTTPStatus.OK,
     )
+
+
+@router.post("/odk-credentials-test")
+async def odk_creds_test(
+    odk_creds: Annotated[ODKCentral, Depends()],
+):
+    """Test ODK Central credentials by attempting to open a session."""
+    await odk_credentials_test(odk_creds)
+    return Response(status_code=HTTPStatus.OK)

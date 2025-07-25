@@ -1,44 +1,39 @@
-import { task_split_type, MapGeomTypes, project_visibility, project_status } from '@/types/enums';
+import { MapGeomTypes, project_visibility, project_status } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
+  createDraftProjectLoading: { loading: boolean; continue: boolean };
+  createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
   formExampleList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
-  generateProjectLoading: boolean;
-  generateProjectSuccess: boolean;
-  generateProjectWarning: string | null;
-  generateProjectError: boolean;
+  GenerateProjectFilesLoading: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
   dividedTaskLoading: boolean;
-  dividedTaskGeojson: null | splittedGeojsonType;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  taskSplittingGeojson: splittedGeojsonType | null;
-  updateBoundaryLoading: boolean;
-  drawnGeojson: DrawnGeojsonTypes | null;
-  drawToggle: boolean;
   validateCustomFormLoading: boolean;
-  uploadAreaSelection: 'upload_file' | 'draw' | null;
-  totalAreaSelection: string | null;
-  taskSplittingMethod: task_split_type | null;
-  dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
-  isUnsavedChanges: boolean;
-  canSwitchCreateProjectSteps: boolean;
-  isTasksSplit: Record<string, any>;
-  isFgbFetching: boolean;
-  toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;
+  splitGeojsonBySquares: splittedGeojsonType | null;
+  splitGeojsonByAlgorithm: splittedGeojsonType | null;
+  basicProjectDetailsLoading: boolean;
+  basicProjectDetails:
+    | ({ id: number } & Pick<
+        ProjectDetailsTypes,
+        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
+      >)
+    | null;
+  isODKCredentialsValid: boolean;
+  ODKCredentialsValidating: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -91,16 +86,16 @@ export type ProjectDetailsTypes = {
   no_of_buildings: number;
   odk_central_user?: string;
   odk_central_password?: string;
-  organisation?: number;
+  organisation: number;
   odk_central_url?: string;
-  name?: string;
-  hashtags?: string[];
-  short_description?: string;
-  description?: string;
+  name: string;
+  hashtags: string[];
+  short_description: string;
+  description: string;
   task_split_type?: number;
   osm_category?: string;
   data_extract_options?: string;
-  organisation_id?: number | null;
+  organisation_id: number | null;
   formExampleSelection?: string;
   osmFormSelectionName?: string;
   average_buildings_per_task?: number;
@@ -110,12 +105,15 @@ export type ProjectDetailsTypes = {
   hasCustomTMS: boolean;
   xlsFormFileUpload: any;
   primaryGeomType: MapGeomTypes;
+  includeCentroid: boolean;
   useMixedGeomTypes: boolean;
   newGeomType: MapGeomTypes;
   project_admins: number[];
   visibility: project_visibility;
   use_odk_collect: boolean;
   status: project_status;
+  outline: splittedGeojsonType;
+  organisation_name: string;
 };
 
 export type FormCategoryListTypes = {

@@ -31,7 +31,7 @@
 }
 
 .geolocation-exit {
-	--at-apply: font-barlow w-full flex justify-center absolute z-10 bottom-2 pointer-events-none;
+	--at-apply: font-primary w-full flex justify-center absolute z-10 bottom-2 pointer-events-none;
 }
 
 .geolocation-exit .content {
