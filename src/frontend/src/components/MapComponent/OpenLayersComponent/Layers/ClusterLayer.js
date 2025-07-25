@@ -21,7 +21,7 @@ function setAsyncStyle(style, feature, getIndividualStyle) {
   const size = feature?.get('features')?.length;
   let stylex = styleCache[size];
   if (size === 1) {
-    const featureProperty = feature?.get('features')[0].getProperties();
+    const featureProperty = feature?.get('features')[0]?.getProperties();
     stylex = getIndividualStyle(featureProperty);
     styleCache[size] = stylex;
     return stylex;
@@ -123,7 +123,7 @@ const ClusterLayer = ({
     const animatedClusterLayer = new AnimatedCluster({
       source: clusterSource,
       animationDuration: 700,
-      distance: 40,
+      distance: 100,
       style: (feature) => setAsyncStyle(style, feature, getIndividualStyle),
     });
 
@@ -285,14 +285,13 @@ const ClusterLayer = ({
     });
 
     const clusterSource = new Cluster({
-      distance: parseInt(50, 10),
+      distance: 50,
       source: vectorSource,
     });
 
     const animatedClusterLayer = new AnimatedCluster({
       source: clusterSource,
-      animationDuration: 700,
-      distance: 40,
+      animationDuration: 100,
       style: (feature) => setAsyncStyle(style, feature, getIndividualStyle),
     });
 
