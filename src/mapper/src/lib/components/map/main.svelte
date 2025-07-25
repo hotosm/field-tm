@@ -588,7 +588,7 @@
 				promoteId="id"
 				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
 				geojsonUpdateDependency={[entitiesStore.entitiesList]}
-				cluster={primaryGeomType === MapGeomTypes.POINT ? { radius: 500 } : undefined}
+				cluster={primaryGeomType === MapGeomTypes.POINT ? { radius: 1000 } : undefined}
 			>
 				{#if primaryGeomType === MapGeomTypes.POLYGON}
 					<FillLayer
@@ -827,7 +827,7 @@
 				/>
 			{:else if drawGeomType === MapGeomTypes.POINT}
 				<CircleLayer
-					id="entity-point-cluster"
+					id="new-entity-point-cluster"
 					applyToClusters
 					hoverCursor="pointer"
 					paint={{
@@ -840,7 +840,7 @@
 					manageHoverState
 				></CircleLayer>
 				<SymbolLayer
-					id="entity-point-cluster-label"
+					id="new-entity-point-cluster-label"
 					interactive={false}
 					applyToClusters
 					layout={{
