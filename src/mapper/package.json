@@ -16,8 +16,7 @@
 		"format": "prettier --plugin prettier-plugin-svelte --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
-		"cleanup": "pnpm dlx knip",
-		"init-db": "node src/lib/db/init.js"
+		"cleanup": "pnpm dlx knip"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.0.13",
@@ -49,8 +48,6 @@
 	},
 	"dependencies": {
 		"@electric-sql/client": "1.0.5",
-		"@electric-sql/pglite": "^0.3.4",
-		"@electric-sql/pglite-sync": "^0.3.7",
 		"@hotosm/ui": "0.2.0-b5",
 		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@shoelace-style/shoelace": "2.17.1",

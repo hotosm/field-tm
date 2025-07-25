@@ -11,12 +11,6 @@ importers:
       '@electric-sql/client':
         specifier: 1.0.5
         version: 1.0.5
-      '@electric-sql/pglite':
-        specifier: ^0.3.4
-        version: 0.3.4
-      '@electric-sql/pglite-sync':
-        specifier: ^0.3.7
-        version: 0.3.7(@electric-sql/pglite@0.3.4)
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
@@ -695,24 +689,8 @@ packages:
     resolution: {integrity: sha512-WyOx8cJQ+FQus4Mm4uPIZA64gbk3Wxh0so5Lcii0aJifqwoVOlfFtorjLE0Hen4OYyHZMXDWqMmaQemBhgxFRQ==}
     engines: {node: '>=14'}
 
-  '@electric-sql/client@1.0.0':
-    resolution: {integrity: sha512-kGiVbBIlMqc/CeJpWZuLjxNkm0836NWxeMtIWH2w5IUK8pUL13hyxg3ZkR7+FlTGhpKuZRiCP5nPOH9D6wbhPw==}
-
   '@electric-sql/client@1.0.5':
     resolution: {integrity: sha512-DO7dvfCbZU6k33vr3ymBCXER6kPpoBODoRBru7oI16B4/ZXlxhMBpsmzmd8p9dQrPICCpQm6bBkNI6qI3oUAIQ==}
-
-  '@electric-sql/experimental@1.0.0':
-    resolution: {integrity: sha512-wOKZyph3cvJ4J5fDwqDpR7nilPOHEFwAtbAM5X/PhV3JZCSzmkbosaQRWsxbHQ80MJv7gNFP960+TyqGAjqouQ==}
-    peerDependencies:
-      '@electric-sql/client': 1.0.0
-
-  '@electric-sql/pglite-sync@0.3.7':
-    resolution: {integrity: sha512-sMlt3Y338VdhRUtbP3Vm/O6h6O9uqsSxwE52lHfOgRmeUv1zAymqgaeHzDztzpcEs2svfQbnKXetI/97mqqbEA==}
-    peerDependencies:
-      '@electric-sql/pglite': 0.3.4
-
-  '@electric-sql/pglite@0.3.4':
-    resolution: {integrity: sha512-h5hoL2GuxcWN8Q3+jtesIRem14iIvAZVEsTeUF6eO9RiUb6ar73QVIEW9t+Ud58iXAcAE2dFMtWqw3W2Oo4LDw==}
 
   '@esbuild/aix-ppc64@0.25.5':
     resolution: {integrity: sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==}
@@ -4688,29 +4666,11 @@ snapshots:
 
   '@ctrl/tinycolor@4.1.0': {}
 
-  '@electric-sql/client@1.0.0':
-    optionalDependencies:
-      '@rollup/rollup-darwin-arm64': 4.44.1
-
   '@electric-sql/client@1.0.5':
     dependencies:
       '@microsoft/fetch-event-source': 2.0.1
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.28.0
-
-  '@electric-sql/experimental@1.0.0(@electric-sql/client@1.0.0)':
-    dependencies:
-      '@electric-sql/client': 1.0.0
-    optionalDependencies:
-      '@rollup/rollup-darwin-arm64': 4.44.1
-
-  '@electric-sql/pglite-sync@0.3.7(@electric-sql/pglite@0.3.4)':
-    dependencies:
-      '@electric-sql/client': 1.0.0
-      '@electric-sql/experimental': 1.0.0(@electric-sql/client@1.0.0)
-      '@electric-sql/pglite': 0.3.4
-
-  '@electric-sql/pglite@0.3.4': {}
 
   '@esbuild/aix-ppc64@0.25.5':
     optional: true
