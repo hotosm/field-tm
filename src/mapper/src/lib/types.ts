@@ -215,7 +215,7 @@ export type DbEntityType = {
 	status: entityStatusOptions;
 	project_id: number;
 	task_id: number;
-	osm_id: number;
+	osm_id: bigint;
 	submission_ids: string;
 	geometry: string | null;
 	created_by: string | null;

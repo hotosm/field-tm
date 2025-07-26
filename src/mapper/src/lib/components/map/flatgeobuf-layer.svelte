@@ -46,7 +46,6 @@
 	// Deserialise flatgeobuf to GeoJSON, reactive to bbox/extent changes
 	async function updateGeoJSONData() {
 		const featcol: FeatureCollection | null = await flatgeobufToGeoJson(url, extent, metadataFunc, extractGeomCols);
-
 		// If there is no data, set to an empty FeatureCollection to avoid
 		// re-adding layer if the bbox extent is updated
 		if (!featcol) {

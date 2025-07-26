@@ -18,14 +18,14 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
-	import type { PGlite } from '@electric-sql/pglite';
+	import { eq, not, useLiveQuery } from '@tanstack/svelte-db';
 	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
+	import type { Position, Geometry as GeoJSONGeometry } from 'geojson';
 	import { centroid } from '@turf/centroid';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
@@ -49,6 +49,7 @@
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/map/click-outside.ts';
 	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
+	import { entityDataToFeatureCollection } from '$store/collections';
 
 	type bboxType = [number, number, number, number];
 
@@ -98,7 +99,6 @@
 	const entitiesStore = getEntitiesStatusStore();
 	const projectBasemapStore = getProjectBasemapStore();
 
-	let db: PGlite | undefined = $derived(commonStore.db);
 	let map: maplibregl.Map | undefined = $state();
 	let loaded: boolean = $state(false);
 	let selectedBaselayer: string = $state('OSM');
@@ -111,6 +111,18 @@
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
 	let toggleLayer = $state(true);
+
+	// Derive new and bad geoms to display as an overlay
+	const badGeomCollection = useLiveQuery({
+		query: (q) =>
+		q.from({ entities: entitiesStore.entitiesCollection })
+		.where(({ entities }) => eq(entities.status, 'MARKED_BAD')),
+	});
+	const newGeomCollection = useLiveQuery({
+		query: (q) =>
+		q.from({ entities: entitiesStore.entitiesCollection })
+		.where(({ entities }) => not(eq(entities.created_by, ''))),
+	})
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,
@@ -223,7 +235,7 @@
 			}) || [];
 
 		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
-		console.log(clickedFeatures);
+
 		// if clicked coordinate contain more than multiple entities, assign it to a variable
 		if (clickedFeatures.length > 1) {
 			selectedFeatures = clickedFeatures;
@@ -264,7 +276,7 @@
 		if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
 			taskAreaClicked = true;
 			const clickedTaskId = clickedTaskFeature[0]?.properties?.fid;
-			taskStore.setSelectedTaskId(db, clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
+			taskStore.setSelectedTaskId(clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
 			if (+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['task_selection']) {
 				localStorage.setItem(`project-${projectId}-setup`, projectSetupStepEnum['complete_setup']);
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['complete_setup']);
@@ -288,7 +300,7 @@
 			toggleActionModal(null);
 		} else {
 			// clear task states i.e. unselect task and it's extract if clicked coordinate doesn't contain any entity or task
-			taskStore.setSelectedTaskId(db, null, null);
+			taskStore.setSelectedTaskId(null, null);
 		}
 	}
 
@@ -455,9 +467,9 @@
 			<sl-icon-button
 				name="arrow-repeat"
 				label="Sync"
-				disabled={entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing}
+				disabled={entitiesStore.syncEntityStatusManuallyLoading}
 				class={`sync-button ${
-					(entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing) && 'animate-spin'
+					(entitiesStore.syncEntityStatusManuallyLoading) && 'animate-spin'
 				}`}
 				onclick={async () => syncButtonTrigger()}
 				onkeydown={async (e: KeyboardEvent) => {
@@ -586,8 +598,8 @@
 					: taskStore.selectedTaskGeom}
 				extractGeomCols={true}
 				promoteId="id"
-				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
-				geojsonUpdateDependency={[entitiesStore.entitiesList]}
+				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperties(geojsonData)}
+				geojsonUpdateDependency={[entitiesStore.entitiesCollection]}
 			>
 				{#if primaryGeomType === MapGeomTypes.POLYGON}
 					<FillLayer
@@ -703,7 +715,7 @@
 				{/if}
 			</FlatGeobuf>
 		{/if}
-		<GeoJSON id="bad-geoms" data={entitiesStore.badGeomFeatcol}>
+		<GeoJSON id="bad-geoms" data={entityDataToFeatureCollection(badGeomCollection.data)}>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="bad-geom-fill-layer"
@@ -757,7 +769,7 @@
 				/>
 			{/if}
 		</GeoJSON>
-		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
+		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperties(entityDataToFeatureCollection(newGeomCollection.data))}>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="new-entity-polygon-layer"

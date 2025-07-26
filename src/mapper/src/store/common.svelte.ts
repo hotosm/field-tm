@@ -1,4 +1,3 @@
-import type { PGliteWithSync } from '@electric-sql/pglite-sync';
 import { getCookieValue, setCookieValue } from '$lib/fs/cookies';
 import type { Basemap } from '$lib/map/basemaps';
 import { getBasemapList } from '$lib/map/basemaps';
@@ -27,7 +26,6 @@ interface AlertDetails {
 	duration?: number;
 }
 
-let db: PGliteWithSync;
 let alert: AlertDetails = $state({ variant: 'default', message: '', duration: 4000 });
 let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
@@ -36,7 +34,6 @@ let selectedTab: string = $state('map');
 let config: ConfigJson | null = $state(null);
 let useOdkCollectOverride: boolean = $state(false);
 let enableWebforms = $derived<boolean>(!useOdkCollectOverride && config?.enableWebforms ? true : false);
-let offlineDataIsSyncing: boolean = $state(false);
 let offlineSyncPercentComplete: number | null = $state(null);
 
 function getCommonStore() {
@@ -73,10 +70,6 @@ function getCommonStore() {
 	}
 
 	return {
-		get db() {
-			return db;
-		},
-		setDb: (newDb: PGliteWithSync) => (db = newDb),
 		get selectedTab() {
 			return selectedTab;
 		},
@@ -92,12 +85,6 @@ function getCommonStore() {
 		setUseOdkCollectOverride: (isEnabled: boolean) => (useOdkCollectOverride = isEnabled),
 		get enableWebforms() {
 			return enableWebforms;
-		},
-		get offlineDataIsSyncing() {
-			return offlineDataIsSyncing;
-		},
-		setOfflineDataIsSyncing(newVal: boolean) {
-			offlineDataIsSyncing = newVal;
 		},
 		get offlineSyncPercentComplete() {
 			return offlineSyncPercentComplete;

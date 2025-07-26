@@ -1,25 +1,14 @@
 <script lang="ts">
 	import '$styles/page.css';
-	import type { PageData } from './$types';
-	import { onMount, onDestroy } from 'svelte';
-	import { online } from 'svelte/reactivity/window';
-	import type { PGlite } from '@electric-sql/pglite';
+	import { onMount } from 'svelte';
 	import type { SlInputEvent } from '@shoelace-style/shoelace';
 
 	import { goto } from '$app/navigation';
-	import { getCommonStore } from '$store/common.svelte';
 	import { getProjectStore } from '$store/projects.svelte';
 	import Pagination from '$lib/components/pagination.svelte';
 	import ProjectCard from '$lib/components/project-summary/project-card.svelte';
 	import ProjectCardSkeleton from '$lib/components/project-summary/project-card-skeleton.svelte';
 
-	interface Props {
-		data: PageData;
-	}
-
-	let db: PGlite | undefined;
-	const { data }: Props = $props();
-	const commonStore = getCommonStore();
 	const projectStore = getProjectStore();
 
 	let paginationPage = $state(1);
@@ -40,11 +29,7 @@
 	});
 
 	function getPaginatedProjects() {
-		if (online.current) {
-			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
-		} else {
-			projectStore.fetchProjectsFromLocalDB(db);
-		}
+		projectStore.fetchProjectsFromAPI(paginationPage, debouncedSearch);
 	};
 
 	onMount(async () => {
@@ -53,10 +38,6 @@
 		if (requestedPath) {
 			goto(requestedPath);
 		}
-
-		// Get db and make accessible via store
-		db = await data.dbPromise;
-		commonStore.setDb(db);
 
 		// Get the project summaries on load
 		getPaginatedProjects();

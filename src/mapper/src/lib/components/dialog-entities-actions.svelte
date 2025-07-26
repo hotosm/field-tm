@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '$styles/dialog-entities-actions.css';
-	import type { PGlite } from '@electric-sql/pglite';
 	import { distance } from '@turf/distance';
 	import type { Coord } from '@turf/helpers';
 	import type { SlDialog } from '@shoelace-style/shoelace';
@@ -36,7 +35,6 @@
 	const taskStore = getTaskStore();
 	const loginStore = getLoginStore();
 
-	let db: PGlite | undefined = $derived(commonStore.db);
 	let dialogRef: SlDialog | null = $state(null);
 	let confirmationDialogRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
@@ -59,7 +57,7 @@
 
 	const updateEntityTaskStatus = () => {
 		if (selectedEntity?.status === 'READY') {
-			entitiesStore.updateEntityStatus(db, projectData.id, {
+			entitiesStore.updateEntityStatus(projectData.id, {
 				entity_id: selectedEntity?.entity_id,
 				status: 1,
 				// NOTE here we don't translate the field as English values are always saved as the Entity label
@@ -161,7 +159,7 @@
 			(feature: Record<string, any>) => feature.properties?.entity_id === entityId,
 		)?.properties;
 		if (created_by && created_by === loginStore.getAuthDetails?.sub) {
-			await entitiesStore.deleteNewEntity(db, projectData.id, entity_id);
+			await entitiesStore.deleteNewEntity(projectData.id, entity_id);
 			showDeleteEntityPopup = false;
 		} else {
 			alertStore.setAlert({

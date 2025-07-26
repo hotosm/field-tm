@@ -1,7 +1,6 @@
 import 'virtual:uno.css';
 import type { LayoutLoad } from './$types';
 
-import { getDbOnce } from '$lib/db/pglite';
 import { clearAllDevCaches } from '$lib/utils/dev-reset';
 
 // NOTE we can't prerender as we are using dynamic routing [projectId]
@@ -10,7 +9,6 @@ export const ssr = false;
 
 export const load: LayoutLoad = async ({ fetch }) => {
 	let config;
-	const dbPromise = getDbOnce(); // Don't await here to allow loading spinner in layout.svelte
 
 	try {
 		const s3Response = await fetch(`${import.meta.env.VITE_S3_URL}/fmtm-data/frontend/config.json`);
@@ -31,7 +29,6 @@ export const load: LayoutLoad = async ({ fetch }) => {
 	}
 
 	return {
-		dbPromise,
 		config,
 	};
 };

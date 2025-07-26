@@ -2,28 +2,23 @@
 	import '$styles/page.css';
 	import '@hotosm/ui/dist/hotosm-ui';
 
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
 	import { error } from '@sveltejs/kit';
 	import type { PageProps } from './$types';
-	import { pwaInfo } from 'virtual:pwa-info';
-	import type { RegisterSWOptions } from 'vite-plugin-pwa/types';
 
-	import { getCommonStore, getAlertStore } from '$store/common.svelte.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { refreshCookies, getUserDetailsFromApi } from '$lib/api/login';
 	import Toast from '$lib/components/toast.svelte';
 	import Header from '$lib/components/header.svelte';
-	import { m } from '$translations/messages.js';
 
 	let { data, children }: PageProps = $props();
 
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
-	const alertStore = getAlertStore();
 	commonStore.setConfig(data.config);
 
-	let dbPromise = data.dbPromise;
 	let lastOnlineStatus: boolean | null = $state(null);
 	let loginDebounce: ReturnType<typeof setTimeout> | null = $state(null);
 
@@ -84,24 +79,10 @@
 			document.head.appendChild(linkElement);
 		}
 	});
-
-	onDestroy(async() => {
-		const db = await dbPromise();
-		db.close()
-	});
 </script>
 
 <main class="flex flex-col h-screen overflow-hidden font-primary">
 	<Header></Header>
 	<Toast></Toast>
-
-	{#await dbPromise}
-		<div class="spinner-wrapper">
-			<sl-spinner class="loading-spinner"></sl-spinner>
-		</div>
-	{:then db}
-		{@render children?.({ data, db })}
-	{:catch error}
-		<p class="text-red-500 p-4">Error loading PGLite: {error.message}</p>
-	{/await}
+	{@render children?.({ data })}
 </main>
