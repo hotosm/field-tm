@@ -1,13 +1,13 @@
-import { ShapeStream, Shape } from '@electric-sql/client';
-import type { ShapeData } from '@electric-sql/client';
+import type { Collection, UseLiveQueryReturn } from '@tanstack/svelte-db';
+import { useLiveQuery } from '@tanstack/svelte-db';
 import type { FeatureCollection } from 'geojson';
 import type { UUID } from 'crypto';
 import type { LngLatLike } from 'svelte-maplibre';
 
-import type { DbEntityType, EntityStatusPayload, entitiesApiResponse, entityStatusOptions } from '$lib/types';
+import type { DbEntityType, EntityStatusPayload, entityStatusOptions } from '$lib/types';
+import type { OdkEntity } from '$store/collections';
 import { EntityStatusNameMap } from '$lib/types';
-import { getAlertStore } from './common.svelte';
-import { javarosaToGeojsonGeom } from '$lib/odk/javarosa';
+import { getAlertStore } from '$store/common.svelte';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,29 +23,14 @@ type taskSubmissionInfoType = {
 	feature_count: number;
 };
 
-let entitiesUnsubscribe: (() => void) | null = $state(null);
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntityId: string | null = $state(null);
-let entitiesList: DbEntityType[] = $state([]);
-// Map each entity_id to the entity data, for faster lookup in map
-let entityMap = $derived(new Map(entitiesList.map((entity) => [entity.entity_id, entity])));
-let selectedEntity: DbEntityType | null = $derived(entityMap.get(selectedEntityId || '') ?? null);
+let entitiesCollection: Collection | undefined = $state(undefined);
+let entitiesList: UseLiveQueryReturn<OdkEntity[]> | undefined;
 
-// Derive new and bad geoms to display as an overlay
-let badGeomFeatcol: FeatureCollection = $derived({
-	type: 'FeatureCollection',
-	features: entitiesList
-		.filter((e) => e.status === 'MARKED_BAD')
-		.map(entityDataToGeojsonFeature)
-		.filter(Boolean),
-});
-let newGeomFeatcol: FeatureCollection = $derived({
-	type: 'FeatureCollection',
-	features: entitiesList
-		.filter((e) => e.created_by !== '')
-		.map(entityDataToGeojsonFeature)
-		.filter(Boolean),
-});
+// Map each entity_id to the entity data, for faster lookup in map
+let entityMap = $derived(new Map(entitiesList?.data.map((entity) => [entity.entity_id, entity])));
+let selectedEntity: DbEntityType | null = $derived(entityMap.get(selectedEntityId || '') ?? null);
 
 const alertStore = getAlertStore();
 
@@ -54,76 +39,62 @@ let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
-let taskSubmissionInfo: taskSubmissionInfoType[] = $state([]);
+// TODO calculate submission info from collection
+let taskSubmissionInfo: taskSubmissionInfoType[] = $derived(calculateTaskSubmissionCounts());
 let fgbOpfsUrl: string = $state('');
 let selectedEntityJavaRosaGeom: string | null = $state(null);
 
-function entityDataToGeojsonFeature(entity: DbEntityType): Feature | null {
-	const geometry = javarosaToGeojsonGeom(entity.geometry);
-	if (!geometry) return null;
+function calculateTaskSubmissionCounts(): taskSubmissionInfoType[] {
+	if (!entitiesList) return [];
 
-	return {
-		type: 'Feature',
-		geometry,
-		properties: {
-			entity_id: entity.entity_id,
-			status: entity.status,
-			project_id: entity.project_id,
-			task_id: entity.task_id,
-			osm_id: entity.osm_id,
-			submission_ids: entity.submission_ids,
-			created_by: entity.created_by,
+	const StatusToCode: Record<entityStatusOptions, number> = Object.entries(EntityStatusNameMap).reduce(
+		(acc, [codeStr, status]) => {
+			acc[status] = Number(codeStr);
+			return acc;
 		},
-	};
+		{} as Record<entityStatusOptions, number>,
+	);
+
+	const taskEntityMap = entitiesList.data?.reduce((acc: Record<number, DbEntityType[]>, item) => {
+		if (!acc[item?.task_id]) {
+			acc[item.task_id] = [];
+		}
+		acc[item.task_id].push(item);
+		return acc;
+	}, {});
+
+	return Object.entries(taskEntityMap).map(([taskId, taskEntities]) => {
+		// Calculate feature_count
+		const featureCount = taskEntities.length;
+		let submissionCount = 0;
+
+		// Calculate submission_count
+		taskEntities.forEach((entity) => {
+			const statusCode = StatusToCode[entity.status];
+			if (statusCode > 1) {
+				submissionCount++;
+			}
+		});
+
+		return {
+			task_id: +taskId,
+			index: +taskId,
+			submission_count: submissionCount,
+			feature_count: featureCount,
+		};
+	});
 }
 
 function getEntitiesStatusStore() {
-	async function startEntityStatusStream(projectId: number): Promise<ShapeStream | undefined> {
-		if (!projectId) {
-			return;
-		}
-
-		const entitiesStream = new ShapeStream({
-			url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-			params: {
-				table: 'odk_entities',
-				where: `project_id=${projectId}`,
-			},
-		});
-		const entitiesShape = new Shape(entitiesStream);
-
-		entitiesUnsubscribe = entitiesShape?.subscribe(async (entityData: ShapeData[]) => {
-			// Here we merge new rows from electric with existing entity records
-			// preserving any existing entity properties not included in the ShapeStream
-			const entityMapClone = new Map(entitiesList.map((e) => [e.entity_id, e]));
-
-			// Append entity_id to data
-			for (const entity of entityData.rows) {
-				const updatedEntity = {
-					...(entityMapClone.get(entity.entity_id) || {}),
-					...entity,
-				};
-				entityMapClone.set(entity.entity_id, updatedEntity);
-			}
-
-			entitiesList = Array.from(entityMapClone.values());
-			_calculateTaskSubmissionCounts();
-		});
-	}
-
-	function unsubscribeEntitiesStream() {
-		if (entitiesUnsubscribe) {
-			entitiesUnsubscribe();
-			entitiesUnsubscribe = null;
-		}
-	}
-
-	function addStatusToGeojsonProperty(geojsonData: FeatureCollection): FeatureCollection {
+	function addStatusToGeojsonProperties(geojsonData: FeatureCollection): FeatureCollection {
 		return {
 			...geojsonData,
 			features: geojsonData.features.map((feature) => {
 				// Must convert number type from fgb number --> bigint for comparison
+				console.log(typeof feature?.properties?.osm_id);
+				console.log(feature?.properties?.osm_id);
 				const entity = getEntityByOsmId(BigInt(feature?.properties?.osm_id));
+				console.log(entity);
 				return {
 					...feature,
 					properties: {
@@ -139,51 +110,7 @@ function getEntitiesStatusStore() {
 		};
 	}
 
-	function _calculateTaskSubmissionCounts() {
-		if (!entitiesList) return;
-
-		const StatusToCode: Record<entityStatusOptions, number> = Object.entries(EntityStatusNameMap).reduce(
-			(acc, [codeStr, status]) => {
-				acc[status] = Number(codeStr);
-				return acc;
-			},
-			{} as Record<entityStatusOptions, number>,
-		);
-
-		const taskEntityMap = entitiesList?.reduce((acc: Record<number, DbEntityType[]>, item) => {
-			if (!acc[item?.task_id]) {
-				acc[item.task_id] = [];
-			}
-			acc[item.task_id].push(item);
-			return acc;
-		}, {});
-
-		const taskInfo = Object.entries(taskEntityMap).map(([taskId, taskEntities]) => {
-			// Calculate feature_count
-			const featureCount = taskEntities.length;
-			let submissionCount = 0;
-
-			// Calculate submission_count
-			taskEntities.forEach((entity) => {
-				const statusCode = StatusToCode[entity.status];
-				if (statusCode > 1) {
-					submissionCount++;
-				}
-			});
-
-			return {
-				task_id: +taskId,
-				index: +taskId,
-				submission_count: submissionCount,
-				feature_count: featureCount,
-			};
-		});
-
-		// Set submission info in store
-		taskSubmissionInfo = taskInfo;
-	}
-
-	// Manually sync the entity status via button
+	// Manually sync the entity status via button - this should push through updates via electric
 	async function syncEntityStatusManually(projectId: number) {
 		try {
 			syncEntityStatusManuallyLoading = true;
@@ -193,24 +120,7 @@ function getEntitiesStatusStore() {
 			if (!entityStatusResponse.ok) {
 				throw Error('Failed to get entities for project');
 			}
-
-			const responseJson: entitiesApiResponse[] = await entityStatusResponse.json();
-			// Convert API response into our internal entity shape
-			const newEntitiesList: DbEntityType[] = responseJson.map((entity: entitiesApiResponse) => ({
-				entity_id: entity.id,
-				status: EntityStatusNameMap[entity.status],
-				project_id: projectId,
-				task_id: entity.task_id,
-				submission_ids: entity.submission_ids,
-				osm_id: entity.osm_id,
-				geometry: entity.geometry,
-				created_by: entity.created_by,
-			}));
 			syncEntityStatusManuallyLoading = false;
-
-			// Replace in-memory list from store entirely (refresh)
-			entitiesList = newEntitiesList;
-			_calculateTaskSubmissionCounts();
 		} catch (error) {
 			syncEntityStatusManuallyLoading = false;
 		}
@@ -248,17 +158,12 @@ function getEntitiesStatusStore() {
 	}
 
 	async function createEntity(projectId: number, entityUuid: UUID, featcol: FeatureCollection) {
-		const entityRequestUrl = `${API_URL}/central/entity?project_id=${projectId}&entity_uuid=${entityUuid}`;
-		const entityRequestMethod = 'POST';
-		const entityRequestPayload = JSON.stringify(featcol);
-		const entityRequestContentType = 'application/json';
-
 		try {
-			const resp = await fetch(entityRequestUrl, {
-				method: entityRequestMethod,
-				body: entityRequestPayload,
+			const resp = await fetch(`${API_URL}/central/entity?project_id=${projectId}&entity_uuid=${entityUuid}`, {
+				method: 'POST',
+				body: JSON.stringify(featcol),
 				headers: {
-					'Content-type': entityRequestContentType,
+					'Content-type': 'application/json',
 				},
 				credentials: 'include',
 			});
@@ -273,15 +178,6 @@ function getEntitiesStatusStore() {
 			});
 			throw new Error(error);
 		}
-	}
-
-	function _fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result as string);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
 	}
 
 	async function createNewSubmission(projectId: number, submissionXml: string, attachments: File[]) {
@@ -346,7 +242,7 @@ function getEntitiesStatusStore() {
 	}
 
 	function getEntityByOsmId(osmId: bigint): DbEntityType | undefined {
-		return entitiesList.find((entity) => entity.osm_id === osmId);
+		return entitiesList?.data.find((entity) => entity.osm_id === osmId);
 	}
 
 	function getOsmIdByEntityId(entityId: string): number | undefined {
@@ -362,10 +258,8 @@ function getEntitiesStatusStore() {
 	}
 
 	return {
-		startEntityStatusStream: startEntityStatusStream,
-		unsubscribeEntitiesStream: unsubscribeEntitiesStream,
 		syncEntityStatusManually: syncEntityStatusManually,
-		addStatusToGeojsonProperty: addStatusToGeojsonProperty,
+		addStatusToGeojsonProperties: addStatusToGeojsonProperties,
 		createEntity: createEntity,
 		deleteNewEntity: deleteNewEntity,
 		updateEntityStatus: updateEntityStatus,
@@ -375,6 +269,15 @@ function getEntitiesStatusStore() {
 		setUserLocationCoordinate: setUserLocationCoordinate,
 		setFgbOpfsUrl: setFgbOpfsUrl,
 		setSelectedEntityJavaRosaGeom: setSelectedEntityJavaRosaGeom,
+		get entitiesCollection() {
+			return entitiesCollection;
+		},
+		setEntitiesCollection(newCollection: Collection) {
+			entitiesCollection = newCollection;
+			entitiesList = useLiveQuery({
+				query: (q) => q.from({ entities: entitiesCollection }),
+			});
+		},
 		get selectedEntityId() {
 			return selectedEntityId;
 		},
@@ -389,11 +292,11 @@ function getEntitiesStatusStore() {
 		},
 		getEntityByOsmId: getEntityByOsmId,
 		getOsmIdByEntityId: getOsmIdByEntityId,
-		get badGeomFeatcol() {
-			return badGeomFeatcol;
+		get badGeomCollection() {
+			return badGeomCollection;
 		},
-		get newGeomFeatcol() {
-			return newGeomFeatcol;
+		get newGeomCollection() {
+			return newGeomCollection;
 		},
 		get syncEntityStatusManuallyLoading() {
 			return syncEntityStatusManuallyLoading;

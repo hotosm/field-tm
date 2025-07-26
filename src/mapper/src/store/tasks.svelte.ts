@@ -1,5 +1,5 @@
-import { ShapeStream, Shape } from '@electric-sql/client';
-import type { ShapeData } from '@electric-sql/client';
+import type { Collection, UseLiveQueryReturn } from '@tanstack/svelte-db';
+import { useLiveQuery } from '@tanstack/svelte-db';
 import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 
 import type { ProjectTask, TaskEventType } from '$lib/types';
@@ -11,8 +11,9 @@ const loginStore = getLoginStore();
 
 let eventsUnsubscribe: (() => void) | null = $state(null);
 let featcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
-let latestEvent: TaskEventType | null = $state(null);
-let events: TaskEventType[] = $state([]);
+let eventsCollection: Collection | undefined = $state(undefined);
+let events: UseLiveQueryReturn<TaskEventType[]> = $state([]);
+let latestEvent: TaskEventType | null = $derived(events.at(-1) ?? null);
 
 // for UI show task index for simplicity & for api's use task id
 let selectedTaskId: number | null = $state(null);
@@ -22,69 +23,23 @@ let selectedTask: any = $state(null);
 let selectedTaskState: taskStatus | null = $state(null);
 let selectedTaskGeom: GeoJSON | null = $state(null);
 let taskIdIndexMap: Record<number, number> = $state({});
-let commentMention: TaskEventType | null = $state(null);
+let commentMention: UseLiveQueryReturn<TaskEventType | null> = $derived(getCommentMention());
 let userDetails = $derived(loginStore.getAuthDetails);
 
+function getCommentMention() {
+	if (
+		latestEvent?.event === 'COMMENT' &&
+		typeof latestEvent?.comment === 'string' &&
+		latestEvent.comment.includes(`@${userDetails?.username}`) &&
+		latestEvent.comment.startsWith('#submissionId:uuid:') &&
+		getTimeDiff(new Date(latestEvent.created_at)) < 120
+	) {
+		return latestEvent;
+	}
+	return null;
+}
+
 function getTaskStore() {
-	async function startTaskEventStream(projectId: number): Promise<ShapeStream | undefined> {
-		if (!projectId) {
-			return;
-		}
-
-		const taskEventStream = new ShapeStream({
-			url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-			params: {
-				table: 'task_events',
-				where: `project_id=${projectId}`,
-			},
-		});
-		const taskEventShape = new Shape(taskEventStream);
-
-		eventsUnsubscribe = taskEventShape?.subscribe((taskEventData: ShapeData[]) => {
-			let taskEventRows: TaskEventType[];
-			if (events.length > 0) {
-				// If we already have data, only append data changes made since last update
-				taskEventRows = taskEventData.rows
-					.filter((item): item is { value: TaskEventType } => 'value' in item && item.value !== null)
-					.map((item) => item.value);
-			} else {
-				taskEventRows = taskEventData.rows;
-			}
-
-			if (taskEventRows.length) {
-				latestEvent = taskEventRows.at(-1) ?? null;
-
-				// If the user is tagged in a comment, then set reactive commentMention variable
-				if (
-					latestEvent?.event === 'COMMENT' &&
-					typeof latestEvent?.comment === 'string' &&
-					latestEvent.comment.includes(`@${userDetails?.username}`) &&
-					latestEvent.comment.startsWith('#submissionId:uuid:') &&
-					getTimeDiff(new Date(latestEvent.created_at)) < 120
-				) {
-					commentMention = latestEvent;
-				}
-
-				// Update the state of currently selected task area
-				for (const newEvent of taskEventRows) {
-					if (newEvent.task_id === selectedTaskId) {
-						selectedTaskState = newEvent.state;
-					}
-				}
-
-				// Update the events in taskStore
-				events = taskEventRows;
-			}
-		});
-	}
-
-	function unsubscribeEventStream() {
-		if (eventsUnsubscribe) {
-			eventsUnsubscribe();
-			eventsUnsubscribe = null;
-		}
-	}
-
 	async function appendTaskStatesToFeatcol(projectTasks: ProjectTask[]) {
 		const latestTaskStates = new Map();
 
@@ -144,14 +99,21 @@ function getTaskStore() {
 		featcol = { type: 'FeatureCollection', features: [] };
 	}
 	return {
-		startTaskEventStream: startTaskEventStream,
-		unsubscribeEventStream: unsubscribeEventStream,
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
 		setSelectedTaskId: setSelectedTaskId,
 		setTaskIdIndexMap: setTaskIdIndexMap,
 		dismissCommentMention: dismissCommentMention,
 		clearTaskStates: clearTaskStates,
+		get eventsCollection() {
+			return eventsCollection;
+		},
+		setEventsCollection(newCollection: Collection) {
+			eventsCollection = newCollection;
+			events = useLiveQuery({
+				query: (q) => q.from({ events: eventsCollection }),
+			}).data;
+		},
 		get featcol() {
 			return featcol;
 		},

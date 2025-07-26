@@ -18,13 +18,14 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
+	import { eq, not, useLiveQuery } from '@tanstack/svelte-db';
 	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
+	import type { Position, Geometry as GeoJSONGeometry } from 'geojson';
 	import { centroid } from '@turf/centroid';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
@@ -48,6 +49,7 @@
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/map/click-outside.ts';
 	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
+	import { entityDataToFeatureCollection } from '$store/collections';
 
 	type bboxType = [number, number, number, number];
 
@@ -109,6 +111,18 @@
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
 	let toggleLayer = $state(true);
+
+	// Derive new and bad geoms to display as an overlay
+	const badGeomCollection = useLiveQuery({
+		query: (q) =>
+		q.from({ entities: entitiesStore.entitiesCollection })
+		.where(({ entities }) => eq(entities.status, 'MARKED_BAD')),
+	});
+	const newGeomCollection = useLiveQuery({
+		query: (q) =>
+		q.from({ entities: entitiesStore.entitiesCollection })
+		.where(({ entities }) => not(eq(entities.created_by, ''))),
+	})
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,
@@ -584,8 +598,8 @@
 					: taskStore.selectedTaskGeom}
 				extractGeomCols={true}
 				promoteId="id"
-				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
-				geojsonUpdateDependency={[entitiesStore.entitiesList]}
+				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperties(geojsonData)}
+				geojsonUpdateDependency={[entitiesStore.entitiesCollection]}
 			>
 				{#if primaryGeomType === MapGeomTypes.POLYGON}
 					<FillLayer
@@ -701,7 +715,7 @@
 				{/if}
 			</FlatGeobuf>
 		{/if}
-		<GeoJSON id="bad-geoms" data={entitiesStore.badGeomFeatcol}>
+		<GeoJSON id="bad-geoms" data={entityDataToFeatureCollection(badGeomCollection.data)}>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="bad-geom-fill-layer"
@@ -755,7 +769,7 @@
 				/>
 			{/if}
 		</GeoJSON>
-		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
+		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperties(entityDataToFeatureCollection(newGeomCollection.data))}>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="new-entity-polygon-layer"

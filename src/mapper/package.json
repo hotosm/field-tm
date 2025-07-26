@@ -51,6 +51,8 @@
 		"@hotosm/ui": "0.2.0-b5",
 		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@shoelace-style/shoelace": "2.17.1",
+		"@tanstack/electric-db-collection": "^0.0.14",
+		"@tanstack/svelte-db": "^0.0.2",
 		"@tiptap/core": "^2.11.7",
 		"@tiptap/extension-image": "^2.11.7",
 		"@tiptap/extension-link": "^2.11.7",
@@ -67,7 +69,8 @@
 		"pako": "^2.1.0",
 		"pmtiles": "^4.3.0",
 		"svelte-maplibre": "^0.9.14",
-		"workbox-window": "^7.3.0"
+		"workbox-window": "^7.3.0",
+		"zod": "^4.0.10"
 	},
 	"packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

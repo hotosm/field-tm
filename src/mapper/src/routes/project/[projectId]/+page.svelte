@@ -5,7 +5,6 @@
 	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
-	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
@@ -41,7 +40,7 @@
 	}
 
 	const { data }: Props = $props();
-	const { project: initialProject, projectId } = data;
+	const { projectId, project: initialProject, entitiesCollection, eventsCollection } = data;
 	let project: DbProjectType | undefined = initialProject;
 
 	let formXmlUrl: string | null = $state(null);
@@ -68,6 +67,10 @@
 
 	const latestEvent = $derived(taskStore.latestEvent);
 	const commentMention = $derived(taskStore.commentMention);
+
+	// Add collections to store
+	taskStore.setEventsCollection(eventsCollection);
+	entitiesStore.setEntitiesCollection(entitiesCollection);
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
@@ -135,20 +138,7 @@
 		}
 	};
 
-	async function subscribeToAllStreams() {
-		// Ensure unsubscribed first
-		unsubscribeFromAllStreams();
-
-		await taskStore.startTaskEventStream(projectId);
-		await entitiesStore.startEntityStatusStream(projectId);
-	}
-
 	onMount(async () => {
-		if (online.current) {
-			// Only subscribe if currently online (no need to await)
-			subscribeToAllStreams();
-		}
-
 		// Set vars that require upstream project details set (and are not reactive)
 		if (project) {
 			commonStore.setUseOdkCollectOverride(project.use_odk_collect);
@@ -174,44 +164,11 @@
 		}, 12000);
 	});
 
-	async function unsubscribeFromAllStreams() {
-		taskStore.unsubscribeEventStream();
-		entitiesStore.unsubscribeEntitiesStream();
-	}
-
 	onDestroy(() => {
 		taskStore.clearTaskStates();
 		entitiesStore.setFgbOpfsUrl('');
 
 		if (timeout) clearTimeout(timeout);
-
-		unsubscribeFromAllStreams();
-	});
-
-	// Subscribe / unsubscribe from streams based on connectivity
-	// note: the effect rune can't accept async, but this is fine
-	// note: we also need to debounce this to prevent infinite loop
-	$effect(() => {
-		const isOnline = online.current;
-
-		if (isOnline === lastOnlineStatus) return;
-		lastOnlineStatus = isOnline;
-
-		if (subscribeDebounce) {
-			clearTimeout(subscribeDebounce);
-			subscribeDebounce = null;
-		}
-
-		subscribeDebounce = setTimeout(() => {
-			if (isOnline) {
-				// Delay initial subscriptions by 5 seconds after load (reduce memory spike)
-				setTimeout(() => {
-					subscribeToAllStreams();
-				}, 5000);
-			} else {
-				unsubscribeFromAllStreams();
-			}
-		}, 200);
 	});
 
 	const projectSetupStepStore = getProjectSetupStepStore();

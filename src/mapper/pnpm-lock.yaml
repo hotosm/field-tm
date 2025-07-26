@@ -20,6 +20,12 @@ importers:
       '@shoelace-style/shoelace':
         specifier: 2.17.1
         version: 2.17.1(@types/react@18.3.3)
+      '@tanstack/electric-db-collection':
+        specifier: ^0.0.14
+        version: 0.0.14(@electric-sql/client@1.0.5)(typescript@5.7.2)
+      '@tanstack/svelte-db':
+        specifier: ^0.0.2
+        version: 0.0.2(svelte@5.35.5)(typescript@5.7.2)
       '@tiptap/core':
         specifier: ^2.11.7
         version: 2.11.7(@tiptap/pm@2.11.7)
@@ -71,6 +77,9 @@ importers:
       workbox-window:
         specifier: ^7.3.0
         version: 7.3.0
+      zod:
+        specifier: ^4.0.10
+        version: 4.0.10
     devDependencies:
       '@inlang/paraglide-js':
         specifier: ^2.0.13
@@ -692,6 +701,9 @@ packages:
   '@electric-sql/client@1.0.5':
     resolution: {integrity: sha512-DO7dvfCbZU6k33vr3ymBCXER6kPpoBODoRBru7oI16B4/ZXlxhMBpsmzmd8p9dQrPICCpQm6bBkNI6qI3oUAIQ==}
 
+  '@electric-sql/d2mini@0.1.7':
+    resolution: {integrity: sha512-gcXZKkMmgGdNB6AQl0S9jJIbKZdlgafbA3u/a9TVltIgXE1VPuBN7j6tf25RfxX/5oi6o6ca9KHluJQwg40oLg==}
+
   '@esbuild/aix-ppc64@0.25.5':
     resolution: {integrity: sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==}
     engines: {node: '>=18'}
@@ -1224,6 +1236,9 @@ packages:
     resolution: {integrity: sha512-hI6twvUkzOmyGZhQMza1gpfqErZxXRw6JEsiVjUbo7tFanVD+8Oil0Ih3l2nGzHdxPI41zFmfUQG7GHqhciKZQ==}
     hasBin: true
 
+  '@standard-schema/spec@1.0.0':
+    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
 
@@ -1260,6 +1275,25 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
       vite: ^6.0.0
+
+  '@tanstack/db@0.0.32':
+    resolution: {integrity: sha512-V1bcvoFZZ4BT0GhCiCO+zMI6HoOl5tvyeDqXoEh30Q4jarcom+Ba69WkdZ2dRVE4wW89OfoDSvYHD6H4izKeXg==}
+    peerDependencies:
+      typescript: '>=4.7'
+
+  '@tanstack/electric-db-collection@0.0.14':
+    resolution: {integrity: sha512-YP86hWItVXBmhO/guuhKLGecJod48jEOtZFFnoGkJUbEHnHoAWPVDQstCHfcaf4UAw/kuIslv6/fi9EwsjN8UQ==}
+    peerDependencies:
+      '@electric-sql/client': '>=1.0.0'
+      typescript: '>=4.7'
+
+  '@tanstack/store@0.7.2':
+    resolution: {integrity: sha512-RP80Z30BYiPX2Pyo0Nyw4s1SJFH2jyM6f9i3HfX4pA+gm5jsnYryscdq2aIQLnL4TaGuQMO+zXmN9nh1Qck+Pg==}
+
+  '@tanstack/svelte-db@0.0.2':
+    resolution: {integrity: sha512-WveWCBkXjNRQdWW2kQnW1SAk8NTiZ1KK+RzgKRPo5c4ZZXDTMkP8ydBAC6Xra/jUOy1JyAyVjSNkMLUb9ljJhg==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   '@tiptap/core@2.11.7':
     resolution: {integrity: sha512-zN+NFFxLsxNEL8Qioc+DL6b8+Tt2bmRbXH22Gk6F6nD30x83eaUSFlSv3wqvgyCq3I1i1NO394So+Agmayx6rQ==}
@@ -2323,6 +2357,10 @@ packages:
   for-each@0.3.5:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
     engines: {node: '>= 0.4'}
+
+  fractional-indexing@3.2.0:
+    resolution: {integrity: sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==}
+    engines: {node: ^14.13.1 || >=16.0.0}
 
   fs-extra@9.1.0:
     resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}
@@ -3391,6 +3429,9 @@ packages:
   smob@1.5.0:
     resolution: {integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==}
 
+  sorted-btree@1.8.1:
+    resolution: {integrity: sha512-395+XIP+wqNn3USkFSrNz7G3Ss/MXlZEqesxvzCRFwL14h6e8LukDHdLBePn5pwbm5OQ9vGu8mDyz2lLDIqamQ==}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -3968,6 +4009,9 @@ packages:
 
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
+
+  zod@4.0.10:
+    resolution: {integrity: sha512-3vB+UU3/VmLL2lvwcY/4RV2i9z/YU0DTV/tDuYjrwmx5WeJ7hwy+rGEEx8glHp6Yxw7ibRbKSaIFBgReRPe5KA==}
 
   zstddec@0.1.0:
     resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}
@@ -4672,6 +4716,12 @@ snapshots:
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.28.0
 
+  '@electric-sql/d2mini@0.1.7':
+    dependencies:
+      fractional-indexing: 3.2.0
+      murmurhash-js: 1.0.0
+      sorted-btree: 1.8.1
+
   '@esbuild/aix-ppc64@0.25.5':
     optional: true
 
@@ -5125,6 +5175,8 @@ snapshots:
 
   '@sqlite.org/sqlite-wasm@3.48.0-build4': {}
 
+  '@standard-schema/spec@1.0.0': {}
+
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     dependencies:
       ejs: 3.1.10
@@ -5179,6 +5231,32 @@ snapshots:
       vitefu: 1.1.1(vite@6.3.5(@types/node@22.10.1)(jiti@2.4.2)(terser@5.43.1)(tsx@4.19.4))
     transitivePeerDependencies:
       - supports-color
+
+  '@tanstack/db@0.0.32(typescript@5.7.2)':
+    dependencies:
+      '@electric-sql/d2mini': 0.1.7
+      '@standard-schema/spec': 1.0.0
+      typescript: 5.7.2
+
+  '@tanstack/electric-db-collection@0.0.14(@electric-sql/client@1.0.5)(typescript@5.7.2)':
+    dependencies:
+      '@electric-sql/client': 1.0.5
+      '@standard-schema/spec': 1.0.0
+      '@tanstack/db': 0.0.32(typescript@5.7.2)
+      '@tanstack/store': 0.7.2
+      debug: 4.4.1
+      typescript: 5.7.2
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tanstack/store@0.7.2': {}
+
+  '@tanstack/svelte-db@0.0.2(svelte@5.35.5)(typescript@5.7.2)':
+    dependencies:
+      '@tanstack/db': 0.0.32(typescript@5.7.2)
+      svelte: 5.35.5
+    transitivePeerDependencies:
+      - typescript
 
   '@tiptap/core@2.11.7(@tiptap/pm@2.11.7)':
     dependencies:
@@ -6496,6 +6574,8 @@ snapshots:
     dependencies:
       is-callable: 1.2.7
 
+  fractional-indexing@3.2.0: {}
+
   fs-extra@9.1.0:
     dependencies:
       at-least-node: 1.0.0
@@ -7645,6 +7725,8 @@ snapshots:
 
   smob@1.5.0: {}
 
+  sorted-btree@1.8.1: {}
+
   source-map-js@1.2.1: {}
 
   source-map-support@0.5.21:
@@ -8329,6 +8411,8 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.2: {}
+
+  zod@4.0.10: {}
 
   zstddec@0.1.0:
     optional: true

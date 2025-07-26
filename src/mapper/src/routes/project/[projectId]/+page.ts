@@ -1,13 +1,17 @@
 import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { online } from 'svelte/reactivity/window';
+import type { Collection } from '@tanstack/svelte-db';
 import type { DbProjectType } from '$lib/types';
+import { getEntitiesCollection, getTaskEventsCollection } from '$store/collections';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
 	const { projectId } = params;
-	let project: DbProjectType | undefined;
+	let project: DbProjectType;
+	let eventsCollection: Collection;
+	let entitiesCollection: Collection;
 
 	if (online.current) {
 		const res = await fetch(`${API_URL}/projects/${projectId}/minimal`, {
@@ -21,12 +25,18 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 		if (res.status >= 300) throw error(400, `Unknown error retrieving project ${projectId}`);
 
 		project = await res.json();
+		entitiesCollection = await getEntitiesCollection(projectId);
+		entitiesCollection.preload();
+		eventsCollection = await getTaskEventsCollection(projectId);
+		eventsCollection.preload();
 	} else {
 		throw error(500, `You must be online to fetch project data`);
 	}
 
 	return {
-		project,
 		projectId: parseInt(projectId),
+		project,
+		entitiesCollection,
+		eventsCollection,
 	};
 };

@@ -42,8 +42,10 @@ export function geojsonGeomToJavarosa(geometry: GeoJSONGeometry) {
 	return `${javarosaGeometry};`;
 }
 
-export function javarosaToGeojsonGeom(javarosa: string | null): GeoJSONGeometry | null {
-	if (!javarosa || !javarosa.trim()) return null;
+export function javarosaToGeojsonGeom(javarosa: string): GeoJSONGeometry {
+	if (!javarosa || !javarosa.trim()) {
+		throw new Error('Invalid javarosa geometry input');
+	}
 
 	const coordinateSets = javarosa
 		.trim()
