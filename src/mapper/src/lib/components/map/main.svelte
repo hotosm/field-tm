@@ -467,9 +467,9 @@
 			<sl-icon-button
 				name="arrow-repeat"
 				label="Sync"
-				disabled={entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing}
+				disabled={entitiesStore.syncEntityStatusManuallyLoading}
 				class={`sync-button ${
-					(entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing) && 'animate-spin'
+					(entitiesStore.syncEntityStatusManuallyLoading) && 'animate-spin'
 				}`}
 				onclick={async () => syncButtonTrigger()}
 				onkeydown={async (e: KeyboardEvent) => {

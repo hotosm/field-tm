@@ -4,7 +4,6 @@
 	import './page.css';
 	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
-	import { online } from 'svelte/reactivity/window';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
