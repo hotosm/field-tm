@@ -19,20 +19,7 @@ export async function clearAllDevCaches() {
 		await Promise.all(cacheNames.map((name) => caches.delete(name)));
 	}
 
-	// 3. Clear all IndexedDB databases
-	if (indexedDB?.databases) {
-		const dbs = await indexedDB.databases();
-		await Promise.all(
-			dbs.map((db) => {
-				if (db.name) {
-					console.log(`Deleting IndexedDB: ${db.name}`);
-					return indexedDB.deleteDatabase(db.name);
-				}
-			}),
-		);
-	}
-
-	// 4. Clear OPFS storage
+	// 3. Clear OPFS storage
 	await clearAllOPFS();
 
 	// Set key to prevent clearing multiple times per session
