@@ -211,7 +211,6 @@ services:
       additional_contexts:
         - code=src/mapper
       dockerfile: Dockerfile.ui.debug
-      target: init-db
     volumes:
       - ./src/mapper/messages:/app/messages
       - ./src/mapper/project.inlang:/app/project.inlang

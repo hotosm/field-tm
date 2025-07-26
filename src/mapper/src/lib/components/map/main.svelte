@@ -18,7 +18,6 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
-	import type { PGlite } from '@electric-sql/pglite';
 	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
@@ -98,7 +97,6 @@
 	const entitiesStore = getEntitiesStatusStore();
 	const projectBasemapStore = getProjectBasemapStore();
 
-	let db: PGlite | undefined = $derived(commonStore.db);
 	let map: maplibregl.Map | undefined = $state();
 	let loaded: boolean = $state(false);
 	let selectedBaselayer: string = $state('OSM');
@@ -223,7 +221,7 @@
 			}) || [];
 
 		const clickedFeatures = [...clickedEntityFeature, ...clickedNewEntityFeature];
-		console.log(clickedFeatures);
+
 		// if clicked coordinate contain more than multiple entities, assign it to a variable
 		if (clickedFeatures.length > 1) {
 			selectedFeatures = clickedFeatures;
@@ -264,7 +262,7 @@
 		if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
 			taskAreaClicked = true;
 			const clickedTaskId = clickedTaskFeature[0]?.properties?.fid;
-			taskStore.setSelectedTaskId(db, clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
+			taskStore.setSelectedTaskId(clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
 			if (+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['task_selection']) {
 				localStorage.setItem(`project-${projectId}-setup`, projectSetupStepEnum['complete_setup']);
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['complete_setup']);
@@ -288,7 +286,7 @@
 			toggleActionModal(null);
 		} else {
 			// clear task states i.e. unselect task and it's extract if clicked coordinate doesn't contain any entity or task
-			taskStore.setSelectedTaskId(db, null, null);
+			taskStore.setSelectedTaskId(null, null);
 		}
 	}
 
