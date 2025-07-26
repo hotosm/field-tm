@@ -1,5 +1,77 @@
 # Changelog
 
+## 2025.4.1 (2025-07-26)
+
+### Feat
+
+- Role unassign from project and odk cred check endpoint (#2708)
+- **json-models**: Added json model of each yaml data models
+- progressive project creation workflow draft / published (#2680)
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- add highways.xlsx in osm-fieldwork and osm_category in frontend
+- **backend**: Replace osm_rawdata with raw_data_api_py adding highway category
+
+### Fix
+
+- **models**: fix project visibility to exclude draft projects for cross organisation manager (#2731)
+- **mapper**: fix features not updating acc to extent click after baselayer change by remounting layer (#2728)
+- use st intersects for linear geoms during project file generation (#2715)
+- **frontend**: use global extent for Line geometry & other fixes (#2711)
+- update project API endpoint to use project ID in URL (#2710)
+- **backend**: avoid slash in data extract file name
+- **backend**: pass access token to generate osm extracts
+- questions wont be skipped for new entity worflow (#2707)
+- **frontend**: project creation bugs & refactor (#2692)
+- **pytest**: remove print statement
+- **pytest**: fix the fixture name and user in submission
+- **projects**: fix total contributions mismatch in infographics (#2691)
+- **backend**: add mapping mode options and fix standard odk collect workflow (#2690)
+- **mapper**: correctly set extent for fgb polyline to undefined
+- **mapper**: towards #2663, fix linestring display for mapper frontend
+- **mapper**: load initial entity db records prior to sync
+- **pytest**: update pytest function test_get_contributors with proper assert and fixture
+- **projects**: fix total contributions mismatch in infographics (#2691)
+- **backend**: add mapping mode options and fix standard odk collect workflow (#2690)
+- **mapper**: correctly set extent for fgb polyline to undefined
+- **mapper**: towards #2663, fix linestring display for mapper frontend
+- **mapper**: load initial entity db records prior to sync
+- **xlsform**: update conflict changes with dev branch
+- **xlsform**: update conflict changes with dev branch
+- **data-models**: fixed the syntax error in models.yaml file
+- **backend**: create valid geojson from javarosa, update osm conflation with raw-data-api-py
+- **main**: dont select existing entity if new entity draw mode is enabled (#2688)
+- **taskList**: fix no task list not being displayed having no features (#2681)
+- **frontend**: pass in entire project aoi extent for fgb filtering polylines #2663
+- **frontend**: disable split by square for polylines
+- **frontend**: disable splitting by square for line geom mapping #2663
+- **backend**: use SecretStr for backend SMTP_PASSWORD
+- **mapper**: bug with pagination on mapper summaries page
+- add docstring for geom_type
+- **xlsform**: update xlsx highway form to xls with latest form
+- **frontend**: pass in entire project aoi extent for fgb filtering polylines #2663
+- **frontend**: disable split by square for polylines
+- **frontend**: disable splitting by square for line geom mapping #2663
+- **backend**: use SecretStr for backend SMTP_PASSWORD
+- **mapper**: bug with pagination on mapper summaries page
+- **build**: issues from rebase
+
+### Refactor
+
+- **mapper**: replaced font-barlow with font-primary (#2700)
+- **frontend**: remove old project creation code (#2705)
+- missed console log
+- missed console log
+- **backend**: update code with json data models
+- update test cases based on stub project creation workflow
+- update test cases based on stub project creation workflow
+- backend
+- **backend**: simplify local dev odkcentral setup, no extra proxy rules, no https required
+- backend
+- **backend**: simplify local dev odkcentral setup, no extra proxy rules, no https required
+
 ## 2025.4.0 (2025-07-09)
 
 ### Feat
