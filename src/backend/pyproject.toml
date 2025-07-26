@@ -18,7 +18,7 @@
 
 [project]
 name = "fmtm"
-version = "2025.4.0"
+version = "2025.4.1"
 description = "Field Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
@@ -133,7 +133,7 @@ asyncio_default_fixture_loop_scope="session"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2025.4.0"
+version = "2025.4.1"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
