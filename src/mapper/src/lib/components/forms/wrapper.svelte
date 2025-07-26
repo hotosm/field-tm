@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '$styles/forms.css';
 	import type { Action } from 'svelte/action';
-	import type { PGlite } from '@electric-sql/pglite';
 	import type { SlDrawer } from '@shoelace-style/shoelace';
 
 	import { getCommonStore } from '$store/common.svelte.ts';
@@ -28,8 +27,6 @@
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
-	let db: PGlite | undefined = $derived(commonStore.db);
-
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 
 	let {
@@ -122,7 +119,7 @@
 			submissionIds = `${selectedEntity.submission_ids},${submissionIds}`;
 		}
 
-		entitiesStore.updateEntityStatus(db, projectId, {
+		entitiesStore.updateEntityStatus(projectId, {
 			entity_id: selectedEntity?.entity_id,
 			status: entityStatus,
 			// NOTE here we don't translate the field as English values are always saved as the Entity label
@@ -144,7 +141,7 @@
 			uploading = true;
 
 			// Submit the XML + any submission media
-			await entitiesStore.createNewSubmission(db, projectId, submissionXml, attachments);
+			await entitiesStore.createNewSubmission(projectId, submissionXml, attachments);
 
 			uploading = false;
 			updateEntityStatusBasedOnSubmissionXml(submissionXml);

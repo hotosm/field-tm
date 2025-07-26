@@ -1,4 +1,3 @@
-import type { PGliteWithSync } from '@electric-sql/pglite-sync';
 import { getCookieValue, setCookieValue } from '$lib/fs/cookies';
 import type { Basemap } from '$lib/map/basemaps';
 import { getBasemapList } from '$lib/map/basemaps';
@@ -27,7 +26,6 @@ interface AlertDetails {
 	duration?: number;
 }
 
-let db: PGliteWithSync;
 let alert: AlertDetails = $state({ variant: 'default', message: '', duration: 4000 });
 let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
@@ -73,10 +71,6 @@ function getCommonStore() {
 	}
 
 	return {
-		get db() {
-			return db;
-		},
-		setDb: (newDb: PGliteWithSync) => (db = newDb),
 		get selectedTab() {
 			return selectedTab;
 		},

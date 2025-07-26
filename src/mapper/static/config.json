@@ -3,7 +3,6 @@
 	"logoText": "Humanitarian OpenStreetMap Team",
 	"cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css",
 	"cssFileWebformsOverride": "",
-	"enableWebforms": true,
 	"loginProviders": {
 		"osm": true,
 		"google": true

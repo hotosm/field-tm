@@ -83,9 +83,6 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				},
 			},
 		],
-
-		// We need to cache files up to 15MB to allow for PGLite to be cached
-		maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
 	},
 
 	// Cache all the static assets in the static folder
@@ -190,9 +187,5 @@ export default defineConfig({
 		// Required to use browser APIs in testing
 		environment: 'jsdom',
 		setupFiles: ['./tests/setup.ts'],
-	},
-	// assetsInclude: ['**/*.tar.gz'],
-	optimizeDeps: {
-		exclude: ['@electric-sql/pglite'],
 	},
 });

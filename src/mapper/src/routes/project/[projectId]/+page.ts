@@ -6,7 +6,6 @@ import type { DbProjectType } from '$lib/types';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
-	const { dbPromise } = await parent();
 	const { projectId } = params;
 	let project: DbProjectType | undefined;
 
@@ -22,11 +21,12 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 		if (res.status >= 300) throw error(400, `Unknown error retrieving project ${projectId}`);
 
 		project = await res.json();
+	} else {
+		throw error(500, `You must be online to fetch project data`);
 	}
 
 	return {
 		project,
 		projectId: parseInt(projectId),
-		dbPromise,
 	};
 };

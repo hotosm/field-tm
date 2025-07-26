@@ -25,11 +25,6 @@ COPY mapper/package.json mapper/pnpm-lock.yaml ./
 RUN corepack enable && corepack install
 RUN pnpm install
 COPY mapper/ .
-# # Code no longer used for bootstrapping db from tar
-# # Build the bootstrap db
-# RUN pnpm run init-db
-# # Copy to required location for build
-# RUN cp pgdata.tar.gz /migrations/init/
 RUN pnpm run build
 
 
