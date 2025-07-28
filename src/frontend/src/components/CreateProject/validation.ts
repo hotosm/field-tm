@@ -71,7 +71,7 @@ export const projectOverviewValidationSchema = z
     project_admins: z.array(z.string()),
     uploadAreaSelection: z.enum(['draw', 'upload_file']).nullable(),
     uploadedAOIFile: z.any().optional(),
-    outline: z.any().refine((val) => val !== undefined, {
+    outline: z.any().refine((val) => !!val, {
       message: 'Project AOI is required',
     }),
     outlineArea: z.string().optional(),
