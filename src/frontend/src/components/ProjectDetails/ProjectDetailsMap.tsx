@@ -407,8 +407,9 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           zIndex={5}
           style=""
         />
-        <VectorLayer
-          geojson={newGeomFeatureCollection}
+        <ClusterLayer
+          map={map}
+          source={newGeomFeatureCollection}
           viewProperties={{
             size: map?.getSize(),
             padding: [50, 50, 50, 50],
@@ -417,13 +418,16 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           }}
           layerProperties={{ name: 'new-entities' }}
           zIndex={5}
-          style=""
-          getTaskStatusStyle={(feature) => {
-            const geomType = feature.getGeometry().getType();
-            const featureProperty = feature.getProperties();
-            const status = entity_state[+featureProperty?.status];
+          style={{
+            ...defaultStyles,
+            background_color: '#2C3038',
+            color: '#929DB3',
+            opacity: 70,
+          }}
+          getIndividualStyle={(featureProperty) => {
+            const status = entity_state[+featureProperty?.status] || 'READY';
             const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
-            return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+            return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
           }}
         />
         <AsyncPopup
