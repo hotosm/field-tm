@@ -784,7 +784,11 @@
 				/>
 			{/if}
 		</GeoJSON>
-		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
+		<GeoJSON
+			id="new-geoms"
+			data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}
+			cluster={drawGeomType === MapGeomTypes.POINT ? { radius: 1000 } : undefined}
+		>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="new-entity-polygon-layer"
