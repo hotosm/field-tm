@@ -338,6 +338,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
                 const isEntitySelected = selectedEntityId === entity?.osm_id;
                 return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
               }}
+              zoomToLayer={false}
             />
           ) : (
             <VectorLayer
@@ -429,6 +430,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
             return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
           }}
+          zoomToLayer={false}
         />
         <AsyncPopup
           map={map}
