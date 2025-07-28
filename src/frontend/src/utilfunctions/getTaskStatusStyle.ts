@@ -2,7 +2,6 @@ import { Fill, Icon, Stroke, Style, Circle } from 'ol/style';
 import { asArray } from 'ol/color';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
-import { GeoGeomTypesEnum } from '@/types/enums';
 import { centroid } from '@turf/centroid';
 import getFeatureGeojson from '@/components/MapComponent/OpenLayersComponent/helpers/getFeatureGeojson';
 
@@ -32,7 +31,6 @@ function createPointStyle(fillColor: string, strokeColor: string) {
       radius: 8,
       declutterMode: 'obstacle',
     }),
-    zIndex: 5,
   });
 }
 
