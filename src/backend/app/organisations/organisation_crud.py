@@ -19,7 +19,7 @@
 
 import io
 import json
-from datetime import date, datetime
+from datetime import date
 from io import BytesIO
 from textwrap import dedent
 from typing import Optional
@@ -40,6 +40,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
+from app.db.postgis_utils import timestamp
 from app.helpers.helper_crud import send_email
 from app.organisations.organisation_schemas import OrganisationIn, OrganisationOut
 from app.organisations.organisation_utils import (
@@ -49,8 +50,6 @@ from app.organisations.organisation_utils import (
     generate_geojson_dict,
 )
 from app.projects.project_crud import DbProject
-
-# from app.users.user_crud import send_mail
 from app.users.user_schemas import UserIn
 
 
@@ -290,7 +289,7 @@ async def get_organisation_stats(
         dict: A dictionary containing overview stats, per-project task status,
               and daily activity stats.
     """
-    today = datetime.utcnow().date()
+    today = timestamp().date()
     if end_date is None:
         end_date = today
     if start_date is None:
@@ -428,20 +427,20 @@ async def get_organisation_stats(
 
         daily_stats = [
             {
-                "date": r[0].isoformat(),
-                "tasks_mapped": r[1] or 0,
-                "tasks_validated": r[2] or 0,
+                "date": row_daily[0].isoformat(),
+                "tasks_mapped": row_daily[1] or 0,
+                "tasks_validated": row_daily[2] or 0,
             }
-            for r in daily_rows
+            for row_daily in daily_rows
         ]
 
         task_status = []
-        for r in project_rows:
-            project_id = r[0]
-            total_tasks = r[1] or 0
-            mapped = r[2] or 0
-            validated = r[3] or 0
-            total_submission = r[4] or 0
+        for row_proj in project_rows:
+            project_id = row_proj[0]
+            total_tasks = row_proj[1] or 0
+            mapped = row_proj[2] or 0
+            validated = row_proj[3] or 0
+            total_submission = row_proj[4] or 0
             to_map = max(total_tasks - mapped - validated, 0)
 
             task_status.append(
