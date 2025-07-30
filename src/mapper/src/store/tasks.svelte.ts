@@ -42,14 +42,7 @@ function getTaskStore() {
 
 		eventsUnsubscribe = taskEventShape?.subscribe((taskEventData: ShapeData[]) => {
 			let taskEventRows: TaskEventType[];
-			if (events.length > 0) {
-				// If we already have data, only append data changes made since last update
-				taskEventRows = taskEventData.rows
-					.filter((item): item is { value: TaskEventType } => 'value' in item && item.value !== null)
-					.map((item) => item.value);
-			} else {
-				taskEventRows = taskEventData.rows;
-			}
+			taskEventRows = taskEventData.rows;
 
 			if (taskEventRows.length) {
 				latestEvent = taskEventRows.at(-1) ?? null;
@@ -67,7 +60,7 @@ function getTaskStore() {
 
 				// Update the state of currently selected task area
 				for (const newEvent of taskEventRows) {
-					if (newEvent.task_id === selectedTaskId) {
+					if (+newEvent.task_id === selectedTaskId) {
 						selectedTaskState = newEvent.state;
 					}
 				}
@@ -114,11 +107,8 @@ function getTaskStore() {
 		selectedTaskId = taskId;
 		selectedTaskIndex = taskIndex;
 
-		if (!taskId) return;
-
 		// Filter the local `events` store for matching task_id
 		const taskRows = events.filter((ev) => ev.task_id === taskId);
-		if (!taskRows.length) return;
 
 		// Pick the latest event for this task
 		selectedTask = taskRows.at(-1) ?? null;
