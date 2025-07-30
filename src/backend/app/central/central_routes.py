@@ -351,6 +351,36 @@ async def upload_form_media(
         ) from e
 
 
+@router.post("/list-form-media", response_model=list[dict])
+async def list_form_media(
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+):
+    """A list of required media to upload for a form."""
+    project = project_user.get("project")
+    project_id = project.id
+    project_odk_id = project.odkid
+    project_xform_id = project.odk_form_id
+    project_odk_creds = project.odk_credentials
+
+    try:
+        form_media = await central_crud.list_form_media(
+            project_xform_id,
+            project_odk_id,
+            project_odk_creds,
+        )
+
+        return form_media
+    except Exception as e:
+        msg = (
+            f"Failed to list all form media for Field-TM project ({project_id}) "
+            f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
+        )
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=msg,
+        ) from e
+
+
 @router.post("/get-form-media", response_model=dict[str, str])
 async def get_form_media(
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
