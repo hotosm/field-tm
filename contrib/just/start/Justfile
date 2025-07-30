@@ -28,10 +28,30 @@ default:
 [no-cd]
 prod:
   #!/usr/bin/env sh
+  set -e
 
   cd {{justfile_directory()}}
   export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  bash deploy/gen-and-deploy.sh
+
+  just config generate-dotenv "${GIT_BRANCH}"
+  just config custom-favicon
+
+  # Pull images
+  cd deploy
+  ../envsubst -i compose.sub.yaml | docker compose -f - pull
+  cd ..
+
+  just build frontends-prod "${GIT_BRANCH}"
+
+  # Pull images
+  cd deploy
+  ../envsubst -i compose.sub.yaml | docker compose -f - pull
+  cd deploy
+  ../envsubst -i compose.sub.yaml | \
+        docker compose -f - up --detach \
+        --remove-orphans --force-recreate
+  
+  just _echo-blue "FieldTM started successfully"
 
 # Start backend API only
 [no-cd]

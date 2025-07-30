@@ -82,6 +82,8 @@ docs:
 # Mount an S3 bucket on your filesystem
 mount-s3:
   #!/usr/bin/env sh
+  set -e
+
   fstab_entry="fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
   use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
   url=http://s3.fmtm.localhost:7050 0 0"
@@ -105,3 +107,9 @@ _echo-blue text:
 _echo-yellow text:
   #!/usr/bin/env sh
   printf "\033[0;33m%s\033[0m\n" "{{ text }}"
+
+# Echo to terminal with red colour
+[no-cd]
+_echo-red text:
+  #!/usr/bin/env sh
+  printf "\033[0;41m%s\033[0m\n" "{{ text }}"
