@@ -54,8 +54,8 @@ generate-dotenv branch="dev":
 
   # Re-export .env to the environment, with cleaned variables
   if [ -f .env ]; then
-    just _echo-red "File '.env' already exists. Please remove it & rerun this command. Aborting."
-    exit 1
+    just _echo-yellow "'.env' file already exists. Skipping dotenv generation."
+    exit 0
   fi
 
   just manage _install_envsubst
@@ -90,7 +90,7 @@ custom-favicon:
 
   # Copy favicon to required directories, if present
   if [ ! -f favicon.svg ]; then
-    just _echo-yellow "'favicon.svg' not found in the repo root. Skipping."
+    just _echo-yellow "'favicon.svg' not found in the repo root. Skipping custom favicon injection."
     exit 0
   fi
 
