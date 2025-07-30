@@ -50,7 +50,10 @@ async function fetchBlobUrl(url: string): Promise<string> {
 async function fetchFormMediBlobUrls(projectId: number): Promise<{ [filename: string]: string }> {
 	if (projectId === undefined) return {};
 
-	const response = await fetch(`${API_URL}/central/get-form-media?project_id=${projectId}`, { method: 'POST' });
+	const response = await fetch(`${API_URL}/central/get-form-media?project_id=${projectId}`, {
+		method: 'POST',
+		credentials: 'include',
+	});
 	const data: { [filename: string]: string } = await response.json();
 
 	const formMediaBlobs: { [filename: string]: string } = {};

@@ -374,13 +374,7 @@ class Mapper:
         # Here temp auth token/cookie is allowed
         current_user: Annotated[AuthUser, Depends(public_endpoint)],
     ) -> ProjectUserDict:
-        """A mapper for a specific project.
-
-        FIXME is this approach flawed?
-        FIXME if the user accesses a /tasks/ endpoint but provides a
-        FIXME ?project_id=xxx for another project, then won't this
-        FIXME given them permission when they shouldn't have it?
-        """
+        """A mapper for a specific project."""
         if self.check_completed and project.status in [
             ProjectStatus.COMPLETED,
             ProjectStatus.ARCHIVED,
