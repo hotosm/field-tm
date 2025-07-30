@@ -151,7 +151,7 @@
 
 		// Set vars that require upstream project details set (and are not reactive)
 		if (project) {
-			commonStore.setUseOdkCollectOverride(project.use_odk_collect);
+			commonStore.setEnableWebForms(!project.use_odk_collect);
 			const { odk_form_xml } = project;
 			const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
 			formXmlUrl = URL.createObjectURL(formXmlBlob);
@@ -397,7 +397,7 @@
 			newFeatureDrawInstance.setMode('select');
 		}}
 		syncButtonTrigger={async () => {
-			await entitiesStore.syncEntityStatusManually(projectId)
+			await entitiesStore.syncEntityStatusManually(projectId);
 		}}
 	></MapComponent>
 
