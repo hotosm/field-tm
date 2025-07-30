@@ -54,7 +54,6 @@ frontends-prod branch="dev":
   export GIT_BRANCH="{{ branch }}"
   cd deploy
   ../envsubst -i compose.sub.yaml | docker compose -f - build ui
-  cd ..
 
 # Set 'dc' alias for docker compose
 alias:

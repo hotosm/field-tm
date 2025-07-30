@@ -33,6 +33,7 @@ prod:
   cd {{justfile_directory()}}
   export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+  # Config
   just config generate-dotenv "${GIT_BRANCH}"
   just config custom-favicon
 
@@ -41,12 +42,10 @@ prod:
   ../envsubst -i compose.sub.yaml | docker compose -f - pull
   cd ..
 
+  # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
 
-  # Pull images
-  cd deploy
-  ../envsubst -i compose.sub.yaml | docker compose -f - pull
-  cd deploy
+  # Deploy
   ../envsubst -i compose.sub.yaml | \
         docker compose -f - up --detach \
         --remove-orphans --force-recreate
