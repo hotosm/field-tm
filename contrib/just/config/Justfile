@@ -28,7 +28,7 @@ _dotenv-check key:
 
 # Update a variable in the .env file
 [no-cd]
-dotenv-update key value:
+update-dotenv key value:
   #!/usr/bin/env sh
 
   var_name={{key}}
@@ -41,6 +41,83 @@ dotenv-update key value:
   else
     echo "${new_var}" >> .env
   fi
+
+# Generate the .env file from scratch, using .env.example and substitutions
+[no-cd]
+generate-dotenv branch="dev":
+  #!/usr/bin/env sh
+  set -e
+
+  # By default we deploy from 'dev' branch, but can be overridden
+
+  cd {{justfile_directory()}}
+
+  # Re-export .env to the environment, with cleaned variables
+  if [ -f .env ]; then
+    just _echo-red "File '.env' already exists. Please remove it & rerun this command. Aborting."
+    exit 1
+  fi
+
+  just manage _install_envsubst
+
+  # Generate a .env file from .env.example, substituting values from environment
+  ./envsubst -i .env.example | grep -vE '^\s*#|^\s*$' > .env
+
+  # Re-export .env to the environment, with cleaned variables
+  if [ -f .env ]; then
+      while IFS= read -r line; do
+          # Remove surrounding quotes (single or double)
+          clean_line=$(echo "$line" | sed -E 's/^([^=]+)=(["'\'']?)(.*)\2$/\1=\3/')
+          var_name=$(echo "$clean_line" | cut -d= -f1)
+          var_value=$(echo "$clean_line" | cut -d= -f2-)
+          export "$var_name=$var_value"
+      done < .env
+  fi
+
+  # Generate compose file (default dev, but can be overridden)
+  export GIT_BRANCH="{{ branch }}"
+  echo ""
+  just _echo-blue "Generated compose file for branch {{ branch }}:"
+  echo ""
+  ./envsubst -i deploy/compose.sub.yaml
+
+# For custom branding, place favicon.svg in the repo root, then run this
+[no-cd]
+custom-favicon:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+
+  # Copy favicon to required directories, if present
+  if [ ! -f favicon.svg ]; then
+    just _echo-yellow "'favicon.svg' not found in the repo root. Skipping."
+    exit 0
+  fi
+
+  echo ""
+  echo "Found favicon.svg in repo root - bundling in frontend build"
+  echo ""
+  # Pull ImageMagick container if not already present
+  docker pull dpokidov/imagemagick:7.1.1-47
+
+  # Convert SVG to PNG (32x32, aspect ratio preserved, transparent padding)
+  docker run --rm -v "$PWD":/repo --workdir /repo --entrypoint=/bin/sh \
+      dpokidov/imagemagick:7.1.1-47 \
+      -c "magick favicon.svg -resize 32x32 -background none -gravity center -extent 32x32 favicon.png"
+
+  # Copy to frontend and mapper static content
+  cp favicon.svg src/frontend/public/favicon.svg
+  cp favicon.svg src/mapper/static/favicon.svg
+  cp favicon.png src/frontend/public/favicon.png
+  cp favicon.png src/mapper/static/favicon.png
+
+  # Then prevent tracking of the changes once overridden
+  git update-index --assume-unchanged src/frontend/public/favicon.svg
+  git update-index --assume-unchanged src/frontend/public/favicon.png
+  git update-index --assume-unchanged src/mapper/static/favicon.svg
+  git update-index --assume-unchanged src/mapper/static/favicon.png
+
+  just _echo-blue "Successfully added custom favicon.svg and favicon.png to frontend"
 
 # Configure web-forms for the mapper frontend (local only)
 [no-cd]
