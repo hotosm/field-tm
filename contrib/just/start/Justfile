@@ -30,7 +30,8 @@ prod:
   #!/usr/bin/env sh
   set -e
 
-  cd {{justfile_directory()}}
+  # From deploy dir
+  cd {{justfile_directory()}}/deploy
   export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
   # Config
@@ -38,9 +39,7 @@ prod:
   just config custom-favicon
 
   # Pull images
-  cd deploy
   ../envsubst -i compose.sub.yaml | docker compose -f - pull
-  cd ..
 
   # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
