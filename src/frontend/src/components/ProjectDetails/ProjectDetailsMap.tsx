@@ -188,7 +188,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
    */
   const handleFeatureClick = (properties, feature) => {
     // Close task area popup, open task feature popup
-    dispatch(ProjectActions.SetSelectedEntityId(feature.getProperties()?.entity_id || feature.getProperties()?.osm_id));
+    dispatch(ProjectActions.SetSelectedEntityId(properties?.entity_id || properties?.osm_id));
     setSelectedTaskFeature(feature);
     dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
@@ -408,30 +408,52 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           zIndex={5}
           style=""
         />
-        <ClusterLayer
-          map={map}
-          source={newGeomFeatureCollection}
-          viewProperties={{
-            size: map?.getSize(),
-            padding: [50, 50, 50, 50],
-            constrainResolution: true,
-            duration: 2000,
-          }}
-          layerProperties={{ name: 'new-entities' }}
-          zIndex={5}
-          style={{
-            ...defaultStyles,
-            background_color: '#2C3038',
-            color: '#929DB3',
-            opacity: 70,
-          }}
-          getIndividualStyle={(featureProperty) => {
-            const status = entity_state[+featureProperty?.status] || 'READY';
-            const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
-            return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
-          }}
-          zoomToLayer={false}
-        />
+        {projectInfo.new_geom_type === GeoGeomTypesEnum.POINT ? (
+          <ClusterLayer
+            map={map}
+            source={newGeomFeatureCollection}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            layerProperties={{ name: 'new-entities' }}
+            zIndex={5}
+            style={{
+              ...defaultStyles,
+              background_color: '#2C3038',
+              color: '#929DB3',
+              opacity: 70,
+            }}
+            getIndividualStyle={(featureProperty) => {
+              const status = entity_state[+featureProperty?.status] || 'READY';
+              const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
+              return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
+            }}
+            zoomToLayer={false}
+          />
+        ) : (
+          <VectorLayer
+            geojson={newGeomFeatureCollection}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            layerProperties={{ name: 'new-entities' }}
+            zIndex={5}
+            style=""
+            getTaskStatusStyle={(feature) => {
+              const geomType = feature.getGeometry().getType();
+              const featureProperty = feature.getProperties();
+              const status = entity_state[+featureProperty?.status];
+              const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
+              return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+            }}
+          />
+        )}
         <AsyncPopup
           map={map}
           popupUI={LockedPopup}
