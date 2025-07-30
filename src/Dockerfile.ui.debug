@@ -15,4 +15,5 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack install
 RUN pnpm install
+# Build required to get generated sveltekit types
 CMD ["pnpm", "run", "dev"]
