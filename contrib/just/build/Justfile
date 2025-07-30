@@ -18,7 +18,7 @@
 
 # Build backend & frontend containers
 [no-cd]
-all: backend frontend
+all: backend frontends
 
 # Build backend container
 [no-cd]
@@ -41,8 +41,20 @@ backend-dev:
 
 # Build frontend container
 [no-cd]
-frontend:
-  docker compose build ui
+frontends:
+  docker compose build ui ui-mapper
+
+frontends-prod branch="dev":
+  #!/usr/bin/env sh
+  set -e
+
+  cd {{justfile_directory()}}
+
+  export COMPOSE_BAKE=true
+  export GIT_BRANCH="{{ branch }}"
+  cd deploy
+  ../envsubst -i compose.sub.yaml | docker compose -f - build ui
+  cd ..
 
 # Set 'dc' alias for docker compose
 alias:
@@ -54,24 +66,3 @@ alias:
   else
       echo "'dc' alias already exists in ~/.bashrc."
   fi
-
-# Generate certs for local ODK Central https
-[no-cd]
-gen-odk-cert:
-    #!/usr/bin/env sh
-    openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -days 36500 \
-    -nodes -keyout odkcentral.key -out odkcentral.crt -subj "/CN=odkcentral" \
-    -addext "subjectAltName=DNS:odkcentral,DNS:*.odk.fmtm.localhost,IP:10.20.30.50"
-
-    CERT_BASE64=$(cat odkcentral.crt | base64 -w0)
-    KEY_BASE64=$(cat odkcentral.key | base64 -w0)
-
-    echo
-    echo "Cert base64:"
-    echo
-    echo ${CERT_BASE64}
-    echo
-    echo "Key base64:"
-    echo
-    echo ${KEY_BASE64}
-    echo
