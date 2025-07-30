@@ -1,5 +1,16 @@
 # Changelog
 
+## 2025.4.2 (2025-07-30)
+
+### Feat
+
+- **mapper**: remove pglite, rely on svelte store + electric sync (#2732)
+
+### Fix
+
+- **frontend**: include credentials when getting form media
+- **validation**: UI crash on AOI reset & continue next (#2734)
+
 ## 2025.4.1 (2025-07-26)
 
 ### Feat
