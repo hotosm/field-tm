@@ -121,6 +121,69 @@ async def validate_form(
         )
 
 
+@router.post("/upload-xlsform")
+async def upload_project_xlsform(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+    xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
+    use_odk_collect: bool = False,
+    need_verification_fields: bool = True,
+):
+    """Upload the final XLSForm for the project."""
+    project = project_user.get("project")
+    project_id = project.id
+    new_geom_type = project.new_geom_type
+    use_odk_collect = project.use_odk_collect or False
+    form_name = f"FMTM_Project_{project.id}"
+
+    # Validate uploaded form
+    await central_crud.validate_and_update_user_xlsform(
+        xlsform=xlsform_upload,
+        form_name=form_name,
+        new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        use_odk_collect=use_odk_collect,
+    )
+
+    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
+        xlsform=xlsform_upload,
+        form_name=form_name,
+        new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        use_odk_collect=use_odk_collect,
+    )
+
+    # Write XLS form content to db
+    xlsform_bytes = project_xlsform.getvalue()
+    if len(xlsform_bytes) == 0 or not xform_id:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="There was an error modifying the XLSForm!",
+        )
+    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
+    sql = """
+        UPDATE public.projects
+        SET
+            odk_form_id = %(odk_form_id)s,
+            xlsform_content = %(xlsform_content)s
+        WHERE id = %(project_id)s;
+    """
+    async with db.cursor() as cur:
+        await cur.execute(
+            sql,
+            {
+                "project_id": project_id,
+                "odk_form_id": xform_id,
+                "xlsform_content": xlsform_bytes,
+            },
+        )
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={"message": "Your form is valid"},
+    )
+
+
 @router.post("/update-form")
 async def update_project_form(
     xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
