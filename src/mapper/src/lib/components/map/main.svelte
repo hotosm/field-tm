@@ -586,6 +586,7 @@
 				promoteId="id"
 				processGeojson={(geojsonData) => entitiesStore.addStatusToGeojsonProperty(geojsonData)}
 				geojsonUpdateDependency={[entitiesStore.entitiesList]}
+				cluster={primaryGeomType === MapGeomTypes.POINT ? { radius: 1000 } : undefined}
 			>
 				{#if primaryGeomType === MapGeomTypes.POLYGON}
 					<FillLayer
@@ -637,6 +638,32 @@
 						manageHoverState
 					/>
 				{:else if primaryGeomType === MapGeomTypes.POINT}
+					<CircleLayer
+						id="entity-point-cluster"
+						applyToClusters
+						hoverCursor="pointer"
+						paint={{
+							'circle-color': '#2C3038',
+							'circle-opacity': 0.7,
+							'circle-radius': ['step', ['get', 'point_count'], 20, 10, 30, 100, 35],
+							'circle-stroke-color': '#929DB3',
+							'circle-stroke-width': 5,
+						}}
+						manageHoverState
+					></CircleLayer>
+					<SymbolLayer
+						id="entity-point-cluster-label"
+						interactive={false}
+						applyToClusters
+						layout={{
+							'text-field': ['get', 'point_count'],
+							'text-size': 12,
+							'text-offset': [0, -0.1],
+						}}
+						paint={{
+							'text-color': '#ffffff',
+						}}
+					/>
 					<CircleLayer
 						id="entity-point-layer"
 						applyToClusters={false}
@@ -755,7 +782,11 @@
 				/>
 			{/if}
 		</GeoJSON>
-		<GeoJSON id="new-geoms" data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}>
+		<GeoJSON
+			id="new-geoms"
+			data={entitiesStore.addStatusToGeojsonProperty(entitiesStore.newGeomFeatcol)}
+			cluster={drawGeomType === MapGeomTypes.POINT ? { radius: 1000 } : undefined}
+		>
 			{#if drawGeomType === MapGeomTypes.POLYGON}
 				<FillLayer
 					id="new-entity-polygon-layer"
@@ -775,7 +806,7 @@
 							cssValue('--entity-validated'),
 							'MARKED_BAD',
 							cssValue('--entity-marked-bad'),
-							cssValue('--entity-ready'), // default color if no match is found
+							cssValue('--entity-ready'),
 						],
 					}}
 					beforeLayerType="symbol"
@@ -797,6 +828,32 @@
 					manageHoverState
 				/>
 			{:else if drawGeomType === MapGeomTypes.POINT}
+				<CircleLayer
+					id="new-entity-point-cluster"
+					applyToClusters
+					hoverCursor="pointer"
+					paint={{
+						'circle-color': '#2C3038',
+						'circle-opacity': 0.7,
+						'circle-radius': ['step', ['get', 'point_count'], 20, 10, 30, 100, 35],
+						'circle-stroke-color': '#929DB3',
+						'circle-stroke-width': 5,
+					}}
+					manageHoverState
+				></CircleLayer>
+				<SymbolLayer
+					id="new-entity-point-cluster-label"
+					interactive={false}
+					applyToClusters
+					layout={{
+						'text-field': ['get', 'point_count'],
+						'text-size': 12,
+						'text-offset': [0, -0.1],
+					}}
+					paint={{
+						'text-color': '#ffffff',
+					}}
+				/>
 				<CircleLayer
 					id="new-entity-point-layer"
 					applyToClusters={false}

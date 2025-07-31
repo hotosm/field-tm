@@ -4,6 +4,7 @@ export const osmStyle = {
 	id: 'OSM Raster',
 	version: 8,
 	name: 'OpenStreetMap',
+	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 	sources: {
 		osm: {
 			type: 'raster',
@@ -34,6 +35,7 @@ let stamenStyle = {
 	id: 'Stamen Raster',
 	version: 8,
 	name: 'Black & White',
+	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 	sources: {
 		stamen: {
 			type: 'raster',
@@ -62,6 +64,7 @@ let esriStyle = {
 	id: 'ESRI Raster',
 	version: 8,
 	name: 'ESRI',
+	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 	sources: {
 		esri: {
 			type: 'raster',
@@ -87,6 +90,7 @@ let satellite = {
 	id: 'Satellite',
 	version: 8,
 	name: 'Satellite',
+	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 	sources: {
 		satellite: {
 			type: 'raster',
@@ -113,6 +117,7 @@ export const pmtilesStyle = {
 	id: 'PMTiles',
 	version: 8,
 	name: 'PMTiles',
+	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 	metadata: {
 		thumbnail: oamLogo,
 	},
