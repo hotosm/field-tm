@@ -22,7 +22,16 @@ from io import BytesIO
 from typing import Annotated, Optional
 
 import geojson
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+)
 from fastapi.responses import JSONResponse, Response
 from loguru import logger as log
 from osm_fieldwork.OdkCentralAsync import OdkCentral
@@ -65,8 +74,8 @@ async def read_submissions(
 @router.post("", response_model=CentralSubmissionOut)
 async def create_submission(
     project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
-    submission_xml: Annotated[str, Body(embed=True)],
-    device_id: Annotated[Optional[str], Body(embed=True)] = None,
+    submission_xml: Annotated[UploadFile, File()],
+    device_id: Annotated[Optional[str], Form()] = None,
     submission_attachments: Annotated[
         Optional[dict[str, BytesIO]], Depends(submission_deps.read_submission_uploads)
     ] = None,
@@ -84,12 +93,13 @@ async def create_submission(
     any form attachments, via the ODK Central REST API (via pyodk),
     """
     project = project_user.get("project")
+    xml_str = (await submission_xml.read()).decode("utf-8")
 
     new_submission = await submission_crud.create_new_submission(
         project.odk_credentials,
         project.odkid,
         project.odk_form_id,
-        submission_xml,
+        xml_str,
         device_id,
         submission_attachments,
     )

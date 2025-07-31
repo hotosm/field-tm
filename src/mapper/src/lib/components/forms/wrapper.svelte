@@ -130,8 +130,7 @@
 
 	function handleSubmit(payload: any) {
 		(async () => {
-			if (!payload.detail) return;
-			if (!projectId) return;
+			if (!payload.detail || !projectId) return;
 
 			const { instanceFile, attachments = [] } = await payload.detail[0].data[0];
 			let submissionXml = await instanceFile.text();
