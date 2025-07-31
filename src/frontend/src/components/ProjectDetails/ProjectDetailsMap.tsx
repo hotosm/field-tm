@@ -227,7 +227,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
   };
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || entityOsmMapLoading) return;
 
     const handleClick = (evt) => {
       // always reset selected entity ID on any map click
@@ -277,7 +277,16 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     return () => {
       map.un('click', handleClick);
     };
-  }, [map, overlappingEntityFeatures]);
+  }, [map, overlappingEntityFeatures, entityOsmMapLoading]);
+
+  useEffect(() => {
+    if (!map) return;
+    if (entityOsmMapLoading) {
+      map.getTargetElement().classList.add('spinner');
+    } else {
+      map.getTargetElement().classList.remove('spinner');
+    }
+  }, [entityOsmMapLoading]);
 
   return (
     <>
