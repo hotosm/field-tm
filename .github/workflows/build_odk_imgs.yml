@@ -17,7 +17,7 @@ jobs:
     with:
       context: odkcentral/api
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.0"
+        "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
       extra_build_args: |
         ODK_CENTRAL_TAG=v2025.2.0
@@ -28,7 +28,7 @@ jobs:
     with:
       context: odkcentral/ui
       image_tags: |
-        "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.0"
+        "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"
       extra_build_args: |
         ODK_CENTRAL_TAG=v2025.2.0

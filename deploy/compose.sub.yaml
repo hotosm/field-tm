@@ -189,7 +189,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
     depends_on:
       proxy:
         condition: service_healthy
@@ -263,7 +263,7 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
     volumes:
       - central_frontend:/frontend
     network_mode: none
