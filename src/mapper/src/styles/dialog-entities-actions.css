@@ -34,7 +34,8 @@
 }
 
 .selected-title {
-	--at-apply: text-neutral-950 text-lg font-semibold;
+	--at-apply: text-neutral-950 text-lg font-bold;
+	color: var(--sl-color-primary-700);
 }
 
 .section {
