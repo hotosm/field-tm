@@ -25,7 +25,7 @@ function setAsyncStyle(style, feature, getIndividualStyle) {
     stylex = getIndividualStyle(featureProperty);
     styleCache[size] = stylex;
     return stylex;
-  } else {
+  } else if (size > 1) {
     stylex = new Style({
       image: new Circle({
         radius: 23,
