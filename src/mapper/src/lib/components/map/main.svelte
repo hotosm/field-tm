@@ -502,9 +502,9 @@
 			<hot-icon name="legend-toggle" class="icon"></hot-icon>
 		</div>
 	</Control>
-	<!-- Add the Geolocation GeoJSON layer to the map -->
-	<Geolocation {map}></Geolocation>
 	{#if toggleLayer}
+		<!-- Add the Geolocation GeoJSON layer to the map -->
+		<Geolocation {map}></Geolocation>
 		<!-- The task area geojson -->
 		<GeoJSON id="tasks" data={taskStore.featcol} promoteId="fid">
 			<FillLayer
