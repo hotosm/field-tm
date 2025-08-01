@@ -463,14 +463,18 @@ async def submission(client, odk_project):
 
     # The file must be uploaded to the API, read, then re-uploaded to Central
     with open(photo_file_path, "rb") as photo_file:
-        files = {"submission_files": (photo_file_name, photo_file, "image/jpeg")}
+        files = {
+            "submission_xml": (
+                submission_xml,
+                submission_xml.encode("utf-8"),
+                "text/xml",
+            ),
+            "submission_files": (photo_file_name, photo_file, "image/jpeg"),
+        }
 
         response = await client.post(
             f"/submission?project_id={fmtm_project_id}",
-            data={
-                "submission_xml": submission_xml,
-                "device_id": "collect:BOYFOcNu8uOK2G4b",
-            },
+            data={"device_id": "collect:BOYFOcNu8uOK2G4b"},
             files=files,
         )
 
