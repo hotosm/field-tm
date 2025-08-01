@@ -134,6 +134,7 @@ asyncio_default_fixture_loop_scope="session"
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "2025.4.2"
+version_provider = "uv"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
