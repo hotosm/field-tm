@@ -203,7 +203,8 @@ function getEntitiesStatusStore() {
 				project_id: projectId,
 				task_id: entity.task_id,
 				submission_ids: entity.submission_ids,
-				osm_id: entity.osm_id,
+				// convert to bigint to maintain consistency
+				osm_id: BigInt(entity.osm_id),
 				geometry: entity.geometry,
 				created_by: entity.created_by,
 			}));
