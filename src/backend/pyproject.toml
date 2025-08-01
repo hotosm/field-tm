@@ -144,6 +144,7 @@ version_files = [
 ]
 changelog_file = "../../CHANGELOG.md"
 update_changelog_on_bump = true
+ignored_tag_formats = ["osm-fieldwork-$version"]
 
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*"
