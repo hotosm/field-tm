@@ -379,21 +379,29 @@ async def odk_project(db, client, project, tasks):
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    xform_file = {
-        "xlsform": (
-            "buildings.xls",
-            xlsform_obj,
+    try:
+        response = await client.post(
+            f"/central/upload-xlsform?project_id={project.id}",
+            files={
+                "xlsform": (
+                    "buildings.xls",
+                    xlsform_obj,
+                )
+            },
         )
-    }
+        log.debug(f"Uploaded XLSForm for project: {project.id}")
+    except Exception as e:
+        log.exception(e)
+        pytest.fail(f"Failed to upload XLSForm for project: {str(e)}")
+
     try:
         response = await client.post(
             f"/projects/{project.id}/generate-project-data",
-            files=xform_file,
         )
         log.debug(f"Generated project files for project: {project.id}")
     except Exception as e:
         log.exception(e)
-        pytest.fail(f"Test failed with exception: {str(e)}")
+        pytest.fail(f"Failed to generate project files: {str(e)}")
 
     yield project
 

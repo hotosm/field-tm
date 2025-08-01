@@ -366,21 +366,25 @@ async def test_generate_project_files(db, client, project):
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    xform_file = {
-        "xlsform": (
-            "buildings.xls",
-            xlsform_obj,
-        )
-    }
+    response = await client.post(
+        f"/central/upload-xlsform?project_id={project_id}",
+        files={
+            "xlsform": (
+                "buildings.xls",
+                xlsform_obj,
+            )
+        },
+    )
+    assert response.status_code == 200
+
     response = await client.post(
         f"/projects/{project_id}/generate-project-data",
-        files=xform_file,
     )
     assert response.status_code == 200
 
     # Now check required values were added to project
     new_project = await DbProject.one(db, project_id)
-    assert len(new_project.tasks) == 1
+    assert new_project.tasks and len(new_project.tasks) == 1
     assert new_project.tasks[0].task_state == MappingState.UNLOCKED_TO_MAP
     assert isinstance(new_project.odk_token, str)
 

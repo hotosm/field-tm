@@ -248,7 +248,7 @@ class OdkForm(OdkCentral):
             async with self.session.get(url, ssl=self.verify) as response:
                 return await response.json()
         except aiohttp.ClientError as e:
-            msg = f"Error fetching submissions: {e}"
+            msg = f"Error fetching form attachments: {e}"
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
 

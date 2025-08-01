@@ -118,12 +118,25 @@ export const CreateDraftProjectService = (
   };
 };
 
+const UploadXlsformService = (url: string, xlsform: File) => {
+  return async () => {
+    const formData = new FormData();
+    formData.append('xlsform', xlsform);
+
+    await axios.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  };
+};
+
 export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
   project_admins: { projectAdminToRemove: string[]; projectAdminToAssign: string[] },
-  file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
+  file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
   navigate: NavigateFunction,
@@ -172,14 +185,9 @@ export const CreateProjectService = (
         );
       }
 
-      // 4. upload form
+      // 4. generate remaining project files
       await dispatch(
-        GenerateProjectFilesService(
-          `${VITE_API_URL}/projects/${id}/generate-project-data`,
-          projectData,
-          file.xlsFormFile,
-          combinedFeaturesCount,
-        ),
+        GenerateProjectFilesService(`${VITE_API_URL}/projects/${id}/generate-project-data`, combinedFeaturesCount),
       );
 
       // 5. assign & remove project managers
@@ -305,22 +313,14 @@ const UploadDataExtractService = (url: string, file: any) => {
   };
 };
 
-const GenerateProjectFilesService = (url: string, projectData: any, formUpload: any, combinedFeaturesCount: number) => {
+const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.GenerateProjectFilesLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
     try {
-      const formData = new FormData();
-
-      // Append xlsform
-      formData.append('xlsform', formUpload);
-
-      // Add combined features count
-      formData.append('combined_features_count', combinedFeaturesCount.toString());
-
-      const response = await axios.post(url, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await axios.post(url, {
+        combined_features_count: combinedFeaturesCount.toString(),
       });
 
       if (!isStatusSuccess(response.status)) {
@@ -329,14 +329,14 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
         throw new Error(msg);
       }
 
-      return true; // ✅ Return success
+      return true;
     } catch (error: any) {
       dispatch(
         CommonActions.SetSnackBar({
           message: JSON.stringify(error?.response?.data?.detail),
         }),
       );
-      return false; // ❌ Return failure
+      return false;
     } finally {
       dispatch(CreateProjectActions.GenerateProjectFilesLoading(false));
       dispatch(CommonActions.SetLoading(false));
@@ -527,7 +527,7 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
   };
 };
 
-const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean) => {
+const ValidateCustomForm = (url: string, formUpload: any) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.ValidateCustomFormLoading(true));
 
@@ -535,10 +535,9 @@ const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean
       try {
         const formUploadFormData = new FormData();
         formUploadFormData.append('xlsform', formUpload);
-        formUploadFormData.append('use_odk_collect', useOdkCollect.toString());
 
-        const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
-        const resp = getTaskSplittingResponse.data;
+        const xlsformUploadResponse = await axios.post(url, formUploadFormData);
+        const resp = xlsformUploadResponse.data;
         dispatch(
           CommonActions.SetSnackBar({
             message: JSON.stringify(resp.message),
@@ -649,6 +648,7 @@ export {
   UploadTaskAreasService,
   FormCategoryService,
   GenerateProjectFilesService,
+  UploadXlsformService,
   OrganisationService,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
