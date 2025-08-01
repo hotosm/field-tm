@@ -1,5 +1,16 @@
 # Changelog
 
+## osm-fieldwork-0.23.0 (2025-08-01)
+
+### Feat
+
+- add highways.xlsx in osm-fieldwork and osm_category in frontend
+- **OdkCentral**: add async method to retrieve submission XML content
+
+### Fix
+
+- XLSForm logic for FieldTM mapping
+
 ## osm-fieldwork-0.22.0 (2025-05-06)
 
 ### Feat
