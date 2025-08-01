@@ -70,7 +70,8 @@ function entityDataToGeojsonFeature(entity: DbEntityType): Feature | null {
 			status: entity.status,
 			project_id: entity.project_id,
 			task_id: entity.task_id,
-			osm_id: entity.osm_id,
+			// BigInt doesn't work with svelte-maplibre layers, so we revert to string
+			osm_id: entity.osm_id.toString(),
 			submission_ids: entity.submission_ids,
 			created_by: entity.created_by,
 		},
@@ -202,7 +203,8 @@ function getEntitiesStatusStore() {
 				project_id: projectId,
 				task_id: entity.task_id,
 				submission_ids: entity.submission_ids,
-				osm_id: entity.osm_id,
+				// convert to bigint to maintain consistency
+				osm_id: BigInt(entity.osm_id),
 				geometry: entity.geometry,
 				created_by: entity.created_by,
 			}));
