@@ -52,7 +52,7 @@ importers:
         version: 7.1.0
       '@watergis/maplibre-gl-terradraw':
         specifier: ^0.8.1
-        version: 0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
+        version: 0.8.5(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
       flatgeobuf:
         specifier: ^3.38.0
         version: 3.38.0
@@ -1733,8 +1733,8 @@ packages:
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
-  '@watergis/maplibre-gl-terradraw@0.8.1':
-    resolution: {integrity: sha512-tK7j4B3WDppEHoeWwVkkWNM16ZL+e+SgthVH5NctXg90D1sMXF68sZcXzak7Nh1CjycdXMVkTQeA5I4umaQs+w==}
+  '@watergis/maplibre-gl-terradraw@0.8.5':
+    resolution: {integrity: sha512-Ow15uTDtpizTPqTxrYI8VrI/TmLRkNCmSaBE/3YnxQZ6zDLYji+YjiemMeaB8SzYyXXWs8PcSQOPlqIfQPzlQA==}
     engines: {pnpm: ^9.0.0}
     peerDependencies:
       maplibre-gl: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
@@ -5864,7 +5864,7 @@ snapshots:
 
   '@vue/shared@3.5.13': {}
 
-  '@watergis/maplibre-gl-terradraw@0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)':
+  '@watergis/maplibre-gl-terradraw@0.8.5(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)':
     dependencies:
       maplibre-gl: 4.7.1
       terra-draw: 1.0.0-beta.8
