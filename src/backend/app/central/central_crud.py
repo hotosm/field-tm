@@ -1058,3 +1058,22 @@ async def get_form_media(
         }
 
     return form_attachment_urls
+
+
+async def list_form_media(
+    xform_id: str,
+    project_odk_id: int,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+) -> list[dict]:
+    """Return a list of form media required for upload.
+
+    Format:
+        [
+            {'name': '1731673738156.jpg', 'exists': False},
+        ]
+    """
+    async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
+        return await async_odk_form.listFormAttachments(
+            project_odk_id,
+            xform_id,
+        )

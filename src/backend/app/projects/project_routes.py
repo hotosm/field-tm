@@ -49,7 +49,7 @@ from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import Mapper, ProjectManager, org_admin
-from app.central import central_crud, central_deps, central_schemas
+from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
@@ -727,7 +727,6 @@ async def generate_files(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
-    xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     combined_features_count: Annotated[int, Form()] = 0,
 ):
     """Generate additional content to initialise the project.
@@ -743,7 +742,6 @@ async def generate_files(
     it to the form.
 
     Args:
-        xlsform_upload (UploadFile): The XLSForm for the project data collection.
         combined_features_count (int): Total count of features to be mapped, plus
             additional dataset features, determined by frontend.
         db (Connection): The database connection.
@@ -755,55 +753,7 @@ async def generate_files(
     """
     project = project_user_dict.get("project")
     project_id = project.id
-    new_geom_type = project.new_geom_type
-    use_odk_collect = project.use_odk_collect or False
-    form_name = f"FMTM_Project_{project.id}"
-    project_contains_existing_feature = True if combined_features_count else False
-
     log.debug(f"Generating additional files for project: {project.id}")
-
-    # Validate uploaded form
-    await central_crud.validate_and_update_user_xlsform(
-        xlsform=xlsform_upload,
-        form_name=form_name,
-        new_geom_type=new_geom_type,
-        # If we are only mapping new features, then verification is irrelevant
-        need_verification_fields=project_contains_existing_feature,
-        use_odk_collect=use_odk_collect,
-    )
-
-    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-        xlsform=xlsform_upload,
-        form_name=form_name,
-        new_geom_type=new_geom_type,
-        need_verification_fields=project_contains_existing_feature,
-        use_odk_collect=use_odk_collect,
-    )
-    # Write XLS form content to db
-    xlsform_bytes = project_xlsform.getvalue()
-    if len(xlsform_bytes) == 0 or not xform_id:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="There was an error modifying the XLSForm!",
-        )
-    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
-    sql = """
-        UPDATE public.projects
-        SET
-            odk_form_id = %(odk_form_id)s,
-            xlsform_content = %(xlsform_content)s
-        WHERE id = %(project_id)s;
-    """
-    async with db.cursor() as cur:
-        await cur.execute(
-            sql,
-            {
-                "project_id": project_id,
-                "odk_form_id": xform_id,
-                "xlsform_content": xlsform_bytes,
-            },
-        )
-
     warning_message = None
 
     if combined_features_count > 10000:
