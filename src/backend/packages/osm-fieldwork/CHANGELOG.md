@@ -1,4 +1,6 @@
-## 0.22.0 (2025-05-06)
+# Changelog
+
+## osm-fieldwork-0.22.0 (2025-05-06)
 
 ### Feat
 
@@ -6,13 +8,13 @@
 - Added highways category back in.
 - Replace osm-fieldwork createEntity with pyodk, set UUID in frontend.
 
-## 0.21.1 (2025-03-05)
+## osm-fieldwork-0.21.1 (2025-03-05)
 
 ### Fix
 
 - remove invalid Accept: "odkcentral" header (triggers ModSec 920600) (#348)
 
-## 0.21.0 (2025-02-24)
+## osm-fieldwork-0.21.0 (2025-02-24)
 
 ### Feat
 
@@ -22,13 +24,13 @@
 
 - remove temp kivy ui (simplify this package)
 
-## 0.20.4 (2025-02-18)
+## osm-fieldwork-0.20.4 (2025-02-18)
 
 ### Fix
 
 - **xlsform**: remove duplicate save_to field for new_feature + xlocation
 
-## 0.20.3 (2025-02-17)
+## osm-fieldwork-0.20.3 (2025-02-17)
 
 ### Fix
 
@@ -36,50 +38,50 @@
 - save new_feature geometry to 'geometry' entity field
 - pt-br --> pt-BR correct two letter iana code
 
-## 0.20.2 (2025-02-14)
+## osm-fieldwork-0.20.2 (2025-02-14)
 
 ### Fix
 
 - rename additional_geometry to be dynamic to allow multiple extra datasets
 
-## 0.20.1 (2025-02-14)
+## osm-fieldwork-0.20.1 (2025-02-14)
 
 ### Fix
 
 - rename additional_geometry to be dynamic to allow multiple extra datasets
 
-## 0.20.0 (2025-02-12)
+## osm-fieldwork-0.20.0 (2025-02-12)
 
 ### Feat
 
 - method to download submission attachment (S3) urls from ODK Central (#342)
 
-## 0.19.0 (2025-02-11)
+## osm-fieldwork-0.19.0 (2025-02-11)
 
 ### Feat
 
 - add sync OdkForm.getXml to get raw form XML
 
-## 0.18.2 (2025-01-21)
+## osm-fieldwork-0.18.2 (2025-01-21)
 
 ### Fix
 
 - add default language in settings tab if not present (#336)
 
-## 0.18.1 (2025-01-15)
+## osm-fieldwork-0.18.1 (2025-01-15)
 
 ### Feat
 
 - add brazilian portguese translation for mandatory fields (#332)
 
-## 0.18.0 (2025-01-10)
+## osm-fieldwork-0.18.0 (2025-01-10)
 
 ### Feat
 
 - configurable XLSForm new_feature question geometry type (#329)
 - add support for filters in OdkForm get submission media (#330)
 
-## 0.17.0 (2024-12-25)
+## osm-fieldwork-0.17.0 (2024-12-25)
 
 ### Feat
 
@@ -96,13 +98,13 @@
 
 - cleanup ancient unused files (#325)
 
-## 0.16.12 (2024-12-10)
+## osm-fieldwork-0.16.12 (2024-12-10)
 
 ### Fix
 
 - update mandatory xlsform fields logic
 
-## 0.16.11 (2024-11-28)
+## osm-fieldwork-0.16.11 (2024-11-28)
 
 ### Feat
 
@@ -114,33 +116,33 @@
 
 - update labels and entities name in test cases following recent changes in update_xls_form (#317)
 
-## 0.16.10 (2024-11-06)
+## osm-fieldwork-0.16.10 (2024-11-06)
 
-## 0.16.9 (2024-10-18)
+## osm-fieldwork-0.16.9 (2024-10-18)
 
 ### Fix
 
 - create_if and update_if column in entity sheet (#307)
 
-## 0.16.8 (2024-09-30)
+## osm-fieldwork-0.16.8 (2024-09-30)
 
 ### Fix
 
 - remove multiple duplicates in choice sheets
 
-## 0.16.7 (2024-09-24)
+## osm-fieldwork-0.16.7 (2024-09-24)
 
 ### Fix
 
 - **xlsform**: do not filter duplicates from choices sheet
 
-## 0.16.6 (2024-09-24)
+## osm-fieldwork-0.16.6 (2024-09-24)
 
 ### Fix
 
 - **xlsform**: remove 'does not exist' option from digitisation form
 
-## 0.16.5 (2024-09-23)
+## osm-fieldwork-0.16.5 (2024-09-23)
 
 ### Fix
 
@@ -150,7 +152,7 @@
 
 - remove logic for appending task_ids to choices in xlsform
 
-## 0.16.5rc0 (2024-09-23)
+## osm-fieldwork-0.16.5rc0 (2024-09-23)
 
 ### Fix
 
@@ -161,7 +163,7 @@
 
 - small tweak to mandatory fields xlsform
 
-## 0.16.4 (2024-09-20)
+## osm-fieldwork-0.16.4 (2024-09-20)
 
 ### Fix
 
@@ -173,7 +175,7 @@
 
 - refactor update_xlsform for readability + minor bugfixes
 
-## 0.16.3 (2024-09-19)
+## osm-fieldwork-0.16.3 (2024-09-19)
 
 ### Fix
 
@@ -183,25 +185,25 @@
 
 - rename fmtm forms --> common forms
 
-## 0.16.2 (2024-09-18)
+## osm-fieldwork-0.16.2 (2024-09-18)
 
 ### Fix
 
 - handle all XLSForm manuipulation in update_xlsform.py (#299)
 
-## 0.16.1 (2024-09-16)
+## osm-fieldwork-0.16.1 (2024-09-16)
 
 ### Fix
 
 - made digitisation_correct read_only field (#297)
 
-## 0.16.0 (2024-09-11)
+## osm-fieldwork-0.16.0 (2024-09-11)
 
 ### Feat
 
 - **xlsforms**: created separate group verification for digitisation form (#294)
 
-## 0.15.0 (2024-08-27)
+## osm-fieldwork-0.15.0 (2024-08-27)
 
 ### Feat
 
@@ -213,19 +215,19 @@
 - Fix writing nodes with no tags, ie... what the way references, and only write the note for ways (#290)
 - don't add the note about duplication, that should be done at a higher level (#287)
 
-## 0.14.3 (2024-08-08)
+## osm-fieldwork-0.14.3 (2024-08-08)
 
 ### Fix
 
 - regex pattern to find spaces in placeholders of tms url (#283)
 
-## 0.14.2 (2024-08-05)
+## osm-fieldwork-0.14.2 (2024-08-05)
 
 ### Refactor
 
 - check if place holders in custom tms url contains any space within (#281)
 
-## 0.14.1 (2024-07-30)
+## osm-fieldwork-0.14.1 (2024-07-30)
 
 ### Fix
 
@@ -236,7 +238,7 @@
 
 - clarify in logs the projectId is for ODK
 
-## 0.14.0 (2024-07-29)
+## osm-fieldwork-0.14.0 (2024-07-29)
 
 ### Feat
 
@@ -248,7 +250,7 @@
 - Add support for ways when importing an OSM XML file (#275)
 - Fix typo, usfs not usgs, add quering the relations table (#274)
 
-## 0.13.0 (2024-07-12)
+## osm-fieldwork-0.13.0 (2024-07-12)
 
 ### Fix
 
@@ -261,32 +263,32 @@
 - delete unused scripts and update the docs (#269)
 - remove test_conflation prior to odk_merge drop
 
-## 0.12.4 (2024-06-20)
+## osm-fieldwork-0.12.4 (2024-06-20)
 
 ### Fix
 
 - final fix to xlsforms, remove 'essential' group for entity by intent
 
-## 0.12.3 (2024-06-20)
+## osm-fieldwork-0.12.3 (2024-06-20)
 
 ### Fix
 
 - bug where task_id filter did not work on xlsforms
 
-## 0.12.2 (2024-06-20)
+## osm-fieldwork-0.12.2 (2024-06-20)
 
 ### Fix
 
 - xlsform separate task_filter and task_id fields
 
-## 0.12.1 (2024-06-19)
+## osm-fieldwork-0.12.1 (2024-06-19)
 
 ### Fix
 
 - update entity xlsforms with working save_to field for status
 - json2osm invalid merge, fix syntax
 
-## 0.12.0 (2024-06-19)
+## osm-fieldwork-0.12.0 (2024-06-19)
 
 ### Feat
 
@@ -296,20 +298,20 @@
 
 - remove groups from xlsforms (essential, verification), entity breakage
 
-## 0.11.2 (2024-06-10)
+## osm-fieldwork-0.11.2 (2024-06-10)
 
 ### Fix
 
 - make digitization_correct question mandatory
 
-## 0.11.1 (2024-06-07)
+## osm-fieldwork-0.11.1 (2024-06-07)
 
 ### Fix
 
 - rename healthcare.xls form to health.xls (osm tag = healthcare)
 - bug in CSVDump where parsing fails if value is None
 
-## 0.11.0 (2024-06-05)
+## osm-fieldwork-0.11.0 (2024-06-05)
 
 ### Feat
 
@@ -320,19 +322,19 @@
 
 - improve Amenities XLSForm & data model (#256)
 
-## 0.10.2 (2024-05-24)
+## osm-fieldwork-0.10.2 (2024-05-24)
 
 ### Fix
 
 - add support to optionally append to the mbtiles file (#255)
 
-## 0.10.1 (2024-05-24)
+## osm-fieldwork-0.10.1 (2024-05-24)
 
 ### Fix
 
 - replace entity buildings.xls to allow top level entity loading
 
-## 0.10.0 (2024-05-22)
+## osm-fieldwork-0.10.0 (2024-05-22)
 
 ### Feat
 
@@ -342,19 +344,19 @@
 
 - tile id extraction for pmtiles correct x/y ordering
 
-## 0.9.2 (2024-04-29)
+## osm-fieldwork-0.9.2 (2024-04-29)
 
 ### Fix
 
 - remove notes column from entities sheet (pyxform error)
 
-## 0.9.1 (2024-04-26)
+## osm-fieldwork-0.9.1 (2024-04-26)
 
 ### Fix
 
 - update buildings form, show all features unless task selected
 
-## 0.9.0 (2024-04-23)
+## osm-fieldwork-0.9.0 (2024-04-23)
 
 ### Feat
 
@@ -364,20 +366,20 @@
 
 - move existing xlsforms to archived dir (replace with entities)
 
-## 0.8.2 (2024-04-19)
+## osm-fieldwork-0.8.2 (2024-04-19)
 
 ### Fix
 
 - add error handling if connecting to OdkCentral fails
 - improve handling if entities fail during bulk upload
 
-## 0.8.1 (2024-04-15)
+## osm-fieldwork-0.8.1 (2024-04-15)
 
 ### Fix
 
 - add missing OdkEntity.getEntity method for get by uuid
 
-## 0.8.0 (2024-04-12)
+## osm-fieldwork-0.8.0 (2024-04-12)
 
 ### Feat
 
@@ -389,13 +391,13 @@
 - improve typing, docstrings, logging for OdkCentralAsync
 - update logging during OdkCentral.OdkForm form creation
 
-## 0.7.2 (2024-04-11)
+## osm-fieldwork-0.7.2 (2024-04-11)
 
 ### Fix
 
 - revert broken basemapper.py and tests
 
-## 0.7.1 (2024-04-11)
+## osm-fieldwork-0.7.1 (2024-04-11)
 
 ### Fix
 
@@ -406,7 +408,7 @@
 
 - remove missed print statements from OdkCentralAsync
 
-## 0.7.0 (2024-04-03)
+## osm-fieldwork-0.7.0 (2024-04-03)
 
 ### Feat
 
@@ -416,13 +418,13 @@
 
 - only get cpu cores in getAllSubmissions method
 
-## 0.6.1 (2024-03-25)
+## osm-fieldwork-0.6.1 (2024-03-25)
 
 ### Fix
 
 - add standardised entity registration form
 
-## 0.6.0 (2024-03-24)
+## osm-fieldwork-0.6.0 (2024-03-24)
 
 ### Feat
 
@@ -432,14 +434,14 @@
 
 - use logger.basicConfig for verbose flag (#244)
 
-## 0.5.4 (2024-03-19)
+## osm-fieldwork-0.5.4 (2024-03-19)
 
 ### Fix
 
 - updated the error message for invalid odk-credentials (#241)
 - method to update review state of submission (#236)
 
-## 0.5.3 (2024-03-05)
+## osm-fieldwork-0.5.3 (2024-03-05)
 
 ### Fix
 
@@ -449,19 +451,19 @@
 - optional bbox as space separated and comma separated
 - add correct typing for bbox var and return types
 
-## 0.5.2 (2024-03-04)
+## osm-fieldwork-0.5.2 (2024-03-04)
 
 ### Fix
 
 - **regression**: upload Media uploading test data instead of real data
 
-## 0.5.1 (2024-02-29)
+## osm-fieldwork-0.5.1 (2024-02-29)
 
 ### Fix
 
 - rename form_fields --> formFields and handle all http errors (#230)
 
-## 0.5.0 (2024-02-28)
+## osm-fieldwork-0.5.0 (2024-02-28)
 
 ### Feat
 
@@ -479,25 +481,25 @@
 - mediaUpload for xform geojson
 - return form name regardless of if exists or not
 
-## 0.4.4 (2024-02-26)
+## osm-fieldwork-0.4.4 (2024-02-26)
 
 ### Fix
 
 - do not index xform path for form name
 
-## 0.4.3 (2024-02-26)
+## osm-fieldwork-0.4.3 (2024-02-26)
 
 ### Fix
 
 - more flexible parsing of xform name for uploadMedia
 
-## 0.4.3rc0 (2024-02-13)
+## osm-fieldwork-0.4.3rc0 (2024-02-13)
 
 ### Fix
 
 - error handling in submission downloadThread (#227)
 
-## 0.4.2 (2024-01-30)
+## osm-fieldwork-0.4.2 (2024-01-30)
 
 ### Fix
 
@@ -507,7 +509,7 @@
 - work with wildcsrds with spaces
 - Add tile filespec if it's an empty image
 
-## 0.4.1 (2024-01-18)
+## osm-fieldwork-0.4.1 (2024-01-18)
 
 ### Fix
 
@@ -522,7 +524,7 @@
 - return full submissions detail
 - add param debug log during basemap generation
 
-## 0.4.0 (2023-12-05)
+## osm-fieldwork-0.4.0 (2023-12-05)
 
 ### Feat
 
@@ -534,7 +536,7 @@
 - Make sure ref exists before trying to use it from a dict
 - Add default variables
 
-## 0.3.8 (2023-11-18)
+## osm-fieldwork-0.3.8 (2023-11-18)
 
 ### Fix
 
@@ -545,7 +547,7 @@
 - Don't call OsmFile.footer, it's now handled by a destructor
 - Add link to XLSForm design doc
 
-## 0.3.7 (2023-10-23)
+## osm-fieldwork-0.3.7 (2023-10-23)
 
 ### Fix
 
@@ -558,7 +560,7 @@
 - bug pmtile generation if file exists in first dir
 - create basemap directory automatically
 
-## 0.3.6 (2023-10-09)
+## osm-fieldwork-0.3.6 (2023-10-09)
 
 ### Fix
 
@@ -570,7 +572,7 @@
 
 - update rootdir refs to variables
 
-## 0.3.6rc3 (2023-10-09)
+## osm-fieldwork-0.3.6rc3 (2023-10-09)
 
 ### Fix
 
@@ -588,7 +590,7 @@
 - ikport uriParser
 - Enale logging
 
-## 0.3.6rc2 (2023-09-11)
+## osm-fieldwork-0.3.6rc2 (2023-09-11)
 
 ### Fix
 
@@ -604,13 +606,13 @@
 - The URL for raw data has changed
 - Add config file for waterways
 
-## 0.3.6rc1 (2023-09-07)
+## osm-fieldwork-0.3.6rc1 (2023-09-07)
 
 ### Fix
 
 - json2osm via cmdline + programatically
 
-## 0.3.6rc0 (2023-09-01)
+## osm-fieldwork-0.3.6rc0 (2023-09-01)
 
 ### Feat
 
@@ -667,14 +669,14 @@
 - update refs logging --> log
 - remove mkgendocs config
 
-## 0.3.5 (2023-08-11)
+## osm-fieldwork-0.3.5 (2023-08-11)
 
 ### Fix
 
 - Add mercantile
 - indentation error in basemapper
 
-## 0.3.4 (2023-08-06)
+## osm-fieldwork-0.3.4 (2023-08-06)
 
 ### Feat
 
@@ -720,7 +722,7 @@
 - highways use ways_line, not ways_poly
 - Add config file for highway query
 
-## 0.3.3 (2023-07-25)
+## osm-fieldwork-0.3.3 (2023-07-25)
 
 ### Fix
 
@@ -780,7 +782,7 @@
 - Add roof:shape and roof:levels to keep
 - Add shop to keep
 
-## 0.3.2 (2023-06-27)
+## osm-fieldwork-0.3.2 (2023-06-27)
 
 ### Fix
 
@@ -790,7 +792,7 @@
 - Remove the sldes.xls file
 - Also use an optional user and password for database access
 
-## 0.3.1 (2023-06-21)
+## osm-fieldwork-0.3.1 (2023-06-21)
 
 ### Fix
 
@@ -799,7 +801,7 @@
 - Display usage() if no arguments are given
 - Add qualifiers to limit the shops that get returned
 
-## 0.3.1rc2 (2023-06-01)
+## osm-fieldwork-0.3.1rc2 (2023-06-01)
 
 ### Fix
 
@@ -823,7 +825,7 @@
 
 - improve logging for OdkCentral + createProject
 
-## 0.3.1rc1 (2023-05-18)
+## osm-fieldwork-0.3.1rc1 (2023-05-18)
 
 ### Fix
 
@@ -869,7 +871,7 @@
 - Add OSM map-icons as submodule
 - fix typo in comment
 
-## 0.3.1rc0 (2023-05-04)
+## osm-fieldwork-0.3.1rc0 (2023-05-04)
 
 ### Fix
 
@@ -919,7 +921,7 @@
 - Update docs, some content pulled into new files
 - Refacor the programs.md file, move large detailed content into there own files
 
-## 0.2.0 (2023-03-31)
+## osm-fieldwork-0.2.0 (2023-03-31)
 
 ### Feat
 
@@ -935,13 +937,13 @@
 - Minor typo fix
 - Refactor and update
 
-## 0.1.1 (2023-03-29)
+## osm-fieldwork-0.1.1 (2023-03-29)
 
 ### Fix
 
 - Refactor and update
 
-## 0.1.0 (2023-03-25)
+## osm-fieldwork-0.1.0 (2023-03-25)
 
 ### Feat
 
