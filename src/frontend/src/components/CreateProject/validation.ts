@@ -126,6 +126,7 @@ export const uploadSurveyValidationSchema = z
     osm_category: z.string().min(1, 'Form Category is must be selected'),
     xlsFormFile: z.any().optional(),
     isXlsFormFileValid: z.boolean(),
+    needVerificationFields: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;
