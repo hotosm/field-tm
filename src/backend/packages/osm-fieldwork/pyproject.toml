@@ -1,6 +1,6 @@
 [project]
 name = "osm-fieldwork"
-version = "0.22.0"
+version = "0.23.0"
 description = "Processing field data from ODK to OpenStreetMap format."
 authors = [
     {name = "Rob Savoye", email = "rob.savoye@hotosm.org"},
@@ -56,7 +56,7 @@ packages = ["osm_fieldwork"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.22.0"
+version = "0.23.0"
 version_provider = "uv"
 version_files = [
     "pyproject.toml:version",
