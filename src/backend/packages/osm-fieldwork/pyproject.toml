@@ -67,6 +67,7 @@ update_changelog_on_bump = true
 tag_format = "osm-fieldwork-$version"
 # Skip the tags for FieldTM
 ignored_tag_formats = ["$version"]
+bump_message = "bump: osm-fieldwork version $current_version → $new_version"
 
 [tool.ruff]
 fix = true
