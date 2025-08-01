@@ -367,7 +367,7 @@ async def test_generate_project_files(db, client, project):
         xlsform_obj = BytesIO(xlsform_data.read())
 
     response = await client.post(
-        f"/central/upload-xlsform?project_id{project_id}",
+        f"/central/upload-xlsform?project_id={project_id}",
         files={
             "xlsform": (
                 "buildings.xls",
