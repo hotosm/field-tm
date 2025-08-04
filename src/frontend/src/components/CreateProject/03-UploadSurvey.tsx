@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useParams } from 'react-router-dom';
 import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectService';
 import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
@@ -12,12 +13,15 @@ import Select2 from '@/components/common/Select2';
 import FieldLabel from '@/components/common/FieldLabel';
 import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import Switch from '@/components/common/Switch';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const UploadSurvey = () => {
   const dispatch = useAppDispatch();
+  const params = useParams();
+  const projectId = params.id ? +params.id : null;
 
   const formExampleList = useAppSelector((state) => state.createproject.formExampleList);
   const formCategoryLoading = useAppSelector((state) => state.createproject.formCategoryLoading);
@@ -38,8 +42,18 @@ const UploadSurvey = () => {
     dispatch(FormCategoryService(`${VITE_API_URL}/central/list-forms`));
   }, []);
 
-  const validateFormFile = (file) => {
-    dispatch(ValidateCustomForm(`${VITE_API_URL}/central/validate-form`, file?.file, values.use_odk_collect));
+  const { getValues } = form;
+  const uploadXlsformFile = (file) => {
+    // use_odk_collect is from previous step, while needVerificationFields is from this step
+    const values = getValues();
+    const needVerificationFields = values.needVerificationFields;
+
+    dispatch(
+      ValidateCustomForm(
+        `${VITE_API_URL}/central/upload-xlsform?project_id=${projectId}&use_odk_collect=${values.use_odk_collect}&need_verification_fields=${needVerificationFields}`,
+        file?.file,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -54,7 +68,7 @@ const UploadSurvey = () => {
 
     setValue('xlsFormFile', file);
     dispatch(CreateProjectActions.SetCustomFileValidity(false));
-    validateFormFile(file);
+    uploadXlsformFile(file);
   };
 
   const resetFile = (): void => {
@@ -119,6 +133,17 @@ const UploadSurvey = () => {
             Edit Interactively
           </a>
         </p>
+      </div>
+
+      <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+        <FieldLabel label="Include digitization verification questions" />
+        <Controller
+          control={control}
+          name="needVerificationFields"
+          render={({ field }) => (
+            <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+          )}
+        />
       </div>
 
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">

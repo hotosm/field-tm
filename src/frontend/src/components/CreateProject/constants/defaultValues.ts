@@ -32,6 +32,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   osm_category: '',
   xlsFormFile: null,
   isXlsFormFileValid: false,
+  needVerificationFields: true,
 
   // 04 Map Data
   primary_geom_type: null,

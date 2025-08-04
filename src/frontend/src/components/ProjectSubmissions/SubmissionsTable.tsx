@@ -448,7 +448,7 @@ const SubmissionsTable = ({ toggleView }) => {
               const taskUid = taskList?.find((task) => task?.index == row?.task_id)?.id;
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
-                  <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`}>
+                  <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.__id}`}>
                     <Tooltip arrow placement="bottom" title="Validate Submission">
                       <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
                     </Tooltip>

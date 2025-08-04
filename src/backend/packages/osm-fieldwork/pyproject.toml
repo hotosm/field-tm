@@ -1,11 +1,12 @@
 [project]
 name = "osm-fieldwork"
-version = "0.22.0"
+version = "0.23.0"
 description = "Processing field data from ODK to OpenStreetMap format."
 authors = [
     {name = "Rob Savoye", email = "rob.savoye@hotosm.org"},
     {name = "Sam Woodcock", email = "sam.woodcock@hotosm.org"},
     {name = "Sujan Adhikari", email = "adhikarisujan.naxa@gmail.com"},
+    {name = "Anuj Gupta", email = "anuj.naxa@gmail.com"},
 ]
 dependencies = [
     "geojson>=3.0.0",
@@ -55,13 +56,18 @@ packages = ["osm_fieldwork"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.22.0"
+version = "0.23.0"
+version_provider = "uv"
 version_files = [
     "pyproject.toml:version",
     "osm_fieldwork/__version__.py",
-    "Makefile:VERSION",
 ]
 update_changelog_on_bump = true
+# Create tag version prepended with osm-fieldwork
+tag_format = "osm-fieldwork-$version"
+# Skip the tags for FieldTM
+ignored_tag_formats = ["$version"]
+bump_message = "bump: osm-fieldwork version $current_version → $new_version"
 
 [tool.ruff]
 fix = true

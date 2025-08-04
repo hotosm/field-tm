@@ -31,7 +31,8 @@
 }
 
 .dialog-task-new-feature .task-index {
-	--at-apply: text-neutral-950 text-xl font-semibold;
+	--at-apply: text-xl font-bold;
+	color: var(--sl-color-primary-700);
 }
 
 .dialog-task-new-feature .icon {

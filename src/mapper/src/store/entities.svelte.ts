@@ -70,7 +70,8 @@ function entityDataToGeojsonFeature(entity: DbEntityType): Feature | null {
 			status: entity.status,
 			project_id: entity.project_id,
 			task_id: entity.task_id,
-			osm_id: entity.osm_id,
+			// BigInt doesn't work with svelte-maplibre layers, so we revert to string
+			osm_id: entity.osm_id.toString(),
 			submission_ids: entity.submission_ids,
 			created_by: entity.created_by,
 		},
@@ -202,7 +203,8 @@ function getEntitiesStatusStore() {
 				project_id: projectId,
 				task_id: entity.task_id,
 				submission_ids: entity.submission_ids,
-				osm_id: entity.osm_id,
+				// convert to bigint to maintain consistency
+				osm_id: BigInt(entity.osm_id),
 				geometry: entity.geometry,
 				created_by: entity.created_by,
 			}));
@@ -275,21 +277,16 @@ function getEntitiesStatusStore() {
 		}
 	}
 
-	function _fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result as string);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
-	}
-
 	async function createNewSubmission(projectId: number, submissionXml: string, attachments: File[]) {
 		const entityRequestUrl = `${API_URL}/submission?project_id=${projectId}`;
 		const entityRequestMethod = 'POST';
 
 		const form = new FormData();
-		form.append('submission_xml', submissionXml);
+
+		// Upload XML as a file (Blob), not a raw string (reduce memory usage)
+		const xmlBlob = new Blob([submissionXml], { type: 'text/xml' });
+		form.append('submission_xml', xmlBlob, 'submission.xml');
+
 		attachments.forEach((file) => {
 			form.append('submission_files', file);
 		});

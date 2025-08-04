@@ -238,7 +238,7 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
     build:
       context: odkcentral/api
       args:
@@ -305,7 +305,7 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
     build:
       context: odkcentral/ui
       args:

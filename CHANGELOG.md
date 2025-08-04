@@ -1,5 +1,19 @@
 # Changelog
 
+## 2025.4.3 (2025-08-01)
+
+### Feat
+
+- **OdkCentral**: add async method to retrieve submission XML content (#2759)
+
+### Fix
+
+- **backend**: backend part to allow listing of required media from uploaded XLSForm (#2738)
+- **mapper**: bad geometry layer & layer unselectable on manual sync issue (#2757)
+- **mapper**: avoid parse of submission XML to string in memory, towards #2740
+- **styles**: make task & entity entity dialog title bold and primary color (#2748)
+- **main**: wrap geolocation inside toggleLayer condition to retain location layer after baselayer switch (#2747)
+
 ## 2025.4.2 (2025-07-30)
 
 ### Feat
