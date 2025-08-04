@@ -392,37 +392,22 @@ async def get_organisation_stats(
 
     try:
         async with db.cursor() as cur:
+            params = {
+                "org_id": org_id,
+                "start_date": start_date,
+                "end_date": end_date,
+            }
+
             # Fetch org-wide stats
-            await cur.execute(
-                main_sql,
-                {
-                    "org_id": org_id,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            )
+            await cur.execute(main_sql, params)
             row = await cur.fetchone()
 
             # Fetch daily stats
-            await cur.execute(
-                daily_sql,
-                {
-                    "org_id": org_id,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            )
+            await cur.execute(daily_sql, params)
             daily_rows = await cur.fetchall()
 
             # Fetch per-project stats
-            await cur.execute(
-                project_task_sql,
-                {
-                    "org_id": org_id,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            )
+            await cur.execute(project_task_sql, params)
             project_rows = await cur.fetchall()
 
         daily_stats = [
