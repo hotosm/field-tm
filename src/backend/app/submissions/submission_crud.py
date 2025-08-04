@@ -20,6 +20,7 @@
 import asyncio
 import json
 import uuid
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
@@ -232,6 +233,9 @@ async def create_new_submission(
     submission_attachments = submission_attachments or {}  # Ensure always a dict
     attachment_filepaths = []
 
+    # deviceID is sent in XML form, so we can extract it from the XML.
+    device_id = device_id or extract_device_id_from_xml(submission_xml)
+
     # Write all uploaded data to temp files for upload (required by PyODK)
     # We must use TemporaryDir and preserve the uploaded file names
     with TemporaryDirectory() as temp_dir:
@@ -249,6 +253,16 @@ async def create_new_submission(
                 device_id=device_id,
                 attachments=attachment_filepaths,
             )
+
+
+def extract_device_id_from_xml(xml_str: str) -> Optional[str]:
+    """Extract device ID from the XML string."""
+    try:
+        root = ET.fromstring(xml_str)
+        device_id_elem = root.find(".//deviceid")
+        return device_id_elem.text if device_id_elem is not None else None
+    except ET.ParseError:
+        return None
 
 
 async def get_submission_photos(

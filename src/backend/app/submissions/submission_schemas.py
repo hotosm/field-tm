@@ -59,7 +59,7 @@ class ReviewStateOut(BaseModel):
 
     instanceId: str  # noqa: N815
     submitterId: int  # noqa: N815
-    deviceId: Optional[str] = None  # noqa: N815
+    deviceId: str  # noqa: N815
     createdAt: str  # noqa: N815
     updatedAt: str  # noqa: N815
     reviewState: str  # noqa: N815
