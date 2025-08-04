@@ -248,7 +248,7 @@ class OdkForm(OdkCentral):
             async with self.session.get(url, ssl=self.verify) as response:
                 return await response.json()
         except aiohttp.ClientError as e:
-            msg = f"Error fetching submissions: {e}"
+            msg = f"Error fetching form attachments: {e}"
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
 
@@ -346,6 +346,31 @@ class OdkForm(OdkCentral):
             msg = f"Error fetching submissions: {e}"
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
+
+    async def getSubmissionXml(
+        self,
+        projectId: int,
+        xform: str,
+        submissionUuid: str,
+    ):
+        """Retrieve the XML content of a submission.
+
+        Args:
+            projectId (int): The ID of the project on ODK Central.
+            xform (str): The XForm ID on ODK Central.
+            submissionUuid (str): The UUID of the submission.
+
+        Returns:
+            Optional[str]: The XML content as a string.
+        """
+        url = f"{self.base}projects/{projectId}/forms/{xform}/submissions/{submissionUuid}.xml"
+
+        try:
+            async with self.session.get(url, ssl=self.verify) as response:
+                return await response.text()
+        except Exception as e:
+            log.error(f"Failed to fetch submission XML for {submissionUuid}: {e}")
+            return None
 
     async def listSubmissionAttachments(self, projectId: int, xform: str, submissionUuid: str):
         """Fetch a list of attachments listed for upload on a given submission.
