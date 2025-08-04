@@ -300,8 +300,11 @@ async def append_field_mapping_fields(
     
     custom_sheets = standardize_xlsform_sheets(custom_sheets)
 
+    # Configure form settings
+    xform_id, default_language = _configure_form_settings(custom_sheets, form_name)
+
     # Select appropriate form components based on target platform
-    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields)
+    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, default_language)
     
     # Process survey sheet
     custom_sheets["survey"] = _process_survey_sheet(
@@ -323,9 +326,6 @@ async def append_field_mapping_fields(
     custom_sheets["entities"] = form_components["entities_df"]
     _validate_required_sheet(custom_sheets, "entities")
     
-    # Configure form settings
-    xform_id = _configure_form_settings(custom_sheets, form_name)
-    
     # Handle additional entities if specified
     if additional_entities:
         custom_sheets["survey"] = _add_additional_entities(custom_sheets["survey"], additional_entities)
@@ -341,7 +341,8 @@ async def append_field_mapping_fields(
 def _get_form_components(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
-        need_verification_fields: bool
+        need_verification_fields: bool,
+        default_language: str,
     ) -> dict:
     """Select appropriate form components based on target platform."""
     if use_odk_collect:
@@ -352,7 +353,7 @@ def _get_form_components(
         digitisation_df.loc[digitisation_correct_col, "read_only"] = "${new_feature} != ''"
 
     return {
-        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields),
+        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields, default_language),
         "choices_df": choices_df,
         "digitisation_df": digitisation_df,
         "photo_collection_df": photo_collection_df,
@@ -449,7 +450,7 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
     if "default_language" not in settings:
         settings["default_language"] = "en"
     
-    return xform_id
+    return xform_id, settings["default_language"]
 
 
 def _add_additional_entities(
