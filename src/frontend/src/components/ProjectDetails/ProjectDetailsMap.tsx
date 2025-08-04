@@ -244,27 +244,38 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
         // store entities in overlappingEntityFeatures to show selection popup if multiple are present at the clicked point
         if (entityFeatures.length > 1) {
           setSelectedTaskArea(undefined);
+
+          const featureProperties = entityFeatures?.[0]?.getProperties();
+          // check if the feature is member of expanded entity of a cluster, the expanded entity show same entity to be overlapped so we handle only one entity
+          if (featureProperties?.selectclusterfeature) {
+            setOverlappingEntityFeatures([]);
+            handleFeatureClick(featureProperties?.features?.[0]?.getProperties(), featureProperties?.features?.[0]);
+            return;
+          }
           setOverlappingEntityFeatures(entityFeatures);
           dispatch(ProjectActions.ToggleTaskModalStatus(false));
         } else {
-          if (overlappingEntityFeatures.length > 1) {
-            setOverlappingEntityFeatures([]);
-          }
+          if (overlappingEntityFeatures.length > 1) setOverlappingEntityFeatures([]);
+
           const feature = entityFeatures[0];
           let featureProperties = feature.getProperties();
 
-          if (featureProperties.features) {
+          // check if the feature is a cluster of entities (no action required)
+          if (featureProperties?.features && featureProperties?.features.length > 1) return;
+          // check if the feature is member of expanded entity of a cluster, then override featureProperties
+          if (featureProperties.features && !featureProperties?.selectcluserfeatures)
             featureProperties = featureProperties.features[0].getProperties();
-          }
+
           handleFeatureClick(featureProperties, feature);
         }
       } else {
-        if (overlappingEntityFeatures.length > 1) {
-          setOverlappingEntityFeatures([]);
-        }
+        if (overlappingEntityFeatures.length > 1) setOverlappingEntityFeatures([]);
+
+        // find task layer
         const taskFeatures = map.getFeaturesAtPixel(evt.pixel, {
           layerFilter: (layer) => layer.get('name') === 'project-area',
         });
+
         if (isEmpty(taskFeatures)) return;
         const feature = taskFeatures[0];
         const featureProperties = feature.getProperties();
@@ -273,7 +284,6 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     };
 
     map.on('click', handleClick);
-
     return () => {
       map.un('click', handleClick);
     };
