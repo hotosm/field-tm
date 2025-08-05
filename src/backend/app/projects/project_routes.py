@@ -165,7 +165,7 @@ async def read_project_summaries(
         hashtags,
         search,
         minimal,
-        status
+        status,
     )
 
 

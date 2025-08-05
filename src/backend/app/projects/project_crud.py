@@ -46,7 +46,7 @@ from psycopg.rows import class_row
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType, ProjectStatus
+from app.db.enums import BackgroundTaskStatus, HTTPStatus, ProjectStatus, XLSFormType
 from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
 from app.db.postgis_utils import (
     check_crs,
