@@ -48,9 +48,10 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
           options={statusOptions}
           value={filter.status || ''}
           choose="value"
-          onChange={filter.onStatusChange}
+          onChange={(value) => filter.onStatusChange(value || undefined)}
           placeholder="Status"
           className="!fmtm-w-[10.313rem] fmtm-bg-white !fmtm-rounded focus:fmtm-ring-0"
+          enableSearchbar={false}
         />
         <Searchbar
           value={filter.searchText}
