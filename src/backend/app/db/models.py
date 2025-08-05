@@ -1728,6 +1728,7 @@ class DbProject(BaseModel):
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
         minimal: bool = False,
+        status: Optional[ProjectStatus] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         if current_user:
@@ -1736,7 +1737,7 @@ class DbProject(BaseModel):
             access_info = None
 
         filters, params = cls._build_query_filters(
-            skip, limit, org_id, user_sub, hashtags, search, access_info
+            skip, limit, org_id, user_sub, hashtags, search, access_info, status
         )
         sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
@@ -1769,13 +1770,16 @@ class DbProject(BaseModel):
         hashtags: Optional[list[str]],
         search: Optional[str],
         access_info: Optional[dict] = None,
+        status: Optional[ProjectStatus] = None,
     ) -> tuple[list[str], dict, bool]:
+        print('status--', status)
         """Build query filters and parameters based on provided criteria."""
         # Build basic filters
         filters_map = {
             "p.organisation_id = %(org_id)s": org_id,
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
+            "p.status = %(status)s": status,
             # search term (project name using ILIKE for case-insensitive match)
             "p.slug ILIKE %(search)s": f"%{search}%" if search else None,
         }
@@ -1798,6 +1802,7 @@ class DbProject(BaseModel):
                 "user_sub": user_sub,
                 "hashtags": hashtags,
                 "search": f"%{search}%" if search else None,
+                "status": status,
             }.items()
             if value is not None
         }
