@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/home.css';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import { HomeSummaryService } from '@/api/HomeService';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
