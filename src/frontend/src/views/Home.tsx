@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Pagination from '@/components/common/Pagination';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
+import { project_status } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,7 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [paginationPage, setPaginationPage] = useState(1);
+  const [status, setStatus] = useState<project_status | undefined>(undefined);
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
@@ -35,11 +37,14 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(
-      HomeSummaryService(
-        `${VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12&search=${searchQuery}`,
-      ),
+      HomeSummaryService(`${VITE_API_URL}/projects/summaries`, {
+        page: paginationPage,
+        results_per_page: 12,
+        search: searchQuery,
+        status: status,
+      }),
     );
-  }, [searchQuery, paginationPage]);
+  }, [searchQuery, paginationPage, status]);
 
   useEffect(() => {
     setPaginationPage(1);
@@ -51,7 +56,14 @@ const Home = () => {
       className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full lg:fmtm-overflow-hidden"
     >
       <div className="fmtm-h-full">
-        <HomePageFilters searchText={searchTextData} onSearch={handleChangeData} />
+        <HomePageFilters
+          filter={{
+            searchText: searchTextData,
+            onSearch: handleChangeData,
+            status: status,
+            onStatusChange: (value) => setStatus(value ? value : undefined),
+          }}
+        />
         {!homeProjectLoading ? (
           <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-2 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-85px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
