@@ -26,7 +26,7 @@ const Home = () => {
 
   const [filter, setFilter] = useState<filterType>({
     page: 1,
-    results_per_page: 2,
+    results_per_page: 12,
     search: '',
     status: undefined,
   });
