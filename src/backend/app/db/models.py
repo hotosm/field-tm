@@ -1772,7 +1772,6 @@ class DbProject(BaseModel):
         access_info: Optional[dict] = None,
         status: Optional[ProjectStatus] = None,
     ) -> tuple[list[str], dict, bool]:
-        print("status--", status)
         """Build query filters and parameters based on provided criteria."""
         # Build basic filters
         filters_map = {
