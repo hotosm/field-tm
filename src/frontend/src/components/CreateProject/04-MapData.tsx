@@ -22,10 +22,13 @@ import Button from '@/components/common/Button';
 import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const MapData = () => {
+  useDocumentTitle('Create Project: Map Data');
+
   const dispatch = useAppDispatch();
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
