@@ -15,10 +15,13 @@ import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const UploadSurvey = () => {
+  useDocumentTitle('Create Project: Upload Survey');
+
   const dispatch = useAppDispatch();
   const params = useParams();
   const projectId = params.id ? +params.id : null;

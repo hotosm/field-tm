@@ -26,10 +26,13 @@ import isEmpty from '@/utilfunctions/isEmpty';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import { ValidateODKCredentials } from '@/api/CreateProjectService';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectOverview = () => {
+  useDocumentTitle('Create Project: Project Overview');
+
   const dispatch = useAppDispatch();
   const isAdmin = useIsAdmin();
 

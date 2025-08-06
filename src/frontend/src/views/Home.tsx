@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/home.css';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import { HomeSummaryService } from '@/api/HomeService';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
@@ -10,15 +9,27 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Pagination from '@/components/common/Pagination';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
+import { project_status } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+type filterType = {
+  page: number;
+  results_per_page: number;
+  search: string;
+  status: project_status | undefined;
+};
 
 const Home = () => {
   useDocumentTitle('Explore Projects');
   const dispatch = useAppDispatch();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [paginationPage, setPaginationPage] = useState(1);
+  const [filter, setFilter] = useState<filterType>({
+    page: 1,
+    results_per_page: 12,
+    search: '',
+    status: undefined,
+  });
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
@@ -27,23 +38,15 @@ const Home = () => {
 
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 400,
-    init: searchQuery,
+    init: filter.search,
     onChange: (e) => {
-      setSearchQuery(e.target.value);
+      setFilter({ ...filter, search: e.target.value, page: 1 });
     },
   });
 
   useEffect(() => {
-    dispatch(
-      HomeSummaryService(
-        `${VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12&search=${searchQuery}`,
-      ),
-    );
-  }, [searchQuery, paginationPage]);
-
-  useEffect(() => {
-    setPaginationPage(1);
-  }, [searchQuery]);
+    dispatch(HomeSummaryService(`${VITE_API_URL}/projects/summaries`, filter));
+  }, [filter]);
 
   return (
     <div
@@ -51,7 +54,14 @@ const Home = () => {
       className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full lg:fmtm-overflow-hidden"
     >
       <div className="fmtm-h-full">
-        <HomePageFilters searchText={searchTextData} onSearch={handleChangeData} />
+        <HomePageFilters
+          filter={{
+            searchText: searchTextData,
+            onSearch: handleChangeData,
+            status: filter.status,
+            onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
+          }}
+        />
         {!homeProjectLoading ? (
           <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-2 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-85px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
@@ -83,7 +93,7 @@ const Home = () => {
               currentPage={homeProjectPagination?.page || 0}
               isLoading={false}
               pageSize={homeProjectPagination.per_page}
-              handlePageChange={(page) => setPaginationPage(page)}
+              handlePageChange={(page) => setFilter({ ...filter, page: page })}
               className="fmtm-fixed fmtm-left-0 fmtm-w-full"
             />
             {showMapStatus && <ProjectListMap />}
