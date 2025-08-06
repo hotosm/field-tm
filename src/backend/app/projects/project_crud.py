@@ -59,7 +59,7 @@ from app.db.postgis_utils import (
 from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
-from app.submissions.submission_crud import get_submission_by_project
+from app.submissions import submission_crud
 
 
 async def get_projects_featcol(
@@ -961,7 +961,7 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
         project = await DbProject.one(db, project_id, minimal=False)
 
         # Fetch all submissions for the project
-        data = await get_submission_by_project(project, {})
+        data = await submission_crud.get_submission_by_project(project, {})
         submissions = data.get("value", [])
 
         # Count submissions per user

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Upload submission data for active projectsto S3."""
 
 import asyncio
