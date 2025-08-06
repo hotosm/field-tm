@@ -149,6 +149,7 @@ async def read_project_summaries(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    status: ProjectStatus = None,
 ):
     """Get a paginated summary of projects.
 
@@ -164,6 +165,7 @@ async def read_project_summaries(
         hashtags,
         search,
         minimal,
+        status,
     )
 
 

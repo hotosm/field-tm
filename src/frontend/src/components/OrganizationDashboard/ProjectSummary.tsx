@@ -34,9 +34,12 @@ const ProjectSummary = () => {
 
   useEffect(() => {
     dispatch(
-      HomeSummaryService(
-        `${VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12&search=${search}&org_id=${organizationId}`,
-      ),
+      HomeSummaryService(`${VITE_API_URL}/projects/summaries`, {
+        page: paginationPage,
+        results_per_page: 12,
+        search,
+        org_id: organizationId ? +organizationId : undefined,
+      }),
     );
   }, [search, paginationPage]);
 

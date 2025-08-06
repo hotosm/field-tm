@@ -3,14 +3,26 @@ import { AppDispatch } from '@/store/Store';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import { projectType } from '@/models/home/homeModel';
 import { paginationType } from '@/store/types/ICommon';
+import { project_status } from '@/types/enums';
 
-export const HomeSummaryService = (url: string) => {
+export const HomeSummaryService = (
+  url: string,
+  params: {
+    page: number;
+    results_per_page?: number;
+    org_id?: number;
+    search?: string;
+    hashtags?: string;
+    minimal?: boolean;
+    status?: project_status;
+  },
+) => {
   return async (dispatch: AppDispatch) => {
     dispatch(HomeActions.HomeProjectLoading(true));
 
-    const fetchHomeSummaries = async (url: string) => {
+    const fetchHomeSummaries = async () => {
       try {
-        const fetchHomeData = await axios.get(url);
+        const fetchHomeData = await axios.get(url, { params });
         const projectSummaries: projectType[] = fetchHomeData.data.results;
         const paginationResp: paginationType = fetchHomeData.data.pagination;
         dispatch(HomeActions.SetHomeProjectPagination(paginationResp));
@@ -21,6 +33,6 @@ export const HomeSummaryService = (url: string) => {
       }
     };
 
-    await fetchHomeSummaries(url);
+    await fetchHomeSummaries();
   };
 };
