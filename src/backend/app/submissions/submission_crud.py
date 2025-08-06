@@ -20,13 +20,13 @@
 import asyncio
 import json
 import uuid
-import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
 
+from defusedxml import ElementTree
 from fastapi import HTTPException, Response
 from loguru import logger as log
 from psycopg import Connection
@@ -258,10 +258,10 @@ async def create_new_submission(
 def extract_device_id_from_xml(xml_str: str) -> Optional[str]:
     """Extract device ID from the XML string."""
     try:
-        root = ET.fromstring(xml_str)
+        root = ElementTree.fromstring(xml_str)
         device_id_elem = root.find(".//deviceid")
         return device_id_elem.text if device_id_elem is not None else None
-    except ET.ParseError:
+    except ElementTree.ParseError:
         return None
 
 
