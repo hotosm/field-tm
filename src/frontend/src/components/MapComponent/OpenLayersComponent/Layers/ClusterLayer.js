@@ -10,17 +10,22 @@ import { Text, Circle } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import SelectCluster from 'ol-ext/interaction/SelectCluster';
 import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { isValidUrl } from '@/utilfunctions/urlChecker';
+import { bbox as OLBbox } from 'ol/loadingstrategy';
+import { geojson as FGBGeoJson } from 'flatgeobuf';
+import { buffer } from 'ol/extent';
+import Point from 'ol/geom/Point.js';
 
 function setAsyncStyle(style, feature, getIndividualStyle) {
   const styleCache = {};
   const size = feature?.get('features')?.length;
   let stylex = styleCache[size];
   if (size === 1) {
-    const featureProperty = feature?.get('features')[0].getProperties();
+    const featureProperty = feature?.get('features')[0]?.getProperties();
     stylex = getIndividualStyle(featureProperty);
     styleCache[size] = stylex;
     return stylex;
-  } else {
+  } else if (size > 1) {
     stylex = new Style({
       image: new Circle({
         radius: 23,
@@ -46,6 +51,44 @@ function setAsyncStyle(style, feature, getIndividualStyle) {
   }
 }
 
+function fgbBoundingBox(originalExtent) {
+  // Add a 50m buffer to the bbox search
+  const bufferMeters = 50;
+  const bufferedExtent = buffer(originalExtent, bufferMeters);
+
+  const minPoint = new Point([bufferedExtent[0], bufferedExtent[1]]);
+  minPoint.transform('EPSG:3857', 'EPSG:4326');
+
+  const maxPoint = new Point([bufferedExtent[2], bufferedExtent[3]]);
+  maxPoint.transform('EPSG:3857', 'EPSG:4326');
+
+  return {
+    minX: minPoint.getCoordinates()[0],
+    minY: minPoint.getCoordinates()[1],
+    maxX: maxPoint.getCoordinates()[0],
+    maxY: maxPoint.getCoordinates()[1],
+  };
+}
+
+function geomWithin(geom, area) {
+  // Only include features that intersect extent
+  let geomCoord;
+
+  if (geom.getType() === 'Point') {
+    geomCoord = geom.getCoordinates();
+  } else if (geom.getType() === 'Polygon') {
+    geomCoord = geom.getInteriorPoint().getCoordinates();
+  } else if (geom.getType() === 'LineString') {
+    geomCoord = geom.getExtent();
+  }
+
+  if (area.intersectsCoordinate(geomCoord)) {
+    return true;
+  }
+
+  return false;
+}
+
 const ClusterLayer = ({
   map,
   source: layerSource,
@@ -55,6 +98,9 @@ const ClusterLayer = ({
   style,
   mapOnClick,
   getIndividualStyle,
+  fgbUrl,
+  fgbExtent,
+  processGeojson,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
   useEffect(() => () => map && vectorLayer && map.removeLayer(vectorLayer), [map, vectorLayer]);
@@ -77,7 +123,7 @@ const ClusterLayer = ({
     const animatedClusterLayer = new AnimatedCluster({
       source: clusterSource,
       animationDuration: 700,
-      distance: 40,
+      distance: 100,
       style: (feature) => setAsyncStyle(style, feature, getIndividualStyle),
     });
 
@@ -106,7 +152,7 @@ const ClusterLayer = ({
   }, [map, vectorLayer, zoomToLayer]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || !mapOnClick) return;
     map.on('singleclick', (evt) => {
       let area_no_9_extent = null;
       map.forEachFeatureAtPixel(
@@ -121,7 +167,6 @@ const ClusterLayer = ({
         map.getView().fit(area_no_9_extent, {
           duration: 1000,
           padding: [50, 50, 50, 50],
-          // maxZoom: 11,
         });
       }
     });
@@ -132,7 +177,7 @@ const ClusterLayer = ({
   }, [map]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || !mapOnClick) return;
 
     map.on('singleclick', (evt) => {
       const features = map.getFeaturesAtPixel(evt.pixel);
@@ -196,6 +241,66 @@ const ClusterLayer = ({
       map.removeInteraction(selectCluster);
     };
   }, [map]);
+
+  async function loadFgbRemote(filterExtent = true, extractGeomCol = true) {
+    this.clear();
+    let filteredFeatures = [];
+    for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtent.getExtent()))) {
+      if (extractGeomCol && feature.geometry.type === 'GeometryCollection') {
+        // Extract first geom from geomcollection
+        feature = {
+          ...feature,
+          geometry: feature.geometry.geometries[0],
+        };
+      }
+      let extractGeom = new GeoJSON().readFeature(feature, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
+
+      // Clip geoms to another geometry (i.e. ST_Within)
+      if (filterExtent) {
+        if (geomWithin(extractGeom.getGeometry(), fgbExtent)) {
+          filteredFeatures.push(extractGeom);
+        }
+      } else {
+        filteredFeatures.push(extractGeom);
+      }
+    }
+    // Process Geojson if needed i.e. filter, modify, etc
+    // ex: in our use case we are filtering only rejected entities
+    if (processGeojson) {
+      filteredFeatures = processGeojson(filteredFeatures);
+    }
+    this.addFeatures(filteredFeatures);
+  }
+
+  useEffect(() => {
+    if (!map || !fgbUrl || !isValidUrl(fgbUrl)) return;
+
+    const vectorSource = new VectorSource({
+      useSpatialIndex: true,
+      strategy: OLBbox,
+      loader: loadFgbRemote,
+    });
+
+    const clusterSource = new Cluster({
+      distance: 50,
+      source: vectorSource,
+    });
+
+    const animatedClusterLayer = new AnimatedCluster({
+      source: clusterSource,
+      animationDuration: 100,
+      style: (feature) => setAsyncStyle(style, feature, getIndividualStyle),
+    });
+
+    setVectorLayer(animatedClusterLayer);
+
+    return () => {
+      setVectorLayer(null);
+    };
+  }, [fgbUrl, fgbExtent]);
 
   return null;
 };
