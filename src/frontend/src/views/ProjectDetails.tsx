@@ -45,7 +45,6 @@ const tabList: { id: tabType; name: string }[] = [
 ];
 
 const ProjectDetails = () => {
-  useDocumentTitle('Project Details');
   const dispatch = useAppDispatch();
   const params = useParams();
   const navigate = useNavigate();
@@ -70,13 +69,7 @@ const ProjectDetails = () => {
   const isProjectManager = useIsProjectManager(projectId as string);
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
 
-  useEffect(() => {
-    if (projectInfo.name) {
-      document.title = `${projectInfo.name} - HOT Field Tasking Manager`;
-    } else {
-      document.title = 'HOT Field Tasking Manager';
-    }
-  }, [projectInfo.name]);
+  useDocumentTitle(projectInfo.name && !projectDetailsLoading ? projectInfo.name : 'Project Details');
 
   //Fetch project for the first time
   useEffect(() => {

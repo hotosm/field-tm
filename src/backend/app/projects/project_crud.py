@@ -46,7 +46,7 @@ from psycopg.rows import class_row
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
+from app.db.enums import BackgroundTaskStatus, HTTPStatus, ProjectStatus, XLSFormType
 from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
 from app.db.postgis_utils import (
     check_crs,
@@ -919,6 +919,7 @@ async def get_paginated_projects(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    status: Optional[ProjectStatus] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -933,6 +934,7 @@ async def get_paginated_projects(
         hashtags=hashtags,
         search=search,
         minimal=minimal,
+        status=status,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
