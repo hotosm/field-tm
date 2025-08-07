@@ -25,14 +25,16 @@ mod test 'contrib/just/test/Justfile'
 mod config 'contrib/just/config/Justfile'
 mod stats 'contrib/just/stats/Justfile'
 mod manage 'contrib/just/manage/Justfile'
+mod prep 'contrib/just/prep/Justfile'
 
-# Run the help script
+# List available commands
+[private]
 default:
-  @just help
+  just help
 
-# View available commands
+# List available commands
 help:
-  @just --list --justfile {{justfile()}}
+  just --justfile {{justfile()}} --list
 
 # Run database migrations for backend
 migrate:

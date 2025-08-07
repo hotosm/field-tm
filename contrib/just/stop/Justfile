@@ -16,9 +16,14 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list stop
+
 # Stop Field-TM
 [no-cd]
-default:
+all:
   docker compose down
 
 # Stop Field-TM & JOSM
