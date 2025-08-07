@@ -1,47 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { HomeSummaryService } from '@/api/HomeService';
+import { useGetProjectSummaries } from '@/api/project';
 import Searchbar from '@/components/common/SearchBar';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import Switch from '@/components/common/Switch';
-import ExploreProjectCard from '../home/ExploreProjectCard';
+import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import Pagination from '@/components/common/Pagination';
 import ProjectSummaryMap from '@/components/OrganizationDashboard/ProjectSummaryMap';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
+import { project_status } from '@/types/enums';
 
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+type filterType = {
+  page: number;
+  results_per_page: number;
+  search: string;
+  status: project_status | undefined;
+  org_id: number;
+};
+
+const initialData = {
+  results: [],
+  pagination: {
+    has_next: false,
+    has_prev: false,
+    next_num: null,
+    page: null,
+    pages: null,
+    prev_num: null,
+    per_page: 12,
+    total: null,
+  },
+};
 
 const ProjectSummary = () => {
-  const dispatch = useAppDispatch();
   const params = useParams();
-
   const organizationId = params.id;
 
   const [showMap, setShowMap] = useState(true);
-  const [search, setSearch] = useState('');
-  const [paginationPage, setPaginationPage] = useState(1);
-
+  const [filter, setFilter] = useState<filterType>({
+    page: 1,
+    results_per_page: 12,
+    search: '',
+    status: undefined,
+    org_id: +organizationId!,
+  });
   const [searchTextData, handleChangeData] = useDebouncedInput({
-    ms: 500,
-    init: search,
-    onChange: (e) => setSearch(e.target.value),
+    ms: 400,
+    init: filter.search,
+    onChange: (e) => {
+      setFilter({ ...filter, search: e.target.value, page: 1 });
+    },
   });
 
-  const projectList = useAppSelector((state) => state.home.homeProjectSummary);
-  const projectListLoading = useAppSelector((state) => state.home.homeProjectLoading);
-  const projectListPagination = useAppSelector((state) => state.home.homeProjectPagination);
-
-  useEffect(() => {
-    dispatch(
-      HomeSummaryService(`${VITE_API_URL}/projects/summaries`, {
-        page: paginationPage,
-        results_per_page: 12,
-        search,
-        org_id: organizationId ? +organizationId : undefined,
-      }),
-    );
-  }, [search, paginationPage]);
+  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummaries({
+    params: filter,
+    queryOptions: { queryKey: ['project-summaries', filter] },
+  });
+  const { results: projectList, pagination } = projectSummaryData || initialData;
 
   return (
     <div className="fmtm-bg-white fmtm-rounded-lg fmtm-p-5 fmtm-flex-1 md:fmtm-overflow-hidden">
@@ -61,7 +76,7 @@ const ProjectSummary = () => {
             <div
               className={`fmtm-grid ${showMap ? 'fmtm-grid-cols-2 xl:fmtm-grid-cols-3' : 'fmtm-grid-cols-2 sm:fmtm-grid-cols-3 md:fmtm-grid-cols-4 xl:fmtm-grid-cols-5'} fmtm-gap-2 sm:fmtm-gap-3`}
             >
-              {projectListLoading ? (
+              {isProjectListLoading ? (
                 <ProjectCardSkeleton className="fmtm-border fmtm-border-[#EDEDED]" />
               ) : projectList?.length === 0 ? (
                 <p
@@ -78,17 +93,17 @@ const ProjectSummary = () => {
           </div>
           <Pagination
             showing={projectList?.length}
-            totalCount={projectListPagination?.total || 0}
-            currentPage={projectListPagination?.page || 0}
+            totalCount={pagination?.total || 0}
+            currentPage={pagination?.page || 0}
             isLoading={false}
-            pageSize={projectListPagination.per_page}
-            handlePageChange={(page) => setPaginationPage(page)}
+            pageSize={pagination.per_page}
+            handlePageChange={(page) => setFilter({ ...filter, page: page })}
             className="fmtm-relative fmtm-border-b fmtm-border-x fmtm-border-[#E2E2E2] fmtm-rounded-b-lg"
           />
         </div>
         {showMap && (
           <div className="fmtm-h-[30vh] md:fmtm-h-full">
-            <ProjectSummaryMap />
+            <ProjectSummaryMap projectList={projectList} />
           </div>
         )}
       </div>
