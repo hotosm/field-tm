@@ -5,7 +5,7 @@ import defaultOrgLogo from '@/assets/images/project_icon.png';
 import AssetModules from '@/shared/AssetModules';
 import StatusChip from '@/components/common/StatusChip';
 import { project_status } from '@/types/enums';
-import { projectSummaryType } from '@/types';
+import type { projectSummaryType } from '@/types';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',

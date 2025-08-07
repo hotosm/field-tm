@@ -1,10 +1,11 @@
 import { api } from '.';
+import type { projectSummariesParamsType } from '@/api/project/types';
 
 export const getProjects = (params) => api.get('/projects', { params });
 
 export const patchCreateProject = (payload, params) => api.patch('/projects/', payload, { params });
 
-export const getProjectSummaries = (params) => api.get('/projects/summaries', { params });
+export const getProjectSummaries = (params: projectSummariesParamsType) => api.get('/projects/summaries', { params });
 
 export const getOdkEntitiesGeojson = (id, params) => api.get(`/projects/${id}/entities`, { params });
 

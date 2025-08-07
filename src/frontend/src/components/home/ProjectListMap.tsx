@@ -9,7 +9,7 @@ import MarkerIcon from '@/assets/images/map-pin-primary.png';
 import { useNavigate } from 'react-router-dom';
 import { Style, Text, Icon, Fill } from 'ol/style';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
-import { projectSummaryType } from '@/types';
+import type { projectSummaryType } from '@/types';
 
 const getIndividualClusterPointStyle = (featureProperty) => {
   const style = new Style({

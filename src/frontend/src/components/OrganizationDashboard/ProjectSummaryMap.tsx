@@ -9,7 +9,7 @@ import { geojsonObjectModel, geojsonObjectModelType } from '@/constants/geojsonO
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { Fill, Icon, Style, Text } from 'ol/style';
 import MarkerIcon from '@/assets/images/map-pin-primary.png';
-import { projectSummaryType } from '@/types';
+import type { projectSummaryType } from '@/types';
 
 const getIndividualClusterPointStyle = (featureProperty) => {
   const style = new Style({
