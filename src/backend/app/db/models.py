@@ -1790,7 +1790,6 @@ class DbProject(BaseModel):
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
             "p.status = %(status)s": status,
-            
             # Improved search: replace dashes and underscores in slug with space
             (
                 "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) ILIKE %(search)s"
