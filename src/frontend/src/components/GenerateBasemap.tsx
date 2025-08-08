@@ -8,7 +8,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useGenerateProjectBasemapMutation, useGetTilesListQuery } from '@/api/project';
-import type { basemap_providers, tile_output_formats } from '@/types/enums';
+import { basemap_providers, tile_output_formats } from '@/types/enums';
 import { Dialog, DialogContent } from '@/components/RadixComponents/Dialog';
 import Select2 from '@/components/common/Select2';
 import { Input } from '@/components/RadixComponents/Input';
@@ -103,7 +103,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
 
   useEffect(() => {
     if (projectInfo?.custom_tms_url) {
-      setSelectedTileSource('custom');
+      setSelectedTileSource(basemap_providers.esri);
       setTmsUrl(projectInfo?.custom_tms_url);
     }
   }, [projectInfo]);
@@ -117,9 +117,9 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     options: { queryKey: ['get-tiles-list', +id], enabled: toggleGenerateMbTilesModal },
   });
 
-  const handleTileSourceChange = (value) => {
+  const handleTileSourceChange = (value: basemap_providers) => {
     setSelectedTileSource(value);
-    if (value !== 'custom') setTmsUrl('');
+    if (value !== basemap_providers.custom) setTmsUrl('');
   };
 
   const { mutate: generateProjectBasemapMutate, isPending: generateProjectBasemapPending } =
