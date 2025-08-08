@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import environment from '@/environment';
@@ -9,7 +8,20 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useGenerateProjectBasemapMutation, useGetTilesListQuery } from '@/api/project';
-import { basemap_providers, tile_output_formats } from '@/types/enums';
+import type { basemap_providers, tile_output_formats } from '@/types/enums';
+import { Dialog, DialogContent } from '@/components/RadixComponents/Dialog';
+import Select2 from '@/components/common/Select2';
+import { Input } from '@/components/RadixComponents/Input';
+import Button from '@/components/common/Button';
+import FieldLabel from '@/components/common/FieldLabel';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import DataTable from '@/components/common/DataTable';
+
+const statusClasses = {
+  SUCCESS: 'fmtm-bg-green-50 fmtm-text-green-700 fmtm-border-green-700',
+  PENDING: 'fmtm-bg-yellow-50 fmtm-text-yellow-500 fmtm-border-yellow-500',
+  FAILED: 'fmtm-bg-red-50 fmtm-text-red-500 fmtm-border-red-500',
+};
 
 const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
   const dispatch = useAppDispatch();
@@ -22,15 +34,72 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   const [error, setError] = useState<string[]>([]);
 
   const toggleGenerateMbTilesModal = useAppSelector((state) => state.project.toggleGenerateMbTilesModal);
-  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
-  const modalStyle = (theme: Record<string, any>) => ({
-    width: '90vw',
-    bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
-    border: '1px solid ',
-    padding: '16px 32px 24px 32px',
-    maxWidth: '1000px',
-  });
+  const tileDataColumns = [
+    {
+      header: 'Source',
+      accessorKey: 'tile_source',
+      cell: ({ getValue }) => {
+        return <p className="fmtm-capitalize">{getValue()}</p>;
+      },
+    },
+    {
+      header: 'Format',
+      accessorKey: 'format',
+      cell: ({ getValue }) => {
+        return <p className="fmtm-capitalize">{getValue()}</p>;
+      },
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: ({ getValue }) => {
+        const status = getValue();
+        return (
+          <div
+            className={`${statusClasses[status]} fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-text-xs`}
+          >
+            {status === 'SUCCESS' ? 'COMPLETED' : status}
+          </div>
+        );
+      },
+    },
+    {
+      header: ' ',
+      cell: ({ row }: any) => {
+        const { status, format, url } = row?.original;
+        return (
+          <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
+            {status === 'SUCCESS' && format === 'pmtiles' && (
+              <AssetModules.VisibilityOutlinedIcon
+                sx={{ cursor: 'pointer', fontSize: '22px' }}
+                onClick={() => dispatch(ProjectActions.SetPmtileBasemapUrl(url))}
+                className="fmtm-text-red-500 hover:fmtm-text-red-700"
+              />
+            )}
+            {status === 'SUCCESS' && (
+              <AssetModules.FileDownloadIcon
+                sx={{ cursor: 'pointer', fontSize: '22px' }}
+                onClick={() => dispatch(DownloadBasemapFile(url))}
+                className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
+              />
+            )}
+            <AssetModules.DeleteIcon
+              sx={{ cursor: 'pointer', fontSize: '22px' }}
+              onClick={() =>
+                dispatch(
+                  CommonActions.SetSnackBar({
+                    message: 'Not implemented',
+                  }),
+                )
+              }
+              className="fmtm-text-red-500 hover:fmtm-text-red-700"
+            ></AssetModules.DeleteIcon>
+          </div>
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
     if (projectInfo?.custom_tms_url) {
@@ -48,9 +117,9 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     options: { queryKey: ['get-tiles-list', +id], enabled: toggleGenerateMbTilesModal },
   });
 
-  const handleTileSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedTileSource(e.target.value);
-    if (e.target.value !== 'custom') setTmsUrl('');
+  const handleTileSourceChange = (value) => {
+    setSelectedTileSource(value);
+    if (value !== 'custom') setTmsUrl('');
   };
 
   const { mutate: generateProjectBasemapMutate, isPending: generateProjectBasemapPending } =
@@ -82,250 +151,65 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   };
 
   return (
-    <CoreModules.CustomizedModal
-      isOpen={!!toggleGenerateMbTilesModal}
-      style={modalStyle}
-      toggleOpen={() => {
+    <Dialog
+      open={!!toggleGenerateMbTilesModal}
+      onOpenChange={() => {
         dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(!toggleGenerateMbTilesModal));
       }}
     >
-      <CoreModules.Grid container spacing={2}>
-        {/* Close Button */}
-        <CoreModules.Grid item xs={12}>
-          <CoreModules.IconButton
-            aria-label="close"
-            onClick={() => {
-              dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(!toggleGenerateMbTilesModal));
-            }}
-            sx={{ width: '50px', float: 'right', display: 'block' }}
-          >
-            <AssetModules.CloseIcon />
-          </CoreModules.IconButton>
-        </CoreModules.Grid>
-
-        <CoreModules.Grid container spacing={2} className="fmtm-px-4 fmtm-mb-4">
-          {/* Tile Source Dropdown or TMS URL Input */}
-          <CoreModules.Grid item xs={12} sm={6} md={4}>
-            <CoreModules.FormControl fullWidth>
-              <CoreModules.InputLabel
-                id="tile-source"
-                sx={{
-                  '&.Mui-focused': {
-                    color: defaultTheme.palette.black,
-                  },
-                }}
-              >
-                Select Tile Source
-              </CoreModules.InputLabel>
-              <CoreModules.Select
-                labelId="tile-source"
-                id="tile_source"
+      <DialogContent className="!fmtm-w-fit !fmtm-max-w-[80vw] fmtm-p-2">
+        <div className="fmtm-max-h-[90vh] fmtm-flex fmtm-flex-col fmtm-w-full fmtm-h-full fmtm-gap-4 fmtm-px-3">
+          <div className="fmtm-grid fmtm-grid-cols-1 sm:fmtm-grid-cols-3 fmtm-w-full fmtm-gap-x-5 fmtm-gap-y-4 sm:fmtm-gap-y-2 fmtm-items-start">
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="Select Tile Source" astric />
+              <Select2
+                options={environment.baseMapProviders || []}
                 value={selectedTileSource}
-                label="Select Tile Source"
-                fullWidth
-                sx={{
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: '2px solid black',
-                  },
-                }}
                 onChange={handleTileSourceChange}
-              >
-                {environment.baseMapProviders?.map((form) => (
-                  <CoreModules.MenuItem key={form.value} value={form.value}>
-                    {form.label}
-                  </CoreModules.MenuItem>
-                ))}
-              </CoreModules.Select>
-            </CoreModules.FormControl>
-            {error.includes('selectedTileSource') && (
-              <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
-            )}
-          </CoreModules.Grid>
-          {selectedTileSource === 'custom' && (
-            <CoreModules.Grid item xs={12} sm={6} md={4}>
-              <CoreModules.FormControl fullWidth>
-                <CoreModules.TextField
-                  // labelId="tms_url-label"
-                  id="tms_url"
-                  variant="outlined"
-                  value={tmsUrl}
-                  label="Enter TMS URL"
-                  fullWidth
-                  color="black"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'black',
-                      },
-                    },
-                    '&.Mui-focused .MuiFormLabel-root-MuiInputLabel-root': {
-                      color: 'black',
-                    },
-                  }}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTmsUrl(e.target.value)}
-                />
-              </CoreModules.FormControl>
-              {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">TMS URL is Required.</p>}
-            </CoreModules.Grid>
-          )}
-          {/* Output Format Dropdown */}
-          <CoreModules.Grid item xs={12} sm={6} md={4}>
-            <CoreModules.FormControl fullWidth>
-              <CoreModules.InputLabel
-                id="output-format"
-                sx={{
-                  '&.Mui-focused': {
-                    color: defaultTheme.palette.black,
-                  },
-                }}
-              >
-                Select Output Format
-              </CoreModules.InputLabel>
-              <CoreModules.Select
-                labelId="output-format"
-                id="output_format"
-                value={selectedOutputFormat}
-                label="Select Output Format"
-                fullWidth
-                sx={{
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: '2px solid black',
-                  },
-                }}
-                onChange={(e) => {
-                  setSelectedOutputFormat(e.target.value);
-                }}
-              >
-                {environment.tileOutputFormats?.map((form) => (
-                  <CoreModules.MenuItem key={form.value} value={form.value}>
-                    {form.label}
-                  </CoreModules.MenuItem>
-                ))}
-              </CoreModules.Select>
-            </CoreModules.FormControl>
-            {error.includes('selectedOutputFormat') && (
-              <p className="fmtm-text-sm fmtm-text-red-500">Output Format is Required.</p>
-            )}
-          </CoreModules.Grid>
-          <CoreModules.Grid
-            item
-            xs={12}
-            sm={selectedTileSource === 'custom' ? 6 : 12}
-            md={selectedTileSource === 'custom' ? 12 : 4}
-          >
-            <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-center sm:fmtm-justify-end fmtm-mr-4 fmtm-gap-4 fmtm-h-full">
-              {/* Generate Button */}
-              <div>
-                <CoreModules.Button
-                  variant="contained"
-                  loading={generateProjectBasemapPending}
-                  color="error"
-                  onClick={generateProjectTiles}
-                >
-                  Generate
-                </CoreModules.Button>
-              </div>
-
-              {/* Refresh Button */}
-              <div>
-                <CoreModules.Button
-                  variant="outlined"
-                  disabled={generateProjectBasemapPending}
-                  color="error"
-                  onClick={refetchTilesList}
-                >
-                  Refresh
-                </CoreModules.Button>
-              </div>
+                placeholder="Select Tile Source"
+                choose="value"
+              />
+              {error.includes('selectedTileSource') && <ErrorMessage message="Tile Source is Required" />}
             </div>
-          </CoreModules.Grid>
-        </CoreModules.Grid>
+            {selectedTileSource === 'custom' && (
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+                <FieldLabel label="Enter TMS URL" astric />
+                <Input value={tmsUrl} onChange={(e) => setTmsUrl(e.target.value)} placeholder="Enter TMS URL" />
+                {error.includes('tmsUrl') && <ErrorMessage message="TMS URL is Required" />}
+              </div>
+            )}
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="Select Output Format" astric />
+              <Select2
+                options={environment.tileOutputFormats || []}
+                value={selectedOutputFormat}
+                onChange={setSelectedOutputFormat}
+                placeholder="Select Output Format"
+                choose="value"
+              />
+              {error.includes('selectedOutputFormat') && <ErrorMessage message="Output Format is Required" />}
+            </div>
+            <div
+              className={`fmtm-flex fmtm-gap-2 fmtm-h-fit fmtm-w-full ${error.length > 0 ? 'fmtm-my-auto' : 'fmtm-mt-auto'}`}
+            >
+              <Button variant="primary-red" onClick={generateProjectTiles} className="!fmtm-w-1/2">
+                GENERATE
+              </Button>
+              <Button variant="secondary-red" onClick={() => refetchTilesList()} className="!fmtm-w-1/2">
+                REFRESH
+              </Button>
+            </div>
+          </div>
 
-        {/* Table Content */}
-        <CoreModules.Grid item xs={12}>
-          <CoreModules.TableContainer
-            component={CoreModules.Paper}
-            className="scrollbar fmtm-overflow-y-auto fmtm-max-h-[38vh] lg:fmtm-max-h-[45vh] sm:fmtm-mb-5"
-          >
-            <CoreModules.Table className="fmtm-min-w-[300px] md:fmtm-min-w-[650px]" aria-label="simple table">
-              <CoreModules.TableHead>
-                <CoreModules.TableRow>
-                  {/* <CoreModules.TableCell>Id</CoreModules.TableCell> */}
-                  <CoreModules.TableCell align="center">Source</CoreModules.TableCell>
-                  <CoreModules.TableCell align="center">Format</CoreModules.TableCell>
-                  <CoreModules.TableCell align="center">Status</CoreModules.TableCell>
-                  <CoreModules.TableCell align="center"></CoreModules.TableCell>
-                </CoreModules.TableRow>
-              </CoreModules.TableHead>
-
-              <CoreModules.TableBody>
-                {tilesList?.map((list) => (
-                  <CoreModules.TableRow key={list.id}>
-                    <CoreModules.TableCell align="center">
-                      <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
-                        {list.tile_source}
-                      </div>
-                    </CoreModules.TableCell>
-                    <CoreModules.TableCell align="center">
-                      <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
-                        {list.format}
-                      </div>
-                    </CoreModules.TableCell>
-                    <CoreModules.TableCell align="center" sx={{ color: environment.statusColors[list.status] }}>
-                      {/* {list.status === 'SUCCESS' ? 'COMPLETED' : list.status} */}
-                      {list.status === 'SUCCESS' ? (
-                        <div className="fmtm-bg-green-50 fmtm-text-green-700 fmtm-border-green-700 fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
-                          COMPLETED
-                        </div>
-                      ) : (
-                        <div
-                          className={`${
-                            list.status === 'PENDING'
-                              ? 'fmtm-bg-yellow-50 fmtm-text-yellow-500 fmtm-border-yellow-500'
-                              : 'fmtm-bg-red-50 fmtm-text-red-500 fmtm-border-red-500'
-                          }  fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto`}
-                        >
-                          {list.status}
-                        </div>
-                      )}
-                    </CoreModules.TableCell>
-                    <CoreModules.TableCell align="center">
-                      <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
-                        {list.status === 'SUCCESS' && list.format === 'pmtiles' && (
-                          <AssetModules.VisibilityOutlinedIcon
-                            sx={{ cursor: 'pointer', fontSize: '22px' }}
-                            onClick={() => dispatch(ProjectActions.SetPmtileBasemapUrl(list.url))}
-                            className="fmtm-text-red-500 hover:fmtm-text-red-700"
-                          />
-                        )}
-                        {list.status === 'SUCCESS' && (
-                          <AssetModules.FileDownloadIcon
-                            sx={{ cursor: 'pointer', fontSize: '22px' }}
-                            onClick={() => dispatch(DownloadBasemapFile(list.url))}
-                            className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
-                          />
-                        )}
-                        <AssetModules.DeleteIcon
-                          sx={{ cursor: 'pointer', fontSize: '22px' }}
-                          onClick={() => {
-                            dispatch(
-                              CommonActions.SetSnackBar({
-                                message: 'Not implemented',
-                              }),
-                            );
-                          }}
-                          className="fmtm-text-red-500 hover:fmtm-text-red-700"
-                        ></AssetModules.DeleteIcon>
-                      </div>
-                    </CoreModules.TableCell>
-                  </CoreModules.TableRow>
-                ))}
-              </CoreModules.TableBody>
-            </CoreModules.Table>
-          </CoreModules.TableContainer>
-        </CoreModules.Grid>
-      </CoreModules.Grid>
-    </CoreModules.CustomizedModal>
+          <DataTable
+            data={tilesList || []}
+            columns={tileDataColumns}
+            isLoading={isTilesListPending}
+            tableWrapperClassName="fmtm-flex-1"
+          />
+        </div>
+      </DialogContent>{' '}
+    </Dialog>
   );
 };
 
