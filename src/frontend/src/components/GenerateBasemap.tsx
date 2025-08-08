@@ -4,45 +4,33 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import environment from '@/environment';
-import { DownloadBasemapFile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
+import { DownloadBasemapFile } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useGenerateProjectBasemapMutation, useGetTilesListQuery } from '@/api/project';
+import { basemap_providers, tile_output_formats } from '@/types/enums';
 
 const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
   const dispatch = useAppDispatch();
   const params = useParams();
-  const id: string | undefined = params.id;
+  const id = params.id as string;
 
-  const [selectedTileSource, setSelectedTileSource] = useState('');
-  const [selectedOutputFormat, setSelectedOutputFormat] = useState('');
+  const [selectedTileSource, setSelectedTileSource] = useState<basemap_providers>();
+  const [selectedOutputFormat, setSelectedOutputFormat] = useState<tile_output_formats>();
   const [tmsUrl, setTmsUrl] = useState('');
   const [error, setError] = useState<string[]>([]);
 
   const toggleGenerateMbTilesModal = useAppSelector((state) => state.project.toggleGenerateMbTilesModal);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
-  const generateProjectTilesLoading = useAppSelector((state) => state.project.generateProjectTilesLoading);
-  const tilesList = useAppSelector((state) => state.project.tilesList);
 
   const modalStyle = (theme: Record<string, any>) => ({
-    width: '90vw', // Responsive modal width using vw
-    // height: '90vh',
+    width: '90vw',
     bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
     border: '1px solid ',
     padding: '16px 32px 24px 32px',
     maxWidth: '1000px',
   });
-
-  const getTilesList = () => {
-    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles`));
-  };
-
-  useEffect(() => {
-    // Only fetch tiles list when the modal is open
-    if (toggleGenerateMbTilesModal) {
-      getTilesList();
-    }
-  }, [toggleGenerateMbTilesModal]);
 
   useEffect(() => {
     if (projectInfo?.custom_tms_url) {
@@ -51,45 +39,46 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     }
   }, [projectInfo]);
 
+  const {
+    data: tilesList,
+    isPending: isTilesListPending,
+    refetch: refetchTilesList,
+  } = useGetTilesListQuery({
+    id: +id,
+    options: { queryKey: ['get-tiles-list', +id], enabled: toggleGenerateMbTilesModal },
+  });
+
   const handleTileSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedTileSource(e.target.value);
-    // If 'custom' is selected, clear the TMS URL
-    if (e.target.value !== 'custom') {
-      setTmsUrl('');
-    }
+    if (e.target.value !== 'custom') setTmsUrl('');
   };
 
-  const handleTmsUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTmsUrl(e.target.value);
-  };
+  const { mutate: generateProjectBasemapMutate, isPending: generateProjectBasemapPending } =
+    useGenerateProjectBasemapMutation({
+      id: +id,
+      payload: {
+        tile_source: selectedTileSource,
+        file_format: selectedOutputFormat,
+        tms_url: tmsUrl,
+      },
+      options: {
+        onSuccess: () => refetchTilesList(),
+      },
+    });
 
-  const generateProjectTilesValidation = () => {
+  const validateFields = () => {
     const currentError: string[] = [];
-    if (!selectedTileSource) {
-      currentError.push('selectedTileSource');
-    }
-    if (!selectedOutputFormat) {
-      currentError.push('selectedOutputFormat');
-    }
-    if (!tmsUrl && selectedTileSource === 'custom') {
-      currentError.push('tmsUrl');
-    }
+    if (!selectedTileSource) currentError.push('selectedTileSource');
+    if (!selectedOutputFormat) currentError.push('selectedOutputFormat');
+    if (!tmsUrl && selectedTileSource === 'custom') currentError.push('tmsUrl');
     setError(currentError);
     return currentError;
   };
 
   const generateProjectTiles = () => {
     if (!id) return;
-    const currentErrors = generateProjectTilesValidation();
-    if (currentErrors.length === 0) {
-      dispatch(
-        GenerateProjectTiles(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles-generate`, id, {
-          tile_source: selectedTileSource,
-          file_format: selectedOutputFormat,
-          tms_url: tmsUrl,
-        }),
-      );
-    }
+    const currentErrors = validateFields();
+    if (currentErrors.length === 0) generateProjectBasemapMutate();
   };
 
   return (
@@ -173,7 +162,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
                       color: 'black',
                     },
                   }}
-                  onChange={handleTmsUrlChange}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTmsUrl(e.target.value)}
                 />
               </CoreModules.FormControl>
               {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">TMS URL is Required.</p>}
@@ -229,9 +218,9 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
               <div>
                 <CoreModules.Button
                   variant="contained"
-                  loading={generateProjectTilesLoading}
+                  loading={generateProjectBasemapPending}
                   color="error"
-                  onClick={() => generateProjectTiles()}
+                  onClick={generateProjectTiles}
                 >
                   Generate
                 </CoreModules.Button>
@@ -241,11 +230,9 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
               <div>
                 <CoreModules.Button
                   variant="outlined"
-                  loading={generateProjectTilesLoading}
+                  disabled={generateProjectBasemapPending}
                   color="error"
-                  onClick={() => {
-                    getTilesList();
-                  }}
+                  onClick={refetchTilesList}
                 >
                   Refresh
                 </CoreModules.Button>
@@ -272,7 +259,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
               </CoreModules.TableHead>
 
               <CoreModules.TableBody>
-                {tilesList.map((list, i) => (
+                {tilesList?.map((list) => (
                   <CoreModules.TableRow key={list.id}>
                     <CoreModules.TableCell align="center">
                       <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">

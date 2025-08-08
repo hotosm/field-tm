@@ -1,18 +1,46 @@
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions } from '@tanstack/react-query';
-import { getProjectSummaries } from '@/services/project';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import type { UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
+import { generateProjectBasemap, getProjectSummaries, getTilesList } from '@/services/project';
 import { paginationType } from '@/store/types/ICommon';
-import type { projectSummariesParamsType, projectSummaryType } from './types';
+import type {
+  generateProjectBasemapPayloadType,
+  tileType,
+  projectSummariesParamsType,
+  projectSummaryType,
+} from './types';
 
-export function useGetProjectSummaries({
+export function useGetProjectSummariesQuery({
   params,
-  queryOptions,
+  options,
 }: {
   params: projectSummariesParamsType;
-  queryOptions: UseQueryOptions<{ results: projectSummaryType[]; pagination: paginationType }>;
+  options: UseQueryOptions<{ results: projectSummaryType[]; pagination: paginationType }>;
 }) {
   return useQuery({
     queryFn: async () => (await getProjectSummaries(params)).data,
-    ...queryOptions,
+    ...options,
+  });
+}
+
+export function useGetTilesListQuery({ id, options }: { id: number; options: UseQueryOptions<tileType[]> }) {
+  return useQuery({
+    queryFn: async () => (await getTilesList(id)).data,
+    ...options,
+  });
+}
+
+export function useGenerateProjectBasemapMutation({
+  id,
+  payload,
+  options,
+}: {
+  id: number;
+  payload: generateProjectBasemapPayloadType;
+  options: UseMutationOptions;
+}) {
+  return useMutation({
+    mutationKey: ['generate-project-basemap', id, payload],
+    mutationFn: () => generateProjectBasemap(id, payload),
+    ...options,
   });
 }

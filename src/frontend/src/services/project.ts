@@ -1,9 +1,7 @@
 import { api } from '.';
-import type { projectSummariesParamsType } from '@/api/project/types';
+import type { generateProjectBasemapPayloadType, projectSummariesParamsType } from '@/api/project/types';
 
-export const getProjects = (params) => api.get('/projects', { params });
-
-export const patchCreateProject = (payload, params) => api.patch('/projects/', payload, { params });
+export const patchCreateProject = (payload, params) => api.patch('/projects', payload, { params });
 
 export const getProjectSummaries = (params: projectSummariesParamsType) => api.get('/projects/summaries', { params });
 
@@ -11,7 +9,7 @@ export const getOdkEntitiesGeojson = (id, params) => api.get(`/projects/${id}/en
 
 export const getOdkEntitiesMappingStatuses = (id) => api.get(`/projects/${id}/entities/statuses`);
 
-export const getTilesList = (id) => api.get(`/projects/${id}/tiles`);
+export const getTilesList = (id: number) => api.get(`/projects/${id}/tiles`);
 
 export const downloadFeatures = (params) => api.get('/projects/features/download', { params });
 
@@ -33,7 +31,8 @@ export const getProjectUsers = (id, params) => api.get(`/projects/${id}/users`);
 
 export const generateFiles = (id, payload) => api.post(`/projects/${id}/generate-project-data`, payload);
 
-export const generateProjectBasemap = (id, payload) => api.post(`/projects/${id}/tiles-generate`, payload);
+export const generateProjectBasemap = (id: number, payload: generateProjectBasemapPayloadType) =>
+  api.post(`/projects/${id}/tiles-generate`, payload);
 
 export const getProject = (id) => api.get(`/projects/${id}`);
 
