@@ -34,8 +34,6 @@ def add_label_translations(base: dict, default_language: Optional[str] = None) -
     print("add_label_translations")
     print("base before label translations:")
     print(base)
-    default_language_key = next((k for k, v in INCLUDED_LANGUAGES.items() if v == default_language), None)
-    print("default_language_key:", default_language_key)
     # If name is a list (from a DataFrame row-style dict), unwrap it
     if isinstance(field_name, list):
         if len(field_name) == 1:
@@ -46,12 +44,22 @@ def add_label_translations(base: dict, default_language: Optional[str] = None) -
     if not isinstance(field_name, str):
         return base
 
-    for lang_key, lang_dict in translations.items():
-        label_key = f"label::{lang_key}"
-        label_value = lang_dict.get(field_name)
-        print(label_key, label_value)
-        if label_value:
-            base[label_key] = label_value
+    if default_language:
+        default_language_key = next((k for k, v in INCLUDED_LANGUAGES.items() if v == default_language), None)
+        print("default_language_key:", default_language_key)
+        new_label_key = f"label::{default_language_key}({default_language})"
+        default_lang_dict = translations.get(f"{default_language_key}({default_language})", {})
+        if default_lang_dict:
+            print("default_lang_dict:", default_lang_dict)
+            base[new_label_key] = default_lang_dict.get(field_name, "")
+    else:
+        for lang_key, lang_dict in translations.items():
+            label_key = f"label::{lang_key}"
+            label_value = lang_dict.get(field_name)
+            # print("label_key", "label_value")
+            # print(label_key, label_value)
+            if label_value:
+                base[label_key] = label_value
 
     print("base after label translations:")
     print(base)
