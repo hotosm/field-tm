@@ -15,7 +15,7 @@ import useDebouncedInput from '@/hooks/useDebouncedInput';
 import isEmpty from '@/utilfunctions/isEmpty';
 import Select2 from '@/components/common/Select2';
 import { taskStatusList } from '@/constants/taskStatusListConstants';
-import { outlineType } from '@/models/project/projectModel';
+import type { Polygon as PolygonType } from 'geojson';
 
 type taskListPropType = { map: any; setSelectedTab: (tab: 'task_activity') => void };
 
@@ -25,7 +25,7 @@ type taskListType = {
   feature_count: number;
   id: number;
   index: number;
-  outline: outlineType;
+  outline: PolygonType;
   submission_count: number;
   task_state: string;
 };

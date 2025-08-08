@@ -3,14 +3,13 @@ import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
-import CoreModules from '@/shared/CoreModules';
 import { geojsonObjectModel, geojsonObjectModelType } from '@/constants/geojsonObjectModal';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MarkerIcon from '@/assets/images/map-pin-primary.png';
 import { useNavigate } from 'react-router-dom';
 import { Style, Text, Icon, Fill } from 'ol/style';
-import { projectType } from '@/models/home/homeModel';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
+import type { projectSummaryType } from '@/types';
 
 const getIndividualClusterPointStyle = (featureProperty) => {
   const style = new Style({
@@ -33,7 +32,7 @@ const getIndividualClusterPointStyle = (featureProperty) => {
   return style;
 };
 
-const ProjectListMap = () => {
+const ProjectListMap = ({ projectList }: { projectList: projectSummaryType[] }) => {
   const navigate = useNavigate();
 
   const [projectGeojson, setProjectGeojson] = useState<geojsonObjectModelType | null>(null);
@@ -44,12 +43,11 @@ const ProjectListMap = () => {
     maxZoom: 20,
   });
 
-  const homeProjectSummary: projectType[] = CoreModules.useAppSelector((state) => state.home.homeProjectSummary);
   useEffect(() => {
-    if (homeProjectSummary?.length === 0) return;
+    if (projectList?.length === 0) return;
     const convertedHomeProjectSummaryGeojson: geojsonObjectModelType = {
       ...geojsonObjectModel,
-      features: homeProjectSummary.map((project) => ({
+      features: projectList.map((project) => ({
         type: 'Feature',
         properties: {
           ...project,
@@ -60,7 +58,7 @@ const ProjectListMap = () => {
     };
 
     setProjectGeojson(convertedHomeProjectSummaryGeojson);
-  }, [homeProjectSummary]);
+  }, [projectList]);
 
   const projectClickOnMap = (properties: any) => {
     const projectId = properties.id;
