@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetProjectSummaries } from '@/api/project';
+import { useGetProjectSummariesQuery } from '@/api/project';
 import Searchbar from '@/components/common/SearchBar';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import Switch from '@/components/common/Switch';
@@ -52,9 +52,9 @@ const ProjectSummary = () => {
     },
   });
 
-  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummaries({
+  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummariesQuery({
     params: filter,
-    queryOptions: { queryKey: ['project-summaries', filter] },
+    options: { queryKey: ['project-summaries', filter] },
   });
   const { results: projectList, pagination } = projectSummaryData || initialData;
 

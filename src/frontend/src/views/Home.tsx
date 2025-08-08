@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import { useAppSelector } from '@/types/reduxTypes';
 import { project_status } from '@/types/enums';
-import { useGetProjectSummaries } from '@/api/project';
+import { useGetProjectSummariesQuery } from '@/api/project';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import HomePageFilters from '@/components/home/HomePageFilters';
@@ -50,9 +50,9 @@ const Home = () => {
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
 
-  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummaries({
+  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummariesQuery({
     params: filter,
-    queryOptions: { queryKey: ['project-summaries', filter] },
+    options: { queryKey: ['project-summaries', filter] },
   });
   const { results: projectList, pagination } = projectSummaryData || initialData;
 
