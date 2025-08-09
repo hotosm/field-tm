@@ -1773,14 +1773,27 @@ class DbProject(BaseModel):
         status: Optional[ProjectStatus] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
+
+        def normalize_search_input(raw: str) -> str:
+            """Normalize user search string.
+
+            remove extra spaces, lowercase, and wrap with '%'.
+            """
+            cleaned = " ".join(raw.lower().split())
+            return f"%{cleaned}%" if cleaned else None
+
+        normalized_search = normalize_search_input(search) if search else None
+
         # Build basic filters
         filters_map = {
             "p.organisation_id = %(org_id)s": org_id,
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
             "p.status = %(status)s": status,
-            # search term (project name using ILIKE for case-insensitive match)
-            "p.slug ILIKE %(search)s": f"%{search}%" if search else None,
+            # Improved search: replace dashes and underscores in slug with space
+            (
+                "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) ILIKE %(search)s"
+            ): normalized_search,
         }
 
         filters = [
