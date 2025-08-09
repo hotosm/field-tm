@@ -1,0 +1,76 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+#
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list prep
+
+[no-cd]
+_curl:
+  #!/usr/bin/env bash
+  if ! command -v curl &> /dev/null; then
+      sudo apt-get update
+      sudo apt-get install -y curl
+  fi
+
+[no-cd]
+_get_arch:
+  #!/usr/bin/env sh
+  dpkg --print-architecture 
+
+# Low level container runtime 
+[no-cd]
+_runc:
+  #!/usr/bin/env bash
+  just prep _curl
+
+  VERSION=1.3.0
+  ARCH=$(just prep _get_arch)
+
+  if ! command -v runc &> /dev/null; then
+    sudo curl -L \
+        https://github.com/opencontainers/runc/releases/download/v${VERSION}/runc.${ARCH} \
+        -o /usr/local/bin/runc
+
+    sudo chmod +x /usr/local/bin/runc
+  fi
+
+# High level container runtime 
+[no-cd]
+_containerd:
+  #!/usr/bin/env bash
+  just prep _curl
+
+  VERSION=1.3.0
+  ARCH=$(just prep _get_arch)
+
+  if ! command -v runc &> /dev/null; then
+    sudo curl -L \
+        https://github.com/opencontainers/runc/releases/download/v${VERSION}/runc.${ARCH} \
+        -o /usr/local/bin/runc
+
+    sudo chmod +x /usr/local/bin/runc
+  fi
+
+# Install container engine (required to run FieldTM)
+[no-cd]
+machine:
+  #!/usr/bin/env sh
+  just prep _runc
+  just prep _containerd

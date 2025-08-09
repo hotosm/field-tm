@@ -16,9 +16,14 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list start
+
 # Start Field-TM
 [no-cd]
-default:
+all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
