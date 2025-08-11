@@ -180,6 +180,7 @@
 	}
 
 	onDestroy(() => {
+		commonStore.setSelectedTab('map');
 		taskStore.clearTaskStates();
 		entitiesStore.setFgbOpfsUrl('');
 
