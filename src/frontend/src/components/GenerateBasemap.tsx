@@ -125,13 +125,14 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   const { mutate: generateProjectBasemapMutate, isPending: generateProjectBasemapPending } =
     useGenerateProjectBasemapMutation({
       id: +id,
-      payload: {
-        tile_source: selectedTileSource,
-        file_format: selectedOutputFormat,
-        tms_url: tmsUrl,
-      },
       options: {
-        onSuccess: () => refetchTilesList(),
+        onSuccess: ({ data }) => {
+          dispatch(CommonActions.SetSnackBar({ message: data.Message, variant: 'success' }));
+          refetchTilesList();
+        },
+        onError: ({ response }) => {
+          dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to generate basemap' }));
+        },
       },
     });
 
@@ -147,7 +148,12 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   const generateProjectTiles = () => {
     if (!id) return;
     const currentErrors = validateFields();
-    if (currentErrors.length === 0) generateProjectBasemapMutate();
+    if (currentErrors.length === 0)
+      generateProjectBasemapMutate({
+        tile_source: selectedTileSource!,
+        file_format: selectedOutputFormat!,
+        tms_url: tmsUrl,
+      });
   };
 
   return (
@@ -192,10 +198,21 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
             <div
               className={`fmtm-flex fmtm-gap-2 fmtm-h-fit fmtm-w-full ${error.length > 0 ? 'fmtm-my-auto' : 'fmtm-mt-auto'}`}
             >
-              <Button variant="primary-red" onClick={generateProjectTiles} className="!fmtm-w-1/2">
+              <Button
+                variant="primary-red"
+                onClick={generateProjectTiles}
+                className="!fmtm-w-1/2"
+                isLoading={generateProjectBasemapPending}
+                disabled={isTilesListPending}
+              >
                 GENERATE
               </Button>
-              <Button variant="secondary-red" onClick={() => refetchTilesList()} className="!fmtm-w-1/2">
+              <Button
+                variant="secondary-red"
+                onClick={() => refetchTilesList()}
+                disabled={isTilesListPending || generateProjectBasemapPending}
+                className="!fmtm-w-1/2"
+              >
                 REFRESH
               </Button>
             </div>
@@ -208,7 +225,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
             tableWrapperClassName="fmtm-flex-1"
           />
         </div>
-      </DialogContent>{' '}
+      </DialogContent>
     </Dialog>
   );
 };
