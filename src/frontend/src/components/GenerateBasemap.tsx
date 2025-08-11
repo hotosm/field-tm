@@ -110,7 +110,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
 
   const {
     data: tilesList,
-    isPending: isTilesListPending,
+    isLoading: isTilesListLoading,
     refetch: refetchTilesList,
   } = useGetTilesListQuery({
     id: +id,
@@ -203,14 +203,14 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
                 onClick={generateProjectTiles}
                 className="!fmtm-w-1/2"
                 isLoading={generateProjectBasemapPending}
-                disabled={isTilesListPending}
+                disabled={isTilesListLoading}
               >
                 GENERATE
               </Button>
               <Button
                 variant="secondary-red"
                 onClick={() => refetchTilesList()}
-                disabled={isTilesListPending || generateProjectBasemapPending}
+                disabled={isTilesListLoading || generateProjectBasemapPending}
                 className="!fmtm-w-1/2"
               >
                 REFRESH
@@ -221,7 +221,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
           <DataTable
             data={tilesList || []}
             columns={tileDataColumns}
-            isLoading={isTilesListPending}
+            isLoading={isTilesListLoading}
             tableWrapperClassName="fmtm-flex-1"
           />
         </div>
