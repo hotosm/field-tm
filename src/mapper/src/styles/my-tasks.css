@@ -1,0 +1,12 @@
+.my-tasks .tasks {
+	--at-apply: flex flex-col gap-2;
+}
+
+.my-tasks .tasks .task-card {
+	--at-apply: flex items-center justify-between px-2 py-3 bg-neutral-50 rounded-md;
+}
+
+.my-tasks .tasks .task-card .task-index {
+	--at-apply: font-bold;
+	color: var(--sl-color-primary-700);
+}
