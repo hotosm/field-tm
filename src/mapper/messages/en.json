@@ -2,7 +2,8 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"common": {
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"zoom_to_task": "Zoom To Task"
 	},
 	"project_states": {
 		"DRAFT": "Draft",
@@ -68,7 +69,8 @@
 		"project_information": "Project Information",
 		"comment": "Comment",
 		"instructions": "Instructions",
-		"activities": "Activities"
+		"activities": "Activities",
+		"my_tasks": "My Tasks"
 	},
 	"odk": {
 		"open": "Open ODK",
