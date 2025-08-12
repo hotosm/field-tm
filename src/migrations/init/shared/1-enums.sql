@@ -18,9 +18,7 @@ ALTER TYPE public.projectstatus OWNER TO fmtm;
 
 CREATE TYPE public.projectvisibility AS ENUM (
     'PUBLIC',
-    'PRIVATE',
-    'INVITE_ONLY',
-    'SENSITIVE'
+    'PRIVATE'
 );
 ALTER TYPE public.projectvisibility OWNER TO fmtm;
 
