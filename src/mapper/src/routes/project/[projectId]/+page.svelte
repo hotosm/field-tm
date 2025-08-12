@@ -532,9 +532,11 @@
 			<sl-tab slot="nav" panel="map">
 				<hot-icon name="map"></hot-icon>
 			</sl-tab>
-			<sl-tab slot="nav" panel="mytasks">
-				<hot-icon name="list-task"></hot-icon>
-			</sl-tab>
+			{#if loginStore.getAuthDetails}
+				<sl-tab slot="nav" panel="mytasks">
+					<hot-icon name="list-task"></hot-icon>
+				</sl-tab>
+			{/if}
 			<!-- <sl-tab slot="nav" panel="offline">
 				<hot-icon name="wifi-off"></hot-icon>
 			</sl-tab> -->
