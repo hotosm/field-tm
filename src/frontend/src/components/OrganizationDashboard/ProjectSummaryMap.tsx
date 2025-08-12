@@ -5,12 +5,11 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import useOLMap from '@/hooks/useOlMap';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
-import { projectType } from '@/models/home/homeModel';
-import { useAppSelector } from '@/types/reduxTypes';
 import { geojsonObjectModel, geojsonObjectModelType } from '@/constants/geojsonObjectModal';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { Fill, Icon, Style, Text } from 'ol/style';
 import MarkerIcon from '@/assets/images/map-pin-primary.png';
+import type { projectSummaryType } from '@/types';
 
 const getIndividualClusterPointStyle = (featureProperty) => {
   const style = new Style({
@@ -33,10 +32,9 @@ const getIndividualClusterPointStyle = (featureProperty) => {
   return style;
 };
 
-const ProjectSummaryMap = () => {
+const ProjectSummaryMap = ({ projectList }: { projectList: projectSummaryType[] }) => {
   const navigate = useNavigate();
 
-  const projectList: projectType[] = useAppSelector((state) => state.home.homeProjectSummary);
   const projectListFeatureCollection: geojsonObjectModelType = {
     ...geojsonObjectModel,
     features: projectList.map((project) => ({
