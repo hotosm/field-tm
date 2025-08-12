@@ -148,5 +148,8 @@
 		"total_offline_submissions": "कुल अफलाइन सबमिशनहरू",
 		"total_failed_submissions": "कुल असफल पेसहरू",
 		"download_csv": "CSV को रूपमा डाउनलोड गर्नुहोस्"
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "कुनै टास्क तोकिएको छैन"
 	}
 }

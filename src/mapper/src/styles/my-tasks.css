@@ -10,3 +10,7 @@
 	--at-apply: font-bold;
 	color: var(--sl-color-primary-700);
 }
+
+.my-tasks .tasks {
+	--at-apply: text-center mt-10;
+}

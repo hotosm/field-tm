@@ -26,6 +26,9 @@
 <div class="my-tasks">
 	<h3>{m['stack_group.my_tasks']()}</h3>
 	<div class="tasks">
+		{#if myTasks?.length === 0}
+			<p class="no-tasks">{m['my_tasks.no_tasks_assigned']()}</p>
+		{/if}
 		{#each myTasks as task}
 			<div class="task-card">
 				<div class="task-index">{m['popup.task']()} #{task.task_index}</div>
