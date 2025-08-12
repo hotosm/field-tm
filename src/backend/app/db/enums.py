@@ -200,17 +200,10 @@ class ProjectVisibility(StrEnum, Enum):
     PRIVATE: The project is not visible to any users until they are invited to the
     project and submissions are only accessible to authenticated users who are
     contributors to the project.
-
-    SENSITIVE: All data is publicly available to all users, however submissions are only
-    accessible to authenticated users who are contributors to the project.
-
-    INVITE_ONLY: Only invited users can access the project, but access all data.
     """
 
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
-    SENSITIVE = "SENSITIVE"
-    INVITE_ONLY = "INVITE_ONLY"
 
 
 class CommunityType(StrEnum, Enum):
