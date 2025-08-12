@@ -18,14 +18,14 @@
 """Pydantic models for Organisations."""
 
 from datetime import date
-from typing import Annotated, List, Optional, Self
+from typing import Annotated, Dict, List, Optional, Self
 
 from fastapi import Form
 from pydantic import BaseModel, Field
 from pydantic.functional_validators import model_validator
 
 from app.central.central_schemas import ODKCentralIn
-from app.db.enums import CommunityType, OrganisationType
+from app.db.enums import CommunityType, OrganisationType, ProjectStatus
 from app.db.models import DbOrganisation, slugify
 
 
@@ -130,6 +130,7 @@ class Overview(BaseModel):
     active_projects: int
     total_submissions: int
     total_contributors: int
+    project_status_counts: Optional[Dict[ProjectStatus, int]] = None
 
 
 class ProjectTaskStatus(BaseModel):
