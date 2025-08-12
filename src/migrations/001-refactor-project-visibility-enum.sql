@@ -1,6 +1,3 @@
--- ## Migration to:
--- * Remove 'SENSITIVE' and 'INVITE_ONLY' from projectvisibility enum
-
 BEGIN;
 
 -- Step 1: Normalize data
@@ -8,7 +5,7 @@ UPDATE projects
 SET visibility = 'PRIVATE'
 WHERE visibility::text IN ('SENSITIVE', 'INVITE_ONLY');
 
--- Step 2: Clean up enum if needed
+-- Step 2: Clean up enum
 DO $$
 BEGIN
     IF EXISTS (
@@ -17,24 +14,28 @@ BEGIN
         IF EXISTS (
             SELECT 1 FROM pg_enum
             WHERE enumtypid = 'projectvisibility'::regtype
-            AND enumlabel IN ('SENSITIVE', 'INVITE_ONLY')
+              AND enumlabel IN ('SENSITIVE', 'INVITE_ONLY')
         ) THEN
-            -- Rename old type
+            -- Rename old enum type
             ALTER TYPE projectvisibility RENAME TO projectvisibility_old;
 
-            -- Create clean enum type
+            -- Create new enum type
             CREATE TYPE projectvisibility AS ENUM ('PUBLIC', 'PRIVATE');
+
+            -- Drop default to allow type change
+            ALTER TABLE projects ALTER COLUMN visibility DROP DEFAULT;
 
             -- Convert column to new enum
             ALTER TABLE projects
             ALTER COLUMN visibility TYPE projectvisibility
             USING visibility::text::projectvisibility;
 
-            -- Drop old enum
+            -- (Optional) Restore default if needed
+            -- ALTER TABLE projects ALTER COLUMN visibility SET DEFAULT 'PRIVATE';
+
+            -- Drop old enum type
             DROP TYPE projectvisibility_old;
-        ELSE        
         END IF;
-    ELSE
     END IF;
 END$$;
 
