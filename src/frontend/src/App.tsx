@@ -5,6 +5,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { refreshCookies, getUserDetailsFromApi } from '@/utilfunctions/login';
 import { useAppDispatch } from '@/types/reduxTypes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // import '@hotosm/ui/components/Tracking';
 import '@hotosm/ui/dist/style.css';
@@ -13,6 +15,15 @@ import '@hotosm/ui/dist/components';
 import environment from '@/environment';
 import AppRoutes from '@/routes';
 import { store, persistor } from '@/store/Store';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
+});
 
 const RefreshUserCookies = () => {
   const dispatch = useAppDispatch();
@@ -49,13 +60,16 @@ const RefreshUserCookies = () => {
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <RouterProvider router={AppRoutes} />
-        <RefreshUserCookies />
-        <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.hotosm.org'}></hot-tracking>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <RouterProvider router={AppRoutes} />
+          <RefreshUserCookies />
+          <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.hotosm.org'}></hot-tracking>
+        </PersistGate>
+      </Provider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 };
 

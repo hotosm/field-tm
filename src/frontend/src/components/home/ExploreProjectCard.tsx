@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
-import { projectType } from '@/models/home/homeModel';
 import defaultOrgLogo from '@/assets/images/project_icon.png';
 import AssetModules from '@/shared/AssetModules';
 import StatusChip from '@/components/common/StatusChip';
 import { project_status } from '@/types/enums';
+import type { projectSummaryType } from '@/types';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -14,7 +14,7 @@ const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'succ
   [project_status.ARCHIVED]: 'error',
 };
 
-export default function ExploreProjectCard({ data, className }: { data: projectType; className?: string }) {
+export default function ExploreProjectCard({ data, className }: { data: projectSummaryType; className?: string }) {
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {

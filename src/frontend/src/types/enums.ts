@@ -96,3 +96,16 @@ export enum data_extract_type {
   CUSTOM = 'custom_data_extract',
   NONE = 'no_data_extract',
 }
+
+export enum basemap_providers {
+  esri = 'esri',
+  bing = 'bing',
+  google = 'google',
+  custom = 'custom',
+}
+
+export enum tile_output_formats {
+  mbtiles = 'mbtiles',
+  sqlitedb = 'sqlitedb',
+  pmtiles = 'pmtiles',
+}
