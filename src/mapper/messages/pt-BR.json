@@ -2,7 +2,8 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"common": {
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"zoom_to_task": "Zoom na tarefa"
 	},
 	"project_states": {
 		"DRAFT": "Rascunho",
@@ -68,7 +69,8 @@
 		"project_information": "Informações do projeto",
 		"comment": "Comentário",
 		"instructions": "Instruções",
-		"activities": "Histórico de atividades"
+		"activities": "Histórico de atividades",
+		"my_tasks": "Minhas tarefas"
 	},
 	"odk": {
 		"open": "Abrir ODK",
@@ -146,5 +148,8 @@
 		"total_offline_submissions": "Total de envios off-line",
 		"total_failed_submissions": "Total de envios com falha",
 		"download_csv": "Baixar como CSV"
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "Nenhuma tarefa atribuída"
 	}
 }
