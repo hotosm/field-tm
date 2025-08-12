@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import useDebouncedInput from '@/hooks/useDebouncedInput';
+import { useAppSelector } from '@/types/reduxTypes';
+import { project_status } from '@/types/enums';
+import { useGetProjectSummariesQuery } from '@/api/project';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
-import { HomeSummaryService } from '@/api/HomeService';
-import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
 import HomePageFilters from '@/components/home/HomePageFilters';
 import ProjectListMap from '@/components/home/ProjectListMap';
-import { projectType } from '@/models/home/homeModel';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Pagination from '@/components/common/Pagination';
-import useDebouncedInput from '@/hooks/useDebouncedInput';
-import { project_status } from '@/types/enums';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
 
 type filterType = {
   page: number;
@@ -20,9 +17,22 @@ type filterType = {
   status: project_status | undefined;
 };
 
+const initialData = {
+  results: [],
+  pagination: {
+    has_next: false,
+    has_prev: false,
+    next_num: null,
+    page: null,
+    pages: null,
+    prev_num: null,
+    per_page: 12,
+    total: null,
+  },
+};
+
 const Home = () => {
   useDocumentTitle('Explore Projects');
-  const dispatch = useAppDispatch();
 
   const [filter, setFilter] = useState<filterType>({
     page: 1,
@@ -30,12 +40,6 @@ const Home = () => {
     search: '',
     status: undefined,
   });
-
-  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
-  const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
-  const filteredProjectCards = useAppSelector((state) => state.home.homeProjectSummary);
-  const homeProjectLoading = useAppSelector((state) => state.home.homeProjectLoading);
-
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 400,
     init: filter.search,
@@ -44,9 +48,13 @@ const Home = () => {
     },
   });
 
-  useEffect(() => {
-    dispatch(HomeSummaryService(`${VITE_API_URL}/projects/summaries`, filter));
-  }, [filter]);
+  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
+
+  const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummariesQuery({
+    params: filter,
+    options: { queryKey: ['project-summaries', filter] },
+  });
+  const { results: projectList, pagination } = projectSummaryData || initialData;
 
   return (
     <div
@@ -62,12 +70,12 @@ const Home = () => {
             onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
           }}
         />
-        {!homeProjectLoading ? (
+        {!isProjectListLoading ? (
           <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-2 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-85px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
               className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}
             >
-              {filteredProjectCards.length > 0 ? (
+              {projectList.length > 0 ? (
                 <>
                   <div
                     className={`fmtm-grid fmtm-gap-3 ${
@@ -76,7 +84,7 @@ const Home = () => {
                         : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-overflow-y-scroll lg:scrollbar'
                     }`}
                   >
-                    {filteredProjectCards.map((value: projectType, index: number) => (
+                    {projectList.map((value, index) => (
                       <ExploreProjectCard data={value} key={index} />
                     ))}
                   </div>
@@ -88,15 +96,15 @@ const Home = () => {
               )}
             </div>
             <Pagination
-              showing={filteredProjectCards?.length}
-              totalCount={homeProjectPagination?.total || 0}
-              currentPage={homeProjectPagination?.page || 0}
+              showing={projectList?.length}
+              totalCount={pagination?.total || 0}
+              currentPage={pagination?.page || 0}
               isLoading={false}
-              pageSize={homeProjectPagination.per_page}
+              pageSize={pagination.per_page}
               handlePageChange={(page) => setFilter({ ...filter, page: page })}
               className="fmtm-fixed fmtm-left-0 fmtm-w-full"
             />
-            {showMapStatus && <ProjectListMap />}
+            {showMapStatus && <ProjectListMap projectList={projectList} />}
           </div>
         ) : (
           <div

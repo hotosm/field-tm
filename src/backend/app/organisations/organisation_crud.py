@@ -342,6 +342,14 @@ async def get_organisation_stats(
             FROM task_events ev
             JOIN base_projects bp ON ev.project_id = bp.id
             WHERE ev.created_at::date BETWEEN %(start_date)s AND %(end_date)s
+        ),
+        project_status_counts AS (
+            SELECT
+                p.status,
+                COUNT(*) AS count
+            FROM projects p
+            WHERE p.organisation_id = %(org_id)s
+            GROUP BY p.status
         )
         SELECT
             po.total_tasks,
@@ -350,10 +358,15 @@ async def get_organisation_stats(
             tea.tasks_validated,
             tea.total_contributors,
             tea.last_activity_date,
-            sc.total_submissions
+            sc.total_submissions,
+            json_object_agg(psc.status, psc.count) AS project_status_breakdown
         FROM project_overview po
         CROSS JOIN task_event_agg tea
-        CROSS JOIN submission_count sc;
+        CROSS JOIN submission_count sc
+        LEFT JOIN project_status_counts psc ON TRUE
+        GROUP BY po.total_tasks, po.active_projects, tea.tasks_mapped,
+        tea.tasks_validated, tea.total_contributors, tea.last_activity_date,
+        sc.total_submissions;
     """
 
     # === Daily Stats Query ===
@@ -450,6 +463,7 @@ async def get_organisation_stats(
                 "active_projects": row[1] or 0,
                 "total_submissions": row[6] or 0,
                 "total_contributors": row[4] or 0,
+                "project_status_counts": row[7] or {},
             },
             "task_status": task_status,
             "activity": {

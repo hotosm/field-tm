@@ -1,3 +1,5 @@
+import { basemap_providers, tile_output_formats } from './types/enums';
+
 export default {
   decode: (id: any) => {
     const decodeFromBase = window.atob(id);
@@ -61,4 +63,9 @@ export default {
     RECEIVED: 'green',
     SUCCESS: 'green',
   },
+} as configType;
+
+type configType = {
+  baseMapProviders: { id: number; label: string; value: basemap_providers }[];
+  tileOutputFormats: { id: number; label: string; value: tile_output_formats }[];
 };
