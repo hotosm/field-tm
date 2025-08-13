@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import environment from '@/environment';
-import { CreateTaskEvent } from '@/api/TaskEvent';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -12,6 +11,8 @@ import { Modal } from '@/components/common/Modal';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useAddNewTaskEventMutation } from '@/api/task/index';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 type dialogPropType = {
   taskId: number;
@@ -36,7 +37,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
 
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
-  const loading = useAppSelector((state) => state.common.loading);
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
@@ -81,59 +81,66 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
 
   useEffect(() => {
     if (projectIndex != -1) {
-      // Get current state of task
-      const selectedTask =
-        projectTaskActivityList.length > 0 ? projectTaskActivityList[0].state : taskStateEnum.UNLOCKED_TO_MAP;
-      const findCorrectTaskStateIndex = environment.tasksStatus.findIndex((data) => data.label == selectedTask);
-      const taskState = feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStateIndex]?.['label'] : '';
-      set_task_state(taskState);
+      const findCorrectTaskStateIndex = environment.tasksStatus.findIndex(
+        (data) => data.label == selectedTask.task_state,
+      );
+      set_task_state(selectedTask.task_state as taskStateEnum);
 
       // Get all available actions given current state
       const taskActionsList =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStateIndex]?.['action'] : [];
       set_list_of_task_actions(taskActionsList);
     }
-  }, [projectTaskActivityList, taskId, feature]);
+  }, [projectTaskActivityList, taskId, selectedTask]);
+
+  const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
+    id: selectedTask?.id,
+    params: { project_id: +currentProjectId },
+    options: {
+      onSuccess: ({ data }) => {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: `Task #${selectedTask.index} has been updated to ${data.state}`,
+            variant: 'success',
+          }),
+        );
+
+        feature.setStyle(geojsonStyles[data.state]);
+        const prevProperties = feature.getProperties();
+        const isTaskLocked = [taskStateEnum.LOCKED_FOR_MAPPING, taskStateEnum.LOCKED_FOR_VALIDATION].includes(
+          data.state,
+        );
+        const updatedProperties = { ...prevProperties, actioned_by_uid: isTaskLocked ? data.user_sub : null };
+        feature.setProperties(updatedProperties);
+        dispatch(
+          ProjectActions.UpdateProjectTaskBoundries({
+            projectId: currentProjectId,
+            taskId: data.task_id,
+            actioned_by_uid: data.user_sub,
+            actioned_by_username: data.username,
+            task_state: data.state,
+          }),
+        );
+      },
+      onError: () => {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: `Failed to update Task #${taskId}`,
+          }),
+        );
+      },
+    },
+  });
 
   const handleOnClick = async (event: React.MouseEvent<HTMLElement>) => {
     const btnId = event.currentTarget.dataset.btnid;
     if (!btnId) return;
     const selectedAction = taskEventEnum[btnId];
-    const authDetailsCopy = authDetails != null ? { ...authDetails } : {};
 
-    if (btnId != undefined) {
-      if (authDetailsCopy.hasOwnProperty('sub')) {
-        // if (btnId === 'MERGE_WITH_OSM') {
-        //   navigate(`/conflate-data/${currentProjectId}/${taskId}`);
-        //   return;
-        // }
-        await dispatch(
-          CreateTaskEvent(
-            `${import.meta.env.VITE_API_URL}/tasks/${selectedTask?.id}/event`,
-            selectedAction,
-            currentProjectId,
-            taskId.toString(),
-            authDetailsCopy,
-            { project_id: currentProjectId },
-            geojsonStyles,
-            feature,
-          ),
-        );
-        if (btnId === task_event.VALIDATE) navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
-      } else {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'Something is wrong with the user.',
-          }),
-        );
-      }
-    } else {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: 'Oops!, Please try again.',
-        }),
-      );
-    }
+    addNewTaskEventMutate({
+      event: selectedAction,
+      user_sub: authDetails?.sub,
+    });
   };
 
   return (
@@ -168,7 +175,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                   handleOnClick(e);
                   setToggleMappedConfirmationModal(false);
                 }}
-                disabled={loading}
+                disabled={isAddNewTaskEventPending}
               >
                 MARK AS FULLY MAPPED
               </Button>
@@ -204,6 +211,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                       }
                     }}
                     className="!fmtm-w-full"
+                    disabled={isAddNewTaskEventPending}
                   >
                     {data.key.toUpperCase()}
                   </Button>
