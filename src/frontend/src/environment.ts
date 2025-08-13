@@ -1,4 +1,4 @@
-import { basemap_providers, tile_output_formats } from './types/enums';
+import { basemap_providers, task_event, task_state, tile_output_formats } from '@/types/enums';
 
 export default {
   decode: (id: any) => {
@@ -66,6 +66,7 @@ export default {
 } as configType;
 
 type configType = {
+  tasksStatus: { label: task_state; action: { key: string; value: task_event; btnType: string }[] }[];
   baseMapProviders: { id: number; label: string; value: basemap_providers }[];
   tileOutputFormats: { id: number; label: string; value: tile_output_formats }[];
 };
