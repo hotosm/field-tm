@@ -19,20 +19,12 @@ type dialogPropType = {
   feature: Record<string, any>;
 };
 
-type taskListStateType = {
-  value: string;
-  key: string;
-  btnType: 'primary-red' | 'primary-grey' | 'link-red' | 'secondary-red';
-};
-
 export default function Dialog({ taskId, feature }: dialogPropType) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
   const geojsonStyles = MapStyles();
 
-  const [list_of_task_actions, set_list_of_task_actions] = useState<taskListStateType[]>([]);
-  const [task_state, set_task_state] = useState(taskStateEnum.UNLOCKED_TO_MAP);
   const [currentTaskInfo, setCurrentTaskInfo] = useState<taskSubmissionInfoType>();
   const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
 
@@ -40,7 +32,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
 
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo?.organisation_id as number);
   const isProjectManager = useIsProjectManager(projectInfo?.id as number);
@@ -79,19 +70,8 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     }
   }, [taskId, taskInfo, selectedTask]);
 
-  useEffect(() => {
-    if (projectIndex != -1) {
-      const findCorrectTaskStateIndex = environment.tasksStatus.findIndex(
-        (data) => data.label == selectedTask.task_state,
-      );
-      set_task_state(selectedTask.task_state as taskStateEnum);
-
-      // Get all available actions given current state
-      const taskActionsList =
-        feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStateIndex]?.['action'] : [];
-      set_list_of_task_actions(taskActionsList);
-    }
-  }, [projectTaskActivityList, taskId, selectedTask]);
+  const listOfTaskActions =
+    environment.tasksStatus.find((data) => data.label == selectedTask.task_state)?.['action'] || [];
 
   const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
     id: selectedTask?.id,
@@ -186,13 +166,13 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
       />
       {projectInfo.status === project_status.PUBLISHED && (
         <>
-          {list_of_task_actions?.length > 0 && (
+          {listOfTaskActions?.length > 0 && (
             <div
               className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
-                list_of_task_actions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
+                listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
               }`}
             >
-              {list_of_task_actions?.map((data, index) => {
+              {listOfTaskActions?.map((data, index) => {
                 return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
                   <Button
                     key={index}
@@ -221,17 +201,18 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
           )}
         </>
       )}
-      {task_state !== taskStateEnum.UNLOCKED_TO_MAP && task_state !== taskStateEnum.LOCKED_FOR_MAPPING && (
-        <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
-          <Button
-            variant="primary-red"
-            onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
-            className="!fmtm-w-full"
-          >
-            GO TO TASK SUBMISSION
-          </Button>
-        </div>
-      )}
+      {selectedTask.task_state !== taskStateEnum.UNLOCKED_TO_MAP &&
+        selectedTask.task_state !== taskStateEnum.LOCKED_FOR_MAPPING && (
+          <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
+            <Button
+              variant="primary-red"
+              onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
+              className="!fmtm-w-full"
+            >
+              GO TO TASK SUBMISSION
+            </Button>
+          </div>
+        )}
     </div>
   );
 }
