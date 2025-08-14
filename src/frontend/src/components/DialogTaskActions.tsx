@@ -3,7 +3,7 @@ import environment from '@/environment';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { project_status, task_event as taskEventEnum, task_state as taskStateEnum, task_event } from '@/types/enums';
+import { project_status, task_event as taskEventEnum, task_state as taskStateEnum, task_state } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
@@ -49,14 +49,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task?.id == taskId;
     })?.[0],
-  };
-
-  const checkIfTaskAssignedOrNot = (taskEvent) => {
-    return (
-      selectedTask?.actioned_by_username === authDetails?.username ||
-      selectedTask?.actioned_by_username === null ||
-      task_event.ASSIGN === taskEvent
-    );
   };
 
   useEffect(() => {
@@ -123,6 +115,8 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
             task_state: data.state,
           }),
         );
+        if (data.state === task_state.UNLOCKED_TO_VALIDATE)
+          navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
       },
       onError: () => {
         dispatch(
@@ -200,22 +194,23 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                 listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
               }`}
             >
-              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP && (
-                <div>
-                  <Select2
-                    options={userListOptions || []}
-                    value={selectedUser || ''}
-                    onChange={setSelectedUser}
-                    handleApiSearch={setSearchUserText}
-                    isLoading={isUserListLoading}
-                    choose="value"
-                    placeholder="Select a user"
-                  />
-                  {showUserError && <ErrorMessage message="Select a user" />}
-                </div>
-              )}
+              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP &&
+                (isOrganizationAdmin || isProjectManager) && (
+                  <div>
+                    <Select2
+                      options={userListOptions || []}
+                      value={selectedUser || ''}
+                      onChange={setSelectedUser}
+                      handleApiSearch={setSearchUserText}
+                      isLoading={isUserListLoading}
+                      choose="value"
+                      placeholder="Select a user"
+                    />
+                    {showUserError && <ErrorMessage message="Select a user" />}
+                  </div>
+                )}
               {listOfTaskActions?.map((data, index) => {
-                return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
+                return isOrganizationAdmin || isProjectManager ? (
                   <Button
                     key={index}
                     variant={data.btnType}
