@@ -320,7 +320,7 @@ async def get_project_submission_geojson(project, filters):
 async def upload_submission_geojson_to_s3(project, submission_geojson):
     """Handles submission GeoJSON generation and upload to S3 for a single project."""
     # FIXME Maybe upload the skipped projects to S3 in private buckets in the future?
-    if project.visibility not in ["PUBLIC", "INVITE_ONLY"] or project.status in [
+    if project.visibility != "PUBLIC" or project.status in [
         ProjectStatus.COMPLETED,
         ProjectStatus.ARCHIVED,
     ]:

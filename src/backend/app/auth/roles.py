@@ -418,7 +418,7 @@ async def project_contributors(
         WHERE sub = %(user_sub)s
             AND (
                 CASE
-                WHEN %(visibility)s IN ('SENSITIVE', 'PRIVATE') THEN
+                WHEN %(visibility)s = 'PRIVATE' THEN
                     CASE
                     WHEN role = 'ADMIN' THEN true
                     WHEN EXISTS (

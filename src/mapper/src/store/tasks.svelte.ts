@@ -2,7 +2,7 @@ import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
 import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 
-import type { ProjectTask, TaskEventType } from '$lib/types';
+import type { ProjectTask, TaskEventType, latestTaskEventType } from '$lib/types';
 import { getLoginStore } from '$store/login.svelte.ts';
 import { getTimeDiff } from '$lib/utils/datetime';
 import type { taskStatus } from '$constants/enums';
@@ -13,6 +13,7 @@ let eventsUnsubscribe: (() => void) | null = $state(null);
 let featcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
 let latestEvent: TaskEventType | null = $state(null);
 let events: TaskEventType[] = $state([]);
+let latestTaskEvent: latestTaskEventType[] = $state([]);
 
 // for UI show task index for simplicity & for api's use task id
 let selectedTaskId: number | null = $state(null);
@@ -85,22 +86,40 @@ function getTaskStore() {
 		for (const taskEvent of events) {
 			latestTaskStates.set(taskEvent.task_id, {
 				state: taskEvent.state,
-				actioned_by_uid: taskEvent.user_id,
+				actioned_by_uid: taskEvent.user_sub,
 			});
 		}
 
-		const features: Feature[] = projectTasks.map((task) => ({
-			type: 'Feature',
-			geometry: task.outline,
-			properties: {
-				fid: task.id,
-				state: latestTaskStates.get(task.id)?.state || 'UNLOCKED_TO_MAP',
-				actioned_by_uid: latestTaskStates.get(task.id)?.actioned_by_uid,
-				task_index: task?.project_task_index,
+		const { features, taskStates } = projectTasks.reduce(
+			(acc, task) => {
+				const state = latestTaskStates.get(task.id)?.state || 'UNLOCKED_TO_MAP';
+				const actioned_by_uid = latestTaskStates.get(task.id)?.actioned_by_uid;
+
+				acc.features.push({
+					type: 'Feature',
+					geometry: task.outline,
+					properties: {
+						fid: task.id,
+						state,
+						actioned_by_uid,
+						task_index: task?.project_task_index,
+					},
+				});
+
+				acc.taskStates.push({
+					id: task.id,
+					state,
+					actioned_by_uid,
+					task_index: task?.project_task_index,
+				});
+
+				return acc;
 			},
-		}));
+			{ features: [] as Feature[], taskStates: [] as latestTaskEventType[] },
+		);
 
 		featcol = { type: 'FeatureCollection', features };
+		latestTaskEvent = taskStates;
 	}
 
 	async function setSelectedTaskId(taskId: number | null, taskIndex: number | null) {
@@ -174,6 +193,9 @@ function getTaskStore() {
 		},
 		get commentMention() {
 			return commentMention;
+		},
+		get latestTaskEvent() {
+			return latestTaskEvent;
 		},
 	};
 }
