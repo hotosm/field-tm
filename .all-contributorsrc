@@ -1,5 +1,5 @@
 {
-  "projectName": "fmtm",
+  "projectName": "field-tm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -407,6 +407,16 @@
       "profile": "https://spotter.ngo",
       "contributions": [
         "translation"
+      ]
+    },
+    {
+      "login": "Sujan167",
+      "name": "Sujan Basnet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76505195?v=4",
+      "profile": "https://github.com/Sujan167",
+      "contributions": [
+        "code",
+        "maintenance"
       ]
     }
   ],
