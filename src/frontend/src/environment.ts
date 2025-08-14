@@ -1,4 +1,5 @@
-import { basemap_providers, tile_output_formats } from './types/enums';
+import { basemap_providers, task_event, task_state, tile_output_formats } from '@/types/enums';
+import { variantType } from '@/components/common/Button';
 
 export default {
   decode: (id: any) => {
@@ -14,7 +15,7 @@ export default {
   tasksStatus: [
     {
       label: 'UNLOCKED_TO_MAP',
-      action: [{ key: 'Assign To Mapper', value: 'MAP', btnType: 'primary-red' }],
+      action: [{ key: 'Assign To Mapper', value: 'ASSIGN', btnType: 'primary-red' }],
     },
     {
       label: 'LOCKED_FOR_MAPPING',
@@ -66,6 +67,7 @@ export default {
 } as configType;
 
 type configType = {
+  tasksStatus: { label: task_state; action: { key: string; value: task_event; btnType: variantType }[] }[];
   baseMapProviders: { id: number; label: string; value: basemap_providers }[];
   tileOutputFormats: { id: number; label: string; value: tile_output_formats }[];
 };
