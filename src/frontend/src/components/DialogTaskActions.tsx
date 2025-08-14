@@ -13,6 +13,9 @@ import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { useGetUserListQuery } from '@/api/user';
+import Select2 from '@/components/common/Select2';
+import ErrorMessage from '@/components/common/ErrorMessage';
 
 type dialogPropType = {
   taskId: number;
@@ -27,6 +30,10 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
 
   const [currentTaskInfo, setCurrentTaskInfo] = useState<taskSubmissionInfoType>();
   const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
+
+  const [searchUserText, setSearchUserText] = useState('');
+  const [selectedUser, setSelectedUser] = useState<string>();
+  const [showUserError, setShowUserError] = useState(false);
 
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
@@ -48,7 +55,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     return (
       selectedTask?.actioned_by_username === authDetails?.username ||
       selectedTask?.actioned_by_username === null ||
-      task_event.MAP === taskEvent
+      task_event.ASSIGN === taskEvent
     );
   };
 
@@ -73,9 +80,24 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const listOfTaskActions =
     environment.tasksStatus.find((data) => data.label == selectedTask.task_state)?.['action'] || [];
 
+  const { data: userList, isLoading: isUserListLoading } = useGetUserListQuery({
+    params: { search: searchUserText, signin_type: 'osm' },
+    options: {
+      queryKey: ['get-user-list', searchUserText],
+      enabled: !!searchUserText,
+    },
+  });
+
+  const userListOptions = userList?.map((user) => {
+    return {
+      label: user.username,
+      value: user.sub,
+    };
+  });
+
   const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
     id: selectedTask?.id,
-    params: { project_id: +currentProjectId },
+    params: { project_id: +currentProjectId, assignee_sub: selectedUser },
     options: {
       onSuccess: ({ data }) => {
         dispatch(
@@ -116,6 +138,12 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     const btnId = event.currentTarget.dataset.btnid;
     if (!btnId) return;
     const selectedAction = taskEventEnum[btnId];
+    if (selectedAction === taskEventEnum.ASSIGN && !selectedUser) {
+      setShowUserError(true);
+      return;
+    } else {
+      if (showUserError) setShowUserError(false);
+    }
 
     addNewTaskEventMutate({
       event: selectedAction,
@@ -168,10 +196,24 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
         <>
           {listOfTaskActions?.length > 0 && (
             <div
-              className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
-                listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
+              className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 fmtm-gap-2 ${
+                listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
               }`}
             >
+              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP && (
+                <div>
+                  <Select2
+                    options={userListOptions || []}
+                    value={selectedUser || ''}
+                    onChange={setSelectedUser}
+                    handleApiSearch={setSearchUserText}
+                    isLoading={isUserListLoading}
+                    choose="value"
+                    placeholder="Select a user"
+                  />
+                  {showUserError && <ErrorMessage message="Select a user" />}
+                </div>
+              )}
               {listOfTaskActions?.map((data, index) => {
                 return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
                   <Button
