@@ -1,5 +1,5 @@
 {
-  "projectName": "fmtm",
+  "projectName": "field-tm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -407,6 +407,16 @@
       "profile": "https://spotter.ngo",
       "contributions": [
         "translation"
+      ]
+    },
+    {
+      "login": "Anuj-Gupta4",
+      "name": "Anuj Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/84966248?v=4",
+      "profile": "https://github.com/Anuj-Gupta4",
+      "contributions": [
+        "code",
+        "maintenance"
       ]
     }
   ],
