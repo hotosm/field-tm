@@ -32,7 +32,7 @@ from geojson_pydantic import (
 from pydantic import (
     BaseModel,
     Field,
-    FieldValidationInfo,
+    ValidationInfo,
     computed_field,
 )
 from pydantic.functional_serializers import field_serializer
@@ -63,7 +63,7 @@ class StubProjectIn(BaseModel):
     short_description: str
     description: Optional[str] = None
     organisation_id: int
-    merge: bool = False
+    merge: bool = True
     outline: MultiPolygon | Polygon = None
     location_str: Optional[str] = None
     status: Optional[ProjectStatus] = None
@@ -103,7 +103,7 @@ class StubProjectIn(BaseModel):
     def parse_input_geojson(
         cls,
         value: FeatureCollection | Feature | MultiPolygon | Polygon,
-        info: FieldValidationInfo,
+        info: ValidationInfo,
     ) -> Optional[Union[Polygon, MultiPolygon]]:
         """Parse any format geojson into a single Polygon or MultiPolygon.
 
