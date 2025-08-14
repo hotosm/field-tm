@@ -19,13 +19,20 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Literal, Optional, Self
+from typing import Annotated, Literal, Optional, Self, Union
 from uuid import UUID
 
-from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Point, Polygon
+from geojson_pydantic import (
+    Feature,
+    FeatureCollection,
+    MultiPolygon,
+    Point,
+    Polygon,
+)
 from pydantic import (
     BaseModel,
     Field,
+    FieldValidationInfo,
     computed_field,
 )
 from pydantic.functional_serializers import field_serializer
@@ -56,7 +63,8 @@ class StubProjectIn(BaseModel):
     short_description: str
     description: Optional[str] = None
     organisation_id: int
-    outline: Polygon
+    merge: bool = False
+    outline: MultiPolygon | Polygon = None
     location_str: Optional[str] = None
     status: Optional[ProjectStatus] = None
     author_sub: Optional[str] = None
@@ -95,8 +103,9 @@ class StubProjectIn(BaseModel):
     def parse_input_geojson(
         cls,
         value: FeatureCollection | Feature | MultiPolygon | Polygon,
-    ) -> Optional[Polygon]:
-        """Parse any format geojson into a single Polygon.
+        info: FieldValidationInfo,
+    ) -> Optional[Union[Polygon, MultiPolygon]]:
+        """Parse any format geojson into a single Polygon or MultiPolygon.
 
         NOTE we run this in mode='before' to allow parsing as Feature first.
         """
@@ -106,8 +115,19 @@ class StubProjectIn(BaseModel):
         # geojson_pydantic.GeometryCollection
         # FIXME update this to remove the Featcol parsing at some point
         featcol = geojson_to_featcol(value)
-        merged_geojson = merge_polygons(featcol, True)
-        return merged_geojson.get("features")[0].get("geometry")
+        merge = info.data.get("merge", True)
+        merged_geojson = merge_polygons(
+            featcol=featcol, merge=merge, dissolve_polygon=True
+        )
+
+        if merge:
+            return merged_geojson.get("features")[0].get("geometry")
+        else:
+            geometries = [
+                feature.get("geometry").get("coordinates")
+                for feature in merged_geojson.get("features", [])
+            ]
+            return {"type": "MultiPolygon", "coordinates": geometries}
 
     @model_validator(mode="after")
     def append_fmtm_hashtag_and_slug(self) -> Self:
@@ -188,7 +208,7 @@ class ProjectOut(DbProject):
     """Converters for DbProject serialisation & display."""
 
     # Parse as geojson_pydantic.Polygon
-    outline: Polygon
+    outline: Polygon | MultiPolygon
     # Parse as geojson_pydantic.Point (sometimes not present, e.g. during create)
     centroid: Optional[Point] = None
     bbox: Optional[list[float]] = None
