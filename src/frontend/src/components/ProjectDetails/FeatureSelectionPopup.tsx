@@ -76,9 +76,9 @@ const FeatureSelectionPopup = ({
       <div
         className={`fmtm-duration-1000 fmtm-z-50 fmtm-h-fit md:fmtm-max-w-[15rem] ${
           taskModalStatus
-            ? 'fmtm-bottom-[4.4rem] md:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw]'
+            ? 'fmtm-bottom-[1.3rem] md:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw]'
             : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(40vh)] md:fmtm-left-[calc(100vw)]'
-        } fmtm-fixed fmtm-rounded-t-3xl fmtm-border-opacity-50`}
+        } fmtm-absolute fmtm-rounded-t-3xl fmtm-border-opacity-50`}
       >
         <div
           className={`fmtm-bg-[#fbfbfb] ${

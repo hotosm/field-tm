@@ -268,7 +268,7 @@ const ProjectDetails = () => {
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle className="fmtm-bg-grey-200 fmtm-hidden md:fmtm-flex" />
-            <ResizablePanel defaultSize={70} className="md:fmtm-min-w-[22rem]">
+            <ResizablePanel defaultSize={70} className="md:fmtm-min-w-[22rem] fmtm-relative">
               {projectId && (
                 <div className="fmtm-relative md:fmtm-static fmtm-flex-grow fmtm-h-full md:fmtm-rounded-xl fmtm-overflow-hidden">
                   <ProjectDetailsMap
@@ -277,6 +277,24 @@ const ProjectDetails = () => {
                     setMap={setMap}
                   />
                 </div>
+              )}
+              {selectedTaskArea && selectedTask && !selectedTaskFeature && (
+                <TaskSelectionPopup
+                  taskId={selectedTask}
+                  feature={selectedTaskArea}
+                  body={
+                    <div>
+                      <DialogTaskActions feature={selectedTaskArea} taskId={selectedTask} />
+                    </div>
+                  }
+                />
+              )}
+              {selectedTaskFeature && (
+                <FeatureSelectionPopup
+                  featureProperties={selectedFeatureProps}
+                  taskId={selectedTask}
+                  setSelectedTaskFeature={setSelectedTaskFeature}
+                />
               )}
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -295,24 +313,6 @@ const ProjectDetails = () => {
           <MobileFooter />
         </div>
       </div>
-      {selectedTaskArea && selectedTask && !selectedTaskFeature && (
-        <TaskSelectionPopup
-          taskId={selectedTask}
-          feature={selectedTaskArea}
-          body={
-            <div>
-              <DialogTaskActions feature={selectedTaskArea} taskId={selectedTask} />
-            </div>
-          }
-        />
-      )}
-      {selectedTaskFeature && (
-        <FeatureSelectionPopup
-          featureProperties={selectedFeatureProps}
-          taskId={selectedTask}
-          setSelectedTaskFeature={setSelectedTaskFeature}
-        />
-      )}
     </div>
   );
 };

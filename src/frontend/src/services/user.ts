@@ -1,8 +1,9 @@
 import { api } from '.';
+import type { getUserListParamsType } from '@/api/user/types';
 
 export const getUsers = (params) => api.get('/users', { params });
 
-export const getUserList = () => api.get('/users/usernames');
+export const getUserList = (params: getUserListParamsType) => api.get('/users/usernames', { params });
 
 export const getProjectUserInvites = () => api.get('/users/invites');
 
