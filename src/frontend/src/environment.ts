@@ -15,7 +15,7 @@ export default {
   tasksStatus: [
     {
       label: 'UNLOCKED_TO_MAP',
-      action: [{ key: 'Assign To Mapper', value: 'MAP', btnType: 'primary-red' }],
+      action: [{ key: 'Assign To Mapper', value: 'ASSIGN', btnType: 'primary-red' }],
     },
     {
       label: 'LOCKED_FOR_MAPPING',
