@@ -51,14 +51,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     })?.[0],
   };
 
-  const checkIfTaskAssignedOrNot = (taskEvent) => {
-    return (
-      selectedTask?.actioned_by_username === authDetails?.username ||
-      selectedTask?.actioned_by_username === null ||
-      task_event.ASSIGN === taskEvent
-    );
-  };
-
   useEffect(() => {
     if (taskId) {
       dispatch(
@@ -200,22 +192,23 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                 listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
               }`}
             >
-              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP && (
-                <div>
-                  <Select2
-                    options={userListOptions || []}
-                    value={selectedUser || ''}
-                    onChange={setSelectedUser}
-                    handleApiSearch={setSearchUserText}
-                    isLoading={isUserListLoading}
-                    choose="value"
-                    placeholder="Select a user"
-                  />
-                  {showUserError && <ErrorMessage message="Select a user" />}
-                </div>
-              )}
+              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP &&
+                (isOrganizationAdmin || isProjectManager) && (
+                  <div>
+                    <Select2
+                      options={userListOptions || []}
+                      value={selectedUser || ''}
+                      onChange={setSelectedUser}
+                      handleApiSearch={setSearchUserText}
+                      isLoading={isUserListLoading}
+                      choose="value"
+                      placeholder="Select a user"
+                    />
+                    {showUserError && <ErrorMessage message="Select a user" />}
+                  </div>
+                )}
               {listOfTaskActions?.map((data, index) => {
-                return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
+                return isOrganizationAdmin || isProjectManager ? (
                   <Button
                     key={index}
                     variant={data.btnType}
