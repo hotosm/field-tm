@@ -97,7 +97,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
 
   const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
     id: selectedTask?.id,
-    params: { project_id: +currentProjectId, assignee_sub: selectedUser },
+    params: { project_id: +currentProjectId, assignee_sub: selectedUser, notify: true },
     options: {
       onSuccess: ({ data }) => {
         dispatch(
