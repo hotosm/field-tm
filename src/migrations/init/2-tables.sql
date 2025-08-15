@@ -79,7 +79,7 @@ CREATE TABLE public.projects (
     per_task_instructions character varying,
     slug character varying,
     location_str character varying,
-    outline public.GEOMETRY (POLYGON, 4326),
+    outline public.GEOMETRY (GEOMETRY, 4326),
     status public.projectstatus NOT NULL DEFAULT 'DRAFT',
     total_tasks integer,
     osm_category character varying,
