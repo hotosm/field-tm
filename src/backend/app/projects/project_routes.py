@@ -908,6 +908,7 @@ async def create_stub_project(
     Either param can be passed to determine if the user has admin permission
     to the organisation (or organisation associated with a project).
     """
+    delattr(project_info, "merge")  # Remove merge field as it is not in database
     db_user = org_user_dict["user"]
     db_org = org_user_dict["org"]
     project_info.organisation_id = db_org.id
