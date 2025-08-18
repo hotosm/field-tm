@@ -115,7 +115,9 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
             task_state: data.state,
           }),
         );
-        if (data.state === task_state.UNLOCKED_TO_VALIDATE)
+        dispatch(ProjectActions.UpdateProjectTaskActivity(data));
+
+        if (data.state === task_state.LOCKED_FOR_VALIDATION)
           navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
       },
       onError: () => {
