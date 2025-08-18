@@ -1,17 +1,28 @@
 import { api } from '.';
+import {
+  downloadSubmissionParamsType,
+  submissionsParamsType,
+  submissionTableParamsType,
+  updateReviewStatePayloadType,
+} from '@/types';
 
-export const getSubmissions = (params) => api.get('/submission', { params });
+export const getSubmissions = (params: submissionsParamsType) => api.get('/submission', { params });
 
-export const downloadSubmission = (params) => api.get('/submission/download', { params });
+export const downloadSubmission = (params: downloadSubmissionParamsType) => api.get('/submission/download', { params });
 
-export const getSubmissionFormFields = (params) => api.get('/submission/submission-form-fields', { params });
+export const getSubmissionFormFields = (params: { project_id: number }) =>
+  api.get('/submission/submission-form-fields', { params });
 
-export const getSubmissionTable = (params) => api.get('/submission/submission-table', { params });
+export const getSubmissionTable = (params: submissionTableParamsType) =>
+  api.get('/submission/submission-table', { params });
 
-export const updateReviewState = (params) => api.post('/submission/update-review-state', params);
+export const updateReviewState = (params: { project_id: number }, payload: updateReviewStatePayloadType) =>
+  api.post('/submission/update-review-state', payload, { params });
 
-export const getSubmissionPhotos = (id) => api.get(`/submission/${id}/photos`);
+export const getSubmissionPhotos = (id: string, params: { project_id: number }) =>
+  api.get(`/submission/${id}/photos`, { params });
 
-export const getProjectSubmissionDashboard = (id) => api.get(`/submission/${id}/dashboard`);
+export const getProjectSubmissionDashboard = (id: number) => api.get(`/submission/${id}/dashboard`);
 
-export const getSubmissionDetail = (id, params) => api.get(`/submission/${id}`, { params });
+export const getSubmissionDetail = (id: string, params: { project_id: number }) =>
+  api.get(`/submission/${id}`, { params });
