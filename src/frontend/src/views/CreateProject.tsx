@@ -170,6 +170,7 @@ const CreateProject = () => {
       odk_central_url,
       odk_central_user,
       odk_central_password,
+      merge,
     } = values;
 
     const projectPayload = {
@@ -179,6 +180,7 @@ const CreateProject = () => {
       organisation_id,
       outline,
       uploadedAOIFile,
+      merge,
     };
 
     let odkPayload: Pick<
