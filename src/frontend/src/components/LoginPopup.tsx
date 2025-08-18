@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import { Modal } from '@/components/common/Modal';
 import { useLocation } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
-import { osmLoginRedirect } from '@/utilfunctions/login';
 import OSMImg from '@/assets/images/osm-logo.png';
 import { useAppDispatch } from '@/types/reduxTypes';
+import { useGetOsmLoginUrlQuery } from '@/api/auth';
 
 type loginOptionsType = {
   id: string;
@@ -29,12 +29,30 @@ const LoginPopup = () => {
 
   const loginModalOpen = CoreModules.useAppSelector((state) => state.login.loginModalOpen);
 
+  const {
+    data: osmLoginUrl,
+    isSuccess,
+    refetch: fetchOsmLoginUrl,
+  } = useGetOsmLoginUrlQuery({
+    options: {
+      queryKey: ['osm-login-url'],
+      enabled: false,
+    },
+  });
+
   const handleSignIn = async (selectedOption: string) => {
     if (selectedOption === 'osm_account') {
       sessionStorage.setItem('requestedPath', from);
-      osmLoginRedirect();
+      fetchOsmLoginUrl();
     }
   };
+
+  useEffect(() => {
+    const login_url = osmLoginUrl?.login_url;
+    if (login_url && isSuccess) {
+      window.location.href = login_url;
+    }
+  }, [osmLoginUrl, isSuccess]);
 
   const LoginDescription = () => {
     return (
