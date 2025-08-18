@@ -390,7 +390,7 @@ const ProjectOverview = () => {
           )}
           {values.uploadAreaSelection === 'upload_file' && (
             <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
-              <FieldLabel label="Select one of the option to upload area" astric />
+              <FieldLabel label="Upload AOI" astric />
               <UploadAreaComponent
                 title=""
                 label="Please upload .geojson, .json file"
@@ -408,16 +408,19 @@ const ProjectOverview = () => {
               )}
             </div>
           )}
-          <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
-            <FieldLabel label="Merge AOI" astric />
-            <Controller
-              control={control}
-              name="merge"
-              render={({ field }) => (
-                <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
-              )}
-            />
-          </div>
+
+          {values.uploadAreaSelection === 'upload_file' && values.outline && (
+            <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="Merge AOI" tooltipMessage="Merge multiple polygons into a single AOI" />
+              <Controller
+                control={control}
+                name="merge"
+                render={({ field }) => (
+                  <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+                )}
+              />
+            </div>
+          )}
         </>
       )}
     </div>
