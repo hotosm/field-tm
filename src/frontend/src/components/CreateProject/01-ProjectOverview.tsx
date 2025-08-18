@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/
 import { ValidateODKCredentials } from '@/api/CreateProjectService';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import Switch from '@/components/common/Switch';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -407,6 +408,16 @@ const ProjectOverview = () => {
               )}
             </div>
           )}
+          <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Merge AOI" astric />
+            <Controller
+              control={control}
+              name="merge"
+              render={({ field }) => (
+                <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+              )}
+            />
+          </div>
         </>
       )}
     </div>
