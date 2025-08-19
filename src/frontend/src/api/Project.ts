@@ -23,7 +23,9 @@ export const ProjectById = (projectId: string) => {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
         const project = await CoreModules.axios.get(`${VITE_API_URL}/projects/${projectId}?project_id=${projectId}`);
         const projectResp: projectInfoType = project.data;
+        const projectTaskIdIndexMap = {};
         const persistingValues = projectResp.tasks.map((data) => {
+          projectTaskIdIndexMap[data.id] = data.project_task_index;
           return {
             id: data.id,
             index: data.project_task_index,
@@ -66,6 +68,7 @@ export const ProjectById = (projectId: string) => {
             status: projectResp.status,
           }),
         );
+        dispatch(ProjectActions.SetProjectTaskIdIndexMap(projectTaskIdIndexMap));
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
       } catch (error) {
         if (error.response.status === 404) {
