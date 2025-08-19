@@ -44,6 +44,7 @@ export type ProjectStateTypes = {
   projectUsers: { user_sub: string; project_id: number; role: user_roles; username: string }[];
   projectUsersLoading: boolean;
   unassigningUserFromProject: boolean;
+  projectTaskIdIndexMap: Record<number, number>;
 };
 
 type projectCommentsListTypes = {
