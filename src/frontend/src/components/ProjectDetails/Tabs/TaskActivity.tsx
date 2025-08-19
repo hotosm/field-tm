@@ -24,6 +24,7 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
   const projectActivityLoading = useAppSelector((state) => state?.project?.projectActivityLoading);
   const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  const projectTaskIdIndexMap = useAppSelector((state) => state?.project?.projectTaskIdIndexMap);
 
   const handleOnchange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -99,7 +100,9 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
               </>
             )}
             <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
-              <p className="fmtm-text-sm fmtm-text-[#7A7676]">#{selectedTask}</p>
+              <p className="fmtm-text-sm fmtm-text-[#7A7676]">
+                #{selectedTask ? projectTaskIdIndexMap?.[selectedTask] : selectedTask}
+              </p>
               <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
                 <AssetModules.AccessTimeIcon className="fmtm-text-primaryRed" style={{ fontSize: '20px' }} />
                 <p className="fmtm-text-sm fmtm-text-[#7A7676]">
@@ -150,11 +153,7 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
         ) : taskHistories?.length === 0 ? (
           <p className="fmtm-mt-5 fmtm-text-center fmtm-text-xl fmtm-text-gray-400">No Task History!</p>
         ) : (
-          <div>
-            {taskHistories?.map((taskEvent) => (
-              <ActivitiesCard taskEvent={taskEvent} />
-            ))}
-          </div>
+          <div>{taskHistories?.map((taskEvent) => <ActivitiesCard taskEvent={taskEvent} />)}</div>
         )}
       </div>
     </div>
