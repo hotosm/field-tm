@@ -222,6 +222,7 @@ const SplitTasks = () => {
               {values.splitGeojsonByAlgorithm?.features?.length ||
                 values.splitGeojsonBySquares?.features?.length ||
                 values.outline?.features?.length ||
+                values.outline?.coordinates?.length ||
                 1}
             </span>
           </p>
