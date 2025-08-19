@@ -153,7 +153,11 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
         ) : taskHistories?.length === 0 ? (
           <p className="fmtm-mt-5 fmtm-text-center fmtm-text-xl fmtm-text-gray-400">No Task History!</p>
         ) : (
-          <div>{taskHistories?.map((taskEvent) => <ActivitiesCard taskEvent={taskEvent} />)}</div>
+          <div>
+            {taskHistories?.map((taskEvent) => (
+              <ActivitiesCard taskEvent={taskEvent} />
+            ))}
+          </div>
         )}
       </div>
     </div>
