@@ -23,7 +23,6 @@ export const acceptInvite = (token: string) => api.get(`/users/invite/${token}`)
 export const updateExistingUser = (user_sub: string, payload: updateExistingUserPayloadType) =>
   api.patch(`/users/${user_sub}`, payload);
 
-///
 export const getUserById = (id: string) => api.get(`/users/${id}`);
 
 export const deleteUserById = (id: string, params: deleteUserByIdParamsType) => api.delete(`/users/${id}`, { params });
