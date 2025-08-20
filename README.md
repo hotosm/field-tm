@@ -102,7 +102,16 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
+# Deprecated approach (for now):
+# curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
+
+# Development
+just config generate-dotenv
+just start all
+
+# Production
+just prep machine
+just start prod
 ```
 
 Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guides.
