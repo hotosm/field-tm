@@ -135,6 +135,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   api:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
@@ -169,6 +171,8 @@ services:
         reservations:
           cpus: "0.1"
           memory: 100M
+    annotations:
+      nerdctl/bypass4netns: true
 
   ui:
     # This service simply builds the frontend to a volume
@@ -187,6 +191,8 @@ services:
       - fmtm_mapper_frontend:/frontend/mapper
     network_mode: none
     restart: "on-failure:2"
+    annotations:
+      nerdctl/bypass4netns: true
 
   central:
     image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
@@ -238,6 +244,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    annotations:
+      nerdctl/bypass4netns: true
 
   central-webhook:
     image: "ghcr.io/hotosm/central-webhook:0.3.0"
@@ -253,12 +261,16 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v3.0.0"
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   central-ui:
     # This service simply builds the frontend to a volume
@@ -268,6 +280,8 @@ services:
       - central_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
+    annotations:
+      nerdctl/bypass4netns: true
 
   s3:
     image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
@@ -291,6 +305,8 @@ services:
       retries: 3
       start_period: 5s
       timeout: 5s
+    annotations:
+      nerdctl/bypass4netns: true
 
   fmtm-db:
     image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
@@ -316,6 +332,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    annotations:
+      nerdctl/bypass4netns: true
 
   electric:
     image: "electricsql/electric:1.0.22"
@@ -337,6 +355,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   central-db:
     image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
@@ -358,6 +378,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    annotations:
+      nerdctl/bypass4netns: true
 
   migrations:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
@@ -374,9 +396,13 @@ services:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
+    annotations:
+      nerdctl/bypass4netns: true
 
   scheduler:
     extends:
       file: ../compose.yaml
       service: scheduler
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
+    annotations:
+      nerdctl/bypass4netns: true
