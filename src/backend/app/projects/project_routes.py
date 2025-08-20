@@ -934,11 +934,13 @@ async def create_stub_project(
     try:
         project = await DbProject.create(db, project_info)
     except Exception as e:
+        log.error(f"Error posting to /stub: {e}")
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
         ) from e
     if not project:
+        log.error("Project creation passed at /stub, but the project is empty")
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
