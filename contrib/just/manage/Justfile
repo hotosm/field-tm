@@ -16,15 +16,17 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list manage
+
 # Install envsubst
 [no-cd]
 [no-exit-message]
 _install_envsubst:
   #!/usr/bin/env bash
-  if ! command -v curl &> /dev/null; then
-      sudo apt-get update
-      sudo apt-get install -y curl
-  fi
+  just prep _curl
 
   echo
   # Get a8m/envsubst (required for default vals syntax ${VAR:-default})

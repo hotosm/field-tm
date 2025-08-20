@@ -133,6 +133,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   api:
     extends:
@@ -206,3 +208,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    annotations:
+      nerdctl/bypass4netns: true

@@ -16,6 +16,11 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list stats
+
 [no-cd]
 _run_stats_script script_name:
   #!/usr/bin/env sh
