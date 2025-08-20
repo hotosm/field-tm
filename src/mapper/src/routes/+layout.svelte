@@ -46,7 +46,7 @@
 				}
 			}
 		} catch (error) {
-			console.warn('Error getting user login details')
+			console.warn('Error getting user login details');
 		}
 	}
 
@@ -84,5 +84,6 @@
 <main class="flex flex-col h-screen overflow-hidden font-primary">
 	<Header></Header>
 	<Toast></Toast>
+	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>
 	{@render children?.({ data })}
 </main>
