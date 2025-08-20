@@ -16,6 +16,11 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list build
+
 # Build backend & frontend containers
 [no-cd]
 all: backend frontends
@@ -44,6 +49,7 @@ backend-dev:
 frontends:
   docker compose build ui ui-mapper
 
+# Build production frontends (via var substitution)
 frontends-prod branch="dev":
   #!/usr/bin/env sh
   set -e
