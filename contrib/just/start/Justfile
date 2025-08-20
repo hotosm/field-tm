@@ -38,7 +38,7 @@ prod:
   # From deploy dir
   cd {{justfile_directory()}}/deploy
   export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${}"
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
