@@ -1,9 +1,12 @@
 import { api } from '.';
+import { updateProjectFormPayloadType, uploadXlsformPayloadType } from '@/types';
 
 export const getFormLists = () => api.get('/central/list-forms');
 
-export const uploadProjectXlsform = (params) => api.post('/central/upload-xlsform', params);
+export const uploadProjectXlsform = (payload: uploadXlsformPayloadType, params: { project_id: number }) =>
+  api.post('/central/upload-xlsform', payload, { params });
 
-export const updateProjectForm = (params) => api.post('/central/update-form', params);
+export const updateProjectForm = (payload: updateProjectFormPayloadType, params: { project_id: number }) =>
+  api.post('/central/update-form', payload, { params });
 
-export const downloadForm = (params) => api.get('/central/download-form', { params });
+export const downloadForm = (params: { project_id: number }) => api.get('/central/download-form', { params });
