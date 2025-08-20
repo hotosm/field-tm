@@ -1,4 +1,5 @@
 import { task_event, task_state } from '@/types/enums';
+import type { Polygon, MultiPolygon } from 'geojson';
 
 // PAYLOAD TYPES
 export type addNewTaskEventPayloadType = {
@@ -7,6 +8,15 @@ export type addNewTaskEventPayloadType = {
 };
 
 // PARAMS TYPES
+export type getTasksParamsType = {
+  project_id: string;
+};
+
+export type getTaskActivityParamsType = {
+  project_id: number;
+  days?: number;
+};
+
 export type addNewTaskEventParamsType = {
   assignee_sub?: string;
   notify?: boolean;
@@ -15,8 +25,31 @@ export type addNewTaskEventParamsType = {
   team_id?: string;
 };
 
+export type getTaskEventHistoryParamsType = {
+  days?: number;
+  comments?: boolean;
+  project_id: number;
+};
+
 // RESPONSE TYPES
-export type addNewTaskEventResponseType = {
+export type taskType = {
+  id: number;
+  outline: Polygon | MultiPolygon;
+  project_id: number;
+  project_task_index: number;
+  feature_count: number;
+  task_state: task_state;
+  actioned_by_uid: string | null;
+  actioned_by_username: string | null;
+};
+
+export type taskActivityType = {
+  date: string;
+  mapped: number;
+  validated: number;
+};
+
+export type taskEventType = {
   event_id: string;
   task_id: number;
   event: task_event;

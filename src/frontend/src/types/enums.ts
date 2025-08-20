@@ -77,6 +77,7 @@ export enum submission_status {
 export enum osm_forms {
   buildings = 'OSM Buildings',
   health = 'OSM Healthcare',
+  highways = 'OSM Highways',
 }
 
 export enum project_visibility {
