@@ -93,10 +93,16 @@ export function useCreateOrganisationMutation({
   });
 }
 
-export function useDeleteUnapprovedOrganisationMutation({ options }: { options: TMutationOptions<unknown, number> }) {
+export function useDeleteUnapprovedOrganisationMutation({
+  id,
+  options,
+}: {
+  id: number;
+  options: TMutationOptions<void, void>;
+}) {
   return useMutation({
     mutationKey: ['delete-unapproved-organisation'],
-    mutationFn: (id: number) => deleteUnapprovedOrganisation(id),
+    mutationFn: () => deleteUnapprovedOrganisation(id),
     ...options,
   });
 }
