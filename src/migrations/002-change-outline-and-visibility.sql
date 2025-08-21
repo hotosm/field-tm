@@ -7,7 +7,7 @@ BEGIN;
 
 DO $$
 BEGIN
-    IF NOT EXISTS (
+    IF EXISTS (
         SELECT 1
         FROM information_schema.columns
         WHERE table_schema = 'public'
@@ -24,7 +24,7 @@ $$;
 
 DO $$
 BEGIN
-    IF NOT EXISTS (
+    IF EXISTS (
         SELECT 1
         FROM information_schema.columns
         WHERE table_schema = 'public'
