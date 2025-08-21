@@ -1,7 +1,3 @@
-.font-primary {
-	font-family: var(--font-primary);
-}
-
 /* override default scrollbar */
 ::-webkit-scrollbar {
 	width: 6px;

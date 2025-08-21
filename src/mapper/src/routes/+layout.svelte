@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '$styles/page.css';
+	import '$styles/layout.css';
 	import '@hotosm/ui/dist/hotosm-ui';
 
 	import { onMount } from 'svelte';
@@ -81,7 +82,7 @@
 	});
 </script>
 
-<main class="flex flex-col h-screen overflow-hidden font-primary">
+<main class="layout flex flex-col h-screen overflow-hidden font-primary">
 	<Header></Header>
 	<Toast></Toast>
 	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>
