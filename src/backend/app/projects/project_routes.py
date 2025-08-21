@@ -932,6 +932,7 @@ async def create_stub_project(
     # Create the project in the Field-TM DB
     project_info.author_sub = db_user.sub
     try:
+        log.debug(f"Project details: {project_info}")
         project = await DbProject.create(db, project_info)
     except Exception as e:
         log.error(f"Error posting to /stub: {e}")
