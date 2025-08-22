@@ -1,7 +1,8 @@
 <script lang="ts">
 	import '$styles/page.css';
 	import '$styles/layout.css';
-	import '@hotosm/ui/dist/hotosm-ui';
+	import '@hotosm/ui';
+	import '@hotosm/ui/dist/style.css';
 
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
@@ -86,7 +87,5 @@
 	<Header></Header>
 	<Toast></Toast>
 	{@render children?.({ data })}
-	<div class="tracking-banner">
-		<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>
-	</div>
+	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>
 </main>

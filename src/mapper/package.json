@@ -48,7 +48,7 @@
 	},
 	"dependencies": {
 		"@electric-sql/client": "1.0.5",
-		"@hotosm/ui": "0.2.0-b5",
+		"@hotosm/ui": "0.3.4-b2",
 		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@shoelace-style/shoelace": "2.17.1",
 		"@tiptap/core": "^2.11.7",
