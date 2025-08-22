@@ -33,8 +33,8 @@ from app.auth.auth_schemas import ProjectUserDict
 from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import Mapper, super_admin
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus, TaskEvent
-from app.db.models import DbProjectTeam, DbTask, DbTaskEvent, DbUser
+from app.db.enums import HTTPStatus, TaskEvent, UserRole
+from app.db.models import DbProjectTeam, DbTask, DbTaskEvent, DbUser, DbUserRole
 from app.projects import project_deps
 from app.tasks import task_crud, task_deps, task_schemas
 
@@ -115,7 +115,6 @@ async def add_new_task_event(
     log.info(f"Task {task.id} event: {new_event.event.name} (by user {user_sub})")
     new_event.user_sub = user_sub
     new_event.task_id = task.id
-
     if new_event.event == TaskEvent.ASSIGN:
         if not (assignee_sub or team.team_id):
             raise HTTPException(
@@ -131,6 +130,9 @@ async def add_new_task_event(
             new_event.user_sub = None
             new_event.username = None
             new_event.team_id = team.team_id
+
+        # Create user role for the assignee
+        await DbUserRole.create(db, task.project_id, user_sub, UserRole.MAPPER)
 
     event = await DbTaskEvent.create(db, new_event)
 
