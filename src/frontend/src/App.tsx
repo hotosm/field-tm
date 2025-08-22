@@ -10,7 +10,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // import '@hotosm/ui/components/Tracking';
 import '@hotosm/ui/dist/style.css';
-import '@hotosm/ui/dist/components';
+import '@hotosm/ui';
 
 import environment from '@/environment';
 import AppRoutes from '@/routes';

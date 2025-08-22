@@ -12,8 +12,8 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.58.1(react@19.1.0))
       '@hotosm/ui':
-        specifier: 0.2.0-b4
-        version: 0.2.0-b4
+        specifier: 0.3.4-b2
+        version: 0.3.4-b2
       '@mui/base':
         specifier: 5.0.0-beta.70
         version: 5.0.0-beta.70(@types/react@19.0.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -629,9 +629,9 @@ packages:
     peerDependencies:
       react-hook-form: ^7.55.0
 
-  '@hotosm/ui@0.2.0-b4':
-    resolution: {integrity: sha512-dSZSg8I7YgCx01LJKDy7xEt7Frdju0P16hZiXMnhC9YxBZbCq0BFEs075gl1HioemMpdPrZ/cU7RNqs4RzR/kQ==}
-    engines: {node: '>=14.17'}
+  '@hotosm/ui@0.3.4-b2':
+    resolution: {integrity: sha512-fE3lgvuuatlenAMeFsDOLA0nURMu5urxt3KpAN+RfOV+AJ9MhRZYLnHWWlQhUW5in5K4BC7EmW3fWkPcxx/GDw==}
+    engines: {node: '>=14.17.0'}
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -4571,7 +4571,7 @@ snapshots:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.58.1(react@19.1.0)
 
-  '@hotosm/ui@0.2.0-b4': {}
+  '@hotosm/ui@0.3.4-b2': {}
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
-    "@hotosm/ui": "0.2.0-b4",
+    "@hotosm/ui": "0.3.4-b2",
     "@mui/base": "5.0.0-beta.70",
     "@mui/icons-material": "^6.4.11",
     "@mui/material": "^6.4.9",
