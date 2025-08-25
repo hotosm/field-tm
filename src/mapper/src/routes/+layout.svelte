@@ -3,6 +3,8 @@
 	import '$styles/layout.css';
 	import '@hotosm/ui';
 	import '@hotosm/ui/dist/style.css';
+	import '@shoelace-style/shoelace/dist/themes/light.css';
+	import '@shoelace-style/shoelace/dist/shoelace.js';
 
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
@@ -83,7 +85,7 @@
 	});
 </script>
 
-<main class="layout flex flex-col h-screen overflow-hidden font-primary">
+<main class="layout flex flex-col h-screen overflow-hidden">
 	<Header></Header>
 	<Toast></Toast>
 	{@render children?.({ data })}
