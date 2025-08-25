@@ -1,3 +1,7 @@
-.layout .tracking-banner {
-	--at-apply: absolute bottom-20 right-0 z-100 px-3;
+/* :root {
+	--hot-font-sans: 'Barlow', -apple-system, Roboto, Helvetica, Arial, sans-serif;
 }
+
+.layout {
+	font-family: var(--hot-font-sans);
+} */

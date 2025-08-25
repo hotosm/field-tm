@@ -1,7 +1,7 @@
 /* Task action modal */
 
 .task-action-modal {
-	--at-apply: font-primary flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
+	--at-apply: flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
 }
 
 .task-action-modal .content {
@@ -119,7 +119,7 @@
 }
 
 .entity span {
-	--at-apply: font-primary font-mediumtext-sm;
+	--at-apply: font-mediumtext-sm;
 }
 
 .entity sl-button {
@@ -127,7 +127,7 @@
 }
 
 .entity-dialog {
-	--at-apply: dialog-overview z-50 font-primary font-regular;
+	--at-apply: dialog-overview z-50 font-regular;
 }
 
 .entity-dialog-content {
@@ -147,13 +147,13 @@
 }
 
 .entity-dialog-actions sl-button span {
-	--at-apply: font-primary font-medium text-sm;
+	--at-apply: font-medium text-sm;
 }
 
 /* Feature comments */
 
 .feature-comments-dialog {
-	--at-apply: dialog-overview z-50 font-primary font-regular;
+	--at-apply: dialog-overview z-50 font-regular;
 }
 
 .feature-comment {
