@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '$styles/page.css';
-	import '$styles/layout.css';
 	import '@hotosm/ui';
 	import '@hotosm/ui/dist/style.css';
 	import '@shoelace-style/shoelace/dist/themes/light.css';
