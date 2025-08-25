@@ -85,7 +85,7 @@
 	});
 </script>
 
-<main class="layout flex flex-col h-screen overflow-hidden">
+<main class="layout flex flex-col h-screen overflow-hidden font-primary">
 	<Header></Header>
 	<Toast></Toast>
 	{@render children?.({ data })}
