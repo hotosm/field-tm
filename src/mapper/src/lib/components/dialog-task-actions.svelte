@@ -33,7 +33,7 @@
 	<div class="dialog-task-actions">
 		<div class="content">
 			<div class="icon">
-				<hot-icon
+				<sl-icon
 					name="close"
 					onclick={() => toggleTaskActionModal(false)}
 					onkeydown={(e: KeyboardEvent) => {
@@ -43,7 +43,7 @@
 					}}
 					role="button"
 					tabindex="0"
-				></hot-icon>
+				></sl-icon>
 			</div>
 			<div class="dialog-task-new-feature">
 				<p class="task-index">{m['popup.task']()} #{taskStore.selectedTaskIndex}</p>
@@ -61,7 +61,7 @@
 						tabindex="0"
 						class="icon"
 					>
-						<hot-icon name="new-window"></hot-icon>
+						<sl-icon name="new-window"></sl-icon>
 						<p class="action">{m['popup.map_new_feature']()}</p>
 					</div>
 				{/if}
@@ -101,7 +101,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="location"></hot-icon>
+							<sl-icon slot="prefix" name="location"></sl-icon>
 							<span>{m['popup.start_mapping']()}</span>
 						</sl-button>
 					</div>
@@ -127,7 +127,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="close"></hot-icon>
+							<sl-icon slot="prefix" name="close"></sl-icon>
 							<span>{m['popup.cancel_mapping']()}</span>
 						</sl-button>
 						<!-- keep button disabled until the entity statuses are fetched -->
@@ -147,7 +147,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="check"></hot-icon>
+							<sl-icon slot="prefix" name="check"></sl-icon>
 							<span>{m['dialog_task_actions.complete_mapping']()}</span>
 						</sl-button>
 					</div>
@@ -162,7 +162,7 @@
 	</div>
 {/if}
 
-<hot-dialog
+<sl-dialog
 	bind:this={dialogRef}
 	class="task-action-dialog"
 	open={toggleTaskCompleteConfirmation}
@@ -229,4 +229,4 @@
 			<span>{m['dialog_task_actions.complete_mapping']()}</span>
 		</sl-button>
 	</div>
-</hot-dialog>
+</sl-dialog>
