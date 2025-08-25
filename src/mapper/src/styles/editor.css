@@ -103,7 +103,7 @@
 	--at-apply: text-[1.2rem] text-neutral-800 hover: bg-rose-50 p-[2px] rounded cursor-pointer duration-200;
 }
 
-.toolbar hot-icon.active {
+.toolbar sl-icon.active {
 	background: var(--sl-color-primary-50);
 	color: var(--sl-color-primary-500);
 }

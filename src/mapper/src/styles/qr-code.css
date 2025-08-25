@@ -14,7 +14,7 @@
 	--at-apply: mr-1;
 }
 
-.qr-code .title .hot-icon {
+.qr-code .title .sl-icon {
 	--at-apply: text-[14px] text-primary-900 cursor-pointer duration-200 scale-[1.5];
 }
 
@@ -22,7 +22,7 @@
 	--at-apply: flex justify-center w-full max-w-sm;
 }
 
-.qr-code-container hot-qr-code {
+.qr-code-container sl-qr-code {
 	--at-apply: p-4 bg-white m-4;
 }
 
@@ -30,7 +30,7 @@
 	--at-apply: secondary w-full max-w-[200px];
 }
 
-.qr-code .download-button hot-icon {
+.qr-code .download-button sl-icon {
 	--at-apply: text-[1rem] text-primary-900 cursor-pointer duration-200;
 }
 

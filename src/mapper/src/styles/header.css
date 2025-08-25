@@ -31,7 +31,7 @@
 	--at-apply: flex items-center gap-2;
 }
 
-.header .user hot-icon {
+.header .user sl-icon {
 	--at-apply: text-[1.5rem] leading-0 cursor-pointer duration-200;
 	color: var(--sl-color-primary-700);
 }

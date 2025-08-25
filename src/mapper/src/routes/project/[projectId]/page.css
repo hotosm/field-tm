@@ -60,7 +60,7 @@ sl-tab {
 	padding-right: 3vw;
 }
 
-sl-tab hot-icon {
+sl-tab sl-icon {
 	font-size: 2rem;
 }
 
@@ -168,7 +168,7 @@ sl-tab hot-icon {
 	--at-apply: z-9999 fixed bottom-0 left-0 right-0;
 }
 
-.web-forms-drawer sl-tab hot-icon {
+.web-forms-drawer sl-tab sl-icon {
 	--at-apply: text-[1.7rem] sm: text-[2rem];
 }
 

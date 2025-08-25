@@ -14,7 +14,7 @@
 	--at-apply: text-2xl font-bold mb-1;
 }
 
-.login-dialog .header hot-icon {
+.login-dialog .header sl-icon {
 	--at-apply: text-[1.5rem] text-neutral-500 cursor-pointer;
 }
 

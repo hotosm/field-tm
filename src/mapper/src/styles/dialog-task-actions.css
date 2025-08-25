@@ -10,7 +10,7 @@
 	--at-apply: flex justify-end;
 }
 
-.dialog-task-actions .icon hot-icon {
+.dialog-task-actions .icon sl-icon {
 	--at-apply: text-[1.5rem] text-neutral-800 cursor-pointer hover: text-primary-600 duration-200;
 }
 
@@ -39,7 +39,7 @@
 	--at-apply: flex items-center gap-1 cursor-pointer group;
 }
 
-.dialog-task-new-feature .icon hot-icon {
+.dialog-task-new-feature .icon sl-icon {
 	--at-apply: text-[1.25rem] duration-200 text-neutral-950 font-light group-hover: text-black;
 }
 
@@ -60,7 +60,7 @@
 	--at-apply: font-medium text-sm;
 }
 
-.dialog-task-new-feature .unlock-actions hot-icon {
+.dialog-task-new-feature .unlock-actions sl-icon {
 	--at-apply: text-[1rem] text-white cursor-pointer duration-200;
 }
 
@@ -68,7 +68,7 @@
 	--at-apply: grid grid-cols-2 sm: grid-cols-3 gap-2;
 }
 
-.dialog-task-new-feature .lock-actions hot-icon {
+.dialog-task-new-feature .lock-actions sl-icon {
 	--at-apply: text-[1rem] text-primary-600 cursor-pointer duration-200 hover: text-primary-900;
 }
 
