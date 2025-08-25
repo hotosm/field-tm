@@ -1,6 +1,9 @@
 <script lang="ts">
 	import '$styles/page.css';
-	import '@hotosm/ui/dist/hotosm-ui';
+	import '@hotosm/ui';
+	import '@hotosm/ui/dist/style.css';
+	import '@shoelace-style/shoelace/dist/themes/light.css';
+	import '@shoelace-style/shoelace/dist/shoelace.js';
 
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
