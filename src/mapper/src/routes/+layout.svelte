@@ -84,7 +84,7 @@
 	});
 </script>
 
-<main class="flex flex-col h-screen overflow-hidden font-primary">
+<main class="flex flex-col h-screen overflow-hidden">
 	<Header></Header>
 	<Toast></Toast>
 	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>

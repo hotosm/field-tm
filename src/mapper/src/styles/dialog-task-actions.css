@@ -1,5 +1,5 @@
 .dialog-task-actions {
-	--at-apply: flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50 font-primary;
+	--at-apply: flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
 }
 
 .dialog-task-actions .content {
@@ -57,7 +57,7 @@
 }
 
 .dialog-task-new-feature .unlock-actions span {
-	--at-apply: font-primary font-medium text-sm;
+	--at-apply: font-medium text-sm;
 }
 
 .dialog-task-new-feature .unlock-actions hot-icon {
@@ -73,5 +73,5 @@
 }
 
 .dialog-task-new-feature .lock-actions span {
-	--at-apply: font-primary font-medium text-sm;
+	--at-apply: font-medium text-sm;
 }

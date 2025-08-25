@@ -1,5 +1,5 @@
 .login-dialog {
-	--at-apply: dialog-overview z-50 font-primary font-regular;
+	--at-apply: dialog-overview z-50 font-regular;
 }
 
 .login-dialog .content {
