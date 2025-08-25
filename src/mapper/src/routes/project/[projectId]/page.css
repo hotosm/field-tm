@@ -175,3 +175,7 @@ sl-tab sl-icon {
 .bottom-sheet-header {
 	--at-apply: mb-2 font-bold text-lg;
 }
+
+.layout .tracking {
+	z-index: 99999;
+}
