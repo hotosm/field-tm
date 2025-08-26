@@ -117,6 +117,31 @@ const ProjectOverview = () => {
     setShowODKCredsModal(false);
   }, [isODKCredentialsValid]);
 
+  useEffect(() => {
+    const outlineArea = values.outlineArea;
+    if (values?.id || !outlineArea) return;
+
+    const area = +outlineArea.split(' ')?.[0];
+    const unit = outlineArea.split(' ')?.[1];
+
+    if (unit !== 'km²') return;
+
+    if (area > 10000) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: 'The project area exceeded 10000 Sq.KM. and must be less than 10000 Sq.KM.',
+        }),
+      );
+    } else if (area > 100) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: 'The project area exceeded over 100 Sq.KM.',
+          variant: 'warning',
+        }),
+      );
+    }
+  }, [values.outlineArea]);
+
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
     if (!orgIdInt) return;
@@ -154,6 +179,7 @@ const ProjectOverview = () => {
   const resetFile = () => {
     setValue('uploadedAOIFile', null);
     setValue('outline', null);
+    setValue('outlineArea', undefined);
 
     if (values.customDataExtractFile) setValue('customDataExtractFile', null);
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
@@ -407,6 +433,9 @@ const ProjectOverview = () => {
                 </p>
               )}
             </div>
+          )}
+          {values.outlineArea && +values.outlineArea?.split(' ')?.[0] > 10000 && errors?.outlineArea?.message && (
+            <ErrorMessage message={errors.outlineArea.message as string} />
           )}
 
           {values.uploadAreaSelection === 'upload_file' && values.outline && (
