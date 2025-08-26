@@ -95,15 +95,15 @@
 		</span>
 	</div>
 	{#if !online.current}
-		<hot-icon name="wifi-off"></hot-icon>
+		<sl-icon name="wifi-off"></sl-icon>
 	{/if}
 	<div class="nav">
 		<!-- profile image and username display -->
 		{#if loginStore?.getAuthDetails?.username}
 			<div class="user">
 				{#if !loginStore?.getAuthDetails?.picture}
-					<hot-icon name="person-fill" class="" onclick={() => {}} onkeydown={() => {}} role="button" tabindex="0"
-					></hot-icon>
+					<sl-icon name="person-fill" class="" onclick={() => {}} onkeydown={() => {}} role="button" tabindex="0"
+					></sl-icon>
 				{:else}
 					<img src={loginStore?.getAuthDetails?.picture} alt="profile" />
 				{/if}
@@ -112,7 +112,7 @@
 				</p>
 			</div>
 		{:else}
-			<hot-button
+			<sl-button
 				class="login-link"
 				variant="text"
 				size="small"
@@ -128,12 +128,12 @@
 				tabindex="0"
 			>
 				<span>{m['header.sign_in']()}</span>
-			</hot-button>
+			</sl-button>
 		{/if}
 
 		<!-- drawer component toggle trigger (snippet to reuse below) -->
 		{#snippet drawerOpenButton()}
-			<hot-icon
+			<sl-icon
 				name="list"
 				class="drawer-icon ${isFirstLoad && !commonStore.enableWebforms ? 'drawer-icon-firstload' : ''}"
 				onclick={() => {
@@ -144,11 +144,11 @@
 				}}
 				role="button"
 				tabindex="0"
-			></hot-icon>
+			></sl-icon>
 		{/snippet}
 		<!-- add tooltip on first load -->
 		{#if isFirstLoad && !commonStore.enableWebforms}
-			<hot-tooltip
+			<sl-tooltip
 				bind:this={drawerOpenButtonRef}
 				content="First download the custom ODK Collect app here"
 				open={true}
@@ -159,7 +159,7 @@
 				}}
 			>
 				{@render drawerOpenButton()}
-			</hot-tooltip>
+			</sl-tooltip>
 			<!-- else render with no tooltip -->
 		{:else}
 			{@render drawerOpenButton()}
@@ -168,14 +168,14 @@
 </div>
 <Login />
 
-<hot-drawer bind:this={drawerRef} class="drawer-overview">
+<sl-drawer bind:this={drawerRef} class="drawer-overview">
 	<div class="content">
 		<div class="locale-selection">
 			<sl-dropdown>
-				<hot-button slot="trigger" caret>
-					<hot-icon name="translate"></hot-icon>
+				<sl-button slot="trigger" caret>
+					<sl-icon name="translate"></sl-icon>
 					{commonStore.locale}
-				</hot-button>
+				</sl-button>
 				<sl-menu>
 					{#each languageList as language}
 						<sl-menu-item value={language.code}><span slot="prefix">{language.flag}</span> {language.name}</sl-menu-item
@@ -188,7 +188,7 @@
 			<a target="_blank" rel="noopener noreferrer" href={item.path} class="menu-item">{item.name}</a>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
-			<hot-button
+			<sl-button
 				class="sign-out"
 				variant="primary"
 				size="small"
@@ -202,7 +202,7 @@
 				tabindex="0"
 			>
 				{#key commonStore.locale}<span>{m['header.sign_out']()}</span>{/key}
-			</hot-button>
+			</sl-button>
 		{/if}
 	</div>
-</hot-drawer>
+</sl-drawer>

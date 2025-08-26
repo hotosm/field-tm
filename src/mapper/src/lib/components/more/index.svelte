@@ -99,10 +99,10 @@
 				role="button"
 			>
 				<div class="icon-title">
-					<hot-icon name={stack.icon} class="icon"></hot-icon>
+					<sl-icon name={stack.icon} class="icon"></sl-icon>
 					<p>{stack.title}</p>
 				</div>
-				<hot-icon name="chevron-right" class="icon-next"></hot-icon>
+				<sl-icon name="chevron-right" class="icon-next"></sl-icon>
 			</div>
 		{/each}
 	{/if}
@@ -110,7 +110,7 @@
 	<!-- header -->
 	{#if activeStack !== ''}
 		<div class="active-stack-header">
-			<hot-icon
+			<sl-icon
 				name="chevron-left"
 				class="icon"
 				onclick={() => {
@@ -125,7 +125,7 @@
 				}}
 				tabindex="0"
 				role="button"
-			></hot-icon>
+			></sl-icon>
 			<p class="title">{activeStackTitle}</p>
 		</div>
 	{/if}

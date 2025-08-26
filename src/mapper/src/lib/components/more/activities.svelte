@@ -28,13 +28,13 @@
 		{#each taskEvents as event (event?.event_id)}
 			<div class="event">
 				<div class="event-content">
-					<hot-icon name="person-fill" style="border: 1px solid" class="icon"></hot-icon>
+					<sl-icon name="person-fill" style="border: 1px solid" class="icon"></sl-icon>
 					<div class="detail">
 						<p class="username">{event?.username}</p>
 						<div class="meta">
 							<p class="task-id">#{taskIdIndexMap[event?.task_id]}</p>
 							<div class="history">
-								<hot-icon name="clock-history" class="icon"></hot-icon>
+								<sl-icon name="clock-history" class="icon"></sl-icon>
 								<p class="created-at">
 									<span>
 										{event?.created_at?.split(' ')[0]}
@@ -52,7 +52,7 @@
 						<span class="capitalize">{event?.username}</span>
 						{m['activities.update_status_to']()} <span>{event?.state}</span>
 					</p>
-					<hot-icon
+					<sl-icon
 						onkeydown={(e: KeyboardEvent) => {
 							if (e.key === 'Enter') {
 								zoomToTask(event?.task_id);
@@ -65,7 +65,7 @@
 						}}
 						name="map"
 						class="icon"
-					></hot-icon>
+					></sl-icon>
 				</div>
 			</div>
 		{/each}

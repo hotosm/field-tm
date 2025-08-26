@@ -1,5 +1,5 @@
-.font-primary {
-	font-family: var(--font-primary);
+body {
+	font-family: var(--hot-font-sans-variant);
 }
 
 /* override default scrollbar */

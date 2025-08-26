@@ -441,7 +441,7 @@
 	<Control class="control" position="top-left">
 		<ControlGroup>
 			<ControlButton title="Zoom to project" on:click={zoomToProject}
-				><hot-icon name="crop-free" class="icon"></hot-icon></ControlButton
+				><sl-icon name="crop-free" class="icon"></sl-icon></ControlButton
 			>
 		</ControlGroup></Control
 	>
@@ -499,7 +499,7 @@
 			}}
 			tabindex="0"
 		>
-			<hot-icon name="legend-toggle" class="icon"></hot-icon>
+			<sl-icon name="legend-toggle" class="icon"></sl-icon>
 		</div>
 	</Control>
 	{#if toggleLayer}
@@ -952,7 +952,7 @@
 >
 	<div class="wrapper">
 		<div class="icon-container">
-			<hot-icon
+			<sl-icon
 				name="close"
 				class="icon"
 				onclick={() => (selectedControl = null)}
@@ -963,7 +963,7 @@
 				}}
 				role="button"
 				tabindex="0"
-			></hot-icon>
+			></sl-icon>
 		</div>
 		<LayerSwitcher
 			{map}
@@ -987,7 +987,7 @@
 	<div class="select-entities-modal">
 		<div class="content">
 			<div class="icon">
-				<hot-icon
+				<sl-icon
 					name="close"
 					onclick={() => (selectedFeatures = [])}
 					onkeydown={(e: KeyboardEvent) => {
@@ -997,7 +997,7 @@
 					}}
 					role="button"
 					tabindex="0"
-				></hot-icon>
+				></sl-icon>
 			</div>
 
 			<div>

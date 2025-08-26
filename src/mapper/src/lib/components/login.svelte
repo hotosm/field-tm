@@ -42,7 +42,7 @@
 	};
 </script>
 
-<hot-dialog
+<sl-dialog
 	bind:this={dialogRef}
 	class="login-dialog"
 	open={loginStore.isLoginModalOpen}
@@ -54,7 +54,7 @@
 	<div class="content">
 		<div class="header">
 			<p class="title">Sign In</p>
-			<hot-icon
+			<sl-icon
 				name="close"
 				onclick={() => loginStore.toggleLoginModal(false)}
 				role="button"
@@ -62,7 +62,7 @@
 				onkeydown={(e: KeyboardEvent) => {
 					if (e.key === 'Enter') loginStore.toggleLoginModal(false);
 				}}
-			></hot-icon>
+			></sl-icon>
 		</div>
 		<div class="subtitle">Select an account type to sign in</div>
 		<div class="options">
@@ -91,4 +91,4 @@
 			{/each}
 		</div>
 	</div>
-</hot-dialog>
+</sl-dialog>

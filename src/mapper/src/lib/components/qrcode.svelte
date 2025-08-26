@@ -6,7 +6,7 @@
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { generateQrCode, downloadQrCode } from '$lib/odk/qrcode';
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 
 	interface Props {
 		infoDialogRef: SlDialog | null;
@@ -31,7 +31,7 @@
 		<div class="title">
 			{#key commonStore.locale}<span>{m['odk.scan_qr_code']()}</span>{/key}
 			<sl-tooltip content={m['qrcode.moreinfo']()} placement="bottom">
-				<hot-icon
+				<sl-icon
 					onclick={() => {
 						if (infoDialogRef) infoDialogRef?.show();
 					}}
@@ -43,14 +43,14 @@
 					role="button"
 					tabindex="0"
 					name="info-circle-fill"
-				></hot-icon>
+				></sl-icon>
 			</sl-tooltip>
 		</div>
 	</div>
 
 	<!-- QR Code Container -->
 	<div class="qr-code-container">
-		<hot-qr-code value={qrCodeData} label={m['qrcode.scan_to_open_odk']()} size="250"></hot-qr-code>
+		<sl-qr-code value={qrCodeData} label={m['qrcode.scan_to_open_odk']()} size="250"></sl-qr-code>
 	</div>
 
 	<!-- Download Button -->
@@ -64,7 +64,7 @@
 		tabindex="0"
 		size="small"
 	>
-		<hot-icon slot="prefix" name="download"></hot-icon>
+		<sl-icon slot="prefix" name="download"></sl-icon>
 		{#key commonStore.locale}<span>{m.download()} QR</span>{/key}
 	</sl-button>
 

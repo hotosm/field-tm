@@ -38,7 +38,7 @@
 					onclick={() => zoomToTask(task.id)}
 					onkeydown={() => zoomToTask(task.id)}
 					role="button"
-					tabindex="0">{m['common.zoom_to_task']()} <hot-icon slot="prefix" name="map"></hot-icon></sl-button
+					tabindex="0">{m['common.zoom_to_task']()} <sl-icon slot="prefix" name="map"></sl-icon></sl-button
 				>
 			</div>
 		{/each}

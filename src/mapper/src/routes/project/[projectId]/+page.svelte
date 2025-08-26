@@ -493,7 +493,7 @@
 				{/if}
 			{/if}
 		</BottomSheet>
-		<hot-dialog bind:this={infoDialogRef} class="dialog-overview" no-header>
+		<sl-dialog bind:this={infoDialogRef} class="dialog-overview" no-header>
 			<div class="content">
 				<img src={ImportQrGif} alt="manual process of importing qr code gif" class="manual-qr-gif" />
 				<sl-button
@@ -509,7 +509,7 @@
 					<span>CLOSE</span>
 				</sl-button>
 			</div>
-		</hot-dialog>
+		</sl-dialog>
 	{/if}
 
 	{#if displayWebFormsDrawer === false}
@@ -530,23 +530,23 @@
 			bind:this={tabGroup}
 		>
 			<sl-tab slot="nav" panel="map">
-				<hot-icon name="map"></hot-icon>
+				<sl-icon name="map"></sl-icon>
 			</sl-tab>
 			{#if loginStore.getAuthDetails}
 				<sl-tab slot="nav" panel="mytasks">
-					<hot-icon name="list-task"></hot-icon>
+					<sl-icon name="list-task"></sl-icon>
 				</sl-tab>
 			{/if}
 			<!-- <sl-tab slot="nav" panel="offline">
-				<hot-icon name="wifi-off"></hot-icon>
+				<sl-icon name="wifi-off"></sl-icon>
 			</sl-tab> -->
 			{#if !commonStore.enableWebforms}
 				<sl-tab slot="nav" panel="qrcode">
-					<hot-icon name="qr-code"></hot-icon>
+					<sl-icon name="qr-code"></sl-icon>
 				</sl-tab>
 			{/if}
 			<sl-tab slot="nav" panel="events">
-				<hot-icon name="three-dots"></hot-icon>
+				<sl-icon name="three-dots"></sl-icon>
 			</sl-tab>
 		</sl-tab-group>
 	{/if}

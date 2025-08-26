@@ -37,7 +37,11 @@
 				editor = editor;
 			},
 			editable: editable,
-			onUpdate: ({ /** editor **/ }) => {
+			onUpdate: (
+				{
+					/** editor **/
+				},
+			) => {
 				setEditorHtmlContent && setEditorHtmlContent(editor.getHTML());
 			},
 		});
@@ -52,7 +56,7 @@
 </script>
 
 <div class="editor-wrapper">
-	<div class="editor ${editable ? 'editable' : 'non-editable'}">
+	<div class="editor {editable ? 'editable' : 'non-editable'}">
 		{#if editor && editable}
 			<Toolbar {editor} />
 		{/if}
