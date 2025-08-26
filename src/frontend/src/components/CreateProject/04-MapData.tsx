@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { z } from 'zod/v4';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -163,6 +163,29 @@ const MapData = () => {
     }
   };
 
+  useEffect(() => {
+    if (!values.dataExtractGeojson) return;
+    const featureCount = values.dataExtractGeojson?.features?.length ?? 0;
+
+    if (featureCount > 30000) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: `${featureCount} is a lot of features! Please consider breaking this into smaller projects.`,
+          variant: 'error',
+          duration: 10000,
+        }),
+      );
+    } else if (featureCount > 10000) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: `${featureCount} is a lot of features to map at once. Are you sure?`,
+          variant: 'warning',
+          duration: 10000,
+        }),
+      );
+    }
+  }, [values.dataExtractGeojson]);
+
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -285,9 +308,6 @@ const MapData = () => {
           >
             Fetch OSM Data
           </Button>
-          {errors?.dataExtractGeojson?.message && (
-            <ErrorMessage message={errors.dataExtractGeojson.message as string} />
-          )}
         </div>
       )}
 
@@ -308,6 +328,8 @@ const MapData = () => {
           )}
         </div>
       )}
+
+      {errors?.dataExtractGeojson?.message && <ErrorMessage message={errors.dataExtractGeojson.message as string} />}
 
       {values.dataExtractGeojson && (
         <p className="fmtm-text-gray-500 fmtm-text-sm">
