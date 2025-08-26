@@ -75,39 +75,37 @@
 }
 
 /* Editor */
-
 .editor {
 	--at-apply: rounded-md;
 }
 
 .editor.editable {
 	border: 1px solid var(--sl-color-neutral-0);
+	--at-apply: border border-[1px] border-solid border-[#e5e7eb] rounded-md;
 }
 
 .editor.editable .bottom {
 	--at-apply: h-[80px] overflow-y-scroll pt-[3px];
 }
 
-.editor.non-editable .bottom {
-	--at-apply: h-full;
-}
-
 /* Toobar */
-
-.toolbar {
-	border-bottom: 1px solid var(--sl-color-neutral-0);
-	--at-apply: items-center gap-2 px-2 py-1 flex-wrap;
+.editor .toolbar {
+	--at-apply: items-center px-2 flex-wrap border border-solid border-[#e5e7eb];
 }
 
-.toolbar .icon {
-	--at-apply: text-[1.2rem] text-neutral-800 hover: bg-rose-50 p-[2px] rounded cursor-pointer duration-200;
+.editor .toolbar .icon {
+	--at-apply: text-[1.2rem] text-neutral-800 p-[2px] rounded cursor-pointer duration-200;
 }
 
-.toolbar sl-icon.active {
+.editor .toolbar sl-icon.active {
 	background: var(--sl-color-primary-50);
 	color: var(--sl-color-primary-500);
 }
 
-.toolbar sl-tooltip {
+.editor .toolbar sl-tooltip {
 	font-size: 10px;
+}
+
+.editable .bottom {
+	--at-apply: h-[250px] overflow-y-scroll;
 }
