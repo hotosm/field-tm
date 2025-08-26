@@ -23,7 +23,7 @@
 }
 
 .task-action-dialog .button-wrapper {
-	--at-apply: flex items-center justify-center gap-x-3;
+	--at-apply: grid grid-cols-2 items-center justify-center gap-x-3;
 }
 
 .dialog-task-new-feature {
@@ -53,7 +53,7 @@
 }
 
 .dialog-task-actions .unlock-actions {
-	--at-apply: flex gap-x-2 mt-4;
+	--at-apply: grid grid-cols-2 gap-x-2 mt-4;
 }
 
 .dialog-task-new-feature .unlock-actions span {
@@ -64,8 +64,8 @@
 	--at-apply: text-[1rem] text-white cursor-pointer duration-200;
 }
 
-.dialog-task-new-feature .lock-actions {
-	--at-apply: grid grid-cols-2 sm: grid-cols-3 gap-2;
+.dialog-task-actions .lock-actions {
+	--at-apply: grid grid-cols-2 gap-2 mt-4;
 }
 
 .dialog-task-new-feature .lock-actions sl-icon {

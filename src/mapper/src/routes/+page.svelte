@@ -46,8 +46,8 @@
 
 <div class=" h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
-		<div class="flex items-center justify-between">
-			<h3>PROJECTS</h3>
+		<div class="flex items-center justify-between my-2">
+			<h5 class="m-0">PROJECTS</h5>
 			<sl-input
 				placeholder="Search"
 				size="small"
