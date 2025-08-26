@@ -87,6 +87,6 @@
 <main class="layout flex flex-col h-screen overflow-hidden">
 	<Header></Header>
 	<Toast></Toast>
-	<hot-tracking site-id="28" domain={'mapper.fmtm.localhost'} class="tracking"></hot-tracking>
+	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'} class="tracking"></hot-tracking>
 	{@render children?.({ data })}
 </main>
