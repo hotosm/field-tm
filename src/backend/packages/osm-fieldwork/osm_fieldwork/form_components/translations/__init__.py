@@ -19,12 +19,23 @@ INCLUDED_LANGUAGES = {
     "swahili": "sw",
     "nepali": "ne",
     "portuguese": "pt-BR",
+    "czech": "cs",
+    "japanese": "ja",
 }
 
 translations = {f"{key}({value})": _load_translations(f"{value}.json") for key, value in INCLUDED_LANGUAGES.items()}
 
 def add_label_translations(base: dict, label_cols: Optional[list[str]] = []) -> dict:
     field_name = base.get("name")
+
+    invalid_langs = [
+        m.group(1).strip().lower()
+        for col in label_cols if col.startswith("label::")
+        if (m := re.match(r"label::([^(]+)", col)) and m.group(1).strip().lower() not in INCLUDED_LANGUAGES
+    ]
+
+    if invalid_langs:
+        raise ValueError(f"Invalid or unsupported translation(s): {', '.join(invalid_langs)}")
 
     # If name is a list (from a DataFrame row-style dict), unwrap it
     if isinstance(field_name, list):
