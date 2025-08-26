@@ -8,5 +8,5 @@
 }
 
 .spinner h2 {
-	--at-apply: font-primary text-neutral-600 font-semibold;
+	--at-apply: text-neutral-600 font-semibold;
 }
