@@ -207,8 +207,6 @@
 			}
 
 			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
-			console.log(featureExistsNode)
-			console.log(selectedEntity)
 			// If the `created_by` field exists, then it must be a new feature
 			if (featureExistsNode && selectedEntity?.created_by) {
 				featureExistsNode?.setValueState('yes');
@@ -261,7 +259,7 @@
 	});
 </script>
 
-<hot-drawer
+<sl-drawer
 	id="odk-web-forms-drawer"
 	bind:this={drawerRef}
 	contained
@@ -314,7 +312,7 @@
 			{/if}
 		{/await}
 	{/await}
-</hot-drawer>
+</sl-drawer>
 
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */

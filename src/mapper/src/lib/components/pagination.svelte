@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$styles/pagination.css';
 	import { getPaginationRange, DOTS } from '$lib/api/get-pagination-range.ts';
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 
 	type propsType = {
 		showing: number;
@@ -34,9 +34,7 @@
 	}
 </script>
 
-<div
-	class={`pagination ${className}`}
->
+<div class={`pagination ${className}`}>
 	<p class="showing-count">
 		Showing {showing} of {totalCount} results
 	</p>
@@ -64,7 +62,7 @@
 					onclick={() => handlePageChange(currentPage - 1)}
 					class={`prev-button page ${currentPage === 1 ? 'first-page' : 'not-first-page'}`}
 				>
-					<hot-icon name="chevron-left"></hot-icon>
+					<sl-icon name="chevron-left"></sl-icon>
 				</button>
 
 				<!-- Page Numbers -->
@@ -81,9 +79,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<p
-								class={`page-num ${currentPage === pageNumber ? 'current-page' : 'not-current-page'}`}
-							>
+							<p class={`page-num ${currentPage === pageNumber ? 'current-page' : 'not-current-page'}`}>
 								{pageNumber}
 							</p>
 						</div>
@@ -97,7 +93,7 @@
 					onclick={() => handlePageChange(currentPage + 1)}
 					class={`next-button ${currentPage === paginationRange[paginationRange.length - 1] ? 'last-page' : 'not-last-page'}`}
 				>
-					<hot-icon name="chevron-right"></hot-icon>
+					<sl-icon name="chevron-right"></sl-icon>
 				</button>
 			</div>
 		{/if}

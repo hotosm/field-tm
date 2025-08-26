@@ -1,6 +1,9 @@
 <script lang="ts">
 	import '$styles/page.css';
-	import '@hotosm/ui/dist/hotosm-ui';
+	import '@hotosm/ui';
+	import '@hotosm/ui/dist/style.css';
+	import '@shoelace-style/shoelace/dist/themes/light.css';
+	import '@shoelace-style/shoelace/dist/shoelace.js';
 
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
@@ -81,9 +84,9 @@
 	});
 </script>
 
-<main class="flex flex-col h-screen overflow-hidden font-primary">
+<main class="layout flex flex-col h-screen overflow-hidden">
 	<Header></Header>
 	<Toast></Toast>
-	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'}></hot-tracking>
+	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'} class="tracking"></hot-tracking>
 	{@render children?.({ data })}
 </main>
