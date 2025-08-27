@@ -126,13 +126,14 @@ async def add_new_task_event(
         # provided else it will save the team if team is provided
         if assignee_sub:
             new_event.user_sub = assignee_sub
+            # Create user role for the assignee
+            await DbUserRole.create(db, task.project_id, assignee_sub, UserRole.MAPPER)
+
         elif team:
             new_event.user_sub = None
             new_event.username = None
             new_event.team_id = team.team_id
-
-        # Create user role for the assignee
-        await DbUserRole.create(db, task.project_id, user_sub, UserRole.MAPPER)
+            # TODO: Add all team members as mappers in the project
 
     event = await DbTaskEvent.create(db, new_event)
 
