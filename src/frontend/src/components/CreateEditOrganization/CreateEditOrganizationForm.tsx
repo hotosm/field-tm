@@ -8,7 +8,6 @@ import useForm from '@/hooks/useForm';
 import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
 import { diffObject } from '@/utilfunctions/compareUtils';
-import { radioOptionsType } from '@/models/organisation/organisationModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -16,19 +15,7 @@ import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useCreateOrganisationMutation, useUpdateOrganisationMutation } from '@/api/organisation';
 import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
-
-const organizationTypeOptions: radioOptionsType[] = [
-  { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
-  { name: 'company', value: 'COMPANY', label: 'Company' },
-  { name: 'non_profit', value: 'NON_PROFIT', label: 'Non-profit' },
-  { name: 'university', value: 'UNIVERSITY', label: 'University' },
-  { name: 'other', value: 'OTHER', label: 'Other' },
-];
-
-const odkTypeOptions: radioOptionsType[] = [
-  { name: 'odk_server_type', value: 'OWN', label: 'Use your own ODK server' },
-  { name: 'odk_server_type', value: 'HOT', label: "Request HOT's ODK server" },
-];
+import { odkTypeOptions, organizationTypeOptions } from './constants';
 
 const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
   const navigate = useNavigate();
