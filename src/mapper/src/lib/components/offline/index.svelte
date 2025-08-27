@@ -32,7 +32,7 @@
 	<!-- header -->
 	{#if activeStack !== ''}
 		<div class="active-stack-header">
-			<hot-icon
+			<sl-icon
 				name="chevron-left"
 				class="icon"
 				onclick={() => {
@@ -47,7 +47,7 @@
 				}}
 				tabindex="0"
 				role="button"
-			></hot-icon>
+			></sl-icon>
 			<p class="title">{activeStackTitle}</p>
 		</div>
 	{/if}
@@ -73,11 +73,11 @@
 				<div class="icon-title">
 					<p>{stack.title}</p>
 				</div>
-				<hot-icon name="chevron-right" class="icon-next"></hot-icon>
+				<sl-icon name="chevron-right" class="icon-next"></sl-icon>
 			</div>
 		{/each}
 	{:else if activeStack === 'basemaps'}
-		<Basemaps projectId={projectId}></Basemaps>
+		<Basemaps {projectId}></Basemaps>
 	{:else if activeStack === 'fgb-extract'}
 		<FgbExtract {projectId} extract_url={project.data_extract_url} />
 	{/if}

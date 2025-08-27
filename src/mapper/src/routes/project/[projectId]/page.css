@@ -27,7 +27,7 @@
 
 .main-page {
 	position: relative;
-	--at-apply: h-[calc(100svh-3.699rem)] sm: h-[calc(100svh-4.625rem)] font-primary;
+	--at-apply: h-[calc(100svh-3.699rem)] sm: h-[calc(100svh-4.625rem)];
 }
 
 /* Tags */
@@ -60,7 +60,7 @@ sl-tab {
 	padding-right: 3vw;
 }
 
-sl-tab hot-icon {
+sl-tab sl-icon {
 	font-size: 2rem;
 }
 
@@ -95,7 +95,7 @@ sl-tab hot-icon {
 }
 
 .alert-msg sl-button span {
-	--at-apply: font-primary font-medium text-xs uppercase;
+	--at-apply: font-medium text-xs uppercase;
 }
 
 /* Proceed Dialog */
@@ -121,7 +121,7 @@ sl-tab hot-icon {
 }
 
 .proceed-dialog .button span {
-	--at-apply: font-primary font-medium text-xs uppercase;
+	--at-apply: font-medium text-xs uppercase;
 }
 
 /* QR Code */
@@ -131,7 +131,7 @@ sl-tab hot-icon {
 }
 
 .map-qr sl-button span {
-	--at-apply: font-primary font-medium text-base uppercase;
+	--at-apply: font-medium text-base uppercase;
 }
 
 /* Dialogs */
@@ -154,7 +154,7 @@ sl-tab hot-icon {
 }
 
 .dialog-overview .content button span {
-	--at-apply: font-primary font-medium text-SM uppercase;
+	--at-apply: font-medium text-SM uppercase;
 }
 
 .dialog-overview .manual-qr-gif {
@@ -168,10 +168,14 @@ sl-tab hot-icon {
 	--at-apply: z-9999 fixed bottom-0 left-0 right-0;
 }
 
-.web-forms-drawer sl-tab hot-icon {
+.web-forms-drawer sl-tab sl-icon {
 	--at-apply: text-[1.7rem] sm: text-[2rem];
 }
 
 .bottom-sheet-header {
 	--at-apply: mb-2 font-bold text-lg;
+}
+
+.layout .tracking {
+	z-index: 99999;
 }

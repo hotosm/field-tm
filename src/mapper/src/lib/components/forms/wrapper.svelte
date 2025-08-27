@@ -65,7 +65,7 @@
 
 		// feature exists question isn't in the payload if it was intentionally hidden because it's a new feature
 		// the verification question is also hidden because it depends on the feature_exists question
-		if (!submissionXml.includes('<feature_exists>') && selectedEntity.is_new) {
+		if (!submissionXml.includes('<feature_exists>') && selectedEntity?.created_by) {
 			submissionXml = submissionXml.replace(
 				'<survey_questions>',
 				`<feature_exists>yes</feature_exists><survey_questions>`,
@@ -207,7 +207,8 @@
 			}
 
 			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
-			if (featureExistsNode && selectedEntity.is_new) {
+			// If the `created_by` field exists, then it must be a new feature
+			if (featureExistsNode && selectedEntity?.created_by) {
 				featureExistsNode?.setValueState('yes');
 
 				// hide this node because we don't need to see it after setting the value
@@ -258,7 +259,7 @@
 	});
 </script>
 
-<hot-drawer
+<sl-drawer
 	id="odk-web-forms-drawer"
 	bind:this={drawerRef}
 	contained
@@ -311,7 +312,7 @@
 			{/if}
 		{/await}
 	{/await}
-</hot-drawer>
+</sl-drawer>
 
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */

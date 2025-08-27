@@ -30,7 +30,7 @@
 
 	function getPaginatedProjects() {
 		projectStore.fetchProjectsFromAPI(paginationPage, debouncedSearch);
-	};
+	}
 
 	onMount(async () => {
 		// if requestedPath set, redirect to the desired path (in our case we have requestedPath set to invite url)
@@ -44,16 +44,16 @@
 	});
 </script>
 
-<div class="font-primary h-full overflow-y-hidden bg-[#f5f5f5]">
+<div class=" h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
-		<div class="flex items-center justify-between">
-			<h3>PROJECTS</h3>
-			<hot-input
+		<div class="flex items-center justify-between my-2">
+			<h5 class="m-0">PROJECTS</h5>
+			<sl-input
 				placeholder="Search"
 				size="small"
 				onsl-input={(e: SlInputEvent) => {
 					search = e?.target?.value;
-				}}><sl-icon name="search" slot="prefix"></sl-icon></hot-input
+				}}><sl-icon name="search" slot="prefix"></sl-icon></sl-input
 			>
 		</div>
 		<div

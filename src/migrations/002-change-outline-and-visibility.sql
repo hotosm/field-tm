@@ -5,26 +5,27 @@
 -- Start a transaction
 BEGIN;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'projects'
-          AND column_name = 'outline'
-    ) THEN
-        ALTER TABLE public.projects
-        ALTER COLUMN outline TYPE geometry(Geometry, 4326)
-        USING outline::geometry(Geometry, 4326);
-    END IF;
-END;
-$$;
+-- Removed https://github.com/hotosm/field-tm/issues/2791
+-- DO $$
+-- BEGIN
+--     IF EXISTS (
+--         SELECT 1
+--         FROM information_schema.columns
+--         WHERE table_schema = 'public'
+--           AND table_name = 'projects'
+--           AND column_name = 'outline'
+--     ) THEN
+--         ALTER TABLE public.projects
+--         ALTER COLUMN outline TYPE geometry(Geometry, 4326)
+--         USING outline::geometry(Geometry, 4326);
+--     END IF;
+-- END;
+-- $$;
 
 
 DO $$
 BEGIN
-    IF NOT EXISTS (
+    IF EXISTS (
         SELECT 1
         FROM information_schema.columns
         WHERE table_schema = 'public'
