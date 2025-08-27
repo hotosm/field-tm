@@ -79,16 +79,14 @@ export function useGetOrganisationDetailQuery({
   });
 }
 
-export function useCreateOrganisationMutation({
-  params,
-  options,
-}: {
-  params: createOrganisationParamsType;
-  options: TMutationOptions<organisationType, createUpdateOrganisationPayloadType>;
-}) {
+export function useCreateOrganisationMutation(
+  options: TMutationOptions<
+    organisationType,
+    { payload: createUpdateOrganisationPayloadType; params: createOrganisationParamsType }
+  >,
+) {
   return useMutation({
-    mutationKey: ['create-organisation', params],
-    mutationFn: (payload: createUpdateOrganisationPayloadType) => createOrganisation(payload, params),
+    mutationFn: ({ payload, params }) => createOrganisation(payload, params),
     ...options,
   });
 }
@@ -137,16 +135,16 @@ export function useAddNewOrganisationAdminMutation({
 
 export function useUpdateOrganisationMutation({
   id,
-  params,
   options,
 }: {
   id: number;
-  params: updateOrganisationParamsType;
-  options: TMutationOptions<organisationType, createUpdateOrganisationPayloadType>;
+  options: TMutationOptions<
+    organisationType,
+    { payload: createUpdateOrganisationPayloadType; params: updateOrganisationParamsType }
+  >;
 }) {
   return useMutation({
-    mutationKey: ['update-organisation', id, params],
-    mutationFn: (payload: createUpdateOrganisationPayloadType) => updateOrganisation(id, payload, params),
+    mutationFn: ({ payload, params }) => updateOrganisation(id, payload, params),
     ...options,
   });
 }

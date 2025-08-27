@@ -2,12 +2,11 @@ import React, { useEffect } from 'react';
 import Button from '@/components/common/Button';
 import InputTextField from '@/components/common/InputTextField';
 import TextArea from '@/components/common/TextArea';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import useForm from '@/hooks/useForm';
 import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
-import { PatchOrganizationDataService, PostOrganisationDataService } from '@/api/OrganisationService';
 import { diffObject } from '@/utilfunctions/compareUtils';
 import { radioOptionsType } from '@/models/organisation/organisationModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
@@ -15,8 +14,8 @@ import UploadArea from '@/components/common/UploadArea';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useCreateOrganisationMutation, useUpdateOrganisationMutation } from '@/api/organisation';
+import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
 
 const organizationTypeOptions: radioOptionsType[] = [
   { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
@@ -34,26 +33,51 @@ const odkTypeOptions: radioOptionsType[] = [
 const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [searchParams, setSearchParams] = useSearchParams();
   const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
-  const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
-  const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
 
   useDocumentTitle(organizationId ? 'Manage Organization' : 'Add Organization');
 
+  const { mutate: createOrganisationMutate, isPending: isOrganisationCreating } = useCreateOrganisationMutation({
+    onSuccess: ({ data }) => {
+      dispatch(
+        CommonActions.SetSnackBar({ message: `${data.name} organization created successfully`, variant: 'success' }),
+      );
+      navigate('/organization');
+    },
+    onError: ({ response }) => {
+      dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to create organization' }));
+    },
+  });
+
+  const { mutate: updateOrganisationMutate, isPending: isOrganisationUpdating } = useUpdateOrganisationMutation({
+    id: +organizationId,
+    options: {
+      onSuccess: ({ data }) => {
+        dispatch(
+          CommonActions.SetSnackBar({ message: `${data.name} organization updated successfully`, variant: 'success' }),
+        );
+        navigate('/organization');
+      },
+      onError: ({ response }) => {
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to update organization' }));
+      },
+    },
+  });
+
   const submission = () => {
     if (!organizationId) {
-      const { ...filteredValues } = values;
-      const request_odk_server = filteredValues.odk_server_type === 'HOT';
-      dispatch(
-        PostOrganisationDataService(`${API_URL}/organisation?request_odk_server=${request_odk_server}`, {
-          ...filteredValues,
-          logo: filteredValues.logo ? filteredValues.logo?.[0].file : null,
-        }),
-      );
+      const request_odk_server = values.odk_server_type === 'HOT';
+      const formData = new FormData();
+      appendObjectToFormData(formData, {
+        ...values,
+        logo: values.logo ? values.logo?.[0].file : null,
+      });
+      createOrganisationMutate({
+        payload: formData,
+        params: { request_odk_server },
+      });
     } else {
-      const { ...filteredValues } = values;
-      let changedValues = diffObject(organisationFormData, filteredValues);
+      let changedValues = diffObject(organisationFormData, values);
       if (changedValues.logo) {
         changedValues = {
           ...changedValues,
@@ -61,7 +85,9 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
         };
       }
       if (Object.keys(changedValues).length > 0) {
-        dispatch(PatchOrganizationDataService(`${API_URL}/organisation/${organizationId}`, changedValues));
+        updateOrganisationMutate({
+          payload: changedValues,
+        });
       } else {
         dispatch(
           CommonActions.SetSnackBar({
@@ -77,28 +103,6 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
     submission,
     OrganizationDetailsValidation,
   );
-
-  // redirect to manage-org page after post success
-  useEffect(() => {
-    if (postOrganisationData) {
-      dispatch(OrganisationAction.postOrganisationData(null));
-      dispatch(OrganisationAction.SetOrganisationFormData({}));
-      dispatch(
-        OrganisationAction.SetConsentDetailsFormData({
-          give_consent: '',
-          review_documentation: [],
-          log_into: [],
-          participated_in: [],
-        }),
-      );
-      dispatch(OrganisationAction.SetConsentApproval(false));
-      if (searchParams.get('popup') === 'true') {
-        window.close();
-      } else {
-        navigate('/organization');
-      }
-    }
-  }, [postOrganisationData]);
 
   useEffect(() => {
     if (values?.odk_server_type === 'HOT') {
@@ -248,8 +252,11 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
             Back
           </Button>
         )}
-
-        <Button variant="primary-red" onClick={handleSubmit} isLoading={postOrganisationDataLoading}>
+        <Button
+          variant="primary-red"
+          onClick={handleSubmit}
+          isLoading={isOrganisationCreating || isOrganisationUpdating}
+        >
           {!organizationId ? 'Submit' : 'Update'}
         </Button>
       </div>
