@@ -102,13 +102,13 @@ export const projectOverviewValidationSchema = z
     if (
       !values.id &&
       values.outlineArea &&
-      +values.outlineArea?.split(' ')?.[0] > 10000 &&
+      +values.outlineArea?.split(' ')?.[0] > 1000 &&
       values.outlineArea?.split(' ')[1] === 'km²'
     ) {
       ctx.issues.push({
         input: values.outlineArea,
         path: ['outlineArea'],
-        message: 'The project area exceeded 10000 Sq.KM. and must be less than 10000 Sq.KM.',
+        message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
         code: 'custom',
       });
     }

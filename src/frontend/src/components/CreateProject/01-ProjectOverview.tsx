@@ -126,10 +126,10 @@ const ProjectOverview = () => {
 
     if (unit !== 'km²') return;
 
-    if (area > 10000) {
+    if (area > 1000) {
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'The project area exceeded 10000 Sq.KM. and must be less than 10000 Sq.KM.',
+          message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
         }),
       );
     } else if (area > 100) {
@@ -434,7 +434,7 @@ const ProjectOverview = () => {
               )}
             </div>
           )}
-          {values.outlineArea && +values.outlineArea?.split(' ')?.[0] > 10000 && errors?.outlineArea?.message && (
+          {values.outlineArea && +values.outlineArea?.split(' ')?.[0] > 1000 && errors?.outlineArea?.message && (
             <ErrorMessage message={errors.outlineArea.message as string} />
           )}
 
