@@ -24,7 +24,7 @@ import { odkTypeOptions, organizationTypeOptions } from './constants';
 import { createOrganizationValidationSchema } from './validation/CreateEditOrganization';
 import { defaultValues } from './constants/defaultValues';
 
-const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail: organisationType | undefined }) => {
+const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail?: organisationType }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const params = useParams();
@@ -97,7 +97,6 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
         logo: dirtyValues.logo ? dirtyValues.logo?.[0].file : null,
       });
       updateOrganisationMutate({
-        // params: { org_id: +orgId },
         payload: formData,
       });
     }
@@ -112,8 +111,8 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
   const values = watch();
 
   const resetState = (organizationDetail: organisationType) => {
-    const { name, associated_email, description, odk_central_url, logo, community_type, url } = organizationDetail;
-    reset({ ...defaultValues, name, associated_email, description, odk_central_url, logo, community_type, url });
+    const { name, associated_email, description, odk_central_url, logo, community_type, url, id } = organizationDetail;
+    reset({ ...defaultValues, name, associated_email, description, odk_central_url, logo, community_type, url, id });
   };
 
   useEffect(() => {
@@ -234,6 +233,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
                   />
                 )}
               />
+              {errors?.community_type?.message && <ErrorMessage message={errors.community_type.message as string} />}
             </div>
           )}
           <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -243,7 +243,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
               label="Please upload .png, .gif, .jpeg"
               data={values.logo}
               onUploadFile={(updatedFiles, fileInputRef) => {
-                setValue('logo', updatedFiles?.[0]);
+                setValue('logo', updatedFiles);
               }}
               acceptedInput="image/*"
             />
