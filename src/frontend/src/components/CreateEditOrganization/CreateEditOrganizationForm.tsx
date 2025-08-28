@@ -23,11 +23,13 @@ import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
 import { odkTypeOptions, organizationTypeOptions } from './constants';
 import { createOrganizationValidationSchema } from './validation/CreateEditOrganization';
 import { defaultValues } from './constants/defaultValues';
+import { useQueryClient } from '@tanstack/react-query';
 
 const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail?: organisationType }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const params = useParams();
+  const queryClient = useQueryClient();
 
   const orgId = params.id;
 
@@ -50,6 +52,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
     options: {
       onSuccess: ({ data }) => {
         resetState(data);
+        queryClient.invalidateQueries({ queryKey: ['get-organisation', orgId] });
         dispatch(
           CommonActions.SetSnackBar({ message: `${data.name} organization updated successfully`, variant: 'success' }),
         );
@@ -64,7 +67,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
     if (!orgId) {
       const data = getValues();
       const request_odk_server = data.odk_server_type === 'HOT';
-      const formData: FormData & { __type?: z.infer<typeof createOrganizationValidationSchema> } = new FormData();
+      const formData = new FormData();
       appendObjectToFormData(formData, {
         ...data,
         logo: data.logo ? data.logo?.[0].file : null,
@@ -83,11 +86,12 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
         description,
         logo,
       };
-      if (data.update_odk_credentials) {
-        fieldsToCompare = { ...fieldsToCompare, odk_central_url, odk_central_user, odk_central_password };
-      }
 
-      const dirtyValues = getDirtyFieldValues(fieldsToCompare, dirtyFields);
+      let dirtyValues = getDirtyFieldValues(fieldsToCompare, dirtyFields);
+      // when updating credentials, passing odk_central_url is a must. so adding it here
+      if (data.update_odk_credentials) {
+        dirtyValues = { ...dirtyValues, odk_central_url, odk_central_user, odk_central_password };
+      }
 
       if (isEmpty(dirtyValues)) {
         dispatch(

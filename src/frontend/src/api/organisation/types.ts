@@ -9,9 +9,9 @@ export type createUpdateOrganisationPayloadType = {
   associated_email: string;
   url: string;
   type?: string;
-  odk_central_url?: string;
-  odk_central_user?: string;
-  odk_central_password?: string;
+  odk_central_url: string | null;
+  odk_central_user: string | null;
+  odk_central_password: string | null;
 };
 
 // PARAMS
