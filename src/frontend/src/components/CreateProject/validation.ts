@@ -99,6 +99,19 @@ export const projectOverviewValidationSchema = z
         code: 'custom',
       });
     }
+    if (
+      !values.id &&
+      values.outlineArea &&
+      +values.outlineArea?.split(' ')?.[0] > 1000 &&
+      values.outlineArea?.split(' ')[1] === 'km²'
+    ) {
+      ctx.issues.push({
+        input: values.outlineArea,
+        path: ['outlineArea'],
+        message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+        code: 'custom',
+      });
+    }
   });
 
 export const projectDetailsValidationSchema = z
@@ -171,6 +184,7 @@ export const mapDataValidationSchema = z
   })
   .check((ctx) => {
     const values = ctx.value;
+    const featureCount = values.dataExtractGeojson?.features?.length;
 
     if (values.useMixedGeomTypes && !values.new_geom_type) {
       ctx.issues.push({
@@ -213,6 +227,14 @@ export const mapDataValidationSchema = z
         input: values.customDataExtractFile,
         path: ['dataExtractGeojson'],
         message: 'Please generate OSM data extract',
+        code: 'custom',
+      });
+    }
+    if (values.dataExtractGeojson && featureCount > 30000) {
+      ctx.issues.push({
+        input: values.dataExtractGeojson,
+        path: ['dataExtractGeojson'],
+        message: `${featureCount} is a lot of features! Please consider breaking this into smaller projects`,
         code: 'custom',
       });
     }
