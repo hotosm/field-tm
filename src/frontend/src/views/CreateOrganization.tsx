@@ -30,11 +30,6 @@ const CreateOrganization = () => {
     dispatch(OrganisationAction.SetConsentApproval(false));
   }, []);
 
-  useEffect(() => {
-    // clear state of formData to empty
-    dispatch(OrganisationAction.SetOrganisationFormData({}));
-  }, []);
-
   return (
     <div className="fmtm-h-full lg:fmtm-overflow-hidden">
       <CreateEditOrganizationHeader organizationId={''} />
@@ -43,7 +38,7 @@ const CreateOrganization = () => {
           <div className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 lg:fmtm-gap-10 fmtm-pt-4 fmtm-h-full`}>
             <InstructionsSidebar />
             <div className="fmtm-w-full fmtm-h-full xl:fmtm-max-w-[50rem] fmtm-bg-white">
-              <CreateEditOrganizationForm organizationId={''} />
+              <CreateEditOrganizationForm />
             </div>
           </div>
         ) : (
