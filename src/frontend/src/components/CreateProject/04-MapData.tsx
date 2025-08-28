@@ -155,7 +155,7 @@ const MapData = () => {
     } catch (error) {
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'Error generating map data',
+          message: error.response.data.detail || 'Error generating map data',
         }),
       );
     } finally {
