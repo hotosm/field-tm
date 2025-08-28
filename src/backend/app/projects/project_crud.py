@@ -17,6 +17,7 @@
 #
 """Logic for Field-TM project routes."""
 
+import ast
 import json
 import subprocess
 import uuid
@@ -178,11 +179,35 @@ async def generate_data_extract(
         "use_st_within": (False if geom_type == "line" else True),
         "filters": config_json,
     }
-    result = await RawDataClient(config).get_osm_data(
-        aoi, output_options=RawDataOutputOptions(download_file=False), **extra_params
-    )
 
-    return result
+    try:
+        result = await RawDataClient(config).get_osm_data(
+            aoi,
+            output_options=RawDataOutputOptions(download_file=False),
+            **extra_params,
+        )
+
+        return result
+    except Exception as e:
+        log.error("Raw data API request failed")
+        if "status 406" in str(e) and "Area" in str(e):
+            try:
+                # Extract the error dict part
+                error_str = str(e).split("status 406:")[-1].strip()
+                error_dict = ast.literal_eval(error_str)
+                msg = error_dict["detail"][0]["msg"]
+            except Exception:
+                msg = """Selected area is too large.
+                Please select an area smaller than 200 km²."""
+
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            ) from e
+
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Failed to generate data extract from the raw data API.",
+        ) from e
 
 
 # ---------------------------
