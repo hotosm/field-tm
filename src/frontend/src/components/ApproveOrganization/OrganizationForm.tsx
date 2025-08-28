@@ -1,20 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InputTextField from '@/components/common/InputTextField';
 import TextArea from '@/components/common/TextArea';
 import Button from '@/components/common/Button';
-import {
-  ApproveOrganizationService,
-  GetIndividualOrganizationService,
-  RejectOrganizationService,
-} from '@/api/OrganisationService';
-import { OrganisationAction } from '@/store/slices/organisationSlice';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch } from '@/types/reduxTypes';
 import RadioButton from '@/components/common/RadioButton';
-import { radioOptionsType } from '@/models/organisation/organisationModel';
+import type { radioOptionsType } from '@/models/organisation/organisationModel';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import {
+  useApproveOrganisationMutation,
+  useDeleteUnapprovedOrganisationMutation,
+  useGetOrganisationDetailQuery,
+} from '@/api/organisation';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const odkTypeOptions: radioOptionsType[] = [
   { name: 'odk_server_type', value: 'OWN', label: 'Own ODK server' },
@@ -26,49 +24,43 @@ const OrganizationForm = () => {
   const params = useParams();
   const navigate = useNavigate();
   const organizationId = params.id;
-  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
-  const organizationApproving = useAppSelector(
-    (state) => state.organisation.organizationApprovalStatus.organizationApproving,
-  );
-  const organizationRejecting = useAppSelector(
-    (state) => state.organisation.organizationApprovalStatus.organizationRejecting,
-  );
-  const organizationApprovalSuccess = useAppSelector(
-    (state) => state.organisation.organizationApprovalStatus.isSuccess,
-  );
-  const organisationFormDataLoading = useAppSelector((state) => state.organisation.organisationFormDataLoading);
 
-  useEffect(() => {
-    if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${VITE_API_URL}/organisation/${organizationId}`));
-    }
-  }, [organizationId]);
+  const { data: organisationData, isLoading: organisationDataLoading } = useGetOrganisationDetailQuery({
+    org_id: +organizationId!,
+    params: { org_id: +organizationId! },
+    options: {
+      queryKey: ['organization', +organizationId!],
+      enabled: !!organizationId,
+    },
+  });
 
-  const approveOrganization = () => {
-    if (organizationId) {
-      dispatch(
-        ApproveOrganizationService(`${VITE_API_URL}/organisation/approve`, {
-          org_id: +organizationId,
-          set_primary_org_odk_server: !organisationFormData?.odk_central_url,
-        }),
-      );
-    }
-  };
+  const { mutate: approveOrganization, isPending: isOrganizationApproving } = useApproveOrganisationMutation({
+    params: { org_id: +organizationId!, set_primary_org_odk_server: !organisationData?.odk_central_url },
+    options: {
+      onSuccess: () => {
+        dispatch(CommonActions.SetSnackBar({ message: 'Organization approved successfully', variant: 'success' }));
+        navigate('/organization');
+      },
+      onError: ({ response }) => {
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to approve organization' }));
+      },
+    },
+  });
 
-  const rejectOrganization = () => {
-    dispatch(RejectOrganizationService(`${VITE_API_URL}/organisation/unapproved/${organizationId}`));
-  };
+  const { mutate: rejectOrganization, isPending: isOrganizationRejecting } = useDeleteUnapprovedOrganisationMutation({
+    id: +organizationId!,
+    options: {
+      onSuccess: () => {
+        dispatch(CommonActions.SetSnackBar({ message: 'Organization rejected successfully', variant: 'success' }));
+        navigate('/organization');
+      },
+      onError: ({ response }) => {
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to reject organization' }));
+      },
+    },
+  });
 
-  // redirect to manage-organization page after approve/reject success
-  useEffect(() => {
-    if (organizationApprovalSuccess) {
-      dispatch(OrganisationAction.SetOrganisationFormData({}));
-      dispatch(OrganisationAction.SetOrganizationApprovalStatus(false));
-      navigate('/organization');
-    }
-  }, [organizationApprovalSuccess]);
-
-  if (organisationFormDataLoading)
+  if (organisationDataLoading)
     return (
       <div className="fmtm-bg-white fmtm-p-5">
         <FormFieldSkeletonLoader count={8} />
@@ -87,7 +79,7 @@ const OrganizationForm = () => {
           id="name"
           name="name"
           label="Community or Organization Name"
-          value={organisationFormData?.name}
+          value={organisationData?.name || ''}
           onChange={() => {}}
           fieldType="text"
           disabled
@@ -96,7 +88,7 @@ const OrganizationForm = () => {
           id="url"
           name="url"
           label="Website URL"
-          value={organisationFormData?.url}
+          value={organisationData?.url || ''}
           onChange={() => {}}
           fieldType="text"
           disabled
@@ -105,7 +97,7 @@ const OrganizationForm = () => {
           id="associated_email"
           name="associated_email"
           label="Email"
-          value={organisationFormData?.associated_email}
+          value={organisationData?.associated_email || ''}
           onChange={() => {}}
           fieldType="text"
           disabled
@@ -115,7 +107,7 @@ const OrganizationForm = () => {
           name="description"
           label="Description"
           rows={3}
-          value={organisationFormData?.description}
+          value={organisationData?.description || ''}
           onChange={() => {}}
           disabled
         />
@@ -123,16 +115,16 @@ const OrganizationForm = () => {
           topic="ODK Server Type"
           options={odkTypeOptions}
           direction="column"
-          value={organisationFormData?.odk_central_url ? 'OWN' : 'HOT'}
+          value={organisationData?.odk_central_url ? 'OWN' : 'HOT'}
           onChangeData={() => {}}
           className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
         />
-        {organisationFormData?.odk_central_url && (
+        {organisationData?.odk_central_url && (
           <InputTextField
             id="odk_central_url"
             name="odk_central_url"
             label="ODK Central URL "
-            value={organisationFormData?.odk_central_url}
+            value={organisationData?.odk_central_url}
             onChange={() => {}}
             fieldType="text"
             disabled
@@ -142,20 +134,16 @@ const OrganizationForm = () => {
           id="url"
           name="url"
           label="Community or Organization are you applied for? "
-          value={organisationFormData?.community_type}
+          value={organisationData?.community_type || ''}
           onChange={() => {}}
           fieldType="text"
           disabled
         />
         <div>
           <p className="fmtm-text-[1rem] fmtm-font-semibold fmtm-mb-2">Logo</p>
-          {organisationFormData?.logo ? (
+          {organisationData?.logo ? (
             <div>
-              <img
-                src={organisationFormData?.logo}
-                alt=""
-                className="fmtm-h-[100px] fmtm-rounded-sm fmtm-border-[1px]"
-              />
+              <img src={organisationData?.logo} alt="" className="fmtm-h-[100px] fmtm-rounded-sm fmtm-border-[1px]" />
             </div>
           ) : (
             <p className="fmtm-ml-3">-</p>
@@ -165,17 +153,17 @@ const OrganizationForm = () => {
       <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">
         <Button
           variant="secondary-red"
-          onClick={rejectOrganization}
-          isLoading={organizationRejecting}
-          disabled={organizationApproving}
+          onClick={() => rejectOrganization()}
+          isLoading={isOrganizationRejecting}
+          disabled={isOrganizationApproving}
         >
           Reject
         </Button>
         <Button
           variant="primary-red"
-          onClick={approveOrganization}
-          isLoading={organizationApproving}
-          disabled={organizationRejecting}
+          onClick={() => approveOrganization()}
+          isLoading={isOrganizationApproving}
+          disabled={isOrganizationRejecting}
         >
           Verify
         </Button>

@@ -1,259 +1,286 @@
 import React, { useEffect } from 'react';
+import { z } from 'zod/v4';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/common/Button';
-import InputTextField from '@/components/common/InputTextField';
-import TextArea from '@/components/common/TextArea';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { OrganisationAction } from '@/store/slices/organisationSlice';
-import useForm from '@/hooks/useForm';
-import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
-import { PatchOrganizationDataService, PostOrganisationDataService } from '@/api/OrganisationService';
-import { diffObject } from '@/utilfunctions/compareUtils';
-import { radioOptionsType } from '@/models/organisation/organisationModel';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
-import { CommonActions } from '@/store/slices/CommonSlice';
 import { CustomCheckbox } from '@/components/common/Checkbox';
+import FieldLabel from '@/components/common/FieldLabel';
+import { Input } from '@/components/RadixComponents/Input';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import { Textarea } from '@/components/RadixComponents/TextArea';
+import { OrganisationAction } from '@/store/slices/organisationSlice';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { useAppDispatch } from '@/types/reduxTypes';
+import { organisationType } from '@/types';
+import { getDirtyFieldValues } from '@/utilfunctions';
+import isEmpty from '@/utilfunctions/isEmpty';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useCreateOrganisationMutation, useUpdateOrganisationMutation } from '@/api/organisation';
+import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
+import { odkTypeOptions, organizationTypeOptions } from './constants';
+import { createOrganizationValidationSchema } from './validation/CreateEditOrganization';
+import { defaultValues } from './constants/defaultValues';
+import { useQueryClient } from '@tanstack/react-query';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const organizationTypeOptions: radioOptionsType[] = [
-  { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
-  { name: 'company', value: 'COMPANY', label: 'Company' },
-  { name: 'non_profit', value: 'NON_PROFIT', label: 'Non-profit' },
-  { name: 'university', value: 'UNIVERSITY', label: 'University' },
-  { name: 'other', value: 'OTHER', label: 'Other' },
-];
-
-const odkTypeOptions: radioOptionsType[] = [
-  { name: 'odk_server_type', value: 'OWN', label: 'Use your own ODK server' },
-  { name: 'odk_server_type', value: 'HOT', label: "Request HOT's ODK server" },
-];
-
-const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
+const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail?: organisationType }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
-  const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
-  const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
+  const params = useParams();
+  const queryClient = useQueryClient();
 
-  useDocumentTitle(organizationId ? 'Manage Organization' : 'Add Organization');
+  const orgId = params.id;
 
-  const submission = () => {
-    if (!organizationId) {
-      const { ...filteredValues } = values;
-      const request_odk_server = filteredValues.odk_server_type === 'HOT';
+  useDocumentTitle(orgId ? 'Manage Organization' : 'Add Organization');
+
+  const { mutate: createOrganisationMutate, isPending: isOrganisationCreating } = useCreateOrganisationMutation({
+    onSuccess: ({ data }) => {
       dispatch(
-        PostOrganisationDataService(`${API_URL}/organisation?request_odk_server=${request_odk_server}`, {
-          ...filteredValues,
-          logo: filteredValues.logo ? filteredValues.logo?.[0].file : null,
-        }),
+        CommonActions.SetSnackBar({ message: `${data.name} organization created successfully`, variant: 'success' }),
       );
+      navigate('/organization');
+    },
+    onError: ({ response }) => {
+      dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to create organization' }));
+    },
+  });
+
+  const { mutate: updateOrganisationMutate, isPending: isOrganisationUpdating } = useUpdateOrganisationMutation({
+    id: +orgId!,
+    options: {
+      onSuccess: ({ data }) => {
+        resetState(data);
+        queryClient.invalidateQueries({ queryKey: ['get-organisation', orgId] });
+        dispatch(
+          CommonActions.SetSnackBar({ message: `${data.name} organization updated successfully`, variant: 'success' }),
+        );
+      },
+      onError: ({ response }) => {
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to update organization' }));
+      },
+    },
+  });
+
+  const onSubmit = () => {
+    if (!orgId) {
+      const data = getValues();
+      const request_odk_server = data.odk_server_type === 'HOT';
+      const formData = new FormData();
+      appendObjectToFormData(formData, {
+        ...data,
+        logo: data.logo ? data.logo?.[0].file : null,
+      });
+      createOrganisationMutate({
+        payload: formData,
+        params: { request_odk_server },
+      });
     } else {
-      const { ...filteredValues } = values;
-      let changedValues = diffObject(organisationFormData, filteredValues);
-      if (changedValues.logo) {
-        changedValues = {
-          ...changedValues,
-          logo: changedValues.logo?.length > 0 ? changedValues.logo?.[0].file : null,
-        };
+      const data = getValues();
+      const { name, associated_email, description, odk_central_url, logo, odk_central_user, odk_central_password } =
+        data;
+      let fieldsToCompare: Partial<z.infer<typeof createOrganizationValidationSchema>> = {
+        name,
+        associated_email,
+        description,
+        logo,
+      };
+
+      let dirtyValues = getDirtyFieldValues(fieldsToCompare, dirtyFields);
+      // when updating credentials, passing odk_central_url is a must. so adding it here
+      if (data.update_odk_credentials) {
+        dirtyValues = { ...dirtyValues, odk_central_url, odk_central_user, odk_central_password };
       }
-      if (Object.keys(changedValues).length > 0) {
-        dispatch(PatchOrganizationDataService(`${API_URL}/organisation/${organizationId}`, changedValues));
-      } else {
+
+      if (isEmpty(dirtyValues)) {
         dispatch(
           CommonActions.SetSnackBar({
             message: 'Organization details up to date',
             variant: 'info',
           }),
         );
+        return;
       }
+      const formData = new FormData();
+      appendObjectToFormData(formData, {
+        ...dirtyValues,
+        logo: dirtyValues.logo ? dirtyValues.logo?.[0].file : null,
+      });
+      updateOrganisationMutate({
+        payload: formData,
+      });
     }
   };
-  const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
-    organisationFormData,
-    submission,
-    OrganizationDetailsValidation,
-  );
 
-  // redirect to manage-org page after post success
+  const formMethods = useForm<z.infer<typeof createOrganizationValidationSchema>>({
+    defaultValues: defaultValues,
+    resolver: zodResolver(createOrganizationValidationSchema),
+  });
+  const { watch, register, control, setValue, formState, handleSubmit, reset, getValues } = formMethods;
+  const { errors, dirtyFields } = formState;
+  const values = watch();
+
+  const resetState = (organizationDetail: organisationType) => {
+    const { name, associated_email, description, odk_central_url, logo, community_type, url, id } = organizationDetail;
+    reset({
+      ...defaultValues,
+      name,
+      associated_email,
+      description,
+      odk_central_url,
+      logo,
+      community_type,
+      url,
+      id,
+    });
+  };
+
   useEffect(() => {
-    if (postOrganisationData) {
-      dispatch(OrganisationAction.postOrganisationData(null));
-      dispatch(OrganisationAction.SetOrganisationFormData({}));
-      dispatch(
-        OrganisationAction.SetConsentDetailsFormData({
-          give_consent: '',
-          review_documentation: [],
-          log_into: [],
-          participated_in: [],
-        }),
-      );
-      dispatch(OrganisationAction.SetConsentApproval(false));
-      if (searchParams.get('popup') === 'true') {
-        window.close();
-      } else {
-        navigate('/organization');
-      }
-    }
-  }, [postOrganisationData]);
+    if (!organizationDetail || !orgId) return;
+    resetState(organizationDetail);
+  }, [organizationDetail, orgId]);
 
   useEffect(() => {
     if (values?.odk_server_type === 'HOT') {
-      handleCustomChange('odk_central_url', '');
-      handleCustomChange('odk_central_user', '');
-      handleCustomChange('odk_central_password', '');
+      setValue('odk_central_url', '');
+      setValue('odk_central_user', '');
+      setValue('odk_central_password', '');
     }
   }, [values?.odk_server_type]);
 
   return (
-    <div className="fmtm-relative fmtm-bg-white fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="fmtm-relative fmtm-bg-white fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden"
+    >
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
-        {!organizationId && (
+        {!orgId && (
           <h5 className="fmtm-text-[#484848] fmtm-text-2xl fmtm-font-[600] fmtm-pb-3 lg:fmtm-pb-7 fmtm-font-archivo fmtm-tracking-wide">
             Organizational Details
           </h5>
         )}
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
-          <InputTextField
-            id="name"
-            name="name"
-            label="Community or Organization Name"
-            subLabel={!organizationId ? 'Please name the local community or organization you are asking to create' : ''}
-            value={values?.name}
-            onChange={handleChange}
-            fieldType="text"
-            required
-            errorMsg={errors.name}
-          />
-          {!organizationId && (
-            <InputTextField
-              id="url"
-              name="url"
-              label="Website URL"
-              value={values?.url}
-              onChange={handleChange}
-              fieldType="text"
-              required
-              errorMsg={errors.url}
-            />
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Community or Organization Name" astric />
+            <Input {...register('name')} />
+            {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
+          </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Website URL" astric />
+            <Input {...register('url')} />
+            {errors?.url?.message && <ErrorMessage message={errors.url.message as string} />}
+          </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Email" astric />
+            <Input {...register('associated_email')} />
+            {errors?.associated_email?.message && <ErrorMessage message={errors.associated_email.message as string} />}
+          </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Description" astric />
+            <Textarea {...register('description')} />
+            {errors?.description?.message && <ErrorMessage message={errors.description.message as string} />}
+          </div>
+          {!orgId && (
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="ODK Server Type" astric />
+              <Controller
+                control={control}
+                name="odk_server_type"
+                render={({ field }) => (
+                  <RadioButton
+                    value={field.value as string}
+                    options={odkTypeOptions}
+                    onChangeData={field.onChange}
+                    ref={field.ref}
+                  />
+                )}
+              />
+              {errors?.odk_server_type?.message && <ErrorMessage message={errors.odk_server_type.message as string} />}
+            </div>
           )}
-          <InputTextField
-            id="associated_email"
-            name="associated_email"
-            label="Email"
-            value={values?.associated_email}
-            onChange={handleChange}
-            fieldType="text"
-            required
-            errorMsg={errors.associated_email}
-          />
-          <TextArea
-            id="description"
-            name="description"
-            label="Description"
-            rows={3}
-            value={values?.description}
-            onChange={handleChange}
-            required
-            errorMsg={errors.description}
-          />
-          {!organizationId && (
-            <RadioButton
-              topic="ODK Server Type"
-              options={odkTypeOptions}
-              direction="column"
-              value={values.odk_server_type}
-              onChangeData={(value) => {
-                handleCustomChange('odk_server_type', value);
-              }}
-              className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
-              errorMsg={errors.odk_server_type}
-              required
-            />
-          )}
-          {organizationId && (
+          {orgId && (
             <CustomCheckbox
+              key="update_odk_credentials"
               label="Update ODK Credentials"
-              checked={values?.update_odk_credentials}
-              onCheckedChange={(checked) => {
-                handleCustomChange('update_odk_credentials', checked);
+              checked={values.update_odk_credentials}
+              onCheckedChange={(value) => {
+                setValue('update_odk_credentials', value);
               }}
+              className="fmtm-text-black fmtm-button fmtm-text-sm"
+              labelClickable={values.update_odk_credentials}
             />
           )}
           {(values?.odk_server_type === 'OWN' || values?.update_odk_credentials) && (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
-              <InputTextField
-                id="odk_central_url"
-                name="odk_central_url"
-                label="ODK Central URL"
-                value={values?.odk_central_url}
-                onChange={handleChange}
-                fieldType="text"
-                errorMsg={errors.odk_central_url}
-                required
-              />
-              <InputTextField
-                id="odk_central_user"
-                name="odk_central_user"
-                label="ODK Central Email"
-                value={values?.odk_central_user}
-                onChange={handleChange}
-                fieldType="text"
-                errorMsg={errors.odk_central_user}
-                required
-              />
-              <InputTextField
-                id="odk_central_password"
-                name="odk_central_password"
-                label="ODK Central Password"
-                value={values?.odk_central_password}
-                onChange={handleChange}
-                fieldType="password"
-                errorMsg={errors.odk_central_password}
-                required
-              />
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+                <FieldLabel label="ODK Central URL" astric />
+                <Input {...register('odk_central_url')} />
+                {errors?.odk_central_url?.message && (
+                  <ErrorMessage message={errors.odk_central_url.message as string} />
+                )}
+              </div>
+
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+                <FieldLabel label="ODK Central Email" astric />
+                <Input {...register('odk_central_user')} />
+                {errors?.odk_central_user?.message && (
+                  <ErrorMessage message={errors.odk_central_user.message as string} />
+                )}
+              </div>
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+                <FieldLabel label="ODK Central Password" astric />
+                <Input {...register('odk_central_password')} />
+                {errors?.odk_central_password?.message && (
+                  <ErrorMessage message={errors.odk_central_password.message as string} />
+                )}
+              </div>
             </div>
           )}
-          {!organizationId && (
-            <RadioButton
-              topic="What type of community or organization are you applying for? "
-              options={organizationTypeOptions}
-              direction="column"
-              value={values.community_type}
-              onChangeData={(value) => {
-                handleCustomChange('community_type', value);
-              }}
-              className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
-              errorMsg={errors.community_type}
-              required
-            />
+          {!orgId && (
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="What type of community or organization are you applying for?" astric />
+              <Controller
+                control={control}
+                name="community_type"
+                render={({ field }) => (
+                  <RadioButton
+                    value={field.value as string}
+                    options={organizationTypeOptions}
+                    onChangeData={field.onChange}
+                    ref={field.ref}
+                  />
+                )}
+              />
+              {errors?.community_type?.message && <ErrorMessage message={errors.community_type.message as string} />}
+            </div>
           )}
-          <UploadArea
-            title="Upload Logo"
-            label="Please upload .png, .gif, .jpeg"
-            data={values?.logo}
-            onUploadFile={(updatedFiles) => {
-              handleCustomChange('logo', updatedFiles);
-            }}
-            acceptedInput="image/*"
-          />
+          <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Upload Logo" />
+            <UploadArea
+              title=""
+              label="Please upload .png, .gif, .jpeg"
+              data={values.logo}
+              onUploadFile={(updatedFiles, fileInputRef) => {
+                setValue('logo', updatedFiles, { shouldDirty: true });
+              }}
+              acceptedInput="image/*"
+            />
+            {errors?.logo?.message && <ErrorMessage message={errors.logo.message as string} />}
+          </div>
         </div>
       </div>
       <div className="fmtm-bg-white fmtm-py-2 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-shadow-2xl fmtm-z-50">
-        {!organizationId && (
+        {!orgId && (
           <Button variant="secondary-red" onClick={() => dispatch(OrganisationAction.SetConsentApproval(false))}>
             Back
           </Button>
         )}
-
-        <Button variant="primary-red" onClick={handleSubmit} isLoading={postOrganisationDataLoading}>
-          {!organizationId ? 'Submit' : 'Update'}
+        <Button type="submit" variant="primary-red" isLoading={isOrganisationCreating || isOrganisationUpdating}>
+          {!orgId ? 'Submit' : 'Update'}
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

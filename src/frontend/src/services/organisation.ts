@@ -13,7 +13,7 @@ export const getOrganisations = () => api.get('/organisation');
 export const createOrganisation = (
   payload: createUpdateOrganisationPayloadType,
   params: createOrganisationParamsType,
-) => api.post('/organisation', { payload }, { params });
+) => api.post('/organisation', payload, { params, headers: { 'Content-Type': 'multipart/form-data' } });
 
 export const getMyOrganisations = () => api.get('/organisation/my-organisations');
 
@@ -36,7 +36,7 @@ export const updateOrganisation = (
   id: number,
   payload: createUpdateOrganisationPayloadType,
   params: updateOrganisationParamsType,
-) => api.patch(`/organisation/${id}`, payload, { params });
+) => api.patch(`/organisation/${id}`, payload, { params, headers: { 'Content-Type': 'multipart/form-data' } });
 
 export const deleteOrganisation = (id: number, params: { project_id: number }) =>
   api.delete(`/organisation/${id}`, { params });
