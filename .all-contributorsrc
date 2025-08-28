@@ -414,14 +414,29 @@
       "name": "Anuj Gupta",
       "avatar_url": "https://avatars.githubusercontent.com/u/84966248?v=4",
       "profile": "https://github.com/Anuj-Gupta4",
-      "contributions": ["code", "maintenance"]
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
     },
     {
       "login": "Sujan167",
       "name": "Sujan Basnet",
       "avatar_url": "https://avatars.githubusercontent.com/u/76505195?v=4",
       "profile": "https://github.com/Sujan167",
-      "contributions": ["code", "maintenance"]
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "Kafle33",
+      "name": "Roshan Kafle",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121845834?v=4",
+      "profile": "https://github.com/Kafle33",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
