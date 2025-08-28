@@ -1,5 +1,37 @@
 # Changelog
 
+## 2025.5.0 (2025-08-28)
+
+### Feat
+
+- **mapper**: hot matomo tracking component add (#2788)
+- **frontend**: merge AOI by default on upload during proj create (#2782)
+- **frontend**: Update task list after task event action (#2783)
+- **backend**: add merge choice during project creation and default visibility (#2779)
+- **frontend**: Task User Assignment (#2775)
+- **mapper**: remove 'Offline' & Add 'My Tasks' section (#2773)
+- **organisation**: Add project status in organisation stats. (#2771)
+- **backend**: org based submission download and infographics (#2689)
+- **mapper**: clustering if primary geoms are point & update point icon (#2555)
+
+### Fix
+
+- **tasks**: correct assignee_sub variable in add_new_task_event function (#2802)
+- **backend**: fix mapper access to assigned task in private project. (#2795)
+- **mapper**: skipping of feature_exists questions for new geoms
+- **backend**: add more information to logs on /stub creation failure
+- **frontend**: Restrict mappers to update task  (#2780)
+- **migration**: Fix broken migration of project visibility. (#2774)
+- **backend**: search functionality when query includes space. (#2767)
+- **mapper**: web-forms fixed option image display (#2765)
+
+### Refactor
+
+- **mapper**: upgrade hotosm/ui package on mapper frontend (#2797)
+- **backend**: project visibility removing SENSITIVE and INVITE_ONLY (#2772)
+- **frontend**: replace API usage and types with Tanstack Query (#2768)
+- **mapper**: add status filter add to project summary and other minor refactors (#2763)
+
 ## 2025.4.3 (2025-08-01)
 
 ### Feat
