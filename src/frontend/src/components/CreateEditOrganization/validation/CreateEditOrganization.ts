@@ -6,11 +6,12 @@ export const createOrganizationValidationSchema = z
     id: z.number().optional(),
     name: z.string().trim().min(1, 'Name is required'),
     url: z
-      .url({ protocol: /^https$/, error: 'Invalid URL' })
+      .string()
       .trim()
-      .min(1, 'URL is required'),
+      .min(1, 'URL is required')
+      .url({ protocol: /^https$/, error: 'Invalid URL' }),
     description: z.string().trim().min(1, 'Description is required'),
-    associated_email: z.email('Invalid email').trim().min(1, 'Email is required'),
+    associated_email: z.string().trim().min(1, 'Email is required').email('Invalid email'),
     odk_server_type: z.string(),
     odk_central_url: z.string().nullable(),
     odk_central_user: z.string().nullable(),
@@ -27,7 +28,7 @@ export const createOrganizationValidationSchema = z
         ctx.issues.push({
           input: values.odk_central_url,
           path: ['odk_central_url'],
-          message: 'ODK URL i s Required',
+          message: 'ODK URL is Required',
           code: 'custom',
         });
       } else if (!isValidUrl(values.odk_central_url)) {
@@ -56,7 +57,7 @@ export const createOrganizationValidationSchema = z
       }
     }
 
-    if (!values.id && values.odk_server_type?.trim()) {
+    if (!values.id && !values.odk_server_type?.trim()) {
       ctx.issues.push({
         input: values.odk_server_type,
         path: ['odk_server_type'],
