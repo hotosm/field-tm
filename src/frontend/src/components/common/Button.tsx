@@ -1,7 +1,13 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
-type variantType = 'primary-red' | 'secondary-red' | 'link-red' | 'primary-grey' | 'secondary-grey' | 'link-grey';
+export type variantType =
+  | 'primary-red'
+  | 'secondary-red'
+  | 'link-red'
+  | 'primary-grey'
+  | 'secondary-grey'
+  | 'link-grey';
 
 interface IButton {
   variant: variantType;

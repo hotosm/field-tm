@@ -76,6 +76,7 @@ export const projectOverviewValidationSchema = z
     }),
     outlineArea: z.string().optional(),
     organisation_name: z.string(),
+    merge: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;

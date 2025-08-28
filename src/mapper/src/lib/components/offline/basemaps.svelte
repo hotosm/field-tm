@@ -34,7 +34,7 @@
 
 		writeOfflinePmtiles(projectId, selectedBasemap?.url, (percent) => {
 			pmtilesDownloadProgress = percent;
-		})
+		});
 	}
 
 	onMount(() => {
@@ -65,7 +65,8 @@
 				{#each basemapStore.projectBasemaps as basemap}
 					{#if basemap.status === 'SUCCESS'}
 						<sl-option value={basemap.id}>
-							{basemap.tile_source} {basemap.format}
+							{basemap.tile_source}
+							{basemap.format}
 						</sl-option>
 					{/if}
 				{/each}
@@ -80,7 +81,7 @@
 
 	<!-- Load baselayer & download to OPFS buttons -->
 	{#if selectedBasemap && selectedBasemap.format === 'pmtiles'}
-		<hot-button
+		<sl-button
 			onclick={() => loadOnlinePmtiles(selectedBasemap?.url)}
 			onkeydown={(e: KeyboardEvent) => {
 				e.key === 'Enter' && loadOnlinePmtiles(selectedBasemap?.url);
@@ -90,11 +91,11 @@
 			size="small"
 			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="icon"></hot-icon>
+			<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
 			<span>{m['basemaps.show_on_map']()}</span>
-		</hot-button>
+		</sl-button>
 
-		<hot-button
+		<sl-button
 			onclick={() => downloadPmtilesWithProgress()}
 			onkeydown={(e: KeyboardEvent) => {
 				if (e.key === 'Enter') downloadPmtilesWithProgress();
@@ -104,18 +105,18 @@
 			size="small"
 			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="icon"></hot-icon>
+			<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
 			<span>{m['basemaps.store_offline']()}</span>
-		</hot-button>
+		</sl-button>
 
 		<!-- Offline download progress bar -->
 		<div class="progress-container">
-			<hot-progress-bar value={pmtilesDownloadProgress}></hot-progress-bar>
+			<sl-progress-bar value={pmtilesDownloadProgress}></sl-progress-bar>
 		</div>
 
 		<!-- Download Mbtiles Button -->
 	{:else if selectedBasemap && selectedBasemap.format === 'mbtiles'}
-		<hot-button
+		<sl-button
 			onclick={() => window.open(selectedBasemap?.url)}
 			onkeydown={(e: KeyboardEvent) => {
 				e.key === 'Enter' && window.open(selectedBasemap?.url);
@@ -125,9 +126,9 @@
 			size="small"
 			class="button"
 		>
-			<hot-icon slot="prefix" name="download" class="icon"></hot-icon>
+			<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
 			<span>{m['basemaps.download_mbtiles']()}</span>
-		</hot-button>
+		</sl-button>
 	{/if}
 
 	{@render children?.()}

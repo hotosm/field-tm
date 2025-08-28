@@ -174,7 +174,7 @@
 	<div class="task-action-modal">
 		<div class="content">
 			<div class="icon">
-				<hot-icon
+				<sl-icon
 					name="close"
 					onclick={() => {
 						toggleTaskActionModal(false);
@@ -190,7 +190,7 @@
 					}}
 					role="button"
 					tabindex="0"
-				></hot-icon>
+				></sl-icon>
 			</div>
 			<div class="section-container">
 				<div class="header">
@@ -209,7 +209,7 @@
 							tabindex="0"
 							class="icon"
 						>
-							<hot-icon name="new-window"></hot-icon>
+							<sl-icon name="new-window"></sl-icon>
 							<p class="action">{m['popup.delete_feature']()}</p>
 						</div>
 					{/if}
@@ -242,7 +242,7 @@
 										<div class="dialog-comment-content">
 											<p>{comment?.username}</p>
 											<div class="dialog-comment-info">
-												<hot-icon name="clock-history"></hot-icon>
+												<sl-icon name="clock-history"></sl-icon>
 												<p class="created-at">{comment?.created_at?.split(' ')[0]}</p>
 											</div>
 										</div>
@@ -287,7 +287,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="direction"></hot-icon>
+							<sl-icon slot="prefix" name="direction"></sl-icon>
 							<span>{m['popup.navigate_here']()}</span>
 						</sl-button>
 						{#if !commonStore.enableWebforms}
@@ -302,7 +302,7 @@
 								role="button"
 								tabindex="0"
 							>
-								<hot-icon slot="prefix" name="location"></hot-icon>
+								<sl-icon slot="prefix" name="location"></sl-icon>
 								<span>{m['popup.map_in_odk']()}</span>
 							</sl-button>
 						{:else}
@@ -317,7 +317,7 @@
 								role="button"
 								tabindex="0"
 							>
-								<hot-icon slot="prefix" name="location"></hot-icon>
+								<sl-icon slot="prefix" name="location"></sl-icon>
 								<span>{m['dialog_entities_actions.collect_data']()}</span>
 							</sl-button>
 						{/if}
@@ -329,7 +329,7 @@
 {/if}
 
 {#if entitiesStore.selectedEntityCoordinate?.coordinate && entitiesStore.userLocationCoord}
-	<hot-dialog
+	<sl-dialog
 		bind:this={dialogRef}
 		class="entity-dialog"
 		open={toggleDistanceWarningDialog}
@@ -384,10 +384,10 @@
 				</sl-button>
 			</div>
 		</div>
-	</hot-dialog>
+	</sl-dialog>
 {/if}
 
-<hot-dialog
+<sl-dialog
 	label="Feature Comments"
 	class="feature-comments-dialog"
 	open={showCommentsPopup}
@@ -401,7 +401,7 @@
 				<div class="feature-comment-meta">
 					<p>{comment?.username}</p>
 					<div class="feature-comment-history">
-						<hot-icon name="clock-history"></hot-icon>
+						<sl-icon name="clock-history"></sl-icon>
 						<p>{comment?.created_at?.split(' ')[0]}</p>
 					</div>
 				</div>
@@ -411,10 +411,10 @@
 			</div>
 		{/each}
 	</div>
-</hot-dialog>
+</sl-dialog>
 
 <!-- new entity delete confirmation -->
-<hot-dialog
+<sl-dialog
 	bind:this={confirmationDialogRef}
 	class="entity-delete-dialog"
 	open={showDeleteEntityPopup}
@@ -450,4 +450,4 @@
 			<span>{m['common.yes']()}</span>
 		</sl-button>
 	</div>
-</hot-dialog>
+</sl-dialog>

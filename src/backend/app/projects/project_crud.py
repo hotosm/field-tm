@@ -46,7 +46,7 @@ from psycopg.rows import class_row
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
+from app.db.enums import BackgroundTaskStatus, HTTPStatus, ProjectStatus, XLSFormType
 from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
 from app.db.postgis_utils import (
     check_crs,
@@ -59,7 +59,7 @@ from app.db.postgis_utils import (
 from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
-from app.submissions.submission_crud import get_submission_by_project
+from app.submissions import submission_crud
 
 
 async def get_projects_featcol(
@@ -919,6 +919,7 @@ async def get_paginated_projects(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    status: Optional[ProjectStatus] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -933,6 +934,7 @@ async def get_paginated_projects(
         hashtags=hashtags,
         search=search,
         minimal=minimal,
+        status=status,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
@@ -961,7 +963,7 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
         project = await DbProject.one(db, project_id, minimal=False)
 
         # Fetch all submissions for the project
-        data = await get_submission_by_project(project, {})
+        data = await submission_crud.get_submission_by_project(project, {})
         submissions = data.get("value", [])
 
         # Count submissions per user

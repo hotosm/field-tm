@@ -14,10 +14,13 @@ import { Input } from '@/components/RadixComponents/Input';
 import Button from '@/components/common/Button';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import AssetModules from '@/shared/AssetModules';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const SplitTasks = () => {
+  useDocumentTitle('Create Project: Split Tasks');
+
   const dispatch = useAppDispatch();
   const generateBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -219,6 +222,7 @@ const SplitTasks = () => {
               {values.splitGeojsonByAlgorithm?.features?.length ||
                 values.splitGeojsonBySquares?.features?.length ||
                 values.outline?.features?.length ||
+                values.outline?.coordinates?.length ||
                 1}
             </span>
           </p>

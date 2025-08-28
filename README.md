@@ -102,7 +102,16 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
+# Deprecated approach (for now):
+# curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
+
+# Development
+just config generate-dotenv
+just start all
+
+# Production
+just prep machine
+just start prod
 ```
 
 Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guides.
@@ -222,6 +231,8 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="http://mapconcierge.com"><img src="https://avatars.githubusercontent.com/u/416977?v=4?s=100" width="100px;" alt="Taichi FURUHASHI"/><br /><sub><b>Taichi FURUHASHI</b></sub></a><br /><a href="#translation-mapconcierge" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ajvs"><img src="https://avatars.githubusercontent.com/u/16050172?v=4?s=100" width="100px;" alt="Ajee"/><br /><sub><b>Ajee</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=ajvs" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://spotter.ngo"><img src="https://avatars.githubusercontent.com/u/15286128?v=4?s=100" width="100px;" alt="Jiří Podhorecký"/><br /><sub><b>Jiří Podhorecký</b></sub></a><br /><a href="#translation-trendspotter" title="Translation">🌍</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sujan167"><img src="https://avatars.githubusercontent.com/u/76505195?v=4?s=100" width="100px;" alt="Sujan Basnet"/><br /><sub><b>Sujan Basnet</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Sujan167" title="Code">💻</a> <a href="#maintenance-Sujan167" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Anuj-Gupta4"><img src="https://avatars.githubusercontent.com/u/84966248?v=4?s=100" width="100px;" alt="Anuj Gupta"/><br /><sub><b>Anuj Gupta</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Anuj-Gupta4" title="Code">💻</a> <a href="#maintenance-Anuj-Gupta4" title="Maintenance">🚧</a></td>
     </tr>
   </tbody>
   <tfoot>

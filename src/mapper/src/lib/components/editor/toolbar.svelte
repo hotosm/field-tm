@@ -5,7 +5,7 @@
 
 <div class="toolbar">
 	<sl-tooltip content="Bold" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="bold"
 			class="icon"
 			class:active={editor.isActive('bold')}
@@ -15,10 +15,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Italic" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="italic"
 			class="icon"
 			class:active={editor.isActive('italic')}
@@ -28,10 +28,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Strike" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="strike"
 			class="icon"
 			class:active={editor.isActive('strike')}
@@ -41,10 +41,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 1" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="h1"
 			class="icon"
 			class:active={editor.isActive('heading', { level: 1 })}
@@ -54,10 +54,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 2" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="h2"
 			class="icon"
 			class:active={editor.isActive('heading', { level: 2 })}
@@ -67,10 +67,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 3" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="h3"
 			class="icon"
 			class:active={editor.isActive('heading', { level: 3 })}
@@ -80,10 +80,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Unordered List" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="list-ul"
 			class="icon"
 			class:active={editor.isActive('bulletList')}
@@ -93,10 +93,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Ordered List" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="list-ol"
 			class="icon"
 			class:active={editor.isActive('orderedList')}
@@ -106,10 +106,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Code" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="code"
 			class="icon"
 			class:active={editor.isActive('codeBlock')}
@@ -119,10 +119,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Quote" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="quote"
 			class="icon"
 			class:active={editor.isActive('blockquote')}
@@ -132,10 +132,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Horizontal Ruler" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="hr"
 			class="icon"
 			onclick={() => editor?.chain()?.focus()?.setHorizontalRule().run()}
@@ -144,10 +144,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Undo" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="undo"
 			class="icon"
 			onclick={() => editor?.chain()?.focus()?.undo().run()}
@@ -156,10 +156,10 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Redo" placement="bottom">
-		<hot-icon
+		<sl-icon
 			name="redo"
 			class="icon"
 			onclick={() => editor?.chain()?.focus()?.redo().run()}
@@ -168,7 +168,6 @@
 			}}
 			role="button"
 			tabindex="0"
-		></hot-icon>
+		></sl-icon>
 	</sl-tooltip>
 </div>
-

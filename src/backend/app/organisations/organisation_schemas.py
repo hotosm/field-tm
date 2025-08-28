@@ -17,14 +17,15 @@
 #
 """Pydantic models for Organisations."""
 
-from typing import Annotated, Optional, Self
+from datetime import date
+from typing import Annotated, Dict, List, Optional, Self
 
 from fastapi import Form
 from pydantic import BaseModel, Field
 from pydantic.functional_validators import model_validator
 
 from app.central.central_schemas import ODKCentralIn
-from app.db.enums import CommunityType, OrganisationType
+from app.db.enums import CommunityType, OrganisationType, ProjectStatus
 from app.db.models import DbOrganisation, slugify
 
 
@@ -119,3 +120,48 @@ class OrgManagersOut(BaseModel):
     user_sub: str
     username: str
     profile_img: Optional[str] = None
+
+
+# ======ORGANISATION STATS========
+class Overview(BaseModel):
+    """Summary of total tasks, projects, submissions, and contributors."""
+
+    total_tasks: int
+    active_projects: int
+    total_submissions: int
+    total_contributors: int
+    project_status_counts: Optional[Dict[ProjectStatus, int]] = None
+
+
+class ProjectTaskStatus(BaseModel):
+    """Task and submission stats for a specific project."""
+
+    project_id: int
+    tasks_mapped: int
+    tasks_validated: int
+    tasks_to_map: int
+    total_task: int
+    total_submission: int
+
+
+class DailyStat(BaseModel):
+    """Daily counts of mapped and validated tasks."""
+
+    date: date
+    tasks_mapped: int
+    tasks_validated: int
+
+
+class Activity(BaseModel):
+    """Recent activity data including last submission date and daily stats."""
+
+    last_submission: Optional[date]
+    daily_stats: List[DailyStat]
+
+
+class StatsResponse(BaseModel):
+    """Aggregated organisation statistics."""
+
+    overview: Overview
+    task_status: List[ProjectTaskStatus]
+    activity: Activity

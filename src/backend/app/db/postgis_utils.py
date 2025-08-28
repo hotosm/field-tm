@@ -719,71 +719,74 @@ def ensure_right_hand_rule(polygon: Polygon):
     return polygon
 
 
+def clean_geom(geom):
+    """Clean geometries based on their type."""
+    if isinstance(geom, (LineString, MultiLineString)):
+        lines = geom.geoms if isinstance(geom, MultiLineString) else [geom]
+        cleaned_lines = []
+        for line in lines:
+            buffered = line.buffer(0.0001)
+            if buffered.is_valid:
+                cleaned_lines.append(buffered)
+        return cleaned_lines
+
+    if geom.geom_type in {"Polygon", "MultiPolygon"}:
+        if geom.geom_type == "MultiPolygon":
+            return [ensure_right_hand_rule(remove_holes(p)) for p in geom.geoms]
+        return [ensure_right_hand_rule(remove_holes(geom))]
+
+    return [geom]
+
+
 def merge_polygons(
     featcol: geojson.FeatureCollection,
+    merge: bool = True,
     dissolve_polygon: bool = False,
 ) -> geojson.FeatureCollection:
-    """Merge multiple polygons, multipolygons, or linestrings into a single polygon.
+    """Merge or clean geometries in a FeatureCollection.
 
-    It is used to create a single polygon boundary. LineStrings are converted to
-    Polygons using buffer.
+    LineStrings are converted to polygons using buffer.
 
     Args:
         featcol: a FeatureCollection containing geometries.
         dissolve_polygon: True to dissolve polygons to single polygon.
+        merge: True to merge geometries into a single polygon.
 
     Returns:
         geojson.FeatureCollection: a FeatureCollection of a single Polygon.
     """
-    geom_list = []
-    properties = {}
-
     try:
         features = featcol.get("features", [])
+        geom_list, properties = [], {}
+
+        if not merge:
+            cleaned = []
+            for feature in features:
+                for g in clean_geom(shape(feature["geometry"])):
+                    cleaned.append(
+                        geojson.Feature(
+                            geometry=mapping(g),
+                            properties=feature.get("properties", {}),
+                        )
+                    )
+            return geojson.FeatureCollection(cleaned)
 
         for feature in features:
-            properties = feature["properties"]
-            geom = shape(feature["geometry"])
-
-            if isinstance(geom, (LineString, MultiLineString)):
-                if isinstance(geom, MultiLineString):
-                    for line in geom.geoms:
-                        buffered = line.buffer(0.0001)
-                        if buffered.is_valid:
-                            geom_list.append(buffered)
-                else:
-                    buffered = geom.buffer(0.0001)
-                    if buffered.is_valid:
-                        geom_list.append(buffered)
-                continue
-
-            # Handle Polygon geometries
-            if isinstance(geom, MultiPolygon):
-                # Remove holes in each polygon
-                polygons_without_holes = [remove_holes(poly) for poly in geom.geoms]
-                valid_polygons = [
-                    ensure_right_hand_rule(poly) for poly in polygons_without_holes
-                ]
-            else:
-                polygon_without_holes = remove_holes(geom)
-                valid_polygons = [ensure_right_hand_rule(polygon_without_holes)]
-            geom_list.extend(valid_polygons)
+            properties = feature.get("properties", {})
+            geom_list.extend(clean_geom(shape(feature["geometry"])))
 
         if not geom_list:
             raise ValueError("No valid geometries found in the FeatureCollection")
 
         # Merge all geometries into a single polygon
         merged_geom = create_single_polygon(MultiPolygon(geom_list), dissolve_polygon)
-
         # Ensure we have a valid polygon
         if not merged_geom.is_valid:
             merged_geom = merged_geom.buffer(0)  # Clean the geometry
 
-        merged_geojson = mapping(merged_geom)
-
         # Create FeatureCollection
         return geojson.FeatureCollection(
-            [geojson.Feature(geometry=merged_geojson, properties=properties)]
+            [geojson.Feature(geometry=mapping(merged_geom), properties=properties)]
         )
     except Exception as e:
         raise HTTPException(

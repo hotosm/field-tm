@@ -16,15 +16,17 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list manage
+
 # Install envsubst
 [no-cd]
 [no-exit-message]
 _install_envsubst:
   #!/usr/bin/env bash
-  if ! command -v curl &> /dev/null; then
-      sudo apt-get update
-      sudo apt-get install -y curl
-  fi
+  just prep _curl
 
   echo
   # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
@@ -73,7 +75,7 @@ upgrade-db:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
 
   # If branch is 'dev', override to 'development'
   if [ "$GIT_BRANCH" = "dev" ]; then

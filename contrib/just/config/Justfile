@@ -16,6 +16,11 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list config
+
 # Check if a dotenv variable is present
 [no-cd]
 [no-exit-message]

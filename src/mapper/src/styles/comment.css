@@ -77,7 +77,7 @@
 
 .comments .add-comment .wrapper .button-clear span,
 .comments .add-comment .wrapper .button-comment span {
-	--at-apply: font-primary text-sm;
+	--at-apply: text-sm;
 }
 
 .comments .add-comment .wrapper .button-comment {

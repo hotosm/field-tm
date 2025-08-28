@@ -16,9 +16,14 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list start
+
 # Start Field-TM
 [no-cd]
-default:
+all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
@@ -32,7 +37,8 @@ prod:
 
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"

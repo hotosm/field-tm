@@ -19,6 +19,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   outline: undefined,
   outlineArea: undefined,
   organisation_name: '',
+  merge: true,
 
   // 02 Project Details
   visibility: project_visibility.PUBLIC,

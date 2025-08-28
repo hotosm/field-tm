@@ -1,7 +1,7 @@
 import type { UUID } from 'crypto';
 import type { Polygon } from 'geojson';
 import { m } from '$translations/messages.js';
-import type { projectStatus } from '$constants/enums';
+import type { projectStatus, taskStatus } from '$constants/enums';
 
 export type ProjectTask = {
 	id: number;
@@ -161,15 +161,23 @@ export type NewEvent = {
 };
 
 export type TaskEventType = {
-	event_id: string;
-	event: TaskEvent | 'COMMENT';
-	state: TaskStatus | null;
-	project_id: number;
-	task_id: number;
-	user_id: number;
-	username: string;
 	comment: string | null;
 	created_at: string;
+	event: TaskEvent | 'COMMENT';
+	event_id: string;
+	project_id: number;
+	state: taskStatus;
+	task_id: number;
+	team_id: string | null;
+	user_sub: string;
+	username: string;
+};
+
+export type latestTaskEventType = {
+	id: number;
+	state: taskStatus;
+	actioned_by_uid: string;
+	task_index: number;
 };
 
 export type paginationType = {

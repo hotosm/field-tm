@@ -13,8 +13,11 @@ import { Input } from '@/components/RadixComponents/Input';
 import Switch from '@/components/common/Switch';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ProjectDetails = () => {
+  useDocumentTitle('Create Project: Project Details');
+
   const { hostname } = window.location;
   const [hashtag, setHashtag] = useState('');
 

@@ -35,13 +35,13 @@
 			{#each comments as comment (comment?.event_id)}
 				<div class="comment">
 					<div class="wrapper">
-						<hot-icon name="person-fill" class="icon"></hot-icon>
+						<sl-icon name="person-fill" class="icon"></sl-icon>
 						<div class="details">
 							<p class="username">{comment?.username}</p>
 							<div class="meta">
 								<p class="task-id">#{comment?.task_id}</p>
 								<div class="history">
-									<hot-icon name="clock-history" class="icon"></hot-icon>
+									<sl-icon name="clock-history" class="icon"></sl-icon>
 									<p class="created-at">
 										<span>
 											{comment?.created_at?.split(' ')[0]}

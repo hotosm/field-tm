@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { CustomCheckbox } from '@/components/common/Checkbox';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -37,6 +38,8 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
   const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
   const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
+
+  useDocumentTitle(organizationId ? 'Manage Organization' : 'Add Organization');
 
   const submission = () => {
     if (!organizationId) {
@@ -104,14 +107,6 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
       handleCustomChange('odk_central_password', '');
     }
   }, [values?.odk_server_type]);
-
-  useEffect(() => {
-    if (organizationId) {
-      document.title = 'Edit Organization - Field Tasking Manager';
-    } else {
-      document.title = 'Add Organization - Field Tasking Manager';
-    }
-  }, []);
 
   return (
     <div className="fmtm-relative fmtm-bg-white fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col fmtm-overflow-hidden">

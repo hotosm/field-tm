@@ -4,7 +4,7 @@
 	import type { FeatureCollection } from 'geojson';
 	import MapLibreGlDirections, { LoadingIndicatorControl } from '@maplibre/maplibre-gl-directions';
 
-	import { m } from "$translations/messages.js";
+	import { m } from '$translations/messages.js';
 	import { GetDeviceRotation } from '$lib/map/get-device-rotation.ts';
 	import { getAlertStore } from '$store/common.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
@@ -224,7 +224,7 @@
 
 <Control class="geolocation" position="top-left">
 	<ControlGroup>
-		<hot-tooltip
+		<sl-tooltip
 			bind:this={tooltipRef}
 			placement="right"
 			hoist
@@ -252,12 +252,10 @@
 					}
 				}}
 			>
-				<hot-icon
-					name="geolocate"
-					class={`geolocate-icon ${entitiesStore.toggleGeolocation ? 'toggle' : 'not-toggle'}`}
-				></hot-icon>
+				<sl-icon name="geolocate" class={`geolocate-icon ${entitiesStore.toggleGeolocation ? 'toggle' : 'not-toggle'}`}
+				></sl-icon>
 			</ControlButton>
-		</hot-tooltip>
+		</sl-tooltip>
 	</ControlGroup>
 </Control>
 

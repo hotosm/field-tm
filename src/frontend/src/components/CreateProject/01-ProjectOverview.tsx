@@ -26,10 +26,14 @@ import isEmpty from '@/utilfunctions/isEmpty';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import { ValidateODKCredentials } from '@/api/CreateProjectService';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import Switch from '@/components/common/Switch';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectOverview = () => {
+  useDocumentTitle('Create Project: Project Overview');
+
   const dispatch = useAppDispatch();
   const isAdmin = useIsAdmin();
 
@@ -386,7 +390,7 @@ const ProjectOverview = () => {
           )}
           {values.uploadAreaSelection === 'upload_file' && (
             <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
-              <FieldLabel label="Select one of the option to upload area" astric />
+              <FieldLabel label="Upload AOI" astric />
               <UploadAreaComponent
                 title=""
                 label="Please upload .geojson, .json file"
@@ -402,6 +406,19 @@ const ProjectOverview = () => {
                   Total Area: <span className="fmtm-font-bold">{values.outlineArea}</span>
                 </p>
               )}
+            </div>
+          )}
+
+          {values.uploadAreaSelection === 'upload_file' && values.outline && (
+            <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
+              <FieldLabel label="Merge AOI" tooltipMessage="Merge multiple polygons into a single AOI" />
+              <Controller
+                control={control}
+                name="merge"
+                render={({ field }) => (
+                  <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+                )}
+              />
             </div>
           )}
         </>

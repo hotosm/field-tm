@@ -38,6 +38,7 @@ const initialState: ProjectStateTypes = {
   projectUsers: [],
   projectUsersLoading: false,
   unassigningUserFromProject: false,
+  projectTaskIdIndexMap: {},
 };
 
 const ProjectSlice = createSlice({
@@ -193,6 +194,9 @@ const ProjectSlice = createSlice({
     },
     UnassigningUserFromProject(state, action: PayloadAction<boolean>) {
       state.unassigningUserFromProject = action.payload;
+    },
+    SetProjectTaskIdIndexMap(state, action: PayloadAction<ProjectStateTypes['projectTaskIdIndexMap']>) {
+      state.projectTaskIdIndexMap = action.payload;
     },
   },
 });

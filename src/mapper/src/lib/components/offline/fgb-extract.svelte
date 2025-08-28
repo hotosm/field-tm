@@ -24,7 +24,7 @@
 </script>
 
 <div class="extract">
-	<hot-button
+	<sl-button
 		onclick={() => storeFeaturesOffline()}
 		onkeydown={(e: KeyboardEvent) => {
 			e.key === 'Enter' && storeFeaturesOffline();
@@ -34,7 +34,7 @@
 		size="small"
 		class="button"
 	>
-		<hot-icon slot="prefix" name="download" class="icon"></hot-icon>
+		<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
 		<span>{m['offline.features_offline_info']()}</span>
-	</hot-button>
+	</sl-button>
 </div>

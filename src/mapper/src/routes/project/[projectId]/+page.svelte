@@ -5,7 +5,6 @@
 	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
-	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
@@ -29,11 +28,12 @@
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import QRCodeComponent from '$lib/components/qrcode.svelte';
-	import OfflineComponent from '$lib/components/offline/index.svelte';
+	// import OfflineComponent from '$lib/components/offline/index.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
 	import OdkWebFormsWrapper from '$lib/components/forms/wrapper.svelte';
 	import More from '$lib/components/more/index.svelte';
+	import MyTasks from '$lib/components/my-tasks.svelte';
 	import Editor from '$lib/components/editor/editor.svelte';
 
 	interface Props {
@@ -180,6 +180,7 @@
 	}
 
 	onDestroy(() => {
+		commonStore.setSelectedTab('map');
 		taskStore.clearTaskStates();
 		entitiesStore.setFgbOpfsUrl('');
 
@@ -299,7 +300,6 @@
 				openOdkCollectNewFeature(project?.odk_form_id, entityUuid);
 			}
 		} catch (error) {
-			console.error(error);
 			alertStore.setAlert({ message: 'Unable to create entity', variant: 'danger' });
 		} finally {
 			isGeometryCreationLoading = false;
@@ -466,8 +466,11 @@
 			{#if commonStore.selectedTab === 'events'}
 				<More projectData={project} zoomToTask={(taskId) => zoomToTask(taskId)}></More>
 			{/if}
-			{#if commonStore.selectedTab === 'offline'}
+			<!-- {#if commonStore.selectedTab === 'offline'}
 				<OfflineComponent projectId={project.id} {project} />
+			{/if} -->
+			{#if commonStore.selectedTab === 'mytasks'}
+				<MyTasks zoomToTask={(taskId) => zoomToTask(taskId)} />
 			{/if}
 			{#if commonStore.selectedTab === 'qrcode'}
 				<QRCodeComponent class="map-qr" {infoDialogRef} projectName={project.name} projectOdkToken={project.odk_token}>
@@ -490,7 +493,7 @@
 				{/if}
 			{/if}
 		</BottomSheet>
-		<hot-dialog bind:this={infoDialogRef} class="dialog-overview" no-header>
+		<sl-dialog bind:this={infoDialogRef} class="dialog-overview" no-header>
 			<div class="content">
 				<img src={ImportQrGif} alt="manual process of importing qr code gif" class="manual-qr-gif" />
 				<sl-button
@@ -506,7 +509,7 @@
 					<span>CLOSE</span>
 				</sl-button>
 			</div>
-		</hot-dialog>
+		</sl-dialog>
 	{/if}
 
 	{#if displayWebFormsDrawer === false}
@@ -527,18 +530,23 @@
 			bind:this={tabGroup}
 		>
 			<sl-tab slot="nav" panel="map">
-				<hot-icon name="map"></hot-icon>
+				<sl-icon name="map"></sl-icon>
 			</sl-tab>
-			<sl-tab slot="nav" panel="offline">
-				<hot-icon name="wifi-off"></hot-icon>
-			</sl-tab>
+			{#if loginStore.getAuthDetails}
+				<sl-tab slot="nav" panel="mytasks">
+					<sl-icon name="list-task"></sl-icon>
+				</sl-tab>
+			{/if}
+			<!-- <sl-tab slot="nav" panel="offline">
+				<sl-icon name="wifi-off"></sl-icon>
+			</sl-tab> -->
 			{#if !commonStore.enableWebforms}
 				<sl-tab slot="nav" panel="qrcode">
-					<hot-icon name="qr-code"></hot-icon>
+					<sl-icon name="qr-code"></sl-icon>
 				</sl-tab>
 			{/if}
 			<sl-tab slot="nav" panel="events">
-				<hot-icon name="three-dots"></hot-icon>
+				<sl-icon name="three-dots"></sl-icon>
 			</sl-tab>
 		</sl-tab-group>
 	{/if}
