@@ -69,18 +69,25 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
         ...data,
         logo: data.logo ? data.logo?.[0].file : null,
       });
-      // formData.append('test', 'dsfdsf');
       createOrganisationMutate({
         payload: formData,
         params: { request_odk_server },
       });
     } else {
       const data = getValues();
-      const { name, associated_email, description, odk_central_url, logo } = data;
-      const dirtyValues = getDirtyFieldValues(
-        { name, associated_email, description, odk_central_url, logo },
-        dirtyFields,
-      );
+      const { name, associated_email, description, odk_central_url, logo, odk_central_user, odk_central_password } =
+        data;
+      let fieldsToCompare: Partial<z.infer<typeof createOrganizationValidationSchema>> = {
+        name,
+        associated_email,
+        description,
+        logo,
+      };
+      if (data.update_odk_credentials) {
+        fieldsToCompare = { ...fieldsToCompare, odk_central_url, odk_central_user, odk_central_password };
+      }
+
+      const dirtyValues = getDirtyFieldValues(fieldsToCompare, dirtyFields);
 
       if (isEmpty(dirtyValues)) {
         dispatch(
@@ -112,7 +119,17 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
 
   const resetState = (organizationDetail: organisationType) => {
     const { name, associated_email, description, odk_central_url, logo, community_type, url, id } = organizationDetail;
-    reset({ ...defaultValues, name, associated_email, description, odk_central_url, logo, community_type, url, id });
+    reset({
+      ...defaultValues,
+      name,
+      associated_email,
+      description,
+      odk_central_url,
+      logo,
+      community_type,
+      url,
+      id,
+    });
   };
 
   useEffect(() => {
@@ -145,13 +162,11 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
             <Input {...register('name')} />
             {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
           </div>
-          {!orgId && (
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-              <FieldLabel label="Website URL" astric />
-              <Input {...register('url')} />
-              {errors?.url?.message && <ErrorMessage message={errors.url.message as string} />}
-            </div>
-          )}
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <FieldLabel label="Website URL" astric />
+            <Input {...register('url')} />
+            {errors?.url?.message && <ErrorMessage message={errors.url.message as string} />}
+          </div>
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
             <FieldLabel label="Email" astric />
             <Input {...register('associated_email')} />
@@ -243,7 +258,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
               label="Please upload .png, .gif, .jpeg"
               data={values.logo}
               onUploadFile={(updatedFiles, fileInputRef) => {
-                setValue('logo', updatedFiles);
+                setValue('logo', updatedFiles, { shouldDirty: true });
               }}
               acceptedInput="image/*"
             />

@@ -23,7 +23,7 @@ export const createOrganizationValidationSchema = z
   .check((ctx) => {
     const values = ctx.value;
 
-    if (values.odk_server_type === 'OWN' && !values.id) {
+    if ((values.odk_server_type === 'OWN' && !values.id) || (values.id && values.update_odk_credentials)) {
       if (!values.odk_central_url?.trim()) {
         ctx.issues.push({
           input: values.odk_central_url,
