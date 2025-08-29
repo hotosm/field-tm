@@ -124,6 +124,7 @@ const MapData = () => {
 
     dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
     dataExtractRequestFormData.append('osm_category', values.osm_category);
+    dataExtractRequestFormData.append('use_st_within', (!values.use_st_within)?.toString() ?? 'false');
     dataExtractRequestFormData.append('geom_type', values.primary_geom_type as GeoGeomTypesEnum);
     if (values.primary_geom_type == GeoGeomTypesEnum.POINT)
       dataExtractRequestFormData.append('centroid', values.includeCentroid ? 'true' : 'false');
@@ -297,18 +298,38 @@ const MapData = () => {
       )}
 
       {values.dataExtractType === 'osm_data_extract' && (
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <Button
-            variant="primary-red"
-            onClick={() => {
-              resetMapDataFile();
-              generateDataExtract();
-            }}
-            isLoading={fetchingOSMData}
-          >
-            Fetch OSM Data
-          </Button>
-        </div>
+        <>
+          <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+            <FieldLabel label="Allow Features that intersect the AOI" />
+            <Controller
+              control={control}
+              name="use_st_within"
+              render={({ field }) => (
+                <Switch
+                  ref={field.ref}
+                  checked={field.value}
+                  onCheckedChange={(value) => {
+                    field.onChange(value);
+                    setValue('use_st_within', value);
+                  }}
+                  className=""
+                />
+              )}
+            />
+          </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <Button
+              variant="primary-red"
+              onClick={() => {
+                resetMapDataFile();
+                generateDataExtract();
+              }}
+              isLoading={fetchingOSMData}
+            >
+              Fetch OSM Data
+            </Button>
+          </div>
+        </>
       )}
 
       {values.dataExtractType === 'custom_data_extract' && (
