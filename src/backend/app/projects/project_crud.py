@@ -136,6 +136,7 @@ async def generate_data_extract(
     geom_type: str,
     config_json=None,
     centroid: bool = False,
+    use_st_within: bool = True,
 ) -> RawDataResult:
     """Request a new data extract in flatgeobuf format.
 
@@ -147,6 +148,7 @@ async def generate_data_extract(
         config_json (Optional[json], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
+        use_st_within (bool): Include features within the AOI.
 
     Raises:
         HTTPException:
@@ -176,7 +178,7 @@ async def generate_data_extract(
         "geometryType": [geom_type],
         "bindZip": False,
         "centroid": centroid,
-        "use_st_within": (False if geom_type == "line" else True),
+        "use_st_within": (False if geom_type == "line" else use_st_within),
         "filters": config_json,
     }
 

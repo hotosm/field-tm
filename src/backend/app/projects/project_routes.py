@@ -538,6 +538,7 @@ async def get_data_extract(
     osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
     centroid: Annotated[bool, Form()] = False,
     geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
+    use_st_within: Annotated[bool, Form()] = True,
 ):
     """Get a new data extract for a given project AOI.
 
@@ -574,6 +575,7 @@ async def get_data_extract(
         geom_type,
         config_data,
         centroid,
+        use_st_within,
     )
 
     return JSONResponse(
