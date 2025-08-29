@@ -36,50 +36,46 @@ import pandas as pd
 from osm_fieldwork.form_components.translations import add_label_translations
 
 digitisation_fields = [
-    add_label_translations({
+    {
         "type": "begin group",
         "name": "verification",
         "relevant": "${feature_exists} = 'yes'",
-    }),
-    add_label_translations({
+    },
+    {
         "type": "select_one yes_no",
         "name": "digitisation_correct",
         "required": "yes",
-    }),
-    add_label_translations({
+    },
+    {
         "type": "select_one digitisation_problem",
         "name": "digitisation_problem",
         "relevant": "${digitisation_correct}='no'",
-    }),
-    add_label_translations({
+    },
+    {
         "type": "text",
         "name": "digitisation_problem_other",
         "relevant": "${digitisation_problem}='other' ",
-    }),
+    },
     {"type": "end group"},
-    add_label_translations({
+    {
         "type": "note",
         "name": "end_note",
         "relevant": "${feature_exists} = 'no'",
-    }),
+    },
 ]
-
-digitisation_df = pd.DataFrame(digitisation_fields)
 
 
 digitisation_choices = [
-    add_label_translations({
+    {
         "list_name": "digitisation_problem",
         "name": "lumped",
-    }),
-    add_label_translations({
+    },
+    {
         "list_name": "digitisation_problem",
         "name": "split",
-    }),
-    add_label_translations({
+    },
+    {
         "list_name": "digitisation_problem",
         "name": "other",
-    }),
+    },
 ]
-
-digitisation_choices_df = pd.DataFrame(digitisation_choices)

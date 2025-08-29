@@ -69,20 +69,19 @@ meta_df = pd.DataFrame(
     ]
 )
 
-photo_collection_df = pd.DataFrame([
-    add_label_translations({
-        "type": "image",
-        "name": "image",
-        "appearance": "minimal",
-        "parameters": "max-pixels=1000",
-    })
-])
+photo_collection_field = {
+    "type": "image",
+    "name": "image",
+    "appearance": "minimal",
+    "parameters": "max-pixels=1000",
+}
 
 
 def _get_mandatory_fields(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
-        need_verification_fields: bool
+        need_verification_fields: bool,
+        label_cols: list[str],
     ):
     """
     Return the mandatory fields data for form creation.
@@ -127,21 +126,27 @@ def _get_mandatory_fields(
                 "type": "select_one mapping_mode",
                 "name": "mapping_mode",
                 "required": "yes",
-            }),
+            },
+                label_cols=label_cols
+            ),
             add_label_translations({
                 "type": "select_one_from_file features.csv",
                 "name": "feature",
                 "appearance": "map",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "yes",
-            }),
+            },
+                label_cols=label_cols
+            ),
             add_label_translations({
                 "type": geom_field,
                 "name": "new_feature",
                 "appearance": "placement-map",
                 "relevant": "${mapping_mode} = 'new'",
                 "required": "yes",
-            })
+            },
+                label_cols=label_cols
+            )
         ]
     else:
         fields = [
@@ -150,7 +155,9 @@ def _get_mandatory_fields(
                 "type": "select_one_from_file features.csv",
                 "name": "feature",
                 "appearance": "map",
-            })
+            },
+                label_cols=label_cols
+            )
         ]
 
     fields.extend([
@@ -230,21 +237,24 @@ def _get_mandatory_fields(
             "type": "select_one yes_no",
             "name": "feature_exists",
             "relevant": "${feature} != '' ",
-        }))
+        },
+            label_cols=label_cols
+        ))
     return fields
 
 
 def create_survey_df(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
-        need_verification_fields: bool
+        need_verification_fields: bool,
+        label_cols: list[str]
     ) -> pd.DataFrame:
     """Create the survey sheet dataframe.
 
     We do this in a function to allow the geometry type
     for new data to be specified.
     """
-    fields = _get_mandatory_fields(use_odk_collect, new_geom_type, need_verification_fields)
+    fields = _get_mandatory_fields(use_odk_collect, new_geom_type, need_verification_fields, label_cols)
     mandatory_df = pd.DataFrame(fields)
     return pd.concat([meta_df, mandatory_df])
 
