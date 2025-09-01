@@ -50,6 +50,7 @@ import type {
   contributorsType,
   uploadProjectTaskBoundariesPayloadType,
   updateProjectPayloadType,
+  projectUserType,
 } from './types';
 
 export function useGetProjectSummariesQuery({
@@ -201,10 +202,11 @@ export const useGetProjectUsersQuery = ({
 }: {
   project_id: number;
   params: projectUsersParamsType;
-  options: TQueryOptions<any>;
+  options: TQueryOptions<projectUserType[]>;
 }) =>
   useQuery({
     queryFn: () => getProjectUsers(project_id, params),
+    select: (data) => data.data,
     ...options,
   });
 

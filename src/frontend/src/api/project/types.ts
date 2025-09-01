@@ -216,3 +216,10 @@ export type contributorsType = {
   user: string;
   submissions: number;
 };
+
+export type projectUserType = {
+  user_sub: string;
+  project_id: number;
+  role: project_roles;
+  username: string;
+};

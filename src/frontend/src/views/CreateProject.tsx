@@ -34,10 +34,9 @@ import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
 import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { GetProjectUsers } from '@/api/Project';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { useGetProjectMinimalQuery } from '@/api/project';
+import { useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -65,7 +64,6 @@ const CreateProject = () => {
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
-  const projectManagers = useAppSelector((state) => state.project.projectUsers);
 
   const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
     project_id: projectId!,
@@ -114,17 +112,18 @@ const CreateProject = () => {
     });
   }, [minimalProjectDetails]);
 
-  useEffect(() => {
-    if (!projectId) return;
-    dispatch(GetProjectUsers(`${VITE_API_URL}/projects/${projectId}/users`, { role: project_roles.PROJECT_MANAGER }));
-  }, [projectId]);
+  const { data: projectManagers } = useGetProjectUsersQuery({
+    project_id: projectId!,
+    params: { role: project_roles.PROJECT_MANAGER },
+    options: { queryKey: ['get-project-users', project_roles.PROJECT_MANAGER, projectId], enabled: !!projectId },
+  });
 
   // setup project admin select options if project admins are available
   useEffect(() => {
     // only set project_admins value after basic project details are fetched
-    if (!projectId || isEmpty(projectManagers) || isMinimalProjectLoading) return;
+    if (!projectId || !projectManagers || isEmpty(projectManagers) || isMinimalProjectLoading) return;
 
-    const projectAdminOptions = projectManagers.map((admin) => ({
+    const projectAdminOptions = projectManagers?.map((admin) => ({
       id: admin.user_sub,
       label: admin.username,
       value: admin.user_sub,
