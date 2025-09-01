@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import DataTable from '@/components/common/DataTable';
-import { GetUserListService, UpdateUserRole } from '@/api/User';
+import { UpdateUserRole } from '@/api/User';
 import { useAppDispatch } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
@@ -25,10 +25,9 @@ const roleLabel = {
 const ManageUsers = () => {
   useDocumentTitle('Manage Users');
   const dispatch = useAppDispatch();
-  
+
   const isAdmin = useIsAdmin();
   if (!isAdmin) return <Forbidden />;
-
 
   const updateRole = (userSub: string, currentRole: roleType, newRole: roleType) => {
     if (currentRole === newRole) {
@@ -125,7 +124,7 @@ const ManageUsers = () => {
     },
   ];
 
-  const [filter, setFilter] = useState({ search: '', page: 1,  results_per_page: 1 });
+  const [filter, setFilter] = useState({ search: '', page: 1, results_per_page: 1 });
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 500,
     init: filter.search,
@@ -158,7 +157,7 @@ const ManageUsers = () => {
         columns={userDatacolumns}
         isLoading={isUserListLoading}
         pagination={{ pageIndex: filter.page, pageSize: 13 }}
-        setPaginationPage={(page) => setFilter(prev => ({ ...prev, pageIndex: page + 1 }))}
+        setPaginationPage={(page) => setFilter((prev) => ({ ...prev, pageIndex: page + 1 }))}
         tableWrapperClassName="fmtm-flex-1"
       />
     </div>
