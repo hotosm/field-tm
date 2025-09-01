@@ -89,7 +89,7 @@ const ProjectOverview = () => {
           hasODKCredentials: true,
         },
       ]
-    : (organisationListData || myOrganisationListData || [])?.map((org) => ({
+    : (isAdmin ? organisationListData : myOrganisationListData)?.map((org) => ({
         id: org.id,
         label: org.name,
         value: org.id,
@@ -221,7 +221,7 @@ const ProjectOverview = () => {
         <div className="relative">
           <Textarea {...register('short_description')} maxLength={200} />
           <p className="fmtm-text-xs fmtm-absolute fmtm-bottom-1 fmtm-right-2 fmtm-text-gray-400">
-            {values.short_description.length}/200
+            {values?.short_description?.length}/200
           </p>
         </div>
         {errors?.short_description?.message && <ErrorMessage message={errors.short_description.message as string} />}

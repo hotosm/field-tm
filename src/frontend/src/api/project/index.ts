@@ -285,6 +285,7 @@ export const useGetProjectMinimalQuery = ({
 }) =>
   useQuery({
     queryFn: () => getProjectMinimal(project_id),
+    select: (data) => data.data,
     ...options,
   });
 

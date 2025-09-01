@@ -8,12 +8,7 @@ import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-  useHasManagedAnyOrganization,
-  useIsAdmin,
-  useIsOrganizationAdmin,
-  useIsProjectManager,
-} from '@/hooks/usePermissions';
+import { useHasManagedAnyOrganization, useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 import Forbidden from '@/views/Forbidden';
 import Stepper from '@/components/CreateProject/Stepper';
@@ -30,12 +25,7 @@ import {
 } from '@/components/CreateProject/validation';
 import { z } from 'zod/v4';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import {
-  CreateDraftProjectService,
-  CreateProjectService,
-  DeleteProjectService,
-  GetBasicProjectDetails,
-} from '@/api/CreateProjectService';
+import { CreateDraftProjectService, CreateProjectService, DeleteProjectService } from '@/api/CreateProjectService';
 import { defaultValues } from '@/components/CreateProject/constants/defaultValues';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
@@ -47,6 +37,7 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 import { GetProjectUsers } from '@/api/Project';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
+import { useGetProjectMinimalQuery } from '@/api/project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -66,27 +57,25 @@ const CreateProject = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const step = Number(searchParams.get('step'));
 
-  const basicProjectDetailsLoading = useAppSelector((state) => state.createproject.basicProjectDetailsLoading);
-
   const resetReduxState = () => {
     dispatch(CreateProjectActions.SetCustomFileValidity(false));
   };
-
-  useEffect(() => {
-    resetReduxState();
-    if (!projectId) return;
-    dispatch(GetBasicProjectDetails(`${VITE_API_URL}/projects/${projectId}/minimal`));
-  }, [projectId]);
 
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
-  const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
   const projectManagers = useAppSelector((state) => state.project.projectUsers);
 
+  const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
+    project_id: projectId!,
+    options: { queryKey: ['get-minimal-project', projectId], enabled: !!projectId },
+  });
+
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-  const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
+  const isOrganizationAdmin = useIsOrganizationAdmin(
+    minimalProjectDetails ? +minimalProjectDetails?.organisation_id : null,
+  );
   const isProjectManager = useIsProjectManager(projectId);
 
   const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
@@ -105,13 +94,25 @@ const CreateProject = () => {
   }, []);
 
   useEffect(() => {
-    if (!basicProjectDetails || !projectId) return;
-    reset({ ...defaultValues, ...basicProjectDetails });
+    resetReduxState();
+  }, [projectId]);
 
-    return () => {
-      dispatch(CreateProjectActions.SetBasicProjectDetails(null));
-    };
-  }, [basicProjectDetails]);
+  useEffect(() => {
+    if (!minimalProjectDetails || !projectId) return;
+    const { id, name, short_description, description, organisation_id, outline, hashtags, organisation_name } =
+      minimalProjectDetails;
+    reset({
+      ...defaultValues,
+      id,
+      name,
+      short_description,
+      description,
+      organisation_id: +organisation_id,
+      outline,
+      hashtags,
+      organisation_name,
+    });
+  }, [minimalProjectDetails]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -121,7 +122,7 @@ const CreateProject = () => {
   // setup project admin select options if project admins are available
   useEffect(() => {
     // only set project_admins value after basic project details are fetched
-    if (!projectId || isEmpty(projectManagers) || basicProjectDetailsLoading) return;
+    if (!projectId || isEmpty(projectManagers) || isMinimalProjectLoading) return;
 
     const projectAdminOptions = projectManagers.map((admin) => ({
       id: admin.user_sub,
@@ -136,7 +137,7 @@ const CreateProject = () => {
       }),
     );
     setValue('project_admins', project_admins);
-  }, [projectManagers, projectId, basicProjectDetailsLoading]);
+  }, [projectManagers, projectId, isMinimalProjectLoading]);
 
   const form = {
     1: <ProjectOverview />,
@@ -279,7 +280,7 @@ const CreateProject = () => {
 
   if (
     (!projectId && !hasManagedAnyOrganization) ||
-    (projectId && !basicProjectDetailsLoading && !(isProjectManager || isOrganizationAdmin))
+    (projectId && !isMinimalProjectLoading && !(isProjectManager || isOrganizationAdmin))
   )
     return <Forbidden />;
 
@@ -343,7 +344,7 @@ const CreateProject = () => {
             className="fmtm-flex fmtm-flex-col fmtm-col-span-12 sm:fmtm-col-span-7 lg:fmtm-col-span-5 sm:fmtm-h-full fmtm-overflow-y-hidden fmtm-rounded-xl fmtm-bg-white fmtm-my-2 sm:fmtm-my-0"
           >
             <div className="fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-px-10 fmtm-py-8">
-              {basicProjectDetailsLoading && projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
+              {isMinimalProjectLoading && projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
             </div>
 
             {/* buttons */}
@@ -352,7 +353,7 @@ const CreateProject = () => {
                 <Button
                   variant="link-grey"
                   onClick={() => setSearchParams({ step: (step - 1).toString() })}
-                  disabled={createProjectLoading || basicProjectDetailsLoading || isProjectDeletePending}
+                  disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeletePending}
                 >
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
@@ -379,7 +380,7 @@ const CreateProject = () => {
                   type="submit"
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
-                    basicProjectDetailsLoading ||
+                    isMinimalProjectLoading ||
                     isProjectDeletePending
                   }
                   isLoading={
