@@ -53,7 +53,7 @@ export function useGetOrganisationAdminsQuery({
   params,
   options,
 }: {
-  params: { org_id: number };
+  params: { org_id?: number };
   options: TQueryOptions<organisationAdminType[]>;
 }) {
   return useQuery({
@@ -69,7 +69,7 @@ export function useGetOrganisationDetailQuery({
   options,
 }: {
   org_id: number;
-  params: { org_id: number };
+  params: { org_id?: number };
   options: TQueryOptions<organisationType>;
 }) {
   return useQuery({
