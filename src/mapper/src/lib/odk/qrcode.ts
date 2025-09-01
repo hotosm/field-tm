@@ -28,7 +28,7 @@ export function generateQrCode(projectName: string, odkToken: string, username: 
 }
 
 export function downloadQrCode(projectName: string) {
-	const qrCodeElement = document.querySelector('hot-qr-code')?.shadowRoot;
+	const qrCodeElement = document.querySelector('sl-qr-code')?.shadowRoot;
 	if (!qrCodeElement) return;
 
 	const canvas = qrCodeElement.querySelector('canvas');

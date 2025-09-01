@@ -75,7 +75,7 @@ const ProjectOptions = () => {
       case 'qr':
         const downloadLink = document.createElement('a');
         downloadLink.href = qrcode;
-        downloadLink.download = `Project_${projectId}`;
+        downloadLink.download = `Project_${projectId}.png`;
         downloadLink.click();
         break;
     }
