@@ -35,7 +35,6 @@ import {
   CreateProjectService,
   DeleteProjectService,
   GetBasicProjectDetails,
-  OrganisationService,
 } from '@/api/CreateProjectService';
 import { defaultValues } from '@/components/CreateProject/constants/defaultValues';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -86,7 +85,6 @@ const CreateProject = () => {
   const basicProjectDetails = useAppSelector((state) => state.createproject.basicProjectDetails);
   const projectManagers = useAppSelector((state) => state.project.projectUsers);
 
-  const isAdmin = useIsAdmin();
   const hasManagedAnyOrganization = useHasManagedAnyOrganization();
   const isOrganizationAdmin = useIsOrganizationAdmin(basicProjectDetails?.organisation_id || null);
   const isProjectManager = useIsProjectManager(projectId);
@@ -114,13 +112,6 @@ const CreateProject = () => {
       dispatch(CreateProjectActions.SetBasicProjectDetails(null));
     };
   }, [basicProjectDetails]);
-
-  useEffect(() => {
-    if (projectId) return;
-    dispatch(
-      OrganisationService(isAdmin ? `${VITE_API_URL}/organisation` : `${VITE_API_URL}/organisation/my-organisations`),
-    );
-  }, [projectId]);
 
   useEffect(() => {
     if (!projectId) return;
