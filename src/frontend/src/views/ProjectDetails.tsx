@@ -176,7 +176,7 @@ const ProjectDetails = () => {
           <div className="fmtm-flex fmtm-items-center">
             <AssetModules.ChevronLeftIcon
               className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/explore')}
             />
             <h5 className="fmtm-line-clamp-1" title={projectInfo.name}>
               {projectInfo.name}
@@ -300,7 +300,7 @@ const ProjectDetails = () => {
           </ResizablePanelGroup>
           <div
             className="fmtm-absolute fmtm-top-4 fmtm-left-4 fmtm-bg-white fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-red-50 fmtm-duration-300 fmtm-border-[1px] md:fmtm-hidden fmtm-cursor-pointer"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/explore')}
           >
             <AssetModules.ArrowBackIcon className="fmtm-text-grey-800" />
           </div>

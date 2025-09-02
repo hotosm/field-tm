@@ -568,7 +568,7 @@ const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
         dispatch(CreateProjectActions.SetProjectDeletePending(true));
         await API.delete(url);
         if (navigate) {
-          navigate('/');
+          navigate('/explore');
           dispatch(
             CommonActions.SetSnackBar({
               message: `Project deleted`,

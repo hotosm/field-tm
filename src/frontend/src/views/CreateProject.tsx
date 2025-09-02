@@ -332,7 +332,7 @@ const CreateProject = () => {
           )} */}
           <AssetModules.CloseIcon
             className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/explore')}
           />
         </div>
       </div>
