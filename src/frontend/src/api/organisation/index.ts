@@ -53,7 +53,7 @@ export function useGetOrganisationAdminsQuery({
   params,
   options,
 }: {
-  params: { org_id: number };
+  params: { org_id?: number };
   options: TQueryOptions<organisationAdminType[]>;
 }) {
   return useQuery({
@@ -69,7 +69,7 @@ export function useGetOrganisationDetailQuery({
   options,
 }: {
   org_id: number;
-  params: { org_id: number };
+  params: { org_id?: number };
   options: TQueryOptions<organisationType>;
 }) {
   return useQuery({
@@ -166,17 +166,12 @@ export function useDeleteOrganisationMutation({
 }
 
 export function useRemoveOrganisationAdminMutation({
-  user_sub,
-  params,
   options,
 }: {
-  user_sub: string;
-  params: removeOrganisationAdminParamsType;
-  options: TMutationOptions<unknown, number>;
+  options: TMutationOptions<unknown, { user_sub: string; params: removeOrganisationAdminParamsType }>;
 }) {
   return useMutation({
-    mutationKey: ['remove-organisation-admin', params],
-    mutationFn: () => removeOrganisationAdmin(user_sub, params),
+    mutationFn: ({ user_sub, params }) => removeOrganisationAdmin(user_sub, params),
     ...options,
   });
 }

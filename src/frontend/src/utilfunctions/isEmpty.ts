@@ -5,7 +5,7 @@
  * @param {object|array} obj  - object or array
  * @returns {boolean} boolean value whether the object or array is empty or not.
  */
-export default function isEmpty(obj: object | []): boolean {
+export default function isEmpty(obj: object | [] | null | undefined): boolean {
   if (!obj) return true;
   if (Array.isArray(obj)) {
     return obj.length === 0;

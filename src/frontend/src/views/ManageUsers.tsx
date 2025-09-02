@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import DataTable from '@/components/common/DataTable';
-import { GetUserListService, UpdateUserRole } from '@/api/User';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { UpdateUserRole } from '@/api/User';
+import { useAppDispatch } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { user_roles } from '@/types/enums';
@@ -11,6 +11,7 @@ import useDebouncedInput from '@/hooks/useDebouncedInput';
 import { useIsAdmin } from '@/hooks/usePermissions';
 import Forbidden from '@/views/Forbidden';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useGetUsersQuery } from '@/api/user';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,13 +24,10 @@ const roleLabel = {
 
 const ManageUsers = () => {
   useDocumentTitle('Manage Users');
+  const dispatch = useAppDispatch();
 
   const isAdmin = useIsAdmin();
   if (!isAdmin) return <Forbidden />;
-
-  const dispatch = useAppDispatch();
-  const userListLoading = useAppSelector((state) => state.user.userListLoading);
-  const userList = useAppSelector((state) => state.user.userList);
 
   const updateRole = (userSub: string, currentRole: roleType, newRole: roleType) => {
     if (currentRole === newRole) {
@@ -126,28 +124,18 @@ const ManageUsers = () => {
     },
   ];
 
-  const [filter, setFilter] = useState({ search: '' });
-
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 13,
-  });
-
+  const [filter, setFilter] = useState({ search: '', page: 1, results_per_page: 13 });
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 500,
     init: filter.search,
     onChange: (debouncedEvent) => setFilter((prev) => ({ ...prev, search: debouncedEvent.target.value })),
   });
 
-  useEffect(() => {
-    dispatch(
-      GetUserListService(`${VITE_API_URL}/users`, {
-        results_per_page: 13,
-        page: pagination.pageIndex + 1,
-        ...filter,
-      }),
-    );
-  }, [filter, pagination, filter]);
+  const { data: userList, isLoading: isUserListLoading } = useGetUsersQuery({
+    params: filter,
+    options: { queryKey: ['get-users', filter] },
+  });
+
   return (
     <div className="fmtm-h-full fmtm-flex fmtm-flex-col">
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
@@ -167,9 +155,9 @@ const ManageUsers = () => {
       <DataTable
         data={userList || []}
         columns={userDatacolumns}
-        isLoading={userListLoading}
-        pagination={{ pageIndex: pagination.pageIndex, pageSize: pagination.pageSize }}
-        setPaginationPage={(page) => setPagination(page)}
+        isLoading={isUserListLoading}
+        pagination={{ pageIndex: filter.page, pageSize: 13 }}
+        setPaginationPage={(page) => setFilter((prev) => ({ ...prev, pageIndex: page + 1 }))}
         tableWrapperClassName="fmtm-flex-1"
       />
     </div>

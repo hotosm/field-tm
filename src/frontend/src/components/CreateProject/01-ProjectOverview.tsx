@@ -28,6 +28,7 @@ import { ValidateODKCredentials } from '@/api/CreateProjectService';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
+import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,8 +57,6 @@ const ProjectOverview = () => {
 
   //@ts-ignore
   const authDetails = useAppSelector((state) => state.login.authDetails);
-  const organisationListData = useAppSelector((state) => state.createproject.organisationList);
-  const organisationListLoading = useAppSelector((state) => state.createproject.organisationListLoading);
   const userList = useAppSelector((state) => state.user.userListForSelect)?.map((user) => ({
     id: user.sub,
     label: user.username,
@@ -72,6 +71,14 @@ const ProjectOverview = () => {
   const { errors } = formState;
   const values = watch();
 
+  const { data: organisationListData, isLoading: isOrganisationListLoading } = useGetOrganisationsQuery({
+    options: { queryKey: ['get-organisation-list'], enabled: isAdmin },
+  });
+
+  const { data: myOrganisationListData, isLoading: isMyOrganisationListLoading } = useGetMyOrganisationsQuery({
+    options: { queryKey: ['get-my-organisation-list'], enabled: !isAdmin },
+  });
+
   // if draft project created, then instead of calling organisation endpoint populate organisation list with project minimal response data
   const organisationList = values?.id
     ? [
@@ -82,7 +89,7 @@ const ProjectOverview = () => {
           hasODKCredentials: true,
         },
       ]
-    : organisationListData.map((org) => ({
+    : (isAdmin ? organisationListData : myOrganisationListData)?.map((org) => ({
         id: org.id,
         label: org.name,
         value: org.id,
@@ -105,7 +112,7 @@ const ProjectOverview = () => {
 
     setValue('organisation_id', authDetails?.orgs_managed[0]);
     handleOrganizationChange(authDetails?.orgs_managed[0]);
-  }, [authDetails, organisationListData]);
+  }, [authDetails, organisationListData, myOrganisationListData]);
 
   // set odk creds to form state only after validating if the creds are available
   useEffect(() => {
@@ -214,7 +221,7 @@ const ProjectOverview = () => {
         <div className="relative">
           <Textarea {...register('short_description')} maxLength={200} />
           <p className="fmtm-text-xs fmtm-absolute fmtm-bottom-1 fmtm-right-2 fmtm-text-gray-400">
-            {values.short_description.length}/200
+            {values?.short_description?.length}/200
           </p>
         </div>
         {errors?.short_description?.message && <ErrorMessage message={errors.short_description.message as string} />}
@@ -242,7 +249,7 @@ const ProjectOverview = () => {
               }}
               placeholder="Organization Name"
               disabled={(!isAdmin && authDetails?.orgs_managed?.length === 1) || !!values.id}
-              isLoading={organisationListLoading}
+              isLoading={isOrganisationListLoading || isMyOrganisationListLoading}
               ref={field.ref}
             />
           )}

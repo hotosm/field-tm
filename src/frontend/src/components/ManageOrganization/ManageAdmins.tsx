@@ -1,26 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import DataTable from '@/components/common/DataTable';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import Button from '@/components/common/Button';
-import { DeleteOrganizationAdminService, GetOrganizationAdminsService } from '@/api/OrganisationService';
 import { useParams } from 'react-router-dom';
 import { OrganizationAdminsModel } from '@/models/organisation/organisationModel';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useGetOrganisationAdminsQuery, useRemoveOrganisationAdminMutation } from '@/api/organisation';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ManageAdmins = () => {
   const dispatch = useAppDispatch();
   const params = useParams();
+  const queryClient = useQueryClient();
 
   const organizationId = params.id;
-  const organizationAdmins = useAppSelector((state) => state.organisation.organizationAdmins);
-  const organizationAdminsLoading = useAppSelector((state) => state.organisation.getOrganizationAdminsLoading);
-  const deleteOrganizationAdminPending = useAppSelector((state) => state.organisation.deleteOrganizationAdminPending);
-
   const [toggleDeleteOrgModal, setToggleDeleteOrgModal] = useState(false);
   const [adminToRemove, setAdminToRemove] = useState<OrganizationAdminsModel | null>(null);
+
+  const { data: organizationAdmins, isLoading: isOrganizationAdminsLoading } = useGetOrganisationAdminsQuery({
+    params: { org_id: +organizationId! },
+    options: { queryKey: ['get-org-admins', +organizationId!], enabled: !!organizationId },
+  });
+
+  const { mutate: removeOrganisationAdmin, isPending: isRemoveOrganisationAdminPending } =
+    useRemoveOrganisationAdminMutation({
+      options: {
+        onSuccess: () => {
+          dispatch(
+            CommonActions.SetSnackBar({ message: 'Organisation admin removed successfully', variant: 'success' }),
+          );
+          queryClient.invalidateQueries({ queryKey: ['get-org-admins', +organizationId!] });
+        },
+        onError: ({ response }) => {
+          dispatch(
+            CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to remove organisation admin' }),
+          );
+        },
+      },
+    });
 
   const userDatacolumns = [
     {
@@ -76,7 +95,7 @@ const ManageAdmins = () => {
                     </Button>
                     <Button
                       variant="primary-red"
-                      isLoading={deleteOrganizationAdminPending}
+                      isLoading={isRemoveOrganisationAdminPending}
                       onClick={() => {
                         adminToRemove && removeOrgAdmin(adminToRemove?.user_sub);
                       }}
@@ -93,23 +112,9 @@ const ManageAdmins = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!organizationId) return;
-    dispatch(GetOrganizationAdminsService(`${VITE_API_URL}/organisation/org-admins`, { org_id: +organizationId }));
-  }, [organizationId]);
-
   const removeOrgAdmin = async (user_sub: string) => {
     if (!organizationId) return;
-    await dispatch(
-      DeleteOrganizationAdminService(
-        `${VITE_API_URL}/organisation/org-admin/${user_sub}`,
-        {
-          org_id: +organizationId,
-        },
-        user_sub,
-        organizationAdmins,
-      ),
-    );
+    removeOrganisationAdmin({ user_sub, params: { org_id: +organizationId } });
     setToggleDeleteOrgModal(false);
   };
 
@@ -118,7 +123,7 @@ const ManageAdmins = () => {
       <DataTable
         data={organizationAdmins || []}
         columns={userDatacolumns}
-        isLoading={organizationAdminsLoading}
+        isLoading={isOrganizationAdminsLoading}
         tableWrapperClassName="fmtm-flex-1"
       />
     </div>

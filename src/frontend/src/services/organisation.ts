@@ -27,9 +27,9 @@ export const approveOrganisation = (params: approveOrganisationParamsType) =>
 export const addNewOrganisationAdmin = (params: addNewOrganisationAdminParamsType) =>
   api.post(`/organisation/new-admin`, {}, { params });
 
-export const getOrganisationAdmins = (params: { org_id: number }) => api.get('/organisation/org-admins', { params });
+export const getOrganisationAdmins = (params: { org_id?: number }) => api.get('/organisation/org-admins', { params });
 
-export const getOrganisationDetail = (id: number, params: { org_id: number }) =>
+export const getOrganisationDetail = (id: number, params: { org_id?: number }) =>
   api.get(`/organisation/${id}`, { params });
 
 export const updateOrganisation = (
