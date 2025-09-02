@@ -35,16 +35,16 @@ import pandas as pd
 from python_calamine.pandas import pandas_monkeypatch
 
 from osm_fieldwork.enums import DbGeomType
-from osm_fieldwork.form_components.choice_fields import choices_df
+from osm_fieldwork.form_components.choice_fields import choices_data
 from osm_fieldwork.form_components.mandatory_fields import (
     meta_df,
     create_survey_df,
-    photo_collection_df,
+    photo_collection_field,
     create_entity_df,
 )
 from osm_fieldwork.form_components.digitisation_fields import (
-    digitisation_df, 
-    digitisation_choices_df,
+    digitisation_fields,
+    digitisation_choices, 
 )
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES, add_label_translations
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -59,7 +59,7 @@ FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
 
-def standardize_xlsform_sheets(xlsform: dict) -> dict:
+def standardize_xlsform_sheets(xlsform: dict):
     """Standardizes column headers in both the 'survey' and 'choices' sheets of an XLSForm.
 
     - Strips spaces and lowercases all column headers.
@@ -95,7 +95,7 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
                         if lang_name in INCLUDED_LANGUAGES:
                             standardized_col = f"{base_col}::{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
 
-                elif col == base_col:  # if only label,hint or required_message then add '::english(en)'
+                elif col == base_col and col != "label":  # if only label,hint or required_message then add '::english(en)'
                     standardized_col = f"{base_col}::english(en)"
 
                 if col != standardized_col:
@@ -116,15 +116,19 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
                 return df[df[column].notna()]
         return df
 
+    label_cols = set()
     for sheet_name, sheet_df in xlsform.items():
         if sheet_df.empty:
             continue
         # standardize the language columns
         sheet_df = standardize_language_columns(sheet_df)
         sheet_df = filter_df_empty_rows(sheet_df)
+        label_cols.update(
+            [col for col in sheet_df.columns if "label" in col.lower()]
+        )
         xlsform[sheet_name] = sheet_df
 
-    return xlsform
+    return xlsform, list(label_cols)
 
 
 def normalize_with_meta(row, meta_df):
@@ -139,6 +143,7 @@ def normalize_with_meta(row, meta_df):
 def merge_dataframes(
         mandatory_df: pd.DataFrame, 
         user_question_df: pd.DataFrame, 
+        add_label: bool,
         digitisation_df: Optional[pd.DataFrame] = None,
         photo_collection_df: Optional[pd.DataFrame] = None,
         need_verification: Optional[bool] = True,
@@ -192,14 +197,17 @@ def merge_dataframes(
     # feature does not exist. If we don't have the `feature_exists` question, then
     # wrapping in the group is unnecessary (all groups are flattened in processing anyway)
     if need_verification:
+        survey_group_field = {
+            "type": ["begin group"],
+            "name": ["survey_questions"],
+            "relevant": "(${feature_exists} = 'yes') or (${status} = '2')",
+        }
+        if add_label:
+            survey_group_field = add_label_translations(survey_group_field)
         survey_group = {
             "begin": (
                 pd.DataFrame(
-                    add_label_translations({
-                        "type": ["begin group"],
-                        "name": ["survey_questions"],
-                        "relevant": "(${feature_exists} = 'yes') or (${status} = '2')",
-                    })
+                    survey_group_field
                 )
             ),
             "end": pd.DataFrame({"type": ["end group"]}
@@ -298,10 +306,48 @@ async def append_field_mapping_fields(
         log.error(msg)
         raise ValueError(msg)
     
-    custom_sheets = standardize_xlsform_sheets(custom_sheets)
+    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets)  # Also get the label columns
+
+    if "label" in label_cols:
+        add_label = False
+        digitisation_df = pd.DataFrame([
+            add_label_translations(field, label_cols)
+            for field in digitisation_fields
+        ])
+        digitisation_choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in digitisation_choices
+        ])
+        choices_df = pd.DataFrame([
+            add_label_translations(choice, label_cols)
+            for choice in choices_data
+        ])
+        photo_collection_df = pd.DataFrame([
+            add_label_translations(photo_collection_field, label_cols)
+        ])
+    else:
+        add_label = True
+        digitisation_df = pd.DataFrame([
+            add_label_translations(field)
+            for field in digitisation_fields
+        ])
+        digitisation_choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in digitisation_choices
+        ])
+        choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in choices_data
+        ])
+        photo_collection_df = pd.DataFrame([
+            add_label_translations(photo_collection_field)
+        ])
+
+    # Configure form settings
+    xform_id = _configure_form_settings(custom_sheets, form_name)
 
     # Select appropriate form components based on target platform
-    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields)
+    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df, label_cols)
     
     # Process survey sheet
     custom_sheets["survey"] = _process_survey_sheet(
@@ -309,6 +355,7 @@ async def append_field_mapping_fields(
         form_components["survey_df"],
         form_components["digitisation_df"] if need_verification_fields else None,
         form_components["photo_collection_df"],
+        add_label = add_label,
         need_verification=need_verification_fields,
     )
     
@@ -317,14 +364,12 @@ async def append_field_mapping_fields(
         custom_sheets.get("choices"), 
         form_components["choices_df"],
         form_components["digitisation_choices_df"],
+        add_label = add_label,
     )
 
     # Process entities and settings sheets
     custom_sheets["entities"] = form_components["entities_df"]
     _validate_required_sheet(custom_sheets, "entities")
-    
-    # Configure form settings
-    xform_id = _configure_form_settings(custom_sheets, form_name)
     
     # Handle additional entities if specified
     if additional_entities:
@@ -341,7 +386,12 @@ async def append_field_mapping_fields(
 def _get_form_components(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
-        need_verification_fields: bool
+        need_verification_fields: bool,
+        choices_df: pd.DataFrame,
+        digitisation_df: pd.DataFrame,
+        digitisation_choices_df: pd.DataFrame,
+        photo_collection_df: pd.DataFrame,
+        label_cols: list[str],
     ) -> dict:
     """Select appropriate form components based on target platform."""
     if use_odk_collect:
@@ -352,7 +402,7 @@ def _get_form_components(
         digitisation_df.loc[digitisation_correct_col, "read_only"] = "${new_feature} != ''"
 
     return {
-        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields),
+        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields, label_cols),
         "choices_df": choices_df,
         "digitisation_df": digitisation_df,
         "photo_collection_df": photo_collection_df,
@@ -366,6 +416,7 @@ def _process_survey_sheet(
         survey_df: pd.DataFrame, 
         digitisation_df: pd.DataFrame,
         photo_collection_df: pd.DataFrame,
+        add_label: bool,
         need_verification: Optional[bool] = True,
     ) -> pd.DataFrame:
     """Process and merge survey sheets."""
@@ -373,6 +424,7 @@ def _process_survey_sheet(
     return merge_dataframes(
         survey_df,
         existing_survey,
+        add_label=add_label,
         digitisation_df=digitisation_df,
         photo_collection_df=photo_collection_df,
         need_verification=need_verification,
@@ -383,6 +435,7 @@ def _process_choices_sheet(
         existing_choices: pd.DataFrame, 
         choices_df: pd.DataFrame, 
         digitisation_choices_df: pd.DataFrame,
+        add_label: bool,
     ) -> pd.DataFrame:
     """Process and merge choices sheets."""
     log.debug("Merging choices sheet XLSForm data")
@@ -393,6 +446,7 @@ def _process_choices_sheet(
     return merge_dataframes(
         choices_df,
         existing_choices,
+        add_label=add_label,
         digitisation_df=digitisation_choices_df,
     )
 
