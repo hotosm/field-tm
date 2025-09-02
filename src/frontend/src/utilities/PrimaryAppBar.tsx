@@ -71,9 +71,9 @@ export default function PrimaryAppBar() {
         />
         <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
           <Link
-            to="/"
+            to="/explore"
             className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-              location.pathname === '/' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+              location.pathname === '/explore' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
             } fmtm-border-b-2`}
           >
             Explore Projects

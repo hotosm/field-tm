@@ -21,7 +21,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
   const MenuItems = [
     {
       name: 'Explore Projects',
-      ref: '/',
+      ref: '/explore',
       isExternalLink: false,
       isActive: true,
     },
@@ -45,7 +45,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'Learn',
-      ref: 'https://hotosm.github.io/fmtm',
+      ref: 'https://hotosm.github.io/field-tm',
       isExternalLink: true,
       isActive: true,
     },
