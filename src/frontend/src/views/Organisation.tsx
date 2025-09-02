@@ -13,6 +13,39 @@ import {
   useGetUnapprovedOrganisationsQuery,
 } from '@/api/organisation';
 
+interface OrganisationSectionProps {
+  isLoading: boolean;
+  orgList: any[] | null | undefined;
+  searchKeyword: string;
+}
+
+const filteredBySearch = (data: GetOrganisationDataModel[], searchKeyword: string) => {
+  const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
+    d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
+  );
+  return filteredCardData;
+};
+
+const OrganisationListSection = ({ isLoading, orgList, searchKeyword }: OrganisationSectionProps) => {
+  if (isLoading) {
+    return (
+      <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <OrganizationCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (orgList) {
+    return (
+      <OrganisationGridCard filteredData={filteredBySearch(orgList, searchKeyword)} allDataLength={orgList.length} />
+    );
+  }
+
+  return null;
+};
+
 const Organisation = () => {
   useDocumentTitle('Organizations');
   const isAdmin = useIsAdmin();
@@ -22,16 +55,6 @@ const Organisation = () => {
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
   const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-
-  const handleSearchChange = (event) => {
-    setSearchKeyword(event.target.value);
-  };
-  const filteredBySearch = (data: GetOrganisationDataModel[], searchKeyword: string) => {
-    const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
-      d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
-    );
-    return filteredCardData;
-  };
 
   const { data: organisationList, isLoading: isOrganisationListLoading } = useGetOrganisationsQuery({
     options: { queryKey: ['get-organisation-list'], enabled: activeTab === 0 && verifiedTab },
@@ -166,7 +189,7 @@ const Organisation = () => {
           size="small"
           placeholder="Search organization"
           value={searchKeyword}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchKeyword(e.target.value)}
           InputProps={{
             startAdornment: (
               <CoreModules.InputAdornment position="start">
@@ -179,51 +202,31 @@ const Organisation = () => {
       </CoreModules.Box>
 
       {/* Verified Organisations */}
-      {activeTab === 0 &&
-        verifiedTab &&
-        (isOrganisationListLoading ? (
-          <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <OrganizationCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : organisationList ? (
-          <OrganisationGridCard
-            filteredData={filteredBySearch(organisationList, searchKeyword)}
-            allDataLength={organisationList?.length}
-          />
-        ) : null)}
+      {activeTab === 0 && verifiedTab && (
+        <OrganisationListSection
+          isLoading={isOrganisationListLoading}
+          orgList={organisationList}
+          searchKeyword={searchKeyword}
+        />
+      )}
 
       {/* Unverified Organisations */}
-      {activeTab === 0 &&
-        !verifiedTab &&
-        (isUnapprovedOrganisationListLoading ? (
-          <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <OrganizationCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : unapprovedOrganisationList ? (
-          <OrganisationGridCard
-            filteredData={filteredBySearch(unapprovedOrganisationList, searchKeyword)}
-            allDataLength={unapprovedOrganisationList?.length}
-          />
-        ) : null)}
+      {activeTab === 0 && !verifiedTab && (
+        <OrganisationListSection
+          isLoading={isUnapprovedOrganisationListLoading}
+          orgList={unapprovedOrganisationList}
+          searchKeyword={searchKeyword}
+        />
+      )}
 
       {/* My Organisations */}
-      {activeTab === 1 &&
-        (isMyOrganisationListLoading ? (
-          <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5 fmtm-w-full">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <OrganizationCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : myOrganisationList ? (
-          <OrganisationGridCard
-            filteredData={filteredBySearch(myOrganisationList, searchKeyword)}
-            allDataLength={myOrganisationList?.length}
-          />
-        ) : null)}
+      {activeTab === 1 && (
+        <OrganisationListSection
+          isLoading={isMyOrganisationListLoading}
+          orgList={myOrganisationList}
+          searchKeyword={searchKeyword}
+        />
+      )}
     </CoreModules.Box>
   );
 };
