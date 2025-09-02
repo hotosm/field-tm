@@ -263,33 +263,3 @@ export const AddOrganizationAdminService = (url: string, user: string[], org_id:
     }
   };
 };
-
-export const DeleteOrganizationAdminService = (
-  url: string,
-  params: { org_id: number },
-  user_sub: string,
-  organizationAdmins: OrganizationAdminsModel[],
-) => {
-  return async (dispatch: AppDispatch) => {
-    const deleteOrganizationAdmins = async (url: string, params: { org_id: number }) => {
-      try {
-        dispatch(OrganisationAction.SetDeleteOrganizationAdminPending(true));
-        await axios.delete(url, {
-          params,
-        });
-        dispatch(
-          OrganisationAction.SetOrganizationAdmins(organizationAdmins?.filter((admin) => admin.user_sub !== user_sub)),
-        );
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error.response.data?.detail || 'Failed to delete organization admin',
-          }),
-        );
-      } finally {
-        dispatch(OrganisationAction.SetDeleteOrganizationAdminPending(false));
-      }
-    };
-    await deleteOrganizationAdmins(url, params);
-  };
-};
