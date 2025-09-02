@@ -1,13 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
-import {
-  GetOrganisationDataModel,
-  OrganisationModal,
-  OrganizationAdminsModel,
-} from '@/models/organisation/organisationModel';
+import { GetOrganisationDataModel, OrganizationAdminsModel } from '@/models/organisation/organisationModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
-import { API } from '.';
-import { LoginActions } from '@/store/slices/LoginSlice';
 import { AppDispatch } from '@/store/Store';
 import { NavigateFunction } from 'react-router-dom';
 
@@ -21,68 +15,6 @@ function appendObjectToFormData(formData: FormData, object: Record<string, any>)
     formData.append(key, value);
   }
 }
-
-export const OrganisationService = (url: string, payload: OrganisationModal) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CommonActions.PostOrganisationLoading(true));
-
-    const postOrganisation = async (url: string, payload: OrganisationModal) => {
-      try {
-        const generateApiFormData = new FormData();
-        appendObjectToFormData(generateApiFormData, payload);
-        await axios.post(url, generateApiFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        // const resp: HomeProjectCardModel = postOrganisationData.data;
-        // dispatch(CommonActions.SetOrganisationDetail(resp))
-        dispatch(CommonActions.PostOrganisationLoading(false));
-      } catch (error) {
-        dispatch(CommonActions.PostOrganisationLoading(false));
-      }
-    };
-
-    await postOrganisation(url, payload);
-  };
-};
-
-export const OrganisationDataService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(OrganisationAction.GetOrganisationDataLoading(true));
-    const getOrganisationData = async (url: string) => {
-      try {
-        const getOrganisationDataResponse = await API.get(url);
-        const response: GetOrganisationDataModel[] = getOrganisationDataResponse.data;
-        dispatch(OrganisationAction.GetOrganisationsData(response));
-        dispatch(OrganisationAction.GetOrganisationDataLoading(false));
-      } catch (error) {
-        dispatch(OrganisationAction.GetOrganisationDataLoading(false));
-        if (error.response.status === 401) {
-          dispatch(LoginActions.setLoginModalOpen(true));
-        }
-      }
-    };
-    await getOrganisationData(url);
-  };
-};
-
-export const MyOrganisationDataService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(OrganisationAction.GetMyOrganisationDataLoading(true));
-    const getMyOrganisationData = async (url: string) => {
-      try {
-        const getMyOrganisationDataResponse = await API.get(url);
-        const response: GetOrganisationDataModel[] = getMyOrganisationDataResponse.data;
-        dispatch(OrganisationAction.GetMyOrganisationsData(response));
-        dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
-      } catch (error) {
-        dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
-      }
-    };
-    await getMyOrganisationData(url);
-  };
-};
 
 export const PostOrganisationDataService = (url: string, payload: any) => {
   return async (dispatch: AppDispatch) => {
