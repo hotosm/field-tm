@@ -8,11 +8,11 @@ import UserListSkeleton from '@/components/Skeletons/OrganizationDashboard/UserL
 import OrganizationInfoSkeleton from '@/components/Skeletons/OrganizationDashboard/OrganizationInfoSkeleton';
 import { useGetOrganisationAdminsQuery, useGetOrganisationDetailQuery } from '@/api/organisation';
 
-const OrganizationAdminList = ({orgId}: {orgId: number}) => {
-   const { data: organisationAdmins, isLoading: isOrganisationAdminsLoading } = useGetOrganisationAdminsQuery({
-      params: {org_id: orgId},
-      options: { queryKey: ['get-organisation', orgId] },
-    });
+const OrganizationAdminList = ({ orgId }: { orgId: number }) => {
+  const { data: organisationAdmins, isLoading: isOrganisationAdminsLoading } = useGetOrganisationAdminsQuery({
+    params: { org_id: orgId },
+    options: { queryKey: ['get-organisation', orgId] },
+  });
 
   if (isOrganisationAdminsLoading) return <UserListSkeleton />;
 
@@ -101,7 +101,7 @@ const OrganizationInfo = () => {
 
       <div className="fmtm-text-grey-800">
         <p className="fmtm-body-lg-medium fmtm-mb-1">Organization Admins</p>
-        <OrganizationAdminList orgId={+organizationId!}/>
+        <OrganizationAdminList orgId={+organizationId!} />
         <a href={organisation?.url} target="_" className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mt-3 fmtm-mb-1">
           <AssetModules.LinkIcon className="!fmtm-text-lg" />
           <p className="fmtm-body-lg-medium">{organisation?.url}</p>
