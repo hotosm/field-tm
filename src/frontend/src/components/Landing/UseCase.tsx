@@ -24,7 +24,7 @@ const useCaseList: useCaseType[] = [
 
 const UseCase = () => {
   return (
-    <div className="fmtm-flex fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-gap-10 fmtm-flex-col md:fmtm-flex-row">
+    <div className="fmtm-flex fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-gap-10 md:fmtm-flex-row fmtm-flex-col-reverse">
       <img
         src={MappingImg}
         className="fmtm-w-[14rem] md:fmtm-w-[18.75rem] lg:fmtm-w-[22rem] fmtm-h-fit fmtm-rounded-2xl fmtm-mx-auto"
