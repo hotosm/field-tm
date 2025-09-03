@@ -7,7 +7,7 @@ import Footer from '@/components/Landing/Footer';
 
 const Landing = () => {
   return (
-    <div className="fmtm-w-[100vw] fmtm-overflow-x-hidden fmtm-grid fmtm-gap-[6rem]">
+    <div className="fmtm-w-[100vw] fmtm-overflow-x-hidden fmtm-grid fmtm-gap-[3rem] md:fmtm-gap-[6rem]">
       <Banner />
       <About />
       <Features />

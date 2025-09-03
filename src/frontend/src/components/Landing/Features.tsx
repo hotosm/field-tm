@@ -26,11 +26,11 @@ const features: featureType[] = [
 
 const Features = () => {
   return (
-    <div className="fmtm-px-[4.5rem]">
+    <div className="fmtm-px-[3rem] md:fmtm-px-[4.5rem]">
       <h4 className="fmtm-mb-3">MAIN FEATURES</h4>
-      <div className="fmtm-grid fmtm-grid-cols-3 fmtm-gap-5 ">
+      <div className="fmtm-grid md:fmtm-grid-cols-3 fmtm-gap-5">
         {features.map((feature, index) => (
-          <div key={index} className="fmtm-bg-red-light fmtm-px-5 fmtm-py-10 fmtm-rounded-xl">
+          <div key={index} className="fmtm-bg-red-light fmtm-px-5 fmtm-py-5 md:fmtm-py-10 fmtm-rounded-xl">
             <h5 key={index} className="fmtm-mb-2">
               {feature.title}
             </h5>

@@ -3,9 +3,9 @@ import MappingImg from '@/assets/images/landing-pic-1.jpg';
 
 const About = () => {
   return (
-    <div className="fmtm-w-full fmtm-grid fmtm-grid-cols-2 fmtm-items-center fmtm-px-[4.5rem] fmtm-gap-x-10">
+    <div className="fmtm-w-full fmtm-grid md:fmtm-grid-cols-2 fmtm-items-center fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-gap-10">
       <div>
-        <h2 className="fmtm-mb-4">What is it?</h2>
+        <h2 className="fmtm-mb-4 fmtm-text-[1.625rem] md:fmtm-text-[2.375rem]">What is it?</h2>
         <p className="fmtm-text-justify fmtm-mb-2">
           The Field Tasking Manager (Field -TM) helps teams add local knowledge to map features by coordinating mapping
           in the field.
