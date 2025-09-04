@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
 import CoreModules from '@/shared/CoreModules';
-import { FormCategoryService } from '@/api/CreateProjectService';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useDownloadFormQuery } from '@/api/central';
@@ -27,10 +26,6 @@ const FormUpdate = ({ projectId }) => {
 
   const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
-
-  useEffect(() => {
-    dispatch(FormCategoryService(`${API_URL}/central/list-forms`));
-  }, []);
 
   const onSave = () => {
     if (uploadForm?.length === 0) {
