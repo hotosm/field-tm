@@ -34,7 +34,6 @@ export const convertGeojsonToJsonFile = (geojson: any, fileName: string) => {
 };
 
 export const downloadBlobData = (blobData: Blob, filename: string, extension: string) => {
-  console.log(blobData, 'blobData');
   if (!blobData) return;
   const url = window.URL.createObjectURL(blobData);
   const a = document.createElement('a');
