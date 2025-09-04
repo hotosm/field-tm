@@ -40,7 +40,7 @@ export function useGetDownloadSubmissionQuery({
   options,
 }: {
   params: downloadSubmissionParamsType;
-  options: TQueryOptions<any>;
+  options: TQueryOptions<Blob, Blob>;
 }) {
   return useQuery({
     queryFn: () => downloadSubmission(params),

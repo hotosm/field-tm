@@ -21,7 +21,7 @@ export function useDownloadFormQuery({
   options,
 }: {
   params: { project_id: number };
-  options: TQueryOptions<Blob>;
+  options: TQueryOptions<Blob, Blob>;
 }) {
   return useQuery({
     queryFn: () => downloadForm(params),

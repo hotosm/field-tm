@@ -128,10 +128,11 @@ export const useDownloadFeaturesQuery = ({
   options,
 }: {
   params: downloadFeaturesParamsType;
-  options: TQueryOptions<unknown>;
+  options: TQueryOptions<Blob, Blob>;
 }) =>
   useQuery({
     queryFn: () => downloadFeatures(params),
+    select: (data) => data.data,
     ...options,
   });
 
@@ -308,10 +309,11 @@ export const useDownloadTaskBoundariesQuery = ({
   options,
 }: {
   project_id: number;
-  options: TQueryOptions<unknown>;
+  options: TQueryOptions<Blob, Blob>;
 }) =>
   useQuery({
     queryFn: () => downloadTaskBoundaries(project_id),
+    select: (data) => data.data,
     ...options,
   });
 
