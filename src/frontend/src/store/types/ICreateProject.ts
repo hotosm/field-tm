@@ -9,11 +9,8 @@ export type CreateProjectStateTypes = {
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  formExampleList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
   GenerateProjectFilesLoading: boolean;
-  organisationList: OrganisationListTypes[];
-  organisationListLoading: boolean;
   dividedTaskLoading: boolean;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
@@ -25,13 +22,6 @@ export type CreateProjectStateTypes = {
   isProjectDeletePending: boolean;
   splitGeojsonBySquares: splittedGeojsonType | null;
   splitGeojsonByAlgorithm: splittedGeojsonType | null;
-  basicProjectDetailsLoading: boolean;
-  basicProjectDetails:
-    | ({ id: number } & Pick<
-        ProjectDetailsTypes,
-        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
-      >)
-    | null;
   isODKCredentialsValid: boolean;
   ODKCredentialsValidating: boolean;
 };

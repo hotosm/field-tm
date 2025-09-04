@@ -1,52 +1,15 @@
 import axios, { AxiosResponse } from 'axios';
 import { API } from '@/api';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
-import {
-  ProjectDetailsModel,
-  FormCategoryListModel,
-  OrganisationListModel,
-  splittedGeojsonType,
-} from '@/models/createproject/createProjectModel';
+import { ProjectDetailsModel, splittedGeojsonType } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
-import { ProjectDetailsTypes } from '@/store/types/ICreateProject';
 import { UnassignUserFromProject } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
-
-export const GetBasicProjectDetails = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    try {
-      dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(true));
-      const response: AxiosResponse<{ id: number } & ProjectDetailsTypes> = await axios.get(url);
-      const { id, name, short_description, description, organisation_id, outline, hashtags, organisation_name } =
-        response.data;
-      dispatch(
-        CreateProjectActions.SetBasicProjectDetails({
-          id,
-          name,
-          short_description,
-          description,
-          organisation_id,
-          outline,
-          hashtags,
-          organisation_name,
-        }),
-      );
-    } catch (error) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: JSON.stringify(error?.response?.data?.detail) || 'Error fetching basic project details',
-        }),
-      );
-    } finally {
-      dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(false));
-    }
-  };
-};
 
 export const CreateDraftProjectService = (
   url: string,
@@ -233,25 +196,6 @@ export const CreateProjectService = (
   };
 };
 
-const FormCategoryService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetFormCategoryLoading(true));
-
-    const getFormCategoryList = async (url: string) => {
-      try {
-        const getFormCategoryListResponse = await axios.get(url);
-        const resp: FormCategoryListModel[] = getFormCategoryListResponse.data;
-        dispatch(CreateProjectActions.GetFormCategoryList(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.GetFormCategoryLoading(false));
-      }
-    };
-
-    await getFormCategoryList(url);
-  };
-};
-
 const UploadTaskAreasService = (url: string, filePayload: any) => {
   return async (dispatch: AppDispatch) => {
     const postUploadArea = async (url: string, filePayload: any) => {
@@ -341,25 +285,6 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
       dispatch(CreateProjectActions.GenerateProjectFilesLoading(false));
       dispatch(CommonActions.SetLoading(false));
     }
-  };
-};
-
-const OrganisationService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetOrganisationListLoading(true));
-
-    const getOrganisationList = async (url: string) => {
-      try {
-        const getOrganisationListResponse = await axios.get(url);
-        const resp: OrganisationListModel[] = getOrganisationListResponse.data;
-        dispatch(CreateProjectActions.GetOrganisationList(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.GetOrganisationListLoading(false));
-      }
-    };
-
-    await getOrganisationList(url);
   };
 };
 
@@ -646,10 +571,8 @@ export const ValidateODKCredentials = (
 
 export {
   UploadTaskAreasService,
-  FormCategoryService,
   GenerateProjectFilesService,
   UploadXlsformService,
-  OrganisationService,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
   GetIndividualProjectDetails,
