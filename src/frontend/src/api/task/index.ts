@@ -36,7 +36,6 @@ export function useAddNewTaskEventMutation({
   options: TMutationOptions<taskEventType, addNewTaskEventPayloadType>;
 }) {
   return useMutation({
-    mutationKey: ['add-new-task-event', id, params],
     mutationFn: (payload: addNewTaskEventPayloadType) => addNewTaskEvent(id, payload, params),
     ...options,
   });

@@ -13,7 +13,7 @@ const SubmissionComments = () => {
   const { data: taskComments, isLoading: isTaskCommentsLoading } = useGetTaskEventHistoryQuery({
     id: +taskId!,
     params: { project_id: +projectId!, comments: true },
-    options: { queryKey: ['get-task-history-comments', +projectId!] },
+    options: { queryKey: ['get-project-comments', +projectId!] },
   });
 
   // handle for old project comments

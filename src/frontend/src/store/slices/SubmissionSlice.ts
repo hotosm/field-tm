@@ -84,14 +84,6 @@ const SubmissionSlice = createSlice({
         });
         state.submissionTableData.results = updatedSubmissionDataList;
       }
-
-      // submission-instance key value pair update
-      if (state.submissionDetails) {
-        state.submissionDetails = {
-          ...state.submissionDetails,
-          __system: { ...state.submissionDetails.__system, reviewState: updatedSubmission.reviewState },
-        };
-      }
     },
     SetMappedVsValidatedTask(state, action: PayloadAction<validatedMappedType[]>) {
       const MappedVsValidatedTask = action.payload;

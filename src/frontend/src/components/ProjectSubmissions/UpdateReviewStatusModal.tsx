@@ -3,15 +3,19 @@ import Mentions from 'rc-mentions';
 import { Modal } from '@/components/common/Modal';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
-import { UpdateReviewStateService } from '@/api/SubmissionService';
 import Button from '@/components/common/Button';
-import { PostProjectComments, UpdateEntityState } from '@/api/Project';
+import { PostProjectComments } from '@/api/Project';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
 import '@/styles/rc-mentions.css';
 import { GetUserNames } from '@/api/User';
 import { UserActions } from '@/store/slices/UserSlice';
+import { useUpdateReviewStateMutation } from '@/api/submission';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { useSetEntitiesMappingStatusMutation } from '@/api/project';
+import { useAddNewTaskEventMutation } from '@/api/task/index';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -45,15 +49,58 @@ const reviewList: reviewListType[] = [
 const UpdateReviewStatusModal = () => {
   const dispatch = useAppDispatch();
   const { Option } = Mentions;
+  const queryClient = useQueryClient();
 
   const [noteComments, setNoteComments] = useState('');
   const [reviewStatus, setReviewStatus] = useState('');
   const [searchText, setSearchText] = useState('');
 
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
-  const updateReviewStateLoading = useAppSelector((state) => state.submission.updateReviewStateLoading);
   const userNames = useAppSelector((state) => state.user.userNames);
   const getUserNamesLoading = useAppSelector((state) => state.user.getUserNamesLoading);
+
+  const { mutate: setEntitiesMappingStatus, isPending: isSetEntitiesMappingStatusPending } =
+    useSetEntitiesMappingStatusMutation({
+      project_id: updateReviewStatusModal.projectId!,
+      options: {
+        onSuccess: () => {
+          dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
+        },
+        onError: () => {},
+      },
+    });
+
+  const { mutate: updateReviewState, isPending: isUpdateReviewStatePending } = useUpdateReviewStateMutation({
+    params: { project_id: +updateReviewStatusModal.projectId! },
+    options: {
+      onSuccess: ({ data }) => {
+        setEntitiesMappingStatus({
+          entity_id: updateReviewStatusModal.entity_id!,
+          status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
+          label: updateReviewStatusModal.label as string,
+        });
+        queryClient.setQueryData<AxiosResponse<Record<string, any>>>(
+          ['get-project-submission-detail', +updateReviewStatusModal.projectId!, updateReviewStatusModal.instanceId],
+          (prevData) => {
+            if (!prevData) return prevData;
+            return {
+              ...prevData,
+              data: {
+                ...prevData.data,
+                __system: {
+                  ...prevData.data.__system,
+                  updatedAt: data.updatedAt,
+                  reviewState: data.reviewState,
+                  deviceId: data.deviceId,
+                },
+              },
+            };
+          },
+        );
+      },
+      onError: () => {},
+    },
+  });
 
   useEffect(() => {
     if (!updateReviewStatusModal.projectId) return;
@@ -90,23 +137,7 @@ const UpdateReviewStatusModal = () => {
     }
 
     if (updateReviewStatusModal.reviewState !== reviewStatus) {
-      await dispatch(
-        UpdateReviewStateService(
-          `${VITE_API_URL}/submission/update-review-state?project_id=${updateReviewStatusModal.projectId}`,
-          {
-            instance_id: updateReviewStatusModal.instanceId,
-            review_state: reviewStatus,
-          },
-        ),
-      );
-
-      dispatch(
-        UpdateEntityState(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/entity/status`, {
-          entity_id: updateReviewStatusModal.entity_id,
-          status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
-          label: updateReviewStatusModal.label as string,
-        }),
-      );
+      updateReviewState({ instance_id: updateReviewStatusModal.instanceId, review_state: reviewStatus });
     }
 
     if (noteComments.trim().length > 0) {
@@ -122,8 +153,6 @@ const UpdateReviewStatusModal = () => {
       );
       setNoteComments('');
     }
-    dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
-    dispatch(SubmissionActions.UpdateReviewStateLoading(false));
   };
 
   return (
@@ -183,7 +212,7 @@ const UpdateReviewStatusModal = () => {
             <Button
               variant="primary-red"
               onClick={handleStatusUpdate}
-              isLoading={updateReviewStateLoading}
+              isLoading={isUpdateReviewStatePending || isSetEntitiesMappingStatusPending}
               disabled={!reviewStatus}
               className="!fmtm-w-full"
             >

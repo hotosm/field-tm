@@ -25,6 +25,7 @@ import {
   downloadTaskBoundaries,
   deleteEntity,
   unassignUserFromProject,
+  setEntitiesMappingStatus,
 } from '@/services/project';
 import { paginationType } from '@/store/types/ICommon';
 import { TMutationOptions, TQueryOptions } from '@/types';
@@ -51,6 +52,7 @@ import type {
   uploadProjectTaskBoundariesPayloadType,
   updateProjectPayloadType,
   projectUserType,
+  entitiesMappingStatusPayloadType,
 } from './types';
 
 export function useGetProjectSummariesQuery({
@@ -342,5 +344,17 @@ export const useUnassignUserFromProjectMutation = ({
 }) =>
   useMutation({
     mutationFn: () => unassignUserFromProject(project_id, user_sub),
+    ...options,
+  });
+
+export const useSetEntitiesMappingStatusMutation = ({
+  project_id,
+  options,
+}: {
+  project_id: number;
+  options: TMutationOptions<odkEntitiesMappingStatusesType, entitiesMappingStatusPayloadType>;
+}) =>
+  useMutation({
+    mutationFn: (payload) => setEntitiesMappingStatus(project_id, payload),
     ...options,
   });

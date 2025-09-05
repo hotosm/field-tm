@@ -17,6 +17,7 @@ import type {
   taskSplitPayloadType,
   uploadProjectTaskBoundariesPayloadType,
   updateProjectPayloadType,
+  entitiesMappingStatusPayloadType,
 } from '@/api/project/types';
 
 export const patchCreateProject = (payload: createProjectPayloadType, params: { project_id: number }) =>
@@ -85,3 +86,6 @@ export const deleteEntity = (entity_uuid: string, params: deleteEntityParamsType
 
 export const unassignUserFromProject = (project_id: number, user_sub: string) =>
   api.delete(`/projects/${project_id}/users/${user_sub}`);
+
+export const setEntitiesMappingStatus = (project_id: number, payload: entitiesMappingStatusPayloadType) =>
+  api.post(`/projects/${project_id}/entity/status`, payload);
