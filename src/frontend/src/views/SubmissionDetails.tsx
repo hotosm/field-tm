@@ -1,20 +1,22 @@
+import React from 'react';
 import CoreModules from '@/shared/CoreModules.js';
-import React, { useEffect } from 'react';
-import { SubmissionService, GetSubmissionPhotosService } from '@/api/Submission';
 import SubmissionInstanceMap from '@/components/SubmissionMap/SubmissionInstanceMap';
-import { GetSubmissionDashboard } from '@/api/Project';
 import Button from '@/components/common/Button';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '@/types/reduxTypes';
+import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Accordion from '@/components/common/Accordion';
-import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
 import { extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
 import { project_status, submission_status } from '@/types/enums';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import {
+  useGetProjectSubmissionDashboardQuery,
+  useGetSubmissionDetailQuery,
+  useGetSubmissionPhotosQuery,
+} from '@/api/submission';
 
 function removeNullValues(obj: Record<string, any>) {
   const newObj = {};
@@ -36,24 +38,34 @@ function removeNullValues(obj: Record<string, any>) {
 const SubmissionDetails = () => {
   useDocumentTitle('Submission Instance');
   const dispatch = useAppDispatch();
-  const params = CoreModules.useParams();
+  const params = useParams();
   const navigate = useNavigate();
 
   const projectId = params.projectId;
   const paramsInstanceId = params.instanceId;
   const taskUid = params.taskId;
-  const projectDashboardDetail = useAppSelector((state) => state.project.projectDashboardDetail);
-  const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
-  const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
-  const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
-  const taskId = submissionDetails?.task_id ? submissionDetails?.task_id : '-';
-  const submissionPhotosLoading = useAppSelector((state) => state.submission.submissionPhotosLoading);
-  const submissionPhotos = useAppSelector((state) => state.submission.submissionPhotos);
+
+  const { data: dashboardDetail, isLoading: isDashboardDetailLoading } = useGetProjectSubmissionDashboardQuery({
+    id: +projectId!,
+    options: { queryKey: ['get-project-dashboard', +projectId!] },
+  });
+
+  const { data: submissionDetail, isLoading: isSubmissionDetailLoading } = useGetSubmissionDetailQuery({
+    id: paramsInstanceId!,
+    params: { project_id: +projectId! },
+    options: { queryKey: ['get-project-submission-detail', +projectId!, paramsInstanceId] },
+  });
+
+  const { data: submissionPhotos, isLoading: isSubmissionPhotosLoading } = useGetSubmissionPhotosQuery({
+    id: paramsInstanceId!,
+    params: { project_id: +projectId! },
+    options: { queryKey: ['get-submission-photos', +projectId!, paramsInstanceId] },
+  });
 
   const isProjectManager = useIsProjectManager(projectId as string);
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectDashboardDetail?.organisation_id as number);
+  const isOrganizationAdmin = useIsOrganizationAdmin(dashboardDetail?.organisation_id as number);
 
-  const { start, end, today, deviceid, new_feature, ...restSubmissionDetails } = submissionDetails || {};
+  const { start, end, today, deviceid, new_feature, ...restSubmissionDetails } = submissionDetail || {};
   const dateDeviceDetails = { start, end, today, deviceid };
 
   const renderValue = (value: any, key: string = '') => {
@@ -102,10 +114,10 @@ const SubmissionDetails = () => {
             {key}
           </div>
           {typeof value === 'string' && /\.(jpeg|jpg|png|gif|bmp|webp|svg|tiff?|heic|avif)$/i.test(value) ? (
-            submissionPhotosLoading ? (
+            isSubmissionPhotosLoading ? (
               <CoreModules.Skeleton style={{ width: '16rem', height: '8rem' }} className="!fmtm-rounded-lg" />
             ) : (
-              <img src={submissionPhotos[value]} alt={key} className="fmtm-max-w-[16rem]" />
+              <img src={submissionPhotos?.[value]} alt={key} className="fmtm-max-w-[16rem]" />
             )
           ) : (
             <span className="fmtm-text-sm fmtm-text-[#555] fmtm-break-words">{value}</span>
@@ -115,43 +127,13 @@ const SubmissionDetails = () => {
     }
   };
 
-  useEffect(() => {
-    dispatch(GetSubmissionDashboard(`${import.meta.env.VITE_API_URL}/submission/${projectId}/dashboard`));
-  }, []);
-
-  useEffect(() => {
-    dispatch(
-      SubmissionService(`${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}?project_id=${projectId}`),
-    );
-  }, [projectId, paramsInstanceId]);
-
-  useEffect(() => {
-    // Note here taskUid is coerced to string so we have to check that
-    if (taskUid == 'undefined') return;
-    dispatch(
-      GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUid)}/history?project_id=${projectId}&comments=true`,
-      ),
-    );
-  }, [taskUid]);
-
-  useEffect(() => {
-    if (paramsInstanceId) {
-      dispatch(
-        GetSubmissionPhotosService(`${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}/photos`, {
-          project_id: projectId,
-        }),
-      );
-    }
-  }, [paramsInstanceId]);
-
   const filteredData = restSubmissionDetails ? removeNullValues(restSubmissionDetails) : {};
 
   return (
     <>
       <UpdateReviewStatusModal />
       <div className="fmtm-bg-[#F5F5F5] fmtm-box-border">
-        {projectDashboardLoading ? (
+        {isDashboardDetailLoading ? (
           <CoreModules.Skeleton style={{ width: '250px' }} className="fmtm-mb-4" />
         ) : (
           <div className="fmtm-pb-4">
@@ -160,7 +142,7 @@ const SubmissionDetails = () => {
                 className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
                 onClick={() => navigate(`/project/${projectId}`)}
               >
-                {projectDashboardDetail?.slug}
+                {dashboardDetail?.slug}
               </span>
               <span> &gt; </span>
               <span
@@ -177,14 +159,16 @@ const SubmissionDetails = () => {
         <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8">
           <div>
             <div>
-              {projectDashboardLoading ? (
+              {isDashboardDetailLoading ? (
                 <CoreModules.Skeleton className="md:!fmtm-w-full fmtm-h-[9rem]" />
               ) : (
                 <div className="fmtm-bg-white fmtm-rounded-lg fmtm-w-full fmtm-h-fit fmtm-p-2 fmtm-px-4 md:fmtm-py-5 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-flex-col">
                   <h2 className="fmtm-text-base fmtm-text-[#545454] fmtm-font-bold fmtm-mb-4 fmtm-break-words">
-                    {projectDashboardDetail?.slug}
+                    {dashboardDetail?.slug}
                   </h2>
-                  <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454]">Task: {taskId}</h2>
+                  <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454]">
+                    Task: {submissionDetail?.task_id || '-'}
+                  </h2>
                   <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">
                     Submission Id: {paramsInstanceId}
                   </h2>
@@ -193,9 +177,9 @@ const SubmissionDetails = () => {
                   </h2>
                 </div>
               )}
-              {!projectDashboardLoading &&
+              {!isDashboardDetailLoading &&
                 (isProjectManager || isOrganizationAdmin) &&
-                projectDashboardDetail?.status === project_status.PUBLISHED && (
+                dashboardDetail?.status === project_status.PUBLISHED && (
                   <div className="fmtm-mt-8">
                     <Button
                       variant="primary-red"
@@ -203,17 +187,17 @@ const SubmissionDetails = () => {
                         dispatch(
                           SubmissionActions.SetUpdateReviewStatusModal({
                             toggleModalStatus: true,
-                            instanceId: paramsInstanceId,
-                            projectId: projectId,
-                            taskId: taskId,
+                            instanceId: paramsInstanceId!,
+                            projectId: +projectId!,
+                            taskId: submissionDetail?.taskId,
                             reviewState: restSubmissionDetails?.__system?.reviewState,
-                            taskUid: taskUid,
+                            taskUid: taskUid!,
                             entity_id: restSubmissionDetails?.feature,
                             label: restSubmissionDetails?.meta?.entity?.label,
                           }),
                         );
                       }}
-                      disabled={submissionDetailsLoading}
+                      disabled={isSubmissionDetailLoading}
                     >
                       Update Review Status
                     </Button>
@@ -222,7 +206,7 @@ const SubmissionDetails = () => {
             </div>
 
             {/* start, end, today, deviceid values */}
-            {submissionDetailsLoading ? (
+            {isSubmissionDetailLoading ? (
               <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6 fmtm-gap-0">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="fmtm-border-b fmtm-py-3">
@@ -247,7 +231,7 @@ const SubmissionDetails = () => {
           </div>
         </div>
         <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8 fmtm-mt-10 fmtm-gap-y-10 fmtm-mb-5">
-          {submissionDetailsLoading ? (
+          {isSubmissionDetailLoading ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-mt-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="fmtm-border-b-[1px] fmtm-pb-4">

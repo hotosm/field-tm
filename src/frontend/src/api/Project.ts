@@ -3,13 +3,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
 import { task_state, task_event, project_roles } from '@/types/enums';
-import {
-  EntityOsmMap,
-  projectDashboardDetailTypes,
-  projectInfoType,
-  projectTaskBoundriesType,
-  tileType,
-} from '@/models/project/projectModel';
+import { EntityOsmMap, projectInfoType, projectTaskBoundriesType, tileType } from '@/models/project/projectModel';
 import { TaskActions } from '@/store/slices/TaskSlice';
 import { AppDispatch } from '@/store/Store';
 import { featureType } from '@/store/types/IProject';
@@ -197,27 +191,6 @@ export const DownloadBasemapFile = (url: string | null) => {
     } else {
       await downloadBasemapFromAPI(url);
     }
-  };
-};
-
-export const GetSubmissionDashboard = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    const GetSubmissionDashboard = async (url: string) => {
-      try {
-        dispatch(ProjectActions.SetProjectDashboardLoading(true));
-        const response: AxiosResponse<projectDashboardDetailTypes> = await CoreModules.axios.get(url);
-        dispatch(ProjectActions.SetProjectDashboardDetail(response.data));
-        dispatch(ProjectActions.SetProjectDashboardLoading(false));
-      } catch (error) {
-        if (error.response.status === 404) {
-          dispatch(CommonActions.SetProjectNotFound(true));
-        }
-        dispatch(ProjectActions.SetProjectDashboardLoading(false));
-      } finally {
-        dispatch(ProjectActions.SetProjectDashboardLoading(false));
-      }
-    };
-    await GetSubmissionDashboard(url);
   };
 };
 

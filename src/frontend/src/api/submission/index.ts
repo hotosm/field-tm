@@ -128,7 +128,7 @@ export function useGetSubmissionDetailQuery({
 }: {
   id: string;
   params: { project_id: number };
-  options: TQueryOptions<projectSubmissionDashboardType>;
+  options: TQueryOptions<Record<string, any>>;
 }) {
   return useQuery({
     queryFn: () => getSubmissionDetail(id, params),

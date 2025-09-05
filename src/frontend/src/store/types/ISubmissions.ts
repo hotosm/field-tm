@@ -5,8 +5,6 @@ import {
 } from '@/models/submission/submissionModel';
 
 export type SubmissionStateTypes = {
-  submissionDetailsLoading: boolean;
-  submissionDetails: Record<string, any> | null;
   submissionContributors: submissionContributorsTypes[];
   submissionContributorsLoading: boolean;
   submissionFormFields: submissionFormFieldsTypes[];
@@ -18,8 +16,6 @@ export type SubmissionStateTypes = {
   updateReviewStateLoading: boolean;
   mappedVsValidatedTask: mappedVsValidatedTaskType[];
   mappedVsValidatedTaskLoading: boolean;
-  submissionPhotos: Record<string, string>;
-  submissionPhotosLoading: boolean;
 };
 
 type updateReviewStatusModal = {
