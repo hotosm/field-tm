@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Mentions from 'rc-mentions';
+import '@/styles/rc-mentions.css';
 import { Modal } from '@/components/common/Modal';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
 import Button from '@/components/common/Button';
-import { PostProjectComments } from '@/api/Project';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
-import '@/styles/rc-mentions.css';
 import { GetUserNames } from '@/api/User';
 import { UserActions } from '@/store/slices/UserSlice';
 import { useUpdateReviewStateMutation } from '@/api/submission';
@@ -16,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { useSetEntitiesMappingStatusMutation } from '@/api/project';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -102,6 +102,24 @@ const UpdateReviewStatusModal = () => {
     },
   });
 
+  // post submission instance comments
+  const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
+    id: +updateReviewStatusModal?.taskUid!,
+    options: {
+      onSuccess: () => {
+        dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
+        setNoteComments('');
+      },
+      onError: (error) => {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: error?.response?.data?.detail || 'Failed to add comment',
+          }),
+        );
+      },
+    },
+  });
+
   useEffect(() => {
     if (!updateReviewStatusModal.projectId) return;
     if (!searchText) {
@@ -141,17 +159,16 @@ const UpdateReviewStatusModal = () => {
     }
 
     if (noteComments.trim().length > 0) {
-      dispatch(
-        PostProjectComments(
-          `${VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
-          {
-            task_id: +updateReviewStatusModal?.taskUid,
-            comment: `#submissionId:${updateReviewStatusModal?.instanceId} #featureId:${updateReviewStatusModal?.entity_id} ${noteComments}`,
-            event: task_event.COMMENT,
-          },
-        ),
-      );
-      setNoteComments('');
+      addNewTaskEventMutate({
+        payload: {
+          task_id: +updateReviewStatusModal?.taskUid,
+          comment: `#submissionId:${updateReviewStatusModal?.instanceId} #featureId:${updateReviewStatusModal?.entity_id} ${noteComments}`,
+          event: task_event.COMMENT,
+        },
+        params: {
+          project_id: +updateReviewStatusModal.projectId,
+        },
+      });
     }
   };
 
@@ -212,7 +229,7 @@ const UpdateReviewStatusModal = () => {
             <Button
               variant="primary-red"
               onClick={handleStatusUpdate}
-              isLoading={isUpdateReviewStatePending || isSetEntitiesMappingStatusPending}
+              isLoading={isUpdateReviewStatePending || isSetEntitiesMappingStatusPending || isAddNewTaskEventPending}
               disabled={!reviewStatus}
               className="!fmtm-w-full"
             >

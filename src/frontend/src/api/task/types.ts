@@ -4,7 +4,9 @@ import type { Polygon, MultiPolygon } from 'geojson';
 // PAYLOAD TYPES
 export type addNewTaskEventPayloadType = {
   event: task_event;
-  user_sub: string;
+  user_sub?: string;
+  task_id?: number;
+  comment?: string;
 };
 
 // PARAMS TYPES
