@@ -56,51 +56,50 @@ const UpdateReviewStatusModal = () => {
 
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
 
-  const { mutate: setEntitiesMappingStatus, isPending: isSetEntitiesMappingStatusPending } =
+  const { mutate: setEntitiesMappingStatusMutate, isPending: isSetEntitiesMappingStatusPending } =
     useSetEntitiesMappingStatusMutation({
       project_id: updateReviewStatusModal.projectId!,
       options: {
-        onSuccess: () => {
-          dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
+        onSuccess: () => {},
+        onError: () => {},
+      },
+    });
+
+  const { isPending: isUpdateReviewStatePending, mutateAsync: updateReviewStateMutateAsync } =
+    useUpdateReviewStateMutation({
+      params: { project_id: +updateReviewStatusModal.projectId! },
+      options: {
+        onSuccess: ({ data }) => {
+          setEntitiesMappingStatusMutate({
+            entity_id: updateReviewStatusModal.entity_id!,
+            status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
+            label: updateReviewStatusModal.label as string,
+          });
+          queryClient.setQueryData<AxiosResponse<Record<string, any>>>(
+            ['get-project-submission-detail', +updateReviewStatusModal.projectId!, updateReviewStatusModal.instanceId],
+            (prevData) => {
+              if (!prevData) return prevData;
+              return {
+                ...prevData,
+                data: {
+                  ...prevData.data,
+                  __system: {
+                    ...prevData.data.__system,
+                    updatedAt: data.updatedAt,
+                    reviewState: data.reviewState,
+                    deviceId: data.deviceId,
+                  },
+                },
+              };
+            },
+          );
         },
         onError: () => {},
       },
     });
 
-  const { mutate: updateReviewState, isPending: isUpdateReviewStatePending } = useUpdateReviewStateMutation({
-    params: { project_id: +updateReviewStatusModal.projectId! },
-    options: {
-      onSuccess: ({ data }) => {
-        setEntitiesMappingStatus({
-          entity_id: updateReviewStatusModal.entity_id!,
-          status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
-          label: updateReviewStatusModal.label as string,
-        });
-        queryClient.setQueryData<AxiosResponse<Record<string, any>>>(
-          ['get-project-submission-detail', +updateReviewStatusModal.projectId!, updateReviewStatusModal.instanceId],
-          (prevData) => {
-            if (!prevData) return prevData;
-            return {
-              ...prevData,
-              data: {
-                ...prevData.data,
-                __system: {
-                  ...prevData.data.__system,
-                  updatedAt: data.updatedAt,
-                  reviewState: data.reviewState,
-                  deviceId: data.deviceId,
-                },
-              },
-            };
-          },
-        );
-      },
-      onError: () => {},
-    },
-  });
-
   // post submission instance comments
-  const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
+  const { isPending: isAddNewTaskEventPending, mutateAsync: addNewTaskEventMutateAsync } = useAddNewTaskEventMutation({
     id: +updateReviewStatusModal?.taskUid!,
     options: {
       onSuccess: ({ data }) => {
@@ -168,21 +167,37 @@ const UpdateReviewStatusModal = () => {
       return;
     }
 
+    const promises: Promise<any>[] = [];
+
     if (updateReviewStatusModal.reviewState !== reviewStatus) {
-      updateReviewState({ instance_id: updateReviewStatusModal.instanceId, review_state: reviewStatus });
+      promises.push(
+        updateReviewStateMutateAsync({
+          instance_id: updateReviewStatusModal.instanceId,
+          review_state: reviewStatus,
+        }),
+      );
     }
 
     if (noteComments.trim().length > 0) {
-      addNewTaskEventMutate({
-        payload: {
-          task_id: +updateReviewStatusModal?.taskUid,
-          comment: `#submissionId:${updateReviewStatusModal?.instanceId} #featureId:${updateReviewStatusModal?.entity_id} ${noteComments}`,
-          event: task_event.COMMENT,
-        },
-        params: {
-          project_id: +updateReviewStatusModal.projectId,
-        },
-      });
+      promises.push(
+        addNewTaskEventMutateAsync({
+          payload: {
+            task_id: +updateReviewStatusModal?.taskUid,
+            comment: `#submissionId:${updateReviewStatusModal?.instanceId} #featureId:${updateReviewStatusModal?.entity_id} ${noteComments}`,
+            event: task_event.COMMENT,
+          },
+          params: {
+            project_id: +updateReviewStatusModal.projectId,
+          },
+        }),
+      );
+    }
+
+    try {
+      await Promise.all(promises);
+      dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
+    } catch (err) {
+      dispatch(CommonActions.SetSnackBar({ message: 'There was an error updating the status' }));
     }
   };
 
