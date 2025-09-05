@@ -82,7 +82,7 @@ export function useUpdateReviewStateMutation({
   options,
 }: {
   params: { project_id: number };
-  options: TMutationOptions<updateReviewStateType, updateReviewStatePayloadType>;
+  options: TMutationOptions<updateReviewStateType, updateReviewStatePayloadType, { detail: string }>;
 }) {
   return useMutation({
     mutationKey: ['update-review-state', params],

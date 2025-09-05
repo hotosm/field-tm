@@ -352,7 +352,7 @@ export const useSetEntitiesMappingStatusMutation = ({
   options,
 }: {
   project_id: number;
-  options: TMutationOptions<odkEntitiesMappingStatusesType, entitiesMappingStatusPayloadType>;
+  options: TMutationOptions<odkEntitiesMappingStatusesType, entitiesMappingStatusPayloadType, { detail: string }>;
 }) =>
   useMutation({
     mutationFn: (payload) => setEntitiesMappingStatus(project_id, payload),

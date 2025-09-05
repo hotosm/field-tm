@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosResponse } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import Mentions from 'rc-mentions';
 import '@/styles/rc-mentions.css';
 import { Modal } from '@/components/common/Modal';
@@ -8,15 +10,12 @@ import Button from '@/components/common/Button';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
-import { UserActions } from '@/store/slices/UserSlice';
 import { useUpdateReviewStateMutation } from '@/api/submission';
-import { useQueryClient } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
 import { useSetEntitiesMappingStatusMutation } from '@/api/project';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { useGetUserListQuery } from '@/api/user';
-import { taskEventType } from '@/types';
+import type { taskEventType } from '@/types';
 
 const initialReviewState = {
   toggleModalStatus: false,
@@ -60,8 +59,16 @@ const UpdateReviewStatusModal = () => {
     useSetEntitiesMappingStatusMutation({
       project_id: updateReviewStatusModal.projectId!,
       options: {
-        onSuccess: () => {},
-        onError: () => {},
+        onSuccess: () => {
+          dispatch(CommonActions.SetSnackBar({ message: 'Review state updated successfully' }));
+        },
+        onError: (error) => {
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: error?.response?.data?.detail || 'Failed to update entity mapping status',
+            }),
+          );
+        },
       },
     });
 
@@ -94,7 +101,13 @@ const UpdateReviewStatusModal = () => {
             },
           );
         },
-        onError: () => {},
+        onError: (error) => {
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: error?.response?.data?.detail || 'Failed to update review state',
+            }),
+          );
+        },
       },
     });
 
@@ -140,10 +153,6 @@ const UpdateReviewStatusModal = () => {
 
   useEffect(() => {
     if (!updateReviewStatusModal.projectId) return;
-    if (!searchText) {
-      dispatch(UserActions.SetUserNames([]));
-      return;
-    }
 
     const timeoutId = setTimeout(() => {
       if (!updateReviewStatusModal.projectId) return;
