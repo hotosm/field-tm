@@ -189,7 +189,7 @@ const SubmissionDetails = () => {
                             toggleModalStatus: true,
                             instanceId: paramsInstanceId!,
                             projectId: +projectId!,
-                            taskId: submissionDetail?.taskId,
+                            taskId: submissionDetail?.task_id,
                             reviewState: restSubmissionDetails?.__system?.reviewState,
                             taskUid: taskUid!,
                             entity_id: restSubmissionDetails?.feature,
