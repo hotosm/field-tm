@@ -8,7 +8,6 @@ import Button from '@/components/common/Button';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
-import { GetUserNames } from '@/api/User';
 import { UserActions } from '@/store/slices/UserSlice';
 import { useUpdateReviewStateMutation } from '@/api/submission';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,8 +15,8 @@ import { AxiosResponse } from 'axios';
 import { useSetEntitiesMappingStatusMutation } from '@/api/project';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
 import { CommonActions } from '@/store/slices/CommonSlice';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useGetUserListQuery } from '@/api/user';
+import { taskEventType } from '@/types';
 
 const initialReviewState = {
   toggleModalStatus: false,
@@ -56,8 +55,6 @@ const UpdateReviewStatusModal = () => {
   const [searchText, setSearchText] = useState('');
 
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
-  const userNames = useAppSelector((state) => state.user.userNames);
-  const getUserNamesLoading = useAppSelector((state) => state.user.getUserNamesLoading);
 
   const { mutate: setEntitiesMappingStatus, isPending: isSetEntitiesMappingStatusPending } =
     useSetEntitiesMappingStatusMutation({
@@ -106,9 +103,19 @@ const UpdateReviewStatusModal = () => {
   const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
     id: +updateReviewStatusModal?.taskUid!,
     options: {
-      onSuccess: () => {
-        dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
+      onSuccess: ({ data }) => {
         setNoteComments('');
+
+        queryClient.setQueryData<AxiosResponse<taskEventType[]>>(
+          ['get-project-comments', +updateReviewStatusModal.projectId!],
+          (prevData) => {
+            if (!prevData) return prevData;
+            return {
+              ...prevData,
+              data: [data, ...prevData.data],
+            };
+          },
+        );
       },
       onError: (error) => {
         dispatch(
@@ -117,6 +124,18 @@ const UpdateReviewStatusModal = () => {
           }),
         );
       },
+    },
+  });
+
+  const {
+    data: userList,
+    isLoading: isUserListLoading,
+    refetch: getUserList,
+  } = useGetUserListQuery({
+    params: { search: searchText },
+    options: {
+      queryKey: ['get-user-list', searchText],
+      enabled: false,
     },
   });
 
@@ -129,12 +148,7 @@ const UpdateReviewStatusModal = () => {
 
     const timeoutId = setTimeout(() => {
       if (!updateReviewStatusModal.projectId) return;
-      dispatch(
-        GetUserNames(`${VITE_API_URL}/users/usernames`, {
-          project_id: updateReviewStatusModal.projectId,
-          search: searchText,
-        }),
-      );
+      getUserList();
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [searchText]);
@@ -205,11 +219,9 @@ const UpdateReviewStatusModal = () => {
               onSearch={(search) => {
                 setSearchText(search);
               }}
-              notFoundContent={
-                getUserNamesLoading ? 'Searching...' : searchText ? 'Search for a user' : 'User not found'
-              }
+              notFoundContent={isUserListLoading ? 'Searching...' : searchText ? 'Search for a user' : 'User not found'}
             >
-              {userNames?.map((user) => (
+              {userList?.map((user) => (
                 <Option key={user.sub} value={user.username}>
                   {user.username}
                 </Option>
