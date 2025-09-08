@@ -176,6 +176,11 @@ _containerd_rootless:
   # containerd restart required
   systemctl --user restart containerd.service
 
+  # Usage of priv ports below 1024
+  # https://rootlesscontaine.rs/getting-started/common/sysctl/
+  echo 'net.ipv4.ip_unprivileged_port_start=0' | sudo tee /etc/sysctl.d/99-rootless.conf
+  sudo sysctl --system
+
 [no-cd]
 _nerdctl_docker_alias:
   #!/usr/bin/env bash
