@@ -60,7 +60,7 @@ const UpdateReviewStatusModal = () => {
       project_id: updateReviewStatusModal.projectId!,
       options: {
         onSuccess: () => {
-          dispatch(CommonActions.SetSnackBar({ message: 'Review state updated successfully' }));
+          dispatch(CommonActions.SetSnackBar({ message: 'Review state updated successfully', variant: 'success' }));
         },
         onError: (error) => {
           dispatch(

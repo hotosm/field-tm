@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import AssetModules from '@/shared/AssetModules';
 import ProjectInfo from '@/components/ProjectSubmissions/ProjectInfo.js';
-import SubmissionsInfographics from '@/components/ProjectSubmissions/SubmissionsInfographics.js';
-import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.js';
+import SubmissionsInfographics from '@/components/ProjectSubmissions/Infographics';
+import SubmissionsTable from '@/components/ProjectSubmissions/Table';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
 import { useParams, useSearchParams } from 'react-router-dom';

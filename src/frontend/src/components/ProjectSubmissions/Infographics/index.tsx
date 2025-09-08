@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import TaskSubmissions from '@/components/ProjectSubmissions/TaskSubmissions';
+import TaskSubmissions from '@/components/ProjectSubmissions/Infographics/TaskSubmissions';
 import CustomBarChart from '@/components/common/BarChart';
 import CustomPieChart from '@/components/common/PieChart';
 import Table, { TableHeader } from '@/components/common/CustomTable';
 import CustomLineChart from '@/components/common/LineChart';
 import CoreModules from '@/shared/CoreModules';
-import InfographicsCard from '@/components/ProjectSubmissions/InfographicsCard';
+import InfographicsCard from '@/components/ProjectSubmissions/Infographics/InfographicsCard';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useAppSelector } from '@/types/reduxTypes';
 import { formSubmissionType } from '@/models/submission/submissionModel';
 import { dateNDaysAgo, getMonthDate } from '@/utilfunctions/commonUtils';
 
-const SubmissionsInfographics = ({ toggleView, entities }) => {
+const Infographics = ({ toggleView, entities }) => {
   useDocumentTitle('Submission Infographics');
   const formSubmissionRef = useRef(null);
   const projectProgressRef = useRef(null);
@@ -217,30 +217,6 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
           />
         </div>
       </div>
-      {/* <div>
-        <InfographicsCard
-          cardRef={plannedVsActualRef}
-          header="Planned vs Actual"
-          body={
-            false ? (
-              <CoreModules.Skeleton className="!fmtm-w-full fmtm-h-full" />
-            ) : lineKeyData.length > 0 ? (
-              <CustomLineChart
-                data={lineKeyData}
-                xAxisDataKey="name"
-                lineOneKey="Planned"
-                lineTwoKey="Actual"
-                xLabel="Submission Date"
-                yLabel="Submission Count"
-              />
-            ) : (
-              <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-text-3xl fmtm-text-gray-400">
-                No data available!
-              </div>
-            )
-          }
-        />
-      </div> */}
       <div>
         <TaskSubmissions />
       </div>
@@ -248,4 +224,4 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
   );
 };
 
-export default SubmissionsInfographics;
+export default Infographics;

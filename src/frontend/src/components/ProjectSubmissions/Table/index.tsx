@@ -14,7 +14,7 @@ import { CustomSelect } from '@/components/common/Select.js';
 import DateRangePicker from '@/components/common/DateRangePicker';
 import Table, { TableHeader } from '@/components/common/CustomTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
+import UpdateReviewStatusModal from '@/components/ProjectSubmissions/Table/UpdateReviewStatusModal';
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';

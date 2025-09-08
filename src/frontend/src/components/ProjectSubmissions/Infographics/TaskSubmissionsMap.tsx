@@ -9,7 +9,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { basicGeojsonTemplate } from '@/utilities/mapUtils';
-import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/TaskSubmissionsMapLegend';
+import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/Infographics/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import {
@@ -22,7 +22,7 @@ import {
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
+import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
 export const municipalStyles = {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import TaskSubmissionsMap from '@/components/ProjectSubmissions/TaskSubmissionsMap';
+import TaskSubmissionsMap from '@/components/ProjectSubmissions/Infographics/TaskSubmissionsMap';
 import InputTextField from '@/components/common/InputTextField';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';
@@ -119,9 +119,7 @@ const TaskSubmissions = () => {
             </div>
           ) : filteredTaskInfo?.length > 0 ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => (
-                <TaskCard key={task.task_id} task={task} />
-              ))}
+              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => <TaskCard key={task.task_id} task={task} />)}
             </div>
           ) : (
             <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-mt-10">

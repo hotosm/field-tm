@@ -3,7 +3,7 @@ import CoreModules from '@/shared/CoreModules.js';
 import SubmissionInstanceMap from '@/components/SubmissionMap/SubmissionInstanceMap';
 import Button from '@/components/common/Button';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
-import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
+import UpdateReviewStatusModal from '@/components/ProjectSubmissions/Table/UpdateReviewStatusModal';
 import { useAppDispatch } from '@/types/reduxTypes';
 import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
