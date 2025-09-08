@@ -47,15 +47,14 @@ prod:
   just config generate-dotenv "${GIT_BRANCH}"
   just config custom-favicon
 
-  # Pull images (run through envsubst twice for nested vars)
-  ../envsubst -no-unset -i compose.sub.yaml | ../envsubst | {{docker}} compose -f - pull
+  # Pull images
+  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull
 
   # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
 
-  # Deploy (run through envsubst twice for nested vars)
+  # Deploy
   ../envsubst -no-unset -i compose.sub.yaml | \
-        ../envsubst | \
         {{docker}} compose -f - up --detach \
         --remove-orphans --force-recreate
   
