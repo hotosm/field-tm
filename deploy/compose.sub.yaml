@@ -77,7 +77,6 @@ services:
       # service for now.
       # More details: https://github.com/containerd/nerdctl/issues/1387
       # and: https://github.com/bunkerity/bunkerweb/discussions/2221
-      #
       DNS_RESOLVERS: 10.20.30.53
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
@@ -148,9 +147,18 @@ services:
   # Required as nginx via nerdctl cannot resolve container aliases
   dns:
     image: "docker.io/4km3/dnsmasq:2.90-r3"
+    depends_on:
+      # Must start after all containers are created and allocated IP addresses
+      api:
+        condition: service_healthy
     command: [
         "-k", # keep in foreground
         "--log-facility=-", # log to stdout
+        "--no-resolv", # don't use default resolv.conf
+        "--cache-size=0", # avoid caching to prevent issues on recreate
+        "--no-hosts", # Don't read the default /etc/hosts
+        "--addn-hosts=/etc/hosts", # Use the nerdctl-injected hosts file
+        "--hostsdir=/etc", # Monitor this directory for changes
         "--server=1.1.1.1", # forward to Cloudflare DNS
         "--server=8.8.8.8", # forward to Google DNS
         "--listen-address=127.0.0.1",
@@ -161,6 +169,12 @@ services:
       fmtm-net:
         ipv4_address: 10.20.30.53
     restart: unless-stopped
+    healthcheck:
+      test: nc -z localhost 53 || exit 1
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
