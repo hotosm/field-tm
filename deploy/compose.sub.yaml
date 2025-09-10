@@ -155,7 +155,7 @@ services:
         "--server=8.8.8.8", # forward to Google DNS
         "--listen-address=127.0.0.1",
         "--listen-address=10.20.30.53", # DNS server inside your network
-        "--addn-hosts=/etc/hosts", # use /etc/hosts injected by nerdctl
+        "--hosts=/etc/hosts", # use /etc/hosts injected by nerdctl
       ]
     networks:
       fmtm-net:
