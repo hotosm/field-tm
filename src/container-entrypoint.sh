@@ -6,8 +6,8 @@ set -e
 # accessible to the Nginx container
 echo "Syncing files from /app --> /frontend."
 rclone sync /app /frontend
-echo "Updating directory group --> nginx."
-chown -R nginx:nginx /frontend
+echo "Updating directory permissions 101:101 (nginx)."
+chown -R 101:101 /frontend
 echo "Sync done."
 
 # Successful exit (stop container)
