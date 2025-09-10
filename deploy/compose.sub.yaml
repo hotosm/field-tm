@@ -69,6 +69,8 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      # Increase domain name max size (for long domain names)
+      SERVER_NAMES_HASH_BUCKET_SIZE: 128
       USE_REDIS: no
       # NOTE for bunkerweb nginx it uses the 'resolver' directive:
       # https://nginx.org/en/docs/http/ngx_http_core_module.html#resolver
