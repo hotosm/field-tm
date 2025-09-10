@@ -70,6 +70,15 @@ services:
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
       USE_REDIS: no
+      # NOTE for bunkerweb nginx it uses the 'resolver' directive:
+      # https://nginx.org/en/docs/http/ngx_http_core_module.html#resolver
+      # However, nerdctl hardcodes container aliases to /etc/hosts, which
+      # cannot be read by Nginx. So we must use a custom dnsmasq resolver
+      # service for now.
+      # More details: https://github.com/containerd/nerdctl/issues/1387
+      # and: https://github.com/bunkerity/bunkerweb/discussions/2221
+      #
+      DNS_RESOLVERS: 10.20.30.53
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -135,6 +144,23 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+
+  # Required as nginx via nerdctl cannot resolve container aliases
+  dns:
+    image: "docker.io/4km3/dnsmasq:2.90-r3"
+    command: [
+        "-k", # keep in foreground
+        "--log-facility=-", # log to stdout
+        "--server=1.1.1.1", # forward to Cloudflare DNS
+        "--server=8.8.8.8", # forward to Google DNS
+        "--listen-address=127.0.0.1",
+        "--listen-address=10.20.30.53", # DNS server inside your network
+        "--addn-hosts=/etc/hosts", # use /etc/hosts injected by nerdctl
+      ]
+    networks:
+      fmtm-net:
+        ipv4_address: 10.20.30.53
+    restart: unless-stopped
 
   api:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
