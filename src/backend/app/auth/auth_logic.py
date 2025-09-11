@@ -307,13 +307,14 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
     """Expire cookies by setting max_age to 0."""
     for cookie_name in cookie_names:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
+        cookie_domain = get_cookie_domain()
         response.set_cookie(
             key=cookie_name,
             value="",
             max_age=0,  # Set to expire immediately
             expires=0,  # Set to expire immediately
             path="/",
-            domain=settings.FMTM_DOMAIN,
+            domain=cookie_domain,
             secure=False if settings.DEBUG else True,
             httponly=True,
             samesite="lax",
