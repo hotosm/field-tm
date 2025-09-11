@@ -108,6 +108,28 @@ def set_cookie(
     )
 
 
+def get_cookie_domain() -> str:
+    """Get the appropriate cookie domain, depending on domain structure."""
+    if settings.FMTM_MAPPER_DOMAIN:
+        mapper_domain = settings.FMTM_MAPPER_DOMAIN
+        manager_domain = settings.FMTM_DOMAIN
+
+        # Check if domains are compatible for cookie sharing
+        if domains_compatible_for_cookies(mapper_domain, manager_domain):
+            mapper_root = get_root_domain(mapper_domain)
+            return f".{mapper_root}"  # Leading dot for subdomain sharing
+        else:
+            # Domains are on entirely different root domains - cookies cannot be shared
+            raise ValueError(
+                f"FMTM_MAPPER_DOMAIN ({mapper_domain}) and FMTM_DOMAIN"
+                f"({manager_domain}) are on different root domains. Cookie "
+                "sharing is not possible."
+            )
+    else:
+        # Use the primary manager domain
+        return settings.FMTM_DOMAIN
+
+
 def set_cookies(
     response: Response,
     access_token: str,
@@ -129,24 +151,7 @@ def set_cookies(
         JSONResponse: A response with attached cookies (set-cookie headers).
     """
     secure = not settings.DEBUG
-    if settings.FMTM_MAPPER_DOMAIN:
-        mapper_domain = settings.FMTM_MAPPER_DOMAIN
-        manager_domain = settings.FMTM_DOMAIN
-
-        # Check if domains are compatible for cookie sharing
-        if domains_compatible_for_cookies(mapper_domain, manager_domain):
-            mapper_root = get_root_domain(mapper_domain)
-            domain = f".{mapper_root}"  # Leading dot for subdomain sharing
-        else:
-            # Domains are on entirely different root domains - cookies cannot be shared
-            raise ValueError(
-                f"FMTM_MAPPER_DOMAIN ({mapper_domain}) and FMTM_DOMAIN"
-                f"({manager_domain}) are on different root domains. Cookie "
-                "sharing is not possible."
-            )
-    else:
-        # Use the primary manager domain
-        domain = settings.FMTM_DOMAIN
+    cookie_domain = get_cookie_domain()
 
     set_cookie(
         response,
@@ -154,7 +159,7 @@ def set_cookies(
         access_token,
         max_age=86400,  # 1 day
         secure=secure,
-        domain=domain,
+        domain=cookie_domain,
     )
     set_cookie(
         response,
@@ -162,7 +167,7 @@ def set_cookies(
         refresh_token,
         max_age=86400 * 7,  # 1 week
         secure=secure,
-        domain=domain,
+        domain=cookie_domain,
     )
 
     return response

@@ -28,7 +28,7 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from osm_login_python.core import Auth
 
-from app.auth.auth_logic import create_jwt_tokens, set_cookies
+from app.auth.auth_logic import create_jwt_tokens, get_cookie_domain, set_cookies
 from app.config import settings
 from app.db.enums import HTTPStatus, UserRole
 
@@ -108,13 +108,14 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
     cookie_name = settings.cookie_name
     osm_cookie_name = f"{cookie_name}_osm"
     log.debug(f"Creating cookie '{osm_cookie_name}' with OSM token")
+    cookie_domain = get_cookie_domain()
     response_plus_cookies.set_cookie(
         key=osm_cookie_name,
         value=serialised_osm_token,
         max_age=864000,
         expires=864000,  # expiry set for 10 days
         path="/",
-        domain=settings.FMTM_DOMAIN,
+        domain=cookie_domain,
         secure=False if settings.DEBUG else True,
         httponly=True,
         samesite="lax",
