@@ -47,6 +47,7 @@ dependencies = [
     "pyjwt==2.9.0",
     "aiosmtplib==4.0.1",
     "markdown==3.8",
+    "tldextract==5.3.0",
     "osm-fieldwork",
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
