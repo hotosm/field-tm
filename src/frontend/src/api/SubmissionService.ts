@@ -1,13 +1,11 @@
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
   submissionContributorsTypes,
   submissionFormFieldsTypes,
   submissionTableDataTypes,
-  updateReviewStateType,
   validatedMappedType,
 } from '@/models/submission/submissionModel';
 import CoreModules from '@/shared/CoreModules';
-import { CommonActions } from '@/store/slices/CommonSlice';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { filterType } from '@/store/types/ISubmissions';
 import { AppDispatch } from '@/store/Store';
@@ -53,7 +51,7 @@ export const SubmissionTableService = (url: string, payload: filterType) => {
     const fetchSubmissionTable = async (url: string, payload: filterType) => {
       try {
         dispatch(SubmissionActions.SetSubmissionTableLoading(true));
-        const response: AxiosResponse<submissionTableDataTypes> = await CoreModules.axios.get(url, { params: payload });
+        const response: AxiosResponse<submissionTableDataTypes> = await axios.get(url, { params: payload });
         dispatch(SubmissionActions.SetSubmissionTable(response.data));
         dispatch(SubmissionActions.SetSubmissionTableLoading(false));
         dispatch(SubmissionActions.SetSubmissionTableRefreshing(false));
@@ -64,27 +62,6 @@ export const SubmissionTableService = (url: string, payload: filterType) => {
     };
 
     await fetchSubmissionTable(url, payload);
-  };
-};
-
-export const UpdateReviewStateService = (url: string, payload: object) => {
-  return async (dispatch: AppDispatch) => {
-    const UpdateReviewState = async (url: string) => {
-      try {
-        dispatch(SubmissionActions.UpdateReviewStateLoading(true));
-        const response: AxiosResponse<updateReviewStateType> = await CoreModules.axios.post(url, payload);
-        dispatch(SubmissionActions.UpdateSubmissionTableDataReview(response.data));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'Failed to update review state.',
-          }),
-        );
-        dispatch(SubmissionActions.UpdateReviewStateLoading(false));
-      }
-    };
-
-    await UpdateReviewState(url);
   };
 };
 

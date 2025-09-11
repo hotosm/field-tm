@@ -34,6 +34,7 @@ export type filterType = {
   submitted_by: string | null;
   review_state: string | null;
   submitted_date_range: string | null;
+  page: number;
 };
 
 type mappedVsValidatedTaskType = {
