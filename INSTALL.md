@@ -34,7 +34,7 @@ On a Linux-based machine with `bash` installed, run the script:
 > However, if you run as root, a user svcfmtm will be created for you.
 
 ```bash
-curl -L https://get.fmtm.dev -o install.sh
+curl -L https://get.fieldtm.hotosm.org -o install.sh
 bash install.sh
 
 # Then follow the prompts
@@ -315,7 +315,7 @@ Once you have deployed, you will need to check that you can properly authenticat
           },
           {
               "name": "Support",
-              "path": "https://docs.fmtm.dev/about/about/"
+              "path": "https://docs.fieldtm.hotosm.org/about/about/"
           }
       ]
   }
@@ -342,6 +342,6 @@ That's it, you have successfully set up Field-TM!!
 [3]: https://git-scm.com/ "Git"
 [4]: https://docs.docker.com/engine/install/ "Docker"
 [5]: https://docs.docker.com/compose/install "Docker Compose"
-[6]: https://docs.fmtm.dev/dev/Setup/ "dev docs"
+[6]: https://docs.fieldtm.hotosm.org/dev/Setup/ "dev docs"
 [7]: https://www.openstreetmap.org/login "Login to OSM"
 [8]: https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png "image"

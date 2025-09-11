@@ -293,7 +293,7 @@ The metadata for a project must be created first.
   - A GeoJSON of the area you wish to map.
 
 - See further details of the exact endpoint requirements
-  [here](https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json#/projects/create_project_projects_post)
+  [here](https://hotosm.github.io/swagger/?url=https://docs.fieldtm.hotosm.org/openapi/openapi.json#/projects/create_project_projects_post)
 
 - Post the JSON data to the following endpoint: `/projects?org_id=xxx`
 
