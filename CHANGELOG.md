@@ -885,7 +885,7 @@
 - **frontend**: update link to custom odk collect from intent apk
 - **frontend**: import hotosm/ui styles.css --> style.css change
 - remove reference to 'topo' basemap imagery provider (usgs)
-- rename fmtm.dev --> docs.fmtm.dev for docs site
+- rename fmtm.dev --> docs.fieldtm.hotosm.org for docs site
 
 ## 2024.3.0 (2024-05-28)
 

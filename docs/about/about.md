@@ -84,7 +84,7 @@ For more information about FieldTM, see the [FAQ][6] and [Timeline][7].
 [1]: https://www.youtube.com/watch?v=GiLKRZpbtrc&\ab_channel=HumanitarianOpenStreetMapTeam
 [2]: https://hotosm.github.io/osm-fieldwork/
 [3]: https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk
-[4]: https://docs.fmtm.dev/CONTRIBUTING/
+[4]: https://docs.fieldtm.hotosm.org/CONTRIBUTING/
 [5]: https://tasks.hotosm.org/
 [6]: ./faq.md
 [7]: ../timeline.md
