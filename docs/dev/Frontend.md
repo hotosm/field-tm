@@ -7,7 +7,7 @@ This is the easiest way to manage all of the services together.
 ### 1A: Starting the API Containers
 
 For details on how to run the API first, please see:
-[Backend Docs](https://docs.fmtm.dev/dev/Backend)
+[Backend Docs](https://docs.fieldtm.hotosm.org/dev/Backend)
 
 ### 1B: Starting the Frontend Containers
 

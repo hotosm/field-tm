@@ -1,7 +1,7 @@
 site_name: Field-TM
 site_description: Coordinated field mapping for Open Mapping campaigns.
 # strict: true
-site_url: "https://docs.fmtm.dev/"
+site_url: "https://docs.fieldtm.hotosm.org/"
 
 repo_name: "hotosm/field-tm"
 repo_url: "https://github.com/hotosm/field-tm/"
@@ -102,6 +102,6 @@ nav:
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: https://xlsform-builder.fmtm.hotosm.org
-  - Roadmap: https://roadmap.fmtm.dev
+  - Roadmap: https://roadmap.fieldtm.hotosm.org
   - Timeline: timeline.md
-  - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json
+  - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fieldtm.hotosm.org/openapi/openapi.json
