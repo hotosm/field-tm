@@ -161,7 +161,10 @@ async def invite_new_user(
         signin_type = "google"
         # We use different domain for non OSM users since they can't access the
         # management interface
-        domain = f"mapper.{settings.FMTM_DOMAIN}"
+        if settings.FMTM_MAPPER_DOMAIN:
+            domain = settings.FMTM_MAPPER_DOMAIN
+        else:
+            domain = f"mapper.{settings.FMTM_DOMAIN}"
     else:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
