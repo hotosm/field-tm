@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import { online } from 'svelte/reactivity/window';
 	import { error } from '@sveltejs/kit';
+	import { browser } from '$app/environment';
 	import type { PageProps } from './$types';
 
 	import { getCommonStore } from '$store/common.svelte.ts';
@@ -24,6 +25,8 @@
 
 	let lastOnlineStatus: boolean | null = $state(null);
 	let loginDebounce: ReturnType<typeof setTimeout> | null = $state(null);
+
+	let hostname = $derived(browser ? window.location.hostname : '');
 
 	async function refreshCookiesAndLogin() {
 		try {
@@ -87,6 +90,12 @@
 <main class="layout flex flex-col h-screen overflow-hidden">
 	<Header></Header>
 	<Toast></Toast>
-	<hot-tracking site-id="28" domain={'mapper.fmtm.hotosm.org'} class="tracking"></hot-tracking>
+	{#if data.config.matomoSiteId}
+		<hot-tracking
+		  site-id={data.config.matomoSiteId}
+		  domain={hostname}
+		  class="tracking">
+		</hot-tracking>
+	{/if}
 	{@render children?.({ data })}
 </main>
