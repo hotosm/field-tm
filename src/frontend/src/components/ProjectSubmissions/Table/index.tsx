@@ -13,25 +13,62 @@ import { project_status } from '@/types/enums';
 import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
-import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import SubmissionsTableSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/SubmissionsTableSkeleton';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
+type tempFilterType = Omit<filterType, 'submitted_date_range'> & {
+  submitted_date_range: { start: Date | null; end: Date | null };
+  page: number;
+};
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterState: filterType = {
-    task_id: searchParams.get('task_id') ? searchParams?.get('task_id') || null : null,
-    submitted_by: searchParams.get('submitted_by'),
-    review_state: searchParams.get('review_state'),
-    submitted_date_range: searchParams.get('submitted_date_range'),
+  const getInitialFilterState = () => {
+    const task_id = searchParams.get('task_id');
+    const submitted_date_range = searchParams.get('submitted_date_range');
+    const submitted_by = searchParams.get('submitted_by');
+    const review_state = searchParams.get('review_state');
+    const page = searchParams.get('page');
+
+    let submittedDateRange: { start: Date | null; end: Date | null } = {
+      start: null,
+      end: null,
+    };
+    if (submitted_date_range) {
+      submittedDateRange = {
+        start: new Date(submitted_date_range?.split(',')?.[0]) || null,
+        end: new Date(submitted_date_range?.split(',')?.[1]) || null,
+      };
+    } else {
+      submittedDateRange = {
+        start: null,
+        end: null,
+      };
+    }
+    const initialFilterState: tempFilterType = {
+      task_id: task_id ? task_id : null,
+      submitted_by: submitted_by ? submitted_by : null,
+      review_state: review_state ? review_state : null,
+      submitted_date_range: submittedDateRange,
+      page: page ? +page : 1,
+    };
+    return initialFilterState;
   };
-  const [filter, setFilter] = useState<filterType>(initialFilterState);
+
+  const [tempFilter, setTempFilter] = useState<tempFilterType>(getInitialFilterState());
+  const [filter, setFilter] = useState<filterType>({
+    ...tempFilter,
+    submitted_date_range:
+      tempFilter?.submitted_date_range?.start && tempFilter?.submitted_date_range?.end
+        ? `${format(new Date(tempFilter.submitted_date_range?.start as Date), 'yyyy-MM-dd')},${format(new Date(tempFilter.submitted_date_range?.end as Date), 'yyyy-MM-dd')}`
+        : null,
+  });
+  console.log(tempFilter, '----> tempFilter');
 
   const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
@@ -49,27 +86,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const taskList = projectData[projectIndex]?.taskBoundries;
 
   const isProjectManager = useIsProjectManager(projectId as string);
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as null | number);
-
-  const [paginationPage, setPaginationPage] = useState<number>(1);
-  const [submittedBy, setSubmittedBy] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
-    start: initialFilterState?.submitted_date_range
-      ? new Date(initialFilterState.submitted_date_range.split(',')[0])
-      : null,
-    end: initialFilterState?.submitted_date_range
-      ? new Date(initialFilterState.submitted_date_range.split(',')[1])
-      : null,
-  });
-
-  useEffect(() => {
-    if (!dateRange.start || !dateRange.end) return;
-
-    setFilter((prev) => ({
-      ...prev,
-      submitted_date_range: `${format(new Date(dateRange.start as Date), 'yyyy-MM-dd')},${format(new Date(dateRange.end as Date), 'yyyy-MM-dd')}`,
-    }));
-  }, [dateRange]);
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id ? +projectInfo.organisation_id : null);
 
   const updatedSubmissionFormFields = submissionFormFields
     //filter necessary fields only
@@ -93,14 +110,9 @@ const SubmissionsTable = ({ toggleView }) => {
   useEffect(() => {
     dispatch(
       SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        page: paginationPage,
         ...filter,
       }),
     );
-  }, [filter, paginationPage]);
-
-  useEffect(() => {
-    setPaginationPage(1);
   }, [filter]);
 
   const refreshTable = () => {
@@ -108,20 +120,11 @@ const SubmissionsTable = ({ toggleView }) => {
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     dispatch(
       SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        page: paginationPage,
         ...filter,
+        page: 1,
       }),
     );
   };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (submittedBy != null) {
-        setFilter((prev) => ({ ...prev, submitted_by: submittedBy }));
-      }
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [submittedBy, 500]);
 
   const handleChangePage = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | React.KeyboardEvent<HTMLInputElement>,
@@ -129,16 +132,52 @@ const SubmissionsTable = ({ toggleView }) => {
   ) => {
     if (!submissionTableData?.pagination?.pages) return;
     if (newPage + 1 > submissionTableData?.pagination?.pages || newPage + 1 < 1) {
-      setPaginationPage(paginationPage);
       return;
     }
-    setPaginationPage(newPage + 1);
+    setFilter({ ...filter, page: newPage + 1 });
+  };
+  console.log(tempFilter, 'tempFilter');
+
+  const applyFilter = () => {
+    const submitted_date_range =
+      tempFilter.submitted_date_range.start && tempFilter.submitted_date_range.end
+        ? `${format(new Date(tempFilter.submitted_date_range.start as Date), 'yyyy-MM-dd')},${format(new Date(tempFilter.submitted_date_range.end as Date), 'yyyy-MM-dd')}`
+        : null;
+    setFilter({
+      ...tempFilter,
+      page: 1,
+      submitted_date_range: submitted_date_range,
+    });
+
+    let searchParams: Record<string, string> = { tab: 'table' };
+    if (tempFilter.task_id) searchParams.task_id = tempFilter.task_id;
+    if (tempFilter.review_state) searchParams.review_state = tempFilter.review_state;
+    if (tempFilter.submitted_by) searchParams.submitted_by = tempFilter.submitted_by;
+    if (submitted_date_range) searchParams.submitted_date_range = submitted_date_range;
+    if (tempFilter.task_id) searchParams.task_id = tempFilter.task_id;
+
+    setSearchParams(searchParams);
   };
 
   const clearFilters = () => {
     setSearchParams({ tab: 'table' });
-    setFilter({ task_id: null, submitted_by: null, review_state: null, submitted_date_range: null });
-    setDateRange({ start: null, end: null });
+    setTempFilter({
+      task_id: null,
+      submitted_by: null,
+      review_state: null,
+      submitted_date_range: {
+        start: null,
+        end: null,
+      },
+      page: 1,
+    });
+    setFilter({
+      task_id: null,
+      submitted_by: null,
+      review_state: null,
+      submitted_date_range: null,
+      page: 1,
+    });
   };
 
   function getValueByPath(obj: any, path: string) {
@@ -166,11 +205,6 @@ const SubmissionsTable = ({ toggleView }) => {
     return value ? (typeof value === 'object' ? '-' : value) : '-';
   }
 
-  useEffect(() => {
-    const filteredParams = filterParams(filter);
-    setSearchParams({ tab: 'table', ...filteredParams });
-  }, [filter]);
-
   return (
     <div className="">
       <Modal
@@ -191,12 +225,10 @@ const SubmissionsTable = ({ toggleView }) => {
       <UpdateReviewStatusModal />
       <Filter
         toggleView={toggleView}
+        tempFilter={tempFilter}
+        setTempFilter={setTempFilter}
         filter={filter}
-        setFilter={setFilter}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        submittedBy={submittedBy}
-        setSubmittedBy={setSubmittedBy}
+        applyFilter={applyFilter}
         clearFilters={clearFilters}
         refreshTable={refreshTable}
       />

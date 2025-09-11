@@ -15,26 +15,41 @@ import windowDimention from '@/hooks/WindowDimension';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DownloadProjectSubmission } from '@/api/task';
 import { CreateTaskEvent } from '@/api/TaskEvent';
+import { filterType } from '@/store/types/ISubmissions';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
+type tempFilterType = Omit<filterType, 'submitted_date_range'> & {
+  submitted_date_range: { start: Date | null; end: Date | null };
+  page: number;
+};
+
+type filterPropsType = {
+  toggleView: React.ReactElement;
+  tempFilter: tempFilterType;
+  setTempFilter: React.Dispatch<React.SetStateAction<tempFilterType>>;
+  filter: Pick<filterType, 'task_id' | 'submitted_by' | 'review_state'> & {
+    submitted_date_range: string | null;
+  };
+  applyFilter: any;
+  clearFilters: any;
+  refreshTable: any;
+};
 
 const Filter = ({
   toggleView,
+  tempFilter,
+  setTempFilter,
   filter,
-  setFilter,
-  dateRange,
-  setDateRange,
-  submittedBy,
-  setSubmittedBy,
+  applyFilter,
   clearFilters,
   refreshTable,
-}) => {
+}: filterPropsType) => {
   const dispatch = useAppDispatch();
   const { windowSize } = windowDimention();
   const params = useParams();
   const navigate = useNavigate();
 
-  const projectId = params.projectId;
+  const projectId = params.projectId!;
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
@@ -50,7 +65,7 @@ const Filter = ({
   const projectIndex = projectData.findIndex((project) => project.id == +projectId);
   const currentStatus = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return filter.task_id && task?.id === +filter.task_id;
+      return tempFilter.task_id && task?.id === +tempFilter.task_id;
     })?.[0],
   };
 
@@ -88,7 +103,7 @@ const Filter = ({
         `${VITE_API_URL}/tasks/${currentStatus.id}/event`,
         task_event.GOOD,
         projectId!,
-        filter?.task_id || '',
+        tempFilter?.task_id || '',
         authDetails || {},
         { project_id: projectId },
       ),
@@ -126,7 +141,7 @@ const Filter = ({
                 <AssetModules.TuneIcon style={{ fontSize: '20px' }} />
                 FILTER{' '}
                 <div className="fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-justify-center fmtm-items-center">
-                  <p>{Object.values(filter).filter((filterObjValue) => filterObjValue).length}</p>
+                  <p>{Object.values(filter).filter((filterObjValue) => filterObjValue).length - 1}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -140,10 +155,12 @@ const Filter = ({
                     placeholder="Select"
                     data={taskInfo}
                     dataKey="value"
-                    value={filter?.task_id?.toString() || ''}
+                    value={tempFilter?.task_id?.toString() || ''}
                     valueKey="task_id"
                     label="task_id"
-                    onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: value.toString() }))}
+                    onValueChange={(value) =>
+                      value && setTempFilter((prev: filterType) => ({ ...prev, task_id: value.toString() }))
+                    }
                     className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
                   />
                 </div>
@@ -153,11 +170,11 @@ const Filter = ({
                     placeholder="Select"
                     data={reviewStateData}
                     dataKey="value"
-                    value={filter?.review_state || ''}
+                    value={tempFilter?.review_state || ''}
                     valueKey="value"
                     label="label"
                     onValueChange={(value) =>
-                      value && setFilter((prev) => ({ ...prev, review_state: value.toString() }))
+                      value && setTempFilter((prev) => ({ ...prev, review_state: value.toString() }))
                     }
                     errorMsg=""
                     className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
@@ -166,10 +183,20 @@ const Filter = ({
                 <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[12rem]'}`}>
                   <DateRangePicker
                     title="Submitted Date"
-                    startDate={dateRange?.start}
-                    endDate={dateRange?.end}
-                    setStartDate={(date) => setDateRange((prev) => ({ ...prev, start: date }))}
-                    setEndDate={(date) => setDateRange((prev) => ({ ...prev, end: date }))}
+                    startDate={tempFilter.submitted_date_range?.start}
+                    endDate={tempFilter.submitted_date_range?.end}
+                    setStartDate={(date) =>
+                      setTempFilter((prev) => ({
+                        ...prev,
+                        submitted_date_range: { ...prev.submitted_date_range, start: date },
+                      }))
+                    }
+                    setEndDate={(date) =>
+                      setTempFilter((prev) => ({
+                        ...prev,
+                        submitted_date_range: { ...prev.submitted_date_range, end: date },
+                      }))
+                    }
                     className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-w-full"
                   />
                 </div>
@@ -183,7 +210,7 @@ const Filter = ({
                       className="fmtm-h-[1.9rem] fmtm-p-2 fmtm-w-full fmtm-outline-none"
                       placeholder="Search User"
                       onChange={(e) => {
-                        setSubmittedBy(e.target.value);
+                        setTempFilter((prev) => ({ ...prev, submitted_by: e.target.value }));
                       }}
                     ></input>
                     <AssetModules.SearchIcon className="fmtm-text-[#9B9999] fmtm-cursor-pointer" />
@@ -191,10 +218,17 @@ const Filter = ({
                 </div>
                 <Button
                   variant="secondary-red"
+                  onClick={applyFilter}
+                  disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+                >
+                  Apply
+                </Button>
+                <Button
+                  variant="secondary-red"
                   onClick={clearFilters}
                   disabled={submissionTableDataLoading || submissionFormFieldsLoading}
                 >
-                  Reset Filter
+                  Reset
                 </Button>
               </div>
             </DropdownMenuContent>
@@ -236,9 +270,9 @@ const Filter = ({
           </div>
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
-          {filter?.task_id &&
-            projectData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +filter?.task_id)?.task_state ===
-              task_state.LOCKED_FOR_VALIDATION && (
+          {tempFilter?.task_id &&
+            projectData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +tempFilter?.task_id)
+              ?.task_state === task_state.LOCKED_FOR_VALIDATION && (
               <Button variant="primary-red" onClick={handleTaskMap} isLoading={updateTaskStatusLoading}>
                 MARK AS VALIDATED
               </Button>
