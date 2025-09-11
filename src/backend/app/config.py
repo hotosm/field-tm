@@ -158,7 +158,7 @@ class Settings(BaseSettings):
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
     FMTM_DOMAIN: str
-    FMTM_DEV_PORT: Optional[str] = "7050"
+    FMTM_MAPPER_DOMAIN: Optional[str] = None
 
     DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
     DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
@@ -210,7 +210,10 @@ class Settings(BaseSettings):
         else:
             # Add the main Field-TM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")
-            default_origins.append(f"https://mapper.{domain}")
+            if settings.FMTM_MAPPER_DOMAIN:
+                default_origins.append(f"https://{settings.FMTM_MAPPER_DOMAIN}")
+            else:
+                default_origins.append(f"https://mapper.{domain}")
 
         # Process `extra_origins` if provided
         if isinstance(extra_origins, str):
@@ -285,7 +288,10 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/osmauth"
         else:
-            uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
+            if settings.FMTM_MAPPER_DOMAIN:
+                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/osmauth"
+            else:
+                uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
         return uri
 
     GOOGLE_CLIENT_ID: Optional[str] = ""
@@ -301,7 +307,10 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/googleauth"
         else:
-            uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
+            if settings.FMTM_MAPPER_DOMAIN:
+                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/googleauth"
+            else:
+                uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
         return uri
 
     S3_ENDPOINT: str
