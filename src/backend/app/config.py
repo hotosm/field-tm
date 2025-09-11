@@ -210,8 +210,9 @@ class Settings(BaseSettings):
         else:
             # Add the main Field-TM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")
-            if settings.FMTM_MAPPER_DOMAIN:
-                default_origins.append(f"https://{settings.FMTM_MAPPER_DOMAIN}")
+            mapper_domain = info.data.get("FMTM_MAPPER_DOMAIN")
+            if mapper_domain:
+                default_origins.append(f"https://{mapper_domain}")
             else:
                 default_origins.append(f"https://mapper.{domain}")
 
@@ -288,7 +289,7 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/osmauth"
         else:
-            if settings.FMTM_MAPPER_DOMAIN:
+            if self.FMTM_MAPPER_DOMAIN:
                 uri = f"https://{self.FMTM_MAPPER_DOMAIN}/osmauth"
             else:
                 uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
@@ -307,7 +308,7 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/googleauth"
         else:
-            if settings.FMTM_MAPPER_DOMAIN:
+            if self.FMTM_MAPPER_DOMAIN:
                 uri = f"https://{self.FMTM_MAPPER_DOMAIN}/googleauth"
             else:
                 uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
