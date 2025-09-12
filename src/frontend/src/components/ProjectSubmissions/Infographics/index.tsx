@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import TaskSubmissions from '@/components/ProjectSubmissions/Infographics/TaskSubmissions';
 import CustomBarChart from '@/components/common/BarChart';
 import CustomPieChart from '@/components/common/PieChart';
-import Table, { TableHeader } from '@/components/common/CustomTable';
 import CustomLineChart from '@/components/common/LineChart';
 import CoreModules from '@/shared/CoreModules';
 import InfographicsCard from '@/components/ProjectSubmissions/Infographics/InfographicsCard';
@@ -10,6 +9,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useAppSelector } from '@/types/reduxTypes';
 import { formSubmissionType } from '@/models/submission/submissionModel';
 import { dateNDaysAgo, getMonthDate } from '@/utilfunctions/commonUtils';
+import DataTable from '@/components/common/DataTable';
 
 const Infographics = ({ toggleView, entities }) => {
   useDocumentTitle('Submission Infographics');
@@ -101,6 +101,23 @@ const Infographics = ({ toggleView, entities }) => {
     },
   ];
 
+  const contributorsTableColumns = [
+    {
+      header: 'S.N',
+      cell: ({ cell }: { cell: any }) => cell.row.index + 1,
+    },
+    {
+      header: 'User',
+      accessorKey: 'user',
+      cell: ({ getValue }) => <p className="fmtm-capitalize">{getValue()}</p>,
+    },
+    {
+      header: 'Submissions',
+      accessorKey: 'submissions',
+      cell: ({ getValue }) => <p className="fmtm-capitalize">{getValue()}</p>,
+    },
+  ];
+
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
       {toggleView}
@@ -173,46 +190,12 @@ const Infographics = ({ toggleView, entities }) => {
             cardRef={totalContributorsRef}
             header={`Total Contributors: ${submissionContributorsData.length}`}
             body={
-              <Table
-                data={submissionContributorsData}
-                onRowClick={() => {}}
-                style={{ height: '100%' }}
+              <DataTable
+                data={submissionContributorsData || []}
+                columns={contributorsTableColumns}
                 isLoading={submissionContributorsLoading}
-              >
-                <TableHeader
-                  dataField="SN"
-                  headerClassName="snHeader"
-                  rowClassName="snRow"
-                  dataFormat={(row, _, index) => <span>{index + 1}</span>}
-                />
-
-                <TableHeader
-                  dataField="User"
-                  headerClassName="codeHeader"
-                  rowClassName="codeRow"
-                  dataFormat={(row) => (
-                    <div
-                      className="fmtm-w-[7rem] fmtm-max-w-[7rem]fmtm-overflow-hidden fmtm-truncate"
-                      title={row?.user}
-                    >
-                      <span className="fmtm-text-[15px]">{row?.user}</span>
-                    </div>
-                  )}
-                />
-                <TableHeader
-                  dataField="Submissions"
-                  headerClassName="codeHeader"
-                  rowClassName="codeRow"
-                  dataFormat={(row) => (
-                    <div
-                      className="fmtm-w-[7rem] fmtm-max-w-[7rem] fmtm-overflow-hidden fmtm-truncate"
-                      title={row?.submissions}
-                    >
-                      <span className="fmtm-text-[15px]">{row?.submissions}</span>
-                    </div>
-                  )}
-                />
-              </Table>
+                tableWrapperClassName="fmtm-flex-1"
+              />
             }
           />
         </div>
