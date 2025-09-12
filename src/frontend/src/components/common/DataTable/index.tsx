@@ -27,7 +27,7 @@ interface DataTableProps {
   setPaginationPage?: any;
   className?: string;
   tableWrapperClassName?: string;
-  initialState: InitialTableState;
+  initialState?: InitialTableState;
 }
 
 const getCommonPinningStyles = (column: Column<any>): CSSProperties => {
