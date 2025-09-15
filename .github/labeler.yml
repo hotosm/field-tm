@@ -50,3 +50,7 @@ dependency:osm-fieldwork:
   - changed-files:
       - any-glob-to-any-file:
           - src/backend/packages/osm-fieldwork/**
+dependency:dependency:area-splitter:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/backend/packages/area-splitter/**
