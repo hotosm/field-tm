@@ -349,17 +349,13 @@ class FMTMSplitter:
 
     def splitBySQL(  # noqa: N802
         self,
-        sql: str,
         db: Union[str, Connection],
         buildings: Optional[int] = None,
         osm_extract: Optional[Union[dict, FeatureCollection]] = None,
     ) -> FeatureCollection:
         """Split the polygon by features in the database using an SQL query.
 
-        FIXME this requires some work to function with custom SQL.
-
         Args:
-            sql (str): The SQL query to execute
             db (str, psycopg.Connection): The db url, format:
                 postgresql://myusername:mypassword@myhost:5432/mydatabase
                 OR an psycopg connection object object that is reused.
@@ -374,30 +370,13 @@ class FMTMSplitter:
         """
         # Validation
         if buildings and not osm_extract:
+            # TODO handle other algorithms
             msg = (
                 "To use the FMTM splitting algo, an OSM data extract must be passed "
                 "via param `osm_extract` as a geojson dict or FeatureCollection."
             )
             log.error(msg)
             raise ValueError(msg)
-
-        # Run custom SQL
-        if not buildings or not osm_extract:
-            log.info(
-                "No `buildings` or `osm_extract` params passed, executing custom SQL"
-            )
-            # FIXME untested
-            conn = create_connection(db)
-            splitter_cursor = conn.cursor()
-            log.debug("Running custom splitting algorithm")
-            splitter_cursor.execute(sql)
-            features = splitter_cursor.fetchall()[0][0]["features"]
-            if features:
-                log.info(f"Query returned {len(features)} features")
-            else:
-                log.info("Query returned no features")
-            self.split_features = FeatureCollection(features)
-            return self.split_features
 
         # Get existing db engine, or create new one
         conn = create_connection(db)
@@ -466,35 +445,30 @@ class FMTMSplitter:
         cur.close()
 
         splitter_cursor = conn.cursor()
-        log.debug("Running task splitting algorithm")
-        # NOTE can't substitute params into multi statement file
-        # splitter_cursor.execute(sql, {"num_buildings": buildings})
-        # Replace num_buildings param to avoid issues on execute
-        sql = sql.replace("%(num_buildings)s", str(buildings))
-        splitter_cursor.execute(sql)
+        log.debug("Collecting task splitting algorithm")
 
-        splitter_cursor.execute("""
-            SELECT
-                JSONB_BUILD_OBJECT(
-                    'type', 'FeatureCollection',
-                    'features', JSONB_AGG(feature)
-                )
-            FROM (
-                SELECT
-                    JSONB_BUILD_OBJECT(
-                        'type', 'Feature',
-                        'geometry', ST_ASGEOJSON(t.geom)::jsonb,
-                        'properties', JSONB_BUILD_OBJECT(
-                            'building_count', (
-                                SELECT COUNT(b.id)
-                                FROM buildings AS b
-                                WHERE ST_CONTAINS(t.geom, b.geom)
-                            )
-                        )
-                    ) AS feature
-                FROM taskpolygons AS t
-            ) AS features;
-        """)
+        sql_files = [
+            "common/1-linear-features.sql",
+            "common/2-group-buildings.sql",
+            "common/3-cluster-buildings.sql",
+            "avg_building_voronoi.sql",
+            "common/5-simplify.sql",
+            "common/6-alignment.sql",
+            "common/7-extract.sql",
+        ]
+
+        log.info(f"Running task splitting algorithm parts in order: {sql_files}")
+
+        algorithms_path = str(Path(__file__).parent / "algorithms")
+        for sql_file in sql_files:
+            with open(f"{algorithms_path}/{sql_file}") as raw_sql:
+                query = raw_sql.read()
+                # NOTE can't substitute params into multi statement file
+                # splitter_cursor.execute(sql, {"num_buildings": buildings})
+                # Replace num_buildings param to avoid issues on execute
+                sql_content = query.replace("%(num_buildings)s", str(buildings))
+                splitter_cursor.execute(sql_content)
+
         features = splitter_cursor.fetchall()[0][0]["features"]
         if features:
             log.info(f"Query returned {len(features)} features")
@@ -632,16 +606,12 @@ def split_by_square(
 def split_by_sql(
     aoi: Union[str, FeatureCollection],
     db: Union[str, Connection],
-    sql_file: Optional[Union[str, Path]] = None,
     num_buildings: Optional[int] = None,
     outfile: Optional[str] = None,
     osm_extract: Optional[Union[str, FeatureCollection]] = None,
 ) -> FeatureCollection:
-    """Split an AOI with a custom SQL query or default FMTM query.
+    """Split an AOI with a field-tm algorithm.
 
-    Note: either sql_file, or num_buildings must be passed.
-
-    If sql_file is not passed, the default FMTM splitter will be used.
     The query will optimise on the following:
     - Attempt to divide the aoi into tasks that contain approximately the
         number of buildings from `num_buildings`.
@@ -658,7 +628,6 @@ def split_by_sql(
             OR an psycopg connection object that is reused.
             Passing an connection object prevents requiring additional
             database connections to be spawned.
-        sql_file(str): Path to custom splitting algorithm.
         num_buildings(str): The number of buildings to optimise the FMTM
             splitting algorithm with (approx buildings per generated feature).
         outfile(str): Output to a GeoJSON file on disk.
@@ -671,17 +640,10 @@ def split_by_sql(
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
     """
-    if not sql_file and not num_buildings:
-        err = "Either sql_file or num_buildings must be passed."
+    if not num_buildings:
+        err = "num_buildings must be passed, until other algorithms are implemented."
         log.error(err)
         raise ValueError(err)
-
-    # Use FMTM splitter of num_buildings set, else use custom SQL
-    if not sql_file:
-        sql_file = Path(__file__).parent / "fmtm_algorithm.sql"
-
-    with open(sql_file) as sql:
-        query = sql.read()
 
     # Parse AOI
     parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
@@ -735,7 +697,6 @@ def split_by_sql(
             featcol = split_by_sql(
                 FeatureCollection(features=[feat]),
                 db,
-                sql_file,
                 num_buildings,
                 f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
                 osm_extract,
@@ -748,7 +709,7 @@ def split_by_sql(
     else:
         splitter = FMTMSplitter(aoi_featcol)
         split_features = splitter.splitBySQL(
-            query, db, num_buildings, osm_extract=extract_geojson
+            db, num_buildings, osm_extract=extract_geojson
         )
         if not split_features:
             msg = "Failed to generate split features."
@@ -863,10 +824,6 @@ be either the data extract used by the XLSForm, or a postgresql database.
         And OUTFILE is a MultiPolygon output file,which defaults to fmtm.geojson
         The task splitting defaults to squares, 50 meters across. If -m is used
         then that also defaults to square splitting.
-
-        area-splitter -b AOI -b 20 -c custom.sql
-        This will use a custom SQL query for splitting by map feature, and adjust task
-        sizes based on the number of buildings.
         """,
     )
     # The default SQL query for feature splitting
@@ -887,12 +844,11 @@ be either the data extract used by the XLSForm, or a postgresql database.
     )
     parser.add_argument("-b", "--boundary", required=True, help="Polygon AOI")
     parser.add_argument("-s", "--source", help="Source data, Geojson or PG:[dbname]")
-    parser.add_argument("-c", "--custom", help="Custom SQL query for database")
     parser.add_argument(
         "-db",
         "--dburl",
         default="postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
-        help="The database url string to custom sql",
+        help="The database url string",
     )
     parser.add_argument(
         "-e", "--extract", help="The OSM data extract for fmtm splitter"
@@ -933,7 +889,6 @@ be either the data extract used by the XLSForm, or a postgresql database.
         split_by_sql(
             args.boundary,
             db=args.dburl,
-            sql_file=args.custom,
             num_buildings=args.number,
             outfile=args.outfile,
             osm_extract=args.extract,
