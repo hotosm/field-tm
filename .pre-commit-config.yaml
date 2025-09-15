@@ -126,9 +126,13 @@ repos:
             --ignore,
             src/backend/packages/osm-fieldwork/LICENSE.md,
             --ignore,
+            src/backend/packages/area-splitter/LICENSE.md,
+            --ignore,
             src/mapper/messages/LICENSE.md,
             --ignore,
             .github,
             --ignore,
             src/backend/packages/osm-fieldwork/CHANGELOG.md,
+            --ignore,
+            src/backend/packages/area-splitter/CHANGELOG.md,
           ]
