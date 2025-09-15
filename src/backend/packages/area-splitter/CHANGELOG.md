@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## area-splitter-3.0.1 (2025-09-15)
+
+### Fix
+
+- fixes #2825 modularlise area-splitter package algorithm
+
+### Refactor
+
+- fix area-splitter current version
+- fixes #2796 full migration of fmtm-splitter as workspace
+
 ## area-splitter-3.0.0 (2025-09-15)
 
 ### Feat
