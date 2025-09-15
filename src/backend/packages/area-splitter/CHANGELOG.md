@@ -1,6 +1,12 @@
 # CHANGELOG
 
-## 2.0.0 (2024-12-12)
+## area-splitter-3.0.0 (2025-09-15)
+
+### Feat
+
+- re-release under a new name
+
+## area-splitter-2.0.0 (2024-12-12)
 
 ### Feat
 
@@ -11,13 +17,13 @@
 - Update command line args
 - Update usage message for current reality
 
-## 1.5.1 (2024-10-30)
+## area-splitter-1.5.1 (2024-10-30)
 
 ### Fix
 
 - typo in fmtm_splitter sql num_buildings substitution
 
-## 1.5.0 (2024-10-30)
+## area-splitter-1.5.0 (2024-10-30)
 
 ### Feat
 
@@ -34,7 +40,7 @@
 
 - merge least feature count polygons with neighbouring polygons
 
-## 1.4.0 (2024-10-24)
+## area-splitter-1.4.0 (2024-10-24)
 
 ### Fix
 
@@ -44,7 +50,7 @@
 
 - remove support for sqlalchemy connections (psycopg2 driver only)
 
-## 1.3.2 (2024-10-14)
+## area-splitter-1.3.2 (2024-10-14)
 
 ### Fix
 
@@ -55,7 +61,7 @@
 
 - move old splitting algorithm parts --> postgis_snippets
 
-## 1.3.1 (2024-09-22)
+## area-splitter-1.3.1 (2024-09-22)
 
 ### Fix
 
@@ -66,7 +72,7 @@
 
 - pass args.data_extract and have parsing function handle it
 
-## 1.3.0 (2024-07-12)
+## area-splitter-1.3.0 (2024-07-12)
 
 ### Feat
 
@@ -81,7 +87,7 @@
 
 - use default line length 88 (over 132)
 
-## 1.2.2 (2024-06-05)
+## area-splitter-1.2.2 (2024-06-05)
 
 ### Refactor
 
@@ -90,19 +96,19 @@
 - removed redundant sql
 - updated algorithm to split aoi when no linear features, by clustering
 
-## 1.2.1 (2024-03-21)
+## area-splitter-1.2.1 (2024-03-21)
 
 ### Fix
 
 - clip square grid with AOI
 
-## 1.2.0 (2024-03-08)
+## area-splitter-1.2.0 (2024-03-08)
 
 ### Feat
 
 - refactor out geopandas entirely, use shapely
 
-## 1.1.2 (2024-02-15)
+## area-splitter-1.1.2 (2024-02-15)
 
 ### Fix
 
@@ -120,14 +126,14 @@
 
 - remove ValueError if no geoms generated
 
-## 1.1.1 (2024-02-11)
+## area-splitter-1.1.1 (2024-02-11)
 
 ### Fix
 
 - allow for automatic data extract generation
 - more flexible parsing of aoi for split_by_sql
 
-## 1.1.0 (2024-02-08)
+## area-splitter-1.1.0 (2024-02-08)
 
 ### Feat
 
@@ -141,7 +147,7 @@
 
 - replace data extract parsing with staticmethod
 
-## 1.0.0 (2024-01-30)
+## area-splitter-1.0.0 (2024-01-30)
 
 ### Fix
 
@@ -152,7 +158,7 @@
 
 - suppress geopandas 'column does not contain geometry'
 
-## 1.0.0rc0 (2024-01-21)
+## area-splitter-1.0.0rc0 (2024-01-21)
 
 ### Feat
 
@@ -166,27 +172,27 @@
 
 - fix all linting errors for pre-commit
 
-## 0.2.6 (2024-01-18)
+## area-splitter-0.2.6 (2024-01-18)
 
 ### Fix
 
 - invalid tag json parsing PR (#20)
 
-## 0.2.5 (2023-12-16)
+## area-splitter-0.2.5 (2023-12-16)
 
 ### Fix
 
 - improve handling of tags as json str
 - return error on empty or invalid data extract
 
-## 0.2.4 (2023-12-07)
+## area-splitter-0.2.4 (2023-12-07)
 
 ### Fix
 
 - run drop_all for tables prior to create_all (if exist)
 - split_by_sql if no data extract provided
 
-## 0.2.3 (2023-12-06)
+## area-splitter-0.2.3 (2023-12-06)
 
 ### Fix
 
@@ -195,7 +201,7 @@
 - fix parsing of Feature type, improve logging
 - prevent attempting to parse paths >250 chars (i.e. geojson)
 
-## 0.2.2 (2023-12-05)
+## area-splitter-0.2.2 (2023-12-05)
 
 ### Fix
 
@@ -208,13 +214,13 @@
 - reduce verbosity of logging when parsing geojsons
 - merge dict and str aoi parsing
 
-## 0.2.1 (2023-12-05)
+## area-splitter-0.2.1 (2023-12-05)
 
 ### Refactor
 
 - add comment to remove geopandas
 
-## 0.2.0 (2023-12-04)
+## area-splitter-0.2.0 (2023-12-04)
 
 ### Feat
 
@@ -245,7 +251,7 @@
 - split by feature
 - split by square
 
-## 0.1.0 (2023-10-25)
+## area-splitter-0.1.0 (2023-10-25)
 
 ### Fix
 
