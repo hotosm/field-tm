@@ -8,11 +8,11 @@ export type drawerItemsType = {
 export const defaultDrawerItems: drawerItemsType[] = [
 	{
 		name: m['header.about'](),
-		path: 'https://docs.fmtm.dev/about/about/',
+		path: 'https://docs.fieldtm.hotosm.org/about/about/',
 	},
 	{
 		name: m['header.guide_for_mappers'](),
-		path: 'https://docs.fmtm.dev/manuals/mapping/',
+		path: 'https://docs.fieldtm.hotosm.org/manuals/mapping/',
 	},
 	{
 		name: m['header.support'](),

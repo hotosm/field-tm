@@ -122,7 +122,34 @@ _containerd_rootless:
   # dbus-user-session is needed for userspace systemd
   sudo apt-get install --no-install-recommends -y uidmap dbus-user-session
   systemctl --user start dbus
-  
+
+  # AppArmor required for Ubuntu 24.04 onwards
+  # https://rootlesscontaine.rs/getting-started/common/apparmor/
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [ "$ID" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 24 ]; then
+      rootlesskit_path="$(command -v rootlesskit || true)"
+      if [ -n "$rootlesskit_path" ] && [ "$rootlesskit_path" != "/usr/bin/rootlesskit" ]; then
+        # Set temp
+        echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+        # Set on restart
+        profile_path="/etc/apparmor.d/${rootlesskit_path#/}"
+        sudo mkdir -p "$(dirname "$profile_path")"
+        just _echo-yellow "Configuring AppArmor for rootlesskit at $rootlesskit_path"
+        {
+          echo 'abi <abi/4.0>,'
+          echo 'include <tunables/global>'
+          echo "${rootlesskit_path} flags=(unconfined) {"
+          echo "  userns,"
+          echo "  # Site-specific additions and overrides. See local/README for details."
+          echo "  include if exists <local/${rootlesskit_path#/}>"
+          echo "}"
+        } | sudo tee "$profile_path" >/dev/null
+        sudo systemctl restart apparmor.service
+      fi
+    fi
+  fi
+
   containerd-rootless-setuptool.sh install
 
   # Enable containerd on startup
@@ -148,6 +175,11 @@ _containerd_rootless:
   fi
   # containerd restart required
   systemctl --user restart containerd.service
+
+  # Usage of priv ports below 1024
+  # https://rootlesscontaine.rs/getting-started/common/sysctl/
+  echo 'net.ipv4.ip_unprivileged_port_start=0' | sudo tee /etc/sysctl.d/99-rootless.conf
+  sudo sysctl --system
 
 [no-cd]
 _nerdctl_docker_alias:
