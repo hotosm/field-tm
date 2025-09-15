@@ -1,6 +1,6 @@
 [project]
 name = "area-splitter"
-version = "3.0.0"
+version = "3.0.1"
 description = "A utility for splitting an AOI into multiple tasks."
 authors = [
     {name = "Ivan Gayton", email = "ivan.gayton@hotosm.org"},
@@ -41,7 +41,7 @@ packages = ["area_splitter"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "3.0.0"
+version = "3.0.1"
 version_provider = "uv"
 version_files = [
     "pyproject.toml:version",

@@ -126,7 +126,7 @@ wheels = [
 
 [[package]]
 name = "area-splitter"
-version = "3.0.0"
+version = "3.0.1"
 source = { editable = "packages/area-splitter" }
 dependencies = [
     { name = "geojson" },
