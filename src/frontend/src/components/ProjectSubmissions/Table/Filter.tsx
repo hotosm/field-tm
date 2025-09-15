@@ -15,13 +15,20 @@ import windowDimention from '@/hooks/WindowDimension';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DownloadProjectSubmission } from '@/api/task';
 import { CreateTaskEvent } from '@/api/TaskEvent';
-import { filterType } from '@/store/types/ISubmissions';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
-type tempFilterType = Omit<filterType, 'submitted_date_range'> & {
-  submitted_date_range: { start: Date | null; end: Date | null };
-  page: number;
-};
+
+interface baseFilterType<T> {
+  task_id: string | null;
+  submitted_by: string | null;
+  review_state: string | null;
+  submitted_date_range: T;
+  pageIndex: number;
+  pageSize: number;
+}
+
+type tempFilterType = baseFilterType<{ start: Date | null; end: Date | null }>;
+type filterType = baseFilterType<string | null>;
 
 type filterPropsType = {
   toggleView: React.ReactElement;
@@ -111,6 +118,10 @@ const Filter = ({
     navigate(`/project/${projectId}`);
   };
 
+  const filterLength = Object.entries(filter).filter(
+    ([key, value]) => ['task_id', 'submitted_by', 'review_state', 'submitted_date_range'].includes(key) && !!value,
+  ).length;
+
   return (
     <div>
       {' '}
@@ -141,7 +152,7 @@ const Filter = ({
                 <AssetModules.TuneIcon style={{ fontSize: '20px' }} />
                 FILTER{' '}
                 <div className="fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-justify-center fmtm-items-center">
-                  <p>{Object.values(filter).filter((filterObjValue) => filterObjValue).length - 1}</p>
+                  <p>{filterLength}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>

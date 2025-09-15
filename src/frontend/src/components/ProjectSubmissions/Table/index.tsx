@@ -9,7 +9,6 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/Table/Updat
 import Filter from '@/components/ProjectSubmissions/Table/Filter';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { project_status } from '@/types/enums';
-import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
@@ -18,10 +17,17 @@ import DataTable from '@/components/common/DataTable';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-type tempFilterType = Omit<filterType, 'submitted_date_range'> & {
-  submitted_date_range: { start: Date | null; end: Date | null };
-  page: number;
-};
+interface baseFilterType<T> {
+  task_id: string | null;
+  submitted_by: string | null;
+  review_state: string | null;
+  submitted_date_range: T;
+  pageIndex: number;
+  pageSize: number;
+}
+
+type tempFilterType = baseFilterType<{ start: Date | null; end: Date | null }>;
+type filterType = baseFilterType<string | null>;
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -32,7 +38,6 @@ const SubmissionsTable = ({ toggleView }) => {
     const submitted_date_range = searchParams.get('submitted_date_range');
     const submitted_by = searchParams.get('submitted_by');
     const review_state = searchParams.get('review_state');
-    const page = searchParams.get('page');
 
     let submittedDateRange: { start: Date | null; end: Date | null } = {
       start: null,
@@ -49,14 +54,13 @@ const SubmissionsTable = ({ toggleView }) => {
         end: null,
       };
     }
-    const initialFilterState: tempFilterType = {
+    const initialFilterState = {
       task_id: task_id ? task_id : null,
       submitted_by: submitted_by ? submitted_by : null,
       review_state: review_state ? review_state : null,
       submitted_date_range: submittedDateRange,
-      page: page ? +page : 1,
     };
-    return initialFilterState;
+    return { ...initialFilterState, pageIndex: 0, pageSize: 13 };
   };
 
   const [tempFilter, setTempFilter] = useState<tempFilterType>(getInitialFilterState());
@@ -105,7 +109,12 @@ const SubmissionsTable = ({ toggleView }) => {
   useEffect(() => {
     dispatch(
       SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        ...filter,
+        review_state: filter.review_state,
+        task_id: filter.task_id,
+        submitted_by: filter.submitted_by,
+        submitted_date_range: filter.submitted_date_range,
+        page: filter.pageIndex + 1,
+        results_per_page: filter.pageSize,
       }),
     );
   }, [filter]);
@@ -115,8 +124,12 @@ const SubmissionsTable = ({ toggleView }) => {
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     dispatch(
       SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        ...filter,
-        page: 1,
+        review_state: filter.review_state,
+        task_id: filter.task_id,
+        submitted_by: filter.submitted_by,
+        submitted_date_range: filter.submitted_date_range,
+        page: filter.pageIndex + 1,
+        results_per_page: filter.pageSize,
       }),
     );
   };
@@ -126,9 +139,10 @@ const SubmissionsTable = ({ toggleView }) => {
       tempFilter.submitted_date_range.start && tempFilter.submitted_date_range.end
         ? `${format(new Date(tempFilter.submitted_date_range.start as Date), 'yyyy-MM-dd')},${format(new Date(tempFilter.submitted_date_range.end as Date), 'yyyy-MM-dd')}`
         : null;
+    setTempFilter({ ...tempFilter, pageIndex: 0 });
     setFilter({
       ...tempFilter,
-      page: 1,
+      pageIndex: 0,
       submitted_date_range: submitted_date_range,
     });
 
@@ -152,14 +166,16 @@ const SubmissionsTable = ({ toggleView }) => {
         start: null,
         end: null,
       },
-      page: 1,
+      pageIndex: 0,
+      pageSize: 13,
     });
     setFilter({
       task_id: null,
       submitted_by: null,
       review_state: null,
       submitted_date_range: null,
-      page: 1,
+      pageIndex: 0,
+      pageSize: 13,
     });
   };
 
@@ -255,11 +271,14 @@ const SubmissionsTable = ({ toggleView }) => {
         refreshTable={refreshTable}
       />
       <DataTable
-        data={submissionTableData?.results || []}
+        data={submissionTableData || []}
         columns={submissionDataColumns}
         isLoading={submissionTableDataLoading || submissionFormFieldsLoading}
-        pagination={{ pageIndex: filter.page, pageSize: 13 }}
-        setPaginationPage={(page) => setFilter((prev) => ({ ...prev, page: page + 1 }))}
+        pagination={{ pageIndex: tempFilter.pageIndex, pageSize: tempFilter.pageSize }}
+        setPaginationPage={(page) => {
+          setTempFilter(page);
+          setFilter(page);
+        }}
         tableWrapperClassName="fmtm-flex-1"
         initialState={{
           columnPinning: {
