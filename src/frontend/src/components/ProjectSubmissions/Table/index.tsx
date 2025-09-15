@@ -205,10 +205,11 @@ const SubmissionsTable = ({ toggleView }) => {
     {
       header: 'Actions',
       cell: ({ row }: any) => {
-        const taskUid = taskList?.find((task) => task?.index == row?.original?.task_id)?.id;
+        const currRow = row?.original;
+        const taskUid = taskList?.find((task) => task?.index == currRow?.task_id)?.id;
         return (
           <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
-            <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.__id}`}>
+            <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${currRow?.__id}`}>
               <Tooltip arrow placement="bottom" title="Validate Submission">
                 <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
               </Tooltip>
@@ -223,12 +224,12 @@ const SubmissionsTable = ({ toggleView }) => {
                       dispatch(
                         SubmissionActions.SetUpdateReviewStatusModal({
                           toggleModalStatus: true,
-                          instanceId: row?.meta?.instanceID,
-                          taskId: row?.task_id,
+                          instanceId: currRow?.meta?.instanceID,
+                          taskId: currRow?.task_id,
                           projectId: projectId,
-                          reviewState: row?.__system?.reviewState,
-                          entity_id: row?.feature,
-                          label: row?.meta?.entity?.label,
+                          reviewState: currRow?.__system?.reviewState,
+                          entity_id: currRow?.feature,
+                          label: currRow?.meta?.entity?.label,
                           taskUid: taskUid?.toString() || null,
                         }),
                       );
