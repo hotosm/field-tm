@@ -158,6 +158,7 @@ class Settings(BaseSettings):
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
     FMTM_DOMAIN: str
+    FMTM_DEV_PORT: Optional[str] = None
     FMTM_MAPPER_DOMAIN: Optional[str] = None
 
     DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
