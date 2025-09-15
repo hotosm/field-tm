@@ -1,5 +1,6 @@
 # FIXME is an automated publishing flow a bit over-complex for the monorepo setup?
 # FIXME Is it even useful if we just publish manually periodically when stable?
+# FIXME we should also add area-splitter if we decided on doing this
 
 name: 🚩 Publish osm-fieldwork
 
