@@ -20,6 +20,7 @@
 import asyncio
 import json
 import uuid
+import zipfile
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
@@ -27,6 +28,7 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 from xml.etree.ElementTree import SubElement
 
+import aiohttp
 from defusedxml import ElementTree
 from fastapi import HTTPException, Response
 from loguru import logger as log
@@ -128,18 +130,89 @@ async def gather_all_submission_csvs(project: DbProject, filters: dict):
     return file.content
 
 
-async def download_submission_in_json(project: DbProject, filters: dict):
-    """Download submission data from ODK Central."""
-    if data := await get_submission_by_project(project, filters):
-        json_data = data
-    else:
-        json_data = None
+async def download_submission_in_json(
+    project: DbProject, filters: dict, include_media: Optional[bool] = False
+):
+    """
+    Download submission data from ODK Central in JSON format.
 
-    json_bytes = BytesIO(json.dumps(json_data).encode("utf-8"))
+    If include_media is True, returns a ZIP file containing:
+        - A JSON file with all submissions.
+        - A 'media' folder with all media files for each submission.
+
+    If include_media is False, returns a plain JSON file with all submissions.
+
+    Args:
+        project (DbProject): The project for which submissions are being downloaded.
+        filters (dict): Filters to apply to the submission query.
+        include_media (Optional[bool]): Whether to include media files in the ZIP.
+
+    Returns:
+        fastapi.Response: A response containing either the JSON file or ZIP archive.
+    """
+    # Fetch submissions
+    if data := await get_submission_by_project(project, filters):
+        submissions = data.get("value", [])
+    else:
+        submissions = []
+
+    json_bytes = BytesIO(json.dumps({"value": submissions}, indent=2).encode("utf-8"))
+
+    # Case 1: JSON + Media (ZIP)
+    if include_media:
+        zip_buffer = BytesIO()
+        async with aiohttp.ClientSession() as session:
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+                zipf.writestr(f"{project.slug}_submissions.json", json_bytes.getvalue())
+                for submission in submissions:
+                    instance_id = submission.get("meta", {}).get(
+                        "instanceID"
+                    ) or submission.get("__id")
+                    if not instance_id:
+                        continue
+                    photos = await get_submission_photos(instance_id, project)
+                    if not photos:
+                        continue
+
+                    for filename, url in photos.items():
+                        try:
+                            async with session.get(url) as resp:
+                                log.info(
+                                    f"Fetching media: {filename} from {url}, "
+                                    f"status: {resp.status}"
+                                )
+                                if resp.status == 200:
+                                    file_bytes = await resp.read()
+                                    zip_path = f"media/{instance_id}/{filename}"
+                                    zipf.writestr(zip_path, file_bytes)
+                                    log.info(f"Added {zip_path} to ZIP")
+                                else:
+                                    log.warning(
+                                        f"Failed to fetch {filename}: "
+                                        f"HTTP {resp.status}"
+                                    )
+                        except Exception as e:
+                            log.warning(
+                                f"Exception fetching media {filename} for "
+                                f"{instance_id}: {e}"
+                            )
+
+        zip_buffer.seek(0)
+        headers = {
+            "Content-Disposition": f"attachment; "
+            f"filename={project.slug}_submissions.zip"
+        }
+        return Response(
+            content=zip_buffer.getvalue(), media_type="application/zip", headers=headers
+        )
+
+    # Case 2: JSON only
     headers = {
         "Content-Disposition": f"attachment; filename={project.slug}_submissions.json"
     }
-    return Response(content=json_bytes.getvalue(), headers=headers)
+    return Response(
+        content=json_bytes.getvalue(), media_type="application/json", headers=headers
+    )
 
 
 async def get_submission_count_of_a_project(project: DbProject):
