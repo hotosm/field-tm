@@ -113,16 +113,16 @@ split_features = split_by_sql(
 
 - The db parameter can be a connection string to start a new connection.
 - Or an existing database connection can be reused.
-- To do this, either the psycopg2 connection, or a DBAPI connection string
+- To do this, either the psycopg connection, or a DBAPI connection string
   must be passed:
 
-psycopg2 example:
+psycopg example:
 
 ```python
-import psycopg2
+import psycopg
 from area_splitter.splitter import split_by_sql
 
-db = psycopg2.connect("postgresql://postgres:postgres@localhost/postgres")
+db = psycopg.connect("postgresql://postgres:postgres@localhost/postgres")
 
 split_features = split_by_sql(
     aoi,
