@@ -65,10 +65,6 @@ const ProjectSubmissions = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(SubmissionFormFieldsService(`${VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`));
-  }, []);
-
-  useEffect(() => {
     if (!searchParams.get('tab')) {
       setSearchParams({ tab: 'table' });
     }

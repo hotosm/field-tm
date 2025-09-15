@@ -15,13 +15,14 @@ import windowDimention from '@/hooks/WindowDimension';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DownloadProjectSubmission } from '@/api/task';
 import { CreateTaskEvent } from '@/api/TaskEvent';
+import { useIsFetching } from '@tanstack/react-query';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 interface baseFilterType<T> {
-  task_id: string | null;
-  submitted_by: string | null;
-  review_state: string | null;
+  task_id: string | undefined;
+  submitted_by: string | undefined;
+  review_state: string | undefined;
   submitted_date_range: T;
   pageIndex: number;
   pageSize: number;
@@ -35,7 +36,7 @@ type filterPropsType = {
   tempFilter: tempFilterType;
   setTempFilter: React.Dispatch<React.SetStateAction<tempFilterType>>;
   filter: Pick<filterType, 'task_id' | 'submitted_by' | 'review_state'> & {
-    submitted_date_range: string | null;
+    submitted_date_range: string | undefined;
   };
   applyFilter: any;
   clearFilters: any;
@@ -58,12 +59,13 @@ const Filter = ({
 
   const projectId = params.projectId!;
 
+  const isSubmissionFormFieldsFetching = useIsFetching({ queryKey: ['submission-form-fields', +projectId] });
+  const isSubmissionTableDataFetching = useIsFetching({ queryKey: ['submission-table-data', filter] });
+
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const updateTaskStatusLoading = useAppSelector((state) => state.common.loading);
-  const submissionFormFieldsLoading = useAppSelector((state) => state.submission.submissionFormFieldsLoading);
-  const submissionTableDataLoading = useAppSelector((state) => state.submission.submissionTableDataLoading);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
 
@@ -230,14 +232,14 @@ const Filter = ({
                 <Button
                   variant="secondary-red"
                   onClick={applyFilter}
-                  disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+                  disabled={isSubmissionFormFieldsFetching > 0 || isSubmissionTableDataFetching > 0}
                 >
                   Apply
                 </Button>
                 <Button
                   variant="secondary-red"
                   onClick={clearFilters}
-                  disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+                  disabled={isSubmissionFormFieldsFetching > 0 || isSubmissionTableDataFetching > 0}
                 >
                   Reset
                 </Button>
@@ -272,8 +274,10 @@ const Filter = ({
             <Button
               variant="link-grey"
               onClick={refreshTable}
-              isLoading={(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing}
-              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+              isLoading={
+                (isSubmissionTableDataFetching > 0 || isSubmissionFormFieldsFetching > 0) && submissionTableRefreshing
+              }
+              disabled={isSubmissionTableDataFetching > 0 || isSubmissionFormFieldsFetching > 0}
             >
               <AssetModules.RefreshIcon className="!fmtm-text-xl" />
               REFRESH

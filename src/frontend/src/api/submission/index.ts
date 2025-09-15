@@ -54,7 +54,7 @@ export function useGetSubmissionFormFieldsQuery({
   options,
 }: {
   params: { project_id: number };
-  options: TQueryOptions<submissionFormFieldsType>;
+  options: TQueryOptions<submissionFormFieldsType[]>;
 }) {
   return useQuery({
     queryFn: () => getSubmissionFormFields(params),

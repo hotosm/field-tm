@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Tooltip } from '@mui/material';
@@ -10,24 +10,22 @@ import Filter from '@/components/ProjectSubmissions/Table/Filter';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { project_status } from '@/types/enums';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
-import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 import DataTable from '@/components/common/DataTable';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useGetSubmissionFormFieldsQuery, useGetSubmissionTableQuery } from '@/api/submission';
 
 interface baseFilterType<T> {
-  task_id: string | null;
-  submitted_by: string | null;
-  review_state: string | null;
+  task_id: string | undefined;
+  submitted_by: string | undefined;
+  review_state: string | undefined;
   submitted_date_range: T;
   pageIndex: number;
   pageSize: number;
 }
 
 type tempFilterType = baseFilterType<{ start: Date | null; end: Date | null }>;
-type filterType = baseFilterType<string | null>;
+type filterType = baseFilterType<string | undefined>;
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -55,9 +53,9 @@ const SubmissionsTable = ({ toggleView }) => {
       };
     }
     const initialFilterState = {
-      task_id: task_id ? task_id : null,
-      submitted_by: submitted_by ? submitted_by : null,
-      review_state: review_state ? review_state : null,
+      task_id: task_id ? task_id : undefined,
+      submitted_by: submitted_by ? submitted_by : undefined,
+      review_state: review_state ? review_state : undefined,
       submitted_date_range: submittedDateRange,
     };
     return { ...initialFilterState, pageIndex: 0, pageSize: 13 };
@@ -69,17 +67,13 @@ const SubmissionsTable = ({ toggleView }) => {
     submitted_date_range:
       tempFilter?.submitted_date_range?.start && tempFilter?.submitted_date_range?.end
         ? `${format(new Date(tempFilter.submitted_date_range?.start as Date), 'yyyy-MM-dd')},${format(new Date(tempFilter.submitted_date_range?.end as Date), 'yyyy-MM-dd')}`
-        : null,
+        : undefined,
   });
 
   const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
 
   const projectId = params.projectId;
-  const submissionFormFields = useAppSelector((state) => state.submission.submissionFormFields);
-  const submissionTableData = useAppSelector((state) => state.submission.submissionTableData);
-  const submissionFormFieldsLoading = useAppSelector((state) => state.submission.submissionFormFieldsLoading);
-  const submissionTableDataLoading = useAppSelector((state) => state.submission.submissionTableDataLoading);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
 
@@ -89,56 +83,52 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const isProjectManager = useIsProjectManager(projectId as string);
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id ? +projectInfo.organisation_id : null);
-  const updatedSubmissionFormFields = submissionFormFields
-    //filter necessary fields only
-    ?.filter(
-      (formField) =>
-        (formField?.path.startsWith('/survey_questions') ||
-          ['/start', '/end', '/username', '/task_id', '/status'].includes(formField?.path)) &&
-        formField.type !== 'structure',
-    )
-    // convert path to dot notation & update name
-    ?.map((formField) => {
-      return {
-        ...formField,
-        path: formField?.path.slice(1).replace(/\//g, '.'),
-        name: formField?.name.charAt(0).toUpperCase() + formField?.name.slice(1).replace(/_/g, ' '),
-      };
-    });
 
-  useEffect(() => {
-    dispatch(
-      SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        review_state: filter.review_state,
-        task_id: filter.task_id,
-        submitted_by: filter.submitted_by,
-        submitted_date_range: filter.submitted_date_range,
-        page: filter.pageIndex + 1,
-        results_per_page: filter.pageSize,
-      }),
-    );
-  }, [filter]);
+  const { data: submissionFormFields, isLoading: isSubmissionFormFieldsLoading } = useGetSubmissionFormFieldsQuery({
+    params: { project_id: projectId },
+    options: { queryKey: ['submission-form-fields', +projectId], staleTime: 60 * 60 * 1000 },
+  });
 
-  const refreshTable = () => {
-    dispatch(SubmissionFormFieldsService(`${VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`));
-    dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
-    dispatch(
-      SubmissionTableService(`${VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
-        review_state: filter.review_state,
-        task_id: filter.task_id,
-        submitted_by: filter.submitted_by,
-        submitted_date_range: filter.submitted_date_range,
-        page: filter.pageIndex + 1,
-        results_per_page: filter.pageSize,
-      }),
-    );
-  };
+  const {
+    data: submissionTableData,
+    isLoading: isSubmissionTableDataLoading,
+    refetch: refreshTable,
+  } = useGetSubmissionTableQuery({
+    params: {
+      project_id: projectId,
+      review_state: filter.review_state,
+      task_id: filter.task_id ? +filter.task_id : undefined,
+      submitted_by: filter.submitted_by,
+      submitted_date_range: filter.submitted_date_range,
+      page: filter.pageIndex + 1,
+      results_per_page: filter.pageSize,
+    },
+    options: { queryKey: ['submission-table-data', filter], staleTime: 60 * 1000 },
+  });
+
+  const updatedSubmissionFormFields =
+    submissionFormFields
+      //filter necessary fields only
+      ?.filter(
+        (formField) =>
+          (formField?.path.startsWith('/survey_questions') ||
+            ['/start', '/end', '/username', '/task_id', '/status'].includes(formField?.path)) &&
+          formField.type !== 'structure',
+      )
+      // convert path to dot notation & update name
+      ?.map((formField) => {
+        return {
+          ...formField,
+          path: formField?.path.slice(1).replace(/\//g, '.'),
+          name: formField?.name.charAt(0).toUpperCase() + formField?.name.slice(1).replace(/_/g, ' '),
+        };
+      }) || [];
 
   const applyFilter = () => {
     const submitted_date_range =
       tempFilter.submitted_date_range.start && tempFilter.submitted_date_range.end
         ? `${format(new Date(tempFilter.submitted_date_range.start as Date), 'yyyy-MM-dd')},${format(new Date(tempFilter.submitted_date_range.end as Date), 'yyyy-MM-dd')}`
-        : null;
+        : undefined;
     setTempFilter({ ...tempFilter, pageIndex: 0 });
     setFilter({
       ...tempFilter,
@@ -159,9 +149,9 @@ const SubmissionsTable = ({ toggleView }) => {
   const clearFilters = () => {
     setSearchParams({ tab: 'table' });
     setTempFilter({
-      task_id: null,
-      submitted_by: null,
-      review_state: null,
+      task_id: undefined,
+      submitted_by: undefined,
+      review_state: undefined,
       submitted_date_range: {
         start: null,
         end: null,
@@ -170,10 +160,10 @@ const SubmissionsTable = ({ toggleView }) => {
       pageSize: 13,
     });
     setFilter({
-      task_id: null,
-      submitted_by: null,
-      review_state: null,
-      submitted_date_range: null,
+      task_id: undefined,
+      submitted_by: undefined,
+      review_state: undefined,
+      submitted_date_range: undefined,
       pageIndex: 0,
       pageSize: 13,
     });
@@ -219,7 +209,7 @@ const SubmissionsTable = ({ toggleView }) => {
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
                 <Tooltip arrow placement="bottom" title="Update Review Status">
                   <AssetModules.CheckOutlinedIcon
-                    className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                    className="fmtm-text-[#545454] hover:fmtm-text-primaryRed fmtm-cursor-pointer"
                     onClick={() => {
                       dispatch(
                         SubmissionActions.SetUpdateReviewStatusModal({
@@ -274,7 +264,7 @@ const SubmissionsTable = ({ toggleView }) => {
       <DataTable
         data={submissionTableData || []}
         columns={submissionDataColumns}
-        isLoading={submissionTableDataLoading || submissionFormFieldsLoading}
+        isLoading={isSubmissionTableDataLoading || isSubmissionFormFieldsLoading}
         pagination={{ pageIndex: tempFilter.pageIndex, pageSize: tempFilter.pageSize }}
         setPaginationPage={(page) => {
           setTempFilter(page);
