@@ -44,6 +44,12 @@ osm-fieldwork:
   docker compose up -d
   docker compose run --rm api pytest package_tests/test_osm_fieldwork
 
+# Test area-splitter package only
+[no-cd]
+splitter:
+  docker compose up -d
+  docker compose run --rm api pytest package_tests/test_area_splitter
+
 # Run all frontend tests
 [no-cd]
 frontend:
