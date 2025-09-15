@@ -188,13 +188,13 @@ def instrument_app_otel(app: FastAPI):
     Only used if environment variables configured.
     """
     from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-    from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+    from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
     from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
     FastAPIInstrumentor.instrument_app(app)
     # FastAPIInstrumentor.instrument_app(
     #   app, tracer_provider=trace.get_tracer_provider()
     # )
-    Psycopg2Instrumentor().instrument(enable_commenter=True, commenter_options={})
+    PsycopgInstrumentor().instrument(enable_commenter=True, commenter_options={})
     RequestsInstrumentor().instrument()
     # RequestsInstrumentor().instrument(tracer_provider=tracer_provider)

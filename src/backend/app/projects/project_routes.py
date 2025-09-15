@@ -469,7 +469,7 @@ async def task_split(
 
     log.debug("STARTED task splitting using provided boundary and data extract")
     # NOTE here we pass the connection string and allow area-splitter to
-    # a use psycopg2 connection (not async)
+    # a use psycopg connection (not async)
     features = await run_in_threadpool(
         lambda: split_by_sql(
             merged_boundary,

@@ -211,8 +211,8 @@ DROP TABLE IF EXISTS clusteredbuildings;
 CREATE TABLE clusteredbuildings AS (
     WITH splitpolygonswithcontents AS (
         SELECT *
-        FROM splitpolygons AS sp
-        WHERE sp.numfeatures > 0
+        FROM splitpolygons
+        WHERE numfeatures > 0
     ),
 
     -- Add the count of features in the splitpolygon each building belongs to
@@ -220,10 +220,10 @@ CREATE TABLE clusteredbuildings AS (
     buildingswithcount AS (
         SELECT
             b.*,
-            p.numfeatures
+            sp.numfeatures
         FROM buildings AS b
-        LEFT JOIN splitpolygons AS p
-            ON b.polyid = p.polyid
+        LEFT JOIN splitpolygonswithcontents AS sp
+            ON b.polyid = sp.polyid
     ),
 
     -- Cluster the buildings within each splitpolygon. The second term in the
@@ -234,20 +234,20 @@ CREATE TABLE clusteredbuildings AS (
     -- TODO: This should certainly not be a hardcoded, the number of features
     --       per cluster should come from a project configuration table
     buildingstocluster AS (
-        SELECT * FROM buildingswithcount AS bc
-        WHERE bc.numfeatures > 0
+        SELECT * FROM buildingswithcount
+        WHERE numfeatures > 0
     ),
 
     clusteredbuildingsnocombineduid AS (
         SELECT
             *,
             ST_CLUSTERKMEANS(
-                b.geom,
-                CAST((b.numfeatures / %(num_buildings)s) + 1 AS integer)
+                geom,
+                CAST((numfeatures / %(num_buildings)s) + 1 AS integer)
             )
-                OVER (PARTITION BY b.polyid)
+                OVER (PARTITION BY polyid)
             AS cid
-        FROM buildingstocluster AS b
+        FROM buildingstocluster
     ),
 
     -- uid combining the id of the outer splitpolygon and inner cluster
@@ -278,7 +278,7 @@ CREATE TABLE dumpedpoints AS (
         -- POSSIBLE BUG: PostGIS' Voronoi implementation seems to panic
         -- with segments less than 0.00004 degrees.
         -- Should probably use geography instead of geometry
-        (ST_DUMPPOINTS(ST_SEGMENTIZE(cb.geom, 0.00004))).geom
+        (ST_DUMPPOINTS(ST_SEGMENTIZE(cb.geom, 0.00004))).geom AS geom
     FROM clusteredbuildings AS cb
 );
 SELECT POPULATE_GEOMETRY_COLUMNS('public.dumpedpoints'::regclass);
