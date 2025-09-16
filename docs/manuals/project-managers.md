@@ -394,7 +394,7 @@ the following resources:
 - Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][4]
 
 [1]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
-[2]: https://docs.fmtm.dev/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form "injected fields"
-[3]: https://docs.fmtm.dev/faq "FAQs"
+[2]: https://docs.fieldtm.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form "injected fields"
+[3]: https://docs.fieldtm.hotosm.org/faq "FAQs"
 [4]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
 [5]: https://docs.getodk.org/collect-using "Using Collect"

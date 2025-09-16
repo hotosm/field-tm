@@ -17,7 +17,7 @@ your own cloud server.
 ### Run the install script
 
 ```bash
-curl -L https://get.fmtm.dev -o install.sh
+curl -L https://get.fieldtm.hotosm.org -o install.sh
 bash install.sh
 
 # Then follow the prompts
@@ -100,6 +100,7 @@ FMTM_API_DOMAIN
 FMTM_ODK_DOMAIN
 FMTM_S3_DOMAIN
 FMTM_SYNC_DOMAIN
+FMTM_MAPPER_DOMAIN
 ```
 
 ### Connecting to a remote database

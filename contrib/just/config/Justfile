@@ -16,6 +16,9 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Allow usage of nerdctl instead of docker
+docker := env("DOCKER_ALIAS", "docker")
+
 # List available commands
 [private]
 default:
@@ -82,9 +85,10 @@ generate-dotenv branch="dev":
   # Generate compose file (default dev, but can be overridden)
   export GIT_BRANCH="{{ branch }}"
   echo ""
-  just _echo-blue "Generated compose file for branch {{ branch }}:"
+  just _echo-blue "Final compose file output for branch {{ branch }}:"
   echo ""
-  ./envsubst -i deploy/compose.sub.yaml
+  # NOTE we run through envsubst twice for nested vars
+  ./envsubst -i deploy/compose.sub.yaml | ./envsubst
 
 # For custom branding, place favicon.svg in the repo root, then run this
 [no-cd]
@@ -103,10 +107,10 @@ custom-favicon:
   echo "Found favicon.svg in repo root - bundling in frontend build"
   echo ""
   # Pull ImageMagick container if not already present
-  docker pull dpokidov/imagemagick:7.1.1-47
+  {{docker}} pull dpokidov/imagemagick:7.1.1-47
 
   # Convert SVG to PNG (32x32, aspect ratio preserved, transparent padding)
-  docker run --rm -v "$PWD":/repo --workdir /repo --entrypoint=/bin/sh \
+  {{docker}} run --rm -v "$PWD":/repo --workdir /repo --entrypoint=/bin/sh \
       dpokidov/imagemagick:7.1.1-47 \
       -c "magick favicon.svg -resize 32x32 -background none -gravity center -extent 32x32 favicon.png"
 
@@ -135,14 +139,14 @@ enable-webforms:
   CONTAINER_CONFIG_PATH=/usr/odk/config.json
 
   # Copy config into container
-  docker cp "$CONFIG_PATH" "$CONTAINER":"$CONTAINER_CONFIG_PATH"
+  {{docker}} cp "$CONFIG_PATH" "$CONTAINER":"$CONTAINER_CONFIG_PATH"
 
   # Modify JSON using jq inside the container
-  docker exec "$CONTAINER" sh -c \
+  {{docker}} exec "$CONTAINER" sh -c \
     "jq '.enableWebforms = true' '${CONTAINER_CONFIG_PATH}' > '${CONTAINER_CONFIG_PATH}.tmp' && mv '${CONTAINER_CONFIG_PATH}.tmp' '${CONTAINER_CONFIG_PATH}'"
 
   # Upload updated config to S3
-  docker exec "$CONTAINER" mc cp "$CONTAINER_CONFIG_PATH" s3/fmtm-data/frontend/config.json
+  {{docker}} exec "$CONTAINER" mc cp "$CONTAINER_CONFIG_PATH" s3/fmtm-data/frontend/config.json
 
 # Merge in translations from weblate
 [no-cd]

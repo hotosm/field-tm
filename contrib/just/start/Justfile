@@ -16,6 +16,9 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Allow usage of nerdctl instead of docker
+docker := env("DOCKER_ALIAS", "docker")
+
 # List available commands
 [private]
 default:
@@ -27,7 +30,7 @@ all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  docker compose up -d
+  {{docker}} compose up -d
 
 # Production deploy, depending which branch on current
 [no-cd]
@@ -45,14 +48,14 @@ prod:
   just config custom-favicon
 
   # Pull images
-  ../envsubst -i compose.sub.yaml | docker compose -f - pull
+  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull
 
   # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
 
   # Deploy
-  ../envsubst -i compose.sub.yaml | \
-        docker compose -f - up --detach \
+  ../envsubst -no-unset -i compose.sub.yaml | \
+        {{docker}} compose -f - up --detach \
         --remove-orphans --force-recreate
   
   just _echo-blue "FieldTM started successfully"
@@ -63,7 +66,7 @@ backend:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  docker compose up -d api
+  {{docker}} compose up -d api
 
 # Start backend API without docker
 [no-cd]
@@ -79,7 +82,7 @@ backend-no-docker:
 # Start frontend UI (also starts backend)
 [no-cd]
 frontend:
-  docker compose up -d ui
+  {{docker}} compose up -d ui
 
 # Start frontend UI without docker, connected to staging
 [no-cd]
@@ -108,12 +111,12 @@ mapper-frontend-dev:
 # Start Field-TM without ODK Central
 [no-cd]
 without-central:
-  docker compose --profile no-odk up -d
+  {{docker}} compose --profile no-odk up -d
 
 # Start Field-TM with JOSM
 [no-cd]
 josm:
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/josm/compose.yaml \
     up -d
@@ -130,7 +133,7 @@ josm:
 # Start S3 browser
 [no-cd]
 s3-browser:
-  docker compose \
+  {{docker}} compose \
     -f contrib/s3_browser/compose.yaml \
     up -d
   
@@ -150,7 +153,7 @@ s3-browser:
 tunnel:
   #!/usr/bin/env sh
 
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     up --wait
@@ -166,7 +169,7 @@ tunnel:
   # Restart Central with DOMAIN var set to new tunnel URL.
   # Is is required to correctly download forms from Collect
   CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     up -d central
@@ -186,7 +189,7 @@ view-tunnel-url:
 _get-tunnel-url service_name:
   #!/usr/bin/env sh
 
-  service_url=$(docker compose \
+  service_url=$({{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     logs {{service_name}}-tunnel | \

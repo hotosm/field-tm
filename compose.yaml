@@ -136,9 +136,8 @@ services:
       # Workspace packages config
       - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork:ro
       - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
-      # External package mounts (testing)
-      # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
-      # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
+      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.12/site-packages/area_splitter:ro
+      - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     environment:
       DEBUG: ${DEBUG:-True}
     depends_on:

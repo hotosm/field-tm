@@ -1,7 +1,7 @@
 repos:
   # Versioning: Commit messages & changelog
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.8.3
+    rev: v4.9.1
     hooks:
       - id: commitizen
         stages: [commit-msg]
@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.12.10"
+    rev: "v0.13.0"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.13
+    rev: 0.8.17
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -126,9 +126,13 @@ repos:
             --ignore,
             src/backend/packages/osm-fieldwork/LICENSE.md,
             --ignore,
+            src/backend/packages/area-splitter/LICENSE.md,
+            --ignore,
             src/mapper/messages/LICENSE.md,
             --ignore,
             .github,
             --ignore,
             src/backend/packages/osm-fieldwork/CHANGELOG.md,
+            --ignore,
+            src/backend/packages/area-splitter/CHANGELOG.md,
           ]
