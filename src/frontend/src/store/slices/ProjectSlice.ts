@@ -17,11 +17,9 @@ const initialState: ProjectStateTypes = {
   toggleGenerateMbTilesModal: false,
   mobileFooterSelection: '',
   projectDetailsLoading: true,
-  projectDashboardDetail: null,
   entityOsmMap: [],
   entityOsmMapLoading: false,
   updateEntityStateLoading: false,
-  projectDashboardLoading: false,
   projectCommentsList: [],
   projectPostCommentsLoading: false,
   projectGetCommentsLoading: false,
@@ -88,17 +86,11 @@ const ProjectSlice = createSlice({
     SetProjectDetialsLoading(state, action: PayloadAction<boolean>) {
       state.projectDetailsLoading = action.payload;
     },
-    SetProjectDashboardDetail(state, action: PayloadAction<ProjectStateTypes['projectDashboardDetail']>) {
-      state.projectDashboardDetail = action.payload;
-    },
     SetEntityToOsmIdMapping(state, action: PayloadAction<ProjectStateTypes['entityOsmMap']>) {
       state.entityOsmMap = action.payload;
     },
     SetEntityToOsmIdMappingLoading(state, action: PayloadAction<boolean>) {
       state.entityOsmMapLoading = action.payload;
-    },
-    SetProjectDashboardLoading(state, action: PayloadAction<boolean>) {
-      state.projectDashboardLoading = action.payload;
     },
     SetProjectCommentsList(state, action) {
       state.projectCommentsList = action.payload;

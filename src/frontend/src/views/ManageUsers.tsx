@@ -124,15 +124,16 @@ const ManageUsers = () => {
     },
   ];
 
-  const [filter, setFilter] = useState({ search: '', page: 1, results_per_page: 13 });
+  const [filter, setFilter] = useState({ search: '', pageIndex: 0, pageSize: 1 });
+
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 500,
     init: filter.search,
-    onChange: (debouncedEvent) => setFilter((prev) => ({ ...prev, search: debouncedEvent.target.value })),
+    onChange: (debouncedEvent) => setFilter((prev) => ({ ...prev, search: debouncedEvent.target.value, pageIndex: 0 })),
   });
 
   const { data: userList, isLoading: isUserListLoading } = useGetUsersQuery({
-    params: filter,
+    params: { search: filter.search, page: filter.pageIndex + 1, results_per_page: filter.pageSize },
     options: { queryKey: ['get-users', filter] },
   });
 
@@ -156,8 +157,8 @@ const ManageUsers = () => {
         data={userList || []}
         columns={userDatacolumns}
         isLoading={isUserListLoading}
-        pagination={{ pageIndex: filter.page, pageSize: 13 }}
-        setPaginationPage={(page) => setFilter((prev) => ({ ...prev, pageIndex: page + 1 }))}
+        pagination={{ pageIndex: filter.pageIndex, pageSize: filter.pageSize }}
+        setPaginationPage={setFilter}
         tableWrapperClassName="fmtm-flex-1"
       />
     </div>

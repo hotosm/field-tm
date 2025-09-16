@@ -8,7 +8,8 @@ import {
 
 export const getSubmissions = (params: submissionsParamsType) => api.get('/submission', { params });
 
-export const downloadSubmission = (params: downloadSubmissionParamsType) => api.get('/submission/download', { params });
+export const downloadSubmission = (params: downloadSubmissionParamsType) =>
+  api.get('/submission/download', { params, responseType: 'blob' });
 
 export const getSubmissionFormFields = (params: { project_id: number }) =>
   api.get('/submission/submission-form-fields', { params });

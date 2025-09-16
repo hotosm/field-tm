@@ -28,16 +28,17 @@ export function useGetTasksQuery({
 
 export function useAddNewTaskEventMutation({
   id,
-  params,
   options,
 }: {
   id: number;
-  params: addNewTaskEventParamsType;
-  options: TMutationOptions<taskEventType, addNewTaskEventPayloadType>;
+  options: TMutationOptions<
+    taskEventType,
+    { payload: addNewTaskEventPayloadType; params: addNewTaskEventParamsType },
+    { detail: string }
+  >;
 }) {
   return useMutation({
-    mutationKey: ['add-new-task-event', id, params],
-    mutationFn: (payload: addNewTaskEventPayloadType) => addNewTaskEvent(id, payload, params),
+    mutationFn: ({ payload, params }) => addNewTaskEvent(id, payload, params),
     ...options,
   });
 }
