@@ -22,14 +22,11 @@ import UploadAreaComponent from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
-import { ValidateODKCredentials } from '@/api/CreateProjectService';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
 import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 import { useGetUserListQuery } from '@/api/user';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useTestOdkCredentialsMutation } from '@/api/helper';
 
 const ProjectOverview = () => {
   useDocumentTitle('Create Project: Project Overview');
@@ -56,8 +53,6 @@ const ProjectOverview = () => {
 
   //@ts-ignore
   const authDetails = useAppSelector((state) => state.login.authDetails);
-  const isODKCredentialsValid = useAppSelector((state) => state.createproject.isODKCredentialsValid);
-  const ODKCredentialsValidating = useAppSelector((state) => state.createproject.ODKCredentialsValidating);
   const projectUsersLoading = useAppSelector((state) => state.project.projectUsersLoading);
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
@@ -111,16 +106,6 @@ const ProjectOverview = () => {
     setValue('organisation_id', authDetails?.orgs_managed[0]);
     handleOrganizationChange(authDetails?.orgs_managed[0]);
   }, [authDetails, organisationListData, myOrganisationListData]);
-
-  // set odk creds to form state only after validating if the creds are available
-  useEffect(() => {
-    if (!isODKCredentialsValid) return;
-    setValue('odk_central_url', odkCreds.odk_central_url);
-    setValue('odk_central_user', odkCreds.odk_central_user);
-    setValue('odk_central_password', odkCreds.odk_central_password);
-
-    setShowODKCredsModal(false);
-  }, [isODKCredentialsValid]);
 
   useEffect(() => {
     const outlineArea = values.outlineArea;
@@ -190,14 +175,29 @@ const ProjectOverview = () => {
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
   };
 
+  const { mutate: validateODKCredentialsMutate, isPending: isODKCredentialsValidating } = useTestOdkCredentialsMutation(
+    {
+      onSuccess: () => {
+        setValue('odk_central_url', odkCreds.odk_central_url);
+        setValue('odk_central_user', odkCreds.odk_central_user);
+        setValue('odk_central_password', odkCreds.odk_central_password);
+        setShowODKCredsModal(false);
+      },
+      onError: ({ response }) => {
+        dispatch(
+          CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to validate ODK credentials' }),
+        );
+      },
+    },
+  );
+
   const validateODKCredentials = async () => {
     const valid = odkCredentialsValidationSchema.safeParse(odkCreds);
 
     let errors = {};
     if (valid.success) {
       errors = {};
-      dispatch(CreateProjectActions.SetODKCredentialsValid(false));
-      dispatch(ValidateODKCredentials(`${VITE_API_URL}/helper/odk-credentials-test`, odkCreds));
+      validateODKCredentialsMutate({ params: odkCreds });
     } else {
       valid.error.issues.forEach((issue) => {
         errors[issue.path[0]] = issue.message;
@@ -322,7 +322,7 @@ const ProjectOverview = () => {
               <Button variant="link-grey" onClick={() => setShowODKCredsModal(false)}>
                 Cancel
               </Button>
-              <Button variant="primary-red" isLoading={ODKCredentialsValidating} onClick={validateODKCredentials}>
+              <Button variant="primary-red" isLoading={isODKCredentialsValidating} onClick={validateODKCredentials}>
                 Confirm
               </Button>
             </div>
