@@ -268,3 +268,11 @@ class OdkWebhookEvents(StrEnum, Enum):
     UPDATE_ENTITY = "entity.update.version"
     NEW_SUBMISSION = "submission.create"
     REVIEW_SUBMISSION = "submission.update"
+
+
+class FieldMappingApp(StrEnum, Enum):
+    """Types of events received from ODK Central webhook."""
+
+    QFIELD = "QField"
+    ODK = "ODK"
+    FIELDTM = "FieldTM"

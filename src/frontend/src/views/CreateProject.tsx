@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import type { FieldMappingApp } from '@/api/project/types';
+import ProjectTypeSelector from '@/components/CreateProject/00-ProjectTypeSelector';
 import ProjectOverview from '@/components/CreateProject/01-ProjectOverview';
 import ProjectDetails from '@/components/CreateProject/02-ProjectDetails';
 import UploadSurvey from '@/components/CreateProject/03-UploadSurvey';
@@ -61,6 +63,7 @@ const CreateProject = () => {
   };
 
   const [toggleEdit, setToggleEdit] = useState(false);
+  const fieldMappingApp = useAppSelector((state) => state.createproject.fieldMappingApp);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
@@ -86,10 +89,16 @@ const CreateProject = () => {
   const values = watch();
 
   useEffect(() => {
+    // Show ProjectTypeSelector if no fieldMappingApp is selected
+    if (!fieldMappingApp && !projectId) {
+      return;
+    }
+
+    // Else show project creation stepper
     if (step < 1 || step > 5 || !values.osm_category) {
       setSearchParams({ step: '1' });
     }
-  }, []);
+  }, [fieldMappingApp, projectId]);
 
   useEffect(() => {
     resetReduxState();
@@ -165,6 +174,7 @@ const CreateProject = () => {
     } = values;
 
     const projectPayload = {
+      field_mapping_app: fieldMappingApp,
       name,
       short_description,
       description,
@@ -208,6 +218,7 @@ const CreateProject = () => {
 
     const projectData = {
       ...dirtyValues,
+      field_mapping_app: fieldMappingApp,
       visibility: data.visibility,
       hashtags: data.hashtags,
       custom_tms_url: data.custom_tms_url,
@@ -277,16 +288,37 @@ const CreateProject = () => {
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
   };
 
+  const handleFieldMappingAppSelect = (app: FieldMappingApp) => {
+    dispatch(CreateProjectActions.SetFieldMappingApp(app));
+    setSearchParams({ step: '1' });
+  };
+
   if (
     (!projectId && !hasManagedAnyOrganization) ||
     (projectId && !isMinimalProjectLoading && !(isProjectManager || isOrganizationAdmin))
   )
     return <Forbidden />;
 
+  /* Project type / mapping app selector */
+  if (!fieldMappingApp && !projectId) {
+    return (
+      <div className="fmtm-w-full fmtm-h-full">
+        <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
+          <h5>CREATE NEW PROJECT</h5>
+          <AssetModules.CloseIcon
+            className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer"
+            onClick={() => navigate('/')}
+          />
+        </div>
+        <ProjectTypeSelector onSelect={handleFieldMappingAppSelect} />
+      </div>
+    );
+  }
+
   return (
     <div className="fmtm-w-full fmtm-h-full">
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-w-full">
-        <h5>CREATE NEW PROJECT</h5>
+        <h5>CREATE NEW PROJECT - {fieldMappingApp}</h5>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
           {projectId && (
             <Dialog>
@@ -310,6 +342,17 @@ const CreateProject = () => {
                 </Button>
               </DialogContent>
             </Dialog>
+          )}
+          {/* Button to return to mapping app selection page */}
+          {!projectId && (
+            <Button
+              variant="link-grey"
+              onClick={() => dispatch(CreateProjectActions.SetFieldMappingApp(null))}
+              disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeletePending}
+            >
+              <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" />
+              Change App
+            </Button>
           )}
           {/* {step > 1 && (
             <Button
