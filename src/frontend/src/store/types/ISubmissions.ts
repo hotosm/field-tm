@@ -1,17 +1,8 @@
-import {
-  submissionContributorsTypes,
-  submissionFormFieldsTypes,
-  submissionTableDataTypes,
-} from '@/models/submission/submissionModel';
+import { submissionContributorsTypes } from '@/models/submission/submissionModel';
 
 export type SubmissionStateTypes = {
   submissionContributors: submissionContributorsTypes[];
   submissionContributorsLoading: boolean;
-  submissionFormFields: submissionFormFieldsTypes[];
-  submissionTableData: submissionTableDataTypes;
-  submissionFormFieldsLoading: boolean;
-  submissionTableDataLoading: boolean;
-  submissionTableRefreshing: boolean;
   updateReviewStatusModal: updateReviewStatusModal;
   updateReviewStateLoading: boolean;
   mappedVsValidatedTask: mappedVsValidatedTaskType[];

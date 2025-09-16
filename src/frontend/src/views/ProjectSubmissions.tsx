@@ -6,11 +6,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import {
-  ProjectContributorsService,
-  MappedVsValidatedTaskService,
-  SubmissionFormFieldsService,
-} from '@/api/SubmissionService';
+import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
 import TableChartViewIcon from '@/components/Icons/TableChartViewIcon';
 import TableIcon from '@/components/Icons/TableIcon';
 import { Tooltip } from '@mui/material';

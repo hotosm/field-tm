@@ -68,8 +68,6 @@ const Filter = ({
   const updateTaskStatusLoading = useAppSelector((state) => state.common.loading);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
-
-  const submissionTableRefreshing = useAppSelector((state) => state.submission.submissionTableRefreshing);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == +projectId);
   const currentStatus = {
@@ -274,9 +272,7 @@ const Filter = ({
             <Button
               variant="link-grey"
               onClick={refreshTable}
-              isLoading={
-                (isSubmissionTableDataFetching > 0 || isSubmissionFormFieldsFetching > 0) && submissionTableRefreshing
-              }
+              isLoading={isSubmissionTableDataFetching > 0 || isSubmissionFormFieldsFetching > 0}
               disabled={isSubmissionTableDataFetching > 0 || isSubmissionFormFieldsFetching > 0}
             >
               <AssetModules.RefreshIcon className="!fmtm-text-xl" />
