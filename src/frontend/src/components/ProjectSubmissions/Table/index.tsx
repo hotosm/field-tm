@@ -251,7 +251,7 @@ const SubmissionsTable = ({ toggleView }) => {
           dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
         }}
       />
-      <UpdateReviewStatusModal />
+      <UpdateReviewStatusModal filter={filter} />
       <Filter
         toggleView={toggleView}
         tempFilter={tempFilter}

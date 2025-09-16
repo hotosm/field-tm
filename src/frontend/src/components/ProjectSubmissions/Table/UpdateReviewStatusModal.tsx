@@ -15,7 +15,11 @@ import { useSetEntitiesMappingStatusMutation } from '@/api/project';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { useGetUserListQuery } from '@/api/user';
-import type { taskEventType } from '@/types';
+import type { submissionTableType, taskEventType } from '@/types';
+
+type propTypes = {
+  filter?: Record<string, any>;
+};
 
 const initialReviewState = {
   toggleModalStatus: false,
@@ -44,7 +48,7 @@ const reviewList: reviewListType[] = [
   },
 ];
 
-const UpdateReviewStatusModal = () => {
+const UpdateReviewStatusModal = ({ filter }: propTypes) => {
   const dispatch = useAppDispatch();
   const { Option } = Mentions;
   const queryClient = useQueryClient();
@@ -82,24 +86,61 @@ const UpdateReviewStatusModal = () => {
             status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
             label: updateReviewStatusModal.label as string,
           });
-          queryClient.setQueryData<AxiosResponse<Record<string, any>>>(
-            ['get-project-submission-detail', +updateReviewStatusModal.projectId!, updateReviewStatusModal.instanceId],
-            (prevData) => {
-              if (!prevData) return prevData;
-              return {
-                ...prevData,
-                data: {
-                  ...prevData.data,
-                  __system: {
-                    ...prevData.data.__system,
-                    updatedAt: data.updatedAt,
-                    reviewState: data.reviewState,
-                    deviceId: data.deviceId,
+
+          if (!filter)
+            queryClient.setQueryData<AxiosResponse<Record<string, any>>>(
+              [
+                'get-project-submission-detail',
+                +updateReviewStatusModal.projectId!,
+                updateReviewStatusModal.instanceId,
+              ],
+              (prevData) => {
+                if (!prevData) return prevData;
+                return {
+                  ...prevData,
+                  data: {
+                    ...prevData.data,
+                    __system: {
+                      ...prevData.data.__system,
+                      updatedAt: data.updatedAt,
+                      reviewState: data.reviewState,
+                      deviceId: data.deviceId,
+                    },
                   },
-                },
-              };
-            },
-          );
+                };
+              },
+            );
+
+          if (filter)
+            queryClient.setQueryData<AxiosResponse<submissionTableType>>(
+              ['submission-table-data', filter],
+              (prevData) => {
+                if (!prevData) return prevData;
+                const submissions = prevData.data;
+                const updatedResults = submissions.results.map((submission) => {
+                  if (submission.submission_ids === updateReviewStatusModal.instanceId) {
+                    return {
+                      ...submission,
+                      __system: {
+                        ...submission.__system,
+                        updatedAt: data.updatedAt,
+                        reviewState: data.reviewState,
+                        deviceId: data.deviceId,
+                      },
+                    };
+                  } else {
+                    return submission;
+                  }
+                });
+                return {
+                  ...prevData,
+                  data: {
+                    ...prevData.data,
+                    results: updatedResults,
+                  },
+                };
+              },
+            );
         },
         onError: (error) => {
           dispatch(
