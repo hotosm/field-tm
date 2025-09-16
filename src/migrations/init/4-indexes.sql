@@ -30,3 +30,15 @@ CREATE INDEX idx_project_team_users_team_id
 ON public.project_team_users USING btree (
     team_id
 );
+
+CREATE INDEX IF NOT EXISTS idx_submission_daily_counts_user_date
+ON public.submission_daily_counts (user_sub, submission_date);
+
+CREATE INDEX IF NOT EXISTS idx_submission_daily_counts_user_project_date
+ON public.submission_daily_counts (user_sub, project_id, submission_date);
+
+CREATE INDEX IF NOT EXISTS idx_submission_stats_cache_user
+ON public.submission_stats_cache (user_sub);
+
+CREATE INDEX IF NOT EXISTS idx_submission_stats_cache_user_project
+ON public.submission_stats_cache (user_sub, project_id);
