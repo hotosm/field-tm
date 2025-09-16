@@ -32,8 +32,6 @@ export type CreateProjectStateTypes = {
         'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
       >)
     | null;
-  isODKCredentialsValid: boolean;
-  ODKCredentialsValidating: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };

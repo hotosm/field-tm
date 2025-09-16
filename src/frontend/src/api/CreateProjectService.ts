@@ -612,38 +612,6 @@ const AssignProjectManager = (url: string, params: { sub: number; project_id: nu
   };
 };
 
-export const ValidateODKCredentials = (
-  url: string,
-  params: { odk_central_url: string; odk_central_user: string; odk_central_password: string },
-) => {
-  return async (dispatch: AppDispatch) => {
-    const validateCustomForm = async () => {
-      try {
-        dispatch(CreateProjectActions.SetODKCredentialsValidating(true));
-        await axios.post(url, {}, { params });
-        dispatch(CreateProjectActions.SetODKCredentialsValid(true));
-        dispatch(
-          CommonActions.SetSnackBar({
-            variant: 'success',
-            message: 'ODK Credentials Valid',
-          }),
-        );
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error?.response?.data?.detail || 'Failed to validate ODK Credentials',
-          }),
-        );
-        dispatch(CreateProjectActions.SetODKCredentialsValid(false));
-      } finally {
-        dispatch(CreateProjectActions.SetODKCredentialsValidating(false));
-      }
-    };
-
-    await validateCustomForm();
-  };
-};
-
 export {
   UploadTaskAreasService,
   FormCategoryService,
