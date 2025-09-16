@@ -26,7 +26,7 @@ const features: featureType[] = [
 
 const Features = () => {
   return (
-    <div className="fmtm-px-[3rem] md:fmtm-px-[4.5rem]">
+    <div className="fmtm-px-[2rem] sm:fmtm-px-[3rem] md:fmtm-px-[4.5rem]">
       <h4 className="fmtm-mb-3">MAIN FEATURES</h4>
       <div className="fmtm-grid md:fmtm-grid-cols-3 fmtm-gap-5">
         {features.map((feature, index) => (

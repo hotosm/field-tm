@@ -36,7 +36,7 @@ const Footer = () => {
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   return (
-    <div className="fmtm-bg-blue-dark fmtm-text-white fmtm-px-[4.5rem] fmtm-py-10">
+    <div className="fmtm-bg-blue-dark fmtm-text-white fmtm-px-[2rem] sm:fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-py-10">
       <div className="fmtm-flex fmtm-gap-4 fmtm-justify-end fmtm-mb-6 sm:fmtm-mb-0">
         <Link to="/explore" className="fmtm-text-base hover:fmtm-text-gray-100">
           EXPLORE PROJECTS
