@@ -549,3 +549,60 @@ async def submission_detail(
         project,
     )
     return submission_detail
+
+
+@router.put("/{submission_id}", response_model=CentralSubmissionOut)
+async def edit_submission(
+    submission_id: str,
+    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
+    submission_xml: Annotated[UploadFile, File()],
+    device_id: Annotated[Optional[str], Form()] = None,
+    submission_attachments: Annotated[
+        Optional[dict[str, BytesIO]], Depends(submission_deps.read_submission_uploads)
+    ] = None,
+):
+    """Edit an existing submission.
+
+    This endpoint allows updating a submission by uploading a new XML and optional
+    attachments.
+    """
+    project = project_user.get("project")
+    xml_str = (await submission_xml.read()).decode("utf-8")
+
+    updated_submission = await submission_crud.edit_submission(
+        project.odk_credentials,
+        project.odkid,
+        project.odk_form_id,
+        submission_id,
+        xml_str,
+        device_id,
+        submission_attachments,
+    )
+
+    async with OdkCentral(
+        url=project.odk_credentials.odk_central_url,
+        user=project.odk_credentials.odk_central_user,
+        passwd=project.odk_credentials.odk_central_password,
+    ) as odk_central:
+        try:
+            await odk_central.s3_sync()
+        except Exception:
+            log.warning("Fails to sync media to S3 after edit.")
+
+    return updated_submission
+
+
+@router.get("/{submission_id}/versions")
+async def list_submission_versions(
+    submission_id: str,
+    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
+):
+    """List all versions of a submission."""
+    project = project_user.get("project")
+    versions = await submission_crud.list_submission_versions(
+        project.odk_credentials,
+        project.odkid,
+        project.odk_form_id,
+        submission_id,
+    )
+    return versions

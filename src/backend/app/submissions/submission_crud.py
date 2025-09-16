@@ -25,6 +25,7 @@ from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
+from xml.etree.ElementTree import SubElement
 
 from defusedxml import ElementTree
 from fastapi import HTTPException, Response
@@ -372,3 +373,148 @@ async def trigger_upload_submissions(
         if recent_entities:
             submission_geojson = await get_project_submission_geojson(project, {})
             await upload_submission_geojson_to_s3(project, submission_geojson)
+
+
+def _inject_submission_metadata(
+    submission_xml: str,
+    current_submission_id: str,
+    form_version: str,
+) -> str:
+    """Inject new instanceID, deprecatedID, and formVersion into the XML string."""
+    root = ElementTree.fromstring(submission_xml)
+
+    # Always update form version
+    root.set("version", form_version)
+
+    # IDs
+    new_instance_id = f"uuid:{uuid.uuid4()}"
+    deprecated_id = current_submission_id
+
+    # Ensure <meta> exists
+    meta_tag = root.find(".//meta")
+    if meta_tag is None:
+        meta_tag = SubElement(root, "meta")
+
+    # instanceID → new
+    instance_id_tag = meta_tag.find("instanceID")
+    if instance_id_tag is not None:
+        instance_id_tag.text = new_instance_id
+    else:
+        SubElement(meta_tag, "instanceID").text = new_instance_id
+
+    # deprecatedID → always overwrite
+    deprecated_id_tag = meta_tag.find("deprecatedID")
+    if deprecated_id_tag is not None:
+        deprecated_id_tag.text = deprecated_id
+    else:
+        SubElement(meta_tag, "deprecatedID").text = deprecated_id
+
+    return ElementTree.tostring(root, encoding="utf-8", xml_declaration=True).decode(
+        "utf-8"
+    )
+
+
+async def edit_submission(
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_project_id: int,
+    odk_form_id: str,
+    submission_id: str,
+    submission_xml: str,
+    device_id: str | None = None,
+    submission_attachments: dict[str, BytesIO] | None = None,
+):
+    """Edit a submission in ODK Central:.
+
+    1. Resolve the latest copy of the submission.
+    2. Inject instanceID + deprecatedID + formVersion.
+    3. PUT the new XML.
+    4. Upload attachments (Not Supported for now).
+    """
+    submission_attachments = submission_attachments or {}
+
+    async with pyodk_client(odk_credentials) as client:
+        # Step 1: Get latest current submission
+        current_instance_id, form_version = await get_latest_submission_instance(
+            odk_credentials,
+            odk_project_id,
+            odk_form_id,
+            submission_id,
+        )
+        log.info(
+            f"Editing latest instance {current_instance_id} (form v{form_version})"
+        )
+
+        # Step 2: Inject metadata
+        updated_xml = _inject_submission_metadata(
+            submission_xml=submission_xml,
+            current_submission_id=current_instance_id,
+            form_version=form_version,
+        )
+
+        # Step 3: PUT updated XML
+        result = client.submissions._put(
+            project_id=odk_project_id,
+            form_id=str(odk_form_id),
+            instance_id=submission_id,
+            xml=updated_xml,
+            encoding="utf-8",
+        )
+        log.info(f"Updated submission: {result.instanceId}")
+
+        # Step 4: Upload attachments
+        # NOTE: PyODK does not currently support attachment upload for the edit.
+        if submission_attachments:
+            pass
+            # with TemporaryDirectory() as temp_dir:
+            #     for file_name, file_data in submission_attachments.items():
+            #         temp_path = Path(temp_dir) / file_name
+            #         with open(temp_path, "wb") as temp_file:
+            #             temp_file.write(file_data.getvalue())
+
+            #         with open(temp_path, "rb") as f:
+            #             client.attachments.add(
+            #                 project_id=odk_project_id,
+            #                 form_id=str(odk_form_id),
+            #                 instance_id=result.instanceId,
+            #                 filename=file_name,
+            #                 file=f,
+            #             )
+            #             log.info(f"Uploaded attachment {file_name}")
+        return result
+
+
+async def list_submission_versions(
+    odk_credentials,
+    odk_project_id,
+    odk_form_id,
+    submission_id,
+):
+    """List all versions of a submission from ODK Central."""
+    async with pyodk_client(odk_credentials) as client:
+        path = (
+            f"projects/{odk_project_id}/forms/{odk_form_id}"
+            f"/submissions/{submission_id}/versions"
+        )
+        headers = {"X-Extended-Metadata": "true"}
+        response = client.get(path, headers=headers)
+        return response.json()
+
+
+async def get_latest_submission_instance(
+    odk_credentials,
+    odk_project_id,
+    odk_form_id,
+    submission_id,
+):
+    """Get the current submission instance ID for a given submission."""
+    versions = await list_submission_versions(
+        odk_credentials,
+        odk_project_id,
+        odk_form_id,
+        submission_id,
+    )
+    latest = next((v for v in versions if v.get("current") is True), None)
+    if not latest:
+        raise ValueError(f"No current version found for submission {submission_id}")
+
+    return latest["instanceId"], latest.get("formVersion")
