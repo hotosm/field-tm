@@ -89,7 +89,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
 
   const { mutate: addNewTaskEventMutate, isPending: isAddNewTaskEventPending } = useAddNewTaskEventMutation({
     id: selectedTask?.id,
-    params: { project_id: +currentProjectId, assignee_sub: selectedUser, notify: true },
     options: {
       onSuccess: ({ data }) => {
         dispatch(
@@ -120,10 +119,10 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
         if (data.state === task_state.LOCKED_FOR_VALIDATION)
           navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
       },
-      onError: () => {
+      onError: (error) => {
         dispatch(
           CommonActions.SetSnackBar({
-            message: `Failed to update Task #${taskId}`,
+            message: error?.response?.data?.detail || `Failed to update Task #${taskId}`,
           }),
         );
       },
@@ -142,8 +141,11 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
     }
 
     addNewTaskEventMutate({
-      event: selectedAction,
-      user_sub: authDetails?.sub,
+      payload: {
+        event: selectedAction,
+        user_sub: authDetails?.sub,
+      },
+      params: { project_id: +currentProjectId, assignee_sub: selectedUser, notify: true },
     });
   };
 

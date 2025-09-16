@@ -40,7 +40,7 @@ export function useGetDownloadSubmissionQuery({
   options,
 }: {
   params: downloadSubmissionParamsType;
-  options: TQueryOptions<any>;
+  options: TQueryOptions<Blob, Blob>;
 }) {
   return useQuery({
     queryFn: () => downloadSubmission(params),
@@ -54,7 +54,7 @@ export function useGetSubmissionFormFieldsQuery({
   options,
 }: {
   params: { project_id: number };
-  options: TQueryOptions<submissionFormFieldsType>;
+  options: TQueryOptions<submissionFormFieldsType[]>;
 }) {
   return useQuery({
     queryFn: () => getSubmissionFormFields(params),
@@ -82,7 +82,7 @@ export function useUpdateReviewStateMutation({
   options,
 }: {
   params: { project_id: number };
-  options: TMutationOptions<updateReviewStateType, updateReviewStatePayloadType>;
+  options: TMutationOptions<updateReviewStateType, updateReviewStatePayloadType, { detail: string }>;
 }) {
   return useMutation({
     mutationKey: ['update-review-state', params],
@@ -128,7 +128,7 @@ export function useGetSubmissionDetailQuery({
 }: {
   id: string;
   params: { project_id: number };
-  options: TQueryOptions<projectSubmissionDashboardType>;
+  options: TQueryOptions<Record<string, any>>;
 }) {
   return useQuery({
     queryFn: () => getSubmissionDetail(id, params),

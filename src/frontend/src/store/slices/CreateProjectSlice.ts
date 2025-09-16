@@ -1,4 +1,4 @@
-import { CreateProjectStateTypes, ProjectDetailsTypes } from '@/store/types/ICreateProject';
+import { CreateProjectStateTypes } from '@/store/types/ICreateProject';
 import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -29,11 +29,8 @@ export const initialState: CreateProjectStateTypes = {
   createProjectLoading: false,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  formExampleList: [],
   formCategoryLoading: false,
   GenerateProjectFilesLoading: false,
-  organisationList: [],
-  organisationListLoading: false,
   dividedTaskLoading: false,
   formUpdateLoading: false,
   taskSplittingGeojsonLoading: false,
@@ -45,8 +42,6 @@ export const initialState: CreateProjectStateTypes = {
   isProjectDeletePending: false,
   splitGeojsonBySquares: null,
   splitGeojsonByAlgorithm: null,
-  basicProjectDetailsLoading: false,
-  basicProjectDetails: null,
   isODKCredentialsValid: false,
   ODKCredentialsValidating: false,
 };
@@ -67,17 +62,8 @@ const CreateProject = createSlice({
     GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
       state.formCategoryLoading = action.payload;
     },
-    GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formExampleList']>) {
-      state.formExampleList = action.payload;
-    },
     GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
       state.GenerateProjectFilesLoading = action.payload;
-    },
-    GetOrganisationList(state, action: PayloadAction<CreateProjectStateTypes['organisationList']>) {
-      state.organisationList = action.payload;
-    },
-    GetOrganisationListLoading(state, action: PayloadAction<boolean>) {
-      state.organisationListLoading = action.payload;
     },
     SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonBySquares']>) {
       state.splitGeojsonBySquares = action.payload;
@@ -114,27 +100,6 @@ const CreateProject = createSlice({
     },
     SetProjectDeletePending(state, action: PayloadAction<boolean>) {
       state.isProjectDeletePending = action.payload;
-    },
-    GetBasicProjectDetailsLoading(state, action: PayloadAction<boolean>) {
-      state.basicProjectDetailsLoading = action.payload;
-    },
-    SetBasicProjectDetails(
-      state,
-      action: PayloadAction<
-        | ({ id: number } & Pick<
-            ProjectDetailsTypes,
-            | 'name'
-            | 'short_description'
-            | 'description'
-            | 'organisation_id'
-            | 'outline'
-            | 'hashtags'
-            | 'organisation_name'
-          >)
-        | null
-      >,
-    ) {
-      state.basicProjectDetails = action.payload;
     },
     SetODKCredentialsValid(state, action: PayloadAction<boolean>) {
       state.isODKCredentialsValid = action.payload;

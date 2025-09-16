@@ -1,17 +1,12 @@
 import React, { useEffect } from 'react';
-import AssetModules from '@/shared/AssetModules';
 import ProjectInfo from '@/components/ProjectSubmissions/ProjectInfo.js';
-import SubmissionsInfographics from '@/components/ProjectSubmissions/SubmissionsInfographics.js';
-import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.js';
+import SubmissionsInfographics from '@/components/ProjectSubmissions/Infographics';
+import SubmissionsTable from '@/components/ProjectSubmissions/Table';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import {
-  ProjectContributorsService,
-  MappedVsValidatedTaskService,
-  SubmissionFormFieldsService,
-} from '@/api/SubmissionService';
+import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
 import TableChartViewIcon from '@/components/Icons/TableChartViewIcon';
 import TableIcon from '@/components/Icons/TableIcon';
 import { Tooltip } from '@mui/material';
@@ -63,10 +58,6 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     dispatch(MappedVsValidatedTaskService(`${VITE_API_URL}/tasks/activity?project_id=${projectId}&days=30`));
-  }, []);
-
-  useEffect(() => {
-    dispatch(SubmissionFormFieldsService(`${VITE_API_URL}/submission/submission-form-fields?project_id=${projectId}`));
   }, []);
 
   useEffect(() => {

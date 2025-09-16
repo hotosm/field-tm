@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Modal } from '@/components/common/Modal';
 import Button from '@/components/common/Button';
-import Table, { TableHeader } from '@/components/common/CustomTable';
+
+// TODO: Replace custom table with DataTable
+// import Table, { TableHeader } from '@/components/common/CustomTable';
 
 type mergeAttributesPropType = {
   selectedConflateMethod: 'submission_feature' | 'osm_feature' | 'merge_attributes' | '';
@@ -32,7 +34,7 @@ const MergeAttributes = ({
         description={
           <div className="fmtm-mt-1">
             <div>
-              <Table
+              {/* <Table
                 flag="primarytable"
                 style={{ maxHeight: '60vh', width: '100%' }}
                 data={tableData}
@@ -119,7 +121,7 @@ const MergeAttributes = ({
                     </div>
                   )}
                 />
-              </Table>
+              </Table> */}
             </div>
             <div className="fmtm-flex fmtm-gap-[0.625rem] fmtm-justify-center fmtm-mt-5">
               <Button variant="primary-red" onClick={() => setSelectedConflateMethod('')}>

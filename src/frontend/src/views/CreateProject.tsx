@@ -315,7 +315,7 @@ const CreateProject = () => {
             <Button
               variant="secondary-grey"
               onClick={saveProject}
-              disabled={createProjectLoading || basicProjectDetailsLoading || isProjectDeletePending}
+              disabled={createProjectLoading || isProjectDeletePending}
             >
               <AssetModules.SaveIcon className="!fmtm-text-base" />
               Save

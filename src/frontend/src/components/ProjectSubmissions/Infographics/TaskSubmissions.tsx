@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import TaskSubmissionsMap from '@/components/ProjectSubmissions/TaskSubmissionsMap';
+import TaskSubmissionsMap from '@/components/ProjectSubmissions/Infographics/TaskSubmissionsMap';
 import InputTextField from '@/components/common/InputTextField';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';

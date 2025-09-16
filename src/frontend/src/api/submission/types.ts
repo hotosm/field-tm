@@ -15,7 +15,7 @@ export type submissionsParamsType = {
 export type downloadSubmissionParamsType = {
   file_type: 'geojson' | 'json' | 'csv';
   submitted_date_range?: string;
-  project_id: string;
+  project_id: number;
 };
 
 export type submissionTableParamsType = {
