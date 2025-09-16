@@ -22,10 +22,10 @@ from SQL statements. Sometimes we only need a subset of the fields.
 """
 
 import json
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 from io import BytesIO
 from re import sub
-from typing import TYPE_CHECKING, Annotated, List, Optional, Self
+from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self
 from uuid import UUID
 
 import geojson
@@ -34,7 +34,7 @@ from fastapi import HTTPException, UploadFile
 from loguru import logger as log
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
-from psycopg.rows import class_row
+from psycopg.rows import class_row, dict_row
 from pydantic import AwareDatetime, BaseModel, Field, PositiveInt, ValidationInfo
 from pydantic.functional_validators import field_validator
 
@@ -165,6 +165,7 @@ class DbUserRole(BaseModel):
         db: Connection,
         project_id: Optional[int] = None,
         role: Optional[ProjectRole] = None,
+        user_sub: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all project user roles, along with username."""
         filters = []
@@ -175,6 +176,9 @@ class DbUserRole(BaseModel):
         if role:
             filters.append("ur.role = %(role)s")
             params["role"] = role if isinstance(role, str) else role.name
+        if user_sub:
+            filters.append("u.sub = %(user_sub)s")
+            params["user_sub"] = user_sub
 
         sql = f"""
                 SELECT ur.*, u.username
@@ -314,6 +318,7 @@ class DbUser(BaseModel):
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
         role: Optional[UserRole] = None,
+        last_login_after: Optional[date] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
         filters = []
@@ -334,6 +339,10 @@ class DbUser(BaseModel):
         if role:
             filters.append("role = %(role)s")
             params["role"] = role
+
+        if last_login_after:
+            filters.append("last_login_at >= %(last_login_after)s")
+            params["last_login_after"] = last_login_after
 
         sql = f"""
             SELECT * FROM users
@@ -1016,6 +1025,8 @@ class DbTaskEvent(BaseModel):
     profile_img: Optional[str] = None
     # Computed via database trigger
     state: Optional[MappingState] = None
+    # Computed
+    project_name: Optional[str] = None
 
     @classmethod
     async def all(
@@ -1024,6 +1035,7 @@ class DbTaskEvent(BaseModel):
         project_id: Optional[int] = None,
         task_id: Optional[int] = None,
         days: Optional[int] = None,
+        user_sub: Optional[str] = None,
         comments: Optional[bool] = None,
     ) -> Optional[list[Self]]:
         """Fetch all task event entries for a project.
@@ -1033,6 +1045,7 @@ class DbTaskEvent(BaseModel):
             project_id (int): return all events for a project.
             task_id (Connection): return all events for a task.
             days (int): filter to only include events since X days ago.
+            user_sub (str): filter to only include events by a specific user.
             comments (bool): show comments rather than events.
 
         Returns:
@@ -1040,8 +1053,6 @@ class DbTaskEvent(BaseModel):
         """
         if project_id and task_id:
             raise ValueError("Specify either project_id or task_id, not both.")
-        if not project_id and not task_id:
-            raise ValueError("Either project_id or task_id must be provided.")
 
         filters = []
         params = {}
@@ -1054,8 +1065,11 @@ class DbTaskEvent(BaseModel):
             params["task_id"] = task_id
         if days is not None:
             end_date = timestamp() - timedelta(days=days)
-            filters.append("created_at >= %(end_date)s")
+            filters.append("the.created_at >= %(end_date)s")
             params["end_date"] = end_date
+        if user_sub:
+            filters.append("the.user_sub = %(user_sub)s")
+            params["user_sub"] = user_sub
         if comments:
             filters.append("event = 'COMMENT'")
         else:
@@ -1066,11 +1080,14 @@ class DbTaskEvent(BaseModel):
         sql = f"""
             SELECT
                 the.*,
+                p.name AS project_name,
                 u.profile_img
             FROM
                 public.task_events the
             LEFT JOIN
                 users u ON u.sub = the.user_sub
+            LEFT JOIN
+                projects p ON p.id = the.project_id
             WHERE {filters_joined}
             ORDER BY created_at DESC;
         """
@@ -2550,6 +2567,242 @@ class DbBasemap(BaseModel):
         if success:
             return True
         return False
+
+
+class DbSubmissionDailyCount(BaseModel):
+    """Table submission_daily_counts."""
+
+    id: int
+    user_sub: str
+    project_id: int
+    submission_date: date
+    count: int = 0
+    last_calculated: Optional[datetime] = None
+
+    @classmethod
+    async def upsert(
+        cls,
+        db: Connection,
+        user_sub: str,
+        project_id: int,
+        submission_date: str | date,
+        count: int,
+    ):
+        """Insert or update a daily submission count for a user."""
+        async with db.cursor() as cur:
+            sql = """
+                INSERT INTO submission_daily_counts (
+                    user_sub,
+                    project_id,
+                    submission_date,
+                    count,
+                    last_calculated
+                )
+                VALUES (
+                    %(user_sub)s,
+                    %(project_id)s,
+                    %(submission_date)s,
+                    %(count)s,
+                    now()
+                )
+                ON CONFLICT (user_sub, project_id, submission_date)
+                DO UPDATE SET
+                    count = EXCLUDED.count,
+                    last_calculated = now();
+            """
+            await cur.execute(
+                sql,
+                {
+                    "user_sub": user_sub,
+                    "project_id": project_id,
+                    "submission_date": submission_date,
+                    "count": count,
+                },
+            )
+
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        user_sub: Optional[str] = None,
+        project_id: Optional[int] = None,
+        days: Optional[int] = None,
+    ) -> list[dict]:
+        """Fetch daily submission counts."""
+        async with db.cursor(row_factory=dict_row) as cur:
+            sql = """
+                SELECT submission_date, SUM(count) as count
+                FROM submission_daily_counts
+                WHERE TRUE
+            """
+            params: dict[str, Any] = {}
+
+            if user_sub:
+                sql += " AND user_sub = %(user_sub)s"
+                params["user_sub"] = user_sub
+
+            if project_id:
+                sql += " AND project_id = %(project_id)s"
+                params["project_id"] = project_id
+
+            if days:
+                sql += """
+                AND submission_date BETWEEN (CURRENT_DATE - %(days)s::int)
+                AND CURRENT_DATE
+            """
+            params["days"] = days
+
+            sql += " GROUP BY submission_date ORDER BY submission_date;"
+
+            await cur.execute(sql, params)
+            rows = await cur.fetchall()
+        return rows or []
+
+
+class DbSubmissionStatsCache(BaseModel):
+    """Table submission_stats_cache."""
+
+    id: int
+    user_sub: str
+    project_id: int
+    total_valid_submissions: int = 0
+    total_invalid_submissions: int = 0
+    total_submissions: int = 0
+    top_organisations: list[dict] = []
+    top_locations: list[dict] = []
+    last_calculated: Optional[datetime] = None
+
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        user_sub: Optional[str] = None,
+        project_id: Optional[int] = None,
+    ) -> dict | list[dict]:
+        """Fetch submission stats cache."""
+        async with db.cursor(row_factory=dict_row) as cur:
+            sql = """
+                SELECT *
+                FROM submission_stats_cache
+                WHERE TRUE
+            """
+            params: dict[str, Any] = {}
+
+            if user_sub:
+                sql += " AND user_sub = %(user_sub)s"
+                params["user_sub"] = user_sub
+
+            if project_id:
+                sql += " AND project_id = %(project_id)s"
+                params["project_id"] = project_id
+
+            await cur.execute(sql, params)
+            rows = await cur.fetchall()
+
+            if not rows:
+                raise KeyError("Submission stats cache not found.")
+
+            if user_sub and not project_id:
+                total_valid = sum(r["total_valid_submissions"] for r in rows)
+                total_invalid = sum(r["total_invalid_submissions"] for r in rows)
+                total = sum(r["total_submissions"] for r in rows)
+                project_counts = [
+                    {
+                        "name": (await DbProject.one(db, r["project_id"])).name,
+                        "count": r["total_submissions"],
+                    }
+                    for r in rows
+                ]
+                org_counts, loc_counts = {}, {}
+                for r in rows:
+                    for org in r["top_organisations"]:
+                        org_counts[org["name"]] = (
+                            org_counts.get(org["name"], 0) + org["count"]
+                        )
+                    for loc in r["top_locations"]:
+                        loc_counts[loc["name"]] = (
+                            loc_counts.get(loc["name"], 0) + loc["count"]
+                        )
+
+                return {
+                    "total_valid_submissions": total_valid,
+                    "total_invalid_submissions": total_invalid,
+                    "total_submissions": total,
+                    "top_projects": sorted(
+                        project_counts, key=lambda x: x["count"], reverse=True
+                    )[:10],
+                    "top_organisations": sorted(
+                        [{"name": k, "count": v} for k, v in org_counts.items()],
+                        key=lambda x: x["count"],
+                        reverse=True,
+                    )[:10],
+                    "top_locations": sorted(
+                        [{"name": k, "count": v} for k, v in loc_counts.items()],
+                        key=lambda x: x["count"],
+                        reverse=True,
+                    )[:10],
+                }
+
+            return rows
+
+    @classmethod
+    async def upsert(
+        cls,
+        db: Connection,
+        user_sub: str,
+        project_id: int,
+        total_valid_submissions: int,
+        total_invalid_submissions: int,
+        total_submissions: int,
+        top_organisations: list[dict],
+        top_locations: list[dict],
+        last_calculated: str,
+    ) -> None:
+        """Insert or update submission stats cache for a user and project."""
+        async with db.cursor() as cur:
+            sql = """
+            INSERT INTO submission_stats_cache (
+                user_sub,
+                project_id,
+                total_valid_submissions,
+                total_invalid_submissions,
+                total_submissions,
+                top_organisations,
+                top_locations,
+                last_calculated
+            )
+            VALUES (
+                %(user_sub)s,
+                %(project_id)s,
+                %(total_valid_submissions)s,
+                %(total_invalid_submissions)s,
+                %(total_submissions)s,
+                %(top_organisations)s,
+                %(top_locations)s,
+                %(last_calculated)s
+            )
+            ON CONFLICT (user_sub, project_id)
+            DO UPDATE SET
+                total_valid_submissions = EXCLUDED.total_valid_submissions,
+                total_invalid_submissions = EXCLUDED.total_invalid_submissions,
+                total_submissions = EXCLUDED.total_submissions,
+                top_organisations = EXCLUDED.top_organisations,
+                top_locations = EXCLUDED.top_locations,
+                last_calculated = EXCLUDED.last_calculated;
+            """
+            await cur.execute(
+                sql,
+                {
+                    "user_sub": user_sub,
+                    "project_id": project_id,
+                    "total_valid_submissions": total_valid_submissions,
+                    "total_invalid_submissions": total_invalid_submissions,
+                    "total_submissions": total_submissions,
+                    "top_organisations": json.dumps(top_organisations),
+                    "top_locations": json.dumps(top_locations),
+                    "last_calculated": last_calculated,
+                },
+            )
 
 
 def slugify(name: Optional[str]) -> Optional[str]:

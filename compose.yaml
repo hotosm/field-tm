@@ -474,6 +474,9 @@ services:
         # Upload and update project submissions to s3 every hours
         echo '0 * * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
 
+        # Refresh user submission counts once a day
+        echo '0 0 * * * /opt/scheduler/user_submission_stats.py' >> ./crontab
+
         exec /usr/local/bin/supercronic ./crontab
       "
     restart: "unless-stopped"

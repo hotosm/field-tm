@@ -46,3 +46,11 @@ ADD CONSTRAINT project_teams_pkey PRIMARY KEY (team_id);
 
 ALTER TABLE ONLY public.project_team_users
 ADD CONSTRAINT project_team_users_pkey PRIMARY KEY (team_id, user_sub);
+
+ALTER TABLE ONLY public.submission_daily_counts
+ADD CONSTRAINT submission_daily_counts_user_project_unique
+UNIQUE (user_sub, project_id, submission_date);
+
+ALTER TABLE ONLY public.submission_stats_cache
+ADD CONSTRAINT submission_stats_cache_user_project_unique
+UNIQUE (user_sub, project_id);
