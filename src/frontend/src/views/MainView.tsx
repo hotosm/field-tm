@@ -64,7 +64,9 @@ const MainView = () => {
             ) : (
               <CoreModules.Stack
                 className={`${
-                  pathname.startsWith('/project/') && windowSize.width < 768 ? '' : 'fmtm-py-2 fmtm-px-5'
+                  (pathname.startsWith('/project/') && windowSize.width < 768) || pathname === '/'
+                    ? ''
+                    : 'fmtm-py-2 fmtm-px-5'
                 } fmtm-bg-[#f5f5f5]`}
                 sx={{
                   height: popupInParams
