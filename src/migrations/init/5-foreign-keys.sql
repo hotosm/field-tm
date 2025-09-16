@@ -65,3 +65,19 @@ ALTER TABLE ONLY public.project_team_users
 ADD CONSTRAINT fk_users FOREIGN KEY (
     user_sub
 ) REFERENCES public.users (sub) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.submission_daily_counts
+ADD CONSTRAINT submission_daily_counts_user_sub_fkey
+FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.submission_daily_counts
+ADD CONSTRAINT submission_daily_counts_project_fkey
+FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.submission_stats_cache
+ADD CONSTRAINT submission_stats_cache_user_sub_fkey
+FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.submission_stats_cache
+ADD CONSTRAINT submission_stats_cache_project_fkey
+FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
