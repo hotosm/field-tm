@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE IF NOT EXISTS public.submission_daily_counts (
     id BIGSERIAL PRIMARY KEY,
     user_sub TEXT NOT NULL,
@@ -14,18 +12,6 @@ ON public.submission_daily_counts (user_sub, submission_date);
 
 CREATE INDEX IF NOT EXISTS idx_submission_daily_counts_user_project_date
 ON public.submission_daily_counts (user_sub, project_id, submission_date);
-
-ALTER TABLE ONLY public.submission_daily_counts
-ADD CONSTRAINT submission_daily_counts_user_sub_fkey
-FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.submission_daily_counts
-ADD CONSTRAINT submission_daily_counts_project_fkey
-FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.submission_daily_counts
-ADD CONSTRAINT submission_daily_counts_user_project_unique
-UNIQUE (user_sub, project_id, submission_date);
 
 CREATE TABLE IF NOT EXISTS public.submission_stats_cache (
     id BIGSERIAL PRIMARY KEY,
@@ -45,16 +31,71 @@ ON public.submission_stats_cache (user_sub);
 CREATE INDEX IF NOT EXISTS idx_submission_stats_cache_user_project
 ON public.submission_stats_cache (user_sub, project_id);
 
-ALTER TABLE ONLY public.submission_stats_cache
-ADD CONSTRAINT submission_stats_cache_user_sub_fkey
-FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_daily_counts_user_sub_fkey'
+          AND table_name = 'submission_daily_counts'
+    ) THEN
+        ALTER TABLE ONLY public.submission_daily_counts
+        ADD CONSTRAINT submission_daily_counts_user_sub_fkey
+        FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
+    END IF;
 
-ALTER TABLE ONLY public.submission_stats_cache
-ADD CONSTRAINT submission_stats_cache_project_fkey
-FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_daily_counts_project_fkey'
+          AND table_name = 'submission_daily_counts'
+    ) THEN
+        ALTER TABLE ONLY public.submission_daily_counts
+        ADD CONSTRAINT submission_daily_counts_project_fkey
+        FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
+    END IF;
 
-ALTER TABLE ONLY public.submission_stats_cache
-ADD CONSTRAINT submission_stats_cache_user_project_unique
-UNIQUE (user_sub, project_id);
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_daily_counts_user_project_unique'
+          AND table_name = 'submission_daily_counts'
+    ) THEN
+        ALTER TABLE ONLY public.submission_daily_counts
+        ADD CONSTRAINT submission_daily_counts_user_project_unique
+        UNIQUE (user_sub, project_id, submission_date);
+    END IF;
 
-COMMIT;
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_stats_cache_user_sub_fkey'
+          AND table_name = 'submission_stats_cache'
+    ) THEN
+        ALTER TABLE ONLY public.submission_stats_cache
+        ADD CONSTRAINT submission_stats_cache_user_sub_fkey
+        FOREIGN KEY (user_sub) REFERENCES public.users (sub) ON DELETE CASCADE;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_stats_cache_project_fkey'
+          AND table_name = 'submission_stats_cache'
+    ) THEN
+        ALTER TABLE ONLY public.submission_stats_cache
+        ADD CONSTRAINT submission_stats_cache_project_fkey
+        FOREIGN KEY (project_id) REFERENCES public.projects (id) ON DELETE CASCADE;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE constraint_name = 'submission_stats_cache_user_project_unique'
+          AND table_name = 'submission_stats_cache'
+    ) THEN
+        ALTER TABLE ONLY public.submission_stats_cache
+        ADD CONSTRAINT submission_stats_cache_user_project_unique
+        UNIQUE (user_sub, project_id);
+    END IF;
+END $$;
