@@ -7,11 +7,11 @@ const About = () => {
       <div>
         <h2 className="fmtm-mb-4 fmtm-text-[1.625rem] md:fmtm-text-[2.375rem]">What is it?</h2>
         <p className="fmtm-text-justify fmtm-mb-2">
-          The Field Tasking Manager (Field -TM) helps teams add local knowledge to map features by coordinating mapping
+          The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by coordinating mapping
           in the field.
         </p>
         <p className="fmtm-text-justify">
-          Field - TM facilitates collaborative mapping by supporting and extending existing mature tools. The Field - TM
+          Field - TM facilitates collaborative mapping by supporting and extending existing mature tools. The Field-TM
           is a standalone mobile and web application that works using OpenDataKit (ODK), a powerful data collection
           platform that leverages commonly-available mobile Android devices to enable people to input information,
           including geospatial data in the field.

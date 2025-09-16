@@ -9,16 +9,19 @@ type useCaseType = {
 
 const useCaseList: useCaseType[] = [
   {
-    title: 'Slum Mapping',
-    description: 'Yes. It adheres to the WAI-ARIA design pattern.Yes. It adheres to the WAI-ARIA design pattern.',
+    title: '1. Community Mapping',
+    description:
+      'Field Tasking Manager empowers communities to map informal settlements, public facilities, and local services. It supports participatory data collection, ensuring that community needs and resources are accurately represented for inclusive planning.',
   },
   {
-    title: 'Urban Management',
-    description: 'Yes. It adheres to the WAI-ARIA design pattern.Yes. It adheres to the WAI-ARIA design pattern.',
+    title: '2. Urban Planning and Management',
+    description:
+      'Field Tasking Manager can support in building smarter cities by streamlining data collection on houses, roads, and utilities. By coordinating through small managable tasks, Field TM ensures accurate, scalable, and collaborative mapping for better decision-making in urban development.',
   },
   {
-    title: 'Road Network Survey',
-    description: 'Yes. It adheres to the WAI-ARIA design pattern.Yes. It adheres to the WAI-ARIA design pattern.',
+    title: '3. Disaster Response & Recovery',
+    description:
+      'Field Tasking Manager enables rapid mapping of damaged buildings, roads, and critical infrastructure after disasters. It helps coordinate volunteers, streamline field surveys, and provide accurate data to guide relief and recovery efforts.',
   },
 ];
 
