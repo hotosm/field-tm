@@ -16,7 +16,7 @@ const useCaseList: useCaseType[] = [
   {
     title: '2. Urban Planning and Management',
     description:
-      'Field Tasking Manager can support in building smarter cities by streamlining data collection on houses, roads, and utilities. By coordinating through small managable tasks, Field TM ensures accurate, scalable, and collaborative mapping for better decision-making in urban development.',
+      'Field Tasking Manager can support in building smarter cities by streamlining data collection on houses, roads, and utilities. By coordinating through small manageable tasks, Field TM ensures accurate, scalable, and collaborative mapping for better decision-making in urban development.',
   },
   {
     title: '3. Disaster Response & Recovery',
