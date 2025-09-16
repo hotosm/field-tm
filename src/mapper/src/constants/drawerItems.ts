@@ -23,7 +23,7 @@ export const defaultDrawerItems: drawerItemsType[] = [
 		path: 'https://hosted.weblate.org/engage/hotosm',
 	},
 	{
-		name: m['header.download_custom_odk_collect'](),
-		path: 'https://github.com/hotosm/odkcollect/releases/download/v2024.3.5-entity-select/ODK-Collect-v2024.3.5-HOTOSM-FMTM.apk',
+		name: m['header.download_odk_collect'](),
+		path: 'https://play.google.com/store/apps/details?id=org.odk.collect.android',
 	},
 ];
