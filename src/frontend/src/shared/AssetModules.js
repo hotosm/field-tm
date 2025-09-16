@@ -107,6 +107,12 @@ import {
   InfoOutlined as InfoOutlineIcon,
   Save as SaveIcon,
   Refresh as RefreshIcon,
+  YouTube as YouTubeIcon,
+  LinkedIn as LinkedInIcon,
+  X as XIcon,
+  Facebook as FacebookIcon,
+  Instagram as InstagramIcon,
+  GitHub as GitHubIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -228,4 +234,10 @@ export default {
   InfoOutlineIcon,
   SaveIcon,
   RefreshIcon,
+  YouTubeIcon,
+  LinkedInIcon,
+  XIcon,
+  FacebookIcon,
+  InstagramIcon,
+  GitHubIcon,
 };
