@@ -108,7 +108,7 @@ export const AcceptInvite = (url: string, navigate: NavigateFunction) => {
           }),
         );
       } finally {
-        navigate('/');
+        navigate('/explore');
       }
     };
     await getProjectUserInvites(url);

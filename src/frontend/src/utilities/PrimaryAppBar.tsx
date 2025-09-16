@@ -63,17 +63,19 @@ export default function PrimaryAppBar() {
         setOpen={setOpen}
       />
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
-        <img
-          src={hotLogo}
-          alt="Field-TM Logo"
-          onClick={() => navigate('/')}
-          className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
-        />
+        <div className="fmtm-flex fmtm-items-center fmtm-gap-4 fmtm-cursor-pointer" onClick={() => navigate('/')}>
+          <img
+            src={hotLogo}
+            alt="Field-TM Logo"
+            className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
+          />
+          <h3 className="fmtm-text-red-medium fmtm-text-xl">Field-TM</h3>
+        </div>
         <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
           <Link
-            to="/"
+            to="/explore"
             className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-              location.pathname === '/' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+              location.pathname === '/explore' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
             } fmtm-border-b-2`}
           >
             Explore Projects

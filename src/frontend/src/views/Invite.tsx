@@ -17,7 +17,7 @@ const Invite = () => {
     if (token) {
       dispatch(AcceptInvite(`${VITE_API_URL}/users/invite/${token}`, navigate));
     } else {
-      navigate('/');
+      navigate('/explore');
     }
   }, [token]);
 

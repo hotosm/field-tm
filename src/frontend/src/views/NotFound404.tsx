@@ -19,7 +19,7 @@ const ProjectNotFound = () => {
             Page Not Found
           </p>
         </div>
-        <Button variant="secondary-red" onClick={() => navigate('/')}>
+        <Button variant="secondary-red" onClick={() => navigate('/explore')}>
           Return Home
         </Button>
       </div>

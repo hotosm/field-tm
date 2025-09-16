@@ -22,7 +22,7 @@ const Forbidden = () => {
             You don't have permission to access this page
           </p>
         </div>
-        <Button variant="secondary-red" onClick={() => navigate('/')}>
+        <Button variant="secondary-red" onClick={() => navigate('/explore')}>
           Return Home
         </Button>
       </div>
