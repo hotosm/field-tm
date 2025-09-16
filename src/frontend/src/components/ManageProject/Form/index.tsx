@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
-// import { CustomSelect } from '@/components/common/Select';
 import CoreModules from '@/shared/CoreModules';
-import { FormCategoryService } from '@/api/CreateProjectService';
-import { DownloadProjectForm } from '@/api/Project';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useDownloadFormQuery } from '@/api/central';
+import { downloadBlobData } from '@/utilfunctions';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,14 +25,7 @@ const FormUpdate = ({ projectId }) => {
   const [formError, setFormError] = useState(false);
 
   const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
-  // const formExampleList = useAppSelector((state) => state.createproject.formExampleList);
-  // const sortedFormExampleList = formExampleList.slice().sort((a, b) => a.title.localeCompare(b.title));
-  // const selectedCategory = useAppSelector((state) => state.createproject.editProjectDetails.osm_category);
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
-
-  useEffect(() => {
-    dispatch(FormCategoryService(`${API_URL}/central/list-forms`));
-  }, []);
 
   const onSave = () => {
     if (uploadForm?.length === 0) {
@@ -42,11 +35,43 @@ const FormUpdate = ({ projectId }) => {
     dispatch(
       PostFormUpdate(`${API_URL}/central/update-form?project_id=${projectId}`, {
         xformId: xFormId,
-        // osm_category: selectedCategory,
         upload: uploadForm && uploadForm?.[0]?.file,
       }),
     );
   };
+
+  const {
+    data: formBlobData,
+    isSuccess: isDownloadFormSuccess,
+    error: downloadFormError,
+    isLoading: isDownloadFormLoading,
+    refetch: downloadForm,
+  } = useDownloadFormQuery({
+    params: { project_id: +projectId },
+    options: { queryKey: ['get-download-form', +projectId], enabled: false },
+  });
+
+  useEffect(() => {
+    if (isDownloadFormSuccess && formBlobData) {
+      downloadBlobData(formBlobData, `project_form_${projectId}`, 'xlsx');
+    }
+  }, [isDownloadFormSuccess, formBlobData]);
+
+  useEffect(() => {
+    const handleBlobErrorResponse = async (blob: Blob | undefined) => {
+      if (!blob) return;
+      const errorMsg = JSON.parse(await blob?.text())?.detail;
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: errorMsg || 'Failed to download',
+        }),
+      );
+    };
+
+    if (downloadFormError) {
+      handleBlobErrorResponse(downloadFormError?.response?.data);
+    }
+  }, [downloadFormError]);
 
   return (
     <div className="fmtm-relative fmtm-flex fmtm-flex-col fmtm-w-full fmtm-h-full fmtm-bg-white">
@@ -56,12 +81,9 @@ const FormUpdate = ({ projectId }) => {
           <p className="fmtm-text-base fmtm-mt-2">
             Please{' '}
             <a
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-              onClick={() =>
-                dispatch(
-                  DownloadProjectForm(`${API_URL}/central/download-form?project_id=${projectId}`, 'form', projectId),
-                )
-              }
+              className={`fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline ${isDownloadFormLoading && 'fmtm-pointer-events-none fmtm-cursor-not-allowed'}`}
+              onClick={() => downloadForm()}
+              aria-disabled={isDownloadFormLoading}
             >
               download
             </a>{' '}

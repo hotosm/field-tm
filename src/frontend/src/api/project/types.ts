@@ -99,6 +99,13 @@ export type uploadProjectTaskBoundariesPayloadType = {
   task_geojson: string;
 };
 
+export type entitiesMappingStatusPayloadType = {
+  entity_id: string;
+  status: number;
+  label: string;
+  submission_ids?: string;
+};
+
 // PARAMS TYPES
 export type projectSummariesParamsType = {
   page: number;

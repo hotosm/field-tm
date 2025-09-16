@@ -1,7 +1,6 @@
 import {
   downloadProjectFormLoadingType,
   EntityOsmMap,
-  projectDashboardDetailTypes,
   projectInfoType,
   projectTaskBoundriesType,
   tileType,
@@ -23,11 +22,9 @@ export type ProjectStateTypes = {
   toggleGenerateMbTilesModal: boolean;
   mobileFooterSelection: '' | 'projectInfo' | 'activities' | 'comment' | 'instructions' | 'infographics';
   projectDetailsLoading: boolean;
-  projectDashboardDetail: projectDashboardDetailTypes | null;
   entityOsmMap: EntityOsmMap[];
   entityOsmMapLoading: boolean;
   updateEntityStateLoading: boolean;
-  projectDashboardLoading: boolean;
   projectCommentsList: projectCommentsListTypes[];
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;

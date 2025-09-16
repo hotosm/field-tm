@@ -1,25 +1,12 @@
-import {
-  submissionContributorsTypes,
-  submissionFormFieldsTypes,
-  submissionTableDataTypes,
-} from '@/models/submission/submissionModel';
+import { submissionContributorsTypes } from '@/models/submission/submissionModel';
 
 export type SubmissionStateTypes = {
-  submissionDetailsLoading: boolean;
-  submissionDetails: Record<string, any> | null;
   submissionContributors: submissionContributorsTypes[];
   submissionContributorsLoading: boolean;
-  submissionFormFields: submissionFormFieldsTypes[];
-  submissionTableData: submissionTableDataTypes;
-  submissionFormFieldsLoading: boolean;
-  submissionTableDataLoading: boolean;
-  submissionTableRefreshing: boolean;
   updateReviewStatusModal: updateReviewStatusModal;
   updateReviewStateLoading: boolean;
   mappedVsValidatedTask: mappedVsValidatedTaskType[];
   mappedVsValidatedTaskLoading: boolean;
-  submissionPhotos: Record<string, string>;
-  submissionPhotosLoading: boolean;
 };
 
 type updateReviewStatusModal = {
@@ -38,6 +25,8 @@ export type filterType = {
   submitted_by: string | null;
   review_state: string | null;
   submitted_date_range: string | null;
+  page: number;
+  results_per_page: number;
 };
 
 type mappedVsValidatedTaskType = {

@@ -1,4 +1,4 @@
-import { project_status, GeoGeomTypesEnum, task_split_type, project_visibility } from '@/types/enums';
+import { GeoGeomTypesEnum, task_split_type, project_visibility } from '@/types/enums';
 import type { BBox, Point, Polygon } from 'geojson';
 
 export type projectInfoType = {
@@ -64,19 +64,6 @@ export type taskType = {
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
-
-export type projectDashboardDetailTypes = {
-  slug: string;
-  organisation_name: string;
-  total_tasks: number;
-  created_at: string;
-  organisation_id: number;
-  organisation_logo: string;
-  total_submissions: number | null;
-  total_contributors: number | null;
-  last_active: string;
-  status: project_status;
-};
 
 export type projectTaskBoundriesType = {
   id: number;
