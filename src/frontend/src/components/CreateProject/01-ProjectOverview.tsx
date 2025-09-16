@@ -5,8 +5,6 @@ import { valid } from 'geojson-validation';
 import { useIsAdmin } from '@/hooks/usePermissions';
 import { z } from 'zod/v4';
 
-import { GetUserListForSelect } from '@/api/User';
-import { UserActions } from '@/store/slices/UserSlice';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { fileType } from '@/store/types/ICommon';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -29,6 +27,7 @@ import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
 import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
+import { useGetUserListQuery } from '@/api/user';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -57,12 +56,6 @@ const ProjectOverview = () => {
 
   //@ts-ignore
   const authDetails = useAppSelector((state) => state.login.authDetails);
-  const userList = useAppSelector((state) => state.user.userListForSelect)?.map((user) => ({
-    id: user.sub,
-    label: user.username,
-    value: user.sub,
-  }));
-  const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const isODKCredentialsValid = useAppSelector((state) => state.createproject.isODKCredentialsValid);
   const ODKCredentialsValidating = useAppSelector((state) => state.createproject.ODKCredentialsValidating);
   const projectUsersLoading = useAppSelector((state) => state.project.projectUsersLoading);
@@ -96,15 +89,20 @@ const ProjectOverview = () => {
         hasODKCredentials: !!org?.odk_central_url,
       }));
 
-  useEffect(() => {
-    if (!userSearchText) return;
-    dispatch(
-      GetUserListForSelect(`${VITE_API_URL}/users/usernames`, {
-        search: userSearchText,
-        signin_type: 'osm',
-      }),
-    );
-  }, [userSearchText]);
+  const { data: users, isLoading: userListLoading } = useGetUserListQuery({
+    params: { search: userSearchText, signin_type: 'osm' },
+    options: {
+      queryKey: ['get-user-list', userSearchText],
+      enabled: !!userSearchText,
+      staleTime: 60 * 60 * 1000,
+    },
+  });
+  const userList =
+    users?.map((user) => ({
+      id: user.sub,
+      label: user.username,
+      value: user.sub,
+    })) || [];
 
   useEffect(() => {
     if (!authDetails || isEmpty(organisationList) || isAdmin || authDetails?.orgs_managed?.length > 1 || !!values.id)
@@ -152,7 +150,7 @@ const ProjectOverview = () => {
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
     if (!orgIdInt) return;
-    const selectedOrg = organisationList.find((org) => org.value === orgIdInt);
+    const selectedOrg = organisationList?.find((org) => org.value === orgIdInt);
     setValue('hasODKCredentials', !!selectedOrg?.hasODKCredentials);
     setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
   };
@@ -354,7 +352,7 @@ const ProjectOverview = () => {
                 if (value) {
                   setUserSearchText(value);
                 } else {
-                  dispatch(UserActions.SetUserListForSelect([]));
+                  // TODO: CLEAR USER LIST STATE
                 }
               }}
               ref={field.ref}
