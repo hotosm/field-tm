@@ -237,20 +237,20 @@ const CreateProject = () => {
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
     // Project admins that are already assigned during draft project creation
-    const assignedPMs = projectManagers.map((pm) => pm.user_sub);
+    const assignedPMs = projectManagers?.map((pm) => pm.user_sub);
 
     // Identify Project Admins to remove: those who are currently assigned but not included in the new list
-    const pmToRemove = assignedPMs.filter((pm) => !data.project_admins.includes(pm));
+    const pmToRemove = assignedPMs?.filter((pm) => !data.project_admins.includes(pm));
 
     // Identify Project Admins to assign: those in the new list who are not yet assigned to the project
-    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs.includes(pm));
+    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs?.includes(pm));
 
     dispatch(
       CreateProjectService(
         `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
-        { projectAdminToRemove: pmToRemove, projectAdminToAssign: pmToAssign },
+        { projectAdminToRemove: pmToRemove || [], projectAdminToAssign: pmToAssign },
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,
