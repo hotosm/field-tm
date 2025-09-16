@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
+from area_splitter.splitter import split_by_sql, split_by_square
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -38,7 +39,6 @@ from fastapi import (
 )
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, StreamingResponse
-from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.json_data_models import data_models_path, get_choices
@@ -468,8 +468,8 @@ async def task_split(
             log.warning("Parsed geojson file contained no geometries")
 
     log.debug("STARTED task splitting using provided boundary and data extract")
-    # NOTE here we pass the connection string and allow fmtm-splitter to
-    # a use psycopg2 connection (not async)
+    # NOTE here we pass the connection string and allow area-splitter to
+    # a use psycopg connection (not async)
     features = await run_in_threadpool(
         lambda: split_by_sql(
             merged_boundary,

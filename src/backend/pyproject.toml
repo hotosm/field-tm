@@ -34,7 +34,7 @@ dependencies = [
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.12",
-    "psycopg[pool]==3.2.3",
+    "psycopg[pool]==3.2.6",
     "geojson==3.1.0",
     "shapely==2.0.6",
     "pyxform==2.1.1",
@@ -48,10 +48,10 @@ dependencies = [
     "aiosmtplib==4.0.1",
     "markdown==3.8",
     "tldextract==5.3.0",
+    #"qfieldcloud-sdk==0.10.0",
     "osm-fieldwork",
+    "area-splitter",
     "osm-login-python==2.0.0",
-    "osm-rawdata==0.4.2",
-    "fmtm-splitter==2.0.0",
     "pg-nearest-city==0.2.1",
     "raw-data-api-py>=0.3.0",
     "pyodk",
@@ -86,14 +86,14 @@ docs = [
     "mdx-truly-sane-lists==1.3",
 ]
 monitoring = [
-    "sentry-sdk[opentelemetry]==2.18.0",
-    #"opentelemetry-sdk==1.27.0",
-    #"opentelemetry-api==1.27.0",
-    #"opentelemetry-exporter-otlp==1.27.0",
-    "opentelemetry-instrumentation-fastapi==0.49b2",
-    "opentelemetry-instrumentation-logging==0.49b2",
-    "opentelemetry-instrumentation-psycopg2==0.49b2",
-    "opentelemetry-instrumentation-requests==0.49b2",
+    "sentry-sdk[opentelemetry]==2.37.1",
+    #"opentelemetry-sdk==1.37.0",
+    #"opentelemetry-api==1.37.0",
+    #"opentelemetry-exporter-otlp==1.37.0",
+    "opentelemetry-instrumentation-fastapi==0.58b0",
+    "opentelemetry-instrumentation-logging==0.58b0",
+    "opentelemetry-instrumentation-psycopg==0.58b0",
+    "opentelemetry-instrumentation-requests==0.58b0",
 ]
 
 [tool.ruff]
@@ -145,7 +145,7 @@ version_files = [
 ]
 changelog_file = "../../CHANGELOG.md"
 update_changelog_on_bump = true
-ignored_tag_formats = ["osm-fieldwork-$version"]
+ignored_tag_formats = ["osm-fieldwork-$version", "area-splitter-$version"]
 
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*"
@@ -154,6 +154,7 @@ write-changes = true
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
+area-splitter = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
 
 [tool.uv.workspace]
