@@ -11,8 +11,8 @@ const About = () => {
           in the field.
         </p>
         <p className="fmtm-text-justify">
-          Field - TM facilitates collaborative mapping by supporting and extending existing mature tools. The Field-TM
-          is a standalone mobile and web application that works using OpenDataKit (ODK), a powerful data collection
+          Field-TM facilitates collaborative mapping by supporting and extending existing mature tools. The Field-TM is
+          a standalone mobile and web application that works using OpenDataKit (ODK), a powerful data collection
           platform that leverages commonly-available mobile Android devices to enable people to input information,
           including geospatial data in the field.
         </p>
