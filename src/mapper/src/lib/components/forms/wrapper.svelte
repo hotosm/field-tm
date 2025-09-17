@@ -81,8 +81,8 @@
 		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split('T')[0]}</today>`);
 
 		const authDetails = loginStore?.getAuthDetails;
-		if (authDetails?.username) {
-			submissionXml = submissionXml.replace('<username/>', `<username>${authDetails?.username}</username>`);
+		if (authDetails?.sub) {
+			submissionXml = submissionXml.replace('<username/>', `<username>${authDetails?.sub}</username>`);
 		}
 
 		if (authDetails?.email_address) {
