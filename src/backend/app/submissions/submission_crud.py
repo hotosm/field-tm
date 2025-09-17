@@ -153,6 +153,7 @@ async def get_submission_count_of_a_project(project: DbProject):
 async def get_submission_by_project(
     project: DbProject,
     filters: dict,
+    expand: Optional[bool] = True,
 ):
     """Get submission by project.
 
@@ -162,6 +163,7 @@ async def get_submission_by_project(
         project (DbProject): The database project object.
         filters (dict): The filters to apply directly to submissions
             in odk central.
+        expand (bool, optional): Whether to include repeating group data.
 
     Returns:
         Tuple[int, List]: A tuple containing the total number of submissions and
@@ -182,7 +184,7 @@ async def get_submission_by_project(
             count=filters.get("$count"),
             wkt=filters.get("$wkt"),
             filter=filters.get("$filter"),
-            expand="*",
+            expand="*" if expand else None,
         )
 
     def add_hashtags(item):

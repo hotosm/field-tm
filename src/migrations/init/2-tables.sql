@@ -253,3 +253,24 @@ CREATE TABLE IF NOT EXISTS public.project_team_users (
     user_sub character varying NOT NULL
 );
 ALTER TABLE public.project_team_users OWNER TO fmtm;
+
+CREATE TABLE IF NOT EXISTS public.submission_daily_counts (
+    id BIGSERIAL PRIMARY KEY,
+    user_sub TEXT NOT NULL,
+    project_id BIGINT NOT NULL,
+    submission_date DATE NOT NULL,
+    count INT NOT NULL DEFAULT 0,
+    last_calculated TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.submission_stats_cache (
+    id BIGSERIAL PRIMARY KEY,
+    user_sub TEXT NOT NULL,
+    project_id BIGINT NOT NULL,
+    total_valid_submissions INT NOT NULL DEFAULT 0,
+    total_invalid_submissions INT NOT NULL DEFAULT 0,
+    total_submissions INT NOT NULL DEFAULT 0,
+    top_organisations JSONB NOT NULL DEFAULT '[]'::jsonb,
+    top_locations JSONB NOT NULL DEFAULT '[]'::jsonb,
+    last_calculated TIMESTAMPTZ NOT NULL DEFAULT now()
+);
