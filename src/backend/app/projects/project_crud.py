@@ -997,6 +997,9 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
         submission_counts = {}
         for sub in submissions:
             username = sub.get("username")
+            if "|" in username:
+                user = await DbUser.one(db, user_subidentifier=username)
+                username = user.username if user else username
             if username:
                 submission_counts[username] = submission_counts.get(username, 0) + 1
 
