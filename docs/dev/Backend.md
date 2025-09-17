@@ -76,6 +76,17 @@ The API should now be accessible at: <http://api.fmtm.localhost:7050/docs>
 
 ## Backend Tips
 
+### Authenticating With The API
+
+- The backend requires a cookie to authenticate.
+- The easiest option is to start the frontend, login via the
+  frontend (this sets the cookie), then make the API calls you need.
+- Because the cookie is set for the root domain (i.e. the shared
+  root domain for both the frontend and backend), it will be sent
+  with every request.
+- There is no need to send authentication headers manually
+  (although this is also a valid option if needed).
+
 ### Database Migration
 
 #### Creating Migration Files
