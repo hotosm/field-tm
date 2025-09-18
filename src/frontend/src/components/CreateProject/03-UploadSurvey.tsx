@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch } from '@/types/reduxTypes';
 import { useParams } from 'react-router-dom';
-import { ValidateCustomForm } from '@/api/CreateProjectService';
 import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
@@ -14,9 +13,9 @@ import FieldLabel from '@/components/common/FieldLabel';
 import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { useGetFormListsQuery } from '@/api/central';
+import { useGetFormListsQuery, useUploadProjectXlsformMutation } from '@/api/central';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,41 +26,49 @@ const UploadSurvey = () => {
   const params = useParams();
   const projectId = params.id ? +params.id : null;
 
-  const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
-  const validateCustomFormLoading = useAppSelector((state) => state.createproject.validateCustomFormLoading);
-
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
-  const { watch, control, setValue, formState } = form;
+  const { watch, control, setValue, getValues, formState } = form;
   const { errors } = formState;
   const values = watch();
 
   const { data: formList, isLoading: isGetFormListsLoading } = useGetFormListsQuery({
     options: { queryKey: ['get-form-lists'], staleTime: 60 * 60 * 1000 },
   });
-
   const sortedFormList =
     formList
       ?.slice()
       .sort((a, b) => a.title.localeCompare(b.title))
       .map((form) => ({ id: form.id, label: form.title, value: form.id })) || [];
 
-  const { getValues } = form;
+  const { mutate: uploadProjectXlsformMutate, isPending: isUploadProjectXlsformPending } =
+    useUploadProjectXlsformMutation({
+      onSuccess: ({ data }) => {
+        setValue('isXlsFormFileValid', true);
+        dispatch(
+          CommonActions.SetSnackBar({ message: data?.message || 'XLSForm uploaded successfully', variant: 'success' }),
+        );
+      },
+      onError: ({ response }) => {
+        setValue('isXlsFormFileValid', false);
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to upload XLSForm form' }));
+      },
+    });
+
   const uploadXlsformFile = (file) => {
     // use_odk_collect is from previous step, while needVerificationFields is from this step
     const values = getValues();
-    const needVerificationFields = values.needVerificationFields;
+    const formData = new FormData();
+    formData.append('xlsform', file?.file);
 
-    dispatch(
-      ValidateCustomForm(
-        `${VITE_API_URL}/central/upload-xlsform?project_id=${projectId}&use_odk_collect=${values.use_odk_collect}&need_verification_fields=${needVerificationFields}`,
-        file?.file,
-      ),
-    );
+    uploadProjectXlsformMutate({
+      payload: formData,
+      params: {
+        project_id: +projectId!,
+        use_odk_collect: values.use_odk_collect,
+        need_verification_fields: values.needVerificationFields,
+      },
+    });
   };
-
-  useEffect(() => {
-    setValue('isXlsFormFileValid', customFileValidity);
-  }, [customFileValidity]);
 
   const changeFileHandler = (file): void => {
     if (!file) {
@@ -70,13 +77,13 @@ const UploadSurvey = () => {
     }
 
     setValue('xlsFormFile', file);
-    dispatch(CreateProjectActions.SetCustomFileValidity(false));
+    setValue('isXlsFormFileValid', false);
     uploadXlsformFile(file);
   };
 
   const resetFile = (): void => {
     setValue('xlsFormFile', null);
-    dispatch(CreateProjectActions.SetCustomFileValidity(false));
+    setValue('isXlsFormFileValid', false);
   };
 
   return (
@@ -185,10 +192,10 @@ const UploadSurvey = () => {
           }}
           acceptedInput=".xls,.xlsx,.xml"
         />
-        {validateCustomFormLoading && (
+        {isUploadProjectXlsformPending && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
-            <p className="fmtm-text-base">Validating form...</p>
+            <p className="fmtm-text-base">Validating & Uploading form...</p>
           </div>
         )}
         {errors?.xlsFormFile?.message && <ErrorMessage message={errors.xlsFormFile.message as string} />}
