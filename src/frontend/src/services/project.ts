@@ -42,11 +42,11 @@ export const taskSplit = (payload: taskSplitPayloadType) => api.post('/projects/
 export const previewSplitBySquare = (payload: previewSplitBySquarePayload) =>
   api.post('/projects/preview-split-by-square', payload);
 
-export const generateDataExtract = (payload: generateDataExtractPayloadType, params: { project_id: number }) =>
-  api.post('/projects/generate-data-extract', { payload }, { params });
+export const generateDataExtract = (payload: FormData, params: { project_id: number }) =>
+  api.post('/projects/generate-data-extract', payload, { params });
 
 export const uploadDataExtract = (payload: uploadDataExtractPayloadType, params: { project_id: number }) =>
-  api.post('/projects/upload-data-extract', { payload }, { params });
+  api.post('/projects/upload-data-extract', payload, { params });
 
 export const addProjectManager = (params: addProjectManagerParamsType) => api.post('/projects/add-manager', { params });
 
@@ -68,7 +68,7 @@ export const deleteProject = (project_id: number, params: { org_id: number }) =>
   api.delete(`/projects/${project_id}`, { params });
 
 export const uploadProjectTaskBoundaries = (project_id: number, payload: uploadProjectTaskBoundariesPayloadType) =>
-  api.post(`/projects/${project_id}/upload-task-boundaries`, { payload });
+  api.post(`/projects/${project_id}/upload-task-boundaries`, payload);
 
 export const createStubProject = (payload: createStubProjectPayloadType, params: createStubProjectParamsType) =>
   api.post('/projects/stub', payload, { params });

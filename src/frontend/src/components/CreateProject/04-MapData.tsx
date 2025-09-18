@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { z } from 'zod/v4';
 import { Controller, useFormContext } from 'react-hook-form';
 import { geojson as fgbGeojson } from 'flatgeobuf';
@@ -23,8 +22,7 @@ import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useGenerateDataExtractMutation } from '@/api/project';
 
 const MapData = () => {
   useDocumentTitle('Create Project: Map Data');
@@ -117,26 +115,10 @@ const MapData = () => {
     return new File([geojsonBlob], 'data.geojson', { type: 'application/json' });
   };
 
-  // Generate OSM data extract
-  const generateDataExtract = async () => {
-    const dataExtractRequestFormData = new FormData();
-    const projectAoiGeojsonFile = getFileFromGeojson(values.outline);
-
-    dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
-    dataExtractRequestFormData.append('osm_category', values.osm_category);
-    dataExtractRequestFormData.append('use_st_within', (!values.use_st_within)?.toString() ?? 'false');
-    dataExtractRequestFormData.append('geom_type', values.primary_geom_type as GeoGeomTypesEnum);
-    if (values.primary_geom_type == GeoGeomTypesEnum.POINT)
-      dataExtractRequestFormData.append('centroid', values.includeCentroid ? 'true' : 'false');
-
-    setFetchingOSMData(true);
-    try {
-      const response = await axios.post(`${VITE_API_URL}/projects/generate-data-extract`, dataExtractRequestFormData, {
-        params: { project_id: values.id },
-      });
-
-      const dataExtractGeojsonUrl = response.data.url;
-
+  const { mutate: generateDataExtractMutate, isPending: isGeneratingDataExtract } = useGenerateDataExtractMutation({
+    onSuccess: async ({ data }) => {
+      setFetchingOSMData(true);
+      const dataExtractGeojsonUrl = data?.url;
       // Extract fgb and set geojson to map
       const geojsonExtractFile = await fetch(dataExtractGeojsonUrl);
       const geojsonExtract = await geojsonExtractFile.json();
@@ -153,15 +135,26 @@ const MapData = () => {
         dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
         setValue('splitGeojsonByAlgorithm', null);
       }
-    } catch (error) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: error.response.data.detail || 'Error generating map data',
-        }),
-      );
-    } finally {
       setFetchingOSMData(false);
-    }
+    },
+    onError: ({ response }) => {
+      dispatch(CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to generate data extract' }));
+    },
+  });
+
+  // Generate OSM data extract
+  const generateDataExtract = async () => {
+    const dataExtractRequestFormData = new FormData();
+    const projectAoiGeojsonFile = getFileFromGeojson(values.outline);
+
+    dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
+    dataExtractRequestFormData.append('osm_category', values.osm_category);
+    dataExtractRequestFormData.append('use_st_within', (!values.use_st_within)?.toString() ?? 'false');
+    dataExtractRequestFormData.append('geom_type', values.primary_geom_type as GeoGeomTypesEnum);
+    if (values.primary_geom_type == GeoGeomTypesEnum.POINT)
+      dataExtractRequestFormData.append('centroid', values.includeCentroid ? 'true' : 'false');
+
+    generateDataExtractMutate({ payload: dataExtractRequestFormData, params: { project_id: values.id! } });
   };
 
   useEffect(() => {
@@ -324,7 +317,7 @@ const MapData = () => {
                 resetMapDataFile();
                 generateDataExtract();
               }}
-              isLoading={fetchingOSMData}
+              isLoading={isGeneratingDataExtract || fetchingOSMData}
             >
               Fetch OSM Data
             </Button>

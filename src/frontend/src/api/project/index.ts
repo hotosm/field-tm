@@ -163,17 +163,11 @@ export const usePreviewSplitBySquareMutation = ({
     ...options,
   });
 
-export const useGenerateDataExtractMutation = ({
-  payload,
-  params,
-  options,
-}: {
-  payload: generateDataExtractPayloadType;
-  params: { project_id: number };
-  options: TMutationOptions<any, void>;
-}) =>
+export const useGenerateDataExtractMutation = (
+  options: TMutationOptions<{ url: string }, { payload: FormData; params: { project_id: number } }, { detail: string }>,
+) =>
   useMutation({
-    mutationFn: () => generateDataExtract(payload, params),
+    mutationFn: ({ payload, params }) => generateDataExtract(payload, params),
     ...options,
   });
 
