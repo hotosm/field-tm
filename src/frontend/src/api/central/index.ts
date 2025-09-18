@@ -30,16 +30,15 @@ export function useDownloadFormQuery({
   });
 }
 
-export function useUploadProjectXlsformMutation({
-  params,
-  options,
-}: {
-  params: uploadXlsformParamsType;
-  options: TMutationOptions<unknown, uploadXlsformPayloadType>;
-}) {
+export function useUploadProjectXlsformMutation(
+  options: TMutationOptions<
+    { message: string },
+    { payload: FormData; params: uploadXlsformParamsType },
+    { message: string }
+  >,
+) {
   return useMutation({
-    mutationKey: ['upload-xlsform'],
-    mutationFn: (payload: uploadXlsformPayloadType) => uploadProjectXlsform(payload, params),
+    mutationFn: ({ payload, params }) => uploadProjectXlsform(payload, params),
     ...options,
   });
 }
