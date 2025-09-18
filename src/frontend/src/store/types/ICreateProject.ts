@@ -9,8 +9,6 @@ export type CreateProjectStateTypes = {
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  formExampleList: FormCategoryListTypes[];
-  formCategoryLoading: boolean;
   GenerateProjectFilesLoading: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;

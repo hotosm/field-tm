@@ -233,25 +233,6 @@ export const CreateProjectService = (
   };
 };
 
-const FormCategoryService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetFormCategoryLoading(true));
-
-    const getFormCategoryList = async (url: string) => {
-      try {
-        const getFormCategoryListResponse = await axios.get(url);
-        const resp: FormCategoryListModel[] = getFormCategoryListResponse.data;
-        dispatch(CreateProjectActions.GetFormCategoryList(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.GetFormCategoryLoading(false));
-      }
-    };
-
-    await getFormCategoryList(url);
-  };
-};
-
 const UploadTaskAreasService = (url: string, filePayload: any) => {
   return async (dispatch: AppDispatch) => {
     const postUploadArea = async (url: string, filePayload: any) => {
@@ -614,7 +595,6 @@ const AssignProjectManager = (url: string, params: { sub: number; project_id: nu
 
 export {
   UploadTaskAreasService,
-  FormCategoryService,
   GenerateProjectFilesService,
   UploadXlsformService,
   OrganisationService,

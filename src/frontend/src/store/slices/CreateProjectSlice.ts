@@ -29,8 +29,6 @@ export const initialState: CreateProjectStateTypes = {
   createProjectLoading: false,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  formExampleList: [],
-  formCategoryLoading: false,
   GenerateProjectFilesLoading: false,
   organisationList: [],
   organisationListLoading: false,
@@ -61,12 +59,6 @@ const CreateProject = createSlice({
     },
     PostProjectDetails(state, action) {
       state.projectDetailsResponse = action.payload;
-    },
-    GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
-      state.formCategoryLoading = action.payload;
-    },
-    GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formExampleList']>) {
-      state.formExampleList = action.payload;
     },
     GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
       state.GenerateProjectFilesLoading = action.payload;
