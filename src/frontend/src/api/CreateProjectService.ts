@@ -508,40 +508,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
   };
 };
 
-const ValidateCustomForm = (url: string, formUpload: any) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.ValidateCustomFormLoading(true));
-
-    const validateCustomForm = async (url: any, formUpload: any) => {
-      try {
-        const formUploadFormData = new FormData();
-        formUploadFormData.append('xlsform', formUpload);
-
-        const xlsformUploadResponse = await axios.post(url, formUploadFormData);
-        const resp = xlsformUploadResponse.data;
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: JSON.stringify(resp.message),
-            variant: 'success',
-          }),
-        );
-        dispatch(CreateProjectActions.SetCustomFileValidity(true));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error?.response?.data?.detail || 'Something Went Wrong',
-          }),
-        );
-        dispatch(CreateProjectActions.SetCustomFileValidity(false));
-      } finally {
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
-      }
-    };
-
-    await validateCustomForm(url, formUpload);
-  };
-};
-
 const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
   return async (dispatch: AppDispatch) => {
     const deleteProject = async (url: string) => {
@@ -603,6 +569,5 @@ export {
   GetIndividualProjectDetails,
   PatchProjectDetails,
   PostFormUpdate,
-  ValidateCustomForm,
   DeleteProjectService,
 };

@@ -15,7 +15,6 @@ export type CreateProjectStateTypes = {
   dividedTaskLoading: boolean;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  validateCustomFormLoading: boolean;
   createProjectValidations: {};
   customFileValidity: boolean;
   task_num_buildings: number | null;
@@ -30,9 +29,6 @@ export type CreateProjectStateTypes = {
         'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
       >)
     | null;
-};
-export type ValidateCustomFormResponse = {
-  detail: { message: string; possible_reason: string };
 };
 
 export type GeometryTypes = {

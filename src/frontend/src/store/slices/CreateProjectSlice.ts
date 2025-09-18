@@ -36,7 +36,6 @@ export const initialState: CreateProjectStateTypes = {
   formUpdateLoading: false,
   taskSplittingGeojsonLoading: false,
   taskSplittingGeojson: null,
-  validateCustomFormLoading: false,
   createProjectValidations: {},
   isUnsavedChanges: false,
   customFileValidity: false,
@@ -95,9 +94,6 @@ const CreateProject = createSlice({
     },
     GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonByAlgorithm']>) {
       state.splitGeojsonByAlgorithm = action.payload;
-    },
-    ValidateCustomFormLoading(state, action: PayloadAction<boolean>) {
-      state.validateCustomFormLoading = action.payload;
     },
     SetCustomFileValidity(state, action: PayloadAction<boolean>) {
       state.customFileValidity = action.payload;
