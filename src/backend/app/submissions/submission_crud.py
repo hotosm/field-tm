@@ -19,6 +19,8 @@
 
 import asyncio
 import json
+import shutil
+import tempfile
 import uuid
 import zipfile
 from datetime import datetime, timedelta, timezone
@@ -28,9 +30,10 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 from xml.etree.ElementTree import SubElement
 
-import aiohttp
+import pandas as pd
 from defusedxml import ElementTree
 from fastapi import HTTPException, Response
+from fastapi.responses import FileResponse
 from loguru import logger as log
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission
@@ -131,10 +134,11 @@ async def gather_all_submission_csvs(project: DbProject, filters: dict):
 
 
 async def download_submission_in_json(
-    project: DbProject, filters: dict, include_media: Optional[bool] = False
+    project: DbProject,
+    filters: dict,
+    include_media: Optional[bool] = False,
 ):
-    """
-    Download submission data from ODK Central in JSON format.
+    """Download submission data from ODK Central in JSON format.
 
     If include_media is True, returns a ZIP file containing:
         - A JSON file with all submissions.
@@ -150,68 +154,75 @@ async def download_submission_in_json(
     Returns:
         fastapi.Response: A response containing either the JSON file or ZIP archive.
     """
-    # Fetch submissions
-    if data := await get_submission_by_project(project, filters):
-        submissions = data.get("value", [])
-    else:
-        submissions = []
+    if not include_media:
+        if data := await get_submission_by_project(project, filters):
+            submissions = data.get("value", [])
+        else:
+            submissions = []
 
-    json_bytes = BytesIO(json.dumps({"value": submissions}, indent=2).encode("utf-8"))
-
-    # Case 1: JSON + Media (ZIP)
-    if include_media:
-        zip_buffer = BytesIO()
-        async with aiohttp.ClientSession() as session:
-            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-                zipf.writestr(f"{project.slug}_submissions.json", json_bytes.getvalue())
-                for submission in submissions:
-                    instance_id = submission.get("meta", {}).get(
-                        "instanceID"
-                    ) or submission.get("__id")
-                    if not instance_id:
-                        continue
-                    photos = await get_submission_photos(instance_id, project)
-                    if not photos:
-                        continue
-
-                    for filename, url in photos.items():
-                        try:
-                            async with session.get(url) as resp:
-                                log.info(
-                                    f"Fetching media: {filename} from {url}, "
-                                    f"status: {resp.status}"
-                                )
-                                if resp.status == 200:
-                                    file_bytes = await resp.read()
-                                    zip_path = f"media/{instance_id}/{filename}"
-                                    zipf.writestr(zip_path, file_bytes)
-                                    log.info(f"Added {zip_path} to ZIP")
-                                else:
-                                    log.warning(
-                                        f"Failed to fetch {filename}: "
-                                        f"HTTP {resp.status}"
-                                    )
-                        except Exception as e:
-                            log.warning(
-                                f"Exception fetching media {filename} for "
-                                f"{instance_id}: {e}"
-                            )
-
-        zip_buffer.seek(0)
+        json_bytes = BytesIO(
+            json.dumps({"value": submissions}, indent=2).encode("utf-8")
+        )
         headers = {
             "Content-Disposition": f"attachment; "
-            f"filename={project.slug}_submissions.zip"
+            f"filename={project.slug}_submissions.json"
         }
         return Response(
-            content=zip_buffer.getvalue(), media_type="application/zip", headers=headers
+            content=json_bytes.getvalue(),
+            media_type="application/json",
+            headers=headers,
         )
 
-    # Case 2: JSON only
-    headers = {
-        "Content-Disposition": f"attachment; filename={project.slug}_submissions.json"
-    }
-    return Response(
-        content=json_bytes.getvalue(), media_type="application/json", headers=headers
+    # 1. Get the ODK ZIP
+    odk_zip_bytes = await gather_all_submission_csvs(project, filters)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        zip_path = Path(temp_dir) / "odk_export.zip"
+        with open(zip_path, "wb") as f:
+            f.write(odk_zip_bytes)
+
+        # 2. Extract ODK ZIP
+        with zipfile.ZipFile(zip_path, "r") as zipf:
+            zipf.extractall(temp_dir)
+
+        # 3. Find the CSV file
+        try:
+            csv_file = next(Path(temp_dir).rglob("*.csv"))
+        except StopIteration as err:
+            raise RuntimeError("No CSV file found in ODK export") from err
+
+        # 4. Convert CSV → JSON
+        df = pd.read_csv(csv_file, encoding="utf-8-sig")
+        json_data = df.to_dict(orient="records")
+        json_path = csv_file.with_suffix(".json")
+        with open(json_path, "w", encoding="utf-8") as jf:
+            json.dump(json_data, jf, indent=2)
+
+        # 5. Create new ZIP with JSON + media folder only
+        new_zip_path = (
+            Path(temp_dir) / f"{project.slug}_submissions_json_with_media.zip"
+        )
+        with zipfile.ZipFile(new_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            
+            zipf.write(json_path, arcname=json_path.name)
+
+            # Add media folder if exists
+            media_dir = Path(temp_dir) / "media"
+            if media_dir.exists() and media_dir.is_dir():
+                for file in media_dir.rglob("*"):
+                    if file.is_file():
+                        zipf.write(file, arcname=str(file.relative_to(temp_dir)))
+
+        # 6. Move final ZIP to persistent temp file
+        temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+        temp_zip_path = Path(temp_zip.name)
+        temp_zip.close()
+        shutil.move(new_zip_path, temp_zip_path)
+
+    return FileResponse(
+        temp_zip_path,
+        media_type="application/zip",
+        filename=f"{project.slug}_submissions_json_with_media.zip",
     )
 
 
