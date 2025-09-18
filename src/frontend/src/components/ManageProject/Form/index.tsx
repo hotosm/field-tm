@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
-// import { CustomSelect } from '@/components/common/Select';
 import CoreModules from '@/shared/CoreModules';
-import { FormCategoryService } from '@/api/CreateProjectService';
 import { DownloadProjectForm } from '@/api/Project';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
@@ -25,14 +23,7 @@ const FormUpdate = ({ projectId }) => {
   const [formError, setFormError] = useState(false);
 
   const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
-  // const formExampleList = useAppSelector((state) => state.createproject.formExampleList);
-  // const sortedFormExampleList = formExampleList.slice().sort((a, b) => a.title.localeCompare(b.title));
-  // const selectedCategory = useAppSelector((state) => state.createproject.editProjectDetails.osm_category);
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
-
-  useEffect(() => {
-    dispatch(FormCategoryService(`${API_URL}/central/list-forms`));
-  }, []);
 
   const onSave = () => {
     if (uploadForm?.length === 0) {
@@ -42,7 +33,6 @@ const FormUpdate = ({ projectId }) => {
     dispatch(
       PostFormUpdate(`${API_URL}/central/update-form?project_id=${projectId}`, {
         xformId: xFormId,
-        // osm_category: selectedCategory,
         upload: uploadForm && uploadForm?.[0]?.file,
       }),
     );
