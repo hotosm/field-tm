@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useParams } from 'react-router-dom';
-import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectService';
+import { ValidateCustomForm } from '@/api/CreateProjectService';
 import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
@@ -16,6 +16,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useGetFormListsQuery } from '@/api/central';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,24 +27,23 @@ const UploadSurvey = () => {
   const params = useParams();
   const projectId = params.id ? +params.id : null;
 
-  const formExampleList = useAppSelector((state) => state.createproject.formExampleList);
-  const formCategoryLoading = useAppSelector((state) => state.createproject.formCategoryLoading);
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
   const validateCustomFormLoading = useAppSelector((state) => state.createproject.validateCustomFormLoading);
-  const sortedFormExampleList = formExampleList
-    .slice()
-    .sort((a, b) => a.title.localeCompare(b.title))
-    .map((form) => ({ id: form.id, label: form.title, value: form.id }));
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, control, setValue, formState } = form;
   const { errors } = formState;
   const values = watch();
 
-  // fetch all form categories
-  useEffect(() => {
-    dispatch(FormCategoryService(`${VITE_API_URL}/central/list-forms`));
-  }, []);
+  const { data: formList, isLoading: isGetFormListsLoading } = useGetFormListsQuery({
+    options: { queryKey: ['get-form-lists'], staleTime: 60 * 60 * 1000 },
+  });
+
+  const sortedFormList =
+    formList
+      ?.slice()
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((form) => ({ id: form.id, label: form.title, value: form.id })) || [];
 
   const { getValues } = form;
   const uploadXlsformFile = (file) => {
@@ -88,14 +88,14 @@ const UploadSurvey = () => {
           name="osm_category"
           render={({ field }) => (
             <Select2
-              options={sortedFormExampleList || []}
+              options={sortedFormList || []}
               value={field.value as string}
               choose="label"
               onChange={(value: any) => {
                 field.onChange(value);
               }}
               placeholder="Form Category"
-              isLoading={formCategoryLoading}
+              isLoading={isGetFormListsLoading}
               ref={field.ref}
             />
           )}
