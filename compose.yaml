@@ -511,6 +511,8 @@ services:
       - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
       - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
       - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+    ports:
+      - "5435:5432"
     networks:
       - fmtm-net
     restart: "unless-stopped"
