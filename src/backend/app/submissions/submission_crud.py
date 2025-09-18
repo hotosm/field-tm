@@ -203,7 +203,6 @@ async def download_submission_in_json(
             Path(temp_dir) / f"{project.slug}_submissions_json_with_media.zip"
         )
         with zipfile.ZipFile(new_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            
             zipf.write(json_path, arcname=json_path.name)
 
             # Add media folder if exists
