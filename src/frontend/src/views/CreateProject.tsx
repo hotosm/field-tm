@@ -29,7 +29,6 @@ import { CreateDraftProjectService, CreateProjectService, DeleteProjectService }
 import { defaultValues } from '@/components/CreateProject/constants/defaultValues';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
 import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
@@ -55,10 +54,6 @@ const CreateProject = () => {
   const projectId = params.id ? +params.id : null;
   const [searchParams, setSearchParams] = useSearchParams();
   const step = Number(searchParams.get('step'));
-
-  const resetReduxState = () => {
-    dispatch(CreateProjectActions.SetCustomFileValidity(false));
-  };
 
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
@@ -90,10 +85,6 @@ const CreateProject = () => {
       setSearchParams({ step: '1' });
     }
   }, []);
-
-  useEffect(() => {
-    resetReduxState();
-  }, [projectId]);
 
   useEffect(() => {
     if (!minimalProjectDetails || !projectId) return;

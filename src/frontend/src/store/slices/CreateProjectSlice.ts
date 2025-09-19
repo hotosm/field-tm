@@ -32,16 +32,8 @@ export const initialState: CreateProjectStateTypes = {
   GenerateProjectFilesLoading: false,
   organisationList: [],
   organisationListLoading: false,
-  dividedTaskLoading: false,
   formUpdateLoading: false,
-  taskSplittingGeojsonLoading: false,
-  taskSplittingGeojson: null,
-  createProjectValidations: {},
-  isUnsavedChanges: false,
-  customFileValidity: false,
   isProjectDeletePending: false,
-  splitGeojsonBySquares: null,
-  splitGeojsonByAlgorithm: null,
   basicProjectDetailsLoading: false,
   basicProjectDetails: null,
 };
@@ -68,12 +60,6 @@ const CreateProject = createSlice({
     GetOrganisationListLoading(state, action: PayloadAction<boolean>) {
       state.organisationListLoading = action.payload;
     },
-    SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonBySquares']>) {
-      state.splitGeojsonBySquares = action.payload;
-    },
-    SetDividedTaskFromGeojsonLoading(state, action: PayloadAction<boolean>) {
-      state.dividedTaskLoading = action.payload;
-    },
     SetIndividualProjectDetails(state, action) {
       state.editProjectDetails = action.payload;
     },
@@ -88,15 +74,6 @@ const CreateProject = createSlice({
     },
     SetPostFormUpdateLoading(state, action: PayloadAction<boolean>) {
       state.formUpdateLoading = action.payload;
-    },
-    GetTaskSplittingPreviewLoading(state, action: PayloadAction<boolean>) {
-      state.taskSplittingGeojsonLoading = action.payload;
-    },
-    GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonByAlgorithm']>) {
-      state.splitGeojsonByAlgorithm = action.payload;
-    },
-    SetCustomFileValidity(state, action: PayloadAction<boolean>) {
-      state.customFileValidity = action.payload;
     },
     SetProjectDeletePending(state, action: PayloadAction<boolean>) {
       state.isProjectDeletePending = action.payload;

@@ -376,70 +376,6 @@ const GetIndividualProjectDetails = (url: string) => {
   };
 };
 
-const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
-    dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true));
-
-    const getDividedTaskFromGeojson = async (url: string, projectData: Record<string, any>) => {
-      try {
-        const dividedTaskFormData = new FormData();
-        dividedTaskFormData.append('project_geojson', projectData.geojson);
-        dividedTaskFormData.append('dimension_meters', projectData.dimension);
-        const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
-        const resp: splittedGeojsonType = getGetDividedTaskFromGeojsonResponse.data;
-        dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
-      }
-    };
-
-    await getDividedTaskFromGeojson(url, projectData);
-  };
-};
-
-const TaskSplittingPreviewService = (
-  url: string,
-  projectAoiFile: any,
-  no_of_buildings: number,
-  dataExtractFile: any,
-) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
-
-    const getTaskSplittingGeojson = async (url: string, projectAoiFile: any, dataExtractFile: any) => {
-      try {
-        const taskSplittingFileFormData = new FormData();
-        taskSplittingFileFormData.append('project_geojson', projectAoiFile);
-        taskSplittingFileFormData.append('no_of_buildings', no_of_buildings.toString());
-        // Only include data extract if custom extract uploaded
-        if (dataExtractFile) {
-          taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
-        }
-
-        const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
-        const resp: splittedGeojsonType = getTaskSplittingResponse.data;
-        if (resp?.features && resp?.features.length < 1) {
-          // Don't update geometry if splitting failed
-          // TODO display error to user, perhaps there is not osm data here?
-          return;
-        }
-        dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'Task generation failed. Please try again',
-          }),
-        );
-      } finally {
-        dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
-      }
-    };
-
-    await getTaskSplittingGeojson(url, projectAoiFile, dataExtractFile);
-  };
-};
 const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(true));
@@ -564,8 +500,6 @@ export {
   GenerateProjectFilesService,
   UploadXlsformService,
   OrganisationService,
-  GetDividedTaskFromGeojson,
-  TaskSplittingPreviewService,
   GetIndividualProjectDetails,
   PatchProjectDetails,
   PostFormUpdate,
