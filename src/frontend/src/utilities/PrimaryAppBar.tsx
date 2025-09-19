@@ -25,6 +25,7 @@ export default function PrimaryAppBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const pathname = location.pathname;
   const { type, windowSize } = windowDimention();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -44,6 +45,38 @@ export default function PrimaryAppBar() {
       );
     }
   };
+
+  const navItems = [
+    {
+      title: 'Explore Projects',
+      path: '/explore',
+      active: pathname === '/explore',
+      isVisible: true,
+      externalLink: false,
+    },
+    {
+      title: 'Organizations',
+      path: '/organization',
+      active: pathname === '/organization',
+      isVisible: !!authDetails,
+      externalLink: false,
+    },
+    {
+      title: 'Manage Users',
+      path: '/manage/user',
+      active: pathname === '/manage/user',
+      isVisible: isAdmin,
+      externalLink: false,
+    },
+    { title: 'Learn', path: 'https://hotosm.github.io/field-tm', active: false, isVisible: true, externalLink: true },
+    {
+      title: 'Support',
+      path: 'https://github.com/hotosm/field-tm/issues/',
+      active: false,
+      isVisible: true,
+      externalLink: true,
+    },
+  ];
 
   return (
     <>
@@ -72,36 +105,21 @@ export default function PrimaryAppBar() {
           <h3 className="fmtm-text-red-medium fmtm-text-xl">Field-TM</h3>
         </div>
         <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
-          <Link
-            to="/explore"
-            className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-              location.pathname === '/explore' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
-            } fmtm-border-b-2`}
-          >
-            Explore Projects
-          </Link>
-          {authDetails && (
-            <>
+          {navItems.map((navItem) => {
+            if (!navItem.isVisible) return null;
+            return (
               <Link
-                to="/organization"
+                to={navItem.path}
+                key={navItem.path}
+                target={navItem.externalLink ? '_blank' : undefined}
                 className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-                  location.pathname === '/organization' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+                  navItem.active ? 'fmtm-border-red-medium' : 'fmtm-border-white'
                 } fmtm-border-b-2`}
               >
-                Organizations
+                {navItem.title}
               </Link>
-              {isAdmin && (
-                <Link
-                  to="/manage/user"
-                  className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-                    location.pathname === '/manage/user' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
-                  } fmtm-border-b-2`}
-                >
-                  Manage Users
-                </Link>
-              )}
-            </>
-          )}
+            );
+          })}
         </div>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
           {authDetails ? (
