@@ -10,20 +10,11 @@ export type CreateProjectStateTypes = {
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
   GenerateProjectFilesLoading: boolean;
-  organisationList: OrganisationListTypes[];
-  organisationListLoading: boolean;
   formUpdateLoading: boolean;
   customFileValidity: boolean;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;
-  basicProjectDetailsLoading: boolean;
-  basicProjectDetails:
-    | ({ id: number } & Pick<
-        ProjectDetailsTypes,
-        'name' | 'short_description' | 'description' | 'organisation_id' | 'outline' | 'hashtags'
-      >)
-    | null;
 };
 
 export type GeometryTypes = {

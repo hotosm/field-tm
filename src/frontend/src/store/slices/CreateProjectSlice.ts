@@ -30,12 +30,8 @@ export const initialState: CreateProjectStateTypes = {
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
   GenerateProjectFilesLoading: false,
-  organisationList: [],
-  organisationListLoading: false,
   formUpdateLoading: false,
   isProjectDeletePending: false,
-  basicProjectDetailsLoading: false,
-  basicProjectDetails: null,
 };
 
 const CreateProject = createSlice({
@@ -54,12 +50,6 @@ const CreateProject = createSlice({
     GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
       state.GenerateProjectFilesLoading = action.payload;
     },
-    GetOrganisationList(state, action: PayloadAction<CreateProjectStateTypes['organisationList']>) {
-      state.organisationList = action.payload;
-    },
-    GetOrganisationListLoading(state, action: PayloadAction<boolean>) {
-      state.organisationListLoading = action.payload;
-    },
     SetIndividualProjectDetails(state, action) {
       state.editProjectDetails = action.payload;
     },
@@ -77,27 +67,6 @@ const CreateProject = createSlice({
     },
     SetProjectDeletePending(state, action: PayloadAction<boolean>) {
       state.isProjectDeletePending = action.payload;
-    },
-    GetBasicProjectDetailsLoading(state, action: PayloadAction<boolean>) {
-      state.basicProjectDetailsLoading = action.payload;
-    },
-    SetBasicProjectDetails(
-      state,
-      action: PayloadAction<
-        | ({ id: number } & Pick<
-            ProjectDetailsTypes,
-            | 'name'
-            | 'short_description'
-            | 'description'
-            | 'organisation_id'
-            | 'outline'
-            | 'hashtags'
-            | 'organisation_name'
-          >)
-        | null
-      >,
-    ) {
-      state.basicProjectDetails = action.payload;
     },
   },
 });
