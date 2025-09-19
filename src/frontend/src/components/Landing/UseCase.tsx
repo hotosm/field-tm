@@ -34,7 +34,7 @@ const UseCase = () => {
         alt="Field mapping in tokha"
       />
       <div className="fmtm-flex-1">
-        <h4 className="fmtm-mb-3">FIELD-TM USE CASES</h4>
+        <h4 className="fmtm-mb-3">Field-TM Use Cases</h4>
         <div>
           <Accordion type="single" collapsible defaultValue="item-0">
             {useCaseList.map((useCase, index) => (
