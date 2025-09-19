@@ -17,6 +17,7 @@ import type {
   taskSplitPayloadType,
   uploadProjectTaskBoundariesPayloadType,
   updateProjectPayloadType,
+  entitiesMappingStatusPayloadType,
 } from '@/api/project/types';
 
 export const patchCreateProject = (payload: createProjectPayloadType, params: { project_id: number }) =>
@@ -33,7 +34,7 @@ export const getOdkEntitiesMappingStatuses = (project_id: number) =>
 export const getTilesList = (id: number) => api.get(`/projects/${id}/tiles`);
 
 export const downloadFeatures = (params: downloadFeaturesParamsType) =>
-  api.get('/projects/features/download', { params });
+  api.get('/projects/features/download', { params, responseType: 'blob' });
 
 export const getContributors = (project_id: number) => api.get(`/projects/contributors/${project_id}`);
 
@@ -75,10 +76,14 @@ export const getProjectMinimal = (project_id: number) => api.get(`/projects/${pr
 
 export const downloadProjectBoundary = (project_id: number) => api.get(`/projects/${project_id}/download`);
 
-export const downloadTaskBoundaries = (project_id: number) => api.get(`/projects/${project_id}/download_tasks`);
+export const downloadTaskBoundaries = (project_id: number) =>
+  api.get(`/projects/${project_id}/download_tasks`, { responseType: 'blob' });
 
 export const deleteEntity = (entity_uuid: string, params: deleteEntityParamsType) =>
   api.delete(`/projects/entity/${entity_uuid}`, { params });
 
 export const unassignUserFromProject = (project_id: number, user_sub: string) =>
   api.delete(`/projects/${project_id}/users/${user_sub}`);
+
+export const setEntitiesMappingStatus = (project_id: number, payload: entitiesMappingStatusPayloadType) =>
+  api.post(`/projects/${project_id}/entity/status`, payload);

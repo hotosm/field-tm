@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
 import CoreModules from '@/shared/CoreModules';
-import { DownloadProjectForm } from '@/api/Project';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useDownloadFormQuery } from '@/api/central';
+import { downloadBlobData } from '@/utilfunctions';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -38,6 +40,39 @@ const FormUpdate = ({ projectId }) => {
     );
   };
 
+  const {
+    data: formBlobData,
+    isSuccess: isDownloadFormSuccess,
+    error: downloadFormError,
+    isLoading: isDownloadFormLoading,
+    refetch: downloadForm,
+  } = useDownloadFormQuery({
+    params: { project_id: +projectId },
+    options: { queryKey: ['get-download-form', +projectId], enabled: false },
+  });
+
+  useEffect(() => {
+    if (isDownloadFormSuccess && formBlobData) {
+      downloadBlobData(formBlobData, `project_form_${projectId}`, 'xlsx');
+    }
+  }, [isDownloadFormSuccess, formBlobData]);
+
+  useEffect(() => {
+    const handleBlobErrorResponse = async (blob: Blob | undefined) => {
+      if (!blob) return;
+      const errorMsg = JSON.parse(await blob?.text())?.detail;
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: errorMsg || 'Failed to download',
+        }),
+      );
+    };
+
+    if (downloadFormError) {
+      handleBlobErrorResponse(downloadFormError?.response?.data);
+    }
+  }, [downloadFormError]);
+
   return (
     <div className="fmtm-relative fmtm-flex fmtm-flex-col fmtm-w-full fmtm-h-full fmtm-bg-white">
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex fmtm-flex-col fmtm-gap-y-5 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
@@ -46,12 +81,9 @@ const FormUpdate = ({ projectId }) => {
           <p className="fmtm-text-base fmtm-mt-2">
             Please{' '}
             <a
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-              onClick={() =>
-                dispatch(
-                  DownloadProjectForm(`${API_URL}/central/download-form?project_id=${projectId}`, 'form', projectId),
-                )
-              }
+              className={`fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline ${isDownloadFormLoading && 'fmtm-pointer-events-none fmtm-cursor-not-allowed'}`}
+              onClick={() => downloadForm()}
+              aria-disabled={isDownloadFormLoading}
             >
               download
             </a>{' '}

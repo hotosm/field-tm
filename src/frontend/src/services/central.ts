@@ -9,4 +9,5 @@ export const uploadProjectXlsform = (payload: FormData, params: { project_id: nu
 export const updateProjectForm = (payload: updateProjectFormPayloadType, params: { project_id: number }) =>
   api.post('/central/update-form', payload, { params });
 
-export const downloadForm = (params: { project_id: number }) => api.get('/central/download-form', { params });
+export const downloadForm = (params: { project_id: number }) =>
+  api.get('/central/download-form', { params, responseType: 'blob' });

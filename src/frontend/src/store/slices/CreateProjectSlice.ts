@@ -1,4 +1,4 @@
-import { CreateProjectStateTypes, ProjectDetailsTypes } from '@/store/types/ICreateProject';
+import { CreateProjectStateTypes } from '@/store/types/ICreateProject';
 import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -29,7 +29,6 @@ export const initialState: CreateProjectStateTypes = {
   createProjectLoading: false,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  GenerateProjectFilesLoading: false,
   formUpdateLoading: false,
   isProjectDeletePending: false,
 };
@@ -46,9 +45,6 @@ const CreateProject = createSlice({
     },
     PostProjectDetails(state, action) {
       state.projectDetailsResponse = action.payload;
-    },
-    GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
-      state.GenerateProjectFilesLoading = action.payload;
     },
     SetIndividualProjectDetails(state, action) {
       state.editProjectDetails = action.payload;

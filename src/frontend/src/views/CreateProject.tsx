@@ -329,7 +329,7 @@ const CreateProject = () => {
             <Button
               variant="secondary-grey"
               onClick={saveProject}
-              disabled={createProjectLoading || basicProjectDetailsLoading || isProjectDeleting}
+              disabled={createProjectLoading || isProjectDeletePending}
             >
               <AssetModules.SaveIcon className="!fmtm-text-base" />
               Save
@@ -337,7 +337,7 @@ const CreateProject = () => {
           )} */}
           <AssetModules.CloseIcon
             className="!fmtm-text-xl hover:fmtm-text-red-medium fmtm-cursor-pointer"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/explore')}
           />
         </div>
       </div>

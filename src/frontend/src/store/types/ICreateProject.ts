@@ -9,7 +9,6 @@ export type CreateProjectStateTypes = {
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  GenerateProjectFilesLoading: boolean;
   formUpdateLoading: boolean;
   customFileValidity: boolean;
   task_num_buildings: number | null;
