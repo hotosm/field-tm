@@ -80,11 +80,6 @@ export default function PrimaryAppBar() {
 
   return (
     <>
-      {/* mapping header */}
-      <div className="fmtm-px-5 fmtm-py-1">
-        <p className="fmtm-body-sm-semibold fmtm-text-primaryRed">Mapping our world together</p>
-      </div>
-      {/* navigation bar */}
       <LoginPopup />
       <DrawerComponent
         open={open}
