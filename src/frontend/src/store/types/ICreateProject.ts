@@ -12,16 +12,11 @@ export type CreateProjectStateTypes = {
   GenerateProjectFilesLoading: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
-  dividedTaskLoading: boolean;
   formUpdateLoading: boolean;
-  taskSplittingGeojsonLoading: boolean;
-  createProjectValidations: {};
   customFileValidity: boolean;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;
-  splitGeojsonBySquares: splittedGeojsonType | null;
-  splitGeojsonByAlgorithm: splittedGeojsonType | null;
   basicProjectDetailsLoading: boolean;
   basicProjectDetails:
     | ({ id: number } & Pick<
