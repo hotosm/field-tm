@@ -20,7 +20,6 @@ import Switch from '@/components/common/Switch';
 import Button from '@/components/common/Button';
 import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useGenerateDataExtractMutation } from '@/api/project';
 
@@ -52,7 +51,6 @@ const MapData = () => {
       return;
     }
     if (values.splitGeojsonByAlgorithm) {
-      dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
       setValue('splitGeojsonByAlgorithm', null);
     }
 
@@ -84,7 +82,6 @@ const MapData = () => {
     setValue('customDataExtractFile', null);
     setValue('dataExtractGeojson', null);
     if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
-      dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
       setValue('task_split_type', null);
       setValue('splitGeojsonByAlgorithm', null);
     }
@@ -132,7 +129,6 @@ const MapData = () => {
         );
       }
       if (values.splitGeojsonByAlgorithm) {
-        dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
         setValue('splitGeojsonByAlgorithm', null);
       }
       setFetchingOSMData(false);
