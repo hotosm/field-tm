@@ -63,8 +63,7 @@ export const getProject = (project_id: number) => api.get(`/projects/${project_i
 export const updateProject = (project_id: number, payload: updateProjectPayloadType) =>
   api.patch(`/projects/${project_id}`, payload);
 
-export const deleteProject = (project_id: number, params: { org_id: number }) =>
-  api.delete(`/projects/${project_id}`, { params });
+export const deleteProject = (project_id: number) => api.delete(`/projects/${project_id}`);
 
 export const uploadProjectTaskBoundaries = (project_id: number, payload: uploadProjectTaskBoundariesPayloadType) =>
   api.post(`/projects/${project_id}/upload-task-boundaries`, payload);

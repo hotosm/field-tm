@@ -1,12 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getFormLists, uploadProjectXlsform, updateProjectForm, downloadForm } from '@/services/central';
 import type { TQueryOptions, TMutationOptions } from '@/types';
-import type {
-  formType,
-  updateProjectFormPayloadType,
-  uploadXlsformParamsType,
-  uploadXlsformPayloadType,
-} from './types';
+import type { formType, updateProjectFormPayloadType, uploadXlsformParamsType } from './types';
 
 export function useGetFormListsQuery({ options }: { options: TQueryOptions<formType[]> }) {
   return useQuery({

@@ -230,17 +230,9 @@ export const useUpdateProjectMutation = ({
     ...options,
   });
 
-export const useDeleteProjectMutation = ({
-  project_id,
-  params,
-  options,
-}: {
-  project_id: number;
-  params: { org_id: number };
-  options: TMutationOptions<any, any>;
-}) =>
+export const useDeleteProjectMutation = (options: TMutationOptions<any, { project_id: number }>) =>
   useMutation({
-    mutationFn: () => deleteProject(project_id, params),
+    mutationFn: ({ project_id }) => deleteProject(project_id),
     ...options,
   });
 
