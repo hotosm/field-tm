@@ -27,6 +27,7 @@ volumes:
   central_frontend:
   qfield_db_data:
   qfield_static:
+  qfield_projects:
 
 networks:
   fmtm-net:
@@ -141,6 +142,7 @@ services:
     # tty: true
     volumes:
       - fmtm_logs:/opt/logs
+      - qfield_projects:/opt/qfield
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
@@ -236,7 +238,6 @@ services:
       - ./src/mapper/vite.config.ts:/app/vite.config.ts
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
-      - TEST_PWA=${TEST_PWA:-false}
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
@@ -245,8 +246,7 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    command: >
-      sh -c "if [ \"$TEST_PWA\" = \"true\" ]; then pnpm run build && pnpm run preview; else pnpm run dev; fi"
+    command: pnpm run dev
 
   central:
     profiles: ["", "central"]
@@ -604,3 +604,15 @@ services:
           --max-requests 300 \
           --workers 1 \
           --threads 4
+
+  qfield-qgis:
+    image: "ghcr.io/hotosm/field-tm/qgis:25.24"
+    build: qfield
+    volumes:
+      - qfield_projects:/opt/qfield
+      - ./qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
+    environment:
+      LOG_LEVEL: DEBUG
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
