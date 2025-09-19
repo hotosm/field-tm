@@ -6,6 +6,7 @@ import logging
 import json
 import traceback
 import atexit
+import shutil
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Optional, Dict, Any
 from pathlib import Path
@@ -164,16 +165,18 @@ def install_logger_hook(qgis_app: Any, log: logging.Logger) -> None:
         log.warning(f"Failed to install logger hook: {e}")
 
 
-def validate_geometry_file(file_path: Path) -> bool:
+def validate_geometry_file(file_path: Path, log: logging.Logger) -> bool:
     """Validate that geometry file exists and is readable."""
     if not file_path.exists():
+        log.error(f"File does not exist: {file_path}")
         return False
     
     try:
         from qgis.core import QgsVectorLayer
-        layer = QgsVectorLayer(str(file_path), "test", "ogr")
+        layer = QgsVectorLayer(str(file_path), "layer", "ogr")
         return layer.isValid() and layer.featureCount() > 0
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -195,12 +198,12 @@ def analyse_and_fix_geometries(input_geojson_path: str, log: logging.Logger) -> 
     from qgis import processing
     
     input_file = Path(input_geojson_path)
-    if not validate_geometry_file(input_file):
+    if not validate_geometry_file(input_file, log):
         raise FileNotFoundError(f"Invalid or empty geometry file: {input_file}")
     
     output_dir = input_file.parent
-    fixed_geojson = output_dir / "features_valid.geojson"
-    fixed_gpkg = output_dir / "features_valid.gpkg"
+    fixed_geojson = output_dir / f"{input_file.stem}_valid.geojson"
+    fixed_gpkg = output_dir / f"{input_file.stem}_valid.gpkg"
 
     try:
         log.info("Analysing geometries by type...")
@@ -299,6 +302,83 @@ def parse_and_validate_extent(extent_str: str) -> list[float]:
     except (ValueError, AttributeError) as e:
         raise ValueError(f"Invalid extent format: {e}")
 
+def set_project_file_permissions(project_path: str | Path) -> None:
+    """Set permissive 777 permissions for upstream file access."""
+    project_path = Path(project_path)
+    for file_path in project_path.iterdir():
+        file_path.chmod(0o777)
+    for file_path in (project_path / "final").iterdir():
+        file_path.chmod(0o777)
+
+
+def xlsform_to_project(final_output_dir: Path, features_gpkg_path: str, extent_bbox: list[float], title: str, language: str, log: logging.Logger):
+    """Using a defined XLSForm create a project via xlsformconverter."""
+    from qgis.core import (
+        QgsCoordinateReferenceSystem,
+        QgsReferencedRectangle,
+        QgsRectangle,
+        QgsVectorLayer,
+    )
+
+    project_path = final_output_dir.parent
+
+    # Check XLSForm file
+    xlsform_path = project_path / "xlsform.xlsx"
+    if not xlsform_path.exists():
+        raise FileNotFoundError(f"XLSForm file not found: {xlsform_path}")
+    
+    # Generate project
+    final_output_dir = project_path / "final"
+    final_output_dir.mkdir(mode=0o777, exist_ok=True)
+    crs = QgsCoordinateReferenceSystem("EPSG:4326")
+    extent_rect = QgsReferencedRectangle(QgsRectangle(*extent_bbox), crs)
+    features_layer = QgsVectorLayer(features_gpkg_path, "features_valid", "ogr")
+    if not features_layer.isValid():
+        raise RuntimeError(f"Failed to load vector layer from {features_gpkg_path}")
+
+    # FIXME running via processing didn't work!
+    # FIXME Issue: Project generation failed: Error creating algorithm from createInstance()
+    # params = {
+    #     "INPUT": str(xlsform_path),
+    #     "TITLE": title,
+    #     "LANGUAGE": language,
+    #     "BASEMAP": 0,
+    #     "GROUPS_AS_TABS": True,
+    #     "UPLOAD_TO_QFIELDCLOUD": False,
+    #     "CRS": crs,
+    #     "EXTENT": f"{extent} [EPSG:4326]",
+    #     "GEOMETRIES": f"{features_gpkg_path}|layername=features_valid",
+    #     "OUTPUT": str(final_output_dir),
+    # }
+    # log.info(f"Generating QGIS project with params: {params}")
+    # result = processing.run("xlsformconverter:xlsformconverter", params)
+    # log.info(f"Project generated: {result['OUTPUT']}")
+
+    from xlsformconverter.XLSFormConverter import XLSFormConverter
+    converter = XLSFormConverter(str(xlsform_path))
+
+    if not converter.is_valid():
+        log.error("The provided XLSForm is invalid, aborting.")
+        sys.exit(1)
+    converter.info.connect(lambda message: log.info(message))
+    converter.warning.connect(lambda message: log.warning(message))
+    converter.error.connect(lambda message: log.error(message))
+
+    converter.set_custom_title(title)
+    converter.set_preferred_language(language)
+    converter.set_basemap("OpenStreetMap")
+    converter.set_geometries(features_layer)
+    converter.set_groups_as_tabs(True)
+    converter.set_crs(crs)
+    converter.set_extent(extent_rect)
+    return converter.convert(str(final_output_dir))
+
+
+def configure_project_settings(qgis_project: "qgis.core.QgsProject", log: logging.Logger) -> None:
+    """Configure the QField project for field mapping."""
+    log.info("Configuring QField project settings for field mapping")
+    # qgis_project
+
 
 def generate_qgis_project(project_dir: str, title: str, language: str, extent: str, log: logging.Logger) -> Dict[str, Any]:
     """
@@ -316,12 +396,7 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
     """
     try:
         # from qgis import processing
-        from qgis.core import (
-            QgsCoordinateReferenceSystem,
-            QgsReferencedRectangle,
-            QgsRectangle,
-            QgsVectorLayer,
-        )
+        from qgis.core import QgsProject, QgsVectorLayer
 
         # Validate inputs
         project_path = Path(project_dir)
@@ -330,74 +405,63 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
 
         extent_bbox = parse_and_validate_extent(extent)
  
-        # Process geometries
-        input_geojson = project_path / "features.geojson"
-        gpkg_path = analyse_and_fix_geometries(str(input_geojson), log)
+        # Process feature geometries
+        log.info("Adding feature geometries")
+        features_geojson_path = project_path / "features.geojson"
+        features_gpkg_path = analyse_and_fix_geometries(str(features_geojson_path), log)
         
-        # Check XLSForm file
-        xlsform_path = project_path / "xlsform.xlsx"
-        if not xlsform_path.exists():
-            raise FileNotFoundError(f"XLSForm file not found: {xlsform_path}")
-        
-        # Generate project
+        # XLSForm --> QGIS project
+        log.info("Converting XLSForm --> project")
         final_output_dir = project_path / "final"
-        final_output_dir.mkdir(mode=0o777, exist_ok=True)
-        crs = QgsCoordinateReferenceSystem("EPSG:4326")
-        extent_rect = QgsReferencedRectangle(QgsRectangle(*extent_bbox), crs)
-        features_layer = QgsVectorLayer(gpkg_path, "features_valid", "ogr")
-        if not features_layer.isValid():
-            raise RuntimeError(f"Failed to load vector layer from {gpkg_path}")
+        project_file = xlsform_to_project(final_output_dir, features_gpkg_path, extent_bbox, title, language, log)
 
-        # FIXME running via processing didn't work!
-        # FIXME Issue: Project generation failed: Error creating algorithm from createInstance()
-        # params = {
-        #     "INPUT": str(xlsform_path),
-        #     "TITLE": title,
-        #     "LANGUAGE": language,
-        #     "BASEMAP": 0,
-        #     "GROUPS_AS_TABS": True,
-        #     "UPLOAD_TO_QFIELDCLOUD": False,
-        #     "CRS": crs,
-        #     "EXTENT": f"{extent} [EPSG:4326]",
-        #     "GEOMETRIES": f"{gpkg_path}|layername=features_valid",
-        #     "OUTPUT": str(final_output_dir),
-        # }
-        # log.info(f"Generating QGIS project with params: {params}")
-        # result = processing.run("xlsformconverter:xlsformconverter", params)
-        # log.info(f"Project generated: {result['OUTPUT']}")
+        # Add task geometries to project dir
+        log.info("Adding task geometries")
+        set_project_file_permissions(project_path) # Ensure permissions are permissive
+        tasks_geojson_path = project_path / "tasks.geojson"
+        tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
+        tasks_gpkg_path_final = str(final_output_dir / "tasks.gpkg")
+        log.debug(f"Moving {tasks_gpkg_path_input} --> {tasks_gpkg_path_final}")
+        shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
+        set_project_file_permissions(project_path) # Ensure permissions are permissive
 
-        from xlsformconverter.XLSFormConverter import XLSFormConverter
-        converter = XLSFormConverter(str(xlsform_path))
+        # Add task layer to project
+        log.info("Adding task layer to project, then re-adding survey on top")
+        project = QgsProject.instance()
+        project.clear()
+        project.read(project_file)
 
-        if not converter.is_valid():
-            log.error("The provided XLSForm is invalid, aborting.")
-            sys.exit(1)
-        converter.info.connect(lambda message: log.info(message))
-        converter.warning.connect(lambda message: log.warning(message))
-        converter.error.connect(lambda message: log.error(message))
+        # Add the task layer, then ensure the survey layer is on top
+        task_layer = QgsVectorLayer(tasks_gpkg_path_final, 'tasks', 'ogr')
+        project.addMapLayer(task_layer)
+        # Find the 'survey' layer
+        survey_layers = project.mapLayersByName("survey")
+        if survey_layers:
+            survey_layer = survey_layers[0]
+            layer_root = project.layerTreeRoot()
+            survey_node = layer_root.findLayer(survey_layer.id())
+            if survey_node:
+                parent = survey_node.parent()
+                # Get current index
+                current_index = parent.children().index(survey_node)
+                if current_index != 0:
+                    # Move survey layer to the top by re-inserting via insertLayer
+                    parent.insertLayer(0, survey_layer)
+                    parent.removeChildNode(survey_node)
 
-        converter.set_custom_title(title)
-        converter.set_preferred_language(language)
-        converter.set_basemap("OpenStreetMap")
-        converter.set_geometries(features_layer)
-        converter.set_groups_as_tabs(True)
-        converter.set_crs(crs)
-        converter.set_extent(extent_rect)
-        project_file = converter.convert(str(final_output_dir))
+        # Finalise the project
+        project.write()
 
-        # Ensure permissions are permissive for deletion upstream
-        for file_path in project_path.iterdir():
-            file_path.chmod(0o777)
-        for file_path in final_output_dir.iterdir():
-            file_path.chmod(0o777)
+        # TODO configure project settings
+        configure_project_settings(project, log)
 
         return {
             "status": "success",
             "message": "QGIS project generated successfully",
             # "output": result['OUTPUT']
-            "output": project_file,
+            "output": str(final_output_dir),
         }
-        
+
     except Exception as e:
         log.error(f"Project generation failed: {e}")
         return {

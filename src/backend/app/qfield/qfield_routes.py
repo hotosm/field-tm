@@ -21,6 +21,7 @@ import json
 import logging
 import shutil
 from pathlib import Path
+from random import getrandbits
 from typing import Annotated
 from uuid import uuid4
 
@@ -36,7 +37,7 @@ from app.auth.roles import ProjectManager
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.projects.project_crud import get_project_features_geojson
+from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
@@ -79,28 +80,33 @@ async def create_project(
 
     xlsform = project.xlsform_content
     features_geojson = await get_project_features_geojson(db, project)
+    tasks_geojson = await get_task_geometry(db, project.id)
 
     # Write files locally for QGIS job
     xlsform_path = job_dir / "xlsform.xlsx"
     with open(xlsform_path, "wb") as f:
         f.write(xlsform)
 
-    geojson_path = job_dir / "features.geojson"
-    with open(geojson_path, "w") as f:
+    features_geojson_path = job_dir / "features.geojson"
+    with open(features_geojson_path, "w") as f:
         json.dump(features_geojson, f)
 
-    # TODO get task areas too
+    tasks_geojson_path = job_dir / "tasks.geojson"
+    with open(tasks_geojson_path, "w") as f:
+        json.dump(json.loads(tasks_geojson), f)
+
     # TODO ensure xlsform has geometry field, if not add in
 
     # 1. Create QGIS project via internal API
     qgis_container_url = "http://qfield-qgis:8080"
+    project_name = f"field-tm-{project.name}-{getrandbits(32)}"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
     async with AsyncClient() as client_httpx:
         response = await client_httpx.post(
             f"{qgis_container_url}/",
             json={
                 "project_dir": str(job_dir),
-                "title": project.name,
+                "title": project_name,
                 "language": language,
                 "extent": bbox_str,
             },
@@ -127,7 +133,7 @@ async def create_project(
 
     # Ensure output file exists
     final_project_file = Path(
-        f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{project.name}.qgz"
+        f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{project_name}.qgz"
     )
     if not final_project_file.exists():
         raise HTTPException(
@@ -138,7 +144,7 @@ async def create_project(
     # 2. Create QFieldCloud project
     async with qfield_client() as client:
         qfield_project = client.create_project(
-            f"field-tm-{project.name}",
+            project_name,
             owner="admin",  # FIXME
             description=project.description,
             is_public=True,
