@@ -147,19 +147,15 @@ export const useGetContributorsQuery = ({
     ...options,
   });
 
-export const useTaskSplitMutation = ({ options }: { options: TMutationOptions<any, taskSplitPayloadType> }) =>
+export const useTaskSplitMutation = (options: TMutationOptions<any, { payload: FormData }>) =>
   useMutation({
-    mutationFn: (payload: taskSplitPayloadType) => taskSplit(payload),
+    mutationFn: ({ payload }) => taskSplit(payload),
     ...options,
   });
 
-export const usePreviewSplitBySquareMutation = ({
-  options,
-}: {
-  options: TMutationOptions<any, previewSplitBySquarePayload>;
-}) =>
+export const usePreviewSplitBySquareMutation = (options: TMutationOptions<any, { payload: FormData }>) =>
   useMutation({
-    mutationFn: (payload: previewSplitBySquarePayload) => previewSplitBySquare(payload),
+    mutationFn: ({ payload }) => previewSplitBySquare(payload),
     ...options,
   });
 
