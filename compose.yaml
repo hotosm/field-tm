@@ -163,6 +163,10 @@ services:
       central:
         condition: service_healthy
         required: false
+      qfield-app:
+        condition: service_healthy
+      qfield-qgis:
+        condition: service_healthy
       migrations:
         condition: service_completed_successfully
       s3:
@@ -537,7 +541,7 @@ services:
       DEBUG: 1
       ENVIRONMENT: development
       QFIELDCLOUD_HOST: qfield.fmtm.localhost
-      DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
+      DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_EMAIL: admin@hotosm.org
       DJANGO_SUPERUSER_PASSWORD: Password1234
@@ -604,6 +608,12 @@ services:
           --max-requests 300 \
           --workers 1 \
           --threads 4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"
@@ -616,3 +626,9 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      start_period: 10s
+      interval: 5s
+      retries: 5
+      timeout: 5s
