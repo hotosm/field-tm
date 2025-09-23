@@ -440,7 +440,7 @@ async def modify_form_for_qfield(
         if "::" in col_name:
             form_languages.append(col_name)
     form_language = form_languages[0].split("::")[1] if form_languages else None
-    if total_languages := len(form_languages) > 1:
+    if (total_languages := len(form_languages)) > 1:
         log.warning(
             f"Found {total_languages} form translations, but only the first will "
             f"be used {form_language}"

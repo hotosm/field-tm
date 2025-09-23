@@ -26,7 +26,6 @@ from random import getrandbits
 from uuid import uuid4
 
 from fastapi.exceptions import HTTPException
-from fastapi.responses import JSONResponse
 from httpx import AsyncClient
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
@@ -60,7 +59,7 @@ async def create_qfield_project(
 
     # NOTE xlsform_content is the already processed ODK-ready form,
     # NOTE so we modify this as needed
-    form_language, xlsform = await modify_form_for_qfield(
+    form_language, final_form = await modify_form_for_qfield(
         BytesIO(project.xlsform_content),
         geom_layer_type=project.primary_geom_type,
     )
@@ -70,7 +69,7 @@ async def create_qfield_project(
     # Write files locally for QGIS job
     xlsform_path = job_dir / "xlsform.xlsx"
     with open(xlsform_path, "wb") as f:
-        f.write(xlsform)
+        f.write(final_form.getvalue())
 
     features_geojson_path = job_dir / "features.geojson"
     with open(features_geojson_path, "w") as f:
@@ -161,12 +160,7 @@ async def create_qfield_project(
                 detail=(f"Failed to upload files to project {qfield_project_id}: {e}"),
             ) from e
 
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content={
-            "url": (
-                f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
-                f"/a/{qfield_project_owner}/{qfield_project_name}"
-            )
-        },
+    return (
+        f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
+        f"/a/{qfield_project_owner}/{qfield_project_name}"
     )
