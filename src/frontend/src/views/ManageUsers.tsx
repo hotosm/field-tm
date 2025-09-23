@@ -124,7 +124,7 @@ const ManageUsers = () => {
     },
   ];
 
-  const [filter, setFilter] = useState({ search: '', pageIndex: 0, pageSize: 1 });
+  const [filter, setFilter] = useState({ search: '', pageIndex: 0, pageSize: 13 });
 
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 500,
