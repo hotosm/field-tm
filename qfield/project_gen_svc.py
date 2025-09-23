@@ -336,8 +336,9 @@ def xlsform_to_project(final_output_dir: Path, features_gpkg_path: str, extent_b
     if not features_layer.isValid():
         raise RuntimeError(f"Failed to load vector layer from {features_gpkg_path}")
 
-    # FIXME running via processing didn't work!
+    # FIXME running via QGIS processing didn't work!
     # FIXME Issue: Project generation failed: Error creating algorithm from createInstance()
+    # FIXME instead we import the converter algorithm directly below
     # params = {
     #     "INPUT": str(xlsform_path),
     #     "TITLE": title,

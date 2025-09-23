@@ -24,7 +24,7 @@ import re
 from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
-from osm_fieldwork.update_xlsform import append_field_mapping_fields
+from osm_fieldwork.update_xlsform import append_odk_mapping_fields
 from osm_fieldwork.xlsforms import buildings, healthcare
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 
@@ -36,7 +36,7 @@ async def test_merge_mandatory_fields():
     with open(test_form, "rb") as xlsform:
         form_bytes = BytesIO(xlsform.read())
 
-    xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
+    xformid, updated_form = await append_odk_mapping_fields(form_bytes, "buildings")
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
     # Write merged xlsform to file for debugging
     with open("merged_xlsform.xlsx", "wb") as merged_xlsform:
@@ -59,7 +59,7 @@ async def test_add_extra_select_from_file():
     with open(test_form, "rb") as xlsform:
         form_bytes = BytesIO(xlsform.read())
 
-    xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings", additional_entities=["roads", "waterpoints"])
+    xformid, updated_form = await append_odk_mapping_fields(form_bytes, "buildings", additional_entities=["roads", "waterpoints"])
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
 
     survey_sheet = workbook["survey"]
@@ -73,7 +73,7 @@ async def test_buildings_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
     with open(buildings, "rb") as xlsform:
         form_bytes = BytesIO(xlsform.read())
-    xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
+    xformid, updated_form = await append_odk_mapping_fields(form_bytes, "buildings")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
 
@@ -85,7 +85,7 @@ async def test_healthcare_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
     with open(healthcare, "rb") as xlsform:
         form_bytes = BytesIO(xlsform.read())
-    xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
+    xformid, updated_form = await append_odk_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
 

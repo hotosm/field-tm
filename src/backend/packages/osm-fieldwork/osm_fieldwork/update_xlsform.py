@@ -270,7 +270,7 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
     return pd.concat([top_df, additional_row, coordinates_row, bottom_df], ignore_index=True)
 
 
-async def append_field_mapping_fields(
+async def append_odk_mapping_fields(
     custom_form: BytesIO,
     form_name: str = f"fmtm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
@@ -595,7 +595,7 @@ async def main():
     with open(input_file, "rb") as file_handle:
         input_xlsform = BytesIO(file_handle.read())
 
-    form_id, form_bytes = await append_field_mapping_fields(
+    form_id, form_bytes = await append_odk_mapping_fields(
         custom_form=input_xlsform,
         form_name=f"fmtm_{uuid4()}",
         additional_entities=args.additional_dataset_names,
