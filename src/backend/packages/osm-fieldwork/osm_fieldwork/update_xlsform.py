@@ -270,44 +270,15 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
     return pd.concat([top_df, additional_row, coordinates_row, bottom_df], ignore_index=True)
 
 
-async def append_odk_mapping_fields(
-    custom_form: BytesIO,
+async def _process_all_form_tabs(
+    custom_sheets: pd.DataFrame,
     form_name: str = f"fmtm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
     use_odk_collect: bool = False,
-) -> tuple[str, BytesIO]:
-    """Append mandatory fields to the XLSForm for use in Field-TM.
-
-    Args:
-        custom_form (BytesIO): The XLSForm data uploaded, wrapped in BytesIO.
-        form_name (str): The friendly form name in ODK web view.
-        additional_entities (list[str], optional): Add extra select_one_from_file fields to
-            reference additional Entity lists (sets of geometries). Defaults to None.
-        new_geom_type (DbGeomType): The type of geometry required when collecting
-            new geometry data: point, line, polygon. Defaults to DbGeomType.POINT.
-        need_verification_fields (bool): Whether to include verification fields.
-            Defaults to True.
-        use_odk_collect (bool): Whether to use ODK Collect-specific components.
-            Defaults to False.
-
-    Returns:
-        tuple[str, BytesIO]: The xFormId and the updated XLSForm wrapped in BytesIO.
-        
-    Raises:
-        ValueError: If required sheets are missing from the XLSForm.
-    """
-    log.info("Appending field mapping questions to XLSForm")
-
-    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
-    if "survey" not in custom_sheets:
-        msg = "Survey sheet is required in XLSForm!"
-        log.error(msg)
-        raise ValueError(msg)
-    
-    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets)  # Also get the label columns
-
+    label_cols: list[str] = [],
+) -> tuple[str, pd.DataFrame]:
     if "label" in label_cols:
         add_label = False
         digitisation_df = pd.DataFrame([
@@ -374,13 +345,143 @@ async def append_odk_mapping_fields(
     # Handle additional entities if specified
     if additional_entities:
         custom_sheets["survey"] = _add_additional_entities(custom_sheets["survey"], additional_entities)
-    
+
+    return (xform_id, custom_sheets)
+
+
+async def write_xlsform(form_content: pd.DataFrame) -> BytesIO:
+    """Write the dataframe to Excel wrapped in BytesIO object."""
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        for sheet_name, df in custom_sheets.items():
+        for sheet_name, df in form_content.items():
             df.to_excel(writer, sheet_name=sheet_name, index=False)
     output.seek(0)
-    return (xform_id, output)
+    return output
+
+
+async def append_field_mapping_fields(
+    custom_form: BytesIO,
+    form_name: str = f"fmtm_{uuid4()}",
+    additional_entities: Optional[list[str]] = None,
+    new_geom_type: DbGeomType = DbGeomType.POINT,
+    need_verification_fields: bool = True,
+    use_odk_collect: bool = False,
+) -> tuple[str, BytesIO]:
+    """Append mandatory fields to the XLSForm for use in Field-TM.
+
+    Args:
+        custom_form (BytesIO): The XLSForm data uploaded, wrapped in BytesIO.
+        form_name (str): The friendly form name in ODK web view.
+        additional_entities (list[str], optional): Add extra select_one_from_file fields to
+            reference additional Entity lists (sets of geometries). Defaults to None.
+        new_geom_type (DbGeomType): The type of geometry required when collecting
+            new geometry data: point, line, polygon. Defaults to DbGeomType.POINT.
+        need_verification_fields (bool): Whether to include verification fields.
+            Defaults to True.
+        use_odk_collect (bool): Whether to use ODK Collect-specific components.
+            Defaults to False.
+
+    Returns:
+        tuple[str, BytesIO]: The xFormId and the updated XLSForm wrapped in BytesIO.
+        
+    Raises:
+        ValueError: If required sheets are missing from the XLSForm.
+    """
+    log.info("Appending field mapping questions to XLSForm")
+
+    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    if "survey" not in custom_sheets:
+        msg = "Survey sheet is required in XLSForm!"
+        log.error(msg)
+        raise ValueError(msg)
+    
+    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets)  # Also get the label columns
+    xformid, updated_form = await _process_all_form_tabs(
+        custom_sheets=custom_sheets,
+        form_name=form_name,
+        additional_entities=additional_entities,
+        new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        use_odk_collect=use_odk_collect,
+        label_cols=label_cols,
+    )
+    return (xformid, await write_xlsform(updated_form))
+
+
+async def modify_form_for_qfield(
+    custom_form: BytesIO,
+    geom_layer_type: DbGeomType = DbGeomType.POINT,
+) -> tuple[Optional[str], BytesIO]:
+    """Append mandatory fields to the XLSForm for use in QField.
+
+    Args:
+        custom_form (BytesIO): The XLSForm data uploaded, wrapped in BytesIO.
+        new_geom_type (DbGeomType): The type of geometry required when collecting
+            new geometry data: point, line, polygon. Defaults to DbGeomType.POINT.
+
+    Returns:
+        tuple[str, BytesIO]: The updated XLSForm wrapped in BytesIO.
+        
+    Raises:
+        ValueError: If required sheets are missing from the XLSForm.
+    """
+    log.info("Modifying XLSForm to work with QField")
+
+    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    if "survey" not in custom_sheets:
+        msg = "Survey sheet is required in XLSForm!"
+        log.error(msg)
+        raise ValueError(msg)
+
+    # Get first available language in format 'english(en)'
+    form_languages = []
+    all_columns = custom_sheets["survey"].columns.tolist()
+    for col_name in all_columns:
+        if "::" in col_name:
+            form_languages.append(col_name)
+    form_language = form_languages[0].split("::")[1] if form_languages else None
+    if total_languages := len(form_languages) > 1:
+        log.warning(
+            f"Found {total_languages} form translations, but only the first will "
+            f"be used {form_language}"
+        )
+
+    # 1. Replace the "select_one_from_file features.csv"
+    #    row with a geometry field
+    qf_survey_df = custom_sheets["survey"]
+    geom_type_map = {
+        DbGeomType.POINT: "geopoint",
+        DbGeomType.POLYGON: "geoshape",
+        DbGeomType.LINESTRING: "geotrace",
+    }
+    geom_type = geom_type_map.get(geom_layer_type, "geopoint")
+    mask = qf_survey_df["type"] == "select_one_from_file features.csv"
+    if mask.any():
+        idx = qf_survey_df.index[mask][0]
+        # Build the replacement row
+        replacement = qf_survey_df.iloc[idx:idx+1].copy()
+        replacement.loc[:, "type"] = geom_type
+        replacement.loc[:, "name"] = "feature"
+        # Replace the row
+        qf_survey_df = pd.concat(
+            [qf_survey_df.iloc[:idx], replacement, qf_survey_df.iloc[idx+1:]]
+        ).reset_index(drop=True)
+
+    # 2. Wrap the final two rows (end_note, image) in a group,
+    #    so they display correctly as final QField tab
+    last_two_rows = qf_survey_df.tail(2)
+    begin_row = pd.DataFrame([{"type": "begin group", "name": "final"}])
+    end_row = pd.DataFrame([{"type": "end group", "name": None}])
+    # Rebuild: all rows except last two + begin + last two + end
+    qf_survey_df = pd.concat(
+        [qf_survey_df.iloc[:-2], begin_row, last_two_rows, end_row],
+        ignore_index=True,
+    )
+
+    # 3. Update survey sheet in updated_form
+    custom_sheets["survey"] = qf_survey_df
+
+    return (form_language, await write_xlsform(custom_sheets))
 
 
 def _get_form_components(
@@ -595,7 +696,7 @@ async def main():
     with open(input_file, "rb") as file_handle:
         input_xlsform = BytesIO(file_handle.read())
 
-    form_id, form_bytes = await append_odk_mapping_fields(
+    form_id, form_bytes = await append_field_mapping_fields(
         custom_form=input_xlsform,
         form_name=f"fmtm_{uuid4()}",
         additional_entities=args.additional_dataset_names,

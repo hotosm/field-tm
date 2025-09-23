@@ -31,7 +31,7 @@ import geojson
 from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
-from osm_fieldwork.update_xlsform import append_odk_mapping_fields
+from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import Connection
 from pyodk._endpoints.entities import Entity
 from pyxform.xls2xform import convert as xform_convert
@@ -285,7 +285,7 @@ async def append_fields_to_user_xlsform(
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory Field-TM fields to XLSForm")
-    return await append_odk_mapping_fields(
+    return await append_field_mapping_fields(
         xlsform,
         form_name=form_name,
         new_geom_type=new_geom_type,

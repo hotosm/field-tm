@@ -20,6 +20,7 @@
 import json
 import logging
 import shutil
+from io import BytesIO
 from pathlib import Path
 from random import getrandbits
 from typing import Annotated
@@ -29,6 +30,7 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from httpx import AsyncClient
+from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
@@ -76,9 +78,13 @@ async def create_project(
     # Get XLSForm and features geojson from project
     project = project_user_dict.get("project")
     bbox_str = ",".join(map(str, project.bbox))
-    language = "english(en)"  # FIXME: hardcoded language for now
 
-    xlsform = project.xlsform_content
+    # NOTE xlsform_content is the already processed ODK-ready form,
+    # NOTE so we modify this as needed
+    form_language, xlsform = await modify_form_for_qfield(
+        BytesIO(project.xlsform_content),
+        geom_layer_type=project.primary_geom_type,
+    )
     features_geojson = await get_project_features_geojson(db, project)
     tasks_geojson = await get_task_geometry(db, project.id)
 
@@ -107,7 +113,7 @@ async def create_project(
             json={
                 "project_dir": str(job_dir),
                 "title": project_name,
-                "language": language,
+                "language": form_language,
                 "extent": bbox_str,
             },
         )
