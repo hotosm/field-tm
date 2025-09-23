@@ -60,3 +60,13 @@ services:
       - fmtm-net
     restart: "unless-stopped"
     command: tunnel --url http://button:3001
+
+  qfield-tunnel:
+    image: "docker.io/cloudflare/cloudflared:2024.10.1"
+    depends_on:
+      central:
+        condition: service_healthy
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+    command: tunnel --url http://qfield-app:8000
