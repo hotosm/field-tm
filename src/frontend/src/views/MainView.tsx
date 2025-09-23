@@ -75,7 +75,7 @@ const MainView = () => {
                       ? '100vh'
                       : windowSize.width <= 599
                         ? '90vh'
-                        : '92vh',
+                        : '94vh',
                   overflow: 'auto',
                   // p: '1.3rem',
                 }}

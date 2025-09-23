@@ -34,9 +34,9 @@ const UseCase = () => {
         alt="Field mapping in tokha"
       />
       <div className="fmtm-flex-1">
-        <h4 className="fmtm-mb-3">FIELD-TM USE CASES</h4>
+        <h4 className="fmtm-mb-3">Field-TM Use Cases</h4>
         <div>
-          <Accordion type="single" collapsible defaultValue="item-0">
+          <Accordion type="multiple" defaultValue={['item-0', 'item-1', 'item-2']}>
             {useCaseList.map((useCase, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="hover:fmtm-no-underline">
