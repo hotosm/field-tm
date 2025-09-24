@@ -162,11 +162,12 @@ COPY backend/stats/ /opt/stats/
 COPY backend/scheduler/ /opt/scheduler/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
-    && mkdir -p /opt/logs \
+    && mkdir -p /opt/logs /opt/qfield \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh /opt/scheduler/*.py
-# Add log volume for persistence
+# Add volumes for persistence
 VOLUME /opt/logs
+VOLUME /opt/qfield
 # Change to non-root user
 USER appuser
 

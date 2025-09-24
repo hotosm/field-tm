@@ -73,6 +73,7 @@ check_all_s3_vars_present() {
     export S3_SECRET_KEY="${S3_SECRET_KEY//\"/}"
     export S3_BUCKET_NAME="${S3_BUCKET_NAME//\"/}"
     export S3_BACKUP_BUCKET_NAME="${S3_BACKUP_BUCKET_NAME//\"/}"
+    export S3_QFIELD_BUCKET_NAME="${S3_QFIELD_BUCKET_NAME//\"/}"
 }
 
 wait_for_db() {
@@ -185,6 +186,7 @@ check_if_missing_migrations() {
 
 init_buckets() {
     BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
+    QFIELD_BUCKET_NAME=${S3_QFIELD_BUCKET_NAME}
     echo "Ensuring S3 bucket ${BUCKET_NAME} exists"
     mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
 
@@ -193,6 +195,11 @@ init_buckets() {
 
     mc mb "s3/${BACKUP_BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BACKUP_BUCKET_NAME}"
+
+    if [ -n "${QFIELD_BUCKET_NAME}" ]; then
+        mc mb "s3/${QFIELD_BUCKET_NAME}" --ignore-existing
+        mc anonymous set download "s3/${QFIELD_BUCKET_NAME}"
+    fi
 }
 
 backup_db() {

@@ -11,6 +11,8 @@ import {
 import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
 import type { taskType } from '@/types';
 
+export type FieldMappingApp = 'ODK' | 'QField' | 'FieldTM';
+
 export interface projectBaseType {
   id: number;
   organisation_id: string;

@@ -42,6 +42,7 @@ from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
     BackgroundTaskStatus,
+    FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
     ProjectVisibility,
@@ -60,6 +61,7 @@ class StubProjectIn(BaseModel):
     """Stub project insert."""
 
     name: str
+    field_mapping_app: FieldMappingApp
     short_description: str
     description: Optional[str] = None
     organisation_id: int

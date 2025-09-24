@@ -148,7 +148,7 @@ s3-browser:
   @echo
 
 
-# Externally accessible ODK Central for tests
+# Externally accessible ODK Central & QFieldCloud for tests
 [no-cd]
 tunnel:
   #!/usr/bin/env sh
@@ -165,6 +165,7 @@ tunnel:
 
   odk_url=$(just start _get-tunnel-url 'central')
   button_url=$(just start _get-tunnel-url 'button')
+  qfc_url=$(just start _get-tunnel-url 'qfield')
 
   # Restart Central with DOMAIN var set to new tunnel URL.
   # Is is required to correctly download forms from Collect
@@ -174,7 +175,7 @@ tunnel:
     -f contrib/tunnel/compose.yaml \
     up -d central
 
-  just start _print-tunnel-url "$odk_url" "$button_url"
+  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
 
 # View the URLs for created tunnels
 [no-cd]
@@ -183,7 +184,8 @@ view-tunnel-url:
 
   odk_url=$(just start _get-tunnel-url 'central')
   button_url=$(just start _get-tunnel-url 'button')
-  just start _print-tunnel-url "$odk_url" "$button_url"
+  qfc_url=$(just start _get-tunnel-url 'qfield')
+  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
 
 [no-cd]
 _get-tunnel-url service_name:
@@ -199,7 +201,7 @@ _get-tunnel-url service_name:
   echo "$service_url"
 
 [no-cd]
-_print-tunnel-url odk_url button_url:
+_print-tunnel-url odk_url button_url qfc_url:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
@@ -208,6 +210,9 @@ _print-tunnel-url odk_url button_url:
   @echo
   @echo "\033[0;34m Frontend Button URL: \033[0m"
   @echo " {{button_url}}"
+  @echo
+  @echo "\033[0;34m QFieldCloud URL: \033[0m"
+  @echo " {{qfc_url}}"
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo

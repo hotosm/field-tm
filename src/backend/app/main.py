@@ -50,6 +50,7 @@ from app.organisations import organisation_routes
 from app.organisations.organisation_crud import init_admin_org
 from app.projects import project_routes
 from app.projects.project_crud import read_and_insert_xlsforms
+from app.qfield import qfield_routes
 from app.submissions import submission_routes
 from app.tasks import task_routes
 from app.users import user_routes
@@ -145,6 +146,7 @@ def get_application() -> FastAPI:
     _app.include_router(project_routes.router)
     _app.include_router(task_routes.router)
     _app.include_router(central_routes.router)
+    _app.include_router(qfield_routes.router)
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organisation_routes.router)
