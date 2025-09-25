@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
-
-import { useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { projectVisibilityOptions } from './constants';
 import FieldLabel from '@/components/common/FieldLabel';
@@ -27,21 +25,15 @@ const ProjectDetails = () => {
   const { errors } = formState;
 
   const values = watch();
-  const fieldMappingApp = useAppSelector((state) => state.createproject.fieldMappingApp);
+  const { field_mapping_app } = values;
 
   useEffect(() => {
     if (!values.hasCustomTMS && values.custom_tms_url) setValue('custom_tms_url', '');
   }, [values.hasCustomTMS]);
 
   useEffect(() => {
-    console.log(fieldMappingApp);
-    if (!fieldMappingApp) {
-      setValue('use_odk_collect', false);
-    } else {
-      // Set use_odk_collect only if app type is ODK
-      setValue('use_odk_collect', fieldMappingApp === 'ODK');
-    }
-  }, [fieldMappingApp, setValue]);
+    setValue('use_odk_collect', field_mapping_app === 'ODK');
+  }, [field_mapping_app]);
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">

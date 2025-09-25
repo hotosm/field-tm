@@ -1,37 +1,40 @@
 import React from 'react';
-
-import type { FieldMappingApp } from '@/api/project/types';
+import { z } from 'zod/v4';
+import { useFormContext } from 'react-hook-form';
+import { createProjectValidationSchema } from './validation';
 import Button from '@/components/common/Button';
 
 import HotLogo from '@/assets/images/favicon.svg';
 import QfieldLogo from '@/assets/images/qfield-logo.svg';
 import OdkLogo from '@/assets/images/odk-logo.svg';
+import { field_mapping_app } from '@/types/enums';
+import { useSearchParams } from 'react-router-dom';
 
-interface ProjectTypeSelectorProps {
-  onSelect: (app: FieldMappingApp) => void;
-}
+const mappingApps = [
+  {
+    id: field_mapping_app.QField,
+    title: 'QField',
+    description: 'The QField mobile application (offline-capable)',
+    logo: QfieldLogo,
+  },
+  {
+    id: field_mapping_app.ODK,
+    title: 'ODK',
+    description: 'The ODK Collect mobile application (offline-capable)',
+    logo: OdkLogo,
+  },
+  {
+    id: field_mapping_app.FieldTM,
+    title: 'FieldTM',
+    description: 'Online real-time collaborative mapping',
+    logo: HotLogo,
+  },
+];
 
-const ProjectTypeSelector: React.FC<ProjectTypeSelectorProps> = ({ onSelect }) => {
-  const mappingApps = [
-    {
-      id: 'QField' as FieldMappingApp,
-      title: 'QField',
-      description: 'The QField mobile application (offline-capable)',
-      logo: QfieldLogo,
-    },
-    {
-      id: 'ODK' as FieldMappingApp,
-      title: 'ODK',
-      description: 'The ODK Collect mobile application (offline-capable)',
-      logo: OdkLogo,
-    },
-    {
-      id: 'FieldTM' as FieldMappingApp,
-      title: 'FieldTM',
-      description: 'Online real-time collaborative mapping',
-      logo: HotLogo,
-    },
-  ];
+const ProjectTypeSelector = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
+  const { setValue } = form;
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-items-center fmtm-justify-center fmtm-h-full fmtm-bg-white fmtm-rounded-xl">
@@ -53,7 +56,14 @@ const ProjectTypeSelector: React.FC<ProjectTypeSelectorProps> = ({ onSelect }) =
             </div>
             <h3 className="fmtm-text-lg fmtm-font-semibold fmtm-text-gray-800 fmtm-mb-2">{app.title}</h3>
             <p className="fmtm-text-sm fmtm-text-gray-600 fmtm-mb-6 fmtm-flex-grow">{app.description}</p>
-            <Button variant="primary-grey" onClick={() => onSelect(app.id)} className="fmtm-w-full fmtm-mt-auto">
+            <Button
+              variant="primary-grey"
+              onClick={() => {
+                setValue('field_mapping_app', app.id);
+                setSearchParams({ step: '1' });
+              }}
+              className="fmtm-w-full fmtm-mt-auto"
+            >
               Select {app.title}
             </Button>
           </div>
