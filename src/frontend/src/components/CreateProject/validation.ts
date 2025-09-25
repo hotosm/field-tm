@@ -1,6 +1,12 @@
 import { z } from 'zod/v4';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { data_extract_type, GeoGeomTypesEnum, project_visibility, task_split_type } from '@/types/enums';
+import {
+  data_extract_type,
+  field_mapping_app,
+  GeoGeomTypesEnum,
+  project_visibility,
+  task_split_type,
+} from '@/types/enums';
 
 const validateODKCreds = (ctx: any, values: Record<string, any>) => {
   if (!values.odk_central_url?.trim()) {
@@ -46,6 +52,15 @@ export const odkCredentialsValidationSchema = z
     const values = ctx.value;
     validateODKCreds(ctx, values);
   });
+
+export const projectTypeSelectorValidationSchema = z.object({
+  field_mapping_app: z
+    .enum(field_mapping_app)
+    .nullable()
+    .refine((val) => val !== null, {
+      message: 'Field Mapping App must be selected',
+    }),
+});
 
 export const projectOverviewValidationSchema = z
   .object({
@@ -302,6 +317,7 @@ export const splitTasksValidationSchema = z
   });
 
 export const createProjectValidationSchema = z.object({
+  ...projectTypeSelectorValidationSchema.shape,
   ...projectOverviewValidationSchema.shape,
   ...projectDetailsValidationSchema.shape,
   ...uploadSurveyValidationSchema.shape,
