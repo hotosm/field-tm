@@ -110,3 +110,9 @@ export enum tile_output_formats {
   sqlitedb = 'sqlitedb',
   pmtiles = 'pmtiles',
 }
+
+export enum field_mapping_app {
+  ODK = 'ODK',
+  QField = 'QField',
+  FieldTM = 'FieldTM',
+}
