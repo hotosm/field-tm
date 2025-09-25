@@ -1,5 +1,6 @@
 import {
   basemap_providers,
+  field_mapping_app,
   GeoGeomTypesEnum,
   MapGeomTypes,
   project_roles,
@@ -10,8 +11,6 @@ import {
 } from '@/types/enums';
 import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
 import type { taskType } from '@/types';
-
-export type FieldMappingApp = 'ODK' | 'QField' | 'FieldTM';
 
 export interface projectBaseType {
   id: number;
@@ -52,6 +51,7 @@ export interface projectBaseType {
   use_odk_collect: boolean;
   created_at: string;
   updated_at: string;
+  field_mapping_app: field_mapping_app;
 }
 
 // PAYLOAD TYPES

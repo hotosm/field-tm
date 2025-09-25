@@ -1,10 +1,8 @@
 import { CreateProjectStateTypes } from '@/store/types/ICreateProject';
 import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { FieldMappingApp } from '@/api/project/types';
 
 export const initialState: CreateProjectStateTypes = {
-  fieldMappingApp: null,
   editProjectDetails: { name: '', description: '', short_description: '' },
   editProjectResponse: null,
   projectDetails: {
@@ -108,9 +106,6 @@ const CreateProject = createSlice({
     },
     SetODKCredentialsValidating(state, action: PayloadAction<boolean>) {
       state.ODKCredentialsValidating = action.payload;
-    },
-    SetFieldMappingApp(state, action: PayloadAction<FieldMappingApp | null>) {
-      state.fieldMappingApp = action.payload;
     },
   },
 });

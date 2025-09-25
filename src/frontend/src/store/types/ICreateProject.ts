@@ -1,8 +1,6 @@
 import { MapGeomTypes, project_visibility, project_status } from '@/types/enums';
-import type { FieldMappingApp } from '@/api/project/types';
 
 export type CreateProjectStateTypes = {
-  fieldMappingApp: FieldMappingApp | null;
   editProjectDetails: ProjectDetailsTypes;
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
