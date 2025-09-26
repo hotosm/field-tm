@@ -43,6 +43,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   dataExtractType: null,
   customDataExtractFile: null,
   dataExtractGeojson: null,
+  use_st_within: false,
 
   // 05 Split Tasks
   task_split_type: null,

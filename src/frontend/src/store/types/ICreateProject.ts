@@ -9,24 +9,11 @@ export type CreateProjectStateTypes = {
   createProjectLoading: boolean;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  formCategoryLoading: boolean;
-  GenerateProjectFilesLoading: boolean;
-  dividedTaskLoading: boolean;
   formUpdateLoading: boolean;
-  taskSplittingGeojsonLoading: boolean;
-  validateCustomFormLoading: boolean;
-  createProjectValidations: {};
   customFileValidity: boolean;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
   isProjectDeletePending: boolean;
-  splitGeojsonBySquares: splittedGeojsonType | null;
-  splitGeojsonByAlgorithm: splittedGeojsonType | null;
-  isODKCredentialsValid: boolean;
-  ODKCredentialsValidating: boolean;
-};
-export type ValidateCustomFormResponse = {
-  detail: { message: string; possible_reason: string };
 };
 
 export type GeometryTypes = {

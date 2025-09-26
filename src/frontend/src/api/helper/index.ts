@@ -16,16 +16,11 @@ export function useDownloadTemplateXlsformQuery({
   });
 }
 
-export function useTestOdkCredentialsMutation({
-  params,
-  options,
-}: {
-  params: odkCredsParamsType;
-  options: TMutationOptions<unknown, void>;
-}) {
+export function useTestOdkCredentialsMutation(
+  options: TMutationOptions<void, { params: odkCredsParamsType }, { detail: string }>,
+) {
   return useMutation({
-    mutationKey: ['test-odk-credentials', params],
-    mutationFn: () => testOdkCredentials(params),
+    mutationFn: ({ params }) => testOdkCredentials(params),
     ...options,
   });
 }

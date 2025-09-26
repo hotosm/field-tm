@@ -29,21 +29,8 @@ export const initialState: CreateProjectStateTypes = {
   createProjectLoading: false,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  formCategoryLoading: false,
-  GenerateProjectFilesLoading: false,
-  dividedTaskLoading: false,
   formUpdateLoading: false,
-  taskSplittingGeojsonLoading: false,
-  taskSplittingGeojson: null,
-  validateCustomFormLoading: false,
-  createProjectValidations: {},
-  isUnsavedChanges: false,
-  customFileValidity: false,
   isProjectDeletePending: false,
-  splitGeojsonBySquares: null,
-  splitGeojsonByAlgorithm: null,
-  isODKCredentialsValid: false,
-  ODKCredentialsValidating: false,
 };
 
 const CreateProject = createSlice({
@@ -58,18 +45,6 @@ const CreateProject = createSlice({
     },
     PostProjectDetails(state, action) {
       state.projectDetailsResponse = action.payload;
-    },
-    GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
-      state.formCategoryLoading = action.payload;
-    },
-    GenerateProjectFilesLoading(state, action: PayloadAction<boolean>) {
-      state.GenerateProjectFilesLoading = action.payload;
-    },
-    SetDividedTaskGeojson(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonBySquares']>) {
-      state.splitGeojsonBySquares = action.payload;
-    },
-    SetDividedTaskFromGeojsonLoading(state, action: PayloadAction<boolean>) {
-      state.dividedTaskLoading = action.payload;
     },
     SetIndividualProjectDetails(state, action) {
       state.editProjectDetails = action.payload;
@@ -86,26 +61,8 @@ const CreateProject = createSlice({
     SetPostFormUpdateLoading(state, action: PayloadAction<boolean>) {
       state.formUpdateLoading = action.payload;
     },
-    GetTaskSplittingPreviewLoading(state, action: PayloadAction<boolean>) {
-      state.taskSplittingGeojsonLoading = action.payload;
-    },
-    GetTaskSplittingPreview(state, action: PayloadAction<CreateProjectStateTypes['splitGeojsonByAlgorithm']>) {
-      state.splitGeojsonByAlgorithm = action.payload;
-    },
-    ValidateCustomFormLoading(state, action: PayloadAction<boolean>) {
-      state.validateCustomFormLoading = action.payload;
-    },
-    SetCustomFileValidity(state, action: PayloadAction<boolean>) {
-      state.customFileValidity = action.payload;
-    },
     SetProjectDeletePending(state, action: PayloadAction<boolean>) {
       state.isProjectDeletePending = action.payload;
-    },
-    SetODKCredentialsValid(state, action: PayloadAction<boolean>) {
-      state.isODKCredentialsValid = action.payload;
-    },
-    SetODKCredentialsValidating(state, action: PayloadAction<boolean>) {
-      state.ODKCredentialsValidating = action.payload;
     },
   },
 });

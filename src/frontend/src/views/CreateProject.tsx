@@ -25,18 +25,17 @@ import {
 } from '@/components/CreateProject/validation';
 import { z } from 'zod/v4';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { CreateDraftProjectService, CreateProjectService, DeleteProjectService } from '@/api/CreateProjectService';
+import { CreateDraftProjectService, CreateProjectService } from '@/api/CreateProjectService';
 import { defaultValues } from '@/components/CreateProject/constants/defaultValues';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
 import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
+import { useDeleteProjectMutation, useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,14 +55,10 @@ const CreateProject = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const step = Number(searchParams.get('step'));
 
-  const resetReduxState = () => {
-    dispatch(CreateProjectActions.SetCustomFileValidity(false));
-  };
-
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
-  const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
+  // const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
 
   const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
     project_id: projectId!,
@@ -90,10 +85,6 @@ const CreateProject = () => {
       setSearchParams({ step: '1' });
     }
   }, []);
-
-  useEffect(() => {
-    resetReduxState();
-  }, [projectId]);
 
   useEffect(() => {
     if (!minimalProjectDetails || !projectId) return;
@@ -237,20 +228,20 @@ const CreateProject = () => {
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
     // Project admins that are already assigned during draft project creation
-    const assignedPMs = projectManagers.map((pm) => pm.user_sub);
+    const assignedPMs = projectManagers?.map((pm) => pm.user_sub);
 
     // Identify Project Admins to remove: those who are currently assigned but not included in the new list
-    const pmToRemove = assignedPMs.filter((pm) => !data.project_admins.includes(pm));
+    const pmToRemove = assignedPMs?.filter((pm) => !data.project_admins.includes(pm));
 
     // Identify Project Admins to assign: those in the new list who are not yet assigned to the project
-    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs.includes(pm));
+    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs?.includes(pm));
 
     dispatch(
       CreateProjectService(
         `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
-        { projectAdminToRemove: pmToRemove, projectAdminToAssign: pmToAssign },
+        { projectAdminToRemove: pmToRemove || [], projectAdminToAssign: pmToAssign },
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,
@@ -259,12 +250,35 @@ const CreateProject = () => {
     );
   };
 
-  // const saveProject = () => {};
-
-  const deleteProject = async () => {
-    if (!projectId) return;
-    await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate));
-  };
+  const { mutate: deleteProjectMutate, isPending: isProjectDeleting } = useDeleteProjectMutation({
+    onSuccess: () => {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: `Project ${projectId} deleted successfully`,
+          variant: 'success',
+        }),
+      );
+      navigate('/');
+    },
+    onError: ({ response }) => {
+      if (response?.status === 404) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: `Project ${projectId} already deleted`,
+            variant: 'error',
+          }),
+        );
+      } else {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: `Failed to delete project ${projectId}`,
+            variant: 'error',
+          }),
+        );
+      }
+      navigate('/');
+    },
+  });
 
   const onSubmit = () => {
     if (step === 1 && !projectId) {
@@ -291,7 +305,7 @@ const CreateProject = () => {
           {projectId && (
             <Dialog>
               <DialogTrigger>
-                <Button variant="link-grey" isLoading={isProjectDeletePending}>
+                <Button variant="link-grey" isLoading={isProjectDeleting}>
                   <AssetModules.DeleteIcon className="!fmtm-text-base" />
                   Delete Project
                 </Button>
@@ -303,8 +317,8 @@ const CreateProject = () => {
                 <Button
                   variant="primary-red"
                   className="fmtm-ml-auto fmtm-mt-5"
-                  onClick={deleteProject}
-                  isLoading={isProjectDeletePending}
+                  onClick={() => deleteProjectMutate({ project_id: +projectId! })}
+                  isLoading={isProjectDeleting}
                 >
                   Delete
                 </Button>
@@ -352,7 +366,7 @@ const CreateProject = () => {
                 <Button
                   variant="link-grey"
                   onClick={() => setSearchParams({ step: (step - 1).toString() })}
-                  disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeletePending}
+                  disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeleting}
                 >
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
@@ -365,8 +379,7 @@ const CreateProject = () => {
                       onClick={() => createDraftProject(false)}
                       isLoading={createDraftProjectLoading.loading && !createDraftProjectLoading.continue}
                       disabled={
-                        (createDraftProjectLoading.loading && createDraftProjectLoading.continue) ||
-                        isProjectDeletePending
+                        (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || isProjectDeleting
                       }
                     >
                       Save & Exit
@@ -380,7 +393,7 @@ const CreateProject = () => {
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
                     isMinimalProjectLoading ||
-                    isProjectDeletePending
+                    isProjectDeleting
                   }
                   isLoading={
                     (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading

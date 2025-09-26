@@ -1,12 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getFormLists, uploadProjectXlsform, updateProjectForm, downloadForm } from '@/services/central';
 import type { TQueryOptions, TMutationOptions } from '@/types';
-import type {
-  formType,
-  updateProjectFormPayloadType,
-  uploadXlsformParamsType,
-  uploadXlsformPayloadType,
-} from './types';
+import type { formType, updateProjectFormPayloadType, uploadXlsformParamsType } from './types';
 
 export function useGetFormListsQuery({ options }: { options: TQueryOptions<formType[]> }) {
   return useQuery({
@@ -30,16 +25,15 @@ export function useDownloadFormQuery({
   });
 }
 
-export function useUploadProjectXlsformMutation({
-  params,
-  options,
-}: {
-  params: uploadXlsformParamsType;
-  options: TMutationOptions<unknown, uploadXlsformPayloadType>;
-}) {
+export function useUploadProjectXlsformMutation(
+  options: TMutationOptions<
+    { message: string },
+    { payload: FormData; params: uploadXlsformParamsType },
+    { message: string }
+  >,
+) {
   return useMutation({
-    mutationKey: ['upload-xlsform'],
-    mutationFn: (payload: uploadXlsformPayloadType) => uploadProjectXlsform(payload, params),
+    mutationFn: ({ payload, params }) => uploadProjectXlsform(payload, params),
     ...options,
   });
 }
