@@ -150,33 +150,23 @@ export const useGetContributorsQuery = ({
     ...options,
   });
 
-export const useTaskSplitMutation = ({ options }: { options: TMutationOptions<any, taskSplitPayloadType> }) =>
+export const useTaskSplitMutation = (options: TMutationOptions<any, { payload: FormData }>) =>
   useMutation({
-    mutationFn: (payload: taskSplitPayloadType) => taskSplit(payload),
+    mutationFn: ({ payload }) => taskSplit(payload),
     ...options,
   });
 
-export const usePreviewSplitBySquareMutation = ({
-  options,
-}: {
-  options: TMutationOptions<any, previewSplitBySquarePayload>;
-}) =>
+export const usePreviewSplitBySquareMutation = (options: TMutationOptions<any, { payload: FormData }>) =>
   useMutation({
-    mutationFn: (payload: previewSplitBySquarePayload) => previewSplitBySquare(payload),
+    mutationFn: ({ payload }) => previewSplitBySquare(payload),
     ...options,
   });
 
-export const useGenerateDataExtractMutation = ({
-  payload,
-  params,
-  options,
-}: {
-  payload: generateDataExtractPayloadType;
-  params: { project_id: number };
-  options: TMutationOptions<any, void>;
-}) =>
+export const useGenerateDataExtractMutation = (
+  options: TMutationOptions<{ url: string }, { payload: FormData; params: { project_id: number } }, { detail: string }>,
+) =>
   useMutation({
-    mutationFn: () => generateDataExtract(payload, params),
+    mutationFn: ({ payload, params }) => generateDataExtract(payload, params),
     ...options,
   });
 
@@ -243,17 +233,9 @@ export const useUpdateProjectMutation = ({
     ...options,
   });
 
-export const useDeleteProjectMutation = ({
-  project_id,
-  params,
-  options,
-}: {
-  project_id: number;
-  params: { org_id: number };
-  options: TMutationOptions<any, any>;
-}) =>
+export const useDeleteProjectMutation = (options: TMutationOptions<any, { project_id: number }>) =>
   useMutation({
-    mutationFn: () => deleteProject(project_id, params),
+    mutationFn: ({ project_id }) => deleteProject(project_id),
     ...options,
   });
 

@@ -181,6 +181,7 @@ export const mapDataValidationSchema = z
       }),
     customDataExtractFile: z.any().optional(),
     dataExtractGeojson: z.any().optional(),
+    use_st_within: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;
