@@ -246,7 +246,6 @@ const UploadDataExtractService = (url: string, file: any) => {
 
 const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GenerateProjectFilesLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
     try {
@@ -269,7 +268,6 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
       );
       return false;
     } finally {
-      dispatch(CreateProjectActions.GenerateProjectFilesLoading(false));
       dispatch(CommonActions.SetLoading(false));
     }
   };
