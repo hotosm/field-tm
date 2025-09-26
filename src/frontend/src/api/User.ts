@@ -2,31 +2,10 @@ import axios, { AxiosResponse } from 'axios';
 import { AppDispatch } from '@/store/Store';
 import { UserActions } from '@/store/slices/UserSlice';
 import { projectUserInvites, userType } from '@/models/user/userModel';
-import { paginationType } from '@/store/types/ICommon';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { NavigateFunction } from 'react-router-dom';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
-
-export const GetUserListService = (url: string, params: { page: number; results_per_page: number; search: string }) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(UserActions.SetUserListLoading(true));
-
-    const getUserList = async (url: string) => {
-      try {
-        const response: AxiosResponse<{ results: userType[]; pagination: paginationType }> = await axios.get(url, {
-          params,
-        });
-        dispatch(UserActions.SetUserList(response.data));
-      } catch (error) {
-      } finally {
-        dispatch(UserActions.SetUserListLoading(false));
-      }
-    };
-
-    await getUserList(url);
-  };
-};
 
 export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMIN' | 'MAPPER' }) => {
   return async (dispatch: AppDispatch) => {
@@ -34,7 +13,6 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
       dispatch(UserActions.SetUpdateUserRoleLoading(true));
       try {
         const response: AxiosResponse<userType> = await axios.patch(url, payload);
-        dispatch(UserActions.UpdateUserList(response.data));
         dispatch(
           CommonActions.SetSnackBar({
             message: `Updated ${response.data.username}'s role to ${response.data.role} successfully`,
@@ -53,26 +31,6 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
     };
 
     await updateUserRole(url);
-  };
-};
-
-export const GetUserListForSelect = (url: string, params: { search: string; signin_type?: 'osm' | 'google' }) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(UserActions.SetUserListForSelectLoading(true));
-
-    const getUserList = async (url: string) => {
-      try {
-        const response: AxiosResponse<{ sub: string; username: string }[]> = await axios.get(url, {
-          params,
-        });
-        dispatch(UserActions.SetUserListForSelect(response.data));
-      } catch (error) {
-      } finally {
-        dispatch(UserActions.SetUserListForSelectLoading(false));
-      }
-    };
-
-    await getUserList(url);
   };
 };
 
