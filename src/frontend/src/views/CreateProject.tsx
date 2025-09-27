@@ -56,7 +56,7 @@ const CreateProject = () => {
   const [toggleEdit, setToggleEdit] = useState(false);
   const createDraftProjectLoading = useAppSelector((state) => state.createproject.createDraftProjectLoading);
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
-  // const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
+  const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
 
   const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
     project_id: projectId!,
