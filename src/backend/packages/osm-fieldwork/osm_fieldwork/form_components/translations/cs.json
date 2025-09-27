@@ -1,19 +1,21 @@
 {
-  "lumped": "Seskupené – jeden polygon (více než jedna budova digitalizovaná jako jedna)",
-  "image": "Udělejte fotku",
   "yes": "Ano",
   "no": "Ne",
+  "survey_questions": "Otázky průzkumu",
+  "image": "Udělejte fotku",
   "mapping_mode": "Chcete mapovat existující nebo novou funkci?",
+  "task_filter": "Jaké ID úkolu mapujete?",
   "existing": "Existující funkce",
   "new": "Nová funkce",
-  "survey_questions": "Otázky průzkumu",
   "feature": "Geometrie",
   "new_feature": "Nakreslete novou geometrii",
   "feature_exists": "Existuje tato funkce?",
   "verification": "Ověření",
-  "digitisation_problem": "Co je špatného na digitalizaci?",
-  "end_note": "Pokud budova neexistuje, nelze pokračovat v získávání dat",
-  "other": "OSTATNÍ",
   "digitisation_correct": "Je digitalizovaná poloha této funkce správná?",
-  "split": "Rozdělení – jedna budova (jedna budova digitalizovaná jako více než jeden polygon)"
+  "digitisation_problem": "Co je špatného na digitalizaci?",
+  "digitisation_problem_other": "Zvolili jste možnost „Jiné“. Prosím, sdělte nám, co se při digitalizaci pokazilo!",
+  "end_note": "Pokud budova neexistuje, nelze pokračovat v získávání dat",
+  "lumped": "Seskupené - jeden polygon (více než jedna budova digitalizovaná jako jedna)",
+  "split": "Rozdělení – jedna budova (jedna budova digitalizovaná jako více než jeden polygon)",
+  "other": "OSTATNÍ"
 }

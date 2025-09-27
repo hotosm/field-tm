@@ -4,6 +4,7 @@
   "survey_questions": "Domande del sondaggio",
   "image": "Scatta una foto",
   "mapping_mode": "Vuoi mappare una funzionalità nuova o esistente?",
+  "task_filter": "Quale ID attività stai mappando?",
   "existing": "Funzionalità esistente",
   "new": "Nuova funzionalità",
   "feature": "Geometria",

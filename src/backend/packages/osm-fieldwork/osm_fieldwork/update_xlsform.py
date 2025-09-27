@@ -35,7 +35,7 @@ import pandas as pd
 from python_calamine.pandas import pandas_monkeypatch
 
 from osm_fieldwork.enums import DbGeomType
-from osm_fieldwork.form_components.choice_fields import choices_data
+from osm_fieldwork.form_components.choice_fields import get_choice_fields, generate_task_id_choices
 from osm_fieldwork.form_components.mandatory_fields import (
     meta_df,
     create_survey_df,
@@ -291,7 +291,7 @@ async def _process_all_form_tabs(
         ])
         choices_df = pd.DataFrame([
             add_label_translations(choice, label_cols)
-            for choice in choices_data
+            for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
             add_label_translations(photo_collection_field, label_cols)
@@ -308,7 +308,7 @@ async def _process_all_form_tabs(
         ])
         choices_df = pd.DataFrame([
             add_label_translations(choice)
-            for choice in choices_data
+            for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
             add_label_translations(photo_collection_field)
@@ -406,6 +406,32 @@ async def append_field_mapping_fields(
         label_cols=label_cols,
     )
     return (xformid, await write_xlsform(updated_form))
+
+
+async def append_task_id_choices(
+    existing_form: BytesIO,
+    task_ids: list[int],
+) -> BytesIO:
+    """From the previously modified form, add the final task_filter choices.
+
+    This must be done separately, as we don't know the task_id options before
+    the project is created.
+    """
+    task_id_choice_df = generate_task_id_choices(task_ids)
+
+    existing_sheets = pd.read_excel(existing_form, sheet_name=None, engine="calamine")
+    if "choices" not in existing_sheets:
+        msg = "Choices sheet is required in XLSForm!"
+        log.error(msg)
+        raise ValueError(msg)
+
+    # Append the new rows
+    existing_sheets["choices"] = pd.concat(
+        [existing_sheets["choices"], task_id_choice_df],
+        ignore_index=True
+    )
+
+    return await write_xlsform(existing_sheets)
 
 
 async def modify_form_for_qfield(
