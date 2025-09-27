@@ -394,6 +394,12 @@ def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureColl
     Returns:
         geojson.FeatureCollection: A normalised FeatureCollection.
     """
+
+    def strip_z_coord(coords):
+        if isinstance(coords[0], (int, float)):  # single coordinate [x, y, z?]
+            return coords[:2]  # drop z if present
+        return [strip_z_coord(c) for c in coords]
+
     for feat in featcol.get("features", []):
         geom = feat.get("geometry")
 
@@ -404,10 +410,10 @@ def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureColl
         ):
             feat["geometry"] = geom.get("geometries")[0]
 
-        # Remove any z-dimension coordinates
+        # Remove any z-dimension coordinates recursively, for any geom type
         coords = geom.get("coordinates")
-        if isinstance(coords, list) and len(coords) == 3:
-            coords.pop()
+        if coords is not None:
+            geom["coordinates"] = strip_z_coord(coords)
 
     # Convert MultiPolygon type --> individual Polygons
     return multigeom_to_singlegeom(featcol)
