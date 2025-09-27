@@ -412,24 +412,39 @@ async def append_task_id_choices(
     existing_form: BytesIO,
     task_ids: list[int],
 ) -> BytesIO:
-    """From the previously modified form, add the final task_filter choices.
+    """From the previously modified form, add the final task_filter choices."""
 
-    This must be done separately, as we don't know the task_id options before
-    the project is created.
-    """
     task_id_choice_df = generate_task_id_choices(task_ids)
 
     existing_sheets = pd.read_excel(existing_form, sheet_name=None, engine="calamine")
     if "choices" not in existing_sheets:
-        msg = "Choices sheet is required in XLSForm!"
-        log.error(msg)
-        raise ValueError(msg)
+        raise ValueError("Choices sheet is required in XLSForm!")
 
-    # Append the new rows
-    existing_sheets["choices"] = pd.concat(
-        [existing_sheets["choices"], task_id_choice_df],
-        ignore_index=True
-    )
+    choices_df = existing_sheets["choices"]
+
+    # Ensure translation columns exist in BOTH dataframes
+    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
+        label_key = f"label::{lang_name}({lang_key})"
+        if label_key not in choices_df.columns:
+            choices_df[label_key] = ""
+        if label_key not in task_id_choice_df.columns:
+            task_id_choice_df[label_key] = ""
+
+    # Append new rows
+    choices_df = pd.concat([choices_df, task_id_choice_df], ignore_index=True)
+
+    # Fill translations for new rows (string compare to avoid int/str mismatch)
+    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
+        label_key = f"label::{lang_name}({lang_key})"
+        for task_id in task_ids:
+            mask = choices_df["name"].astype(str) == str(task_id)
+            choices_df.loc[mask, label_key] = str(task_id)
+
+    # Drop plain "label" if translations exist
+    if "label" in choices_df.columns:
+        choices_df = choices_df.drop(columns=["label"])
+
+    existing_sheets["choices"] = choices_df
 
     return await write_xlsform(existing_sheets)
 

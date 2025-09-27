@@ -581,7 +581,7 @@ async def test_update_and_download_project_form(client, project):
 
     with (
         patch("app.central.central_deps.read_xlsform", return_value=xls_file),
-        patch("app.central.central_crud.update_project_xform", return_value=None),
+        patch("app.central.central_crud.update_odk_central_xform", return_value=None),
         patch(
             "app.central.central_crud.get_project_form_xml",
             return_value="<fake-xml></fake-xml>",

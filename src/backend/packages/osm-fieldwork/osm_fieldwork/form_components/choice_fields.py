@@ -29,7 +29,11 @@ Returns:
 and digitisation problems respectively.
 """
 
+import logging
 import pandas as pd
+
+
+log = logging.getLogger(__name__)
 
 # Define the choices sheet
 choices_data = [
@@ -57,11 +61,11 @@ def get_choice_fields(use_odk_collect: bool):
         # Append an empty task_filter choice, to ensure validation passes
         # We add the actual values in later in the final stages of project
         # creation, once we know all the task ids in the project.
-        # Selecting the empty choice removes the filter.
+        # Selecting None choice removes the filter in the logic
+        log.debug("Appending task_ids list to choices sheet")
         choices_data.append({
             "list_name": "task_ids",
-            "name": " ",
-            "label": " "
+            "name": "none",
         })
     return choices_data
 

@@ -29,6 +29,7 @@ from uuid import UUID, uuid4
 
 import geojson
 from fastapi import HTTPException
+from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
@@ -39,12 +40,13 @@ from pyxform.xls2xform import convert as xform_convert
 from app.central import central_deps, central_schemas
 from app.config import settings
 from app.db.enums import DbGeomType, EntityState, HTTPStatus
-from app.db.models import DbXLSForm
+from app.db.models import DbProject, DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
     parse_geojson_file_to_featcol,
 )
+from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
 
 
@@ -315,7 +317,7 @@ async def validate_and_update_user_xlsform(
     return await read_and_test_xform(updated_file_bytes)
 
 
-async def update_project_xform(
+async def update_odk_central_xform(
     xform_id: str,
     odk_id: int,
     xlsform: BytesIO,
@@ -347,6 +349,38 @@ async def update_project_xform(
     # NOTE we can't directly publish existing forms
     # in createForm and need 2 steps
     xform_obj.publishForm(odk_id, xform_id)
+
+
+async def update_project_xlsform(
+    db: Connection,
+    project: DbProject,
+    xlsform: BytesIO,
+    xform_id: str,
+):
+    """Update both the ODK Central and FieldTM XLSForm."""
+    # Update ODK Central form data
+    await update_odk_central_xform(
+        xform_id,
+        project.odkid,
+        xlsform,
+        project.odk_credentials,
+    )
+    form_xml = await run_in_threadpool(
+        get_project_form_xml,
+        project.odk_credentials,
+        project.odkid,
+        xform_id,
+    )
+
+    await DbProject.update(
+        db,
+        project.id,
+        project_schemas.ProjectUpdate(
+            xlsform_content=xlsform.getvalue(),
+            odk_form_xml=form_xml,
+        ),
+    )
+    await db.commit()
 
 
 async def convert_geojson_to_odk_csv(
