@@ -18,8 +18,7 @@
 	import { defaultDrawerItems } from '$constants/drawerItems.ts';
 	import { revokeCookies } from '$lib/api/login';
 	import { getAlertStore } from '$store/common.svelte';
-	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
-	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 	import { goto } from '$app/navigation';
 	import { languages } from '$constants/languages';
 
@@ -34,13 +33,8 @@
 	const loginStore = getLoginStore();
 	const alertStore = getAlertStore();
 	const commonStore = getCommonStore();
-	const projectSetupStepStore = getProjectSetupStepStore();
 	const languageList: languageListType[] = locales.map((locale: string) =>
 		languages.find((language) => language.code === locale),
-	);
-
-	let isFirstLoad = $derived(
-		+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load'],
 	);
 
 	const handleSignOut = async () => {
@@ -131,39 +125,19 @@
 			</sl-button>
 		{/if}
 
-		<!-- drawer component toggle trigger (snippet to reuse below) -->
-		{#snippet drawerOpenButton()}
-			<sl-icon
-				name="list"
-				class="drawer-icon ${isFirstLoad && !commonStore.enableWebforms ? 'drawer-icon-firstload' : ''}"
-				onclick={() => {
-					drawerRef?.show();
-				}}
-				onkeydown={() => {
-					drawerRef?.show();
-				}}
-				role="button"
-				tabindex="0"
-			></sl-icon>
-		{/snippet}
-		<!-- add tooltip on first load -->
-		{#if isFirstLoad && !commonStore.enableWebforms}
-			<sl-tooltip
-				bind:this={drawerOpenButtonRef}
-				content="First download the custom ODK Collect app here"
-				open={true}
-				placement="bottom"
-				onhot-after-hide={() => {
-					// Always keep tooltip open
-					drawerOpenButtonRef?.show();
-				}}
-			>
-				{@render drawerOpenButton()}
-			</sl-tooltip>
-			<!-- else render with no tooltip -->
-		{:else}
-			{@render drawerOpenButton()}
-		{/if}
+		<!-- drawer component toggle trigger -->
+		<sl-icon
+			name="list"
+			class="drawer-icon"
+			onclick={() => {
+				drawerRef?.show();
+			}}
+			onkeydown={() => {
+				drawerRef?.show();
+			}}
+			role="button"
+			tabindex="0"
+		></sl-icon>
 	</div>
 </div>
 <Login />
