@@ -130,11 +130,20 @@ def _get_mandatory_fields(
                 label_cols=label_cols
             ),
             add_label_translations({
+                "type": "select_one tasks_ids",
+                "name": "task_filter",
+                "relevant": "${mapping_mode} = 'existing'",
+                "required": "no",
+            },
+                label_cols=label_cols
+            ),
+            add_label_translations({
                 "type": "select_one_from_file features.csv",
                 "name": "feature",
                 "appearance": "map",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "yes",
+                "choice_filter": "task_id = ${task_filter}",
             },
                 label_cols=label_cols
             ),

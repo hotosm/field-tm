@@ -31,7 +31,6 @@ and digitisation problems respectively.
 
 import pandas as pd
 
-
 # Define the choices sheet
 choices_data = [
     {
@@ -51,3 +50,31 @@ choices_data = [
         "name": "no",
     },
 ]
+
+
+def get_choice_fields(use_odk_collect: bool):
+    if use_odk_collect:
+        # Append an empty task_filter choice, to ensure validation passes
+        # We add the actual values in later in the final stages of project
+        # creation, once we know all the task ids in the project.
+        # Selecting the empty choice removes the filter.
+        choices_data.append({
+            "list_name": "task_ids",
+            "name": " ",
+            "label": " "
+        })
+    return choices_data
+
+
+def generate_task_id_choices(task_ids: list[int]) -> pd.DataFrame:
+    """Given a list of task ids, generate the values for the choice selection."""
+    return pd.DataFrame(
+        [
+            {
+                "list_name": "task_ids",
+                "name": str(task_id),
+                "label": str(task_id),
+            }
+            for task_id in task_ids
+        ]
+    )
