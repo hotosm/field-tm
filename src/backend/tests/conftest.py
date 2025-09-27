@@ -40,7 +40,13 @@ from app.central.central_deps import pyodk_client
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
 from app.db.database import db_conn
-from app.db.enums import CommunityType, OrganisationType, TaskEvent, UserRole
+from app.db.enums import (
+    CommunityType,
+    FieldMappingApp,
+    OrganisationType,
+    TaskEvent,
+    UserRole,
+)
 from app.db.models import (
     DbOrganisation,
     DbProject,
@@ -218,6 +224,7 @@ async def project(db, admin_user, organisation):
 
     project_metadata = ProjectIn(
         name=project_name,
+        field_mapping_app=FieldMappingApp.FIELDTM,
         short_description="test",
         description="test",
         osm_category="buildings",
@@ -521,6 +528,7 @@ async def stub_project_data(organisation):
     project_name = f"Test Project {uuid4()}"
     data = {
         "name": project_name,
+        "field_mapping_app": "FieldTM",
         "short_description": "test",
         "description": "test",
         "organisation_id": organisation.id,

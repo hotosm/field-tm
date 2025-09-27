@@ -46,6 +46,7 @@ from app.db.enums import (
     CommunityType,
     DbGeomType,
     EntityState,
+    FieldMappingApp,
     HTTPStatus,
     MappingLevel,
     MappingState,
@@ -1501,6 +1502,7 @@ class DbProject(BaseModel):
 
     id: int
     name: str
+    field_mapping_app: Optional[FieldMappingApp] = None
     outline: Optional[dict] = None
     odkid: Optional[int] = None
     author_sub: Optional[str] = None

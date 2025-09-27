@@ -542,6 +542,7 @@ dependencies = [
     { name = "pyproj" },
     { name = "python-multipart" },
     { name = "pyxform" },
+    { name = "qfieldcloud-sdk" },
     { name = "raw-data-api-py" },
     { name = "shapely" },
     { name = "sozipfile" },
@@ -609,6 +610,7 @@ requires-dist = [
     { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.12" },
     { name = "pyxform", specifier = "==2.1.1" },
+    { name = "qfieldcloud-sdk", specifier = "==0.10.0" },
     { name = "raw-data-api-py", specifier = ">=0.3.0" },
     { name = "shapely", specifier = "==2.0.6" },
     { name = "sozipfile", specifier = "==0.3.2" },
@@ -1559,6 +1561,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pathvalidate"
+version = "3.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fa/2a/52a8da6fe965dea6192eb716b357558e103aea0a1e9a8352ad575a8406ca/pathvalidate-3.3.1.tar.gz", hash = "sha256:b18c07212bfead624345bb8e1d6141cdcf15a39736994ea0b94035ad2b1ba177", size = 63262, upload-time = "2025-06-15T09:07:20.736Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/70/875f4a23bfc4731703a5835487d0d2fb999031bd415e7d17c0ae615c18b7/pathvalidate-3.3.1-py3-none-any.whl", hash = "sha256:5263baab691f8e1af96092fa5137ee17df5bdfbd6cff1fcac4d6ef4bc2e1735f", size = 24305, upload-time = "2025-06-15T09:07:19.117Z" },
+]
+
+[[package]]
 name = "pg-nearest-city"
 version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2047,6 +2058,25 @@ wheels = [
 ]
 
 [[package]]
+name = "qfieldcloud-sdk"
+version = "0.10.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "click" },
+    { name = "idna" },
+    { name = "pathvalidate" },
+    { name = "requests" },
+    { name = "tqdm" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/80/48/7422ab48a169d49dd282e684cd67b5f5a8decece3b0baed2c372bd4de959/qfieldcloud_sdk-0.10.0.tar.gz", hash = "sha256:843507c629e265b0aed7dd4b9de850bad39345dbe6e36d7a7cb246210c1ca3e7", size = 30035, upload-time = "2025-08-05T13:39:42.483Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/2f/8f7bb9b789664367bf6555dc645f9f46a02d5ae48389ec4dbd76862bad1f/qfieldcloud_sdk-0.10.0-py3-none-any.whl", hash = "sha256:bb09c9c53e0736f2a8d39ba886b08b1baa12f2247b22f4e4b29d2f4f84e63a4d", size = 23743, upload-time = "2025-08-05T13:39:41.221Z" },
+]
+
+[[package]]
 name = "questionary"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2350,6 +2380,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b1/09/a439bec5888f00a54b8b9f05fa94d7f901d6735ef4e55dcec9bc37b5d8fa/tomlkit-0.13.2.tar.gz", hash = "sha256:fff5fe59a87295b278abd31bec92c15d9bc4a06885ab12bcea52c71119392e79", size = 192885, upload-time = "2024-08-14T08:19:41.488Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/b6/a447b5e4ec71e13871be01ba81f5dfc9d0af7e473da256ff46bc0e24026f/tomlkit-0.13.2-py3-none-any.whl", hash = "sha256:7a974427f6e119197f670fbbbeae7bef749a6c14e793db934baefc1b5f03efde", size = 37955, upload-time = "2024-08-14T08:19:40.05Z" },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.67.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737, upload-time = "2024-11-24T20:12:22.481Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762aeb1c1184ed1f6b14/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2", size = 78540, upload-time = "2024-11-24T20:12:19.698Z" },
 ]
 
 [[package]]

@@ -3,6 +3,9 @@ import { createProjectValidationSchema } from '../validation';
 import { project_visibility } from '@/types/enums';
 
 export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
+  // 00 Project Type Selector
+  field_mapping_app: null,
+
   // 01 Project Overview
   name: '',
   short_description: '',

@@ -126,8 +126,9 @@ async def upload_project_xlsform(
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    use_odk_collect: bool = False,
     need_verification_fields: bool = True,
+    # FIXME this var should be probably be refactored to project.field_mapping_app
+    use_odk_collect: bool = False,
 ):
     """Upload the final XLSForm for the project."""
     project = project_user.get("project")
