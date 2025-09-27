@@ -38,6 +38,13 @@ volumes:
     name: fmtm-central-db-data-dev
   central_frontend:
     name: fmtm-central-frontend-dev
+  # TODO enable as part of qfield app
+  # qfield_db_data:
+  #   name: qfield-db-data-dev
+  # qfield_static:
+  #   name: qfield-static-dev
+  qfield_projects:
+    name: qfield-projects-dev
 
 networks:
   fmtm-net:
@@ -142,6 +149,7 @@ services:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     volumes:
       - fmtm_logs:/opt/logs
+      - qfield_projects:/opt/qfield
     depends_on:
       proxy:
         condition: service_healthy
@@ -404,5 +412,133 @@ services:
       file: ../compose.yaml
       service: scheduler
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
+    annotations:
+      nerdctl/bypass4netns: true
+
+  # TODO enable this instead of qfield.cloud
+  # qfield-db:
+  #   # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
+  #   image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
+  #   volumes:
+  #     - qfield_db_data:/var/lib/postgresql/data/
+  #   environment:
+  #     - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+  #     - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+  #     - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+  #   ports:
+  #     - "5435:5432"
+  #   networks:
+  #     - fmtm-net
+  #   restart: "unless-stopped"
+  #   # Optimise to a low number of connections, see fmtm-db service
+  #   command: -c 'max_connections=64'
+  #   healthcheck:
+  #     test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
+  #     start_period: 5s
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+  # qfield-app:
+  #   image: ghcr.io/opengisch/qfieldcloud-app:25.24
+  #   volumes:
+  #     - qfield_static:/usr/src/app/staticfiles
+  #   networks:
+  #     - fmtm-net
+  #   restart: "unless-stopped"
+  #   environment:
+  #     DJANGO_SETTINGS_MODULE: qfieldcloud.settings
+  #     DEBUG: 1
+  #     ENVIRONMENT: development
+  #     QFIELDCLOUD_HOST: qfield.fmtm.localhost
+  #     DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
+  #     DJANGO_SUPERUSER_USERNAME: admin
+  #     DJANGO_SUPERUSER_EMAIL: admin@hotosm.org
+  #     DJANGO_SUPERUSER_PASSWORD: Password1234
+  #     SECRET_KEY: xxxxx
+  #     SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
+  #     ACCOUNT_EMAIL_VERIFICATION: none
+  #     # TODO fix injecting S3 vars into STORAGES
+  #     # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fmtm}
+  #     # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-somelongpassword}
+  #     # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
+  #     # STORAGE_ENDPOINT_URL: http://s3:9000
+  #     STORAGES: '{
+  #       "default": {
+  #       "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
+  #       "OPTIONS": {
+  #       "access_key": "fmtm",
+  #       "secret_key": "somelongpassword",
+  #       "bucket_name": "qfield-cloud",
+  #       "region_name": "",
+  #       "endpoint_url": "http://s3:9000"
+  #       },
+  #       "QFC_IS_LEGACY": false
+  #       }
+  #       }'
+  #     POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
+  #     POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+  #     POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+  #     POSTGRES_HOST: qfield-db
+  #     POSTGRES_PORT: 5432
+  #     GEODB_HOST: qfield-db
+  #     GEODB_PORT: 5432
+  #     GEODB_USER: ${FMTM_DB_USER:-fmtm}
+  #     GEODB_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+  #     GEODB_DB: ${FMTM_DB_NAME:-fmtm}
+  #     QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
+  #     # FIXME add actual worker
+  #     QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: http://localhost:8000
+  #     QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
+  #     QFIELDCLOUD_USE_I18N: 0
+  #     QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
+  #     QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
+  #     # QFIELDCLOUD_DEFAULT_NETWORK: ${QFIELDCLOUD_DEFAULT_NETWORK:-${COMPOSE_PROJECT_NAME}_default}
+  #     # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
+  #     # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
+  #     # QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_transformation_grids
+  #     # EMAIL_HOST: ${EMAIL_HOST}
+  #     # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
+  #     # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
+  #     # EMAIL_PORT: ${EMAIL_PORT}
+  #     # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+  #     # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+  #     # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+  #   command:
+  #     - sh
+  #     - -c
+  #     - |
+  #       python manage.py migrate &&
+  #       python manage.py collectstatic --noinput &&
+  #       python manage.py createsuperuser --no-input || true &&
+  #       python manage.py compilemessages &&
+  #       exec gunicorn qfieldcloud.wsgi:application \
+  #         --bind 0.0.0.0:8000 \
+  #         --timeout 300 \
+  #         --max-requests 300 \
+  #         --workers 1 \
+  #         --threads 4
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
+  #     start_period: 30s
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+
+  qfield-qgis:
+    image: "ghcr.io/hotosm/field-tm/qgis:25.24"
+    volumes:
+      - qfield_projects:/opt/qfield
+    environment:
+      LOG_LEVEL: DEBUG
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      start_period: 10s
+      interval: 5s
+      retries: 5
+      timeout: 5s
     annotations:
       nerdctl/bypass4netns: true
