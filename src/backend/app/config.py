@@ -284,14 +284,21 @@ class Settings(BaseSettings):
 
         if all([url, user, password]):
             print(f"Generating QFieldCloud session token for user {user}")
-            client = sdk.Client(url=url)
-            client.login(
-                username=user,
-                password=password,
-            )
-            if client.token:
-                return client.token
-            else:
+            try:
+                client = sdk.Client(url=url)
+                client.login(
+                    username=user,
+                    password=password,
+                )
+                if client.token:
+                    return client.token
+                else:
+                    print(
+                        "Error logging into QFieldCloud. Are the credentials correct?"
+                    )
+                    return None
+            except Exception as e:
+                print(e)
                 print("Error logging into QFieldCloud. Are the credentials correct?")
                 return None
 
