@@ -79,6 +79,9 @@
 		if (isMobile) {
 			updateEntityTaskStatus();
 			// Load entity in ODK Collect by intent
+			// NOTE we have since removed support for the custom ODK Collect application
+			// however, this will still open the app without any existing data loaded
+			// (if the user has the old custom app, it may still work and load the feature)
 			document.location.href = `odkcollect://form/${xformId}?feature=${entityUuid}`;
 		} else {
 			alertStore.setAlert({ message: 'Requires a mobile phone with ODK Collect.', variant: 'warning' });

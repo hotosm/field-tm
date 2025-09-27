@@ -78,34 +78,12 @@ for field mapping:
       If you encounter issues with the base imagery, contact your project
       manager.
 
-### Step 3: Install The Custom ODK Collect Mobile App
+### Step 3: Configure ODK Collect (once only)
 
-!!! note
-
-    It is recommended to not use ODK Collect in most, but instead use the
-    automatically configured WebForms.
-
-    If you must use ODK Collect, then configuration via QRCodes will be required.
-
-- The first time you load the project, you should be prompted to download
-  the custom ODK `.apk` from the sidebar.
-- Once downloaded, you should install the custom ODK Collect application.
-
-  ![highlighted-sidebar](https://github.com/user-attachments/assets/53de2d80-2709-45b0-bb82-32f0190c7859)
-  ![download-custom-odk](https://github.com/user-attachments/assets/22501751-4962-4cd7-ace1-7587269ae16c)
-
-!!! tip
-
-      If you already have ODK Collect installed, you may have to uninstall
-      it first.
-
-      You may have to enable installing from unknown sources in your device
-      settings too.
-
-### Step 4: Configure ODK Collect (once only)
+First ensure you have **ODK Collect** installed from the app store.
 
 - **Option 1:** Scan the QR code displayed on the Mapper page using
-  the custom ODK Collect mobile application.
+  the ODK Collect mobile application.
 
 - **Option 2:** Download the QR code and import it into ODK Collect to
   load the project. Follow the steps below:

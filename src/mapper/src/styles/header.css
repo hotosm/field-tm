@@ -57,10 +57,6 @@
 	--at-apply: text-[1.8rem] text-neutral-800 leading-0 cursor-pointer hover: text-primary-600 duration-200;
 }
 
-.header .drawer-icon-firstload {
-	background-color: var(--sl-color-warning-300);
-}
-
 .drawer-overview .content {
 	--at-apply: flex flex-col gap-8 px-4;
 }

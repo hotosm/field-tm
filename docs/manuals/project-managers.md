@@ -290,20 +290,17 @@ Go to [fmtm] <https://fmtm.hotosm.org/>
 
 #### During Training
 
-1. Make sure mapper has downloaded custom odk collect from  
-   Field-TM website. You can also share the apk file if mappers
-   find it difficult to download by themselves.
-2. Share the link of the project for the mapper to reach  
+1. Share the link of the project for the mapper to reach  
    to the project easily. The URL be:
    [https://mapper.fmtm.hotosm.org/project_id](https://mapper.fmtm.hotosm.org/project_id)
-3. **Updating Metadata**  
+2. **Updating Metadata**  
    If you need mappers to include their email  
    and phone number along with their username, guide them  
    to update their ODK Collect settings:
    - Navigate to **Settings** for the project.
    - Click on **User and Device Identity** to update the  
      metadata fields.
-4. **Test Submissions**  
+3. **Test Submissions**  
    Encourage mappers to submit a few test entries to  
    familiarize themselves with the workflow and address  
    any issues during training.
