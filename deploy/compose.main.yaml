@@ -34,6 +34,13 @@ volumes:
     name: fmtm-tiles-main
   certs:
     name: fmtm-certs-main
+  # TODO enable as part of qfield app
+  # qfield_db_data:
+  #   name: qfield-db-data-main
+  # qfield_static:
+  #   name: qfield-static-main
+  qfield_projects:
+    name: qfield-projects-main
 
 networks:
   fmtm-net:
@@ -158,6 +165,11 @@ services:
     extends:
       file: compose.staging.yaml
       service: scheduler
+
+  qfield-qgis:
+    extends:
+      file: compose.staging.yaml
+      service: qfield-qgis
 
   backups:
     image: "ghcr.io/hotosm/field-tm/backend:main"
