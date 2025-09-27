@@ -937,8 +937,12 @@ async def create_stub_project(
         latitude, longitude = centroid.y, centroid.x
         location = await geocoder.query(latitude, longitude)
         # Convert to two letter country code --> full name
-        country_full_name = countries.get(location.country, location.country)
-        project_info.location_str = f"{location.city},{country_full_name}"
+        country_full_name = (
+            countries.get(location.country, location.country) if location else None
+        )
+        project_info.location_str = (
+            f"{location.city},{country_full_name}" if location else None
+        )
 
     # Create the project in the Field-TM DB
     project_info.author_sub = db_user.sub
