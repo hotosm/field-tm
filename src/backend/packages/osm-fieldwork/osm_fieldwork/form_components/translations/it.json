@@ -5,6 +5,7 @@
   "image": "Scatta una foto",
   "mapping_mode": "Vuoi mappare una funzionalità nuova o esistente?",
   "task_filter": "Quale ID attività stai mappando?",
+  "none": "Nessuno",
   "existing": "Funzionalità esistente",
   "new": "Nuova funzionalità",
   "feature": "Geometria",

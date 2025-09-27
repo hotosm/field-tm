@@ -5,6 +5,7 @@
   "image": "Udělejte fotku",
   "mapping_mode": "Chcete mapovat existující nebo novou funkci?",
   "task_filter": "Jaké ID úkolu mapujete?",
+  "none": "Žádné",
   "existing": "Existující funkce",
   "new": "Nová funkce",
   "feature": "Geometrie",
