@@ -38,6 +38,13 @@ volumes:
     name: fmtm-central-db-data-staging
   central_frontend:
     name: fmtm-central-frontend-staging
+  # TODO enable as part of qfield app
+  # qfield_db_data:
+  #   name: qfield-db-data-staging
+  # qfield_static:
+  #   name: qfield-static-staging
+  qfield_projects:
+    name: qfield-projects-staging
 
 networks:
   fmtm-net:
@@ -184,6 +191,10 @@ services:
     extends:
       file: compose.dev.yaml
       service: scheduler
+  qfield-qgis:
+    extends:
+      file: compose.dev.yaml
+      service: qfield-qgis
 
   backups:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
