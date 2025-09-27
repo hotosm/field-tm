@@ -38,7 +38,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.json_data_models import data_models_path, get_choices
@@ -65,6 +65,7 @@ from app.db.models import (
     DbTask,
     DbUser,
     DbUserRole,
+    FieldMappingApp,
 )
 from app.db.postgis_utils import (
     check_crs,
@@ -76,6 +77,7 @@ from app.db.postgis_utils import (
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUserContributions
+from app.qfield.qfield_crud import create_qfield_project
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
@@ -760,7 +762,14 @@ async def generate_files(
     log.debug(f"Generating additional files for project: {project.id}")
     warning_message = None
 
-    if combined_features_count > 10000:
+    # Handle QField separately
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        qfield_url = await create_qfield_project(db, project)
+        # Redirect to qfieldcloud project dashboard
+        return RedirectResponse(qfield_url)
+
+    # Run in background for ODK project with lots of features
+    elif combined_features_count > 10000:
         # Return immediately and run in background if many features
         background_tasks.add_task(
             project_crud.generate_project_files,
