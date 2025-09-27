@@ -387,11 +387,9 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    # Low max_connections for better performance.
-    # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
-    # and other sources online. Approx (cores * 4 * replicas)
-    # Plus electric-sql defaults to need 20 connections (64+20)
-    command: -c 'max_connections=84' -c 'wal_level=logical'
+    # We don't need to optimise connections like the prod deploy here.
+    # Conversely, we increase connections for test runners.
+    command: -c 'max_connections=300' -c 'wal_level=logical'
     healthcheck:
       test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
       start_period: 5s
