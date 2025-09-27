@@ -5,6 +5,7 @@
   "image": "Tomar una foto",
   "feature": "Geometría",
   "mapping_mode": "Quieres mapear una característica existente o nueva?",
+  "task_filter": "¿Qué ID de tarea estás asignando?",
   "existing": "Característica existente",
   "new": "Nueva característica",
   "new_feature": "Por favor, dibuje una nueva geometría",

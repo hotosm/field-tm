@@ -4,6 +4,7 @@
   "survey_questions": "Perguntas da pesquisa",
   "image": "Tire uma foto",
   "mapping_mode": "Você quer mapear um recurso existente ou novo?",
+  "task_filter": "Qual ID de tarefa você está mapeando?",
   "existing": "Recurso existente",
   "new": "Novo recurso",
   "feature": "Geometria",
