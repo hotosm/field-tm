@@ -5,6 +5,7 @@
   "image": "Take a Picture",
   "mapping_mode": "Do you want to map an existing or new feature?",
   "task_filter": "What task ID are you mapping?",
+  "none": "None",
   "existing": "Existing feature",
   "new": "New feature",
   "feature": "Geometry",

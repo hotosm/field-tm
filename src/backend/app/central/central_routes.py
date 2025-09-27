@@ -134,7 +134,6 @@ async def upload_project_xlsform(
     project = project_user.get("project")
     project_id = project.id
     new_geom_type = project.new_geom_type
-    use_odk_collect = project.use_odk_collect or False
     form_name = f"FMTM_Project_{project.id}"
 
     # Validate uploaded form
@@ -162,22 +161,15 @@ async def upload_project_xlsform(
             detail="There was an error modifying the XLSForm!",
         )
     log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
-    sql = """
-        UPDATE public.projects
-        SET
-            odk_form_id = %(odk_form_id)s,
-            xlsform_content = %(xlsform_content)s
-        WHERE id = %(project_id)s;
-    """
-    async with db.cursor() as cur:
-        await cur.execute(
-            sql,
-            {
-                "project_id": project_id,
-                "odk_form_id": xform_id,
-                "xlsform_content": xlsform_bytes,
-            },
-        )
+    await DbProject.update(
+        db,
+        project_id,
+        ProjectUpdate(
+            xlsform_content=xlsform_bytes,
+            odk_form_id=xform_id,
+        ),
+    )
+    await db.commit()
 
     return JSONResponse(
         status_code=HTTPStatus.OK,
@@ -198,40 +190,12 @@ async def update_project_form(
 ):
     """Update the XForm data in ODK Central & Field-TM DB."""
     project = project_user_dict["project"]
-
-    # Update ODK Central form data
-    await central_crud.update_project_xform(
-        xform_id,
-        project.odkid,
+    await central_crud.update_project_xlsform(
+        db,
+        project,
         xlsform,
-        project.odk_credentials,
-    )
-    form_xml = await run_in_threadpool(
-        central_crud.get_project_form_xml,
-        project.odk_credentials,
-        project.odkid,
         xform_id,
     )
-
-    sql = """
-        UPDATE projects
-        SET
-            xlsform_content = %(xls_data)s,
-            odk_form_xml = %(form_xml)s
-        WHERE
-            id = %(project_id)s
-        RETURNING id, hashtags;
-    """
-    async with db.cursor() as cur:
-        await cur.execute(
-            sql,
-            {
-                "xls_data": xlsform.getvalue(),
-                "form_xml": form_xml,
-                "project_id": project.id,
-            },
-        )
-        await db.commit()
 
     return JSONResponse(
         status_code=HTTPStatus.OK,

@@ -130,7 +130,7 @@ def _get_mandatory_fields(
                 label_cols=label_cols
             ),
             add_label_translations({
-                "type": "select_one tasks_ids",
+                "type": "select_one task_ids",
                 "name": "task_filter",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "no",
@@ -143,7 +143,8 @@ def _get_mandatory_fields(
                 "appearance": "map",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "yes",
-                "choice_filter": "task_id = ${task_filter}",
+                # This removes the choice filter if selection is 'None', else applies
+                "choice_filter": "${task_filter} = 'None' or task_id = ${task_filter}",
             },
                 label_cols=label_cols
             ),

@@ -42,6 +42,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.json_data_models import data_models_path, get_choices
+from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -795,6 +796,29 @@ async def generate_files(
                 },
             )
 
+    # Update the XLSForm if using ODK Collect to add task id choice filter
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        log.info("Appending task_filter choices to XLSForm for ODK Collect project")
+        existing_xlsform = BytesIO(project.xlsform_content)
+        if not project.tasks:
+            msg = "Project has no generated tasks. Please try again."
+            log.error(msg)
+            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+
+        # Append task ids to choices sheet
+        task_ids = [task.project_task_index for task in project.tasks]
+        log.debug(f"Found {len(task_ids)} for project ID {project.id}")
+        new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
+
+        # Update in both db + ODK Central
+        await central_crud.update_project_xlsform(
+            db,
+            project,
+            new_xlsform,
+            project.odk_form_id,
+        )
+
+    # Generate the basemap automatically if custom TMS url provided
     if project.custom_tms_url:
         basemap_in = project_schemas.BasemapGenerate(
             tile_source="custom", file_format="pmtiles", tms_url=project.custom_tms_url

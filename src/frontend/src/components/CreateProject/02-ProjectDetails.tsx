@@ -32,6 +32,7 @@ const ProjectDetails = () => {
   }, [values.hasCustomTMS]);
 
   useEffect(() => {
+    // NOTE this var may be deprecated in future in favour of simply field_mapping_app
     setValue('use_odk_collect', field_mapping_app === 'ODK');
   }, [field_mapping_app]);
 
