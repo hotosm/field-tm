@@ -25,8 +25,8 @@ from pathlib import Path
 from random import getrandbits
 from uuid import uuid4
 
+from aiohttp import ClientSession
 from fastapi.exceptions import HTTPException
-from httpx import AsyncClient
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
@@ -85,8 +85,8 @@ async def create_qfield_project(
     qgis_container_url = "http://qfield-qgis:8080"
     project_name = f"field-tm-{project.name}-{getrandbits(32)}"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
-    async with AsyncClient() as client_httpx:
-        response = await client_httpx.post(
+    async with ClientSession() as http_client:
+        response = await http_client.post(
             f"{qgis_container_url}/",
             json={
                 "project_dir": str(job_dir),
