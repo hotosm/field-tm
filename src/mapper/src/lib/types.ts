@@ -29,7 +29,7 @@ export interface APIProject {
 	priority: number;
 	location_str: string;
 	odk_form_id: string;
-	odk_form_xml: string;
+	odk_form_xml: BlobPart;
 	data_extract_url: string;
 	odk_token: string;
 	organisation_id: number;
@@ -55,7 +55,7 @@ export interface DbProjectType {
 	status: string; // e.g., 'DRAFT' | 'ACTIVE' | ...
 	total_tasks?: string | null;
 	odk_form_id?: string | null;
-	odk_form_xml?: string | null;
+	odk_form_xml?: BlobPart;
 	visibility: string; // e.g., 'PUBLIC' | 'PRIVATE'
 	mapper_level: string; // e.g., 'BEGINNER' | 'INTERMEDIATE'
 	priority?: string | null; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
