@@ -118,9 +118,13 @@ async def create_qfield_project(
         f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{project_name}.qgz"
     )
     if not final_project_file.exists():
+        msg = (
+            f"QGIS job completed but output file was not created: {final_project_file}"
+        )
+        log.error(msg)
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="QGIS job completed but output file was not created",
+            detail=msg,
         )
 
     # 2. Create QFieldCloud project
