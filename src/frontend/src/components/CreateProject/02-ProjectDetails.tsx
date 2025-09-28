@@ -25,16 +25,10 @@ const ProjectDetails = () => {
   const { errors } = formState;
 
   const values = watch();
-  const { field_mapping_app } = values;
 
   useEffect(() => {
     if (!values.hasCustomTMS && values.custom_tms_url) setValue('custom_tms_url', '');
   }, [values.hasCustomTMS]);
-
-  useEffect(() => {
-    // NOTE this var may be deprecated in future in favour of simply field_mapping_app
-    setValue('use_odk_collect', field_mapping_app === 'ODK');
-  }, [field_mapping_app]);
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
