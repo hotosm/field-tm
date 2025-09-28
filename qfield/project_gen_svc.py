@@ -311,8 +311,19 @@ def set_project_file_permissions(project_path: str | Path) -> None:
         file_path.chmod(0o777)
 
 
-def xlsform_to_project(final_output_dir: Path, features_gpkg_path: str, extent_bbox: list[float], title: str, language: str, log: logging.Logger):
-    """Using a defined XLSForm create a project via xlsformconverter."""
+def xlsform_to_project(
+    final_output_dir: Path,
+    features_gpkg_path: str,
+    extent_bbox: list[float],
+    title: str,
+    language: str,
+    log: logging.Logger
+) -> str:
+    """Using a defined XLSForm create a project via xlsformconverter.
+    
+    Returns:
+        str: Path to the final qgz project file.
+    """
     from qgis.core import (
         QgsCoordinateReferenceSystem,
         QgsReferencedRectangle,
@@ -456,7 +467,7 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
         # TODO configure project settings
         configure_project_settings(project, log)
 
-        log.info(f"Final QField project located at: {str(final_output_dir)}")
+        log.info(f"Final QField project located at: {project_file}")
         return {
             "status": "success",
             "message": "QGIS project generated successfully",
