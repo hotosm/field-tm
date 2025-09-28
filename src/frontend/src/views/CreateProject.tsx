@@ -98,6 +98,7 @@ const CreateProject = () => {
       hashtags,
       organisation_name,
       field_mapping_app,
+      use_odk_collect,
     } = minimalProjectDetails;
     reset({
       ...defaultValues,
@@ -110,6 +111,7 @@ const CreateProject = () => {
       hashtags,
       organisation_name,
       field_mapping_app,
+      use_odk_collect,
     });
   }, [minimalProjectDetails]);
 
@@ -164,6 +166,7 @@ const CreateProject = () => {
       odk_central_password,
       merge,
       field_mapping_app,
+      use_odk_collect,
     } = values;
 
     const projectPayload = {
@@ -175,6 +178,7 @@ const CreateProject = () => {
       uploadedAOIFile,
       merge,
       field_mapping_app,
+      use_odk_collect,
     };
 
     let odkPayload: Pick<
@@ -215,7 +219,6 @@ const CreateProject = () => {
       hashtags: data.hashtags,
       custom_tms_url: data.custom_tms_url,
       per_task_instructions: data.per_task_instructions,
-      use_odk_collect: data.use_odk_collect,
       osm_category: data.osm_category,
       primary_geom_type: data.primary_geom_type,
       new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
