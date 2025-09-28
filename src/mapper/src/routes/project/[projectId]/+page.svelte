@@ -12,6 +12,7 @@
 	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
 	import type { ProjectTask, DbProjectType } from '$lib/types';
+	import { FieldMappingAppEnum } from '$lib/types';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { m } from '$translations/messages.js';
 	import { openOdkCollectNewFeature } from '$lib/odk/collect';
@@ -151,7 +152,9 @@
 
 		// Set vars that require upstream project details set (and are not reactive)
 		if (project) {
-			commonStore.setEnableWebForms(!project.use_odk_collect);
+			// FIXME for now we disable webforms when in ODK mode, but perhaps we want to actually
+			// FIXME use a hybrid solution in future, where ODK + WebForms can both work together?
+			commonStore.setEnableWebForms(project.field_mapping_app === FieldMappingAppEnum.FIELDTM);
 			const { odk_form_xml } = project;
 			const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
 			formXmlUrl = URL.createObjectURL(formXmlBlob);
