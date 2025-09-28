@@ -81,7 +81,9 @@ async def create_qfield_project(
 
     # 1. Create QGIS project via internal API
     qgis_container_url = "http://qfield-qgis:8080"
-    project_name = f"field-tm-{project.name}-{getrandbits(32)}"
+    # Here we need the name without spaces for the final .qgz filename
+    qgis_project_name = project.slug
+    qfc_project_name = f"FieldTM {project.name} ({getrandbits(32)})"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
 
     async with ClientSession() as http_client:
@@ -89,7 +91,7 @@ async def create_qfield_project(
             f"{qgis_container_url}/",
             json={
                 "project_dir": str(job_dir),
-                "title": project_name,
+                "title": qgis_project_name,
                 "language": form_language,
                 "extent": bbox_str,
             },
@@ -115,7 +117,8 @@ async def create_qfield_project(
 
     # Ensure output file exists
     final_project_file = Path(
-        f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{project_name}.qgz"
+        # Use project slug (no spaces in filename)
+        f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{qgis_project_name}.qgz"
     )
     if not final_project_file.exists():
         msg = (
@@ -130,20 +133,20 @@ async def create_qfield_project(
     # 2. Create QFieldCloud project
     async with qfield_client() as client:
         qfield_project = client.create_project(
-            project_name,
+            qfc_project_name,
             owner="admin",  # FIXME
             description=project.description,
             is_public=True,
         )
 
         # 3. Upload generated files from shared volume
-        qfield_project_id = qfield_project.get("id")
-        qfield_project_owner = qfield_project.get("owner")
-        qfield_project_name = qfield_project.get("name")
+        api_project_id = qfield_project.get("id")
+        api_project_owner = qfield_project.get("owner")
+        api_project_name = qfield_project.get("name")
 
         try:
             upload_info = client.upload_files(
-                project_id=qfield_project_id,
+                project_id=api_project_id,
                 upload_type=FileTransferType.PROJECT,
                 project_path=str(final_project_file.parent),
                 filter_glob="*",
@@ -153,16 +156,16 @@ async def create_qfield_project(
             log.debug(f"File upload complete: {upload_info}")
         except Exception as e:
             log.warning(
-                f"File upload failed, deleting QFieldCloud project {qfield_project_id}"
+                f"File upload failed, deleting QFieldCloud project {api_project_id}"
             )
             # Delete the project if upload fails
-            client.delete_project(qfield_project_id)
+            client.delete_project(api_project_id)
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=(f"Failed to upload files to project {qfield_project_id}: {e}"),
+                detail=(f"Failed to upload files to project {api_project_id}: {e}"),
             ) from e
 
     return (
         f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
-        f"/a/{qfield_project_owner}/{qfield_project_name}"
+        f"/a/{api_project_owner}/{api_project_name}"
     )
