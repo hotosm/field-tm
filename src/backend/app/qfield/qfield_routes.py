@@ -23,12 +23,13 @@ from fastapi import (
     APIRouter,
     Depends,
 )
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse
 from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import ProjectManager
 from app.db.database import db_conn
+from app.db.enums import HTTPStatus
 from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
 
@@ -61,4 +62,4 @@ async def trigger_qfield_project_create(
     project = project_user_dict.get("project")
     qfield_url = await create_qfield_project(db, project)
     # Redirect to qfieldcloud project dashboard
-    return RedirectResponse(qfield_url)
+    return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
