@@ -175,8 +175,8 @@ def get_logger():
     for logger_name in logger_name_list:
         logging.getLogger(logger_name).setLevel(settings.LOG_LEVEL)
         logging.getLogger(logger_name).handlers = []
-        if logger_name == "urllib3":
-            # Don't hook urllib3, called on each OTEL trace
+        if settings.LOG_LEVEL != "DEBUG" and logger_name == "urllib3":
+            # Don't hook urllib3 in prod, as it's called on each OTEL trace
             continue
         if logger_name == "pyodk._utils.config":
             # Set pyodk logger level to CRITICAL to avoid noise
