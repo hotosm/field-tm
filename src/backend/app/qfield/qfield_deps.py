@@ -45,7 +45,18 @@ async def qfield_client():
                 client.login, settings.QFIELDCLOUD_USER, settings.QFIELDCLOUD_PASSWORD
             ),
         )
-        yield client
+
+        if not client.token:
+            msg = "QFieldCloud login failed. No token set."
+            log.exception(msg)
+            raise ValueError(msg)
+
+        # Return a client with token explicitly set
+        yield await loop.run_in_executor(
+            None,
+            partial(Client, url=settings.QFIELDCLOUD_URL, token=client.token),
+        )
+
     finally:
         try:
             await loop.run_in_executor(None, client.logout)
