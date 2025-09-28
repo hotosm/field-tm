@@ -81,7 +81,7 @@ async def create_qfield_project(
     qgis_container_url = "http://qfield-qgis:8080"
     # Here we need the name without spaces for the final .qgz filename
     qgis_project_name = project.slug
-    qfc_project_name = f"FieldTM {project.name} ({getrandbits(32)})"
+    qfc_project_name = f"FieldTM-{qgis_project_name}-{getrandbits(32)}"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
 
     async with ClientSession() as http_client:
@@ -134,7 +134,7 @@ async def create_qfield_project(
         qfield_project = client.create_project(
             qfc_project_name,
             owner=settings.QFIELDCLOUD_ORG_NAME,
-            description=project.description,
+            description="Created by the Field Tasking Manager",
             is_public=True,
         )
 
