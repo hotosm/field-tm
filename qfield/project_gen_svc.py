@@ -456,6 +456,7 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
         # TODO configure project settings
         configure_project_settings(project, log)
 
+        log.info(f"Final QField project located at: {str(final_output_dir)}")
         return {
             "status": "success",
             "message": "QGIS project generated successfully",
