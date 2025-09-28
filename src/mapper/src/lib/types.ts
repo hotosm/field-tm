@@ -11,9 +11,18 @@ export type ProjectTask = {
 	outline: Polygon;
 };
 
+export type FieldMappingApp = 'QField' | 'ODK' | 'FieldTM';
+
+export const FieldMappingAppEnum = Object.freeze({
+	QFIELD: 'QField' as FieldMappingApp,
+	ODK: 'ODK' as FieldMappingApp,
+	FIELDTM: 'FieldTM' as FieldMappingApp,
+});
+
 export interface APIProject {
 	id: number;
 	name: string;
+	field_mapping_app: FieldMappingApp;
 	short_description: string;
 	description: string;
 	per_task_instructions: string;
@@ -32,11 +41,11 @@ export interface APIProject {
 	tasks: ProjectTask[];
 	geo_restrict_distance_meters: number;
 	geo_restrict_force_error: boolean;
-	use_odk_collect: boolean;
 }
 
 export interface DbProjectType {
 	id: number;
+	field_mapping_app: FieldMappingApp;
 	organisation_id?: string | null;
 	name?: string | null;
 	short_description?: string | null;
@@ -59,7 +68,6 @@ export interface DbProjectType {
 	geo_restrict_distance_meters?: number | null;
 	primary_geom_type?: string | null; // e.g., 'POLYGON'
 	new_geom_type?: string | null;
-	use_odk_collect?: boolean | null;
 	created_at: string; // ISO timestamp
 	updated_at?: string | null;
 
@@ -97,7 +105,6 @@ export const DB_PROJECT_COLUMNS = new Set([
 	'geo_restrict_distance_meters',
 	'primary_geom_type',
 	'new_geom_type',
-	'use_odk_collect',
 	'created_at',
 	'updated_at',
 	'organisation_logo',
