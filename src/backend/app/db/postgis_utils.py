@@ -18,7 +18,6 @@
 """PostGIS and geometry handling helper funcs."""
 
 import json
-import logging
 from datetime import datetime, timezone
 from random import getrandbits
 from typing import Optional, Union
@@ -26,6 +25,7 @@ from typing import Optional, Union
 import geojson
 import geojson_pydantic
 from fastapi import HTTPException
+from loguru import logger as log
 from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
 from psycopg import Connection, ProgrammingError
@@ -44,8 +44,6 @@ from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
 from app.db.enums import HTTPStatus, XLSFormType
-
-log = logging.getLogger(__name__)
 
 
 def timestamp():
