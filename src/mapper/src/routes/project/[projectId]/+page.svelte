@@ -156,6 +156,9 @@
 			// FIXME use a hybrid solution in future, where ODK + WebForms can both work together?
 			commonStore.setEnableWebForms(project.field_mapping_app === FieldMappingAppEnum.FIELDTM);
 			const { odk_form_xml } = project;
+			if (!odk_form_xml) {
+				throw Error('odk_form_xml must be set for the project')
+			}
 			const formXmlBlob = new Blob([odk_form_xml], { type: 'application/xml' });
 			formXmlUrl = URL.createObjectURL(formXmlBlob);
 		}
