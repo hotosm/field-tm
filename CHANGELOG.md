@@ -1,5 +1,52 @@
 # Changelog
 
+## 2025.6.0 (2025-09-28)
+
+### Feat
+
+- **backend**: add endpoint to retry qfield project generation
+- **osm-fieldwork**: add function to append task_id choices to form after created
+- **backend**: QField Cloud integration (#2828)
+- **frontend**: Refactor landing page according to feedback (#2831)
+- **submission**: Add endpoint to edit existing submissions. (#2820)
+- **backend**: allow setting cookie domains not using subdomains (#2822)
+- **project**: add 'use_st_within' option for data extraction and update form handling (#2807)
+
+### Fix
+
+- **backend**: create qfield project with no spaces in the name
+- **backend**: correctly set qfieldcloud project owner to HOTOSM org
+- **backend**: set qfieldcloud client with token explicitly
+- **createProject**: update use_odk_collect state during stub project creation (#2839)
+- **backend**: improving logs for qfield project creation, login on demand only
+- **osm-fieldwork**: hook urllib logger when LOG_LEVEL=DEBUG
+- **qfield**: handle spaces in project name for final qgis project file
+- **backend**: log the final qfield project file location
+- **mapper**: do not enable webforms when mapping app selection = ODK or QField
+- **backend**: usage of aiohttp for qfield project creation
+- **backend**: add task_filter question to ODK Collect workflow offline
+- **backend**: handling of multipolygons with z dimension (e.g. from qgis)
+- **backend**: fail gracefully if project location_str extraction fails
+- **frontend**: missed isProjectDeletePending app selector
+- **backend**: do not fails to start api if QField creds are incorrect
+- **backend**: use aiohttp vs httpx for qfield cloud calls
+- **backend**: using FMTM_DEV_PORT locally
+- fixes #2825 modularlise area-splitter package algorithm
+- **backend**: set correct domain for expiring cookies
+- **backend**: also correctly set cookie domain for osm cookie
+- **backend**: reference to FMTM_MAPPER_DOMAIN in config.py
+- **mapper**: add matomo tracking via config.json param
+
+### Refactor
+
+- **backend**: swap redirectresponse --> jsonresponse qfield project dash url
+- **mapper**: minor typing issue
+- remove details about custom odk application
+- remove old scripts from repo, reorganise
+- fix area-splitter current version
+- fixes #2796 full migration of fmtm-splitter as workspace
+- replace all reference fmtm.dev --> fieldtm.hotosm.org
+
 ## 2025.5.0 (2025-08-28)
 
 ### Feat
