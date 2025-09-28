@@ -17,13 +17,20 @@
 #
 """Routes to relay requests to QFieldCloud server."""
 
-import logging
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import (
+    APIRouter,
+    Depends,
+)
+from fastapi.responses import RedirectResponse
+from psycopg import Connection
 
+from app.auth.auth_schemas import ProjectUserDict
+from app.auth.roles import ProjectManager
+from app.db.database import db_conn
+from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
-
-log = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/qfield",
@@ -38,3 +45,20 @@ async def list_projects():
     async with qfield_client() as client:
         projects = client.list_projects()
         return projects
+
+
+@router.post("/projects")
+async def trigger_qfield_project_create(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
+):
+    """Attempt to generate the QFieldCloud project from FieldTM project.
+
+    The QField project should be created in /projects/generate-project-data,
+    however, if this fails, we can trigger the project creation again via this
+    endpoint.
+    """
+    project = project_user_dict.get("project")
+    qfield_url = await create_qfield_project(db, project)
+    # Redirect to qfieldcloud project dashboard
+    return RedirectResponse(qfield_url)
