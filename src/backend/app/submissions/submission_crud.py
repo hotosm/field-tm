@@ -19,7 +19,10 @@
 
 import asyncio
 import json
+import shutil
+import tempfile
 import uuid
+import zipfile
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
@@ -27,8 +30,10 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 from xml.etree.ElementTree import SubElement
 
+import pandas as pd
 from defusedxml import ElementTree
 from fastapi import HTTPException, Response
+from fastapi.responses import FileResponse
 from loguru import logger as log
 from psycopg import Connection
 from pyodk._endpoints.submissions import Submission
@@ -128,18 +133,96 @@ async def gather_all_submission_csvs(project: DbProject, filters: dict):
     return file.content
 
 
-async def download_submission_in_json(project: DbProject, filters: dict):
-    """Download submission data from ODK Central."""
-    if data := await get_submission_by_project(project, filters):
-        json_data = data
-    else:
-        json_data = None
+async def download_submission_in_json(
+    project: DbProject,
+    filters: dict,
+    include_media: Optional[bool] = False,
+):
+    """Download submission data from ODK Central in JSON format.
 
-    json_bytes = BytesIO(json.dumps(json_data).encode("utf-8"))
-    headers = {
-        "Content-Disposition": f"attachment; filename={project.slug}_submissions.json"
-    }
-    return Response(content=json_bytes.getvalue(), headers=headers)
+    If include_media is True, returns a ZIP file containing:
+        - A JSON file with all submissions.
+        - A 'media' folder with all media files for each submission.
+
+    If include_media is False, returns a plain JSON file with all submissions.
+
+    Args:
+        project (DbProject): The project for which submissions are being downloaded.
+        filters (dict): Filters to apply to the submission query.
+        include_media (Optional[bool]): Whether to include media files in the ZIP.
+
+    Returns:
+        fastapi.Response: A response containing either the JSON file or ZIP archive.
+    """
+    if not include_media:
+        if data := await get_submission_by_project(project, filters):
+            submissions = data.get("value", [])
+        else:
+            submissions = []
+
+        json_bytes = BytesIO(
+            json.dumps({"value": submissions}, indent=2).encode("utf-8")
+        )
+        headers = {
+            "Content-Disposition": f"attachment; "
+            f"filename={project.slug}_submissions.json"
+        }
+        return Response(
+            content=json_bytes.getvalue(),
+            media_type="application/json",
+            headers=headers,
+        )
+
+    # 1. Get the ODK ZIP
+    odk_zip_bytes = await gather_all_submission_csvs(project, filters)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        zip_path = Path(temp_dir) / "odk_export.zip"
+        with open(zip_path, "wb") as f:
+            f.write(odk_zip_bytes)
+
+        # 2. Extract ODK ZIP
+        with zipfile.ZipFile(zip_path, "r") as zipf:
+            zipf.extractall(temp_dir)
+
+        # 3. Find the CSV file
+        try:
+            csv_file = next(Path(temp_dir).rglob("*.csv"))
+        except StopIteration as err:
+            raise RuntimeError("No CSV file found in ODK export") from err
+
+        # 4. Convert CSV → JSON
+        df = pd.read_csv(csv_file, encoding="utf-8-sig")
+        json_data = df.to_dict(orient="records")
+        json_path = csv_file.with_suffix(".json")
+        with open(json_path, "w", encoding="utf-8") as jf:
+            json.dump(json_data, jf, indent=2)
+
+        # 5. Create new ZIP with JSON + media folder only
+        new_zip_path = (
+            Path(temp_dir) / f"{project.slug}_submissions_json_with_media.zip"
+        )
+        with zipfile.ZipFile(new_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(json_path, arcname=json_path.name)
+
+            # Add media folder if exists
+            media_dir = Path(temp_dir) / "media"
+            if media_dir.exists() and media_dir.is_dir():
+                for file in media_dir.rglob("*"):
+                    if file.is_file():
+                        zipf.write(file, arcname=str(file.relative_to(temp_dir)))
+
+        # 6. Move final ZIP to persistent temp file
+        temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+        temp_zip_path = Path(temp_zip.name)
+        temp_zip.close()
+        shutil.move(new_zip_path, temp_zip_path)
+
+    return FileResponse(
+        temp_zip_path,
+        media_type="application/zip",
+        filename=f"{project.slug}_submissions_json_with_media.zip",
+    )
 
 
 async def get_submission_count_of_a_project(project: DbProject):
