@@ -264,6 +264,7 @@ class Settings(BaseSettings):
     QFIELDCLOUD_URL: Optional[str] = ""
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[str] = ""
+    QFIELDCLOUD_ORG_NAME: Optional[str] = "HOTOSM"
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr

@@ -133,7 +133,7 @@ async def create_qfield_project(
     async with qfield_client() as client:
         qfield_project = client.create_project(
             qfc_project_name,
-            owner="admin",  # FIXME
+            owner=settings.QFIELDCLOUD_ORG_NAME,
             description=project.description,
             is_public=True,
         )
