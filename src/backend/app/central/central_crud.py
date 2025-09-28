@@ -991,10 +991,12 @@ async def get_appuser_token(
         appuser = get_odk_app_user(odk_credentials)
         odk_project = get_odk_project(odk_credentials)
         odk_app_user = odk_project.listAppUsers(project_odk_id)
+        log.debug(f"Current project appusers in ODK: {odk_app_user}")
 
         # delete if app_user already exists
         if odk_app_user:
             app_user_sub = odk_app_user[0].get("id")
+            log.debug(f"Removing existing appuser: {app_user_sub}")
             appuser.delete(project_odk_id, app_user_sub)
 
         # create new app_user
@@ -1018,7 +1020,7 @@ async def get_appuser_token(
         if not response.ok:
             try:
                 json_data = response.json()
-                log.error(json_data)
+                log.error(f"Error updating XForm role {json_data}")
             except json.decoder.JSONDecodeError:
                 log.error(
                     "Could not parse response json during appuser update. "

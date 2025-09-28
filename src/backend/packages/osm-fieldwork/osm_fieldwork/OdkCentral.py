@@ -122,6 +122,13 @@ class OdkCentral:
         # Use a persistent connect, better for multiple requests
         self.session = requests.Session()
 
+        # Hook into the session's request method to log the URL that is called
+        original_request = self.session.request
+        def logging_request(method, url, *args, **kwargs):
+            log.debug(f"ODKCentral request: {method.upper()} {url}")
+            return original_request(method, url, *args, **kwargs)
+        self.session.request = logging_request
+
         # Authentication with session token
         self.authenticate()
 
@@ -1002,7 +1009,7 @@ class OdkAppUser(OdkCentral):
         Returns:
             (bool): Whether it was update or not
         """
-        log.info("Update access to XForm {} for {}".format(xform, actorId))
+        log.info(f"Update access to XForm ({xform}) for {actorId}")
         url = f"{self.base}projects/{projectId}/forms/{xform}/assignments/{roleId}/{actorId}"
         result = self.session.post(url, verify=self.verify)
         return result
