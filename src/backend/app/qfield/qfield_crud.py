@@ -18,7 +18,6 @@
 """Logic for interaction with QFieldCloud & data."""
 
 import json
-import logging
 import shutil
 from io import BytesIO
 from pathlib import Path
@@ -27,6 +26,7 @@ from uuid import uuid4
 
 from aiohttp import ClientSession
 from fastapi.exceptions import HTTPException
+from loguru import logger as log
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
@@ -36,8 +36,6 @@ from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.qfield.qfield_deps import qfield_client
-
-log = logging.getLogger(__name__)
 
 # Configuration
 CONTAINER_IMAGE = "ghcr.io/opengisch/qfieldcloud-qgis:25.24"
@@ -131,8 +129,8 @@ async def create_qfield_project(
         )
 
     # 2. Create QFieldCloud project
+    log.debug(f"Creating QFieldCloud project: {qfc_project_name}")
     async with qfield_client() as client:
-        log.debug(f"Creating QFieldCloud project: {qfc_project_name}")
         qfield_project = client.create_project(
             qfc_project_name,
             owner="admin",  # FIXME
