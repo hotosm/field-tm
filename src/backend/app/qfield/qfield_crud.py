@@ -79,14 +79,13 @@ async def create_qfield_project(
     with open(tasks_geojson_path, "w") as f:
         json.dump(json.loads(tasks_geojson), f)
 
-    # TODO ensure xlsform has geometry field, if not add in
-
     # 1. Create QGIS project via internal API
     qgis_container_url = "http://qfield-qgis:8080"
     project_name = f"field-tm-{project.name}-{getrandbits(32)}"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
+
     async with ClientSession() as http_client:
-        response = await http_client.post(
+        async with http_client.post(
             f"{qgis_container_url}/",
             json={
                 "project_dir": str(job_dir),
@@ -94,26 +93,25 @@ async def create_qfield_project(
                 "language": form_language,
                 "extent": bbox_str,
             },
-        )
+        ) as response:
+            if response.status != 200:
+                msg = f"QGIS API request failed: {await response.text()}"
+                log.error(msg)
+                shutil.rmtree(job_dir)
+                raise HTTPException(
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    detail=msg,
+                )
 
-        if response.status_code != 200:
-            msg = f"QGIS API request failed: {response.text}"
-            log.error(msg)
-            shutil.rmtree(job_dir)
-            raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
-
-        result = response.json()
-        if result.get("status") != "success":
-            msg = f"Failed to generate QGIS project: {result.get('message')}"
-            log.error(msg)
-            shutil.rmtree(job_dir)
-            raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
+            result = await response.json()
+            if result.get("status") != "success":
+                msg = f"Failed to generate QGIS project: {result.get('message')}"
+                log.error(msg)
+                shutil.rmtree(job_dir)
+                raise HTTPException(
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    detail=msg,
+                )
 
     # Ensure output file exists
     final_project_file = Path(
