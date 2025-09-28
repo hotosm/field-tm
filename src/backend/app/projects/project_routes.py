@@ -38,7 +38,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.json_data_models import data_models_path, get_choices
@@ -766,8 +766,8 @@ async def generate_files(
     # Handle QField separately
     if project.field_mapping_app == FieldMappingApp.QFIELD:
         qfield_url = await create_qfield_project(db, project)
-        # Redirect to qfieldcloud project dashboard
-        return RedirectResponse(qfield_url)
+        # Provide URL for qfieldcloud project dashboard
+        return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
 
     # Run in background for ODK project with lots of features
     elif combined_features_count > 10000:
