@@ -33,17 +33,24 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def qfield_client():
     """Login to QFieldCloud using session token."""
-    if not settings.QFIELDCLOUD_TOKEN:
-        log.error("QFieldCloud is not logged in")
-
     loop = get_running_loop()
     client = await loop.run_in_executor(
         None,
-        partial(Client, url=settings.QFIELDCLOUD_URL, token=settings.QFIELDCLOUD_TOKEN),
+        partial(Client, url=settings.QFIELDCLOUD_URL),
     )
 
     try:
-        # FIXME add logic to renew token if invalid when tested
+        # First generate a token in the client object state
+        await loop.run_in_executor(
+            None,
+            partial(
+                client.login, settings.QFIELDCLOUD_USER, settings.QFIELDCLOUD_PASSWORD
+            ),
+        )
         yield client
     finally:
-        await loop.run_in_executor(None, client.logout)
+        try:
+            await loop.run_in_executor(None, client.logout)
+        except Exception as e:
+            # Log but don’t suppress main exception
+            log.warning(f"Failed to logout QFieldCloud client: {e}")

@@ -35,7 +35,6 @@ from pydantic import (
 )
 from pydantic.networks import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from qfieldcloud_sdk import sdk
 
 # NOTE this validator also appends a trailing slash to a URL
 HttpUrlStr = Annotated[
@@ -265,42 +264,6 @@ class Settings(BaseSettings):
     QFIELDCLOUD_URL: Optional[str] = ""
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[str] = ""
-    QFIELDCLOUD_TOKEN: Optional[str] = None
-
-    @field_validator("QFIELDCLOUD_TOKEN", mode="before")
-    @classmethod
-    def generate_qfield_session_token(
-        cls, v: Optional[str], info: ValidationInfo
-    ) -> Optional[str]:
-        """Create a QField session token for the API.
-
-        By default this expires in 2 weeks, after which QFieldCloud
-        API access will not work & the token must be regenerated
-        by restarting FieldTM.
-        """
-        url = info.data.get("QFIELDCLOUD_URL")
-        user = info.data.get("QFIELDCLOUD_USER")
-        password = info.data.get("QFIELDCLOUD_PASSWORD")
-
-        if all([url, user, password]):
-            print(f"Generating QFieldCloud session token for user {user}")
-            try:
-                client = sdk.Client(url=url)
-                client.login(
-                    username=user,
-                    password=password,
-                )
-                if client.token:
-                    return client.token
-                else:
-                    print(
-                        "Error logging into QFieldCloud. Are the credentials correct?"
-                    )
-                    return None
-            except Exception as e:
-                print(e)
-                print("Error logging into QFieldCloud. Are the credentials correct?")
-                return None
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
