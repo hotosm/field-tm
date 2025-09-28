@@ -72,6 +72,7 @@ class StubProjectIn(BaseModel):
     author_sub: Optional[str] = None
     hashtags: Optional[list[str]] = []
     slug: Optional[str] = None
+    use_odk_collect: bool = False
 
     @field_validator("hashtags", mode="before")
     @classmethod
