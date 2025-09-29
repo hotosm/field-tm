@@ -92,7 +92,9 @@ monitoring = [
     #"opentelemetry-exporter-otlp==1.37.0",
     "opentelemetry-instrumentation-fastapi==0.58b0",
     "opentelemetry-instrumentation-logging==0.58b0",
-    "opentelemetry-instrumentation-psycopg==0.58b0",
+    # FIXME enable once addressed:
+    # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/3793
+    #"opentelemetry-instrumentation-psycopg==0.58b0",
     "opentelemetry-instrumentation-requests==0.58b0",
 ]
 
