@@ -23,7 +23,7 @@ description = "Field Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "uvicorn==0.34.2",
     "uvloop==0.21.0",
@@ -34,7 +34,7 @@ dependencies = [
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.12",
-    "psycopg[c,pool]==3.1.7",
+    "psycopg[c,pool]==3.2.6",
     "geojson==3.1.0",
     "shapely==2.0.6",
     "pyxform==2.1.1",
@@ -99,7 +99,7 @@ monitoring = [
 [tool.ruff]
 fix = true
 line-length = 88
-target-version = "py312"
+target-version = "py313"
 exclude = [
     ".ruff_cache",
     "app/__version__.py",
