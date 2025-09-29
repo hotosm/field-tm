@@ -139,7 +139,7 @@ dependencies = [
 requires-dist = [
     { name = "geojson", specifier = ">=2.5.0" },
     { name = "osm-rawdata", specifier = ">=0.2.2" },
-    { name = "psycopg", specifier = ">=3.1.17" },
+    { name = "psycopg", specifier = ">=3.1.7" },
     { name = "shapely", specifier = ">=1.8.1" },
 ]
 
@@ -602,7 +602,7 @@ requires-dist = [
     { name = "osm-fieldwork", editable = "packages/osm-fieldwork" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "pg-nearest-city", specifier = "==0.2.1" },
-    { name = "psycopg", extras = ["pool"], specifier = "==3.2.6" },
+    { name = "psycopg", extras = ["pool"], specifier = "==3.1.7" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
@@ -1686,15 +1686,15 @@ wheels = [
 
 [[package]]
 name = "psycopg"
-version = "3.2.6"
+version = "3.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/67/97/eea08f74f1c6dd2a02ee81b4ebfe5b558beb468ebbd11031adbf58d31be0/psycopg-3.2.6.tar.gz", hash = "sha256:16fa094efa2698f260f2af74f3710f781e4a6f226efe9d1fd0c37f384639ed8a", size = 156322, upload-time = "2025-03-12T20:43:12.228Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8b/43/209b5c52e8acb0ff3dd9299965becb5f56997ae4c848a576d1321581b63b/psycopg-3.1.7.tar.gz", hash = "sha256:83bb8b231a58802b6434d994d20c4897818d7e2d8970206975a06b6919c63985", size = 138078, upload-time = "2022-12-20T15:54:56.572Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/7d/0ba52deff71f65df8ec8038adad86ba09368c945424a9bd8145d679a2c6a/psycopg-3.2.6-py3-none-any.whl", hash = "sha256:f3ff5488525890abb0566c429146add66b329e20d6d4835662b920cbbf90ac58", size = 199077, upload-time = "2025-03-12T20:38:07.112Z" },
+    { url = "https://files.pythonhosted.org/packages/28/c4/43691328bb0c1576bb2bb5c4f7e9795e767589aeff6a28234a5dff6a2fc5/psycopg-3.1.7-py3-none-any.whl", hash = "sha256:7030781cb98f33b6780ffef4cfe0449a1e0ec626d4009378aa081143dab3b20f", size = 167156, upload-time = "2022-12-20T15:54:51.321Z" },
 ]
 
 [package.optional-dependencies]
