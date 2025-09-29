@@ -550,7 +550,7 @@ requires-dist = [
     { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=feat%2Fenv-var-config" },
     { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.12" },
-    { name = "pyxform", specifier = "==2.1.1" },
+    { name = "pyxform", specifier = "==4.0.0" },
     { name = "qfieldcloud-sdk", specifier = "==0.10.0" },
     { name = "raw-data-api-py", specifier = ">=0.3.0" },
     { name = "shapely", specifier = "==2.0.6" },
@@ -1831,16 +1831,16 @@ wheels = [
 
 [[package]]
 name = "pyxform"
-version = "2.1.1"
+version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "defusedxml" },
     { name = "openpyxl" },
     { name = "xlrd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c7/ee/1bf86acc3676cf5cd6bef60e0d077e617b54225a72f2a6ca27c282dfe1b1/pyxform-2.1.1.tar.gz", hash = "sha256:bb118936c4524fdff72674a505bc9962983420c7191215807d1d5bc2d17d2168", size = 5494793, upload-time = "2024-10-09T19:05:32.091Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/34/5e6ad70a96530f0adc54a0a28c0d04152ec1986a7b170f2c0baaf736b017/pyxform-4.0.0.tar.gz", hash = "sha256:b646a91c28e8bf3f57801818c7bd52ba09ae66e0c45f9f0330858691aab50dfa", size = 5501284, upload-time = "2025-06-09T19:22:38.998Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/ff/1fbb6a13d4aeceed0f4a3192e0d769c0497df4ffedc31aaa02a623090f29/pyxform-2.1.1-py3-none-any.whl", hash = "sha256:f17864e37191759689fdb64ba22ed075bbda25dc9400dbe223c904a887bf1326", size = 5505453, upload-time = "2024-10-09T19:05:29.486Z" },
+    { url = "https://files.pythonhosted.org/packages/51/25/4a1d9c940b70fb15e2087484baa97489a6f7a622dc526e2bb4f3926d3f7a/pyxform-4.0.0-py3-none-any.whl", hash = "sha256:c58aeef81a5d250718c4eb4dd2e9b6b9f92eaf0c6d8972b38f393b05aeeec499", size = 5516084, upload-time = "2025-06-09T19:22:36.693Z" },
 ]
 
 [[package]]
