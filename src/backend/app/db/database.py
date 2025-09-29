@@ -21,7 +21,7 @@
 from typing import cast
 
 from fastapi import Request
-from loguru import log
+from loguru import logger as log
 from psycopg import Connection
 from psycopg_pool import AsyncConnectionPool
 
