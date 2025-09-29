@@ -150,8 +150,8 @@ services:
     extends:
       file: compose.staging.yaml
       service: fmtm-db
-    # Increase max connections as we have 4 API replicas
-    command: -c 'max_connections=200' -c 'wal_level=logical'
+    # Increase max connections as we have 4 API replicas (+64)
+    command: -c 'max_connections=148' -c 'wal_level=logical'
 
   electric:
     extends:
