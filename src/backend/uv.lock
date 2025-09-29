@@ -534,7 +534,7 @@ dependencies = [
     { name = "osm-fieldwork" },
     { name = "osm-login-python" },
     { name = "pg-nearest-city" },
-    { name = "psycopg", extra = ["pool"] },
+    { name = "psycopg", extra = ["c", "pool"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyjwt" },
@@ -602,7 +602,7 @@ requires-dist = [
     { name = "osm-fieldwork", editable = "packages/osm-fieldwork" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "pg-nearest-city", specifier = "==0.2.1" },
-    { name = "psycopg", extras = ["pool"], specifier = "==3.1.7" },
+    { name = "psycopg", extras = ["c", "pool"], specifier = "==3.1.7" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
@@ -1698,9 +1698,18 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+c = [
+    { name = "psycopg-c" },
+]
 pool = [
     { name = "psycopg-pool" },
 ]
+
+[[package]]
+name = "psycopg-c"
+version = "3.1.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/df/0e/11159cbdffb260bc79ab46fe33e36083506f1204ba5ef7686b45df5d03da/psycopg-c-3.1.7.tar.gz", hash = "sha256:3be083c911780d98a9ccc61059b104cdbc3121e6f038feb5e6fa82418c6cb004", size = 562554, upload-time = "2022-12-20T15:55:04.126Z" }
 
 [[package]]
 name = "psycopg-pool"
