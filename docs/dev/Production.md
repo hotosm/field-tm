@@ -269,3 +269,17 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
   - Push your branch, then create a PR against the `main` branch in Github.
   - Merge in the PR and wait for the deployment.
   - Later the code can be pulled back into develop / staging.
+
+### The prod server is broken, but dev / stage work?
+
+- Have been here a few times before...
+- Always keep in mind that if you recently push to prod,
+  then the code is likely the same across instances, so it's
+  likely external factors:
+  1. Database migrations - some mismatch between database fields
+     or data inconsistency.
+  2. The server that it's hosted on - this may be different between
+     environments.
+  3. The logging / telemetry config - I have been caught out here
+     before! OpenTelemetry may only be configured on production
+     and could potentially have bugs.
