@@ -149,9 +149,9 @@ services:
       - ./src/backend/scheduler:/opt/scheduler:ro
       - ./src/backend/stats:/opt/stats:ro
       # Workspace packages config
-      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork:ro
+      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
       - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
-      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.12/site-packages/area_splitter:ro
+      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.13/site-packages/area_splitter:ro
       - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     environment:
       DEBUG: ${DEBUG:-True}
