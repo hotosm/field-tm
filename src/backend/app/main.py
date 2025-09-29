@@ -30,7 +30,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
-from psycopg import Connection
+from psycopg import Connection, connection
 
 from app.__version__ import __version__
 from app.auth import auth_routes
@@ -86,20 +86,11 @@ async def lifespan(
     app: FastAPI,  # dead: disable
 ) -> AsyncIterator[None]:
     """FastAPI startup/shutdown event."""
-    log.debug("Starting up FastAPI server.")
+    log.debug("Starting up FastAPI server")
 
-    # Create a pooled db connection and make available in lifespan state
-    # https://asgi.readthedocs.io/en/latest/specs/lifespan.html#lifespan-state
-    # NOTE to use within a request (this is wrapped in database.py already):
-    # from typing import cast
-    # db_pool = cast(AsyncConnectionPool, request.state.db_pool)
-    # async with db_pool.connection() as conn:
-    db_pool = get_db_connection_pool()
-    log.debug("Opening database connection pool")
-    await db_pool.open()
-
+    # NOTE we run this outside db pool to avoid competing with pool init
     log.debug("Creating db connection for server initialisation steps")
-    async with db_pool.connection() as conn:
+    async with connection() as conn:
         log.debug("Initialising admin org and user in DB")
         await init_admin_org(conn)
         log.debug("Reading XLSForms from DB")
@@ -108,10 +99,21 @@ async def lifespan(
         async with AsyncNearestCity(conn):
             pass
 
+    # Create a pooled db connection and make available in lifespan state
+    # https://asgi.readthedocs.io/en/latest/specs/lifespan.html#lifespan-state
+    # NOTE to use within a request (this is wrapped in database.py already):
+    # from typing import cast
+    # db_pool = cast(AsyncConnectionPool, request.state.db_pool)
+    # async with db_pool.connection() as conn:
+    db_pool = get_db_connection_pool()
+    log.debug("Opening database connection pool for server")
+    await db_pool.open()
+    log.debug("Database pool opened, attaching to lifespan")
+
     yield {"db_pool": db_pool}
 
     # Shutdown events
-    log.debug("Shutting down FastAPI server.")
+    log.debug("Shutting down FastAPI server")
     await db_pool.close()
 
 
