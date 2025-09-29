@@ -133,10 +133,7 @@ RUN apt-get update --quiet \
         "gettext-base" \
         "libpcre2-16-0" \
         "media-types" \
-        # FIXME not working with libpq5 on prod
-        # FIXME attempt using libpq-dev
-        # "libpq5" \
-        "libpq-dev" \
+        "libpq5" \
         "postgresql-client" \
         "libglib2.0-0t64" \
         "libspatialindex-c8" \
