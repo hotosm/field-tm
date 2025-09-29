@@ -95,12 +95,14 @@ async def lifespan(
     # db_pool = cast(AsyncConnectionPool, request.state.db_pool)
     # async with db_pool.connection() as conn:
     db_pool = get_db_connection_pool()
+    log.debug("Opening database connection pool")
     await db_pool.open()
 
+    log.debug("Creating db connection for server initialisation steps")
     async with db_pool.connection() as conn:
-        log.debug("Initialising admin org and user in DB.")
+        log.debug("Initialising admin org and user in DB")
         await init_admin_org(conn)
-        log.debug("Reading XLSForms from DB.")
+        log.debug("Reading XLSForms from DB")
         await read_and_insert_xlsforms(conn, xlsforms_path)
         log.debug("Initialising reverse geocoding database")
         async with AsyncNearestCity(conn):
