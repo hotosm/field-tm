@@ -134,11 +134,15 @@ RUN apt-get update --quiet \
         "libpcre3" \
         "mime-support" \
         "postgresql-common" \
-        "postgresql-client-17" \
         "libglib2.0-0" \
         "libspatialindex-c6" \
         "libproj25" \
         "libgeos-c1v5" \
+    # Temp until Debian supports Postgres v16 by default
+    && yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh \
+    && DEBIAN_FRONTEND=noninteractive \
+       apt-get install -y --quiet --no-install-recommends \
+       "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/
