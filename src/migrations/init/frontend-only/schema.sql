@@ -13,6 +13,7 @@
 CREATE TABLE public.projects (
     id integer NOT NULL,
     organisation_id integer,
+    field_mapping_app public.fieldmappingapp DEFAULT 'FieldTM',
     name character varying,
     short_description character varying,
     description character varying,

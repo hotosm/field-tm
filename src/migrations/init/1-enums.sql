@@ -48,3 +48,6 @@ CREATE TYPE public.communitytype AS ENUM (
     'OTHER'
 );
 ALTER TYPE public.communitytype OWNER TO fmtm;
+
+CREATE TYPE public.fieldmappingapp AS ENUM ('QField', 'ODK', 'FieldTM');
+ALTER TYPE public.fieldmappingapp OWNER TO fmtm;
