@@ -30,7 +30,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
-from psycopg import Connection, connection
+from psycopg import AsyncConnection, Connection
 
 from app.__version__ import __version__
 from app.auth import auth_routes
@@ -90,7 +90,7 @@ async def lifespan(
 
     # NOTE we run this outside db pool to avoid competing with pool init
     log.debug("Creating db connection for server initialisation steps")
-    async with connection() as conn:
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as conn:
         log.debug("Initialising admin org and user in DB")
         await init_admin_org(conn)
         log.debug("Reading XLSForms from DB")
