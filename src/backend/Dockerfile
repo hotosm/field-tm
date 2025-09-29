@@ -134,6 +134,7 @@ RUN apt-get update --quiet \
         "libpcre3" \
         "mime-support" \
         "postgresql-common" \
+        "postgresql-client-17" \
         "libglib2.0-0" \
         "libspatialindex-c6" \
         "libproj25" \
