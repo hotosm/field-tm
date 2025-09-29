@@ -280,6 +280,8 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
      or data inconsistency.
   2. The server that it's hosted on - this may be different between
      environments.
-  3. The logging / telemetry config - I have been caught out here
+  3. The deployment configuration - be it docker or Kubernetes, this
+     may vary slightly between environments.
+  4. The logging / telemetry config - I have been caught out here
      before! OpenTelemetry may only be configured on production
      and could potentially have bugs.
