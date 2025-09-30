@@ -196,24 +196,36 @@ def analyse_and_fix_geometries(input_geojson_path: str, log: logging.Logger) -> 
         RuntimeError: If processing fails
     """
     from qgis import processing
-    
+
     input_file = Path(input_geojson_path)
     if not validate_geometry_file(input_file, log):
         raise FileNotFoundError(f"Invalid or empty geometry file: {input_file}")
     
     output_dir = input_file.parent
+    pre_fixed_geojson = output_dir / f"{input_file.stem}_prefixed.geojson"
     fixed_geojson = output_dir / f"{input_file.stem}_valid.geojson"
     fixed_gpkg = output_dir / f"{input_file.stem}_valid.gpkg"
 
     try:
         log.info("Analysing geometries by type...")
+
+        # First fix geometries globally to avoid errors in filtering step
+        log.info("Pre-fixing geometries before filtering...")
+        processing.run(
+            "native:fixgeometries",
+            {
+                "INPUT": str(input_file),
+                "METHOD": 1,  # Structure method
+                "OUTPUT": str(pre_fixed_geojson),
+            }
+        )
         
         log.debug("Filtering geoms")
         # Filter geometries by type
         filter_result = processing.run(
             "native:filterbygeometry",
             {
-                "INPUT": str(input_file),
+                "INPUT": str(pre_fixed_geojson),
                 "POINTS": "TEMPORARY_OUTPUT",
                 "LINES": "TEMPORARY_OUTPUT", 
                 "POLYGONS": "TEMPORARY_OUTPUT",
@@ -241,7 +253,7 @@ def analyse_and_fix_geometries(input_geojson_path: str, log: logging.Logger) -> 
         
         input_for_fixing = filter_result[predominant_type]
         
-        # Fix geometries
+        # Fix geometries for predominant type
         log.info("Fixing invalid geometries...")
         processing.run(
             "native:fixgeometries",
