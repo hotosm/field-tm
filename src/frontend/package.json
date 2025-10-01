@@ -24,7 +24,7 @@
     "email": "sysadmin@hotosm.org"
   },
   "devDependencies": {
-    "@playwright/test": "1.48.1",
+    "@playwright/test": "1.55.1",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^22.0.2",
     "@types/react": "19.0.8",
