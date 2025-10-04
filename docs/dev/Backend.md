@@ -291,6 +291,15 @@ to create projects and call API endpoints, using the key.
 - For any API call you make in the next section, ensure to set the `x-api-key`
   header. See the example in the next section!
 
+<!-- markdownlint-disable -->
+
+!!! note
+
+      Ensure the user you create the API key for has `is_email_verified=True`
+      in the users table of the database, else this won't work.
+
+<!-- markdownlint-restore -->
+
 #### 2. Create project metadata
 
 The metadata for a project must be created first.
