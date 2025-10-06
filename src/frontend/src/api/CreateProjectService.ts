@@ -93,6 +93,10 @@ export const CreateProjectService = (
 ) => {
   return async (dispatch: AppDispatch) => {
     try {
+      const stopProjectCreation = () => {
+        throw new Error();
+      };
+
       dispatch(CreateProjectActions.CreateProjectLoading(true));
 
       // 1. patch project details
@@ -112,21 +116,25 @@ export const CreateProjectService = (
         );
       }
 
+      let APISuccess = false;
+
       // 2. post task boundaries
-      await dispatch(
+      APISuccess = await dispatch(
         UploadTaskAreasService(`${VITE_API_URL}/projects/${id}/upload-task-boundaries`, file.taskSplitGeojsonFile),
       );
+      if (!APISuccess) stopProjectCreation();
 
       // 3. upload data extract
       if (isEmptyDataExtract) {
         // manually set response as we don't call an API
       } else if (file.dataExtractGeojsonFile) {
-        await dispatch(
+        APISuccess = await dispatch(
           UploadDataExtractService(
             `${VITE_API_URL}/projects/upload-data-extract?project_id=${id}`,
             file.dataExtractGeojsonFile,
           ),
         );
+        if (!APISuccess) stopProjectCreation();
       } else {
         dispatch(
           CommonActions.SetSnackBar({
@@ -136,9 +144,10 @@ export const CreateProjectService = (
       }
 
       // 4. generate remaining project files
-      await dispatch(
+      APISuccess = await dispatch(
         GenerateProjectFilesService(`${VITE_API_URL}/projects/${id}/generate-project-data`, combinedFeaturesCount),
       );
+      if (!APISuccess) stopProjectCreation();
 
       // 5. assign & remove project managers
       const addAdminPromises = project_admins.projectAdminToAssign?.map(async (sub: any) => {
@@ -167,12 +176,6 @@ export const CreateProjectService = (
       await delay(5000);
       navigate(`/project/${id}`);
     } catch (error) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: error?.response?.data?.detail || 'Something went wrong. Please try again.',
-        }),
-      );
-
       // revert project status to draft if any error arises during project generation
       await API.patch(url, {
         status: 'DRAFT',
@@ -263,7 +266,7 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
     } catch (error: any) {
       dispatch(
         CommonActions.SetSnackBar({
-          message: JSON.stringify(error?.response?.data?.detail),
+          message: JSON.stringify(error?.response?.data?.detail || 'Failed to generate project data'),
         }),
       );
       return false;
