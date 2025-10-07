@@ -37,7 +37,7 @@ async def test_helper_odk_creds_test(client):
     }
 
     with patch(
-        "app.helpers.helper_routes.odk_credentials_test", new_callable=AsyncMock
+        "app.central.central_crud.odk_credentials_test", new_callable=AsyncMock
     ) as mock_test_odk:
         response = await client.post("/central/test-credentials", json=odk_creds)
         assert response.status_code == 200
