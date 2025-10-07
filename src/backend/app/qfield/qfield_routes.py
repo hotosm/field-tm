@@ -23,14 +23,15 @@ from fastapi import (
     APIRouter,
     Depends,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import ProjectManager
+from app.central.central_schemas import ODKCentral
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.qfield.qfield_crud import create_qfield_project
+from app.qfield.qfield_crud import create_qfield_project, qfc_credentials_test
 from app.qfield.qfield_deps import qfield_client
 
 router = APIRouter(
@@ -63,3 +64,14 @@ async def trigger_qfield_project_create(
     qfield_url = await create_qfield_project(db, project)
     # Redirect to qfieldcloud project dashboard
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
+
+
+@router.post("/test-credentials")
+async def qfc_creds_test(
+    # FIXME
+    # qfc_creds: Annotated[qfield_schemas.QFieldCloud, Depends()],
+    qfc_creds: Annotated[ODKCentral, Depends()],
+):
+    """Test QFieldCloud credentials by attempting to open a session."""
+    await qfc_credentials_test(qfc_creds)
+    return Response(status_code=HTTPStatus.OK)

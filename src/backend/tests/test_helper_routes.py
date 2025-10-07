@@ -26,7 +26,7 @@ import pytest
 async def test_helper_odk_creds_test(client):
     """Unit tests for the helper routes in the FastAPI application.
 
-    This module tests the `/helper/odk-credentials-test` endpoint,
+    This module tests the `/central/test-credentials` endpoint,
     mocking the ODK credentials verification logic to ensure the route
     responds correctly without making real network calls.
     """
@@ -39,7 +39,7 @@ async def test_helper_odk_creds_test(client):
     with patch(
         "app.helpers.helper_routes.odk_credentials_test", new_callable=AsyncMock
     ) as mock_test_odk:
-        response = await client.post("/helper/odk-credentials-test", json=odk_creds)
+        response = await client.post("/central/test-credentials", json=odk_creds)
         assert response.status_code == 200
         mock_test_odk.assert_awaited_once()
 

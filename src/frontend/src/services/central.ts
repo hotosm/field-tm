@@ -1,5 +1,7 @@
 import { api } from '.';
-import { updateProjectFormPayloadType } from '@/types';
+import { updateProjectFormPayloadType, odkCredsParamsType } from '@/types';
+
+export const testOdkCredentials = (params: odkCredsParamsType) => api.post('/central/test-credentials', {}, { params });
 
 export const getFormLists = () => api.get('/central/list-forms');
 

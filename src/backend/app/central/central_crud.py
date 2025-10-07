@@ -1113,3 +1113,23 @@ async def list_form_media(
             project_odk_id,
             xform_id,
         )
+
+
+async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
+    """Test ODK Central credentials by attempting to open a session.
+
+    Returns status 200 if credentials are valid, otherwise raises HTTPException.
+    """
+    try:
+        async with central_deps.get_odk_dataset(odk_creds):
+            pass
+        return HTTPStatus.OK
+    except HTTPException as e:
+        log.error(f"ODK Central credential test failed: {e.detail}")
+        raise
+    except Exception as e:
+        log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Unexpected error while testing ODK Central credentials.",
+        ) from e

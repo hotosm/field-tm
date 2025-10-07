@@ -26,7 +26,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
 import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 import { useGetUserListQuery } from '@/api/user';
-import { useTestOdkCredentialsMutation } from '@/api/helper';
+import { useTestOdkCredentialsMutation } from '@/api/central';
 
 const ProjectOverview = () => {
   useDocumentTitle('Create Project: Project Overview');

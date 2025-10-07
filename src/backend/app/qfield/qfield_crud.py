@@ -31,11 +31,13 @@ from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
+from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.qfield.qfield_deps import qfield_client
+from app.qfield.qfield_schemas import QFieldCloud
 
 # Configuration
 CONTAINER_IMAGE = "ghcr.io/opengisch/qfieldcloud-qgis:25.24"
@@ -171,3 +173,28 @@ async def create_qfield_project(
     )
     log.info(f"Finished QFieldCloud project upload: {qfc_project_url}")
     return qfc_project_url
+
+
+# FIXME replace with qfield_schemas.QFieldCloud
+async def qfc_credentials_test(qfc_creds: ODKCentral):
+    """Test QFieldCloud credentials by attempting to open a session.
+
+    Returns status 200 if credentials are valid, otherwise raises HTTPException.
+    """
+    try:
+        # FIXME temp solution
+        creds = QFieldCloud(
+            qfield_cloud_url=qfc_creds.odk_central_url,
+            qfield_cloud_user=qfc_creds.odk_central_user,
+            qfield_cloud_password=qfc_creds.odk_central_password,
+        )
+        async with qfield_client(creds):
+            pass
+        return HTTPStatus.OK
+    except Exception as e:
+        msg = f"QFieldCloud credential test failed: {str(e)}"
+        log.debug(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="QFieldCloud credentials are invalid.",
+        ) from e
