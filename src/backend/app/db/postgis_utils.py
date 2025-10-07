@@ -662,7 +662,7 @@ def multigeom_to_singlegeom(
     final_features = []
 
     for feature in featcol.get("features", []):
-        properties = feature["properties"]
+        properties = feature.get("properties", {})
         try:
             geom = shape(feature["geometry"])
         except ValueError:
