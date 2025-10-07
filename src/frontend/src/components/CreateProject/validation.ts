@@ -156,6 +156,7 @@ export const uploadSurveyValidationSchema = z
     xlsFormFile: z.any().optional(),
     isXlsFormFileValid: z.boolean(),
     needVerificationFields: z.boolean(),
+    mandatoryPhotoUpload: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;

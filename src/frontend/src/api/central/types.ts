@@ -13,6 +13,7 @@ export type uploadXlsformParamsType = {
   project_id: number;
   use_odk_collect?: boolean;
   need_verification_fields?: boolean;
+  mandatory_photo_upload?: boolean;
 };
 
 // RESPONSE
