@@ -24,8 +24,6 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from markdown import markdown
 
-from app.central.central_deps import get_odk_dataset
-from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import HTTPStatus
 
@@ -73,23 +71,3 @@ async def send_email(
         log.error(e)
         log.error(f"Failed to send email to {', '.join(user_emails)}")
         raise
-
-
-async def odk_credentials_test(odk_creds: ODKCentral):
-    """Test ODK Central credentials by attempting to open a session.
-
-    Returns status 200 if credentials are valid, otherwise raises HTTPException.
-    """
-    try:
-        async with get_odk_dataset(odk_creds):
-            pass
-        return HTTPStatus.OK
-    except HTTPException as e:
-        log.error(f"ODK Central credential test failed: {e.detail}")
-        raise
-    except Exception as e:
-        log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Unexpected error while testing ODK Central credentials.",
-        ) from e

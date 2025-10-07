@@ -21,29 +21,38 @@
 from asyncio import get_running_loop
 from contextlib import asynccontextmanager
 from functools import partial
+from typing import Optional
 
 from loguru import logger as log
 from qfieldcloud_sdk.sdk import Client
 
 from app.config import settings
+from app.qfield.qfield_schemas import QFieldCloud
 
 
 @asynccontextmanager
-async def qfield_client():
+async def qfield_client(creds: Optional[QFieldCloud] = None):
     """Login to QFieldCloud using session token."""
+    if creds:
+        qfc_url = creds.qfield_cloud_url
+        qfc_user = creds.qfield_cloud_user
+        qfc_password = creds.qfield_cloud_password
+    else:
+        qfc_url = settings.QFIELDCLOUD_URL
+        qfc_user = settings.QFIELDCLOUD_USER
+        qfc_password = settings.QFIELDCLOUD_PASSWORD
+
     loop = get_running_loop()
     client = await loop.run_in_executor(
         None,
-        partial(Client, url=settings.QFIELDCLOUD_URL),
+        partial(Client, url=qfc_url),
     )
 
     try:
         # First generate a token in the client object state
         await loop.run_in_executor(
             None,
-            partial(
-                client.login, settings.QFIELDCLOUD_USER, settings.QFIELDCLOUD_PASSWORD
-            ),
+            partial(client.login, qfc_user, qfc_password),
         )
 
         if not client.token:
@@ -54,7 +63,7 @@ async def qfield_client():
         # Return a client with token explicitly set
         yield await loop.run_in_executor(
             None,
-            partial(Client, url=settings.QFIELDCLOUD_URL, token=client.token),
+            partial(Client, url=qfc_url, token=client.token),
         )
 
     finally:
