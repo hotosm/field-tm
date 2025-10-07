@@ -39,7 +39,7 @@ from osm_fieldwork.form_components.choice_fields import get_choice_fields, gener
 from osm_fieldwork.form_components.mandatory_fields import (
     meta_df,
     create_survey_df,
-    photo_collection_field,
+    get_photo_collection_field,
     create_entity_df,
 )
 from osm_fieldwork.form_components.digitisation_fields import (
@@ -276,6 +276,7 @@ async def _process_all_form_tabs(
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     label_cols: list[str] = [],
 ) -> tuple[str, pd.DataFrame]:
@@ -294,7 +295,7 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(photo_collection_field, label_cols)
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols)
         ])
     else:
         add_label = True
@@ -311,7 +312,7 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(photo_collection_field)
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload))
         ])
 
     # Configure form settings
@@ -365,6 +366,7 @@ async def append_field_mapping_fields(
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
@@ -402,6 +404,7 @@ async def append_field_mapping_fields(
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,
     )
@@ -689,13 +692,22 @@ async def main():
         default=DbGeomType.POINT,
     )
     parser.add_argument(
-        "-vr",
+        "-verify",
         "--need-verification-fields",
         type=str2bool,
         nargs='?',
         const=True,
         default=True,
         help="Requirement of verification questions (true/false)",
+    )
+    parser.add_argument(
+        "-photo",
+        "--mandatory-photo-upload",
+        type=str2bool,
+        nargs='?',
+        const=True,
+        default=False,
+        help="Requirement of photo upload field (true/false)",
     )
     parser.add_argument(
         "-odk",
@@ -743,6 +755,7 @@ async def main():
         additional_entities=args.additional_dataset_names,
         new_geom_type=args.new_geom_type,
         need_verification_fields=args.need_verification_fields,
+        mandatory_photo_upload=args.mandatory_photo_upload,
         use_odk_collect=args.use_odk_collect,
     )
 

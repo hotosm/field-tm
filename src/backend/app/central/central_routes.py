@@ -83,6 +83,7 @@ async def validate_form(
     debug: bool = False,
     use_odk_collect: bool = False,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
 ):
     """Basic validity check for uploaded XLSForm.
 
@@ -100,6 +101,7 @@ async def validate_form(
         xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
             xlsform,
             need_verification_fields=need_verification_fields,
+            mandatory_photo_upload=mandatory_photo_upload,
             use_odk_collect=use_odk_collect,
         )
         return StreamingResponse(
@@ -113,6 +115,7 @@ async def validate_form(
         await central_crud.validate_and_update_user_xlsform(
             xlsform,
             need_verification_fields=need_verification_fields,
+            mandatory_photo_upload=mandatory_photo_upload,
             use_odk_collect=use_odk_collect,
         )
         return JSONResponse(
@@ -127,6 +130,7 @@ async def upload_project_xlsform(
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
     xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     # FIXME this var should be probably be refactored to project.field_mapping_app
     use_odk_collect: bool = False,
 ):
@@ -142,6 +146,7 @@ async def upload_project_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
     )
 
@@ -150,6 +155,7 @@ async def upload_project_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
     )
 

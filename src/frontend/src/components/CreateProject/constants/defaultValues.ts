@@ -37,6 +37,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   xlsFormFile: null,
   isXlsFormFileValid: false,
   needVerificationFields: true,
+  mandatoryPhotoUpload: false,
 
   // 04 Map Data
   primary_geom_type: null,

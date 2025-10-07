@@ -283,6 +283,7 @@ async def append_fields_to_user_xlsform(
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -292,6 +293,7 @@ async def append_fields_to_user_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
     )
 
@@ -301,6 +303,7 @@ async def validate_and_update_user_xlsform(
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
@@ -309,6 +312,7 @@ async def validate_and_update_user_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
     )
 
