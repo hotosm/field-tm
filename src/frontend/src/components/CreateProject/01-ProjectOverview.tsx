@@ -28,6 +28,7 @@ import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/orga
 import { useGetUserListQuery } from '@/api/user';
 import { useTestOdkCredentialsMutation } from '@/api/central';
 import { field_mapping_app } from '@/types/enums';
+import { useTestQFieldCredentialsMutation } from '@/api/qfield';
 
 const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
   ODK: 'ODK Central',
@@ -182,14 +183,16 @@ const ProjectOverview = () => {
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
   };
 
+  const saveServerCredentials = () => {
+    setValue('odk_central_url', odkCreds.odk_central_url);
+    setValue('odk_central_user', odkCreds.odk_central_user);
+    setValue('odk_central_password', odkCreds.odk_central_password);
+    setShowODKCredsModal(false);
+  };
+
   const { mutate: validateODKCredentialsMutate, isPending: isODKCredentialsValidating } = useTestOdkCredentialsMutation(
     {
-      onSuccess: () => {
-        setValue('odk_central_url', odkCreds.odk_central_url);
-        setValue('odk_central_user', odkCreds.odk_central_user);
-        setValue('odk_central_password', odkCreds.odk_central_password);
-        setShowODKCredsModal(false);
-      },
+      onSuccess: saveServerCredentials,
       onError: ({ response }) => {
         dispatch(
           CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to validate ODK credentials' }),
@@ -197,6 +200,16 @@ const ProjectOverview = () => {
       },
     },
   );
+
+  const { mutate: validateQFieldCredentialsMutate, isPending: isQFieldCredentialsValidating } =
+    useTestQFieldCredentialsMutation({
+      onSuccess: saveServerCredentials,
+      onError: ({ response }) => {
+        dispatch(
+          CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to validate QField credentials' }),
+        );
+      },
+    });
 
   const validateODKCredentials = async () => {
     const valid = odkCredentialsValidationSchema.safeParse({
@@ -207,12 +220,8 @@ const ProjectOverview = () => {
     let errors = {};
     if (valid.success) {
       errors = {};
-      // only validate ODK credentials for ODK via endpoint
       if (values.field_mapping_app === field_mapping_app.QField) {
-        setValue('odk_central_url', odkCreds.odk_central_url);
-        setValue('odk_central_user', odkCreds.odk_central_user);
-        setValue('odk_central_password', odkCreds.odk_central_password);
-        setShowODKCredsModal(false);
+        validateQFieldCredentialsMutate({ params: odkCreds });
       } else {
         validateODKCredentialsMutate({ params: odkCreds });
       }
@@ -342,7 +351,11 @@ const ProjectOverview = () => {
               <Button variant="link-grey" onClick={() => setShowODKCredsModal(false)}>
                 Cancel
               </Button>
-              <Button variant="primary-red" isLoading={isODKCredentialsValidating} onClick={validateODKCredentials}>
+              <Button
+                variant="primary-red"
+                isLoading={isODKCredentialsValidating || isQFieldCredentialsValidating}
+                onClick={validateODKCredentials}
+              >
                 Confirm
               </Button>
             </div>
