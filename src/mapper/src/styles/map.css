@@ -47,6 +47,7 @@
 
 .map .help-text p {
 	--at-apply: uppercase font-medium text-base;
+	background-color: var(--sl-color-yellow-600);
 }
 
 .map .help-text-2 {
