@@ -69,12 +69,15 @@ meta_df = pd.DataFrame(
     ]
 )
 
-photo_collection_field = {
-    "type": "image",
-    "name": "image",
-    "appearance": "minimal",
-    "parameters": "max-pixels=1000",
-}
+
+def get_photo_collection_field(mandatory_photo_upload: bool = False):
+    return {
+        "type": "image",
+        "name": "image",
+        "appearance": "minimal",
+        "parameters": "max-pixels=1000",
+        "required": "yes" if mandatory_photo_upload else "no",
+    }
 
 
 def _get_mandatory_fields(

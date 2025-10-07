@@ -66,6 +66,7 @@ const UploadSurvey = () => {
         project_id: +projectId!,
         use_odk_collect: values.use_odk_collect,
         need_verification_fields: values.needVerificationFields,
+        mandatory_photo_upload: values.mandatoryPhotoUpload,
       },
     });
   };
@@ -146,10 +147,21 @@ const UploadSurvey = () => {
       </div>
 
       <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-        <FieldLabel label="Include digitization verification questions" />
+        <FieldLabel className="fmtm-pr-3" label="Include digitization verification questions" />
         <Controller
           control={control}
           name="needVerificationFields"
+          render={({ field }) => (
+            <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+          )}
+        />
+      </div>
+
+      <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+        <FieldLabel className="fmtm-pr-20" label="Make photo upload mandatory" />
+        <Controller
+          control={control}
+          name="mandatoryPhotoUpload"
           render={({ field }) => (
             <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
           )}
