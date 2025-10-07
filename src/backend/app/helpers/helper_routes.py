@@ -59,7 +59,7 @@ from app.db.postgis_utils import (
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
-from app.helpers.helper_crud import odk_credentials_test, send_email
+from app.helpers.helper_crud import send_email
 
 router = APIRouter(
     prefix="/helper",
@@ -393,12 +393,3 @@ async def send_test_email(user_emails: list[str]):
     return Response(
         status_code=HTTPStatus.OK,
     )
-
-
-@router.post("/odk-credentials-test")
-async def odk_creds_test(
-    odk_creds: Annotated[ODKCentral, Depends()],
-):
-    """Test ODK Central credentials by attempting to open a session."""
-    await odk_credentials_test(odk_creds)
-    return Response(status_code=HTTPStatus.OK)

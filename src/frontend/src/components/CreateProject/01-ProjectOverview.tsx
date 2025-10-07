@@ -26,7 +26,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
 import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 import { useGetUserListQuery } from '@/api/user';
-import { useTestOdkCredentialsMutation } from '@/api/helper';
+import { useTestOdkCredentialsMutation } from '@/api/central';
 import { field_mapping_app } from '@/types/enums';
 
 const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {

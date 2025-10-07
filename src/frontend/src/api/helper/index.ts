@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { testOdkCredentials, downloadTemplateXlsform } from '@/services/helper';
-import type { TQueryOptions, TMutationOptions, odkCredsParamsType, xlsformTemplateDownloadParamsType } from '@/types';
+import { useQuery } from '@tanstack/react-query';
+import { downloadTemplateXlsform } from '@/services/helper';
+import type { TQueryOptions, xlsformTemplateDownloadParamsType } from '@/types';
 
 export function useDownloadTemplateXlsformQuery({
   params,
@@ -12,15 +12,6 @@ export function useDownloadTemplateXlsformQuery({
   return useQuery({
     queryFn: () => downloadTemplateXlsform(params),
     select: (data) => data.data,
-    ...options,
-  });
-}
-
-export function useTestOdkCredentialsMutation(
-  options: TMutationOptions<void, { params: odkCredsParamsType }, { detail: string }>,
-) {
-  return useMutation({
-    mutationFn: ({ params }) => testOdkCredentials(params),
     ...options,
   });
 }

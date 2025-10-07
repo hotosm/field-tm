@@ -35,7 +35,7 @@ from pyodk._endpoints.entities import Entity
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import Mapper, ProjectManager
-from app.central import central_crud, central_deps
+from app.central import central_crud, central_deps, central_schemas
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbOdkEntities, DbProject
@@ -473,3 +473,12 @@ async def add_new_entity(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Entity creation failed",
         ) from e
+
+
+@router.post("/test-credentials")
+async def odk_creds_test(
+    odk_creds: Annotated[central_schemas.ODKCentral, Depends()],
+):
+    """Test ODK Central credentials by attempting to open a session."""
+    await central_crud.odk_credentials_test(odk_creds)
+    return Response(status_code=HTTPStatus.OK)
