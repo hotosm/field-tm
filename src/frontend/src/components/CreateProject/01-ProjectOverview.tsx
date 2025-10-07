@@ -27,6 +27,13 @@ import Switch from '@/components/common/Switch';
 import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 import { useGetUserListQuery } from '@/api/user';
 import { useTestOdkCredentialsMutation } from '@/api/helper';
+import { field_mapping_app } from '@/types/enums';
+
+const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
+  ODK: 'ODK Central',
+  FieldTM: 'ODK Central',
+  QField: 'QField Coud',
+};
 
 const ProjectOverview = () => {
   useDocumentTitle('Create Project: Project Overview');
@@ -134,7 +141,7 @@ const ProjectOverview = () => {
 
   const handleOrganizationChange = (orgId: number) => {
     const orgIdInt = orgId && +orgId;
-    if (!orgIdInt) return;
+    if (!orgIdInt || values.field_mapping_app === field_mapping_app.QField) return;
     const selectedOrg = organisationList?.find((org) => org.value === orgIdInt);
     setValue('hasODKCredentials', !!selectedOrg?.hasODKCredentials);
     setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
@@ -192,12 +199,23 @@ const ProjectOverview = () => {
   );
 
   const validateODKCredentials = async () => {
-    const valid = odkCredentialsValidationSchema.safeParse(odkCreds);
+    const valid = odkCredentialsValidationSchema.safeParse({
+      field_mapping_app: values.field_mapping_app,
+      ...odkCreds,
+    });
 
     let errors = {};
     if (valid.success) {
       errors = {};
-      validateODKCredentialsMutate({ params: odkCreds });
+      // only validate ODK credentials for ODK via endpoint
+      if (values.field_mapping_app === field_mapping_app.QField) {
+        setValue('odk_central_url', odkCreds.odk_central_url);
+        setValue('odk_central_user', odkCreds.odk_central_user);
+        setValue('odk_central_password', odkCreds.odk_central_password);
+        setShowODKCredsModal(false);
+      } else {
+        validateODKCredentialsMutate({ params: odkCreds });
+      }
     } else {
       valid.error.issues.forEach((issue) => {
         errors[issue.path[0]] = issue.message;
@@ -255,19 +273,21 @@ const ProjectOverview = () => {
         {errors?.organisation_id?.message && <ErrorMessage message={errors.organisation_id.message as string} />}
       </div>
 
-      {values.organisation_id && values.hasODKCredentials && !values.id && (
-        <CustomCheckbox
-          key="useDefaultODKCredentials"
-          label="Use default or requested ODK credentials"
-          checked={values.useDefaultODKCredentials}
-          onCheckedChange={(value) => {
-            setValue('useDefaultODKCredentials', value);
-            if (!value) setShowODKCredsModal(true);
-          }}
-          className="fmtm-text-black fmtm-button fmtm-text-sm"
-          labelClickable={values.useDefaultODKCredentials}
-        />
-      )}
+      {((values.organisation_id && values.hasODKCredentials) ||
+        values.field_mapping_app === field_mapping_app.QField) &&
+        !values.id && (
+          <CustomCheckbox
+            key="useDefaultODKCredentials"
+            label={`Use default or requested ${values.field_mapping_app === field_mapping_app.QField ? 'QField' : 'ODK'} credentials`}
+            checked={values.useDefaultODKCredentials}
+            onCheckedChange={(value) => {
+              setValue('useDefaultODKCredentials', value);
+              if (!value) setShowODKCredsModal(true);
+            }}
+            className="fmtm-text-black fmtm-button fmtm-text-sm"
+            labelClickable={values.useDefaultODKCredentials}
+          />
+        )}
 
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
         <Dialog
@@ -282,18 +302,18 @@ const ProjectOverview = () => {
               });
           }}
         >
-          {values.organisation_id && !values.useDefaultODKCredentials && (
+          {!values.useDefaultODKCredentials && (
             <DialogTrigger className="fmtm-w-fit">
               <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
-                Set ODK Credentials
+                Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
               </Button>
             </DialogTrigger>
           )}
           <DialogContent>
-            <DialogTitle>Set ODK Credentials</DialogTitle>
+            <DialogTitle>Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials</DialogTitle>
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                <FieldLabel label="ODK Central URL" astric />
+                <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} URL`} astric />
                 <Input
                   value={odkCreds.odk_central_url}
                   onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_url: e.target.value })}
@@ -301,7 +321,7 @@ const ProjectOverview = () => {
                 {odkCredsError.odk_central_url && <ErrorMessage message={odkCredsError.odk_central_url as string} />}
               </div>
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                <FieldLabel label="ODK Central Email" astric />
+                <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Email`} astric />
                 <Input
                   value={odkCreds.odk_central_user}
                   onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_user: e.target.value })}
@@ -309,7 +329,7 @@ const ProjectOverview = () => {
                 {odkCredsError.odk_central_user && <ErrorMessage message={odkCredsError.odk_central_user} />}
               </div>
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                <FieldLabel label="ODK Central Password" astric />
+                <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Password`} astric />
                 <Input
                   value={odkCreds.odk_central_password}
                   onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_password: e.target.value })}
