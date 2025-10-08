@@ -3,7 +3,8 @@
 	"common": {
 		"yes": "Yes",
 		"no": "No",
-		"zoom_to_task": "Zoom na tarefa"
+		"zoom_to_task": "Zoom na tarefa",
+		"projects": "MAPEAMENTOS"
 	},
 	"project_states": {
 		"DRAFT": "Rascunho",
