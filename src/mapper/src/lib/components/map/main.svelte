@@ -49,6 +49,9 @@
 	import { clickOutside } from '$lib/map/click-outside.ts';
 	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
 
+	import { defaultLocale } from 'maplibre-gl/src/ui/default_locale';
+	import { ptBR, ne } from '$assets/maplibre-translations';
+
 	type bboxType = [number, number, number, number];
 
 	interface Props {
@@ -109,6 +112,13 @@
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
 	let toggleLayer = $state(true);
+
+	const localeMap: Record<string, Record<string, string>> = {
+		'en': defaultLocale,
+		'pt-BR': ptBR,
+		ne,
+	};
+	let maplibreLocale = $derived({ ...defaultLocale, ...(localeMap[commonStore.locale] ?? localeMap['en']) });
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,
@@ -417,6 +427,7 @@
 	bind:loaded
 	style={osmStyle}
 	class="map"
+	locale={maplibreLocale}
 	center={[0, 0]}
 	zoom={2}
 	attributionControl={false}
@@ -440,7 +451,7 @@
 	<ScaleControl />
 	<Control class="control" position="top-left">
 		<ControlGroup>
-			<ControlButton title="Zoom to project" on:click={zoomToProject}
+			<ControlButton title={m['map.control_zoom_to_project']()} on:click={zoomToProject}
 				><sl-icon name="crop-free" class="icon"></sl-icon></ControlButton
 			>
 		</ControlGroup></Control

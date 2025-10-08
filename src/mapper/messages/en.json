@@ -44,7 +44,9 @@
 		"geometry_correct_place": "Is the geometry in the correct place?",
 		"distance": "Distance",
 		"no_orientation_sensors": "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
-		"legend_features": "Legend (Features)"
+		"legend_features": "Legend (Features)",
+		"control_zoom_to_project": "Zoom to project",
+		"control_geolocation": "Geolocation"
 	},
 	"popup": {
 		"task": "Task",

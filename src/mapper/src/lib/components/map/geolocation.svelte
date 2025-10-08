@@ -243,7 +243,7 @@
 				<button class="button">{m['map.enable_geolocation_got_it']()}</button>
 			</div>
 			<ControlButton
-				title="Geolocation"
+				title={m['map.control_zoom_to_project']()}
 				on:click={() => {
 					entitiesStore.setToggleGeolocation(!entitiesStore.toggleGeolocation);
 					if (!entitiesStore.toggleGeolocation) {

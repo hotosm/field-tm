@@ -44,7 +44,9 @@
 		"geometry_correct_place": "A geometria está no local correto?",
 		"distance": "Distância",
 		"no_orientation_sensors": "Não é possível lidar com a orientação do dispositivo. Seu navegador não é compatível com sensores de orientação do dispositivo.",
-		"legend_features": "Legenda (Pontos)"
+		"legend_features": "Legenda (Pontos)",
+		"control_zoom_to_project": "Ampliar para projetar",
+		"control_geolocation": "Geolocalização"
 	},
 	"popup": {
 		"task": "Tarefa",
