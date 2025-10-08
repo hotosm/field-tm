@@ -46,7 +46,10 @@
 		"no_orientation_sensors": "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
 		"legend_features": "Legend (Features)",
 		"control_zoom_to_project": "Zoom to project",
-		"control_geolocation": "Geolocation"
+		"control_geolocation": "Geolocation",
+		"control_basemaps": "Basemaps",
+		"control_legend": "Legend",
+		"control_sync_status": "Sync Map"
 	},
 	"popup": {
 		"task": "Task",
