@@ -3,7 +3,8 @@
 	"common": {
 		"yes": "Yes",
 		"no": "No",
-		"zoom_to_task": "Zoom To Task"
+		"zoom_to_task": "Zoom To Task",
+		"projects": "PROJECTS"
 	},
 	"project_states": {
 		"DRAFT": "Draft",
