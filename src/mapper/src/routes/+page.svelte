@@ -4,6 +4,7 @@
 	import type { SlInputEvent } from '@shoelace-style/shoelace';
 
 	import { goto } from '$app/navigation';
+	import { m } from '$translations/messages.js';
 	import { getProjectStore } from '$store/projects.svelte';
 	import Pagination from '$lib/components/pagination.svelte';
 	import ProjectCard from '$lib/components/project-summary/project-card.svelte';
@@ -47,7 +48,7 @@
 <div class=" h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
 		<div class="flex items-center justify-between my-2">
-			<h5 class="m-0">PROJECTS</h5>
+			<h5 class="m-0">{m['common.projects']()}</h5>
 			<sl-input
 				placeholder="Search"
 				size="small"

@@ -3,7 +3,8 @@
 	"common": {
 		"yes": "हो",
 		"no": "No",
-		"zoom_to_task": "टास्कमा जुम गर्नुहोस्"
+		"zoom_to_task": "टास्कमा जुम गर्नुहोस्",
+		"projects": "परियोजनाहरू"
 	},
 	"project_states": {
 		"DRAFT": "ड्राफ्ट",
