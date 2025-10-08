@@ -4,6 +4,7 @@
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { APIProject } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte';
 	import { unicodeBold } from '$lib/utils/text.ts';
 	import { projectStatus, taskStatus } from '$constants/enums';
@@ -18,6 +19,7 @@
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
+	const commonStore = getCommonStore();
 
 	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, clickMapNewFeature }: Props = $props();
 
@@ -172,6 +174,7 @@
 	noHeader
 >
 	<h5 class="dialog-text">
+		{#key commonStore.locale}
 		{#if taskSubmission}
 			<!-- Subtle difference to include 'only' in the text here -->
 			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
@@ -188,6 +191,7 @@
 		{/if}
 		<!--  The confirmation dialog is always displayed -->
 		{m['popup.task_complete_confirm']()}
+		{/key}
 	</h5>
 	<div class="button-wrapper">
 		<sl-button
