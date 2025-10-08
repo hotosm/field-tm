@@ -281,16 +281,25 @@ async def wrap_check_access(
     )
 
     if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail="User does not have permission to access the project.",
-        )
+        # NOTE workaround to allow a mix of svcfmtm access on mapper frontend
+        # for public projects, but also blocking access for svcfmtm on
+        # mapper frontend if the project is private. We must send 401 and
+        # not 403 to make managing this easier
+        if user_data.username == "svcfmtm":
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                detail="User does not have permission to access the project.",
+            )
+        else:
+            raise HTTPException(
+                status_code=HTTPStatus.FORBIDDEN,
+                detail="User does not have permission to access the project.",
+            )
 
     return {
         "user": db_user,
         "project": project,
     }
-
 
 class ProjectManager:
     """A wrapper for the project manager to restrict access if project is completed."""
