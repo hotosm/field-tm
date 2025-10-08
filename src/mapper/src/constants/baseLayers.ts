@@ -31,35 +31,6 @@ export const osmStyle = {
 	],
 };
 
-let stamenStyle = {
-	id: 'Stamen Raster',
-	version: 8,
-	name: 'Black & White',
-	glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
-	sources: {
-		stamen: {
-			type: 'raster',
-			tiles: ['https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png'],
-			minzoom: 0,
-			maxzoom: 19,
-			attribution: `© <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">
-           © Stamen Design</a> 
-           © <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
-           `,
-		},
-	},
-	layers: [
-		{
-			id: 'stamen',
-			type: 'raster',
-			source: 'stamen',
-			layout: {
-				visibility: 'visible',
-			},
-		},
-	],
-};
-
 let esriStyle = {
 	id: 'ESRI Raster',
 	version: 8,
@@ -141,4 +112,4 @@ export const pmtilesStyle = {
 	],
 };
 
-export const baseLayers = [osmStyle, stamenStyle, esriStyle, satellite];
+export const baseLayers = [osmStyle, esriStyle, satellite];
