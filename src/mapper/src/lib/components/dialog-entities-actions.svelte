@@ -212,7 +212,7 @@
 							tabindex="0"
 							class="icon"
 						>
-							<sl-icon name="new-window"></sl-icon>
+							<sl-icon name="trash"></sl-icon>
 							<p class="action">{m['popup.delete_feature']()}</p>
 						</div>
 					{/if}
