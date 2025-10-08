@@ -63,7 +63,7 @@
 		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?",
 		"select_this_feature": "Selecione este recurso",
 		"map_this_feature": "Mapeie este recurso",
-		"proceed": "prosseguir",
+		"proceed": "PROSSEGUIR",
 		"delete_feature": "Excluir este recurso"
 	},
 	"stack_group": {
