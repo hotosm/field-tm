@@ -25,6 +25,7 @@ import asyncio
 import logging
 import re
 import sys
+import importlib
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -47,7 +48,6 @@ from osm_fieldwork.form_components.digitisation_fields import (
     digitisation_choices, 
 )
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES, add_label_translations
-from osm_fieldwork.xlsforms import xlsforms_path
 
 log = logging.getLogger(__name__)
 
@@ -391,7 +391,12 @@ async def append_field_mapping_fields(
     """
     log.info("Appending field mapping questions to XLSForm")
 
-    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    if isinstance(custom_form, BytesIO):
+        custom_data = custom_form
+    else: 
+        custom_data = BytesIO(custom_form)
+
+    custom_sheets = pd.read_excel(custom_data, sheet_name=None, engine="calamine")
     if "survey" not in custom_sheets:
         msg = "Survey sheet is required in XLSForm!"
         log.error(msg)
@@ -408,7 +413,8 @@ async def append_field_mapping_fields(
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,
     )
-    return (xformid, await write_xlsform(updated_form))
+    output_bytes = await write_xlsform(updated_form)
+    return (xformid, output_bytes)
 
 
 async def append_task_id_choices(
@@ -736,7 +742,8 @@ async def main():
     if args.input:
         input_file = Path(args.input)
     elif args.category:
-        input_file = Path(f"{xlsforms_path}/{args.category}.yaml")
+        xlsforms_resource_path = importlib.resources.files('osm_fieldwork.xlsforms')
+        input_file = xlsforms_resource_path.joinpath(f"{args.category}.yaml")
     else:
         log.error("Must choose one of '-i' for file input, or '-c' for category selection")
         parser.print_help()

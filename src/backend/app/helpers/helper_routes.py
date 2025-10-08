@@ -18,6 +18,7 @@
 """Routes to help with common processes in the Field-TM workflow."""
 
 import csv
+import importlib.resources
 import json
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -33,11 +34,12 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
-from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms.conversion import convert_yaml_to_xlsform
 from osm_login_python.core import Auth
 from psycopg import Connection
+from starlette.responses import StreamingResponse
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
@@ -74,11 +76,24 @@ async def download_template(
 ):
     """Download example XLSForm from Field-TM."""
     form_filename = XLSFormType(form_type).name
-    xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
-    if Path(xlsform_path).exists():
-        return FileResponse(xlsform_path, filename=f"{form_filename}.xls")
-    else:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")
+    try:
+        xlsforms_resource_path = importlib.resources("osm_fieldwork.xlsforms")
+        yaml_filepath = xlsforms_resource_path.joinpath(f"{form_filename}.yaml")
+        converted_data = await convert_yaml_to_xlsform(yaml_filepath)
+
+        buffer = BytesIO(converted_data)
+        return StreamingResponse(
+            buffer,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename={form_filename}.xlsx"
+            },
+        )
+
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Form not found"
+        ) from e
 
 
 @router.get("/convert-fgb-to-geojson")

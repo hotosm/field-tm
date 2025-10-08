@@ -25,16 +25,14 @@ from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
-from osm_fieldwork.xlsforms import buildings, healthcare
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
+from osm_fieldwork.xlsforms.conversion import convert_yaml_to_xlsform
 
 
 async def test_merge_mandatory_fields():
     """Merge the mandatory fields XLSForm to a test survey form."""
-    test_form = Path(__file__).parent / "test_data" / "test_form_for_mandatory_fields.xls"
-
-    with open(test_form, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    yaml_form = Path(__file__).parent / "test_data" / "test_form_for_mandatory_fields.yaml"
+    form_bytes = await convert_yaml_to_xlsform(yaml_form)
 
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
@@ -54,10 +52,8 @@ async def test_merge_mandatory_fields():
 
 async def test_add_extra_select_from_file():
     """Append extra select_one_from_file questions based on Entity list names."""
-    test_form = Path(__file__).parent / "test_data" / "test_form_for_mandatory_fields.xls"
-
-    with open(test_form, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    yaml_form = Path(__file__).parent / "test_data" / "test_form_for_mandatory_fields.yaml"
+    form_bytes = await convert_yaml_to_xlsform(yaml_form)
 
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings", additional_entities=["roads", "waterpoints"])
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
@@ -71,8 +67,9 @@ async def test_add_extra_select_from_file():
 
 async def test_buildings_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
-    with open(buildings, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    buildings_yaml_path = Path("/opt/python/lib/python3.13/site-packages/osm_fieldwork/xlsforms/buildings.yaml")
+    form_bytes= await convert_yaml_to_xlsform(buildings_yaml_path)
+
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
@@ -83,8 +80,8 @@ async def test_buildings_xlsform():
 
 async def test_healthcare_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
-    with open(healthcare, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    health_yaml_path = Path("/opt/python/lib/python3.13/site-packages/osm_fieldwork/xlsforms/health.yaml")
+    form_bytes = await convert_yaml_to_xlsform(health_yaml_path)
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)

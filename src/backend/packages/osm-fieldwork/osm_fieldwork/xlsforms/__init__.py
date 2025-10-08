@@ -1,9 +1,9 @@
 """Index of XLSForm file paths."""
 
-import os
+#import os
 
-xlsforms_path = os.path.dirname(os.path.abspath(__file__))
+# = os.path.dirname(os.path.abspath(__file__))
 
-buildings = f"{xlsforms_path}/buildings.xls"
-healthcare = f"{xlsforms_path}/health.xls"
-highways = f"{xlsforms_path}/highways.xls"
+#buildings = f"{xlsforms_path}/buildings.yaml"
+#healthcare = f"{xlsforms_path}/health.yaml"
+#highways = f"{xlsforms_path}/highways.yaml"

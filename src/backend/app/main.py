@@ -17,6 +17,7 @@
 #
 """Entrypoint for FastAPI app."""
 
+import importlib.resources
 import json
 import logging
 import sys
@@ -28,7 +29,6 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
-from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection, Connection
 
@@ -91,10 +91,13 @@ async def lifespan(
     # NOTE we run this outside db pool to avoid competing with pool init
     log.debug("Creating db connection for server initialisation steps")
     async with await AsyncConnection.connect(settings.FMTM_DB_URL) as conn:
-        log.debug("Initialising admin org and user in DB")
+        log.debug("Initialising admin org and user in DB.")
         await init_admin_org(conn)
-        log.debug("Reading XLSForms from DB")
-        await read_and_insert_xlsforms(conn, xlsforms_path)
+
+        log.debug("Reading XLSForms from DB.")
+        xlsforms_resource_path = importlib.resources.files("osm_fieldwork.xlsforms")
+        await read_and_insert_xlsforms(conn, xlsforms_resource_path)
+
         log.debug("Initialising reverse geocoding database")
         async with AsyncNearestCity(conn):
             pass

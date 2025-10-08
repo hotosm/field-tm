@@ -1,0 +1,205 @@
+survey:
+- '#': Converted by yxf, from test_form_for_mandatory_fields.xlsx. Edit the YAML file
+    instead of the Excel file.
+- type: username
+  name: username
+- type: email
+  name: email
+- type: begin group
+  name: buildings
+  label: Building Types
+  appearance: field-list
+- type: select_one category
+  name: category
+  label: What type of Building is this ?
+  appearance: minimal
+  required: yes
+- type: text
+  name: name
+  label: What is the name if there is one ?
+  appearance: minimal
+  relevant: ${category}!=’’
+- type: select_one building:material
+  name: building_material
+  label: What are the walls made of ?
+  appearance: minimal
+  relevant: ${category}!=’’
+  default: ${last-saved#building_material}
+- type: text
+  name: building_levels
+  label: How many levels are in the building ?
+  appearance: minimal
+  relevant: ${category}!=’’
+- type: end group
+- type: text
+  name: comment
+  label: Any other comments about this feature
+  appearance: minimal
+choices:
+- list_name: yes_no
+  name: yes
+  label::English(en): Yes
+  label::Swahili(sw): Ndiyo
+  label::French(fr): Oui
+  label::Spanish(es): Sí
+- list_name: yes_no
+  name: no
+  label::English(en): No
+  label::Swahili(sw): Hapana
+  label::French(fr): Non
+  label::Spanish(es): No
+- list_name: category
+  name: housing
+  label::English(en): A place people live in
+  label::Swahili(sw): Mahali watu wanaishi
+  label::French(fr): Un endroit dans les gens vivent
+  label::Spanish(es): Un lugar en el que la gente vive
+- list_name: category
+  name: retail
+  label::English(en): Does this building sell things to the public ?
+  label::Swahili(sw): Jengo hili linauza vitu kwa umma?
+  label::French(fr): Ce bâtiment vend-il des choses au public?
+  label::Spanish(es): ¿Este edificio vende cosas al público?
+- list_name: category
+  name: food
+  label::English(en): Can people get food or alcohol here ?
+  label::Swahili(sw): Je, watu wanaweza kupata chakula au pombe hapa?
+  label::French(fr): Les gens peuvent-ils obtenir de la nourriture ou de l'alcool
+    ici?
+  label::Spanish(es): ¿Pueden las personas obtener comida o alcohol aquí?
+- list_name: category
+  name: medical
+  label::English(en): A place that provides medical service
+  label::Swahili(sw): Mahali ambapo hutoa huduma ya matibabu
+  label::French(fr): Un endroit qui fournit un service médical
+  label::Spanish(es): Un lugar que brinda servicio médico
+- list_name: category
+  name: service
+  label::English(en): Does this building provides services ?
+  label::Swahili(sw): Je, jengo hili hutoa huduma?
+  label::French(fr): Ce bâtiment fournit-il des services?
+  label::Spanish(es): ¿Este edificio brinda servicios?
+- list_name: category
+  name: religious
+  label::English(en): Is this a building for religious services ?
+  label::Swahili(sw): Je, hili ni jengo la huduma za kidini?
+  label::French(fr): Est-ce un bâtiment pour les services religieux?
+  label::Spanish(es): ¿Es este un edificio para servicios religiosos?
+- list_name: category
+  name: tourism
+  label::English(en): Is this building for cultural or tourism purposes ?
+  label::Swahili(sw): Jengo hili ni kwa madhumuni ya kitamaduni au kitalii?
+  label::French(fr): Ce bâtiment est-il à des fins culturelles ou touristiques?
+  label::Spanish(es): ¿Es este edificio para fines culturales o turísticos?
+- list_name: category
+  name: government
+  label::English(en): Is this a public government building ?
+  label::Swahili(sw): Je, hili ni jengo la serikali?
+  label::French(fr): Est-ce un bâtiment du gouvernement public?
+  label::Spanish(es): ¿Es este un edificio de gobierno público?
+- list_name: category
+  name: emergency
+  label::English(en): Is this building used for emergencies ?
+  label::Swahili(sw): Jengo hili linatumika kwa dharura?
+  label::French(fr): Ce bâtiment est-il utilisé pour les urgences?
+  label::Spanish(es): ¿Se utiliza este edificio para emergencias?
+- list_name: category
+  name: education
+  label::English(en): Is this building used for education ?
+  label::Swahili(sw): Je, jengo hili linatumika kwa elimu?
+  label::French(fr): Ce bâtiment est-il utilisé pour l'éducation?
+  label::Spanish(es): ¿Se utiliza este edificio para la educación?
+- list_name: building:material
+  name: cement_block
+  label::English(en): Cement blocks
+  label::Swahili(sw): vipande vigumu vya saruji
+  label::French(fr): Blocs de ciment
+  label::Spanish(es): Bloques de cemento
+- list_name: building:material
+  name: wood
+  label::English(en): Wood
+  label::Swahili(sw): Mbao
+  label::French(fr): Bois
+  label::Spanish(es): Madera
+- list_name: building:material
+  name: brick
+  label::English(en): Bricks
+  label::Swahili(sw): Matofali
+  label::French(fr): Briques
+  label::Spanish(es): Ladrillos
+- list_name: building:material
+  name: concrete
+  label::English(en): Concrete
+  label::Swahili(sw): Zege
+  label::French(fr): Béton
+  label::Spanish(es): Hormigón
+- list_name: building:material
+  name: stone
+  label::English(en): Stone
+  label::Swahili(sw): Jiwe
+  label::French(fr): Pierre
+  label::Spanish(es): Roca
+- list_name: building:material
+  name: glass
+  label::English(en): Glass
+  label::Swahili(sw): Kioo
+  label::French(fr): Verre
+  label::Spanish(es): Vaso
+- list_name: building:material
+  name: bamboo
+  label::English(en): Bamboo
+  label::Swahili(sw): Mwanzi
+  label::French(fr): Bambou
+  label::Spanish(es): Bambú
+- list_name: building:material
+  name: iron_sheet
+  label::English(en): Iron Sheet
+  label::Swahili(sw): Vipande vya chuma
+  label::French(fr): Feuille de fer
+  label::Spanish(es): Hoja de hierro
+- list_name: building:material
+  name: metal
+  label::English(en): Metal (Corrugated iron sheets)
+  label::Swahili(sw): Metali (Bati)/ chuma
+  label::French(fr): Métal (feuilles en feu ondulées)
+  label::Spanish(es): Metal (hojas de hierro corrugado)
+- list_name: building:material
+  name: nowalls
+  label::English(en): There are no walls
+  label::Swahili(sw): Hakuna kuta
+  label::French(fr): Il n'y a pas de murs
+  label::Spanish(es): No hay paredes
+settings:
+- form_id: buildings
+  version: =NOW()
+  form_title: buildings
+  allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+    - '#'
+    - type
+    - name
+    - label
+    - hint
+    - appearance
+    - relevant
+    - choice_filter
+    - calculation
+    - default
+    - trigger
+    - parameters
+    - required
+    choices:
+    - list_name
+    - name
+    - label::English(en)
+    - label::Swahili(sw)
+    - label::French(fr)
+    - label::Spanish(es)
+    - category
+    settings:
+    - form_id
+    - version
+    - form_title
+    - allow_choice_duplicates

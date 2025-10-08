@@ -55,6 +55,7 @@ dependencies = [
     "pg-nearest-city==0.2.1",
     "raw-data-api-py>=0.3.0",
     "pyodk",
+    "yxf",
 ]
 readme = "../../README.md"
 license = {text = "AGPL-3.0-only"}
@@ -64,6 +65,8 @@ dev = [
     "pre-commit==4.0.1",
     "commitizen==3.31.0",
     "itrm==1.4.21",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.24.0",
 ]
 test = [
     "pytest==8.3.5",
@@ -149,13 +152,14 @@ ignored_tag_formats = ["osm-fieldwork-$version", "area-splitter-$version"]
 
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/frontend/src/assets/*"
-ignore-words-list = "ProjectIn"
+ignore-words-list = "ProjectIn, Indien"
 write-changes = true
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
+yxf = { git = "https://github.com/Sjlver/yxf" }
 
 [tool.uv.workspace]
 members = ["packages/*"]
