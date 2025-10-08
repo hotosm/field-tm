@@ -301,6 +301,7 @@ async def wrap_check_access(
         "project": project,
     }
 
+
 class ProjectManager:
     """A wrapper for the project manager to restrict access if project is completed."""
 
