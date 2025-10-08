@@ -62,7 +62,7 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 ## Usage of ODK
 
-This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
+This project relies heavily on the [ODK](https://getodk.org) ecosystem underneath:
 
 - [XLSForms](https://xlsform.org) are used for the underlying data collection
   survey. The fields in this survey can be mapped to OpenStreetMap tags.
