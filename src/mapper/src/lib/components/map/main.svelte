@@ -460,58 +460,64 @@
 		{#if commonStore.offlineSyncPercentComplete}
 			<div class="offline-sync-percent">{commonStore.offlineSyncPercentComplete}%</div>
 		{/if}
-		<div class="content">
-			<sl-icon-button
-				name="arrow-repeat"
-				label="Sync"
-				disabled={entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing}
-				class={`sync-button ${
-					(entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing) && 'animate-spin'
-				}`}
-				onclick={async () => syncButtonTrigger()}
-				onkeydown={async (e: KeyboardEvent) => {
-					e.key === 'Enter' && syncButtonTrigger();
-				}}
-				role="button"
-				tabindex="0"
-			></sl-icon-button>
-		</div>
-		<div
-			class="layer-switcher"
-			aria-label="layer switcher"
-			onclick={() => {
-				selectedControl = 'layer-switcher';
-				toggleActionModal(null);
-			}}
-			role="button"
-			onkeydown={(e) => {
-				if (e.key === 'Enter') {
+		<sl-tooltip content={m['map.control_sync_status']()} placement="top">
+			<div class="content">
+				<sl-icon-button
+					name="arrow-repeat"
+					label="Sync"
+					disabled={entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing}
+					class={`sync-button ${
+						(entitiesStore.syncEntityStatusManuallyLoading || commonStore.offlineDataIsSyncing) && 'animate-spin'
+					}`}
+					onclick={async () => syncButtonTrigger()}
+					onkeydown={async (e: KeyboardEvent) => {
+						e.key === 'Enter' && syncButtonTrigger();
+					}}
+					role="button"
+					tabindex="0"
+				></sl-icon-button>
+			</div>
+		</sl-tooltip>
+		<sl-tooltip content={m['map.control_basemaps']()} placement="top">
+			<div
+				class="layer-switcher"
+				aria-label="layer switcher"
+				onclick={() => {
 					selectedControl = 'layer-switcher';
 					toggleActionModal(null);
-				}
-			}}
-			tabindex="0"
-		>
-			<img class="basemap-icon" src={selectedStyleUrl} alt="Basemap Icon" />
-		</div>
-		<div
-			aria-label="toggle legend"
-			class="toggle-legend"
-			onclick={() => {
-				selectedControl = 'legend';
-				toggleActionModal(null);
-			}}
-			role="button"
-			onkeydown={(e) => {
-				if (e.key === 'Enter') {
+				}}
+				role="button"
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						selectedControl = 'layer-switcher';
+						toggleActionModal(null);
+					}
+				}}
+				tabindex="0"
+			>
+				<img class="basemap-icon" src={selectedStyleUrl} alt="Basemap Icon" />
+			</div>
+		</sl-tooltip>
+		<sl-tooltip content={m['map.control_legend']()} placement="top">
+			<div
+				aria-label="toggle legend"
+				class="toggle-legend"
+				onclick={() => {
 					selectedControl = 'legend';
 					toggleActionModal(null);
-				}
-			}}
-			tabindex="0"
-		>
-			<sl-icon name="legend-toggle" class="icon"></sl-icon>
-		</div>
+				}}
+				role="button"
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						selectedControl = 'legend';
+						toggleActionModal(null);
+					}
+				}}
+				tabindex="0"
+			>
+				<sl-icon name="legend-toggle" class="icon"></sl-icon>
+			</div>
+		</sl-tooltip>
 	</Control>
 	{#if toggleLayer}
 		<!-- Add the Geolocation GeoJSON layer to the map -->

@@ -46,7 +46,10 @@
 		"no_orientation_sensors": "Não é possível lidar com a orientação do dispositivo. Seu navegador não é compatível com sensores de orientação do dispositivo.",
 		"legend_features": "Legenda (Pontos)",
 		"control_zoom_to_project": "Ampliar para projetar",
-		"control_geolocation": "Geolocalização"
+		"control_geolocation": "Geolocalização",
+		"control_basemaps": "Mapas base",
+		"control_legend": "Lenda",
+		"control_sync_status": "Sincronizar mapa"
 	},
 	"popup": {
 		"task": "Tarefa",

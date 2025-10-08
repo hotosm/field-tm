@@ -46,7 +46,10 @@
 		"no_orientation_sensors": "उपकरण अभिमुखीकरण ह्यान्डल गर्न असमर्थ। तपाईंको ब्राउजरले उपकरण अभिमुखीकरण सेन्सरहरूलाई समर्थन गर्दैन।",
 		"legend_features": "फिचरहरूको सङ्केत",
 		"control_zoom_to_project": "प्रोजेक्ट गर्न जुम गर्नुहोस्",
-		"control_geolocation": "भौगोलिक स्थान"
+		"control_geolocation": "भौगोलिक स्थान",
+		"control_basemaps": "आधार नक्साहरू",
+		"control_legend": "किंवदन्ती",
+		"control_sync_status": "नक्सा सिंक गर्नुहोस्"
 	},
 	"popup": {
 		"task": "टास्क",
