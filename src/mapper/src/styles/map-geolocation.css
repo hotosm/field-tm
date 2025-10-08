@@ -11,10 +11,12 @@
 }
 
 .geolocation .button {
-	border: white 1px solid;
+	border: 1px solid white;
 	width: fit-content;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding: 0.25rem 0.625rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	--at-apply: text-white rounded;
 }
 
