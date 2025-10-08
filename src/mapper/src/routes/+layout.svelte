@@ -77,6 +77,10 @@
 	});
 
 	onMount(async () => {
+		// Dynamically web page title (tabTitle) based on config
+		if (data.config?.tabTitle && data.config?.tabTitle !== "Field Tasking Manager") {
+			document.title = data.config.tabTitle;
+		}
 		// Dynamically inject CSS specified in config
 		if (data.config?.cssFile) {
 			const linkElement = document.createElement('link');
