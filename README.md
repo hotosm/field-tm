@@ -62,7 +62,7 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 ## Usage of ODK
 
-This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
+This project relies heavily on the [ODK](https://getodk.org) ecosystem underneath:
 
 - [XLSForms](https://xlsform.org) are used for the underlying data collection
   survey. The fields in this survey can be mapped to OpenStreetMap tags.
@@ -237,6 +237,7 @@ Thanks goes to these wonderful people:
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kafle33"><img src="https://avatars.githubusercontent.com/u/121845834?v=4?s=100" width="100px;" alt="Roshan Kafle"/><br /><sub><b>Roshan Kafle</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Kafle33" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://gareth.nz"><img src="https://avatars.githubusercontent.com/u/2064938?v=4?s=100" width="100px;" alt="Gareth Bowen"/><br /><sub><b>Gareth Bowen</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=garethbowen" title="Documentation">📖</a></td>
     </tr>
   </tbody>
   <tfoot>
