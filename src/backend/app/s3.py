@@ -112,7 +112,6 @@ def add_obj_to_bucket(
     client = s3_client()
     # Set BytesIO object to start, prior to .read()
     file_obj.seek(0)
-
     result = client.put_object(
         bucket_name,
         s3_path,

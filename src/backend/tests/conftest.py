@@ -17,6 +17,7 @@
 #
 """Configuration and fixtures for PyTest."""
 
+import importlib
 import json
 import os
 import uuid
@@ -32,6 +33,7 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from loguru import logger as log
+from osm_fieldwork.xlsforms.conversion import convert_yaml_to_xlsform
 from psycopg import AsyncConnection
 
 from app.auth.auth_schemas import AuthUser, FMTMUser
@@ -375,6 +377,7 @@ async def odk_project(db, client, project, tasks):
     )
 
     internal_s3_url = f"{settings.S3_ENDPOINT}{urlparse(data_extract_s3_path).path}"
+    log.info(f"Generated internal_s3_url: {internal_s3_url}")
 
     async with AsyncClient() as client_httpx:
         response = await client_httpx.head(internal_s3_url, follow_redirects=True)
@@ -382,9 +385,11 @@ async def odk_project(db, client, project, tasks):
             f"HEAD request failed with status {response.status_code}"
         )
 
-    xlsform_file = Path(f"{test_data_path}/buildings.xls")
-    with open(xlsform_file, "rb") as xlsform_data:
-        xlsform_obj = BytesIO(xlsform_data.read())
+    xlsform_resource_path = importlib.resources.files("osm_fieldwork.xlsforms")
+    yaml_resource_path = xlsform_resource_path.joinpath("buildings.yaml")
+
+    converted_data = await convert_yaml_to_xlsform(yaml_resource_path)
+    xlsform_obj = BytesIO(converted_data)
 
     try:
         response = await client.post(
@@ -396,6 +401,7 @@ async def odk_project(db, client, project, tasks):
                 )
             },
         )
+        response.raise_for_status()
         log.debug(f"Uploaded XLSForm for project: {project.id}")
     except Exception as e:
         log.exception(e)
@@ -405,6 +411,7 @@ async def odk_project(db, client, project, tasks):
         response = await client.post(
             f"/projects/{project.id}/generate-project-data",
         )
+        response.raise_for_status()
         log.debug(f"Generated project files for project: {project.id}")
     except Exception as e:
         log.exception(e)

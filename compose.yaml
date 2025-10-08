@@ -334,6 +334,7 @@ services:
   central-webhook:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/central-webhook:0.3.0"
+    platform: linux/amd64
     depends_on:
       central:
         condition: service_healthy
@@ -420,6 +421,7 @@ services:
   central-db:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
+    platform: linux/amd64
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
@@ -529,6 +531,7 @@ services:
 
   qfield-app:
     image: ghcr.io/opengisch/qfieldcloud-app:25.24
+    platform: linux/amd64
     volumes:
       - qfield_static:/usr/src/app/staticfiles
     networks:
@@ -615,6 +618,7 @@ services:
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"
+    platform: linux/amd64
     build: qfield
     volumes:
       - qfield_projects:/opt/qfield

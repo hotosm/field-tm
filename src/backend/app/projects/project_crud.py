@@ -18,9 +18,11 @@
 """Logic for Field-TM project routes."""
 
 import ast
+import importlib
 import json
 import subprocess
 import uuid
+from importlib.resources.abc import Traversable
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
@@ -40,6 +42,7 @@ from osm_data_client import (
     RawDataOutputOptions,
     RawDataResult,
 )
+from osm_fieldwork.xlsforms.conversion import convert_yaml_to_xlsform
 from osm_login_python.core import Auth
 from psycopg import Connection, sql
 from psycopg.rows import class_row
@@ -217,7 +220,9 @@ async def generate_data_extract(
 # ---------------------------
 
 
-async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
+async def read_and_insert_xlsforms(
+    db: Connection, directory: Union[Traversable, Path]
+) -> None:
     """Read the list of XLSForms from the disk and sync them with the database."""
     async with db.cursor() as cur:
         existing_db_forms = set()
@@ -230,29 +235,50 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
         existing_db_forms = {row[0] for row in await cur.fetchall()}
 
         # Insert or update new XLSForms from disk
-        for xls_type in XLSFormType:
-            file_name = xls_type.name
-            form_type = xls_type.value
-            file_path = Path(directory) / f"{file_name}.xls"
+        for file_type in XLSFormType:
+            file_name = file_type.name
+            form_type = file_type.value
 
-            if not file_path.exists():
-                log.warning(f"{file_path} does not exist!")
+            yaml_resource_path = directory.joinpath(f"{file_name}.yaml")
+
+            if not yaml_resource_path.exists():
+                log.warning(f"{yaml_resource_path} does not exist!")
                 continue
-
-            if file_path.stat().st_size == 0:
-                log.warning(f"{file_path} is empty!")
-                continue
-
-            with open(file_path, "rb") as xls:
-                data = xls.read()
 
             try:
+                with importlib.resources.as_file(yaml_resource_path) as yaml_filepath:
+                    if yaml_filepath.stat().st_size == 0:
+                        log.warning(f"{yaml_filepath} is empty!")
+                        continue
+            except FileNotFoundError:
+                log.warning(f"File not found to check size: {yaml_filepath}")
+                continue
+
+            try:
+                log.info(f"Converting YAMLForm '{yaml_resource_path}' to XLSForm.")
+                data = await convert_yaml_to_xlsform(yaml_resource_path)
+                log.info(
+                    f"Successfully converted from YAMLForm to XLSForm '{file_name}'."
+                )
+            except Exception as e:
+                log.exception(
+                    f"Failed to convert YAMLForm '{file_name} to XLSForm'.",
+                    f"Error '{e}",
+                    stack_info=True,
+                )
+                continue
+
+            try:
+                log.info(
+                    f"INSERTING converted XLSForm for '{form_type}' into the database."
+                )
                 insert_query = """
                     INSERT INTO xlsforms (title, xls)
                     VALUES (%(title)s, %(xls)s)
                     ON CONFLICT (title) DO UPDATE
                     SET xls = EXCLUDED.xls
                 """
+                # NOTE: The 'xls' column name now stores .xlsx data.
                 await cur.execute(insert_query, {"title": form_type, "xls": data})
                 log.info(f"XLSForm for '{form_type}' inserted/updated in the database")
 
