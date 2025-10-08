@@ -437,6 +437,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "garethbowen",
+      "name": "Gareth Bowen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2064938?v=4",
+      "profile": "https://gareth.nz",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
