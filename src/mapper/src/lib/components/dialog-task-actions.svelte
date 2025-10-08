@@ -61,7 +61,7 @@
 						tabindex="0"
 						class="icon"
 					>
-						<sl-icon name="new-window"></sl-icon>
+						<sl-icon name="plus-circle"></sl-icon>
 						<p class="action">{m['popup.map_new_feature']()}</p>
 					</div>
 				{/if}
