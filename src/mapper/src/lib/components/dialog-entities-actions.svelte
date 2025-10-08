@@ -235,6 +235,11 @@
 							{m[`entity_states.${selectedEntity?.status}`]()}
 						</p>
 					</div>
+					{#if selectedEntity?.created_by && selectedEntity?.created_by === loginStore.getAuthDetails?.sub}
+					<div class="item">
+						<p class="label"><b>This feature was created by you.</b></p>
+					</div>
+					{/if}
 					{#if entityComments?.length > 0}
 						<div class="dialog-comments">
 							<p class="label">{m['dialog_entities_actions.comments']()}</p>

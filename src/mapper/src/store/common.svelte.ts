@@ -13,6 +13,7 @@ export interface LoginProviders {
 interface ConfigJson {
 	logoUrl: string;
 	logoText: string;
+	tabTitle: string;
 	cssFile: string;
 	cssFileWebforms: string;
 	enableWebforms: boolean;

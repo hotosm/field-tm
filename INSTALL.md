@@ -261,6 +261,7 @@ Once you have deployed, you will need to check that you can properly authenticat
   {
     "logoUrl": "/favicon.svg",
     "logoText": "Humanitarian OpenStreetMap Team",
+    "tabTitle": "Field Tasking Manager",
     "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css",
     "enableWebforms": false,
     "loginProviders": {
@@ -288,6 +289,7 @@ Once you have deployed, you will need to check that you can properly authenticat
       ...
       "logoUrl": "/favicon.svg",
       "logoText": "Humanitarian OpenStreetMap Team",
+      "tabTitle": "Field Tasking Manager",
       "cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css"
   }
   ```
