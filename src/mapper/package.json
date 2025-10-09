@@ -64,6 +64,7 @@
 		"@watergis/maplibre-gl-terradraw": "^0.8.5",
 		"flatgeobuf": "^3.38.0",
 		"maplibre-gl": "^4.7.1",
+		"maplibre-ui-translations": "^0.1.0",
 		"pako": "^2.1.0",
 		"pmtiles": "^4.3.0",
 		"svelte-maplibre": "^0.9.14",
