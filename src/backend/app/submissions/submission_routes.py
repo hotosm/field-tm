@@ -126,6 +126,7 @@ async def download_submission(
     background_tasks: BackgroundTasks,
     project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
     file_type: SubmissionDownloadType,
+    include_media: Optional[bool] = False,
     submitted_date_range: Optional[str] = Query(
         None,
         title="Submitted Date Range",
@@ -149,7 +150,9 @@ async def download_submission(
         }
 
     if file_type == SubmissionDownloadType.JSON:
-        return await submission_crud.download_submission_in_json(project, filters)
+        return await submission_crud.download_submission_in_json(
+            project, filters, include_media
+        )
 
     elif file_type == SubmissionDownloadType.CSV:
         file_content = await submission_crud.gather_all_submission_csvs(
