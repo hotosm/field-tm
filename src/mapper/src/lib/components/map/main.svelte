@@ -18,13 +18,15 @@
 		ControlButton,
 		CircleLayer,
 	} from 'svelte-maplibre';
-	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl';
+	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl'
+	import { defaultLocale } from 'maplibre-gl/src/ui/default_locale';
+	import { ptBR, ne } from 'maplibre-ui-translations';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
+	import type { Position, Geometry as GeoJSONGeometry } from 'geojson';
 	import { centroid } from '@turf/centroid';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
@@ -48,9 +50,6 @@
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/map/click-outside.ts';
 	import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
-
-	import { defaultLocale } from 'maplibre-gl/src/ui/default_locale';
-	import { ptBR, ne } from '$assets/maplibre-translations';
 
 	type bboxType = [number, number, number, number];
 

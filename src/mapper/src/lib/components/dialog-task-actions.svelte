@@ -179,12 +179,12 @@
 			<!-- Subtle difference to include 'only' in the text here -->
 			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
 				{m['popup.task_complete_only_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count} / ${taskSubmission?.feature_count}`),
 				})}
 				<br />
 			{:else}
 				{m['popup.task_complete_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count} / ${taskSubmission?.feature_count}`),
 				})}
 				<br />
 			{/if}
