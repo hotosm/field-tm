@@ -176,21 +176,20 @@
 	<h5 class="dialog-text">
 		{#key commonStore.locale}
 		{#if taskSubmission}
-			<!-- Subtle difference to include 'only' in the text here -->
 			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
-				{m['popup.task_complete_only_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count} / ${taskSubmission?.feature_count}`),
-				})}
+				<!-- Inform the user they have mapped all the features, continue -->
+				{m['popup.task_complete_all_mapped']()}
 				<br />
 			{:else}
-				{m['popup.task_complete_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count} / ${taskSubmission?.feature_count}`),
+				<!-- Inform the user not all features are mapped yet, confirm to continue or not -->
+				{m['popup.task_complete_partial_mapped']({
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count}`),
+					totalFeatures: unicodeBold(`${taskSubmission?.feature_count}`),
 				})}
 				<br />
+				{m['popup.task_complete_confirm']()}
 			{/if}
 		{/if}
-		<!--  The confirmation dialog is always displayed -->
-		{m['popup.task_complete_confirm']()}
 		{/key}
 	</h5>
 	<div class="button-wrapper">
