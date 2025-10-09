@@ -177,17 +177,18 @@
 		{#key commonStore.locale}
 		{#if taskSubmission}
 			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
-				<!-- Inform the user they have mapped all the features, continue -->
-				{m['popup.task_complete_all_mapped']()}
-				<br />
-			{:else}
 				<!-- Inform the user not all features are mapped yet, confirm to continue or not -->
 				{m['popup.task_complete_partial_mapped']({
 					totalMapped: unicodeBold(`${taskSubmission?.submission_count}`),
 					totalFeatures: unicodeBold(`${taskSubmission?.feature_count}`),
 				})}
 				<br />
+				<br />
 				{m['popup.task_complete_confirm']()}
+			{:else}
+				<!-- Inform the user they have mapped all the features, continue -->
+				{m['popup.task_complete_all_mapped']()}
+				<br />
 			{/if}
 		{/if}
 		{/key}
