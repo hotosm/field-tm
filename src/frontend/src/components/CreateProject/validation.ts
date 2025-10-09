@@ -8,12 +8,18 @@ import {
   task_split_type,
 } from '@/types/enums';
 
+const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
+  ODK: 'ODK Central',
+  FieldTM: 'ODK Central',
+  QField: 'QField Cloud',
+};
+
 const validateODKCreds = (ctx: any, values: Record<string, any>) => {
   if (!values.odk_central_url?.trim()) {
     ctx.issues.push({
       input: values.odk_central_url,
       path: ['odk_central_url'],
-      message: 'ODK URL is Required',
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} URL is Required`,
       code: 'custom',
     });
   } else if (!isValidUrl(values.odk_central_url)) {
@@ -28,7 +34,7 @@ const validateODKCreds = (ctx: any, values: Record<string, any>) => {
     ctx.issues.push({
       input: values.odk_central_user,
       path: ['odk_central_user'],
-      message: 'ODK Central User is Required',
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} User is Required`,
       code: 'custom',
     });
   }
@@ -36,7 +42,7 @@ const validateODKCreds = (ctx: any, values: Record<string, any>) => {
     ctx.issues.push({
       input: values.odk_central_password,
       path: ['odk_central_password'],
-      message: 'ODK Central Password is Required',
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} Password is Required`,
       code: 'custom',
     });
   }
@@ -44,6 +50,7 @@ const validateODKCreds = (ctx: any, values: Record<string, any>) => {
 
 export const odkCredentialsValidationSchema = z
   .object({
+    field_mapping_app: z.enum(field_mapping_app),
     odk_central_url: z.string(),
     odk_central_user: z.string().optional(),
     odk_central_password: z.string().optional(),
@@ -92,6 +99,7 @@ export const projectOverviewValidationSchema = z
     outlineArea: z.string().optional(),
     organisation_name: z.string(),
     merge: z.boolean(),
+    field_mapping_app: z.enum(field_mapping_app),
   })
   .check((ctx) => {
     const values = ctx.value;
