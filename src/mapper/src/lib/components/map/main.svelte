@@ -20,7 +20,7 @@
 	} from 'svelte-maplibre';
 	import maplibre, { type MapGeoJSONFeature, type PointLike } from 'maplibre-gl'
 	import { defaultLocale } from 'maplibre-gl/src/ui/default_locale';
-	import { ptBR, ne } from 'maplibre-ui-translations';
+	import { maplibreLocales } from 'maplibre-ui-translations';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
@@ -112,12 +112,7 @@
 	let selectedFeatures: MapGeoJSONFeature[] = $state([]);
 	let toggleLayer = $state(true);
 
-	const localeMap: Record<string, Record<string, string>> = {
-		'en': defaultLocale,
-		'pt-BR': ptBR,
-		ne,
-	};
-	let maplibreLocale = $derived({ ...defaultLocale, ...(localeMap[commonStore.locale] ?? localeMap['en']) });
+	let maplibreLocale = $derived({ ...defaultLocale, ...(maplibreLocales[commonStore.locale] ?? maplibreLocales['en']) });
 
 	let taskCentroidGeojson = $derived({
 		...taskStore.featcol,

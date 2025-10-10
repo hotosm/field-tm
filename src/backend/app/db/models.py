@@ -2276,10 +2276,11 @@ class DbOdkEntities(BaseModel):
                 {"uuid": uuid},
             )
             if cur.rowcount == 0:
-                raise HTTPException(
-                    status_code=HTTPStatus.NOT_FOUND,
-                    detail=f"Entity with UUID {uuid} not found in database.",
+                log.warning(
+                    f"Entity {uuid} not found in local database (nothing to delete)."
                 )
+            else:
+                log.info(f"Entity {uuid} deleted from local database successfully.")
 
 
 class DbBackgroundTask(BaseModel):

@@ -13,6 +13,8 @@
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { projectStatus } from '$constants/enums';
 
+	const API_URL = import.meta.env.VITE_API_URL;
+
 	type Props = {
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
@@ -37,12 +39,17 @@
 
 	let dialogRef: SlDialog | null = $state(null);
 	let confirmationDialogRef: SlDialog | null = $state(null);
+	let submissionDetailsRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
 	let showCommentsPopup: boolean = $state(false);
 	let showDeleteEntityPopup: boolean = $state(false);
+	let showSubmissionDetailsPopup: boolean = $state(false);
+	let submissionData: Record<string, any> | null = $state(null);
+	let loadingSubmission = false;
 
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 	const selectedEntityCoordinate = $derived(entitiesStore.selectedEntityCoordinate);
+	const latestSubmissionId = $derived(entitiesStore.selectedEntity?.submission_ids?.split(',').at(-1))
 	const entityToNavigate = $derived(entitiesStore.entityToNavigate);
 	const entityComments = $derived(
 		taskStore.events
@@ -171,6 +178,74 @@
 			});
 		}
 	};
+
+	const getAndDisplaySubmissionDetails = async (submissionId: string) => {
+		// FIXME this should probably be done via backend
+		try {
+			loadingSubmission = true;
+			showSubmissionDetailsPopup = true;
+
+			const res = await fetch(`${API_URL}/submission/${submissionId}?project_id=${projectData.id}`, {
+				credentials: 'include',
+			});
+
+			if (!res.ok) throw new Error(`Failed to fetch submission: ${res.statusText}`);
+			const dataJson = await res.json();
+			const surveyQuestionsGroup = dataJson?.survey_questions;
+			
+			// Fields to exclude from display (system/metadata fields)
+			const excludeFields = [
+				'__id',
+				'__system',
+				'meta',
+				'start',
+				'end',
+				'deviceid',
+				'phonenumber',
+				'email',
+				'warmup',
+				'feature',
+				'xid',
+				'xlocation',
+				'submission_ids',
+				'created_by',
+				'today',
+				'username',
+				'task_id',
+				'status',
+			];
+			
+			// Nested when verification group included
+			if (surveyQuestionsGroup) {
+				submissionData = dataJson?.survey_questions;
+			// When no verification group, questions are not grouped
+			} else {
+				// Filter out excluded fields
+				const filteredData = Object.entries(dataJson)
+					.filter(([key]) => !excludeFields.includes(key))
+					.reduce((acc, [key, value]) => {
+						acc[key] = value;
+						return acc;
+					}, {} as Record<string, any>);
+				
+				submissionData = filteredData;
+				console.log(submissionData);
+			}
+		} catch (err) {
+			console.error("Error loading submission:", err);
+			submissionData = { error: "Failed to load submission details." };
+		} finally {
+			loadingSubmission = false;
+		}
+	};
+
+	function isObject(value: any): boolean {
+		return value && typeof value === 'object' && !Array.isArray(value);
+	}
+
+	function hasNonNullValues(obj: any): boolean {
+		return Object.values(obj).some(v => v !== null && v !== undefined);
+	}
 </script>
 
 {#if isTaskActionModalOpen && selectedTab === 'map' && selectedEntity}
@@ -197,49 +272,54 @@
 			</div>
 			<div class="section-container">
 				<div class="header">
-					<p class="selected-title">{m['popup.feature']()} {selectedEntity?.osm_id}</p>
+					<p class="selected-title">
+						{m['popup.feature']()} {selectedEntity?.osm_id}
+					</p>
+
 					{#if selectedEntity?.osm_id < 0 && (selectedEntity?.status === 'READY' || selectedEntity?.status === 'OPENED_IN_ODK')}
 						<div
-							onclick={() => {
-								showDeleteEntityPopup = true;
-							}}
-							onkeydown={(e: KeyboardEvent) => {
-								if (e.key === 'Enter') {
-									showDeleteEntityPopup = true;
-								}
-							}}
+							onclick={() => (showDeleteEntityPopup = true)}
+							onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && (showDeleteEntityPopup = true)}
 							role="button"
 							tabindex="0"
-							class="icon"
+							class="icon group"
 						>
 							<sl-icon name="trash"></sl-icon>
 							<p class="action">{m['popup.delete_feature']()}</p>
 						</div>
 					{/if}
 				</div>
+
 				<div class="section">
-					<div class="item">
+					<!-- Task ID -->
+					<div class="detail-row">
 						<p class="label">{m['popup.task_id']()}</p>
-						:
 						<p class="value">{selectedEntity?.task_id}</p>
 					</div>
-					<div class="item">
-						<p class="label">{m['dialog_entities_actions.entity_uuid']()}</p>
-						:
+
+					<!-- Unique ID -->
+					<div class="detail-row">
+						<p class="label">{m['dialog_entities_actions.unique_id']()}</p>
 						<p class="value">{selectedEntity?.entity_id}</p>
 					</div>
-					<div class="item items-center">
+
+					<!-- Mapping status -->
+					<div class="detail-row">
 						<p class="label">{m['dialog_entities_actions.status']()}</p>
-						:
 						<p class={`status ${selectedEntity?.status}`}>
 							{m[`entity_states.${selectedEntity?.status}`]()}
 						</p>
 					</div>
+
+					<!-- Created by current user -->
 					{#if selectedEntity?.created_by && selectedEntity?.created_by === loginStore.getAuthDetails?.sub}
-					<div class="item">
-						<p class="label"><b>This feature was created by you.</b></p>
-					</div>
+						<div class="detail-row">
+							<p class="label">{m['dialog_entities_actions.created_by']()}</p>
+							<p class="value font-bold">{m['dialog_entities_actions.you_created_this']()}</p>
+						</div>
 					{/if}
+
+					<!-- Comments -->
 					{#if entityComments?.length > 0}
 						<div class="dialog-comments">
 							<p class="label">{m['dialog_entities_actions.comments']()}</p>
@@ -265,11 +345,7 @@
 										<div
 											class="dialog-comment-see-all-link"
 											onclick={() => (showCommentsPopup = true)}
-											onkeydown={(e: KeyboardEvent) => {
-												if (e.key === 'Enter') {
-													showCommentsPopup = true;
-												}
-											}}
+											onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && (showCommentsPopup = true)}
 											tabindex="0"
 											role="button"
 										>
@@ -281,54 +357,60 @@
 						</div>
 					{/if}
 				</div>
+
+				<!-- Action Buttons -->
 				{#if projectData.status === projectStatus.PUBLISHED}
-					<div class="entity">
-						<sl-button
-							disabled={entityToNavigate?.entityId === selectedEntity?.entity_id}
-							variant="default"
-							size="small"
-							class="entity-button-to"
-							onclick={() => navigateToEntity()}
-							onkeydown={(e: KeyboardEvent) => {
-								if (e.key === 'Enter') navigateToEntity();
-							}}
-							role="button"
-							tabindex="0"
-						>
-							<sl-icon slot="prefix" name="direction"></sl-icon>
-							<span>{m['popup.navigate_here']()}</span>
-						</sl-button>
-						{#if !commonStore.enableWebforms}
+					<div class="entity-buttons">
+						<!-- View Existing Data button (if available) -->
+						{#if latestSubmissionId}
 							<sl-button
-								loading={entitiesStore.updateEntityStatusLoading}
-								variant="primary"
+								variant="default"
 								size="small"
-								onclick={() => handleMapFeature()}
-								onkeydown={(e: KeyboardEvent) => {
-									if (e.key === 'Enter') handleMapFeature();
-								}}
+								class="entity-button"
+								onclick={() => getAndDisplaySubmissionDetails(latestSubmissionId)}
+								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && getAndDisplaySubmissionDetails(latestSubmissionId)}
 								role="button"
 								tabindex="0"
 							>
-								<sl-icon slot="prefix" name="location"></sl-icon>
-								<span>{m['popup.map_in_odk']()}</span>
-							</sl-button>
-						{:else}
-							<sl-button
-								loading={entitiesStore.updateEntityStatusLoading}
-								variant="primary"
-								size="small"
-								onclick={() => handleMapFeature()}
-								onkeydown={(e: KeyboardEvent) => {
-									if (e.key === 'Enter') handleMapFeature();
-								}}
-								role="button"
-								tabindex="0"
-							>
-								<sl-icon slot="prefix" name="location"></sl-icon>
-								<span>{m['dialog_entities_actions.collect_data']()}</span>
+								<sl-icon slot="prefix" name="file-earmark-text"></sl-icon>
+								<span>{m['dialog_entities_actions.view_existing_data']()}</span>
 							</sl-button>
 						{/if}
+
+						<!-- Navigate Here + Collect Data buttons -->
+						<div class="entity-button-row">
+							<sl-button
+								disabled={entityToNavigate?.entityId === selectedEntity?.entity_id}
+								variant="default"
+								size="small"
+								class="entity-button"
+								onclick={() => navigateToEntity()}
+								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && navigateToEntity()}
+								role="button"
+								tabindex="0"
+							>
+								<sl-icon slot="prefix" name="direction"></sl-icon>
+								<span>{m['popup.navigate_here']()}</span>
+							</sl-button>
+
+							<sl-button
+								loading={entitiesStore.updateEntityStatusLoading}
+								variant="primary"
+								size="small"
+								class="entity-button"
+								onclick={() => handleMapFeature()}
+								onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleMapFeature()}
+								role="button"
+								tabindex="0"
+							>
+								<sl-icon slot="prefix" name="location"></sl-icon>
+								<span>
+									{commonStore.enableWebforms
+										? m['dialog_entities_actions.collect_data']()
+										: m['popup.map_in_odk']()}
+								</span>
+							</sl-button>
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -458,4 +540,56 @@
 			<span>{m['common.yes']()}</span>
 		</sl-button>
 	</div>
+</sl-dialog>
+
+<!-- modal to view submission data on request -->
+<sl-dialog
+	bind:this={submissionDetailsRef}
+	class="submission-details-dialog"
+	open={showSubmissionDetailsPopup}
+	onsl-hide={() => (showSubmissionDetailsPopup = false)}
+	noHeader
+>
+	<div class="dialog-header">
+		<h3>{m['dialog_entities_actions.view_existing_data']()}</h3>
+		<sl-icon name="x" class="close-icon" onclick={() => submissionDetailsRef.hide()}></sl-icon>
+	</div>
+
+	{#if loadingSubmission}
+		<div class="loading">
+			<sl-spinner></sl-spinner>
+		</div>
+	{:else if submissionData && Object.keys(submissionData).length > 0}
+		<div class="submission-details-content">
+			{#each Object.entries(submissionData) as [key, value]}
+				{#if isObject(value)}
+					<details open>
+						<summary class="section-title">{key}</summary>
+						<div class="nested">
+							{#each Object.entries(value) as [nestedKey, nestedValue]}
+								{#if nestedValue !== null && nestedValue !== undefined}
+									<div class="submission-item">
+										<p class="label">{nestedKey}</p>
+										<p class="value">{nestedValue}</p>
+									</div>
+								{/if}
+							{/each}
+							{#if !hasNonNullValues(value)}
+								<p class="empty-section">No data available</p>
+							{/if}
+						</div>
+					</details>
+				{:else}
+				{#if value}
+					<div class="submission-item">
+						<p class="label">{key}</p>
+						<p class="value">{value}</p>
+					</div>
+				{/if}
+				{/if}
+			{/each}
+		</div>
+	{:else}
+		<p class="empty">{m['dialog_entities_actions.no_data']()}</p>
+	{/if}
 </sl-dialog>

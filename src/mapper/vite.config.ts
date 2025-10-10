@@ -152,7 +152,7 @@ export default defineConfig({
 	base: '/',
 	plugins: [
 		sveltekit(),
-		SvelteKitPWA(pwaOptions),
+		// SvelteKitPWA(pwaOptions),
 		paraglideVitePlugin({
 			project: './project.inlang',
 			outdir: './src/translations',
