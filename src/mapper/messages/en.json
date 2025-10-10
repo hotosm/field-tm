@@ -122,7 +122,7 @@
 		"contact_pm_for_entity_deletion": "Only the creator can delete this feature. Please contact the project manager",
 		"created_by": "Created by",
 		"you_created_this": "You created this feature",
-		"view_existing_data": "View Data",
+		"view_existing_data": "VIEW DATA",
 		"no_data": "Submission contains no data"
 	},
 	"dialog_task_actions": {
