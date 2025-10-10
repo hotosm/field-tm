@@ -116,10 +116,14 @@
 		"far_away_confirm": "Você está a {distance} de distância do recurso. Tem certeza de que deseja mapear esse recurso?",
 		"status": "Status",
 		"comments": "Comentários",
-		"entity_uuid": "UUID da entidade",
+		"unique_id": "ID exclusivo",
 		"collect_data": "PREENCHER FORMULÁRIO",
 		"entity_delete_confirmation": "Tem certeza de que deseja excluir este recurso?",
-		"contact_pm_for_entity_deletion": "Somente o criador pode excluir este recurso. Entre em contato com o gerente do projeto."
+		"contact_pm_for_entity_deletion": "Somente o criador pode excluir este recurso. Entre em contato com o gerente do projeto.",
+		"created_by": "Criado por",
+		"you_created_this": "Você criou esse recurso",
+		"view_existing_data": "Ver Dados",
+		"no_data": "A submissão não contém dados"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "CONCLUIR MAPEAMENTO",
@@ -146,14 +150,9 @@
 	"offline": {
 		"features": "Recursos",
 		"basemaps": "Mapas base",
-		"data": "Exibir dados off-line",
-		"store_features_offline": "Armazenar recursos off-line",
 		"features_offline_info": "Extratos de recursos já armazenados offline",
 		"fetch_projects_offline": "Você está off-line e não pode buscar projetos extras",
-		"ready_offline": "Pronto para uso off-line.",
-		"total_offline_submissions": "Total de envios off-line",
-		"total_failed_submissions": "Total de envios com falha",
-		"download_csv": "Baixar como CSV"
+		"ready_offline": "Pronto para uso off-line."
 	},
 	"my_tasks": {
 		"no_tasks_assigned": "Nenhuma tarefa atribuída"
