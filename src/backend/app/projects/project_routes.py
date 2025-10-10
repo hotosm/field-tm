@@ -45,6 +45,7 @@ from osm_fieldwork.json_data_models import data_models_path, get_choices
 from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
+from pyodk.errors import PyODKError
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
@@ -1248,32 +1249,47 @@ async def delete_entity(
     dataset_name: str = "features",
 ):
     """Delete an Entity from ODK and local database."""
-    try:
-        project = project_user_dict.get("project")
-        project_odk_id = project.odkid
-        project_odk_creds = project.odk_credentials
+    project = project_user_dict.get("project")
+    project_odk_id = project.odkid
+    project_odk_creds = project.odk_credentials
 
-        log.debug(
-            f"Deleting ODK Entity in dataset '{dataset_name}'(ODK ID: {project_odk_id})"
-        )
+    log.debug(
+        f"Deleting ODK Entity in dataset '{dataset_name}'(ODK ID: {project_odk_id})"
+    )
+
+    # Try deleting from ODK Central first
+    try:
         await central_crud.delete_entity(
             odk_creds=project_odk_creds,
             odk_id=project_odk_id,
             entity_uuid=entity_uuid,
             dataset_name=dataset_name,
         )
-        await DbOdkEntities.delete(db, entity_uuid)
-        return {"detail": "Entity deleted successfully"}
+        log.info(f"Entity {entity_uuid} deleted from ODK Central successfully.")
+    except PyODKError as e:
+        # ODK Central 404 means the entity is already gone there, safe to delete locally
+        if "404" in str(e):
+            log.warning(
+                f"Entity {entity_uuid} not found in ODK Central (already deleted). "
+                "Proceeding with local cleanup."
+            )
+        else:
+            log.error(f"Failed to delete entity {entity_uuid} from ODK Central: {e}")
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Failed to delete entity in ODK Central: {str(e)}",
+            ) from e
 
-    except HTTPException as http_err:
-        log.error(f"HTTP error during deletion: {http_err.detail}")
-        raise
-    except Exception as e:
-        log.exception("Unexpected error during entity deletion")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Entity deletion failed",
-        ) from e
+    # Delete from local database (safe delete)
+    deleted_count = await DbOdkEntities.delete(db, entity_uuid)
+    if deleted_count == 0:
+        log.warning(
+            f"Entity {entity_uuid} not found in local database (nothing to delete)."
+        )
+    else:
+        log.info(f"Entity {entity_uuid} deleted from local database successfully.")
+
+    return {"detail": f"Entity {entity_uuid} deleted successfully"}
 
 
 @router.delete("/{project_id}/users/{user_sub}")
