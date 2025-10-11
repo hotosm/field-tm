@@ -1,9 +1,15 @@
 """Index of XLSForm file paths."""
 
-#import os
+import importlib.resources
 
-# = os.path.dirname(os.path.abspath(__file__))
+def buildings(): 
+    "Returns a Traversable object for the buildings.yaml file"
+    return importlib.resources.files(__name__).joinpath("buildings.yaml")
 
-#buildings = f"{xlsforms_path}/buildings.yaml"
-#healthcare = f"{xlsforms_path}/health.yaml"
-#highways = f"{xlsforms_path}/highways.yaml"
+def health(): 
+    "Returns a Traversable object for the health.yaml file"
+    return importlib.resources.files(__name__).joinpath("health.yaml")
+
+def highways(): 
+    "Returns a Traversable object for the highways.yaml file"
+    return importlib.resources.files(__name__).joinpath("highways.yaml")
