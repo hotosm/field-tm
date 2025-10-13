@@ -50,13 +50,13 @@ lint:
   cd {{justfile_directory()}}/src/backend
   uv run pre-commit run --all-files
 
-# Increment version
+# Increment field-tm
 bump:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
   uv run cz bump --check-consistency
 
-# Increment version
+# Increment osm-fieldwork (doesn't work yet!)
 bump-osm-fieldwork:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
