@@ -46,40 +46,28 @@ clean:
 
 # Run pre-commit hooks
 lint:
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && pre-commit run --all-files'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run pre-commit run --all-files
 
 # Increment version
 bump:
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && git config --global user.name svcfmtm \
-    && git config --global user.email fmtm@hotosm.org \
-    && cd src/backend \
-    && cz bump --check-consistency --no-verify'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run cz bump --check-consistency
+
+# Increment version
+bump-osm-fieldwork:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv --project packages/osm-fieldwork --directory packages/osm-fieldwork run cz bump --check-consistency
 
 # Run docs website locally
 docs:
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-  @echo
-  @echo "\033[0;34m Access the docs site on: http://localhost:55425 \033[0m"
-  @echo
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD --publish 55425:3000 \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && mkdocs serve --dev-addr 0.0.0.0:3000'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv sync --group docs
+  uv run mkdocs serve --config-file ../../mkdocs.yml --dev-addr 0.0.0.0:3000
 
 # Mount an S3 bucket on your filesystem
 mount-s3:
