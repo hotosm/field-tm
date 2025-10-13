@@ -8,6 +8,7 @@ import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { UnassignUserFromProject } from '@/api/Project';
+import { field_mapping_app } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -144,9 +145,10 @@ export const CreateProjectService = (
       }
 
       // 4. generate remaining project files
-      APISuccess = await dispatch(
+      const generateProjectDataResponse = await dispatch(
         GenerateProjectFilesService(`${VITE_API_URL}/projects/${id}/generate-project-data`, combinedFeaturesCount),
       );
+      APISuccess = !!generateProjectDataResponse;
       if (!APISuccess) stopProjectCreation();
 
       // 5. assign & remove project managers
@@ -174,7 +176,12 @@ export const CreateProjectService = (
       // Add 5-second delay to allow backend Entity generation to catch up
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(5000);
-      navigate(`/project/${id}`);
+
+      if (projectData.field_mapping_app === field_mapping_app.QField && !!generateProjectDataResponse) {
+        window.location.href = generateProjectDataResponse;
+      } else {
+        navigate(`/project/${id}`);
+      }
     } catch (error) {
       // revert project status to draft if any error arises during project generation
       await API.patch(url, {
@@ -262,14 +269,19 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
         throw new Error(msg);
       }
 
-      return true;
+      // if field mapping app is QField, redirect path to QField dashboard is returned
+      if (response.data?.url) {
+        return response.data.url;
+      } else {
+        return 'success';
+      }
     } catch (error: any) {
       dispatch(
         CommonActions.SetSnackBar({
           message: JSON.stringify(error?.response?.data?.detail || 'Failed to generate project data'),
         }),
       );
-      return false;
+      return null;
     } finally {
       dispatch(CommonActions.SetLoading(false));
     }

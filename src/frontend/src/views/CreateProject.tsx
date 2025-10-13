@@ -224,6 +224,7 @@ const CreateProject = () => {
       new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
       task_split_type: data.task_split_type,
       status: 'PUBLISHED',
+      field_mapping_app: data.field_mapping_app,
     };
 
     if (data.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
