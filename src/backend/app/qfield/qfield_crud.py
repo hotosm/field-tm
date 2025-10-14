@@ -219,15 +219,17 @@ async def create_qfield_project(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                 detail=(f"Failed to upload files to project {api_project_id}: {e}"),
             ) from e
-
-    # {settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
-    qfc_project_url = (
-        f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
-        f"/a/{api_project_owner}/{api_project_name}"
-    )
-    log.info(f"Finished QFieldCloud project upload: {qfc_project_url}")
-    return qfc_project_url
-
+    
+    log.info(f"Finished QFieldCloud project upload")
+    if settings.DEBUG:
+        return (
+            f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
+            f"/a/{api_project_owner}/{api_project_name}"
+        )
+    return (
+            f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
+            f"/a/{api_project_owner}/{api_project_name}"
+        )
 
 async def qfc_credentials_test(qfc_creds: QFieldCloud):
     """Test QFieldCloud credentials by attempting to open a session.
