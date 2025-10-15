@@ -33,8 +33,22 @@
 	const loginStore = getLoginStore();
 	const alertStore = getAlertStore();
 	const commonStore = getCommonStore();
-	const languageList: languageListType[] = locales.map((locale: string) =>
-		languages.find((language) => language.code === locale),
+	const primaryLocale = $derived(commonStore.config?.primaryLocale);
+	const languageList = $derived(
+		locales
+			.map((locale: string) => languages.find((language) => language.code === locale))
+			.filter((lang): lang is languageListType => !!lang) // ensure no undefined
+			.sort((a, b) => {
+				// If set, prioritise primary locale from config
+				if (primaryLocale) {
+					if (a.code === primaryLocale) return -1;
+					if (b.code === primaryLocale) return 1;
+				}
+				// else fallback to 'en' on top of list
+				if (a.code === 'en') return -1;
+				if (b.code === 'en') return 1;
+				return 0;
+			})
 	);
 
 	const handleSignOut = async () => {
