@@ -33,8 +33,14 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import (
+    JSONResponse,
+    RedirectResponse,
+    Response,
+    StreamingResponse,
+)
 from loguru import logger as log
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
 from psycopg import Connection
@@ -74,11 +80,23 @@ async def download_template(
 ):
     """Download example XLSForm from Field-TM."""
     form_filename = XLSFormType(form_type).name
-    xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
-    if Path(xlsform_path).exists():
-        return FileResponse(xlsform_path, filename=f"{form_filename}.xls")
+    xlsform_path = f"{xlsforms_path}/{form_filename}.yaml"
+    xlsx_bytes = convert_to_xlsform(str(xlsform_path))
+    if xlsx_bytes:
+        return StreamingResponse(
+            xlsx_bytes,
+            media_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": f"attachment; filename={form_filename}.xlsx"
+            },
+        )
     else:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Failed to convert YAML form to XLSForm.",
+        )
 
 
 @router.get("/convert-fgb-to-geojson")
