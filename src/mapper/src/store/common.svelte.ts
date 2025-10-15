@@ -11,6 +11,7 @@ export interface LoginProviders {
 	google: boolean;
 }
 interface ConfigJson {
+	primaryLocale: string;
 	logoUrl: string;
 	logoText: string;
 	tabTitle: string;
