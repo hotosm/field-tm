@@ -264,7 +264,7 @@ class Settings(BaseSettings):
     QFIELDCLOUD_URL: Optional[str] = ""
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
-    QFIELDCLOUD_ORG_NAME: Optional[str] = ""
+    # NOTE we also reuse DEFAULT_ORG_NAME var for QField
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
