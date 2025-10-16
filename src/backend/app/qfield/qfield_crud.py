@@ -188,7 +188,7 @@ async def create_qfield_project(
     async with qfield_client() as client:
         qfield_project = client.create_project(
             qfc_project_name,
-            # owner=settings.QFIELDCLOUD_ORG_NAME,
+            owner=settings.DEFAULT_ORG_NAME,
             description="Created by the Field Tasking Manager",
             is_public=True,
         )
