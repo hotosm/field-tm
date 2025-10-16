@@ -40,8 +40,7 @@ async def qfield_client(creds: Optional[QFieldCloud] = None):
     else:
         qfc_url = settings.QFIELDCLOUD_URL
         qfc_user = settings.QFIELDCLOUD_USER
-        qfc_password = settings.QFIELDCLOUD_PASSWORD
-
+        qfc_password = settings.QFIELDCLOUD_PASSWORD.get_secret_value()
     loop = get_running_loop()
     client = await loop.run_in_executor(
         None,

@@ -28,9 +28,9 @@ from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import ProjectManager
-from app.central.central_schemas import ODKCentral
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
+from app.qfield import qfield_schemas
 from app.qfield.qfield_crud import create_qfield_project, qfc_credentials_test
 from app.qfield.qfield_deps import qfield_client
 
@@ -68,9 +68,7 @@ async def trigger_qfield_project_create(
 
 @router.post("/test-credentials")
 async def qfc_creds_test(
-    # FIXME
-    # qfc_creds: Annotated[qfield_schemas.QFieldCloud, Depends()],
-    qfc_creds: Annotated[ODKCentral, Depends()],
+    qfc_creds: Annotated[qfield_schemas.QFieldCloud, Depends()],
 ):
     """Test QFieldCloud credentials by attempting to open a session."""
     await qfc_credentials_test(qfc_creds)
