@@ -163,8 +163,8 @@ services:
       central:
         condition: service_healthy
         required: false
-      qfield-app:
-        condition: service_healthy
+      qfield-init:
+        condition: service_completed_successfully
       qfield-qgis:
         condition: service_healthy
       migrations:
@@ -541,9 +541,9 @@ services:
       QFIELDCLOUD_HOST: qfield.fmtm.localhost
       DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
       DJANGO_SUPERUSER_USERNAME: admin
-      DJANGO_SUPERUSER_EMAIL: admin@hotosm.org
-      DJANGO_SUPERUSER_PASSWORD: Password1234
-      SECRET_KEY: xxxxx
+      DJANGO_SUPERUSER_EMAIL: sysadmin@hotosm.org
+      DJANGO_SUPERUSER_PASSWORD: ${QFIELDCLOUD_ADMIN_PASSWORD}
+      SECRET_KEY: YKuuTCb256dMmcg4DxpxrCafrcVvk8s3ZJrtDr9JaVAkeLiULGiemyzUTQESrzPQhiYUfn
       SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
       ACCOUNT_EMAIL_VERIFICATION: none
       # TODO fix injecting S3 vars into STORAGES
@@ -592,6 +592,11 @@ services:
       # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+      # For qfield-init:
+      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
+      QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
+      QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
+      QFIELDCLOUD_ORG_NAME: ${QFIELDCLOUD_ORG_NAME}
     command:
       - sh
       - -c
@@ -612,6 +617,61 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  qfield-init:
+    extends: qfield-app
+    depends_on:
+      qfield-app:
+        condition: service_healthy
+    restart: "on-failure:2"
+    command:
+      - sh
+      - -c
+      - |
+        echo "Waiting for app to be ready..."
+        until curl -sf http://qfield-app:8000/api/v1/status > /dev/null; do
+          sleep 3
+        done
+
+        echo "Initializing organizations and users..."
+        python - <<'PYCODE'
+        import os, sys, django
+        django.setup()
+
+        from qfieldcloud.core.models import Organization, Person, User
+
+        username = os.getenv("QFIELDCLOUD_USER")
+        email = "svcfmtm@hotosm.org"
+        password = os.getenv("QFIELDCLOUD_PASSWORD")
+        org_name = os.getenv("DEFAULT_ORG_NAME")
+
+        if not all([username, password, org_name]):
+            print("QFIELDCLOUD_USER or QFIELDCLOUD_PASSWORD or DEFAULT_ORG_NAME not set")
+            sys.exit(1)
+
+        # Create or get the person
+        user, _ = Person.objects.get_or_create(
+            username=username,
+            defaults={
+                "email": email,
+                "type": User.Type.PERSON,
+                "has_accepted_tos": True,
+            },
+        )
+
+        # Create or get the organization
+        org, _ = Organization.objects.get_or_create(
+            username=org_name,
+            defaults={
+                "organization_owner": user,
+                "created_by": user,
+                "type": User.Type.ORGANIZATION,
+                "is_initially_trial": False,
+            },
+        )
+
+        print(f"Initialized organization: {org.username}, owner: {user.username}")
+        PYCODE
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"
