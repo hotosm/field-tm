@@ -596,7 +596,6 @@ services:
       DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
       QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
       QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
-      QFIELDCLOUD_ORG_NAME: ${QFIELDCLOUD_ORG_NAME}
     command:
       - sh
       - -c
@@ -649,15 +648,15 @@ services:
             print("QFIELDCLOUD_USER or QFIELDCLOUD_PASSWORD or DEFAULT_ORG_NAME not set")
             sys.exit(1)
 
-        # Create or get the person
-        user, _ = Person.objects.get_or_create(
-            username=username,
-            defaults={
-                "email": email,
-                "type": User.Type.PERSON,
-                "has_accepted_tos": True,
-            },
-        )
+        # Create or get the user (do not use get_or_create, as we need password hashing)
+        if not Person.objects.filter(username=username).exists():
+            user = Person.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_superuser=False,
+                has_accepted_tos=True,
+            )
 
         # Create or get the organization
         org, _ = Organization.objects.get_or_create(
