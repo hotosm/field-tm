@@ -24,6 +24,7 @@ from pathlib import Path
 from random import getrandbits
 from uuid import uuid4
 
+import geojson
 from aiohttp import ClientSession
 from fastapi.exceptions import HTTPException
 from loguru import logger as log
@@ -31,7 +32,6 @@ from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
-from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
@@ -43,6 +43,51 @@ from app.qfield.qfield_schemas import QFieldCloud
 CONTAINER_IMAGE = "ghcr.io/opengisch/qfieldcloud-qgis:25.24"
 SHARED_VOLUME_NAME = "qfield_projects"  # docker/nerdctl volume name
 SHARED_VOLUME_PATH = "/opt/qfield"  # inside the container
+
+
+def clean_tags_for_qgis(
+    geojson_data: geojson.FeatureCollection,
+) -> geojson.FeatureCollection:
+    """Clean tags field in GeoJSON to be compatible with QGIS.
+
+    QGIS has issues with JSON string tags like '{"building": "yes"}', so we convert
+    them to a format that QGIS can handle.
+
+    Args:
+        geojson_data: GeoJSON FeatureCollection to clean
+
+    Returns:
+        Cleaned GeoJSON FeatureCollection
+    """
+    if not geojson_data or "features" not in geojson_data:
+        return geojson_data
+
+    for feature in geojson_data.get("features", []):
+        properties = feature.get("properties", {})
+        tags = properties.get("tags")
+
+        if tags:
+            if isinstance(tags, str) and tags.startswith("{") and tags.endswith("}"):
+                try:
+                    tags_dict = json.loads(tags)
+                    if isinstance(tags_dict, dict):
+                        # Convert to "key=value;key2=value2" format
+                        tags_str = ";".join([f"{k}={v}" for k, v in tags_dict.items()])
+                        properties["tags"] = tags_str
+                    else:
+                        # If it's not a dict, keep as string
+                        properties["tags"] = str(tags)
+                except (json.JSONDecodeError, TypeError):
+                    # If JSON parsing fails, keep as string
+                    properties["tags"] = str(tags)
+            else:
+                properties["tags"] = str(tags) if tags else ""
+        else:
+            properties["tags"] = ""
+
+        feature["properties"] = properties
+
+    return geojson_data
 
 
 async def create_qfield_project(
@@ -66,6 +111,9 @@ async def create_qfield_project(
     features_geojson = await get_project_features_geojson(db, project)
     tasks_geojson = await get_task_geometry(db, project.id)
 
+    # Clean up tags field for QGIS compatibility
+    features_geojson = clean_tags_for_qgis(features_geojson)
+
     # Write files locally for QGIS job
     xlsform_path = job_dir / "xlsform.xlsx"
     with open(xlsform_path, "wb") as f:
@@ -76,8 +124,10 @@ async def create_qfield_project(
         json.dump(features_geojson, f)
 
     tasks_geojson_path = job_dir / "tasks.geojson"
+    tasks_geojson_parsed = json.loads(tasks_geojson)
+    tasks_geojson_cleaned = clean_tags_for_qgis(tasks_geojson_parsed)
     with open(tasks_geojson_path, "w") as f:
-        json.dump(json.loads(tasks_geojson), f)
+        json.dump(tasks_geojson_cleaned, f)
 
     # 1. Create QGIS project via internal API
     qgis_container_url = "http://qfield-qgis:8080"
@@ -131,15 +181,18 @@ async def create_qfield_project(
         )
 
     # 2. Create QFieldCloud project
+    # TODO: Find solution to create organization before creating project.
+    # This will be handled while decoupling backend.
+    # IF organization is not given then it will use default username as owner.
     log.debug(f"Creating QFieldCloud project: {qfc_project_name}")
     async with qfield_client() as client:
         qfield_project = client.create_project(
             qfc_project_name,
-            owner=settings.QFIELDCLOUD_ORG_NAME,
+            # owner=settings.QFIELDCLOUD_ORG_NAME,
             description="Created by the Field Tasking Manager",
             is_public=True,
         )
-
+        log.debug(f"Successfully created QFieldCloud project: {qfield_project}")
         # 3. Upload generated files from shared volume
         api_project_id = qfield_project.get("id")
         api_project_owner = qfield_project.get("owner")
@@ -167,26 +220,28 @@ async def create_qfield_project(
                 detail=(f"Failed to upload files to project {api_project_id}: {e}"),
             ) from e
 
-    qfc_project_url = (
+    log.info("Finished QFieldCloud project upload")
+    if settings.DEBUG:
+        return (
+            f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
+            f"/a/{api_project_owner}/{api_project_name}"
+        )
+    return (
         f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
         f"/a/{api_project_owner}/{api_project_name}"
     )
-    log.info(f"Finished QFieldCloud project upload: {qfc_project_url}")
-    return qfc_project_url
 
 
-# FIXME replace with qfield_schemas.QFieldCloud
-async def qfc_credentials_test(qfc_creds: ODKCentral):
+async def qfc_credentials_test(qfc_creds: QFieldCloud):
     """Test QFieldCloud credentials by attempting to open a session.
 
     Returns status 200 if credentials are valid, otherwise raises HTTPException.
     """
     try:
-        # FIXME temp solution
         creds = QFieldCloud(
-            qfield_cloud_url=qfc_creds.odk_central_url,
-            qfield_cloud_user=qfc_creds.odk_central_user,
-            qfield_cloud_password=qfc_creds.odk_central_password,
+            qfield_cloud_url=qfc_creds.qfield_cloud_url,
+            qfield_cloud_user=qfc_creds.qfield_cloud_user,
+            qfield_cloud_password=qfc_creds.qfield_cloud_password,
         )
         async with qfield_client(creds):
             pass
