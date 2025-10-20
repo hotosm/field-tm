@@ -764,6 +764,11 @@ async def main():
         file_handle.write(form_bytes.getvalue())
 
 
+def run():
+    """Wrapper to run via CLI / pyproject scripts."""
+    asyncio.run(main())
+
+
 if __name__ == "__main__":
     """Wrap for running the file directly."""
-    asyncio.run(main())
+    run()
