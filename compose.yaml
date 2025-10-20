@@ -28,6 +28,7 @@ volumes:
   qfield_db_data:
   qfield_static:
   qfield_projects:
+  qfield_transformation_grids:
 
 networks:
   fmtm-net:
@@ -36,6 +37,97 @@ networks:
       driver: default
       config:
         - subnet: 10.20.30.0/24
+
+x-qfield-common-env: &qfield-common-env
+  DJANGO_SETTINGS_MODULE: qfieldcloud.settings
+  DEBUG: 1
+  ENVIRONMENT: development
+  QFIELDCLOUD_HOST: qfield.fmtm.localhost
+  DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
+  DJANGO_SUPERUSER_USERNAME: admin
+  DJANGO_SUPERUSER_EMAIL: sysadmin@hotosm.org
+  DJANGO_SUPERUSER_PASSWORD: ${QFIELDCLOUD_ADMIN_PASSWORD}
+  SECRET_KEY: YKuuTCb256dMmcg4DxpxrCafrcVvk8s3ZJrtDr9JaVAkeLiULGiemyzUTQESrzPQhiYUfn
+  SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
+  ACCOUNT_EMAIL_VERIFICATION: none
+  QFIELDCLOUD_PASSWORD_LOGIN_IS_ENABLED: 1
+  # TODO fix injecting S3 vars into STORAGES
+  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fmtm}
+  # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-somelongpassword}
+  # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
+  # STORAGE_ENDPOINT_URL: http://s3:9000
+  STORAGES: '{
+    "default": {
+    "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
+    "OPTIONS": {
+    "access_key": "fmtm",
+    "secret_key": "somelongpassword",
+    "bucket_name": "qfield-cloud",
+    "region_name": "",
+    "endpoint_url": "http://s3:9000"
+    },
+    "QFC_IS_LEGACY": false
+    }
+    }'
+  POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
+  POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+  POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+  POSTGRES_HOST: qfield-db
+  POSTGRES_PORT: 5432
+  GEODB_HOST: qfield-db
+  GEODB_PORT: 5432
+  GEODB_USER: ${FMTM_DB_USER:-fmtm}
+  GEODB_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+  GEODB_DB: ${FMTM_DB_NAME:-fmtm}
+  # EMAIL_HOST: ${EMAIL_HOST}
+  # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
+  # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
+  # EMAIL_PORT: ${EMAIL_PORT}
+  # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+  # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+  # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
+  # NOTE this must have a trailing slash
+  QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_URL}
+  QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
+  QFIELDCLOUD_USE_I18N: 0
+  QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
+  QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
+  QFIELDCLOUD_DEFAULT_NETWORK: fmtm-local
+  QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_qfield_transformation_grids
+  # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
+  # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
+  # Required for spawned QGIS job containers
+  TMP_DIRECTORY: /tmp
+
+x-qfield-common: &qfield-common
+  image: ghcr.io/opengisch/qfieldcloud-app:25.24
+  volumes:
+    - qfield_static:/usr/src/app/staticfiles
+  networks:
+    - fmtm-net
+  restart: "unless-stopped"
+  environment: *qfield-common-env
+  command:
+    - sh
+    - -c
+    - |
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      python manage.py createsuperuser --no-input || true &&
+      python manage.py compilemessages &&
+      exec gunicorn qfieldcloud.wsgi:application \
+        --bind 0.0.0.0:8000 \
+        --timeout 300 \
+        --max-requests 300 \
+        --workers 1 \
+        --threads 4
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
+    start_period: 30s
+    interval: 10s
+    timeout: 5s
+    retries: 10
 
 services:
   proxy:
@@ -527,101 +619,47 @@ services:
       timeout: 5s
       retries: 3
 
+  # Note we can't use compose 'extends' here due to double port definition / conflict
   qfield-app:
-    image: ghcr.io/opengisch/qfieldcloud-app:25.24
-    volumes:
-      - qfield_static:/usr/src/app/staticfiles
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    environment:
-      DJANGO_SETTINGS_MODULE: qfieldcloud.settings
-      DEBUG: 1
-      ENVIRONMENT: development
-      QFIELDCLOUD_HOST: qfield.fmtm.localhost
-      DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
-      DJANGO_SUPERUSER_USERNAME: admin
-      DJANGO_SUPERUSER_EMAIL: sysadmin@hotosm.org
-      DJANGO_SUPERUSER_PASSWORD: ${QFIELDCLOUD_ADMIN_PASSWORD}
-      SECRET_KEY: YKuuTCb256dMmcg4DxpxrCafrcVvk8s3ZJrtDr9JaVAkeLiULGiemyzUTQESrzPQhiYUfn
-      SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
-      ACCOUNT_EMAIL_VERIFICATION: none
-      # TODO fix injecting S3 vars into STORAGES
-      # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fmtm}
-      # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-somelongpassword}
-      # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
-      # STORAGE_ENDPOINT_URL: http://s3:9000
-      STORAGES: '{
-        "default": {
-        "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
-        "OPTIONS": {
-        "access_key": "fmtm",
-        "secret_key": "somelongpassword",
-        "bucket_name": "qfield-cloud",
-        "region_name": "",
-        "endpoint_url": "http://s3:9000"
-        },
-        "QFC_IS_LEGACY": false
-        }
-        }'
-      POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
-      POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
-      POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
-      POSTGRES_HOST: qfield-db
-      POSTGRES_PORT: 5432
-      GEODB_HOST: qfield-db
-      GEODB_PORT: 5432
-      GEODB_USER: ${FMTM_DB_USER:-fmtm}
-      GEODB_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
-      GEODB_DB: ${FMTM_DB_NAME:-fmtm}
-      QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
-      # FIXME add actual worker
-      QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: http://localhost:8000
-      QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
-      QFIELDCLOUD_USE_I18N: 0
-      QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
-      QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
-      # QFIELDCLOUD_DEFAULT_NETWORK: ${QFIELDCLOUD_DEFAULT_NETWORK:-${COMPOSE_PROJECT_NAME}_default}
-      # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
-      # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
-      # QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_transformation_grids
-      # EMAIL_HOST: ${EMAIL_HOST}
-      # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
-      # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
-      # EMAIL_PORT: ${EMAIL_PORT}
-      # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
-      # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
-      # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
-      # For qfield-init:
-      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
-      QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
-      QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
-    command:
-      - sh
-      - -c
-      - |
-        python manage.py migrate &&
-        python manage.py collectstatic --noinput &&
-        python manage.py createsuperuser --no-input || true &&
-        python manage.py compilemessages &&
-        exec gunicorn qfieldcloud.wsgi:application \
-          --bind 0.0.0.0:8000 \
-          --timeout 300 \
-          --max-requests 300 \
-          --workers 1 \
-          --threads 4
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
-      start_period: 30s
-      interval: 10s
-      timeout: 5s
-      retries: 10
+    <<: *qfield-common
+    ports:
+      # In QField on desktop, double click Nyuki and enter http://localhost:8442
+      - 8442:8000
 
-  qfield-init:
-    extends: qfield-app
+  qfield-worker:
+    <<: *qfield-common
+    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:25.24
     depends_on:
       qfield-app:
         condition: service_healthy
+      qfield-transformation-grids:
+        condition: service_completed_successfully
+    command: python manage.py dequeue
+    user: root # required
+    scale: 1
+    stop_grace_period: 15m
+    labels:
+      ofelia.enabled: "false"
+    environment:
+      <<: *qfield-common-env
+    volumes:
+      # Required to run qgis containers and process project files
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Required to process geospatial datasets
+      - qfield_transformation_grids:/transformation_grids
+      # Required for loading feedback.json from QGIS job container
+      - /tmp:/tmp
+
+  qfield-init:
+    <<: *qfield-common
+    depends_on:
+      qfield-app:
+        condition: service_healthy
+    environment:
+      <<: *qfield-common-env
+      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
+      QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
+      QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
     restart: "on-failure:2"
     command:
       - sh
@@ -649,6 +687,7 @@ services:
             sys.exit(1)
 
         # Create or get the user (do not use get_or_create, as we need password hashing)
+        user = None
         if not Person.objects.filter(username=username).exists():
             user = Person.objects.create_user(
                 username=username,
@@ -659,17 +698,19 @@ services:
             )
 
         # Create or get the organization
-        org, _ = Organization.objects.get_or_create(
-            username=org_name,
-            defaults={
-                "organization_owner": user,
-                "created_by": user,
-                "type": User.Type.ORGANIZATION,
-                "is_initially_trial": False,
-            },
-        )
+        org = None
+        if not Organization.objects.filter(username=org_name).exists():
+            org = Organization.objects.create(
+                username=org_name,
+                organization_owner=user,
+                created_by=user,
+                is_initially_trial=False,
+            )
 
-        print(f"Initialized organization: {org.username}, owner: {user.username}")
+        if user and org:
+            print(f"Initialized organization: {org.username}, owner: {user.username}")
+        else:
+            print("Org + user creation skipped, as they already exist.")
         PYCODE
 
   qfield-qgis:
@@ -689,3 +730,12 @@ services:
       interval: 5s
       retries: 5
       timeout: 5s
+
+  qfield-transformation-grids:
+    image: k3rnelpan1c/alpine-wget:latest
+    command: |
+      wget --mirror https://cdn.proj.org/ -P /transformation_grids --no-host-directories
+      && chmod a+r /transformation_grids/*
+    volumes:
+      - qfield_transformation_grids:/transformation_grids
+    restart: "on-failure:2"
