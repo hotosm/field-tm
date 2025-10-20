@@ -37,6 +37,14 @@ homepage = "https://hotosm.github.io/osm-fieldwork"
 documentation = "https://hotosm.github.io/osm-fieldwork"
 repository = "https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork"
 
+[project.scripts]
+basemapper = "osm_fieldwork.basemapper:main"
+osm2favorites = "osm_fieldwork.osm2favorities:main"
+odk2osm = "osm_fieldwork.odk2osm:main"
+odk_client = "osm_fieldwork.odk_client:main"
+make_data_extract = "osm_fieldwork.make_data_extract:main"
+fmtm_xlsform = "osm_fieldwork.update_xlsform:run"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -81,12 +89,3 @@ ignore = ["N805", "B008"]
 "osm_fieldwork/basemapper.py" = ["N802"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-# TODO update these from PDM --> uv setup
-[project.scripts]
-basemapper = "osm_fieldwork.basemapper:main"
-osm2favorites = "osm_fieldwork.osm2favorities:main"
-odk2osm = "osm_fieldwork.odk2osm:main"
-odk_client = "osm_fieldwork.odk_client:main"
-make_data_extract = "osm_fieldwork.make_data_extract:main"
-fmtm_xlsform = "osm_fieldwork.update_xlsform:main"
