@@ -499,9 +499,9 @@ async def modify_form_for_qfield(
         DbGeomType.LINESTRING: "geotrace",
     }
     geom_type = geom_type_map.get(geom_layer_type, "geopoint")
-    mask = qf_survey_df["type"] == "select_one_from_file features.csv"
-    if mask.any():
-        idx = qf_survey_df.index[mask][0]
+    geom_field_mask = qf_survey_df["type"] == "select_one_from_file features.csv"
+    if geom_field_mask.any():
+        idx = qf_survey_df.index[geom_field_mask][0]
         # Build the replacement row
         replacement = qf_survey_df.iloc[idx:idx+1].copy()
         replacement.loc[:, "type"] = geom_type
@@ -511,7 +511,13 @@ async def modify_form_for_qfield(
             [qf_survey_df.iloc[:idx], replacement, qf_survey_df.iloc[idx+1:]]
         ).reset_index(drop=True)
 
-    # 2. Wrap the final two rows (end_note, image) in a group,
+    # 2. Remove the 'start-geopoint' field we add as mandatory fields for ODK
+    #    - this breaks XLSFormConverter identifying the correct geom type
+    start_geopoint_mask = qf_survey_df["type"] == "start-geopoint"
+    if start_geopoint_mask.any():
+        qf_survey_df = qf_survey_df[~start_geopoint_mask].reset_index(drop=True)
+
+    # 3. Wrap the final two rows (end_note, image) in a group,
     #    so they display correctly as final QField tab
     last_two_rows = qf_survey_df.tail(2)
     begin_row = pd.DataFrame([{"type": "begin group", "name": "final"}])
@@ -522,7 +528,7 @@ async def modify_form_for_qfield(
         ignore_index=True,
     )
 
-    # 3. Update survey sheet in updated_form
+    # 4. Update survey sheet in updated_form
     custom_sheets["survey"] = qf_survey_df
 
     return (form_language, await write_xlsform(custom_sheets))

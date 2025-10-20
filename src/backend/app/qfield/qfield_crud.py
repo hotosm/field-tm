@@ -36,6 +36,7 @@ from app.config import settings
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
+from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
 from app.qfield.qfield_schemas import QFieldCloud
 
@@ -114,10 +115,27 @@ async def create_qfield_project(
     # Clean up tags field for QGIS compatibility
     features_geojson = clean_tags_for_qgis(features_geojson)
 
+    # Write updated XLSForm content to db (for latest inspection)
+    xlsform_bytes = final_form.getvalue()
+    if len(xlsform_bytes) == 0:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="There was an error modifying the XLSForm!",
+        )
+    log.debug(f"Setting project XLSForm db data for project ({project.id})")
+    await DbProject.update(
+        db,
+        project.id,
+        ProjectUpdate(
+            xlsform_content=xlsform_bytes,
+        ),
+    )
+    await db.commit()
+
     # Write files locally for QGIS job
     xlsform_path = job_dir / "xlsform.xlsx"
     with open(xlsform_path, "wb") as f:
-        f.write(final_form.getvalue())
+        f.write(xlsform_bytes)
 
     features_geojson_path = job_dir / "features.geojson"
     with open(features_geojson_path, "w") as f:
