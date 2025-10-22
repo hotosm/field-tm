@@ -1,0 +1,577 @@
+survey:
+  - "#":
+      Converted by yxf, from highways.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: begin_group
+    name: Roads
+    label::English(en): Roads
+    appearance: field-list
+  - type: select_one feature
+    name: highway_type
+    label::English(en): What feature is this?
+    required: yes
+    appearance: minimal
+  - type: select_one highway
+    name: highway
+    label::English(en): What type of road is this?
+    default: residential
+    required: yes
+    relevant: ${highway_type} = 'highway'
+    trigger: ${feature}
+    appearance: minimal
+  - type: text
+    name: name
+    label::English(en): Does this feature have a name?
+    relevant: ${highway_type} = 'highway'
+    appearance: minimal
+  - type: end_group
+  - type: begin_group
+    name: Highway
+    label::English(en): Highway
+    relevant: ${highway_type} = 'highway'
+    trigger: ${feature}
+    appearance: field-list
+  - type: select_one surface
+    name: surface
+    label::English(en): What is the surface of this road?
+    default: unpaved
+    required: yes
+    trigger: ${feature}
+    appearance: minimal
+  - type: select_one smoothness
+    name: smoothness
+    label::English(en): How smooth is this road?
+    default: good
+    required: yes
+    trigger: ${feature}
+    appearance: minimal
+  - type: select_one oneway
+    name: oneway
+    label::English(en): Is it oneway?
+    hint::English(en): (direction of traffic, NOT the number of lanes)
+    appearance: minimal
+  - type: select_one accessibility
+    name: accessibility
+    label::English(en): Is the road is accessible throughout the year?
+    default: unknown
+    appearance: minimal
+  - type: integer
+    name: width
+    label::English(en): What is the width in meters ?
+    hint::English(en): (in meters)
+    default: ${last-saved#width}
+    appearance: minimal
+  - type: select_one tracktype
+    name: tracktype
+    label::English(en): What is the grade of this highway ?
+    appearance: minimal
+  - type: select_one sidewalk
+    name: sidewalk
+    label::English(en): Is there a sidewalk ?
+    default: ${last-saved#sidewalk}
+    appearance: minimal
+  - type: end_group
+  - type: begin_group
+    name: Path
+    label::English(en): Path conditions
+    relevant: ${highway_type} = 'path'
+    appearance: minimal
+  - type: select_one sac_scale
+    name: sac_scale
+    label::English(en): What is the difficulty of this path ?
+    default: hiking
+    trigger: ${feature}
+    appearance: minimal
+  - type: select_one trail_visibility
+    name: visibility
+    label::English(en): How difficult is it to follow the path ?
+    default: ${last-saved#visibility}
+    appearance: minimal
+  - type: end_group
+  - type: begin_group
+    name: Bridge
+    label::English(en): Bridges
+    relevant: ${highway_type} = 'bridge'
+    appearance: field-list
+  - type: select_one bridge
+    name: bridge
+    label::English(en): What type of bridge is it ?
+    default: yes
+    required: yes
+    appearance: minimal
+  - type: select_one material
+    name: bridge_material
+    label::English(en): What is this bridge made of ?
+    appearance: minimal
+  - type: select_one structure
+    name: bridge_structure
+    label::English(en): What type of bridge structure is this ?
+    appearance: minimal
+  - type: text
+    name: bridge_name
+    label::English(en): Name of this bridge if it has one
+    appearance: minimal
+  - type: end_group
+  - type: begin_group
+    name: Barrier
+    label::English(en): Is there a barrier blocking this highway ?
+    relevant: ${highway_type} = 'barrier'
+    appearance: field-list
+  - type: select_one barrier
+    name: barrier
+    label::English(en): What type of barrier is it ?
+    default: ${last-saved#barrier}
+    required: yes
+    appearance: minimal
+  - type: text
+    name: barrier_name
+    label::English(en): Name or reference on the barrier if there is one
+    appearance: minimal
+  - type: select_one swing_gate
+    name: swing_gate
+    label::English(en): Type of swing gate
+    default: single
+    relevant: ${barrier} = 'swing_gate'
+    appearance: minimal
+  - type: end_group
+  - type: begin_group
+    name: comments
+    label::English(en): Comments
+    appearance: field-list
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: end_group
+choices:
+  - list_name: feature
+    name: highway
+    label: Highway
+  - list_name: feature
+    name: path
+    label: Path (foot traffic only)
+  - list_name: feature
+    name: bridge
+    label: Bridge
+  - list_name: feature
+    name: barrier
+    label: Barrier
+  - list_name: highway
+    name: unclassified
+    label: Unclassified (minor roads which serve a purpose other than access to properties)
+  - list_name: highway
+    name: residential
+    label: Residential (roads which serve as an access to housing, not between settlements)
+  - list_name: highway
+    name: service
+    label: Service (driveways, access roads)
+  - list_name: highway
+    name: path
+    label: Path (foot traffic only)
+  - list_name: highway
+    name: track
+    label: Track (jeep trail)
+  - list_name: highway
+    name: trunk
+    label: Trunk (The most important roads in a country's system that aren't motorways)
+  - list_name: highway
+    name: primary
+    label:
+      Primary (The next most important roads in a country's system, often linking
+      larger towns)
+  - list_name: highway
+    name: secondary
+    label: Secondary (major road within city)
+  - list_name: highway
+    name: tertiary
+    label:
+      Tertiary (The next most important roads, often linking smaller towns and
+      villages)
+  - list_name: surface
+    name: paved
+    label: Paved (covered with paving stones, concrete or asphalt)
+  - list_name: surface
+    name: asphalt
+    label: Asphalt (mineral aggregate bound by asphalt)
+  - list_name: surface
+    name: concrete
+    label: Concrete
+  - list_name: surface
+    name: unpaved
+    label: Unpaved (loose covering ranging from compacted stone chippings to earth)
+  - list_name: surface
+    name: cobblestone
+    label: Cobblestone (raw cobblestone of natural, uncut, rounded stones)
+  - list_name: surface
+    name: sand
+    label: Sand (small to very small fractions (less than 2mm) of rock.)
+  - list_name: surface
+    name: gravel
+    label: Gravel (broken/crushed rock with sharp edges,)
+  - list_name: surface
+    name: compacted
+    label: Compacted (mixture of larger gravel and sand)
+  - list_name: surface
+    name: dirt
+    label:
+      Dirt (Some compacted surfaces are sometimes called "dirt" too, please consider
+      using  compacted)
+  - list_name: surface
+    name: metal
+    label: Metal (temporary tracks over fields for normal road vehicles or site traffic)
+  - list_name: surface
+    name: grass
+    label: Grass (Grass covered ground)
+  - list_name: surface
+    name: mud
+    label: Mud (most of the year wet which gives a soft ground with low carrying capacity)
+  - list_name: smoothness
+    name: good
+    label: Good (Possible to drive consistently at the speed limit)
+  - list_name: smoothness
+    name: intermediate
+    label: Intermediate (Occasional imperfections requiring caution or slow passage)
+  - list_name: smoothness
+    name: bad
+    label:
+      Bad (Many imperfections, not possible to drive consistently at the speed
+      limit)
+  - list_name: smoothness
+    name: very_bad
+    label:
+      Very Bad (Impossible to ever drive at the speed limit, better to use 4-wheel
+      drive)
+  - list_name: smoothness
+    name: horrible
+    label: Horrible (You'll know it when you see it.)
+  - list_name: smoothness
+    name: impassable
+    label: Impassable (In  wheeled vehicle)
+  - list_name: oneway
+    name: yes
+    label: yes
+  - list_name: oneway
+    name: no
+    label: no
+  - list_name: accessibility
+    name: yes
+    label: yes
+  - list_name: accessibility
+    name: no
+    label: no
+  - list_name: accessibility
+    name: only_in_dry_season
+    label: Only in dry season
+  - list_name: accessibility
+    name: unknown
+    label: Unknown
+  - list_name: tracktype
+    name: grade1
+    label: Grade 1 (usually a paved or sealed surface)
+  - list_name: tracktype
+    name: grade2
+    label: Grade 2 (solid but unpaved. Usually an unpaved track with surface of gravel)
+  - list_name: tracktype
+    name: grade3
+    label: Grade 3 (mostly solid. Even mixture of hard and soft materials)
+  - list_name: tracktype
+    name: grade4
+    label: Grade 4 (mostly soft. Almost always an unpaved track prominently with soil/sand/grass)
+  - list_name: tracktype
+    name: grade5
+    label:
+      Grade 5 (almost always an unimproved track lacking hard materials, same as
+      surrounding soil)
+  - list_name: access
+    name: private
+    label: Private
+  - list_name: access
+    name: public
+    label: Public
+  - list_name: access
+    name: permissive
+    label: Permissive
+  - list_name: access
+    name: emergency
+    label: Emergency
+  - list_name: access
+    name: no
+    label: No gate
+  - list_name: access
+    name: yes
+    label: Yes
+  - list_name: gps_type
+    name: track
+    label: Record a track while moving
+  - list_name: gps_type
+    name: point
+    label: Record a single point while stationary
+  - list_name: swing_gate
+    name: double
+    label: Double Wide
+  - list_name: swing_gate
+    name: single
+    label: Single wide
+  - list_name: bridge
+    name: movable
+    label: A bridge that can be moved
+  - list_name: bridge
+    name: trestle
+    label:
+      "Trestle (composed of a series of short spans where each span is supported
+      by a rigid frame ) "
+  - list_name: bridge
+    name: low_water_crossing
+    label: Low Water Crossing (low bridge over a waterway suitable to cross with a vehicle)
+  - list_name: bridge
+    name: aqueduct
+    label: Aqueduct (longer structure for carrying a canal or fresh water)
+  - list_name: bridge
+    name: ford
+    label: Ford (shallow spot in a waterway suitable to cross with a vehicle)
+  - list_name: bridge
+    name: boardwalk
+    label:
+      Boardwalk (plank walkway over wet or otherwise difficult terrain  usually
+      low to the ground and supported by posts. )
+  - list_name: bridge
+    name: cantilever
+    label: "Cantilever (bridge where a span is supported at one end only) "
+  - list_name: bridge
+    name: covered
+    label: "Covered (covered bridge has a roof and fully or partly enclosed sides) "
+  - list_name: bridge
+    name: viaduct
+    label:
+      "Viaduct (composed of a series of spans  often short relative to its overall
+      length) "
+  - list_name: bridge
+    name: baily
+    label: Baily Bridge (often left over from WW2)
+  - list_name: bridge
+    name: yes
+    label: Unknown bridge type
+  - list_name: structure
+    name: arch
+    label: Arch
+  - list_name: structure
+    name: truss
+    label: Truss
+  - list_name: structure
+    name: floating
+    label: Floating
+  - list_name: structure
+    name: suspension
+    label: Suspension
+  - list_name: structure
+    name: cable-stayed
+    label: Cable-stayed
+  - list_name: structure
+    name: humpback
+    label: Humpback
+  - list_name: sidewalk
+    name: both
+    label: Sidewalk on both sides of the highway
+  - list_name: sidewalk
+    name: left
+    label: Sidewalk on the left side of the highway
+  - list_name: sidewalk
+    name: right
+    label: Sidewalk on the right side of the highway
+  - list_name: sidewalk
+    name: none
+    label: No sidewalk
+  - list_name: material
+    name: concrete
+    label: Concrete
+  - list_name: material
+    name: masonry
+    label: Masonry
+  - list_name: material
+    name: steel
+    label: Steel
+  - list_name: material
+    name: iron
+    label: Iron
+  - list_name: material
+    name: wood
+    label: Wood
+  - list_name: material
+    name: mixed
+    label: Mixed
+  - list_name: barrier
+    name: swing_gate
+    label: Swing Gate (single or double)
+  - list_name: barrier
+    name: cattle grid
+    label:
+      Cattle Grid (bars in the road surface that allow wheeled vehicles but not
+      animals to cross)
+  - list_name: barrier
+    name: hampshire gate
+    label: Hampshire Gate (section of wire fence which can be removed temporarily)
+  - list_name: barrier
+    name: chain
+    label: Chain (chain used to prevent motorized vehicles)
+  - list_name: barrier
+    name: debris
+    label: Debris (road is blocked by debris with or without ground)
+  - list_name: barrier
+    name: ditch
+    label:
+      Ditch (trench,  ditch or ravine,  usually with a stream at the bottom  that
+      is not easily crossed especially if not on foot)
+  - list_name: barrier
+    name: cable barrier
+    label:
+      Cable Barrier (road side or median barrier made of steel wire ropes mounted
+      on weak posts)
+  - list_name: barrier
+    name: gate
+    label: Gate (entrance that can be opened or closed to get through the barrier)
+  - list_name: barrier
+    name: bollard
+    label:
+      Bollard (usually concrete or metal) pillar or pillars in the middle of the
+      road to prevent passage by some traffic
+  - list_name: barrier
+    name: block
+    label:
+      Block (large  solid  immobile block that can be moved only with heavy machinery
+      or great effort)
+  - list_name: barrier
+    name: fence
+    label:
+      Fence (structure supported by posts driven into the ground and designed to
+      prevent movement across a boundary)
+  - list_name: barrier
+    name: guard rail
+    label: Guard Rail (also called a crash barrier)
+  - list_name: barrier
+    name: hedge
+    label:
+      Hedge (Is a line of closely spaced shrubs and bushes  planted and trained
+      in such a way as to form a barrier or to mark the boundary of an area)
+  - list_name: barrier
+    name: jersey barrier
+    label: Jersey Barrier (consists of heavy prefabricated blocks to create a barrier)
+  - list_name: barrier
+    name: kerb
+    label:
+      "Kerb or Curb (short solid barrier, usually found at the edge of a road,
+      path or sidewalk,  which prevents entrance by vehicles) wheelchair users "
+  - list_name: barrier
+    name: lift gate
+    label:
+      Lift Gate (bar,  or pole pivoted in such a way as to allow the boom to block
+      vehicular access through a controlled point)
+  - list_name: barrier
+    name: log
+    label: Log (passage is closed by lumber, like the trunk of a tree)
+  - list_name: barrier
+    name: rope
+    label:
+      Rope (flexible barrier made of fibers twisted or braided together to improve
+      strength)
+  - list_name: barrier
+    name: sliding gate
+    label: Sliding Gate (Similar to a lift gate but slides sidewards to open)
+  - list_name: barrier
+    name: stile
+    label:
+      Stile  (allows pedestrians to cross a wall or fence  but never actually "opens"
+      the barrier )
+  - list_name: barrier
+    name: yes
+    label: Unknown barrier type
+  - list_name: barrier
+    name: city wall
+    label:
+      City Wall (A fortification used to defend a city or settlement from potential
+      aggressors)
+  - list_name: barrier
+    name: border control
+    label: Border Control (control point at an international border between two countries)
+  - list_name: sac_scale
+    name: hiking
+    label: Hiking (Can be hiked in ordinary sports shoes/trainers, no risk of falling)
+  - list_name: sac_scale
+    name: mountain_hiking
+    label: Mountain Hking (terrain is steep in places and may have fall hazards)
+  - list_name: sac_scale
+    name: demanding_mountain_hiking
+    label:
+      Demanding Mountain Hiking (Trail may have unmarked portions and cross fields
+      of loose scree or talus)
+  - list_name: sac_scale
+    name: alpine_hiking
+    label:
+      Alpine Hiking (may include steep grassy pitches, talus slopes, easy snowfields,
+      or snow-free glacier crossings )
+  - list_name: sac_scale
+    name: demanding_alpine_hiking
+    label:
+      Demanding Alpine Hiking (exposed and demanding terrain. May include steep
+      rock scrambles, glaciers and snowfields with risk of sliding.)
+  - list_name: sac_scale
+    name: difficult_alpine_hiking
+    label:
+      Difficult Alpine Hiking (difficult craggy terrain, includes climbing pitches
+      up to UIAA grade II.)
+  - list_name: trail_visibility
+    name: excellent
+    label: Excellent (Unambiguous path or markers everywhere)
+  - list_name: trail_visibility
+    name: good
+    label:
+      Good (Next marker always visible, but sometimes has to be searched for. Basic
+      sense of direction recommended)
+  - list_name: trail_visibility
+    name: intermediate
+    label: Intermediate (track mostly visible, Good sense of direction, map required)
+  - list_name: trail_visibility
+    name: bad
+    label: Bad (path sometimes invisible, route partly pathless, orienting skills recommended)
+  - list_name: trail_visibility
+    name: horrible
+    label: Horrible (often pathless, advanced orientational skills recommended)
+  - list_name: trail_visibility
+    name: no
+    label: No (mostly pathless, excellent orientational skills recommended)
+  - list_name: service
+    name: driveway
+    label: Driveway (access to a house)
+  - list_name: service
+    name: pipestem
+    label:
+      Pipestem (shared driveway leads away from a main road toward several houses,
+      each with their own shorter driveways)
+settings:
+  - form_id: highways
+    version: 2024-12-25 11:35:47.433000
+    form_title: buildings
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - default
+      - required
+      - relevant
+      - calculation
+      - trigger
+      - choice_filter
+      - appearance
+    choices:
+      - list_name
+      - name
+      - label
+    settings:
+      - form_id
+      - version
+      - form_title
+      - allow_choice_duplicates

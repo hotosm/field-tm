@@ -1,0 +1,2195 @@
+survey:
+  - "#":
+      Converted by yxf, from buildings.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: begin group
+    name: buildings
+    label::english(en): Building Types
+    label::nepali(ne): भवनका प्रकारहरू
+    appearance: field-list
+    label::swahili(sw): Aina za Ujenzi/ aina za majengo
+    label::french(fr): Types de bâtiments
+    label::spanish(es): Tipos de edificios
+  - type: select_one category
+    name: category
+    label::english(en): What type of Building is this ?
+    label::nepali(ne): यो कस्तो प्रकारको भवन हो?
+    appearance: minimal
+    required: yes
+    label::swahili(sw): Jengo hili ni la aina gani?
+    label::french(fr): De quel type de bâtiment s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio es este?
+  - type: text
+    name: name
+    label::english(en): What is the name if there is one ?
+    label::nepali(ne): छ भने नाम के हो ?
+    appearance: minimal
+    relevant: ${category}!=’’
+    label::swahili(sw): Je, linaitwaje, kama lipo moja?
+    label::french(fr): Quel est le nom s'il y en a un ?
+    label::spanish(es): ¿Cuál es el nombre si hay uno?
+  - type: select_one building:material
+    name: building_material
+    label::english(en): What are the walls made of ?
+    label::nepali(ne): पर्खालहरू कुन सामग्रीबाट बनेका छन्?
+    appearance: minimal
+    relevant: ${category}!=’’
+    default: ${last-saved#building_material}
+    label::swahili(sw): Kuta zimetengenezwa na nini?
+    label::french(fr): De quoi sont faits les murs ?
+    label::spanish(es): ¿De qué están hechas las paredes?
+  - type: text
+    name: building_levels
+    label::english(en): How many levels are in the building ?
+    label::nepali(ne): भवनमा कति स्तरहरू छन्?
+    appearance: minimal
+    relevant: ${category}!=’’
+    label::swahili(sw): Je! kuna ngazi ngapi katika hili jengo?
+    label::french(fr): Combien y a-t-il de niveaux dans le bâtiment ?
+    label::spanish(es): ¿Cuántos niveles hay en el edificio?
+  - type: select_one religion
+    name: religion
+    label::english(en): What religion is practiced here ?
+    label::nepali(ne): यहाँ कुन धर्म मानिन्छ ?
+    appearance: minimal
+    relevant: ${category}=’religious’
+    trigger: ${feature}
+    required: yes
+    label::swahili(sw): Ni dini gani inatumika hapa?
+    label::french(fr): Quelle religion est pratiquée ici ?
+    label::spanish(es): ¿Qué religión se practica aquí?
+  - type: select_one denomination
+    name: denomination
+    label::english(en): What is the denomination ?
+    label::nepali(ne): सम्प्रदाय के हो?
+    appearance: minimal
+    relevant: ${religion}=’christian’
+    label::swahili(sw): Dhehebu gani?
+    label::french(fr): Quelle est la dénomination ?
+    label::spanish(es): ¿Cuál es la denominación?
+  - type: select_one muslim
+    name: muslim
+    label::english(en): What is the Muslim Sect ?
+    label::nepali(ne): यहाँ कुन मुस्लिम सम्प्रदाय चल्छ ?
+    appearance: minimal
+    relevant: ${religion}=’muslim’
+    label::swahili(sw): Madhehebu gani ya kiislam?
+    label::french(fr): Qu'est-ce que la secte musulmane ?
+    label::spanish(es): ¿Qué es la secta musulmana?
+  - type: select_one hindu
+    name: hindu
+    label::english(en): What is the Hindu Sect ?
+    label::nepali(ne): यहाँ कुन हिन्दू सम्प्रदाय चल्छ ?
+    appearance: minimal
+    relevant: ${religion}=’hindu’
+    label::swahili(sw): Madhehebu gani ya kihindu?
+    label::french(fr): Qu'est-ce que la secte hindoue ?
+    label::spanish(es): ¿Qué es la secta hindú?
+  - type: select_one religious
+    name: religious
+    label::english(en): What type of religious building is this ?
+    label::nepali(ne): यो कस्तो प्रकारको धार्मिक भवन हो?
+    appearance: minimal
+    relevant: ${category}=’religious’
+    trigger: ${feature}
+    label::swahili(sw): Je, hili ni jengo la kidini la aina gani?
+    label::french(fr): De quel type d'édifice religieux s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio religioso es este?
+  - type: select_one service
+    name: service
+    label::english(en): What type of services are available here ?
+    label::nepali(ne): यहाँ कस्ता प्रकारका सेवाहरू उपलब्ध छन्?
+    appearance: minimal
+    relevant: ${category}=’service’
+    required: yes
+    label::swahili(sw): Ni aina gani za huduma zinazopatikana hapa?
+    label::french(fr): Quels types de services sont disponibles ici ?
+    label::spanish(es): ¿Qué tipo de servicios están disponibles aquí?
+  - type: select_one shop
+    name: Shop
+    label::english(en): What type of retail shop is this ?
+    label::nepali(ne): यो कस्तो प्रकारको खुद्रा पसल हो?
+    appearance: minimal
+    relevant: ${category}=’retail’
+    required: yes
+    label::swahili(sw): Hili ni duka la aina gani la rejareja?
+    label::french(fr): De quel type de magasin s'agit-il ?
+    label::spanish(es): ¿Qué tipo de tienda minorista es este?
+  - type: select_one tourism
+    name: tourism
+    label::english(en): What type of tourist building is this ?
+    label::nepali(ne): यो कस्तो प्रकारको पर्यटक भवन हो?
+    appearance: minimal
+    relevant: ${category}=’tourism’
+    choice_filter: category=${category}
+    default: ${last-saved#tourism}
+    required: yes
+    label::swahili(sw): Je, hili ni jengo la watalii la aina gani?
+    label::french(fr): De quel type de bâtiment touristique s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio turístico es este?
+  - type: select_one amenity
+    name: education_details
+    label::english(en): What type of educational building is this ?
+    label::nepali(ne): यो कस्तो शैक्षिक भवन हो ?
+    appearance: minimal
+    relevant: ${category}=’education’
+    choice_filter: category=${category}
+    trigger: ${feature}
+    required: yes
+    label::swahili(sw): Jengo hili la elimu ni la aina gani?
+    label::french(fr): De quel type de bâtiment scolaire s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio educativo es este?
+  - type: note
+    name: link
+    label::english(en):
+      For more details about schools, please use the education XForm
+      instead.
+    label::nepali(ne):
+      विद्यालयहरूको बारेमा थप विवरणहरूको लागि, कृपया शिक्षा XForm प्रयोग
+      गर्नुहोस्।
+    relevant: ${category}=’education’
+    trigger: ${feature}
+    label::swahili(sw):
+      Kwa maelezo zaidi kuhusu skuli, tafadhali tumia XForm ya elimu
+      badala yake.
+    label::french(fr):
+      Pour plus de détails sur les écoles, veuillez utiliser le XForm
+      éducation à la place.
+    label::spanish(es):
+      Para obtener más detalles sobre las escuelas, utilice la educación
+      XForm en su lugar.
+  - type: select_one amenity
+    name: government
+    label::english(en): What type of public building is this ?
+    label::nepali(ne): यो कस्तो प्रकारको सार्वजनिक भवन हो?
+    appearance: minimal
+    relevant: ${category}=’government’
+    choice_filter: category=${category}
+    trigger: ${feature}
+    required: yes
+    label::swahili(sw): Je, hili ni jengo la umma la aina gani?
+    label::french(fr): De quel type de bâtiment public s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio público es este?
+  - type: select_one amenity
+    name: medical
+    label::english(en): What type of medical facility is this ?
+    label::nepali(ne): यो कस्तो प्रकारको चिकित्सा सुविधा हो?
+    appearance: minimal
+    relevant: ${category}=’medical’
+    choice_filter: category=${category}
+    trigger: ${feature}
+    required: yes
+    label::swahili(sw): Hiki ni kituo cha matibabu cha aina gani?
+    label::french(fr): De quel type d'établissement médical s'agit-il ?
+    label::spanish(es): ¿Qué tipo de instalación médica es este?
+  - type: select_one amenity
+    name: food
+    label::english(en): What type of food is available here ?
+    label::nepali(ne): यहाँ कस्तो प्रकारको खाना उपलब्ध छ?
+    appearance: minimal
+    relevant: ${category}=’food’
+    choice_filter: category=${category}
+    trigger: ${feature}
+    required: yes
+    label::swahili(sw): Ni aina gani ya chakula kinapatikana hapa?
+    label::french(fr): Quel type de nourriture est disponible ici ?
+    label::spanish(es): ¿Qué tipo de comida está disponible aquí?
+  - type: select_one cuisine
+    name: cuisine
+    label::english(en): What type of cuisine is served here ?
+    label::nepali(ne): यहाँ कस्तो प्रकारको खाना पाइन्छ?
+    appearance: minimal
+    relevant: ${category}=’food’ and ${food}=’restaurant'
+    label::swahili(sw): Ni aina gani ya vyakula vinavyotolewa hapa?
+    label::french(fr): Quel type de cuisine est servi ici ?
+    label::spanish(es): ¿Qué tipo de cocina se sirve aquí?
+  - type: select_one historic
+    name: heritage
+    label::english(en): What type of historical building is this ?
+    label::nepali(ne): यो कस्तो ऐतिहासिक भवन हो ?
+    appearance: minimal
+    relevant: ${category}=’historic’
+    choice_filter: category=${category}
+    required: yes
+    label::swahili(sw): Jengo hili la kihistoria ni la aina gani?
+    label::french(fr): De quel type de bâtiment historique s'agit-il ?
+    label::spanish(es): ¿Qué tipo de edificio histórico es este?
+  - type: select_one amenity
+    name: emergency
+    label::english(en): What type of emergency services can you get here ?
+    label::nepali(ne): तपाईं यहाँ कस्तो प्रकारको आपतकालीन सेवाहरू पाउन सक्नुहुन्छ?
+    appearance: minimal
+    relevant: ${category}=’emergency’
+    choice_filter: category=${category}
+    label::swahili(sw): Ni aina gani ya huduma za dharura unaweza kupata hapa?
+    label::french(fr): Quel type de services d'urgence pouvez-vous obtenir ici ?
+    label::spanish(es): ¿Qué tipo de servicios de emergencia puede obtener aquí?
+  - type: text
+    name: operator
+    label::english(en): What is the name of the operator ?
+    label::nepali(ne): अपरेटर को नाम के हो?
+    appearance: minimal
+    relevant: ${category}=’historic’ or ${housing}=’apartment'
+    required: yes
+    label::swahili(sw): opereta anaitwaje?
+    label::french(fr): Quel est le nom de l'opérateur ?
+    label::spanish(es): ¿Cuál es el nombre del operador?
+  - type: date
+    name: inscription
+    label::english(en): What is the date on the inscription ?
+    label::nepali(ne): शिलालेखमा मिति के हो?
+    appearance: minimal
+    relevant: ${category}=’historic’
+    label::swahili(sw): Je, ni taarifa gani zilizo kwenye maandishi?
+    label::french(fr): Quelles sont les données sur l'inscription ?
+    label::spanish(es): ¿Cuáles son los datos sobre la inscripción?
+  - type: select_one housing
+    name: housing
+    label::english(en): What type of living space is here ?
+    label::nepali(ne): यहाँ कस्तो प्रकारको बस्ने ठाउँ छ?
+    appearance: minimal
+    relevant: ${category}=’housing’
+    label::swahili(sw): Ni aina gani ya nafasi ya kuishi hapa?
+    label::french(fr): Quel type d'espace de via est ici?
+    label::spanish(es): ¿Qué tipo de espacio vital está aquí?
+  - type: text
+    name: provider
+    label::english(en): What is the name of the operator ?
+    label::nepali(ne): अपरेटर को नाम के हो?
+    appearance: minimal
+    relevant: ${housing}!=’residential’ and ${category}=’housing'
+    trigger: ${feature}
+    label::swahili(sw): Jina la opereta ni nani?
+    label::french(fr): Quel est le nom de l'opérateur ?
+    label::spanish(es): ¿Cuál es el nombre del operador?
+  - type: integer
+    name: rooms
+    label::english(en): How many rooms are available ?
+    label::nepali(ne): कति कोठा उपलब्ध छन्?
+    appearance: minimal
+    relevant: ${housing}=’hotel’ or ${housing}=’hostel’
+    label::swahili(sw): Vyumba vingapi vinapatikana?
+    label::french(fr): Combien de chambers sont disponibles ?
+    label::spanish(es): ¿Cuántas habitaciones hay disponibles?
+  - type: integer
+    name: ref
+    label::english(en): What is the reference number for this camp site ?
+    label::nepali(ne): यस शिविर साइटको लागि सन्दर्भ नम्बर के हो?
+    appearance: minimal
+    relevant: ${housing}=’camp_pitch’
+    label::swahili(sw): Je, ni nambari gani ya marejeleo ya kwa eneo hili la kambi?
+    label::french(fr): Quelle est la référence de ce camping ?
+    label::spanish(es): ¿Cuál es el número de referencia para este campamento?
+  - type: integer
+    name: building_neighbor
+    label::english(en): How many people are in the neighborhood ?
+    label::nepali(ne): छिमेकमा कति जना छन् ?
+    appearance: minimal
+    relevant: ${housing}=’residential’
+    label::swahili(sw): Je, una majirani wangapi?
+    label::french(fr): Combien y a-t-il de personnes dans le quartier ?
+    label::spanish(es): ¿Cuántas personas hay en el vecindario?
+  - type: end group
+  - type: begin group
+    name: details
+    label::english(en): More Details (Optional)
+    label::nepali(ne): थप विवरणहरू (वैकल्पिक)
+    appearance: field-list
+    label::swahili(sw): Maelezo Zaidi (Si lazima)
+    label::french(fr): Plus de détails (optionnel)
+    label::spanish(es): More Details (Optional)
+  - type: select_one yes_no
+    name: power
+    label::english(en): Does this building have electricity ?
+    label::nepali(ne): के यो भवनमा बिजुली छ?
+    appearance: minimal
+    default: ${last-saved#power}
+    label::swahili(sw): Je, jengo hili lina umeme?
+    label::french(fr): Ce bâtiment a-t-il l'électricité ?
+    label::spanish(es): ¿Este edificio tiene electricidad?
+  - type: select_one generator:source
+    name: generator_source
+    label::english(en): What is the primary power source ?
+    label::nepali(ne): प्राथमिक शक्ति स्रोत के हो?
+    appearance: minimal
+    relevant: ${power}=’yes’
+    default: ${last-saved#generator_source}
+    label::swahili(sw): kipi ni chanzo kikuu cha umeme?
+    label::french(fr): Quelle est la source d'alimentation primaire ?
+    label::spanish(es): ¿Cuál es la fuente de energía principal?
+  - type: select_one yes_no
+    name: generator
+    label::english(en): Does this building have a backup generator ?
+    label::nepali(ne): के यो भवनमा ब्याकअप जेनेरेटर छ?
+    appearance: minimal
+    relevant: ${category}=’medical’ or ${category}=’food'
+    label::swahili(sw): Jengo hili lina jenereta mbadala?
+    label::french(fr): Ce bâtiment dispose-t-il d'un générateur de secours ?
+    label::spanish(es): ¿Este edificio tiene un generador de respaldo?
+  - type: select_one yes_no
+    name: water
+    label::english(en): Does this building have a water source ?
+    label::nepali(ne): के यो भवनमा पानीको स्रोत छ?
+    appearance: minimal
+    default: ${last-saved#water}
+    label::swahili(sw): Jengo hili lina chanzo cha maji?
+    label::french(fr): Ce bâtiment a-t-il une source d'eau ?
+    label::spanish(es): ¿Este edificio tiene una fuente de agua?
+  - type: select_one water_source
+    name: water_source
+    label::english(en): What type of water source ?
+    label::nepali(ne): कस्तो प्रकारको पानीको स्रोत छ?
+    appearance: minimal
+    relevant: ${water}=’yes’
+    default: ${last-saved#water_source}
+    label::swahili(sw): Kuna aina gani ya chanzo cha maji?
+    label::french(fr): Quel type de source d'eau ?
+    label::spanish(es): ¿Qué tipo de fuente de agua?
+  - type: integer
+    name: pump_unit
+    label::english(en): What is the pump unit number ?
+    label::nepali(ne): पम्प एकाइ नम्बर के हो?
+    appearance: minimal
+    relevant: ${water}=’yes’
+    label::swahili(sw): Nambari ya kitengo cha pampu ni nini?
+    label::french(fr): Quel est le numéro de la pompe ?
+    label::spanish(es): ¿Cuál es el número de la unidad de la bomba?
+  - type: integer
+    name: capacity
+    label::english(en): What is the capacity of the pump ?
+    label::nepali(ne): पम्पको क्षमता कति छ ?
+    appearance: minimal
+    relevant: ${water}=’yes’
+    label::swahili(sw): Pampu hii ina uwezo gani?
+    label::french(fr): Quelle est la capacité de la pompe ?
+    label::spanish(es): ¿Cuál es la capacidad de la bomba?
+  - type: integer
+    name: age
+    label::english(en): Age of building
+    label::nepali(ne): निर्माण को उमेर
+    appearance: minimal
+    label::swahili(sw): Umri wa kujenga
+    label::french(fr): Âge du bâtiment
+    label::spanish(es): Era de la construcción
+  - type: select_one yes_no
+    name: building_prefab
+    label::english(en): Is this a prefabricated building ?
+    label::nepali(ne): के यो पूर्वनिर्मित भवन हो?
+    appearance: minimal
+    trigger: ${feature}
+    label::swahili(sw): Je, hili ni jengo lililojengwa tayari?
+    label::french(fr): Est-ce un bâtiment préfabriqué ?
+    label::spanish(es): ¿Es este un edificio prefabricado?
+  - type: select_one building:floor
+    name: building_floor
+    label::english(en): What is the floor made of ?
+    label::nepali(ne): भुइँ केबाट बनेको हुन्छ ?
+    appearance: minimal
+    default: ${last-saved#building_floor}
+    label::swahili(sw): Sakafu imetengenezwa na nini?
+    label::french(fr): De quoi est composé le parquet ?
+    label::spanish(es): ¿De qué está hecho el piso?
+  - type: select_one building:roof
+    name: building_roof
+    label::english(en): Is this building only a roof ?
+    label::nepali(ne): के यो भवन छत मात्र हो?
+    appearance: minimal
+    default: ${last-saved#building_roof}
+    label::swahili(sw): Jengo hili ni paa tu?
+    label::french(fr): Ce bâtiment n'est-il qu'un toit ?
+    label::spanish(es): ¿Es este edificio solo un techo?
+  - type: select_one building:condition
+    name: condition
+    label::english(en): What is the building condition ?
+    label::nepali(ne): भवनको अवस्था कस्तो छ ?
+    appearance: minimal
+    default: ${last-saved#condition}
+    trigger: ${feature}
+    label::swahili(sw): Je, hali ya jengo ikoje?
+    label::french(fr): Quel est l'état du bâtiment ?
+    label::spanish(es): ¿Cuál es la condición del edificio?
+  - type: select_one yes_no
+    name: access_roof
+    label::english(en): Is there access to the roof ?
+    label::nepali(ne): छतमा पहुँच छ?
+    appearance: minimal
+    label::swahili(sw): Kuna njia yoyote ya kulifikia paa?
+    label::french(fr): Y a-t-il un accès au toit ?
+    label::spanish(es): ¿Hay acceso al techo?
+  - type: text
+    name: levels_underground
+    label::english(en): How many levels are underground ?
+    label::nepali(ne): कति तह भूमिगत छन्?
+    appearance: minimal
+    label::swahili(sw): Ni ngazi ngapi ziko chini ya ardhi?
+    label::french(fr): Combien y a-t-il de niveaux souterrains ?
+    label::spanish(es): ¿Cuántos niveles están subterráneos?
+  - type: end group
+  - type: text
+    name: comment
+    label::english(en): Any other comments about this feature
+    label::nepali(ne): यस सुविधाको बारेमा कुनै पनि अन्य टिप्पणीहरू
+    appearance: minimal
+    label::swahili(sw): Maoni mengine yoyote kuhusu kipengele hiki
+    label::french(fr): Tout autre commentaire sur cet endroit
+    label::spanish(es): Cualquier otro comentario sobre esta característica
+choices:
+  - list_name: category
+    name: housing
+    label::english(en): A place people live in
+    label::swahili(sw): Mahali watu wanaishi
+    label::french(fr): Un endroit dans les gens vivent
+    label::spanish(es): Un lugar en el que la gente vive
+    label::nepali(ne): मानिसहरू बस्ने ठाउँ
+  - list_name: category
+    name: retail
+    label::english(en): Does this building sell things to the public ?
+    label::swahili(sw): Jengo hili linauza vitu kwa umma?
+    label::french(fr): Ce bâtiment vend-il des choses au public?
+    label::spanish(es): ¿Este edificio vende cosas al público?
+    label::nepali(ne): के यो भवन सामान बेच्नको लागि हो?
+  - list_name: category
+    name: food
+    label::english(en): Can people get food or alcohol here ?
+    label::swahili(sw): Je, watu wanaweza kupata chakula au pombe hapa?
+    label::french(fr):
+      Les gens peuvent-ils obtenir de la nourriture ou de l'alcool
+      ici?
+    label::spanish(es): ¿Pueden las personas obtener comida o alcohol aquí?
+    label::nepali(ne): के मानिसहरूले यहाँ खाना वा पेय पाउन सक्छन्?
+  - list_name: category
+    name: medical
+    label::english(en): A place that provides medical service
+    label::swahili(sw): Mahali ambapo hutoa huduma ya matibabu
+    label::french(fr): Un endroit qui fournit un service médical
+    label::spanish(es): Un lugar que brinda servicio médico
+    label::nepali(ne): चिकित्सा सेवा प्रदान गर्ने ठाउँ
+  - list_name: category
+    name: service
+    label::english(en): Does this building provides services ?
+    label::swahili(sw): Je, jengo hili hutoa huduma?
+    label::french(fr): Ce bâtiment fournit-il des services?
+    label::spanish(es): ¿Este edificio brinda servicios?
+    label::nepali(ne): के यो भवनले सेवाहरू प्रदान गर्दछ?
+  - list_name: category
+    name: religious
+    label::english(en): Is this a building for religious services ?
+    label::swahili(sw): Je, hili ni jengo la huduma za kidini?
+    label::french(fr): Est-ce un bâtiment pour les services religieux?
+    label::spanish(es): ¿Es este un edificio para servicios religiosos?
+    label::nepali(ne): के यो धार्मिक सेवाको लागि भवन हो?
+  - list_name: category
+    name: tourism
+    label::english(en): Is this building for cultural or tourism purposes ?
+    label::swahili(sw): Jengo hili ni kwa madhumuni ya kitamaduni au kitalii?
+    label::french(fr): Ce bâtiment est-il à des fins culturelles ou touristiques?
+    label::spanish(es): ¿Es este edificio para fines culturales o turísticos?
+    label::nepali(ne): यो भवन सांस्कृतिक वा पर्यटन उद्देश्यका लागि हो?
+  - list_name: category
+    name: government
+    label::english(en): Is this a public government building ?
+    label::swahili(sw): Je, hili ni jengo la serikali?
+    label::french(fr): Est-ce un bâtiment du gouvernement public?
+    label::spanish(es): ¿Es este un edificio de gobierno público?
+    label::nepali(ne): के यो सार्वजनिक सरकारी भवन हो?
+  - list_name: category
+    name: emergency
+    label::english(en): Is this building used for emergencies ?
+    label::swahili(sw): Jengo hili linatumika kwa dharura?
+    label::french(fr): Ce bâtiment est-il utilisé pour les urgences?
+    label::spanish(es): ¿Se utilize este edificio para emergencias?
+    label::nepali(ne): के यो भवन आपतकालिनका लागि प्रयोग गरिन्छ?
+  - list_name: category
+    name: education
+    label::english(en): Is this building used for education ?
+    label::swahili(sw): Je, jengo hili linatumika kwa elimu?
+    label::french(fr): Ce bâtiment est-il utilisé pour l'éducation?
+    label::spanish(es): ¿Se utilize este edificio para la educación?
+    label::nepali(ne): के यो भवन शिक्षाको लागि प्रयोग गरिन्छ?
+  - list_name: building:material
+    name: cement_block
+    label::english(en): Cement blocks
+    label::swahili(sw): vipande vigumu vya saruji
+    label::french(fr): Blocks de ciment
+    label::spanish(es): Bloques de cemento
+    label::nepali(ne): सिमेन्ट ब्लकहरू
+  - list_name: building:material
+    name: wood
+    label::english(en): Wood
+    label::swahili(sw): Mbao
+    label::french(fr): Bois
+    label::spanish(es): Madera
+    label::nepali(ne): काठ
+  - list_name: building:material
+    name: brick
+    label::english(en): Bricks
+    label::swahili(sw): Matofali
+    label::french(fr): Briques
+    label::spanish(es): Ladrillos
+    label::nepali(ne): ईंटहरू
+  - list_name: building:material
+    name: concrete
+    label::english(en): Concrete
+    label::swahili(sw): Zege
+    label::french(fr): Béton
+    label::spanish(es): Hormigón
+    label::nepali(ne): कंक्रीट
+  - list_name: building:material
+    name: stone
+    label::english(en): Stone
+    label::swahili(sw): Jiwe
+    label::french(fr): Pierre
+    label::spanish(es): Roca
+    label::nepali(ne): ढुङ्गा
+  - list_name: building:material
+    name: glass
+    label::english(en): Glass
+    label::swahili(sw): Kioo
+    label::french(fr): Verre
+    label::spanish(es): Vaso
+    label::nepali(ne): गिलास
+  - list_name: building:material
+    name: bamboo
+    label::english(en): Bamboo
+    label::swahili(sw): Mwanzi
+    label::french(fr): Bambou
+    label::spanish(es): Bambú
+    label::nepali(ne): बाँस
+  - list_name: building:material
+    name: iron_sheet
+    label::english(en): Iron Sheet
+    label::swahili(sw): Vipande vya chuma
+    label::french(fr): Feuille de fer
+    label::spanish(es): Hoja de hierro
+    label::nepali(ne): फलामको पाना
+  - list_name: building:material
+    name: metal
+    label::english(en): Metal (Corrugated iron sheets)
+    label::swahili(sw): Metali (Bati)/ chuma
+    label::french(fr): Métal (feuilles en feu ondulées)
+    label::spanish(es): Metal (hojas de hierro corrugado)
+    label::nepali(ne): धातु (नालीदार फलामका पानाहरू)
+  - list_name: building:material
+    name: nowalls
+    label::english(en): There are no walls
+    label::swahili(sw): Hakuna kuta
+    label::french(fr): Il n'y a pas de murs
+    label::spanish(es): No hay paredes
+    label::nepali(ne): त्यहाँ पर्खालहरू छैनन्
+  - list_name: building:structure
+    name: confined_masonry
+    label::english(en): Confined Masonry
+    label::swahili(sw): Uzio uliojengwa/kuzungushiwa madhubuti
+    label::french(fr): Maçonnerie confinée
+    label::spanish(es): Mampostería confinada
+    label::nepali(ne): सिमित इँटा निर्माण
+  - list_name: building:structure
+    name: steel_frame
+    label::english(en): Steel Frame
+    label::swahili(sw): Fremu ya chuma
+    label::french(fr): Châssis en acier
+    label::spanish(es): Marco de acero
+    label::nepali(ne): स्टील फ्रेम
+  - list_name: building:structure
+    name: wood_frame
+    label::english(en): Wood Frame
+    label::swahili(sw): Fremu ya mbao
+    label::french(fr): Cadre en bois
+    label::spanish(es): Marco de madera
+    label::nepali(ne): काठ फ्रेम
+  - list_name: building:structure
+    name: bamboo_frame
+    label::english(en): Bamboo Frame
+    label::swahili(sw): Fremu ya mianzi
+    label::french(fr): Cadre en bambou
+    label::spanish(es): Marco de bambú
+    label::nepali(ne): बाँसको फ्रेम
+  - list_name: building:floor
+    name: ground
+    label::english(en): Ground
+    label::swahili(sw): Ardhi
+    label::french(fr): Sol
+    label::spanish(es): Tierra
+    label::nepali(ne): जमिन
+  - list_name: building:floor
+    name: wood
+    label::english(en): Wood
+    label::swahili(sw): Mbao
+    label::french(fr): Bois
+    label::spanish(es): Madera
+    label::nepali(ne): काठ
+  - list_name: building:floor
+    name: cement
+    label::english(en): Cement
+    label::swahili(sw): Saruji
+    label::french(fr): Ciment
+    label::spanish(es): Cemento
+    label::nepali(ne): सिमेन्ट
+  - list_name: building:floor
+    name: tekhel
+    label::english(en): Tekhel
+    label::swahili(sw): Tekhel
+    label::french(fr): Tekhel
+    label::spanish(es): Tekhel
+    label::nepali(ne): तेखेल (विनाइल फ्लोरिङ)
+  - list_name: building:floor
+    name: ceramics
+    label::english(en): Ceramics
+    label::swahili(sw): Keramic
+    label::french(fr): Céramique
+    label::spanish(es): Cerámica
+    label::nepali(ne): सिरेमिक
+  - list_name: building:roof
+    name: metal
+    label::english(en): Metal (Corrugated iron sheets)
+    label::swahili(sw): Metali (Bati)
+    label::french(fr): Métal (feuilles en feu ondulées)
+    label::spanish(es): Metal (hojas de hierro corrugado)
+    label::nepali(ne): धातु (नालीदार फलामका पानाहरू)
+  - list_name: building:roof
+    name: concrete
+    label::english(en): Concrete
+    label::swahili(sw): Zege
+    label::french(fr): Béton
+    label::spanish(es): Hormigón
+    label::nepali(ne): कंक्रीट
+  - list_name: building:roof
+    name: tiles
+    label::english(en): Tiles
+    label::swahili(sw): Vigae
+    label::french(fr): Carrelage
+    label::spanish(es): Losas
+    label::nepali(ne): टाइलहरू
+  - list_name: building:roof
+    name: wood
+    label::english(en): Wood
+    label::swahili(sw): Mbao
+    label::french(fr): Bois
+    label::spanish(es): Madera
+    label::nepali(ne): काठ
+  - list_name: building:roof
+    name: bamboo
+    label::english(en): Bamboo
+    label::swahili(sw): Muanzi
+    label::french(fr): Bambou
+    label::spanish(es): Bambú
+    label::nepali(ne): बाँस
+  - list_name: building:roof
+    name: iron_sheet
+    label::english(en): Iron Sheet
+    label::swahili(sw): Mkusanyiko wa vyuma
+    label::french(fr): Feuille de fer
+    label::spanish(es): Hoja de hierro
+    label::nepali(ne): फलामको पाना
+  - list_name: building:roof
+    name: thatch
+    label::english(en): Thatch
+    label::swahili(sw): Nyasi
+    label::french(fr): Chaume
+    label::spanish(es): Paja
+    label::nepali(ne): फुस, पराल
+  - list_name: building:roof
+    name: clay_tiles
+    label::english(en): Clay Tiles
+    label::swahili(sw): Matofali ya Udongo
+    label::french(fr): Carreaux d'argile
+    label::spanish(es): Fichas de arcilla
+    label::nepali(ne): माटोको टाइलहरू
+  - list_name: building:roof
+    name: stone
+    label::english(en): Stone
+    label::swahili(sw): Jiwe
+    label::french(fr): Pierre
+    label::spanish(es): Roca
+    label::nepali(ne): ढुङ्गा
+  - list_name: building:roof
+    name: shingles
+    label::english(en): Asphalt shingles
+    label::swahili(sw): Bara bara ya lami iliyo chimbuka
+    label::french(fr): Bardeaux d'asphalte
+    label::spanish(es): Tejas de asfalto
+    label::nepali(ne): डामरको छाना टायल
+  - list_name: building:condition
+    name: good
+    label::english(en): Good
+    label::swahili(sw): Nzuri
+    label::french(fr): Bien
+    label::spanish(es): Bueno
+    label::nepali(ne): राम्रो
+  - list_name: building:condition
+    name: average
+    label::english(en): Average
+    label::swahili(sw): Wastani
+    label::french(fr): Moyenne
+    label::spanish(es): Promedio
+    label::nepali(ne): औसत
+  - list_name: building:condition
+    name: poor
+    label::english(en): Poor
+    label::swahili(sw): Maskini
+    label::french(fr): Pauvre
+    label::spanish(es): Pobre
+    label::nepali(ne): गरिब
+  - list_name: building:condition
+    name: disused
+    label::english(en): Disused
+    label::swahili(sw): Haitumiki
+    label::french(fr): Abandonné
+    label::spanish(es): Desuso
+    label::nepali(ne): अप्रयुक्त
+  - list_name: building
+    name: residential
+    label::english(en): Residential
+    label::swahili(sw): Makazi ya watu
+    label::french(fr): Résidentiel
+    label::spanish(es): Residential
+    label::nepali(ne): आवासीय
+  - list_name: building
+    name: commercial
+    label::english(en): Commercial
+    label::swahili(sw): Biashara
+    label::french(fr): Commercial
+    label::spanish(es): Commercial
+    label::nepali(ne): व्यापारिक
+  - list_name: building
+    name: commercial;residential
+    label::english(en): Commercial and residential (mixed use)
+    label::swahili(sw): Biashara na makaazi (matumizi mchanganyiko)
+    label::french(fr): Commercial et résidentiel (usage mixte)
+    label::spanish(es): Commercial y residential (uso mixto)
+    label::nepali(ne): व्यावसायिक र आवासीय (मिश्रित प्रयोग)
+  - list_name: building
+    name: construction
+    label::english(en): Under Construction
+    label::swahili(sw): Chini ya Ujenzi
+    label::french(fr): En cours de construction
+    label::spanish(es): En construcción
+    label::nepali(ne): निर्माणाधीन
+  - list_name: building
+    name: office
+    label::english(en): Office Building
+    label::swahili(sw): Jengo la Ofisi
+    label::french(fr): Immeuble de bureaux
+    label::spanish(es): Edificio de oficinas
+    label::nepali(ne): कार्यालय भवन
+  - list_name: building
+    name: supermarket
+    label::english(en): Supermarket
+    label::swahili(sw): Maduka makubwa
+    label::french(fr): Supermarché
+    label::spanish(es): Supermercado
+    label::nepali(ne): सुपरमार्केट
+  - list_name: building
+    name: construction
+    label::english(en): Under construction
+    label::swahili(sw): Chini ya ujenzi
+    label::french(fr): En cours de construction
+    label::spanish(es): En construcción
+    label::nepali(ne): निर्माणाधीन
+  - list_name: building
+    name: service
+    label::english(en): Service (water, power, etc)
+    label::swahili(sw): Huduma (maji, umeme, n.k)
+    label::french(fr): Service (eau, énergie, etc.)
+    label::spanish(es): Servicio (agua, energía, etc.)
+    label::nepali(ne): सेवा (पानी, विद्युत, आदि)
+  - list_name: building
+    name: public
+    label::english(en): A public building
+    label::swahili(sw): Jengo la umma
+    label::french(fr): Un bâtiment public
+    label::spanish(es): Un edificio público
+    label::nepali(ne): सार्वजनिक भवन
+  - list_name: building
+    name: industrial
+    label::english(en): Industrial
+    label::swahili(sw): Viwandani
+    label::french(fr): Industriel
+    label::spanish(es): Industrial
+    label::nepali(ne): औद्योगिक
+  - list_name: building
+    name: kiosk
+    label::english(en): Kiosk (a small one-room retail building)
+    label::swahili(sw): Kiosk (jengo dogo la rejareja la chumba kimoja)
+    label::french(fr): Kiosque (un petit bâtiment de vente au détail d'une pièce)
+    label::spanish(es): Quiosco (un pequeño edificio minorista de una habitación)
+    label::nepali(ne): किओस्क (सानो एक कोठाको खुद्रा भवन)
+  - list_name: building
+    name: apartments
+    label::english(en): Apartment building
+    label::swahili(sw): Jengo la ghorofa
+    label::french(fr): Immeuble
+    label::spanish(es): Edificio de apartamentos
+    label::nepali(ne): अपार्टमेन्ट भवन
+  - list_name: building
+    name: cabin
+    label::english(en): Cabin
+    label::swahili(sw): Kibanda cha udongo
+    label::french(fr): Cabine
+    label::spanish(es): Cabina
+    label::nepali(ne): केबिन
+  - list_name: building
+    name: hotel
+    label::english(en): Hotel
+    label::swahili(sw): Hoteli
+    label::french(fr): Hôtel
+    label::spanish(es): Hotel
+    label::nepali(ne): होटल
+  - list_name: building
+    name: hut
+    label::english(en): Hut
+    label::swahili(sw): Kibanda
+    label::french(fr): Cabane
+    label::spanish(es): Cabaña
+    label::nepali(ne): हट
+  - list_name: building
+    name: train_station
+    label::english(en): Train Station
+    label::swahili(sw): Kituo cha Treni
+    label::french(fr): Gare
+    label::spanish(es): Estación de tren
+    label::nepali(ne): रेल स्टेशन
+  - list_name: building
+    name: historic
+    label::english(en): A historical building
+    label::swahili(sw): Jengo la kihistoria
+    label::french(fr): Un bâtiment historique
+    label::spanish(es): Un edificio histórico
+    label::nepali(ne): ऐतिहासिक भवन
+  - list_name: building
+    name: pump_station
+    label::english(en): Is this a pumping station ?
+    label::swahili(sw): Je, hiki ni kituo cha kusukuma maji?
+    label::french(fr): Est-ce une station de pompage?
+    label::spanish(es): ¿Es esta una estación de bombeo?
+    label::nepali(ne): के यो पम्पिङ स्टेशन हो?
+  - list_name: building
+    name: depot
+    label::english(en): Depot
+    label::swahili(sw): Kuhamishwa
+    label::french(fr): Dépôt
+    label::spanish(es): deposito
+    label::nepali(ne): डिपो
+  - list_name: shop
+    name: fuel
+    label::english(en): Gas station
+    label::swahili(sw): Kituo cha gesi
+    label::french(fr): Station-essence
+    label::spanish(es): Gasolinera
+    label::nepali(ne): ग्यास स्टेशन
+  - list_name: shop
+    name: convenience
+    label::english(en): Convenience shop
+    label::swahili(sw): Duka la urahisi
+    label::french(fr): Épicerie
+    label::spanish(es): Tienda de conveniencia
+    label::nepali(ne): सुविधा पसल
+  - list_name: shop
+    name: clothes
+    label::english(en): Clothing Store
+    label::swahili(sw): Sehemu ya kuhifadhia nguo
+    label::french(fr): Magasin de vêtements
+    label::spanish(es): Tienda de ropa
+    label::nepali(ne): कपडा पसल
+  - list_name: shop
+    name: alcohol
+    label::english(en): Liquor Store
+    label::swahili(sw): Duka la pombe
+    label::french(fr): Magasin d'alcool
+    label::spanish(es): Tienda de licores
+    label::nepali(ne): रक्सी पसल
+  - list_name: shop
+    name: hardware
+    label::english(en): Hardware Store
+    label::swahili(sw): Duka la vifaa
+    label::french(fr): Quincaillerie
+    label::spanish(es): Ferretería
+    label::nepali(ne): हार्डवेयर स्टोर
+  - list_name: shop
+    name: general
+    label::english(en): General Discount Store
+    label::swahili(sw): Duka la Punguzo la Jumla
+    label::french(fr): Magasin de réduction générale
+    label::spanish(es): Tienda de descuento general
+    label::nepali(ne): सामान्य छुट स्टोर
+  - list_name: shop
+    name: mobile_phone
+    label::english(en): Mobile Phone
+    label::swahili(sw): Simu ya mkononi
+    label::french(fr): Téléphone portable
+    label::spanish(es): Teléfono móvil
+    label::nepali(ne): मोबाइल फोन
+  - list_name: shop
+    name: supermarket
+    label::english(en): Supermarket
+    label::swahili(sw): Maduka makubwa
+    label::french(fr): Supermarché
+    label::spanish(es): Supermercado
+    label::nepali(ne): सुपरमार्केट
+  - list_name: shop
+    name: mall
+    label::english(en): Shopping Mall
+    label::swahili(sw): Sehemu ya kununua bidhaa katika maduka makubwa
+    label::french(fr): Centre commercial
+    label::spanish(es): Centro commercial
+    label::nepali(ne): शपिङ मल
+  - list_name: shop
+    name: tea
+    label::english(en): Tea Shop
+    label::swahili(sw): Duka la Chai
+    label::french(fr): Boutique de thé
+    label::spanish(es): Tienda de té
+    label::nepali(ne): चिया पसल
+  - list_name: shop
+    name: car_parts
+    label::english(en): Car Parts
+    label::swahili(sw): Sehemu za Gari
+    label::french(fr): Pièces de voiture
+    label::spanish(es): Piezas de automóvil
+    label::nepali(ne): कार पार्ट्स
+  - list_name: shop
+    name: art
+    label::english(en): Art
+    label::swahili(sw): Sanaa
+    label::french(fr): Art
+    label::spanish(es): Arte
+    label::nepali(ne): कला
+  - list_name: shop
+    name: beauty
+    label::english(en): Beauty
+    label::swahili(sw): Uzuri
+    label::french(fr): Beauté
+    label::spanish(es): Belleza
+    label::nepali(ne): सौन्दर्य
+  - list_name: shop
+    name: beverages
+    label::english(en): Beverages
+    label::swahili(sw): Vinywaji
+    label::french(fr): Breuvages
+    label::spanish(es): Bebidas
+    label::nepali(ne): पेय पदार्थ
+  - list_name: shop
+    name: bicycle
+    label::english(en): Bicycle
+    label::swahili(sw): Baiskeli
+    label::french(fr): Vélo
+    label::spanish(es): Bicicleta
+    label::nepali(ne): साइकल
+  - list_name: shop
+    name: books
+    label::english(en): Books
+    label::swahili(sw): Vitabu
+    label::french(fr): Livres
+    label::spanish(es): Libros
+    label::nepali(ne): पुस्तकहरू
+  - list_name: shop
+    name: car
+    label::english(en): Cars
+    label::swahili(sw): Magari
+    label::french(fr): Voitures
+    label::spanish(es): Carros
+    label::nepali(ne): कारहरू
+  - list_name: shop
+    name: cosmetics
+    label::english(en): Cosmetics
+    label::swahili(sw): Vipodozi
+    label::french(fr): Produits de beauté
+    label::spanish(es): Productos cosméticos
+    label::nepali(ne): कस्मेटिक्स
+  - list_name: shop
+    name: charcoal
+    label::english(en): Charcoal
+    label::swahili(sw): Mkaa
+    label::french(fr): charbon
+    label::spanish(es): Carbón
+    label::nepali(ne): चारकोल
+  - list_name: shop
+    name: electronics
+    label::english(en): Electronics
+    label::swahili(sw): Elektroniki
+    label::french(fr): Électronique
+    label::spanish(es): Electrónica
+    label::nepali(ne): इलेक्ट्रोनिक्स
+  - list_name: shop
+    name: farm
+    label::english(en): Farm Stand
+    label::swahili(sw): Stendi ya Shamba
+    label::french(fr): Stand de ferme
+    label::spanish(es): Stand de granja
+    label::nepali(ne): फार्म स्ट्यान्ड
+  - list_name: shop
+    name: furniture
+    label::english(en): Furniture
+    label::swahili(sw): Samani
+    label::french(fr): Meubles
+    label::spanish(es): Mueble
+    label::nepali(ne): फर्निचर
+  - list_name: shop
+    name: greengrocer
+    label::english(en): Green Grocer
+    label::swahili(sw): Watu wanaoshuhulikia bustani
+    label::french(fr): Épicier vert
+    label::spanish(es): Tendero verde
+    label::nepali(ne): हरियो किराना
+  - list_name: shop
+    name: houseware
+    label::english(en): Houseware
+    label::swahili(sw): Vyombo vya nyumbani
+    label::french(fr): Ustensiles
+    label::spanish(es): Compatibilidad
+    label::nepali(ne): घरको सामान
+  - list_name: shop
+    name: jewellery
+    label::english(en): Jewellery
+    label::swahili(sw): Vito
+    label::french(fr): Bijoux
+    label::spanish(es): Joyería
+    label::nepali(ne): आभूषण
+  - list_name: shop
+    name: kiosk
+    label::english(en): Kiosk
+    label::swahili(sw): Kioski
+    label::french(fr): Kiosque
+    label::spanish(es): Quiosco
+    label::nepali(ne): किओस्क
+  - list_name: shop
+    name: pastry
+    label::english(en): Pastry
+    label::swahili(sw): Vyakula vya unga
+    label::french(fr): Pâtisserie
+    label::spanish(es): Pastelería
+    label::nepali(ne): पेस्ट्री
+  - list_name: shop
+    name: department_store
+    label::english(en): Department Store
+    label::swahili(sw): Hifadhi ya Idara
+    label::french(fr): Grand magasin
+    label::spanish(es): Grandes almacenes
+    label::nepali(ne): डिपार्टमेन्ट स्टोर
+  - list_name: office
+    name: company
+    label::english(en): Company
+    label::swahili(sw): Kampuni
+    label::french(fr): Compagnie
+    label::spanish(es): Empresa
+    label::nepali(ne): कम्पनी
+  - list_name: office
+    name: government
+    label::english(en): Government
+    label::swahili(sw): Serikali
+    label::french(fr): Gouvernement
+    label::spanish(es): Gobierno
+    label::nepali(ne): सरकार
+  - list_name: office
+    name: insurance
+    label::english(en): Insurance
+    label::swahili(sw): Bima
+    label::french(fr): Assurance
+    label::spanish(es): Seguro
+    label::nepali(ne): बीमा
+  - list_name: office
+    name: lawyer
+    label::english(en): Lawyer
+    label::swahili(sw): Mwanasheria
+    label::french(fr): Avocat
+    label::spanish(es): Abogado
+    label::nepali(ne): वकिल
+  - list_name: office
+    name: political_party
+    label::english(en): Political Party
+    label::swahili(sw): Chama cha siasa
+    label::french(fr): Parti politique
+    label::spanish(es): Partido político
+    label::nepali(ne): राजनीतिक दल
+  - list_name: office
+    name: charity
+    label::english(en): Charity
+    label::swahili(sw): Hisani
+    label::french(fr): Charité
+    label::spanish(es): Caridad
+    label::nepali(ne): परोपकार
+  - list_name: office
+    name: ngo
+    label::english(en): NGO
+    label::swahili(sw): NGO
+    label::french(fr): ONG
+    label::spanish(es): ONG
+    label::nepali(ne): NGO
+  - list_name: office
+    name: foundation
+    label::english(en): Foundation
+    label::swahili(sw): Msingi
+    label::french(fr): Fondation
+    label::spanish(es): Base
+    label::nepali(ne): फाउन्डेसन
+  - list_name: office
+    name: union
+    label::english(en): Union
+    label::swahili(sw): Muungano
+    label::french(fr): syndicat
+    label::spanish(es): Unión
+    label::nepali(ne): संघ
+  - list_name: office
+    name: financial
+    label::english(en): Financial
+    label::swahili(sw): Kifedha
+    label::french(fr): Financier
+    label::spanish(es): Financiero
+    label::nepali(ne): आर्थिक
+  - list_name: religious
+    name: church
+    label::english(en): Church
+    label::swahili(sw): Kanisa
+    label::french(fr): Église
+    label::spanish(es): Iglesia
+    label::nepali(ne): चर्च
+  - list_name: religious
+    name: mosque
+    label::english(en): Mosque
+    label::swahili(sw): Msikiti
+    label::french(fr): Mosquée
+    label::spanish(es): Mezquita
+    label::nepali(ne): मस्जिद
+  - list_name: religious
+    name: temple
+    label::english(en): Temple
+    label::swahili(sw): Hekalu
+    label::french(fr): Temple
+    label::spanish(es): Templo
+    label::nepali(ne): मन्दिर
+  - list_name: religious
+    name: shrine
+    label::english(en): Shrine
+    label::swahili(sw): Madhabahu
+    label::french(fr): Tombeau
+    label::spanish(es): Santuario
+    label::nepali(ne): तीर्थ
+  - list_name: religious
+    name: cathedral
+    label::english(en): Cathedral
+    label::swahili(sw): Kanisa kuu
+    label::french(fr): cathédrale
+    label::spanish(es): Catedral
+    label::nepali(ne): क्याथेड्रल
+  - list_name: religious
+    name: chapel
+    label::english(en): Chapel
+    label::swahili(sw): Kanisa dogo
+    label::french(fr): Chapelle
+    label::spanish(es): Capilla
+    label::nepali(ne): चैपल
+  - list_name: religious
+    name: synagogue
+    label::english(en): Synagogue
+    label::swahili(sw): Sinagogi
+    label::french(fr): Synagogue
+    label::spanish(es): Sinagoga
+    label::nepali(ne): सिनेगोग
+  - list_name: religion
+    name: muslim
+    label::english(en): Muslim
+    label::swahili(sw): Muislamu
+    label::french(fr): musulman
+    label::spanish(es): musulmán
+    label::nepali(ne): मुस्लिम
+  - list_name: religion
+    name: hindu
+    label::english(en): Hindu
+    label::swahili(sw): Kihindu
+    label::french(fr): hindou
+    label::spanish(es): hindú
+    label::nepali(ne): हिन्दू
+  - list_name: religion
+    name: christian
+    label::english(en): Christian
+    label::swahili(sw): Mkristo
+    label::french(fr): Christian
+    label::spanish(es): cristiano
+    label::nepali(ne): क्रिस्चियन
+  - list_name: religion
+    name: buddhist
+    label::english(en): Buddhist
+    label::swahili(sw): Mbudha
+    label::french(fr): bouddhiste
+    label::spanish(es): Budista
+    label::nepali(ne): बौद्ध
+  - list_name: religion
+    name: jewish
+    label::english(en): Jewish
+    label::swahili(sw): Myahudi
+    label::french(fr): juif
+    label::spanish(es): judío
+    label::nepali(ne): यहूदी
+  - list_name: religion
+    name: bahai
+    label::english(en): Baha’i
+    label::swahili(sw): Kibaha'i
+    label::french(fr): Baha'i
+    label::spanish(es): Baha’i
+    label::nepali(ne): बहाई
+  - list_name: capacity_persons
+    name: <50
+    label::english(en): <50
+    label::swahili(sw): <50
+    label::french(fr): <50
+    label::spanish(es): <50
+    label::nepali(ne): <५०
+  - list_name: capacity_persons
+    name: 50-100
+    label::english(en): 50-100
+    label::swahili(sw): 50-100
+    label::french(fr): 50-100
+    label::spanish(es): 50-100
+    label::nepali(ne): ५०-१००
+  - list_name: capacity_persons
+    name: 100-250
+    label::english(en): 100-250
+    label::swahili(sw): 100-250
+    label::french(fr): 100-250
+    label::spanish(es): 100-250
+    label::nepali(ne): 100-250
+  - list_name: capacity_persons
+    name: 250-500
+    label::english(en): 250-500
+    label::swahili(sw): 250-500
+    label::french(fr): 250-500
+    label::spanish(es): 250-500
+    label::nepali(ne): 250-500
+  - list_name: capacity_persons
+    name: ">500"
+    label::english(en): ">500"
+    label::swahili(sw): ">500"
+    label::french(fr): "> 500"
+    label::spanish(es): "> 500"
+    label::nepali(ne): ">५००"
+  - list_name: denomination
+    name: protestant
+    label::english(en): Protestant
+    label::swahili(sw): Kiprotestanti
+    label::french(fr): protestant
+    label::spanish(es): protestante
+    label::nepali(ne): प्रोटेस्टेन्ट
+  - list_name: denomination
+    name: pentecostal
+    label::english(en): Pentecostal
+    label::swahili(sw): Wapentekoste
+    label::french(fr): Pentecôtiste
+    label::spanish(es): de Pentecostés
+    label::nepali(ne): पेन्टेकोस्टल
+  - list_name: denomination
+    name: catholic
+    label::english(en): Catholic
+    label::swahili(sw): Mkatoliki
+    label::french(fr): catholique
+    label::spanish(es): católico
+    label::nepali(ne): क्याथोलिक
+  - list_name: denomination
+    name: baptist
+    label::english(en): Baptist
+    label::swahili(sw): Mbaptisti
+    label::french(fr): Baptiste
+    label::spanish(es): Bautista
+    label::nepali(ne): ब्याप्टिस्ट
+  - list_name: denomination
+    name: methodist
+    label::english(en): Methodist
+    label::swahili(sw): Methodisti
+    label::french(fr): méthodiste
+    label::spanish(es): metodista
+    label::nepali(ne): मेथोडिस्ट
+  - list_name: denomination
+    name: orthodox
+    label::english(en): Greek Orthodox
+    label::swahili(sw): Orthodox ya Kigiriki
+    label::french(fr): Orthodoxe grec
+    label::spanish(es): ortodoxo griego
+    label::nepali(ne): ग्रीक अर्थोडक्स
+  - list_name: denomination
+    name: Presbyterian
+    label::english(en): Presbyterian
+    label::swahili(sw): Presbiteri
+    label::french(fr): presbytérien
+    label::spanish(es): presbiteriano
+    label::nepali(ne): प्रेस्बिटेरियन
+  - list_name: denomination
+    name: lutheran
+    label::english(en): Lutheran
+    label::swahili(sw): Mlutheri
+    label::french(fr): luthérien
+    label::spanish(es): luterano
+    label::nepali(ne): लुथरन
+  - list_name: denomination
+    name: Mormon
+    label::english(en): Mormon
+    label::swahili(sw): Mormoni
+    label::french(fr): mormon
+    label::spanish(es): mormón
+    label::nepali(ne): मोर्मोन
+  - list_name: denomination
+    name: evangelical
+    label::english(en): Evangelical
+    label::swahili(sw): Kiinjili
+    label::french(fr): Évangélique
+    label::spanish(es): Evangélico
+    label::nepali(ne): इभान्जेलिकल
+  - list_name: muslim
+    name: sunni
+    label::english(en): Sunni
+    label::swahili(sw): Sunni
+    label::french(fr): Sunnite
+    label::spanish(es): Sunita
+    label::nepali(ne): सुन्नी
+  - list_name: muslim
+    name: sufi
+    label::english(en): Sufi
+    label::swahili(sw): Sufi
+    label::french(fr): Soufi
+    label::spanish(es): Sufí
+    label::nepali(ne): सुफी
+  - list_name: muslim
+    name: shia
+    label::english(en): Shia
+    label::swahili(sw): Shia
+    label::french(fr): Shia
+    label::spanish(es): Chiíta
+    label::nepali(ne): शिया
+  - list_name: hindu
+    name: vaishnavism
+    label::english(en): Vaishnavism
+    label::swahili(sw): Mabaniani ( wanaoabudu mungu vishnu)
+    label::french(fr): Vaishnavisme
+    label::spanish(es): Vaisnavismo
+    label::nepali(ne): वैष्णव धर्म
+  - list_name: hindu
+    name: shaivism
+    label::english(en): Shaivism
+    label::swahili(sw): Wanao abudu mungu shiva
+    label::french(fr): Shaivisme
+    label::spanish(es): Shaivismo
+    label::nepali(ne): शैव धर्म
+  - list_name: hindu
+    name: shaktism
+    label::english(en): Shaktism
+    label::swahili(sw): Wanao abudu mungu shakti
+    label::french(fr): Shaktisme
+    label::spanish(es): Shaktismo
+    label::nepali(ne): शक्तिवाद
+  - list_name: hindu
+    name: smartism
+    label::english(en): Smartism
+    label::swahili(sw): Wanaoabudu mungu smati
+    label::french(fr): Smartalisme
+    label::spanish(es): Inteligencia
+    label::nepali(ne): स्मार्टवाद
+  - list_name: water_source
+    name: water_works
+    label::english(en): Water works
+    label::swahili(sw): Bomba la kuhifadhi na kusambaza maji
+    label::french(fr): Water Works
+    label::spanish(es): Obras de agua
+    label::nepali(ne): पानीको काम
+  - list_name: water_source
+    name: manual_pump
+    label::english(en): Manual pump
+    label::swahili(sw): Pampu ya Mkono
+    label::french(fr): Pompe manuelle
+    label::spanish(es): Bomba manual
+    label::nepali(ne): म्यानुअल पम्प
+  - list_name: water_source
+    name: powered_pump
+    label::english(en): Powered pump
+    label::swahili(sw): Pampu ya umeme
+    label::french(fr): Pompe
+    label::spanish(es): Bomba
+    label::nepali(ne): संचालित पम्प
+  - list_name: water_source
+    name: groundwater
+    label::english(en): Groundwater
+    label::swahili(sw): Maji ya ardhini
+    label::french(fr): Eaux souterraines
+    label::spanish(es): Agua subterránea
+    label::nepali(ne): भूमिगत पानी
+  - list_name: historic
+    name: archaeological_site
+    label::english(en): Archaeological Site
+    label::swahili(sw): Sehemu ya utafiti kwa kuchimba
+    label::french(fr): Site archéologique
+    label::spanish(es): Sitio arqueológico
+    label::nepali(ne): पुरातात्विक स्थल
+  - list_name: historic
+    name: building
+    label::english(en): Unknown Building
+    label::swahili(sw): Jengo Lisilojulikana
+    label::french(fr): Bâtiment inconnu
+    label::spanish(es): Edificio desconocido
+    label::nepali(ne): अज्ञात भवन
+  - list_name: historic
+    name: fort
+    label::english(en): Fort
+    label::swahili(sw): Ngome
+    label::french(fr): Fort
+    label::spanish(es): Fuerte
+    label::nepali(ne): फोर्ट
+  - list_name: historic
+    name: monument
+    label::english(en): Monument
+    label::swahili(sw): Masanamu ya kuchonga kwa mawe
+    label::french(fr): Monument
+    label::spanish(es): Monumento
+    label::nepali(ne): स्मारक
+  - list_name: historic
+    name: area
+    label::english(en): Historical area
+    label::swahili(sw): Eneo la kihistoria
+    label::french(fr): Zone historique
+    label::spanish(es): Área histórica
+    label::nepali(ne): ऐतिहासिक क्षेत्र
+  - list_name: housing
+    name: residential
+    label::english(en): Residential
+    label::swahili(sw): Makaazi
+    label::french(fr): Résidentiel
+    label::spanish(es): Residential
+    label::nepali(ne): आवासीय
+  - list_name: housing
+    name: hotel
+    label::english(en): Hotel
+    label::swahili(sw): Hoteli
+    label::french(fr): Hôtel
+    label::spanish(es): Hotel
+    label::nepali(ne): होटल
+  - list_name: housing
+    name: camp_site
+    label::english(en): A camp ground
+    label::swahili(sw): Uwanja wa kambi
+    label::french(fr): Un terrain de camp
+    label::spanish(es): Un campamento
+    label::nepali(ne): एक शिविर मैदान
+  - list_name: housing
+    name: camp_pitch
+    label::english(en): An individual camp site
+    label::swahili(sw): Sehemu ya kambi ya mtu binafsi
+    label::french(fr): Un camping individual
+    label::spanish(es): Un campamento individual
+    label::nepali(ne): एक व्यक्तिगत शिविर साइट
+  - list_name: housing
+    name: apartments
+    label::english(en): Apartment building
+    label::swahili(sw): Jengo la ghorofa
+    label::french(fr): Immeuble
+    label::spanish(es): Edificio de apartamentos
+    label::nepali(ne): अपार्टमेन्ट भवन
+  - list_name: housing
+    name: toilet
+    label::english(en): A public toilet or outhouse
+    label::swahili(sw): Choo cha umma au choo nje ya nyumba
+    label::french(fr): Une toilette publique ou une dépendance
+    label::spanish(es): Un baño público o una letrina
+    label::nepali(ne): सार्वजनिक शौचालय वा बाहिरी घर
+  - list_name: service
+    name: car_repair
+    label::english(en): Car repair, tire repair, etc…
+    label::swahili(sw): Ukarabati wa gari, ukarabati wa matairi, n.k...
+    label::french(fr): Réparation de voitures, réparation des pneus, etc…
+    label::spanish(es): Reparación de automóviles, reparación de neumáticos, etc.
+    label::nepali(ne): कार मर्मत, टायर मर्मत, आदि...
+  - list_name: service
+    name: electronics_repair
+    label::english(en): Electronics repair
+    label::swahili(sw): Urekebishaji vitu vinotumia umeme
+    label::french(fr): Réparation électronique
+    label::spanish(es): Reparación electrónica
+    label::nepali(ne): इलेक्ट्रोनिक्स मर्मत
+  - list_name: service
+    name: pump_station
+    label::english(en): Water Pumping Station
+    label::swahili(sw): Kituo cha Kusambaza Maji
+    label::french(fr): Station de pompage à eau
+    label::spanish(es): Estación de bombeo de agua
+    label::nepali(ne): पानी पम्पिङ स्टेशन
+  - list_name: service
+    name: copyshop
+    label::english(en): Copy shop
+    label::swahili(sw): Duka la nakala
+    label::french(fr): Boutique de reprographie
+    label::spanish(es): Tienda de copias
+    label::nepali(ne): प्रतिलिपि पसल
+  - list_name: service
+    name: beauty
+    label::english(en): Beauty
+    label::swahili(sw): Uzuri
+    label::french(fr): Beauté
+    label::spanish(es): Belleza
+    label::nepali(ne): सौन्दर्य
+  - list_name: service
+    name: service
+    label::english(en): Hairdresser
+    label::swahili(sw): Msusi
+    label::french(fr): Coiffeur
+    label::spanish(es): Peluquero
+    label::nepali(ne): हेयरड्रेसर
+  - list_name: service
+    name: tailor
+    label::english(en): Tailor
+    label::swahili(sw): Mshonaji nguo
+    label::french(fr): Tailleur
+    label::spanish(es): Sastre
+    label::nepali(ne): दर्जी
+  - list_name: cuisine
+    name: pizza
+    label::english(en): Pizza
+    label::swahili(sw): Pizza
+    label::french(fr): Pizza
+    label::spanish(es): Pizza
+    label::nepali(ne): पिज्जा
+  - list_name: cuisine
+    name: burger
+    label::english(en): Burger
+    label::swahili(sw): Banzi linalotiwa nyama
+    label::french(fr): Burger
+    label::spanish(es): Hamburguesa
+    label::nepali(ne): बर्गर
+  - list_name: cuisine
+    name: italian
+    label::english(en): Italian
+    label::swahili(sw): chakula cha kitaliano
+    label::french(fr): italien
+    label::spanish(es): italiano
+    label::nepali(ne): इटालियन
+  - list_name: cuisine
+    name: mexican
+    label::english(en): Mexican
+    label::swahili(sw): Chakula cha kimeksiko
+    label::french(fr): mexicain
+    label::spanish(es): mexicano
+    label::nepali(ne): मेक्सिकन
+  - list_name: cuisine
+    name: thai
+    label::english(en): Thai
+    label::swahili(sw): Vyakula vya asili vya tailand
+    label::french(fr): thaïlandais
+    label::spanish(es): tailandés
+    label::nepali(ne): थाई
+  - list_name: cuisine
+    name: sandwich
+    label::english(en): Sandwich
+    label::swahili(sw): Sandwichi ( mkate unaochanganywa na nyama)
+    label::french(fr): Sandwich
+    label::spanish(es): Emparedado
+    label::nepali(ne): स्यान्डविच
+  - list_name: cuisine
+    name: indian
+    label::english(en): Indian
+    label::swahili(sw): Chakula cha kihindi
+    label::french(fr): Indien
+    label::spanish(es): indio
+    label::nepali(ne): भारतीय
+  - list_name: cuisine
+    name: chinese
+    label::english(en): Chinese
+    label::swahili(sw): Chakula cha kichina
+    label::french(fr): Chinois
+    label::spanish(es): Chino
+    label::nepali(ne): चिनियाँ
+  - list_name: cuisine
+    name: seafood
+    label::english(en): Seafood
+    label::swahili(sw): Chakula cha baharini
+    label::french(fr): Fruits de mer
+    label::spanish(es): Mariscos
+    label::nepali(ne): समुद्री खाना
+  - list_name: cuisine
+    name: steak_house
+    label::english(en): Steak House
+    label::swahili(sw): Mgahawa kwa ajili ya Nyama
+    label::french(fr): Steak House
+    label::spanish(es): Asador
+    label::nepali(ne): स्टीक हाउस
+  - list_name: amenity
+    name: fire_station
+    label::english(en): Fire Station
+    label::swahili(sw): Kituo cha Zima Moto
+    label::french(fr): Caserne de pompiers
+    label::spanish(es): Estación de bomberos
+    category: emergency
+    label::nepali(ne): फायर स्टेशन
+  - list_name: amenity
+    name: refuge_site
+    label::english(en): Refuge Site
+    label::swahili(sw): Maeneo ya wakimbizi
+    label::french(fr): Site de refuge
+    label::spanish(es): Sitio de refugio
+    category: emergency
+    label::nepali(ne): शरण स्थल
+  - list_name: amenity
+    name: police
+    label::english(en): Police Station
+    label::swahili(sw): Kituo cha polisi
+    label::french(fr): Poste de police
+    label::spanish(es): Estación de policía
+    category: emergency
+    label::nepali(ne): प्रहरी चौकी
+  - list_name: amenity
+    name: hospital
+    label::english(en): Hospital
+    label::swahili(sw): Hospitali(kituo cha afya)
+    label::french(fr): Hôpital
+    label::spanish(es): Hospital
+    category: emergency
+    label::nepali(ne): अस्पताल
+  - list_name: amenity
+    name: clinic
+    label::english(en): Clinic
+    label::swahili(sw): Zahanati
+    label::french(fr): Clinique
+    label::spanish(es): Clínica
+    category: emergency
+    label::nepali(ne): क्लिनिक
+  - list_name: amenity
+    name: toilets
+    label::english(en): Public Toilet
+    label::swahili(sw): Choo cha Umma
+    label::french(fr): Toilette publique
+    label::spanish(es): Baño público
+    category: emergency
+    label::nepali(ne): सार्वजनिक शौचालय
+  - list_name: amenity
+    name: coffee
+    label::english(en): Coffee shop
+    label::swahili(sw): Duka la kahawa
+    label::french(fr): Café
+    label::spanish(es): Cafetería
+    category: food
+    label::nepali(ne): कफी पसल
+  - list_name: amenity
+    name: bar
+    label::english(en): Bar
+    label::swahili(sw): Baa
+    label::french(fr): Bar
+    label::spanish(es): Bar
+    category: food
+    label::nepali(ne): बार
+  - list_name: amenity
+    name: brewery
+    label::english(en): Micro-Brewery
+    label::swahili(sw): Kiwanda kidogo cha Bia
+    label::french(fr): Micro-brasserie
+    label::spanish(es): Micro cervecería
+    category: food
+    label::nepali(ne): माइक्रो ब्रुअरी
+  - list_name: amenity
+    name: pub
+    label::english(en): Pub (a bar with food)
+    label::swahili(sw): Baa (baa yenye chakula)
+    label::french(fr): Pub (un bar avec de la nourriture)
+    label::spanish(es): Pub (un bar con comida)
+    category: food
+    label::nepali(ne): पब (खाना संग एक बार)
+  - list_name: amenity
+    name: cafe
+    label::english(en): Cafe
+    label::swahili(sw): Mkahawa
+    label::french(fr): Café
+    label::spanish(es): Cafetería
+    category: food
+    label::nepali(ne): क्याफे
+  - list_name: amenity
+    name: fast_food
+    label::english(en): Fast Food (not a restaurant)
+    label::swahili(sw): Chakula cha Haraka (sio mgahawa)
+    label::french(fr): Fast Food (pas un restaurant)
+    label::spanish(es): Comida rápida (no un restaurante)
+    category: food
+    label::nepali(ne): फास्ट फूड (रेस्टुरेन्ट होइन)
+  - list_name: amenity
+    name: restaurant
+    label::english(en): Restaurant (not fast food)
+    label::swahili(sw): Mgahawa (sio chakula cha haraka)
+    label::french(fr): Restaurant (pas de restoration rapide)
+    label::spanish(es): Restaurante (no comida rápida)
+    category: food
+    label::nepali(ne): भोजनालय (फास्ट फूड होइन)
+  - list_name: amenity
+    name: fbakery
+    label::english(en): Bakery
+    label::swahili(sw): Bakari
+    label::french(fr): Pâtisserie
+    label::spanish(es): Panadería
+    category: food
+    label::nepali(ne): बेकरी
+  - list_name: amenity
+    name: fbutcher
+    label::english(en): Butcher
+    label::swahili(sw): Duka la kuuza nyama
+    label::french(fr): Boucher
+    label::spanish(es): Carnicero
+    category: food
+    label::nepali(ne): कसाई
+  - list_name: amenity
+    name: courthouse
+    label::english(en): Court House
+    label::swahili(sw): Mahakama
+    label::french(fr): Palais de justice
+    label::spanish(es): Tribunal
+    category: government
+    label::nepali(ne): अदालत हाउस
+  - list_name: amenity
+    name: library
+    label::english(en): Library
+    label::swahili(sw): Maktaba
+    label::french(fr): Bibliothèque
+    label::spanish(es): Biblioteca
+    category: government
+    label::nepali(ne): पुस्तकालय
+  - list_name: amenity
+    name: police
+    label::english(en): Police
+    label::swahili(sw): Polisi
+    label::french(fr): Police
+    label::spanish(es): Policía
+    category: government
+    label::nepali(ne): प्रहरी
+  - list_name: amenity
+    name: post_office
+    label::english(en): Post Office
+    label::swahili(sw): Ofisi ya Posta
+    label::french(fr): Bureau de poste
+    label::spanish(es): Oficina de correos
+    category: government
+    label::nepali(ne): हुलाक कार्यालय
+  - list_name: amenity
+    name: townhall
+    label::english(en): Town Hall
+    label::swahili(sw): Ukumbi wa Habari na Sanaa
+    label::french(fr): Mairie
+    label::spanish(es): Ayuntamiento
+    category: government
+    label::nepali(ne): टाउन हल
+  - list_name: amenity
+    name: social_facility
+    label::english(en): Social Facility
+    label::swahili(sw): Sehemu ya huduma za kijamii
+    label::french(fr): Installation sociale
+    label::spanish(es): Instalación social
+    category: government
+    label::nepali(ne): सामाजिक सुविधा
+  - list_name: amenity
+    name: clinic
+    label::english(en): Clinic
+    label::swahili(sw): zahanati
+    label::french(fr): Clinique
+    label::spanish(es): Clínica
+    category: medical
+    label::nepali(ne): क्लिनिक
+  - list_name: amenity
+    name: dentist
+    label::english(en): Dentist
+    label::swahili(sw): Daktari wa meno
+    label::french(fr): Dentiste
+    label::spanish(es): Dentista
+    category: medical
+    label::nepali(ne): दन्त चिकित्सक
+  - list_name: amenity
+    name: doctors
+    label::english(en): Doctors
+    label::swahili(sw): Madaktari
+    label::french(fr): Médecins
+    label::spanish(es): Doctores
+    category: medical
+    label::nepali(ne): डाक्टरहरू
+  - list_name: amenity
+    name: hospital
+    label::english(en): Hospital
+    label::swahili(sw): Kituo cha afya
+    label::french(fr): Hôpital
+    label::spanish(es): Hospital
+    category: medical
+    label::nepali(ne): अस्पताल
+  - list_name: amenity
+    name: pharmacy
+    label::english(en): Pharmacy
+    label::swahili(sw): Duka la dawa baridi
+    label::french(fr): Pharmacie
+    label::spanish(es): Farmacia
+    category: medical
+    label::nepali(ne): फार्मेसी
+  - list_name: amenity
+    name: veterinary
+    label::english(en): Veterinary
+    label::swahili(sw): Daktari wa Mifugo
+    label::french(fr): Vétérinaire
+    label::spanish(es): Veterinario
+    category: medical
+    label::nepali(ne): पशु चिकित्सा
+  - list_name: amenity
+    name: cemetery
+    label::english(en): Cemetery
+    label::swahili(sw): Makaburini
+    label::french(fr): Cimetière
+    label::spanish(es): Cementerio
+    category: medical
+    label::nepali(ne): चिहान
+  - list_name: amenity
+    name: place_of_worship
+    label::english(en): Place of Worship
+    label::swahili(sw): Sehemu ya ibada
+    label::french(fr): Lieu de culte
+    label::spanish(es): Lugar de adoración
+    category: religious
+    label::nepali(ne): पूजा स्थल
+  - list_name: amenity
+    name: fuel
+    label::english(en): Fuel (petrol station; gas station; marine fuel)
+    label::swahili(sw):
+      Nishati (kituo cha petroli; kituo cha gesi; mafuta ya vyombo
+      vya baharini)
+    label::french(fr): Carburant (station-service; station-service; carburant marin)
+    label::spanish(es):
+      Combustible (estación de servicio; estación de servicio; combustible
+      marino)
+    category: retail
+    label::nepali(ne): इन्धन (पेट्रोल स्टेशन; ग्यास स्टेशन; समुद्री ईन्धन)
+  - list_name: amenity
+    name: convenience
+    label::english(en): Convenience Store
+    label::swahili(sw): Duka la vitu vya rejareja
+    label::french(fr): Épicerie
+    label::spanish(es): Tienda de conveniencia
+    category: retail
+    label::nepali(ne): सुविधा स्टोर
+  - list_name: amenity
+    name: marketplace
+    label::english(en): Marketplace
+    label::swahili(sw): Maeneo ya sokoni
+    label::french(fr): Marché
+    label::spanish(es): Mercado
+    category: retail
+    label::nepali(ne): बजार
+  - list_name: amenity
+    name: bureau_de_change
+    label::english(en): Bureau de change
+    label::swahili(sw): Ofisi ya kubadili fedha
+    label::french(fr): Bureau de changement
+    label::spanish(es): cambio de moneda
+    category: retail
+    label::nepali(ne): ब्यूरो परिवर्तन
+  - list_name: amenity
+    name: atm
+    label::english(en): ATM
+    label::swahili(sw): Machine ya kutolea fedha ( automotela)
+    label::french(fr): AU M
+    label::spanish(es): Cajero automático
+    category: service
+    label::nepali(ne): ATM
+  - list_name: amenity
+    name: parking
+    label::english(en): Parking
+    label::swahili(sw): Maegesho ya vyombo vya moto
+    label::french(fr): Parking
+    label::spanish(es): Estacionamiento
+    category: tourism
+    label::nepali(ne): पार्किङ
+  - list_name: amenity
+    name: toilets
+    label::english(en): Public Toilet
+    label::swahili(sw): Choo cha Umma
+    label::french(fr): Toilette publique
+    label::spanish(es): Baño público
+    category: tourism
+    label::nepali(ne): सार्वजनिक शौचालय
+  - list_name: amenity
+    name: nursery
+    label::english(en): Nursery School
+    label::swahili(sw): Skuli ya maandalizi au chekechea
+    label::french(fr): École maternelle
+    label::spanish(es): Guardería
+    category: education
+    label::nepali(ne): नर्सरी स्कूल
+  - list_name: amenity
+    name: primary
+    label::english(en): Primary School
+    label::swahili(sw): Skuli ya msingi
+    label::french(fr): École primaire
+    label::spanish(es): Escuela primaria
+    category: education
+    label::nepali(ne): प्राथमिक विद्यालय
+  - list_name: amenity
+    name: secondary
+    label::english(en): Secondary School
+    label::swahili(sw): skuli ya Sekondari
+    label::french(fr): École secondaire
+    label::spanish(es): Escuela secundaria
+    category: education
+    label::nepali(ne): माध्यमिक विद्यालय
+  - list_name: amenity
+    name: tertiary
+    label::english(en): Tertiary School
+    label::swahili(sw): Elimu ya juu( baada sekondari na kabla ya chuo kikuu)
+    label::french(fr): École tertiaire
+    label::spanish(es): Escuela terciaria
+    category: education
+    label::nepali(ne): तृतीयक विद्यालय
+  - list_name: amenity
+    name: training
+    label::english(en): Technical Vocational Education
+    label::swahili(sw): Elimu ya stadi ya ufundi
+    label::french(fr): Enseignement professionnel technique
+    label::spanish(es): Educación vocacional técnica
+    category: education
+    label::nepali(ne): प्राविधिक व्यावसायिक शिक्षा
+  - list_name: amenity
+    name: university
+    label::english(en): College/University
+    label::swahili(sw): Chuo/Chuo kikuu
+    label::french(fr): Collège / université
+    label::spanish(es): Colegio Universitario
+    category: education
+    label::nepali(ne): कलेज/विश्वविद्यालय
+  - list_name: amenity
+    name: language_school
+    label::english(en): Language school
+    label::swahili(sw): Skuli ya lugha
+    label::french(fr): École de langue
+    label::spanish(es): Escuela de idiomas
+    category: education
+    label::nepali(ne): भाषा विद्यालय
+  - list_name: amenity
+    name: music_school
+    label::english(en): Music school
+    label::swahili(sw): Skuli ya muziki
+    label::french(fr): École de musique
+    label::spanish(es): Escuela de Musica
+    category: education
+    label::nepali(ne): संगीत विद्यालय
+  - list_name: amenity
+    name: kindergarten
+    label::english(en): Kindergarten
+    label::swahili(sw): Skuli ya chekechea
+    label::french(fr): Jardin d'enfants
+    label::spanish(es): Jardín de infancia
+    category: education
+    label::nepali(ne): बालवाडी
+  - list_name: amenity
+    name: childcare
+    label::english(en): Childcare
+    label::swahili(sw): Ulezi wa watoto
+    label::french(fr): Garde d'enfants
+    label::spanish(es): Cuidado de los niños
+    category: education
+    label::nepali(ne): बाल हेरचाह
+  - list_name: amenity
+    name: prep_school
+    label::english(en): Prep school
+    label::swahili(sw): Skuli ya maandalizi
+    label::french(fr): École préparatoire
+    label::spanish(es): Preparatoria
+    category: education
+    label::nepali(ne): तयारी स्कूल
+  - list_name: amenity
+    name: amenity
+    label::english(en): School
+    label::swahili(sw): Skuli
+    label::french(fr): L'école
+    label::spanish(es): Escuela
+    category: education
+    label::nepali(ne): विद्यालय
+  - list_name: tourism
+    name: camp_site
+    label::english(en): Campground
+    label::swahili(sw): Uwanja wa kambi
+    label::french(fr): Camping
+    label::spanish(es): Terreno de camping
+    category: tourism
+    label::nepali(ne): शिविर मैदान
+  - list_name: tourism
+    name: taxi
+    label::english(en): Taxi Stand
+    label::swahili(sw): Kituo cha teksi
+    label::french(fr): Station de taxi
+    label::spanish(es): Parada de taxi
+    category: tourism
+    label::nepali(ne): ट्याक्सी स्ट्यान्ड
+  - list_name: tourism
+    name: camp pitch
+    label::english(en): Camp site
+    label::swahili(sw): Maeneo ya kambi
+    label::french(fr): Site de camp
+    label::spanish(es): Sitio de campamento
+    category: tourism
+    label::nepali(ne): शिविर स्थल
+  - list_name: tourism
+    name: caravan_site
+    label::english(en): Caravan site
+    label::swahili(sw): Eneo La misafara ya biashara
+    label::french(fr): Site de caravane
+    label::spanish(es): Sitio de caravanas
+    category: tourism
+    label::nepali(ne): कारवां साइट
+  - list_name: tourism
+    name: artwork
+    label::english(en): Artwork
+    label::swahili(sw): Kazi za sanaa
+    label::french(fr): Ouvrages d'art
+    label::spanish(es): Obra de arte
+    category: tourism
+    label::nepali(ne): कलाकृति
+  - list_name: tourism
+    name: gallery
+    label::english(en): gallery
+    label::swahili(sw): nyumba ya sanaa
+    label::french(fr): Galerie
+    label::spanish(es): galería
+    category: tourism
+    label::nepali(ne): ग्यालेरी
+  - list_name: tourism
+    name: museum
+    label::english(en): Museum
+    label::swahili(sw): Makumbusho
+    label::french(fr): Musée
+    label::spanish(es): Museo
+    category: tourism
+    label::nepali(ne): संग्रहालय
+  - list_name: tourism
+    name: zoo
+    label::english(en): Zoo
+    label::swahili(sw): sehemu za kuangalia wanyama
+    label::french(fr): zoo
+    label::spanish(es): zoo
+    category: tourism
+    label::nepali(ne): चिडियाखाना
+  - list_name: tourism
+    name: attraction
+    label::english(en): Attraction
+    label::swahili(sw): Kivutio
+    label::french(fr): Attraction
+    label::spanish(es): Atracción
+    category: tourism
+    label::nepali(ne): आकर्षण
+  - list_name: tourism
+    name: guest_house
+    label::english(en): Guest house
+    label::swahili(sw): Nyumba ya wageni
+    label::french(fr): Maison d'hôtes
+    label::spanish(es): Casa de invitados
+    category: tourism
+    label::nepali(ne): गेस्ट हाउस
+  - list_name: tourism
+    name: hotel
+    label::english(en): Hotel
+    label::swahili(sw): Hoteli
+    label::french(fr): Hôtel
+    label::spanish(es): Hotel
+    category: tourism
+    label::nepali(ne): होटल
+  - list_name: tourism
+    name: hostel
+    label::english(en): Hostel
+    label::swahili(sw): Dahalia
+    label::french(fr): Auberge
+    label::spanish(es): Albergue
+    category: tourism
+    label::nepali(ne): होस्टेल
+  - list_name: generator:source
+    name: grid
+    label::english(en): Grid
+    label::swahili(sw): Nyaya za umeme( zinazoelekea maeneo tofauti)
+    label::french(fr): Grille
+    label::spanish(es): Cuadrícula
+    label::nepali(ne): ग्रिड
+  - list_name: generator:source
+    name: generator
+    label::english(en): Generator
+    label::swahili(sw): Jenereta
+    label::french(fr): Générateur
+    label::spanish(es): Generador
+    label::nepali(ne): जेनेरेटर
+  - list_name: generator:source
+    name: solar
+    label::english(en): Solar
+    label::swahili(sw): Umeme wa jua
+    label::french(fr): Solaire
+    label::spanish(es): Solar
+    label::nepali(ne): सौर्य
+  - list_name: generator:source
+    name: hydro
+    label::english(en): Hydro
+    label::swahili(sw): Maji(nguvu za maji, mfano katika kuzalisha umeme)
+    label::french(fr): Hydroélectricité
+    label::spanish(es): Hídico
+    label::nepali(ne): हाइड्रो
+  - list_name: opening_hours
+    name: 24/7
+    label::english(en): 24/7
+    label::nepali(ne): २४/७
+  - list_name: opening_hours
+    name: mo-sa_08:00-18:00
+    label::english(en): Monday – Sat 08:00-18:00
+    label::nepali(ne): सोमबार - शनिवार 08:00-18:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-17:00
+    label::english(en): Monday – Sat 09:00-17:00
+    label::nepali(ne): सोमबार - शनि 09:00-17:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-18:00
+    label::english(en): Monday – Sat 09:00-18:00
+    label::nepali(ne): सोमबार - शनि 09:00-18:00
+  - list_name: opening_hours
+    name: mo-fr_09:00-17:00
+    label::english(en): Monday – Friday 09:00-17:00
+    label::nepali(ne): सोमबार - शुक्रबार 09:00-17:00
+  - list_name: opening_hours
+    name: mo-su_09:00-21:00
+    label::english(en): Monday - Sunday 09:00-21:00
+    label::nepali(ne): सोमबार - आइतबार 09:00-21:00
+  - list_name: opening_hours
+    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
+    label::english(en): Monday - Friday 08:00-18:00; Sat - Sunday 08:00-15:00
+    label::nepali(ne): सोमबार - शुक्रबार 08:00-18:00; शनिवार - आइतबार 08:00-15:00
+  - list_name: opening_hours
+    name: by_appointment
+    label::english(en): By Appointment Only
+    label::nepali(ne): नियुक्ति द्वारा मात्र
+settings:
+  - form_id: buildings
+    version: =NOW()
+    form_title: buildings
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::english(en)
+      - hint::english(en)
+      - label::nepali(ne)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - default
+      - trigger
+      - parameters
+      - required
+      - required_message::English(en)
+      - label::swahili(sw)
+      - hint::swahili(sw)
+      - label::french(fr)
+      - hint::french(fr)
+      - label::spanish(es)
+      - hint::spanish(es)
+      - save_to
+    choices:
+      - list_name
+      - name
+      - label::english(en)
+      - label::swahili(sw)
+      - label::french(fr)
+      - label::spanish(es)
+      - category
+      - label::nepali(ne)
+    settings:
+      - form_id
+      - version
+      - form_title
+      - allow_choice_duplicates

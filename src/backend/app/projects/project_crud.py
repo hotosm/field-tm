@@ -40,6 +40,7 @@ from osm_data_client import (
     RawDataOutputOptions,
     RawDataResult,
 )
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_login_python.core import Auth
 from psycopg import Connection, sql
 from psycopg.rows import class_row
@@ -230,10 +231,10 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
         existing_db_forms = {row[0] for row in await cur.fetchall()}
 
         # Insert or update new XLSForms from disk
-        for xls_type in XLSFormType:
-            file_name = xls_type.name
-            form_type = xls_type.value
-            file_path = Path(directory) / f"{file_name}.xls"
+        for yaml_type in XLSFormType:
+            file_name = yaml_type.name
+            form_type = yaml_type.value
+            file_path = Path(directory) / f"{file_name}.yaml"
 
             if not file_path.exists():
                 log.warning(f"{file_path} does not exist!")
@@ -243,8 +244,13 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
                 log.warning(f"{file_path} is empty!")
                 continue
 
-            with open(file_path, "rb") as xls:
-                data = xls.read()
+            try:
+                data = convert_to_xlsform(str(file_path))
+
+            except Exception:
+                log.exception(
+                    f"Error occurred during in-memory conversion for {file_path}"
+                )
 
             try:
                 insert_query = """
@@ -265,7 +271,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
         # Determine the forms that need to be deleted (those in the DB but
         # not in the current XLSFormType)
-        required_forms = {xls_type.value for xls_type in XLSFormType}
+        required_forms = {yaml_type.value for yaml_type in XLSFormType}
         forms_to_delete = existing_db_forms - required_forms
 
         if forms_to_delete:

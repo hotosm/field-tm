@@ -16,7 +16,7 @@
 #     along with osm_fieldwork.  If not, see <https:#www.gnu.org/licenses/>.
 #
 """Test functionality of update_form.py."""
-
+import io
 from io import BytesIO
 from pathlib import Path
 import re
@@ -27,7 +27,7 @@ from pyxform.xls2xform import convert as xform_convert
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from osm_fieldwork.xlsforms import buildings, healthcare
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
-
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 
 async def test_merge_mandatory_fields():
     """Merge the mandatory fields XLSForm to a test survey form."""
@@ -71,8 +71,7 @@ async def test_add_extra_select_from_file():
 
 async def test_buildings_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
-    with open(buildings, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    form_bytes = io.BytesIO(convert_to_xlsform(str(buildings)))
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
@@ -83,8 +82,7 @@ async def test_buildings_xlsform():
 
 async def test_healthcare_xlsform():
     """Merge and test if buildings form is a valid XLSForm."""
-    with open(healthcare, "rb") as xlsform:
-        form_bytes = BytesIO(xlsform.read())
+    form_bytes = io.BytesIO(convert_to_xlsform(str(healthcare)))
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
