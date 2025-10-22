@@ -1,0 +1,403 @@
+survey:
+  - "#":
+      Converted by yxf, from health.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: begin group
+    name: healthcare
+    label::English(en): Healthcare Types
+    appearance: field-list
+    label::Swahili(sw): Aina za Afya
+    label::French(fr): Types de soins de santé
+    label::Spanish(es): Tipos de asistencia sanitaria
+  - type: select_multiple healthcare
+    name: healthcare_type
+    label::English(en): What type of healthcare is provided ?
+    appearance: minimal
+    calculation: instance('features’)/root/item[id=${feature}]/healthcare
+    trigger: ${feature}
+    required: yes
+    label::Swahili(sw): Jengo hili ni la aina gani?
+    label::French(fr): De quel type de bâtiment s'agit-il ?
+    label::Spanish(es): ¿Qué tipo de edificio es este?
+  - type: select_multiple specialty
+    name: specialty
+    label::English(en): What is the specialty provided here ?
+    appearance: minimal
+    label::Swahili(sw): Je, linaitwaje, kama lipo moja?
+    label::French(fr): Quel est le nom s'il y en a un ?
+    label::Spanish(es): ¿Cuál es el nombre si hay uno?
+  - type: select_multiple amenity:type
+    name: amenity_type
+    label::English(en): What type of equipment do they have ?
+    appearance: minimal
+    label::Swahili(sw): Kuta zimetengenezwa na nini?
+    label::French(fr): De quoi sont faits les murs ?
+    label::Spanish(es): ¿De qué están hechas las paredes?
+  - type: text
+    name: name
+    label::English(en): What is the name of this facility ?
+    appearance: minimal
+    required: yes
+    label::Swahili(sw): Je! kuna ngazi ngapi katika hili jengo?
+    label::French(fr): Combien y a-t-il de niveaux dans le bâtiment ?
+    label::Spanish(es): ¿Cuántos niveles hay en el edificio?
+  - type: select_one operator:type
+    name: operator_type
+    label::English(en): What is the type of operator ?
+    appearance: minimal
+  - type: select_one yes_no
+    name: emergency
+    label::English(en): Does this facility provide emergency services ?
+    appearance: minimal
+    label::Swahili(sw): Ni dini gani inatumika hapa?
+    label::French(fr): Quelle religion est pratiquée ici ?
+    label::Spanish(es): ¿Qué religión se practica aquí?
+  - type: select_one opening_hours
+    name: opening_hours
+    label::English(en): What are the opening hours ?
+    appearance: minimal
+    label::Swahili(sw): Dhehebu gani?
+    label::French(fr): Quelle est la dénomination ?
+    label::Spanish(es): ¿Cuál es la denominación?
+  - type: end group
+    label::Swahili(sw): Madhehebu gani ya kiislam?
+    label::French(fr): Qu'est-ce que la secte musulmane ?
+    label::Spanish(es): ¿Qué es la secta musulmana?
+  - type: begin group
+    name: details
+    label::English(en): More Details (Optional)
+    appearance: field-list
+    label::Swahili(sw): Maelezo Zaidi (Si lazima)
+    label::French(fr): Plus de détails (optionnel)
+    label::Spanish(es): More Details (Optional)
+  - type: select_one insurance
+    name: insurance
+    label::English(en): Does this facility take health insurance ?
+    appearance: minimal
+    label::Swahili(sw): Ni aina gani za huduma zinazopatikana hapa?
+    label::French(fr): Quels types de services sont disponibles ici ?
+    label::Spanish(es): ¿Qué tipo de servicios están disponibles aquí?
+  - type: select_one yes_no
+    name: wheelchair
+    label::English(en): Is this facility wheelchair accessible ?
+    appearance: minimal
+    calculation: instance('features’)/root/item[id=${feature}]/wheelchair
+    trigger: ${feature}
+    label::Swahili(sw): Hili ni duka la aina gani la rejareja?
+    label::French(fr): De quel type de magasin s'agit-il ?
+    label::Spanish(es): ¿Qué tipo de tienda minorista es este?
+  - type: text
+    name: phone
+    label::English(en): What is the contact phone number ?
+    appearance: minimal
+    label::Swahili(sw): Je, hili ni jengo la watalii la aina gani?
+    label::French(fr): De quel type de bâtiment touristique s'agit-il ?
+    label::Spanish(es): ¿Qué tipo de edificio turístico es este?
+  - type: select_one yes_no
+    name: power
+    label::English(en): Is there electricity  ?
+    appearance: minimal
+    label::Swahili(sw): Jengo hili la elimu ni la aina gani?
+    label::French(fr): De quel type de bâtiment scolaire s'agit-il ?
+    label::Spanish(es): ¿Qué tipo de edificio educativo es este?
+  - type: select_one generator:source
+    name: generator_source
+    label::English(en): What is the source of power ?
+    appearance: minimal
+    label::Swahili(sw):
+      Kwa maelezo zaidi kuhusu skuli, tafadhali tumia XForm ya elimu
+      badala yake.
+    label::French(fr):
+      Pour plus de détails sur les écoles, veuillez utiliser le XForm
+      éducation à la place.
+    label::Spanish(es):
+      Para obtener más detalles sobre las escuelas, utilice la educación
+      XForm en su lugar.
+  - type: select_one yes_no
+    name: operational
+    label::English(en): Is this facility operational ?
+    appearance: minimal
+    label::Swahili(sw): Je, hili ni jengo la umma la aina gani?
+    label::French(fr): De quel type de bâtiment public s'agit-il ?
+    label::Spanish(es): ¿Qué tipo de edificio público es este?
+  - type: end group
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+    label::Swahili(sw): Maoni mengine yoyote kuhusu kipengele hiki
+    label::French(fr): Tout autre commentaire sur cet endroit
+    label::Spanish(es): Cualquier otro comentario sobre esta característica
+choices:
+  - list_name: amenity
+    name: doctors
+    label: Doctors
+  - list_name: amenity
+    name: hospital
+    label: Hospital
+  - list_name: amenity
+    name: dentist
+    label: Dentist
+  - list_name: amenity
+    name: healthcare
+    label: pharmacy
+  - list_name: amenity
+    name: veterinary
+    label: Veterinary
+  - list_name: healthcare
+    name: doctors
+    label: Doctors
+  - list_name: healthcare
+    name: hospital
+    label: Hospital
+  - list_name: healthcare
+    name: dentist
+    label: Dentist
+  - list_name: healthcare
+    name: healthcare
+    label: pharmacy
+  - list_name: healthcare
+    name: veterinary
+    label: Veterinary
+  - list_name: healthcare
+    name: yes
+    label: Yes
+  - list_name: healthcare
+    name: clinic
+    label: Clinic
+  - list_name: healthcare
+    name: pharmacy
+    label: pharmacy
+  - list_name: healthcare
+    name: physiotherapist
+    label: Physiotherapist
+  - list_name: healthcare
+    name: alternative
+    label: Alternative
+  - list_name: healthcare
+    name: laboratory
+    label: laboratory
+  - list_name: healthcare
+    name: optometrist
+    label: Optometrist
+  - list_name: healthcare
+    name: rehabilitation
+    label: Rehabilitation
+  - list_name: healthcare
+    name: blood_donation
+    label: Blood Donation
+  - list_name: healthcare
+    name: birthing_center
+    label: Birthing Center
+  - list_name: healthcare
+    name: midwife
+    label: Midwife
+  - list_name: healthcare
+    name: doctor
+    label: Doctors
+  - list_name: healthcare
+    name: pediatrics
+    label: Pediatrics
+  - list_name: healthcare
+    name: counseling
+    label: Counseling
+  - list_name: healthcare
+    name: dialysis
+    label: dialysis
+  - list_name: healthcare
+    name: hospice
+    label: Hospice
+  - list_name: healthcare
+    name: nurse
+    label: Nurse
+  - list_name: healthcare
+    name: psychotherapist
+    label: Psychotherapist
+  - list_name: healthcare
+    name: sample_collection
+    label: Sample Collection
+  - list_name: healthcare
+    name: speech_therapist
+    label: Speech Therapist
+  - list_name: healthcare
+    name: vaccination_centre
+    label: Vaccination Centre
+  - list_name: specialty
+    name: biology
+    label: Biology
+  - list_name: specialty
+    name: blood_check
+    label: Blood_check
+  - list_name: specialty
+    name: clinical_pathology
+    label: Clinical Pathology
+  - list_name: specialty
+    name: diagnostic_radiology
+    label: Diagnostic Radiology
+  - list_name: specialty
+    name: medical_physics
+    label: Medical Physics
+  - list_name: specialty
+    name: medical_engineering
+    label: Medical Engineering
+  - list_name: specialty
+    name: radiology
+    label: Radiology
+  - list_name: specialty
+    name: abortion
+    label: Abortion Clinic
+  - list_name: specialty
+    name: fertility_clinic
+    label: Fertility Clinic
+  - list_name: specialty
+    name: dialysis
+    label: dialysis
+  - list_name: amenity:type
+    name: ultrasound
+    label: Ultrasound
+  - list_name: amenity:type
+    name: mri
+    label: MRI
+  - list_name: amenity:type
+    name: x_ray
+    label: Xray
+  - list_name: amenity:type
+    name: dialysis
+    label: dialysis
+  - list_name: amenity:type
+    name: operating_theater
+    label: Operating Theater
+  - list_name: amenity:type
+    name: laboratory
+    label: laboratory
+  - list_name: amenity:type
+    name: imaging_equipment
+    label: Imaging Equipment
+  - list_name: amenity:type
+    name: intensive_care_unit
+    label: Intensive Care Unit
+  - list_name: amenity:type
+    name: emergency_department
+    label: Emergency Department
+  - list_name: amenity:type
+    name: baby_hatch
+    label: Baby Hatch
+  - list_name: insurance
+    name: no
+    label: No
+  - list_name: insurance
+    name: public
+    label: Public
+  - list_name: insurance
+    name: private
+    label: Private
+  - list_name: insurance
+    name: unknown
+    label: Unknown
+  - list_name: water_supply
+    name: well
+    label: Well
+  - list_name: water_supply
+    name: water_works
+    label: Water Works
+  - list_name: water_supply
+    name: groundwater
+    label: Groundwater
+  - list_name: water_supply
+    name: rain
+    label: Rain
+  - list_name: generator:source
+    name: grid
+    label: Grid
+  - list_name: generator:source
+    name: generator
+    label: Generator
+  - list_name: generator:source
+    name: solar
+    label: Solar
+  - list_name: generator:source
+    name: none
+    label: No power
+  - list_name: opening_hours
+    name: 24/7
+    label: 24/7
+  - list_name: opening_hours
+    name: mo-sa_08:00-18:00
+    label: Monday – Sat 08:00-18:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-17:00
+    label: Monday – Sat 09:00-17:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-18:00
+    label: Monday – Sat 09:00-18:00
+  - list_name: opening_hours
+    name: mo-fr_09:00-17:00
+    label: Monday – Friday 09:00-17:00
+  - list_name: opening_hours
+    name: mo-su_09:00-21:00
+    label: Monday - Sunday 09:00-21:00
+  - list_name: opening_hours
+    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
+    label: Monday - Friday 08:00-18:00; Sat - Sunday 08:00-15:00
+  - list_name: opening_hours
+    name: by_appointment
+    label: By Appointment Only
+  - list_name: operator:type
+    name: public
+    label: Public
+  - list_name: operator:type
+    name: private
+    label: Private
+  - list_name: operator:type
+    name: community
+    label: Community
+  - list_name: operator:type
+    name: religious
+    label: Religious
+  - list_name: operator:type
+    name: government
+    label: Government
+  - list_name: operator:type
+    name: ngo
+    label: NGO
+  - list_name: operator:type
+    name: combination
+    label: Combination
+settings:
+  - form_id: healthcare
+    version: =NOW()
+    form_title: healthcare
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - default
+      - trigger
+      - parameters
+      - required
+      - required_message::English(en)
+      - label::Swahili(sw)
+      - hint::Swahili(sw)
+      - label::French(fr)
+      - hint::French(fr)
+      - label::Spanish(es)
+      - hint::Spanish(es)
+      - save_to
+    choices:
+      - list_name
+      - name
+      - label
+    settings:
+      - form_id
+      - version
+      - form_title
+      - allow_choice_duplicates
