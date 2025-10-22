@@ -12,12 +12,14 @@
 
 """DB models for temporary tables in splitBySQL."""
 
+import logging
 from typing import Union
 
 import psycopg
-from loguru import logger as log
 from psycopg.types.json import Json
 from shapely.geometry import Polygon
+
+log = logging.getLogger(__name__)
 
 
 def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
