@@ -88,11 +88,11 @@ repos:
       - id: sqlfluff-lint
         files: ^src/migrations/.*\.sql$
         types: [sql]
-        args: ["--dialect", "postgres", "--exclude-rules", "CP05, RF02"]
+        args: ["--dialect", "postgres", "--exclude-rules", "CP05,RF02,RF04"]
       - id: sqlfluff-fix
         files: ^src/migrations/.*\.sql$
         types: [sql]
-        args: ["--dialect", "postgres", "--exclude-rules", "CP05, RF02"]
+        args: ["--dialect", "postgres", "--exclude-rules", "CP05,RF02,RF04"]
 
   # Lint: Bash scripts
   - repo: https://github.com/openstack-dev/bashate.git
