@@ -583,7 +583,9 @@ async def client(app: FastAPI, db: AsyncConnection):
     # NOTE this is marginally slower, but required else tests fail
     app.dependency_overrides[db_conn] = lambda: db
 
-    async with LifespanManager(app) as manager:
+    # NOTE we increase startup_timeout from 5s --> 30s to avoid timeouts
+    # during slow initialisation / startup (due to yaml conversion etc)
+    async with LifespanManager(app, startup_timeout=30) as manager:
         async with AsyncClient(
             transport=ASGITransport(app=manager.app),
             base_url=f"http://{settings.FMTM_DOMAIN}",
