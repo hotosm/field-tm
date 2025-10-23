@@ -155,7 +155,7 @@ just migrate
 To run the backend tests locally, run:
 
 ```bash
-docker compose run --rm api pytest
+docker compose -f compose.test.yaml run --rm api pytest
 
 # Or via Just
 just test backend

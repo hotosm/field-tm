@@ -1,0 +1,135 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# For testing the entire stack, with only the required services
+
+name: fmtm-test
+
+volumes:
+  fmtm_data:
+  fmtm_db_data:
+  fmtm_logs:
+  fmtm_images:
+  fmtm_tiles:
+  central_db_data:
+  central_frontend:
+
+networks:
+  fmtm-net:
+    name: fmtm-test
+
+services:
+  # Frontend tests may rely on the proxy, at some point
+  # proxy:
+  #   extends:
+  #     file: compose.yaml
+  #     service: proxy
+
+  # Remove qfield dependencies
+  api:
+    extends:
+      file: compose.yaml
+      service: api
+    volumes: !override
+      - fmtm_logs:/opt/logs
+      - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
+      - ./src/backend/app:/opt/app:ro
+      - ./src/backend/tests:/opt/tests:ro
+      - ./src/backend/scheduler:/opt/scheduler:ro
+      - ./src/backend/stats:/opt/stats:ro
+      # Workspace packages config
+      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
+      - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
+      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.13/site-packages/area_splitter:ro
+      - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
+    # We don't need proxy
+    depends_on: !override
+      fmtm-db:
+        condition: service_healthy
+      central:
+        condition: service_healthy
+        required: false
+      migrations:
+        condition: service_completed_successfully
+      s3:
+        condition: service_healthy
+
+  # ui:
+  #   extends:
+  #     file: compose.yaml
+  #     service: ui
+
+  # ui-mapper:
+  #   extends:
+  #     file: compose.yaml
+  #     service: ui-mapper
+
+  central:
+    extends:
+      file: compose.yaml
+      service: central
+    # We don't need proxy or pyxform
+    depends_on: !override
+      central-db:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+
+  central-ui:
+    extends:
+      file: compose.yaml
+      service: central-ui
+
+  # No tests involve the webhook, yet
+  # central-webhook:
+  #   extends:
+  #     file: compose.yaml
+  #     service: central-webhook
+
+  s3:
+    extends:
+      file: compose.yaml
+      service: s3
+    # We don't need proxy
+    depends_on: !override []
+
+  fmtm-db:
+    extends:
+      file: compose.yaml
+      service: fmtm-db
+
+  # Frontend tests may use electric, at some point
+  # electric:
+  #   extends:
+  #     file: compose.yaml
+  #     service: electric
+
+  central-db:
+    extends:
+      file: compose.yaml
+      service: central-db
+
+  migrations:
+    extends:
+      file: compose.yaml
+      service: migrations
+
+  # No need for scheduler during tests
+  scheduler:
+    extends:
+      file: compose.yaml
+      service: scheduler
