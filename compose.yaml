@@ -74,11 +74,6 @@ x-qfield-common-env: &qfield-common-env
   POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
   POSTGRES_HOST: qfield-db
   POSTGRES_PORT: 5432
-  GEODB_HOST: qfield-db
-  GEODB_PORT: 5432
-  GEODB_USER: ${FMTM_DB_USER:-fmtm}
-  GEODB_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
-  GEODB_DB: ${FMTM_DB_NAME:-fmtm}
   # EMAIL_HOST: ${EMAIL_HOST}
   # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
   # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
@@ -108,20 +103,6 @@ x-qfield-common: &qfield-common
     - fmtm-net
   restart: "unless-stopped"
   environment: *qfield-common-env
-  command:
-    - sh
-    - -c
-    - |
-      python manage.py migrate &&
-      python manage.py collectstatic --noinput &&
-      python manage.py createsuperuser --no-input || true &&
-      python manage.py compilemessages &&
-      exec gunicorn qfieldcloud.wsgi:application \
-        --bind 0.0.0.0:8000 \
-        --timeout 300 \
-        --max-requests 300 \
-        --workers 1 \
-        --threads 4
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
     start_period: 30s
@@ -625,6 +606,20 @@ services:
     ports:
       # In QField on desktop, double click Nyuki and enter http://localhost:8442
       - 8442:8000
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        python manage.py createsuperuser --no-input || true &&
+        python manage.py compilemessages &&
+        exec gunicorn qfieldcloud.wsgi:application \
+          --bind 0.0.0.0:8000 \
+          --timeout 300 \
+          --max-requests 300 \
+          --workers 1 \
+          --threads 4
 
   qfield-worker:
     <<: *qfield-common

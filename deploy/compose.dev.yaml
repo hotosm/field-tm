@@ -481,11 +481,6 @@ services:
   #     POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
   #     POSTGRES_HOST: qfield-db
   #     POSTGRES_PORT: 5432
-  #     GEODB_HOST: qfield-db
-  #     GEODB_PORT: 5432
-  #     GEODB_USER: ${FMTM_DB_USER:-fmtm}
-  #     GEODB_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
-  #     GEODB_DB: ${FMTM_DB_NAME:-fmtm}
   #     QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
   #     # FIXME add actual worker
   #     QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: http://localhost:8000
