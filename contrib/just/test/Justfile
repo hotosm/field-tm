@@ -213,9 +213,10 @@ backend-coverage:
 
   export TAG_OVERRIDE=ci-dev
   just build backend
-  docker compose up -d
 
-  docker rm --force backend-coverage-run 
+  # Cleanup any missed previous container
+  docker rm --force backend-coverage-run
+
   docker compose -f compose.test.yaml run \
     --name backend-coverage-run \
     --entrypoint="sh -c" \
