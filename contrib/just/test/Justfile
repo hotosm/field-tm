@@ -34,19 +34,16 @@ backend:
 # Test backend API only
 [no-cd]
 api:
-  docker compose up -d
   docker compose -f compose.test.yaml run --rm api pytest tests
 
 # Test osm-fieldwork package only
 [no-cd]
 osm-fieldwork:
-  docker compose up -d
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
 
 # Test area-splitter package only
 [no-cd]
 splitter:
-  docker compose up -d
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
 
 # Run all frontend tests
@@ -219,7 +216,7 @@ backend-coverage:
   docker compose up -d
 
   docker rm --force backend-coverage-run 
-  docker compose run \
+  docker compose -f compose.test.yaml run \
     --name backend-coverage-run \
     --entrypoint="sh -c" \
     api \
