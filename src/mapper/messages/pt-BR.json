@@ -76,7 +76,8 @@
 		"comment": "Comentário",
 		"instructions": "Instruções",
 		"activities": "Histórico de atividades",
-		"my_tasks": "Minhas tarefas"
+		"my_tasks": "Minhas tarefas",
+		"basemaps": "Mapas base"
 	},
 	"odk": {
 		"open": "Abrir ODK",
@@ -86,8 +87,7 @@
 		"manage": "Gerenciar mapas base",
 		"no_basemaps_available": "Não há mapas base disponíveis para este projeto.",
 		"ask_pm": "Por favor, solicite ao usuário responsável que crie mapas base.",
-		"show_on_map": "Mostrar no mapa",
-		"store_offline": "Armazenar offline",
+		"add_to_map_layers": "Adicionar às camadas do mapa",
 		"download_mbtiles": "Baixar MBTiles"
 	},
 	"project_info": {

@@ -29,7 +29,6 @@
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import QRCodeComponent from '$lib/components/qrcode.svelte';
-	// import OfflineComponent from '$lib/components/offline/index.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
 	import OdkWebFormsWrapper from '$lib/components/forms/wrapper.svelte';
@@ -472,9 +471,6 @@
 			{#if commonStore.selectedTab === 'events'}
 				<More projectData={project} zoomToTask={(taskId) => zoomToTask(taskId)}></More>
 			{/if}
-			<!-- {#if commonStore.selectedTab === 'offline'}
-				<OfflineComponent projectId={project.id} {project} />
-			{/if} -->
 			{#if commonStore.selectedTab === 'mytasks'}
 				<MyTasks zoomToTask={(taskId) => zoomToTask(taskId)} />
 			{/if}
@@ -543,9 +539,6 @@
 					<sl-icon name="list-task"></sl-icon>
 				</sl-tab>
 			{/if}
-			<!-- <sl-tab slot="nav" panel="offline">
-				<sl-icon name="wifi-off"></sl-icon>
-			</sl-tab> -->
 			{#if !commonStore.enableWebforms}
 				<sl-tab slot="nav" panel="qrcode">
 					<sl-icon name="qr-code"></sl-icon>
