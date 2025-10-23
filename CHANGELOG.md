@@ -1,5 +1,55 @@
 # Changelog
 
+## 2025.6.1 (2025-10-23)
+
+### Feat
+
+- **mapper**: add basemap loader to 'more' section for custom imagery
+- init qfield org and user at startup
+- **mapper**: allow mapper to view existing collected data from last submission (#2860)
+- **backend**: add option to include media in submission JSON download (#2823)
+- **backend**: save QField server creds (#2849)
+- **osm-fieldwork**: make the photo upload required=True or False (configurable)
+- **backend**: add endpoint to check if qfield cloud credentials are valid
+
+### Fix
+
+- **area-splitter**: remove accidentally added loguru dep to area-splitter db
+- **osm-fieldwork**: ensure start-geopoint question is removed from qfield xlsform
+- **qfield**: fix qfield worker wrapper (for processing qfield project file)
+- **package**: expose python package scripts to uv command runner
+- **backend**: QField Project creation fixes (#2864)
+- **qfield**: correct QFieldCloud credentials test endpoint to use QField instead of ODK
+- **qfield**: fix the redirect QFieldCloud URL.
+- **mapper**: allow setting primaryLocale on mapper frontend config
+- **createProject**: on qfield select and generate-project-data success, redirect user to qfield cloud dashboard (#2861)
+- **mapper**: ordering of dialogs to confirm mapping complete
+- **mapper**: make translations clearer for total features mapped checj
+- **mapper**: remove broken stamen black&white basemap
+- **mapper**: add translations for all map controls
+- **mapper**: add translations for all maplibre control tooltips
+- **mapper**: alignment of 'got it' button text in geolocation dialog
+- **mapper**: replace icons for new point and delete point
+- **mapper**: brazillian portuguese proceed translation all caps
+- **mapper**: add translation for project home page
+- **mapper**: add configurable tabTitle for mapper frontend (page title)
+- **mapper**: login dialog for private projects, if not logged in (#2852)
+- **mapper**: add clearer text highlighting for initial instructions
+- **backend**: do not error if featcol has no properties key multi --> single geom
+- **createProjectService**: throw error and stop project creation if any of the project creation apis fail (#2846)
+- **backend**: qfield geometry validation in project creation service
+- **backend**: comment out psycopg otel instrumentor for now
+- **backend**: remove psycopg opentelemetry instrumentation until fixed
+- **backend**: init of db on server startup
+- update init order for db pool initialisation
+- **backend**: init of loguru in the database init file
+
+### Refactor
+
+- **osm-fieldwork**: converted xlsforms to .yaml for better version control (#2865)
+- remove QFIELDCLOUD_ORG_NAME var
+- **qfield**: hide QFieldCloud password using secrets instead of plain text
+
 ## 2025.6.0 (2025-09-28)
 
 ### Feat
