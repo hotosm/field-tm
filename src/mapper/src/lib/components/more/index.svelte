@@ -4,11 +4,12 @@
 	import Comment from '$lib/components/more/comment.svelte';
 	import Activities from '$lib/components/more/activities.svelte';
 	import ProjectInfo from '$lib/components/more/project-info.svelte';
+	import Basemaps from '$lib/components/more/basemaps.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { APIProject, TaskEventType } from '$lib/types';
 	import { m } from '$translations/messages.js';
 
-	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info';
+	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info' | 'basemaps';
 
 	type stackGroupType = {
 		id: stackType;
@@ -44,6 +45,11 @@
 			id: 'activities',
 			icon: 'list-ul',
 			title: m['stack_group.activities'](),
+		},
+		{
+			id: 'basemaps',
+			icon: 'layers',
+			title: m['stack_group.basemaps'](),
 		},
 	];
 
@@ -147,4 +153,5 @@
 		<Activities {taskEvents} {zoomToTask} />
 	{/if}
 	{#if activeStack === 'project-info'}<ProjectInfo {projectData} />{/if}
+	{#if activeStack === 'basemaps'}<Basemaps projectId={projectData?.id} />{/if}
 </div>
