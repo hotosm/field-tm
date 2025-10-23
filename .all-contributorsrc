@@ -446,6 +446,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "allisonsibrian",
+      "name": "allison",
+      "avatar_url": "https://avatars.githubusercontent.com/u/114789954?v=4",
+      "profile": "https://github.com/allisonsibrian",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

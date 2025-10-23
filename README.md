@@ -238,6 +238,7 @@ Thanks goes to these wonderful people:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kafle33"><img src="https://avatars.githubusercontent.com/u/121845834?v=4?s=100" width="100px;" alt="Roshan Kafle"/><br /><sub><b>Roshan Kafle</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Kafle33" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://gareth.nz"><img src="https://avatars.githubusercontent.com/u/2064938?v=4?s=100" width="100px;" alt="Gareth Bowen"/><br /><sub><b>Gareth Bowen</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=garethbowen" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/allisonsibrian"><img src="https://avatars.githubusercontent.com/u/114789954?v=4?s=100" width="100px;" alt="allison"/><br /><sub><b>allison</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=allisonsibrian" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
