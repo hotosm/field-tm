@@ -13,7 +13,7 @@
 
 	import type { Basemap } from '$lib/map/basemaps';
 	import { getProjectBasemapStore } from '$store/common.svelte.ts';
-	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/map/basemaps';
+	import { loadOnlinePmtiles } from '$lib/map/basemaps';
 	import { m } from '$translations/messages.js';
 
 	interface Props {
@@ -24,18 +24,9 @@
 	let { projectId, children }: Props = $props();
 	const basemapStore = getProjectBasemapStore();
 	let selectedBasemap: Basemap | null = $state(null);
-	let pmtilesDownloadProgress = $state(0);
 
 	// Reactive variables
 	let basemapsAvailable: boolean = $derived(basemapStore.projectBasemaps && basemapStore.projectBasemaps.length > 0);
-
-	function downloadPmtilesWithProgress() {
-		pmtilesDownloadProgress = 0;
-
-		writeOfflinePmtiles(projectId, selectedBasemap?.url, (percent) => {
-			pmtilesDownloadProgress = percent;
-		});
-	}
 
 	onMount(() => {
 		basemapStore.refreshBasemaps(projectId);
@@ -92,27 +83,8 @@
 			class="button"
 		>
 			<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
-			<span>{m['basemaps.show_on_map']()}</span>
+			<span>{m['basemaps.add_to_map_layers']()}</span>
 		</sl-button>
-
-		<sl-button
-			onclick={() => downloadPmtilesWithProgress()}
-			onkeydown={(e: KeyboardEvent) => {
-				if (e.key === 'Enter') downloadPmtilesWithProgress();
-			}}
-			role="button"
-			tabindex="0"
-			size="small"
-			class="button"
-		>
-			<sl-icon slot="prefix" name="download" class="icon"></sl-icon>
-			<span>{m['basemaps.store_offline']()}</span>
-		</sl-button>
-
-		<!-- Offline download progress bar -->
-		<div class="progress-container">
-			<sl-progress-bar value={pmtilesDownloadProgress}></sl-progress-bar>
-		</div>
 
 		<!-- Download Mbtiles Button -->
 	{:else if selectedBasemap && selectedBasemap.format === 'mbtiles'}

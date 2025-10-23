@@ -76,7 +76,8 @@
 		"comment": "Comment",
 		"instructions": "Instructions",
 		"activities": "Activities",
-		"my_tasks": "My Tasks"
+		"my_tasks": "My Tasks",
+		"basemaps": "Basemaps"
 	},
 	"odk": {
 		"open": "Open ODK",
@@ -86,8 +87,7 @@
 		"manage": "Manage Basemaps",
 		"no_basemaps_available": "There are no basemaps available for this project.",
 		"ask_pm": "Please ask the project manager to create basemaps.",
-		"show_on_map": "Show on Map",
-		"store_offline": "Store Offline",
+		"add_to_map_layers": "Add To Map Layers",
 		"download_mbtiles": "Download MBTiles"
 	},
 	"project_info": {
