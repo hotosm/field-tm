@@ -61,8 +61,8 @@ jobs:
 
       - name: Run Tests With Coverage
         run: |
-          docker compose up -d
-          docker compose run --entrypoint "sh -c" \
+          docker compose -f compose.test.yaml up -d
+          docker compose -f compose.test.yaml run --entrypoint "sh -c" \
             --volume ${{ github.workspace }}/coverage:/tmp/coverage api \
             "coverage run -m pytest \
             && coverage report && coverage html \
