@@ -314,6 +314,7 @@ def parse_and_validate_extent(extent_str: str) -> list[float]:
     except (ValueError, AttributeError) as e:
         raise ValueError(f"Invalid extent format: {e}")
 
+
 def set_project_file_permissions(project_path: str | Path) -> None:
     """Set permissive 777 permissions for upstream file access."""
     project_path = Path(project_path)
@@ -398,10 +399,111 @@ def xlsform_to_project(
     return converter.convert(str(final_output_dir))
 
 
+def configure_task_layer_style(task_layer: "qgis.core.QgsLayer", log: logging.Logger) -> None:
+    """Configure the tasks layer in QGIS."""
+    pass
+    # from qgis.core import (
+    #     QgsFillSymbol,
+    #     QgsPalLayerSettings,
+    #     QgsTextFormat,
+    #     QgsTextBufferSettings,
+    #     QgsVectorLayerSimpleLabeling,
+    # )
+    # from qgis.PyQt.QtGui import QColor, QFont
+
+    # task_layer = task_layer[0]
+    # log.info("Styling tasks layer")
+    
+    # # Create fill symbol with light blue stroke and grey semi-transparent fill
+    # symbol = QgsFillSymbol.createSimple({
+    #     'color': '128,128,128,77',  # Grey with 0.3 opacity (77/255 ≈ 0.3)
+    #     'outline_color': '173,216,230,255',  # Light blue
+    #     'outline_style': 'solid',
+    #     'outline_width': '0.5',
+    #     'style': 'solid'
+    # })
+    
+    # task_layer.renderer().setSymbol(symbol)
+    
+    # # Configure labels for task_id
+    # label_settings = QgsPalLayerSettings()
+    # label_settings.fieldName = 'task_id'
+    # label_settings.enabled = True
+    
+    # # Text format
+    # text_format = QgsTextFormat()
+    # text_format.setSize(12)
+    # font = QFont()
+    # font.setBold(True)
+    # text_format.setFont(font)
+    # text_format.setColor(QColor(0, 0, 0))  # Black text
+    
+    # # Add text buffer for better visibility
+    # buffer_settings = QgsTextBufferSettings()
+    # buffer_settings.setEnabled(True)
+    # buffer_settings.setSize(1)
+    # buffer_settings.setColor(QColor(255, 255, 255))  # White buffer
+    # text_format.setBuffer(buffer_settings)
+    
+    # label_settings.setFormat(text_format)
+    
+    # # Center placement
+    # label_settings.placement = QgsPalLayerSettings.OverPoint
+    # label_settings.centroidInside = True
+    # label_settings.centroidWhole = True
+    
+    # # Apply labeling
+    # labeling = QgsVectorLayerSimpleLabeling(label_settings)
+    # task_layer.setLabeling(labeling)
+    # task_layer.setLabelsEnabled(True)
+    
+    # task_layer.triggerRepaint()
+   
+
+def configure_survey_layer_style(survey_layer: "qgis.core.QgsLayer", log: logging.Logger) -> None:
+    """Configure the survey layer in QGIS."""
+    pass
+    # from qgis.core import (
+    #     QgsFillSymbol,
+    # )
+
+    # survey_layer = survey_layer[0]
+    # log.info("Styling survey/features layer")
+    
+    # # Create fill symbol with purple fill and no stroke
+    # symbol = QgsFillSymbol.createSimple({
+    #     'color': '128,0,128,255',  # Purple
+    #     'outline_style': 'no',  # No stroke
+    #     'style': 'solid'
+    # })
+    
+    # survey_layer.renderer().setSymbol(symbol)
+    # survey_layer.triggerRepaint() 
+
+
 def configure_project_settings(qgis_project: "qgis.core.QgsProject", log: logging.Logger) -> None:
     """Configure the QField project for field mapping."""
     log.info("Configuring QField project settings for field mapping")
-    # qgis_project
+    
+    # Configure tasks layer
+    task_layers = qgis_project.mapLayersByName("tasks")
+    if task_layers:
+        configure_task_layer_style(qgis_project, log)
+        log.info("Tasks layer styled successfully")
+    else:
+        log.warning("Tasks layer not found in project")
+    
+    
+    # Configure features layer (survey layer with purple fill, no stroke)
+    survey_layers = qgis_project.mapLayersByName("survey")
+    if survey_layers:
+        configure_survey_layer_style(qgis_project, log)
+        log.info("Survey/features layer styled successfully")
+    else:
+        log.warning("Survey layer not found in project")
+    
+    # Save project changes
+    qgis_project.write()
 
 
 def generate_qgis_project(project_dir: str, title: str, language: str, extent: str, log: logging.Logger) -> Dict[str, Any]:
