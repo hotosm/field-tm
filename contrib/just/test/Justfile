@@ -32,6 +32,7 @@ backend:
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest
+  docker compose -f compose.test.yaml down
 
 # Test backend API only
 [no-cd]
@@ -39,6 +40,7 @@ api:
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest tests
+  docker compose -f compose.test.yaml down
 
 # Test osm-fieldwork package only
 [no-cd]
@@ -46,6 +48,7 @@ osm-fieldwork:
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
+  docker compose -f compose.test.yaml down
 
 # Test area-splitter package only
 [no-cd]
@@ -53,6 +56,7 @@ splitter:
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
+  docker compose -f compose.test.yaml down
 
 # Run all frontend tests
 [no-cd]
@@ -241,6 +245,7 @@ backend-coverage:
   docker cp backend-coverage-run:/opt/htmlcov/index.html coverage/coverage.html
   docker cp backend-coverage-run:/opt/coverage.svg coverage/coverage.svg
   docker rm backend-coverage-run
+  docker compose -f compose.test.yaml down
 
 # Upload coverage report to gh-pages
 [no-cd]
