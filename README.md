@@ -142,7 +142,7 @@ various deployment guides.
 | ✅ | 🖥️ optional private projects to restrict access | Since [v2025.2.0][4] |
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
-| ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], removed[8] |
+| ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ editing of submissions marked bad by the project manager | – |
