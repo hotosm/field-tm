@@ -142,7 +142,7 @@ various deployment guides.
 | ✅ | 🖥️ optional private projects to restrict access | Since [v2025.2.0][4] |
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
-| ✅ | 📱 fully offline field mapping (local-first design) | Since [v2025.3.0][7] |
+| ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], removed[8] |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ editing of submissions marked bad by the project manager | – |
@@ -268,3 +268,4 @@ Thanks goes to these wonderful people:
 [5]: https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image"
 [6]: https://raw.githubusercontent.com/hotosm/field-tm/dev/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
+[8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
