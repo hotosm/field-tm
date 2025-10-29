@@ -21,6 +21,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   uploadedAOIFile: undefined,
   outline: undefined,
   outlineArea: undefined,
+  proceedWithLargeOutlineArea: false,
   organisation_name: '',
   merge: true,
 
