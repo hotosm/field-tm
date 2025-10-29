@@ -740,8 +740,8 @@ def generate_project_basemap(
         # ESRI uses inverted zyx convention
         # the ordering is extracted automatically from the URL, else use
         # -inverted-y param
-        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
-        tile_format = "png"
+        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
+        tile_format = "jpeg"
     elif source == "bing":
         # FIXME this probably doesn't work
         tms_url = "http://ecn.t0.tiles.virtualearth.net/tiles/h{z}/{x}/{y}.jpg?g=129&mkt=en&stl=H"
@@ -798,6 +798,7 @@ def generate_project_basemap(
             "mbtiles",  # options: mbtiles or disk
             "-mbtiles-format",
             f"{tile_format}",
+            "-ensure-gzip=false",
             "-tileset-name",
             f"fmtm_{project_id}_{source}tiles",
         ]
