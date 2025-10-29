@@ -84,7 +84,7 @@ async def download_template(
     xlsx_bytes = convert_to_xlsform(str(xlsform_path))
     if xlsx_bytes:
         return StreamingResponse(
-            xlsx_bytes,
+            BytesIO(xlsx_bytes),
             media_type=(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ),
