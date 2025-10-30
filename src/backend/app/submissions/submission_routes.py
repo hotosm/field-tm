@@ -367,7 +367,9 @@ async def submission_table(
     if filter_clauses:
         filters["$filter"] = " and ".join(filter_clauses)
 
-    data = await submission_crud.get_submission_by_project(project, filters)
+    data = await submission_crud.get_submission_by_project(
+        project, filters, expand=False
+    )
 
     submissions = data.get("value", [])
 
