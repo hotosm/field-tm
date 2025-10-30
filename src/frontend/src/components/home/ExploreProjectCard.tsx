@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
-import defaultOrgLogo from '@/assets/images/project_icon.png';
 import AssetModules from '@/shared/AssetModules';
 import StatusChip from '@/components/common/StatusChip';
-import { project_status } from '@/types/enums';
+import { field_mapping_app, project_status } from '@/types/enums';
 import type { projectSummaryType } from '@/types';
+import defaultOrgLogo from '@/assets/images/project_icon.png';
+import QfieldLogo from '@/assets/images/qfield-logo.svg';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -18,6 +19,11 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {
+    if (data.field_mapping_app !== field_mapping_app.FieldTM) {
+      // FIXME: After external_link field set on backend, redirect to external link replacing dummmy link
+      window.open('https://qfield.cloud/', '_blank');
+      return;
+    }
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile && data.status !== project_status.DRAFT) {
       // Redirect to mapper frontend on mobile
@@ -48,9 +54,14 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
               <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
             )}
 
-            {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
-              <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
-            )}
+            <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+              {data.status !== project_status.DRAFT && data.field_mapping_app === field_mapping_app.QField && (
+                <img src={QfieldLogo} className="fmtm-h-5 fmtm-max-h-5" alt="qfield logo" />
+              )}
+              {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
+                <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
+              )}
+            </div>
           </div>
           <div className="fmtm-my-3">
             <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mb-1">
