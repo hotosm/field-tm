@@ -40,7 +40,7 @@ const MapData = () => {
       value: data_extract_type.OSM,
       label: 'Fetch data from OSM',
       disabled:
-        values.outlineArea && +values.outlineArea?.split(' ')?.[0] && values.outlineArea?.split(' ')[1] === 'km²',
+        values.outlineArea && +values.outlineArea?.split(' ')?.[0] > 200 && values.outlineArea?.split(' ')[1] === 'km²',
     },
     { name: 'data_extract', value: data_extract_type.CUSTOM, label: 'Upload custom map data' },
     { name: 'data_extract', value: data_extract_type.NONE, label: 'No existing data' },
