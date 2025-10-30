@@ -255,6 +255,7 @@ class ProjectSummary(BaseModel):
     short_description: Optional[str] = None
     status: Optional[ProjectStatus] = None
     visibility: Optional[ProjectVisibility] = None
+    field_mapping_app: Optional[FieldMappingApp] = None
 
     # Calculated
     organisation_logo: Optional[str] = None
