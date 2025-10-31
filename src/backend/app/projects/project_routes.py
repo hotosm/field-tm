@@ -154,6 +154,7 @@ async def read_project_summaries(
     search: Optional[str] = None,
     minimal: bool = False,
     status: ProjectStatus = None,
+    field_mapping_app: Optional[FieldMappingApp] = None
 ):
     """Get a paginated summary of projects.
 
@@ -170,6 +171,7 @@ async def read_project_summaries(
         search,
         minimal,
         status,
+        field_mapping_app,
     )
 
 
