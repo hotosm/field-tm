@@ -129,11 +129,13 @@ const ProjectOverview = () => {
       dispatch(
         CommonActions.SetSnackBar({
           message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+          duration: 10000,
         }),
       );
     } else if (area > 100) {
       dispatch(
         CommonActions.SetSnackBar({
+          duration: 10000,
           message: 'The project area exceeded over 100 Sq.KM.',
           variant: 'warning',
         }),
