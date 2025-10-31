@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025.6.2 (2025-10-31)
+
+### Fix
+
+- **submission**: handle repeat group questions response on submission table (#2885)
+- **basemap**: disable gzip compression and set correct tile format for tile generation (#2882)
+
 ## 2025.6.1 (2025-10-23)
 
 ### Feat
