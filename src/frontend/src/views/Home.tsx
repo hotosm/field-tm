@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import { useAppSelector } from '@/types/reduxTypes';
-import { project_status } from '@/types/enums';
+import type { field_mapping_app as field_mapping_app_type, project_status } from '@/types/enums';
 import { useGetProjectSummariesQuery } from '@/api/project';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
@@ -15,6 +15,7 @@ type filterType = {
   results_per_page: number;
   search: string;
   status: project_status | undefined;
+  field_mapping_app: field_mapping_app_type | undefined;
 };
 
 const initialData = {
@@ -38,6 +39,7 @@ const Home = () => {
     page: 1,
     results_per_page: 12,
     search: '',
+    field_mapping_app: undefined,
     status: undefined,
   });
   const [searchTextData, handleChangeData] = useDebouncedInput({
@@ -66,6 +68,8 @@ const Home = () => {
           filter={{
             searchText: searchTextData,
             onSearch: handleChangeData,
+            fieldMappingApp: filter.field_mapping_app,
+            onFieldMappingAppChange: (value) => setFilter({ ...filter, field_mapping_app: value, page: 1 }),
             status: filter.status,
             onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
           }}

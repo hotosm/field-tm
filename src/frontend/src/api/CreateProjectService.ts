@@ -167,18 +167,25 @@ export const CreateProjectService = (
 
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'Project Generation Completed. Redirecting...',
+          message: `Project created successfully. ${
+            projectData.field_mapping_app !== field_mapping_app.FieldTM
+              ? `The QFieldCloud project dashboard has been opened in a new tab. You can also access it anytime using this link: ${generateProjectDataResponse}`
+              : 'Redirecting...'
+          }`,
           variant: 'success',
-          duration: 5000,
+          duration: projectData.field_mapping_app !== field_mapping_app.FieldTM ? 10000 : 5000,
         }),
       );
+
+      if (projectData.field_mapping_app === field_mapping_app.QField)
+        window.open(generateProjectDataResponse, '_blank');
 
       // Add 5-second delay to allow backend Entity generation to catch up
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(5000);
 
       if (projectData.field_mapping_app === field_mapping_app.QField && !!generateProjectDataResponse) {
-        window.location.href = generateProjectDataResponse;
+        navigate(`/explore`);
       } else {
         navigate(`/project/${id}`);
       }

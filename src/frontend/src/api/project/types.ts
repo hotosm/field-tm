@@ -160,6 +160,7 @@ export type projectSummaryType = {
   short_description: string;
   status: project_status;
   visibility: project_visibility;
+  field_mapping_app: field_mapping_app;
   organisation_logo: string | null;
   centroid: Point;
   total_tasks: number;
