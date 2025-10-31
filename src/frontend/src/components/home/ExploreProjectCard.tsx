@@ -33,7 +33,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {
-    if (data.field_mapping_app !== field_mapping_app.FieldTM) {
+    if (data.field_mapping_app !== field_mapping_app.FieldTM && data.status !== project_status.DRAFT) {
       // FIXME: After external_link field set on backend, redirect to external link replacing dummmy link
       window.open('https://qfield.cloud/', '_blank');
       return;
@@ -57,7 +57,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   return (
     <Tooltip
       title={
-        data.field_mapping_app !== field_mapping_app.FieldTM
+        data.field_mapping_app !== field_mapping_app.FieldTM && data.status !== project_status.DRAFT
           ? `Open project in ${fieldMappingAppNameMap[data.field_mapping_app]}`
           : ''
       }
