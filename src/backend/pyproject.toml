@@ -75,7 +75,7 @@ test = [
     "coverage-badge==1.1.2",
 ]
 debug = [
-    "debugpy==1.8.16",
+    "debugpy==1.8.17",
 ]
 docs = [
     "mkdocs==1.6.1",
