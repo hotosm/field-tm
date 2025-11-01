@@ -115,7 +115,7 @@ importers:
         version: 4.0.36(ol@8.2.0)
       ol-layerswitcher:
         specifier: ^4.1.1
-        version: 4.1.1(ol@8.2.0)
+        version: 4.1.2(ol@8.2.0)
       ol-pmtiles:
         specifier: ^1.0.2
         version: 1.0.2(ol@8.2.0)
@@ -3134,8 +3134,8 @@ packages:
     peerDependencies:
       ol: '>= 5.3.0'
 
-  ol-layerswitcher@4.1.1:
-    resolution: {integrity: sha512-uqIqZCr/23GoOIOl2T1iPzcVBPweJZgkVHTrn8DLNCa3cCuX+aJzz0DhkA+qJjm5NqXO5uCvB7zpk9vWtRWmsQ==}
+  ol-layerswitcher@4.1.2:
+    resolution: {integrity: sha512-yF1iNqPKWr7AcsIWnr5He+T/J4X3qdce7qr8QUi/5Xyjo6uFjVvVijdAhMwiNfJrBNh9JhrXeDSl+1/cTT58KA==}
     peerDependencies:
       ol: '>=5.0.0'
 
@@ -7437,7 +7437,7 @@ snapshots:
     dependencies:
       ol: 8.2.0
 
-  ol-layerswitcher@4.1.1(ol@8.2.0):
+  ol-layerswitcher@4.1.2(ol@8.2.0):
     dependencies:
       ol: 8.2.0
 
