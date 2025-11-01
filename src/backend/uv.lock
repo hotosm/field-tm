@@ -573,7 +573,7 @@ requires-dist = [
     { name = "tldextract", specifier = "==5.3.0" },
     { name = "uvicorn", specifier = "==0.34.2" },
     { name = "uvloop", specifier = "==0.21.0" },
-    { name = "yxf", git = "https://github.com/spwoodcock/yxf.git?rev=feat%2Fin-memory-processing" },
+    { name = "yxf", git = "https://github.com/spwoodcock/yxf.git?rev=8cdb6a67427b8729b564de69fa68085dc84c9443" },
 ]
 
 [package.metadata.requires-dev]
@@ -2419,8 +2419,8 @@ wheels = [
 
 [[package]]
 name = "yxf"
-version = "1.0.0"
-source = { git = "https://github.com/spwoodcock/yxf.git?rev=feat%2Fin-memory-processing#9d2892cecc5230535193e5acd44f7f55eeb89b58" }
+version = "0.5.1"
+source = { git = "https://github.com/spwoodcock/yxf.git?rev=8cdb6a67427b8729b564de69fa68085dc84c9443#8cdb6a67427b8729b564de69fa68085dc84c9443" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "openpyxl" },

@@ -157,7 +157,7 @@ write-changes = true
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
-yxf = { git = "https://github.com/spwoodcock/yxf.git", rev = "feat/in-memory-processing"}
+yxf = { git = "https://github.com/spwoodcock/yxf.git", rev = "8cdb6a67427b8729b564de69fa68085dc84c9443"}
 
 [tool.uv.workspace]
 members = ["packages/*"]
