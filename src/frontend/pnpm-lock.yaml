@@ -112,7 +112,7 @@ importers:
         version: 8.2.0
       ol-ext:
         specifier: ^4.0.11
-        version: 4.0.11(ol@8.2.0)
+        version: 4.0.36(ol@8.2.0)
       ol-layerswitcher:
         specifier: ^4.1.1
         version: 4.1.1(ol@8.2.0)
@@ -3129,8 +3129,8 @@ packages:
     resolution: {integrity: sha512-yBYjY9QX2hnRmZHAjG/f13MzmBzxzYgQhFrke06TTyKY5zSTEqkOeukBzIdVA3j3ulu8Qa3MbVFShV7T2RmGtQ==}
     engines: {node: '>= 0.4'}
 
-  ol-ext@4.0.11:
-    resolution: {integrity: sha512-zorUn71RsahiA/kbf+tRDbv19wqdLCclxd3gkjsFMnqCbdgl+P59CSJCqMO4O7b2bvaHrw5FEmep7FNFnGGQXg==}
+  ol-ext@4.0.36:
+    resolution: {integrity: sha512-CyOk2PmCpY4xjKNeFahEmYCeWugs1LYiU/msXwGN8mYN/uT9TP//ZxyuBUskUzzfI3S0nw6/ONG3a34ZTWCi1w==}
     peerDependencies:
       ol: '>= 5.3.0'
 
@@ -7433,7 +7433,7 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.0.0
 
-  ol-ext@4.0.11(ol@8.2.0):
+  ol-ext@4.0.36(ol@8.2.0):
     dependencies:
       ol: 8.2.0
 
