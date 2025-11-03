@@ -95,3 +95,38 @@
 .ol-attribution {
   display: none !important;
 } /*# sourceMappingURL=map.css.map */
+
+.ol-search {
+  left: 0.5rem !important;
+}
+.ol-search.ol-control {
+  background-color: transparent;
+}
+.ol-search.ol-control button {
+  border-radius: 5px;
+  border: 0px !important;
+}
+.ol-search.ol-control button:focus {
+  border: 0px !important;
+  background-color: #f3f4f6 !important;
+}
+.ol-search.ol-control button:hover {
+  background-color: #f3f4f6 !important;
+  border: 0px !important;
+}
+.ol-search input {
+  outline: none;
+  margin: 0px 0px 0px 4px !important;
+  height: 1.6em !important;
+  border-radius: 5px;
+}
+.ol-search ul {
+  color: #333;
+  font-size: 0.85em;
+  max-width: 21em;
+}
+.ol-search ul i {
+  display: block;
+  color: #333;
+  font-size: 0.85em;
+}

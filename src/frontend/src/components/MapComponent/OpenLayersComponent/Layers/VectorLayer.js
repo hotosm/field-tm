@@ -8,7 +8,7 @@ import { Vector as VectorSource } from 'ol/source';
 import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { isExtentValid } from '@/components/MapComponent/OpenLayersComponent/helpers/layerUtils';
-import { Draw, Modify, Snap, Select, defaults as defaultInteractions } from 'ol/interaction.js';
+import { Draw, Modify, Select } from 'ol/interaction.js';
 import { getArea } from 'ol/sphere';
 import { valid } from 'geojson-validation';
 import Point from 'ol/geom/Point.js';
@@ -432,13 +432,6 @@ const VectorLayer = ({
     getAOIArea(area);
   }, [vectorLayer, getAOIArea]);
 
-  // ROTATE MAP ACCORDING TO ORIENTATION
-  // useEffect(() => {
-  //   if (!map) return;
-  //   if (rotation) {
-  //     map.getView().setRotation(rotation);
-  //   }
-  // }, [rotation, map]);
   return null;
 };
 
