@@ -34,7 +34,8 @@ CREATE TABLE clusteredbuildings AS (
             *,
             ST_CLUSTERKMEANS(
                 geom,
-                CAST((numfeatures / %(num_buildings)s) + 1 AS integer)
+                CAST(CEIL(numfeatures / CAST(%(num_buildings)s AS float))
+                     AS integer)
             )
                 OVER (PARTITION BY polyid)
             AS cid
