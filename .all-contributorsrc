@@ -455,6 +455,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "amitdkhan-pg",
+      "name": "Amit Khanekar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/64206751?v=4",
+      "profile": "https://amitdkhan-pg.blogspot.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
