@@ -1,5 +1,22 @@
 # Changelog
 
+## 2025.6.3 (2025-11-07)
+
+## 2025.7.0 (2025-11-07)
+
+### Feat
+
+- **frontend**: search location feature on map (#2888)
+
+### Fix
+
+- **DbOdkEntities**: adjust default batch size and dynamically compute maximum batch size (#2902)
+- **area-splitter**: issue when splitting by buildings=1 (#2899)
+- **submission**: handle repeat group questions response on submission table (#2885)
+- **basemap**: disable gzip compression and set correct tile format for tile generation (#2882)
+- wrap xlsx_bytes in BytesIO for streaming response (#2881)
+- **create-project**: show warning dialog if area size >200-1000 sqkm and restrice project creation if area size >1000 sqkm (#2879)
+
 ## 2025.6.2 (2025-10-31)
 
 ### Fix
