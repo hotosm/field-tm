@@ -97,6 +97,9 @@ def _get_mandatory_fields(
     Returns:
         List of field definitions for the form
     """
+    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#aaaaaa', '#00ff00'))"
+    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#888888', '#00cc00'))"
+
     status_field_calculation = f"if({FEATURE} != '', 2, "
     if need_verification_fields:
         status_field_calculation += "if(${feature_exists} = 'no', 6, "
@@ -244,6 +247,46 @@ def _get_mandatory_fields(
             "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, 'svcfmtm')" if use_odk_collect else "''",
             "save_to": "created_by",
         },
+        {
+            "type": "calculate",
+            "name": "fill",
+            "notes": "Polygon fill color based on mapping status",
+            "label::english(en)": "Fill Color",
+            "appearance": "minimal",
+            "calculation": color_calc,
+            "save_to": "fill",
+            "default": "#aaaaaa",
+        },
+        {
+            "type": "calculate",
+            "name": "marker-color",
+            "notes": "Point marker color based on mapping status",
+            "label::english(en)": "Marker Color",
+            "appearance": "minimal",
+            "calculation": color_calc,
+            "save_to": "marker-color",
+            "default": "#aaaaaa",
+        },
+        {
+            "type": "calculate",
+            "name": "stroke",
+            "notes": "Line/Polygon border color based on mapping status",
+            "label::english(en)": "Stroke Color",
+            "appearance": "minimal",
+            "calculation": stroke_calc,
+            "save_to": "stroke",
+            "default": "#aaaaaa",
+        },
+        {
+            "type": "calculate",
+            "name": "stroke-width",
+            "notes": "Line/Polygon stroke thickness",
+            "label::english(en)": "Stroke Width",
+            "appearance": "minimal",
+            "calculation": "6",
+            "save_to": "stroke-width",
+            "default": "6",
+        }
     ])
     if need_verification_fields:
         fields.append(add_label_translations({

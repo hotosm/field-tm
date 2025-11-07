@@ -139,7 +139,7 @@ RESERVED_KEYS = {
     "label",
     "uuid",
 }  # Add any other reserved keys of odk central in here as needed
-ALLOWED_PROPERTY_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
+ALLOWED_PROPERTY_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 
 def is_valid_property_name(name: str) -> bool:

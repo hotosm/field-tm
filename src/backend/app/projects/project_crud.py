@@ -452,6 +452,18 @@ async def generate_odk_central_project_content(
             task_extract_dict
         )
 
+    default_style = {
+        "fill": "#aaaaaa",
+        "marker-color": "#aaaaaa",
+        "stroke": "#aaaaaa",
+        "stroke-width": "6",
+    }
+
+    for entity in entities_list:
+        data = entity["data"]
+        for key, value in default_style.items():
+            data.setdefault(key, value)
+
     log.debug("Creating project ODK dataset named 'features'")
     await central_crud.create_entity_list(
         odk_credentials,
@@ -511,7 +523,14 @@ async def generate_project_files(
         if first_feature and "properties" in first_feature:  # Check if properties exist
             # FIXME perhaps this should be done in the SQL code?
             entity_properties = list(first_feature["properties"].keys())
-            for field in ["submission_ids", "created_by"]:
+            for field in [
+                "submission_ids",
+                "created_by",
+                "fill",
+                "marker-color",
+                "stroke",
+                "stroke-width",
+            ]:
                 if field not in entity_properties:
                     entity_properties.append(field)
 
