@@ -142,12 +142,15 @@ various deployment guides.
 | ✅ | 🖥️ optional private projects to restrict access | Since [v2025.2.0][4] |
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
-| ✅ | 📱 fully offline field mapping (local-first design) | Since [v2025.3.0][7] |
+| ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
+| 🔄 | 🖥️ integration with QField | – |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ editing of submissions marked bad by the project manager | – |
 | 📅 | 🖥️ reduced resource usage of FieldTM on mobile devices | – |
-| 📅 | 🖥️ integration with other mobile apps: EveryDoor, StreetComplete | – |
+| 📅 | 🖥️ integration with OSM mobile apps: EveryDoor, StreetComplete | – |
+| 📅 | 🖥️ integration with ChatMap | – |
+| 📅 | 🖥️ integration with HeiGIT Sketch Map Tool | – |
 | 📅 | 🖥️ integration with other ODK server types: Ona.io, Kobo | – |
 | 📅 | 🖥️ multiple approaches to task splitting algorithm | – |
 | 📅 | 🖥️ improvements to the validation criteria and workflow | – |
@@ -239,6 +242,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kafle33"><img src="https://avatars.githubusercontent.com/u/121845834?v=4?s=100" width="100px;" alt="Roshan Kafle"/><br /><sub><b>Roshan Kafle</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Kafle33" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://gareth.nz"><img src="https://avatars.githubusercontent.com/u/2064938?v=4?s=100" width="100px;" alt="Gareth Bowen"/><br /><sub><b>Gareth Bowen</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=garethbowen" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/allisonsibrian"><img src="https://avatars.githubusercontent.com/u/114789954?v=4?s=100" width="100px;" alt="allison"/><br /><sub><b>allison</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=allisonsibrian" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://amitdkhan-pg.blogspot.com"><img src="https://avatars.githubusercontent.com/u/64206751?v=4?s=100" width="100px;" alt="Amit Khanekar"/><br /><sub><b>Amit Khanekar</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=amitdkhan-pg" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
@@ -268,3 +272,4 @@ Thanks goes to these wonderful people:
 [5]: https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image"
 [6]: https://raw.githubusercontent.com/hotosm/field-tm/dev/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
+[8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
