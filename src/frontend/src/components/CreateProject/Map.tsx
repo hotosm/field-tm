@@ -5,8 +5,10 @@ import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLaye
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import SearchLocation from '@/components/MapComponent/OpenLayersComponent/Search';
 import { DrawnGeojsonTypes, GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
 import MapControls from './MapControls';
+import { useParams } from 'react-router-dom';
 
 type propsType = {
   drawToggle?: boolean;
@@ -31,6 +33,9 @@ const Map = ({
   toggleEdit,
   setToggleEdit,
 }: propsType) => {
+  const params = useParams();
+  const projectId = params.id;
+
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
     zoom: 1,
@@ -49,9 +54,9 @@ const Map = ({
           width: '100%',
         }}
       >
-        <LayerSwitcherControl visible={'osm'} />
+        <LayerSwitcherControl visible={'osm'} map={map} />
         <MapControls map={map} toggleEdit={toggleEdit} setToggleEdit={setToggleEdit} />
-
+        {!projectId && <SearchLocation />}
         {isDrawOrGeojsonFile && !splitGeojson && (
           <VectorLayer
             geojson={aoiGeojson}

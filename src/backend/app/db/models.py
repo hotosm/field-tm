@@ -2145,7 +2145,7 @@ class DbOdkEntities(BaseModel):
         db: Connection,
         project_id: int,
         entities: list[Self],
-        batch_size: int = 10000,
+        batch_size: int = 8000,
     ) -> bool:
         """Update or insert Entity data in batches, with statuses.
 
@@ -2158,6 +2158,11 @@ class DbOdkEntities(BaseModel):
         Returns:
             bool: Success or failure.
         """
+        # dynamically compute batch size
+        no_of_column = 8
+        max_batch_size = 65000 // no_of_column
+        batch_size = min(batch_size, max_batch_size)
+
         log.info(
             f"Updating Field-TM database Entities for project {project_id} "
             f"with ({len(entities)}) features in batches of {batch_size}"
@@ -2173,7 +2178,6 @@ class DbOdkEntities(BaseModel):
                     osm_id, submission_ids, geometry, created_by)
                 VALUES
             """
-
             # Prepare data for batch insert
             values = []
             data = {}
@@ -2221,7 +2225,6 @@ class DbOdkEntities(BaseModel):
                 RETURNING True;
             """
             )
-
             async with db.cursor() as cur:
                 await cur.execute(sql, data)
                 batch_result = await cur.fetchall()
@@ -2230,7 +2233,6 @@ class DbOdkEntities(BaseModel):
                         f"Batch failed at batch {batch_start} for project {project_id}"
                     )
                 result.extend(batch_result)
-
         return bool(result)
 
     @classmethod

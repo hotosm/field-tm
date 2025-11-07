@@ -49,11 +49,11 @@ dependencies = [
     "markdown==3.8",
     "tldextract==5.3.0",
     "qfieldcloud-sdk==0.10.0",
-    "osm-fieldwork",
-    "area-splitter",
     "osm-login-python==2.0.0",
     "pg-nearest-city==0.2.1",
-    "raw-data-api-py>=0.3.0",
+    "raw-data-api-py==0.3.0",
+    "osm-fieldwork",
+    "area-splitter",
     "pyodk",
     "yxf",
 ]
@@ -75,7 +75,7 @@ test = [
     "coverage-badge==1.1.2",
 ]
 debug = [
-    "debugpy==1.8.16",
+    "debugpy==1.8.17",
 ]
 docs = [
     "mkdocs==1.6.1",

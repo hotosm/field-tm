@@ -61,12 +61,9 @@ export const odkCredentialsValidationSchema = z
   });
 
 export const projectTypeSelectorValidationSchema = z.object({
-  field_mapping_app: z
-    .enum(field_mapping_app)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Field Mapping App must be selected',
-    }),
+  field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
+    message: 'Field Mapping App must be selected',
+  }),
 });
 
 export const projectOverviewValidationSchema = z
@@ -97,9 +94,12 @@ export const projectOverviewValidationSchema = z
       message: 'Project AOI is required',
     }),
     outlineArea: z.string().optional(),
+    proceedWithLargeOutlineArea: z.boolean(),
     organisation_name: z.string(),
     merge: z.boolean(),
-    field_mapping_app: z.enum(field_mapping_app),
+    field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
+      message: 'Field Mapping App must be selected',
+    }),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -132,6 +132,20 @@ export const projectOverviewValidationSchema = z
         input: values.outlineArea,
         path: ['outlineArea'],
         message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+        code: 'custom',
+      });
+    }
+    if (
+      !values.id &&
+      values.outlineArea &&
+      +values.outlineArea?.split(' ')?.[0] > 200 &&
+      values.outlineArea?.split(' ')[1] === 'km²' &&
+      !values.proceedWithLargeOutlineArea
+    ) {
+      ctx.issues.push({
+        input: values.proceedWithLargeOutlineArea,
+        path: ['proceedWithLargeOutlineArea'],
+        message: 'Mapping area exceeds 200km²',
         code: 'custom',
       });
     }
