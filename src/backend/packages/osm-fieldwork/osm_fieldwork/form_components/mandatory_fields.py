@@ -97,8 +97,9 @@ def _get_mandatory_fields(
     Returns:
         List of field definitions for the form
     """
-    color_calc = "if(${status}=2, '#00ff00', if(${status}=6, '#ff0000', ''))"
-    stroke_calc = "if(${status}=2, '#00cc00', if(${status}=6, '#cc0000', ''))"
+    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#aaaaaa', '#00ff00'))"
+    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#888888', '#00cc00'))"
+
     status_field_calculation = f"if({FEATURE} != '', 2, "
     if need_verification_fields:
         status_field_calculation += "if(${feature_exists} = 'no', 6, "
@@ -254,6 +255,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": color_calc,
             "save_to": "fill",
+            "default": "#aaaaaa",
         },
         {
             "type": "calculate",
@@ -263,6 +265,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": color_calc,
             "save_to": "marker-color",
+            "default": "#aaaaaa",
         },
         {
             "type": "calculate",
@@ -272,6 +275,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": stroke_calc,
             "save_to": "stroke",
+            "default": "#aaaaaa",
         },
         {
             "type": "calculate",
@@ -279,8 +283,9 @@ def _get_mandatory_fields(
             "notes": "Line/Polygon stroke thickness",
             "label::english(en)": "Stroke Width",
             "appearance": "minimal",
-            "calculation": "2",
+            "calculation": "6",
             "save_to": "stroke-width",
+            "default": "6",
         }
     ])
     if need_verification_fields:
