@@ -8,6 +8,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useDownloadFormQuery } from '@/api/central';
 import { downloadBlobData } from '@/utilfunctions';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import AssetModules from '@/shared/AssetModules';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -76,20 +77,27 @@ const FormUpdate = ({ projectId }) => {
   return (
     <div className="fmtm-relative fmtm-flex fmtm-flex-col fmtm-w-full fmtm-h-full fmtm-bg-white">
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex fmtm-flex-col fmtm-gap-y-5 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
-        <div>
-          <p className="fmtm-text-base">⚠️ IMPORTANT ⚠️</p>
-          <p className="fmtm-text-base fmtm-mt-2">
-            Please{' '}
-            <a
-              className={`fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline ${isDownloadFormLoading && 'fmtm-pointer-events-none fmtm-cursor-not-allowed'}`}
-              onClick={() => downloadForm()}
-              aria-disabled={isDownloadFormLoading}
-            >
-              download
-            </a>{' '}
-            {`your form and modify it, before re-uploading below.`}
-          </p>
-          <p className="fmtm-text-base fmtm-mt-2">Do not upload the original form, as it has since been updated.</p>
+        <div className="fmtm-border fmtm-border-yellow-400 fmtm-rounded-xl fmtm-bg-yellow-50 fmtm-py-3 fmtm-px-5">
+          <div className="fmtm-flex fmtm-gap-2 fmtm-items-center fmtm-mb-1">
+            <AssetModules.AssignmentIcon className=" fmtm-text-yellow-500" sx={{ fontSize: '20px' }} />
+            <h5 className="fmtm-text-[1rem] fmtm-font-semibold">Steps to follow:</h5>
+          </div>
+          <div>
+            <p className="fmtm-body-md">
+              Download the{' '}
+              <a
+                className={`fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline ${isDownloadFormLoading && 'fmtm-pointer-events-none fmtm-cursor-not-allowed'}`}
+                onClick={() => downloadForm()}
+                aria-disabled={isDownloadFormLoading}
+              >
+                latest version
+              </a>{' '}
+              of your form from this page.
+            </p>
+            <p className="fmtm-body-md">Edit the form as needed.</p>
+            <p className="fmtm-body-md">Re-upload the updated version here.</p>
+            <p className="fmtm-body-md">Ensure your changes stay compatible with the project&apos;s current setup.</p>
+          </div>
         </div>
         <div>
           <UploadArea
