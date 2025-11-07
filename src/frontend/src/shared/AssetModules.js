@@ -113,6 +113,7 @@ import {
   Facebook as FacebookIcon,
   Instagram as InstagramIcon,
   GitHub as GitHubIcon,
+  Assignment as AssignmentIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -240,4 +241,5 @@ export default {
   FacebookIcon,
   InstagramIcon,
   GitHubIcon,
+  AssignmentIcon,
 };
