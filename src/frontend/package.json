@@ -78,6 +78,7 @@
     "geojson-validation": "^1.0.2",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.418.0",
+    "motion": "^12.23.24",
     "ol": "^8.0.0",
     "ol-ext": "^4.0.11",
     "ol-layerswitcher": "^4.1.1",

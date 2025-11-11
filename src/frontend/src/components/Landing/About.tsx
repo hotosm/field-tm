@@ -1,11 +1,12 @@
 import React from 'react';
 import MappingImg from '@/assets/images/landing-pic-1.jpg';
+import { motion } from 'motion/react';
 
 const About = () => {
   return (
     <div className="fmtm-w-full fmtm-grid md:fmtm-grid-cols-2 fmtm-items-center fmtm-px-[2rem] sm:fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-gap-10">
-      <div>
-        <h2 className="fmtm-mb-4 fmtm-text-[1.625rem] md:fmtm-text-[2.375rem]">What is it?</h2>
+      <motion.div initial={{ x: -80, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }}>
+        <motion.h2 className="fmtm-mb-4 fmtm-text-[1.625rem] md:fmtm-text-[2.375rem]">What is it?</motion.h2>
         <p className="fmtm-text-justify fmtm-mb-2">
           The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by coordinating mapping
           in the field.
@@ -16,14 +17,14 @@ const About = () => {
           platform that leverages commonly-available mobile Android devices to enable people to input information,
           including geospatial data in the field.
         </p>
-      </div>
-      <div>
+      </motion.div>
+      <motion.div initial={{ x: 80, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }}>
         <img
           src={MappingImg}
           className="fmtm-mx-auto fmtm-rounded-2xl"
           alt="A project manager who has just created an FieldTM project on their laptop demonstrates to a field mapper how they can select their assigned buildings on their phone"
         />
-      </div>
+      </motion.div>
     </div>
   );
 };
