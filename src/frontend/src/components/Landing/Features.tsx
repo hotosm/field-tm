@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 
 type featureType = {
   title: string;
@@ -27,15 +28,24 @@ const features: featureType[] = [
 const Features = () => {
   return (
     <div className="fmtm-px-[2rem] sm:fmtm-px-[3rem] md:fmtm-px-[4.5rem]">
-      <h4 className="fmtm-mb-3">Main Features</h4>
+      <motion.h4 className="fmtm-mb-3" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+        Main Features
+      </motion.h4>
       <div className="fmtm-grid md:fmtm-grid-cols-3 fmtm-gap-5">
         {features.map((feature, index) => (
-          <div key={index} className="fmtm-bg-red-light fmtm-px-5 fmtm-py-5 md:fmtm-py-10 fmtm-rounded-xl">
+          <motion.div
+            key={index}
+            className="box fmtm-bg-red-light fmtm-px-5 fmtm-py-5 md:fmtm-py-10 fmtm-rounded-xl"
+            initial={{ x: -10, y: 0, opacity: 0 }}
+            whileInView={{ x: 0, y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ type: 'spring', delay: index * 0.2 }}
+          >
             <h5 key={index} className="fmtm-mb-2">
               {feature.title}
             </h5>
             <p>{feature.description}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
