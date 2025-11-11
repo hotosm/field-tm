@@ -54,7 +54,13 @@ from app.auth.roles import Mapper, ProjectManager, org_admin
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
+from app.db.enums import (
+    DbGeomType,
+    HTTPStatus,
+    ProjectRole,
+    ProjectStatus,
+    XLSFormType,
+)
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
@@ -62,6 +68,7 @@ from app.db.models import (
     DbOdkEntities,
     DbOrganisation,
     DbProject,
+    DbProjectExternalURL,
     DbProjectTeam,
     DbProjectTeamUser,
     DbTask,
@@ -153,7 +160,10 @@ async def read_project_summaries(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    my_projects: bool = False,
+    country: Optional[str] = None,
     status: ProjectStatus = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
 ):
     """Get a paginated summary of projects.
 
@@ -170,6 +180,9 @@ async def read_project_summaries(
         search,
         minimal,
         status,
+        field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
 
 
@@ -883,6 +896,44 @@ async def generate_basemap(
     )
 
 
+async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
+    """Persist the external URL for ODK-based projects."""
+    if project.field_mapping_app != FieldMappingApp.ODK:
+        return
+
+    # Refresh project with enriched/coalesced credentials to ensure URL is available
+    try:
+        enriched = await DbProject.one(db, project.id, minimal=False)
+    except Exception:
+        enriched = project
+
+    odk_url = None
+    if getattr(enriched, "odk_credentials", None):
+        odk_url = enriched.odk_credentials.odk_central_url
+    if not odk_url:
+        odk_url = getattr(enriched, "odk_central_url", None)
+
+    if not odk_url:
+        return
+
+    # Build project-specific Central URL: <central>/projects/<odkid>
+    base = odk_url[:-1] if odk_url.endswith("/") else odk_url
+    final_url = base
+    if getattr(enriched, "odkid", None):
+        if "/projects/" not in base:
+            final_url = f"{base}/projects/{enriched.odkid}"
+
+    try:
+        await DbProjectExternalURL.create_or_update(
+            db=db,
+            project_id=project.id,
+            source=FieldMappingApp.ODK,
+            url=final_url,
+        )
+    except Exception as exc:
+        log.warning(f"Failed to store ODK project URL for project {project.id}: {exc}")
+
+
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     new_data: project_schemas.ProjectUpdate,
@@ -1056,6 +1107,8 @@ async def create_project(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project update failed.",
         ) from e
+
+    await _store_odk_project_url(db, project)
 
     return project
 

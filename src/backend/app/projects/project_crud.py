@@ -48,8 +48,21 @@ from psycopg.rows import class_row
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, ProjectStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
+from app.db.enums import (
+    BackgroundTaskStatus,
+    FieldMappingApp,
+    HTTPStatus,
+    ProjectStatus,
+    XLSFormType,
+)
+from app.db.models import (
+    DbBackgroundTask,
+    DbBasemap,
+    DbProject,
+    DbProjectExternalURL,
+    DbUser,
+    DbUserRole,
+)
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -973,6 +986,9 @@ async def get_paginated_projects(
     search: Optional[str] = None,
     minimal: bool = False,
     status: Optional[ProjectStatus] = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
+    my_projects: bool = False,
+    country: Optional[str] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -988,16 +1004,47 @@ async def get_paginated_projects(
         search=search,
         minimal=minimal,
         status=status,
+        field_mapping_app=field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
     paginated_projects = projects[start_index:end_index]
 
+    project_ids = [
+        project.id
+        for project in paginated_projects
+        if getattr(project, "id", None) is not None
+    ]
+    external_urls = await DbProjectExternalURL.map_for_projects(db, project_ids)
+
+    summaries: list[project_schemas.ProjectSummary] = []
+    for project in paginated_projects:
+        urls_for_project = external_urls.get(project.id, {})
+        field_app = getattr(project, "field_mapping_app", None)
+
+        # Get the stored URL for the appropriate field mapping app
+        project_url = (
+            (
+                urls_for_project.get(field_app)
+                or urls_for_project.get(field_app.value if field_app else None)
+            )
+            if field_app
+            else None
+        )
+
+        summary = project_schemas.ProjectSummary.model_validate(
+            project,
+            from_attributes=True,
+        )
+        summaries.append(summary.model_copy(update={"project_url": project_url}))
+
     pagination = await get_pagination(
         page, len(paginated_projects), results_per_page, len(projects)
     )
 
-    return {"results": paginated_projects, "pagination": pagination}
+    return {"results": summaries, "pagination": pagination}
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):

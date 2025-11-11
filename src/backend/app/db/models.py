@@ -25,7 +25,7 @@ import json
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from re import sub
-from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self
+from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self, Sequence
 from uuid import UUID
 
 import geojson
@@ -60,6 +60,7 @@ from app.db.enums import (
     UserRole,
     XLSFormType,
 )
+from app.db.languages_and_countries import countries
 from app.db.postgis_utils import timestamp
 from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 
@@ -1748,6 +1749,9 @@ class DbProject(BaseModel):
         search: Optional[str] = None,
         minimal: bool = False,
         status: Optional[ProjectStatus] = None,
+        field_mapping_app: Optional[FieldMappingApp] = None,
+        my_projects: Optional[bool] = None,
+        country: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         if current_user:
@@ -1756,7 +1760,17 @@ class DbProject(BaseModel):
             access_info = None
 
         filters, params = cls._build_query_filters(
-            skip, limit, org_id, user_sub, hashtags, search, access_info, status
+            skip,
+            limit,
+            org_id,
+            user_sub,
+            hashtags,
+            search,
+            access_info,
+            status,
+            field_mapping_app,
+            country=country,
+            my_projects=my_projects,
         )
         sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
@@ -1790,6 +1804,9 @@ class DbProject(BaseModel):
         search: Optional[str],
         access_info: Optional[dict] = None,
         status: Optional[ProjectStatus] = None,
+        field_mapping_app: Optional[FieldMappingApp] = None,
+        country: Optional[str] = None,
+        my_projects: Optional[bool] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
 
@@ -1809,15 +1826,46 @@ class DbProject(BaseModel):
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
             "p.status = %(status)s": status,
-            # Improved search: replace dashes and underscores in slug with space
-            (
-                "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) ILIKE %(search)s"
-            ): normalized_search,
+            "p.field_mapping_app = %(field_mapping_app)s": field_mapping_app,
         }
 
         filters = [
             condition for condition, value in filters_map.items() if value is not None
         ]
+
+        # Handle search: support both ID and name/slug search
+        search_id = None
+        if normalized_search:
+            # Check if search is numeric (ID search)
+            if search.strip().isdigit():
+                filters.append("p.id = %(search_id)s")
+                search_id = int(search.strip())
+            else:
+                # Text search: replace dashes and underscores in slug with space
+                filters.append(
+                    "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) "
+                    "ILIKE %(search)s"
+                )
+
+        # Country filter: accept 2-letter codes or full country names
+        country_param = None
+        if country:
+            c = country.strip()
+            if len(c) == 2:
+                # map 2-letter code to full country name when possible
+                c_full = countries.get(c.upper(), c)
+            else:
+                c_full = c
+            filters.append("p.location_str ILIKE %(country)s")
+            country_param = f"%{c_full}%"
+
+        # My projects filter
+        if my_projects and access_info and access_info.get("user_sub"):
+            filters.append(
+                "(p.author_sub = %(current_user_sub)s OR EXISTS"
+                "(SELECT 1 FROM user_roles ur WHERE ur.project_id = p.id"
+                "AND ur.user_sub = %(current_user_sub)s"
+            )
 
         # Add visibility filter based on user authorization
         visibility_filter = cls._build_visibility_filter(access_info)
@@ -1832,8 +1880,13 @@ class DbProject(BaseModel):
                 "org_id": org_id,
                 "user_sub": user_sub,
                 "hashtags": hashtags,
-                "search": f"%{search}%" if search else None,
+                "search": f"%{search}%"
+                if (search and not search.strip().isdigit())
+                else None,
+                "search_id": search_id,
+                "country": country_param,
                 "status": status,
+                "field_mapping_app": field_mapping_app,
             }.items()
             if value is not None
         }
@@ -1952,6 +2005,12 @@ class DbProject(BaseModel):
         return """
             SELECT
                 fp.*,
+                COALESCE(NULLIF(fp.odk_central_url, ''),
+                project_org.odk_central_url) AS odk_central_url,
+                COALESCE(NULLIF(fp.odk_central_user, ''),
+                project_org.odk_central_user) AS odk_central_user,
+                COALESCE(NULLIF(fp.odk_central_password, ''),
+                project_org.odk_central_password) AS odk_central_password,
                 ST_AsGeoJSON(fp.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(fp.outline))::jsonb AS centroid,
                 project_org.logo AS organisation_logo,
@@ -2119,6 +2178,107 @@ class DbProject(BaseModel):
             """,
                 {"project_id": project_id},
             )
+
+
+class DbProjectExternalURL(BaseModel):
+    """Table project_external_urls."""
+
+    id: Optional[int] = None
+    project_id: int
+    source: FieldMappingApp
+    url: str
+    created_at: Optional[AwareDatetime] = None
+    updated_at: Optional[AwareDatetime] = None
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def normalize_source(cls, value):
+        """Normalize source value."""
+        if value is None or isinstance(value, FieldMappingApp):
+            return value
+
+        value_str = str(value).strip()
+        for app in FieldMappingApp:
+            if value_str.lower() == app.value.lower():
+                return app
+
+        return FieldMappingApp(value_str)
+
+    @classmethod
+    async def create_or_update(
+        cls,
+        db: Connection,
+        project_id: int,
+        source: FieldMappingApp | str,
+        url: str,
+    ) -> Self:
+        """Insert or update the external URL for a project."""
+        if not url:
+            raise ValueError("Project external URL cannot be empty.")
+
+        source_value = (
+            source.value if isinstance(source, FieldMappingApp) else str(source)
+        )
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                    INSERT INTO project_external_urls (project_id, source, url)
+                    VALUES (%(project_id)s, %(source)s, %(url)s)
+                    ON CONFLICT (project_id, source) DO UPDATE
+                    SET url = EXCLUDED.url,
+                        updated_at = NOW()
+                    RETURNING *;
+                """,
+                {
+                    "project_id": project_id,
+                    "source": source_value,
+                    "url": url,
+                },
+            )
+            return await cur.fetchone()
+
+    @classmethod
+    async def map_for_projects(
+        cls,
+        db: Connection,
+        project_ids: Sequence[int],
+    ) -> dict[int, dict[FieldMappingApp, str]]:
+        """Return external URLs keyed by project ID and source."""
+        if not project_ids:
+            return {}
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                    SELECT *
+                    FROM project_external_urls
+                    WHERE project_id = ANY(%(project_ids)s);
+                """,
+                {"project_ids": list(project_ids)},
+            )
+            rows = await cur.fetchall() or []
+
+        project_urls: dict[int, dict[FieldMappingApp, str]] = {}
+        for row in rows:
+            try:
+                if isinstance(row.source, FieldMappingApp):
+                    source_enum = row.source
+                else:
+                    source_normalized = str(row.source).strip().lower()
+                    if source_normalized == FieldMappingApp.QFIELD.value.lower():
+                        source_enum = FieldMappingApp.QFIELD
+                    elif source_normalized == FieldMappingApp.ODK.value.lower():
+                        source_enum = FieldMappingApp.ODK
+                    elif source_normalized == FieldMappingApp.FIELDTM.value.lower():
+                        source_enum = FieldMappingApp.FIELDTM
+                    else:
+                        continue
+            except Exception:
+                # Skip unknown sources
+                continue
+            project_urls.setdefault(row.project_id, {})[source_enum] = row.url
+        return project_urls
 
 
 class DbOdkEntities(BaseModel):
