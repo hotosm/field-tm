@@ -19,6 +19,7 @@ import {
 } from '@/components/common/Dropdown';
 import { useIsAdmin } from '@/hooks/usePermissions';
 import Button from '@/components/common/Button';
+import { motion } from 'motion/react';
 
 export default function PrimaryAppBar() {
   const isAdmin = useIsAdmin();
@@ -92,12 +93,20 @@ export default function PrimaryAppBar() {
       />
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
         <div className="fmtm-flex fmtm-items-center fmtm-gap-4 fmtm-cursor-pointer" onClick={() => navigate('/')}>
-          <img
+          <motion.img
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             src={hotLogo}
             alt="Field-TM Logo"
             className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
           />
-          <h3 className="fmtm-text-red-medium fmtm-text-xl">Field-TM</h3>
+          <motion.h3
+            initial={{ x: -50, opacity: 0, filter: 'blur(5px)' }}
+            animate={{ x: 0, opacity: 1, filter: 'none' }}
+            className="fmtm-text-red-medium fmtm-text-xl"
+          >
+            Field-TM
+          </motion.h3>
         </div>
         <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
           {navItems.map((navItem) => {
