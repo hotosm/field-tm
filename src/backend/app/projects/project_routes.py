@@ -914,7 +914,7 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
         return
 
     try:
-        enriched = await DbProject.one(db, project.id, minimal=False)        
+        enriched = await DbProject.one(db, project.id, minimal=False)
     except Exception:
         enriched = project
 
