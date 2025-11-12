@@ -896,40 +896,51 @@ async def generate_basemap(
     )
 
 
+def _get_local_odk_url() -> str:
+    """Return local ODK proxy URL: http://odk.<domain>:<port>."""
+    domain = getattr(settings, "FMTM_DOMAIN", "fmtm.localhost")
+    port = getattr(settings, "FMTM_DEV_PORT", "7050")
+    domain = domain.replace("http://", "").replace("https://", "")
+    return f"http://odk.{domain}:{port}".rstrip(":")
+
+
 async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
-    """Persist the external URL for ODK-based projects."""
+    """Store the external ODK project URL.
+
+    Uses local proxy URL if credentials indicate local Docker setup (central:8383),
+    otherwise uses the custom ODK Central URL from project/org credentials.
+    """
     if project.field_mapping_app != FieldMappingApp.ODK:
         return
 
-    # Refresh project with enriched/coalesced credentials to ensure URL is available
     try:
-        enriched = await DbProject.one(db, project.id, minimal=False)
+        enriched = await DbProject.one(db, project.id, minimal=False)        
     except Exception:
         enriched = project
 
-    odk_url = None
-    if getattr(enriched, "odk_credentials", None):
-        odk_url = enriched.odk_credentials.odk_central_url
-    if not odk_url:
-        odk_url = getattr(enriched, "odk_central_url", None)
+    creds = getattr(enriched, "odk_credentials", None)
+    odk_url = getattr(creds, "odk_central_url", None) if creds else None
 
     if not odk_url:
         return
 
-    # Build project-specific Central URL: <central>/projects/<odkid>
-    base = odk_url[:-1] if odk_url.endswith("/") else odk_url
-    final_url = base
-    if getattr(enriched, "odkid", None):
-        if "/projects/" not in base:
-            final_url = f"{base}/projects/{enriched.odkid}"
+    if "central:8383" in odk_url:
+        odk_url = _get_local_odk_url()
+
+    # Append project ID to URL
+    odk_url = odk_url.rstrip("/")
+    odkid = getattr(enriched, "odkid", None)
+    if odkid and "/projects/" not in odk_url:
+        odk_url = f"{odk_url}/projects/{odkid}"
 
     try:
         await DbProjectExternalURL.create_or_update(
             db=db,
             project_id=project.id,
             source=FieldMappingApp.ODK,
-            url=final_url,
+            url=odk_url,
         )
+        log.debug(f"Stored ODK project URL for project {project.id}: {odk_url}")
     except Exception as exc:
         log.warning(f"Failed to store ODK project URL for project {project.id}: {exc}")
 

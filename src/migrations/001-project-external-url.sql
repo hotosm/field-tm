@@ -1,5 +1,6 @@
 BEGIN;
 
+-- Create table to store external URLs associated with projects(ODK, QFIELD)
 CREATE TABLE IF NOT EXISTS project_external_urls (
     id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL REFERENCES projects (id) ON DELETE CASCADE,

@@ -59,7 +59,6 @@ from app.db.models import (
     DbBackgroundTask,
     DbBasemap,
     DbProject,
-    DbProjectExternalURL,
     DbUser,
     DbUserRole,
 )
@@ -1012,33 +1011,11 @@ async def get_paginated_projects(
     end_index = start_index + results_per_page
     paginated_projects = projects[start_index:end_index]
 
-    project_ids = [
-        project.id
+    # Build project summaries with external URLs from the query
+    summaries = [
+        project_schemas.ProjectSummary.model_validate(project, from_attributes=True)
         for project in paginated_projects
-        if getattr(project, "id", None) is not None
     ]
-    external_urls = await DbProjectExternalURL.map_for_projects(db, project_ids)
-
-    summaries: list[project_schemas.ProjectSummary] = []
-    for project in paginated_projects:
-        urls_for_project = external_urls.get(project.id, {})
-        field_app = getattr(project, "field_mapping_app", None)
-
-        # Get the stored URL for the appropriate field mapping app
-        project_url = (
-            (
-                urls_for_project.get(field_app)
-                or urls_for_project.get(field_app.value if field_app else None)
-            )
-            if field_app
-            else None
-        )
-
-        summary = project_schemas.ProjectSummary.model_validate(
-            project,
-            from_attributes=True,
-        )
-        summaries.append(summary.model_copy(update={"project_url": project_url}))
 
     pagination = await get_pagination(
         page, len(paginated_projects), results_per_page, len(projects)

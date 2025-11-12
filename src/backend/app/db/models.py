@@ -25,7 +25,7 @@ import json
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from re import sub
-from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self, Sequence
+from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self
 from uuid import UUID
 
 import geojson
@@ -1560,6 +1560,7 @@ class DbProject(BaseModel):
     tasks_mapped: Optional[int] = 0
     tasks_validated: Optional[int] = 0
     tasks_bad: Optional[int] = 0
+    project_url: Optional[str] = None
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1769,8 +1770,8 @@ class DbProject(BaseModel):
             access_info,
             status,
             field_mapping_app,
-            country=country,
-            my_projects=my_projects,
+            country,
+            my_projects,
         )
         sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
@@ -2019,13 +2020,19 @@ class DbProject(BaseModel):
                 stats.total_submissions,
                 stats.tasks_mapped,
                 stats.tasks_bad,
-                stats.tasks_validated
+                stats.tasks_validated,
+                ext_url.url AS project_url
+
             FROM
                 filtered_projects fp
             LEFT JOIN
                 organisations project_org ON fp.organisation_id = project_org.id
             LEFT JOIN
                 mv_project_stats stats ON fp.id = stats.project_id
+            LEFT JOIN
+                project_external_urls ext_url
+                ON fp.id = ext_url.project_id
+
             ORDER BY
                 fp.created_at DESC
         """
@@ -2193,16 +2200,20 @@ class DbProjectExternalURL(BaseModel):
     @field_validator("source", mode="before")
     @classmethod
     def normalize_source(cls, value):
-        """Normalize source value."""
+        """Normalize source value to FieldMappingApp enum."""
         if value is None or isinstance(value, FieldMappingApp):
             return value
 
-        value_str = str(value).strip()
-        for app in FieldMappingApp:
-            if value_str.lower() == app.value.lower():
-                return app
-
-        return FieldMappingApp(value_str)
+        # Try direct enum conversion first
+        try:
+            return FieldMappingApp(str(value).strip())
+        except (ValueError, KeyError) as err:
+            # Fallback to case-insensitive match by value
+            value_lower = str(value).strip().lower()
+            for app in FieldMappingApp:
+                if app.value.lower() == value_lower:
+                    return app
+            raise ValueError(f"Unknown FieldMappingApp: {value}") from err
 
     @classmethod
     async def create_or_update(
@@ -2226,8 +2237,7 @@ class DbProjectExternalURL(BaseModel):
                     INSERT INTO project_external_urls (project_id, source, url)
                     VALUES (%(project_id)s, %(source)s, %(url)s)
                     ON CONFLICT (project_id, source) DO UPDATE
-                    SET url = EXCLUDED.url,
-                        updated_at = NOW()
+                    SET url = EXCLUDED.url, updated_at = NOW()
                     RETURNING *;
                 """,
                 {
@@ -2237,48 +2247,6 @@ class DbProjectExternalURL(BaseModel):
                 },
             )
             return await cur.fetchone()
-
-    @classmethod
-    async def map_for_projects(
-        cls,
-        db: Connection,
-        project_ids: Sequence[int],
-    ) -> dict[int, dict[FieldMappingApp, str]]:
-        """Return external URLs keyed by project ID and source."""
-        if not project_ids:
-            return {}
-
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                """
-                    SELECT *
-                    FROM project_external_urls
-                    WHERE project_id = ANY(%(project_ids)s);
-                """,
-                {"project_ids": list(project_ids)},
-            )
-            rows = await cur.fetchall() or []
-
-        project_urls: dict[int, dict[FieldMappingApp, str]] = {}
-        for row in rows:
-            try:
-                if isinstance(row.source, FieldMappingApp):
-                    source_enum = row.source
-                else:
-                    source_normalized = str(row.source).strip().lower()
-                    if source_normalized == FieldMappingApp.QFIELD.value.lower():
-                        source_enum = FieldMappingApp.QFIELD
-                    elif source_normalized == FieldMappingApp.ODK.value.lower():
-                        source_enum = FieldMappingApp.ODK
-                    elif source_normalized == FieldMappingApp.FIELDTM.value.lower():
-                        source_enum = FieldMappingApp.FIELDTM
-                    else:
-                        continue
-            except Exception:
-                # Skip unknown sources
-                continue
-            project_urls.setdefault(row.project_id, {})[source_enum] = row.url
-        return project_urls
 
 
 class DbOdkEntities(BaseModel):
