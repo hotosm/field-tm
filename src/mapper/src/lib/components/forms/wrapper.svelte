@@ -137,7 +137,7 @@
 						// if no file or file not an image, return it as-is
 						if (!attachment || !attachment.type.startsWith('image/')) return resolve(attachment);
 
-						// converting iframe file to real file (file recieved from iframe is not an instance of file, so we manually need to convert it to instance of file)
+						// converting iframe file to real file (file received from iframe is not an instance of file, so we manually need to convert it to instance of file)
 						const realFile = new File([attachment], attachment.name, {
 							type: attachment.type,
 							lastModified: attachment.lastModified,
