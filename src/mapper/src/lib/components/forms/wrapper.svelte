@@ -9,6 +9,7 @@
 	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/random';
 	import { m } from '$translations/messages.js';
+	import Compressor from 'compressorjs';
 
 	type Props = {
 		display: Boolean;
@@ -128,6 +129,45 @@
 		});
 	}
 
+	async function compressAttachments(attachments: File[]): Promise<File[]> {
+		const compressedFiles = await Promise.all(
+			attachments.map(
+				(attachment) =>
+					new Promise<File>((resolve) => {
+						// if no file or file not an image, return it as-is
+						if (!attachment || !attachment.type.startsWith('image/')) return resolve(attachment);
+
+						// converting iframe file to real file (file recieved from iframe is not an instance of file, so we manually need to convert it to instance of file)
+						const realFile = new File([attachment], attachment.name, {
+							type: attachment.type,
+							lastModified: attachment.lastModified,
+						});
+
+						// Use CompressorJS to compress images as we don't want higher quality images
+						new Compressor(realFile, {
+							quality: 0.6,
+							maxHeight: 1080,
+							maxWidth: 720,
+							success(result) {
+								// Convert Blob to File (Compressor returns Blob)
+								const compressedFile = new File([result], attachment.name, {
+									type: result.type,
+									lastModified: Date.now(),
+								});
+								resolve(compressedFile);
+							},
+							error(err) {
+								console.error('Compression failed:', err.message);
+								resolve(attachment); // fallback to original file
+							},
+						});
+					}),
+			),
+		);
+
+		return compressedFiles;
+	}
+
 	function handleSubmit(payload: any) {
 		(async () => {
 			if (!payload.detail || !projectId) return;
@@ -138,9 +178,10 @@
 
 			uploadingMessage = m['forms.uploading']() || 'uploading';
 			uploading = true;
-
+			// compress image attachments before submitting
+			const compressedAttachments = await compressAttachments(attachments);
 			// Submit the XML + any submission media
-			await entitiesStore.createNewSubmission(projectId, submissionXml, attachments);
+			await entitiesStore.createNewSubmission(projectId, submissionXml, compressedAttachments);
 
 			uploading = false;
 			updateEntityStatusBasedOnSubmissionXml(submissionXml);
