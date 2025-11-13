@@ -90,6 +90,36 @@ const SubmissionDetails = () => {
         </>
       );
     } else if (typeof value === 'object' && value !== null) {
+      // Handle photos repeat group specially
+      if (key === 'photos' && Array.isArray(value)) {
+        return (
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+            <div className="fmtm-capitalize fmtm-text-base fmtm-font-bold fmtm-leading-normal fmtm-text-[#555] fmtm-break-words">
+              {key}
+            </div>
+            <div className="fmtm-flex fmtm-flex-wrap fmtm-gap-2">
+              {value.map((photo, index) => (
+                <div key={index} className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+                  {typeof photo === 'object' && photo.image ? (
+                    isSubmissionPhotosLoading ? (
+                      <CoreModules.Skeleton style={{ width: '8rem', height: '6rem' }} className="!fmtm-rounded-lg" />
+                    ) : (
+                      <img
+                        src={submissionPhotos?.[photo.image]}
+                        alt={`Photo ${index + 1}`}
+                        className="fmtm-w-32 fmtm-h-24 fmtm-object-cover fmtm-rounded-lg"
+                      />
+                    )
+                  ) : (
+                    <span className="fmtm-text-sm fmtm-text-[#555] fmtm-break-words">{photo}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       return (
         <ul className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <Accordion
