@@ -33,8 +33,8 @@ from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
 from app.config import settings
-from app.db.enums import HTTPStatus
-from app.db.models import DbProject
+from app.db.enums import FieldMappingApp, HTTPStatus
+from app.db.models import DbProject, DbProjectExternalURL
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -239,15 +239,22 @@ async def create_qfield_project(
             ) from e
 
     log.info("Finished QFieldCloud project upload")
-    if settings.DEBUG:
-        return (
-            f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
-            f"/a/{api_project_owner}/{api_project_name}"
-        )
-    return (
-        f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
+    # Create QField URL
+    qfield_url = (
+        f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
+        f"/a/{api_project_owner}/{api_project_name}"
+        if settings.DEBUG
+        else f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
         f"/a/{api_project_owner}/{api_project_name}"
     )
+
+    # Store QField URL in project_external_urls
+    await DbProjectExternalURL.create_or_update(
+        db=db, project_id=project.id, source=FieldMappingApp.QFIELD, url=qfield_url
+    )
+    await db.commit()
+
+    return qfield_url
 
 
 async def qfc_credentials_test(qfc_creds: QFieldCloud):
