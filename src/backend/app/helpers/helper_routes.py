@@ -44,6 +44,7 @@ from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
 from psycopg import Connection
+from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
@@ -411,3 +412,42 @@ async def send_test_email(user_emails: list[str]):
     return Response(
         status_code=HTTPStatus.OK,
     )
+
+
+@router.get("/metrics")
+async def get_metrics(db: Annotated[Connection, Depends(db_conn)]) -> dict:
+    """Return a summary of dashboard like ODK based metrics."""
+    query = """
+        WITH
+        total_features AS (
+            SELECT COUNT(*) AS total_features_surveyed
+            FROM odk_entities
+            WHERE status NOT IN ('READY', 'OPENED_IN_ODK')
+        ),
+        countries AS (
+            SELECT COUNT(DISTINCT SPLIT_PART(location_str, ',', 2)) AS countries_covered
+            FROM projects
+            WHERE location_str IS NOT NULL
+        ),
+        projects_count AS (
+            SELECT COUNT(*) AS total_projects FROM projects
+        ),
+        users_count AS (
+            SELECT COUNT(*) AS total_users FROM users
+        ),
+        organisations AS (
+            SELECT COUNT(*) AS total_organisations
+            FROM organisations
+            WHERE approved IS TRUE
+        )
+        SELECT * FROM
+            total_features,
+            countries,
+            projects_count,
+            users_count,
+            organisations;
+    """
+    async with db.cursor(row_factory=dict_row) as cur:
+        await cur.execute(query)
+        row = await cur.fetchone()
+        return row or {}
