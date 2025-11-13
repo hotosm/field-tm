@@ -48,8 +48,20 @@ from psycopg.rows import class_row
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, ProjectStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser, DbUserRole
+from app.db.enums import (
+    BackgroundTaskStatus,
+    FieldMappingApp,
+    HTTPStatus,
+    ProjectStatus,
+    XLSFormType,
+)
+from app.db.models import (
+    DbBackgroundTask,
+    DbBasemap,
+    DbProject,
+    DbUser,
+    DbUserRole,
+)
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -973,6 +985,9 @@ async def get_paginated_projects(
     search: Optional[str] = None,
     minimal: bool = False,
     status: Optional[ProjectStatus] = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
+    my_projects: bool = False,
+    country: Optional[str] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -988,16 +1003,25 @@ async def get_paginated_projects(
         search=search,
         minimal=minimal,
         status=status,
+        field_mapping_app=field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
     paginated_projects = projects[start_index:end_index]
 
+    # Build project summaries with external URLs from the query
+    summaries = [
+        project_schemas.ProjectSummary.model_validate(project, from_attributes=True)
+        for project in paginated_projects
+    ]
+
     pagination = await get_pagination(
         page, len(paginated_projects), results_per_page, len(projects)
     )
 
-    return {"results": paginated_projects, "pagination": pagination}
+    return {"results": summaries, "pagination": pagination}
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
