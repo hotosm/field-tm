@@ -39,7 +39,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import DbGeomType, EntityState, HTTPStatus
+from app.db.enums import DbGeomType, EntityState, FieldMappingApp, HTTPStatus
 from app.db.models import DbProject, DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -48,6 +48,29 @@ from app.db.postgis_utils import (
 )
 from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
+
+STATUS_VISUALS = {
+    EntityState.OPENED_IN_ODK.value: {
+        "fill": "#1a1a1a",
+        "marker-color": "#1a1a1a",
+        "stroke": "#000000",
+    },
+    EntityState.MARKED_BAD.value: {
+        "fill": "#ff0000",
+        "marker-color": "#ff0000",
+        "stroke": "#cc0000",
+    },
+    EntityState.SURVEY_SUBMITTED.value: {
+        "fill": "#00ff00",
+        "marker-color": "#00ff00",
+        "stroke": "#00cc00",
+    },
+    EntityState.VALIDATED.value: {
+        "fill": "#00ff00",
+        "marker-color": "#00ff00",
+        "stroke": "#00cc00",
+    },
+}
 
 
 def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
@@ -890,6 +913,7 @@ async def get_entity_mapping_status(
 
 async def update_entity_mapping_status(
     odk_creds: central_schemas.ODKCentralDecrypted,
+    field_mapping_app: str,
     odk_id: int,
     entity_uuid: str,
     label: str,
@@ -903,6 +927,7 @@ async def update_entity_mapping_status(
 
     Args:
         odk_creds (ODKCentralDecrypted): ODK credentials for a project.
+        field_mapping_app (str): Field Mapping app used.
         odk_id (str): The project ID in ODK Central.
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
@@ -913,17 +938,20 @@ async def update_entity_mapping_status(
     Returns:
         dict: All Entity data in OData JSON format.
     """
+    visuals = (
+        STATUS_VISUALS.get(int(status), {})
+        if field_mapping_app == FieldMappingApp.ODK
+        else {}
+    )
     async with central_deps.pyodk_client(odk_creds) as client:
         updated_entity = client.entities.update(
             entity_uuid,
             entity_list_name=dataset_name,
             project_id=odk_id,
             label=label,
-            data={"status": status, "submission_ids": submission_ids}
+            data={"status": status, "submission_ids": submission_ids, **visuals}
             if submission_ids
-            else {
-                "status": status,
-            },
+            else {"status": status, **visuals},
             # We don't know the current entity version, so we need this
             force=True,
         )
