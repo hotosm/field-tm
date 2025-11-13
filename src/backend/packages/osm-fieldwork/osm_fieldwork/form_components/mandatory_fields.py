@@ -97,8 +97,8 @@ def _get_mandatory_fields(
     Returns:
         List of field definitions for the form
     """
-    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#aaaaaa', '#00ff00'))"
-    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#888888', '#00cc00'))"
+    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#1a1a1a', '#00ff00'))"
+    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#000000', '#00cc00'))"
 
     status_field_calculation = f"if({FEATURE} != '', 2, "
     if need_verification_fields:
@@ -255,7 +255,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": color_calc,
             "save_to": "fill",
-            "default": "#aaaaaa",
+            "default": "#1a1a1a",
         },
         {
             "type": "calculate",
@@ -265,7 +265,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": color_calc,
             "save_to": "marker-color",
-            "default": "#aaaaaa",
+            "default": "#1a1a1a",
         },
         {
             "type": "calculate",
@@ -275,7 +275,7 @@ def _get_mandatory_fields(
             "appearance": "minimal",
             "calculation": stroke_calc,
             "save_to": "stroke",
-            "default": "#aaaaaa",
+            "default": "#000000",
         },
         {
             "type": "calculate",
