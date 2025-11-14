@@ -42,14 +42,24 @@ async def test_merge_mandatory_fields():
     with open("merged_xlsform.xlsx", "wb") as merged_xlsform:
         merged_xlsform.write(updated_form.getvalue())
 
+    # remove duplicate field names in 'survey'
+    survey = workbook["survey"]
+    seen = set()
+    for row in range(2, survey.max_row + 1):
+        name = survey.cell(row=row, column=2).value
+        if name in seen:
+            survey.delete_rows(row, 1)
+        else:
+            seen.add(name)
+
     check_survey_sheet(workbook)
-    # NOTE the choices sheet can have duplicates in the 'name' field without issue
     check_entities_sheet(workbook)
     check_form_title(workbook)
 
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
     check_translation_fields(workbook)
+
 
 
 async def test_add_extra_select_from_file():
