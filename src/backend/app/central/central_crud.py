@@ -50,11 +50,6 @@ from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
 
 STATUS_VISUALS = {
-    EntityState.OPENED_IN_ODK.value: {
-        "fill": "#1a1a1a",
-        "marker-color": "#1a1a1a",
-        "stroke": "#000000",
-    },
     EntityState.MARKED_BAD.value: {
         "fill": "#ff0000",
         "marker-color": "#ff0000",
@@ -66,9 +61,9 @@ STATUS_VISUALS = {
         "stroke": "#00cc00",
     },
     EntityState.VALIDATED.value: {
-        "fill": "#00ff00",
-        "marker-color": "#00ff00",
-        "stroke": "#00cc00",
+        "fill": "#008000",
+        "marker-color": "#008000",
+        "stroke": "#006600",
     },
 }
 
