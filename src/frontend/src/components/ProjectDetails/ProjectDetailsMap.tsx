@@ -23,7 +23,7 @@ import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { entity_state, GeoGeomTypesEnum } from '@/types/enums';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { GetEntityStatusList, GetOdkEntitiesGeojson, SyncTaskState } from '@/api/Project';
-import MapLegends from '@/components/MapLegends';
+import MapLegends from '@/components/ProjectDetails/MapLegends';
 import isEmpty from '@/utilfunctions/isEmpty';
 import AssetModules from '@/shared/AssetModules';
 import { Polygon } from 'ol/geom';

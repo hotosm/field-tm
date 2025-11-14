@@ -226,7 +226,10 @@ const SubmissionDetails = () => {
           </div>
           <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center fmtm-mt-10 md:fmtm-mt-0">
             <div className="fmtm-w-full fmtm-h-[20rem] md:fmtm-h-full fmtm-rounded-lg fmtm-overflow-hidden">
-              <SubmissionInstanceMap featureGeojson={extractGeojsonFromObject(restSubmissionDetails)} />
+              <SubmissionInstanceMap
+                featureGeojson={extractGeojsonFromObject(restSubmissionDetails)}
+                status={restSubmissionDetails?.__system?.reviewState}
+              />
             </div>
           </div>
         </div>
