@@ -301,6 +301,7 @@ async def set_odk_entities_mapping_status(
     project = project_user.get("project")
     return await central_crud.update_entity_mapping_status(
         project.odk_credentials,
+        project.field_mapping_app,
         project.odkid,
         entity_details.entity_id,
         entity_details.label,
