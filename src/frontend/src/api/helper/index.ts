@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { downloadTemplateXlsform } from '@/services/helper';
-import type { TQueryOptions, xlsformTemplateDownloadParamsType } from '@/types';
+import { downloadTemplateXlsform, getMetrics } from '@/services/helper';
+import type { metricsType, TQueryOptions, xlsformTemplateDownloadParamsType } from '@/types';
 
 export function useDownloadTemplateXlsformQuery({
   params,
@@ -11,6 +11,14 @@ export function useDownloadTemplateXlsformQuery({
 }) {
   return useQuery({
     queryFn: () => downloadTemplateXlsform(params),
+    select: (data) => data.data,
+    ...options,
+  });
+}
+
+export function useGetMetricsQuery({ options }: { options: TQueryOptions<metricsType> }) {
+  return useQuery({
+    queryFn: () => getMetrics(),
     select: (data) => data.data,
     ...options,
   });
