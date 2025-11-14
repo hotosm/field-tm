@@ -42,3 +42,6 @@ ON public.submission_stats_cache (user_sub);
 
 CREATE INDEX IF NOT EXISTS idx_submission_stats_cache_user_project
 ON public.submission_stats_cache (user_sub, project_id);
+
+CREATE INDEX IF NOT EXISTS project_external_urls_project_source_idx
+ON project_external_urls (project_id, source);
