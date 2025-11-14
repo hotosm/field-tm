@@ -297,9 +297,9 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field()),
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
             add_label_translations(get_photo_repeat_field()),
-            add_label_translations(get_photo_repeat_end(mandatory_photo_upload), label_cols)
+            add_label_translations(get_photo_repeat_end())
         ])
     else:
         add_label = True
@@ -316,9 +316,9 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field()),
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
             add_label_translations(get_photo_repeat_field()),
-            add_label_translations(get_photo_repeat_end(mandatory_photo_upload), label_cols)
+            add_label_translations(get_photo_repeat_end())
         ])
 
     # Configure form settings

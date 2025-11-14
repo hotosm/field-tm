@@ -70,14 +70,11 @@ meta_df = pd.DataFrame(
 )
 
 
-def get_photo_collection_field():
+def get_photo_collection_field(mandatory_photo_upload: bool = False):
     return {
     "type": "begin repeat",
     "name": "photos",
-    "label::english(en)": "Photos",
-    "label::swahili(sw)": "Picha",
-    "label::french(fr)": "Photos",
-    "label::spanish(es)": "Fotos",
+    "required": "yes" if mandatory_photo_upload else "no",
 }
 
 def get_photo_repeat_field():
@@ -86,17 +83,12 @@ def get_photo_repeat_field():
     "name": "image",
     "appearance": "minimal",
     "parameters": "max-pixels=1000",
-    "label::english(en)": "Photo",
-    "label::swahili(sw)": "Picha",
-    "label::french(fr)": "Photo",
-    "label::spanish(es)": "Foto",
 }
 
-def get_photo_repeat_end(mandatory_photo_upload: bool = False):
+def get_photo_repeat_end():
     return {
     "type": "end repeat",
     "name": "photos",
-        "required": "yes" if mandatory_photo_upload else "no",
     }
 
 
