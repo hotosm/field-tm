@@ -13,6 +13,7 @@ import { Fill } from 'ol/style';
 import { geojsonType } from '@/store/types/ISubmissions';
 import MapControlComponent from '@/components/SubmissionMap/MapControlComponent';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
+import MapLegend from './MapLegend';
 
 type submissionInstanceMapPropType = {
   featureGeojson: { vectorLayerGeojson: geojsonType; clusterLayerGeojson: geojsonType };
@@ -120,6 +121,7 @@ const SubmissionInstanceMap = ({ featureGeojson, status }: submissionInstanceMap
           />
         )}
         <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="label" />
+        <MapLegend />
       </MapComponent>
     </div>
   );
