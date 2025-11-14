@@ -465,9 +465,9 @@ async def generate_odk_central_project_content(
         )
 
     default_style = {
-        "fill": "#aaaaaa",
-        "marker-color": "#aaaaaa",
-        "stroke": "#aaaaaa",
+        "fill": "#1a1a1a",
+        "marker-color": "#1a1a1a",
+        "stroke": "#000000",
         "stroke-width": "6",
     }
 
