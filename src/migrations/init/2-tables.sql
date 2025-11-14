@@ -275,3 +275,13 @@ CREATE TABLE IF NOT EXISTS public.submission_stats_cache (
     top_locations JSONB NOT NULL DEFAULT '[]'::jsonb,
     last_calculated TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS project_external_urls (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+    source TEXT NOT NULL,
+    url TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (project_id, source)
+);
