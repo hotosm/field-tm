@@ -38,7 +38,7 @@ dependencies = [
     "geojson==3.1.0",
     "shapely==2.0.6",
     "pyxform==4.0.0",
-    "loguru==0.7.2",
+    "loguru==0.7.3",
     "minio==7.2.9",
     "pyproj==3.7.0",
     "asgiref==3.8.1",
