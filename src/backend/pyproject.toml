@@ -27,7 +27,7 @@ requires-python = ">=3.13"
 dependencies = [
     "uvicorn==0.34.2",
     "uvloop==0.21.0",
-    "httptools==0.6.4",
+    "httptools==0.7.1",
     "fastapi==0.115.3",
     "asgi-lifespan==2.1.0",
     "pydantic==2.9.2",
