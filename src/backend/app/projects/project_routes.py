@@ -164,7 +164,6 @@ async def read_project_summaries(
     country: Optional[str] = None,
     status: ProjectStatus = None,
     field_mapping_app: Optional[FieldMappingApp] = None,
-    field_mapping_app: Optional[FieldMappingApp] = None,
 ):
     """Get a paginated summary of projects.
 
