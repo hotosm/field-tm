@@ -60,6 +60,7 @@ from app.db.enums import (
     UserRole,
     XLSFormType,
 )
+from app.db.languages_and_countries import countries
 from app.db.postgis_utils import timestamp
 from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 
@@ -1559,6 +1560,7 @@ class DbProject(BaseModel):
     tasks_mapped: Optional[int] = 0
     tasks_validated: Optional[int] = 0
     tasks_bad: Optional[int] = 0
+    project_url: Optional[str] = None
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1749,6 +1751,8 @@ class DbProject(BaseModel):
         minimal: bool = False,
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
+        my_projects: Optional[bool] = None,
+        country: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         if current_user:
@@ -1766,6 +1770,8 @@ class DbProject(BaseModel):
             access_info,
             status,
             field_mapping_app,
+            country,
+            my_projects,
         )
         sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
@@ -1800,6 +1806,8 @@ class DbProject(BaseModel):
         access_info: Optional[dict] = None,
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
+        country: Optional[str] = None,
+        my_projects: Optional[bool] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
 
@@ -1819,16 +1827,46 @@ class DbProject(BaseModel):
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
             "p.status = %(status)s": status,
-            # Improved search: replace dashes and underscores in slug with space
-            (
-                "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) ILIKE %(search)s"
-            ): normalized_search,
             "p.field_mapping_app = %(field_mapping_app)s": field_mapping_app,
         }
 
         filters = [
             condition for condition, value in filters_map.items() if value is not None
         ]
+
+        # Handle search: support both ID and name/slug search
+        search_id = None
+        if normalized_search:
+            # Check if search is numeric (ID search)
+            if search.strip().isdigit():
+                filters.append("p.id = %(search_id)s")
+                search_id = int(search.strip())
+            else:
+                # Text search: replace dashes and underscores in slug with space
+                filters.append(
+                    "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) "
+                    "ILIKE %(search)s"
+                )
+
+        # Country filter: accept 2-letter codes or full country names
+        country_param = None
+        if country:
+            c = country.strip()
+            if len(c) == 2:
+                # map 2-letter code to full country name when possible
+                c_full = countries.get(c.upper(), c)
+            else:
+                c_full = c
+            filters.append("p.location_str ILIKE %(country)s")
+            country_param = f"%{c_full}%"
+
+        # My projects filter
+        if my_projects and access_info and access_info.get("user_sub"):
+            filters.append(
+                "(p.author_sub = %(current_user_sub)s OR EXISTS"
+                "(SELECT 1 FROM user_roles ur WHERE ur.project_id = p.id"
+                "AND ur.user_sub = %(current_user_sub)s"
+            )
 
         # Add visibility filter based on user authorization
         visibility_filter = cls._build_visibility_filter(access_info)
@@ -1843,9 +1881,13 @@ class DbProject(BaseModel):
                 "org_id": org_id,
                 "user_sub": user_sub,
                 "hashtags": hashtags,
-                "search": f"%{search}%" if search else None,
+                "search": f"%{search}%"
+                if (search and not search.strip().isdigit())
+                else None,
+                "search_id": search_id,
+                "country": country_param,
                 "status": status,
-                "field_mapping_app": field_mapping_app if field_mapping_app else None,
+                "field_mapping_app": field_mapping_app,
             }.items()
             if value is not None
         }
@@ -1964,6 +2006,12 @@ class DbProject(BaseModel):
         return """
             SELECT
                 fp.*,
+                COALESCE(NULLIF(fp.odk_central_url, ''),
+                project_org.odk_central_url) AS odk_central_url,
+                COALESCE(NULLIF(fp.odk_central_user, ''),
+                project_org.odk_central_user) AS odk_central_user,
+                COALESCE(NULLIF(fp.odk_central_password, ''),
+                project_org.odk_central_password) AS odk_central_password,
                 ST_AsGeoJSON(fp.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(fp.outline))::jsonb AS centroid,
                 project_org.logo AS organisation_logo,
@@ -1972,13 +2020,19 @@ class DbProject(BaseModel):
                 stats.total_submissions,
                 stats.tasks_mapped,
                 stats.tasks_bad,
-                stats.tasks_validated
+                stats.tasks_validated,
+                ext_url.url AS project_url
+
             FROM
                 filtered_projects fp
             LEFT JOIN
                 organisations project_org ON fp.organisation_id = project_org.id
             LEFT JOIN
                 mv_project_stats stats ON fp.id = stats.project_id
+            LEFT JOIN
+                project_external_urls ext_url
+                ON fp.id = ext_url.project_id
+
             ORDER BY
                 fp.created_at DESC
         """
@@ -2133,6 +2187,68 @@ class DbProject(BaseModel):
             )
 
 
+class DbProjectExternalURL(BaseModel):
+    """Table project_external_urls."""
+
+    id: Optional[int] = None
+    project_id: int
+    source: FieldMappingApp
+    url: str
+    created_at: Optional[AwareDatetime] = None
+    updated_at: Optional[AwareDatetime] = None
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def normalize_source(cls, value):
+        """Normalize source value to FieldMappingApp enum."""
+        if value is None or isinstance(value, FieldMappingApp):
+            return value
+
+        # Try direct enum conversion first
+        try:
+            return FieldMappingApp(str(value).strip())
+        except (ValueError, KeyError) as err:
+            # Fallback to case-insensitive match by value
+            value_lower = str(value).strip().lower()
+            for app in FieldMappingApp:
+                if app.value.lower() == value_lower:
+                    return app
+            raise ValueError(f"Unknown FieldMappingApp: {value}") from err
+
+    @classmethod
+    async def create_or_update(
+        cls,
+        db: Connection,
+        project_id: int,
+        source: FieldMappingApp | str,
+        url: str,
+    ) -> Self:
+        """Insert or update the external URL for a project."""
+        if not url:
+            raise ValueError("Project external URL cannot be empty.")
+
+        source_value = (
+            source.value if isinstance(source, FieldMappingApp) else str(source)
+        )
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                    INSERT INTO project_external_urls (project_id, source, url)
+                    VALUES (%(project_id)s, %(source)s, %(url)s)
+                    ON CONFLICT (project_id, source) DO UPDATE
+                    SET url = EXCLUDED.url, updated_at = NOW()
+                    RETURNING *;
+                """,
+                {
+                    "project_id": project_id,
+                    "source": source_value,
+                    "url": url,
+                },
+            )
+            return await cur.fetchone()
+
+
 class DbOdkEntities(BaseModel):
     """Table odk_entities.
 
@@ -2157,7 +2273,7 @@ class DbOdkEntities(BaseModel):
         db: Connection,
         project_id: int,
         entities: list[Self],
-        batch_size: int = 10000,
+        batch_size: int = 8000,
     ) -> bool:
         """Update or insert Entity data in batches, with statuses.
 
@@ -2170,6 +2286,11 @@ class DbOdkEntities(BaseModel):
         Returns:
             bool: Success or failure.
         """
+        # dynamically compute batch size
+        no_of_column = 8
+        max_batch_size = 65000 // no_of_column
+        batch_size = min(batch_size, max_batch_size)
+
         log.info(
             f"Updating Field-TM database Entities for project {project_id} "
             f"with ({len(entities)}) features in batches of {batch_size}"
@@ -2185,7 +2306,6 @@ class DbOdkEntities(BaseModel):
                     osm_id, submission_ids, geometry, created_by)
                 VALUES
             """
-
             # Prepare data for batch insert
             values = []
             data = {}
@@ -2233,7 +2353,6 @@ class DbOdkEntities(BaseModel):
                 RETURNING True;
             """
             )
-
             async with db.cursor() as cur:
                 await cur.execute(sql, data)
                 batch_result = await cur.fetchall()
@@ -2242,7 +2361,6 @@ class DbOdkEntities(BaseModel):
                         f"Batch failed at batch {batch_start} for project {project_id}"
                     )
                 result.extend(batch_result)
-
         return bool(result)
 
     @classmethod

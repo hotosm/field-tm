@@ -445,7 +445,10 @@ async def submission(client, odk_project):
         <instructions/>
         <warmup/>
         <feature/>
-        <image>{photo_file_name}</image>
+        <photos>
+            <image>{photo_file_name}</image>
+            <image>additional_photo.jpg</image>
+        </photos>
         <new_feature>12.750577838121643 -24.776785714285722 0.0 0.0</new_feature>
         <xid/>
         <xlocation>12.750577838121643 -24.776785714285722 0.0 0.0</xlocation>

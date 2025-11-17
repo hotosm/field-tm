@@ -54,7 +54,13 @@ from app.auth.roles import Mapper, ProjectManager, org_admin
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
+from app.db.enums import (
+    DbGeomType,
+    HTTPStatus,
+    ProjectRole,
+    ProjectStatus,
+    XLSFormType,
+)
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
@@ -62,6 +68,7 @@ from app.db.models import (
     DbOdkEntities,
     DbOrganisation,
     DbProject,
+    DbProjectExternalURL,
     DbProjectTeam,
     DbProjectTeamUser,
     DbTask,
@@ -153,7 +160,10 @@ async def read_project_summaries(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    my_projects: bool = False,
+    country: Optional[str] = None,
     status: ProjectStatus = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
     field_mapping_app: Optional[FieldMappingApp] = None,
 ):
     """Get a paginated summary of projects.
@@ -172,6 +182,8 @@ async def read_project_summaries(
         minimal,
         status,
         field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
 
 
@@ -290,6 +302,7 @@ async def set_odk_entities_mapping_status(
     project = project_user.get("project")
     return await central_crud.update_entity_mapping_status(
         project.odk_credentials,
+        project.field_mapping_app,
         project.odkid,
         entity_details.entity_id,
         entity_details.label,
@@ -885,6 +898,55 @@ async def generate_basemap(
     )
 
 
+def _get_local_odk_url() -> str:
+    """Return local ODK proxy URL: http://odk.<domain>:<port>."""
+    domain = getattr(settings, "FMTM_DOMAIN", "fmtm.localhost")
+    port = getattr(settings, "FMTM_DEV_PORT", "7050")
+    domain = domain.replace("http://", "").replace("https://", "")
+    return f"http://odk.{domain}:{port}".rstrip(":")
+
+
+async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
+    """Store the external ODK project URL.
+
+    Uses local proxy URL if credentials indicate local Docker setup (central:8383),
+    otherwise uses the custom ODK Central URL from project/org credentials.
+    """
+    if project.field_mapping_app != FieldMappingApp.ODK:
+        return
+
+    try:
+        enriched = await DbProject.one(db, project.id, minimal=False)
+    except Exception:
+        enriched = project
+
+    creds = getattr(enriched, "odk_credentials", None)
+    odk_url = getattr(creds, "odk_central_url", None) if creds else None
+
+    if not odk_url:
+        return
+
+    if "central:8383" in odk_url:
+        odk_url = _get_local_odk_url()
+
+    # Append project ID to URL
+    odk_url = odk_url.rstrip("/")
+    odkid = getattr(enriched, "odkid", None)
+    if odkid and "/projects/" not in odk_url:
+        odk_url = f"{odk_url}/projects/{odkid}"
+
+    try:
+        await DbProjectExternalURL.create_or_update(
+            db=db,
+            project_id=project.id,
+            source=FieldMappingApp.ODK,
+            url=odk_url,
+        )
+        log.debug(f"Stored ODK project URL for project {project.id}: {odk_url}")
+    except Exception as exc:
+        log.warning(f"Failed to store ODK project URL for project {project.id}: {exc}")
+
+
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     new_data: project_schemas.ProjectUpdate,
@@ -1058,6 +1120,8 @@ async def create_project(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project update failed.",
         ) from e
+
+    await _store_odk_project_url(db, project)
 
     return project
 
