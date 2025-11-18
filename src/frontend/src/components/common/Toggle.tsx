@@ -13,7 +13,7 @@ const Toggle = ({ label, isToggled, onToggle, tooltipMessage = '' }: toggleProps
     <Tooltip title={tooltipMessage} placement="bottom" arrow>
       <div
         onClick={() => onToggle(!isToggled)}
-        className={`${isToggled ? 'fmtm-bg-red-light fmtm-text-red-medium fmtm-border-red-medium' : 'fmtm-bg-transparent fmtm-text-grey-700 fmtm-border-grey-700'} fmtm-border fmtm-px-3 fmtm-py-1 fmtm-cursor-pointer hover:fmtm-text-red-medium hover:fmtm-border-red-medium fmtm-text-base fmtm-rounded-3xl fmtm-duration-150`}
+        className={`${isToggled ? 'fmtm-bg-red-light fmtm-text-red-medium fmtm-border-red-medium' : 'fmtm-bg-white fmtm-text-grey-600 fmtm-border-grey-600'} fmtm-border fmtm-px-3 fmtm-py-1 fmtm-cursor-pointer hover:fmtm-text-red-medium hover:fmtm-border-red-medium fmtm-text-base fmtm-rounded fmtm-duration-150`}
       >
         {label}
       </div>
