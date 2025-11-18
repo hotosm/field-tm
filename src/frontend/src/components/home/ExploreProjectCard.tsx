@@ -60,7 +60,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
     >
       <div
         onClick={handleProjectCardClick}
-        className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
+        className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-h-full fmtm-cursor-pointer ${className}`}
       >
         <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
           <div>

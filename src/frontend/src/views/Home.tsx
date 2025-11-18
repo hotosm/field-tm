@@ -9,6 +9,7 @@ import HomePageFilters from '@/components/home/HomePageFilters';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import Pagination from '@/components/common/Pagination';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
+import { motion } from 'motion/react';
 
 type filterType = {
   page: number;
@@ -89,7 +90,15 @@ const Home = () => {
                     }`}
                   >
                     {projectList.map((value, index) => (
-                      <ExploreProjectCard data={value} key={index} />
+                      <motion.div
+                        key={index}
+                        initial={{ x: -10, y: 0, opacity: 0 }}
+                        whileInView={{ x: 0, y: 0, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <ExploreProjectCard data={value} key={index} />
+                      </motion.div>
                     ))}
                   </div>
                 </>
