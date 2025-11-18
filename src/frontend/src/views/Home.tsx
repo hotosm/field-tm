@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import { useAppSelector } from '@/types/reduxTypes';
-import { project_status } from '@/types/enums';
+import type { field_mapping_app as field_mapping_app_type, project_status } from '@/types/enums';
 import { useGetProjectSummariesQuery } from '@/api/project';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
@@ -15,6 +16,9 @@ type filterType = {
   results_per_page: number;
   search: string;
   status: project_status | undefined;
+  field_mapping_app: field_mapping_app_type | undefined;
+  country: string;
+  my_projects: boolean;
 };
 
 const initialData = {
@@ -38,13 +42,25 @@ const Home = () => {
     page: 1,
     results_per_page: 12,
     search: '',
+    field_mapping_app: undefined,
     status: undefined,
+    country: '',
+    my_projects: false,
   });
+
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 400,
     init: filter.search,
     onChange: (e) => {
-      setFilter({ ...filter, search: e.target.value, page: 1 });
+      setFilter((prev) => ({ ...prev, search: e.target.value, page: 1 }));
+    },
+  });
+
+  const [countrySearch, handleCountrySearchChange] = useDebouncedInput({
+    ms: 400,
+    init: filter.country,
+    onChange: (e) => {
+      setFilter((prev) => ({ ...prev, country: e.target.value, page: 1 }));
     },
   });
 
@@ -66,8 +82,14 @@ const Home = () => {
           filter={{
             searchText: searchTextData,
             onSearch: handleChangeData,
+            fieldMappingApp: filter.field_mapping_app,
+            onFieldMappingAppChange: (value) => setFilter({ ...filter, field_mapping_app: value, page: 1 }),
             status: filter.status,
             onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
+            country: countrySearch,
+            onCountrySearch: handleCountrySearchChange,
+            myProjects: filter.my_projects,
+            onMyProjectsToggle: (state) => setFilter({ ...filter, my_projects: state, page: 1 }),
           }}
         />
         {!isProjectListLoading ? (
@@ -85,7 +107,15 @@ const Home = () => {
                     }`}
                   >
                     {projectList.map((value, index) => (
-                      <ExploreProjectCard data={value} key={index} />
+                      <motion.div
+                        key={index}
+                        initial={{ x: -10, y: 0, opacity: 0 }}
+                        whileInView={{ x: 0, y: 0, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <ExploreProjectCard data={value} key={index} />
+                      </motion.div>
                     ))}
                   </div>
                 </>

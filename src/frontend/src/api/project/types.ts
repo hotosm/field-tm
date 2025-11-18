@@ -52,6 +52,7 @@ export interface projectBaseType {
   created_at: string;
   updated_at: string;
   field_mapping_app: field_mapping_app;
+  project_url: string | null;
 }
 
 // PAYLOAD TYPES
@@ -158,8 +159,10 @@ export type projectSummaryType = {
   hashtags: string[];
   location_str: string;
   short_description: string;
+  project_url: string | null;
   status: project_status;
   visibility: project_visibility;
+  field_mapping_app: field_mapping_app;
   organisation_logo: string | null;
   centroid: Point;
   total_tasks: number;
