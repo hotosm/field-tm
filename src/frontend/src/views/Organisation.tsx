@@ -55,7 +55,6 @@ const OrganisationListSection = ({ isLoading, orgList, searchKeyword }: Organisa
 };
 
 const Tab = ({ label, isActive, onClick }: TabType) => {
-  console.log(isActive);
   return (
     <div
       onClick={onClick}

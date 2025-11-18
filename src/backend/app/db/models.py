@@ -1864,8 +1864,8 @@ class DbProject(BaseModel):
         if my_projects and access_info and access_info.get("user_sub"):
             filters.append(
                 "(p.author_sub = %(current_user_sub)s OR EXISTS"
-                "(SELECT 1 FROM user_roles ur WHERE ur.project_id = p.id"
-                "AND ur.user_sub = %(current_user_sub)s"
+                "(SELECT 1 FROM user_roles ur WHERE ur.project_id = p.id "
+                "AND ur.user_sub = %(current_user_sub)s))"
             )
 
         # Add visibility filter based on user authorization
