@@ -9,6 +9,7 @@ import defaultOrgLogo from '@/assets/images/project_icon.png';
 import QfieldLogo from '@/assets/images/qfield-logo.svg';
 import ODKLogo from '@/assets/images/odk-logo.svg';
 import HotLogo from '@/assets/images/favicon.svg';
+import { fieldMappingAppNameMap } from '@/constants/fieldMapping';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -23,19 +24,13 @@ const fieldMappingAppLogoMap: Record<field_mapping_app, string> = {
   [field_mapping_app.QField]: QfieldLogo,
 };
 
-const fieldMappingAppNameMap: Record<field_mapping_app, string> = {
-  FieldTM: 'FieldTM',
-  ODK: 'ODK Central',
-  QField: 'QFieldCloud',
-};
-
 export default function ExploreProjectCard({ data, className }: { data: projectSummaryType; className?: string }) {
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {
-    if (data.field_mapping_app !== field_mapping_app.FieldTM && data.status !== project_status.DRAFT) {
+    if (data.project_url && data.status !== project_status.DRAFT) {
       // FIXME: After external_link field set on backend, redirect to external link replacing dummmy link
-      window.open('https://qfield.cloud/', '_blank');
+      window.open(data.project_url, '_blank');
       return;
     }
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -57,7 +52,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   return (
     <Tooltip
       title={
-        data.field_mapping_app !== field_mapping_app.FieldTM && data.status !== project_status.DRAFT
+        data.project_url && data.status !== project_status.DRAFT
           ? `Open project in ${fieldMappingAppNameMap[data.field_mapping_app]}`
           : ''
       }
@@ -77,7 +72,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
               )}
 
               <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-                {data.status !== project_status.DRAFT && data.field_mapping_app !== field_mapping_app.FieldTM && (
+                {data.project_url && data.status !== project_status.DRAFT && (
                   <img
                     src={fieldMappingAppLogoMap[data.field_mapping_app]}
                     className="fmtm-h-5 fmtm-max-h-5"
