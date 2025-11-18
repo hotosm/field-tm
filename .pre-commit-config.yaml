@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.14.4"
+    rev: "v0.14.5"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.8
+    rev: 0.9.9
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -83,7 +83,7 @@ repos:
 
   # Lint & Autoformat: SQL
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 4.0.0a1
+    rev: 4.0.0a2
     hooks:
       - id: sqlfluff-lint
         files: ^src/migrations/.*\.sql$
