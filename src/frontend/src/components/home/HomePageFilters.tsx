@@ -17,6 +17,8 @@ type homePageFiltersPropType = {
   onStatusChange: (data: project_status) => void;
   fieldMappingApp: field_mapping_app | undefined;
   onFieldMappingAppChange: (data: field_mapping_app) => void;
+  country: string;
+  onCountrySearch: (data: string) => void;
 };
 
 type statusOptionType = { value: project_status; label: string };
@@ -84,8 +86,15 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
         <Searchbar
           value={filter.searchText}
           onChange={filter.onSearch}
-          placeholder="Search by Id or Name"
-          wrapperStyle="!fmtm-w-[11.5rem] !fmtm-h-9"
+          placeholder="Project Name or ID"
+          wrapperStyle="!fmtm-w-[11.7rem] !fmtm-h-9"
+          className="!fmtm-rounded !fmtm-h-9 placeholder:fmtm-text-sm"
+        />
+        <Searchbar
+          value={filter.country}
+          onChange={filter.onCountrySearch}
+          placeholder="Country Name or Code"
+          wrapperStyle="!fmtm-w-[11.7rem] !fmtm-h-9"
           className="!fmtm-rounded !fmtm-h-9 placeholder:fmtm-text-sm"
         />
       </div>

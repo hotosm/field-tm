@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
 import { useAppSelector } from '@/types/reduxTypes';
 import type { field_mapping_app as field_mapping_app_type, project_status } from '@/types/enums';
@@ -9,7 +10,6 @@ import HomePageFilters from '@/components/home/HomePageFilters';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import Pagination from '@/components/common/Pagination';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
-import { motion } from 'motion/react';
 
 type filterType = {
   page: number;
@@ -17,6 +17,7 @@ type filterType = {
   search: string;
   status: project_status | undefined;
   field_mapping_app: field_mapping_app_type | undefined;
+  country: string;
 };
 
 const initialData = {
@@ -42,12 +43,22 @@ const Home = () => {
     search: '',
     field_mapping_app: undefined,
     status: undefined,
+    country: '',
   });
+
   const [searchTextData, handleChangeData] = useDebouncedInput({
     ms: 400,
     init: filter.search,
     onChange: (e) => {
       setFilter({ ...filter, search: e.target.value, page: 1 });
+    },
+  });
+
+  const [countrySearch, handleCountrySearchChange] = useDebouncedInput({
+    ms: 400,
+    init: filter.country,
+    onChange: (e) => {
+      setFilter({ ...filter, country: e.target.value, page: 1 });
     },
   });
 
@@ -73,6 +84,8 @@ const Home = () => {
             onFieldMappingAppChange: (value) => setFilter({ ...filter, field_mapping_app: value, page: 1 }),
             status: filter.status,
             onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
+            country: countrySearch,
+            onCountrySearch: handleCountrySearchChange,
           }}
         />
         {!isProjectListLoading ? (
