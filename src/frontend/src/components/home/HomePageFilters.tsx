@@ -9,6 +9,7 @@ import Button from '@/components/common/Button';
 import { useHasManagedAnyOrganization } from '@/hooks/usePermissions';
 import Select2 from '@/components/common/Select2';
 import { field_mapping_app, project_status } from '@/types/enums';
+import Toggle from '@/components/common/Toggle';
 
 type homePageFiltersPropType = {
   searchText: string;
@@ -19,6 +20,8 @@ type homePageFiltersPropType = {
   onFieldMappingAppChange: (data: field_mapping_app) => void;
   country: string;
   onCountrySearch: (data: string) => void;
+  myProjects: boolean;
+  onMyProjectsToggle: (state: boolean) => void;
 };
 
 type statusOptionType = { value: project_status; label: string };
@@ -96,6 +99,12 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
           placeholder="Country Name or Code"
           wrapperStyle="!fmtm-w-[11.7rem] !fmtm-h-9"
           className="!fmtm-rounded !fmtm-h-9 placeholder:fmtm-text-sm"
+        />
+        <Toggle
+          label="My Projects"
+          isToggled={filter.myProjects}
+          onToggle={filter.onMyProjectsToggle}
+          tooltipMessage={`Toggle to view ${!filter.myProjects ? 'your projects' : 'all projects'}`}
         />
       </div>
       <div className="fmtm-flex fmtm-items-center fmtm-justify-end fmtm-gap-3 fmtm-ml-auto sm:fmtm-ml-0">
