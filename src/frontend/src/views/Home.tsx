@@ -52,7 +52,7 @@ const Home = () => {
     ms: 400,
     init: filter.search,
     onChange: (e) => {
-      setFilter({ ...filter, search: e.target.value, page: 1 });
+      setFilter((prev) => ({ ...prev, search: e.target.value, page: 1 }));
     },
   });
 
@@ -60,7 +60,7 @@ const Home = () => {
     ms: 400,
     init: filter.country,
     onChange: (e) => {
-      setFilter({ ...filter, country: e.target.value, page: 1 });
+      setFilter((prev) => ({ ...prev, country: e.target.value, page: 1 }));
     },
   });
 
