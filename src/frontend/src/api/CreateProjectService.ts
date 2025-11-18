@@ -9,6 +9,7 @@ import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { UnassignUserFromProject } from '@/api/Project';
 import { field_mapping_app } from '@/types/enums';
+import { fieldMappingAppNameMap } from '@/constants/fieldMapping';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -169,7 +170,7 @@ export const CreateProjectService = (
         CommonActions.SetSnackBar({
           message: `Project created successfully. ${
             projectData.field_mapping_app !== field_mapping_app.FieldTM
-              ? `The QFieldCloud project dashboard has been opened in a new tab. You can also access it anytime using this link: ${generateProjectDataResponse}`
+              ? `The ${fieldMappingAppNameMap[projectData.field_mapping_app]} project dashboard has been opened in a new tab. You can also access it anytime using this link: ${generateProjectDataResponse}`
               : 'Redirecting...'
           }`,
           variant: 'success',
@@ -177,7 +178,7 @@ export const CreateProjectService = (
         }),
       );
 
-      if (projectData.field_mapping_app === field_mapping_app.QField)
+      if (projectData.field_mapping_app !== field_mapping_app.FieldTM)
         window.open(generateProjectDataResponse, '_blank');
 
       // Add 5-second delay to allow backend Entity generation to catch up
