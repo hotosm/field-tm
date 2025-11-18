@@ -67,6 +67,7 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
           choose="value"
           onChange={(value) => filter.onFieldMappingAppChange(value || undefined)}
           placeholder="Mapping App"
+          placeholderClassName="fmtm-text-sm"
           className="!fmtm-w-[10.313rem] fmtm-bg-white !fmtm-rounded focus:fmtm-ring-0"
           enableSearchbar={false}
         />
@@ -76,14 +77,16 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
           choose="value"
           onChange={(value) => filter.onStatusChange(value || undefined)}
           placeholder="Status"
+          placeholderClassName="fmtm-text-sm"
           className="!fmtm-w-[10.313rem] fmtm-bg-white !fmtm-rounded focus:fmtm-ring-0"
           enableSearchbar={false}
         />
         <Searchbar
           value={filter.searchText}
           onChange={filter.onSearch}
-          wrapperStyle="!fmtm-w-[10.313rem] !fmtm-h-9"
-          className="!fmtm-rounded !fmtm-h-9"
+          placeholder="Search by Id or Name"
+          wrapperStyle="!fmtm-w-[11.5rem] !fmtm-h-9"
+          className="!fmtm-rounded !fmtm-h-9 placeholder:fmtm-text-sm"
         />
       </div>
       <div className="fmtm-flex fmtm-items-center fmtm-justify-end fmtm-gap-3 fmtm-ml-auto sm:fmtm-ml-0">
