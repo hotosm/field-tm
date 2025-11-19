@@ -1,6 +1,6 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
-import CustomizedImage from '@/utilities/CustomizedImage';
+import osmLogo from '@/assets/images/project_icon.png';
 import { Link } from 'react-router-dom';
 import { user_roles } from '@/types/enums';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
@@ -44,7 +44,7 @@ const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridC
                 </div>
               ) : (
                 <div className="fmtm-min-w-[60px] fmtm-max-w-[60px] md:fmtm-min-w-[80px] md:fmtm-max-w-[80px] lg:fmtm-min-w-[120px] lg:fmtm-max-w-[120px]">
-                  <CustomizedImage status={'card'} style={{ width: '100%' }} />
+                  <img src={osmLogo} alt="Default Logo - OSM" className="fmtm-w-full" />
                 </div>
               )}
 
