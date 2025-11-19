@@ -7,8 +7,7 @@ export const isInputEmpty = (text: string): boolean => {
 };
 
 export const camelToFlat = (word: string): string => (
-  (word = word.replace(/[A-Z]/g, ' $&')),
-  word[0].toUpperCase() + word.slice(1)
+  (word = word.replace(/[A-Z]/g, ' $&')), word[0].toUpperCase() + word.slice(1)
 );
 
 export const isStatusSuccess = (status: number): boolean => {
@@ -42,14 +41,6 @@ export const generateLast30Days = (): string[] => {
 
   return last30Days;
 };
-
-// checks if object or array is empty
-export function isEmpty(obj: any): boolean {
-  if (Array.isArray(obj)) {
-    return obj.length === 0;
-  }
-  return Object.keys(obj).length === 0;
-}
 
 export function appendObjectToFormData(formData: FormData, object: Record<string, any>) {
   for (const [key, value] of Object.entries(object)) {
