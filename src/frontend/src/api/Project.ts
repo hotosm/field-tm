@@ -2,8 +2,8 @@ import axios, { AxiosResponse } from 'axios';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
-import { task_state, task_event, project_roles } from '@/types/enums';
-import { EntityOsmMap, projectInfoType, projectTaskBoundriesType, tileType } from '@/models/project/projectModel';
+import { task_state, task_event } from '@/types/enums';
+import { EntityOsmMap, projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 import { TaskActions } from '@/store/slices/TaskSlice';
 import { AppDispatch } from '@/store/Store';
 import { featureType } from '@/store/types/IProject';
@@ -79,98 +79,6 @@ export const ProjectById = (projectId: string) => {
 
     await fetchProjectById(projectId);
     dispatch(ProjectActions.SetNewProjectTrigger());
-  };
-};
-
-export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: true }));
-
-    const fetchProjectForm = async (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
-      try {
-        let response;
-        if (downloadType === 'form') {
-          response = await CoreModules.axios.get(url, { responseType: 'blob' });
-        } else {
-          response = await CoreModules.axios.get(url, {
-            responseType: 'blob',
-          });
-        }
-        const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = `${
-          downloadType === 'form' ? `project_form_${projectId}.xlsx` : `task_polygons_${projectId}.geojson`
-        }`;
-        a.click();
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
-      } catch (error) {
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
-      } finally {
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
-      }
-    };
-    await fetchProjectForm(url, downloadType, projectId);
-  };
-};
-
-export const DownloadDataExtract = (url: string, projectId: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(ProjectActions.SetDownloadDataExtractLoading(true));
-
-    const getDownloadExtract = async (url: string, projectId: string) => {
-      try {
-        let response;
-        response = await CoreModules.axios.get(url, {
-          responseType: 'blob',
-        });
-        const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = `${projectId}_map_features.geojson`;
-        a.click();
-        dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
-      } catch (error) {
-        dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
-      } finally {
-        dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
-      }
-    };
-    await getDownloadExtract(url, projectId);
-  };
-};
-
-export const GetTilesList = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(ProjectActions.SetTilesListLoading(true));
-
-    const fetchTilesList = async (url: string) => {
-      try {
-        const response: AxiosResponse<tileType[]> = await CoreModules.axios.get(url);
-        dispatch(ProjectActions.SetTilesList(response.data));
-      } catch (error) {
-      } finally {
-        dispatch(ProjectActions.SetTilesListLoading(false));
-      }
-    };
-    await fetchTilesList(url);
-  };
-};
-
-export const GenerateProjectTiles = (url: string, projectId: string, data: object) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(ProjectActions.SetGenerateProjectTilesLoading(true));
-
-    const generateProjectTiles = async (url: string, projectId: string) => {
-      try {
-        await CoreModules.axios.post(url, data);
-        dispatch(GetTilesList(`${VITE_API_URL}/projects/${projectId}/tiles`));
-        dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
-      } catch (error) {
-        dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
-      } finally {
-        dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
-      }
-    };
-    await generateProjectTiles(url, projectId);
   };
 };
 
@@ -275,27 +183,6 @@ export const GetProjectTaskActivity = (url: string) => {
   };
 };
 
-export const UpdateEntityState = (url: string, payload: { entity_id: string; status: number; label: string }) => {
-  return async (dispatch: AppDispatch) => {
-    const updateEntityState = async (url: string, payload: { entity_id: string; status: number; label: string }) => {
-      try {
-        dispatch(ProjectActions.UpdateEntityStateLoading(true));
-        const response = await CoreModules.axios.post(url, payload);
-        dispatch(ProjectActions.UpdateEntityState(response.data));
-        dispatch(ProjectActions.UpdateEntityStateLoading(false));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error?.response?.data?.detail || 'Failed to update entity state.',
-          }),
-        );
-        dispatch(ProjectActions.UpdateEntityStateLoading(false));
-      }
-    };
-    await updateEntityState(url, payload);
-  };
-};
-
 export const DeleteEntity = (url: string, project_id: number, entity_id: string) => {
   return async (dispatch: AppDispatch) => {
     const deleteEntity = async () => {
@@ -374,28 +261,6 @@ export const GetOdkEntitiesGeojson = (url: string) => {
       }
     };
     await getProjectActivity(url);
-  };
-};
-
-export const GetProjectUsers = (url: string, params: { role: project_roles }) => {
-  return async (dispatch: AppDispatch) => {
-    const getProjectUsers = async (url: string) => {
-      try {
-        dispatch(ProjectActions.SetProjectUsersLoading(true));
-        const response = await axios.get(url, { params });
-        dispatch(ProjectActions.SetProjectUsers(response.data));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error?.response?.data?.detail || 'Failed to retrieve project users',
-          }),
-        );
-        dispatch(ProjectActions.SetProjectUsers([]));
-      } finally {
-        dispatch(ProjectActions.SetProjectUsersLoading(false));
-      }
-    };
-    await getProjectUsers(url);
   };
 };
 
