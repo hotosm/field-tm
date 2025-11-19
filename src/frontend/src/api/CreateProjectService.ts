@@ -264,8 +264,6 @@ const UploadDataExtractService = (url: string, file: any) => {
 
 const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(CommonActions.SetLoading(true));
-
     try {
       const response = await axios.post(url, {
         combined_features_count: combinedFeaturesCount.toString(),
@@ -290,8 +288,6 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
         }),
       );
       return null;
-    } finally {
-      dispatch(CommonActions.SetLoading(false));
     }
   };
 };

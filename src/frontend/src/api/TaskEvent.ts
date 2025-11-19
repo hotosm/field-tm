@@ -22,8 +22,6 @@ export const CreateTaskEvent = (
       feature?: Record<string, any>,
     ) => {
       try {
-        dispatch(CommonActions.SetLoading(true));
-
         body = {
           event: action,
           ...body,
@@ -53,7 +51,6 @@ export const CreateTaskEvent = (
           );
         }
 
-        dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: `Task #${taskId} has been updated to ${response.data.state}`,
@@ -61,7 +58,6 @@ export const CreateTaskEvent = (
           }),
         );
       } catch (error) {
-        dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: `Failed to update Task #${taskId}`,

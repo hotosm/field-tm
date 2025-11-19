@@ -53,8 +53,6 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { PersistGate } from 'redux-persist/integration/react';
-// import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
-// import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import {
   useNavigate,
@@ -70,7 +68,6 @@ import { createSlice, configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import { TaskActions } from '@/store/slices/TaskSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import CustomizedModal from '@/utilities/CustomizedModal';
 
 export default {
   Provider,
@@ -118,10 +115,6 @@ export default {
   createTheme,
   Outlet,
   Container,
-  // SwiperNavigation,
-  // SwiperPagination,
-  // Swiper,
-  // SwiperSlide,
   axios,
   TextField,
   FormControlLabel,
@@ -140,7 +133,6 @@ export default {
   TaskActions,
   useAppDispatch,
   useAppSelector,
-  CustomizedModal,
   Table,
   TableBody,
   TableCell,
