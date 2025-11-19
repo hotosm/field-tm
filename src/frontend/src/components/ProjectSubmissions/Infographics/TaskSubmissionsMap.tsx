@@ -8,7 +8,6 @@ import { Vector as VectorSource } from 'ol/source';
 import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
-import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/Infographics/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
@@ -108,7 +107,7 @@ const TaskSubmissionsMap = () => {
       return;
     }
     const taskGeojsonFeatureCollection = {
-      ...basicGeojsonTemplate,
+      type: 'FeatureCollection',
       features: [
         ...projectTaskBoundries?.[0]?.taskBoundries?.map((task) => ({
           type: 'Feature',
@@ -127,7 +126,7 @@ const TaskSubmissionsMap = () => {
     if (!taskBoundaries) return;
     if (!selectedTask) return;
     const filteredSelectedTaskGeojson = {
-      ...basicGeojsonTemplate,
+      type: 'FeatureCollection',
       features: taskBoundaries?.features?.filter((task) => task?.properties?.fid === selectedTask),
     };
     const vectorSource = new VectorSource({
