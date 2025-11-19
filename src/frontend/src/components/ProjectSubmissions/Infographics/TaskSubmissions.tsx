@@ -120,7 +120,9 @@ const TaskSubmissions = () => {
             </div>
           ) : filteredTaskInfo?.length > 0 ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => <TaskCard key={task.task_id} task={task} />)}
+              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => (
+                <TaskCard key={task.task_id} task={task} />
+              ))}
             </div>
           ) : (
             <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-mt-10">
