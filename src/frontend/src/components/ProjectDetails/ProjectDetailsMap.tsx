@@ -27,6 +27,7 @@ import MapLegends from '@/components/ProjectDetails/MapLegends';
 import isEmpty from '@/utilfunctions/isEmpty';
 import AssetModules from '@/shared/AssetModules';
 import { Polygon } from 'ol/geom';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -165,7 +166,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       behavior: 'smooth',
     });
 
-    dispatch(CoreModules.TaskActions.SetSelectedTask(feature.getId()));
+    dispatch(TaskActions.SetSelectedTask(feature.getId()));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
 
     // Fit the map view to the clicked feature's extent based on the window size
@@ -190,7 +191,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     // Close task area popup, open task feature popup
     dispatch(ProjectActions.SetSelectedEntityId(properties?.entity_id || properties?.osm_id));
     setSelectedTaskFeature(feature);
-    dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
+    dispatch(TaskActions.SetSelectedFeatureProps(properties));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
   };
 

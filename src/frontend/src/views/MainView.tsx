@@ -4,8 +4,7 @@ import PrimaryAppBar from '@/utilities/PrimaryAppBar';
 import CoreModules from '@/shared/CoreModules';
 import CustomizedSnackbars from '@/utilities/CustomizedSnackbar';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import Loader from '@/utilities/AppLoader';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectNotFound from './ProjectNotFound';
 
@@ -50,7 +49,6 @@ const MainView = () => {
         handleClose={handleClose}
       />
       <CoreModules.CssBaseline />
-      <Loader />
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
@@ -80,7 +78,7 @@ const MainView = () => {
                   // p: '1.3rem',
                 }}
               >
-                <CoreModules.Outlet />
+                <Outlet />
                 {/* Footer */}
               </CoreModules.Stack>
             )}

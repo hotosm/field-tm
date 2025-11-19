@@ -1,7 +1,7 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
 import { EntityOsmMap } from '@/models/project/projectModel';
 
@@ -11,8 +11,8 @@ type propType = {
 
 const ProjectInfo = ({ entities }: propType) => {
   const navigate = useNavigate();
-  const params = CoreModules.useParams();
-  const projectId = params.projectId;
+  const params = useParams();
+  const projectId = params.projectId!;
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const submissionContributorsData = useAppSelector((state) => state.submission.submissionContributors);
 
