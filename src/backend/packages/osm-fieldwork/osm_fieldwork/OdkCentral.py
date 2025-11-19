@@ -522,8 +522,10 @@ class OdkForm(OdkCentral):
         disk: bool = False,
         json: bool = True,
     ):
-        """Fetch a CSV or JSON file of the submissions without media to a survey form.
-
+        """
+        Fetch a JSON submission and recursively populate all @odata.navigationLink fields.
+        Internal fields (__id, __Submissions-id) are removed from media items.
+        
         Args:
             projectId (int): The ID of the project on ODK Central
             xform (str): The XForm to get the details of from ODK Central
@@ -532,7 +534,7 @@ class OdkForm(OdkCentral):
             json (bool): Download JSON or CSV format
 
         Returns:
-            (bytes): The list of submissions as JSON or CSV bytes object.
+            dict: Cleaned submission JSON
         """
         now = datetime.now()
         timestamp = f"{now.year}_{now.hour}_{now.minute}"
@@ -545,29 +547,85 @@ class OdkForm(OdkCentral):
             filespec = f"{xform}_{timestamp}.csv"
 
         if submission_id:
-            url = url + f"('{submission_id}')"
+            url += f"('{submission_id}')"
 
-        # log.debug(f'Getting submissions for {projectId}, Form {xform}')
-        result = self.session.get(
+        # Fetch submission
+        response = self.session.get(
             url,
-            headers=dict({"Content-Type": "application/json"}, **self.session.headers),
+            headers={**self.session.headers, "Content-Type": "application/json"},
             verify=self.verify,
         )
-        if result.status_code == 200:
-            if disk:
-                # id = self.forms[0]['xmlFormId']
-                try:
-                    file = open(filespec, "xb")
-                    file.write(result.content)
-                except FileExistsError:
-                    file = open(filespec, "wb")
-                    file.write(result.content)
-                log.info("Wrote output file %s" % filespec)
-                file.close()
-            return result.content
-        else:
-            log.error(f"Submissions for {projectId}, Form {xform}" + " doesn't exist")
+        if response.status_code != 200:
+            log.error(f"Failed to fetch submission: {response.status_code}")
             return b""
+
+        submission_json = response.json()
+
+        # Save raw JSON if requested
+        if disk:
+            mode = "xb" if not os.path.exists(filespec) else "wb"
+            with open(filespec, mode) as f:
+                f.write(response.content)
+
+        def strip_internal_fields(node):
+            """
+            Recursively strip internal fields ("__id", "__Submissions-id") from a node.
+
+            Args:
+                node (dict or list): The node to strip internal fields from.
+
+            Returns:
+                dict or list: The node with internal fields stripped.
+            """
+            if isinstance(node, dict):
+                return {k: strip_internal_fields(v) for k, v in node.items() if k not in ("__id", "__Submissions-id")}
+            if isinstance(node, list):
+                return [strip_internal_fields(i) for i in node]
+            return node
+
+        # Recursive OData navigation resolver
+        def resolve_links(node):
+            """
+            Recursively resolve OData navigation links in a node.
+
+            Args:
+                node (dict or list): The node to resolve navigation links from.
+
+            Returns:
+                dict or list: The node with navigation links resolved.
+            """
+            if isinstance(node, dict):
+                resolved = {}
+                for key, value in node.items():
+                    # Handle navigation links
+                    if key.endswith("@odata.navigationLink"):
+                        field_name = key.replace("@odata.navigationLink", "")
+                        link_url = f"{self.base}projects/{projectId}/forms/{xform}.svc/{value}"
+
+                        resp = self.session.get(link_url, headers={"Accept": "application/json"}, verify=self.verify)
+                        resp.raise_for_status()
+                        linked_data = resp.json().get("value", resp.json())
+
+                        # Strip internal fields and recurse
+                        resolved[field_name] = resolve_links(strip_internal_fields(linked_data))
+                    else:
+                        # Regular field: recurse
+                        resolved[key] = resolve_links(value)
+                return resolved
+
+            if isinstance(node, list):
+                return [resolve_links(i) for i in node]
+
+            return node
+
+        # Resolve for single/multi submission formats
+        if "value" in submission_json:
+            submission_json["value"] = resolve_links(submission_json["value"])
+        else:
+            submission_json = resolve_links(submission_json)
+
+        return submission_json
+
 
     def getSubmissionMedia(
         self,
