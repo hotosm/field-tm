@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import environment from '@/environment';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { project_status, task_event as taskEventEnum, task_state as taskStateEnum, task_state } from '@/types/enums';
 import Button from '@/components/common/Button';
-import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
 import { Modal } from '@/components/common/Modal';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
@@ -25,7 +25,7 @@ type dialogPropType = {
 export default function Dialog({ taskId, feature }: dialogPropType) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const params = CoreModules.useParams();
+  const params = useParams();
   const geojsonStyles = MapStyles();
 
   const [currentTaskInfo, setCurrentTaskInfo] = useState<taskSubmissionInfoType>();
@@ -43,7 +43,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo?.organisation_id as number);
   const isProjectManager = useIsProjectManager(projectInfo?.id as number);
 
-  const currentProjectId: string = params.id;
+  const currentProjectId: string = params.id!;
   const projectIndex = projectData.findIndex((project) => project.id == parseInt(currentProjectId));
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {

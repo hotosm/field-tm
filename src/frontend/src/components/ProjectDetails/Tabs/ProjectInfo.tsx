@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import { useAppSelector } from '@/types/reduxTypes';
-import { entity_state, project_status } from '@/types/enums';
+import { project_status } from '@/types/enums';
 import { EntityOsmMap } from '@/models/project/projectModel';
 import CoreModules from '@/shared/CoreModules';
 import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';

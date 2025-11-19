@@ -7,19 +7,13 @@ const initialState: ProjectStateTypes = {
   newProjectTrigger: false,
   projectInfo: {},
   projectDataExtractLoading: false,
-  downloadProjectFormLoading: { type: 'form', loading: false },
-  generateProjectTilesLoading: false,
-  tilesList: [],
-  tilesListLoading: false,
   customBasemapUrl: null,
-  downloadDataExtractLoading: false,
   taskModalStatus: false,
   toggleGenerateMbTilesModal: false,
   mobileFooterSelection: '',
   projectDetailsLoading: true,
   entityOsmMap: [],
   entityOsmMapLoading: false,
-  updateEntityStateLoading: false,
   projectCommentsList: [],
   projectPostCommentsLoading: false,
   projectGetCommentsLoading: false,
@@ -33,8 +27,6 @@ const initialState: ProjectStateTypes = {
   newGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
   OdkEntitiesGeojsonLoading: false,
   isEntityDeleting: {},
-  projectUsers: [],
-  projectUsersLoading: false,
   unassigningUserFromProject: false,
   projectTaskIdIndexMap: {},
 };
@@ -56,23 +48,8 @@ const ProjectSlice = createSlice({
       storage.removeItem('persist:project');
       state.projectTaskBoundries = action.payload;
     },
-    SetDownloadProjectFormLoading(state, action: PayloadAction<ProjectStateTypes['downloadProjectFormLoading']>) {
-      state.downloadProjectFormLoading = action.payload;
-    },
-    SetGenerateProjectTilesLoading(state, action: PayloadAction<boolean>) {
-      state.generateProjectTilesLoading = action.payload;
-    },
-    SetTilesList(state, action: PayloadAction<ProjectStateTypes['tilesList']>) {
-      state.tilesList = action.payload;
-    },
-    SetTilesListLoading(state, action: PayloadAction<boolean>) {
-      state.tilesListLoading = action.payload;
-    },
     SetPmtileBasemapUrl(state, action: PayloadAction<string | null>) {
       state.customBasemapUrl = action.payload;
-    },
-    SetDownloadDataExtractLoading(state, action: PayloadAction<boolean>) {
-      state.downloadDataExtractLoading = action.payload;
     },
     ToggleTaskModalStatus(state, action: PayloadAction<boolean>) {
       state.taskModalStatus = action.payload;
@@ -115,18 +92,6 @@ const ProjectSlice = createSlice({
     },
     UpdateProjectTaskActivity(state, action) {
       state.projectTaskActivity = [action.payload, ...state.projectTaskActivity];
-    },
-    UpdateEntityStateLoading(state, action: PayloadAction<boolean>) {
-      state.updateEntityStateLoading = action.payload;
-    },
-    UpdateEntityState(state, action) {
-      const updatedEntityOsmMap = state.entityOsmMap?.map((entity) => {
-        if (entity.id === action.payload.id) {
-          return action.payload;
-        }
-        return entity;
-      });
-      state.entityOsmMap = updatedEntityOsmMap;
     },
     UpdateProjectTaskBoundries(state, action) {
       const updatedProjectTaskBoundries = state.projectTaskBoundries?.map((boundary) => {
@@ -177,12 +142,6 @@ const ProjectSlice = createSlice({
     ClearProjectFeatures(state) {
       state.newGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
       state.badGeomFeatureCollection = { type: 'FeatureCollection', features: [] };
-    },
-    SetProjectUsers(state, action: PayloadAction<ProjectStateTypes['projectUsers']>) {
-      state.projectUsers = action.payload;
-    },
-    SetProjectUsersLoading(state, action: PayloadAction<boolean>) {
-      state.projectUsersLoading = action.payload;
     },
     UnassigningUserFromProject(state, action: PayloadAction<boolean>) {
       state.unassigningUserFromProject = action.payload;

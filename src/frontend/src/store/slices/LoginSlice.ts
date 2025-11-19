@@ -1,13 +1,12 @@
-import CoreModules from '@/shared/CoreModules';
-import storage from 'redux-persist/lib/storage';
 import { LoginStateTypes } from '@/store/types/ILogin';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: LoginStateTypes = {
   authDetails: null,
   loginModalOpen: false,
 };
 
-const LoginSlice = CoreModules.createSlice({
+const LoginSlice = createSlice({
   name: 'login',
   initialState: initialState,
   reducers: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
-import CustomizedImage from '@/utilities/CustomizedImage';
+import osmLogo from '@/assets/images/project_icon.png';
 import { Link } from 'react-router-dom';
 import { user_roles } from '@/types/enums';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
@@ -39,19 +39,15 @@ const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridC
           >
             <CoreModules.Card key={index} sx={cardStyle} className="fmtm-h-full">
               {data.logo ? (
-                <div className="fmtm-min-w-[60px] md:fmtm-min-w-[80px] lg:fmtm-min-w-[120px]">
-                  <CoreModules.CardMedia component="img" src={data.logo} sx={{ width: ['60px', '80px', '120px'] }} />
+                <div className="fmtm-min-w-[60px] fmtm-max-w-[60px] md:fmtm-min-w-[80px] md:fmtm-max-w-[80px] lg:fmtm-min-w-[120px] lg:fmtm-max-w-[120px]">
+                  <img src={data.logo} alt="Default Logo - OSM" className="fmtm-w-full" />
                 </div>
               ) : (
                 <div className="fmtm-min-w-[60px] fmtm-max-w-[60px] md:fmtm-min-w-[80px] md:fmtm-max-w-[80px] lg:fmtm-min-w-[120px] lg:fmtm-max-w-[120px]">
-                  <CustomizedImage status={'card'} style={{ width: '100%' }} />
+                  <img src={osmLogo} alt="Default Logo - OSM" className="fmtm-w-full" />
                 </div>
               )}
-
-              <CoreModules.Box
-                sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
-                className="fmtm-overflow-hidden fmtm-grow fmtm-h-full fmtm-justify-between"
-              >
+              <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-gap-1 fmtm-overflow-hidden fmtm-grow fmtm-h-full">
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <h2
                     className="fmtm-line-clamp-1 fmtm-text-base sm:fmtm-text-lg fmtm-font-bold fmtm-capitalize"
@@ -79,7 +75,7 @@ const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridC
                     </div>
                   </div>
                 )}
-              </CoreModules.Box>
+              </div>
             </CoreModules.Card>
           </Link>
         ))}

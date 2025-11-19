@@ -8,6 +8,8 @@ import environment from '@/environment';
 import QrcodeComponent from '@/components/QrcodeComponent';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_state_labels } from '@/types/enums';
+import { useParams } from 'react-router-dom';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 type TaskSelectionPopupPropType = {
   taskId: number | null;
@@ -16,10 +18,10 @@ type TaskSelectionPopupPropType = {
 };
 
 const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropType) => {
-  const params = CoreModules.useParams();
+  const params = useParams();
   const dispatch = useAppDispatch();
 
-  const currentProjectId: string = params.id;
+  const currentProjectId = params.id;
   const [task_state, set_task_state] = useState('UNLOCKED_TO_MAP');
 
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
@@ -52,7 +54,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
 
   const closeModal = () => {
     dispatch(ProjectActions.ToggleTaskModalStatus(false));
-    dispatch(CoreModules.TaskActions.SetSelectedTask(null));
+    dispatch(TaskActions.SetSelectedTask(null));
   };
 
   return (

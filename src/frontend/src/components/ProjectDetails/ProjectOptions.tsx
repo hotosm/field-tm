@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import Button from '@/components/common/Button';
@@ -15,10 +16,10 @@ type downloadTypeType = 'form' | 'geojson' | 'extract' | 'submission' | 'qr';
 type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean; show: boolean };
 
 const ProjectOptions = () => {
-  const params = CoreModules.useParams();
+  const params = useParams();
   const dispatch = useDispatch();
 
-  const projectId: string = params.id;
+  const projectId = params.id!;
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
 
   const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);

@@ -1,5 +1,4 @@
 import { Fill, Icon, Stroke, Style, Circle } from 'ol/style';
-import { asArray } from 'ol/color';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
 import { centroid } from '@turf/centroid';
@@ -76,18 +75,8 @@ function createIconStyle(iconSrc: string, scale: number = 0.8, color: any = 'red
   });
 }
 
-function updateRbgAlpha(colorString: string, alphaVal: number) {
-  const val = asArray(colorString);
-  return `rgb(${val.slice(0, 3).join(',')},${alphaVal})`;
-}
-
-const strokeColor = 'rgb(0,0,0,0.3)';
-const secondaryStrokeColor = 'rgb(0,0,0,1)';
-
 const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<string, any>, taskLockedByUser: boolean) => {
   const status = feature.getProperties().task_state;
-
-  const isTaskStatusLocked = ['LOCKED_FOR_MAPPING', 'LOCKED_FOR_VALIDATION'].includes(status);
   const borderStrokeColor = 'rgb(15, 255, 255, 0.4)';
 
   const lockedPolygonStyle = createPolygonStyle(
