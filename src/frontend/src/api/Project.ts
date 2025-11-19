@@ -107,7 +107,7 @@ export const GetEntityStatusList = (url: string) => {
     const getEntityOsmMap = async (url: string) => {
       try {
         dispatch(ProjectActions.SetEntityToOsmIdMappingLoading(true));
-        dispatch(CoreModules.TaskActions.SetTaskSubmissionStatesLoading(true));
+        dispatch(TaskActions.SetTaskSubmissionStatesLoading(true));
         const response: AxiosResponse<EntityOsmMap[]> = await CoreModules.axios.get(url);
         dispatch(ProjectActions.SetEntityToOsmIdMapping(response.data));
         dispatch(TaskActions.SetTaskSubmissionStates(response.data));

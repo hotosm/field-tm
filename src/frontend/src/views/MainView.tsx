@@ -4,7 +4,7 @@ import PrimaryAppBar from '@/utilities/PrimaryAppBar';
 import CoreModules from '@/shared/CoreModules';
 import CustomizedSnackbars from '@/utilities/CustomizedSnackbar';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectNotFound from './ProjectNotFound';
 
@@ -78,7 +78,7 @@ const MainView = () => {
                   // p: '1.3rem',
                 }}
               >
-                <CoreModules.Outlet />
+                <Outlet />
                 {/* Footer */}
               </CoreModules.Stack>
             )}

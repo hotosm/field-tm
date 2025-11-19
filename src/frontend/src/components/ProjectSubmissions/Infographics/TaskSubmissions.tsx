@@ -8,6 +8,7 @@ import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import TaskCardSkeleton from '@/components/Skeletons/ProjectSubmissions.tsx/TaskCardSkeleton';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 const TaskSubmissions = () => {
   const params = useParams();
@@ -48,7 +49,7 @@ const TaskSubmissions = () => {
   }, [taskInfo, projectTaskLength]);
 
   const zoomToTask = (taskId) => {
-    dispatch(CoreModules.TaskActions.SetSelectedTask(+taskId));
+    dispatch(TaskActions.SetSelectedTask(+taskId));
   };
 
   useEffect(() => {
@@ -119,9 +120,7 @@ const TaskSubmissions = () => {
             </div>
           ) : filteredTaskInfo?.length > 0 ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => (
-                <TaskCard key={task.task_id} task={task} />
-              ))}
+              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => <TaskCard key={task.task_id} task={task} />)}
             </div>
           ) : (
             <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-mt-10">
