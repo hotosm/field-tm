@@ -60,7 +60,7 @@ const ManageProject = () => {
       case 'details':
         return <EditDetails project={project} />;
       case 'form':
-        return <FormUpdate projectId={projectId} />;
+        return <FormUpdate project={project} />;
       default:
         return <></>;
     }
