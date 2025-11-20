@@ -1,5 +1,4 @@
 import React from 'react';
-import { consentQuestions } from '@/constants/ConsentQuestions';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import RadioButton from '@/components/common/RadioButton';
 import Button from '@/components/common/Button';
@@ -10,6 +9,7 @@ import { OrganisationAction } from '@/store/slices/organisationSlice';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { consentQuestions } from './constants';
 
 const ConsentDetailsForm = () => {
   useDocumentTitle('Consent Details Form');
