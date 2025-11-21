@@ -15,7 +15,7 @@ export const odkTypeOptions: radioOptionsType[] = [
 ];
 
 type consentQuestionsType = {
-  id: string;
+  id: 'give_consent' | 'review_documentation' | 'participated_in';
   type: 'radio' | 'checkbox';
   required: boolean;
   question: string;
