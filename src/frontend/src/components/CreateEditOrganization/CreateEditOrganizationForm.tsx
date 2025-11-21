@@ -22,7 +22,7 @@ import { useCreateOrganisationMutation, useUpdateOrganisationMutation } from '@/
 import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
 import { odkTypeOptions, organizationTypeOptions } from './constants';
 import { createOrganizationValidationSchema } from './validation/CreateEditOrganization';
-import { defaultValues } from './constants/defaultValues';
+import { organizationDefaultValues } from './constants/organizationDefaultValues';
 import { useQueryClient } from '@tanstack/react-query';
 
 const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail?: organisationType }) => {
@@ -114,7 +114,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
   };
 
   const formMethods = useForm<z.infer<typeof createOrganizationValidationSchema>>({
-    defaultValues: defaultValues,
+    defaultValues: organizationDefaultValues,
     resolver: zodResolver(createOrganizationValidationSchema),
   });
   const { watch, register, control, setValue, formState, handleSubmit, reset, getValues } = formMethods;
@@ -124,7 +124,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
   const resetState = (organizationDetail: organisationType) => {
     const { name, associated_email, description, odk_central_url, logo, community_type, url, id } = organizationDetail;
     reset({
-      ...defaultValues,
+      ...organizationDefaultValues,
       name,
       associated_email,
       description,
