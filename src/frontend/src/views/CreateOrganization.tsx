@@ -17,13 +17,12 @@ const CreateOrganization = () => {
 
   const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 
+  // clear consent form on new org add
   useEffect(() => {
-    // clear consent form on new org add
     dispatch(
       OrganisationAction.SetConsentDetailsFormData({
         give_consent: '',
         review_documentation: [],
-        log_into: [],
         participated_in: [],
       }),
     );
