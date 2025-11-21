@@ -256,7 +256,7 @@ async def detect_form_languages(
         content={
             "detected_languages": detected_languages,  # in the order found in form
             "default_language": default_language or [],
-            "all_languages": list(INCLUDED_LANGUAGES.keys()),
+            "supported_languages": list(INCLUDED_LANGUAGES.keys()),
         },
     )
 
