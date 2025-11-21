@@ -18,6 +18,7 @@ import type {
   getUsersParamsType,
   inviteNewUserParamsType,
   inviteNewUserPayloadType,
+  inviteNewUserResponseType,
   projectUserInvite,
   updateExistingUserPayloadType,
   userType,
@@ -66,16 +67,14 @@ export function useProjectUserInvitesQuery({
   });
 }
 
-export function useInviteNewUserMutation({
-  params,
-  options,
-}: {
-  params: inviteNewUserParamsType;
-  options: TMutationOptions<any, inviteNewUserPayloadType>;
-}) {
+export function useInviteNewUserMutation(
+  options: TMutationOptions<
+    inviteNewUserResponseType,
+    { payload: inviteNewUserPayloadType; params: inviteNewUserParamsType }
+  >,
+) {
   return useMutation({
-    mutationKey: ['invite-new-user', params],
-    mutationFn: (payload: inviteNewUserPayloadType) => inviteNewUser(payload, params),
+    mutationFn: ({ payload, params }) => inviteNewUser(payload, params),
     ...options,
   });
 }
