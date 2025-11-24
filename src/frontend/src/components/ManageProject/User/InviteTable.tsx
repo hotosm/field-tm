@@ -1,12 +1,9 @@
-import { GetProjectUserInvites } from '@/api/User';
+import React, { useRef } from 'react';
 import DataTable from '@/components/common/DataTable';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import AssetModules from '@/shared/AssetModules';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useProjectUserInvitesQuery } from '@/api/user';
 
 function getStatusStyle(status: 'Active' | 'Pending' | 'Expired' | '') {
   switch (status) {
@@ -22,14 +19,18 @@ function getStatusStyle(status: 'Active' | 'Pending' | 'Expired' | '') {
 }
 
 const InviteTable = () => {
-  const dispatch = useAppDispatch();
   const params = useParams();
   const copyTextRef = useRef<HTMLElement>(null);
   const { protocol, hostname, port } = window.location;
 
-  const projectId = params.id;
-  const projectUserInvites = useAppSelector((state) => state.user.projectUserInvitesList);
-  const projectUserInvitesLoading = useAppSelector((state) => state.user.getProjectUserInvitesLoading);
+  const projectId = +params.id!;
+
+  const { data: projectUserInvites, isLoading: projectUserInvitesLoading } = useProjectUserInvitesQuery({
+    params: { project_id: projectId },
+    options: {
+      queryKey: ['project-user-invites', projectId],
+    },
+  });
 
   const projectUserInvitesDataColumns = [
     {
@@ -94,7 +95,7 @@ const InviteTable = () => {
                     if (copyTextRef.current) copyTextRef.current.textContent = 'Copied!';
                   }}
                 >
-                  <AssetModules.ContentCopyIcon className="!fmtm-text-sm  hover:fmtm-text-primaryRed" />{' '}
+                  <AssetModules.ContentCopyIcon className="!fmtm-text-sm hover:fmtm-text-primaryRed" />
                   <span ref={copyTextRef}>Copy invite link</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -104,11 +105,6 @@ const InviteTable = () => {
       },
     },
   ];
-
-  useEffect(() => {
-    if (!projectId) return;
-    dispatch(GetProjectUserInvites(`${VITE_API_URL}/users/invites`, { project_id: +projectId }));
-  }, []);
 
   return (
     <DataTable

@@ -91,3 +91,7 @@ export type projectUserInvite = {
   used_at: string;
   created_at: string;
 };
+
+export type inviteNewUserResponseType = {
+  invite_url: string;
+};

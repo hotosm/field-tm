@@ -218,6 +218,7 @@ export const useGetProjectQuery = ({
 }) =>
   useQuery({
     queryFn: () => getProject(project_id),
+    select: (data) => data.data,
     ...options,
   });
 

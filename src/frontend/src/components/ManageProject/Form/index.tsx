@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
-import CoreModules from '@/shared/CoreModules';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useDownloadFormQuery } from '@/api/central';
 import { downloadBlobData } from '@/utilfunctions';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import AssetModules from '@/shared/AssetModules';
+import { projectType } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,14 +18,18 @@ type FileType = {
   previewURL: string;
 };
 
-const FormUpdate = ({ projectId }) => {
+type formUpdatePropType = {
+  project: projectType | undefined;
+};
+
+const FormUpdate = ({ project }: formUpdatePropType) => {
   useDocumentTitle('Manage Project: Form Update');
   const dispatch = useAppDispatch();
+  const projectId = project?.id;
 
   const [uploadForm, setUploadForm] = useState<FileType[] | null>([]);
   const [formError, setFormError] = useState(false);
 
-  const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
 
   const onSave = () => {
@@ -35,7 +39,7 @@ const FormUpdate = ({ projectId }) => {
     }
     dispatch(
       PostFormUpdate(`${API_URL}/central/update-form?project_id=${projectId}`, {
-        xformId: xFormId,
+        xformId: project?.odk_form_id,
         upload: uploadForm && uploadForm?.[0]?.file,
       }),
     );
@@ -48,8 +52,8 @@ const FormUpdate = ({ projectId }) => {
     isLoading: isDownloadFormLoading,
     refetch: downloadForm,
   } = useDownloadFormQuery({
-    params: { project_id: +projectId },
-    options: { queryKey: ['get-download-form', +projectId], enabled: false },
+    params: { project_id: +projectId! },
+    options: { queryKey: ['get-download-form', +projectId!], enabled: false },
   });
 
   useEffect(() => {
@@ -87,7 +91,10 @@ const FormUpdate = ({ projectId }) => {
               Download the{' '}
               <a
                 className={`fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline ${isDownloadFormLoading && 'fmtm-pointer-events-none fmtm-cursor-not-allowed'}`}
-                onClick={() => downloadForm()}
+                onClick={() => {
+                  if (!project?.id) return;
+                  downloadForm();
+                }}
                 aria-disabled={isDownloadFormLoading}
               >
                 latest version
