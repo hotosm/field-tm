@@ -59,17 +59,15 @@ generate-dotenv branch="dev":
   # By default we deploy from 'dev' branch, but can be overridden
 
   cd {{justfile_directory()}}
-
-  # Re-export .env to the environment, with cleaned variables
-  if [ -f .env ]; then
-    just _echo-yellow "'.env' file already exists. Skipping dotenv generation."
-    exit 0
-  fi
-
   just manage _install_envsubst
 
-  # Generate a .env file from .env.example, substituting values from environment
-  ./envsubst -i .env.example | grep -vE '^\s*#|^\s*$' > .env
+  # Check if .env already exists and warn, but continue
+  if [ -f .env ]; then
+    just _echo-yellow "'.env' file already exists. Skipping dotenv generation to avoid overwriting."
+  else
+    # Generate a .env file from .env.example, substituting values from environment
+    ./envsubst -i .env.example | grep -vE '^\s*#|^\s*$' > .env
+  fi
 
   # Re-export .env to the environment, with cleaned variables
   if [ -f .env ]; then
