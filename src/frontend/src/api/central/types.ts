@@ -21,3 +21,9 @@ export type formType = {
   id: number;
   title: string;
 };
+
+export type formLanguagesType = {
+  detected_languages: string[];
+  default_language: string[];
+  supported_languages: string[];
+};
