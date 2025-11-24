@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AssetModules from '@/shared/AssetModules.js';
-import { InviteNewUser } from '@/api/User';
 import Button from '@/components/common/Button';
 import Chips from '@/components/common/Chips.js';
 import Select2 from '@/components/common/Select2.js';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { inviteValidationSchema } from '@/components/ManageProject/User/validation/inviteValidation';
 import RadioButton from '@/components/common/RadioButton';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import InviteTable from './InviteTable';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { UserActions } from '@/store/slices/UserSlice';
 import { inviteUserDefaultValue } from './constants/defaultValues';
 import { inviteOptions, invitePropType } from './constants';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,30 +17,38 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Textarea } from '@/components/RadixComponents/TextArea';
 import FieldLabel from '@/components/common/FieldLabel';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import { useInviteNewUserMutation } from '@/api/user';
+import { useQueryClient } from '@tanstack/react-query';
 
 const InviteTab = ({ roleList }: invitePropType) => {
   useDocumentTitle('Manage Project: Invite User');
-  const dispatch = useAppDispatch();
   const params = useParams();
+  const queryClient = useQueryClient();
 
   const projectId = +params.id!;
   const [user, setUser] = useState('');
+  const [projectUserInvitesError, setProjectUserInvitesError] = useState<string[]>([]);
 
-  const inviteNewUserPending = useAppSelector((state) => state.user.inviteNewUserPending);
-  const projectUserInvitesError = useAppSelector((state) => state.user.projectUserInvitesError);
+  const { mutate: inviteNewUser, isPending: isInvitingUser } = useInviteNewUserMutation({
+    onSuccess: (data) => {
+      setProjectUserInvitesError(data);
+      reset(inviteUserDefaultValue);
+      queryClient.invalidateQueries({ queryKey: ['project-user-invites', projectId] });
+    },
+    onError: () => {},
+  });
 
   const onSubmit = () => {
     const values = getValues();
-    dispatch(InviteNewUser(`${VITE_API_URL}/users/invite`, { ...values, projectId }));
+    const { inviteVia, role, user } = values;
+    inviteNewUser({ params: { project_id: projectId }, payload: { inviteVia, role: role!, user, projectId } });
   };
 
   const formMethods = useForm({
     defaultValues: inviteUserDefaultValue,
     resolver: zodResolver(inviteValidationSchema),
   });
-  const { watch, control, setValue, formState, handleSubmit, getValues } = formMethods;
+  const { watch, control, setValue, formState, handleSubmit, getValues, reset } = formMethods;
   const { errors } = formState;
   const values = watch();
 
@@ -52,7 +57,7 @@ const InviteTab = ({ roleList }: invitePropType) => {
       <Dialog
         open={!isEmpty(projectUserInvitesError)}
         onOpenChange={(state) => {
-          if (!state) dispatch(UserActions.SetProjectUserInvitesError([]));
+          if (!state) setProjectUserInvitesError([]);
         }}
       >
         <DialogContent>
@@ -66,11 +71,7 @@ const InviteTab = ({ roleList }: invitePropType) => {
               </p>
             ))}
           </div>
-          <Button
-            variant="primary-grey"
-            className="fmtm-ml-auto"
-            onClick={() => dispatch(UserActions.SetProjectUserInvitesError([]))}
-          >
+          <Button variant="primary-grey" className="fmtm-ml-auto" onClick={() => setProjectUserInvitesError([])}>
             Dismiss
           </Button>
         </DialogContent>
@@ -176,7 +177,7 @@ const InviteTab = ({ roleList }: invitePropType) => {
             {errors?.role?.message && <ErrorMessage message={errors.role.message as string} />}
           </div>
           <div className="fmtm-flex fmtm-justify-center">
-            <Button type="submit" variant="primary-red" isLoading={inviteNewUserPending}>
+            <Button type="submit" variant="primary-red" isLoading={isInvitingUser}>
               ASSIGN
             </Button>
           </div>

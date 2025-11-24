@@ -4,5 +4,5 @@ import { inviteValidationSchema } from '../validation/inviteValidation';
 export const inviteUserDefaultValue: z.infer<typeof inviteValidationSchema> = {
   inviteVia: 'osm',
   user: [],
-  role: '',
+  role: null,
 };

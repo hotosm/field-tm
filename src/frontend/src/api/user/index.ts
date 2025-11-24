@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import {
   acceptInvite,
   deleteUserById,
@@ -17,13 +17,13 @@ import type {
   getUserListType,
   getUsersParamsType,
   inviteNewUserParamsType,
-  inviteNewUserPayloadType,
-  inviteNewUserResponseType,
   projectUserInvite,
   updateExistingUserPayloadType,
   userType,
 } from './types';
 import { paginationType } from '@/store/types/ICommon';
+import { project_roles } from '@/types/enums';
+import { AxiosError } from 'axios';
 
 export function useGetUsersQuery({
   params,
@@ -68,13 +68,41 @@ export function useProjectUserInvitesQuery({
 }
 
 export function useInviteNewUserMutation(
-  options: TMutationOptions<
-    inviteNewUserResponseType,
-    { payload: inviteNewUserPayloadType; params: inviteNewUserParamsType }
+  options: UseMutationOptions<
+    string[],
+    AxiosError<Error>,
+    {
+      payload: { inviteVia: string; user: string[]; role: project_roles; projectId: number };
+      params: inviteNewUserParamsType;
+    }
   >,
 ) {
   return useMutation({
-    mutationFn: ({ payload, params }) => inviteNewUser(payload, params),
+    mutationFn: async ({ payload, params }) => {
+      const results: string[] = [];
+      const { inviteVia, user, role, projectId } = payload;
+
+      const requests = user.map(async (u) => {
+        const body = {
+          project_id: projectId,
+          role,
+          ...(inviteVia === 'osm' ? { osm_username: u.trim() } : { email: u.trim() }),
+        };
+
+        try {
+          const res = await inviteNewUser(body, params);
+          if (res.status === 201) {
+            results.push(res.data.message);
+          }
+        } catch (err: any) {
+          const msg = err?.response?.data?.detail || 'Something went wrong';
+          results.push(msg);
+        }
+      });
+
+      await Promise.all(requests);
+      return results;
+    },
     ...options,
   });
 }
