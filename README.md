@@ -121,7 +121,7 @@ various deployment guides.
 
 <!-- prettier-ignore-start -->
 | Status | Feature | Release |
-|:------:|:-------:|:--------|
+| :------: | :-------: | :--------: |
 | ✅ | 🖥️ project area splitting avoiding roads, rivers, railways | Since [v2024.4.0][1] |
 | ✅ | 🖥️ XLSForm survey generation in ODK Central | Since [v2024.4.0][1] |
 | ✅ | 📱 mapping of project via survey in ODK Collect mobile app | Since [v2024.4.0][1] |
