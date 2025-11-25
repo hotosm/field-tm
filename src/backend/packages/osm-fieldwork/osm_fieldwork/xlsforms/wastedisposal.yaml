@@ -1,0 +1,229 @@
+survey:
+  - "#":
+      Converted by yxf, from wastedisposal.xlsx. Edit the YAML file instead of the
+      Excel file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is maintained by the Humanitarian
+      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/tree/main/osm-fieldwork/xlsforms"
+    relevant: ${username}!=’rsavoye’
+  - type: begin group
+    name: location_details
+    label::English(en): Location Details
+    appearance: Field-list
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+  - type: select_one_from_file wastedisposal.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    appearance: map
+    choice_filter: true()
+  - type: calculate
+    name: xid
+    label::English(en): OSM ID
+    appearance: minimal
+    calculation: instance('wastedisposal’)/root/item[id=${existing}]/id
+    trigger: ${existing}
+  - type: calculate
+    name: xlocation
+    label::English(en): Location
+    appearance: minimal
+    calculation: instance('wastedisposal’)/root/item[id=${existing}]/geometry
+    trigger: ${existing}
+  - type: begin_group
+    name: details
+    label::English(en): Details
+    appearance: Field-list
+  - type: select_one management
+    name: management
+    label::English(en):
+      Is it overflowing, properly managed or if waste is regularly
+      burned on site
+    appearance: minimal
+  - type: select_one yes_no
+    name: fee
+    label::English(en): Is a fee charged ?
+    hint::English(en): Indicate if a fee is required to enroll at this school
+    appearance: minimal
+    calculation: yes
+    required_message::English(en): Sorry, this question is required
+  - type: select_one yes_no
+    name: equipped
+    label::English(en): Is there a container for waste ?
+    appearance: minimal
+  - type: select_one type
+    name: type
+    label::English(en): What type of Recycling is available ?
+    appearance: minimal
+    relevant: ${management}=’recycling’
+  - type: select_multiple recycling
+    name: recycling_hazardous_waste
+    label::English(en): Can hazardous waste be recycled here ?
+    appearance: minimal
+    relevant: ${management}=’recycling’
+  - type: select_one yes_no
+    name: official
+    label::English(en): Is this an official dump site?
+  - type: begin_group
+    name: gps
+    label::English(en): GPS Coordinates
+    appearance: field-list
+  - type: geopoint
+    name: location
+    label::English(en): Please take a GPS point at the feature location.
+    hint::English(en): Where are we ?
+    appearance: Placement-map
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: image
+    name: image
+    label::English(en): Take A Picture
+    appearance: minimal
+    parameters: max-pixels=1000
+  - type: end_group
+    name: end of gps
+  - type: end_group
+    name: end of details
+  - type: end_group
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: waste
+    name: trash
+    label::English(en): Trash
+  - list_name: waste
+    name: oil
+    label::English(en): Oil
+  - list_name: waste
+    name: drugs
+    label::English(en): Drugs
+  - list_name: waste
+    name: organic
+    label::English(en): Organic
+  - list_name: waste
+    name: rubble
+    label::English(en): Rubble
+  - list_name: waste
+    name: dog_excrement
+    label::English(en): Dog Excrement
+  - list_name: waste
+    name: cigarettes
+    label::English(en): Cigarettes
+  - list_name: management
+    name: overflowing
+    label::English(en): Over Flowing
+  - list_name: management
+    name: properly_managed
+    label::English(en): Properly Managed
+  - list_name: management
+    name: waste_burning
+    label::English(en): Waste Burning
+  - list_name: management
+    name: recycling
+    label::English(en): Recycling
+  - list_name: type
+    name: container
+    label::English(en): Container
+  - list_name: type
+    name: centre
+    label::English(en): Recycling Center
+  - list_name: recycling
+    name: glass_bottles
+    label::English(en): Glass bottles
+  - list_name: recycling
+    name: aluminum
+    label::English(en): Aluminum
+  - list_name: recycling
+    name: batteries
+    label::English(en): Batteries
+  - list_name: recycling
+    name: small_appliances
+    label::English(en): Small appliances
+  - list_name: recycling
+    name: scrap_metal
+    label::English(en): Scrap Metal
+  - list_name: recycling
+    name: plastic
+    label::English(en): Plastic
+  - list_name: recycling
+    name: hazardous_waste
+    label::English(en): Hazardous Waste
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+  - list_name: amenity
+    name: waste_disposal
+    label::English(en): Waste Disposal
+  - list_name: amenity
+    name: waste_dump_site
+    label::English(en): waste Dump Site
+  - list_name: amenity
+    name: waste_transfer_station
+    label::English(en): Waste Transfer Station
+  - list_name: amenity
+    name: waste_basket
+    label::English(en): Waste basket
+  - list_name: amenity
+    name: recycling
+    label::English(en): Recycling
+  - list_name: amenity
+    name: landfill
+    label::English(en): Landfill
+settings:
+  - form_title: Waste Management
+    form_id: waste
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - required_message::English(en)
+      - default
+      - trigger
+      - parameters
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates

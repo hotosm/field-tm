@@ -1,0 +1,524 @@
+survey:
+  - "#":
+      Converted by yxf, from waterpoints.xlsx. Edit the YAML file instead of the
+      Excel file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is maintained by the Humanitarian
+      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/tree/main/osm-field-work/xlsforms"
+    relevant: ${username}!=”rsavoye”
+  - type: start-geopoint
+    name: warmup
+  - type: begin_group
+    name: first_screen
+    label::English(en): First Screen
+    appearance: field-list
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+    required: basic
+  - type: select_one_from_file waterpoints.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    appearance: map
+    choice_filter: true()
+  - type: calculate
+    name: xid
+    label::English(en): OSM ID
+    appearance: minimal
+    calculation: instance('waterpoints’)/root/item[id=${existing}]/id
+    required_message::French(fr): ${existing}
+  - type: calculate
+    name: xlocation
+    label::English(en): Location
+    appearance: minimal
+    calculation: instance('waterpoints’)/root/item[id=${existing}]/geometry
+    required_message::French(fr): ${existing}
+  - type: begin_group
+    name: typeinfo
+    appearance: Field-list
+    label::French(fr): Détails du type de points d’eau
+  - type: text
+    name: ref
+    label::English(en): Enter the code or the identifier of this water point
+    hint::English(en):
+      Look around the water through and if there is a code, enter it
+      here as shown.
+    appearance: minimal
+    label::French(fr): Entrez le code ou l’identifiant de ce point d'eau
+    hint::French(fr):
+      Regardez autour de l'abreuvoir et s'il y a un code, entrez-le
+      ici comme indiqué.
+  - type: select_one waterpoint_type or_other
+    name: waterpoint_type
+    label::English(en): What type of water point is it?
+    appearance: minimal
+    required: yes
+    label::French(fr): Quel type de point d'eau est-ce ?
+    hint::French(fr): Sélectionnez le type de point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one pump_type
+    name: pump_type
+    label::English(en): What type of pump is this?
+    appearance: minimal
+    required: yes
+    label::French(fr): Quel est ce type de pompe ?
+    hint::French(fr): Sélectionnez le type de pompe
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one power_type
+    name: power_type
+    label::English(en): What type of feed does this water point us
+    appearance: minimal
+    required: yes
+    label::French(fr): Quel type d'alimentation ce point d'eau utilise-t-il ?
+    hint::French(fr): Indiquez le type d'alimentation de ce point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one operational_status
+    name: operational_status
+    label::English(en): What is the operational status of this water point?
+    appearance: minimal
+    required: yes
+    label::French(fr): Quel est le statut opérationnel de ce point d'eau ?
+    hint::French(fr): Sélectionnez le statut opérationnel de ce point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: end_group
+  - type: begin_group
+    name: waterpointinfo
+    appearance: Field-list
+    label::French(fr): Détails du Point d’eau
+  - type: select_multiple primary
+    name: primary_usage
+    label::English(en): What is the main use of this water point?
+    hint::English(en): Indicate the main use of this water point
+    appearance: minimal
+    required: yes
+    label::French(fr): Quelle est l'utilisation principale de ce point d'eau ?
+    hint::French(fr): Indiquez l'usage principal de ce point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one access or_other
+    name: access
+    label::English(en): Who has access to this water point?
+    hint::English(en): Indicate who can access this water point
+    appearance: minimal
+    required: yes
+    label::French(fr): Qui accède à ce point d'eau ?
+    hint::French(fr): Indiquez qui peut accéder à ce point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one seasonal
+    name: seasonal
+    label::English(en): In what season is this water point functional?
+    hint::English(en): Indicate the season of access to the water point
+    appearance: minimal
+    required: yes
+    label::French(fr): En quelle saison ce point d'eau est-il fonctionnel ?
+    hint::French(fr): Indiquez la saison d'accès au point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one yes_no
+    name: fee
+    label::English(en): Is there a charge for access to this water point?
+    hint::English(en):
+      Indicate whether there is a charge for access to water from this
+      water point.
+    appearance: minimal
+    required: yes
+    label::French(fr): L'accès à ce point d'eau est-il payant ?
+    hint::French(fr): Indiquez si l'accès à l'eau de ce point d'eau est payant.
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: text
+    name: charge
+    label::English(en): What is the amount of the fee?
+    hint::English(en): Indicate the amount in CFA the price
+    label::French(fr): Quel est le montant de la redevance ?
+    hint::French(fr): Indiquez le montant en CFA le tarif
+  - type: select_one opening_hours
+    name: opening_hours
+    label::English(en): "Select the operating hours for this water point:"
+    hint::English(en):
+      Select the days and hours this water point is open by asking
+      a resident
+    appearance: minimal
+    required: yes
+    label::French(fr):
+      "Sélectionnez les heures de fonctionnement de ce point d'eau\
+      \ :"
+    hint::French(fr):
+      Sélectionnez les jours et les heures d'ouverture de ce point d'eau
+      en demandant à un résident
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one cost
+    name: currency
+    label::English(en): What is the currency denomination ?
+    appearance: minimal
+  - type: integer
+    name: waterpoint_capacity
+    label::English(en): How many concurrent users does this water point have?
+    hint::English(en):
+      Indicate the number of people who can access the water at the
+      same time.
+    appearance: minimal
+    required: yes
+    label::French(fr): Combien d'utilisateurs simultanés ce point d'eau a-t-il ?
+    hint::French(fr):
+      Indiquez le nombre de personnes qui peuvent accéder à l'eau en
+      même temps.
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: text
+    name: risk_impact
+    label::English(en): What is the potential risk that impacts this water point?
+    hint::English(en):
+      Look around the water point and explain any potential hazards
+      impacting that water point.
+    label::French(fr):
+      Quel est le risque potential qui a un impact sur ce point d'eau
+      ?
+    hint::French(fr):
+      Regardez autour du point d'eau et expliquez tout risque potential
+      ayant un impact sur ce point d'eau.
+  - type: text
+    name: water_quality
+    label::English(en): What is the water quality at this water point?
+    hint::English(en):
+      Look at sanitation, environment and explain what you think the
+      quality of this water point is.
+    label::French(fr): Quelle est la qualité de l'eau à ce point d'eau ?
+    hint::French(fr):
+      Regardez l'assainissement, l'environnement et expliquez ce que
+      vous pensez être la qualité de ce point d'eau.
+  - type: end_group
+  - type: begin_group
+    name: waterpoint_mgmt_details
+    appearance: Field-list
+    label::French(fr): Détails de Gestion
+  - type: select_one operator or_other
+    name: operator
+    label::English(en): Who manages this water point?
+    hint::English(en): Select the operator of this water point
+    appearance: minimal
+    required: yes
+    label::French(fr): Qui gère ce point d'eau ?
+    hint::French(fr): Sélectionnez l'opérateur de ce point d'eau
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one  provider or_other
+    name: waterpoint_provider
+    label::English(en): Who is funding this water point?
+    hint::English(en): Enter the name of the supplier/lessor as it is written.
+    appearance: minimal
+    required: yes
+    label::French(fr): Qui est le financeur de ce point d'eau ?
+    hint::French(fr): Inscrivez le nom du fournisseur/bailleur tel qu'il est écrit.
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one yes_no
+    name: waterpoint_mgmt
+    label::English(en): Does this water point have a management committee?
+    hint::English(en): Indicate if this water point has a management committee.
+    appearance: minimal
+    required: yes
+    label::French(fr): Ce point d'eau dispose-t-il d'un comité de gestion ?
+    hint::French(fr): Indiquez si ce point d'eau a un comité de gestion.
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one frequency
+    name: maintenc_frequency
+    label::English(en): How often is this water point maintained?
+    hint::English(en): Indicate the frequency
+    appearance: minimal
+    required: yes
+    label::French(fr): Quelle est la fréquence d'entretien de ce point d'eau ?
+    hint::French(fr): Indiquez la fréquence
+  - type: end_group
+  - type: begin_group
+    name: gps
+    label::English(en): GPS Coordinates
+    appearance: field-list
+  - type: geopoint
+    name: location
+    label::English(en): Record the coordinates of this water point
+    hint::English(en):
+      Using GPS, enter the location. Please stand as close to the water
+      point as possible.
+    appearance: Placement-map
+    relevant: ${xlocation}=””
+    trigger: ${existing}
+  - type: image
+    name: image
+    label::English(en): Take a picture of this water point
+    hint::English(en):
+      "Take a photo of this waterhole. Make sure the entire waterhole
+      is captured in the photo:"
+    appearance: minimal
+    parameters: max-pixels=1000
+  - type: end_group
+    name: end of gps
+  - type: end_group
+    name: end of gps
+choices:
+  - list_name: model
+    name: basic
+    label::French(fr): Basic Model
+  - list_name: model
+    name: extended
+    label::French(fr): Extended Model
+  - list_name: operational_status
+    name: operational
+    label::French(fr): Opérationnel
+    label::English(en): Operational
+  - list_name: operational_status
+    name: needs_maintainance
+    label::French(fr): Besoin de maintenance
+    label::English(en): Need maintenance
+  - list_name: operational_status
+    name: closed
+    label::French(fr): Fermé
+    label::English(en): Closed
+  - list_name: operator
+    name: private
+    label::French(fr): Privé
+    label::English(en): Private
+  - list_name: operator
+    name: public
+    label::French(fr): Public
+    label::English(en): Public
+  - list_name: operator
+    name: community
+    label::French(fr): Communauté
+    label::English(en): Community
+  - list_name: yes_no
+    name: yes
+    label::French(fr): Oui
+    label::English(en): Yes
+  - list_name: yes_no
+    name: no
+    label::French(fr): Non
+    label::English(en): No
+  - list_name: opening_hours
+    name: 24/7
+    label::French(fr): 24/7
+    label::English(en): 24/7
+  - list_name: opening_hours
+    name: mo-sa_08:00-18:00
+    label::French(fr): Lu-Sa 08:00-18:00
+    label::English(en): Monday-Saturday  08-18:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-17:00
+    label::French(fr): Lu-Sa 09:00-17:00
+    label::English(en): Monday-Saturday  09:00-17:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-18:00
+    label::French(fr): Lu-Sa 09:00-18:00
+    label::English(en): Monday-Saturday 09:00-17:00
+  - list_name: opening_hours
+    name: mo-fr_09:00-17:00
+    label::French(fr): Lu-Ve 09:00-17:00
+    label::English(en): Monday-Friday 09:00-17:00
+  - list_name: opening_hours
+    name: mo-su_09:00-21:00
+    label::French(fr): Lu-Di 09:00-21:00
+    label::English(en): Monday-Sunday 09:00-21:00
+  - list_name: opening_hours
+    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
+    label::French(fr): Lu-Ve 08:00-18:00 ; Sa-Di 08:00-15:00
+    label::English(en): Monday-Friday
+  - list_name: opening_hours
+    name: by_appointment
+    label::French(fr): Sur rendez-vous uniquement
+  - list_name: waterpoint_type
+    name: faucet
+    label::French(fr): Robinet
+    label::English(en): Faucet
+  - list_name: waterpoint_type
+    name: well
+    label::French(fr): Puits d'eau
+    label::English(en): Water well
+  - list_name: waterpoint_type
+    name: pump
+    label::French(fr): Pompe
+    label::English(en): Pump
+  - list_name: waterpoint_type
+    name: borehole
+    label::French(fr): "Réservoir d’eau "
+    label::English(en): Water reservoir
+  - list_name: waterpoint_type
+    name: water_tower
+    label::French(fr): Tour d'eau (Château)
+    label::English(en): Water Tower (Castle)
+  - list_name: pump_type
+    name: powered
+    label::French(fr): Alimentation électrique
+    label::English(en): Power Supply
+  - list_name: pump_type
+    name: manual
+    label::French(fr): Manuel
+    label::English(en): Manual
+  - list_name: access
+    name: public
+    label::French(fr): Public
+    label::English(en): Public
+  - list_name: access
+    name: private
+    label::French(fr): Privé
+    label::English(en): Private
+  - list_name: access
+    name: religion
+    label::French(fr): Groupe religieux/Institution
+    label::English(en): Religious Group
+  - list_name: provider
+    name: private
+    label::French(fr): Privé
+    label::English(en): Private
+  - list_name: provider
+    name: government
+    label::French(fr): Gouvernement
+    label::English(en): Government
+  - list_name: provider
+    name: community
+    label::French(fr): Communauté
+    label::English(en): Community
+  - list_name: provider
+    name: ngo
+    label::French(fr): ONG
+    label::English(en): NGO
+  - list_name: provider
+    name: religious
+    label::French(fr): Religieux
+    label::English(en): Religious
+  - list_name: frequency
+    name: day
+    label::French(fr): Journalier
+    label::English(en): Daily
+  - list_name: frequency
+    name: week
+    label::French(fr): Hebdomadaire
+    label::English(en): Weekly
+  - list_name: frequency
+    name: month
+    label::French(fr): Mensuel
+    label::English(en): Monthly
+  - list_name: frequency
+    name: year
+    label::French(fr): Annuellement
+    label::English(en): Annually
+  - list_name: elevation
+    name: valley
+    label::French(fr): Vallée
+    label::English(en): Valley
+  - list_name: elevation
+    name: plateau
+    label::French(fr): Plateau
+    label::English(en): Plateau
+  - list_name: primary
+    name: drinking
+    label::French(fr): Eau de boisson
+    label::English(en): Drinking Water
+  - list_name: primary
+    name: irrigation
+    label::French(fr): Irrigation
+    label::English(en): Irrigation
+  - list_name: primary
+    name: livestock
+    label::French(fr): Bétail
+    label::English(en): Livestock
+  - list_name: power_type
+    name: solar
+    label::French(fr): Solaire
+    label::English(en): Solar
+  - list_name: power_type
+    name: thermal
+    label::French(fr): Énergie thermique
+    label::English(en): Thermal Energy
+  - list_name: power_type
+    name: wind_power
+    label::French(fr): Énergie éolienne
+    label::English(en): Wind Power
+  - list_name: seasonal
+    name: dry
+    label::French(fr): Saison sèche
+    label::English(en): Dry Season
+  - list_name: seasonal
+    name: rainy
+    label::French(fr): Saison des pluies
+    label::English(en): Wet Season
+  - list_name: seasonal
+    name: all_seasoon
+    label::French(fr): Toutes les saisons
+    label::English(en): All Seasons
+  - list_name: cost
+    name: EUR
+    label::English(en): Europe
+  - list_name: cost
+    name: TZS
+    label::English(en): Tanzania
+  - list_name: cost
+    name: KES
+    label::English(en): Kenya
+  - list_name: cost
+    name: UGX
+    label::English(en): Uganda
+  - list_name: cost
+    name: NGN
+    label::English(en): Nigeria
+  - list_name: cost
+    name: XOF
+    label::English(en): Senegal
+  - list_name: cost
+    name: NPR
+    label::English(en): Nepal
+  - list_name: cost
+    name: USD
+    label::English(en): United States
+  - list_name: cost
+    name: IDR
+    label::English(en): Indonesian
+  - list_name: cost
+    name: PHP
+    label::English(en): Philippines
+settings:
+  - form_title: Waterpoints
+    form_id: waterpoints
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - default
+      - trigger
+      - parameters
+      - required
+      - label::French(fr)
+      - hint::French(fr)
+      - required_message::French(fr)
+    choices:
+      - list_name
+      - name
+      - label::French(fr)
+      - label::English(en)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates

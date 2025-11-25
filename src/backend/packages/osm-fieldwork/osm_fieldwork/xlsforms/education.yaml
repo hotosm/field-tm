@@ -1,0 +1,414 @@
+survey:
+  - "#":
+      Converted by yxf, from education.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is funded and supported technically
+      by the Humanitarian OpenStreetMapTeam (HOT). The source for this XLSForm is at:
+      https://github.com/hotosm/osm-fieldwork/tree/main/XForms"
+    relevant: ${username}!=’rsavoye’
+  - type: start-geopoint
+    name: warmup
+  - type: begin group
+    name: first_screen
+    label::English(en): First Screen
+    appearance: field-list
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+    default: basic
+  - type: select_one_from_file education.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    appearance: map
+    choice_filter: true()
+  - type: calculate
+    name: xid
+    appearance: minimal
+    calculation: instance('education’)/root/item[id=${existing}]/id
+    trigger: ${existing}
+    required_message: ${existing}
+  - type: calculate
+    name: xlocation
+    appearance: minimal
+    calculation: instance('education’)/root/item[id=${existing}]/geometry
+    trigger: ${existing}
+    required_message: ${existing}
+  - type: begin group
+    name: facility_details
+    label::English(en): Educational Facility Details
+    appearance: Field-list
+  - type: text
+    name: name
+    label::English(en): What is the name of this School?
+    hint::English(en): Enter name of this school
+    appearance: minimal
+    calculation: instance('education’)/root/item[id=${existing}]/title
+    trigger: ${existing}
+    required_message: Sorry, this question is required
+  - type: text
+    name: operator
+    label::English(en): Who is operator of this School?
+    hint::English(en): Enter the name of the provider/donor as it is written
+    appearance: minimal
+    calculation: instance('education’)/root/item[id=${existing}]/operator
+    trigger: ${existing}
+    required_message: Sorry, this question is required
+  - type: select_one amenity
+    name: amenity
+    label::English(en): What type of School is this?
+    hint::English(en): Select the type of school
+    appearance: minimal
+    calculation: instance('education’)/root/item[id=${existing}]/amenity
+    trigger: ${existing}
+    required_message: Sorry, this question is required
+  - type: select_one operator:type
+    name: operator_type
+    label::English(en): What type of organization operates this School ?
+    hint::English(en): Select the Operator of this school
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one denomination
+    name: denomination
+    label::English(en): What is the religious denomination ?
+    appearance: minimal
+    relevant: ${operator_type}=”religious”
+  - type: select_one isced:level
+    name: isced_level
+    label::English(en): ISCED Level
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one school:gender
+    name: gender
+    label::English(en): What genders attend this school ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one pedagogy
+    name: pedagogy
+    label::English(en): What type of instruction is used at this school ?
+    appearance: minimal
+    relevant: ${model}=’extended’
+    required_message: Sorry, this question is required
+  - type: integer
+    name: min_age
+    label::English(en): What is the lowest age that can enroll ?
+    appearance: minimal
+    relevant: ${model}=’extended’
+    required_message: Sorry, this question is required
+  - type: select_one yes_no
+    name: temporary
+    label::English(en): Is this school a temporary structure ?
+    appearance: minimal
+    relevant: ${model}=’extended’
+    required_message: Sorry, this question is required
+  - type: text
+    name: code
+    label::English(en): Enter the code of this School
+    hint::English(en):
+      Look around the school and if it has a code, enter it here as
+      written
+    appearance: minimal
+    relevant: ${model}=’extended’
+  - type: end_group
+    name: end of facility_details
+  - type: begin_group
+    name: facility_services
+    label::English(en): Services at this school
+    appearance: Field-list
+    relevant: ${model}=’extended’
+  - type: integer
+    name: faculty_count
+    label::English(en):
+      What is the approximate number of faculty members operating
+      this school?
+    hint::English(en): Ask the administrator, and enter the number of faculty members
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: integer
+    name: capacity
+    label::English(en): Maximum number of students
+    appearance: minimal
+  - type: select_one yes_no
+    name: fee
+    label::English(en): Is a fee charged to attend this school?
+    hint::English(en): Indicate if a fee is required to enroll at this school
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one toilets:access
+    name: toilets_access
+    label::English(en): Who has access to the toilets ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one yes_no
+    name: generator
+    label::English(en): Does this school use a generator ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one generator:source
+    name: generator_source
+    label::English(en): What type of fuel is used by the generator ?
+    appearance: minimal
+    relevant: ${generator}=’yes’
+    required_message: Sorry, this question is required
+  - type: select_one yes_no
+    name: water
+    label::English(en): Does this school have a water supply ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one yes_no
+    name: toilets
+    label::English(en): Does this school have toilets ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: select_one water_supply
+    name: water_supply
+    label::English(en): What type of water supply is at this school ?
+    appearance: minimal
+    relevant: ${water}=’yes’
+    required_message: Sorry, this question is required
+  - type: select_one yes_no
+    name: wheelchair
+    label::English(en): Is this school wheelchair accessible ?
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: text
+    name: addr_full
+    label::English(en): Full address
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: text
+    name: phone
+    label::English(en): School contact phone number
+    appearance: minimal
+    required_message: Sorry, this question is required
+  - type: end group
+    name: end of facility_services
+  - type: begin_group
+    name: gps
+    label::English(en): GPS Coordinates
+    appearance: field-list
+  - type: geopoint
+    name: location
+    label::English(en): Please take a GPS point at the feature location.
+    hint::English(en): Where are we ?
+    appearance: Placement-map
+    relevant: ${xlocation}=””
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: image
+    name: image
+    label::English(en): Take A Picture
+    appearance: minimal
+    relevant: ${model}=’extended’
+    parameters: max-pixels=1000
+  - type: end_group
+    name: end of gps
+  - type: end_group
+    name: end of first screen
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: amenity
+    name: nursery
+    label::English(en): Nursery School
+  - list_name: amenity
+    name: primary
+    label::English(en): Primary School
+  - list_name: amenity
+    name: secondary
+    label::English(en): Secondary School
+  - list_name: amenity
+    name: tertiary
+    label::English(en): Tertiary School
+  - list_name: amenity
+    name: training
+    label::English(en): Technical Vocational Education
+  - list_name: amenity
+    name: university
+    label::English(en): College/University
+  - list_name: amenity
+    name: language_school
+    label::English(en): Language school
+  - list_name: amenity
+    name: music_school
+    label::English(en): Music school
+  - list_name: amenity
+    name: kindergarten
+    label::English(en): Kindergarten
+  - list_name: amenity
+    name: childcare
+    label::English(en): Childcare
+  - list_name: amenity
+    name: prep_school
+    label::English(en): Prep school
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+  - list_name: operator:type
+    name: private
+    label::English(en): Private
+  - list_name: operator:type
+    name: ngo
+    label::English(en): NGO
+  - list_name: operator:type
+    name: public
+    label::English(en): Public
+  - list_name: operator:type
+    name: government
+    label::English(en): Government
+  - list_name: operator:type
+    name: religious
+    label::English(en): Religious
+  - list_name: denomination
+    name: christian
+    label::English(en): Christian
+  - list_name: denomination
+    name: muslin
+    label::English(en): Muslim
+  - list_name: denomination
+    name: buddhist
+    label::English(en): Buddhist
+  - list_name: water_supply
+    name: water_well
+    label::English(en): Well
+  - list_name: water_supply
+    name: pipeline
+    label::English(en): Pipeline
+  - list_name: water_supply
+    name: pump
+    label::English(en): Pump
+  - list_name: water_supply
+    name: borehole
+    label::English(en): Borehole
+  - list_name: pedagogy
+    name: hybrid
+    label::English(en): Hybrid
+  - list_name: pedagogy
+    name: mainstream
+    label::English(en): Mainstream
+  - list_name: pedagogy
+    name: freinet
+    label::English(en): Freinet
+  - list_name: pedagogy
+    name: montessori
+    label::English(en): Montessori
+  - list_name: pedagogy
+    name: outdoor
+    label::English(en): Outdoor
+  - list_name: pedagogy
+    name: sudbury
+    label::English(en): Sudbury
+  - list_name: pedagogy
+    name: waldorf
+    label::English(en): Waldorf
+  - list_name: generator:source
+    name: oil
+    label::English(en): Oil
+  - list_name: generator:source
+    name: gas
+    label::English(en): Gas
+  - list_name: generator:source
+    name: coal
+    label::English(en): Coal
+  - list_name: generator:source
+    name: biomass
+    label::English(en): Biomass
+  - list_name: toilets:access
+    name: public
+    label::English(en): Public
+  - list_name: toilets:access
+    name: staff_only
+    label::English(en): Staff Only
+  - list_name: school:gender
+    name: mixed
+    label::English(en): Mixed
+  - list_name: school:gender
+    name: female
+    label::English(en): Female Only
+  - list_name: school:gender
+    name: male
+    label::English(en): Male Only
+  - list_name: school:gender
+    name: separated
+    label::English(en): Both but separate
+  - list_name: isced:level
+    label::English(en): "Pre-primary education "
+  - list_name: isced:level
+    name: 1
+    label::English(en): Primary education
+  - list_name: isced:level
+    name: 2
+    label::English(en): Lower secondary or second stage
+  - list_name: isced:level
+    name: 3
+    label::English(en): (Upper) secondary education
+  - list_name: isced:level
+    name: 4
+    label::English(en): "Post-secondary non-tertiary education "
+  - list_name: isced:level
+    name: 5
+    label::English(en): First stage of tertiary education
+  - list_name: isced:level
+    name: 6
+    label::English(en): Second stage of tertiary education
+settings:
+  - form_title: Educational Facilities
+    form_id: education
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - trigger
+      - default
+      - required
+      - required_message
+      - constraint
+      - constraint_message
+      - parameters
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates

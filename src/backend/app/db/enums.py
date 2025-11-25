@@ -248,10 +248,15 @@ class XLSFormType(StrEnum, Enum):
     buildings = "OSM Buildings"
     highways = "OSM Highways"
     health = "OSM Healthcare"
-    # toilets = "toilets"
-    # religious = "religious"
-    # landusage = "landusage"
-    # waterways = "waterways"
+    toilets = "OSM Toilets"
+    religious = "OSM Religious"
+    landusage = "OSM Landuse"
+    waterways = "OSM Waterways"
+    waterpoints = "OSM Water Points"
+    wastedisposal = "OSM Waste Disposal"
+    education = "OSM Education"
+    cemeteries = "OSM Cemeteries"
+    amenities = "OSM Amenities"
 
 
 class SubmissionDownloadType(StrEnum, Enum):

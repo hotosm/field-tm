@@ -1,0 +1,1011 @@
+survey:
+  - "#":
+      Converted by yxf, from amenities.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: phonenumber
+    name: phonenumber
+  - type: deviceid
+    name: deviceid
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    label::English(en):
+      "This Xform is for mapping Amenities. The source file is at:  https://gitlab.com/rsavoye/xforms/-/blob/main/Amenities.xls.
+      Improvements are appreciated."
+    relevant: ${username}!=’rsavoye’
+  - type: start-geopoint
+    name: warmup
+  - type: begin_group
+    name: buildings
+    label::English(en): Buildings
+    appearance: field-list
+  - type: select_one_from_file Amenities.geojson
+    name: existing
+    label::English(en): Existing OSM Amenities
+    appearance: map
+  - type: calculate
+    name: xlabel
+    label::English(en): Get the label
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/label
+  - type: calculate
+    name: xlocation
+    label::English(en): Amenity location
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/geometry
+  - type: calculate
+    name: xid
+    label::English(en): OSM ID
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/id
+  - type: calculate
+    name: xamenity
+    label::English(en): OSM Amenity
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/amenity
+  - type: calculate
+    name: xcuisine
+    label::English(en): OSM Cuisine
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/cuisine
+  - type: calculate
+    name: xhours
+    label::English(en): OSM Opening Hours
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/opening_hours
+  - type: calculate
+    name: xcraft
+    label::English(en): OSM Craft
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/craft
+  - type: calculate
+    name: xaddr
+    label::English(en): Building address
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/addr_housenumber
+  - type: calculate
+    name: xstreet
+    label::English(en): Building Street
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/addr_street
+  - type: calculate
+    name: xwheelchair
+    label::English(en): Wheelchair accessible
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/wheelchair
+  - type: calculate
+    name: xshelter
+    label::English(en): Shelter Type
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/shelter_type
+  - type: calculate
+    name: xshop
+    label::English(en): Shop Type
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/shop
+  - type: calculate
+    name: xdiesel
+    label::English(en): Diesel Fuel available
+    appearance: minimal
+    calculation: instance(“Amenities”)/root/item[id=${existing}]/fuel:diesel
+  - type: select_one yes_no
+    name: detail
+    label::English(en): Do you want more detailed questions ?
+    default: no
+    appearance: minimal
+  - type: select_one building_menu
+    name: building_menu
+    label::English(en): What type of building is this ?
+    relevant: ${detail}=’no’ and ${xamenity}!=”"
+    required: yes
+    appearance: minimal
+  - type: select_one food_menu
+    name: food_menu
+    label::English(en): What type of food or alcohol is available ?
+    hint::English(en): .
+    relevant: ${building_menu}=’food’
+    appearance: minimal
+  - type: select_one retail_menu
+    name: retail_menu
+    label::English(en): What type of products are for sale ?
+    hint::English(en): .
+    relevant: ${building_menu}=’retail’
+    appearance: minimal
+  - type: select_one housing_menu
+    name: housing_menu
+    label::English(en): What type of housing is this building ?
+    hint::English(en): .
+    relevant: ${building_menu}=’housing’
+    appearance: minimal
+  - type: select_one government_menu
+    name: government_menu
+    label::English(en): What type of public government building is this ?
+    hint::English(en): .
+    relevant: ${building_menu}=’government’
+    appearance: minimal
+  - type: select_one medical_menu
+    name: medical_menu
+    label::English(en): What type of medical care is available ?
+    hint::English(en): .
+    relevant: ${building_menu}=’medical’
+    appearance: minimal
+  - type: select_one service_menu
+    name: service_menu
+    label::English(en): What type of service is available ?
+    hint::English(en): .
+    relevant: ${building_menu}=’service’
+    appearance: minimal
+  - type: select_one religious_menu
+    name: religious_menu
+    label::English(en): What type of religious building is this ?
+    hint::English(en): .
+    relevant: ${building_menu}=’religious’ or ${xamenity}=’religious’
+    appearance: minimal
+  - type: select_one amenity
+    name: amenity
+    label::English(en): Type of Amenity
+    relevant: ${detail}=’yes’
+    default: fuel
+    appearance: minimal
+  - type: select_one shop
+    name: shop
+    label::English(en): Type of Retail Shop
+    relevant: ${building_menu}=’retail’ or ${xamenity}=’retail'
+    appearance: minimal
+  - type: select_one historic
+    name: historic
+    label::English(en): Type of Historical building
+    relevant: ${building_menu}=’historic’
+    appearance: minimal
+  - type: select_one denomination
+    name: religious
+    label::English(en): Type of Religious building
+    relevant: ${building_menu}=”religious” or ${xamenity}=’religious’
+    appearance: minimal
+  - type: select_one yes_no
+    name: wheelchair
+    label::English(en): Is it wheelchair accessible ?
+    relevant: ${detail}=’yes’
+    calculation: ${xwheelchair}
+  - type: begin_group
+    name: fuel
+    label::English(en): Fuel Group
+    relevant: ${xamenity}=’fuel’ or ${building_menu}=’fuel’
+    appearance: field-list
+  - type: select_one yes_no
+    name: food
+    label::English(en): Is there also food available ?
+    appearance: minimal
+  - type: select_one yes_no
+    name: convenience
+    label::English(en): Is there also a convenience store ?
+    appearance: minimal
+  - type: select_one yes_no
+    name: diesel
+    label::English(en): Is there diesel  fuel available ?
+    appearance: minimal
+  - type: end_group
+    name: fuel
+    label::English(en): End of fuel group
+  - type: begin_group
+    name: restaurant
+    label::English(en): Restaurant data
+    relevant: ${xamenity}=’restaurant' or ${building_menu}=’food'
+    appearance: field-list
+  - type: select_one cuisine
+    name: cuisine
+    label::English(en): What type of food is available here ?
+    appearance: minimal
+    calculation: ${xcuisine}
+  - type: select_one opening_hours
+    name: opening_hours
+    label::English(en): Opening Hours
+    appearance: minimal
+    calculation: ${xhours}
+  - type: select_one yes_no
+    name: takeaway
+    label::English(en): Take away food only ?
+    relevant: ${detail}=’yes’
+    appearance: minimal
+  - type: select_one yes_no
+    name: delivery
+    label::English(en): Do they deliver ?
+    relevant: ${detail}=’yes’
+    appearance: minimal
+  - type: select_one yes_no
+    name: internet
+    label::English(en): Is there wifi ?
+    appearance: minimal
+  - type: end_group
+    name: restaurant
+    label::English(en): End of Restaurant group
+  - type: end_group
+    name: buildings
+    label::English(en): End of Buildings group
+  - type: begin_group
+    name: more
+    label::English(en): Details
+    appearance: field-list
+  - type: text
+    name: name
+    label::English(en): Name of building (if present)
+    appearance: minimal
+    calculation: ${xlabel}
+  - type: text
+    name: operator
+    label::English(en): Name of operator (if a formal market structure)
+    relevant: ${detail}=’yes’
+    appearance: minimal
+    calculation: ${xlabel}
+  - type: text
+    name: street
+    label::English(en): Street Name
+    appearance: minimal
+    calculation: ${xstreet}
+  - type: integer
+    name: housenumber
+    label::English(en): Address number (house number if present)
+    appearance: minimal
+    calculation: ${xaddr}
+  - type: select_one building:age
+    name: age
+    label::English(en): Age of building
+    relevant: ${detail}=’yes’
+    appearance: minimal
+  - type: end_group
+    name: more
+    label::English(en): End of more group
+  - type: begin_group
+    name: gps
+    label::English(en): GPS Coordinates
+    relevant: ${xlocation}=””
+    appearance: field-list
+  - type: geopoint
+    name: location
+    label::English(en): Please take a GPS point at the feature location.
+    hint::English(en): Where are we ?
+    appearance: Placement-map
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: audio
+    name: audio
+    label::English(en): Audio Note
+    appearance: minimal
+  - type: image
+    name: image
+    label::English(en): Take A Picture
+    parameters: max-pixels=1000
+    appearance: minimal
+  - type: end_group
+    name: end of gps
+choices:
+  - list_name: building_menu
+    name: housing
+    label::English(en): A place people live in
+  - list_name: building_menu
+    name: retail
+    label::English(en): Does this building sell things to the public ?
+  - list_name: building_menu
+    name: food
+    label::English(en): Can people get food here ?
+  - list_name: building_menu
+    name: fuel
+    label::English(en): Can you buy fuel here?
+  - list_name: building_menu
+    name: medical
+    label::English(en): A place that provides medical service
+  - list_name: building_menu
+    name: service
+    label::English(en): Does this building provides services ?
+  - list_name: building_menu
+    name: religious
+    label::English(en): Is this a building for religious services ?
+  - list_name: building_menu
+    name: government
+    label::English(en): Is this a public government building ?
+  - list_name: building_menu
+    name: industry
+    label::English(en): Does this building make something ?
+  - list_name: food_menu
+    name: cafe
+    label::English(en):
+      Cafe (a cafe is generally an informal place that offers casual
+      meals and beverages)
+  - list_name: food_menu
+    name: restaurant
+    label::English(en): Restaurant (not fast food)
+  - list_name: food_menu
+    name: pub
+    label::English(en): A pub or bar
+  - list_name: food_menu
+    name: convenience
+    label::English(en):
+      Convenience (a small local shop carrying a small subset of the
+      items you would find in a supermarket)
+  - list_name: food_menu
+    name: supermarket
+    label::English(en): A supermarket
+  - list_name: food_menu
+    name: alcohol
+    label::English(en): A place that sells alcohol to take away
+  - list_name: food_menu
+    name: fast_food
+    label::English(en): Fast Food (not a restaurant)
+  - list_name: food_menu
+    name: bakery
+    label::English(en): Bakery (shop focused on selling bread)
+  - list_name: food_menu
+    name: butcher
+    label::English(en): Butcher (Shop focused on selling meat)
+  - list_name: food_menu
+    name: deli
+    label::English(en):
+      Deli (shop focused on selling delicatessen (fine foods, gourmet
+      foods)
+  - list_name: food_menu
+    name: farm
+    label::English(en):
+      Farm Stand (shop or roadside stand focused on selling freshly
+      harvested farm produce)
+  - list_name: medical_menu
+    name: clinic
+    label::English(en): Clinic
+  - list_name: medical_menu
+    name: hospital
+    label::English(en): Hospital
+  - list_name: medical_menu
+    name: healthcare
+    label::English(en): Healthcare
+  - list_name: medical_menu
+    name: dispensary
+    label::English(en): Dispensary
+  - list_name: housing_menu
+    name: residential
+    label::English(en): Residential
+  - list_name: housing_menu
+    name: hotel
+    label::English(en):
+      Hotel (a building designed with separate rooms available for
+      overnight accommodation)
+  - list_name: housing_menu
+    name: camp_site
+    label::English(en): A camp ground
+  - list_name: housing_menu
+    name: apartments
+    label::English(en): Apartment building
+  - list_name: housing_menu
+    name: toilet
+    label::English(en): A public toilet or outhouse
+  - list_name: service_menu
+    name: car_repair
+    label::English(en): Service oriented, cat repair, etc…
+  - list_name: service_menu
+    name: electronics_repair
+    label::English(en): Electronics repair
+  - list_name: service_menu
+    name: tire_repair
+    label::English(en): Tire Repair
+  - list_name: religious_menu
+    name: religious
+    label::English(en): A building for religious purposes
+  - list_name: religious_menu
+    name: christian
+    label::English(en): Christian (all variations)
+  - list_name: religious_menu
+    name: jewish
+    label::English(en): Jewish
+  - list_name: religious_menu
+    name: muslim
+    label::English(en): "Muslim Mosque "
+  - list_name: religious_menu
+    name: hindu
+    label::English(en): Hindu Temple
+  - list_name: religious_menu
+    name: buddhist
+    label::English(en): Buddhist Temple
+  - list_name: religious_menu
+    name: shrine
+    label::English(en): Shrine
+  - list_name: retail_menu
+    name: convenience
+    label::English(en):
+      Convenience (a small local shop carrying a small subset of the
+      items you would find in a supermarket)
+  - list_name: retail_menu
+    name: hardware
+    label::English(en):
+      Hardware (shop focused on selling building supplies including
+      screws, bolts & paints, etc…)
+  - list_name: retail_menu
+    name: fuel
+    label::English(en): Fuel (petrol station; gas station; marine fuel)
+  - list_name: retail_menu
+    name: general
+    label::English(en): General (a store that carries a general line of merchandise)
+  - list_name: retail_menu
+    name: gifts
+    label::English(en): Gifts and Souvenirs
+  - list_name: government_menu
+    name: library
+    label::English(en): A Public library
+  - list_name: government_menu
+    name: town_hall
+    label::English(en): Town Hall
+  - list_name: government_menu
+    name: court_house
+    label::English(en): Court House
+  - list_name: government_menu
+    name: police
+    label::English(en): Police station
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+  - list_name: building
+    name: residential
+    label::English(en): Residential
+  - list_name: building
+    name: commercial
+    label::English(en): Commercial (not retail)
+  - list_name: building
+    name: retail
+    label::English(en):
+      Retail Shop (a building primarily used for selling goods that
+      are sold to the public)
+  - list_name: building
+    name: commercial;residential
+    label::English(en): Commercial and residential (mixed use)
+  - list_name: building
+    name: clinic
+    label::English(en): Clinic (a building erected as medical clinic)
+  - list_name: building
+    name: toilet
+    label::English(en): Public Toilet
+  - list_name: building
+    name: apartments
+    label::English(en): Apartments
+  - list_name: building
+    name: school
+    label::English(en): School (a building erected as school)
+  - list_name: building
+    name: kitchen
+    label::English(en): Kitchen (small outbuilding used as a cooking area)
+  - list_name: building
+    name: roof
+    label::English(en): Roof (building open on at least two sides)
+  - list_name: building
+    name: construction
+    label::English(en): Under Construction
+  - list_name: building
+    name: public
+    label::English(en): Public (a town hall, police station, court house, etc.)
+  - list_name: building
+    name: hospital
+    label::English(en): Hospital (a building erected for a hospital)
+  - list_name: building
+    name: office
+    label::English(en): Office (an office building)
+  - list_name: building
+    name: religious
+    label::English(en): A building for religious purposes
+  - list_name: building
+    name: service
+    label::English(en): Service (water, power, etc)
+  - list_name: building
+    name: warehouse
+    label::English(en):
+      Warehouse (a building primarily intended for the storage or
+      goods or as part of a distribution system)
+  - list_name: building
+    name: industrial
+    label::English(en): Industrial (a building for industrial purposes)
+  - list_name: building
+    name: kiosk
+    label::English(en): Kiosk (a small one-room retail building)
+  - list_name: building
+    name: abandoned
+    label::English(en): Abandoned building
+  - list_name: building
+    name: none
+    label::English(en): Building does not exist on ground
+  - list_name: building
+    name: cabin
+    label::English(en):
+      Cabin (A cabin is a small, roughly built house usually with
+      a wood exterior and typically found in rural areas)
+  - list_name: building
+    name: bungalow
+    label::English(en): Bungalow (a single-story detached small house)
+  - list_name: building
+    name: hotel
+    label::English(en):
+      Hotel (a building designed with separate rooms available for
+      overnight accommodation)
+  - list_name: building
+    name: farm
+    label::English(en): Farm (a residential building on a farm)
+  - list_name: building
+    name: hut
+    label::English(en): Hut (A hut is a small and crude shelter)
+  - list_name: building
+    name: train_station
+    label::English(en): Train Station (a building constructed to be a train station)
+  - list_name: building
+    name: house_boat
+    label::English(en): House boat (a boat used primarily as a home)
+  - list_name: building
+    name: barn
+    label::English(en):
+      Barn (an agricultural building used for storage and as a covered
+      workplace)
+  - list_name: building
+    name: historic
+    label::English(en): A historical building
+  - list_name: shop
+    name: alcohol
+    label::English(en): Alcohol
+  - list_name: shop
+    name: art
+    label::English(en): Art
+  - list_name: shop
+    name: bakery
+    label::English(en): Bakery (shop focused on selling bread)
+  - list_name: shop
+    name: beauty
+    label::English(en): Beauty
+  - list_name: shop
+    name: beverages
+    label::English(en): Beverages
+  - list_name: shop
+    name: bicycle
+    label::English(en): Bicycle
+  - list_name: shop
+    name: books
+    label::English(en): Books
+  - list_name: shop
+    name: butcher
+    label::English(en): Butcher (Shop focused on selling meat)
+  - list_name: shop
+    name: car
+    label::English(en): Car
+  - list_name: shop
+    name: car_parts
+    label::English(en):
+      Car Parts (Shop focused on selling auto parts, auto accessories,
+      motor oil, car chemicals, etc…)
+  - list_name: shop
+    name: car_repair
+    label::English(en): Car Repair (shop focused on car repair)
+  - list_name: shop
+    name: chemist
+    label::English(en): Chemist
+  - list_name: shop
+    name: clothes
+    label::English(en): Clothes
+  - list_name: shop
+    name: convenience
+    label::English(en):
+      Convenience (a small local shop carrying a small subset of the
+      items you would find in a supermarket)
+  - list_name: shop
+    name: copyshop
+    label::English(en): Copyshop
+  - list_name: shop
+    name: cosmetics
+    label::English(en): Cosmetics
+  - list_name: shop
+    name: deli
+    label::English(en):
+      Deli (shop focused on selling delicatessen (fine foods, gourmet
+      foods)
+  - list_name: shop
+    name: doityourself
+    label::English(en): Do It Yourself
+  - list_name: shop
+    name: electronics
+    label::English(en): Electronics
+  - list_name: shop
+    name: farm
+    label::English(en):
+      Farm Stand (shop or roadside stand focused on selling freshly
+      harvested farm produce)
+  - list_name: shop
+    name: furniture
+    label::English(en): Furniture
+  - list_name: shop
+    name: general
+    label::English(en): General (a store that carries a general line of merchandise)
+  - list_name: shop
+    name: greengrocer
+    label::English(en): Green Grocer (shop focused on selling vegetables and fruits)
+  - list_name: shop
+    name: hairdresser
+    label::English(en): Hairdresser
+  - list_name: shop
+    name: hardware
+    label::English(en):
+      Hardware (shop focused on selling building supplies including
+      screws, bolts & paints, etc...)
+  - list_name: shop
+    name: houseware
+    label::English(en): Houseware
+  - list_name: shop
+    name: jewellery
+    label::English(en): Jewellery
+  - list_name: shop
+    name: kiosk
+    label::English(en): Kiosk
+  - list_name: shop
+    name: mobile_phone
+    label::English(en): Mobile Phone (shop focused on selling mobile phones and accessories)
+  - list_name: shop
+    name: pastry
+    label::English(en): Pastry
+  - list_name: shop
+    name: shoes
+    label::English(en): Shoes
+  - list_name: shop
+    name: stationary
+    label::English(en): Stationary
+  - list_name: shop
+    name: supermarket
+    label::English(en): Supermarket
+  - list_name: shop
+    name: tailor
+    label::English(en): Tailor
+  - list_name: shop
+    name: tea
+    label::English(en): Tea (shop focused on selling tea)
+  - list_name: office
+    name: company
+    label::English(en): Company
+  - list_name: office
+    name: government
+    label::English(en): Government
+  - list_name: office
+    name: insurance
+    label::English(en): Insurance
+  - list_name: office
+    name: lawyer
+    label::English(en): Lawyer
+  - list_name: office
+    name: political_party
+    label::English(en): Political Party
+  - list_name: office
+    name: yes
+    label::English(en): Yes
+  - list_name: amenity
+    name: atm
+    label::English(en): ATM
+  - list_name: amenity
+    name: bank
+    label::English(en): Bank
+  - list_name: amenity
+    name: bar
+    label::English(en):
+      Bar (a purpose-built commercial establishment that sells alcoholic
+      drinks to be consumed on the premises)
+  - list_name: amenity
+    name: cafe
+    label::English(en): 33
+  - list_name: amenity
+    name: clinic
+    label::English(en): Clinic
+  - list_name: amenity
+    name: college
+    label::English(en): College
+  - list_name: amenity
+    name: courthouse
+    label::English(en): Court House
+  - list_name: amenity
+    name: fast_food
+    label::English(en): Fast Food
+  - list_name: amenity
+    name: fire_station
+    label::English(en): Fire Station
+  - list_name: amenity
+    name: fuel
+    label::English(en): Fuel (petrol station; gas station; marine fuel)
+  - list_name: amenity
+    name: hospital
+    label::English(en): Hospital
+  - list_name: amenity
+    name: kindergarten
+    label::English(en): Kindergarten
+  - list_name: amenity
+    name: library
+    label::English(en): Library
+  - list_name: amenity
+    name: marketplace
+    label::English(en): Marketplace
+  - list_name: amenity
+    name: parking
+    label::English(en): Parking
+  - list_name: amenity
+    name: pharmacy
+    label::English(en): Pharmacy
+  - list_name: amenity
+    name: place_of_worship
+    label::English(en): Place of Worship
+  - list_name: amenity
+    name: police
+    label::English(en):
+      Police (a police station where police officers patrol from and
+      that is a first point of contact for civilians)
+  - list_name: amenity
+    name: post_office
+    label::English(en): Post Office
+  - list_name: amenity
+    name: pub
+    label::English(en): Pub
+  - list_name: amenity
+    name: refuge_site
+    label::English(en):
+      Refuge Site (a human settlement sheltering refugees or internally
+      displaced persons)
+  - list_name: amenity
+    name: restaurant
+    label::English(en): Restaurant (not fast food)
+  - list_name: amenity
+    name: school
+    label::English(en): School (primary, middle and secondary schools)
+  - list_name: amenity
+    name: taxi
+    label::English(en): Taxi Stand (a place where taxis wait for passengers)
+  - list_name: amenity
+    name: townhall
+    label::English(en): Town Hall
+  - list_name: amenity
+    name: trailhead
+    label::English(en): Trailhead
+  - list_name: tourism
+    name: hostel
+    label::English(en):
+      Hostel ( provide inexpensive accommodation, typically with them
+      having shared bedrooms, bathrooms, kitchens)
+  - list_name: tourism
+    name: hotel
+    label::English(en):
+      Hotel (provides accommodation for guests with usually numbered
+      rooms)
+  - list_name: tourism
+    name: motel
+    label::English(en):
+      "Motel (an establishment that provides accommodation designed
+      for motorists usually on a short-term basis, with convenient parking "
+  - list_name: tourism
+    name: museum
+    label::English(en):
+      Museum (s an institution which has exhibitions on scientific,
+      historical, artistic, or cultural artifacts)
+  - list_name: tourism
+    name: guesthouse
+    label::English(en):
+      Similar to a Hostel, provides lodging accommodation without
+      a hotel license that is typically owner-operated.
+  - list_name: tourism
+    name: alpinehut
+    label::English(en):
+      A remote building positioned in the mountains designed to provided
+      lodging accommodation for mountaineers, climbers a
+  - list_name: tourism
+    name: wildernesshut
+    label::English(en):
+      A remote building, with generally a fireplace, intended to provide
+      temporary shelter and sleeping accommodation
+  - list_name: tourism
+    name: information
+    label::English(en):
+      visitor center or centre, visitor information center or tourist
+      information center
+  - list_name: tourism
+    name: yes
+    label::English(en): yes
+  - list_name: religion
+    name: christian
+    label::English(en): Christian
+  - list_name: religion
+    name: hindu
+    label::English(en): Hindu
+  - list_name: religion
+    name: muslim
+    label::English(en): Muslim
+  - list_name: religion
+    name: buddhist
+    label::English(en): Buddhist
+  - list_name: building:age
+    name: post_2000
+    label::English(en): Recent (post 2000)
+  - list_name: building:age
+    name: pre_2000
+    label::English(en): Old (pre 2000)
+  - list_name: capacity_persons
+    name: <50
+    label::English(en): <50
+  - list_name: capacity_persons
+    name: 50-100
+    label::English(en): 50-100
+  - list_name: capacity_persons
+    name: 100-250
+    label::English(en): 100-250
+  - list_name: capacity_persons
+    name: 250-500
+    label::English(en): 250-500
+  - list_name: capacity_persons
+    name: ">500"
+    label::English(en): ">500"
+  - list_name: denomination
+    name: christian
+    label::English(en): Christian (all variations)
+  - list_name: denomination
+    name: jewish
+    label::English(en): Jewish
+  - list_name: denomination
+    name: muslin
+    label::English(en): "Muslim Mosque "
+  - list_name: denomination
+    name: hindu
+    label::English(en): Hindu Temple
+  - list_name: denomination
+    name: hindu_shrine
+    label::English(en): Hindu Shrine
+  - list_name: denomination
+    name: buddhist
+    label::English(en): Buddhist Temple
+  - list_name: denomination
+    name: buddhist_shrine
+    label::English(en): Buddhist Shrine
+  - list_name: water_source
+    name: water_works
+    label::English(en): Water works
+  - list_name: water_source
+    name: manual_pump
+    label::English(en): Manual pump
+  - list_name: water_source
+    name: powered_pump
+    label::English(en): Powered pump
+  - list_name: water_source
+    name: groundwater
+    label::English(en): Groundwater
+  - list_name: gps_type
+    name: track
+    label::English(en): Record a track while moving
+  - list_name: gps_type
+    name: point
+    label::English(en): Record a single point while stationary
+  - list_name: gps_type
+    name: polygon
+    label::English(en): Record a polygon
+  - list_name: historic
+    name: archaeological_site
+    label::English(en): Archaeological Site
+  - list_name: historic
+    name: building
+    label::English(en): Unknown Building
+  - list_name: historic
+    name: ruin
+    label::English(en): Ruin
+  - list_name: historic
+    name: castle
+    label::English(en): Castle
+  - list_name: historic
+    name: monastery
+    label::English(en): Monastery
+  - list_name: historic
+    name: fort
+    label::English(en): Fort
+  - list_name: historic
+    name: tomb
+    label::English(en): Tomb
+  - list_name: historic
+    name: monument
+    label::English(en): Monument
+  - list_name: historic
+    name: temple
+    label::English(en): Temple
+  - list_name: historic
+    name: stumpa
+    label::English(en): Stumpa
+  - list_name: historic
+    name: gompa
+    label::English(en): Gompa
+  - list_name: historic
+    name: abandoned
+    label::English(en): Abandoned building
+  - list_name: historic
+    name: cemetery
+    label::English(en): Cemetery
+  - list_name: historic
+    name: mine
+    label::English(en): Mine
+  - list_name: cuisine
+    name: pizza
+    label::English(en): Pizza
+  - list_name: cuisine
+    name: burger
+    label::English(en): Burger
+  - list_name: cuisine
+    name: italian
+    label::English(en): Italian
+  - list_name: cuisine
+    name: mexican
+    label::English(en): Mexican
+  - list_name: cuisine
+    name: thai
+    label::English(en): Thai
+  - list_name: cuisine
+    name: sandwich
+    label::English(en): Sandwich
+  - list_name: cuisine
+    name: indian
+    label::English(en): Indian
+  - list_name: cuisine
+    name: chinese
+    label::English(en): Chinese
+  - list_name: cuisine
+    name: seafood
+    label::English(en): Seafood
+  - list_name: cuisine
+    name: steak_house
+    label::English(en): Steak House
+  - list_name: opening_hours
+    name: 24/7
+    label::English(en): 24/7
+  - list_name: opening_hours
+    name: mo-sa_08:00-18:00
+    label::English(en): Monday – Sat 08:00-18:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-17:00
+    label::English(en): Monday – Sat 09:00-17:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-18:00
+    label::English(en): Monday – Sat 09:00-18:00
+  - list_name: opening_hours
+    name: mo-fr_09:00-17:00
+    label::English(en): Monday – Friday 09:00-17:00
+  - list_name: opening_hours
+    name: mo-su_09:00-21:00
+    label::English(en): Monday - Sunday 09:00-21:00
+  - list_name: opening_hours
+    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
+    label::English(en): Monday - Friday 08:00-18:00; Sat - Sunday 08:00-15:00
+  - list_name: opening_hours
+    name: by_appointment
+    label::English(en): By Appointment Only
+settings:
+  - form_id: Amenities
+    version: =NOW()
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - relevant
+      - default
+      - parameters
+      - required
+      - appearance
+      - calculation
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+    settings:
+      - form_id
+      - form_title
+      - version

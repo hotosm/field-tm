@@ -1,0 +1,183 @@
+survey:
+  - "#":
+      Converted by yxf, from cemeteries.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+    relevant: " "
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is maintained by the Humanitarian
+      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/tree/main/osm-field-work/xlsforms"
+    relevant: ${username}!=”rsavoye”
+  - type: begin group
+    name: first_screen
+    label::English(en): First Screen
+    appearance: field-list
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+    default: basic
+  - type: select_one_from_file cemeteries.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    appearance: map
+    required: true()
+  - type: calculate
+    name: xid
+    appearance: minimal
+    calculation: instance('cemeteries’)/root/item[id=${existing}]/id
+  - type: calculate
+    name: xlocation
+    appearance: minimal
+    calculation: instance('cemeteries’)/root/item[id=${existing}]/geometry
+  - type: begin group
+    name: cemetery_details
+    label::English(en): Cemetery Details
+    appearance: Field-list
+  - type: geopoint
+    name: location
+    label::English(en): "Capture the location of this Cemetery site:"
+    hint::English(en):
+      Using the GPS, capture the location. Please stand in the cemetery
+      as possible
+    appearance: Placement-map
+    label::French(fr): Capturez
+    hint::French(fr):
+      À l'aide du GPS, capturez l'emplacement. Veuillez vous tenir dans
+      le cimetière autant que possible
+    required_message::French(fr): Désolé, cette question est obligatoire
+  - type: text
+    name: name
+    label::English(en): What is the name of this Cemetery?
+    hint::English(en): Enter name of this cemetery, if it is available
+    label::French(fr): Comment s'appelle ce cimetière ?
+    hint::French(fr): Entrez le nom de ce cimetière, s'il est disponible
+  - type: select_multiple cemetery_services or_other
+    name: amenity
+    label::English(en): What services are offer at this Cemetery?
+    hint::English(en): Select the services of this cemetery
+    appearance: minimal
+    required: yes
+    label::French(fr): Quels services sont offerts dans ce cimetière?
+    hint::French(fr): Sélectionnez les services de ce cimetière
+    required_message::French(fr): Désolé, cette question est obligatoire
+  - type: select_one yes_no
+    name: fee
+    label::English(en): Is a fee charged to use this Cemetery?
+    hint::English(en): Indicate if a fee is required to use this cemetery services
+    appearance: minimal
+    required: yes
+    label::French(fr): Des frais sont-ils facturés pour l'utilisation de ce cimetière ?
+    hint::French(fr):
+      Indiquez si des frais sont exigés pour utiliser les services de
+      ce cimetière
+    required_message::French(fr): Désolé, cette question est obligatoire
+  - type: select_one operator_type or_other
+    name: operator_type
+    label::English(en): Who operates this cemetery?
+    hint::English(en): Select the Operator of this cemetery
+    appearance: minimal
+    required: yes
+    label::French(fr): Qui gère ce cimetière ?
+    hint::French(fr): Sélectionnez l'Opérateur de ce cimetière
+    required_message::French(fr): Désolé, cette question est obligatoire
+  - type: end group
+  - type: end group
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: cemetery_services
+    name: grave_yard
+    label::English(en): A small cemetery
+    label::French(fr): Un petit cimetière
+  - list_name: cemetery_services
+    name: crematorium
+    label::English(en): A crematorium
+    label::French(fr): Un crématorium
+  - list_name: cemetery_services
+    name: mausoleum
+    label::English(en): A mausoleum
+    label::French(fr): Un mausolée
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+    label::French(fr): Oui
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+    label::French(fr): Non
+  - list_name: operator_type
+    name: religious
+    label::English(en): Operated by a Religious organization
+    label::French(fr): Exploité par une organisation religieuse
+  - list_name: operator_type
+    name: government
+    label::English(en): Operated by a Government organization
+    label::French(fr): Exploité par un organisme gouvernemental
+  - list_name: operator_type
+    name: public
+    label::English(en): Operated by a public organization
+    label::French(fr): Exploité par un organisme public
+  - list_name: operator_type
+    name: private
+    label::English(en): Operated by a private organization
+    label::French(fr): Exploité par un organisme privé
+  - list_name: operator_type
+    name: community
+    label::English(en): Operated by a community based organization
+    label::French(fr): Géré par une organisation communautaire
+settings:
+  - form_title: Cemetery or Grave Yard
+    form_id: cemeteries
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - default
+      - trigger
+      - parameters
+      - required
+      - label::French(fr)
+      - hint::French(fr)
+      - required_message::French(fr)
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+      - label::French(fr)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates

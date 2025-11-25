@@ -1,0 +1,367 @@
+survey:
+  - "#":
+      Converted by yxf, from landusage.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: phonenumber
+    name: phonenumber
+  - type: deviceid
+    name: deviceid
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is maintained by the Humanitarian
+      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/tree/main/osm-field-work/xlsforms"
+    relevant: ${username}!=’rsavoye’
+  - type: begin_group
+    name: first_screen
+    label::English(en): First Screen
+    appearance: field-list
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+    default: basic
+  - type: select_one_from_file landusage.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    appearance: map
+    choice_filter: true()
+  - type: calculate
+    name: xid
+    label::English(en): OSM ID
+    appearance: minimal
+    calculation: instance('landusage’)/root/item[id=${existing}]/id
+    trigger: ${existing}
+  - type: calculate
+    name: xlocation
+    label::English(en): Location
+    appearance: minimal
+    calculation: instance('landusage’)/root/item[id=${existing}]/geometry
+    trigger: ${existing}
+  - type: select_one landuse
+    name: landuse
+    label::English(en): What type of landuse ?
+    appearance: minimal
+  - type: select_one type
+    name: type
+    label::English(en): What activities can be done here ?
+    appearance: minimal
+  - type: select_one leisure
+    name: leisure
+    label::English(en): What type of leisure activity can be done here ?
+    appearance: minimal
+    relevant: ${type}=’leisure’
+  - type: text
+    name: operator
+    label::English(en): What is the name of this operator ?
+    appearance: minimal
+  - type: select_one tourism
+    name: tourism
+    label::English(en): What type of tourist site is this ?
+    appearance: minimal
+    relevant: ${type}=’tourism’
+  - type: select_one historic
+    name: historic
+    label::English(en): What type of historical site is this ?
+    appearance: minimal
+    relevant: ${type}=’historic’
+  - type: date
+    name: date
+    label::English(en): What is the inscription date ?
+    appearance: minimal
+    relevant: ${type}=’historic’
+  - type: integer
+    name: rooms
+    label::English(en): How many rooms are here ?
+    appearance: minimal
+    relevant: ${tourism}=’hotel’ or ${tourism}=’hostel' or ${tourism}=’guest_house'
+  - type: select_one access
+    name: access
+    label::English(en): Is this accessible to the public ?
+    appearance: minimal
+    relevant: "${type}=’leisure’ or ${leisure}=’garden’ "
+  - type: select_one garden:type
+    name: garden_type
+    label::English(en): What type of garden is this ?
+    appearance: minimal
+    relevant: ${leisure}=’garden’
+  - type: begin group
+    name: gps
+    label::English(en): Location Details
+    appearance: Field-list
+  - type: geopoint
+    name: location
+    label::English(en): Please take a GPS point at the feature location.
+    hint::English(en): Where are we ?
+    appearance: Placement-map
+    relevant: ${xlocation}=””
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: image
+    name: image
+    label::English(en): Take A Picture
+    appearance: minimal
+    relevant: ${model}=”extended”
+    parameters: max-pixels=1000
+  - type: end group
+    name: end of gps
+  - type: end_group
+    name: end of first_screen
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: leisure
+    name: park
+    label::English(en): park
+  - list_name: leisure
+    name: pitch
+    label::English(en): pitch
+  - list_name: leisure
+    name: sport_centre
+    label::English(en): sport_centre
+  - list_name: leisure
+    name: stadium
+    label::English(en): stadium
+  - list_name: leisure
+    name: nature_reserve
+    label::English(en): nature_reserve
+  - list_name: leisure
+    name: playground
+    label::English(en): playground
+  - list_name: leisure
+    name: garden
+    label::English(en): garden
+  - list_name: leisure
+    name: square
+    label::English(en): Town Square
+  - list_name: leisure
+    name: community_centre
+    label::English(en): Community Centre
+  - list_name: leisure
+    name: nature_preserve
+    label::English(en): Nature Preserve
+  - list_name: tourism
+    name: camp_site
+    label::English(en): Camp Site
+  - list_name: tourism
+    name: caravan_site
+    label::English(en): Caravan Site
+  - list_name: tourism
+    name: artwork
+    label::English(en): Artwork
+  - list_name: tourism
+    name: gallery
+    label::English(en): Gallery
+  - list_name: tourism
+    name: museum
+    label::English(en): Museum
+  - list_name: tourism
+    name: zoo
+    label::English(en): Zoo
+  - list_name: tourism
+    name: attraction
+    label::English(en): Tourist Attraction
+  - list_name: tourism
+    name: guest_house
+    label::English(en): Guest House
+  - list_name: tourism
+    name: hotel
+    label::English(en): Hotel
+  - list_name: tourism
+    name: hostel
+    label::English(en): Hostel
+  - list_name: historic
+    name: building
+    label::English(en): Historic Building
+  - list_name: historic
+    name: area
+    label::English(en): Historic Area
+  - list_name: historic
+    name: monument
+    label::English(en): Monument
+  - list_name: historic
+    name: archaeological_site
+    label::English(en): Archaeological Site
+  - list_name: historic
+    name: memorial
+    label::English(en): Memorial
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+  - list_name: garden:type
+    name: community
+    label::English(en): Community garden
+  - list_name: garden:type
+    name: roof_garden
+    label::English(en): Rooftop garden
+  - list_name: garden:type
+    name: residential
+    label::English(en): Residential garden
+  - list_name: type
+    name: tourism
+    label::English(en): Tourism
+  - list_name: type
+    name: historic
+    label::English(en): "Historic "
+  - list_name: type
+    name: leisure
+    label::English(en): Leisure
+  - list_name: type
+    name: natural
+    label::English(en): Natural
+  - list_name: type
+    name: wetland
+    label::English(en): Wetland
+  - list_name: access
+    name: yes
+    label::English(en): Yes
+  - list_name: access
+    name: no
+    label::English(en): No
+  - list_name: access
+    name: permissive
+    label::English(en): Permissive
+  - list_name: landuse
+    name: allotments
+    label::English(en): Allotments
+  - list_name: landuse
+    name: farmland
+    label::English(en): Farmland
+  - list_name: landuse
+    name: forest
+    label::English(en): Forest
+  - list_name: landuse
+    name: meadow
+    label::English(en): Meadow
+  - list_name: landuse
+    name: orchard
+    label::English(en): Orchard
+  - list_name: landuse
+    name: plant_nursery
+    label::English(en): Plant Nursery
+  - list_name: landuse
+    name: vineyard
+    label::English(en): vineyard
+  - list_name: landuse
+    name: basin
+    label::English(en): Basin
+  - list_name: landuse
+    name: brownfield
+    label::English(en): Brownfield
+  - list_name: landuse
+    name: commercial
+    label::English(en): Commercial
+  - list_name: landuse
+    name: construction
+    label::English(en): Construction
+  - list_name: landuse
+    name: residential
+    label::English(en): Residential
+  - list_name: landuse
+    name: industrial
+    label::English(en): Industrial
+  - list_name: landuse
+    name: retail
+    label::English(en): Retail
+  - list_name: landuse
+    name: salt_pond
+    label::English(en): Salt Pond
+  - list_name: landuse
+    name: quarry
+    label::English(en): Quarry
+  - list_name: landuse
+    name: cemetery
+    label::English(en): Cemetery
+  - list_name: natural
+    name: grassland
+    label::English(en): Grassland
+  - list_name: natural
+    name: wetland
+    label::English(en): Wetland
+  - list_name: natural
+    name: glacier
+    label::English(en): Glacier
+  - list_name: natural
+    name: beach
+    label::English(en): Beach
+  - list_name: natural
+    name: reef
+    label::English(en): Reef
+  - list_name: natural
+    name: wood
+    label::English(en): Wood
+  - list_name: natural
+    name: scrub
+    label::English(en): Scrub
+  - list_name: natural
+    name: health
+    label::English(en): Health
+  - list_name: wetland
+    name: bog
+    label::English(en): Bog
+  - list_name: wetland
+    name: marsh
+    label::English(en): Marsh
+  - list_name: wetland
+    name: swamp
+    label::English(en): Swamp
+  - list_name: wetland
+    name: mangrove
+    label::English(en): Mangrove
+  - list_name: wetland
+    name: tidal flat
+    label::English(en): Tidal Flat
+  - list_name: wetland
+    name: dam
+    label::English(en): Dam
+settings:
+  - form_id: landuse
+    version: =NOW()
+    form_title: Landuse
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - parameters
+      - required
+      - trigger
+      - default
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+    settings:
+      - form_id
+      - version
+      - form_title
+      - allow_choice_duplicates
