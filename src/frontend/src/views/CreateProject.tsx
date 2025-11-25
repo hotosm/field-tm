@@ -301,12 +301,14 @@ const CreateProject = () => {
     useUploadProjectXlsformMutation({
       onSuccess: ({ data }) => {
         setSearchParams({ step: (step + 1).toString() });
+        setValue('isFormValidAndUploaded', true);
         dispatch(
           CommonActions.SetSnackBar({ message: data?.message || 'XLSForm uploaded successfully', variant: 'success' }),
         );
       },
       onError: ({ response }) => {
         setError('xlsFormFile', { message: response?.data?.detail });
+        setValue('isFormValidAndUploaded', false);
         dispatch(
           CommonActions.SetSnackBar({
             message: response?.data?.detail || 'Failed to upload XLSForm form',
@@ -338,7 +340,7 @@ const CreateProject = () => {
       return;
     }
 
-    if (step === 3) {
+    if (step === 3 && !values.isFormValidAndUploaded) {
       uploadXlsformFile(values.xlsFormFile);
       return;
     }

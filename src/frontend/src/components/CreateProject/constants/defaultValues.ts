@@ -38,6 +38,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   xlsFormFile: null,
   needVerificationFields: true,
   mandatoryPhotoUpload: false,
+  isFormValidAndUploaded: false,
   advancedConfig: false,
   default_language: '',
 

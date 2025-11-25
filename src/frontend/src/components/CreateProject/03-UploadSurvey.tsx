@@ -199,6 +199,7 @@ const UploadSurvey = () => {
           data={values.xlsFormFile ? [values.xlsFormFile] : []}
           onUploadFile={(updatedFiles, fileInputRef) => {
             clearErrors();
+            values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
             changeFileHandler(updatedFiles?.[0] as fileType);
           }}
           acceptedInput=".xls,.xlsx,.xml"

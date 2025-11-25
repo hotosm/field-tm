@@ -178,6 +178,7 @@ export const uploadSurveyValidationSchema = z
     xlsFormFile: z.any().optional(),
     needVerificationFields: z.boolean(),
     mandatoryPhotoUpload: z.boolean(),
+    isFormValidAndUploaded: z.boolean(),
     advancedConfig: z.boolean(),
     default_language: z.string(),
   })
