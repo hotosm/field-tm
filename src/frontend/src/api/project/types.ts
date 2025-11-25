@@ -24,7 +24,7 @@ export interface projectBaseType {
   slug: string;
   location_str: string;
   outline: Polygon;
-  status: string;
+  status: project_status;
   total_tasks: number;
   osm_category: string;
   odk_form_id: string;

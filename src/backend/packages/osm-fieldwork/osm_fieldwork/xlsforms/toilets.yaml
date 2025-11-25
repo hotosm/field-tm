@@ -1,0 +1,497 @@
+survey:
+  - "#":
+      Converted by yxf, from toilets.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      "This is a data and mapping project that will provide national
+      government and development actors with reliable open datasets for decision-making
+      and designing of interventions. The project is maintained by the Humanitarian
+      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/osm-fieldwork/xlsforms"
+    relevant: ${username}!=’rsavoye’
+  - type: begin group
+    name: toiletprofile
+    label::English(en): Toilet profile Details
+    appearance: Field-list
+  - type: select_one_from_file toilets.geojson
+    name: existing
+    label::English(en): Existing OSM data
+    appearance: map
+  - type: calculate
+    name: xid
+    label::English(en): OSM ID
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/id
+    trigger: ${existing}
+  - type: calculate
+    name: xlocation
+    label::English(en): Location
+    appearance: minimal
+    calculation: instance('toilets')/root/item[name=${existing}]/geometry
+    trigger: ${existing}
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: select_one yes_no
+    default: basic
+  - type: select_one operational_status
+    name: operational_status
+    label::English(en): What is the operational status of this toilet?
+    hint::English(en): Select the operational status of this toilet
+    appearance: minimal
+    default: operational
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Quel est l'état de fonctionnement de ces toilettes ?
+    hint::French(fr): Sélectionnez l'état de fonctionnement de cette toilette
+  - type: begin group
+    name: basic
+    label::English(en): Basic model
+    appearance: Field-list
+    relevant: (${operational_status} = 'operational' or ${operational_status} = 'needs_maintenance')
+  - type: select_one gender
+    name: gender
+    label::English(en): Which genders can access this toilet ?
+    hint::English(en):
+      Indicate if this toilet has a separate chamber for Female and
+      Male.
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/unisex
+    default: unisex
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr):
+      Ces toilettes ont-elles des chambers séparées pour les femmes
+      et les hommes ?
+    hint::French(fr):
+      Indiquez si ces toilettes ont une chamber séparée pour les femmes
+      et les hommes.
+  - type: select_one toilet_disposal
+    name: disposal
+    label::English(en): What type of toilet disposal does this toilet has?
+    hint::English(en): Indicate the disposal type of this toilet.
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/disposal
+    default: pitlatrine
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Quel type d'élimination des toilettes ces toilettes ont-elles ?
+    hint::French(fr): Indiquez le type d'élimination de cette toilette.
+  - type: select_one toilet_position
+    name: position
+    label::English(en): What is the toilet position of this toilet?
+    hint::English(en): Indicate the toilet position at this toilet.
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/position
+    default: seated
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): "Quelle est la position des toilettes de ces toilettes ? "
+    hint::French(fr): Indiquez la position des toilettes à ces toilettes.
+  - type: select_one access
+    name: access
+    label::English(en): Who can access this toilet?
+    hint::English(en): Indicate who can access this toilet
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/access
+    default: public
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Qui peut accéder à ces toilettes ?
+    hint::French(fr): Indiquez qui peut accéder à ces toilettes
+  - type: select_one yes_no
+    name: fee
+    label::English(en): Is fee charged to access this toilet?
+    hint::English(en): Indicate if a fee is required to access this toilet
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/fee
+    default: ${last-saved#fee}
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Des frais sont-ils facturés pour accéder à ces toilettes ?
+    hint::French(fr): Indiquez si des frais sont exigés pour accéder à ces toilettes
+  - type: text
+    name: name
+    label::English(en): Enter the name of this toilet
+    hint::English(en): Enter this toilet name if it has one
+    appearance: quickcompact
+    calculation: instance('toilets')/root/item[id=${existing}]/label
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Entrez le nom de cette toilette
+    hint::French(fr): Entrez ce nom de toilette
+  - type: end group
+    name: end of basic
+  - type: end group
+    name: end of toiletprofile
+  - type: begin group
+    name: extended
+    label::English(en): Extended model
+    appearance: Field-list
+    relevant:
+      (${operational_status} = 'operational' or ${operational_status} = 'needs_maintenance')
+      and ${model}=’extended'
+  - type: select_one yes_no
+    name: lit
+    label::English(en): Does this toilet have lighting ?
+    appearance: minimal
+  - type: integer
+    name: num_chambers
+    label::English(en): How many chambers does this toilet contains?
+    hint::English(en): Indicate number of chambers this toilet has
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Combien de chambers ces toilettes contiennent-elles ?
+    hint::French(fr): Indiquez le nombre de chambers de cette toilette
+  - type: select_one opening_hours
+    name: opening_hours
+    label::English(en): Select the operating hours of this toilet
+    hint::English(en): Indicate the operating hours and days of this toilet
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/opening_hours
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Sélectionnez les heures de fonctionnement de cette toilette
+    hint::French(fr): Indiquez les heures et les jours de fonctionnement de cette toilette
+  - type: text
+    name: ref
+    label::English(en): Enter the code of this toilet
+    hint::English(en):
+      Look around the toilet and if it has a code, enter it here as
+      written
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Entrez le code de cette toilette
+    hint::French(fr):
+      Regardez autour des toilettes et s'il y a un code, entrez-le ici
+      tel qu'il est écrit
+  - type: select_one yes_no
+    name: wheelchair
+    label::English(en): Is this toilet accessible by a Wheelchair?
+    hint::English(en): Indicate if this toilet is accessible by a wheelchair
+    appearance: minimal
+    calculation: instance('toilets')/root/item[id=${existing}]/wheelchair
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Ces toilettes sont-elles accessibles en fauteuil roulant ?
+    hint::French(fr): Indiquez si cette toilette est accessible en fauteuil roulant
+  - type: select_one yes_no
+    name: handwash
+    label::English(en): Does this toilet has a Hand washing station?
+    hint::English(en): Indicate if there is a hand washing station at this toilet.
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Est-ce que cette toilette a une station de lavage des mains
+    hint::French(fr): Indiquez s'il y a une station de lavage des mains à cette toilette.
+  - type: select_one yes_no
+    name: flood_prone
+    label::English(en): Is this toilet flood prone ?
+    appearance: minimal
+  - type: select_one yes_no
+    name: changing_table
+    label::English(en): Does this toilet have a changing table  ?
+    appearance: quickcompact
+  - type: end group
+    name: end of extended
+  - type: begin group
+    name: mgmt_details
+    label::English(en): Toilet Management Details
+    appearance: Field-list
+    relevant:
+      (${operational_status} = 'operational' or ${operational_status} = 'needs_maintenance')
+      and ${model}=’extended'
+  - type: select_one operator:type
+    name: operator_type
+    label::English(en): Who operates this toilet?
+    hint::English(en): Select the Operator of this toilet
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Qui exploite ces toilettes ?
+    hint::French(fr): Sélectionnez l'opérateur de cette toilette
+  - type: text
+    name: operator
+    label::English(en): Who is the provider of this toilet?
+    hint::English(en): Enter the name of the provider/donor as it is written
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Qui est le fournisseur de ces toilettes ?
+    hint::French(fr): Entrez le nom du fournisseur/donateur tel qu'il est écrit
+  - type: select_one yes_no
+    name: management
+    label::English(en): Does this toilet has a management committee?
+    hint::English(en): Indicate if this toilet has a management committee
+    appearance: minimal
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Est-ce que cette toilette a un comité de gestion ?
+    hint::French(fr): Indiquez si cette toilette a un comité de gestion
+  - type: select_one frequency
+    name: frequency
+    label::English(en): What is the frequency of maintenance of this toilet?
+    hint::English(en): Indicate the frequency
+    appearance: minimal
+    relevant: ${management} = 'yes'
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Quelle est la fréquence d'entretien de cette toilette ?
+    hint::French(fr): Indiquez la fréquence
+  - type: select_one yes_no
+    name: emptier
+    label::English(en): Does  a manager empty the toilet ?
+    appearance: minimal
+  - type: text
+    name: manager
+    label::English(en): What is the name of the manager ?
+    appearance: minimal
+    relevant: ${emptier} = ‘yes’
+  - type: text
+    name: phone
+    label::English(en): What is the manager’s phone number ?
+    appearance: minimal
+    relevant: ${emptier} = ‘yes’
+  - type: text
+    name: parking_name
+    label::English(en): What is the name of the parking place for the emptier ?
+    appearance: minimal
+    relevant: ${emptier} = ‘yes’ and ${management} = 'yes'
+  - type: select_one yes_no
+    name: noname
+    label::English(en):
+      Is there really no name for the person that empties the toilet
+      ?
+    appearance: quickcompact
+    relevant: ${manager}=”” and ${management} = 'yes'
+  - type: end group
+  - type: begin group
+    name: location_details
+    label::English(en): Location Details
+    appearance: Field-list
+  - type: geopoint
+    name: location
+    label::English(en): Capture the location of this Toilet
+    hint::English(en):
+      Using the GPS, capture the location. Please stand very close
+      to the toilet as possible
+    appearance: Placement-map
+    relevant: ${xlocation}=”"
+    trigger: ${existing}
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    label::French(fr): Capturez l'emplacement de cette toilette
+    hint::French(fr):
+      À l'aide du GPS, capturez l'emplacement. Veuillez vous tenir le
+      plus près possible des toilettes
+  - type: text
+    name: comment
+    label::English(en): Any other comments about this feature
+    appearance: minimal
+  - type: image
+    name: image
+    label::English(en): Take a photo of this Toilet
+    hint::English(en):
+      "Take a photo of this public toilet. Make sure the entire toilet
+      entrance, and roof are captured in the photo:"
+    appearance: minimal
+    parameters: max-pixels=1000
+    label::French(fr): Prenez une photo de cette toilette
+    hint::French(fr):
+      "Prenez une photo de ces toilettes publiques. Assurez-vous que\
+      \ toute l'entrée des toilettes et le toit sont capturés sur la photo :"
+  - type: end group
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: yes_no
+    name: yes
+    label::English(en): Yes
+    label::French(fr): Oui
+  - list_name: yes_no
+    name: no
+    label::English(en): No
+    label::French(fr): Non
+  - list_name: toilet_access
+    name: yes
+    label::English(en): Yes
+    label::French(fr): Oui
+  - list_name: toilet_access
+    name: no
+    label::English(en): No
+    label::French(fr): Non
+  - list_name: toilet_access
+    name: customers
+    label::English(en): Customers only
+  - list_name: gender
+    name: female
+    label::English(en): Female
+  - list_name: gender
+    name: male
+    label::English(en): Male
+  - list_name: gender
+    name: unisex
+    label::English(en): Unisex
+  - list_name: access
+    name: public
+    label::English(en): Public
+    label::French(fr): Public
+  - list_name: access
+    name: private
+    label::English(en): Private
+    label::French(fr): Privé
+  - list_name: access
+    name: religion
+    label::English(en): Religious Group/Institution
+    label::French(fr): Groupe religieux/Institution
+  - list_name: frequency
+    name: day
+    label::English(en): Daily
+    label::French(fr): Religieux
+  - list_name: frequency
+    name: week
+    label::English(en): Weekly
+    label::French(fr): Hebdomadaire
+  - list_name: frequency
+    name: month
+    label::English(en): Monthly
+    label::French(fr): nsuel
+  - list_name: frequency
+    name: year
+    label::English(en): Annually
+    label::French(fr): Annuellement
+  - list_name: toilet_disposal
+    name: pitlatrine
+    label::English(en): Pit Latrine
+    label::French(fr): Latrine à fosse
+  - list_name: toilet_disposal
+    name: chemical
+    label::English(en): Chemical
+    label::French(fr): Chimique
+  - list_name: toilet_disposal
+    name: bucket
+    label::English(en): Bucket
+  - list_name: toilet_disposal
+    name: flush
+    label::English(en): Flush Toilet
+  - list_name: toilet_disposal
+    name: dry_toilet
+    label::English(en): Dry Toilet
+  - list_name: toilet_position
+    name: seated
+    label::English(en): Seated
+    label::French(fr): Assise
+  - list_name: toilet_position
+    name: urinal
+    label::English(en): Urinal
+    label::French(fr): Urinoir
+  - list_name: toilet_position
+    name: squat
+    label::English(en): Squat
+    label::French(fr): S'accroupir
+  - list_name: operational_status
+    name: operational
+    label::English(en): Operational
+    label::French(fr): Opérationnel
+  - list_name: operational_status
+    name: needs_maintenance
+    label::English(en): Needs Maintenance
+    label::French(fr): Besoin de maintenance
+  - list_name: operational_status
+    name: closed
+    label::English(en): Closed
+    label::French(fr): Fermé
+  - list_name: operational_status
+    name: under_construction
+    label::English(en): Under Construction
+  - list_name: operator:type
+    name: private
+    label::English(en): Private
+    label::French(fr): Privé
+  - list_name: operator:type
+    name: government
+    label::English(en): Government
+    label::French(fr): Gouvernement
+  - list_name: operator:type
+    name: community
+    label::English(en): Community
+    label::French(fr): Communauté
+  - list_name: operator:type
+    name: ngo
+    label::English(en): Non-profit organization
+    label::French(fr): Organisation à but non lucratif
+  - list_name: operator:type
+    name: religious
+    label::English(en): Religious
+    label::French(fr): Religieux
+  - list_name: opening_hours
+    name: 24/7
+    label::English(en): 24/7
+  - list_name: opening_hours
+    name: mo-sa_08:00-18:00
+    label::English(en): Monday – Sat 08:00-18:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-17:00
+    label::English(en): Monday – Sat 09:00-17:00
+  - list_name: opening_hours
+    name: mo-sa_09:00-18:00
+    label::English(en): Monday – Sat 09:00-18:00
+  - list_name: opening_hours
+    name: mo-fr_09:00-17:00
+    label::English(en): Monday – Friday 09:00-17:00
+  - list_name: opening_hours
+    name: mo-su_09:00-21:00
+    label::English(en): Monday - Sunday 09:00-21:00
+  - list_name: opening_hours
+    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
+    label::English(en): Monday - Friday 08:00-18:00; Sat - Sunday 08:00-15:00
+  - list_name: opening_hours
+    name: by_appointment
+    label::English(en): By Appointment Only
+    label::French(fr): Sur rendez-vous uniquement
+settings:
+  - form_title: Toilets and Sanitation
+    form_id: toilets
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - appearance
+      - relevant
+      - choice_filter
+      - calculation
+      - default
+      - trigger
+      - parameters
+      - required
+      - required_message::French(fr)
+      - label::French(fr)
+      - hint::French(fr)
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+      - label::French(fr)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates
