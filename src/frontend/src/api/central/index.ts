@@ -45,7 +45,7 @@ export function useUploadProjectXlsformMutation(
   options: TMutationOptions<
     { message: string },
     { payload: FormData; params: uploadXlsformParamsType },
-    { message: string }
+    { detail: string }
   >,
 ) {
   return useMutation({

@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch } from '@/types/reduxTypes';
-import { useParams } from 'react-router-dom';
 import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
@@ -14,20 +13,33 @@ import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { useGetFormListsQuery, useUploadProjectXlsformMutation } from '@/api/central';
+import { useDetectFormLanguagesMutation, useGetFormListsQuery } from '@/api/central';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { formLanguagesType } from '@/types';
+import isEmpty from '@/utilfunctions/isEmpty';
+import AssetModules from '@/shared/AssetModules';
+import { motion } from 'motion/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
+const prepareRadioOptions = (values: string[]): { label: string; value: string }[] => {
+  return values?.map((value) => ({ label: value, value: value }));
+};
+
 const UploadSurvey = () => {
   useDocumentTitle('Create Project: Upload Survey');
-
   const dispatch = useAppDispatch();
-  const params = useParams();
-  const projectId = params.id ? +params.id : null;
+  const queryClient = useQueryClient();
+
+  const [formLanguages, setFormLanguages] = useState<formLanguagesType>({
+    detected_languages: [],
+    default_language: [],
+    supported_languages: [],
+  });
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
-  const { watch, control, setValue, getValues, formState } = form;
+  const { watch, control, setValue, formState, clearErrors } = form;
   const { errors } = formState;
   const values = watch();
 
@@ -40,34 +52,23 @@ const UploadSurvey = () => {
       .sort((a, b) => a.title.localeCompare(b.title))
       .map((form) => ({ id: form.id, label: form.title, value: form.id })) || [];
 
-  const { mutate: uploadProjectXlsformMutate, isPending: isUploadProjectXlsformPending } =
-    useUploadProjectXlsformMutation({
+  const { mutate: detectFormLanguagesMutate, isPending: isDetectFormLanguagesPending } = useDetectFormLanguagesMutation(
+    {
       onSuccess: ({ data }) => {
-        setValue('isXlsFormFileValid', true);
-        dispatch(
-          CommonActions.SetSnackBar({ message: data?.message || 'XLSForm uploaded successfully', variant: 'success' }),
-        );
+        setValue('default_language', '');
+        setFormLanguages(data);
       },
       onError: ({ response }) => {
-        setValue('isXlsFormFileValid', false);
-        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to upload XLSForm form' }));
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Invalid XLSForm form' }));
       },
-    });
+    },
+  );
 
-  const uploadXlsformFile = (file) => {
-    // use_odk_collect is from previous step, while needVerificationFields is from this step
-    const values = getValues();
+  const detectDefaultLanguage = (file) => {
     const formData = new FormData();
     formData.append('xlsform', file?.file);
-
-    uploadProjectXlsformMutate({
+    detectFormLanguagesMutate({
       payload: formData,
-      params: {
-        project_id: +projectId!,
-        use_odk_collect: values.use_odk_collect,
-        need_verification_fields: values.needVerificationFields,
-        mandatory_photo_upload: values.mandatoryPhotoUpload,
-      },
     });
   };
 
@@ -76,15 +77,12 @@ const UploadSurvey = () => {
       resetFile();
       return;
     }
-
     setValue('xlsFormFile', file);
-    setValue('isXlsFormFileValid', false);
-    uploadXlsformFile(file);
+    detectDefaultLanguage(file);
   };
 
   const resetFile = (): void => {
     setValue('xlsFormFile', null);
-    setValue('isXlsFormFileValid', false);
   };
 
   return (
@@ -200,11 +198,18 @@ const UploadSurvey = () => {
           label="The supported file formats are .xlsx, .xls, .xml"
           data={values.xlsFormFile ? [values.xlsFormFile] : []}
           onUploadFile={(updatedFiles, fileInputRef) => {
+            clearErrors();
             changeFileHandler(updatedFiles?.[0] as fileType);
           }}
           acceptedInput=".xls,.xlsx,.xml"
         />
-        {isUploadProjectXlsformPending && (
+        {isDetectFormLanguagesPending && (
+          <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+            <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
+            <p className="fmtm-text-base">Detecting form languages...</p>
+          </div>
+        )}
+        {!!queryClient.isMutating({ mutationKey: ['upload-project-xlsform'] }) && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
             <p className="fmtm-text-base">Validating & Uploading form...</p>
@@ -212,6 +217,45 @@ const UploadSurvey = () => {
         )}
         {errors?.xlsFormFile?.message && <ErrorMessage message={errors.xlsFormFile.message as string} />}
       </div>
+      {!!values.xlsFormFile && isEmpty(formLanguages?.default_language) && (
+        <>
+          <div
+            className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
+            onClick={() => setValue('advancedConfig', !values.advancedConfig)}
+          >
+            <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
+            <motion.div className="" animate={{ rotate: values.advancedConfig ? 180 : 0 }}>
+              <AssetModules.ExpandLessIcon className={`!fmtm-text-base group-hover:!fmtm-text-grey-800`} />
+            </motion.div>
+          </div>
+          {values.advancedConfig && (
+            <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-flex-wrap">
+              <FieldLabel label="Form Default Language" />
+              <Controller
+                control={control}
+                name="osm_category"
+                render={({ field }) => (
+                  <Select2
+                    options={
+                      !isEmpty(formLanguages.detected_languages)
+                        ? prepareRadioOptions(formLanguages.detected_languages)
+                        : prepareRadioOptions(formLanguages.supported_languages)
+                    }
+                    value={field.value as string}
+                    choose="label"
+                    onChange={(value: any) => {
+                      field.onChange(value);
+                    }}
+                    placeholder="Form Category"
+                    isLoading={isGetFormListsLoading}
+                    ref={field.ref}
+                  />
+                )}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
