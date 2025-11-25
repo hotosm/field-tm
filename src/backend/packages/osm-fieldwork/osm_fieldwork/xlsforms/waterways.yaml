@@ -1,0 +1,228 @@
+survey:
+  - "#":
+      Converted by yxf, from waterways.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::French(fr): |2-
+
+    Il s'agit d'un project de données et de cartographie des cours d'eau. Les produits de données du project fourniront au gouvernement national et aux acteurs du développement des ensembles de données ouvertes fiables pour la prise de décision. Le project est financé et soutenu techniquement par l'équipe Humanitaire OpenStreetMap (HOT) à travers son Open Mapping Hub pour la région de l'Afrique de l'Ouest et du Nord et mis en œuvre par OSM Niger. En tant qu'émunérateur, vous devrez demander à un résident de la communauté de fournir des réponses à plusieurs des questions du formulaire.
+    label::English(en):
+      This is a data and mapping project waterways. The data products
+      from the project will provide national government and development actors with
+      reliable open datasets for decision-making. The project is funded and supported
+      technically by the Humanitarian OpenStreetMap Team (HOT) through its Open Mapping
+      Hub for West and Northern Africa region and implemented by OSM Niger. As an Emunerator,
+      you will need to ask a resident of the community to provide answers to several
+      of the questions in the form.
+  - type: begin group
+    name: location_details
+    label::French(fr): Détails de la localité
+    appearance: Field-list
+  - type: text
+    name: enum_name
+    label::French(fr): Nom du collecteur de données
+    hint::French(fr): Entrez votre nom
+    label::English(en): Data collector name
+    hint::English(en): Enter your name
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+  - type: select_one_from_file municipality.csv
+    name: municipality
+    label::French(fr): "Sélectionner la commune dans laquelle les données sont collectés :"
+    hint::French(fr): "Sélectionner la commune dans laquelle les données sont collectés :"
+    label::English(en): "Select the municipality in which the data is collected:"
+    hint::English(en): "Select the municipality in which the data is collected:"
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+  - type: "select_one_from_file towns.csv "
+    name: town
+    label::French(fr):
+      Sélectionner la localité dans laquelle vous êtes en train de
+      collecter les données
+    hint::French(fr):
+      Sélectionner la localité dans laquelle vous êtes en train de collecter
+      les données aujourd’hui
+    label::English(en): Select the locality in which you are collecting the data
+    hint::English(en): Select the locality in which you are collecting data today
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: minimal
+    choice_filter: municipality=${municipality}
+  - type: text
+    name: locality
+    label::French(fr): "Saisir le nom du village ou la communauté "
+    hint::French(fr):
+      Demander aux résidents, le nom de du village ou de la localité
+      ou communauté et l’écrire ici
+    label::English(en): Enter the name of the village or the community
+    hint::English(en):
+      Ask residents for the name of the village or locality or community
+      and write it here
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: minimal
+  - type: end group
+  - type: begin group
+    name: waterway_details
+    label::French(fr): Détails de la voie navigable
+    appearance: Field-list
+  - type: geopoint
+    name: waterway_location
+    label::French(fr): "Saisissez l'emplacement de ce cours d’eau :"
+    hint::French(fr):
+      À l'aide du GPS, saisissez l'emplacement. Veuillez vous tenir
+      le plus près possible du cours d’eau.
+    label::English(en): Enter the location of this waterway
+    hint::English(en):
+      Using GPS, enter the location. Please stay as close to the waterway
+      as possible.
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: Placement-map
+    body::accuracyThreshold: 1.5
+  - type: text
+    name: waterway_name
+    label::French(fr): Quel est le nom de ce cours d’eau?
+    hint::French(fr): Saisissez le nom de ce cours d’eau, si disponible
+    label::English(en): What is the name of this waterway ?
+    hint::English(en): Enter the name of this waterway, if available
+  - type: select_one elevation
+    name: waterway_elevation
+    label::French(fr): Quelle est l'altitude de cours d'eau ?
+    hint::French(fr): Sélectionnez le niveau d'élévation de ce cours d’eau
+    label::English(en): What is the elevation of the waterway ?
+    hint::English(en): Select the elevation level of this waterway
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: minimal
+  - type: select_one waterway_type or_other
+    name: waterway_type
+    label::French(fr): Quel est le type de cours d’eau?
+    hint::French(fr): Sélectionnez le type de ce cours d’eau
+    label::English(en): What is the type of waterway ?
+    hint::English(en): Select the type of this waterway
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: minimal
+  - type: select_one seasonal
+    name: waterway_seasonal
+    label::French(fr): En quelle saison ce cours d’eau est-il accessible ?
+    hint::French(fr): Indiquez la saison pendant laquelle ce cours d’eau est accessible.
+    label::English(en): In what season is this waterway accessible?
+    hint::English(en): Indicate the season during which this waterway is accessible.
+    required: yes
+    required_message::French(fr)required_message::English(en):
+      Désolé, la réponse est
+      obligatoire
+    "": Sorry, this question is required
+    appearance: minimal
+  - type: end group
+choices:
+  - list_name: waterway_type
+    name: river
+    label::French(fr): Rivière
+  - list_name: waterway_type
+    name: stream
+    label::French(fr): Ruisseau
+  - list_name: waterway_type
+    name: lake
+    label::French(fr): Lac
+  - list_name: waterway_type
+    name: underground_water
+    label::French(fr): Eau souterraine
+    label::English(en): Underground water
+  - list_name: elevation
+    name: valley
+    label::French(fr): Vallée
+    label::English(en): Valley
+  - list_name: elevation
+    name: plateau
+    label::French(fr): Plateau
+    label::English(en): Plateau
+  - list_name: seasonal
+    name: dry
+    label::French(fr): Saison sèche
+    label::English(en): Dry season
+  - list_name: seasonal
+    name: rainy
+    label::French(fr): Saison des pluies
+    label::English(en): Rainy season
+  - list_name: seasonal
+    name: all_seasoon
+    label::French(fr): Toutes les saisons
+    label::English(en): All seasons
+settings:
+  - form_title: HOT Waterways
+    form_id: waterways
+    version: 09012022_v1
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::French(fr)
+      - hint::French(fr)
+      - label::English(en)
+      - hint::English(en)
+      - required
+      - required_message::French(fr)required_message::English(en)
+      -
+      - appearance
+      - body::accuracyThreshold
+      - default
+      - constraint
+      - constraint_message
+      - calculation
+      - choice_filter
+      - parameters
+      - repeat_count
+      - relevant
+      - note
+    choices:
+      - list_name
+      - name
+      - label::French(fr)
+      - label::English(en)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates
