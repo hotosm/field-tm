@@ -330,6 +330,7 @@ const CreateProject = () => {
         use_odk_collect: values.use_odk_collect,
         need_verification_fields: values.needVerificationFields,
         mandatory_photo_upload: values.mandatoryPhotoUpload,
+        default_language: values.default_language,
       },
     });
   };

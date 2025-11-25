@@ -181,6 +181,11 @@ export const uploadSurveyValidationSchema = z
     isFormValidAndUploaded: z.boolean(),
     advancedConfig: z.boolean(),
     default_language: z.string(),
+    formLanguages: z.object({
+      detected_languages: z.array(z.string()),
+      default_language: z.array(z.string()),
+      supported_languages: z.array(z.string()),
+    }),
   })
   .check((ctx) => {
     const values = ctx.value;

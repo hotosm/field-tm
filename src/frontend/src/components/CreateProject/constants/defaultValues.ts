@@ -41,6 +41,11 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   isFormValidAndUploaded: false,
   advancedConfig: false,
   default_language: '',
+  formLanguages: {
+    detected_languages: [],
+    default_language: [],
+    supported_languages: [],
+  },
 
   // 04 Map Data
   primary_geom_type: null,

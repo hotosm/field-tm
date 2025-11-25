@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
@@ -15,7 +15,6 @@ import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useDetectFormLanguagesMutation, useGetFormListsQuery } from '@/api/central';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { formLanguagesType } from '@/types';
 import isEmpty from '@/utilfunctions/isEmpty';
 import AssetModules from '@/shared/AssetModules';
 import { motion } from 'motion/react';
@@ -31,12 +30,6 @@ const UploadSurvey = () => {
   useDocumentTitle('Create Project: Upload Survey');
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
-
-  const [formLanguages, setFormLanguages] = useState<formLanguagesType>({
-    detected_languages: [],
-    default_language: [],
-    supported_languages: [],
-  });
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, control, setValue, formState, clearErrors } = form;
@@ -56,7 +49,7 @@ const UploadSurvey = () => {
     {
       onSuccess: ({ data }) => {
         setValue('default_language', '');
-        setFormLanguages(data);
+        setValue('formLanguages', data);
       },
       onError: ({ response }) => {
         dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Invalid XLSForm form' }));
@@ -84,6 +77,20 @@ const UploadSurvey = () => {
   const resetFile = (): void => {
     setValue('xlsFormFile', null);
   };
+
+  useEffect(() => {
+    if (!values.advancedConfig) {
+      let defaultLanguage = '';
+      if (!isEmpty(values.formLanguages?.default_language)) {
+        defaultLanguage = values.formLanguages?.default_language[0];
+      } else if (!isEmpty(values.formLanguages?.detected_languages)) {
+        defaultLanguage = values.formLanguages?.detected_languages[0];
+      } else {
+        defaultLanguage = 'english';
+      }
+      setValue('default_language', defaultLanguage);
+    }
+  }, [values.advancedConfig, values.formLanguages]);
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
@@ -150,7 +157,15 @@ const UploadSurvey = () => {
           control={control}
           name="needVerificationFields"
           render={({ field }) => (
-            <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+            <Switch
+              ref={field.ref}
+              checked={field.value}
+              onCheckedChange={(e) => {
+                field.onChange(e);
+                setValue('isFormValidAndUploaded', false);
+              }}
+              className=""
+            />
           )}
         />
       </div>
@@ -161,7 +176,15 @@ const UploadSurvey = () => {
           control={control}
           name="mandatoryPhotoUpload"
           render={({ field }) => (
-            <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
+            <Switch
+              ref={field.ref}
+              checked={field.value}
+              onCheckedChange={(e) => {
+                field.onChange(e);
+                setValue('isFormValidAndUploaded', false);
+              }}
+              className=""
+            />
           )}
         />
       </div>
@@ -199,6 +222,7 @@ const UploadSurvey = () => {
           data={values.xlsFormFile ? [values.xlsFormFile] : []}
           onUploadFile={(updatedFiles, fileInputRef) => {
             clearErrors();
+            setValue('default_language', '');
             values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
             changeFileHandler(updatedFiles?.[0] as fileType);
           }}
@@ -218,11 +242,14 @@ const UploadSurvey = () => {
         )}
         {errors?.xlsFormFile?.message && <ErrorMessage message={errors.xlsFormFile.message as string} />}
       </div>
-      {!!values.xlsFormFile && isEmpty(formLanguages?.default_language) && (
+      {!!values.xlsFormFile && isEmpty(values.formLanguages?.default_language) && (
         <>
           <div
             className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
-            onClick={() => setValue('advancedConfig', !values.advancedConfig)}
+            onClick={() => {
+              setValue('advancedConfig', !values.advancedConfig);
+              setValue('default_language', '');
+            }}
           >
             <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
             <motion.div className="" animate={{ rotate: values.advancedConfig ? 180 : 0 }}>
@@ -234,18 +261,19 @@ const UploadSurvey = () => {
               <FieldLabel label="Form Default Language" />
               <Controller
                 control={control}
-                name="osm_category"
+                name="default_language"
                 render={({ field }) => (
                   <Select2
                     options={
-                      !isEmpty(formLanguages.detected_languages)
-                        ? prepareRadioOptions(formLanguages.detected_languages)
-                        : prepareRadioOptions(formLanguages.supported_languages)
+                      !isEmpty(values.formLanguages.detected_languages)
+                        ? prepareRadioOptions(values.formLanguages.detected_languages)
+                        : prepareRadioOptions(values.formLanguages.supported_languages)
                     }
                     value={field.value as string}
                     choose="label"
                     onChange={(value: any) => {
                       field.onChange(value);
+                      setValue('isFormValidAndUploaded', false);
                     }}
                     placeholder="Form Category"
                     isLoading={isGetFormListsLoading}
@@ -253,6 +281,9 @@ const UploadSurvey = () => {
                   />
                 )}
               />
+              {errors?.default_language?.message && (
+                <ErrorMessage message={errors.default_language.message as string} />
+              )}
             </div>
           )}
         </>

@@ -14,6 +14,7 @@ export type uploadXlsformParamsType = {
   use_odk_collect?: boolean;
   need_verification_fields?: boolean;
   mandatory_photo_upload?: boolean;
+  default_language?: string;
 };
 
 // RESPONSE
