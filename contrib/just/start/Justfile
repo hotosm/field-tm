@@ -48,7 +48,7 @@ prod:
   just config custom-favicon
 
   # Pull images
-  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull
+  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull api
 
   # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
