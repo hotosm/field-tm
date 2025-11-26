@@ -47,11 +47,11 @@ prod:
   just config generate-dotenv "${GIT_BRANCH}"
   just config custom-favicon
 
+  # Pull images
+  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull api
+
   # Build frontends
   just build frontends-prod "${GIT_BRANCH}"
-
-  # Pull images
-  ../envsubst -no-unset -i compose.sub.yaml | {{docker}} compose -f - pull
 
   # Deploy
   ../envsubst -no-unset -i compose.sub.yaml | \
