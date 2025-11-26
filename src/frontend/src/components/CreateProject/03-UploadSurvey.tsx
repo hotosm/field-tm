@@ -4,18 +4,18 @@ import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch } from '@/types/reduxTypes';
 import { useParams } from 'react-router-dom';
-import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
-
 import Select2 from '@/components/common/Select2';
 import FieldLabel from '@/components/common/FieldLabel';
-import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useGetFormListsQuery, useUploadProjectXlsformMutation } from '@/api/central';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import FileUpload from '@/components/common/FileUpload';
+import isEmpty from '@/utilfunctions/isEmpty';
+import { FileType } from '@/types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -58,7 +58,7 @@ const UploadSurvey = () => {
     // use_odk_collect is from previous step, while needVerificationFields is from this step
     const values = getValues();
     const formData = new FormData();
-    formData.append('xlsform', file?.file);
+    formData.append('xlsform', file);
 
     uploadProjectXlsformMutate({
       payload: formData,
@@ -71,15 +71,11 @@ const UploadSurvey = () => {
     });
   };
 
-  const changeFileHandler = (file): void => {
-    if (!file) {
-      resetFile();
-      return;
-    }
-
+  const changeFileHandler = (file: FileType[]): void => {
+    if (isEmpty(file)) return;
     setValue('xlsFormFile', file);
     setValue('isXlsFormFileValid', false);
-    uploadXlsformFile(file);
+    uploadXlsformFile(file?.[0]?.file);
   };
 
   const resetFile = (): void => {
@@ -196,13 +192,12 @@ const UploadSurvey = () => {
             </div>
           }
         />
-        <UploadArea
-          label="The supported file formats are .xlsx, .xls, .xml"
-          data={values.xlsFormFile ? [values.xlsFormFile] : []}
-          onUploadFile={(updatedFiles, fileInputRef) => {
-            changeFileHandler(updatedFiles?.[0] as fileType);
-          }}
-          acceptedInput=".xls,.xlsx,.xml"
+        <FileUpload
+          name="logo"
+          onChange={changeFileHandler}
+          onDelete={resetFile}
+          data={values.xlsFormFile}
+          fileAccept=".xls,.xlsx,.xml"
         />
         {isUploadProjectXlsformPending && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
