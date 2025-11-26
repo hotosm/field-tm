@@ -18,9 +18,14 @@ survey:
     name: email
   - type: note
     name: instructions
-    label::French(fr): |2-
-
-    Il s'agit d'un project de données et de cartographie des cours d'eau. Les produits de données du project fourniront au gouvernement national et aux acteurs du développement des ensembles de données ouvertes fiables pour la prise de décision. Le project est financé et soutenu techniquement par l'équipe Humanitaire OpenStreetMap (HOT) à travers son Open Mapping Hub pour la région de l'Afrique de l'Ouest et du Nord et mis en œuvre par OSM Niger. En tant qu'émunérateur, vous devrez demander à un résident de la communauté de fournir des réponses à plusieurs des questions du formulaire.
+    label::French(fr):
+      Il s'agit d'un project de données et de cartographie des cours d'eau. Les produits
+      de données du project fourniront au gouvernement national et aux acteurs du développement
+      des ensembles de données ouvertes fiables pour la prise de décision. Le project est
+      financé et soutenu techniquement par l'équipe Humanitaire OpenStreetMap (HOT) à travers
+      son Open Mapping Hub pour la région de l'Afrique de l'Ouest et du Nord et mis en œuvre
+      par OSM Niger. En tant qu'émunérateur, vous devrez demander à un résident de la communauté
+      de fournir des réponses à plusieurs des questions du formulaire.
     label::English(en):
       This is a data and mapping project waterways. The data products
       from the project will provide national government and development actors with
