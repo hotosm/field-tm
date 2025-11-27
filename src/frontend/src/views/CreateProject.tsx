@@ -35,6 +35,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { useDeleteProjectMutation, useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
 import { useUploadProjectXlsformMutation } from '@/api/central';
+import { FileType } from '@/types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -161,7 +162,6 @@ const CreateProject = () => {
       organisation_id,
       project_admins,
       outline,
-      uploadedAOIFile,
       odk_central_url,
       odk_central_user,
       odk_central_password,
@@ -176,7 +176,6 @@ const CreateProject = () => {
       description,
       organisation_id,
       outline,
-      uploadedAOIFile,
       merge,
       field_mapping_app,
       use_odk_collect,
@@ -240,7 +239,7 @@ const CreateProject = () => {
     );
     const dataExtractGeojsonFile = convertGeojsonToJsonFile(data.dataExtractGeojson, 'extract');
 
-    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile, xlsFormFile: data.xlsFormFile?.file };
+    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile };
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
@@ -317,11 +316,11 @@ const CreateProject = () => {
       },
     });
 
-  const uploadXlsformFile = (file) => {
+  const uploadXlsformFile = (file: FileType[]) => {
     // use_odk_collect is from previous step, while needVerificationFields is from this step
     const values = getValues();
     const formData = new FormData();
-    formData.append('xlsform', file?.file);
+    formData.append('xlsform', file?.[0]?.file);
 
     uploadProjectXlsformMutate({
       payload: formData,
@@ -500,7 +499,7 @@ const CreateProject = () => {
                 ? null
                 : (geojson) => {
                     setValue('outline', JSON.parse(geojson));
-                    setValue('uploadedAOIFile', undefined);
+                    setValue('uploadedAOIFile', []);
                   }
             }
             onModify={
@@ -508,7 +507,7 @@ const CreateProject = () => {
                 ? (geojson) => {
                     setValue('outline', JSON.parse(geojson));
 
-                    if (values.customDataExtractFile) setValue('customDataExtractFile', null);
+                    if (values.customDataExtractFile) setValue('customDataExtractFile', []);
                     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
 
                     if (values.splitGeojsonBySquares) setValue('splitGeojsonBySquares', null);

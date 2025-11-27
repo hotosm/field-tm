@@ -3,19 +3,18 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch } from '@/types/reduxTypes';
-import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
-
 import Select2 from '@/components/common/Select2';
 import FieldLabel from '@/components/common/FieldLabel';
-import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useDetectFormLanguagesMutation, useGetFormListsQuery } from '@/api/central';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
+import { FileType } from '@/types';
 import AssetModules from '@/shared/AssetModules';
 import { motion } from 'motion/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -59,23 +58,26 @@ const UploadSurvey = () => {
 
   const detectDefaultLanguage = (file) => {
     const formData = new FormData();
-    formData.append('xlsform', file?.file);
+    formData.append('xlsform', file);
     detectFormLanguagesMutate({
       payload: formData,
     });
   };
 
-  const changeFileHandler = (file): void => {
-    if (!file) {
-      resetFile();
-      return;
-    }
+  const changeFileHandler = (file: FileType[]): void => {
+    if (isEmpty(file)) return;
     setValue('xlsFormFile', file);
-    detectDefaultLanguage(file);
+    clearErrors();
+    setValue('default_language', '');
+    values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
+    detectDefaultLanguage(file?.[0]?.file);
   };
 
   const resetFile = (): void => {
-    setValue('xlsFormFile', null);
+    clearErrors();
+    setValue('xlsFormFile', []);
+    setValue('default_language', '');
+    values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
   };
 
   useEffect(() => {
@@ -217,16 +219,12 @@ const UploadSurvey = () => {
             </div>
           }
         />
-        <UploadArea
-          label="The supported file formats are .xlsx, .xls, .xml"
-          data={values.xlsFormFile ? [values.xlsFormFile] : []}
-          onUploadFile={(updatedFiles, fileInputRef) => {
-            clearErrors();
-            setValue('default_language', '');
-            values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
-            changeFileHandler(updatedFiles?.[0] as fileType);
-          }}
-          acceptedInput=".xls,.xlsx,.xml"
+        <FileUpload
+          placeholder="The supported file formats are .xlsx, .xls, .xml"
+          onChange={changeFileHandler}
+          onDelete={resetFile}
+          data={values.xlsFormFile}
+          fileAccept=".xls,.xlsx,.xml"
         />
         {isDetectFormLanguagesPending && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">

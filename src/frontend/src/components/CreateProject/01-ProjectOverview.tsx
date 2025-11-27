@@ -6,7 +6,6 @@ import { useIsAdmin } from '@/hooks/usePermissions';
 import { z } from 'zod/v4';
 
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
-import { fileType } from '@/store/types/ICommon';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { createProjectValidationSchema, odkCredentialsValidationSchema } from './validation';
 
@@ -18,7 +17,6 @@ import { Textarea } from '@/components/RadixComponents/TextArea';
 import { uploadAreaOptions } from './constants';
 import Button from '@/components/common/Button';
 import RadioButton from '@/components/common/RadioButton';
-import UploadAreaComponent from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
@@ -29,6 +27,8 @@ import { useGetUserListQuery } from '@/api/user';
 import { useTestOdkCredentialsMutation } from '@/api/central';
 import { field_mapping_app } from '@/types/enums';
 import { useTestQFieldCredentialsMutation } from '@/api/qfield';
+import FileUpload from '@/components/common/FileUpload';
+import { FileType } from '@/types';
 
 const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
   ODK: 'ODK Central',
@@ -155,13 +155,10 @@ const ProjectOverview = () => {
     setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
   };
 
-  const changeFileHandler = async (file: fileType, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
-    if (!file) {
-      resetFile();
-      return;
-    }
+  const changeFileHandler = async (file: FileType[]) => {
+    if (isEmpty(file)) return;
 
-    const fileObject = file?.file;
+    const fileObject = file?.[0]?.file;
     const convertedGeojson = await convertFileToGeojson(fileObject);
     const isGeojsonValid = valid(convertedGeojson, true);
 
@@ -169,9 +166,8 @@ const ProjectOverview = () => {
       setValue('uploadedAOIFile', file);
       setValue('outline', convertedGeojson);
     } else {
-      setValue('uploadedAOIFile', null);
+      setValue('uploadedAOIFile', []);
       setValue('outline', null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
           message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,
@@ -182,11 +178,11 @@ const ProjectOverview = () => {
   };
 
   const resetFile = () => {
-    setValue('uploadedAOIFile', null);
+    setValue('uploadedAOIFile', []);
     setValue('outline', null);
     setValue('outlineArea', undefined);
 
-    if (values.customDataExtractFile) setValue('customDataExtractFile', null);
+    if (values.customDataExtractFile) setValue('customDataExtractFile', []);
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
   };
 
@@ -465,14 +461,11 @@ const ProjectOverview = () => {
             {values.uploadAreaSelection === 'upload_file' && (
               <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
                 <FieldLabel label="Upload AOI" astric />
-                <UploadAreaComponent
-                  title=""
-                  label="Please upload .geojson, .json file"
-                  data={values.uploadedAOIFile ? [values.uploadedAOIFile] : []}
-                  onUploadFile={(updatedFiles, fileInputRef) => {
-                    changeFileHandler(updatedFiles?.[0] as fileType, fileInputRef);
-                  }}
-                  acceptedInput=".geojson, .json"
+                <FileUpload
+                  onChange={changeFileHandler}
+                  onDelete={resetFile}
+                  data={values.uploadedAOIFile}
+                  fileAccept=".geojson, .json"
                 />
                 {errors?.uploadedAOIFile?.message && (
                   <ErrorMessage message={errors.uploadedAOIFile.message as string} />
