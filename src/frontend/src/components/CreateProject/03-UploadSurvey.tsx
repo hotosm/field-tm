@@ -3,8 +3,6 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { useAppDispatch } from '@/types/reduxTypes';
-import { useParams } from 'react-router-dom';
-import { fileType } from '@/store/types/ICommon';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
 import Select2 from '@/components/common/Select2';
@@ -228,17 +226,6 @@ const UploadSurvey = () => {
           data={values.xlsFormFile}
           fileAccept=".xls,.xlsx,.xml"
         />
-        {/* <UploadArea
-          label="The supported file formats are .xlsx, .xls, .xml"
-          data={values.xlsFormFile ? [values.xlsFormFile] : []}
-          onUploadFile={(updatedFiles, fileInputRef) => {
-            clearErrors();
-            setValue('default_language', '');
-            values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
-            changeFileHandler(updatedFiles?.[0] as fileType);
-          }} */}
-        {/* acceptedInput=".xls,.xlsx,.xml"
-        /> */}
         {isDetectFormLanguagesPending && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
