@@ -36,9 +36,16 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   // 03 Upload Survey
   osm_category: '',
   xlsFormFile: null,
-  isXlsFormFileValid: false,
   needVerificationFields: true,
   mandatoryPhotoUpload: false,
+  isFormValidAndUploaded: false,
+  advancedConfig: false,
+  default_language: '',
+  formLanguages: {
+    detected_languages: [],
+    default_language: [],
+    supported_languages: [],
+  },
 
   // 04 Map Data
   primary_geom_type: null,
