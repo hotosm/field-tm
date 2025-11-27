@@ -77,7 +77,7 @@ const MapData = () => {
   };
 
   const resetMapDataFile = () => {
-    setValue('customDataExtractFile', null);
+    setValue('customDataExtractFile', []);
     setValue('dataExtractGeojson', null);
     if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
       setValue('task_split_type', null);

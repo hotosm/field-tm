@@ -79,7 +79,7 @@ const UploadSurvey = () => {
   };
 
   const resetFile = (): void => {
-    setValue('xlsFormFile', null);
+    setValue('xlsFormFile', []);
     setValue('isXlsFormFileValid', false);
   };
 

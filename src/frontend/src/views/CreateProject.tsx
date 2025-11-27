@@ -160,7 +160,6 @@ const CreateProject = () => {
       organisation_id,
       project_admins,
       outline,
-      uploadedAOIFile,
       odk_central_url,
       odk_central_user,
       odk_central_password,
@@ -175,7 +174,6 @@ const CreateProject = () => {
       description,
       organisation_id,
       outline,
-      uploadedAOIFile,
       merge,
       field_mapping_app,
       use_odk_collect,
@@ -239,7 +237,7 @@ const CreateProject = () => {
     );
     const dataExtractGeojsonFile = convertGeojsonToJsonFile(data.dataExtractGeojson, 'extract');
 
-    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile, xlsFormFile: data.xlsFormFile?.file };
+    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile };
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
@@ -455,7 +453,7 @@ const CreateProject = () => {
                 ? null
                 : (geojson) => {
                     setValue('outline', JSON.parse(geojson));
-                    setValue('uploadedAOIFile', undefined);
+                    setValue('uploadedAOIFile', []);
                   }
             }
             onModify={
@@ -463,7 +461,7 @@ const CreateProject = () => {
                 ? (geojson) => {
                     setValue('outline', JSON.parse(geojson));
 
-                    if (values.customDataExtractFile) setValue('customDataExtractFile', null);
+                    if (values.customDataExtractFile) setValue('customDataExtractFile', []);
                     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
 
                     if (values.splitGeojsonBySquares) setValue('splitGeojsonBySquares', null);

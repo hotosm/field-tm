@@ -7,6 +7,7 @@ import {
   project_visibility,
   task_split_type,
 } from '@/types/enums';
+import isEmpty from '@/utilfunctions/isEmpty';
 
 const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
   ODK: 'ODK Central',
@@ -106,7 +107,7 @@ export const projectOverviewValidationSchema = z
     if (values.hasODKCredentials && !values.useDefaultODKCredentials) {
       validateODKCreds(ctx, values);
     }
-    if (values.uploadAreaSelection === 'upload_file' && !values.uploadedAOIFile) {
+    if (values.uploadAreaSelection === 'upload_file' && isEmpty(values.uploadedAOIFile)) {
       ctx.issues.push({
         input: values.uploadedAOIFile,
         path: ['uploadedAOIFile'],
@@ -182,7 +183,7 @@ export const uploadSurveyValidationSchema = z
   })
   .check((ctx) => {
     const values = ctx.value;
-    if (!values.xlsFormFile) {
+    if (isEmpty(values.xlsFormFile)) {
       ctx.issues.push({
         input: values.xlsFormFile,
         path: ['xlsFormFile'],
@@ -190,7 +191,7 @@ export const uploadSurveyValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.xlsFormFile && !values.isXlsFormFileValid) {
+    if (!isEmpty(values.xlsFormFile) && !values.isXlsFormFileValid) {
       ctx.issues.push({
         input: values.xlsFormFile,
         path: ['xlsFormFile'],
@@ -241,7 +242,7 @@ export const mapDataValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.dataExtractType === data_extract_type.CUSTOM && !values.customDataExtractFile) {
+    if (values.dataExtractType === data_extract_type.CUSTOM && isEmpty(values.customDataExtractFile)) {
       ctx.issues.push({
         input: values.customDataExtractFile,
         path: ['customDataExtractFile'],
@@ -252,7 +253,7 @@ export const mapDataValidationSchema = z
     if (
       values.dataExtractGeojson?.id &&
       values.primary_geom_type !== values.dataExtractGeojson?.id &&
-      !values.customDataExtractFile
+      isEmpty(values.customDataExtractFile)
     ) {
       ctx.issues.push({
         input: values.dataExtractGeojson,
@@ -261,7 +262,7 @@ export const mapDataValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.dataExtractType === data_extract_type.OSM && values.customDataExtractFile) {
+    if (values.dataExtractType === data_extract_type.OSM && !isEmpty(values.customDataExtractFile)) {
       ctx.issues.push({
         input: values.customDataExtractFile,
         path: ['dataExtractGeojson'],
