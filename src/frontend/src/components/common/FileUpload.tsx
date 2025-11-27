@@ -21,8 +21,8 @@ type FileUploadProps = {
   fileAccept?: string;
   data: FileType[] | string[];
   placeholder?: string;
-  onChange?: any;
-  onDelete?: () => void;
+  onChange?: (files: FileType[]) => void;
+  onDelete?: (files: FileType[]) => void;
   showPreview?: boolean;
 };
 
@@ -117,7 +117,7 @@ export default function FileUpload({
       setValue(name, updatedData, { shouldDirty: true });
     }
     resetFileInput();
-    onDelete?.();
+    onDelete?.(updatedData);
   };
 
   return (
