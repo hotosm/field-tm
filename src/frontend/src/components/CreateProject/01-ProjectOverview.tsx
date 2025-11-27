@@ -6,7 +6,6 @@ import { useIsAdmin } from '@/hooks/usePermissions';
 import { z } from 'zod/v4';
 
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
-import { fileType } from '@/store/types/ICommon';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { createProjectValidationSchema, odkCredentialsValidationSchema } from './validation';
 
@@ -29,6 +28,7 @@ import { useTestOdkCredentialsMutation } from '@/api/central';
 import { field_mapping_app } from '@/types/enums';
 import { useTestQFieldCredentialsMutation } from '@/api/qfield';
 import FileUpload from '@/components/common/FileUpload';
+import { FileType } from '@/types';
 
 const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
   ODK: 'ODK Central',
@@ -155,7 +155,7 @@ const ProjectOverview = () => {
     setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
   };
 
-  const changeFileHandler = async (file: fileType, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
+  const changeFileHandler = async (file: FileType[]) => {
     if (isEmpty(file)) return;
 
     const fileObject = file?.[0]?.file;
@@ -168,7 +168,6 @@ const ProjectOverview = () => {
     } else {
       setValue('uploadedAOIFile', []);
       setValue('outline', null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
           message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,

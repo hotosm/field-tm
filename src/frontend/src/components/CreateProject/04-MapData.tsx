@@ -21,6 +21,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useGenerateDataExtractMutation } from '@/api/project';
 import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
+import { FileType } from '@/types';
 
 const MapData = () => {
   useDocumentTitle('Create Project: Map Data');
@@ -45,7 +46,7 @@ const MapData = () => {
     { name: 'data_extract', value: data_extract_type.NONE, label: 'No existing data' },
   ];
 
-  const changeFileHandler = async (file: any, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
+  const changeFileHandler = async (file: FileType[]) => {
     if (isEmpty(file)) return;
 
     if (values.splitGeojsonByAlgorithm) {
@@ -73,7 +74,7 @@ const MapData = () => {
       setValue('customDataExtractFile', geojsonFromFgbFile);
     }
 
-    validateDataExtractGeojson(extractFeatCol, fileInputRef);
+    validateDataExtractGeojson(extractFeatCol);
   };
 
   const resetMapDataFile = () => {
@@ -85,16 +86,12 @@ const MapData = () => {
     }
   };
 
-  const validateDataExtractGeojson = (
-    extractFeatCol: FeatureCollection<null, Record<string, any>>,
-    fileInputRef: React.RefObject<HTMLInputElement | null>,
-  ) => {
+  const validateDataExtractGeojson = (extractFeatCol: FeatureCollection<null, Record<string, any>>) => {
     const isGeojsonValid = valid(extractFeatCol, true);
     if (isGeojsonValid?.length === 0 && extractFeatCol) {
       setValue('dataExtractGeojson', { ...extractFeatCol, id: values.primary_geom_type });
     } else {
       resetMapDataFile();
-      if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
           message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,
