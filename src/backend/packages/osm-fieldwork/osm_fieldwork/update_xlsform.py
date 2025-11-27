@@ -663,7 +663,7 @@ def _configure_form_settings(custom_sheets: dict, form_name: str, default_langua
     if "default_language" not in settings:
         settings["default_language"] = f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
     else:
-        default_language_value = settings["default_language"].strip()
+        default_language_value = settings["default_language"].iloc[0]
 
         if "(" not in default_language_value:
             code = INCLUDED_LANGUAGES.get(default_language_value)
