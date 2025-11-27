@@ -91,15 +91,6 @@ export default function FileUpload({
     onChange?.(uploadedFilesState);
   };
 
-  function downloadBlob(blobURL: string, fileName: string) {
-    const link = document.createElement('a');
-    link.href = blobURL;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
   // reset file input to allow re-upload after deletion
   const resetFileInput = () => {
     if (inputRef && 'current' in inputRef) {
@@ -165,10 +156,6 @@ export default function FileUpload({
                 </div>
               </div>
               <div className="fmtm-flex fmtm-gap-3">
-                <AssetModules.FileDownloadOutlinedIcon
-                  className="fmtm-text-grey-400 fmtm-cursor-pointer !fmtm-text-xl"
-                  onClick={() => downloadBlob(previewURL, file?.name)}
-                />
                 <AssetModules.DeleteOutlinedIcon
                   className="fmtm-text-red-400 fmtm-cursor-pointer !fmtm-text-xl"
                   onClick={() => handleDeleteFile(id)}
