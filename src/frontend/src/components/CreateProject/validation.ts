@@ -176,9 +176,16 @@ export const uploadSurveyValidationSchema = z
   .object({
     osm_category: z.string().min(1, 'Form Category is must be selected'),
     xlsFormFile: z.any().optional(),
-    isXlsFormFileValid: z.boolean(),
     needVerificationFields: z.boolean(),
     mandatoryPhotoUpload: z.boolean(),
+    isFormValidAndUploaded: z.boolean(),
+    advancedConfig: z.boolean(),
+    default_language: z.string(),
+    formLanguages: z.object({
+      detected_languages: z.array(z.string()),
+      default_language: z.array(z.string()),
+      supported_languages: z.array(z.string()),
+    }),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -190,11 +197,11 @@ export const uploadSurveyValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.xlsFormFile && !values.isXlsFormFileValid) {
+    if (values.advancedConfig && !values.default_language) {
       ctx.issues.push({
-        input: values.xlsFormFile,
-        path: ['xlsFormFile'],
-        message: 'File is Invalid',
+        input: values.default_language,
+        path: ['default_language'],
+        message: 'Default Language is Required',
         code: 'custom',
       });
     }

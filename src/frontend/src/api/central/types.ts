@@ -14,10 +14,17 @@ export type uploadXlsformParamsType = {
   use_odk_collect?: boolean;
   need_verification_fields?: boolean;
   mandatory_photo_upload?: boolean;
+  default_language?: string;
 };
 
 // RESPONSE
 export type formType = {
   id: number;
   title: string;
+};
+
+export type formLanguagesType = {
+  detected_languages: string[];
+  default_language: string[];
+  supported_languages: string[];
 };
