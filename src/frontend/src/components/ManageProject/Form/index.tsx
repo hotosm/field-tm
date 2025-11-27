@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import UploadArea from '@/components/common/UploadArea';
 import Button from '@/components/common/Button';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
@@ -8,15 +7,10 @@ import { useDownloadFormQuery } from '@/api/central';
 import { downloadBlobData } from '@/utilfunctions';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import AssetModules from '@/shared/AssetModules';
-import { projectType } from '@/types';
+import { FileType, projectType } from '@/types';
+import FileUpload from '@/components/common/FileUpload';
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-type FileType = {
-  id: string;
-  file: File;
-  previewURL: string;
-};
 
 type formUpdatePropType = {
   project: projectType | undefined;
@@ -27,7 +21,7 @@ const FormUpdate = ({ project }: formUpdatePropType) => {
   const dispatch = useAppDispatch();
   const projectId = project?.id;
 
-  const [uploadForm, setUploadForm] = useState<FileType[] | null>([]);
+  const [uploadForm, setUploadForm] = useState<FileType[]>([]);
   const [formError, setFormError] = useState(false);
 
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
@@ -107,16 +101,7 @@ const FormUpdate = ({ project }: formUpdatePropType) => {
           </div>
         </div>
         <div>
-          <UploadArea
-            title="Upload Form"
-            label="Please upload .xls, .xlsx, .xml file"
-            data={uploadForm || []}
-            onUploadFile={(updatedFiles) => {
-              setUploadForm(updatedFiles as FileType[]);
-              formError && setFormError(false);
-            }}
-            acceptedInput=".xls, .xlsx, .xml"
-          />
+          <FileUpload data={uploadForm} onChange={setUploadForm} fileAccept=".xls, .xlsx, .xml" />
           {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
         </div>
       </div>

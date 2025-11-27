@@ -24,3 +24,11 @@ export type TMutationOptions<TData, TVariables, TError = Error> = UseMutationOpt
   AxiosError<TError>,
   TVariables
 >;
+
+export type FileType = {
+  id: string;
+  previewURL: string;
+  file: File & {
+    lastModifiedDate?: Date;
+  };
+};

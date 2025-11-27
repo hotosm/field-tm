@@ -11,17 +11,17 @@ import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { data_extract_type, GeoGeomTypesEnum, task_split_type } from '@/types/enums';
 import { useAppDispatch } from '@/types/reduxTypes';
-import { fileType } from '@/store/types/ICommon';
 import { createProjectValidationSchema } from './validation';
-
 import FieldLabel from '@/components/common/FieldLabel';
 import RadioButton from '@/components/common/RadioButton';
 import Switch from '@/components/common/Switch';
 import Button from '@/components/common/Button';
-import UploadArea from '@/components/common/UploadArea';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useGenerateDataExtractMutation } from '@/api/project';
+import FileUpload from '@/components/common/FileUpload';
+import isEmpty from '@/utilfunctions/isEmpty';
+import { FileType } from '@/types';
 
 const MapData = () => {
   useDocumentTitle('Create Project: Map Data');
@@ -46,16 +46,14 @@ const MapData = () => {
     { name: 'data_extract', value: data_extract_type.NONE, label: 'No existing data' },
   ];
 
-  const changeFileHandler = async (file: fileType, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
-    if (!file) {
-      resetMapDataFile();
-      return;
-    }
+  const changeFileHandler = async (file: FileType[]) => {
+    if (isEmpty(file)) return;
+
     if (values.splitGeojsonByAlgorithm) {
       setValue('splitGeojsonByAlgorithm', null);
     }
 
-    const uploadedFile = file?.file;
+    const uploadedFile = file?.[0]?.file;
     const fileType = uploadedFile.name.split('.').pop();
 
     // Handle geojson and fgb types, return featurecollection geojson
@@ -76,11 +74,11 @@ const MapData = () => {
       setValue('customDataExtractFile', geojsonFromFgbFile);
     }
 
-    validateDataExtractGeojson(extractFeatCol, fileInputRef);
+    validateDataExtractGeojson(extractFeatCol);
   };
 
   const resetMapDataFile = () => {
-    setValue('customDataExtractFile', null);
+    setValue('customDataExtractFile', []);
     setValue('dataExtractGeojson', null);
     if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
       setValue('task_split_type', null);
@@ -88,16 +86,12 @@ const MapData = () => {
     }
   };
 
-  const validateDataExtractGeojson = (
-    extractFeatCol: FeatureCollection<null, Record<string, any>>,
-    fileInputRef: React.RefObject<HTMLInputElement | null>,
-  ) => {
+  const validateDataExtractGeojson = (extractFeatCol: FeatureCollection<null, Record<string, any>>) => {
     const isGeojsonValid = valid(extractFeatCol, true);
     if (isGeojsonValid?.length === 0 && extractFeatCol) {
       setValue('dataExtractGeojson', { ...extractFeatCol, id: values.primary_geom_type });
     } else {
       resetMapDataFile();
-      if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
           message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,
@@ -325,14 +319,11 @@ const MapData = () => {
       {values.dataExtractType === 'custom_data_extract' && (
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <FieldLabel label="Upload Map Data" astric />
-          <UploadArea
-            title=""
-            label="The supported file formats are .geojson, .json, .fgb"
-            data={values.customDataExtractFile ? [values.customDataExtractFile] : []}
-            onUploadFile={(updatedFiles, fileInputRef) => {
-              changeFileHandler(updatedFiles?.[0] as fileType, fileInputRef);
-            }}
-            acceptedInput=".geojson,.json,.fgb"
+          <FileUpload
+            onChange={changeFileHandler}
+            onDelete={resetMapDataFile}
+            data={values.customDataExtractFile}
+            fileAccept=".geojson,.json,.fgb"
           />
           {errors?.customDataExtractFile?.message && (
             <ErrorMessage message={errors.customDataExtractFile.message as string} />
