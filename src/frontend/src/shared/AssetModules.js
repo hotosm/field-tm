@@ -115,6 +115,7 @@ import {
   Instagram as InstagramIcon,
   GitHub as GitHubIcon,
   Assignment as AssignmentIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -244,4 +245,5 @@ export default {
   InstagramIcon,
   GitHubIcon,
   AssignmentIcon,
+  WarningIcon,
 };

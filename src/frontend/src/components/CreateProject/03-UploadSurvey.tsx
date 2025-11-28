@@ -116,81 +116,67 @@ const UploadSurvey = () => {
           )}
         />
         {errors?.osm_category?.message && <ErrorMessage message={errors.osm_category.message as string} />}
-
-        <p className="fmtm-body-sm fmtm-text-[#9B9999]">
-          Selecting a form based on OpenStreetMap{' '}
-          <a
-            href="https://wiki.openstreetmap.org/wiki/Tags"
-            target="_"
-            className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-          >
-            tags
-          </a>{' '}
-          {`will help with merging the final data back to OSM.`}
-        </p>
       </div>
-
-      <div>
+      <div className="fmtm-body-md fmtm-inline">
+        We have some sample forms for the type of survey category you chose above. You can{' '}
         <Tooltip arrow placement="bottom" title={!values.osm_category ? 'Please select a form category first' : ''}>
-          <div className="fmtm-w-fit">
+          <span className="fmtm-inline-block">
             <a
               href={`${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
               target="_"
               className={`fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline fmtm-w-fit ${!values.osm_category && 'fmtm-opacity-70 fmtm-pointer-events-none'}`}
             >
-              Download Form
+              download form
             </a>
-          </div>
-        </Tooltip>
-        <p className="fmtm-mt-1">
-          <a
-            href={`https://xlsform-editor.fmtm.hotosm.org?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
-            target="_"
-            className="fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-          >
-            Edit Interactively
-          </a>
-        </p>
+          </span>
+        </Tooltip>{' '}
+        and modify in your device or{' '}
+        <a
+          href={`https://xlsform-editor.fmtm.hotosm.org?url=${VITE_API_URL}/helper/download-template-xlsform?form_type=${values.osm_category}`}
+          target="_"
+          className="fmtm-text-sm fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+        >
+          edit interactively
+        </a>{' '}
+        from the browser.
       </div>
-
-      <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-        <FieldLabel className="fmtm-pr-3" label="Include digitization verification questions" />
-        <Controller
-          control={control}
-          name="needVerificationFields"
-          render={({ field }) => (
-            <Switch
-              ref={field.ref}
-              checked={field.value}
-              onCheckedChange={(e) => {
-                field.onChange(e);
-                setValue('isFormValidAndUploaded', false);
-              }}
-              className=""
-            />
-          )}
-        />
+      <div className="fmtm-border fmtm-border-yellow-400 fmtm-rounded-xl fmtm-bg-yellow-50 fmtm-py-3 fmtm-px-5">
+        <div className="fmtm-flex fmtm-gap-2 fmtm-items-center fmtm-mb-1">
+          <AssetModules.WarningIcon className=" fmtm-text-yellow-500" sx={{ fontSize: '20px' }} />
+          <h5 className="fmtm-text-[1rem] fmtm-font-semibold">Warning</h5>
+        </div>
+        <div>
+          <p className="fmtm-body-md">
+            We add a few Additional questions into your form to assess the digitization status. View additional fields{' '}
+            <a
+              href="https://docs.fieldtm.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-field-tm-xls-form"
+              target="_"
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+            >
+              here
+            </a>
+            . If you don&apos;t wish to include those, kindly toggle this button
+          </p>
+        </div>
+        <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mt-4">
+          <FieldLabel className="fmtm-pr-3" label="Include digitization verification questions" />
+          <Controller
+            control={control}
+            name="needVerificationFields"
+            render={({ field }) => (
+              <Switch
+                ref={field.ref}
+                checked={field.value}
+                onCheckedChange={(e) => {
+                  field.onChange(e);
+                  setValue('isFormValidAndUploaded', false);
+                }}
+                className=""
+              />
+            )}
+          />
+        </div>
       </div>
-
-      <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-        <FieldLabel className="fmtm-pr-20" label="Make photo upload mandatory" />
-        <Controller
-          control={control}
-          name="mandatoryPhotoUpload"
-          render={({ field }) => (
-            <Switch
-              ref={field.ref}
-              checked={field.value}
-              onCheckedChange={(e) => {
-                field.onChange(e);
-                setValue('isFormValidAndUploaded', false);
-              }}
-              className=""
-            />
-          )}
-        />
-      </div>
-
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
         <FieldLabel
           label="Upload Form"
@@ -240,52 +226,79 @@ const UploadSurvey = () => {
         )}
         {errors?.xlsFormFile?.message && <ErrorMessage message={errors.xlsFormFile.message as string} />}
       </div>
-      {!!values.xlsFormFile && isEmpty(values.formLanguages?.default_language) && (
-        <>
-          <div
-            className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
-            onClick={() => {
-              setValue('advancedConfig', !values.advancedConfig);
-              setValue('default_language', '');
-            }}
-          >
-            <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
-            <motion.div className="" animate={{ rotate: values.advancedConfig ? 180 : 0 }}>
-              <AssetModules.ExpandLessIcon className={`!fmtm-text-base group-hover:!fmtm-text-grey-800`} />
-            </motion.div>
-          </div>
-          {values.advancedConfig && (
-            <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-flex-wrap">
-              <FieldLabel label="Form Default Language" />
+      <>
+        <div
+          className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
+          onClick={() => {
+            setValue('advancedConfig', !values.advancedConfig);
+            setValue('default_language', '');
+          }}
+        >
+          <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
+          <motion.div className="" animate={{ rotate: values.advancedConfig ? 180 : 0 }}>
+            <AssetModules.ExpandLessIcon className={`!fmtm-text-base group-hover:!fmtm-text-grey-800`} />
+          </motion.div>
+        </div>
+        {values.advancedConfig && (
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem]">
+            <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+              <FieldLabel
+                className="fmtm-pr-20"
+                label="Make photo upload mandatory"
+                tooltipMessage="Make photo upload mandatory when submitting the form."
+              />
               <Controller
                 control={control}
-                name="default_language"
+                name="mandatoryPhotoUpload"
                 render={({ field }) => (
-                  <Select2
-                    options={
-                      !isEmpty(values.formLanguages.detected_languages)
-                        ? prepareRadioOptions(values.formLanguages.detected_languages)
-                        : prepareRadioOptions(values.formLanguages.supported_languages)
-                    }
-                    value={field.value as string}
-                    choose="label"
-                    onChange={(value: any) => {
-                      field.onChange(value);
+                  <Switch
+                    ref={field.ref}
+                    checked={field.value}
+                    onCheckedChange={(e) => {
+                      field.onChange(e);
                       setValue('isFormValidAndUploaded', false);
                     }}
-                    placeholder="Form Category"
-                    isLoading={isGetFormListsLoading}
-                    ref={field.ref}
+                    className=""
                   />
                 )}
               />
-              {errors?.default_language?.message && (
-                <ErrorMessage message={errors.default_language.message as string} />
-              )}
             </div>
-          )}
-        </>
-      )}
+            {!isEmpty(values.xlsFormFile) && isEmpty(values.formLanguages?.default_language) && (
+              <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-flex-wrap">
+                <FieldLabel
+                  label="Select Default Form Language"
+                  tooltipMessage="Your form includes multiple languages, but no default is set. Please choose a default language."
+                />
+                <Controller
+                  control={control}
+                  name="default_language"
+                  render={({ field }) => (
+                    <Select2
+                      options={
+                        !isEmpty(values.formLanguages.detected_languages)
+                          ? prepareRadioOptions(values.formLanguages.detected_languages)
+                          : prepareRadioOptions(values.formLanguages.supported_languages)
+                      }
+                      value={field.value as string}
+                      choose="label"
+                      onChange={(value: any) => {
+                        field.onChange(value);
+                        setValue('isFormValidAndUploaded', false);
+                      }}
+                      placeholder="Form Category"
+                      isLoading={isGetFormListsLoading}
+                      ref={field.ref}
+                    />
+                  )}
+                />
+                {errors?.default_language?.message && (
+                  <ErrorMessage message={errors.default_language.message as string} />
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </>
     </div>
   );
 };
