@@ -6,9 +6,16 @@ import {
   updateProjectForm,
   downloadForm,
   detectFormLanguages,
+  listFormMedia,
 } from '@/services/central';
 import type { TQueryOptions, TMutationOptions, odkCredsParamsType } from '@/types';
-import type { formLanguagesType, formType, updateProjectFormPayloadType, uploadXlsformParamsType } from './types';
+import type {
+  formLanguagesType,
+  formMediaType,
+  formType,
+  updateProjectFormPayloadType,
+  uploadXlsformParamsType,
+} from './types';
 
 export function useTestOdkCredentialsMutation(
   options: TMutationOptions<void, { params: odkCredsParamsType }, { detail: string }>,
@@ -73,6 +80,15 @@ export function useDetectFormLanguagesMutation(
 ) {
   return useMutation({
     mutationFn: ({ payload }) => detectFormLanguages(payload),
+    ...options,
+  });
+}
+
+export function useListFormMediaMutation(
+  options: TMutationOptions<formMediaType[], { params: { project_id: number } }, { message: string }>,
+) {
+  return useMutation({
+    mutationFn: ({ params }) => listFormMedia(params),
     ...options,
   });
 }

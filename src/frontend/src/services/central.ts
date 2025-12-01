@@ -15,3 +15,5 @@ export const downloadForm = (params: { project_id: number }) =>
   api.get('/central/download-form', { params, responseType: 'blob' });
 
 export const detectFormLanguages = (payload: FormData) => api.post('/central/detect-form-languages', payload);
+
+export const listFormMedia = (params: { project_id: number }) => api.post('/central/list-form-media', {}, { params });

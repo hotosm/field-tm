@@ -28,3 +28,12 @@ export type formLanguagesType = {
   default_language: string[];
   supported_languages: string[];
 };
+
+export type formMediaType = {
+  name: string;
+  type: string;
+  hash: unknown;
+  exists: boolean;
+  blobExists: boolean;
+  datasetExists: boolean;
+};
