@@ -1,25 +1,9 @@
 {
-  "select": {
-    "nodes": [],
-    "ways_poly": [
-      {
-        "osm_id": []
+  "tags": {
+    "polygon": {
+      "join_or": {
+        "landuse": []
       }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "tables": ["ways_poly"],
-  "where": {
-    "nodes": [],
-    "ways_poly": [
-      {
-        "landuse": ["not null"],
-        "op": "or"
-      }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "keep": []
+    }
+  }
 }

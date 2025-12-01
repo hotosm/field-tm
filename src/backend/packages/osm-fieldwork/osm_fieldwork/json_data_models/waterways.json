@@ -1,34 +1,10 @@
 {
-  "select": {
-    "nodes": [],
-    "ways_poly": [],
-    "ways_line": [
-      {
-        "osm_id": "id"
-      },
-      {
-        "version": []
-      },
-      {
-        "name": []
-      },
-      {
-        "intermittent": []
+  "tags": {
+    "all_geometry": {
+      "join_or": {
+        "waterway": [],
+        "natural": ["water"]
       }
-    ],
-    "relations": []
-  },
-  "tables": ["ways_line"],
-  "where": {
-    "nodes": [],
-    "ways_poly": [],
-    "ways_line": [
-      {
-        "waterway": ["not null"],
-        "op": "or"
-      }
-    ],
-    "relations": []
-  },
-  "keep": ["name", "intermittent"]
+    }
+  }
 }

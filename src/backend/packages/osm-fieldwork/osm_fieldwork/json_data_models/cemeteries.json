@@ -1,29 +1,10 @@
 {
-  "select": {
-    "nodes": [],
-    "ways_poly": [
-      {
-        "osm_id": []
+  "tags": {
+    "all_geometry": {
+      "join_or": {
+        "amenity": ["grave_yard"],
+        "landuse": ["cemetery"]
       }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "tables": ["ways_poly"],
-  "where": {
-    "nodes": [],
-    "ways_poly": [
-      {
-        "amenity": [["grave_yard"]],
-        "op": "or"
-      },
-      {
-        "landuse": [["cemetery"]],
-        "op": "or"
-      }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "keep": []
+    }
+  }
 }

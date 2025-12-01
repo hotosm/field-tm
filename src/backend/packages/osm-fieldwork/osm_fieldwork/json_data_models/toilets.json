@@ -1,74 +1,9 @@
 {
-  "select": {
-    "nodes": [
-      {
-        "osm_id": []
+  "tags": {
+    "all_geometry": {
+      "join_or": {
+        "amenity": ["toilets"]
       }
-    ],
-    "ways_poly": [
-      {
-        "osm_id": []
-      }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "tables": ["ways_poly", "nodes"],
-  "where": {
-    "nodes": [
-      {
-        "amenity": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:access": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:disposal": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:position": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:unisex": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:wheelchair": ["not null"],
-        "op": "or"
-      }
-    ],
-    "ways_poly": [
-      {
-        "amenity": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:access": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:disposal": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:position": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:unisex": ["not null"],
-        "op": "or"
-      },
-      {
-        "toilets:wheelchair": ["not null"],
-        "op": "or"
-      }
-    ],
-    "ways_line": [],
-    "relations": []
-  },
-  "keep": []
+    }
+  }
 }

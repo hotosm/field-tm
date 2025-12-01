@@ -576,14 +576,6 @@ async def get_data_extract(
         with open(data_model, encoding="utf-8") as f:
             config_data = json.load(f)
 
-        data_config = {
-            ("polygon", False): ["ways_poly"],
-            ("point", True): ["ways_poly", "nodes"],
-            ("point", False): ["nodes"],
-            ("polyline", False): ["ways_line"],
-        }
-
-        config_data["from"] = data_config.get((geom_type, centroid))
         if geom_type == "polyline":
             geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 

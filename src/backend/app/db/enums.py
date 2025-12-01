@@ -245,18 +245,18 @@ class XLSFormType(StrEnum, Enum):
     The the value is the user facing form name (e.g. healthcare).
     """
 
-    buildings = "OSM Buildings"
-    highways = "OSM Highways"
-    health = "OSM Healthcare"
-    toilets = "OSM Toilets"
-    religious = "OSM Religious"
-    landusage = "OSM Landuse"
-    waterways = "OSM Waterways"
-    waterpoints = "OSM Water Points"
-    wastedisposal = "OSM Waste Disposal"
-    education = "OSM Education"
-    cemeteries = "OSM Cemeteries"
-    amenities = "OSM Amenities"
+    buildings = "Buildings"
+    highways = "Highways"
+    health = "Healthcare"
+    toilets = "Toilets"
+    religious = "Religious"
+    landusage = "Landuse"
+    waterways = "Waterways"
+    waterpoints = "Water Points"
+    wastedisposal = "Waste Disposal"
+    education = "Education"
+    cemeteries = "Cemeteries"
+    amenities = "Amenities"
 
 
 class SubmissionDownloadType(StrEnum, Enum):

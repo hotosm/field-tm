@@ -188,7 +188,7 @@ async def generate_data_extract(
             else f"fmtm_extract_{project_id}"
         ),
         "outputType": "geojson",
-        "geometryType": [geom_type],
+        "geometryType": ["polygon", "point"] if centroid else [geom_type],
         "bindZip": False,
         "centroid": centroid,
         "use_st_within": (False if geom_type == "line" else use_st_within),
