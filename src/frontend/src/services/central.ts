@@ -17,3 +17,6 @@ export const downloadForm = (params: { project_id: number }) =>
 export const detectFormLanguages = (payload: FormData) => api.post('/central/detect-form-languages', payload);
 
 export const listFormMedia = (params: { project_id: number }) => api.post('/central/list-form-media', {}, { params });
+
+export const uploadFormMedia = (payload: FormData, params: { project_id: number }) =>
+  api.post('/central/upload-form-media', payload, { params });

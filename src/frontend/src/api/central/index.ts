@@ -7,6 +7,7 @@ import {
   downloadForm,
   detectFormLanguages,
   listFormMedia,
+  uploadFormMedia,
 } from '@/services/central';
 import type { TQueryOptions, TMutationOptions, odkCredsParamsType } from '@/types';
 import type {
@@ -89,6 +90,15 @@ export function useListFormMediaMutation(
 ) {
   return useMutation({
     mutationFn: ({ params }) => listFormMedia(params),
+    ...options,
+  });
+}
+
+export function useUploadFormMediaMutation(
+  options: TMutationOptions<any, { payload: FormData; params: { project_id: number } }, { message: string }>,
+) {
+  return useMutation({
+    mutationFn: ({ payload, params }) => uploadFormMedia(payload, params),
     ...options,
   });
 }
