@@ -11,6 +11,48 @@
 	},
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"task_states": {
-		"UNLOCKED_TO_MAP": "Připraveno"
+		"UNLOCKED_TO_MAP": "Připraveno",
+		"LOCKED_FOR_MAPPING": "Uzamčeno pro mapování",
+		"UNLOCKED_TO_VALIDATE": "Připraveno k validaci",
+		"LOCKED_FOR_VALIDATION": "Uzamčeno pro validaci",
+		"UNLOCKED_DONE": "Ověřeno"
+	},
+	"entity_states": {
+		"READY": "Připraveno",
+		"OPENED_IN_ODK": "Otevřeno v ODK",
+		"SURVEY_SUBMITTED": "Průzkum odeslán",
+		"MARKED_BAD": "Označeno jako špatné",
+		"VALIDATED": "Ověřeno"
+	},
+	"header": {
+		"about": "O",
+		"guide_for_mappers": "Průvodce pro mapovače",
+		"support": "Podpora",
+		"download_custom_odk_collect": "Stáhnout vlastní ODK Collect",
+		"sign_in": "PŘIHLÁSIT SE",
+		"sign_out": "ODHLÁSIT SE",
+		"translate": "Pomozte nám překládat!"
+	},
+	"map": {
+		"enable_geolocation": "Pro získání nejlepších výsledků zapněte funkci polohy",
+		"enable_geolocation_got_it": "Rozumím!",
+		"exit_navigation": "Ukončení navigace",
+		"click_on_a_task": "KLIKNUTÍM NA ÚLOHU VYBERETE PRVEK PRO MAPOVÁNÍ",
+		"click_on_the_map": "Kliknutím na mapu vytvořte nový bod",
+		"geometry_correct_place": "Je geometrie na správném místě?",
+		"distance": "Vzdálenost",
+		"no_orientation_sensors": "Nelze zpracovat orientaci zařízení. Váš prohlížeč nepodporuje snímače orientace zařízení.",
+		"legend_features": "Legenda (Prvky)"
+	},
+	"popup": {
+		"task": "Úloha",
+		"task_id": "ID úlohy",
+		"feature": "Prvek",
+		"start_mapping_task": "Chcete zahájit mapování úlohy #{taskId}?",
+		"map_new_feature": "MAPOVAT NOVÝ PRVEK",
+		"start_mapping": "ZAČÍT MAPOVAT",
+		"cancel_mapping": "ZRUŠIT MAPOVÁNÍ",
+		"cancel": "ZRUŠIT",
+		"navigate_here": "PŘEJÍT SEM"
 	}
 }
