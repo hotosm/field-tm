@@ -187,6 +187,8 @@ export const uploadSurveyValidationSchema = z
       default_language: z.array(z.string()),
       supported_languages: z.array(z.string()),
     }),
+    media_uploads: z.array(z.any()),
+    requiredFormMediaList: z.array(z.any()),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -205,6 +207,32 @@ export const uploadSurveyValidationSchema = z
         message: 'Default Language is Required',
         code: 'custom',
       });
+    }
+    if (values.requiredFormMediaList.length > 0) {
+      const requiredMediaNames = values.requiredFormMediaList;
+      const uploadedMediaNames = values.media_uploads.map((media) => media.file.name);
+
+      // check missing files
+      const missing = requiredMediaNames.filter((r) => !uploadedMediaNames.includes(r));
+      if (missing.length > 0) {
+        ctx.issues.push({
+          input: values.media_uploads,
+          path: ['media_uploads'],
+          message: `Missing required files: ${missing.join(', ')}`,
+          code: 'custom',
+        });
+      }
+
+      // check extra files
+      const extra = uploadedMediaNames.filter((u) => !requiredMediaNames.includes(u));
+      if (extra.length > 0) {
+        ctx.issues.push({
+          input: values.media_uploads,
+          path: ['media_uploads'],
+          message: `Only ${requiredMediaNames.join(', ')} are allowed. Extra files: ${extra.join(', ')}`,
+          code: 'custom',
+        });
+      }
     }
   });
 
