@@ -1,6 +1,6 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import TaskActivity from '@/components/ProjectDetails/Tabs/TaskActivity';
-import CoreModules from '@/shared/CoreModules';
 import { useAppSelector } from '@/types/reduxTypes';
 
 type mobileActivitiesContentsType = {
@@ -8,7 +8,7 @@ type mobileActivitiesContentsType = {
 };
 
 const MobileActivitiesContents = ({ map }: mobileActivitiesContentsType) => {
-  const params: Record<string, any> = CoreModules.useParams();
+  const params: Record<string, any> = useParams();
   const state = useAppSelector((state) => state.project);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 

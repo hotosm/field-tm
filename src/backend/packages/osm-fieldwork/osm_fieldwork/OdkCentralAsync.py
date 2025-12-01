@@ -15,6 +15,7 @@
 #
 """The async counterpart to OdkCentral.py, an ODK Central API client."""
 
+import asyncio
 import logging
 import os
 from asyncio import gather
@@ -248,7 +249,7 @@ class OdkForm(OdkCentral):
             async with self.session.get(url, ssl=self.verify) as response:
                 return await response.json()
         except aiohttp.ClientError as e:
-            msg = f"Error fetching submissions: {e}"
+            msg = f"Error fetching form attachments: {e}"
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
 
@@ -346,6 +347,31 @@ class OdkForm(OdkCentral):
             msg = f"Error fetching submissions: {e}"
             log.error(msg)
             raise aiohttp.ClientError(msg) from e
+
+    async def getSubmissionXml(
+        self,
+        projectId: int,
+        xform: str,
+        submissionUuid: str,
+    ):
+        """Retrieve the XML content of a submission.
+
+        Args:
+            projectId (int): The ID of the project on ODK Central.
+            xform (str): The XForm ID on ODK Central.
+            submissionUuid (str): The UUID of the submission.
+
+        Returns:
+            Optional[str]: The XML content as a string.
+        """
+        url = f"{self.base}projects/{projectId}/forms/{xform}/submissions/{submissionUuid}.xml"
+
+        try:
+            async with self.session.get(url, ssl=self.verify) as response:
+                return await response.text()
+        except Exception as e:
+            log.error(f"Failed to fetch submission XML for {submissionUuid}: {e}")
+            return None
 
     async def listSubmissionAttachments(self, projectId: int, xform: str, submissionUuid: str):
         """Fetch a list of attachments listed for upload on a given submission.
@@ -540,10 +566,13 @@ class OdkDataset(OdkCentral):
         # FIXME for adding dataset properties in bulk
         try:
             log.debug(f"Creating properties for dataset ({datasetName}): {properties}")
-            properties_tasks = [self.createDatasetProperty(projectId, field, datasetName) for field in properties]
-            success = await gather(*properties_tasks, return_exceptions=True)  # type: ignore
-            if not success:
-                log.warning(f"No properties were uploaded for ODK project ({projectId}) dataset name ({datasetName})")
+            for field in properties:
+                try:
+                    await self.createDatasetProperty(projectId, field, datasetName)
+                    await asyncio.sleep(0.1)
+                except aiohttp.ClientError as e:
+                    log.error(f"Failed to create property ({field}) for dataset {datasetName}: {e}")
+                    continue
         except aiohttp.ClientError as e:
             msg = f"Failed to create properties: {e}"
             log.error(msg)

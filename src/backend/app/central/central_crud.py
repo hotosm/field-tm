@@ -29,6 +29,7 @@ from uuid import UUID, uuid4
 
 import geojson
 from fastapi import HTTPException
+from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
@@ -38,14 +39,33 @@ from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import DbGeomType, EntityState, HTTPStatus
-from app.db.models import DbXLSForm
+from app.db.enums import DbGeomType, EntityState, FieldMappingApp, HTTPStatus
+from app.db.models import DbProject, DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
     parse_geojson_file_to_featcol,
 )
+from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
+
+STATUS_VISUALS = {
+    EntityState.MARKED_BAD.value: {
+        "fill": "#ff0000",
+        "marker-color": "#ff0000",
+        "stroke": "#cc0000",
+    },
+    EntityState.SURVEY_SUBMITTED.value: {
+        "fill": "#00ff00",
+        "marker-color": "#00ff00",
+        "stroke": "#00cc00",
+    },
+    EntityState.VALIDATED.value: {
+        "fill": "#008000",
+        "marker-color": "#008000",
+        "stroke": "#006600",
+    },
+}
 
 
 def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
@@ -281,6 +301,8 @@ async def append_fields_to_user_xlsform(
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
+    default_language: str = "english",
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -290,15 +312,19 @@ async def append_fields_to_user_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
+        default_language=default_language,
         use_odk_collect=use_odk_collect,
     )
 
 
 async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
+    default_language: str = "english",
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
@@ -307,6 +333,8 @@ async def validate_and_update_user_xlsform(
         form_name=form_name,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
+        default_language=default_language,
         use_odk_collect=use_odk_collect,
     )
 
@@ -315,7 +343,7 @@ async def validate_and_update_user_xlsform(
     return await read_and_test_xform(updated_file_bytes)
 
 
-async def update_project_xform(
+async def update_odk_central_xform(
     xform_id: str,
     odk_id: int,
     xlsform: BytesIO,
@@ -347,6 +375,38 @@ async def update_project_xform(
     # NOTE we can't directly publish existing forms
     # in createForm and need 2 steps
     xform_obj.publishForm(odk_id, xform_id)
+
+
+async def update_project_xlsform(
+    db: Connection,
+    project: DbProject,
+    xlsform: BytesIO,
+    xform_id: str,
+):
+    """Update both the ODK Central and FieldTM XLSForm."""
+    # Update ODK Central form data
+    await update_odk_central_xform(
+        xform_id,
+        project.odkid,
+        xlsform,
+        project.odk_credentials,
+    )
+    form_xml = await run_in_threadpool(
+        get_project_form_xml,
+        project.odk_credentials,
+        project.odkid,
+        xform_id,
+    )
+
+    await DbProject.update(
+        db,
+        project.id,
+        project_schemas.ProjectUpdate(
+            xlsform_content=xlsform.getvalue(),
+            odk_form_xml=form_xml,
+        ),
+    )
+    await db.commit()
 
 
 async def convert_geojson_to_odk_csv(
@@ -764,7 +824,6 @@ async def get_entities_data(
             filters.append(f"__system/updatedAt gt {filter_date}")
         if filters:
             url_params += f"&$filter={' and '.join(filters)}"
-
         async with central_deps.get_odk_dataset(odk_creds) as odk_central:
             entities = await odk_central.getEntityData(
                 odk_id,
@@ -853,6 +912,7 @@ async def get_entity_mapping_status(
 
 async def update_entity_mapping_status(
     odk_creds: central_schemas.ODKCentralDecrypted,
+    field_mapping_app: str,
     odk_id: int,
     entity_uuid: str,
     label: str,
@@ -866,6 +926,7 @@ async def update_entity_mapping_status(
 
     Args:
         odk_creds (ODKCentralDecrypted): ODK credentials for a project.
+        field_mapping_app (str): Field Mapping app used.
         odk_id (str): The project ID in ODK Central.
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
@@ -876,17 +937,20 @@ async def update_entity_mapping_status(
     Returns:
         dict: All Entity data in OData JSON format.
     """
+    visuals = (
+        STATUS_VISUALS.get(int(status), {})
+        if field_mapping_app == FieldMappingApp.ODK
+        else {}
+    )
     async with central_deps.pyodk_client(odk_creds) as client:
         updated_entity = client.entities.update(
             entity_uuid,
             entity_list_name=dataset_name,
             project_id=odk_id,
             label=label,
-            data={"status": status, "submission_ids": submission_ids}
+            data={"status": status, "submission_ids": submission_ids, **visuals}
             if submission_ids
-            else {
-                "status": status,
-            },
+            else {"status": status, **visuals},
             # We don't know the current entity version, so we need this
             force=True,
         )
@@ -958,10 +1022,12 @@ async def get_appuser_token(
         appuser = get_odk_app_user(odk_credentials)
         odk_project = get_odk_project(odk_credentials)
         odk_app_user = odk_project.listAppUsers(project_odk_id)
+        log.debug(f"Current project appusers in ODK: {odk_app_user}")
 
         # delete if app_user already exists
         if odk_app_user:
             app_user_sub = odk_app_user[0].get("id")
+            log.debug(f"Removing existing appuser: {app_user_sub}")
             appuser.delete(project_odk_id, app_user_sub)
 
         # create new app_user
@@ -985,7 +1051,7 @@ async def get_appuser_token(
         if not response.ok:
             try:
                 json_data = response.json()
-                log.error(json_data)
+                log.error(f"Error updating XForm role {json_data}")
             except json.decoder.JSONDecodeError:
                 log.error(
                     "Could not parse response json during appuser update. "
@@ -1059,3 +1125,42 @@ async def get_form_media(
         }
 
     return form_attachment_urls
+
+
+async def list_form_media(
+    xform_id: str,
+    project_odk_id: int,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+) -> list[dict]:
+    """Return a list of form media required for upload.
+
+    Format:
+        [
+            {'name': '1731673738156.jpg', 'exists': False},
+        ]
+    """
+    async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
+        return await async_odk_form.listFormAttachments(
+            project_odk_id,
+            xform_id,
+        )
+
+
+async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
+    """Test ODK Central credentials by attempting to open a session.
+
+    Returns status 200 if credentials are valid, otherwise raises HTTPException.
+    """
+    try:
+        async with central_deps.get_odk_dataset(odk_creds):
+            pass
+        return HTTPStatus.OK
+    except HTTPException as e:
+        log.error(f"ODK Central credential test failed: {e.detail}")
+        raise
+    except Exception as e:
+        log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Unexpected error while testing ODK Central credentials.",
+        ) from e

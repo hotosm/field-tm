@@ -1,11 +1,4 @@
-import {
-  downloadProjectFormLoadingType,
-  EntityOsmMap,
-  projectDashboardDetailTypes,
-  projectInfoType,
-  projectTaskBoundriesType,
-  tileType,
-} from '@/models/project/projectModel';
+import { EntityOsmMap, projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 import { project_status } from '@/types/enums';
 
 export type ProjectStateTypes = {
@@ -13,21 +6,13 @@ export type ProjectStateTypes = {
   newProjectTrigger: boolean;
   projectInfo: Partial<projectInfoType>;
   projectDataExtractLoading: boolean;
-  downloadProjectFormLoading: downloadProjectFormLoadingType;
-  generateProjectTilesLoading: boolean;
-  tilesList: tileType[];
-  tilesListLoading: boolean;
   customBasemapUrl: string | null;
-  downloadDataExtractLoading: boolean;
   taskModalStatus: boolean;
   toggleGenerateMbTilesModal: boolean;
-  mobileFooterSelection: '' | 'projectInfo' | 'activities' | 'comment';
+  mobileFooterSelection: '' | 'projectInfo' | 'activities' | 'comment' | 'instructions' | 'infographics';
   projectDetailsLoading: boolean;
-  projectDashboardDetail: projectDashboardDetailTypes | null;
   entityOsmMap: EntityOsmMap[];
   entityOsmMapLoading: boolean;
-  updateEntityStateLoading: boolean;
-  projectDashboardLoading: boolean;
   projectCommentsList: projectCommentsListTypes[];
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;
@@ -41,6 +26,8 @@ export type ProjectStateTypes = {
   newGeomFeatureCollection: FeatureCollectionType;
   OdkEntitiesGeojsonLoading: boolean;
   isEntityDeleting: Record<string, boolean>;
+  unassigningUserFromProject: boolean;
+  projectTaskIdIndexMap: Record<number, number>;
 };
 
 type projectCommentsListTypes = {

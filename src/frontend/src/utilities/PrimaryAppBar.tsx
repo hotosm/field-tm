@@ -19,12 +19,14 @@ import {
 } from '@/components/common/Dropdown';
 import { useIsAdmin } from '@/hooks/usePermissions';
 import Button from '@/components/common/Button';
+import { motion } from 'motion/react';
 
 export default function PrimaryAppBar() {
   const isAdmin = useIsAdmin();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const pathname = location.pathname;
   const { type, windowSize } = windowDimention();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -45,13 +47,40 @@ export default function PrimaryAppBar() {
     }
   };
 
+  const navItems = [
+    {
+      title: 'Explore Projects',
+      path: '/explore',
+      active: pathname === '/explore',
+      isVisible: true,
+      externalLink: false,
+    },
+    {
+      title: 'Organizations',
+      path: '/organization',
+      active: pathname === '/organization',
+      isVisible: !!authDetails,
+      externalLink: false,
+    },
+    {
+      title: 'Manage Users',
+      path: '/manage/user',
+      active: pathname === '/manage/user',
+      isVisible: isAdmin,
+      externalLink: false,
+    },
+    { title: 'Learn', path: 'https://hotosm.github.io/field-tm', active: false, isVisible: true, externalLink: true },
+    {
+      title: 'Support',
+      path: 'https://github.com/hotosm/field-tm/issues/',
+      active: false,
+      isVisible: true,
+      externalLink: true,
+    },
+  ];
+
   return (
     <>
-      {/* mapping header */}
-      <div className="fmtm-px-5 fmtm-py-1">
-        <p className="fmtm-body-sm-semibold fmtm-text-primaryRed">Mapping our world together</p>
-      </div>
-      {/* navigation bar */}
       <LoginPopup />
       <DrawerComponent
         open={open}
@@ -63,43 +92,38 @@ export default function PrimaryAppBar() {
         setOpen={setOpen}
       />
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
-        <img
-          src={hotLogo}
-          alt="Field-TM Logo"
-          onClick={() => navigate('/')}
-          className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
-        />
-        <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
-          <Link
-            to="/"
-            className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-              location.pathname === '/' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
-            } fmtm-border-b-2`}
+        <div className="fmtm-flex fmtm-items-center fmtm-gap-4 fmtm-cursor-pointer" onClick={() => navigate('/')}>
+          <motion.img
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            src={hotLogo}
+            alt="Field-TM Logo"
+            className="fmtm-w-[4.188rem] fmtm-min-w-[4.188rem] fmtm-cursor-pointer"
+          />
+          <motion.h3
+            initial={{ x: -50, opacity: 0, filter: 'blur(5px)' }}
+            animate={{ x: 0, opacity: 1, filter: 'none' }}
+            className="fmtm-text-red-medium fmtm-text-xl"
           >
-            Explore Projects
-          </Link>
-          {authDetails && (
-            <>
+            Field-TM
+          </motion.h3>
+        </div>
+        <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
+          {navItems.map((navItem) => {
+            if (!navItem.isVisible) return null;
+            return (
               <Link
-                to="/organization"
+                to={navItem.path}
+                key={navItem.path}
+                target={navItem.externalLink ? '_blank' : undefined}
                 className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-                  location.pathname === '/organization' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
+                  navItem.active ? 'fmtm-border-red-medium' : 'fmtm-border-white'
                 } fmtm-border-b-2`}
               >
-                Organizations
+                {navItem.title}
               </Link>
-              {isAdmin && (
-                <Link
-                  to="/manage/user"
-                  className={`fmtm-uppercase fmtm-button fmtm-text-grey-900 hover:fmtm-text-grey-800 fmtm-duration-200 fmtm-px-3 fmtm-pt-2 fmtm-pb-1 ${
-                    location.pathname === '/manage/user' ? 'fmtm-border-red-medium' : 'fmtm-border-white'
-                  } fmtm-border-b-2`}
-                >
-                  Manage Users
-                </Link>
-              )}
-            </>
-          )}
+            );
+          })}
         </div>
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
           {authDetails ? (

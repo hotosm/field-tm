@@ -1,7 +1,7 @@
 /* Header */
 
 .header {
-	--at-apply: p-3 flex items-center justify-between font-barlow;
+	--at-apply: p-3 flex items-center justify-between;
 }
 
 /* Logo */
@@ -31,7 +31,7 @@
 	--at-apply: flex items-center gap-2;
 }
 
-.header .user hot-icon {
+.header .user sl-icon {
 	--at-apply: text-[1.5rem] leading-0 cursor-pointer duration-200;
 	color: var(--sl-color-primary-700);
 }
@@ -50,15 +50,11 @@
 }
 
 .header .login-link span {
-	--at-apply: font-barlow font-medium text-base;
+	--at-apply: font-medium text-base;
 }
 
 .header .drawer-icon {
 	--at-apply: text-[1.8rem] text-neutral-800 leading-0 cursor-pointer hover: text-primary-600 duration-200;
-}
-
-.header .drawer-icon-firstload {
-	background-color: var(--sl-color-warning-300);
 }
 
 .drawer-overview .content {
@@ -66,7 +62,7 @@
 }
 
 .menu-item {
-	--at-apply: hover: text-primary-600 cursor-pointer duration-200 decoration-none text-black font-barlow;
+	--at-apply: hover: text-primary-600 cursor-pointer duration-200 decoration-none text-black;
 }
 
 .header .sign-out {
@@ -74,7 +70,7 @@
 }
 
 .header .sign-out span {
-	--at-apply: font-barlow font-medium text-base;
+	--at-apply: font-medium text-base;
 }
 
 .header.offline-bg-color {

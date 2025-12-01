@@ -17,7 +17,7 @@ your own cloud server.
 ### Run the install script
 
 ```bash
-curl -L https://get.fmtm.dev -o install.sh
+curl -L https://get.fieldtm.hotosm.org -o install.sh
 bash install.sh
 
 # Then follow the prompts
@@ -45,8 +45,11 @@ Some can be updated manually, as required.
 - This variable allows central-webhook to make requests to the backend API.
 - We use this to update the feature/entity colours after mapping events occur.
 - Create an API Key for user `svcfmtm`, which will add the key to the database.
-- Set the key for the `CENTRAL_WEBHOOK_API_KEY` variable, and this should
-  allow the webhook to work.
+  - To create an API key, first log in as the user to generate a cookie.
+  - Next visit the API docs page, then call endpoint:
+    `/integrations/api-key`, and save the result.
+- Set the key for the `CENTRAL_WEBHOOK_API_KEY` variable.
+- Restart the containers and this should allow the webhook to work.
 
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
@@ -66,6 +69,15 @@ These can point to an externally hosted instance of ODK Central.
 
 Or ODK Central can be started as part of the Field-TM docker compose
 stack, and variables should be set accordingly.
+
+##### Changing The Default Organisation
+
+```dotenv
+DEFAULT_ORG_NAME=MdP
+DEFAULT_ORG_URL=https://mapadasperiferias.cidades.gov.br
+DEFAULT_ORG_EMAIL=snp.gab@cidades.gov.br
+DEFAULT_ORG_LOGO_URL=https://www.gov.br/cidades/pt-br/logo.png
+```
 
 #### Other Domains
 
@@ -88,6 +100,7 @@ FMTM_API_DOMAIN
 FMTM_ODK_DOMAIN
 FMTM_S3_DOMAIN
 FMTM_SYNC_DOMAIN
+FMTM_MAPPER_DOMAIN
 ```
 
 ### Connecting to a remote database
@@ -256,3 +269,19 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
   - Push your branch, then create a PR against the `main` branch in Github.
   - Merge in the PR and wait for the deployment.
   - Later the code can be pulled back into develop / staging.
+
+### The prod server is broken, but dev / stage work?
+
+- Have been here a few times before...
+- Always keep in mind that if you recently push to prod,
+  then the code is likely the same across instances, so it's
+  likely external factors:
+  1. Database migrations - some mismatch between database fields
+     or data inconsistency.
+  2. The server that it's hosted on - this may be different between
+     environments.
+  3. The deployment configuration - be it docker or Kubernetes, this
+     may vary slightly between environments.
+  4. The logging / telemetry config - I have been caught out here
+     before! OpenTelemetry may only be configured on production
+     and could potentially have bugs.

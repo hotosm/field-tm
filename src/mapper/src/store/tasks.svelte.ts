@@ -1,8 +1,8 @@
-import type { PGliteWithSync } from '@electric-sql/pglite-sync';
-import type { ShapeStream, ShapeData, Row, Value, FetchError } from '@electric-sql/client';
+import { ShapeStream, Shape } from '@electric-sql/client';
+import type { ShapeData } from '@electric-sql/client';
 import type { Feature, FeatureCollection, GeoJSON } from 'geojson';
 
-import type { ProjectTask, TaskEventType, TaskStatus } from '$lib/types';
+import type { ProjectTask, TaskEventType, latestTaskEventType } from '$lib/types';
 import { getLoginStore } from '$store/login.svelte.ts';
 import { getTimeDiff } from '$lib/utils/datetime';
 import type { taskStatus } from '$constants/enums';
@@ -13,6 +13,7 @@ let eventsUnsubscribe: (() => void) | null = $state(null);
 let featcol: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
 let latestEvent: TaskEventType | null = $state(null);
 let events: TaskEventType[] = $state([]);
+let latestTaskEvent: latestTaskEventType[] = $state([]);
 
 // for UI show task index for simplicity & for api's use task id
 let selectedTaskId: number | null = $state(null);
@@ -23,117 +24,113 @@ let selectedTaskState: taskStatus | null = $state(null);
 let selectedTaskGeom: GeoJSON | null = $state(null);
 let taskIdIndexMap: Record<number, number> = $state({});
 let commentMention: TaskEventType | null = $state(null);
-
 let userDetails = $derived(loginStore.getAuthDetails);
-let taskEventSync: any = $state(undefined);
 
 function getTaskStore() {
-	async function getTaskEventStream(db: PGliteWithSync, projectId: number): Promise<ShapeStream | undefined> {
-		if (!db || !projectId) {
+	async function startTaskEventStream(projectId: number): Promise<ShapeStream | undefined> {
+		if (!projectId) {
 			return;
 		}
 
-		taskEventSync = await db.electric.syncShapeToTable({
-			shape: {
-				url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-				params: {
-					table: 'task_events',
-					where: `project_id=${projectId}`,
-				},
+		const taskEventStream = new ShapeStream({
+			url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
+			params: {
+				table: 'task_events',
+				where: `project_id=${projectId}`,
 			},
-			table: 'task_events',
-			primaryKey: ['event_id'],
-			shapeKey: 'task_events',
-			initialInsertMethod: 'csv', // performance boost on initial sync
 		});
+		const taskEventShape = new Shape(taskEventStream);
 
-		eventsUnsubscribe = taskEventSync?.stream.subscribe(
-			(taskEvent: ShapeData[]) => {
-				// Filter only rows that have a .value (actual data changes)
-				const rows: TaskEventType[] = taskEvent
-					.filter((item): item is { value: TaskEventType } => 'value' in item && item.value !== null)
-					.map((item) => item.value);
+		eventsUnsubscribe = taskEventShape?.subscribe((taskEventData: ShapeData[]) => {
+			let taskEventRows: TaskEventType[];
+			taskEventRows = taskEventData.rows;
 
-				if (rows.length) {
-					latestEvent = rows.at(-1) ?? null;
+			if (taskEventRows.length) {
+				latestEvent = taskEventRows.at(-1) ?? null;
 
-					if (
-						latestEvent?.event === 'COMMENT' &&
-						typeof latestEvent?.comment === 'string' &&
-						latestEvent.comment.includes(`@${userDetails?.username}`) &&
-						latestEvent.comment.startsWith('#submissionId:uuid:') &&
-						getTimeDiff(new Date(latestEvent.created_at)) < 120
-					) {
-						commentMention = latestEvent;
-					}
+				// If the user is tagged in a comment, then set reactive commentMention variable
+				if (
+					latestEvent?.event === 'COMMENT' &&
+					typeof latestEvent?.comment === 'string' &&
+					latestEvent.comment.includes(`@${userDetails?.username}`) &&
+					latestEvent.comment.startsWith('#submissionId:uuid:') &&
+					getTimeDiff(new Date(latestEvent.created_at)) < 120
+				) {
+					commentMention = latestEvent;
+				}
 
-					for (const newEvent of rows) {
-						if (newEvent.task_id === selectedTaskId) {
-							selectedTaskState = newEvent.state;
-						}
+				// Update the state of currently selected task area
+				for (const newEvent of taskEventRows) {
+					if (+newEvent.task_id === selectedTaskId) {
+						selectedTaskState = newEvent.state;
 					}
 				}
-			},
-			(error: FetchError) => {
-				console.error('taskEvent sync error', error);
-			},
-		);
 
-		return taskEventSync;
+				// Update the events in taskStore
+				events = taskEventRows;
+			}
+		});
 	}
 
 	function unsubscribeEventStream() {
 		if (eventsUnsubscribe) {
-			taskEventSync.unsubscribe();
 			eventsUnsubscribe();
 			eventsUnsubscribe = null;
 		}
 	}
 
-	async function appendTaskStatesToFeatcol(db: PGliteWithSync, projectId: number, projectTasks: ProjectTask[]) {
-		const latestTaskStates = await getLatestStatePerTask(db, projectId);
-		const features: Feature[] = projectTasks.map((task) => ({
-			type: 'Feature',
-			geometry: task.outline,
-			properties: {
-				fid: task.id,
-				state: latestTaskStates.get(task.id)?.state || 'UNLOCKED_TO_MAP',
-				actioned_by_uid: latestTaskStates.get(task.id)?.actioned_by_uid,
-				task_index: task?.project_task_index,
-			},
-		}));
+	async function appendTaskStatesToFeatcol(projectTasks: ProjectTask[]) {
+		const latestTaskStates = new Map();
 
-		featcol = { type: 'FeatureCollection', features };
-	}
-
-	async function getLatestStatePerTask(db: PGliteWithSync, projectId: number) {
-		const taskEvents = await db.query('SELECT * FROM task_events WHERE project_id = $1', [projectId]);
-		const taskEventRows = Array.from(taskEvents.rows.values()) as TaskEventType[];
-		// Update the events in taskStore
-		events = taskEventRows;
-
-		const currentTaskStates = new Map();
-
-		for (const taskData of taskEventRows) {
-			// Use the task_id as the key and state as the value
-			currentTaskStates.set(taskData.task_id, {
-				state: taskData.state,
-				actioned_by_uid: taskData.user_id,
+		// Ensure state and actioned_by_uid vars are set for each event
+		for (const taskEvent of events) {
+			latestTaskStates.set(taskEvent.task_id, {
+				state: taskEvent.state,
+				actioned_by_uid: taskEvent.user_sub,
 			});
 		}
 
-		return currentTaskStates;
+		const { features, taskStates } = projectTasks.reduce(
+			(acc, task) => {
+				const state = latestTaskStates.get(task.id)?.state || 'UNLOCKED_TO_MAP';
+				const actioned_by_uid = latestTaskStates.get(task.id)?.actioned_by_uid;
+
+				acc.features.push({
+					type: 'Feature',
+					geometry: task.outline,
+					properties: {
+						fid: task.id,
+						state,
+						actioned_by_uid,
+						task_index: task?.project_task_index,
+					},
+				});
+
+				acc.taskStates.push({
+					id: task.id,
+					state,
+					actioned_by_uid,
+					task_index: task?.project_task_index,
+				});
+
+				return acc;
+			},
+			{ features: [] as Feature[], taskStates: [] as latestTaskEventType[] },
+		);
+
+		featcol = { type: 'FeatureCollection', features };
+		latestTaskEvent = taskStates;
 	}
 
-	async function setSelectedTaskId(db: PGliteWithSync, taskId: number | null, taskIndex: number | null) {
+	async function setSelectedTaskId(taskId: number | null, taskIndex: number | null) {
 		selectedTaskId = taskId;
 		selectedTaskIndex = taskIndex;
 
-		const tasks = await db.query('SELECT * FROM task_events WHERE task_id = $1', [taskId]);
-		const taskRows = Array.from(tasks.rows.values()) as TaskEventType[];
-		if (!taskRows) return;
+		// Filter the local `events` store for matching task_id
+		const taskRows = events.filter((ev) => ev.task_id === taskId);
 
-		selectedTask = taskRows.slice(-1)?.[0];
+		// Pick the latest event for this task
+		selectedTask = taskRows.at(-1) ?? null;
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
 		selectedTaskGeom = featcol.features.find((x) => x?.properties?.fid === taskId)?.geometry || null;
 	}
@@ -156,7 +153,7 @@ function getTaskStore() {
 		featcol = { type: 'FeatureCollection', features: [] };
 	}
 	return {
-		getTaskEventStream: getTaskEventStream,
+		startTaskEventStream: startTaskEventStream,
 		unsubscribeEventStream: unsubscribeEventStream,
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
@@ -196,6 +193,9 @@ function getTaskStore() {
 		},
 		get commentMention() {
 			return commentMention;
+		},
+		get latestTaskEvent() {
+			return latestTaskEvent;
 		},
 	};
 }

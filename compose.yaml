@@ -25,6 +25,10 @@ volumes:
   fmtm_tiles:
   central_db_data:
   central_frontend:
+  qfield_db_data:
+  qfield_static:
+  qfield_projects:
+  qfield_transformation_grids:
 
 networks:
   fmtm-net:
@@ -34,9 +38,81 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
+x-qfield-common-env: &qfield-common-env
+  DJANGO_SETTINGS_MODULE: qfieldcloud.settings
+  DEBUG: 1
+  ENVIRONMENT: development
+  QFIELDCLOUD_HOST: qfield.fmtm.localhost
+  DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
+  DJANGO_SUPERUSER_USERNAME: admin
+  DJANGO_SUPERUSER_EMAIL: sysadmin@hotosm.org
+  DJANGO_SUPERUSER_PASSWORD: ${QFIELDCLOUD_ADMIN_PASSWORD}
+  SECRET_KEY: YKuuTCb256dMmcg4DxpxrCafrcVvk8s3ZJrtDr9JaVAkeLiULGiemyzUTQESrzPQhiYUfn
+  SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
+  ACCOUNT_EMAIL_VERIFICATION: none
+  QFIELDCLOUD_PASSWORD_LOGIN_IS_ENABLED: 1
+  # TODO fix injecting S3 vars into STORAGES
+  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fmtm}
+  # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-somelongpassword}
+  # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
+  # STORAGE_ENDPOINT_URL: http://s3:9000
+  STORAGES: '{
+    "default": {
+    "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
+    "OPTIONS": {
+    "access_key": "fmtm",
+    "secret_key": "somelongpassword",
+    "bucket_name": "qfield-cloud",
+    "region_name": "",
+    "endpoint_url": "http://s3:9000"
+    },
+    "QFC_IS_LEGACY": false
+    }
+    }'
+  POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
+  POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
+  POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+  POSTGRES_HOST: qfield-db
+  POSTGRES_PORT: 5432
+  # EMAIL_HOST: ${EMAIL_HOST}
+  # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
+  # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
+  # EMAIL_PORT: ${EMAIL_PORT}
+  # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+  # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+  # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
+  # NOTE this must have a trailing slash
+  QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_URL}
+  QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
+  QFIELDCLOUD_USE_I18N: 0
+  QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
+  QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
+  QFIELDCLOUD_DEFAULT_NETWORK: fmtm-local
+  QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_qfield_transformation_grids
+  # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
+  # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
+  # Required for spawned QGIS job containers
+  TMP_DIRECTORY: /tmp
+
+x-qfield-common: &qfield-common
+  image: ghcr.io/opengisch/qfieldcloud-app:25.24
+  volumes:
+    - qfield_static:/usr/src/app/staticfiles
+  networks:
+    - fmtm-net
+  restart: "unless-stopped"
+  environment: *qfield-common-env
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/status"]
+    start_period: 30s
+    interval: 10s
+    timeout: 5s
+    retries: 10
+
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -48,6 +124,7 @@ services:
         required: false
     volumes:
       - central_frontend:/var/www/html/odk.fmtm.localhost:ro
+      - qfield_static:/var/www/html/qfield.fmtm.localhost/staticfiles:ro
     ports:
       - ${FMTM_DEV_PORT:-7050}:8080
     environment:
@@ -57,6 +134,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -80,7 +158,7 @@ services:
       # On client, brotli is preferred over gzip if both are enabled
       USE_BROTLI: yes
       # Reverse proxy configs
-      SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost odkcentral
+      SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost qfield.fmtm.localhost
       fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
       fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
@@ -102,12 +180,22 @@ services:
       # Expose-Headers are RESPONSE headers the browser is allowed to access
       sync.fmtm.localhost_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
       odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
+      # Required to allow loading frontend
       odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
       odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
       odk.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Override X-Forwarded-Proto during local dev to allow auth over http
       odk.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http"
+      qfield.fmtm.localhost_REVERSE_PROXY_HOST: http://qfield-app:8000
+      # Required to allow loading staticfiles (else route to reverse proxy)
+      qfield.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/(?!staticfiles)
+      # Sometimes we have large base imagery mbtile layers...
+      qfield.fmtm.localhost_MAX_CLIENT_SIZE: 2G
+      # Override X-Forwarded-Proto during local dev to allow auth over http
+      # https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header
+      # NOTE we also override the origin to remove the port & prefer CSRF issues
+      qfield.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http; Origin http://qfield.fmtm.localhost"
     networks:
       fmtm-net:
         ipv4_address: 10.20.30.50
@@ -121,29 +209,23 @@ services:
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
-      cache_to:
-        - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
-        - type=gha
-      cache_from:
-        - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
-        - type=gha
     # Uncomment these to debug with a terminal debugger like pdb
     # Then `docker attach fmtm_api` to debug
     # stdin_open: true
     # tty: true
     volumes:
       - fmtm_logs:/opt/logs
+      - qfield_projects:/opt/qfield
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
       - ./src/backend/scheduler:/opt/scheduler:ro
       - ./src/backend/stats:/opt/stats:ro
       # Workspace packages config
-      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork:ro
+      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
       - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
-      # External package mounts (testing)
-      # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
-      # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
+      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.13/site-packages/area_splitter:ro
+      - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     environment:
       DEBUG: ${DEBUG:-True}
     depends_on:
@@ -154,6 +236,10 @@ services:
       central:
         condition: service_healthy
         required: false
+      qfield-init:
+        condition: service_completed_successfully
+      qfield-qgis:
+        condition: service_healthy
       migrations:
         condition: service_completed_successfully
       s3:
@@ -191,8 +277,16 @@ services:
       dockerfile: Dockerfile.ui.debug
       target: build
     volumes:
-      - ./src/frontend:/app
-      - /app/node_modules/
+      - ./src/frontend/e2e:/app/e2e
+      - ./src/frontend/public:/app/public
+      - ./src/frontend/src:/app/src
+      - ./src/frontend/tests:/app/tests
+      - ./src/frontend/index.html:/app/index.html
+      - ./src/frontend/package.json:/app/package.json
+      - ./src/frontend/playwright.config.ts:/app/playwright.config.ts
+      - ./src/frontend/postcss.config.js:/app/postcss.config.js
+      - ./src/frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./src/frontend/vite.config.ts:/app/vite.config.ts
     environment:
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     ports:
@@ -208,14 +302,19 @@ services:
       additional_contexts:
         - code=src/mapper
       dockerfile: Dockerfile.ui.debug
-      target: init-db
     volumes:
-      - ./src/mapper:/app
-      - /app/node_modules/
-      - /app/.svelte-kit/
+      - ./src/mapper/messages:/app/messages
+      - ./src/mapper/project.inlang:/app/project.inlang
+      - ./src/mapper/src:/app/src
+      - ./src/mapper/static:/app/static
+      - ./src/mapper/tests:/app/tests
+      - ./src/mapper/package.json:/app/package.json
+      - ./src/mapper/playwright.config.ts:/app/playwright.config.ts
+      - ./src/mapper/svelte.config.js:/app/svelte.config.js
+      - ./src/mapper/uno.config.ts:/app/uno.config.ts
+      - ./src/mapper/vite.config.ts:/app/vite.config.ts
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
-      - TEST_PWA=${TEST_PWA:-false}
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
@@ -224,12 +323,11 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    command: >
-      sh -c "if [ \"$TEST_PWA\" = \"true\" ]; then pnpm run build && pnpm run preview; else pnpm run dev; fi"
+    command: pnpm run dev
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
     build:
       context: odkcentral/api
       args:
@@ -296,7 +394,7 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
     build:
       context: odkcentral/ui
       args:
@@ -362,11 +460,9 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    # Low max_connections for better performance.
-    # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
-    # and other sources online. Approx (cores * 4 * replicas)
-    # Plus electric-sql defaults to need 20 connections (64+20)
-    command: -c 'max_connections=84' -c 'wal_level=logical'
+    # We don't need to optimise connections like the prod deploy here.
+    # Conversely, we increase connections for test runners.
+    command: -c 'max_connections=300' -c 'wal_level=logical'
     healthcheck:
       test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
       start_period: 5s
@@ -432,6 +528,7 @@ services:
       - S3_ENDPOINT=http://s3:9000
       - S3_BUCKET_NAME=${S3_BUCKET_NAME:-"fmtm-data"}
       - S3_BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME:-"fmtm-db-backups"}
+      - S3_QFIELD_BUCKET_NAME=${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
@@ -463,8 +560,11 @@ services:
         # Run project stats script every 10 mins
         echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
 
-        # Upload and update project submissions to s3 every 6 hours
-        echo '0 */6 * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
+        # Upload and update project submissions to s3 every hours
+        echo '0 * * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
+
+        # Refresh user submission counts once a day
+        echo '0 0 * * * /opt/scheduler/user_submission_stats.py' >> ./crontab
 
         exec /usr/local/bin/supercronic ./crontab
       "
@@ -476,3 +576,161 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  qfield-db:
+    # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
+    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
+    volumes:
+      - qfield_db_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+    ports:
+      - "5435:5432"
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+    # Optimise to a low number of connections, see fmtm-db service
+    command: -c 'max_connections=64'
+    healthcheck:
+      test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Note we can't use compose 'extends' here due to double port definition / conflict
+  qfield-app:
+    <<: *qfield-common
+    ports:
+      # In QField on desktop, double click Nyuki and enter http://localhost:8442
+      - 8442:8000
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        python manage.py createsuperuser --no-input || true &&
+        python manage.py compilemessages &&
+        exec gunicorn qfieldcloud.wsgi:application \
+          --bind 0.0.0.0:8000 \
+          --timeout 300 \
+          --max-requests 300 \
+          --workers 1 \
+          --threads 4
+
+  qfield-worker:
+    <<: *qfield-common
+    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:25.24
+    depends_on:
+      qfield-app:
+        condition: service_healthy
+      qfield-transformation-grids:
+        condition: service_completed_successfully
+    command: python manage.py dequeue
+    user: root # required
+    scale: 1
+    stop_grace_period: 15m
+    labels:
+      ofelia.enabled: "false"
+    environment:
+      <<: *qfield-common-env
+    volumes:
+      # Required to run qgis containers and process project files
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Required to process geospatial datasets
+      - qfield_transformation_grids:/transformation_grids
+      # Required for loading feedback.json from QGIS job container
+      - /tmp:/tmp
+
+  qfield-init:
+    <<: *qfield-common
+    depends_on:
+      qfield-app:
+        condition: service_healthy
+    environment:
+      <<: *qfield-common-env
+      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
+      QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
+      QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
+    restart: "on-failure:2"
+    command:
+      - sh
+      - -c
+      - |
+        echo "Waiting for app to be ready..."
+        until curl -sf http://qfield-app:8000/api/v1/status > /dev/null; do
+          sleep 3
+        done
+
+        echo "Initializing organizations and users..."
+        python - <<'PYCODE'
+        import os, sys, django
+        django.setup()
+
+        from qfieldcloud.core.models import Organization, Person, User
+
+        username = os.getenv("QFIELDCLOUD_USER")
+        email = "svcfmtm@hotosm.org"
+        password = os.getenv("QFIELDCLOUD_PASSWORD")
+        org_name = os.getenv("DEFAULT_ORG_NAME")
+
+        if not all([username, password, org_name]):
+            print("QFIELDCLOUD_USER or QFIELDCLOUD_PASSWORD or DEFAULT_ORG_NAME not set")
+            sys.exit(1)
+
+        # Create or get the user (do not use get_or_create, as we need password hashing)
+        user = None
+        if not Person.objects.filter(username=username).exists():
+            user = Person.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_superuser=False,
+                has_accepted_tos=True,
+            )
+
+        # Create or get the organization
+        org = None
+        if not Organization.objects.filter(username=org_name).exists():
+            org = Organization.objects.create(
+                username=org_name,
+                organization_owner=user,
+                created_by=user,
+                is_initially_trial=False,
+            )
+
+        if user and org:
+            print(f"Initialized organization: {org.username}, owner: {user.username}")
+        else:
+            print("Org + user creation skipped, as they already exist.")
+        PYCODE
+
+  qfield-qgis:
+    image: "ghcr.io/hotosm/field-tm/qgis:25.24"
+    build: qfield
+    volumes:
+      - qfield_projects:/opt/qfield
+      - ./qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
+    environment:
+      LOG_LEVEL: DEBUG
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      start_period: 10s
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  qfield-transformation-grids:
+    image: k3rnelpan1c/alpine-wget:latest
+    command: |
+      wget --mirror https://cdn.proj.org/ -P /transformation_grids --no-host-directories
+      && chmod a+r /transformation_grids/*
+    volumes:
+      - qfield_transformation_grids:/transformation_grids
+    restart: "on-failure:2"

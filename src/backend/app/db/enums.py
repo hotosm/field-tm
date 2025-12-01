@@ -185,7 +185,7 @@ class BackgroundTaskStatus(StrEnum, Enum):
 
 
 class TaskSplitType(StrEnum, Enum):
-    """Task splitting type for fmtm-splitter."""
+    """Task splitting type for area-splitter."""
 
     DIVIDE_ON_SQUARE = "DIVIDE_ON_SQUARE"
     CHOOSE_AREA_AS_TASK = "CHOOSE_AREA_AS_TASK"
@@ -200,17 +200,10 @@ class ProjectVisibility(StrEnum, Enum):
     PRIVATE: The project is not visible to any users until they are invited to the
     project and submissions are only accessible to authenticated users who are
     contributors to the project.
-
-    SENSITIVE: All data is publicly available to all users, however submissions are only
-    accessible to authenticated users who are contributors to the project.
-
-    INVITE_ONLY: Only invited users can access the project, but access all data.
     """
 
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
-    SENSITIVE = "SENSITIVE"
-    INVITE_ONLY = "INVITE_ONLY"
 
 
 class CommunityType(StrEnum, Enum):
@@ -255,10 +248,15 @@ class XLSFormType(StrEnum, Enum):
     buildings = "OSM Buildings"
     highways = "OSM Highways"
     health = "OSM Healthcare"
-    # toilets = "toilets"
-    # religious = "religious"
-    # landusage = "landusage"
-    # waterways = "waterways"
+    toilets = "OSM Toilets"
+    religious = "OSM Religious"
+    landusage = "OSM Landuse"
+    waterways = "OSM Waterways"
+    waterpoints = "OSM Water Points"
+    wastedisposal = "OSM Waste Disposal"
+    education = "OSM Education"
+    cemeteries = "OSM Cemeteries"
+    amenities = "OSM Amenities"
 
 
 class SubmissionDownloadType(StrEnum, Enum):
@@ -275,3 +273,11 @@ class OdkWebhookEvents(StrEnum, Enum):
     UPDATE_ENTITY = "entity.update.version"
     NEW_SUBMISSION = "submission.create"
     REVIEW_SUBMISSION = "submission.update"
+
+
+class FieldMappingApp(StrEnum, Enum):
+    """Types of events received from ODK Central webhook."""
+
+    QFIELD = "QField"
+    ODK = "ODK"
+    FIELDTM = "FieldTM"

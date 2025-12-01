@@ -21,7 +21,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
   const MenuItems = [
     {
       name: 'Explore Projects',
-      ref: '/',
+      ref: '/explore',
       isExternalLink: false,
       isActive: true,
     },
@@ -45,13 +45,13 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'Learn',
-      ref: 'https://hotosm.github.io/fmtm',
+      ref: 'https://hotosm.github.io/field-tm',
       isExternalLink: true,
       isActive: true,
     },
     {
       name: 'About',
-      ref: 'https://docs.fmtm.dev/about/about/',
+      ref: 'https://docs.fieldtm.hotosm.org/about/about/',
       isExternalLink: true,
       isActive: true,
     },
@@ -62,8 +62,8 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
       isActive: true,
     },
     {
-      name: 'Download Custom ODK Collect',
-      ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.3.5-entity-select/ODK-Collect-v2024.3.5-HOTOSM-FMTM.apk',
+      name: 'Download ODK Collect',
+      ref: 'https://play.google.com/store/apps/details?id=org.odk.collect.android',
       isExternalLink: true,
       isActive: true,
     },

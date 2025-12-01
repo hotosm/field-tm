@@ -74,6 +74,7 @@ class UserRolesOut(DbUserRole):
     user_sub: str
     role: ProjectRole
     project_id: Optional[int] = None
+    username: str
 
 
 class PaginatedUsers(BaseModel):

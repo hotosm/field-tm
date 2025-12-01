@@ -3,8 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { task_split_type } from '@/types/enums';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { GetDividedTaskFromGeojson, TaskSplittingPreviewService } from '@/api/CreateProjectService';
+import { useAppDispatch } from '@/types/reduxTypes';
 import { createProjectValidationSchema } from './validation';
 import { z } from 'zod/v4';
 
@@ -14,17 +13,15 @@ import { Input } from '@/components/RadixComponents/Input';
 import Button from '@/components/common/Button';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import AssetModules from '@/shared/AssetModules';
-
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { usePreviewSplitBySquareMutation, useTaskSplitMutation } from '@/api/project';
 
 const SplitTasks = () => {
+  useDocumentTitle('Create Project: Split Tasks');
+
   const dispatch = useAppDispatch();
   const generateBtnRef = useRef<HTMLButtonElement>(null);
-
-  const splitGeojsonBySquares = useAppSelector((state) => state.createproject.splitGeojsonBySquares);
-  const splitGeojsonByAlgorithm = useAppSelector((state) => state.createproject.splitGeojsonByAlgorithm);
-  const dividedTaskLoading = useAppSelector((state) => state.createproject.dividedTaskLoading);
-  const taskSplittingGeojsonLoading = useAppSelector((state) => state.createproject.taskSplittingGeojsonLoading);
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, control, register, setValue, formState } = form;
@@ -36,7 +33,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.DIVIDE_ON_SQUARE,
       label: 'Divide into square tasks',
-      disabled: false,
+      disabled: values.primary_geom_type === 'POLYLINE',
     },
     {
       name: 'define_tasks',
@@ -48,9 +45,28 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.TASK_SPLITTING_ALGORITHM,
       label: 'Task Splitting Algorithm',
-      disabled: !values.dataExtractGeojson?.features?.length || values.primaryGeomType === 'POLYLINE',
+      disabled: !values.dataExtractGeojson?.features?.length || values.primary_geom_type === 'POLYLINE',
     },
   ];
+
+  const { mutate: previewSplitBySquareMutate, isPending: isPreviewSplitBySquarePending } =
+    usePreviewSplitBySquareMutation({
+      onSuccess: ({ data }) => {
+        setValue('splitGeojsonBySquares', data);
+      },
+      onError: ({ response }) => {
+        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to upload XLSForm form' }));
+      },
+    });
+
+  const { mutate: taskSplitMutate, isPending: isTaskSplitPending } = useTaskSplitMutation({
+    onSuccess: ({ data }) => {
+      setValue('splitGeojsonByAlgorithm', data);
+    },
+    onError: ({ response }) => {
+      dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to upload XLSForm form' }));
+    },
+  });
 
   const generateTaskBasedOnSelection = (e) => {
     e.preventDefault();
@@ -64,23 +80,25 @@ const SplitTasks = () => {
     const dataExtractBlob = new Blob([JSON.stringify(values.dataExtractGeojson)], { type: 'application/json' });
     const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
 
+    setValue('splitGeojsonBySquares', null);
+    setValue('splitGeojsonByAlgorithm', null);
+
     if (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE) {
-      dispatch(
-        GetDividedTaskFromGeojson(`${VITE_API_URL}/projects/preview-split-by-square`, {
-          geojson: drawnGeojsonFile,
-          extract_geojson: values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
-          dimension: values?.dimension,
-        }),
-      );
+      const dividedTaskFormData = new FormData();
+      dividedTaskFormData.append('project_geojson', drawnGeojsonFile);
+      dividedTaskFormData.append('dimension_meters', values?.task_split_dimension?.toString() || '0');
+      previewSplitBySquareMutate({ payload: dividedTaskFormData });
     } else if (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM) {
-      dispatch(
-        TaskSplittingPreviewService(
-          `${VITE_API_URL}/projects/task-split`,
-          drawnGeojsonFile,
-          values?.average_buildings_per_task as number,
-          values.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
-        ),
-      );
+      const taskSplittingFileFormData = new FormData();
+      taskSplittingFileFormData.append('project_geojson', drawnGeojsonFile);
+      taskSplittingFileFormData.append('no_of_buildings', values?.task_num_buildings?.toString() || '0');
+      // Only include data extract if custom extract uploaded
+      if (dataExtractFile) {
+        taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
+      }
+      taskSplitMutate({
+        payload: taskSplittingFileFormData,
+      });
     }
   };
 
@@ -94,14 +112,6 @@ const SplitTasks = () => {
   };
 
   useEffect(() => {
-    setValue('splitGeojsonBySquares', splitGeojsonBySquares);
-  }, [splitGeojsonBySquares]);
-
-  useEffect(() => {
-    setValue('splitGeojsonByAlgorithm', splitGeojsonByAlgorithm);
-  }, [splitGeojsonByAlgorithm]);
-
-  useEffect(() => {
     if (errors.splitGeojsonBySquares || errors.splitGeojsonByAlgorithm) {
       generateBtnRef?.current?.focus();
     }
@@ -110,7 +120,21 @@ const SplitTasks = () => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="Select an option to split your project area" astric />
+        <FieldLabel
+          label="Select an option to split your project area"
+          astric
+          tooltipMessage={
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+              <p>You may choose how to divide an area into tasks for field mapping:</p>
+              <p>i) Divide area on squares split the AOI into squares based on user’s input in dimensions</p>
+              <p>ii) Choose area as task creates the number of tasks based on number of polygons in AOI</p>
+              <p>
+                iii) Task splitting algorithm splits an entire AOI into smallers tasks based on linear networks (road,
+                river) followed by taking into account the input of number of average buildings per task
+              </p>
+            </div>
+          }
+        />
         <Controller
           control={control}
           name="task_split_type"
@@ -143,9 +167,15 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Dimension of square in metres:" />
-            <Input {...register('dimension', { valueAsNumber: true })} className="!fmtm-w-20" type="number" />
+            <Input
+              {...register('task_split_dimension', { valueAsNumber: true })}
+              className="!fmtm-w-20"
+              type="number"
+            />
           </div>
-          {errors?.dimension?.message && <ErrorMessage message={errors.dimension.message as string} />}
+          {errors?.task_split_dimension?.message && (
+            <ErrorMessage message={errors.task_split_dimension.message as string} />
+          )}
         </div>
       )}
 
@@ -153,10 +183,10 @@ const SplitTasks = () => {
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Average number of buildings per task:" />
-            <Input {...register('average_buildings_per_task', { valueAsNumber: true })} className="!fmtm-w-20" />
+            <Input {...register('task_num_buildings', { valueAsNumber: true })} className="!fmtm-w-20" />
           </div>
-          {errors?.average_buildings_per_task?.message && (
-            <ErrorMessage message={errors.average_buildings_per_task.message as string} />
+          {errors?.task_num_buildings?.message && (
+            <ErrorMessage message={errors.task_num_buildings.message as string} />
           )}
         </div>
       )}
@@ -169,12 +199,11 @@ const SplitTasks = () => {
             <Button
               ref={generateBtnRef}
               variant="primary-red"
-              isLoading={dividedTaskLoading || taskSplittingGeojsonLoading}
+              isLoading={isPreviewSplitBySquarePending || isTaskSplitPending}
               onClick={generateTaskBasedOnSelection}
               disabled={
-                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.dimension) ||
-                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM &&
-                  !values.average_buildings_per_task)
+                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.task_split_dimension) ||
+                (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM && !values.task_num_buildings)
                   ? true
                   : false
               }
@@ -200,6 +229,7 @@ const SplitTasks = () => {
               {values.splitGeojsonByAlgorithm?.features?.length ||
                 values.splitGeojsonBySquares?.features?.length ||
                 values.outline?.features?.length ||
+                values.outline?.coordinates?.length ||
                 1}
             </span>
           </p>

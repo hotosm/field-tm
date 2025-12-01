@@ -39,7 +39,7 @@
 	--at-apply: hover: bg-primary-50 duration-100 hover: text-primary-900;
 }
 
-.pagination .actions button hot-icon {
+.pagination .actions button sl-icon {
 	--at-apply: text-[0.8rem] text-primary-900 cursor-pointer;
 }
 
@@ -75,6 +75,6 @@
 	--at-apply: hover: bg-primary-50 duration-100 hover: text-primary-900;
 }
 
-.pagination .next-button hot-icon {
+.pagination .next-button sl-icon {
 	--at-apply: text-[0.8rem] text-primary-900 cursor-pointer;
 }

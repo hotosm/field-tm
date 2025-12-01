@@ -1,11 +1,12 @@
 [project]
 name = "osm-fieldwork"
-version = "0.22.0"
+version = "0.23.0"
 description = "Processing field data from ODK to OpenStreetMap format."
 authors = [
     {name = "Rob Savoye", email = "rob.savoye@hotosm.org"},
     {name = "Sam Woodcock", email = "sam.woodcock@hotosm.org"},
     {name = "Sujan Adhikari", email = "adhikarisujan.naxa@gmail.com"},
+    {name = "Anuj Gupta", email = "anuj.naxa@gmail.com"},
 ]
 dependencies = [
     "geojson>=3.0.0",
@@ -16,7 +17,6 @@ dependencies = [
     "openpyxl>=3.0.10",
     "requests>=2.26.0",
     "aiohttp>=3.8.4",
-    "osm-rawdata>=0.1.7",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
@@ -29,6 +29,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 [project.urls]
@@ -36,15 +37,13 @@ homepage = "https://hotosm.github.io/osm-fieldwork"
 documentation = "https://hotosm.github.io/osm-fieldwork"
 repository = "https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork"
 
-[dependency-groups]
-docs = [
-    "mkdocs>=1.5.2",
-    "mkdocs-material>=9.2.3",
-    "mkdocstrings-python>=1.5.1",
-    "mkdocs-exclude>=1.0.2",
-    "mkdocs-git-revision-date-localized-plugin>=1.2.4",
-    "mdx-truly-sane-lists>=1.3",
-]
+[project.scripts]
+basemapper = "osm_fieldwork.basemapper:main"
+osm2favorites = "osm_fieldwork.osm2favorities:main"
+odk2osm = "osm_fieldwork.odk2osm:main"
+odk_client = "osm_fieldwork.odk_client:main"
+make_data_extract = "osm_fieldwork.make_data_extract:main"
+fmtm_xlsform = "osm_fieldwork.update_xlsform:run"
 
 [build-system]
 requires = ["hatchling"]
@@ -55,13 +54,18 @@ packages = ["osm_fieldwork"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.22.0"
+version = "0.23.0"
+version_provider = "uv"
 version_files = [
     "pyproject.toml:version",
     "osm_fieldwork/__version__.py",
-    "Makefile:VERSION",
 ]
 update_changelog_on_bump = true
+# Create tag version prepended with osm-fieldwork
+tag_format = "osm-fieldwork-$version"
+# Skip the tags for FieldTM
+ignored_tag_formats = ["$version"]
+bump_message = "bump: osm-fieldwork version $current_version → $new_version"
 
 [tool.ruff]
 fix = true
@@ -85,12 +89,3 @@ ignore = ["N805", "B008"]
 "osm_fieldwork/basemapper.py" = ["N802"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-# TODO update these from PDM --> uv setup
-[project.scripts]
-basemapper = "osm_fieldwork.basemapper:main"
-osm2favorites = "osm_fieldwork.osm2favorities:main"
-odk2osm = "osm_fieldwork.odk2osm:main"
-odk_client = "osm_fieldwork.odk_client:main"
-make_data_extract = "osm_fieldwork.make_data_extract:main"
-fmtm_xlsform = "osm_fieldwork.update_xlsform:main"

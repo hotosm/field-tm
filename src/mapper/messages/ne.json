@@ -2,7 +2,9 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"common": {
 		"yes": "हो",
-		"no": "No"
+		"no": "No",
+		"zoom_to_task": "टास्कमा जुम गर्नुहोस्",
+		"projects": "परियोजनाहरू"
 	},
 	"project_states": {
 		"DRAFT": "ड्राफ्ट",
@@ -28,7 +30,7 @@
 		"about": "बारेमा",
 		"guide_for_mappers": "Mappers को लागी गाइड",
 		"support": "सहायताको लागी",
-		"download_custom_odk_collect": "ODK Collect डाउनलोड",
+		"download_odk_collect": "ODK Collect डाउनलोड",
 		"sign_in": "साइन इन",
 		"sign_out": "साइन आउट",
 		"translate": "हामीलाई अनुवाद गर्न मद्दत गर्नुहोस्!"
@@ -42,7 +44,12 @@
 		"geometry_correct_place": "के ज्यामिति सही ठाउँमा छ?",
 		"distance": "दूरी",
 		"no_orientation_sensors": "उपकरण अभिमुखीकरण ह्यान्डल गर्न असमर्थ। तपाईंको ब्राउजरले उपकरण अभिमुखीकरण सेन्सरहरूलाई समर्थन गर्दैन।",
-		"legend_features": "फिचरहरूको सङ्केत"
+		"legend_features": "फिचरहरूको सङ्केत",
+		"control_zoom_to_project": "प्रोजेक्ट गर्न जुम गर्नुहोस्",
+		"control_geolocation": "भौगोलिक स्थान",
+		"control_basemaps": "आधार नक्साहरू",
+		"control_legend": "किंवदन्ती",
+		"control_sync_status": "नक्सा सिंक गर्नुहोस्"
 	},
 	"popup": {
 		"task": "टास्क",
@@ -56,9 +63,9 @@
 		"navigate_here": "यहाँ नेभिगेट गर्नुहोस्",
 		"map_in_odk": "ODK मा फिचर म्याप गर्नुहोस्",
 		"collect_data": "डाटा संकलन गर्नुहोस्",
-		"task_complete_total_mapped": "तपाईंले कार्य क्षेत्रमा {totalMapped} विशेषताहरू म्याप गर्नुभएको छ।",
-		"task_complete_only_total_mapped": "तपाईंले कार्य क्षेत्रमा मात्र {totalMapped} विशेषताहरू म्याप गर्नुभएको छ।",
+		"task_complete_partial_mapped": "तपाईंले कार्य क्षेत्रमा {totalFeatures} सुविधाहरू मध्ये {totalMapped} मात्र म्याप गर्नुभएको छ।",
 		"task_complete_confirm": "के तपाईं निश्चित रूपमा यो कार्य सम्पन्न भएको रूपमा चिन्हित गर्न चाहनुहुन्छ?",
+		"task_complete_all_mapped": "तपाईंले कार्य क्षेत्रमा सबै सुविधाहरू म्याप गर्नुभएको छ। जारी राख्ने हो?",
 		"select_this_feature": "यो फिचर चयन गर्नुहोस्",
 		"map_this_feature": "यो फिचर फिचर म्याप गर्नुहोस्",
 		"proceed": "अगाडि बढ्नुहोस्",
@@ -68,7 +75,9 @@
 		"project_information": "परियोजनाको जानकारी",
 		"comment": "टिप्पणी",
 		"instructions": "निर्देशनहरू",
-		"activities": "गतिविधिहरू"
+		"activities": "गतिविधिहरू",
+		"my_tasks": "मेरो टास्कहरू",
+		"basemaps": "आधार नक्साहरू"
 	},
 	"odk": {
 		"open": "ODK खोल्नुहोस्",
@@ -78,8 +87,7 @@
 		"manage": "बेसम्यापहरू व्यवस्थापन गर्नुहोस्",
 		"no_basemaps_available": "यो परियोजनाका लागि बेसम्यापहरू उपलब्ध छैनन्।",
 		"ask_pm": "कृपया परियोजना प्रबन्धकलाई बेसम्यापहरू सिर्जना गर्न अनुरोध गर्नुहोस्।",
-		"show_on_map": "नक्सामा देखाउनुहोस्",
-		"store_offline": "अफलाइन भण्डारण गर्नुहोस्",
+		"add_to_map_layers": "नक्सा तहहरूमा थप्नुहोस्",
 		"download_mbtiles": "MBTiles डाउनलोड गर्नुहोस्"
 	},
 	"project_info": {
@@ -108,10 +116,14 @@
 		"far_away_confirm": "तपाईं यो सुविधाबाट {distance} टाढा हुनुहुन्छ। के तपाईं यो सुविधा नक्सा गर्न निश्चित हुनुहुन्छ?",
 		"status": "स्थिति",
 		"comments": "टिप्पणीहरू",
-		"entity_uuid": "Entity UUID",
+		"unique_id": "अद्वितीय परिचयपत्र",
 		"collect_data": "डाटा संकलन गर्नुहोस्",
 		"entity_delete_confirmation": "के तपाईं यो फिचर मेटाउन निश्चित हुनुहुन्छ?",
-		"contact_pm_for_entity_deletion": "सिर्जनाकर्ताले मात्र यो फिचर मेटाउन सक्छ। कृपया परियोजना प्रबन्धकलाई सम्पर्क गर्नुहोस्।"
+		"contact_pm_for_entity_deletion": "सिर्जनाकर्ताले मात्र यो फिचर मेटाउन सक्छ। कृपया परियोजना प्रबन्धकलाई सम्पर्क गर्नुहोस्।",
+		"created_by": "सिर्जनाकर्ता",
+		"you_created_this": "तपाईंले यो सुविधा सिर्जना गर्नुभयो",
+		"view_existing_data": "डेटा हेर्नुहोस्",
+		"no_data": "सबमिशनमा कुनै डेटा छैन।"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "म्यापिङ सम्पन्न गर्नुहोस्",
@@ -138,13 +150,11 @@
 	"offline": {
 		"features": "फिचरहरू",
 		"basemaps": "बेसम्याप",
-		"data": "अफलाइन डेटा हेर्नुहोस्",
-		"store_features_offline": "फिचर अफलाइन भण्डारण गर्नुहोस्",
 		"features_offline_info": "फिचर पहिले नै अफलाइन भण्डारण गरिएका छन्",
 		"fetch_projects_offline": "तपाईं अफलाइन हुनुहुन्छ र अतिरिक्त परियोजनाहरू ल्याउन सक्नुहुन्न।",
-		"ready_offline": "अफलाइन प्रयोगको लागि तयार।",
-		"total_offline_submissions": "कुल अफलाइन सबमिशनहरू",
-		"total_failed_submissions": "कुल असफल पेसहरू",
-		"download_csv": "CSV को रूपमा डाउनलोड गर्नुहोस्"
+		"ready_offline": "अफलाइन प्रयोगको लागि तयार।"
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "कुनै टास्क तोकिएको छैन"
 	}
 }

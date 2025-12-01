@@ -25,14 +25,16 @@ mod test 'contrib/just/test/Justfile'
 mod config 'contrib/just/config/Justfile'
 mod stats 'contrib/just/stats/Justfile'
 mod manage 'contrib/just/manage/Justfile'
+mod prep 'contrib/just/prep/Justfile'
 
-# Run the help script
+# List available commands
+[private]
 default:
-  @just help
+  just help
 
-# View available commands
+# List available commands
 help:
-  @just --list --justfile {{justfile()}}
+  just --justfile {{justfile()}} --list
 
 # Run database migrations for backend
 migrate:
@@ -44,44 +46,34 @@ clean:
 
 # Run pre-commit hooks
 lint:
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && pre-commit run --all-files'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run pre-commit run --all-files
 
-# Increment version
+# Increment field-tm
 bump:
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && git config --global user.name svcfmtm \
-    && git config --global user.email fmtm@hotosm.org \
-    && cd src/backend \
-    && cz bump --check-consistency --no-verify'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run cz bump --check-consistency
+
+# Increment osm-fieldwork (doesn't work yet!)
+bump-osm-fieldwork:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv --project packages/osm-fieldwork --directory packages/osm-fieldwork run cz bump --check-consistency
 
 # Run docs website locally
 docs:
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-  @echo
-  @echo "\033[0;34m Access the docs site on: http://localhost:55425 \033[0m"
-  @echo
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-
-  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
-    --volume $PWD:$PWD --workdir $PWD --publish 55425:3000 \
-    --entrypoint='sh -c' api \
-    'git config --global --add safe.directory $PWD \
-    && mkdocs serve --dev-addr 0.0.0.0:3000'
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv sync --group docs
+  uv run mkdocs serve --config-file ../../mkdocs.yml --dev-addr 0.0.0.0:3000
 
 # Mount an S3 bucket on your filesystem
 mount-s3:
   #!/usr/bin/env sh
+  set -e
+
   fstab_entry="fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
   use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
   url=http://s3.fmtm.localhost:7050 0 0"
@@ -105,3 +97,9 @@ _echo-blue text:
 _echo-yellow text:
   #!/usr/bin/env sh
   printf "\033[0;33m%s\033[0m\n" "{{ text }}"
+
+# Echo to terminal with red colour
+[no-cd]
+_echo-red text:
+  #!/usr/bin/env sh
+  printf "\033[0;41m%s\033[0m\n" "{{ text }}"

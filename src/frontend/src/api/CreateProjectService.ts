@@ -1,72 +1,62 @@
 import axios, { AxiosResponse } from 'axios';
 import { API } from '@/api';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
-import {
-  ProjectDetailsModel,
-  FormCategoryListModel,
-  OrganisationListModel,
-  splittedGeojsonType,
-} from '@/models/createproject/createProjectModel';
+import { ProjectDetailsModel } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
-import { ProjectDetailsTypes } from '@/store/types/ICreateProject';
+import { UnassignUserFromProject } from '@/api/Project';
+import { field_mapping_app } from '@/types/enums';
+import { fieldMappingAppNameMap } from '@/constants/fieldMapping';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-export const GetBasicProjectDetails = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    try {
-      dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(true));
-      const response: AxiosResponse<{ id: number } & ProjectDetailsTypes> = await axios.get(url);
-      const { id, name, short_description, description, organisation_id, outline } = response.data;
-      dispatch(
-        CreateProjectActions.SetBasicProjectDetails({
-          id,
-          name,
-          short_description,
-          description,
-          organisation_id,
-          outline,
-        }),
-      );
-    } catch (error) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: JSON.stringify(error?.response?.data?.detail) || 'Error fetching basic project details',
-        }),
-      );
-    } finally {
-      dispatch(CreateProjectActions.GetBasicProjectDetailsLoading(false));
-    }
-  };
-};
-
 export const CreateDraftProjectService = (
   url: string,
-  payload: Record<string, any>,
-  project_admins: string[],
-  params: Record<string, any>,
+  payload: { projectPayload: Record<string, any>; odkPayload: Record<string, any> | null; project_admins: string[] },
   navigate: NavigateFunction,
   continueToNextStep: boolean,
 ) => {
   return async (dispatch: AppDispatch) => {
+    let projectId: number | null = null;
     try {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(true));
-      const response: AxiosResponse = await axios.post(url, payload, { params });
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
 
+      const { projectPayload, odkPayload, project_admins } = payload;
+
+      // 1. Create draft project
+      const response: AxiosResponse = await axios.post(url, projectPayload, {
+        params: { org_id: projectPayload.organisation_id },
+      });
+
+      projectId = response.data.id;
+
+      // 2. Add ODK details (to create project in ODK  patch createProject even if default ODK creds used)
+      await axios.patch(`${VITE_API_URL}/projects`, odkPayload || {}, {
+        params: { project_id: projectId as number },
+      });
+
+      // 3. Add project admins
       if (!isEmpty(project_admins)) {
-        const promises = project_admins?.map(async (sub: any) => {
-          await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-              sub,
-              project_id: response.data.id as number,
+        try {
+          const promises = project_admins?.map(async (sub: any) => {
+            await dispatch(
+              AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+                sub,
+                project_id: projectId as number,
+              }),
+            );
+          });
+          await Promise.all(promises);
+        } catch (error) {
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: error?.response?.data?.detail || 'Failed to add project admin',
             }),
           );
-        });
-        await Promise.all(promises);
+        }
       }
 
       dispatch(
@@ -75,7 +65,7 @@ export const CreateDraftProjectService = (
           message: 'Draft project created successfully',
         }),
       );
-      const redirectTo = continueToNextStep ? `/create-project/${response.data.id}?step=2` : `/`;
+      const redirectTo = continueToNextStep ? `/create-project/${projectId}?step=2` : `/`;
       navigate(redirectTo);
     } catch (error) {
       dispatch(
@@ -83,8 +73,12 @@ export const CreateDraftProjectService = (
           message: error?.response?.data?.detail || 'Failed to create draft project',
         }),
       );
+
+      if (projectId) {
+        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`));
+      }
     } finally {
-      dispatch(CreateProjectActions.CreateDraftProjectLoading(false));
+      dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: false, continue: false }));
     }
   };
 };
@@ -93,16 +87,21 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
-  file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File; xlsFormFile: File },
+  project_admins: { projectAdminToRemove: string[]; projectAdminToAssign: string[] },
+  file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
   navigate: NavigateFunction,
 ) => {
   return async (dispatch: AppDispatch) => {
     try {
+      const stopProjectCreation = () => {
+        throw new Error();
+      };
+
       dispatch(CreateProjectActions.CreateProjectLoading(true));
 
-      // 1. post project details
+      // 1. patch project details
       try {
         await API.patch(url, projectData);
       } catch (error) {
@@ -119,21 +118,25 @@ export const CreateProjectService = (
         );
       }
 
+      let APISuccess = false;
+
       // 2. post task boundaries
-      await dispatch(
+      APISuccess = await dispatch(
         UploadTaskAreasService(`${VITE_API_URL}/projects/${id}/upload-task-boundaries`, file.taskSplitGeojsonFile),
       );
+      if (!APISuccess) stopProjectCreation();
 
       // 3. upload data extract
       if (isEmptyDataExtract) {
         // manually set response as we don't call an API
       } else if (file.dataExtractGeojsonFile) {
-        await dispatch(
+        APISuccess = await dispatch(
           UploadDataExtractService(
             `${VITE_API_URL}/projects/upload-data-extract?project_id=${id}`,
             file.dataExtractGeojsonFile,
           ),
         );
+        if (!APISuccess) stopProjectCreation();
       } else {
         dispatch(
           CommonActions.SetSnackBar({
@@ -142,161 +145,59 @@ export const CreateProjectService = (
         );
       }
 
-      // 4. upload form
-      await dispatch(
-        GenerateProjectFilesService(
-          `${VITE_API_URL}/projects/${id}/generate-project-data`,
-          projectData,
-          file.xlsFormFile,
-          combinedFeaturesCount,
-        ),
+      // 4. generate remaining project files
+      const generateProjectDataResponse = await dispatch(
+        GenerateProjectFilesService(`${VITE_API_URL}/projects/${id}/generate-project-data`, combinedFeaturesCount),
       );
+      APISuccess = !!generateProjectDataResponse;
+      if (!APISuccess) stopProjectCreation();
+
+      // 5. assign & remove project managers
+      const addAdminPromises = project_admins.projectAdminToAssign?.map(async (sub: any) => {
+        await dispatch(
+          AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
+            sub,
+            project_id: id as number,
+          }),
+        );
+      });
+      const removeAdminPromises = project_admins.projectAdminToRemove?.map(async (sub: any) => {
+        await dispatch(UnassignUserFromProject(`${VITE_API_URL}/projects/${id}/users/${sub}`));
+      });
+      await Promise.all([addAdminPromises, removeAdminPromises]);
 
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'Project Generation Completed. Redirecting...',
+          message: `Project created successfully. ${
+            projectData.field_mapping_app !== field_mapping_app.FieldTM
+              ? `The ${fieldMappingAppNameMap[projectData.field_mapping_app]} project dashboard has been opened in a new tab. You can also access it anytime using this link: ${generateProjectDataResponse}`
+              : 'Redirecting...'
+          }`,
           variant: 'success',
-          duration: 5000,
+          duration: projectData.field_mapping_app !== field_mapping_app.FieldTM ? 10000 : 5000,
         }),
       );
+
+      if (projectData.field_mapping_app !== field_mapping_app.FieldTM)
+        window.open(generateProjectDataResponse, '_blank');
 
       // Add 5-second delay to allow backend Entity generation to catch up
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(5000);
-      navigate(`/project/${id}`);
-    } catch (error) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: error?.response?.data?.detail || 'Something went wrong. Please try again.',
-        }),
-      );
-    } finally {
-      dispatch(CreateProjectActions.CreateProjectLoading(false));
-    }
-  };
-};
 
-const CreateProjectServiceDeprecated = (
-  url: string,
-  projectData: any,
-  taskAreaGeojson: any,
-  formUpload: any,
-  dataExtractFile: File,
-  projectAdmins: number[],
-  combinedFeaturesCount: number,
-  isEmptyDataExtract: boolean,
-) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.CreateProjectLoading(true));
-    dispatch(CommonActions.SetLoading(true));
-
-    let projectId: null | number = null;
-    try {
-      let hasAPISuccess = false; // set to true if any of the APIs fails
-      let postNewProjectDetails: AxiosResponse<ProjectDetailsModel> | null = null;
-
-      // 1. post project details
-      try {
-        postNewProjectDetails = await API.post(url, projectData);
-      } catch (error) {
-        const errorResponse = error?.response?.data?.detail;
-        const errorMessage =
-          typeof errorResponse === 'string'
-            ? errorResponse || 'Something went wrong. Please try again.'
-            : `Following errors occurred while creating project: ${errorResponse?.map((err) => `\n${err?.msg}`)}`;
-
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: errorMessage,
-          }),
-        );
-      }
-
-      hasAPISuccess = !!postNewProjectDetails; // postNewProjectDetails is null if post project request fails
-      if (!hasAPISuccess) throw new Error();
-
-      const projectCreateResp: ProjectDetailsModel = postNewProjectDetails?.data!;
-      projectId = projectCreateResp.id;
-      dispatch(CreateProjectActions.PostProjectDetails(projectCreateResp));
-
-      // 2. post task boundaries
-      hasAPISuccess = await dispatch(
-        UploadTaskAreasService(`${VITE_API_URL}/projects/${projectId}/upload-task-boundaries`, taskAreaGeojson),
-      );
-      if (!hasAPISuccess) throw new Error();
-
-      // 3. upload data extract
-      if (isEmptyDataExtract) {
-        // manually set response as we don't call an API
-      } else if (dataExtractFile) {
-        hasAPISuccess = await dispatch(
-          UploadDataExtractService(
-            `${VITE_API_URL}/projects/upload-data-extract?project_id=${projectId}`,
-            dataExtractFile,
-          ),
-        );
-        if (!hasAPISuccess) throw new Error();
+      if (projectData.field_mapping_app === field_mapping_app.QField && !!generateProjectDataResponse) {
+        navigate(`/explore`);
       } else {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'No dataExtractFile or EmptyDataExtractwas set',
-          }),
-        );
-        throw new Error();
+        navigate(`/project/${id}`);
       }
-
-      // 4. upload form
-      const generateProjectFile = await dispatch(
-        GenerateProjectFilesService(
-          `${VITE_API_URL}/projects/${projectId}/generate-project-data`,
-          projectData,
-          formUpload,
-          combinedFeaturesCount,
-        ),
-      );
-
-      hasAPISuccess = generateProjectFile;
-      if (!hasAPISuccess) throw new Error();
-
-      // 5. assign project admins
-      if (!isEmpty(projectAdmins)) {
-        const promises = projectAdmins?.map(async (sub: any) => {
-          await dispatch(
-            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, { sub, project_id: projectId as number }),
-          );
-        });
-        await Promise.all(promises);
-      }
-
-      dispatch(CreateProjectActions.GenerateProjectError(false));
-    } catch (error: any) {
-      if (projectId) {
-        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`));
-      }
-      dispatch(CreateProjectActions.GenerateProjectError(true));
+    } catch (error) {
+      // revert project status to draft if any error arises during project generation
+      await API.patch(url, {
+        status: 'DRAFT',
+      });
     } finally {
       dispatch(CreateProjectActions.CreateProjectLoading(false));
-      dispatch(CommonActions.SetLoading(false));
     }
-  };
-};
-
-const FormCategoryService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetFormCategoryLoading(true));
-
-    const getFormCategoryList = async (url: string) => {
-      try {
-        const getFormCategoryListResponse = await axios.get(url);
-        const resp: FormCategoryListModel[] = getFormCategoryListResponse.data;
-        dispatch(CreateProjectActions.GetFormCategoryList(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.GetFormCategoryLoading(false));
-      }
-    };
-
-    await getFormCategoryList(url);
   };
 };
 
@@ -321,7 +222,6 @@ const UploadTaskAreasService = (url: string, filePayload: any) => {
         }
       } catch (error: any) {
         isAPISuccess = false;
-        await dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
             message: JSON.stringify(error?.response?.data?.detail) || 'Upload task area failed',
@@ -362,22 +262,11 @@ const UploadDataExtractService = (url: string, file: any) => {
   };
 };
 
-const GenerateProjectFilesService = (url: string, projectData: any, formUpload: any, combinedFeaturesCount: number) => {
+const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GenerateProjectLoading(true));
-    dispatch(CommonActions.SetLoading(true));
-
     try {
-      const formData = new FormData();
-
-      // Append xlsform
-      formData.append('xlsform', formUpload);
-
-      // Add combined features count
-      formData.append('combined_features_count', combinedFeaturesCount.toString());
-
-      const response = await axios.post(url, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await axios.post(url, {
+        combined_features_count: combinedFeaturesCount.toString(),
       });
 
       if (!isStatusSuccess(response.status)) {
@@ -386,45 +275,20 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
         throw new Error(msg);
       }
 
-      // If warning provided, then inform user
-      const message = response.data?.message;
-      if (message) {
-        dispatch(CreateProjectActions.GenerateProjectWarning(message));
+      // if field mapping app is QField, redirect path to QField dashboard is returned
+      if (response.data?.url) {
+        return response.data.url;
+      } else {
+        return 'success';
       }
-
-      dispatch(CreateProjectActions.GenerateProjectSuccess(true));
-      return true; // ✅ Return success
     } catch (error: any) {
-      dispatch(CreateProjectActions.GenerateProjectError(true));
       dispatch(
         CommonActions.SetSnackBar({
-          message: JSON.stringify(error?.response?.data?.detail),
+          message: JSON.stringify(error?.response?.data?.detail || 'Failed to generate project data'),
         }),
       );
-      return false; // ❌ Return failure
-    } finally {
-      dispatch(CreateProjectActions.GenerateProjectLoading(false));
-      dispatch(CommonActions.SetLoading(false));
+      return null;
     }
-  };
-};
-
-const OrganisationService = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetOrganisationListLoading(true));
-
-    const getOrganisationList = async (url: string) => {
-      try {
-        const getOrganisationListResponse = await axios.get(url);
-        const resp: OrganisationListModel[] = getOrganisationListResponse.data;
-        dispatch(CreateProjectActions.GetOrganisationList(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.GetOrganisationListLoading(false));
-      }
-    };
-
-    await getOrganisationList(url);
   };
 };
 
@@ -460,75 +324,6 @@ const GetIndividualProjectDetails = (url: string) => {
   };
 };
 
-const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.GetTaskSplittingPreview(null));
-    dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true));
-
-    const getDividedTaskFromGeojson = async (url: string, projectData: Record<string, any>) => {
-      try {
-        const dividedTaskFormData = new FormData();
-        dividedTaskFormData.append('project_geojson', projectData.geojson);
-        dividedTaskFormData.append('dimension_meters', projectData.dimension);
-        const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
-        const resp: splittedGeojsonType = getGetDividedTaskFromGeojsonResponse.data;
-        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: true }));
-        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: false }));
-        dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
-      }
-    };
-
-    await getDividedTaskFromGeojson(url, projectData);
-  };
-};
-
-const TaskSplittingPreviewService = (
-  url: string,
-  projectAoiFile: any,
-  no_of_buildings: number,
-  dataExtractFile: any,
-) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
-    dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
-
-    const getTaskSplittingGeojson = async (url: string, projectAoiFile: any, dataExtractFile: any) => {
-      try {
-        const taskSplittingFileFormData = new FormData();
-        taskSplittingFileFormData.append('project_geojson', projectAoiFile);
-        taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
-        // Only include data extract if custom extract uploaded
-        if (dataExtractFile) {
-          taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
-        }
-
-        const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
-        const resp: splittedGeojsonType = getTaskSplittingResponse.data;
-        if (resp?.features && resp?.features.length < 1) {
-          // Don't update geometry if splitting failed
-          // TODO display error to user, perhaps there is not osm data here?
-          return;
-        }
-        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: false }));
-        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: true }));
-        dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'Task generation failed. Please try again',
-          }),
-        );
-      } finally {
-        dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
-      }
-    };
-
-    await getTaskSplittingGeojson(url, projectAoiFile, dataExtractFile);
-  };
-};
 const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(true));
@@ -597,85 +392,21 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
   };
 };
 
-const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: any) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(true));
-
-    const postFormUpdate = async (url: string, geojsonUpload: any, dimension: any) => {
-      try {
-        const editBoundaryFormData = new FormData();
-        editBoundaryFormData.append('project_geojson', geojsonUpload);
-        if (dimension) {
-          editBoundaryFormData.append('dimension', dimension);
-        }
-        const postBoundaryUpdateResponse = await axios.post(url, editBoundaryFormData);
-        const resp: unknown = postBoundaryUpdateResponse.data;
-        // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
-        // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: 'Project Boundary Successfully Updated',
-            variant: 'success',
-          }),
-        );
-      } catch (error) {
-      } finally {
-        dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
-      }
-    };
-
-    await postFormUpdate(url, geojsonUpload, dimension);
-  };
-};
-
-const ValidateCustomForm = (url: string, formUpload: any, useOdkCollect: boolean) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.ValidateCustomFormLoading(true));
-
-    const validateCustomForm = async (url: any, formUpload: any) => {
-      try {
-        const formUploadFormData = new FormData();
-        formUploadFormData.append('xlsform', formUpload);
-        formUploadFormData.append('use_odk_collect', useOdkCollect.toString());
-
-        const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
-        const resp = getTaskSplittingResponse.data;
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: JSON.stringify(resp.message),
-            variant: 'success',
-          }),
-        );
-        dispatch(CreateProjectActions.SetCustomFileValidity(true));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error?.response?.data?.detail || 'Something Went Wrong',
-          }),
-        );
-        dispatch(CreateProjectActions.SetCustomFileValidity(false));
-      } finally {
-        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
-      }
-    };
-
-    await validateCustomForm(url, formUpload);
-  };
-};
-
 const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
   return async (dispatch: AppDispatch) => {
     const deleteProject = async (url: string) => {
       try {
         dispatch(CreateProjectActions.SetProjectDeletePending(true));
         await API.delete(url);
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: `Project deleted`,
-            variant: 'success',
-          }),
-        );
-        if (navigate) navigate('/');
+        if (navigate) {
+          navigate('/explore');
+          dispatch(
+            CommonActions.SetSnackBar({
+              message: `Project deleted`,
+              variant: 'success',
+            }),
+          );
+        }
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(
@@ -714,16 +445,9 @@ const AssignProjectManager = (url: string, params: { sub: number; project_id: nu
 
 export {
   UploadTaskAreasService,
-  CreateProjectServiceDeprecated,
-  FormCategoryService,
   GenerateProjectFilesService,
-  OrganisationService,
-  GetDividedTaskFromGeojson,
-  TaskSplittingPreviewService,
   GetIndividualProjectDetails,
   PatchProjectDetails,
   PostFormUpdate,
-  EditProjectBoundaryService,
-  ValidateCustomForm,
   DeleteProjectService,
 };

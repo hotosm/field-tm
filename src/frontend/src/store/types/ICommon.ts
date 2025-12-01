@@ -2,13 +2,7 @@ import { selectOptionsType } from '@/components/common/Select2';
 
 export type CommonStateTypes = {
   snackbar: snackbarTypes;
-  loading: boolean;
   postOrganisationLoading: boolean;
-  currentStepFormStep: {
-    create_project: {
-      step: number;
-    };
-  };
   projectNotFound: boolean;
   previousSelectedOptions: Record<string, selectOptionsType[]>;
 };

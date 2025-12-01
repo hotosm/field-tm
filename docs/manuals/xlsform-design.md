@@ -176,8 +176,11 @@ overview of the injected fields and their purposes:
 4. If no feature is selected, the user would be prompted to take a GPS coordinate
    of new feature.
    Note: One of these two options must be filled up to proceed.
-5. We also dedicate few rows for calculating OSM ID,
-   Task ID and mapping status used on Field-TM.
+5. We also dedicate few rows for calculating OSM ID, Task ID, mapping status,
+   submission IDs, created by and mapping mode used on Field-TM. Some fields
+   will be missing and handled differently based on whether the project is
+   configured to utilize webforms or the ODK Collect app during the project's
+   creation.
 6. We then ask mappers to answer if the feature exist in reality?
    If yes, user proceeds with form submission.
 7. If no, the user is prompted to capture an image (if available) and the form

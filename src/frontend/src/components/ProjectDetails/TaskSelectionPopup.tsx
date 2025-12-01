@@ -8,6 +8,8 @@ import environment from '@/environment';
 import QrcodeComponent from '@/components/QrcodeComponent';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_state_labels } from '@/types/enums';
+import { useParams } from 'react-router-dom';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 type TaskSelectionPopupPropType = {
   taskId: number | null;
@@ -16,10 +18,10 @@ type TaskSelectionPopupPropType = {
 };
 
 const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropType) => {
-  const params = CoreModules.useParams();
+  const params = useParams();
   const dispatch = useAppDispatch();
 
-  const currentProjectId: string = params.id;
+  const currentProjectId = params.id;
   const [task_state, set_task_state] = useState('UNLOCKED_TO_MAP');
 
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
@@ -50,55 +52,37 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
     }
   }, [projectData, taskId, feature]);
 
+  const closeModal = () => {
+    dispatch(ProjectActions.ToggleTaskModalStatus(false));
+    dispatch(TaskActions.SetSelectedTask(null));
+  };
+
   return (
     <div
       className={`fmtm-duration-1000 fmtm-z-[10002] fmtm-h-fit ${
         taskModalStatus
-          ? 'fmtm-bottom-[4.4rem] md:fmtm-bottom-0 lg:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-[25rem]'
+          ? 'fmtm-bottom-[1.4rem] md:fmtm-bottom-0 lg:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-[25rem]'
           : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(40vh)] md:fmtm-left-[calc(100vw)] fmtm-w-[100vw]'
-      } fmtm-fixed
+      } fmtm-absolute
         fmtm-rounded-t-3xl fmtm-border-opacity-50`}
     >
-      <div
-        className={`fmtm-absolute fmtm-top-[17px] fmtm-right-[20px] ${
-          taskModalStatus ? '' : 'fmtm-hidden'
-        }  fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-3`}
-      >
-        <div
-          title="Download Tiles"
-          className="fmtm-flex fmtm-items-center fmtm-gap-1 fmtm-group"
-          onClick={() => {
-            dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
-            dispatch(ProjectActions.ToggleTaskModalStatus(false));
-          }}
-        >
-          <AssetModules.FileDownloadOutlinedIcon
-            style={{ width: '20px' }}
-            className="fmtm-text-primaryRed group-hover:fmtm-text-red-700"
-          />
-          <p className="fmtm-text-base fmtm-text-primaryRed group-hover:fmtm-text-red-700">Basemaps</p>
-        </div>
-        <div title="Close">
-          <AssetModules.CloseIcon
-            style={{ width: '20px' }}
-            className="hover:fmtm-text-primaryRed"
-            onClick={() => {
-              dispatch(ProjectActions.ToggleTaskModalStatus(false));
-              dispatch(CoreModules.TaskActions.SetSelectedTask(null));
-            }}
-          />
-        </div>
-      </div>
       <div
         className={`fmtm-bg-[#fbfbfb] ${
           taskModalStatus ? 'sm:fmtm-shadow-[-20px_0px_60px_25px_rgba(0,0,0,0.2)] fmtm-border-b sm:fmtm-border-b-0' : ''
         } fmtm-rounded-t-2xl md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl`}
       >
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-p-3 sm:fmtm-p-5">
-          <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
-          <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_state_labels[task_state]}</p>
+          <div className="fmtm-flex fmtm-justify-between fmtm-items-center">
+            <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
+            <AssetModules.CloseIcon
+              style={{ width: '20px' }}
+              className="hover:fmtm-text-primaryRed fmtm-text-grey-600"
+              onClick={closeModal}
+            />
+          </div>
+          <p className="fmtm-text-base fmtm-text-grey-700">Status: {task_state_labels[task_state]}</p>
           {selectedTask?.actioned_by_username && (
-            <p className="fmtm-text-base fmtm-text-[#757575]">Actioned By: {selectedTask?.actioned_by_username}</p>
+            <p className="fmtm-text-base fmtm-text-grey-700">Actioned By: {selectedTask?.actioned_by_username}</p>
           )}
         </div>
         {/* only display qr code component render inside taskPopup on mobile screen */}

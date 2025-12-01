@@ -1,9 +1,11 @@
 {
+	"primaryLocale": "pt-BR",
 	"logoUrl": "/favicon.svg",
 	"logoText": "Humanitarian OpenStreetMap Team",
+	"tabTitle": "Field Tasking Manager",
 	"cssFile": "https://cdn.jsdelivr.net/npm/@hotosm/ui@0.2.0-b6/dist/style.css",
 	"cssFileWebformsOverride": "",
-	"enableWebforms": true,
+	"matomoSiteId": null,
 	"loginProviders": {
 		"osm": true,
 		"google": true

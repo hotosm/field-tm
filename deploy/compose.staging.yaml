@@ -38,6 +38,13 @@ volumes:
     name: fmtm-central-db-data-staging
   central_frontend:
     name: fmtm-central-frontend-staging
+  # TODO enable as part of qfield app
+  # qfield_db_data:
+  #   name: qfield-db-data-staging
+  # qfield_static:
+  #   name: qfield-static-staging
+  qfield_projects:
+    name: qfield-projects-staging
 
 networks:
   fmtm-net:
@@ -49,7 +56,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -69,6 +76,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -132,6 +140,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   api:
     extends:
@@ -181,6 +191,10 @@ services:
     extends:
       file: compose.dev.yaml
       service: scheduler
+  qfield-qgis:
+    extends:
+      file: compose.dev.yaml
+      service: qfield-qgis
 
   backups:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
@@ -205,3 +219,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    annotations:
+      nerdctl/bypass4netns: true

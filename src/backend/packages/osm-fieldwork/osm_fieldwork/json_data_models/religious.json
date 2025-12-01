@@ -1,0 +1,34 @@
+{
+  "select": {
+    "nodes": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_poly": [
+      {
+        "osm_id": []
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "tables": ["ways_poly", "nodes"],
+  "where": {
+    "nodes": [
+      {
+        "religion": ["not null"],
+        "op": "or"
+      }
+    ],
+    "ways_poly": [
+      {
+        "religion": ["not null"],
+        "op": "or"
+      }
+    ],
+    "ways_line": [],
+    "relations": []
+  },
+  "keep": []
+}

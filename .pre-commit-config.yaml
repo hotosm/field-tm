@@ -1,7 +1,7 @@
 repos:
   # Versioning: Commit messages & changelog
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.8.3
+    rev: v4.10.0
     hooks:
       - id: commitizen
         stages: [commit-msg]
@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.12.1"
+    rev: "v0.14.7"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.17
+    rev: 0.9.13
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -29,7 +29,7 @@ repos:
 
   # Upgrade: upgrade Python syntax
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
 
@@ -83,16 +83,16 @@ repos:
 
   # Lint & Autoformat: SQL
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.1
+    rev: 4.0.0a2
     hooks:
       - id: sqlfluff-lint
         files: ^src/migrations/.*\.sql$
         types: [sql]
-        args: ["--dialect", "postgres", "--exclude-rules", "CP05, RF02"]
+        args: ["--dialect", "postgres", "--exclude-rules", "CP05,RF02,RF04"]
       - id: sqlfluff-fix
         files: ^src/migrations/.*\.sql$
         types: [sql]
-        args: ["--dialect", "postgres", "--exclude-rules", "CP05, RF02"]
+        args: ["--dialect", "postgres", "--exclude-rules", "CP05,RF02,RF04"]
 
   # Lint: Bash scripts
   - repo: https://github.com/openstack-dev/bashate.git
@@ -103,7 +103,7 @@ repos:
 
   # Lint: Shell scripts
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         files: ^(?!.*(?:^|/)contrib(?:/|$)).*$
@@ -111,7 +111,7 @@ repos:
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+    rev: v0.46.0
     hooks:
       - id: markdownlint
         args:
@@ -126,9 +126,13 @@ repos:
             --ignore,
             src/backend/packages/osm-fieldwork/LICENSE.md,
             --ignore,
+            src/backend/packages/area-splitter/LICENSE.md,
+            --ignore,
             src/mapper/messages/LICENSE.md,
             --ignore,
             .github,
             --ignore,
             src/backend/packages/osm-fieldwork/CHANGELOG.md,
+            --ignore,
+            src/backend/packages/area-splitter/CHANGELOG.md,
           ]

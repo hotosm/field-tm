@@ -17,6 +17,7 @@
 #
 """Logic for Field-TM project routes."""
 
+import ast
 import json
 import subprocess
 import uuid
@@ -33,16 +34,34 @@ from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
+from osm_data_client import (
+    RawDataClient,
+    RawDataClientConfig,
+    RawDataOutputOptions,
+    RawDataResult,
+)
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_login_python.core import Auth
-from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, sql
 from psycopg.rows import class_row
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
+from app.db.enums import (
+    BackgroundTaskStatus,
+    FieldMappingApp,
+    HTTPStatus,
+    ProjectStatus,
+    XLSFormType,
+)
+from app.db.models import (
+    DbBackgroundTask,
+    DbBasemap,
+    DbProject,
+    DbUser,
+    DbUserRole,
+)
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -54,6 +73,7 @@ from app.db.postgis_utils import (
 from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
+from app.submissions import submission_crud
 
 
 async def get_projects_featcol(
@@ -124,20 +144,24 @@ async def get_projects_featcol(
 
 
 async def generate_data_extract(
-    aoi: geojson.FeatureCollection | geojson.Feature | dict,
     project_id: int,
-    extract_config: Optional[BytesIO] = None,
+    aoi: geojson.FeatureCollection | geojson.Feature | dict,
+    geom_type: str,
+    config_json=None,
     centroid: bool = False,
-) -> str:
+    use_st_within: bool = True,
+) -> RawDataResult:
     """Request a new data extract in flatgeobuf format.
 
     Args:
+        project_id (int): Id (primary key) of the project.
         aoi (geojson.FeatureCollection | geojson.Feature | dict]):
             Area of interest for data extraction.
-        project_id (int): The ID of the project.
-        extract_config (Optional[BytesIO], optional):
+        geom_type (str): Type of geometry to extract.
+        config_json (Optional[json], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
+        use_st_within (bool): Include features within the AOI.
 
     Raises:
         HTTPException:
@@ -147,43 +171,58 @@ async def generate_data_extract(
         str:
             URL for the geojson data extract.
     """
-    if not extract_config:
+    if not config_json:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="To generate a new data extract a extract_config must be specified.",
         )
-
-    pg = PostgresClient(
-        "underpass",
-        extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
+    config = RawDataClientConfig(
+        access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
         if settings.RAW_DATA_API_AUTH_TOKEN
-        else None,
+        else None
     )
-    geojson_url = pg.execQuery(
-        aoi,
-        extra_params={
-            "fileName": (
-                f"fmtm/{settings.FMTM_DOMAIN}/data_extract_{project_id}"
-                if settings.RAW_DATA_API_AUTH_TOKEN
-                else f"fmtm_extract_{project_id}"
-            ),
-            "outputType": "geojson",
-            "bind_zip": False,
-            "useStWithin": False,
-            "centroid": centroid,
-        },
-    )
+    extra_params = {
+        "fileName": (
+            f"fmtm_{settings.FMTM_DOMAIN}_data_extract_{project_id}"
+            if settings.RAW_DATA_API_AUTH_TOKEN
+            else f"fmtm_extract_{project_id}"
+        ),
+        "outputType": "geojson",
+        "geometryType": [geom_type],
+        "bindZip": False,
+        "centroid": centroid,
+        "use_st_within": (False if geom_type == "line" else use_st_within),
+        "filters": config_json,
+    }
 
-    if not geojson_url:
-        msg = "Could not get download URL for data extract. Did the API change?"
-        log.error(msg)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=msg,
+    try:
+        result = await RawDataClient(config).get_osm_data(
+            aoi,
+            output_options=RawDataOutputOptions(download_file=False),
+            **extra_params,
         )
 
-    return geojson_url
+        return result
+    except Exception as e:
+        log.error("Raw data API request failed")
+        if "status 406" in str(e) and "Area" in str(e):
+            try:
+                # Extract the error dict part
+                error_str = str(e).split("status 406:")[-1].strip()
+                error_dict = ast.literal_eval(error_str)
+                msg = error_dict["detail"][0]["msg"]
+            except Exception:
+                msg = """Selected area is too large.
+                Please select an area smaller than 200 km²."""
+
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            ) from e
+
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Failed to generate data extract from the raw data API.",
+        ) from e
 
 
 # ---------------------------
@@ -204,10 +243,10 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
         existing_db_forms = {row[0] for row in await cur.fetchall()}
 
         # Insert or update new XLSForms from disk
-        for xls_type in XLSFormType:
-            file_name = xls_type.name
-            form_type = xls_type.value
-            file_path = Path(directory) / f"{file_name}.xls"
+        for yaml_type in XLSFormType:
+            file_name = yaml_type.name
+            form_type = yaml_type.value
+            file_path = Path(directory) / f"{file_name}.yaml"
 
             if not file_path.exists():
                 log.warning(f"{file_path} does not exist!")
@@ -217,8 +256,13 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
                 log.warning(f"{file_path} is empty!")
                 continue
 
-            with open(file_path, "rb") as xls:
-                data = xls.read()
+            try:
+                data = convert_to_xlsform(str(file_path))
+
+            except Exception:
+                log.exception(
+                    f"Error occurred during in-memory conversion for {file_path}"
+                )
 
             try:
                 insert_query = """
@@ -239,7 +283,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
         # Determine the forms that need to be deleted (those in the DB but
         # not in the current XLSFormType)
-        required_forms = {xls_type.value for xls_type in XLSFormType}
+        required_forms = {yaml_type.value for yaml_type in XLSFormType}
         forms_to_delete = existing_db_forms - required_forms
 
         if forms_to_delete:
@@ -420,6 +464,18 @@ async def generate_odk_central_project_content(
             task_extract_dict
         )
 
+    default_style = {
+        "fill": "#1a1a1a",
+        "marker-color": "#1a1a1a",
+        "stroke": "#000000",
+        "stroke-width": "6",
+    }
+
+    for entity in entities_list:
+        data = entity["data"]
+        for key, value in default_style.items():
+            data.setdefault(key, value)
+
     log.debug("Creating project ODK dataset named 'features'")
     await central_crud.create_entity_list(
         odk_credentials,
@@ -465,6 +521,7 @@ async def generate_project_files(
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
+        geom_type = project.primary_geom_type
         log.info(f"Starting generate_project_files for project {project_id}")
 
         # Extract data extract from flatgeobuf
@@ -478,7 +535,14 @@ async def generate_project_files(
         if first_feature and "properties" in first_feature:  # Check if properties exist
             # FIXME perhaps this should be done in the SQL code?
             entity_properties = list(first_feature["properties"].keys())
-            for field in ["submission_ids", "created_by"]:
+            for field in [
+                "submission_ids",
+                "created_by",
+                "fill",
+                "marker-color",
+                "stroke",
+                "stroke-width",
+            ]:
                 if field not in entity_properties:
                     entity_properties.append(field)
 
@@ -486,7 +550,7 @@ async def generate_project_files(
             # TODO in future this splitting could be removed if the task_id is
             # no longer used in the XLSForm for the map filter
             task_extract_dict = await split_geojson_by_task_areas(
-                db, feature_collection, project_id
+                db, feature_collection, project_id, geom_type
             )
         else:
             # NOTE the entity properties are generated by the form `save_to` field
@@ -609,6 +673,7 @@ async def get_project_features_geojson(
 ) -> geojson.FeatureCollection:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
+    geom_type = db_project.primary_geom_type
 
     data_extract_url = db_project.data_extract_url
 
@@ -652,7 +717,7 @@ async def get_project_features_geojson(
     # Split by task areas if task_id provided
     if task_id:
         split_extract_dict = await split_geojson_by_task_areas(
-            db, data_extract_geojson, project_id
+            db, data_extract_geojson, project_id, geom_type
         )
         return split_extract_dict[task_id]
 
@@ -706,8 +771,8 @@ def generate_project_basemap(
         # ESRI uses inverted zyx convention
         # the ordering is extracted automatically from the URL, else use
         # -inverted-y param
-        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
-        tile_format = "png"
+        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
+        tile_format = "jpeg"
     elif source == "bing":
         # FIXME this probably doesn't work
         tms_url = "http://ecn.t0.tiles.virtualearth.net/tiles/h{z}/{x}/{y}.jpg?g=129&mkt=en&stl=H"
@@ -764,6 +829,7 @@ def generate_project_basemap(
             "mbtiles",  # options: mbtiles or disk
             "-mbtiles-format",
             f"{tile_format}",
+            "-ensure-gzip=false",
             "-tileset-name",
             f"fmtm_{project_id}_{source}tiles",
         ]
@@ -918,6 +984,10 @@ async def get_paginated_projects(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    status: Optional[ProjectStatus] = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
+    my_projects: bool = False,
+    country: Optional[str] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
@@ -932,20 +1002,30 @@ async def get_paginated_projects(
         hashtags=hashtags,
         search=search,
         minimal=minimal,
+        status=status,
+        field_mapping_app=field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
     paginated_projects = projects[start_index:end_index]
 
+    # Build project summaries with external URLs from the query
+    summaries = [
+        project_schemas.ProjectSummary.model_validate(project, from_attributes=True)
+        for project in paginated_projects
+    ]
+
     pagination = await get_pagination(
         page, len(paginated_projects), results_per_page, len(projects)
     )
 
-    return {"results": paginated_projects, "pagination": pagination}
+    return {"results": summaries, "pagination": pagination}
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
-    """Get the users and their contributions for a project.
+    """Get the users and their number of submissions for a project.
 
     Args:
         db (Connection): The database connection.
@@ -953,27 +1033,37 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
 
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing
-            the username and the number of contributions made by each user
+            the username and the number of submissions made by each user
             for the specified project.
     """
-    query = """
-        SELECT
-            u.username as user,
-            COUNT(th.user_sub) as contributions
-        FROM
-            users u
-        JOIN
-            task_events th ON u.sub = th.user_sub
-        WHERE
-            th.project_id = %(project_id)s
-        GROUP BY u.username
-        ORDER BY contributions DESC
-    """
-    async with db.cursor(
-        row_factory=class_row(project_schemas.ProjectUserContributions)
-    ) as cur:
-        await cur.execute(query, {"project_id": project_id})
-        return await cur.fetchall()
+    try:
+        project = await DbProject.one(db, project_id, minimal=False)
+
+        # Fetch all submissions for the project
+        data = await submission_crud.get_submission_by_project(project, {})
+        submissions = data.get("value", [])
+
+        # Count submissions per user
+        submission_counts = {}
+        for sub in submissions:
+            username = sub.get("username")
+            if "|" in username:
+                user = await DbUser.one(db, user_subidentifier=username)
+                username = user.username if user else username
+            if username:
+                submission_counts[username] = submission_counts.get(username, 0) + 1
+
+        # Format as list of dicts, sorted by count desc
+        result = [
+            {"user": user, "submissions": count}
+            for user, count in sorted(
+                submission_counts.items(), key=lambda x: x[1], reverse=True
+            )
+        ]
+        return result
+    except Exception as e:
+        log.error(f"Error in get_project_users_plus_contributions: {e}")
+        return []
 
 
 async def send_project_manager_message(
@@ -1006,3 +1096,33 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
+
+
+async def unassign_user_from_project(db, project_id, user_sub):
+    """Unassigns a user from a project by removing their role.
+
+    Args:
+        db: Database session or connection.
+        project_id: ID of the project.
+        user_sub: Unique user identifier.
+
+    Returns:
+        bool: True if the user was successfully unassigned.
+
+    Raises:
+        HTTPException (404): If the user is not associated with the project.
+    """
+    try:
+        user_role = await DbUserRole.get(db, project_id, user_sub)
+        if not user_role:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User {user_sub} is not associated with project {project_id}.",
+            )
+        return await DbUserRole.delete(db, project_id, user_sub)
+    except Exception as e:
+        log.exception(f"Failed to unassign user {user_sub} from project {project_id}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Failed to unassign user {user_sub} from project {project_id}",
+        ) from e

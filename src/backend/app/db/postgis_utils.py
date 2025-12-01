@@ -18,17 +18,16 @@
 """PostGIS and geometry handling helper funcs."""
 
 import json
-import logging
 from datetime import datetime, timezone
-from io import BytesIO
 from random import getrandbits
 from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
 from fastapi import HTTPException
+from loguru import logger as log
+from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
-from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
@@ -44,10 +43,7 @@ from shapely.geometry import (
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from app.config import settings
 from app.db.enums import HTTPStatus, XLSFormType
-
-log = logging.getLogger(__name__)
 
 
 def timestamp():
@@ -213,25 +209,27 @@ async def flatgeobuf_to_featcol(
 
 
 async def split_geojson_by_task_areas(
-    db: Connection,
-    featcol: geojson.FeatureCollection,
-    project_id: int,
+    db: Connection, featcol: geojson.FeatureCollection, project_id: int, geom_type: str
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
 
     NOTE batch inserts feature.properties.osm_id as feature.id for each feature.
-    NOTE ST_Within used on polygon centroids to correctly capture the geoms per task.
+    NOTE ST_Within used on polygon centroids and ST_Intersects used on linear features
+    to correctly capture the geoms per task.
 
     Args:
         db (Connection): Database connection.
-        featcol (bytes): Data extract feature collection.
+        featcol (geojson.FeatureCollection): Data extract feature collection.
         project_id (int): The project ID for associated tasks.
+        geom_type (str): The geometry type of the features.
 
     Returns:
         dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
     """
     try:
         features = featcol["features"]
+        use_st_intersects = geom_type == "POLYLINE"
+
         feature_ids = []
         feature_properties = []
         feature_geometries = []
@@ -241,42 +239,49 @@ async def split_geojson_by_task_areas(
             feature_properties.append(Json(f["properties"]))
             feature_geometries.append(json.dumps(f["geometry"]))
 
+        # Choose spatial join logic based on geometry type
+        spatial_join_condition = (
+            "ST_Intersects(f.geom, t.outline)"
+            if use_st_intersects
+            else "ST_Within(ST_Centroid(f.geom), t.outline)"
+        )
+
         async with db.cursor(row_factory=dict_row) as cur:
             await cur.execute(
-                """
-            WITH feature_data AS (
-                SELECT DISTINCT ON (geom)
-                    unnest(%s::TEXT[]) AS id,
-                    unnest(%s::JSONB[]) AS properties,
-                    ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
-            ),
-            task_features AS (
+                f"""
+                WITH feature_data AS (
+                    SELECT DISTINCT ON (geom)
+                        unnest(%s::TEXT[]) AS id,
+                        unnest(%s::JSONB[]) AS properties,
+                        ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
+                ),
+                task_features AS (
+                    SELECT
+                        t.project_task_index AS task_id,
+                        jsonb_build_object(
+                            'type', 'Feature',
+                            'id', f.id,
+                            'geometry', ST_AsGeoJSON(f.geom)::jsonb,
+                            'properties', jsonb_set(
+                                jsonb_set(
+                                    f.properties,
+                                    '{{task_id}}',
+                                    to_jsonb(t.project_task_index)
+                                ),
+                                '{{project_id}}', to_jsonb(%s)
+                            )
+                        ) AS feature
+                    FROM tasks t
+                    JOIN feature_data f
+                    ON {spatial_join_condition}
+                    WHERE t.project_id = %s
+                )
                 SELECT
-                    t.project_task_index AS task_id,
-                    jsonb_build_object(
-                        'type', 'Feature',
-                        'id', f.id,
-                        'geometry', ST_AsGeoJSON(f.geom)::jsonb,
-                        'properties', jsonb_set(
-                            jsonb_set(
-                                f.properties,
-                                '{task_id}',
-                                to_jsonb(t.project_task_index)
-                            ),
-                            '{project_id}', to_jsonb(%s)
-                        )
-                    ) AS feature
-                FROM tasks t
-                JOIN feature_data f
-                ON ST_Within(ST_Centroid(f.geom), t.outline)
-                WHERE t.project_id = %s
-            )
-            SELECT
-                task_id,
-                jsonb_agg(feature) AS features
-            FROM task_features
-            GROUP BY task_id;
-            """,
+                    task_id,
+                    jsonb_agg(feature) AS features
+                FROM task_features
+                GROUP BY task_id;
+                """,
                 (
                     feature_ids,
                     feature_properties,
@@ -306,7 +311,7 @@ async def split_geojson_by_task_areas(
                 )
                 log.warning(msg)
                 return None
-        return result_dict
+            return result_dict
 
     except ProgrammingError as e:
         log.error(e)
@@ -387,6 +392,12 @@ def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureColl
     Returns:
         geojson.FeatureCollection: A normalised FeatureCollection.
     """
+
+    def strip_z_coord(coords):
+        if isinstance(coords[0], (int, float)):  # single coordinate [x, y, z?]
+            return coords[:2]  # drop z if present
+        return [strip_z_coord(c) for c in coords]
+
     for feat in featcol.get("features", []):
         geom = feat.get("geometry")
 
@@ -397,10 +408,10 @@ def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureColl
         ):
             feat["geometry"] = geom.get("geometries")[0]
 
-        # Remove any z-dimension coordinates
+        # Remove any z-dimension coordinates recursively, for any geom type
         coords = geom.get("coordinates")
-        if isinstance(coords, list) and len(coords) == 3:
-            coords.pop()
+        if coords is not None:
+            geom["coordinates"] = strip_z_coord(coords)
 
     # Convert MultiPolygon type --> individual Polygons
     return multigeom_to_singlegeom(featcol)
@@ -591,22 +602,35 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     Returns:
         dict: A geojson geometry.
     """
-    if javarosa_geom_string is None:
+    if not javarosa_geom_string or not isinstance(javarosa_geom_string, str):
         return {}
 
-    # Split by semicolon to get coordinate sets
-    coordinate_sets = javarosa_geom_string.strip().split(";")
-    # Convert coordinates to [lon, lat] pairs
-    coordinates = [
-        [float(coord) for coord in reversed(point.split()[:2])]
-        for point in coordinate_sets
-    ]
+    coordinates = []
+
+    for point_str in javarosa_geom_string.strip().split(";"):
+        parts = point_str.strip().split()
+
+        # Expect at least lat and lon
+        if len(parts) < 2:
+            continue
+
+        try:
+            lat = float(parts[0])
+            lon = float(parts[1])
+            coordinates.append([lon, lat])
+        except ValueError:
+            continue  # Skip if conversion fails
+
+    if not coordinates:
+        return {}
 
     # Determine geometry type
     if len(coordinates) == 1:
         geom_type = "Point"
         coordinates = coordinates[0]  # Flatten for Point
-    elif coordinates[0] == coordinates[-1]:  # Check if closed loop
+    elif (
+        coordinates[0] == coordinates[-1] and len(coordinates) >= 4
+    ):  # Check if closed loop
         geom_type = "Polygon"
         coordinates = [coordinates]  # Wrap in extra list for Polygon
     else:
@@ -638,7 +662,7 @@ def multigeom_to_singlegeom(
     final_features = []
 
     for feature in featcol.get("features", []):
-        properties = feature["properties"]
+        properties = feature.get("properties", {})
         try:
             geom = shape(feature["geometry"])
         except ValueError:
@@ -699,71 +723,74 @@ def ensure_right_hand_rule(polygon: Polygon):
     return polygon
 
 
+def clean_geom(geom):
+    """Clean geometries based on their type."""
+    if isinstance(geom, (LineString, MultiLineString)):
+        lines = geom.geoms if isinstance(geom, MultiLineString) else [geom]
+        cleaned_lines = []
+        for line in lines:
+            buffered = line.buffer(0.0001)
+            if buffered.is_valid:
+                cleaned_lines.append(buffered)
+        return cleaned_lines
+
+    if geom.geom_type in {"Polygon", "MultiPolygon"}:
+        if geom.geom_type == "MultiPolygon":
+            return [ensure_right_hand_rule(remove_holes(p)) for p in geom.geoms]
+        return [ensure_right_hand_rule(remove_holes(geom))]
+
+    return [geom]
+
+
 def merge_polygons(
     featcol: geojson.FeatureCollection,
+    merge: bool = True,
     dissolve_polygon: bool = False,
 ) -> geojson.FeatureCollection:
-    """Merge multiple polygons, multipolygons, or linestrings into a single polygon.
+    """Merge or clean geometries in a FeatureCollection.
 
-    It is used to create a single polygon boundary. LineStrings are converted to
-    Polygons using buffer.
+    LineStrings are converted to polygons using buffer.
 
     Args:
         featcol: a FeatureCollection containing geometries.
         dissolve_polygon: True to dissolve polygons to single polygon.
+        merge: True to merge geometries into a single polygon.
 
     Returns:
         geojson.FeatureCollection: a FeatureCollection of a single Polygon.
     """
-    geom_list = []
-    properties = {}
-
     try:
         features = featcol.get("features", [])
+        geom_list, properties = [], {}
+
+        if not merge:
+            cleaned = []
+            for feature in features:
+                for g in clean_geom(shape(feature["geometry"])):
+                    cleaned.append(
+                        geojson.Feature(
+                            geometry=mapping(g),
+                            properties=feature.get("properties", {}),
+                        )
+                    )
+            return geojson.FeatureCollection(cleaned)
 
         for feature in features:
-            properties = feature["properties"]
-            geom = shape(feature["geometry"])
-
-            if isinstance(geom, (LineString, MultiLineString)):
-                if isinstance(geom, MultiLineString):
-                    for line in geom.geoms:
-                        buffered = line.buffer(0.0001)
-                        if buffered.is_valid:
-                            geom_list.append(buffered)
-                else:
-                    buffered = geom.buffer(0.0001)
-                    if buffered.is_valid:
-                        geom_list.append(buffered)
-                continue
-
-            # Handle Polygon geometries
-            if isinstance(geom, MultiPolygon):
-                # Remove holes in each polygon
-                polygons_without_holes = [remove_holes(poly) for poly in geom.geoms]
-                valid_polygons = [
-                    ensure_right_hand_rule(poly) for poly in polygons_without_holes
-                ]
-            else:
-                polygon_without_holes = remove_holes(geom)
-                valid_polygons = [ensure_right_hand_rule(polygon_without_holes)]
-            geom_list.extend(valid_polygons)
+            properties = feature.get("properties", {})
+            geom_list.extend(clean_geom(shape(feature["geometry"])))
 
         if not geom_list:
             raise ValueError("No valid geometries found in the FeatureCollection")
 
         # Merge all geometries into a single polygon
         merged_geom = create_single_polygon(MultiPolygon(geom_list), dissolve_polygon)
-
         # Ensure we have a valid polygon
         if not merged_geom.is_valid:
             merged_geom = merged_geom.buffer(0)  # Clean the geometry
 
-        merged_geojson = mapping(merged_geom)
-
         # Create FeatureCollection
         return geojson.FeatureCollection(
-            [geojson.Feature(geometry=merged_geojson, properties=properties)]
+            [geojson.Feature(geometry=mapping(merged_geom), properties=properties)]
         )
     except Exception as e:
         raise HTTPException(
@@ -772,7 +799,7 @@ def merge_polygons(
         ) from e
 
 
-def get_osm_geometries(osm_category, geometry):
+async def get_osm_geometries(osm_category, geometry):
     """Request a snapshot based on the provided geometry.
 
     Args:
@@ -783,25 +810,23 @@ def get_osm_geometries(osm_category, geometry):
         dict: The JSON response containing the snapshot data.
     """
     config_filename = XLSFormType(osm_category).name
-    data_model = f"{data_models_path}/{config_filename}.yaml"
+    data_model = f"{data_models_path}/{config_filename}.json"
+    geom_type = "polygon"
 
-    with open(data_model, "rb") as data_model_yaml:
-        extract_config = BytesIO(data_model_yaml.read())
+    if config_filename == "highways":
+        geom_type = "line"
 
-    pg = PostgresClient(
-        "underpass",
-        extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
-        if settings.RAW_DATA_API_AUTH_TOKEN
-        else None,
-    )
-    return pg.execQuery(
-        geometry,
-        extra_params={
-            "outputType": "geojson",
-            "bind_zip": True,
-            "useStWithin": False,
-        },
+    with open(data_model, encoding="utf-8") as f:
+        config_json = json.load(f)
+
+    return await get_osm_data(
+        geometry=geometry,
+        outputType="geojson",
+        output_options=RawDataOutputOptions(download_file=False),
+        geometryType=[geom_type],
+        bindZip=True,
+        use_st_within=False,
+        filters=config_json,
     )
 
 

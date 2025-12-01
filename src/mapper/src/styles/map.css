@@ -46,7 +46,8 @@
 }
 
 .map .help-text p {
-	--at-apply: uppercase font-barlow font-medium text-base;
+	--at-apply: uppercase font-medium text-base;
+	background-color: var(--sl-color-yellow-600);
 }
 
 .map .help-text-2 {
@@ -54,11 +55,11 @@
 }
 
 .map .help-text-2 p {
-	--at-apply: uppercase font-barlow font-medium text-base;
+	--at-apply: uppercase font-medium text-base;
 }
 
 .map-control-container {
-	--at-apply: font-barlow flex justify-center w-[100vw] absolute left-0 z-20 duration-400 pointer-events-none;
+	--at-apply: flex justify-center w-[100vw] absolute left-0 z-20 duration-400 pointer-events-none;
 }
 
 .map-control-container.selected {
@@ -81,7 +82,7 @@
 }
 
 .select-entities-modal {
-	--at-apply: font-barlow flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
+	--at-apply: flex justify-center w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50;
 }
 
 .select-entities-modal .content {
@@ -101,7 +102,7 @@
 	--at-apply: flex justify-end;
 }
 
-.select-entities-modal .icon hot-icon {
+.select-entities-modal .icon sl-icon {
 	--at-apply: text-[1.5rem] text-neutral-800 cursor-pointer hover: text-primary-600 duration-200;
 }
 

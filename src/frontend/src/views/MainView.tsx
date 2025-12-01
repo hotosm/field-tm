@@ -4,8 +4,7 @@ import PrimaryAppBar from '@/utilities/PrimaryAppBar';
 import CoreModules from '@/shared/CoreModules';
 import CustomizedSnackbars from '@/utilities/CustomizedSnackbar';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import Loader from '@/utilities/AppLoader';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectNotFound from './ProjectNotFound';
 
@@ -50,7 +49,6 @@ const MainView = () => {
         handleClose={handleClose}
       />
       <CoreModules.CssBaseline />
-      <Loader />
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
@@ -64,7 +62,9 @@ const MainView = () => {
             ) : (
               <CoreModules.Stack
                 className={`${
-                  pathname.startsWith('/project/') && windowSize.width < 768 ? '' : 'fmtm-py-2 fmtm-px-5'
+                  (pathname.startsWith('/project/') && windowSize.width < 768) || pathname === '/'
+                    ? ''
+                    : 'fmtm-py-2 fmtm-px-5'
                 } fmtm-bg-[#f5f5f5]`}
                 sx={{
                   height: popupInParams
@@ -73,12 +73,12 @@ const MainView = () => {
                       ? '100vh'
                       : windowSize.width <= 599
                         ? '90vh'
-                        : '92vh',
+                        : '94vh',
                   overflow: 'auto',
                   // p: '1.3rem',
                 }}
               >
-                <CoreModules.Outlet />
+                <Outlet />
                 {/* Footer */}
               </CoreModules.Stack>
             )}

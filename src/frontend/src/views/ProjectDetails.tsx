@@ -45,7 +45,6 @@ const tabList: { id: tabType; name: string }[] = [
 ];
 
 const ProjectDetails = () => {
-  useDocumentTitle('Project Details');
   const dispatch = useAppDispatch();
   const params = useParams();
   const navigate = useNavigate();
@@ -70,13 +69,7 @@ const ProjectDetails = () => {
   const isProjectManager = useIsProjectManager(projectId as string);
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
 
-  useEffect(() => {
-    if (projectInfo.name) {
-      document.title = `${projectInfo.name} - HOT Field Tasking Manager`;
-    } else {
-      document.title = 'HOT Field Tasking Manager';
-    }
-  }, [projectInfo.name]);
+  useDocumentTitle(projectInfo.name && !projectDetailsLoading ? projectInfo.name : 'Project Details');
 
   //Fetch project for the first time
   useEffect(() => {
@@ -183,7 +176,7 @@ const ProjectDetails = () => {
           <div className="fmtm-flex fmtm-items-center">
             <AssetModules.ChevronLeftIcon
               className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/explore')}
             />
             <h5 className="fmtm-line-clamp-1" title={projectInfo.name}>
               {projectInfo.name}
@@ -275,7 +268,7 @@ const ProjectDetails = () => {
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle className="fmtm-bg-grey-200 fmtm-hidden md:fmtm-flex" />
-            <ResizablePanel defaultSize={70} className="md:fmtm-min-w-[22rem]">
+            <ResizablePanel defaultSize={70} className="md:fmtm-min-w-[22rem] fmtm-relative">
               {projectId && (
                 <div className="fmtm-relative md:fmtm-static fmtm-flex-grow fmtm-h-full md:fmtm-rounded-xl fmtm-overflow-hidden">
                   <ProjectDetailsMap
@@ -285,11 +278,29 @@ const ProjectDetails = () => {
                   />
                 </div>
               )}
+              {selectedTaskArea && selectedTask && !selectedTaskFeature && (
+                <TaskSelectionPopup
+                  taskId={selectedTask}
+                  feature={selectedTaskArea}
+                  body={
+                    <div>
+                      <DialogTaskActions feature={selectedTaskArea} taskId={selectedTask} />
+                    </div>
+                  }
+                />
+              )}
+              {selectedTaskFeature && (
+                <FeatureSelectionPopup
+                  featureProperties={selectedFeatureProps}
+                  taskId={selectedTask}
+                  setSelectedTaskFeature={setSelectedTaskFeature}
+                />
+              )}
             </ResizablePanel>
           </ResizablePanelGroup>
           <div
             className="fmtm-absolute fmtm-top-4 fmtm-left-4 fmtm-bg-white fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-red-50 fmtm-duration-300 fmtm-border-[1px] md:fmtm-hidden fmtm-cursor-pointer"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/explore')}
           >
             <AssetModules.ArrowBackIcon className="fmtm-text-grey-800" />
           </div>
@@ -302,24 +313,6 @@ const ProjectDetails = () => {
           <MobileFooter />
         </div>
       </div>
-      {selectedTaskArea && selectedTask && !selectedTaskFeature && (
-        <TaskSelectionPopup
-          taskId={selectedTask}
-          feature={selectedTaskArea}
-          body={
-            <div>
-              <DialogTaskActions feature={selectedTaskArea} taskId={selectedTask} />
-            </div>
-          }
-        />
-      )}
-      {selectedTaskFeature && (
-        <FeatureSelectionPopup
-          featureProperties={selectedFeatureProps}
-          taskId={selectedTask}
-          setSelectedTaskFeature={setSelectedTaskFeature}
-        />
-      )}
     </div>
   );
 };

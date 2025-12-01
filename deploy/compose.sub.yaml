@@ -15,33 +15,33 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-name: fmtm-dev
+name: fmtm
 
 volumes:
   fmtm_frontend:
-    name: fmtm-frontend-${GIT_BRANCH}
+    name: fmtm-frontend
   fmtm_mapper_frontend:
-    name: fmtm-mapper-frontend-${GIT_BRANCH}
+    name: fmtm-mapper-frontend
   fmtm_db_data:
-    name: fmtm-db-data-${GIT_BRANCH}
+    name: fmtm-db-data
   fmtm_data:
-    name: fmtm-s3-data-${GIT_BRANCH}
+    name: fmtm-s3-data
   fmtm_logs:
-    name: fmtm-logs-${GIT_BRANCH}
+    name: fmtm-logs
   fmtm_images:
-    name: fmtm-images-${GIT_BRANCH}
+    name: fmtm-images
   fmtm_tiles:
-    name: fmtm-tiles-${GIT_BRANCH}
+    name: fmtm-tiles
   certs:
-    name: fmtm-certs-${GIT_BRANCH}
+    name: fmtm-certs
   central_db_data:
-    name: fmtm-central-db-data-${GIT_BRANCH}
+    name: fmtm-central-db-data
   central_frontend:
-    name: fmtm-central-frontend-${GIT_BRANCH}
+    name: fmtm-central-frontend
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH}
+    name: fmtm
     ipam:
       driver: default
       config:
@@ -49,7 +49,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -60,8 +60,8 @@ services:
       # - certs:/etc/letsencrypt
       - certs:/data
       - fmtm_frontend:/var/www/html/${FMTM_DOMAIN}:ro
-      - fmtm_mapper_frontend:/var/www/html/mapper.${FMTM_DOMAIN}:ro
-      - central_frontend:/var/www/html/odk.${FMTM_DOMAIN}:ro
+      - fmtm_mapper_frontend:/var/www/html/${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}:ro
+      - central_frontend:/var/www/html/${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}:ro
     environment:
       # General
       BUNKERWEB_INSTANCES: proxy:5000
@@ -69,6 +69,17 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      # Increase domain name max size (for long domain names)
+      SERVER_NAMES_HASH_BUCKET_SIZE: 128
+      USE_REDIS: no
+      # NOTE for bunkerweb nginx it uses the 'resolver' directive:
+      # https://nginx.org/en/docs/http/ngx_http_core_module.html#resolver
+      # However, nerdctl hardcodes container aliases to /etc/hosts, which
+      # cannot be read by Nginx. So we must use a custom dnsmasq resolver
+      # service for now.
+      # More details: https://github.com/containerd/nerdctl/issues/1387
+      # and: https://github.com/bunkerity/bunkerweb/discussions/2221
+      DNS_RESOLVERS: 10.20.30.53
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -98,42 +109,74 @@ services:
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
       # Reverse proxy configs
-      SERVER_NAME: ${FMTM_DOMAIN} mapper.${FMTM_DOMAIN} api.${FMTM_DOMAIN} s3.${FMTM_DOMAIN} sync.${FMTM_DOMAIN} odk.${FMTM_DOMAIN}
+      SERVER_NAME: ${FMTM_DOMAIN} ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN} ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN} ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN} ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN} ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
       # We need this to allow for client-side routing in the SPA (from index.html)
       ${FMTM_DOMAIN}_ERRORS: 404=/index.html
-      mapper.${FMTM_DOMAIN}_ERRORS: 404=/index.html
-      mapper.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_ERRORS: 404=/index.html
+      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
-      mapper.${FMTM_DOMAIN}_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
+      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
       # CORS for the backend is configured by FastAPI
-      api.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
-      api.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
-      api.${FMTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
-      s3.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://s3:9000
-      s3.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 10G
+      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
+      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://s3:9000
+      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 10G
       # CORS must be enabled for Minio to work
-      s3.${FMTM_DOMAIN}_USE_CORS: yes
-      s3.${FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://${FMTM_DOMAIN}
-      sync.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://electric:3000
-      sync.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_USE_CORS: yes
+      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://${FMTM_DOMAIN}
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://electric:3000
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # CORS must be enabled for Electric to work
-      sync.${FMTM_DOMAIN}_USE_CORS: yes
-      sync.${FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://mapper.${FMTM_DOMAIN}
-      sync.${FMTM_DOMAIN}_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_USE_CORS: yes
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
       # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.${FMTM_DOMAIN}_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
-      odk.${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
-      odk.${FMTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
+      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
+      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
+      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
-      odk.${FMTM_DOMAIN}_REVERSE_PROXY_BUFFERING: no
-      odk.${FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_BUFFERING: no
+      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
       - 443:8443
     networks:
       - fmtm-net
     restart: "unless-stopped"
+
+  # Required as nginx via nerdctl cannot resolve container aliases
+  dns:
+    image: "docker.io/4km3/dnsmasq:2.90-r3"
+    depends_on:
+      # Must start after all containers are created and allocated IP addresses
+      api:
+        condition: service_healthy
+    command: [
+        "-k", # keep in foreground
+        "--log-facility=-", # log to stdout
+        "--no-resolv", # don't use default resolv.conf
+        "--cache-size=0", # avoid caching to prevent issues on recreate
+        "--no-hosts", # Don't read the default /etc/hosts
+        "--addn-hosts=/etc/hosts", # Use the nerdctl-injected hosts file
+        "--hostsdir=/etc", # Monitor this directory for changes
+        "--server=1.1.1.1", # forward to Cloudflare DNS
+        "--server=8.8.8.8", # forward to Google DNS
+        "--listen-address=127.0.0.1",
+        "--listen-address=10.20.30.53", # DNS server inside your network
+        "--hosts=/etc/hosts", # use /etc/hosts injected by nerdctl
+      ]
+    networks:
+      fmtm-net:
+        ipv4_address: 10.20.30.53
+    restart: unless-stopped
+    healthcheck:
+      test: nc -z localhost 53 || exit 1
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
@@ -178,9 +221,9 @@ services:
       dockerfile: Dockerfile.ui.prod
       args:
         APP_VERSION: ${GIT_BRANCH}
-        VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-        VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
-        VITE_S3_URL: https://${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
+        VITE_API_URL: https://${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}
+        VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}
+        VITE_S3_URL: https://${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}
     volumes:
       - fmtm_frontend:/frontend/manager
       - fmtm_mapper_frontend:/frontend/mapper
@@ -188,7 +231,7 @@ services:
     restart: "on-failure:2"
 
   central:
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
     depends_on:
       proxy:
         condition: service_healthy
@@ -199,7 +242,7 @@ services:
       pyxform:
         condition: service_started
     environment:
-      - DOMAIN=${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
+      - DOMAIN=${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
       - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
@@ -262,7 +305,7 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.0"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
     volumes:
       - central_frontend:/frontend
     network_mode: none

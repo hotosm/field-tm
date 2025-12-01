@@ -281,10 +281,15 @@ async def wrap_check_access(
     )
 
     if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail="User does not have permission to access the project.",
-        )
+        msg = "User does not have permission to access the project."
+        # NOTE workaround to allow a mix of svcfmtm access on mapper frontend
+        # for public projects, but also blocking access for svcfmtm on
+        # mapper frontend if the project is private. We must send 401 and
+        # not 403 to make managing this easier
+        if user_data.username == "svcfmtm":
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=msg)
+        else:
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=msg)
 
     return {
         "user": db_user,
@@ -374,13 +379,7 @@ class Mapper:
         # Here temp auth token/cookie is allowed
         current_user: Annotated[AuthUser, Depends(public_endpoint)],
     ) -> ProjectUserDict:
-        """A mapper for a specific project.
-
-        FIXME is this approach flawed?
-        FIXME if the user accesses a /tasks/ endpoint but provides a
-        FIXME ?project_id=xxx for another project, then won't this
-        FIXME given them permission when they shouldn't have it?
-        """
+        """A mapper for a specific project."""
         if self.check_completed and project.status in [
             ProjectStatus.COMPLETED,
             ProjectStatus.ARCHIVED,
@@ -424,7 +423,7 @@ async def project_contributors(
         WHERE sub = %(user_sub)s
             AND (
                 CASE
-                WHEN %(visibility)s IN ('SENSITIVE', 'PRIVATE') THEN
+                WHEN %(visibility)s = 'PRIVATE' THEN
                     CASE
                     WHEN role = 'ADMIN' THEN true
                     WHEN EXISTS (

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { onDestroy } from 'svelte';
-	import { GeoJSON as MapLibreGeoJSON } from 'svelte-maplibre';
+	import { GeoJSON as MapLibreGeoJSON, type ClusterOptions } from 'svelte-maplibre';
 	import { getId, updatedSourceContext, addSource, removeSource } from 'svelte-maplibre';
 	import type { HeaderMeta } from 'flatgeobuf';
 	import type { GeoJSON, Polygon, FeatureCollection } from 'geojson';
@@ -18,6 +18,7 @@
 		children?: Snippet;
 		processGeojson?: (geojson: FeatureCollection) => FeatureCollection;
 		geojsonUpdateDependency?: any;
+		cluster?: ClusterOptions | undefined;
 	}
 
 	let {
@@ -30,11 +31,11 @@
 		children,
 		processGeojson,
 		geojsonUpdateDependency = '',
+		cluster,
 	}: Props = $props();
 
 	const { map, self: sourceId } = updatedSourceContext();
 	let sourceObj: maplibregl.GeoJSONSource | undefined = $state();
-	let first = $state(true);
 	let geojsonData: GeoJSON = $state({ type: 'FeatureCollection', features: [] });
 
 	// Set currentSourceId as reactive property once determined from context
@@ -46,7 +47,6 @@
 	// Deserialise flatgeobuf to GeoJSON, reactive to bbox/extent changes
 	async function updateGeoJSONData() {
 		const featcol: FeatureCollection | null = await flatgeobufToGeoJson(url, extent, metadataFunc, extractGeomCols);
-
 		// If there is no data, set to an empty FeatureCollection to avoid
 		// re-adding layer if the bbox extent is updated
 		if (!featcol) {
@@ -72,6 +72,7 @@
 		}
 
 		currentSourceId = id;
+		removeSource($map, currentSourceId!, sourceObj);
 		addSourceToMap();
 	}
 
@@ -97,21 +98,9 @@
 			(sourceId) => sourceId === currentSourceId,
 			() => {
 				sourceObj = $map?.getSource(currentSourceId!) as maplibregl.GeoJSONSource;
-				first = true;
 			},
 		);
 	}
-
-	// Update data only if source already exists
-	$effect(() => {
-		if (sourceObj && geojsonData) {
-			if (first) {
-				first = false;
-			} else {
-				sourceObj.setData(geojsonData);
-			}
-		}
-	});
 
 	onDestroy(() => {
 		if (sourceObj && $map) {
@@ -122,6 +111,6 @@
 	});
 </script>
 
-<MapLibreGeoJSON id={currentSourceId} data={geojsonData} {promoteId}>
+<MapLibreGeoJSON id={currentSourceId} data={geojsonData} {promoteId} {cluster}>
 	{@render children?.()}
 </MapLibreGeoJSON>

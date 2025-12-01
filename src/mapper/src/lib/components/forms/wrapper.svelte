@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '$styles/forms.css';
 	import type { Action } from 'svelte/action';
-	import type { PGlite } from '@electric-sql/pglite';
 	import type { SlDrawer } from '@shoelace-style/shoelace';
 
 	import { getCommonStore } from '$store/common.svelte.ts';
@@ -10,6 +9,7 @@
 	import { fetchCachedBlobUrl, fetchFormMediBlobUrls } from '$lib/api/fetch';
 	import { getDeviceId } from '$lib/utils/random';
 	import { m } from '$translations/messages.js';
+	import Compressor from 'compressorjs';
 
 	type Props = {
 		display: Boolean;
@@ -28,8 +28,6 @@
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
 	const entitiesStore = getEntitiesStatusStore();
-	let db: PGlite | undefined = $derived(commonStore.db);
-
 	const selectedEntity = $derived(entitiesStore.selectedEntity);
 
 	let {
@@ -68,7 +66,7 @@
 
 		// feature exists question isn't in the payload if it was intentionally hidden because it's a new feature
 		// the verification question is also hidden because it depends on the feature_exists question
-		if (!submissionXml.includes('<feature_exists>') && selectedEntity.is_new) {
+		if (!submissionXml.includes('<feature_exists>') && selectedEntity?.created_by) {
 			submissionXml = submissionXml.replace(
 				'<survey_questions>',
 				`<feature_exists>yes</feature_exists><survey_questions>`,
@@ -84,8 +82,8 @@
 		submissionXml = submissionXml.replace('<today/>', `<today>${new Date().toISOString().split('T')[0]}</today>`);
 
 		const authDetails = loginStore?.getAuthDetails;
-		if (authDetails?.username) {
-			submissionXml = submissionXml.replace('<username/>', `<username>${authDetails?.username}</username>`);
+		if (authDetails?.sub) {
+			submissionXml = submissionXml.replace('<username/>', `<username>${authDetails?.sub}</username>`);
 		}
 
 		if (authDetails?.email_address) {
@@ -122,7 +120,7 @@
 			submissionIds = `${selectedEntity.submission_ids},${submissionIds}`;
 		}
 
-		entitiesStore.updateEntityStatus(db, projectId, {
+		entitiesStore.updateEntityStatus(projectId, {
 			entity_id: selectedEntity?.entity_id,
 			status: entityStatus,
 			// NOTE here we don't translate the field as English values are always saved as the Entity label
@@ -131,10 +129,48 @@
 		});
 	}
 
+	async function compressAttachments(attachments: File[]): Promise<File[]> {
+		const compressedFiles = await Promise.all(
+			attachments.map(
+				(attachment) =>
+					new Promise<File>((resolve) => {
+						// if no file or file not an image, return it as-is
+						if (!attachment || !attachment.type.startsWith('image/')) return resolve(attachment);
+
+						// converting iframe file to real file (file received from iframe is not an instance of file, so we manually need to convert it to instance of file)
+						const realFile = new File([attachment], attachment.name, {
+							type: attachment.type,
+							lastModified: attachment.lastModified,
+						});
+
+						// Use CompressorJS to compress images as we don't want higher quality images
+						new Compressor(realFile, {
+							quality: 0.6,
+							maxHeight: 1080,
+							maxWidth: 720,
+							success(result) {
+								// Convert Blob to File (Compressor returns Blob)
+								const compressedFile = new File([result], attachment.name, {
+									type: result.type,
+									lastModified: Date.now(),
+								});
+								resolve(compressedFile);
+							},
+							error(err) {
+								console.error('Compression failed:', err.message);
+								resolve(attachment); // fallback to original file
+							},
+						});
+					}),
+			),
+		);
+
+		return compressedFiles;
+	}
+
 	function handleSubmit(payload: any) {
 		(async () => {
-			if (!payload.detail) return;
-			if (!projectId) return;
+			if (!payload.detail || !projectId) return;
 
 			const { instanceFile, attachments = [] } = await payload.detail[0].data[0];
 			let submissionXml = await instanceFile.text();
@@ -142,9 +178,10 @@
 
 			uploadingMessage = m['forms.uploading']() || 'uploading';
 			uploading = true;
-
+			// compress image attachments before submitting
+			const compressedAttachments = await compressAttachments(attachments);
 			// Submit the XML + any submission media
-			await entitiesStore.createNewSubmission(db, projectId, submissionXml, attachments);
+			await entitiesStore.createNewSubmission(projectId, submissionXml, compressedAttachments);
 
 			uploading = false;
 			updateEntityStatusBasedOnSubmissionXml(submissionXml);
@@ -211,7 +248,8 @@
 			}
 
 			const featureExistsNode = nodes.find((it: any) => it.definition.nodeset === '/data/feature_exists');
-			if (featureExistsNode && selectedEntity.is_new) {
+			// If the `created_by` field exists, then it must be a new feature
+			if (featureExistsNode && selectedEntity?.created_by) {
 				featureExistsNode?.setValueState('yes');
 
 				// hide this node because we don't need to see it after setting the value
@@ -262,7 +300,7 @@
 	});
 </script>
 
-<hot-drawer
+<sl-drawer
 	id="odk-web-forms-drawer"
 	bind:this={drawerRef}
 	contained
@@ -315,7 +353,7 @@
 			{/if}
 		{/await}
 	{/await}
-</hot-drawer>
+</sl-drawer>
 
 <style>
 	/* from https://www.w3schools.com/howto/howto_css_loader.asp */

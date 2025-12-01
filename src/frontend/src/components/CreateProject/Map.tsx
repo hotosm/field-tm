@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useOLMap from '@/hooks/useOlMap';
 
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import SearchLocation from '@/components/MapComponent/OpenLayersComponent/Search';
 import { DrawnGeojsonTypes, GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
 import MapControls from './MapControls';
+import { useParams } from 'react-router-dom';
 
 type propsType = {
   drawToggle?: boolean;
-  splittedGeojson?: GeoJSONFeatureTypes | null;
-  uploadedOrDrawnGeojsonFile: DrawnGeojsonTypes | null;
-  buildingExtractedGeojson?: GeoJSONFeatureTypes | null;
-  lineExtractedGeojson?: GeoJSONFeatureTypes;
+  aoiGeojson: DrawnGeojsonTypes | null;
+  extractGeojson?: GeoJSONFeatureTypes | null;
+  splitGeojson?: GeoJSONFeatureTypes | null;
   onDraw?: ((geojson: any, area: string) => void) | null;
   onModify?: ((geojson: any, area: string) => void) | null;
-  hasEditUndo?: boolean;
   getAOIArea?: ((area?: string) => void) | null;
   toggleEdit?: boolean;
   setToggleEdit?: (value: boolean) => void;
@@ -24,23 +24,24 @@ type propsType = {
 
 const Map = ({
   drawToggle,
-  uploadedOrDrawnGeojsonFile,
-  splittedGeojson,
-  buildingExtractedGeojson,
-  lineExtractedGeojson,
+  aoiGeojson,
+  extractGeojson,
+  splitGeojson,
   onDraw,
   onModify,
-  hasEditUndo,
   getAOIArea,
   toggleEdit,
   setToggleEdit,
 }: propsType) => {
+  const params = useParams();
+  const projectId = params.id;
+
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
     zoom: 1,
     maxZoom: 25,
   });
-  const isDrawOrGeojsonFile = drawToggle || uploadedOrDrawnGeojsonFile;
+  const isDrawOrGeojsonFile = drawToggle || aoiGeojson;
 
   return (
     <div className="map-container fmtm-w-full fmtm-h-full">
@@ -53,12 +54,12 @@ const Map = ({
           width: '100%',
         }}
       >
-        <LayerSwitcherControl visible={'osm'} />
-        <MapControls hasEditUndo={hasEditUndo} toggleEdit={toggleEdit} setToggleEdit={setToggleEdit} />
-
-        {isDrawOrGeojsonFile && !splittedGeojson && (
+        <LayerSwitcherControl visible={'osm'} map={map} />
+        <MapControls map={map} toggleEdit={toggleEdit} setToggleEdit={setToggleEdit} />
+        {!projectId && <SearchLocation />}
+        {isDrawOrGeojsonFile && !splitGeojson && (
           <VectorLayer
-            geojson={uploadedOrDrawnGeojsonFile}
+            geojson={aoiGeojson}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
@@ -73,9 +74,9 @@ const Map = ({
           />
         )}
 
-        {splittedGeojson && (
+        {splitGeojson && (
           <VectorLayer
-            geojson={splittedGeojson}
+            geojson={splitGeojson}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
@@ -87,9 +88,9 @@ const Map = ({
           />
         )}
 
-        {buildingExtractedGeojson && (
+        {extractGeojson && (
           <VectorLayer
-            geojson={buildingExtractedGeojson}
+            geojson={extractGeojson}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
@@ -98,19 +99,6 @@ const Map = ({
             }}
             zoomToLayer
             style={{ ...defaultStyles, lineColor: '#1a2fa2', fillOpacity: 30, lineOpacity: 50 }}
-          />
-        )}
-
-        {lineExtractedGeojson && (
-          <VectorLayer
-            geojson={lineExtractedGeojson}
-            viewProperties={{
-              size: map?.getSize(),
-              padding: [50, 50, 50, 50],
-              constrainResolution: true,
-              duration: 500,
-            }}
-            zoomToLayer
           />
         )}
       </MapComponent>

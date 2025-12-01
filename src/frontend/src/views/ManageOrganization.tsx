@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { DeleteOrganizationService, GetIndividualOrganizationService } from '@/api/OrganisationService';
-import Button from '@/components/common/Button';
-import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
+import { DeleteOrganizationService } from '@/api/OrganisationService';
 import { useIsOrganizationAdmin } from '@/hooks/usePermissions';
 import Forbidden from '@/views/Forbidden';
+import Button from '@/components/common/Button';
+import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import InputTextField from '@/components/common/InputTextField';
 import ManageAdmins from '@/components/ManageOrganization/ManageAdmins';
 import AddOrganizationAdminModal from '@/components/ManageOrganization/AddOrganizationAdminModal';
 import ManageOrganizationSkeleton from '@/components/Skeletons/ManageOrganization';
+import { useGetOrganisationDetailQuery } from '@/api/organisation';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -30,24 +31,22 @@ const ManageOrganization = () => {
   const isOrganizationAdmin = useIsOrganizationAdmin(+(organizationId as string));
   if (organizationId && !isOrganizationAdmin) return <Forbidden />;
 
-  const organization = useAppSelector((state) => state.organisation.organisationFormData);
   const organizationDeleteLoading = useAppSelector((state) => state.organisation.organizationDeleteLoading);
-  const organisationFormDataLoading = useAppSelector((state) => state.organisation.organisationFormDataLoading);
 
   const [selectedTab, setSelectedTab] = useState('details');
   const [toggleDeleteOrgModal, setToggleDeleteOrgModal] = useState(false);
   const [confirmOrgName, setConfirmOrgName] = useState('');
 
-  useEffect(() => {
-    if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${API_URL}/organisation/${organizationId}`));
-    }
-  }, [organizationId]);
+  const { data: organizationDetail, isLoading: isOrganizationDetailLoading } = useGetOrganisationDetailQuery({
+    org_id: +organizationId!,
+    params: { org_id: +organizationId! },
+    options: { queryKey: ['get-organisation', organizationId] },
+  });
 
   const getContent = (tab: string) => {
     switch (tab) {
       case 'details':
-        return <CreateEditOrganizationForm organizationId={organizationId || ''} />;
+        return <CreateEditOrganizationForm organizationDetail={organizationDetail} />;
       case 'admins':
         return <ManageAdmins />;
       default:
@@ -68,7 +67,7 @@ const ManageOrganization = () => {
           </div>
           <AddOrganizationAdminModal />
         </div>
-        {organisationFormDataLoading ? (
+        {isOrganizationDetailLoading ? (
           <ManageOrganizationSkeleton />
         ) : (
           <div className="sm:fmtm-flex-1 fmtm-flex fmtm-justify-center fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
@@ -76,15 +75,15 @@ const ManageOrganization = () => {
             <div className="fmtm-bg-white fmtm-h-full fmtm-rounded-xl sm:fmtm-w-[17.5rem] fmtm-p-6 fmtm-flex sm:fmtm-flex-col fmtm-flex-wrap sm:fmtm-flex-nowrap fmtm-gap-x-5">
               <div className="fmtm-flex fmtm-flex-col fmtm-items-center fmtm-mx-auto fmtm-gap-3 fmtm-mb-2 sm:fmtm-mb-6">
                 <div className="fmtm-w-[4.688rem] fmtm-min-w-[4.688rem] fmtm-min-h-[4.688rem] fmtm-max-w-[4.688rem] fmtm-max-h-[4.688rem]">
-                  {organization?.logo ? (
-                    <img src={organization?.logo} className="fmtm-w-full" alt="organization-logo" />
+                  {organizationDetail?.logo ? (
+                    <img src={organizationDetail?.logo} className="fmtm-w-full" alt="organization-logo" />
                   ) : (
                     <div className="fmtm-bg-[#757575] fmtm-w-full fmtm-h-full fmtm-rounded-full fmtm-flex fmtm-items-center fmtm-justify-center">
-                      <h2 className="fmtm-text-white">{organization?.name?.[0]}</h2>
+                      <h2 className="fmtm-text-white">{organizationDetail?.name?.[0]}</h2>
                     </div>
                   )}
                 </div>
-                <p className="fmtm-body-md-semibold">{organization?.name}</p>
+                <p className="fmtm-body-md-semibold">{organizationDetail?.name}</p>
               </div>
               <div className="fmtm-flex-1 fmtm-flex sm:fmtm-flex-col fmtm-h-fit">
                 {tabList.map((tab) => (
@@ -129,7 +128,7 @@ const ManageOrganization = () => {
                       <Button
                         variant="primary-red"
                         isLoading={organizationDeleteLoading}
-                        disabled={confirmOrgName !== organization?.name}
+                        disabled={confirmOrgName !== organizationDetail?.name}
                         onClick={() =>
                           dispatch(DeleteOrganizationService(`${API_URL}/organisation/${organizationId}`, navigate))
                         }

@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-import yaml
+from area_splitter.splitter import split_by_sql, split_by_square
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -39,21 +39,28 @@ from fastapi import (
 )
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, StreamingResponse
-from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path, get_choices
+from osm_fieldwork.json_data_models import data_models_path, get_choices
+from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
+from pyodk.errors import PyODKError
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import Mapper, ProjectManager, org_admin
-from app.central import central_crud, central_deps, central_schemas
+from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import DbGeomType, HTTPStatus, ProjectRole, ProjectStatus, XLSFormType
+from app.db.enums import (
+    DbGeomType,
+    HTTPStatus,
+    ProjectRole,
+    ProjectStatus,
+    XLSFormType,
+)
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
@@ -61,11 +68,13 @@ from app.db.models import (
     DbOdkEntities,
     DbOrganisation,
     DbProject,
+    DbProjectExternalURL,
     DbProjectTeam,
     DbProjectTeamUser,
     DbTask,
     DbUser,
     DbUserRole,
+    FieldMappingApp,
 )
 from app.db.postgis_utils import (
     check_crs,
@@ -76,6 +85,8 @@ from app.db.postgis_utils import (
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
+from app.projects.project_schemas import ProjectUserContributions
+from app.qfield.qfield_crud import create_qfield_project
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
@@ -110,7 +121,7 @@ async def read_projects(
     limit: int = 100,
 ):
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, user_sub)
+    projects = await DbProject.all(db, skip, limit, current_user, user_sub)
     return projects
 
 
@@ -149,6 +160,10 @@ async def read_project_summaries(
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
     minimal: bool = False,
+    my_projects: bool = False,
+    country: Optional[str] = None,
+    status: ProjectStatus = None,
+    field_mapping_app: Optional[FieldMappingApp] = None,
 ):
     """Get a paginated summary of projects.
 
@@ -164,6 +179,10 @@ async def read_project_summaries(
         hashtags,
         search,
         minimal,
+        status,
+        field_mapping_app,
+        my_projects=my_projects,
+        country=country,
     )
 
 
@@ -282,6 +301,7 @@ async def set_odk_entities_mapping_status(
     project = project_user.get("project")
     return await central_crud.update_entity_mapping_status(
         project.odk_credentials,
+        project.field_mapping_app,
         project.odkid,
         entity_details.entity_id,
         entity_details.label,
@@ -411,15 +431,12 @@ async def get_task_status(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
 
-@router.get("/contributors/{project_id}")
+@router.get("/contributors/{project_id}", response_model=list[ProjectUserContributions])
 async def get_contributors(
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
 ):
-    """Get contributors of a project.
-
-    TODO use a pydantic model for return type
-    """
+    """Get contributors of a project."""
     project = project_user.get("project")
     return await project_crud.get_project_users_plus_contributions(db, project.id)
 
@@ -469,8 +486,8 @@ async def task_split(
             log.warning("Parsed geojson file contained no geometries")
 
     log.debug("STARTED task splitting using provided boundary and data extract")
-    # NOTE here we pass the connection string and allow fmtm-splitter to
-    # a use psycopg2 connection (not async)
+    # NOTE here we pass the connection string and allow area-splitter to
+    # a use psycopg connection (not async)
     features = await run_in_threadpool(
         lambda: split_by_sql(
             merged_boundary,
@@ -539,6 +556,7 @@ async def get_data_extract(
     osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
     centroid: Annotated[bool, Form()] = False,
     geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
+    use_st_within: Annotated[bool, Form()] = True,
 ):
     """Get a new data extract for a given project AOI.
 
@@ -551,36 +569,36 @@ async def get_data_extract(
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
-    extract_config = None
     if osm_category:
         config_filename = XLSFormType(osm_category).name
-        data_model = f"{data_models_path}/{config_filename}.yaml"
+        data_model = f"{data_models_path}/{config_filename}.json"
 
-        with open(data_model) as f:
-            config = yaml.safe_load(f)
+        with open(data_model, encoding="utf-8") as f:
+            config_data = json.load(f)
 
         data_config = {
             ("polygon", False): ["ways_poly"],
             ("point", True): ["ways_poly", "nodes"],
             ("point", False): ["nodes"],
-            ("linestring", False): ["ways_line"],
+            ("polyline", False): ["ways_line"],
         }
 
-        config["from"] = data_config.get((geom_type, centroid))
-        # Serialize to YAML string
-        yaml_str = yaml.safe_dump(config, sort_keys=False)
+        config_data["from"] = data_config.get((geom_type, centroid))
+        if geom_type == "polyline":
+            geom_type = "line"  # line is recognized as a geomtype in raw-data-api
 
-        # Encode to bytes and wrap in BytesIO
-        extract_config = BytesIO(yaml_str.encode("utf-8"))
-
-    geojson_url = await project_crud.generate_data_extract(
-        clean_boundary_geojson,
+    result = await project_crud.generate_data_extract(
         project.id,
-        extract_config,
+        clean_boundary_geojson,
+        geom_type,
+        config_data,
         centroid,
+        use_st_within,
     )
 
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": geojson_url})
+    return JSONResponse(
+        status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")}
+    )
 
 
 @router.get("/data-extract-url")
@@ -682,10 +700,11 @@ async def add_new_project_manager(
 async def get_project_users(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    role: Optional[str] = None,
 ):
     """Get project users and their project role."""
     project = project_user_dict.get("project")
-    users = await DbUserRole.all(db, project.id)
+    users = await DbUserRole.all(db, project.id, role=role)
     if not users:
         return []
     return users
@@ -730,7 +749,6 @@ async def generate_files(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
     background_tasks: BackgroundTasks,
-    xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     combined_features_count: Annotated[int, Form()] = 0,
 ):
     """Generate additional content to initialise the project.
@@ -746,7 +764,6 @@ async def generate_files(
     it to the form.
 
     Args:
-        xlsform_upload (UploadFile): The XLSForm for the project data collection.
         combined_features_count (int): Total count of features to be mapped, plus
             additional dataset features, determined by frontend.
         db (Connection): The database connection.
@@ -758,58 +775,17 @@ async def generate_files(
     """
     project = project_user_dict.get("project")
     project_id = project.id
-    new_geom_type = project.new_geom_type
-    use_odk_collect = project.use_odk_collect or False
-    form_name = f"FMTM_Project_{project.id}"
-    project_contains_existing_feature = True if combined_features_count else False
-
     log.debug(f"Generating additional files for project: {project.id}")
-
-    # Validate uploaded form
-    await central_crud.validate_and_update_user_xlsform(
-        xlsform=xlsform_upload,
-        form_name=form_name,
-        new_geom_type=new_geom_type,
-        # If we are only mapping new features, then verification is irrelevant
-        need_verification_fields=project_contains_existing_feature,
-        use_odk_collect=use_odk_collect,
-    )
-
-    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-        xlsform=xlsform_upload,
-        form_name=form_name,
-        new_geom_type=new_geom_type,
-        need_verification_fields=project_contains_existing_feature,
-        use_odk_collect=use_odk_collect,
-    )
-    # Write XLS form content to db
-    xlsform_bytes = project_xlsform.getvalue()
-    if len(xlsform_bytes) == 0 or not xform_id:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="There was an error modifying the XLSForm!",
-        )
-    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
-    sql = """
-        UPDATE public.projects
-        SET
-            odk_form_id = %(odk_form_id)s,
-            xlsform_content = %(xlsform_content)s
-        WHERE id = %(project_id)s;
-    """
-    async with db.cursor() as cur:
-        await cur.execute(
-            sql,
-            {
-                "project_id": project_id,
-                "odk_form_id": xform_id,
-                "xlsform_content": xlsform_bytes,
-            },
-        )
-
     warning_message = None
 
-    if combined_features_count > 10000:
+    # Handle QField separately
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        qfield_url = await create_qfield_project(db, project)
+        # Provide URL for qfieldcloud project dashboard
+        return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
+
+    # Run in background for ODK project with lots of features
+    elif combined_features_count > 10000:
         # Return immediately and run in background if many features
         background_tasks.add_task(
             project_crud.generate_project_files,
@@ -835,6 +811,29 @@ async def generate_files(
                 },
             )
 
+    # Update the XLSForm if using ODK Collect to add task id choice filter
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        log.info("Appending task_filter choices to XLSForm for ODK Collect project")
+        existing_xlsform = BytesIO(project.xlsform_content)
+        if not project.tasks:
+            msg = "Project has no generated tasks. Please try again."
+            log.error(msg)
+            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+
+        # Append task ids to choices sheet
+        task_ids = [task.project_task_index for task in project.tasks]
+        log.debug(f"Found {len(task_ids)} for project ID {project.id}")
+        new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
+
+        # Update in both db + ODK Central
+        await central_crud.update_project_xlsform(
+            db,
+            project,
+            new_xlsform,
+            project.odk_form_id,
+        )
+
+    # Generate the basemap automatically if custom TMS url provided
     if project.custom_tms_url:
         basemap_in = project_schemas.BasemapGenerate(
             tile_source="custom", file_format="pmtiles", tms_url=project.custom_tms_url
@@ -898,6 +897,55 @@ async def generate_basemap(
     )
 
 
+def _get_local_odk_url() -> str:
+    """Return local ODK proxy URL: http://odk.<domain>:<port>."""
+    domain = getattr(settings, "FMTM_DOMAIN", "fmtm.localhost")
+    port = getattr(settings, "FMTM_DEV_PORT", "7050")
+    domain = domain.replace("http://", "").replace("https://", "")
+    return f"http://odk.{domain}:{port}".rstrip(":")
+
+
+async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
+    """Store the external ODK project URL.
+
+    Uses local proxy URL if credentials indicate local Docker setup (central:8383),
+    otherwise uses the custom ODK Central URL from project/org credentials.
+    """
+    if project.field_mapping_app != FieldMappingApp.ODK:
+        return
+
+    try:
+        enriched = await DbProject.one(db, project.id, minimal=False)
+    except Exception:
+        enriched = project
+
+    creds = getattr(enriched, "odk_credentials", None)
+    odk_url = getattr(creds, "odk_central_url", None) if creds else None
+
+    if not odk_url:
+        return
+
+    if "central:8383" in odk_url:
+        odk_url = _get_local_odk_url()
+
+    # Append project ID to URL
+    odk_url = odk_url.rstrip("/")
+    odkid = getattr(enriched, "odkid", None)
+    if odkid and "/projects/" not in odk_url:
+        odk_url = f"{odk_url}/projects/{odkid}"
+
+    try:
+        await DbProjectExternalURL.create_or_update(
+            db=db,
+            project_id=project.id,
+            source=FieldMappingApp.ODK,
+            url=odk_url,
+        )
+        log.debug(f"Stored ODK project URL for project {project.id}: {odk_url}")
+    except Exception as exc:
+        log.warning(f"Failed to store ODK project URL for project {project.id}: {exc}")
+
+
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     new_data: project_schemas.ProjectUpdate,
@@ -959,6 +1007,7 @@ async def create_stub_project(
     Either param can be passed to determine if the user has admin permission
     to the organisation (or organisation associated with a project).
     """
+    delattr(project_info, "merge")  # Remove merge field as it is not in database
     db_user = org_user_dict["user"]
     db_org = org_user_dict["org"]
     project_info.organisation_id = db_org.id
@@ -976,19 +1025,26 @@ async def create_stub_project(
         latitude, longitude = centroid.y, centroid.x
         location = await geocoder.query(latitude, longitude)
         # Convert to two letter country code --> full name
-        country_full_name = countries.get(location.country, location.country)
-        project_info.location_str = f"{location.city},{country_full_name}"
+        country_full_name = (
+            countries.get(location.country, location.country) if location else None
+        )
+        project_info.location_str = (
+            f"{location.city},{country_full_name}" if location else None
+        )
 
     # Create the project in the Field-TM DB
     project_info.author_sub = db_user.sub
     try:
+        log.debug(f"Project details: {project_info}")
         project = await DbProject.create(db, project_info)
     except Exception as e:
+        log.error(f"Error posting to /stub: {e}")
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
         ) from e
     if not project:
+        log.error("Project creation passed at /stub, but the project is empty")
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
@@ -1063,6 +1119,8 @@ async def create_project(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Project update failed.",
         ) from e
+
+    await _store_odk_project_url(db, project)
 
     return project
 
@@ -1256,29 +1314,56 @@ async def delete_entity(
     dataset_name: str = "features",
 ):
     """Delete an Entity from ODK and local database."""
-    try:
-        project = project_user_dict.get("project")
-        project_odk_id = project.odkid
-        project_odk_creds = project.odk_credentials
+    project = project_user_dict.get("project")
+    project_odk_id = project.odkid
+    project_odk_creds = project.odk_credentials
 
-        log.debug(
-            f"Deleting ODK Entity in dataset '{dataset_name}'(ODK ID: {project_odk_id})"
-        )
+    log.debug(
+        f"Deleting ODK Entity in dataset '{dataset_name}'(ODK ID: {project_odk_id})"
+    )
+
+    # Try deleting from ODK Central first
+    try:
         await central_crud.delete_entity(
             odk_creds=project_odk_creds,
             odk_id=project_odk_id,
             entity_uuid=entity_uuid,
             dataset_name=dataset_name,
         )
-        await DbOdkEntities.delete(db, entity_uuid)
-        return {"detail": "Entity deleted successfully"}
+        log.info(f"Entity {entity_uuid} deleted from ODK Central successfully.")
+    except PyODKError as e:
+        # ODK Central 404 means the entity is already gone there, safe to delete locally
+        if "404" in str(e):
+            log.warning(
+                f"Entity {entity_uuid} not found in ODK Central (already deleted). "
+                "Proceeding with local cleanup."
+            )
+        else:
+            log.error(f"Failed to delete entity {entity_uuid} from ODK Central: {e}")
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Failed to delete entity in ODK Central: {str(e)}",
+            ) from e
 
-    except HTTPException as http_err:
-        log.error(f"HTTP error during deletion: {http_err.detail}")
-        raise
-    except Exception as e:
-        log.exception("Unexpected error during entity deletion")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Entity deletion failed",
-        ) from e
+    # Delete from local database (safe delete)
+    deleted_count = await DbOdkEntities.delete(db, entity_uuid)
+    if deleted_count == 0:
+        log.warning(
+            f"Entity {entity_uuid} not found in local database (nothing to delete)."
+        )
+    else:
+        log.info(f"Entity {entity_uuid} deleted from local database successfully.")
+
+    return {"detail": f"Entity {entity_uuid} deleted successfully"}
+
+
+@router.delete("/{project_id}/users/{user_sub}")
+async def unassign_user_from_project(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
+    user_sub: str,
+):
+    """Unassign a user from a project (remove their role)."""
+    project = project_user_dict.get("project")
+    await project_crud.unassign_user_from_project(db, project.id, user_sub)
+    return {"message": f"User {user_sub} unassigned from project {project.id}."}

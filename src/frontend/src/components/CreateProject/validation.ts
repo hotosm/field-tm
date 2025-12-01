@@ -1,8 +1,73 @@
 import { z } from 'zod/v4';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { data_extract_type, GeoGeomTypesEnum, project_visibility, task_split_type } from '@/types/enums';
+import {
+  data_extract_type,
+  field_mapping_app,
+  GeoGeomTypesEnum,
+  project_visibility,
+  task_split_type,
+} from '@/types/enums';
+import isEmpty from '@/utilfunctions/isEmpty';
 
-export const basicDetailsValidationSchema = z
+const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
+  ODK: 'ODK Central',
+  FieldTM: 'ODK Central',
+  QField: 'QField Cloud',
+};
+
+const validateODKCreds = (ctx: any, values: Record<string, any>) => {
+  if (!values.odk_central_url?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_url,
+      path: ['odk_central_url'],
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} URL is Required`,
+      code: 'custom',
+    });
+  } else if (!isValidUrl(values.odk_central_url)) {
+    ctx.issues.push({
+      input: values.odk_central_url,
+      path: ['odk_central_url'],
+      message: 'Invalid URL',
+      code: 'custom',
+    });
+  }
+  if (!values.odk_central_user?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_user,
+      path: ['odk_central_user'],
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} User is Required`,
+      code: 'custom',
+    });
+  }
+  if (!values.odk_central_password?.trim()) {
+    ctx.issues.push({
+      input: values.odk_central_password,
+      path: ['odk_central_password'],
+      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} Password is Required`,
+      code: 'custom',
+    });
+  }
+};
+
+export const odkCredentialsValidationSchema = z
+  .object({
+    field_mapping_app: z.enum(field_mapping_app),
+    odk_central_url: z.string(),
+    odk_central_user: z.string().optional(),
+    odk_central_password: z.string().optional(),
+  })
+  .check((ctx) => {
+    const values = ctx.value;
+    validateODKCreds(ctx, values);
+  });
+
+export const projectTypeSelectorValidationSchema = z.object({
+  field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
+    message: 'Field Mapping App must be selected',
+  }),
+});
+
+export const projectOverviewValidationSchema = z
   .object({
     id: z.number().optional(),
     name: z
@@ -23,62 +88,30 @@ export const basicDetailsValidationSchema = z
     odk_central_url: z.string().optional(),
     odk_central_user: z.string().optional(),
     odk_central_password: z.string().optional(),
-    project_admins: z.array(z.string()).optional(),
+    project_admins: z.array(z.string()),
     uploadAreaSelection: z.enum(['draw', 'upload_file']).nullable(),
     uploadedAOIFile: z.any().optional(),
-    outline: z.any().refine((val) => val !== undefined, {
+    outline: z.any().refine((val) => !!val, {
       message: 'Project AOI is required',
     }),
     outlineArea: z.string().optional(),
+    proceedWithLargeOutlineArea: z.boolean(),
+    organisation_name: z.string(),
+    merge: z.boolean(),
+    field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
+      message: 'Field Mapping App must be selected',
+    }),
   })
   .check((ctx) => {
     const values = ctx.value;
     if (values.hasODKCredentials && !values.useDefaultODKCredentials) {
-      if (!values.odk_central_url?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_url,
-          path: ['odk_central_url'],
-          message: 'ODK URL is Required',
-          code: 'custom',
-        });
-      } else if (!isValidUrl(values.odk_central_url)) {
-        ctx.issues.push({
-          input: values.odk_central_url,
-          path: ['odk_central_url'],
-          message: 'Invalid URL',
-          code: 'custom',
-        });
-      }
-      if (!values.odk_central_user?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_user,
-          path: ['odk_central_user'],
-          message: 'ODK Central User is Required',
-          code: 'custom',
-        });
-      }
-      if (!values.odk_central_password?.trim()) {
-        ctx.issues.push({
-          input: values.odk_central_password,
-          path: ['odk_central_password'],
-          message: 'ODK Central Password is Required',
-          code: 'custom',
-        });
-      }
+      validateODKCreds(ctx, values);
     }
-    if (values.uploadAreaSelection === 'upload_file' && !values.uploadedAOIFile) {
+    if (values.uploadAreaSelection === 'upload_file' && isEmpty(values.uploadedAOIFile)) {
       ctx.issues.push({
         input: values.uploadedAOIFile,
         path: ['uploadedAOIFile'],
         message: 'AOI Geojson File is Required',
-        code: 'custom',
-      });
-    }
-    if (!values.id && values.project_admins?.length === 0) {
-      ctx.issues.push({
-        input: values.project_admins,
-        path: ['project_admins'],
-        message: 'At least one Project Admin shall be selected',
         code: 'custom',
       });
     }
@@ -87,6 +120,33 @@ export const basicDetailsValidationSchema = z
         input: values.uploadAreaSelection,
         path: ['uploadAreaSelection'],
         message: 'Upload Project Area Type must be selected',
+        code: 'custom',
+      });
+    }
+    if (
+      !values.id &&
+      values.outlineArea &&
+      +values.outlineArea?.split(' ')?.[0] > 1000 &&
+      values.outlineArea?.split(' ')[1] === 'km²'
+    ) {
+      ctx.issues.push({
+        input: values.outlineArea,
+        path: ['outlineArea'],
+        message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+        code: 'custom',
+      });
+    }
+    if (
+      !values.id &&
+      values.outlineArea &&
+      +values.outlineArea?.split(' ')?.[0] > 200 &&
+      values.outlineArea?.split(' ')[1] === 'km²' &&
+      !values.proceedWithLargeOutlineArea
+    ) {
+      ctx.issues.push({
+        input: values.proceedWithLargeOutlineArea,
+        path: ['proceedWithLargeOutlineArea'],
+        message: 'Mapping area exceeds 200km²',
         code: 'custom',
       });
     }
@@ -115,13 +175,22 @@ export const projectDetailsValidationSchema = z
 
 export const uploadSurveyValidationSchema = z
   .object({
-    formExampleSelection: z.string().min(1, 'Form Category is must be selected'),
+    osm_category: z.string().min(1, 'Form Category is must be selected'),
     xlsFormFile: z.any().optional(),
-    isXlsFormFileValid: z.boolean(),
+    needVerificationFields: z.boolean(),
+    mandatoryPhotoUpload: z.boolean(),
+    isFormValidAndUploaded: z.boolean(),
+    advancedConfig: z.boolean(),
+    default_language: z.string(),
+    formLanguages: z.object({
+      detected_languages: z.array(z.string()),
+      default_language: z.array(z.string()),
+      supported_languages: z.array(z.string()),
+    }),
   })
   .check((ctx) => {
     const values = ctx.value;
-    if (!values.xlsFormFile) {
+    if (isEmpty(values.xlsFormFile)) {
       ctx.issues.push({
         input: values.xlsFormFile,
         path: ['xlsFormFile'],
@@ -129,11 +198,11 @@ export const uploadSurveyValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.xlsFormFile && !values.isXlsFormFileValid) {
+    if (values.advancedConfig && !values.default_language) {
       ctx.issues.push({
-        input: values.xlsFormFile,
-        path: ['xlsFormFile'],
-        message: 'File is Invalid',
+        input: values.default_language,
+        path: ['default_language'],
+        message: 'Default Language is Required',
         code: 'custom',
       });
     }
@@ -141,7 +210,7 @@ export const uploadSurveyValidationSchema = z
 
 export const mapDataValidationSchema = z
   .object({
-    primaryGeomType: z
+    primary_geom_type: z
       .enum(GeoGeomTypesEnum)
       .nullable()
       .refine((val) => val !== null, {
@@ -149,7 +218,7 @@ export const mapDataValidationSchema = z
       }),
     includeCentroid: z.boolean(),
     useMixedGeomTypes: z.boolean(),
-    newGeomType: z.union([z.enum(GeoGeomTypesEnum), z.null()]).optional(),
+    new_geom_type: z.union([z.enum(GeoGeomTypesEnum), z.null()]).optional(),
     dataExtractType: z
       .enum(data_extract_type)
       .nullable()
@@ -158,14 +227,16 @@ export const mapDataValidationSchema = z
       }),
     customDataExtractFile: z.any().optional(),
     dataExtractGeojson: z.any().optional(),
+    use_st_within: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;
+    const featureCount = values.dataExtractGeojson?.features?.length;
 
-    if (values.useMixedGeomTypes && !values.newGeomType) {
+    if (values.useMixedGeomTypes && !values.new_geom_type) {
       ctx.issues.push({
-        input: values.newGeomType,
-        path: ['newGeomType'],
+        input: values.new_geom_type,
+        path: ['new_geom_type'],
         message: 'New Geometry Type must be selected',
         code: 'custom',
       });
@@ -178,7 +249,7 @@ export const mapDataValidationSchema = z
         code: 'custom',
       });
     }
-    if (values.dataExtractType === data_extract_type.CUSTOM && !values.customDataExtractFile) {
+    if (values.dataExtractType === data_extract_type.CUSTOM && isEmpty(values.customDataExtractFile)) {
       ctx.issues.push({
         input: values.customDataExtractFile,
         path: ['customDataExtractFile'],
@@ -188,21 +259,29 @@ export const mapDataValidationSchema = z
     }
     if (
       values.dataExtractGeojson?.id &&
-      values.primaryGeomType !== values.dataExtractGeojson?.id &&
-      !values.customDataExtractFile
+      values.primary_geom_type !== values.dataExtractGeojson?.id &&
+      isEmpty(values.customDataExtractFile)
     ) {
       ctx.issues.push({
         input: values.dataExtractGeojson,
         path: ['dataExtractGeojson'],
-        message: `Please generate data extract for ${values.primaryGeomType?.toLowerCase()}`,
+        message: `Please generate data extract for ${values.primary_geom_type?.toLowerCase()}`,
         code: 'custom',
       });
     }
-    if (values.dataExtractType === data_extract_type.OSM && values.customDataExtractFile) {
+    if (values.dataExtractType === data_extract_type.OSM && !isEmpty(values.customDataExtractFile)) {
       ctx.issues.push({
         input: values.customDataExtractFile,
         path: ['dataExtractGeojson'],
         message: 'Please generate OSM data extract',
+        code: 'custom',
+      });
+    }
+    if (values.dataExtractGeojson && featureCount > 30000) {
+      ctx.issues.push({
+        input: values.dataExtractGeojson,
+        path: ['dataExtractGeojson'],
+        message: `${featureCount} is a lot of features! Please consider breaking this into smaller projects`,
         code: 'custom',
       });
     }
@@ -216,8 +295,8 @@ export const splitTasksValidationSchema = z
       .refine((val) => val !== null, {
         message: 'Task Split Type is Required',
       }),
-    dimension: z.number().optional(),
-    average_buildings_per_task: z.number().optional(),
+    task_split_dimension: z.number().optional(),
+    task_num_buildings: z.number().optional(),
     splitGeojsonBySquares: z.any().optional(),
     splitGeojsonByAlgorithm: z.any().optional(),
     dividedTaskGeojson: z.any().optional(),
@@ -227,28 +306,28 @@ export const splitTasksValidationSchema = z
 
     if (
       values.task_split_type === task_split_type.DIVIDE_ON_SQUARE &&
-      values.dimension !== undefined &&
-      values.dimension < 10
+      values.task_split_dimension !== undefined &&
+      values.task_split_dimension < 10
     ) {
       ctx.issues.push({
         minimum: 10,
         message: 'Dimension must be at least 10',
-        input: values.dimension,
+        input: values.task_split_dimension,
         code: 'custom',
-        path: ['dimension'],
+        path: ['task_split_dimension'],
       });
     }
     if (
       values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM &&
-      values.average_buildings_per_task !== undefined &&
-      values.average_buildings_per_task < 1
+      values.task_num_buildings !== undefined &&
+      values.task_num_buildings < 1
     ) {
       ctx.issues.push({
         minimum: 1,
         message: 'Average buildings per task must be greater than 0',
-        input: values.average_buildings_per_task,
+        input: values.task_num_buildings,
         code: 'custom',
-        path: ['average_buildings_per_task'],
+        path: ['task_num_buildings'],
       });
     }
     if (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.splitGeojsonBySquares) {
@@ -270,7 +349,8 @@ export const splitTasksValidationSchema = z
   });
 
 export const createProjectValidationSchema = z.object({
-  ...basicDetailsValidationSchema.shape,
+  ...projectTypeSelectorValidationSchema.shape,
+  ...projectOverviewValidationSchema.shape,
   ...projectDetailsValidationSchema.shape,
   ...uploadSurveyValidationSchema.shape,
   ...mapDataValidationSchema.shape,

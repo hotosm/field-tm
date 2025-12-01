@@ -12,14 +12,14 @@ const ProjectNotFound = () => {
           <img src={NotFound} alt="Project Not Found Photo" className="fmtm-w-[12rem] lg:fmtm-w-[16.75rem]" />
         </div>
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-3">
-          <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-[#4F4F4F] fmtm-font-barlow fmtm-font-bold fmtm-text-center">
+          <h2 className="fmtm-text-[1.5rem] md:fmtm-text-[2rem] lg:fmtm-text-[2.5rem] fmtm-text-[#4F4F4F] fmtm-font-primary fmtm-font-bold fmtm-text-center">
             404
           </h2>
           <p className="fmtm-text-sm sm:fmtm-text-base fmtm-text-center fmtm-text-[#4F4F4F] fmtm-uppercase fmtm-font-semibold">
             Page Not Found
           </p>
         </div>
-        <Button variant="secondary-red" onClick={() => navigate('/')}>
+        <Button variant="secondary-red" onClick={() => navigate('/explore')}>
           Return Home
         </Button>
       </div>

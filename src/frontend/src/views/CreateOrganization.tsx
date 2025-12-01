@@ -17,22 +17,16 @@ const CreateOrganization = () => {
 
   const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 
+  // clear consent form on new org add
   useEffect(() => {
-    // clear consent form on new org add
     dispatch(
       OrganisationAction.SetConsentDetailsFormData({
         give_consent: '',
         review_documentation: [],
-        log_into: [],
         participated_in: [],
       }),
     );
     dispatch(OrganisationAction.SetConsentApproval(false));
-  }, []);
-
-  useEffect(() => {
-    // clear state of formData to empty
-    dispatch(OrganisationAction.SetOrganisationFormData({}));
   }, []);
 
   return (
@@ -43,7 +37,7 @@ const CreateOrganization = () => {
           <div className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 lg:fmtm-gap-10 fmtm-pt-4 fmtm-h-full`}>
             <InstructionsSidebar />
             <div className="fmtm-w-full fmtm-h-full xl:fmtm-max-w-[50rem] fmtm-bg-white">
-              <CreateEditOrganizationForm organizationId={''} />
+              <CreateEditOrganizationForm />
             </div>
           </div>
         ) : (

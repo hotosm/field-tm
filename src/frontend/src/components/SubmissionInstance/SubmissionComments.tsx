@@ -1,30 +1,37 @@
-import { useAppSelector } from '@/types/reduxTypes';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import AssetModules from '@/shared/AssetModules';
 import CoreModules from '@/shared/CoreModules';
+import { useGetTaskEventHistoryQuery } from '@/api/task/index';
 
 const SubmissionComments = () => {
   const params = useParams();
   const submissionInstanceId = params.instanceId;
+  const taskId = params.taskId;
+  const projectId = params.projectId;
 
-  const taskCommentsList = useAppSelector((state) => state?.project?.projectCommentsList);
-  const taskGetCommentsLoading = useAppSelector((state) => state?.project?.projectGetCommentsLoading);
+  const { data: taskComments, isLoading: isTaskCommentsLoading } = useGetTaskEventHistoryQuery({
+    id: +taskId!,
+    params: { project_id: +projectId!, comments: true },
+    options: { queryKey: ['get-project-comments', +projectId!] },
+  });
 
   // handle for old project comments
-  const oldfilteredTaskCommentsList = taskCommentsList
-    ?.filter((entry) => entry?.comment.includes('-SUBMISSION_INST-'))
-    .filter((entry) => entry.comment.split('-SUBMISSION_INST-')[0] === submissionInstanceId);
-  const newfilteredTaskCommentsList = taskCommentsList?.filter(
-    (comment) => comment?.comment?.split(' ')?.[0] === `#submissionId:${submissionInstanceId}`,
-  );
+  const oldfilteredTaskCommentsList =
+    taskComments
+      ?.filter((entry) => entry?.comment?.includes('-SUBMISSION_INST-'))
+      .filter((entry) => entry?.comment?.split('-SUBMISSION_INST-')[0] === submissionInstanceId) || [];
+
+  const newfilteredTaskCommentsList =
+    taskComments?.filter((comment) => comment?.comment?.split(' ')?.[0] === `#submissionId:${submissionInstanceId}`) ||
+    [];
 
   const filteredTaskCommentsList = [...oldfilteredTaskCommentsList, ...newfilteredTaskCommentsList];
 
   return (
     <div className="fmtm-bg-white fmtm-rounded-xl fmtm-p-6">
       <h4 className="fmtm-font-bold fmtm-text-[#555] fmtm-text-xl fmtm-mb-[0.625rem]">Comments</h4>
-      {taskGetCommentsLoading ? (
+      {isTaskCommentsLoading ? (
         <div>
           {Array.from({ length: 6 }).map((_, i) => (
             <div

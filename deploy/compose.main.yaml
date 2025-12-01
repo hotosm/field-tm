@@ -34,6 +34,13 @@ volumes:
     name: fmtm-tiles-main
   certs:
     name: fmtm-certs-main
+  # TODO enable as part of qfield app
+  # qfield_db_data:
+  #   name: qfield-db-data-main
+  # qfield_static:
+  #   name: qfield-static-main
+  qfield_projects:
+    name: qfield-projects-main
 
 networks:
   fmtm-net:
@@ -45,7 +52,7 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2-rc7"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -62,6 +69,7 @@ services:
       UI_WIZARD: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
+      USE_REDIS: no
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
@@ -120,6 +128,8 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    annotations:
+      nerdctl/bypass4netns: true
 
   api:
     extends:
@@ -140,6 +150,8 @@ services:
     extends:
       file: compose.staging.yaml
       service: fmtm-db
+    # Increase max connections as we have 4 API replicas (+64)
+    command: -c 'max_connections=148' -c 'wal_level=logical'
 
   electric:
     extends:
@@ -155,6 +167,11 @@ services:
     extends:
       file: compose.staging.yaml
       service: scheduler
+
+  qfield-qgis:
+    extends:
+      file: compose.staging.yaml
+      service: qfield-qgis
 
   backups:
     image: "ghcr.io/hotosm/field-tm/backend:main"
@@ -177,3 +194,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    annotations:
+      nerdctl/bypass4netns: true

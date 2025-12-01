@@ -43,10 +43,9 @@ export const generateLast30Days = (): string[] => {
   return last30Days;
 };
 
-// checks if object or array is empty
-export function isEmpty(obj: any): boolean {
-  if (Array.isArray(obj)) {
-    return obj.length === 0;
+export function appendObjectToFormData(formData: FormData, object: Record<string, any>) {
+  for (const [key, value] of Object.entries(object)) {
+    if (value === null || value === undefined) continue;
+    formData.append(key, value);
   }
-  return Object.keys(obj).length === 0;
 }

@@ -9,13 +9,7 @@ const initialState: CommonStateTypes = {
     variant: 'info',
     duration: 2000,
   },
-  loading: false,
   postOrganisationLoading: false,
-  currentStepFormStep: {
-    create_project: {
-      step: 1,
-    },
-  },
   projectNotFound: false,
   previousSelectedOptions: {},
 };
@@ -35,14 +29,8 @@ const CommonSlice = createSlice({
     ) {
       state.snackbar = { open: true, variant: 'error', duration: 2000, ...action.payload };
     },
-    SetLoading(state, action: PayloadAction<boolean>) {
-      state.loading = action.payload;
-    },
     PostOrganisationLoading(state, action: PayloadAction<boolean>) {
       state.postOrganisationLoading = action.payload;
-    },
-    SetCurrentStepFormStep(state, action: PayloadAction<{ flag: string; step: number }>) {
-      state.currentStepFormStep[action.payload.flag] = { step: action.payload.step };
     },
     SetProjectNotFound(state, action: PayloadAction<boolean>) {
       state.projectNotFound = action.payload;

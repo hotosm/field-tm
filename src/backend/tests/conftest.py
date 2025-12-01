@@ -40,7 +40,13 @@ from app.central.central_deps import pyodk_client
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
 from app.db.database import db_conn
-from app.db.enums import CommunityType, OrganisationType, TaskEvent, UserRole
+from app.db.enums import (
+    CommunityType,
+    FieldMappingApp,
+    OrganisationType,
+    TaskEvent,
+    UserRole,
+)
 from app.db.models import (
     DbOrganisation,
     DbProject,
@@ -218,6 +224,7 @@ async def project(db, admin_user, organisation):
 
     project_metadata = ProjectIn(
         name=project_name,
+        field_mapping_app=FieldMappingApp.FIELDTM,
         short_description="test",
         description="test",
         osm_category="buildings",
@@ -379,21 +386,29 @@ async def odk_project(db, client, project, tasks):
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    xform_file = {
-        "xlsform": (
-            "buildings.xls",
-            xlsform_obj,
+    try:
+        response = await client.post(
+            f"/central/upload-xlsform?project_id={project.id}",
+            files={
+                "xlsform": (
+                    "buildings.xls",
+                    xlsform_obj,
+                )
+            },
         )
-    }
+        log.debug(f"Uploaded XLSForm for project: {project.id}")
+    except Exception as e:
+        log.exception(e)
+        pytest.fail(f"Failed to upload XLSForm for project: {str(e)}")
+
     try:
         response = await client.post(
             f"/projects/{project.id}/generate-project-data",
-            files=xform_file,
         )
         log.debug(f"Generated project files for project: {project.id}")
     except Exception as e:
         log.exception(e)
-        pytest.fail(f"Test failed with exception: {str(e)}")
+        pytest.fail(f"Failed to generate project files: {str(e)}")
 
     yield project
 
@@ -426,11 +441,14 @@ async def submission(client, odk_project):
         <end>2024-11-15T12:29:00.876Z</end>
         <today>2024-11-15</today>
         <phonenumber/>
-        <username>testuser</username>
+        <username>localadmin</username>
         <instructions/>
         <warmup/>
         <feature/>
-        <image>{photo_file_name}</image>
+        <photos>
+            <image>{photo_file_name}</image>
+            <image>additional_photo.jpg</image>
+        </photos>
         <new_feature>12.750577838121643 -24.776785714285722 0.0 0.0</new_feature>
         <xid/>
         <xlocation>12.750577838121643 -24.776785714285722 0.0 0.0</xlocation>
@@ -463,14 +481,18 @@ async def submission(client, odk_project):
 
     # The file must be uploaded to the API, read, then re-uploaded to Central
     with open(photo_file_path, "rb") as photo_file:
-        files = {"submission_files": (photo_file_name, photo_file, "image/jpeg")}
+        files = {
+            "submission_xml": (
+                submission_xml,
+                submission_xml.encode("utf-8"),
+                "text/xml",
+            ),
+            "submission_files": (photo_file_name, photo_file, "image/jpeg"),
+        }
 
         response = await client.post(
             f"/submission?project_id={fmtm_project_id}",
-            data={
-                "submission_xml": submission_xml,
-                "device_id": "collect:BOYFOcNu8uOK2G4b",
-            },
+            data={"device_id": "collect:BOYFOcNu8uOK2G4b"},
             files=files,
         )
 
@@ -509,6 +531,7 @@ async def stub_project_data(organisation):
     project_name = f"Test Project {uuid4()}"
     data = {
         "name": project_name,
+        "field_mapping_app": "FieldTM",
         "short_description": "test",
         "description": "test",
         "organisation_id": organisation.id,
@@ -563,7 +586,9 @@ async def client(app: FastAPI, db: AsyncConnection):
     # NOTE this is marginally slower, but required else tests fail
     app.dependency_overrides[db_conn] = lambda: db
 
-    async with LifespanManager(app) as manager:
+    # NOTE we increase startup_timeout from 5s --> 30s to avoid timeouts
+    # during slow initialisation / startup (due to yaml conversion etc)
+    async with LifespanManager(app, startup_timeout=30) as manager:
         async with AsyncClient(
             transport=ASGITransport(app=manager.app),
             base_url=f"http://{settings.FMTM_DOMAIN}",

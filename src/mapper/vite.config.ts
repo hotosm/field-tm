@@ -11,8 +11,21 @@ import extractorSvelte from '@unocss/extractor-svelte';
 const pwaOptions: Partial<VitePWAOptions> = {
 	// This ensures that caches are invalidated when the app is updated
 	registerType: 'autoUpdate',
-	injectRegister: 'auto',
+	injectRegister: false,
 	strategies: 'generateSW',
+
+	// Important to ensure the PWA runs on the **entire** website
+	// For example, it's possible to have `scope: '/project'` for a PWA
+	// on only part of the website
+	scope: '/',
+
+	// Required for sveltekit
+	kit: {
+		adapterFallback: 'index.html',
+		spa: {
+			fallbackMapping: '/',
+		},
+	},
 
 	// Allow testing the PWA during local development
 	devOptions: {
@@ -70,9 +83,6 @@ const pwaOptions: Partial<VitePWAOptions> = {
 				},
 			},
 		],
-
-		// We need to cache files up to 15MB to allow for PGLite to be cached
-		maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
 	},
 
 	// Cache all the static assets in the static folder
@@ -84,11 +94,14 @@ const pwaOptions: Partial<VitePWAOptions> = {
 		short_name: 'Field-TM',
 		description: 'Coordinated field mapping for Open Mapping campaigns.',
 		categories: ['mapping', 'humanitarian', 'hotosm', 'field', 'odk'],
+		scope: '/',
 		start_url: '/',
 		orientation: 'portrait',
 		dir: 'auto',
 		display: 'standalone',
-		launch_handler: 'auto',
+		launch_handler: {
+			client_mode: 'auto',
+		},
 		theme_color: '#d63f3f',
 		background_color: '#d63f3f',
 		icons: [
@@ -134,9 +147,12 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 export default defineConfig({
+	// Ensure the base is not '/project/xxx', but always '/', else
+	// registration of sw and manifest can fail under /project
+	base: '/',
 	plugins: [
 		sveltekit(),
-		SvelteKitPWA(pwaOptions),
+		// SvelteKitPWA(pwaOptions),
 		paraglideVitePlugin({
 			project: './project.inlang',
 			outdir: './src/translations',
@@ -171,9 +187,5 @@ export default defineConfig({
 		// Required to use browser APIs in testing
 		environment: 'jsdom',
 		setupFiles: ['./tests/setup.ts'],
-	},
-	// assetsInclude: ['**/*.tar.gz'],
-	optimizeDeps: {
-		exclude: ['@electric-sql/pglite'],
 	},
 });

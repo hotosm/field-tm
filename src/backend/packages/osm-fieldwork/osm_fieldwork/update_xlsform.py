@@ -35,16 +35,18 @@ import pandas as pd
 from python_calamine.pandas import pandas_monkeypatch
 
 from osm_fieldwork.enums import DbGeomType
-from osm_fieldwork.form_components.choice_fields import choices_df
+from osm_fieldwork.form_components.choice_fields import get_choice_fields, generate_task_id_choices
 from osm_fieldwork.form_components.mandatory_fields import (
+    get_photo_repeat_end,
     meta_df,
     create_survey_df,
-    photo_collection_df,
+    get_photo_collection_field,
+    get_photo_repeat_field,
     create_entity_df,
 )
 from osm_fieldwork.form_components.digitisation_fields import (
-    digitisation_df, 
-    digitisation_choices_df,
+    digitisation_fields,
+    digitisation_choices, 
 )
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES, add_label_translations
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -59,7 +61,7 @@ FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
 
-def standardize_xlsform_sheets(xlsform: dict) -> dict:
+def standardize_xlsform_sheets(xlsform: dict, default_language: str):
     """Standardizes column headers in both the 'survey' and 'choices' sheets of an XLSForm.
 
     - Strips spaces and lowercases all column headers.
@@ -72,7 +74,7 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
         dict: The updated XLSForm dictionary with standardized column headers.
     """
 
-    def standardize_language_columns(df):
+    def standardize_language_columns(df, default_language):
         """Standardize existing language columns.
 
         :param df: Original DataFrame with existing translations.
@@ -95,8 +97,8 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
                         if lang_name in INCLUDED_LANGUAGES:
                             standardized_col = f"{base_col}::{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
 
-                elif col == base_col:  # if only label,hint or required_message then add '::english(en)'
-                    standardized_col = f"{base_col}::english(en)"
+                elif col == base_col:
+                    standardized_col = f"{base_col}::{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})"
 
                 if col != standardized_col:
                     df.rename(columns={col: standardized_col}, inplace=True)
@@ -116,15 +118,19 @@ def standardize_xlsform_sheets(xlsform: dict) -> dict:
                 return df[df[column].notna()]
         return df
 
+    label_cols = set()
     for sheet_name, sheet_df in xlsform.items():
         if sheet_df.empty:
             continue
         # standardize the language columns
-        sheet_df = standardize_language_columns(sheet_df)
+        sheet_df = standardize_language_columns(sheet_df, default_language)
         sheet_df = filter_df_empty_rows(sheet_df)
+        label_cols.update(
+            [col for col in sheet_df.columns if "label" in col.lower()]
+        )
         xlsform[sheet_name] = sheet_df
 
-    return xlsform
+    return xlsform, list(label_cols)
 
 
 def normalize_with_meta(row, meta_df):
@@ -139,6 +145,7 @@ def normalize_with_meta(row, meta_df):
 def merge_dataframes(
         mandatory_df: pd.DataFrame, 
         user_question_df: pd.DataFrame, 
+        add_label: bool,
         digitisation_df: Optional[pd.DataFrame] = None,
         photo_collection_df: Optional[pd.DataFrame] = None,
         need_verification: Optional[bool] = True,
@@ -192,15 +199,17 @@ def merge_dataframes(
     # feature does not exist. If we don't have the `feature_exists` question, then
     # wrapping in the group is unnecessary (all groups are flattened in processing anyway)
     if need_verification:
+        survey_group_field = {
+            "type": ["begin group"],
+            "name": ["survey_questions"],
+            "relevant": "(${feature_exists} = 'yes') or (${status} = '2')",
+        }
+        if add_label:
+            survey_group_field = add_label_translations(survey_group_field)
         survey_group = {
             "begin": (
                 pd.DataFrame(
-                    add_label_translations({
-                        "type": ["begin group"],
-                        "name": ["survey_questions"],
-                        # Status 3 means collecting new feature
-                        "relevant": "(${feature_exists} = 'yes') or (${status} != '3')",
-                    })
+                    survey_group_field
                 )
             ),
             "end": pd.DataFrame({"type": ["end group"]}
@@ -263,12 +272,109 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
     return pd.concat([top_df, additional_row, coordinates_row, bottom_df], ignore_index=True)
 
 
+async def _process_all_form_tabs(
+    custom_sheets: pd.DataFrame,
+    form_name: str = f"fmtm_{uuid4()}",
+    additional_entities: Optional[list[str]] = None,
+    new_geom_type: DbGeomType = DbGeomType.POINT,
+    need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
+    use_odk_collect: bool = False,
+    label_cols: list[str] = [],
+    default_language: str = "english",
+) -> tuple[str, pd.DataFrame]:
+    if "label" in label_cols:
+        add_label = False
+        digitisation_df = pd.DataFrame([
+            add_label_translations(field, label_cols)
+            for field in digitisation_fields
+        ])
+        digitisation_choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in digitisation_choices
+        ])
+        choices_df = pd.DataFrame([
+            add_label_translations(choice, label_cols)
+            for choice in get_choice_fields(use_odk_collect)
+        ])
+        photo_collection_df = pd.DataFrame([
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
+            add_label_translations(get_photo_repeat_field()),
+            add_label_translations(get_photo_repeat_end())
+        ])
+    else:
+        add_label = True
+        digitisation_df = pd.DataFrame([
+            add_label_translations(field)
+            for field in digitisation_fields
+        ])
+        digitisation_choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in digitisation_choices
+        ])
+        choices_df = pd.DataFrame([
+            add_label_translations(choice)
+            for choice in get_choice_fields(use_odk_collect)
+        ])
+        photo_collection_df = pd.DataFrame([
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
+            add_label_translations(get_photo_repeat_field()),
+            add_label_translations(get_photo_repeat_end())
+        ])
+
+    # Configure form settings
+    xform_id = _configure_form_settings(custom_sheets, form_name, default_language)
+
+    # Select appropriate form components based on target platform
+    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df, label_cols)
+    
+    # Process survey sheet
+    custom_sheets["survey"] = _process_survey_sheet(
+        custom_sheets.get("survey"),
+        form_components["survey_df"],
+        form_components["digitisation_df"] if need_verification_fields else None,
+        form_components["photo_collection_df"],
+        add_label = add_label,
+        need_verification=need_verification_fields,
+    )
+    
+    # Process choices sheet
+    custom_sheets["choices"] = _process_choices_sheet(
+        custom_sheets.get("choices"), 
+        form_components["choices_df"],
+        form_components["digitisation_choices_df"],
+        add_label = add_label,
+    )
+
+    # Process entities and settings sheets
+    custom_sheets["entities"] = form_components["entities_df"]
+    _validate_required_sheet(custom_sheets, "entities")
+    
+    # Handle additional entities if specified
+    if additional_entities:
+        custom_sheets["survey"] = _add_additional_entities(custom_sheets["survey"], additional_entities)
+
+    return (xform_id, custom_sheets)
+
+
+async def write_xlsform(form_content: pd.DataFrame) -> BytesIO:
+    """Write the dataframe to Excel wrapped in BytesIO object."""
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        for sheet_name, df in form_content.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+    output.seek(0)
+    return output
+
+
 async def append_field_mapping_fields(
     custom_form: BytesIO,
     form_name: str = f"fmtm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
+    mandatory_photo_upload: bool = False,
+    default_language: str = "english",
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
@@ -299,50 +405,153 @@ async def append_field_mapping_fields(
         log.error(msg)
         raise ValueError(msg)
     
-    custom_sheets = standardize_xlsform_sheets(custom_sheets)
-
-    # Select appropriate form components based on target platform
-    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields)
-    
-    # Process survey sheet
-    custom_sheets["survey"] = _process_survey_sheet(
-        custom_sheets.get("survey"),
-        form_components["survey_df"],
-        form_components["digitisation_df"] if need_verification_fields else None,
-        form_components["photo_collection_df"],
-        need_verification=need_verification_fields,
+    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets, default_language)  # Also get the label columns
+    xformid, updated_form = await _process_all_form_tabs(
+        custom_sheets=custom_sheets,
+        form_name=form_name,
+        additional_entities=additional_entities,
+        new_geom_type=new_geom_type,
+        need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
+        use_odk_collect=use_odk_collect,
+        label_cols=label_cols,
+        default_language=default_language
     )
-    
-    # Process choices sheet
-    custom_sheets["choices"] = _process_choices_sheet(
-        custom_sheets.get("choices"), 
-        form_components["choices_df"],
-        form_components["digitisation_choices_df"],
+    return (xformid, await write_xlsform(updated_form))
+
+
+async def append_task_id_choices(
+    existing_form: BytesIO,
+    task_ids: list[int],
+) -> BytesIO:
+    """From the previously modified form, add the final task_filter choices."""
+
+    task_id_choice_df = generate_task_id_choices(task_ids)
+
+    existing_sheets = pd.read_excel(existing_form, sheet_name=None, engine="calamine")
+    if "choices" not in existing_sheets:
+        raise ValueError("Choices sheet is required in XLSForm!")
+
+    choices_df = existing_sheets["choices"]
+
+    # Ensure translation columns exist in BOTH dataframes
+    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
+        label_key = f"label::{lang_name}({lang_key})"
+        if label_key not in choices_df.columns:
+            choices_df[label_key] = ""
+        if label_key not in task_id_choice_df.columns:
+            task_id_choice_df[label_key] = ""
+
+    # Append new rows
+    choices_df = pd.concat([choices_df, task_id_choice_df], ignore_index=True)
+
+    # Fill translations for new rows (string compare to avoid int/str mismatch)
+    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
+        label_key = f"label::{lang_name}({lang_key})"
+        for task_id in task_ids:
+            mask = choices_df["name"].astype(str) == str(task_id)
+            choices_df.loc[mask, label_key] = str(task_id)
+
+    # Drop plain "label" if translations exist
+    if "label" in choices_df.columns:
+        choices_df = choices_df.drop(columns=["label"])
+
+    existing_sheets["choices"] = choices_df
+
+    return await write_xlsform(existing_sheets)
+
+
+async def modify_form_for_qfield(
+    custom_form: BytesIO,
+    geom_layer_type: DbGeomType = DbGeomType.POINT,
+) -> tuple[Optional[str], BytesIO]:
+    """Append mandatory fields to the XLSForm for use in QField.
+
+    Args:
+        custom_form (BytesIO): The XLSForm data uploaded, wrapped in BytesIO.
+        new_geom_type (DbGeomType): The type of geometry required when collecting
+            new geometry data: point, line, polygon. Defaults to DbGeomType.POINT.
+
+    Returns:
+        tuple[str, BytesIO]: The updated XLSForm wrapped in BytesIO.
+        
+    Raises:
+        ValueError: If required sheets are missing from the XLSForm.
+    """
+    log.info("Modifying XLSForm to work with QField")
+
+    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    if "survey" not in custom_sheets:
+        msg = "Survey sheet is required in XLSForm!"
+        log.error(msg)
+        raise ValueError(msg)
+
+    # Get first available language in format 'english(en)'
+    form_languages = []
+    all_columns = custom_sheets["survey"].columns.tolist()
+    for col_name in all_columns:
+        if "::" in col_name:
+            form_languages.append(col_name)
+    form_language = form_languages[0].split("::")[1] if form_languages else None
+    if (total_languages := len(form_languages)) > 1:
+        log.warning(
+            f"Found {total_languages} form translations, but only the first will "
+            f"be used {form_language}"
+        )
+
+    # 1. Replace the "select_one_from_file features.csv"
+    #    row with a geometry field
+    qf_survey_df = custom_sheets["survey"]
+    geom_type_map = {
+        DbGeomType.POINT: "geopoint",
+        DbGeomType.POLYGON: "geoshape",
+        DbGeomType.LINESTRING: "geotrace",
+    }
+    geom_type = geom_type_map.get(geom_layer_type, "geopoint")
+    geom_field_mask = qf_survey_df["type"] == "select_one_from_file features.csv"
+    if geom_field_mask.any():
+        idx = qf_survey_df.index[geom_field_mask][0]
+        # Build the replacement row
+        replacement = qf_survey_df.iloc[idx:idx+1].copy()
+        replacement.loc[:, "type"] = geom_type
+        replacement.loc[:, "name"] = "feature"
+        # Replace the row
+        qf_survey_df = pd.concat(
+            [qf_survey_df.iloc[:idx], replacement, qf_survey_df.iloc[idx+1:]]
+        ).reset_index(drop=True)
+
+    # 2. Remove the 'start-geopoint' field we add as mandatory fields for ODK
+    #    - this breaks XLSFormConverter identifying the correct geom type
+    start_geopoint_mask = qf_survey_df["type"] == "start-geopoint"
+    if start_geopoint_mask.any():
+        qf_survey_df = qf_survey_df[~start_geopoint_mask].reset_index(drop=True)
+
+    # 3. Wrap the final two rows (end_note, image) in a group,
+    #    so they display correctly as final QField tab
+    last_two_rows = qf_survey_df.tail(2)
+    begin_row = pd.DataFrame([{"type": "begin group", "name": "final"}])
+    end_row = pd.DataFrame([{"type": "end group", "name": None}])
+    # Rebuild: all rows except last two + begin + last two + end
+    qf_survey_df = pd.concat(
+        [qf_survey_df.iloc[:-2], begin_row, last_two_rows, end_row],
+        ignore_index=True,
     )
 
-    # Process entities and settings sheets
-    custom_sheets["entities"] = form_components["entities_df"]
-    _validate_required_sheet(custom_sheets, "entities")
-    
-    # Configure form settings
-    xform_id = _configure_form_settings(custom_sheets, form_name)
-    
-    # Handle additional entities if specified
-    if additional_entities:
-        custom_sheets["survey"] = _add_additional_entities(custom_sheets["survey"], additional_entities)
-    
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        for sheet_name, df in custom_sheets.items():
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
-    output.seek(0)
-    return (xform_id, output)
+    # 4. Update survey sheet in updated_form
+    custom_sheets["survey"] = qf_survey_df
+
+    return (form_language, await write_xlsform(custom_sheets))
 
 
 def _get_form_components(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
-        need_verification_fields: bool
+        need_verification_fields: bool,
+        choices_df: pd.DataFrame,
+        digitisation_df: pd.DataFrame,
+        digitisation_choices_df: pd.DataFrame,
+        photo_collection_df: pd.DataFrame,
+        label_cols: list[str],
     ) -> dict:
     """Select appropriate form components based on target platform."""
     if use_odk_collect:
@@ -353,7 +562,7 @@ def _get_form_components(
         digitisation_df.loc[digitisation_correct_col, "read_only"] = "${new_feature} != ''"
 
     return {
-        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields),
+        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields, label_cols),
         "choices_df": choices_df,
         "digitisation_df": digitisation_df,
         "photo_collection_df": photo_collection_df,
@@ -367,6 +576,7 @@ def _process_survey_sheet(
         survey_df: pd.DataFrame, 
         digitisation_df: pd.DataFrame,
         photo_collection_df: pd.DataFrame,
+        add_label: bool,
         need_verification: Optional[bool] = True,
     ) -> pd.DataFrame:
     """Process and merge survey sheets."""
@@ -374,6 +584,7 @@ def _process_survey_sheet(
     return merge_dataframes(
         survey_df,
         existing_survey,
+        add_label=add_label,
         digitisation_df=digitisation_df,
         photo_collection_df=photo_collection_df,
         need_verification=need_verification,
@@ -384,6 +595,7 @@ def _process_choices_sheet(
         existing_choices: pd.DataFrame, 
         choices_df: pd.DataFrame, 
         digitisation_choices_df: pd.DataFrame,
+        add_label: bool,
     ) -> pd.DataFrame:
     """Process and merge choices sheets."""
     log.debug("Merging choices sheet XLSForm data")
@@ -394,6 +606,7 @@ def _process_choices_sheet(
     return merge_dataframes(
         choices_df,
         existing_choices,
+        add_label=add_label,
         digitisation_df=digitisation_choices_df,
     )
 
@@ -408,7 +621,7 @@ def _validate_required_sheet(
         raise ValueError(msg)
 
 
-def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
+def _configure_form_settings(custom_sheets: dict, form_name: str, default_language: str) -> str:
     """Configure form settings and extract/set form ID.
     
     Args:
@@ -427,7 +640,7 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
             "version": current_datetime,
             "form_title": form_name,
             "allow_choice_duplicates": "yes",
-            "default_language": "en"
+            "default_language": f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
         }])
         
         log.debug(f"Created default settings with form_id: {xform_id}")
@@ -448,7 +661,14 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
     settings["form_title"] = form_name
     
     if "default_language" not in settings:
-        settings["default_language"] = "en"
+        settings["default_language"] = f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
+    else:
+        default_language_value = settings["default_language"].iloc[0]
+
+        if "(" not in default_language_value:
+            code = INCLUDED_LANGUAGES.get(default_language_value)
+            if code:
+                settings["default_language"] = f"{default_language_value}({code})"
     
     return xform_id
 
@@ -494,13 +714,22 @@ async def main():
         default=DbGeomType.POINT,
     )
     parser.add_argument(
-        "-vr",
+        "-verify",
         "--need-verification-fields",
         type=str2bool,
         nargs='?',
         const=True,
         default=True,
         help="Requirement of verification questions (true/false)",
+    )
+    parser.add_argument(
+        "-photo",
+        "--mandatory-photo-upload",
+        type=str2bool,
+        nargs='?',
+        const=True,
+        default=False,
+        help="Requirement of photo upload field (true/false)",
     )
     parser.add_argument(
         "-odk",
@@ -548,6 +777,7 @@ async def main():
         additional_entities=args.additional_dataset_names,
         new_geom_type=args.new_geom_type,
         need_verification_fields=args.need_verification_fields,
+        mandatory_photo_upload=args.mandatory_photo_upload,
         use_odk_collect=args.use_odk_collect,
     )
 
@@ -556,6 +786,11 @@ async def main():
         file_handle.write(form_bytes.getvalue())
 
 
+def run():
+    """Wrapper to run via CLI / pyproject scripts."""
+    asyncio.run(main())
+
+
 if __name__ == "__main__":
     """Wrap for running the file directly."""
-    asyncio.run(main())
+    run()

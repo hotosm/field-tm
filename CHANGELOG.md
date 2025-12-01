@@ -1,5 +1,279 @@
 # Changelog
 
+## 2025.6.1 (2025-10-23)
+
+### Feat
+
+- **mapper**: add basemap loader to 'more' section for custom imagery
+- init qfield org and user at startup
+- **mapper**: allow mapper to view existing collected data from last submission (#2860)
+- **backend**: add option to include media in submission JSON download (#2823)
+- **backend**: save QField server creds (#2849)
+- **osm-fieldwork**: make the photo upload required=True or False (configurable)
+- **backend**: add endpoint to check if qfield cloud credentials are valid
+
+### Fix
+
+- **area-splitter**: remove accidentally added loguru dep to area-splitter db
+- **osm-fieldwork**: ensure start-geopoint question is removed from qfield xlsform
+- **qfield**: fix qfield worker wrapper (for processing qfield project file)
+- **package**: expose python package scripts to uv command runner
+- **backend**: QField Project creation fixes (#2864)
+- **qfield**: correct QFieldCloud credentials test endpoint to use QField instead of ODK
+- **qfield**: fix the redirect QFieldCloud URL.
+- **mapper**: allow setting primaryLocale on mapper frontend config
+- **createProject**: on qfield select and generate-project-data success, redirect user to qfield cloud dashboard (#2861)
+- **mapper**: ordering of dialogs to confirm mapping complete
+- **mapper**: make translations clearer for total features mapped checj
+- **mapper**: remove broken stamen black&white basemap
+- **mapper**: add translations for all map controls
+- **mapper**: add translations for all maplibre control tooltips
+- **mapper**: alignment of 'got it' button text in geolocation dialog
+- **mapper**: replace icons for new point and delete point
+- **mapper**: brazillian portuguese proceed translation all caps
+- **mapper**: add translation for project home page
+- **mapper**: add configurable tabTitle for mapper frontend (page title)
+- **mapper**: login dialog for private projects, if not logged in (#2852)
+- **mapper**: add clearer text highlighting for initial instructions
+- **backend**: do not error if featcol has no properties key multi --> single geom
+- **createProjectService**: throw error and stop project creation if any of the project creation apis fail (#2846)
+- **backend**: qfield geometry validation in project creation service
+- **backend**: comment out psycopg otel instrumentor for now
+- **backend**: remove psycopg opentelemetry instrumentation until fixed
+- **backend**: init of db on server startup
+- update init order for db pool initialisation
+- **backend**: init of loguru in the database init file
+
+### Refactor
+
+- **osm-fieldwork**: converted xlsforms to .yaml for better version control (#2865)
+- remove QFIELDCLOUD_ORG_NAME var
+- **qfield**: hide QFieldCloud password using secrets instead of plain text
+
+## 2025.6.0 (2025-09-28)
+
+### Feat
+
+- **backend**: add endpoint to retry qfield project generation
+- **osm-fieldwork**: add function to append task_id choices to form after created
+- **backend**: QField Cloud integration (#2828)
+- **frontend**: Refactor landing page according to feedback (#2831)
+- **submission**: Add endpoint to edit existing submissions. (#2820)
+- **backend**: allow setting cookie domains not using subdomains (#2822)
+- **project**: add 'use_st_within' option for data extraction and update form handling (#2807)
+
+### Fix
+
+- **backend**: create qfield project with no spaces in the name
+- **backend**: correctly set qfieldcloud project owner to HOTOSM org
+- **backend**: set qfieldcloud client with token explicitly
+- **createProject**: update use_odk_collect state during stub project creation (#2839)
+- **backend**: improving logs for qfield project creation, login on demand only
+- **osm-fieldwork**: hook urllib logger when LOG_LEVEL=DEBUG
+- **qfield**: handle spaces in project name for final qgis project file
+- **backend**: log the final qfield project file location
+- **mapper**: do not enable webforms when mapping app selection = ODK or QField
+- **backend**: usage of aiohttp for qfield project creation
+- **backend**: add task_filter question to ODK Collect workflow offline
+- **backend**: handling of multipolygons with z dimension (e.g. from qgis)
+- **backend**: fail gracefully if project location_str extraction fails
+- **frontend**: missed isProjectDeletePending app selector
+- **backend**: do not fails to start api if QField creds are incorrect
+- **backend**: use aiohttp vs httpx for qfield cloud calls
+- **backend**: using FMTM_DEV_PORT locally
+- fixes #2825 modularlise area-splitter package algorithm
+- **backend**: set correct domain for expiring cookies
+- **backend**: also correctly set cookie domain for osm cookie
+- **backend**: reference to FMTM_MAPPER_DOMAIN in config.py
+- **mapper**: add matomo tracking via config.json param
+
+### Refactor
+
+- **backend**: swap redirectresponse --> jsonresponse qfield project dash url
+- **mapper**: minor typing issue
+- remove details about custom odk application
+- remove old scripts from repo, reorganise
+- fix area-splitter current version
+- fixes #2796 full migration of fmtm-splitter as workspace
+- replace all reference fmtm.dev --> fieldtm.hotosm.org
+
+## 2025.5.0 (2025-08-28)
+
+### Feat
+
+- **mapper**: hot matomo tracking component add (#2788)
+- **frontend**: merge AOI by default on upload during proj create (#2782)
+- **frontend**: Update task list after task event action (#2783)
+- **backend**: add merge choice during project creation and default visibility (#2779)
+- **frontend**: Task User Assignment (#2775)
+- **mapper**: remove 'Offline' & Add 'My Tasks' section (#2773)
+- **organisation**: Add project status in organisation stats. (#2771)
+- **backend**: org based submission download and infographics (#2689)
+- **mapper**: clustering if primary geoms are point & update point icon (#2555)
+
+### Fix
+
+- **tasks**: correct assignee_sub variable in add_new_task_event function (#2802)
+- **backend**: fix mapper access to assigned task in private project. (#2795)
+- **mapper**: skipping of feature_exists questions for new geoms
+- **backend**: add more information to logs on /stub creation failure
+- **frontend**: Restrict mappers to update task  (#2780)
+- **migration**: Fix broken migration of project visibility. (#2774)
+- **backend**: search functionality when query includes space. (#2767)
+- **mapper**: web-forms fixed option image display (#2765)
+
+### Refactor
+
+- **mapper**: upgrade hotosm/ui package on mapper frontend (#2797)
+- **backend**: project visibility removing SENSITIVE and INVITE_ONLY (#2772)
+- **frontend**: replace API usage and types with Tanstack Query (#2768)
+- **mapper**: add status filter add to project summary and other minor refactors (#2763)
+
+## 2025.4.3 (2025-08-01)
+
+### Feat
+
+- **OdkCentral**: add async method to retrieve submission XML content (#2759)
+
+### Fix
+
+- **backend**: backend part to allow listing of required media from uploaded XLSForm (#2738)
+- **mapper**: bad geometry layer & layer unselectable on manual sync issue (#2757)
+- **mapper**: avoid parse of submission XML to string in memory, towards #2740
+- **styles**: make task & entity entity dialog title bold and primary color (#2748)
+- **main**: wrap geolocation inside toggleLayer condition to retain location layer after baselayer switch (#2747)
+
+## 2025.4.2 (2025-07-30)
+
+### Feat
+
+- **mapper**: remove pglite, rely on svelte store + electric sync (#2732)
+
+### Fix
+
+- **frontend**: include credentials when getting form media
+- **validation**: UI crash on AOI reset & continue next (#2734)
+
+## 2025.4.1 (2025-07-26)
+
+### Feat
+
+- Role unassign from project and odk cred check endpoint (#2708)
+- **json-models**: Added json model of each yaml data models
+- progressive project creation workflow draft / published (#2680)
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- add highways.xlsx in osm-fieldwork and osm_category in frontend
+- **backend**: Replace osm_rawdata with raw_data_api_py adding highway category
+
+### Fix
+
+- **models**: fix project visibility to exclude draft projects for cross organisation manager (#2731)
+- **mapper**: fix features not updating acc to extent click after baselayer change by remounting layer (#2728)
+- use st intersects for linear geoms during project file generation (#2715)
+- **frontend**: use global extent for Line geometry & other fixes (#2711)
+- update project API endpoint to use project ID in URL (#2710)
+- **backend**: avoid slash in data extract file name
+- **backend**: pass access token to generate osm extracts
+- questions wont be skipped for new entity worflow (#2707)
+- **frontend**: project creation bugs & refactor (#2692)
+- **pytest**: remove print statement
+- **pytest**: fix the fixture name and user in submission
+- **projects**: fix total contributions mismatch in infographics (#2691)
+- **backend**: add mapping mode options and fix standard odk collect workflow (#2690)
+- **mapper**: correctly set extent for fgb polyline to undefined
+- **mapper**: towards #2663, fix linestring display for mapper frontend
+- **mapper**: load initial entity db records prior to sync
+- **pytest**: update pytest function test_get_contributors with proper assert and fixture
+- **projects**: fix total contributions mismatch in infographics (#2691)
+- **backend**: add mapping mode options and fix standard odk collect workflow (#2690)
+- **mapper**: correctly set extent for fgb polyline to undefined
+- **mapper**: towards #2663, fix linestring display for mapper frontend
+- **mapper**: load initial entity db records prior to sync
+- **xlsform**: update conflict changes with dev branch
+- **xlsform**: update conflict changes with dev branch
+- **data-models**: fixed the syntax error in models.yaml file
+- **backend**: create valid geojson from javarosa, update osm conflation with raw-data-api-py
+- **main**: dont select existing entity if new entity draw mode is enabled (#2688)
+- **taskList**: fix no task list not being displayed having no features (#2681)
+- **frontend**: pass in entire project aoi extent for fgb filtering polylines #2663
+- **frontend**: disable split by square for polylines
+- **frontend**: disable splitting by square for line geom mapping #2663
+- **backend**: use SecretStr for backend SMTP_PASSWORD
+- **mapper**: bug with pagination on mapper summaries page
+- add docstring for geom_type
+- **xlsform**: update xlsx highway form to xls with latest form
+- **frontend**: pass in entire project aoi extent for fgb filtering polylines #2663
+- **frontend**: disable split by square for polylines
+- **frontend**: disable splitting by square for line geom mapping #2663
+- **backend**: use SecretStr for backend SMTP_PASSWORD
+- **mapper**: bug with pagination on mapper summaries page
+- **build**: issues from rebase
+
+### Refactor
+
+- **mapper**: replaced font-barlow with font-primary (#2700)
+- **frontend**: remove old project creation code (#2705)
+- missed console log
+- missed console log
+- **backend**: update code with json data models
+- update test cases based on stub project creation workflow
+- update test cases based on stub project creation workflow
+- backend
+- **backend**: simplify local dev odkcentral setup, no extra proxy rules, no https required
+- backend
+- **backend**: simplify local dev odkcentral setup, no extra proxy rules, no https required
+
+## 2025.4.0 (2025-07-09)
+
+### Feat
+
+- **backend**: add highways xlsform for #2630
+- **backend**: implement scheduled upload of project submissions to S3 (#2643)
+- **backend**: add 'SENSITIVE' project and allow public access to public and invite only projects (#2653)
+- **mapper**: display offline submissions in offline tab for debugging (+csv) (#2543)
+- add status chip to project card & details section (#2623)
+- Project Completed Workflow (#2618)
+- **frontend**: request HOT's ODK server workflow (#2595)
+
+### Fix
+
+- **backend**: missing From header in smtp email send config
+- **mapper**: display css overlay with locale warning in web-forms (#2665)
+- **deps**: update dependency @electric-sql/pglite-sync to v0.3.7 (#2669)
+- **deps**: update dependency @electric-sql/pglite to v0.3.4 (#2668)
+- **deps**: update dependency @electric-sql/client to v1.0.5 (#2667)
+- **backend**: add a check to get-form-media to avoid returning bytes
+- **ci**: allow e2e workflow on forks (#2644)
+- **frontend**: ensure 'include centroids' param included in osm exports (#2660)
+- **backend**: update visibility logic for project access permissions (#2658)
+- **frontend**: project qr option & submission table (#2657)
+- **mapper**: prompt login before sending offline submission if made by logged out user (#2641)
+- **mapper**: conditionally render status badges on project card (#2635)
+- **mapper**: allow multiple submission id's tracked via entity property (#2634)
+- **mapper**: add user_sub to api_submissions table via migration / login
+- **backend**: submission count in project card and detail page (#2616)
+- **mapper**: disable upload image preview (#2622)
+- **backend**: suppress invalid error from pyodk about cache file  (#2614)
+- **mapper**: mapping feature for a second time (#2601)
+- **frontend**: submission count on project submissions page (#2612)
+
+### Refactor
+
+- **backend**: tweak SMTP vars for rollout dev/stage/prod, related #2458
+- **backend**: update to latest pyodk, removing custom code, towards #2210
+- update highways.xlsx --> highways.xls for consistency
+- rename repo fmtm --> field-tm & update all links
+- rename development branch --> dev
+- improve the icon used for point data in both frontends (#2640)
+- remove additional_feature entity functionality from fieldtm (#2633)
+- add favicon.ico and favicon.svg in root to gitignore
+- **userInvite**: invite multiple osm user by comma seperated value (#2621)
+- **frontend**: user role access components (#2611)
+- **frontend**: dedicated skeleton loader folder, reduce dup (#2609)
+
 ## 2025.3.1 (2025-06-17)
 
 ### Feat
@@ -708,7 +982,7 @@
 - **frontend**: update link to custom odk collect from intent apk
 - **frontend**: import hotosm/ui styles.css --> style.css change
 - remove reference to 'topo' basemap imagery provider (usgs)
-- rename fmtm.dev --> docs.fmtm.dev for docs site
+- rename fmtm.dev --> docs.fieldtm.hotosm.org for docs site
 
 ## 2024.3.0 (2024-05-28)
 

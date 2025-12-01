@@ -76,6 +76,22 @@ The API should now be accessible at: <http://api.fmtm.localhost:7050/docs>
 
 ## Backend Tips
 
+### Authenticating With The API
+
+- To authenticate with the backend, it is required to send with the
+  request one of either:
+  1. A cookie for the root domain, with a valid auth token.
+     e.g. for `field-tm.hotosm.org`, and `mapper.field-tm.hotosm.org`,
+     a cookie for the API set on domain `field-tm.hotosm.org` with
+     authenticate both frontends.
+- The easiest option is to start the frontend, login via the
+  frontend (this sets the cookie), then make the API calls you need
+  in the same browser where the cookie was set. It will be sent for
+  every request on the root domain (e.g. `field-tm.hotosm.org`).
+- There is no need to send authentication headers manually
+  (although this is also a valid option if needed,
+  see [creating projects via the API](#creating-projects-via-the-api)).
+
 ### Database Migration
 
 #### Creating Migration Files
@@ -139,7 +155,7 @@ just migrate
 To run the backend tests locally, run:
 
 ```bash
-docker compose run --rm api pytest
+docker compose -f compose.test.yaml run --rm api pytest
 
 # Or via Just
 just test backend
@@ -236,9 +252,10 @@ This adds JOSM to the docker compose stack for local development.
 You can now call the JOSM API from Field-TM and changes will be
 reflected in the GUI.
 
-### Debugging ODK forms when running on localhost
+### Debugging ODK Collect & QField when running on localhost
 
-- ODK Collect requires an externally accessible instance of Central.
+- ODK Collect and QField require externally accessible project servers
+  to pull from.
 - To achieve this for local development / debugging, a good solution is Cloudflare
   tunnelling (alternative to Ngrok).
 - There is a helper script to do this automatically for you:
@@ -247,10 +264,12 @@ reflected in the GUI.
   just start tunnel
   ```
 
-Once started, use the output ODK Central URL from the terminal during
-project creation. The QRCode should now work in ODK Collect.
+Once started, use the output URLs from the terminal during
+project creation. The QRCodes should now work in ODK Collect
+or QField (depending on project type).
 
-> The credentials for the local ODK Central instance are:
+> The credentials for the local ODK Central or QField instances
+> are:
 > Username: <admin@hotosm.org>
 > Password: Password1234
 
@@ -271,6 +290,15 @@ to create projects and call API endpoints, using the key.
 - Save the API key somewhere safe! The key can access all your data in Field-TM!
 - For any API call you make in the next section, ensure to set the `x-api-key`
   header. See the example in the next section!
+
+<!-- markdownlint-disable -->
+
+!!! note
+
+      Ensure the user you create the API key for has `is_email_verified=True`
+      in the users table of the database, else this won't work.
+
+<!-- markdownlint-restore -->
 
 #### 2. Create project metadata
 
@@ -293,7 +321,7 @@ The metadata for a project must be created first.
   - A GeoJSON of the area you wish to map.
 
 - See further details of the exact endpoint requirements
-  [here](https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi/openapi.json#/projects/create_project_projects_post)
+  [here](https://hotosm.github.io/swagger/?url=https://docs.fieldtm.hotosm.org/openapi/openapi.json#/projects/create_project_projects_post)
 
 - Post the JSON data to the following endpoint: `/projects?org_id=xxx`
 

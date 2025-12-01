@@ -20,11 +20,13 @@
 
 from time import time
 from typing import Optional
+from urllib.parse import urlparse
 
 import jwt
 from fastapi import HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from loguru import logger as log
+from tldextract import extract as domain_root_extract
 
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
@@ -57,6 +59,30 @@ def get_cookie_value(request: Request, *cookie_names: str) -> Optional[str]:
     return None
 
 
+def get_root_domain(domain_or_url: str) -> str:
+    """Extract root domain from a domain or URL."""
+    if domain_or_url.startswith(("http://", "https://")):
+        parsed = urlparse(domain_or_url)
+        domain = parsed.hostname
+        if not domain:
+            raise ValueError("Domain root could not be determined")
+    else:
+        domain = domain_or_url
+
+    # tldextract handles public suffixes nicely, like co.uk, com.np, etc
+    ext = domain_root_extract(domain)
+    if not ext.domain or not ext.suffix:
+        raise ValueError(f"Invalid domain: {domain}")
+    return f"{ext.domain}.{ext.suffix}"
+
+
+def domains_compatible_for_cookies(domain1: str, domain2: str) -> bool:
+    """Check if two domains can share cookies (same root domain)."""
+    root1 = get_root_domain(domain1)
+    root2 = get_root_domain(domain2)
+    return root1 == root2
+
+
 def set_cookie(
     response: Response,
     key: str,
@@ -82,6 +108,28 @@ def set_cookie(
     )
 
 
+def get_cookie_domain() -> str:
+    """Get the appropriate cookie domain, depending on domain structure."""
+    if settings.FMTM_MAPPER_DOMAIN:
+        mapper_domain = settings.FMTM_MAPPER_DOMAIN
+        manager_domain = settings.FMTM_DOMAIN
+
+        # Check if domains are compatible for cookie sharing
+        if domains_compatible_for_cookies(mapper_domain, manager_domain):
+            mapper_root = get_root_domain(mapper_domain)
+            return f".{mapper_root}"  # Leading dot for subdomain sharing
+        else:
+            # Domains are on entirely different root domains - cookies cannot be shared
+            raise ValueError(
+                f"FMTM_MAPPER_DOMAIN ({mapper_domain}) and FMTM_DOMAIN"
+                f"({manager_domain}) are on different root domains. Cookie "
+                "sharing is not possible."
+            )
+    else:
+        # Use the primary manager domain
+        return settings.FMTM_DOMAIN
+
+
 def set_cookies(
     response: Response,
     access_token: str,
@@ -103,7 +151,7 @@ def set_cookies(
         JSONResponse: A response with attached cookies (set-cookie headers).
     """
     secure = not settings.DEBUG
-    domain = settings.FMTM_DOMAIN
+    cookie_domain = get_cookie_domain()
 
     set_cookie(
         response,
@@ -111,7 +159,7 @@ def set_cookies(
         access_token,
         max_age=86400,  # 1 day
         secure=secure,
-        domain=domain,
+        domain=cookie_domain,
     )
     set_cookie(
         response,
@@ -119,7 +167,7 @@ def set_cookies(
         refresh_token,
         max_age=86400 * 7,  # 1 week
         secure=secure,
-        domain=domain,
+        domain=cookie_domain,
     )
 
     return response
@@ -259,13 +307,14 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
     """Expire cookies by setting max_age to 0."""
     for cookie_name in cookie_names:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
+        cookie_domain = get_cookie_domain()
         response.set_cookie(
             key=cookie_name,
             value="",
             max_age=0,  # Set to expire immediately
             expires=0,  # Set to expire immediately
             path="/",
-            domain=settings.FMTM_DOMAIN,
+            domain=cookie_domain,
             secure=False if settings.DEBUG else True,
             httponly=True,
             samesite="lax",

@@ -16,22 +16,46 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Allow usage of nerdctl instead of docker
+docker := env("DOCKER_ALIAS", "docker")
+
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list start
+
 # Start Field-TM
 [no-cd]
-default:
+all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  docker compose up -d
+  {{docker}} compose up -d
 
 # Production deploy, depending which branch on current
 [no-cd]
 prod:
   #!/usr/bin/env sh
+  set -e
 
-  cd {{justfile_directory()}}
-  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  bash deploy/gen-and-deploy.sh
+  # From deploy dir
+  cd {{justfile_directory()}}/deploy
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
+
+  # Config
+  just config generate-dotenv "${GIT_BRANCH}"
+  just config custom-favicon
+
+  # Build frontends
+  just build frontends-prod "${GIT_BRANCH}"
+
+  # Deploy
+  ../envsubst -no-unset -i compose.sub.yaml | \
+        {{docker}} compose -f - up --detach \
+        --remove-orphans --force-recreate
+  
+  just _echo-blue "FieldTM started successfully"
 
 # Start backend API only
 [no-cd]
@@ -39,7 +63,7 @@ backend:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  docker compose up -d api
+  {{docker}} compose up -d api
 
 # Start backend API without docker
 [no-cd]
@@ -55,7 +79,7 @@ backend-no-docker:
 # Start frontend UI (also starts backend)
 [no-cd]
 frontend:
-  docker compose up -d ui
+  {{docker}} compose up -d ui
 
 # Start frontend UI without docker, connected to staging
 [no-cd]
@@ -84,12 +108,12 @@ mapper-frontend-dev:
 # Start Field-TM without ODK Central
 [no-cd]
 without-central:
-  docker compose --profile no-odk up -d
+  {{docker}} compose --profile no-odk up -d
 
 # Start Field-TM with JOSM
 [no-cd]
 josm:
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/josm/compose.yaml \
     up -d
@@ -106,7 +130,7 @@ josm:
 # Start S3 browser
 [no-cd]
 s3-browser:
-  docker compose \
+  {{docker}} compose \
     -f contrib/s3_browser/compose.yaml \
     up -d
   
@@ -121,12 +145,12 @@ s3-browser:
   @echo
 
 
-# Externally accessible ODK Central for tests
+# Externally accessible ODK Central & QFieldCloud for tests
 [no-cd]
 tunnel:
   #!/usr/bin/env sh
 
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     up --wait
@@ -138,16 +162,17 @@ tunnel:
 
   odk_url=$(just start _get-tunnel-url 'central')
   button_url=$(just start _get-tunnel-url 'button')
+  qfc_url=$(just start _get-tunnel-url 'qfield')
 
   # Restart Central with DOMAIN var set to new tunnel URL.
   # Is is required to correctly download forms from Collect
   CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     up -d central
 
-  just start _print-tunnel-url "$odk_url" "$button_url"
+  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
 
 # View the URLs for created tunnels
 [no-cd]
@@ -156,13 +181,14 @@ view-tunnel-url:
 
   odk_url=$(just start _get-tunnel-url 'central')
   button_url=$(just start _get-tunnel-url 'button')
-  just start _print-tunnel-url "$odk_url" "$button_url"
+  qfc_url=$(just start _get-tunnel-url 'qfield')
+  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
 
 [no-cd]
 _get-tunnel-url service_name:
   #!/usr/bin/env sh
 
-  service_url=$(docker compose \
+  service_url=$({{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     logs {{service_name}}-tunnel | \
@@ -172,7 +198,7 @@ _get-tunnel-url service_name:
   echo "$service_url"
 
 [no-cd]
-_print-tunnel-url odk_url button_url:
+_print-tunnel-url odk_url button_url qfc_url:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
@@ -181,6 +207,9 @@ _print-tunnel-url odk_url button_url:
   @echo
   @echo "\033[0;34m Frontend Button URL: \033[0m"
   @echo " {{button_url}}"
+  @echo
+  @echo "\033[0;34m QFieldCloud URL: \033[0m"
+  @echo " {{qfc_url}}"
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo

@@ -4,6 +4,7 @@
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { APIProject } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { getCommonStore } from '$store/common.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte';
 	import { unicodeBold } from '$lib/utils/text.ts';
 	import { projectStatus, taskStatus } from '$constants/enums';
@@ -18,6 +19,7 @@
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
+	const commonStore = getCommonStore();
 
 	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, clickMapNewFeature }: Props = $props();
 
@@ -33,7 +35,7 @@
 	<div class="dialog-task-actions">
 		<div class="content">
 			<div class="icon">
-				<hot-icon
+				<sl-icon
 					name="close"
 					onclick={() => toggleTaskActionModal(false)}
 					onkeydown={(e: KeyboardEvent) => {
@@ -43,7 +45,7 @@
 					}}
 					role="button"
 					tabindex="0"
-				></hot-icon>
+				></sl-icon>
 			</div>
 			<div class="dialog-task-new-feature">
 				<p class="task-index">{m['popup.task']()} #{taskStore.selectedTaskIndex}</p>
@@ -61,7 +63,7 @@
 						tabindex="0"
 						class="icon"
 					>
-						<hot-icon name="new-window"></hot-icon>
+						<sl-icon name="plus-circle"></sl-icon>
 						<p class="action">{m['popup.map_new_feature']()}</p>
 					</div>
 				{/if}
@@ -101,7 +103,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="location"></hot-icon>
+							<sl-icon slot="prefix" name="location"></sl-icon>
 							<span>{m['popup.start_mapping']()}</span>
 						</sl-button>
 					</div>
@@ -127,7 +129,7 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="close"></hot-icon>
+							<sl-icon slot="prefix" name="close"></sl-icon>
 							<span>{m['popup.cancel_mapping']()}</span>
 						</sl-button>
 						<!-- keep button disabled until the entity statuses are fetched -->
@@ -147,9 +149,14 @@
 							role="button"
 							tabindex="0"
 						>
-							<hot-icon slot="prefix" name="check"></hot-icon>
+							<sl-icon slot="prefix" name="check"></sl-icon>
 							<span>{m['dialog_task_actions.complete_mapping']()}</span>
 						</sl-button>
+					</div>
+				{:else}
+					<div>
+						This task was marked as fully mapped. If you wish to unlock it and continue mapping, please contact the
+						project manager.
 					</div>
 				{/if}
 			{/if}
@@ -157,7 +164,7 @@
 	</div>
 {/if}
 
-<hot-dialog
+<sl-dialog
 	bind:this={dialogRef}
 	class="task-action-dialog"
 	open={toggleTaskCompleteConfirmation}
@@ -167,22 +174,24 @@
 	noHeader
 >
 	<h5 class="dialog-text">
+		{#key commonStore.locale}
 		{#if taskSubmission}
-			<!-- Subtle difference to include 'only' in the text here -->
 			{#if taskSubmission?.submission_count < taskSubmission?.feature_count}
-				{m['popup.task_complete_only_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
+				<!-- Inform the user not all features are mapped yet, confirm to continue or not -->
+				{m['popup.task_complete_partial_mapped']({
+					totalMapped: unicodeBold(`${taskSubmission?.submission_count}`),
+					totalFeatures: unicodeBold(`${taskSubmission?.feature_count}`),
 				})}
 				<br />
+				<br />
+				{m['popup.task_complete_confirm']()}
 			{:else}
-				{m['popup.task_complete_total_mapped']({
-					totalMapped: unicodeBold(`${taskSubmission?.submission_count}/${taskSubmission?.feature_count}`),
-				})}
+				<!-- Inform the user they have mapped all the features, continue -->
+				{m['popup.task_complete_all_mapped']()}
 				<br />
 			{/if}
 		{/if}
-		<!--  The confirmation dialog is always displayed -->
-		{m['popup.task_complete_confirm']()}
+		{/key}
 	</h5>
 	<div class="button-wrapper">
 		<sl-button
@@ -224,4 +233,4 @@
 			<span>{m['dialog_task_actions.complete_mapping']()}</span>
 		</sl-button>
 	</div>
-</hot-dialog>
+</sl-dialog>

@@ -6,7 +6,7 @@ import { Polygon } from 'ol/geom';
 import { useAppSelector } from '@/types/reduxTypes';
 import { projectTaskActivity } from '@/store/types/IProject';
 import { projectTaskBoundriesType } from '@/models/project/projectModel';
-import { task_state_labels } from '@/types/enums';
+import { task_event, task_state_labels } from '@/types/enums';
 import ActivitiesCardSkeleton from '@/components/Skeletons/ProjectDetails/ActivitiesCardSkeleton';
 import ShowingCountSkeleton from '@/components/Skeletons/ProjectDetails/ShowingCountSkeleton';
 
@@ -24,6 +24,7 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
   const projectActivityLoading = useAppSelector((state) => state?.project?.projectActivityLoading);
   const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  const projectTaskIdIndexMap = useAppSelector((state) => state?.project?.projectTaskIdIndexMap);
 
   const handleOnchange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -81,13 +82,27 @@ const TaskActivity = ({ defaultTheme, state, params, map }: taskActivityType) =>
             )}
           </div>
           <div className="fmtm-text-base fmtm-flex-1">
-            <span className="fmtm-text-[#555555] fmtm-font-medium">{taskEvent?.username} </span>
-            <span className="fmtm-text-[#7A7676] fmtm-font-extralight fmtm-italic ">updated status to </span>
-            <span style={{ color: defaultTheme.statusTextTheme[taskEvent?.state] }}>
-              {task_state_labels[taskEvent?.state]}
-            </span>
+            {taskEvent.event === task_event.ASSIGN ? (
+              <>
+                <span style={{ color: defaultTheme.statusTextTheme[taskEvent?.state] }}>
+                  Task
+                  <span className="fmtm-text-[#7A7676] fmtm-font-extralight fmtm-italic "> assigned to </span>
+                </span>{' '}
+                <span className="fmtm-text-[#555555] fmtm-font-medium">{taskEvent?.username}</span>
+              </>
+            ) : (
+              <>
+                <span className="fmtm-text-[#555555] fmtm-font-medium">{taskEvent?.username} </span>
+                <span className="fmtm-text-[#7A7676] fmtm-font-extralight fmtm-italic ">updated status to </span>
+                <span style={{ color: defaultTheme.statusTextTheme[taskEvent?.state] }}>
+                  {task_state_labels[taskEvent?.state]}
+                </span>
+              </>
+            )}
             <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
-              <p className="fmtm-text-sm fmtm-text-[#7A7676]">#{selectedTask}</p>
+              <p className="fmtm-text-sm fmtm-text-[#7A7676]">
+                #{selectedTask ? projectTaskIdIndexMap?.[selectedTask] : selectedTask}
+              </p>
               <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
                 <AssetModules.AccessTimeIcon className="fmtm-text-primaryRed" style={{ fontSize: '20px' }} />
                 <p className="fmtm-text-sm fmtm-text-[#7A7676]">

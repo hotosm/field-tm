@@ -13,7 +13,11 @@
         },
         {
           "localRoot": "${workspaceFolder}/src/backend/packages/osm-fieldwork/osm_fieldwork",
-          "remoteRoot": "/opt/python/lib/python3.12/site-packages/osm_fieldwork"
+          "remoteRoot": "/opt/python/lib/python3.13/site-packages/osm_fieldwork"
+        },
+        {
+          "localRoot": "${workspaceFolder}/src/backend/packages/area-splitter/area_splitter",
+          "remoteRoot": "/opt/python/lib/python3.13/site-packages/area_splitter"
         }
       ],
       "justMyCode": false

@@ -22,10 +22,10 @@ from SQL statements. Sometimes we only need a subset of the fields.
 """
 
 import json
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 from io import BytesIO
 from re import sub
-from typing import TYPE_CHECKING, Annotated, List, Optional, Self
+from typing import TYPE_CHECKING, Annotated, Any, List, Optional, Self
 from uuid import UUID
 
 import geojson
@@ -34,7 +34,7 @@ from fastapi import HTTPException, UploadFile
 from loguru import logger as log
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
-from psycopg.rows import class_row
+from psycopg.rows import class_row, dict_row
 from pydantic import AwareDatetime, BaseModel, Field, PositiveInt, ValidationInfo
 from pydantic.functional_validators import field_validator
 
@@ -46,6 +46,7 @@ from app.db.enums import (
     CommunityType,
     DbGeomType,
     EntityState,
+    FieldMappingApp,
     HTTPStatus,
     MappingLevel,
     MappingState,
@@ -59,6 +60,7 @@ from app.db.enums import (
     UserRole,
     XLSFormType,
 )
+from app.db.languages_and_countries import countries
 from app.db.postgis_utils import timestamp
 from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 
@@ -109,6 +111,7 @@ class DbUserRole(BaseModel):
     user_sub: str
     project_id: int
     role: ProjectRole
+    username: Optional[str] = None
 
     @classmethod
     async def create(
@@ -163,23 +166,85 @@ class DbUserRole(BaseModel):
         cls,
         db: Connection,
         project_id: Optional[int] = None,
+        role: Optional[ProjectRole] = None,
+        user_sub: Optional[str] = None,
     ) -> Optional[list[Self]]:
-        """Fetch all project user roles."""
+        """Fetch all project user roles, along with username."""
         filters = []
         params = {}
         if project_id:
-            filters.append(f"project_id = {project_id}")
+            filters.append("ur.project_id = %(project_id)s")
             params["project_id"] = project_id
+        if role:
+            filters.append("ur.role = %(role)s")
+            params["role"] = role if isinstance(role, str) else role.name
+        if user_sub:
+            filters.append("u.sub = %(user_sub)s")
+            params["user_sub"] = user_sub
+
+        sql = f"""
+                SELECT ur.*, u.username
+                FROM user_roles ur
+                JOIN users u ON ur.user_sub = u.sub
+                {"WHERE " + " AND ".join(filters) if filters else ""}
+            """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+                params if params else None,
+            )
+            return await cur.fetchall()
+
+    @classmethod
+    async def delete(
+        cls,
+        db: Connection,
+        project_id: int,
+        user_sub: str,
+    ) -> bool:
+        """Delete a user's role from a specific project (unassign user from project)."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM user_roles WHERE project_id = %(project_id)s
+                AND user_sub = %(user_sub)s;
+                """,
+                {"project_id": project_id, "user_sub": user_sub},
+            )
+        return True
+
+    @classmethod
+    async def get(
+        cls,
+        db: Connection,
+        project_id: Optional[int] = None,
+        user_sub: Optional[str] = None,
+    ) -> Optional[Self]:
+        """Fetch a user's role for a project.
+
+        filtered by any combination of user_sub and project_id.
+        """
+        filters = []
+        params = {}
+
+        if user_sub:
+            filters.append("user_sub = %(user_sub)s")
+            params["user_sub"] = str(user_sub)
+
+        if project_id is not None:
+            filters.append("project_id = %(project_id)s")
+            params["project_id"] = int(project_id)
 
         sql = f"""
             SELECT * FROM user_roles
             {"WHERE " + " AND ".join(filters) if filters else ""}
+            LIMIT 1
         """
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                sql,
-            )
-            return await cur.fetchall()
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, params if params else None)
+            return await cur.fetchone()
 
 
 class DbUser(BaseModel):
@@ -255,6 +320,7 @@ class DbUser(BaseModel):
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
         role: Optional[UserRole] = None,
+        last_login_after: Optional[date] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
         filters = []
@@ -275,6 +341,10 @@ class DbUser(BaseModel):
         if role:
             filters.append("role = %(role)s")
             params["role"] = role
+
+        if last_login_after:
+            filters.append("last_login_at >= %(last_login_after)s")
+            params["last_login_after"] = last_login_after
 
         sql = f"""
             SELECT * FROM users
@@ -957,6 +1027,8 @@ class DbTaskEvent(BaseModel):
     profile_img: Optional[str] = None
     # Computed via database trigger
     state: Optional[MappingState] = None
+    # Computed
+    project_name: Optional[str] = None
 
     @classmethod
     async def all(
@@ -965,6 +1037,7 @@ class DbTaskEvent(BaseModel):
         project_id: Optional[int] = None,
         task_id: Optional[int] = None,
         days: Optional[int] = None,
+        user_sub: Optional[str] = None,
         comments: Optional[bool] = None,
     ) -> Optional[list[Self]]:
         """Fetch all task event entries for a project.
@@ -974,6 +1047,7 @@ class DbTaskEvent(BaseModel):
             project_id (int): return all events for a project.
             task_id (Connection): return all events for a task.
             days (int): filter to only include events since X days ago.
+            user_sub (str): filter to only include events by a specific user.
             comments (bool): show comments rather than events.
 
         Returns:
@@ -981,8 +1055,6 @@ class DbTaskEvent(BaseModel):
         """
         if project_id and task_id:
             raise ValueError("Specify either project_id or task_id, not both.")
-        if not project_id and not task_id:
-            raise ValueError("Either project_id or task_id must be provided.")
 
         filters = []
         params = {}
@@ -995,8 +1067,11 @@ class DbTaskEvent(BaseModel):
             params["task_id"] = task_id
         if days is not None:
             end_date = timestamp() - timedelta(days=days)
-            filters.append("created_at >= %(end_date)s")
+            filters.append("the.created_at >= %(end_date)s")
             params["end_date"] = end_date
+        if user_sub:
+            filters.append("the.user_sub = %(user_sub)s")
+            params["user_sub"] = user_sub
         if comments:
             filters.append("event = 'COMMENT'")
         else:
@@ -1007,11 +1082,14 @@ class DbTaskEvent(BaseModel):
         sql = f"""
             SELECT
                 the.*,
+                p.name AS project_name,
                 u.profile_img
             FROM
                 public.task_events the
             LEFT JOIN
                 users u ON u.sub = the.user_sub
+            LEFT JOIN
+                projects p ON p.id = the.project_id
             WHERE {filters_joined}
             ORDER BY created_at DESC;
         """
@@ -1425,6 +1503,7 @@ class DbProject(BaseModel):
 
     id: int
     name: str
+    field_mapping_app: Optional[FieldMappingApp] = None
     outline: Optional[dict] = None
     odkid: Optional[int] = None
     author_sub: Optional[str] = None
@@ -1481,6 +1560,7 @@ class DbProject(BaseModel):
     tasks_mapped: Optional[int] = 0
     tasks_validated: Optional[int] = 0
     tasks_bad: Optional[int] = 0
+    project_url: Optional[str] = None
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1669,6 +1749,10 @@ class DbProject(BaseModel):
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
         minimal: bool = False,
+        status: Optional[ProjectStatus] = None,
+        field_mapping_app: Optional[FieldMappingApp] = None,
+        my_projects: Optional[bool] = None,
+        country: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         if current_user:
@@ -1677,7 +1761,17 @@ class DbProject(BaseModel):
             access_info = None
 
         filters, params = cls._build_query_filters(
-            skip, limit, org_id, user_sub, hashtags, search, access_info
+            skip,
+            limit,
+            org_id,
+            user_sub,
+            hashtags,
+            search,
+            access_info,
+            status,
+            field_mapping_app,
+            country,
+            my_projects,
         )
         sql = cls._construct_sql_query(filters, minimal, skip, limit)
 
@@ -1710,20 +1804,69 @@ class DbProject(BaseModel):
         hashtags: Optional[list[str]],
         search: Optional[str],
         access_info: Optional[dict] = None,
+        status: Optional[ProjectStatus] = None,
+        field_mapping_app: Optional[FieldMappingApp] = None,
+        country: Optional[str] = None,
+        my_projects: Optional[bool] = None,
     ) -> tuple[list[str], dict, bool]:
         """Build query filters and parameters based on provided criteria."""
+
+        def normalize_search_input(raw: str) -> str:
+            """Normalize user search string.
+
+            remove extra spaces, lowercase, and wrap with '%'.
+            """
+            cleaned = " ".join(raw.lower().split())
+            return f"%{cleaned}%" if cleaned else None
+
+        normalized_search = normalize_search_input(search) if search else None
+
         # Build basic filters
         filters_map = {
             "p.organisation_id = %(org_id)s": org_id,
             "p.author_sub = %(user_sub)s": user_sub,  # project author
             "p.hashtags && %(hashtags)s": hashtags,
-            # search term (project name using ILIKE for case-insensitive match)
-            "p.slug ILIKE %(search)s": f"%{search}%" if search else None,
+            "p.status = %(status)s": status,
+            "p.field_mapping_app = %(field_mapping_app)s": field_mapping_app,
         }
 
         filters = [
             condition for condition, value in filters_map.items() if value is not None
         ]
+
+        # Handle search: support both ID and name/slug search
+        search_id = None
+        if normalized_search:
+            # Check if search is numeric (ID search)
+            if search.strip().isdigit():
+                filters.append("p.id = %(search_id)s")
+                search_id = int(search.strip())
+            else:
+                # Text search: replace dashes and underscores in slug with space
+                filters.append(
+                    "LOWER(REPLACE(REPLACE(p.slug, '-', ' '), '_', ' ')) "
+                    "ILIKE %(search)s"
+                )
+
+        # Country filter: accept 2-letter codes or full country names
+        country_param = None
+        if country:
+            c = country.strip()
+            if len(c) == 2:
+                # map 2-letter code to full country name when possible
+                c_full = countries.get(c.upper(), c)
+            else:
+                c_full = c
+            filters.append("p.location_str ILIKE %(country)s")
+            country_param = f"%{c_full}%"
+
+        # My projects filter
+        if my_projects and access_info and access_info.get("user_sub"):
+            filters.append(
+                "(p.author_sub = %(current_user_sub)s OR EXISTS"
+                "(SELECT 1 FROM user_roles ur WHERE ur.project_id = p.id "
+                "AND ur.user_sub = %(current_user_sub)s))"
+            )
 
         # Add visibility filter based on user authorization
         visibility_filter = cls._build_visibility_filter(access_info)
@@ -1738,7 +1881,13 @@ class DbProject(BaseModel):
                 "org_id": org_id,
                 "user_sub": user_sub,
                 "hashtags": hashtags,
-                "search": f"%{search}%" if search else None,
+                "search": f"%{search}%"
+                if (search and not search.strip().isdigit())
+                else None,
+                "search_id": search_id,
+                "country": country_param,
+                "status": status,
+                "field_mapping_app": field_mapping_app,
             }.items()
             if value is not None
         }
@@ -1755,42 +1904,48 @@ class DbProject(BaseModel):
         cls, access_info: Optional[dict] = None
     ) -> Optional[str]:
         """Build visibility filter based on user context."""
-        # Not logged in, so return public projects only
+        # Not logged in, so return public projects only, excluding drafts
         if access_info is None:
             return """
-            (
-                p.visibility = 'PUBLIC'
-            )
-            """
+        (
+            p.visibility = 'PUBLIC'
+            AND p.status != 'DRAFT'
+        )
+        """
 
         if access_info["is_superadmin"]:
             # Superadmin sees everything, no filters
             return None
 
         if access_info["managed_org_ids"]:
-            # Org managers see all projects in their orgs
+            # Org managers see all projects in their orgs including drafts
             return """
-                (
-                    p.visibility = 'PUBLIC'
-                    OR p.organisation_id = ANY(%(managed_org_ids)s)
-                )
-            """
-
-        # All users see public, sensitive, and invite-only projects.
-        # Private projects are only visible to users who have access.
-        return """
             (
-                p.visibility != 'PRIVATE'
-                OR (
-                    p.visibility = 'PRIVATE'
-                    AND EXISTS (
-                        SELECT 1 FROM user_roles ur
-                        WHERE ur.project_id = p.id
-                        AND ur.user_sub = %(current_user_sub)s
-                    )
-                )
+                (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
+                OR p.organisation_id = ANY(%(managed_org_ids)s)
             )
         """
+
+        # Regular users see:
+        # 1. Public non-draft projects
+        # 2. Projects they have access to:
+        #    - If Any user is assigned as a project manager in any project,
+        # can see public projects and assigned project even it is draft
+        return """
+        (
+            (p.visibility = 'PUBLIC' AND p.status != 'DRAFT')
+            OR
+            EXISTS (
+                SELECT 1 FROM user_roles ur
+                WHERE ur.project_id = p.id
+                AND ur.user_sub = %(current_user_sub)s
+                AND (
+                    ur.role = 'PROJECT_MANAGER'
+                    OR p.status != 'DRAFT'
+                )
+            )
+        )
+    """
 
     @classmethod
     def _construct_sql_query(
@@ -1851,6 +2006,12 @@ class DbProject(BaseModel):
         return """
             SELECT
                 fp.*,
+                COALESCE(NULLIF(fp.odk_central_url, ''),
+                project_org.odk_central_url) AS odk_central_url,
+                COALESCE(NULLIF(fp.odk_central_user, ''),
+                project_org.odk_central_user) AS odk_central_user,
+                COALESCE(NULLIF(fp.odk_central_password, ''),
+                project_org.odk_central_password) AS odk_central_password,
                 ST_AsGeoJSON(fp.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(fp.outline))::jsonb AS centroid,
                 project_org.logo AS organisation_logo,
@@ -1859,13 +2020,19 @@ class DbProject(BaseModel):
                 stats.total_submissions,
                 stats.tasks_mapped,
                 stats.tasks_bad,
-                stats.tasks_validated
+                stats.tasks_validated,
+                ext_url.url AS project_url
+
             FROM
                 filtered_projects fp
             LEFT JOIN
                 organisations project_org ON fp.organisation_id = project_org.id
             LEFT JOIN
                 mv_project_stats stats ON fp.id = stats.project_id
+            LEFT JOIN
+                project_external_urls ext_url
+                ON fp.id = ext_url.project_id
+
             ORDER BY
                 fp.created_at DESC
         """
@@ -2020,6 +2187,68 @@ class DbProject(BaseModel):
             )
 
 
+class DbProjectExternalURL(BaseModel):
+    """Table project_external_urls."""
+
+    id: Optional[int] = None
+    project_id: int
+    source: FieldMappingApp
+    url: str
+    created_at: Optional[AwareDatetime] = None
+    updated_at: Optional[AwareDatetime] = None
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def normalize_source(cls, value):
+        """Normalize source value to FieldMappingApp enum."""
+        if value is None or isinstance(value, FieldMappingApp):
+            return value
+
+        # Try direct enum conversion first
+        try:
+            return FieldMappingApp(str(value).strip())
+        except (ValueError, KeyError) as err:
+            # Fallback to case-insensitive match by value
+            value_lower = str(value).strip().lower()
+            for app in FieldMappingApp:
+                if app.value.lower() == value_lower:
+                    return app
+            raise ValueError(f"Unknown FieldMappingApp: {value}") from err
+
+    @classmethod
+    async def create_or_update(
+        cls,
+        db: Connection,
+        project_id: int,
+        source: FieldMappingApp | str,
+        url: str,
+    ) -> Self:
+        """Insert or update the external URL for a project."""
+        if not url:
+            raise ValueError("Project external URL cannot be empty.")
+
+        source_value = (
+            source.value if isinstance(source, FieldMappingApp) else str(source)
+        )
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                    INSERT INTO project_external_urls (project_id, source, url)
+                    VALUES (%(project_id)s, %(source)s, %(url)s)
+                    ON CONFLICT (project_id, source) DO UPDATE
+                    SET url = EXCLUDED.url, updated_at = NOW()
+                    RETURNING *;
+                """,
+                {
+                    "project_id": project_id,
+                    "source": source_value,
+                    "url": url,
+                },
+            )
+            return await cur.fetchone()
+
+
 class DbOdkEntities(BaseModel):
     """Table odk_entities.
 
@@ -2044,7 +2273,7 @@ class DbOdkEntities(BaseModel):
         db: Connection,
         project_id: int,
         entities: list[Self],
-        batch_size: int = 10000,
+        batch_size: int = 8000,
     ) -> bool:
         """Update or insert Entity data in batches, with statuses.
 
@@ -2057,6 +2286,11 @@ class DbOdkEntities(BaseModel):
         Returns:
             bool: Success or failure.
         """
+        # dynamically compute batch size
+        no_of_column = 8
+        max_batch_size = 65000 // no_of_column
+        batch_size = min(batch_size, max_batch_size)
+
         log.info(
             f"Updating Field-TM database Entities for project {project_id} "
             f"with ({len(entities)}) features in batches of {batch_size}"
@@ -2072,7 +2306,6 @@ class DbOdkEntities(BaseModel):
                     osm_id, submission_ids, geometry, created_by)
                 VALUES
             """
-
             # Prepare data for batch insert
             values = []
             data = {}
@@ -2120,7 +2353,6 @@ class DbOdkEntities(BaseModel):
                 RETURNING True;
             """
             )
-
             async with db.cursor() as cur:
                 await cur.execute(sql, data)
                 batch_result = await cur.fetchall()
@@ -2129,7 +2361,6 @@ class DbOdkEntities(BaseModel):
                         f"Batch failed at batch {batch_start} for project {project_id}"
                     )
                 result.extend(batch_result)
-
         return bool(result)
 
     @classmethod
@@ -2175,10 +2406,11 @@ class DbOdkEntities(BaseModel):
                 {"uuid": uuid},
             )
             if cur.rowcount == 0:
-                raise HTTPException(
-                    status_code=HTTPStatus.NOT_FOUND,
-                    detail=f"Entity with UUID {uuid} not found in database.",
+                log.warning(
+                    f"Entity {uuid} not found in local database (nothing to delete)."
                 )
+            else:
+                log.info(f"Entity {uuid} deleted from local database successfully.")
 
 
 class DbBackgroundTask(BaseModel):
@@ -2326,6 +2558,7 @@ class DbBasemap(BaseModel):
     created_at: Optional[AwareDatetime] = None
 
     # Calculated
+
     bbox: Optional[list[float]] = None
 
     @classmethod
@@ -2467,6 +2700,242 @@ class DbBasemap(BaseModel):
         if success:
             return True
         return False
+
+
+class DbSubmissionDailyCount(BaseModel):
+    """Table submission_daily_counts."""
+
+    id: int
+    user_sub: str
+    project_id: int
+    submission_date: date
+    count: int = 0
+    last_calculated: Optional[datetime] = None
+
+    @classmethod
+    async def upsert(
+        cls,
+        db: Connection,
+        user_sub: str,
+        project_id: int,
+        submission_date: str | date,
+        count: int,
+    ):
+        """Insert or update a daily submission count for a user."""
+        async with db.cursor() as cur:
+            sql = """
+                INSERT INTO submission_daily_counts (
+                    user_sub,
+                    project_id,
+                    submission_date,
+                    count,
+                    last_calculated
+                )
+                VALUES (
+                    %(user_sub)s,
+                    %(project_id)s,
+                    %(submission_date)s,
+                    %(count)s,
+                    now()
+                )
+                ON CONFLICT (user_sub, project_id, submission_date)
+                DO UPDATE SET
+                    count = EXCLUDED.count,
+                    last_calculated = now();
+            """
+            await cur.execute(
+                sql,
+                {
+                    "user_sub": user_sub,
+                    "project_id": project_id,
+                    "submission_date": submission_date,
+                    "count": count,
+                },
+            )
+
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        user_sub: Optional[str] = None,
+        project_id: Optional[int] = None,
+        days: Optional[int] = None,
+    ) -> list[dict]:
+        """Fetch daily submission counts."""
+        async with db.cursor(row_factory=dict_row) as cur:
+            sql = """
+                SELECT submission_date, SUM(count) as count
+                FROM submission_daily_counts
+                WHERE TRUE
+            """
+            params: dict[str, Any] = {}
+
+            if user_sub:
+                sql += " AND user_sub = %(user_sub)s"
+                params["user_sub"] = user_sub
+
+            if project_id:
+                sql += " AND project_id = %(project_id)s"
+                params["project_id"] = project_id
+
+            if days:
+                sql += """
+                AND submission_date BETWEEN (CURRENT_DATE - %(days)s::int)
+                AND CURRENT_DATE
+            """
+            params["days"] = days
+
+            sql += " GROUP BY submission_date ORDER BY submission_date;"
+
+            await cur.execute(sql, params)
+            rows = await cur.fetchall()
+        return rows or []
+
+
+class DbSubmissionStatsCache(BaseModel):
+    """Table submission_stats_cache."""
+
+    id: int
+    user_sub: str
+    project_id: int
+    total_valid_submissions: int = 0
+    total_invalid_submissions: int = 0
+    total_submissions: int = 0
+    top_organisations: list[dict] = []
+    top_locations: list[dict] = []
+    last_calculated: Optional[datetime] = None
+
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        user_sub: Optional[str] = None,
+        project_id: Optional[int] = None,
+    ) -> dict | list[dict]:
+        """Fetch submission stats cache."""
+        async with db.cursor(row_factory=dict_row) as cur:
+            sql = """
+                SELECT *
+                FROM submission_stats_cache
+                WHERE TRUE
+            """
+            params: dict[str, Any] = {}
+
+            if user_sub:
+                sql += " AND user_sub = %(user_sub)s"
+                params["user_sub"] = user_sub
+
+            if project_id:
+                sql += " AND project_id = %(project_id)s"
+                params["project_id"] = project_id
+
+            await cur.execute(sql, params)
+            rows = await cur.fetchall()
+
+            if not rows:
+                raise KeyError("Submission stats cache not found.")
+
+            if user_sub and not project_id:
+                total_valid = sum(r["total_valid_submissions"] for r in rows)
+                total_invalid = sum(r["total_invalid_submissions"] for r in rows)
+                total = sum(r["total_submissions"] for r in rows)
+                project_counts = [
+                    {
+                        "name": (await DbProject.one(db, r["project_id"])).name,
+                        "count": r["total_submissions"],
+                    }
+                    for r in rows
+                ]
+                org_counts, loc_counts = {}, {}
+                for r in rows:
+                    for org in r["top_organisations"]:
+                        org_counts[org["name"]] = (
+                            org_counts.get(org["name"], 0) + org["count"]
+                        )
+                    for loc in r["top_locations"]:
+                        loc_counts[loc["name"]] = (
+                            loc_counts.get(loc["name"], 0) + loc["count"]
+                        )
+
+                return {
+                    "total_valid_submissions": total_valid,
+                    "total_invalid_submissions": total_invalid,
+                    "total_submissions": total,
+                    "top_projects": sorted(
+                        project_counts, key=lambda x: x["count"], reverse=True
+                    )[:10],
+                    "top_organisations": sorted(
+                        [{"name": k, "count": v} for k, v in org_counts.items()],
+                        key=lambda x: x["count"],
+                        reverse=True,
+                    )[:10],
+                    "top_locations": sorted(
+                        [{"name": k, "count": v} for k, v in loc_counts.items()],
+                        key=lambda x: x["count"],
+                        reverse=True,
+                    )[:10],
+                }
+
+            return rows
+
+    @classmethod
+    async def upsert(
+        cls,
+        db: Connection,
+        user_sub: str,
+        project_id: int,
+        total_valid_submissions: int,
+        total_invalid_submissions: int,
+        total_submissions: int,
+        top_organisations: list[dict],
+        top_locations: list[dict],
+        last_calculated: str,
+    ) -> None:
+        """Insert or update submission stats cache for a user and project."""
+        async with db.cursor() as cur:
+            sql = """
+            INSERT INTO submission_stats_cache (
+                user_sub,
+                project_id,
+                total_valid_submissions,
+                total_invalid_submissions,
+                total_submissions,
+                top_organisations,
+                top_locations,
+                last_calculated
+            )
+            VALUES (
+                %(user_sub)s,
+                %(project_id)s,
+                %(total_valid_submissions)s,
+                %(total_invalid_submissions)s,
+                %(total_submissions)s,
+                %(top_organisations)s,
+                %(top_locations)s,
+                %(last_calculated)s
+            )
+            ON CONFLICT (user_sub, project_id)
+            DO UPDATE SET
+                total_valid_submissions = EXCLUDED.total_valid_submissions,
+                total_invalid_submissions = EXCLUDED.total_invalid_submissions,
+                total_submissions = EXCLUDED.total_submissions,
+                top_organisations = EXCLUDED.top_organisations,
+                top_locations = EXCLUDED.top_locations,
+                last_calculated = EXCLUDED.last_calculated;
+            """
+            await cur.execute(
+                sql,
+                {
+                    "user_sub": user_sub,
+                    "project_id": project_id,
+                    "total_valid_submissions": total_valid_submissions,
+                    "total_invalid_submissions": total_invalid_submissions,
+                    "total_submissions": total_submissions,
+                    "top_organisations": json.dumps(top_organisations),
+                    "top_locations": json.dumps(top_locations),
+                    "last_calculated": last_calculated,
+                },
+            )
 
 
 def slugify(name: Optional[str]) -> Optional[str]:

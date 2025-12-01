@@ -22,9 +22,9 @@
 | :--- | :--- | :--- |
 | **Tech Stack** | | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Svelte](https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
 | **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev) |
-| **Quality** | | [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
+| **Quality** | | [![Coverage](https://docs.fieldtm.hotosm.org/coverage.svg)](https://docs.fieldtm.hotosm.org/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
 | **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/contributors/hotosm/field-tm?logo=github)](#contributors-) |
-| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
+| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.fieldtm.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fieldtm.hotosm.org) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.fieldtm.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
 
 </div>
 
@@ -42,9 +42,9 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 > More details can be found here:
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
-> [timeline](https://docs.fmtm.dev/timeline),
-> [docs](https://docs.fmtm.dev) page, and the
-> [FAQ](https://docs.fmtm.dev/about/faq).
+> [timeline](https://docs.fieldtm.hotosm.org/timeline),
+> [docs](https://docs.fieldtm.hotosm.org) page, and the
+> [FAQ](https://docs.fieldtm.hotosm.org/about/faq).
 
 ![fmtm-splash][6]
 
@@ -62,7 +62,7 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 ## Usage of ODK
 
-This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
+This project relies heavily on the [ODK](https://getodk.org) ecosystem underneath:
 
 - [XLSForms](https://xlsform.org) are used for the underlying data collection
   survey. The fields in this survey can be mapped to OpenStreetMap tags.
@@ -91,7 +91,7 @@ To aid future disaster response, we would really welcome contributions for:
 - Mobile developers
 
 Please take a look at our [Documentation](https://hotosm.github.io/fmtm)
-and [contributor guidance](https://docs.fmtm.dev/CONTRIBUTING/)
+and [contributor guidance](https://docs.fieldtm.hotosm.org/CONTRIBUTING/)
 for more details!
 
 Reach out to us if any questions!
@@ -102,16 +102,26 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
+# Deprecated approach (for now):
+# curl --proto '=https' --tlsv1.2 -sSf https://get.fieldtm.hotosm.org | bash
+
+# Development
+just config generate-dotenv
+just start all
+
+# Production
+just prep machine
+just start prod
 ```
 
-Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guides.
+Alternatively see the [docs](https://docs.fieldtm.hotosm.org) for
+various deployment guides.
 
 ## Roadmap
 
 <!-- prettier-ignore-start -->
 | Status | Feature | Release |
-|:------:|:-------:|:--------|
+| :------: | :-------: | :--------: |
 | ✅ | 🖥️ project area splitting avoiding roads, rivers, railways | Since [v2024.4.0][1] |
 | ✅ | 🖥️ XLSForm survey generation in ODK Central | Since [v2024.4.0][1] |
 | ✅ | 📱 mapping of project via survey in ODK Collect mobile app | Since [v2024.4.0][1] |
@@ -132,12 +142,15 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | ✅ | 🖥️ optional private projects to restrict access | Since [v2025.2.0][4] |
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
-| ✅ | 📱 fully offline field mapping (local-first design) | Since [v2025.3.0][7] |
+| ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
+| 🔄 | 🖥️ integration with QField | – |
 | 🔄 | 🖥️ simplify project creation with basic / advanced workflows | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ editing of submissions marked bad by the project manager | – |
 | 📅 | 🖥️ reduced resource usage of FieldTM on mobile devices | – |
-| 📅 | 🖥️ integration with other mobile apps: EveryDoor, StreetComplete | – |
+| 📅 | 🖥️ integration with OSM mobile apps: EveryDoor, StreetComplete | – |
+| 📅 | 🖥️ integration with ChatMap | – |
+| 📅 | 🖥️ integration with HeiGIT Sketch Map Tool | – |
 | 📅 | 🖥️ integration with other ODK server types: Ona.io, Kobo | – |
 | 📅 | 🖥️ multiple approaches to task splitting algorithm | – |
 | 📅 | 🖥️ improvements to the validation criteria and workflow | – |
@@ -153,7 +166,7 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 > 🖥️ for desktop / managers / validators
 
 A more developer-facing roadmap can be found
-[here](https://roadmap.fmtm.dev).
+[here](https://roadmap.fieldtm.hotosm.org).
 
 ## Contributors ✨
 
@@ -222,6 +235,14 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="http://mapconcierge.com"><img src="https://avatars.githubusercontent.com/u/416977?v=4?s=100" width="100px;" alt="Taichi FURUHASHI"/><br /><sub><b>Taichi FURUHASHI</b></sub></a><br /><a href="#translation-mapconcierge" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ajvs"><img src="https://avatars.githubusercontent.com/u/16050172?v=4?s=100" width="100px;" alt="Ajee"/><br /><sub><b>Ajee</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=ajvs" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://spotter.ngo"><img src="https://avatars.githubusercontent.com/u/15286128?v=4?s=100" width="100px;" alt="Jiří Podhorecký"/><br /><sub><b>Jiří Podhorecký</b></sub></a><br /><a href="#translation-trendspotter" title="Translation">🌍</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Anuj-Gupta4"><img src="https://avatars.githubusercontent.com/u/84966248?v=4?s=100" width="100px;" alt="Anuj Gupta"/><br /><sub><b>Anuj Gupta</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Anuj-Gupta4" title="Code">💻</a> <a href="#maintenance-Anuj-Gupta4" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sujan167"><img src="https://avatars.githubusercontent.com/u/76505195?v=4?s=100" width="100px;" alt="Sujan Basnet"/><br /><sub><b>Sujan Basnet</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Sujan167" title="Code">💻</a> <a href="#maintenance-Sujan167" title="Maintenance">🚧</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kafle33"><img src="https://avatars.githubusercontent.com/u/121845834?v=4?s=100" width="100px;" alt="Roshan Kafle"/><br /><sub><b>Roshan Kafle</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Kafle33" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://gareth.nz"><img src="https://avatars.githubusercontent.com/u/2064938?v=4?s=100" width="100px;" alt="Gareth Bowen"/><br /><sub><b>Gareth Bowen</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=garethbowen" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/allisonsibrian"><img src="https://avatars.githubusercontent.com/u/114789954?v=4?s=100" width="100px;" alt="allison"/><br /><sub><b>allison</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=allisonsibrian" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://amitdkhan-pg.blogspot.com"><img src="https://avatars.githubusercontent.com/u/64206751?v=4?s=100" width="100px;" alt="Amit Khanekar"/><br /><sub><b>Amit Khanekar</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=amitdkhan-pg" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
@@ -251,3 +272,4 @@ Thanks goes to these wonderful people:
 [5]: https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image"
 [6]: https://raw.githubusercontent.com/hotosm/field-tm/dev/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
+[8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"

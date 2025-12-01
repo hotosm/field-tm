@@ -16,6 +16,11 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list test
+
 # Test backend & frontend
 [no-cd]
 all: backend frontend
@@ -24,20 +29,34 @@ all: backend frontend
 [no-cd]
 backend:
   just build backend
-  docker compose up -d
-  docker compose run --rm api pytest
+  # Start all service and ensure API has finish init process
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run --rm api pytest
+  docker compose -f compose.test.yaml down
 
 # Test backend API only
 [no-cd]
 api:
-  docker compose up -d
-  docker compose run --rm api pytest tests
+  # Start all service and ensure API has finish init process
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run --rm api pytest tests
+  docker compose -f compose.test.yaml down
 
 # Test osm-fieldwork package only
 [no-cd]
 osm-fieldwork:
-  docker compose up -d
-  docker compose run --rm api pytest package_tests/test_osm_fieldwork
+  # Start all service and ensure API has finish init process
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
+  docker compose -f compose.test.yaml down
+
+# Test area-splitter package only
+[no-cd]
+splitter:
+  # Start all service and ensure API has finish init process
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
+  docker compose -f compose.test.yaml down
 
 # Run all frontend tests
 [no-cd]
@@ -206,10 +225,14 @@ backend-coverage:
 
   export TAG_OVERRIDE=ci-dev
   just build backend
-  docker compose up -d
 
-  docker rm --force backend-coverage-run 
-  docker compose run \
+  # Cleanup any missed previous container
+  docker rm --force backend-coverage-run
+
+  # Start all service and ensure API has finish init process
+  # Note that compose returns exit code 0 for ui builds, but that's ok
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run \
     --name backend-coverage-run \
     --entrypoint="sh -c" \
     api \
@@ -222,6 +245,7 @@ backend-coverage:
   docker cp backend-coverage-run:/opt/htmlcov/index.html coverage/coverage.html
   docker cp backend-coverage-run:/opt/coverage.svg coverage/coverage.svg
   docker rm backend-coverage-run
+  docker compose -f compose.test.yaml down
 
 # Upload coverage report to gh-pages
 [no-cd]

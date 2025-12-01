@@ -14,7 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-ARG PYTHON_IMG_TAG=3.12
+ARG PYTHON_IMG_TAG=3.13
 ARG UV_IMG_TAG=0.5.2
 ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
@@ -23,7 +23,7 @@ FROM ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 AS basemap-bins
 
 
 # Includes all labels and timezone info to extend from
-FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm AS base
+FROM docker.io/python:${PYTHON_IMG_TAG}-slim-trixie AS base
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG PYTHON_IMG_TAG
@@ -81,7 +81,7 @@ RUN apt-get update --quiet \
     apt-get install -y --quiet --no-install-recommends \
         "build-essential" \
         "gcc" \
-        "libpcre3-dev" \
+        "libpcre2-dev" \
         "libpq-dev" \
         "libspatialindex-dev" \
         "libproj-dev" \
@@ -131,18 +131,19 @@ RUN apt-get update --quiet \
         "curl" \
         "procps" \
         "gettext-base" \
-        "libpcre3" \
-        "mime-support" \
-        "postgresql-common" \
-        "libglib2.0-0" \
-        "libspatialindex-c6" \
+        "libpcre2-16-0" \
+        "media-types" \
+        "libpq5" \
+        "postgresql-client" \
+        "libglib2.0-0t64" \
+        "libspatialindex-c8" \
         "libproj25" \
-        "libgeos-c1v5" \
-    # Temp until Debian supports Postgres v16 by default
-    && yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh \
-    && DEBIAN_FRONTEND=noninteractive \
-       apt-get install -y --quiet --no-install-recommends \
-       "postgresql-client-17" \
+        "libgeos-c1t64" \
+    # Enable to install a specific version of Postgresql client tools
+    # && yes '' | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh \
+    # && DEBIAN_FRONTEND=noninteractive \
+    #    apt-get install -y --quiet --no-install-recommends \
+    #    "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/
@@ -162,11 +163,12 @@ COPY backend/stats/ /opt/stats/
 COPY backend/scheduler/ /opt/scheduler/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
-    && mkdir -p /opt/logs \
+    && mkdir -p /opt/logs /opt/qfield \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh /opt/scheduler/*.py
-# Add log volume for persistence
+# Add volumes for persistence
 VOLUME /opt/logs
+VOLUME /opt/qfield
 # Change to non-root user
 USER appuser
 

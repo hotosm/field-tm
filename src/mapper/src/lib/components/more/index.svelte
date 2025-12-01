@@ -4,11 +4,12 @@
 	import Comment from '$lib/components/more/comment.svelte';
 	import Activities from '$lib/components/more/activities.svelte';
 	import ProjectInfo from '$lib/components/more/project-info.svelte';
+	import Basemaps from '$lib/components/more/basemaps.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { APIProject, TaskEventType } from '$lib/types';
 	import { m } from '$translations/messages.js';
 
-	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info';
+	type stackType = '' | 'comment' | 'instructions' | 'activities' | 'project-info' | 'basemaps';
 
 	type stackGroupType = {
 		id: stackType;
@@ -44,6 +45,11 @@
 			id: 'activities',
 			icon: 'list-ul',
 			title: m['stack_group.activities'](),
+		},
+		{
+			id: 'basemaps',
+			icon: 'layers',
+			title: m['stack_group.basemaps'](),
 		},
 	];
 
@@ -99,10 +105,10 @@
 				role="button"
 			>
 				<div class="icon-title">
-					<hot-icon name={stack.icon} class="icon"></hot-icon>
+					<sl-icon name={stack.icon} class="icon"></sl-icon>
 					<p>{stack.title}</p>
 				</div>
-				<hot-icon name="chevron-right" class="icon-next"></hot-icon>
+				<sl-icon name="chevron-right" class="icon-next"></sl-icon>
 			</div>
 		{/each}
 	{/if}
@@ -110,7 +116,7 @@
 	<!-- header -->
 	{#if activeStack !== ''}
 		<div class="active-stack-header">
-			<hot-icon
+			<sl-icon
 				name="chevron-left"
 				class="icon"
 				onclick={() => {
@@ -125,7 +131,7 @@
 				}}
 				tabindex="0"
 				role="button"
-			></hot-icon>
+			></sl-icon>
 			<p class="title">{activeStackTitle}</p>
 		</div>
 	{/if}
@@ -147,4 +153,5 @@
 		<Activities {taskEvents} {zoomToTask} />
 	{/if}
 	{#if activeStack === 'project-info'}<ProjectInfo {projectData} />{/if}
+	{#if activeStack === 'basemaps'}<Basemaps projectId={projectData?.id} />{/if}
 </div>

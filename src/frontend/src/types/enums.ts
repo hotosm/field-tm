@@ -77,6 +77,7 @@ export enum submission_status {
 export enum osm_forms {
   buildings = 'OSM Buildings',
   health = 'OSM Healthcare',
+  highways = 'OSM Highways',
 }
 
 export enum project_visibility {
@@ -95,4 +96,23 @@ export enum data_extract_type {
   OSM = 'osm_data_extract',
   CUSTOM = 'custom_data_extract',
   NONE = 'no_data_extract',
+}
+
+export enum basemap_providers {
+  esri = 'esri',
+  bing = 'bing',
+  google = 'google',
+  custom = 'custom',
+}
+
+export enum tile_output_formats {
+  mbtiles = 'mbtiles',
+  sqlitedb = 'sqlitedb',
+  pmtiles = 'pmtiles',
+}
+
+export enum field_mapping_app {
+  ODK = 'ODK',
+  QField = 'QField',
+  FieldTM = 'FieldTM',
 }

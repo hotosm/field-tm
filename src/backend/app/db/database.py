@@ -21,6 +21,7 @@
 from typing import cast
 
 from fastapi import Request
+from loguru import logger as log
 from psycopg import Connection
 from psycopg_pool import AsyncConnectionPool
 
@@ -32,9 +33,14 @@ def get_db_connection_pool() -> AsyncConnectionPool:
 
     NOTE the pool connection is opened in the FastAPI server startup (lifespan).
     """
+    log.debug(
+        "Creating database connection pool: "
+        f"{settings.FMTM_DB_USER}@{settings.FMTM_DB_HOST}"
+    )
     return AsyncConnectionPool(
         conninfo=settings.FMTM_DB_URL,
         open=False,
+        min_size=1,
         max_size=10,  # max 10 concurrent DB connections (less than max_connections)
         timeout=30.0,  # how long to wait if all connections are busy
     )

@@ -2,7 +2,9 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"common": {
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"zoom_to_task": "Zoom na tarefa",
+		"projects": "MAPEAMENTOS"
 	},
 	"project_states": {
 		"DRAFT": "Rascunho",
@@ -28,7 +30,7 @@
 		"about": "Sobre",
 		"guide_for_mappers": "Guia para mapeadores",
 		"support": "Suporte",
-		"download_custom_odk_collect": "Baixar ODK Collect personalizado",
+		"download_odk_collect": "Baixar ODK Collect",
 		"sign_in": "INICIAR SESSÃO",
 		"sign_out": "SAIR",
 		"translate": "Ajude-nos a traduzir!"
@@ -42,7 +44,12 @@
 		"geometry_correct_place": "A geometria está no local correto?",
 		"distance": "Distância",
 		"no_orientation_sensors": "Não é possível lidar com a orientação do dispositivo. Seu navegador não é compatível com sensores de orientação do dispositivo.",
-		"legend_features": "Legenda (Pontos)"
+		"legend_features": "Legenda (Pontos)",
+		"control_zoom_to_project": "Ampliar para projetar",
+		"control_geolocation": "Geolocalização",
+		"control_basemaps": "Mapas base",
+		"control_legend": "Lenda",
+		"control_sync_status": "Sincronizar mapa"
 	},
 	"popup": {
 		"task": "Tarefa",
@@ -56,19 +63,21 @@
 		"navigate_here": "IR ATÉ O PONTO",
 		"map_in_odk": "COLETAR PONTO NO ODK",
 		"collect_data": "PREENCHER FORMULÁRIO",
-		"task_complete_total_mapped": "Você mapeou {totalMapped} recursos na área da tarefa.",
-		"task_complete_only_total_mapped": "Você mapeou apenas {totalMapped} recursos na área da tarefa.",
+		"task_complete_partial_mapped": "Você mapeou apenas {totalMapped} dos {totalFeatures} recursos na área de tarefas.",
 		"task_complete_confirm": "Tem certeza de que deseja marcar esta tarefa como concluída?",
+		"task_complete_all_mapped": "Você mapeou todos os recursos na área de tarefas. Deseja continuar?",
 		"select_this_feature": "Selecione este recurso",
 		"map_this_feature": "Mapeie este recurso",
-		"proceed": "prosseguir",
+		"proceed": "PROSSEGUIR",
 		"delete_feature": "Excluir este recurso"
 	},
 	"stack_group": {
 		"project_information": "Informações do projeto",
 		"comment": "Comentário",
 		"instructions": "Instruções",
-		"activities": "Histórico de atividades"
+		"activities": "Histórico de atividades",
+		"my_tasks": "Minhas tarefas",
+		"basemaps": "Mapas base"
 	},
 	"odk": {
 		"open": "Abrir ODK",
@@ -78,8 +87,7 @@
 		"manage": "Gerenciar mapas base",
 		"no_basemaps_available": "Não há mapas base disponíveis para este projeto.",
 		"ask_pm": "Por favor, solicite ao usuário responsável que crie mapas base.",
-		"show_on_map": "Mostrar no mapa",
-		"store_offline": "Armazenar offline",
+		"add_to_map_layers": "Adicionar às camadas do mapa",
 		"download_mbtiles": "Baixar MBTiles"
 	},
 	"project_info": {
@@ -108,10 +116,14 @@
 		"far_away_confirm": "Você está a {distance} de distância do recurso. Tem certeza de que deseja mapear esse recurso?",
 		"status": "Status",
 		"comments": "Comentários",
-		"entity_uuid": "UUID da entidade",
+		"unique_id": "ID exclusivo",
 		"collect_data": "PREENCHER FORMULÁRIO",
 		"entity_delete_confirmation": "Tem certeza de que deseja excluir este recurso?",
-		"contact_pm_for_entity_deletion": "Somente o criador pode excluir este recurso. Entre em contato com o gerente do projeto."
+		"contact_pm_for_entity_deletion": "Somente o criador pode excluir este recurso. Entre em contato com o gerente do projeto.",
+		"created_by": "Criado por",
+		"you_created_this": "Você criou esse recurso",
+		"view_existing_data": "VER DADOS",
+		"no_data": "A submissão não contém dados"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "CONCLUIR MAPEAMENTO",
@@ -138,13 +150,11 @@
 	"offline": {
 		"features": "Recursos",
 		"basemaps": "Mapas base",
-		"data": "Exibir dados off-line",
-		"store_features_offline": "Armazenar recursos off-line",
 		"features_offline_info": "Extratos de recursos já armazenados offline",
 		"fetch_projects_offline": "Você está off-line e não pode buscar projetos extras",
-		"ready_offline": "Pronto para uso off-line.",
-		"total_offline_submissions": "Total de envios off-line",
-		"total_failed_submissions": "Total de envios com falha",
-		"download_csv": "Baixar como CSV"
+		"ready_offline": "Pronto para uso off-line."
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "Nenhuma tarefa atribuída"
 	}
 }

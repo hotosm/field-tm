@@ -1,0 +1,215 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+#
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list prep
+
+[no-cd]
+_curl:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if command -v curl &> /dev/null; then
+    exit 0
+  fi
+  sudo apt-get update
+  sudo apt-get install --no-install-recommends -y curl ca-certificates
+
+[no-cd]
+_get_arch:
+  #!/usr/bin/env sh
+  set -e
+  dpkg --print-architecture 
+
+# Check the current user is not root
+[no-cd]
+_check_not_root:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  echo "Current user:"
+  echo "$(id)"
+  if [ "$(id -u)" == 0 ]; then
+    just _echo-red "Currently logged in as root. Please login as a different user."
+    echo ""
+    just _echo-yellow "Create a new user and grant sudo privileges with:"
+    just _echo-yellow "    adduser myuser"
+    just _echo-yellow "    usermod -aG sudo myuser     # (use 'wheel' instead of 'sudo' on RHEL/Fedora)"
+    echo ""
+    just _echo-yellow "Then log in as that user with a full PAM session (not 'su -'):"
+    just _echo-yellow "First 'apt install systemd-container', then"
+    just _echo-yellow "    machinectl shell myuser@"
+    echo ""
+    just _echo-yellow "⚠️ Make sure to remove the user from sudoers when you're done."
+    just _echo-yellow "    usermod -rG sudo myuser"
+
+    exit 1
+  fi
+
+# Low level container runtime 
+[no-cd]
+_runc:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  cd {{justfile_directory()}}
+
+  if command -v runc &> /dev/null; then
+    just _echo-yellow "Binary 'runc' already installed"
+    exit 0
+  fi
+
+  just prep _curl
+
+  VERSION=1.3.0
+  ARCH=$(just prep _get_arch)
+  URL="https://github.com/opencontainers/runc/releases/download/v${VERSION}/runc.${ARCH}"
+
+  just _echo-blue "Installing low level container runtime: runc"
+  sudo curl -SL "${URL}" -o /usr/local/bin/runc
+  sudo chmod +x /usr/local/bin/runc
+
+# High level container runtime + CLI
+[no-cd]
+_nerdctl_containerd:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  cd {{justfile_directory()}}
+
+  if command -v containerd &> /dev/null; then
+    just _echo-yellow "Binary 'containerd' already installed. Exiting."
+    exit 0
+  fi
+  if command -v nerdctl &> /dev/null; then
+    just _echo-yellow "Binary 'nerdctl' already installed. Exiting."
+    exit 0
+  fi
+
+  just prep _curl
+
+  just _echo-blue "Installing high level container runtime: containerd + nerdctl CLI"
+  VERSION=2.1.3
+  ARCH=$(just prep _get_arch)
+  URL="https://github.com/containerd/nerdctl/releases/download/v${VERSION}/nerdctl-full-${VERSION}-linux-${ARCH}.tar.gz"
+
+  TMP_DIR=$(mktemp -d)
+  curl -SL "${URL}" -o "${TMP_DIR}/nerdctl-${VERSION}-linux-${ARCH}.tar.gz"
+  sudo tar Cxzvvf /usr/local "${TMP_DIR}/nerdctl-${VERSION}-linux-${ARCH}.tar.gz"
+
+# Convert containerd to rootless mode
+[no-cd]
+_containerd_rootless:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  just _echo-blue "Converting containerd --> rootless install"
+
+  # uidmap is needed for 'newuidmap' and 'newgidmap' binaries
+  # dbus-user-session is needed for userspace systemd
+  sudo apt-get install --no-install-recommends -y uidmap dbus-user-session
+  systemctl --user start dbus
+
+  # AppArmor required for Ubuntu 24.04 onwards
+  # https://rootlesscontaine.rs/getting-started/common/apparmor/
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [ "$ID" = "ubuntu" ] && [ "${VERSION_ID%%.*}" -ge 24 ]; then
+      rootlesskit_path="$(command -v rootlesskit || true)"
+      if [ -n "$rootlesskit_path" ] && [ "$rootlesskit_path" != "/usr/bin/rootlesskit" ]; then
+        # Set temp
+        echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+        # Set on restart
+        profile_path="/etc/apparmor.d/${rootlesskit_path#/}"
+        sudo mkdir -p "$(dirname "$profile_path")"
+        just _echo-yellow "Configuring AppArmor for rootlesskit at $rootlesskit_path"
+        {
+          echo 'abi <abi/4.0>,'
+          echo 'include <tunables/global>'
+          echo "${rootlesskit_path} flags=(unconfined) {"
+          echo "  userns,"
+          echo "  # Site-specific additions and overrides. See local/README for details."
+          echo "  include if exists <local/${rootlesskit_path#/}>"
+          echo "}"
+        } | sudo tee "$profile_path" >/dev/null
+        sudo systemctl restart apparmor.service
+      fi
+    fi
+  fi
+
+  containerd-rootless-setuptool.sh install
+
+  # Enable containerd on startup
+  sudo loginctl enable-linger "$(id -un)"
+
+  # Ensure buildkit is installed
+  containerd-rootless-setuptool.sh install-buildkit
+
+  # Enable bypass4netnsd rootless network accelerator
+  containerd-rootless-setuptool.sh install-bypass4netnsd
+
+  # Enable lazy image pulling
+  containerd-rootless-setuptool.sh install-stargz
+  sudo mkdir -p "/home/$(id -un)/.config/containerd"
+  config_file="/home/$(id -un)/.config/containerd/config.toml"
+  if ! grep -q 'proxy_plugins."stargz"' "$config_file" 2>/dev/null; then
+    {
+      echo '[proxy_plugins]'
+      echo '  [proxy_plugins."stargz"]'
+      echo '    type = "snapshot"'
+      echo "    address = \"/run/user/$(id -u)/containerd-stargz-grpc/containerd-stargz-grpc.sock\""
+    } | tee -a "$config_file" > /dev/null
+  fi
+  # containerd restart required
+  systemctl --user restart containerd.service
+
+  # Usage of priv ports below 1024
+  # https://rootlesscontaine.rs/getting-started/common/sysctl/
+  echo 'net.ipv4.ip_unprivileged_port_start=0' | sudo tee /etc/sysctl.d/99-rootless.conf
+  sudo sysctl --system
+
+[no-cd]
+_nerdctl_docker_alias:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  just _echo-blue "Adding docker --> nerdctl alias to bashrc"
+
+  stargz_env_var='export CONTAINERD_SNAPSHOTTER="stargz"'
+  docker_alias_cmd="alias docker='nerdctl'"
+  dc_alias_cmd="alias dc='nerdctl compose'"
+
+  for cmd in "$stargz_env_var" "$docker_alias_cmd" "$dc_alias_cmd"; do
+    if ! grep -Fxq "$cmd" ~/.bashrc; then
+      echo "$cmd" >> ~/.bashrc
+    fi
+  done
+
+  echo ""
+  just _echo-yellow "To use the 'docker' alias, login and log out."
+  just _echo-yellow "Or run:"
+  just _echo-yellow "    source ~/.bashrc"
+
+# Install container engine (NOTE: do not run as root!)
+[no-cd]
+machine:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  just prep _check_not_root
+  just prep _runc
+  just prep _nerdctl_containerd
+  just prep _containerd_rootless
+  just prep _nerdctl_docker_alias

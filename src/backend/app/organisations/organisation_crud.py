@@ -17,14 +17,19 @@
 #
 """Logic for organisation management."""
 
+import io
+import json
+from datetime import date
 from io import BytesIO
 from textwrap import dedent
+from typing import Optional
 
 import aiohttp
 from fastapi import (
     Request,
     UploadFile,
 )
+from fastapi.responses import StreamingResponse
 from loguru import logger as log
 from osm_login_python.core import Auth
 from psycopg import Connection
@@ -35,8 +40,16 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
+from app.db.postgis_utils import timestamp
 from app.helpers.helper_crud import send_email
 from app.organisations.organisation_schemas import OrganisationIn, OrganisationOut
+from app.organisations.organisation_utils import (
+    build_submission_filters,
+    collect_all_submissions,
+    generate_csv_string,
+    generate_geojson_dict,
+)
+from app.projects.project_crud import DbProject
 from app.users.user_schemas import UserIn
 
 
@@ -250,3 +263,300 @@ async def send_organisation_approval_request(
         "Notification about organisation creation sent at "
         f"{primary_organisation.associated_email}."
     )
+
+
+async def get_organisation_stats(
+    db,
+    org_id: int,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+):
+    """Retrieve aggregated statistics for a given organisation.
+
+    This includes overall task counts, project-level task status,
+    and daily activity (e.g., tasks mapped per day) within a specified date range.
+
+    If no start_date is provided, it defaults to the beginning of the current year.
+    If no end_date is provided, it defaults to today's date.
+
+    Args:
+        db (Connection): Database connection object.
+        org_id (int): ID of the organisation to retrieve statistics for.
+        start_date (date, optional): Start date of the stats period.
+        end_date (date, optional): End date of the stats period.
+
+    Returns:
+        dict: A dictionary containing overview stats, per-project task status,
+              and daily activity stats.
+    """
+    today = timestamp().date()
+    if end_date is None:
+        end_date = today
+    if start_date is None:
+        start_date = end_date.replace(month=1, day=1)
+
+    log.info(
+        f"""Fetching stats for org_id={org_id}, start_date={start_date},
+        end_date={end_date}"""
+    )
+
+    empty_stats = {
+        "overview": {
+            "total_tasks": 0,
+            "active_projects": 0,
+            "total_submissions": 0,
+            "total_contributors": 0,
+        },
+        "task_status": [],
+        "activity": {
+            "last_submission": None,
+            "daily_stats": [],
+        },
+    }
+
+    # === Main Overview Query ===
+    main_sql = """
+        WITH base_projects AS (
+            SELECT id FROM projects WHERE organisation_id = %(org_id)s
+        ),
+        project_overview AS (
+            SELECT
+                COALESCE(SUM(p.total_tasks), 0) AS total_tasks,
+                COUNT(*) FILTER (WHERE p.status NOT IN ('COMPLETED', 'ARCHIVED'))
+                AS active_projects
+            FROM projects p
+            WHERE p.organisation_id = %(org_id)s
+        ),
+        submission_count AS (
+            SELECT COALESCE(SUM(stats.total_submissions), 0) AS
+            total_submissions
+            FROM mv_project_stats stats
+            JOIN base_projects bp ON stats.project_id = bp.id
+        ),
+        task_event_agg AS (
+            SELECT
+                COUNT(*) FILTER (WHERE ev.event = 'FINISH') AS tasks_mapped,
+                COUNT(*) FILTER (WHERE ev.event = 'GOOD') AS tasks_validated,
+                COUNT(DISTINCT ev.user_sub) AS total_contributors,
+                MAX(ev.created_at::date) AS last_activity_date
+            FROM task_events ev
+            JOIN base_projects bp ON ev.project_id = bp.id
+            WHERE ev.created_at::date BETWEEN %(start_date)s AND %(end_date)s
+        ),
+        project_status_counts AS (
+            SELECT
+                p.status,
+                COUNT(*) AS count
+            FROM projects p
+            WHERE p.organisation_id = %(org_id)s
+            GROUP BY p.status
+        )
+        SELECT
+            po.total_tasks,
+            po.active_projects,
+            tea.tasks_mapped,
+            tea.tasks_validated,
+            tea.total_contributors,
+            tea.last_activity_date,
+            sc.total_submissions,
+            json_object_agg(psc.status, psc.count) AS project_status_breakdown
+        FROM project_overview po
+        CROSS JOIN task_event_agg tea
+        CROSS JOIN submission_count sc
+        LEFT JOIN project_status_counts psc ON TRUE
+        GROUP BY po.total_tasks, po.active_projects, tea.tasks_mapped,
+        tea.tasks_validated, tea.total_contributors, tea.last_activity_date,
+        sc.total_submissions;
+    """
+
+    # === Daily Stats Query ===
+    daily_sql = """
+        SELECT
+            ev.created_at::date AS date,
+            COUNT(*) FILTER (WHERE ev.event = 'FINISH') AS tasks_mapped,
+            COUNT(*) FILTER (WHERE ev.event = 'GOOD') AS tasks_validated
+        FROM task_events ev
+        JOIN projects p ON ev.project_id = p.id
+        WHERE p.organisation_id = %(org_id)s
+          AND ev.created_at::date BETWEEN %(start_date)s AND %(end_date)s
+        GROUP BY ev.created_at::date
+        ORDER BY date;
+    """
+
+    # === Task Stats per Project ===
+    project_task_sql = """
+        SELECT
+            p.id AS project_id,
+            p.total_tasks,
+            COUNT(*) FILTER (WHERE ev.event = 'FINISH') AS tasks_mapped,
+            COUNT(*) FILTER (WHERE ev.event = 'GOOD') AS tasks_validated,
+            COALESCE(stats.total_submissions, 0) AS total_submission
+        FROM projects p
+        LEFT JOIN task_events ev
+            ON ev.project_id = p.id AND ev.created_at::date BETWEEN
+            %(start_date)s AND %(end_date)s
+        LEFT JOIN mv_project_stats stats ON stats.project_id = p.id
+        WHERE p.organisation_id = %(org_id)s
+        GROUP BY p.id, p.total_tasks, stats.total_submissions
+        ORDER BY p.id;
+
+
+    """
+
+    try:
+        async with db.cursor() as cur:
+            params = {
+                "org_id": org_id,
+                "start_date": start_date,
+                "end_date": end_date,
+            }
+
+            # Fetch org-wide stats
+            await cur.execute(main_sql, params)
+            row = await cur.fetchone()
+
+            # Fetch daily stats
+            await cur.execute(daily_sql, params)
+            daily_rows = await cur.fetchall()
+
+            # Fetch per-project stats
+            await cur.execute(project_task_sql, params)
+            project_rows = await cur.fetchall()
+
+        daily_stats = [
+            {
+                "date": row_daily[0].isoformat(),
+                "tasks_mapped": row_daily[1] or 0,
+                "tasks_validated": row_daily[2] or 0,
+            }
+            for row_daily in daily_rows
+        ]
+
+        task_status = []
+        for row_proj in project_rows:
+            project_id = row_proj[0]
+            total_tasks = row_proj[1] or 0
+            mapped = row_proj[2] or 0
+            validated = row_proj[3] or 0
+            total_submission = row_proj[4] or 0
+            to_map = max(total_tasks - mapped - validated, 0)
+
+            task_status.append(
+                {
+                    "project_id": project_id,
+                    "tasks_mapped": mapped,
+                    "tasks_validated": validated,
+                    "tasks_to_map": to_map,
+                    "total_submission": total_submission,
+                    "total_task": total_tasks,
+                }
+            )
+
+        if not row:
+            empty_stats["task_status"] = task_status
+            empty_stats["activity"]["daily_stats"] = daily_stats
+            return empty_stats
+
+        return {
+            "overview": {
+                "total_tasks": row[0] or 0,
+                "active_projects": row[1] or 0,
+                "total_submissions": row[6] or 0,
+                "total_contributors": row[4] or 0,
+                "project_status_counts": row[7] or {},
+            },
+            "task_status": task_status,
+            "activity": {
+                "last_submission": row[5],
+                "daily_stats": daily_stats,
+            },
+        }
+
+    except Exception as e:
+        log.error(f"Error fetching stats for org_id={org_id}: {str(e)}")
+        return empty_stats
+
+
+async def download_organisation_submissions(
+    db: Connection,
+    org_id: int,
+    file_type: str,
+    submitted_date_range: str = None,
+):
+    """Download all form submissions for a given organisation across all projects.
+
+    Args:
+        db (Connection): Database connection object.
+        org_id (int): Organisation ID to fetch submissions for.
+        file_type (str): Output format - 'csv' or 'geojson'.
+        submitted_date_range (str, optional): Date range filter
+        in format "YYYY-MM-DD,YYYY-MM-DD".
+
+    Returns:
+        StreamingResponse: A file download stream in the requested format.
+    """
+    log.info(f"Starting export for organisation {org_id} as {file_type.upper()}")
+
+    try:
+        org = await DbOrganisation.one(db, org_id)
+        projects = await DbProject.all(db, org_id=org_id, minimal=False)
+
+        if not projects:
+            log.warning(f"No projects found for organisation {org_id}")
+            return {"message": f"No projects found for organisation {org_id}"}
+
+        log.info(f"Found {len(projects)} project(s) for organisation {org_id}")
+
+        # Set ODK credentials on each project
+        # await get_project_or_org_odk_creds(projects, org)
+
+        # Parse and apply filters
+        filters = build_submission_filters(submitted_date_range)
+        if filters:
+            log.info(
+                f"Applied filters for submission date range: {submitted_date_range}"
+            )
+
+        # Fetch submissions of all projects
+        all_submissions = await collect_all_submissions(projects, org, filters)
+        if not all_submissions:
+            log.warning(f"No submissions found for organisation {org_id}")
+            return {"message": f"No submissions found for organisation {org_id}"}
+
+        log.info(f"Collected {len(all_submissions)} submission(s) for export")
+
+        # Format output
+        file_type = file_type.lower()
+        if file_type == "csv":
+            csv_content = generate_csv_string(all_submissions)
+            log.info(f"Exporting CSV for organisation {org_id}")
+            return StreamingResponse(
+                io.StringIO(csv_content),
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": (
+                        f"attachment; filename=organisation_{org_id}_submissions.csv"
+                    )
+                },
+            )
+
+        elif file_type == "geojson":
+            geojson_data = generate_geojson_dict(all_submissions)
+            log.info(f"Exporting GeoJSON for organisation {org_id}")
+            return StreamingResponse(
+                io.StringIO(json.dumps(geojson_data)),
+                media_type="application/geo+json",
+                headers={
+                    "Content-Disposition": (
+                        f"attachment; "
+                        f"filename=organisation_{org_id}_submissions.geojson"
+                    )
+                },
+            )
+
+        log.error(f"Unsupported file type requested: {file_type}")
+        return {"error": "Unsupported file type. Use 'csv' or 'geojson'."}
+
+    except Exception as e:
+        log.exception(f"Failed to export submissions for organisation {org_id}: {e}")
+        return {"error": "Internal server error while exporting submissions."}

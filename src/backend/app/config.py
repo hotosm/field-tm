@@ -158,7 +158,8 @@ class Settings(BaseSettings):
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
     FMTM_DOMAIN: str
-    FMTM_DEV_PORT: Optional[str] = "7050"
+    FMTM_DEV_PORT: Optional[str] = None
+    FMTM_MAPPER_DOMAIN: Optional[str] = None
 
     DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
     DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
@@ -183,7 +184,7 @@ class Settings(BaseSettings):
     ) -> list[str]:
         """Build and validate CORS origins list."""
         # Initialize default origins
-        default_origins = ["https://xlsforms.fmtm.dev"]
+        default_origins = ["https://xlsform-editor.fmtm.hotosm.org"]
 
         # Handle localhost/testing scenario
         domain = info.data.get("FMTM_DOMAIN", "fmtm.localhost")
@@ -210,7 +211,11 @@ class Settings(BaseSettings):
         else:
             # Add the main Field-TM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")
-            default_origins.append(f"https://mapper.{domain}")
+            mapper_domain = info.data.get("FMTM_MAPPER_DOMAIN")
+            if mapper_domain:
+                default_origins.append(f"https://{mapper_domain}")
+            else:
+                default_origins.append(f"https://mapper.{domain}")
 
         # Process `extra_origins` if provided
         if isinstance(extra_origins, str):
@@ -249,10 +254,17 @@ class Settings(BaseSettings):
         )
         return pg_url.unicode_string()
 
+    # ODK
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
     ODK_CENTRAL_PASSWD: Optional[SecretStr] = ""
     CENTRAL_WEBHOOK_API_KEY: Optional[SecretStr] = ""
+
+    # QField
+    QFIELDCLOUD_URL: Optional[str] = ""
+    QFIELDCLOUD_USER: Optional[str] = ""
+    QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
+    # NOTE we also reuse DEFAULT_ORG_NAME var for QField
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
@@ -285,7 +297,10 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/osmauth"
         else:
-            uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
+            if self.FMTM_MAPPER_DOMAIN:
+                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/osmauth"
+            else:
+                uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
         return uri
 
     GOOGLE_CLIENT_ID: Optional[str] = ""
@@ -301,7 +316,10 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7057/googleauth"
         else:
-            uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
+            if self.FMTM_MAPPER_DOMAIN:
+                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/googleauth"
+            else:
+                uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
         return uri
 
     S3_ENDPOINT: str

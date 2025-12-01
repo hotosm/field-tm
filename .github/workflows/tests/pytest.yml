@@ -13,75 +13,9 @@ permissions:
   contents: write
 
 jobs:
-  run-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Vars and Secrets to Env
-        env:
-          TAG_OVERRIDE: ${{ env.TAG_OVERRIDE || 'ci-dev' }}
-          TARGET_OVERRIDE: ${{ env.TARGET_OVERRIDE || 'ci' }}
-          GIT_BRANCH: ${{ github.ref_name }}
-          VARS_CONTEXT: ${{ toJson(vars) }}
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
-        run: |
-          # Random delimiter string for security
-          delim=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-
-          # Parse JSON with multiline strings, using delimiter (Github specific)
-          to_envs() { jq -r "to_entries[] | \"\(.key)<<$delim\n\(.value)\n$delim\n\""; }
-
-          # Set VARS_CONTEXT if not null
-          if [ "${VARS_CONTEXT}" != "null" ]; then
-            echo "${VARS_CONTEXT}" | to_envs >> $GITHUB_ENV
-          fi
-
-          # Set SECRETS_CONTEXT if not null
-          if [ "${SECRETS_CONTEXT}" != "null" ]; then
-            echo "${SECRETS_CONTEXT}" | to_envs >> $GITHUB_ENV
-          fi
-
-      - name: Create .env file
-        run: |
-          # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
-          echo "Downloading envsubst"
-          curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
-          chmod +x envsubst
-
-          echo "Substituting variables from .env.example --> .env"
-          ./envsubst < .env.example > .env
-
-          # Set all vars
-          echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> .env
-          echo "TARGET_OVERRIDE=${TARGET_OVERRIDE}" >> .env
-          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
-
-      - name: Run Tests With Coverage
-        run: |
-          docker compose up -d
-          docker compose run --entrypoint "sh -c" \
-            --volume ${{ github.workspace }}/coverage:/tmp/coverage api \
-            "coverage run -m pytest \
-            && coverage report && coverage html \
-            && coverage-badge -o coverage.svg \
-            && mv htmlcov/index.html /tmp/coverage/coverage.html \
-            && mv coverage.svg /tmp/coverage/coverage.svg"
-
-      - name: Upload Coverage
-        run: |
-          # Checkout to gh-pages
-          git config user.name svchot
-          git config user.email sysadmin@hotosm.org
-          git checkout gh-pages
-
-          # Overwrite coverage index and badge
-          echo "Coverage dir contents:"
-          ls ${{ github.workspace }}/coverage
-          echo ""
-          mv ${{ github.workspace }}/coverage/* ${{ github.workspace }}
-
-          # Assess diff
-          git --no-pager diff
+  pytest:
+    uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
+    with:
+      environment: "test"
+      command: "test backend"
+    secrets: inherit

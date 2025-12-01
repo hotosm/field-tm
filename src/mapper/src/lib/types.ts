@@ -1,7 +1,7 @@
 import type { UUID } from 'crypto';
 import type { Polygon } from 'geojson';
 import { m } from '$translations/messages.js';
-import type { projectStatus } from '$constants/enums';
+import type { projectStatus, taskStatus } from '$constants/enums';
 
 export type ProjectTask = {
 	id: number;
@@ -11,16 +11,25 @@ export type ProjectTask = {
 	outline: Polygon;
 };
 
+export type FieldMappingApp = 'QField' | 'ODK' | 'FieldTM';
+
+export const FieldMappingAppEnum = Object.freeze({
+	QFIELD: 'QField' as FieldMappingApp,
+	ODK: 'ODK' as FieldMappingApp,
+	FIELDTM: 'FieldTM' as FieldMappingApp,
+});
+
 export interface APIProject {
 	id: number;
 	name: string;
+	field_mapping_app: FieldMappingApp;
 	short_description: string;
 	description: string;
 	per_task_instructions: string;
 	priority: number;
 	location_str: string;
 	odk_form_id: string;
-	odk_form_xml: string;
+	odk_form_xml: BlobPart;
 	data_extract_url: string;
 	odk_token: string;
 	organisation_id: number;
@@ -32,11 +41,11 @@ export interface APIProject {
 	tasks: ProjectTask[];
 	geo_restrict_distance_meters: number;
 	geo_restrict_force_error: boolean;
-	use_odk_collect: boolean;
 }
 
 export interface DbProjectType {
 	id: number;
+	field_mapping_app: FieldMappingApp;
 	organisation_id?: string | null;
 	name?: string | null;
 	short_description?: string | null;
@@ -46,7 +55,7 @@ export interface DbProjectType {
 	status: string; // e.g., 'DRAFT' | 'ACTIVE' | ...
 	total_tasks?: string | null;
 	odk_form_id?: string | null;
-	odk_form_xml?: string | null;
+	odk_form_xml?: BlobPart;
 	visibility: string; // e.g., 'PUBLIC' | 'PRIVATE'
 	mapper_level: string; // e.g., 'BEGINNER' | 'INTERMEDIATE'
 	priority?: string | null; // e.g., 'LOW' | 'MEDIUM' | 'HIGH'
@@ -59,7 +68,6 @@ export interface DbProjectType {
 	geo_restrict_distance_meters?: number | null;
 	primary_geom_type?: string | null; // e.g., 'POLYGON'
 	new_geom_type?: string | null;
-	use_odk_collect?: boolean | null;
 	created_at: string; // ISO timestamp
 	updated_at?: string | null;
 
@@ -97,7 +105,6 @@ export const DB_PROJECT_COLUMNS = new Set([
 	'geo_restrict_distance_meters',
 	'primary_geom_type',
 	'new_geom_type',
-	'use_odk_collect',
 	'created_at',
 	'updated_at',
 	'organisation_logo',
@@ -161,15 +168,23 @@ export type NewEvent = {
 };
 
 export type TaskEventType = {
-	event_id: string;
-	event: TaskEvent | 'COMMENT';
-	state: TaskStatus | null;
-	project_id: number;
-	task_id: number;
-	user_id: number;
-	username: string;
 	comment: string | null;
 	created_at: string;
+	event: TaskEvent | 'COMMENT';
+	event_id: string;
+	project_id: number;
+	state: taskStatus;
+	task_id: number;
+	team_id: string | null;
+	user_sub: string;
+	username: string;
+};
+
+export type latestTaskEventType = {
+	id: number;
+	state: taskStatus;
+	actioned_by_uid: string;
+	task_index: number;
 };
 
 export type paginationType = {
@@ -215,7 +230,7 @@ export type DbEntityType = {
 	status: entityStatusOptions;
 	project_id: number;
 	task_id: number;
-	osm_id: number;
+	osm_id: bigint;
 	submission_ids: string;
 	geometry: string | null;
 	created_by: string | null;

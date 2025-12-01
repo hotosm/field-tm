@@ -74,11 +74,11 @@ const FeatureSelectionPopup = ({
         </DialogContent>
       </Dialog>
       <div
-        className={`fmtm-duration-1000 fmtm-z-50 fmtm-h-fit ${
+        className={`fmtm-duration-1000 fmtm-z-50 fmtm-h-fit md:fmtm-max-w-[15rem] ${
           taskModalStatus
-            ? 'fmtm-bottom-[4.4rem] md:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-fit'
-            : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(40vh)] md:fmtm-left-[calc(100vw)] fmtm-w-[100vw] md:fmtm-max-w-[23rem]'
-        } fmtm-fixed fmtm-rounded-t-3xl fmtm-border-opacity-50`}
+            ? 'fmtm-bottom-[1.3rem] md:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw]'
+            : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(40vh)] md:fmtm-left-[calc(100vw)]'
+        } fmtm-absolute fmtm-rounded-t-3xl fmtm-border-opacity-50`}
       >
         <div
           className={`fmtm-bg-[#fbfbfb] ${
@@ -87,7 +87,7 @@ const FeatureSelectionPopup = ({
               : ''
           } fmtm-rounded-t-2xl md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl`}
         >
-          <div className="fmtm-flex fmtm-justify-between fmtm-items-center fmtm-gap-2 fmtm-px-3 sm:fmtm-px-5 fmtm-py-2">
+          <div className="fmtm-flex fmtm-justify-between fmtm-items-center fmtm-gap-2 fmtm-px-3 sm:fmtm-px-5 fmtm-py-2 fmtm-w-full">
             <h4 className="fmtm-text-lg fmtm-font-bold">
               {featureProperties?.osm_id
                 ? `Feature: ${featureProperties.osm_id}`

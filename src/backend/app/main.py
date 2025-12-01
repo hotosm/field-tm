@@ -30,7 +30,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
-from psycopg import Connection
+from psycopg import AsyncConnection, Connection
 
 from app.__version__ import __version__
 from app.auth import auth_routes
@@ -50,6 +50,7 @@ from app.organisations import organisation_routes
 from app.organisations.organisation_crud import init_admin_org
 from app.projects import project_routes
 from app.projects.project_crud import read_and_insert_xlsforms
+from app.qfield import qfield_routes
 from app.submissions import submission_routes
 from app.tasks import task_routes
 from app.users import user_routes
@@ -85,7 +86,18 @@ async def lifespan(
     app: FastAPI,  # dead: disable
 ) -> AsyncIterator[None]:
     """FastAPI startup/shutdown event."""
-    log.debug("Starting up FastAPI server.")
+    log.debug("Starting up FastAPI server")
+
+    # NOTE we run this outside db pool to avoid competing with pool init
+    log.debug("Creating db connection for server initialisation steps")
+    async with await AsyncConnection.connect(settings.FMTM_DB_URL) as conn:
+        log.debug("Initialising admin org and user in DB")
+        await init_admin_org(conn)
+        log.debug("Reading XLSForms from DB")
+        await read_and_insert_xlsforms(conn, xlsforms_path)
+        log.debug("Initialising reverse geocoding database")
+        async with AsyncNearestCity(conn):
+            pass
 
     # Create a pooled db connection and make available in lifespan state
     # https://asgi.readthedocs.io/en/latest/specs/lifespan.html#lifespan-state
@@ -94,21 +106,14 @@ async def lifespan(
     # db_pool = cast(AsyncConnectionPool, request.state.db_pool)
     # async with db_pool.connection() as conn:
     db_pool = get_db_connection_pool()
+    log.debug("Opening database connection pool for server")
     await db_pool.open()
-
-    async with db_pool.connection() as conn:
-        log.debug("Initialising admin org and user in DB.")
-        await init_admin_org(conn)
-        log.debug("Reading XLSForms from DB.")
-        await read_and_insert_xlsforms(conn, xlsforms_path)
-        log.debug("Initialising reverse geocoding database")
-        async with AsyncNearestCity(conn):
-            pass
+    log.debug("Database pool opened, attaching to lifespan")
 
     yield {"db_pool": db_pool}
 
     # Shutdown events
-    log.debug("Shutting down FastAPI server.")
+    log.debug("Shutting down FastAPI server")
     await db_pool.close()
 
 
@@ -145,6 +150,7 @@ def get_application() -> FastAPI:
     _app.include_router(project_routes.router)
     _app.include_router(task_routes.router)
     _app.include_router(central_routes.router)
+    _app.include_router(qfield_routes.router)
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organisation_routes.router)
@@ -173,8 +179,8 @@ def get_logger():
     for logger_name in logger_name_list:
         logging.getLogger(logger_name).setLevel(settings.LOG_LEVEL)
         logging.getLogger(logger_name).handlers = []
-        if logger_name == "urllib3":
-            # Don't hook urllib3, called on each OTEL trace
+        if settings.LOG_LEVEL != "DEBUG" and logger_name == "urllib3":
+            # Don't hook urllib3 in prod, as it's called on each OTEL trace
             continue
         if logger_name == "pyodk._utils.config":
             # Set pyodk logger level to CRITICAL to avoid noise

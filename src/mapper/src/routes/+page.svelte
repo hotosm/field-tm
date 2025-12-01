@@ -1,25 +1,15 @@
 <script lang="ts">
 	import '$styles/page.css';
-	import type { PageData } from './$types';
-	import { onMount, onDestroy } from 'svelte';
-	import { online } from 'svelte/reactivity/window';
-	import type { PGlite } from '@electric-sql/pglite';
+	import { onMount } from 'svelte';
 	import type { SlInputEvent } from '@shoelace-style/shoelace';
 
 	import { goto } from '$app/navigation';
-	import { getCommonStore } from '$store/common.svelte';
+	import { m } from '$translations/messages.js';
 	import { getProjectStore } from '$store/projects.svelte';
 	import Pagination from '$lib/components/pagination.svelte';
 	import ProjectCard from '$lib/components/project-summary/project-card.svelte';
 	import ProjectCardSkeleton from '$lib/components/project-summary/project-card-skeleton.svelte';
 
-	interface Props {
-		data: PageData;
-	}
-
-	let db: PGlite | undefined;
-	const { data }: Props = $props();
-	const commonStore = getCommonStore();
 	const projectStore = getProjectStore();
 
 	let paginationPage = $state(1);
@@ -40,13 +30,8 @@
 	});
 
 	function getPaginatedProjects() {
-		console.log('here')
-		if (online.current) {
-			projectStore.fetchProjectsFromAPI(db, paginationPage, debouncedSearch);
-		} else {
-			projectStore.fetchProjectsFromLocalDB(db);
-		}
-	};
+		projectStore.fetchProjectsFromAPI(paginationPage, debouncedSearch);
+	}
 
 	onMount(async () => {
 		// if requestedPath set, redirect to the desired path (in our case we have requestedPath set to invite url)
@@ -55,25 +40,21 @@
 			goto(requestedPath);
 		}
 
-		// Get db and make accessible via store
-		db = await data.dbPromise;
-		commonStore.setDb(db);
-
 		// Get the project summaries on load
 		getPaginatedProjects();
 	});
 </script>
 
-<div class="font-barlow h-full overflow-y-hidden bg-[#f5f5f5]">
+<div class=" h-full overflow-y-hidden bg-[#f5f5f5]">
 	<div class="px-4 h-[calc(100%-85px)] sm:h-[calc(100%-60px)] flex flex-col">
-		<div class="flex items-center justify-between">
-			<h3>PROJECTS</h3>
-			<hot-input
+		<div class="flex items-center justify-between my-2">
+			<h5 class="m-0">{m['common.projects']()}</h5>
+			<sl-input
 				placeholder="Search"
 				size="small"
 				onsl-input={(e: SlInputEvent) => {
 					search = e?.target?.value;
-				}}><sl-icon name="search" slot="prefix"></sl-icon></hot-input
+				}}><sl-icon name="search" slot="prefix"></sl-icon></sl-input
 			>
 		</div>
 		<div

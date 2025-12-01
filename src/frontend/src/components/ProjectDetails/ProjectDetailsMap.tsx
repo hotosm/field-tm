@@ -4,9 +4,11 @@ import { Circle, Fill, Stroke, Style } from 'ol/style';
 import MapStyles from '@/hooks/MapStyles';
 import { MapContainer as MapComponent, useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
+import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index';
 import MapControlComponent from '@/components/ProjectDetails/MapControlComponent';
 import AsyncPopup from '../MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
+import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
 import CoreModules from '@/shared/CoreModules';
 import WindowDimension from '@/hooks/WindowDimension';
@@ -21,9 +23,11 @@ import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { entity_state, GeoGeomTypesEnum } from '@/types/enums';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { GetEntityStatusList, GetOdkEntitiesGeojson, SyncTaskState } from '@/api/Project';
-import MapLegends from '@/components/MapLegends';
+import MapLegends from '@/components/ProjectDetails/MapLegends';
 import isEmpty from '@/utilfunctions/isEmpty';
 import AssetModules from '@/shared/AssetModules';
+import { Polygon } from 'ol/geom';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -162,7 +166,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       behavior: 'smooth',
     });
 
-    dispatch(CoreModules.TaskActions.SetSelectedTask(feature.getId()));
+    dispatch(TaskActions.SetSelectedTask(feature.getId()));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
 
     // Fit the map view to the clicked feature's extent based on the window size
@@ -185,9 +189,9 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
    */
   const handleFeatureClick = (properties, feature) => {
     // Close task area popup, open task feature popup
-    dispatch(ProjectActions.SetSelectedEntityId(feature.getProperties()?.entity_id || feature.getProperties()?.osm_id));
+    dispatch(ProjectActions.SetSelectedEntityId(properties?.entity_id || properties?.osm_id));
     setSelectedTaskFeature(feature);
-    dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
+    dispatch(TaskActions.SetSelectedFeatureProps(properties));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
   };
 
@@ -224,7 +228,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
   };
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || entityOsmMapLoading) return;
 
     const handleClick = (evt) => {
       // always reset selected entity ID on any map click
@@ -233,6 +237,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       // get features from layer excluding 'project-area'(task layer) i.e. get feature from data-extract & new-geoms layer
       const entityFeatures = map.getFeaturesAtPixel(evt.pixel, {
         layerFilter: (layer) => !['bad-entities-point', 'bad-entities', 'project-area'].includes(layer.get('name')),
+        hitTolerance: 5,
       });
 
       // if the clicked point contains entity-related features, handle them; otherwise, check for task features
@@ -240,34 +245,59 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
         // store entities in overlappingEntityFeatures to show selection popup if multiple are present at the clicked point
         if (entityFeatures.length > 1) {
           setSelectedTaskArea(undefined);
+
+          const featureProperties = entityFeatures?.[0]?.getProperties();
+          // check if the feature is member of expanded entity of a cluster, the expanded entity show same entity to be overlapped so we handle only one entity
+          if (featureProperties?.selectclusterfeature) {
+            setOverlappingEntityFeatures([]);
+            handleFeatureClick(featureProperties?.features?.[0]?.getProperties(), featureProperties?.features?.[0]);
+            return;
+          }
           setOverlappingEntityFeatures(entityFeatures);
           dispatch(ProjectActions.ToggleTaskModalStatus(false));
         } else {
-          if (overlappingEntityFeatures.length > 1) {
-            setOverlappingEntityFeatures([]);
-          }
+          if (overlappingEntityFeatures.length > 1) setOverlappingEntityFeatures([]);
+
           const feature = entityFeatures[0];
-          handleFeatureClick(feature.getProperties(), feature);
+          let featureProperties = feature.getProperties();
+
+          // check if the feature is a cluster of entities (no action required)
+          if (featureProperties?.features && featureProperties?.features.length > 1) return;
+          // check if the feature is member of expanded entity of a cluster, then override featureProperties
+          if (featureProperties.features && !featureProperties?.selectcluserfeatures)
+            featureProperties = featureProperties.features[0].getProperties();
+
+          handleFeatureClick(featureProperties, feature);
         }
       } else {
-        if (overlappingEntityFeatures.length > 1) {
-          setOverlappingEntityFeatures([]);
-        }
+        if (overlappingEntityFeatures.length > 1) setOverlappingEntityFeatures([]);
+
+        // find task layer
         const taskFeatures = map.getFeaturesAtPixel(evt.pixel, {
           layerFilter: (layer) => layer.get('name') === 'project-area',
         });
+
         if (isEmpty(taskFeatures)) return;
         const feature = taskFeatures[0];
-        handleTaskClick(feature.getProperties(), feature);
+        const featureProperties = feature.getProperties();
+        handleTaskClick(featureProperties, feature);
       }
     };
 
     map.on('click', handleClick);
-
     return () => {
       map.un('click', handleClick);
     };
-  }, [map, overlappingEntityFeatures]);
+  }, [map, overlappingEntityFeatures, entityOsmMapLoading]);
+
+  useEffect(() => {
+    if (!map) return;
+    if (entityOsmMapLoading) {
+      map.getTargetElement().classList.add('spinner');
+    } else {
+      map.getTargetElement().classList.remove('spinner');
+    }
+  }, [entityOsmMapLoading]);
 
   return (
     <>
@@ -280,6 +310,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       >
         <MapLegends defaultTheme={defaultTheme} />
         <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
+        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
 
         {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
           <VectorLayer
@@ -302,32 +333,70 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             }}
           />
         )}
-        {projectInfo.data_extract_url && isValidUrl(projectInfo.data_extract_url) && taskAreaExtent && selectedTask && (
-          <VectorLayer
-            fgbUrl={projectInfo.data_extract_url}
-            // For POLYLINE, show all geoms, else filter by clicked task area (not working)
-            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? new GeoJSON().readFeatures(projectInfo.outline)[0].getGeometry() : taskAreaExtent}
-            fgbExtentFilter={taskAreaExtent}
-            getTaskStatusStyle={(feature) => {
-              const geomType = feature.getGeometry().getType();
-              const entity = entityOsmMap?.find(
-                (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
-              ) as EntityOsmMap;
-              const status = entity_state[entity?.status];
-              const isEntitySelected = selectedEntityId === entity?.osm_id;
-              return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
-            }}
-            viewProperties={{
-              size: map?.getSize(),
-              padding: [50, 50, 50, 50],
-              constrainResolution: true,
-              duration: 2000,
-            }}
-            style=""
-            zoomToLayer
-            zIndex={5}
-          />
-        )}
+        {projectInfo.data_extract_url &&
+          isValidUrl(projectInfo.data_extract_url) &&
+          taskAreaExtent &&
+          selectedTask &&
+          (projectInfo.primary_geom_type === 'POINT' ? (
+            <ClusterLayer
+              map={map}
+              fgbUrl={projectInfo.data_extract_url}
+              fgbExtent={taskAreaExtent}
+              zIndex={100}
+              visibleOnMap={true}
+              style={{
+                ...defaultStyles,
+                background_color: '#2C3038',
+                color: '#929DB3',
+                opacity: 70,
+              }}
+              getIndividualStyle={(featureProperty) => {
+                const entity = entityOsmMap?.find((entity) => {
+                  return entity?.osm_id === featureProperty?.osm_id;
+                }) as EntityOsmMap;
+                const status = entity_state[entity?.status] || 'READY';
+                const isEntitySelected = selectedEntityId === entity?.osm_id;
+                return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
+              }}
+              zoomToLayer={false}
+            />
+          ) : (
+            <VectorLayer
+              fgbUrl={projectInfo.data_extract_url}
+              // For POLYLINE, show all geoms (pass global extent), else filter by clicked task area (not working)
+              fgbExtentFilter={
+                projectInfo.primary_geom_type === 'POLYLINE'
+                  ? new Polygon([
+                      [
+                        [-180, -90],
+                        [-180, 90],
+                        [180, 90],
+                        [180, -90],
+                        [-180, -90],
+                      ],
+                    ]).transform('EPSG:4326', 'EPSG:3857')
+                  : taskAreaExtent
+              }
+              getTaskStatusStyle={(feature) => {
+                const geomType = feature.getGeometry().getType();
+                const entity = entityOsmMap?.find(
+                  (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
+                ) as EntityOsmMap;
+                const status = entity_state[entity?.status];
+                const isEntitySelected = selectedEntityId === entity?.osm_id;
+                return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+              }}
+              viewProperties={{
+                size: map?.getSize(),
+                padding: [50, 50, 50, 50],
+                constrainResolution: true,
+                duration: 2000,
+              }}
+              style=""
+              zoomToLayer
+              zIndex={5}
+            />
+          ))}
         {(projectInfo.primary_geom_type === GeoGeomTypesEnum.POINT ||
           projectInfo.new_geom_type === GeoGeomTypesEnum.POINT) && (
           <VectorLayer
@@ -359,25 +428,52 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           zIndex={5}
           style=""
         />
-        <VectorLayer
-          geojson={newGeomFeatureCollection}
-          viewProperties={{
-            size: map?.getSize(),
-            padding: [50, 50, 50, 50],
-            constrainResolution: true,
-            duration: 2000,
-          }}
-          layerProperties={{ name: 'new-entities' }}
-          zIndex={5}
-          style=""
-          getTaskStatusStyle={(feature) => {
-            const geomType = feature.getGeometry().getType();
-            const featureProperty = feature.getProperties();
-            const status = entity_state[+featureProperty?.status];
-            const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
-            return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
-          }}
-        />
+        {projectInfo.new_geom_type === GeoGeomTypesEnum.POINT ? (
+          <ClusterLayer
+            map={map}
+            source={newGeomFeatureCollection}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            layerProperties={{ name: 'new-entities' }}
+            zIndex={5}
+            style={{
+              ...defaultStyles,
+              background_color: '#2C3038',
+              color: '#929DB3',
+              opacity: 70,
+            }}
+            getIndividualStyle={(featureProperty) => {
+              const status = entity_state[+featureProperty?.status] || 'READY';
+              const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
+              return getFeatureStatusStyle('Point', mapTheme, status, isEntitySelected);
+            }}
+            zoomToLayer={false}
+          />
+        ) : (
+          <VectorLayer
+            geojson={newGeomFeatureCollection}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            layerProperties={{ name: 'new-entities' }}
+            zIndex={5}
+            style=""
+            getTaskStatusStyle={(feature) => {
+              const geomType = feature.getGeometry().getType();
+              const featureProperty = feature.getProperties();
+              const status = entity_state[+featureProperty?.status];
+              const isEntitySelected = selectedEntityId ? +selectedEntityId === +featureProperty?.osm_id : false;
+              return getFeatureStatusStyle(geomType, mapTheme, status, isEntitySelected);
+            }}
+          />
+        )}
         <AsyncPopup
           map={map}
           popupUI={LockedPopup}
@@ -386,7 +482,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           popupId="locked-popup"
           className="fmtm-w-[235px]"
         />
-        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-40">
+        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-10">
           <Button
             variant="primary-red"
             onClick={syncStatus}
@@ -396,7 +492,6 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             Sync Status
           </Button>
         </div>
-        <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
       </MapComponent>
       {/* show entity selection popup only if multiple features overlap at the clicked point */}
       {overlappingEntityFeatures.length > 1 && (

@@ -366,21 +366,25 @@ async def test_generate_project_files(db, client, project):
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    xform_file = {
-        "xlsform": (
-            "buildings.xls",
-            xlsform_obj,
-        )
-    }
+    response = await client.post(
+        f"/central/upload-xlsform?project_id={project_id}",
+        files={
+            "xlsform": (
+                "buildings.xls",
+                xlsform_obj,
+            )
+        },
+    )
+    assert response.status_code == 200
+
     response = await client.post(
         f"/projects/{project_id}/generate-project-data",
-        files=xform_file,
     )
     assert response.status_code == 200
 
     # Now check required values were added to project
     new_project = await DbProject.one(db, project_id)
-    assert len(new_project.tasks) == 1
+    assert new_project.tasks and len(new_project.tasks) == 1
     assert new_project.tasks[0].task_state == MappingState.UNLOCKED_TO_MAP
     assert isinstance(new_project.odk_token, str)
 
@@ -577,7 +581,7 @@ async def test_update_and_download_project_form(client, project):
 
     with (
         patch("app.central.central_deps.read_xlsform", return_value=xls_file),
-        patch("app.central.central_crud.update_project_xform", return_value=None),
+        patch("app.central.central_crud.update_odk_central_xform", return_value=None),
         patch(
             "app.central.central_crud.get_project_form_xml",
             return_value="<fake-xml></fake-xml>",
@@ -613,21 +617,22 @@ async def test_update_and_download_project_form(client, project):
         assert response.content == b"updated xlsform data"
 
 
-async def test_get_contributors(client, project, task_events, admin_user):
+# NOTE we need odk_project and task_events fixture to populate data
+# NOTE we need odk_project and task_events fixture to populate data
+async def test_get_contributors(client, project, odk_project, submission, admin_user):
     """Test fetching contributors of a project."""
     response = await client.get(f"projects/contributors/{project.id}")
     assert response.status_code == 200
     data = response.json()
-
     assert isinstance(data, list)
     assert len(data) > 0
     assert all(
-        "user" in contributor and "contributions" in contributor for contributor in data
+        "user" in contributor and "submissions" in contributor for contributor in data
     )
 
     contributor = data[0]
     assert contributor["user"] == admin_user.username
-    assert contributor["contributions"] == 2
+    assert contributor["submissions"] == 1
 
 
 async def test_add_new_project_manager(client, project, new_mapper_user):

@@ -2,7 +2,9 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"common": {
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"zoom_to_task": "Zoom To Task",
+		"projects": "PROJECTS"
 	},
 	"project_states": {
 		"DRAFT": "Draft",
@@ -28,7 +30,7 @@
 		"about": "About",
 		"guide_for_mappers": "Guide For Mappers",
 		"support": "Support",
-		"download_custom_odk_collect": "Download Custom ODK Collect",
+		"download_odk_collect": "Download ODK Collect",
 		"sign_in": "SIGN IN",
 		"sign_out": "SIGN OUT",
 		"translate": "Help Us Translate!"
@@ -42,7 +44,12 @@
 		"geometry_correct_place": "Is the geometry in the correct place?",
 		"distance": "Distance",
 		"no_orientation_sensors": "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
-		"legend_features": "Legend (Features)"
+		"legend_features": "Legend (Features)",
+		"control_zoom_to_project": "Zoom to project",
+		"control_geolocation": "Geolocation",
+		"control_basemaps": "Basemaps",
+		"control_legend": "Legend",
+		"control_sync_status": "Sync Map"
 	},
 	"popup": {
 		"task": "Task",
@@ -56,9 +63,9 @@
 		"navigate_here": "NAVIGATE HERE",
 		"map_in_odk": "MAP FEATURE IN ODK",
 		"collect_data": "COLLECT DATA",
-		"task_complete_total_mapped": "You have mapped {totalMapped} features in the task area.",
-		"task_complete_only_total_mapped": "You have only mapped {totalMapped} features in the task area.",
+		"task_complete_partial_mapped": "You have only mapped {totalMapped} out of {totalFeatures} features in the task area.",
 		"task_complete_confirm": "Are you sure you wish to mark this task as complete?",
+		"task_complete_all_mapped": "You have mapped all the feature in the task area. Continue?",
 		"select_this_feature": "Select This Feature",
 		"map_this_feature": "Map This Feature",
 		"proceed": "PROCEED",
@@ -68,7 +75,9 @@
 		"project_information": "Project Information",
 		"comment": "Comment",
 		"instructions": "Instructions",
-		"activities": "Activities"
+		"activities": "Activities",
+		"my_tasks": "My Tasks",
+		"basemaps": "Basemaps"
 	},
 	"odk": {
 		"open": "Open ODK",
@@ -78,8 +87,7 @@
 		"manage": "Manage Basemaps",
 		"no_basemaps_available": "There are no basemaps available for this project.",
 		"ask_pm": "Please ask the project manager to create basemaps.",
-		"show_on_map": "Show on Map",
-		"store_offline": "Store Offline",
+		"add_to_map_layers": "Add To Map Layers",
 		"download_mbtiles": "Download MBTiles"
 	},
 	"project_info": {
@@ -108,10 +116,14 @@
 		"far_away_confirm": "You are {distance} away from the feature. Are you sure you want to map this feature?",
 		"status": "Status",
 		"comments": "Comments",
-		"entity_uuid": "Entity Uuid",
+		"unique_id": "Unique ID",
 		"collect_data": "COLLECT DATA",
 		"entity_delete_confirmation": "Are you sure you want to delete this feature?",
-		"contact_pm_for_entity_deletion": "Only the creator can delete this feature. Please contact the project manager"
+		"contact_pm_for_entity_deletion": "Only the creator can delete this feature. Please contact the project manager",
+		"created_by": "Created by",
+		"you_created_this": "You created this feature",
+		"view_existing_data": "VIEW DATA",
+		"no_data": "Submission contains no data"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "COMPLETE MAPPING",
@@ -138,13 +150,11 @@
 	"offline": {
 		"features": "Features",
 		"basemaps": "Basemaps",
-		"data": "View Offline Data",
-		"store_features_offline": "Store Features Offline",
 		"features_offline_info": "Feauture extracts already stored offline",
 		"fetch_projects_offline": "You are offline and cannot fetch extra projects",
-		"ready_offline": "Ready for offline use.",
-		"total_offline_submissions": "Total offline submissions",
-		"total_failed_submissions": "Total failed submissions",
-		"download_csv": "Download as CSV"
+		"ready_offline": "Ready for offline use."
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "No tasks assigned"
 	}
 }
