@@ -53,6 +53,98 @@
         "start_mapping": "ZAČÍT MAPOVAT",
         "cancel_mapping": "ZRUŠIT MAPOVÁNÍ",
         "cancel": "ZRUŠIT",
-        "navigate_here": "PŘEJÍT SEM"
+        "navigate_here": "PŘEJÍT SEM",
+        "map_in_odk": "PRVEK MAPY V ODK",
+        "collect_data": "SBĚR DAT",
+        "task_complete_total_mapped": "V oblasti úloh jste zmapovali {totalMapped} prvků.",
+        "task_complete_only_total_mapped": "V oblasti úloh máte namapováno pouze {totalMapped} prvků.",
+        "task_complete_confirm": "Opravdu chcete označit tuto úlohu jako dokončenou?",
+        "select_this_feature": "Vyberte tento prvek",
+        "map_this_feature": "Mapujte tento prvek",
+        "proceed": "POKRAČOVAT",
+        "delete_feature": "Smazat tento prvek"
+    },
+    "stack_group": {
+        "project_information": "Informace o projektu",
+        "comment": "Komentář",
+        "instructions": "Pokyny",
+        "activities": "Aktivity"
+    },
+    "odk": {
+        "open": "Otevřít ODK",
+        "scan_qr_code": "Naskenujte tento QR kód v ODK Collect z telefonu jiného uživatele nebo si jej stáhněte a importujte ručně"
+    },
+    "basemaps": {
+        "manage": "Správa podkladových map",
+        "no_basemaps_available": "Pro tento projekt nejsou k dispozici žádné podkladové mapy.",
+        "ask_pm": "Požádejte projektového manažera o vytvoření podkladových map.",
+        "show_on_map": "Zobrazit na mapě",
+        "store_offline": "Uložit offline",
+        "download_mbtiles": "Stáhnout MBTiles"
+    },
+    "project_info": {
+        "organization_name": "Název organizace",
+        "description": "Popis",
+        "total_tasks": "Celkem úloh",
+        "project_id": "ID Projektu"
+    },
+    "activities": {
+        "update_status_to": "stav aktualizován na",
+        "no_activities_on_task_yet": "Zatím žádné aktivity v úloze",
+        "no_activities_yet": "Zatím žádné aktivity"
+    },
+    "comment": {
+        "clear": "VYMAZAT",
+        "comment": "KOMENTÁŘ",
+        "no_comments_yet_on_task": "Zatím žádné komentáře k úloze",
+        "no_comments_yet": "Zatím žádné komentáře"
+    },
+    "dialog_entities_actions": {
+        "distance_constraint": "Tento projekt má povoleno omezení vzdálenosti. Pro optimální funkčnost povolte geolokaci zařízení",
+        "feature_must_be": "Prvek musí být uvnitř",
+        "meters_location": "metrů od vaší polohy",
+        "enable_location": "Pro navigaci k subjektu povolte geolokaci.",
+        "map_in_webforms": "MAPA VE WEBOVÝCH FORMULÁŘÍCH ODK",
+        "far_away_confirm": "Jste {distance} daleko od prvku. Opravdu chcete tento prvek zmapovat?",
+        "status": "Stav",
+        "comments": "Komentáře",
+        "entity_uuid": "Uuid entity",
+        "collect_data": "SBĚR DAT",
+        "entity_delete_confirmation": "Opravdu chcete tento prvek odstranit?",
+        "contact_pm_for_entity_deletion": "Tento prvek může odstranit pouze jeho tvůrce. Obraťte se prosím na správce projektu"
+    },
+    "dialog_task_actions": {
+        "complete_mapping": "DOKONČENÍ MAPOVÁNÍ",
+        "locked_is_complete": "byl uzamčen. Je úloha kompletně zmapována?",
+        "task": "Úloha",
+        "continue_mapping": "POKRAČOVAT V MAPOVÁNÍ"
+    },
+    "pagination": {
+        "go_to_page": "Přejít na stranu"
+    },
+    "qrcode": {
+        "scan_to_open_odk": "Skenovat a otevřít ODK Collect",
+        "moreinfo": "Další informace o ručním importu QR kódu"
+    },
+    "index": {
+        "no_instructions": "Žádné instrukce"
+    },
+    "download": "STÁHNOUT",
+    "error_downloading": "Chyba stahování.",
+    "forms": {
+        "default_language_warning": "Zobrazení formuláře ve výchozím jazyce, protože neexistuje česká verze formuláře.",
+        "uploading": "Nahrávání"
+    },
+    "offline": {
+        "features": "Prvky",
+        "basemaps": "Podkladové mapy",
+        "data": "Zobrazit offline data",
+        "store_features_offline": "Ukládat prvky Offline",
+        "features_offline_info": "Extrakty prvků již uložených v režimu offline",
+        "fetch_projects_offline": "Jste offline a nemůžete načíst další projekty",
+        "ready_offline": "Připraveno k použití offline.",
+        "total_offline_submissions": "Celkem podání offline",
+        "total_failed_submissions": "Celkem neúspěšných podání",
+        "download_csv": "Stáhnout jako CSV"
     }
 }
