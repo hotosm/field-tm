@@ -1,1 +1,159 @@
-{}
+{
+    "common": {
+        "yes": "Si",
+        "no": "No",
+        "zoom_to_task": "Enfocar tarea",
+        "projects": "PROYECTOS"
+    },
+    "project_states": {
+        "DRAFT": "Borrador",
+        "PUBLISHED": "Publicado",
+        "ARCHIVED": "Archivado",
+        "COMPLETED": "Completado"
+    },
+    "task_states": {
+        "UNLOCKED_TO_MAP": "Listo",
+        "LOCKED_FOR_MAPPING": "Bloqueado para la cartografía",
+        "UNLOCKED_TO_VALIDATE": "Listo para validar",
+        "UNLOCKED_DONE": "Validado",
+        "LOCKED_FOR_VALIDATION": "Cerrado para la validación"
+    },
+    "entity_states": {
+        "READY": "Listo",
+        "OPENED_IN_ODK": "Abierto en ODK",
+        "SURVEY_SUBMITTED": "Encuesta enviada",
+        "VALIDATED": "Validado",
+        "MARKED_BAD": "Marcado como malo"
+    },
+    "header": {
+        "about": "Acerca de",
+        "guide_for_mappers": "Guía para mapeadores",
+        "support": "Soporte",
+        "download_odk_collect": "Descarga ODK Collect",
+        "sign_in": "INGRESAR",
+        "sign_out": "CERRAR SESIÓN",
+        "translate": "¡Ayúdanos a traducir!"
+    },
+    "map": {
+        "enable_geolocation": "Para una mejor experiencia activa tu ubicación",
+        "enable_geolocation_got_it": "Entendido!",
+        "exit_navigation": "Salir de la navegación",
+        "click_on_the_map": "Haz clic en el mapa para crear un punto nuevo",
+        "geometry_correct_place": "¿La geometría se encuentra en el lugar correcto?",
+        "distance": "Distancia",
+        "no_orientation_sensors": "Incapaz de resolver la orientación del equipo. Su navegador no soporta los sensores de orientación de su equipo.",
+        "control_zoom_to_project": "Enfocar el proyecto",
+        "control_geolocation": "Geolocación",
+        "control_basemaps": "Mapa de base",
+        "control_legend": "Leyenda",
+        "control_sync_status": "Sincronizar mapa",
+        "click_on_a_task": "HAZ CLIC EN UNA TAREA PARA SELECCIONAR LA CARACTERÍSTICA A MAPEAR",
+        "legend_features": "Leyenda (Características)"
+    },
+    "popup": {
+        "task": "Tarea",
+        "task_id": "ID Tarea",
+        "feature": "Característica",
+        "start_mapping_task": "¿Quieres empezar a mapear la tarea #{taskId}?",
+        "map_new_feature": "MAPEAR UNA NUEVA CARACTERÍSTICA",
+        "start_mapping": "EMPEZAR MAPEO",
+        "cancel_mapping": "CANCELAR MAPEO",
+        "cancel": "CANCELAR",
+        "navigate_here": "NAVEGAR AQUÍ",
+        "map_in_odk": "MAPEAR CARACTERÍSTICA EN ODK",
+        "collect_data": "RECOLECTAR DATOS",
+        "task_complete_partial_mapped": "Solo mapeaste {totalMapped} de {totalFeatures} características en el área de la tarea.",
+        "task_complete_confirm": "¿Seguro que quieres marcar la tarea como completada?",
+        "task_complete_all_mapped": "Mapeaste todas las características en el área de la tarea. ¿Continuar?",
+        "select_this_feature": "Seleccionar esta característica",
+        "map_this_feature": "Mapear esta característica",
+        "proceed": "PROCEDER",
+        "delete_feature": "Borrar esta característica"
+    },
+    "stack_group": {
+        "project_information": "Información del proyecto",
+        "comment": "Comentario",
+        "instructions": "Instrucciones",
+        "activities": "Actividades",
+        "my_tasks": "Mis tareas",
+        "basemaps": "Mapas de base"
+    },
+    "odk": {
+        "open": "Abrir ODK",
+        "scan_qr_code": "Escanea este QR en la app ODK Collect desde el celular de otro usuario, o descarga e importalo manualmente"
+    },
+    "basemaps": {
+        "manage": "Administrar mapas de base",
+        "no_basemaps_available": "No hay mapas de base disponible para este proyecto.",
+        "ask_pm": "Favor consultar al administrador del proyecto para crear mapas de base.",
+        "add_to_map_layers": "Agregar a capas del mapa",
+        "download_mbtiles": "Descargar MBTiles"
+    },
+    "project_info": {
+        "organization_name": "Nombre de la organización",
+        "description": "Descripción",
+        "total_tasks": "Total de tareas",
+        "project_id": "ID Proyecto"
+    },
+    "activities": {
+        "update_status_to": "actualizar estado a",
+        "no_activities_on_task_yet": "Sin actividades en la tarea aún",
+        "no_activities_yet": "Aún sin actividades"
+    },
+    "comment": {
+        "clear": "VACIAR",
+        "comment": "COMENTARIO",
+        "no_comments_yet_on_task": "Aún sin comentarios en la tarea",
+        "no_comments_yet": "Aún sin comentarios"
+    },
+    "dialog_entities_actions": {
+        "distance_constraint": "Este proyecto tiene limitaciones de distancia habilitadas. Favor habilita la geolocación de tu equipo para mejor funcionalidad",
+        "feature_must_be": "Esta característica debe estar entre",
+        "meters_location": "metros de tu ubicación",
+        "enable_location": "Favor habilita la geolocación para navegar a esta entidad.",
+        "map_in_webforms": "MAPEAR EN ODK WEB FORMS",
+        "far_away_confirm": "Está a {distance} de la característica. ¿Seguro que quieres mapear esta característica?",
+        "status": "Estado",
+        "comments": "Comentarios",
+        "unique_id": "ID Única",
+        "collect_data": "RECOLECTAR DATOS",
+        "entity_delete_confirmation": "¿Seguro que quieres eliminar esta característica?",
+        "contact_pm_for_entity_deletion": "Solamente el creador puede eliminar esta característica. Favor contacta al administrador del proyecto",
+        "created_by": "Creado por",
+        "you_created_this": "Tu creaste esta característica",
+        "view_existing_data": "VER DATOS",
+        "no_data": "El envío no contiene datos"
+    },
+    "dialog_task_actions": {
+        "complete_mapping": "COMPLETAR MAPEO",
+        "locked_is_complete": "ha sido bloqueado. ¿La tarea fue mapeada completamente?",
+        "task": "Tarea",
+        "continue_mapping": "CONTINUAR MAPEO"
+    },
+    "pagination": {
+        "go_to_page": "Ir a la página"
+    },
+    "qrcode": {
+        "scan_to_open_odk": "Escanear para abrir ODK Collect",
+        "moreinfo": "Más información acerca de importar el código QR manualmente"
+    },
+    "index": {
+        "no_instructions": "Sin instrucciones"
+    },
+    "download": "DESCARGAR",
+    "error_downloading": "Error al descargar.",
+    "forms": {
+        "default_language_warning": "Mostrando el formulario en su lenguaje por defecto porque no existe una versión en Inglés de este formulario.",
+        "uploading": "Subiendo"
+    },
+    "offline": {
+        "features": "Características",
+        "basemaps": "Mapas de base",
+        "features_offline_info": "Los extractos de las características ya fueron almacenados fuera de línea",
+        "fetch_projects_offline": "Estás fuera de línea y no puedes descargar proyectos adicionales",
+        "ready_offline": "Disponible para uso fuera de línea."
+    },
+    "my_tasks": {
+        "no_tasks_assigned": "Sin tareas asignadas"
+    }
+}
