@@ -1,150 +1,171 @@
 {
-	"common": {
-		"yes": "Ano",
-		"no": "Ne"
-	},
-	"project_states": {
-		"DRAFT": "Koncept",
-		"PUBLISHED": "Zveřejněno",
-		"ARCHIVED": "Archivováno",
-		"COMPLETED": "Dokončeno"
-	},
-	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"task_states": {
-		"UNLOCKED_TO_MAP": "Připraveno",
-		"LOCKED_FOR_MAPPING": "Uzamčeno pro mapování",
-		"UNLOCKED_TO_VALIDATE": "Připraveno k validaci",
-		"LOCKED_FOR_VALIDATION": "Uzamčeno pro validaci",
-		"UNLOCKED_DONE": "Ověřeno"
-	},
-	"entity_states": {
-		"READY": "Připraveno",
-		"OPENED_IN_ODK": "Otevřeno v ODK",
-		"SURVEY_SUBMITTED": "Průzkum odeslán",
-		"MARKED_BAD": "Označeno jako špatné",
-		"VALIDATED": "Ověřeno"
-	},
-	"header": {
-		"about": "O",
-		"guide_for_mappers": "Průvodce pro mapovače",
-		"support": "Podpora",
-		"download_custom_odk_collect": "Stáhnout vlastní ODK Collect",
-		"sign_in": "PŘIHLÁSIT SE",
-		"sign_out": "ODHLÁSIT SE",
-		"translate": "Pomozte nám překládat!"
-	},
-	"map": {
-		"enable_geolocation": "Pro získání nejlepších výsledků zapněte funkci polohy",
-		"enable_geolocation_got_it": "Rozumím!",
-		"exit_navigation": "Ukončení navigace",
-		"click_on_a_task": "KLIKNUTÍM NA ÚLOHU VYBERETE PRVEK PRO MAPOVÁNÍ",
-		"click_on_the_map": "Kliknutím na mapu vytvořte nový bod",
-		"geometry_correct_place": "Je geometrie na správném místě?",
-		"distance": "Vzdálenost",
-		"no_orientation_sensors": "Nelze zpracovat orientaci zařízení. Váš prohlížeč nepodporuje snímače orientace zařízení.",
-		"legend_features": "Legenda (Prvky)"
-	},
-	"popup": {
-		"task": "Úloha",
-		"task_id": "ID úlohy",
-		"feature": "Prvek",
-		"start_mapping_task": "Chcete zahájit mapování úlohy #{taskId}?",
-		"map_new_feature": "MAPOVAT NOVÝ PRVEK",
-		"start_mapping": "ZAČÍT MAPOVAT",
-		"cancel_mapping": "ZRUŠIT MAPOVÁNÍ",
-		"cancel": "ZRUŠIT",
-		"navigate_here": "PŘEJÍT SEM",
-		"map_in_odk": "PRVEK MAPY V ODK",
-		"collect_data": "SBĚR DAT",
-		"task_complete_total_mapped": "V oblasti úloh jste zmapovali {totalMapped} prvků.",
-		"task_complete_only_total_mapped": "V oblasti úloh máte namapováno pouze {totalMapped} prvků.",
-		"task_complete_confirm": "Opravdu chcete označit tuto úlohu jako dokončenou?",
-		"select_this_feature": "Vyberte tento prvek",
-		"map_this_feature": "Mapujte tento prvek",
-		"proceed": "POKRAČOVAT",
-		"delete_feature": "Smazat tento prvek"
-	},
-	"stack_group": {
-		"project_information": "Informace o projektu",
-		"comment": "Komentář",
-		"instructions": "Pokyny",
-		"activities": "Aktivity"
-	},
-	"odk": {
-		"open": "Otevřít ODK",
-		"scan_qr_code": "Naskenujte tento QR kód v ODK Collect z telefonu jiného uživatele nebo si jej stáhněte a importujte ručně"
-	},
-	"basemaps": {
-		"manage": "Správa podkladových map",
-		"no_basemaps_available": "Pro tento projekt nejsou k dispozici žádné podkladové mapy.",
-		"ask_pm": "Požádejte projektového manažera o vytvoření podkladových map.",
-		"show_on_map": "Zobrazit na mapě",
-		"store_offline": "Uložit offline",
-		"download_mbtiles": "Stáhnout MBTiles"
-	},
-	"project_info": {
-		"organization_name": "Název organizace",
-		"description": "Popis",
-		"total_tasks": "Celkem úloh",
-		"project_id": "ID Projektu"
-	},
-	"activities": {
-		"update_status_to": "stav aktualizován na",
-		"no_activities_on_task_yet": "Zatím žádné aktivity v úloze",
-		"no_activities_yet": "Zatím žádné aktivity"
-	},
-	"comment": {
-		"clear": "VYMAZAT",
-		"comment": "KOMENTÁŘ",
-		"no_comments_yet_on_task": "Zatím žádné komentáře k úloze",
-		"no_comments_yet": "Zatím žádné komentáře"
-	},
-	"dialog_entities_actions": {
-		"distance_constraint": "Tento projekt má povoleno omezení vzdálenosti. Pro optimální funkčnost povolte geolokaci zařízení",
-		"feature_must_be": "Prvek musí být uvnitř",
-		"meters_location": "metrů od vaší polohy",
-		"enable_location": "Pro navigaci k subjektu povolte geolokaci.",
-		"map_in_webforms": "MAPA VE WEBOVÝCH FORMULÁŘÍCH ODK",
-		"far_away_confirm": "Jste {distance} daleko od prvku. Opravdu chcete tento prvek zmapovat?",
-		"status": "Stav",
-		"comments": "Komentáře",
-		"entity_uuid": "Uuid entity",
-		"collect_data": "SBĚR DAT",
-		"entity_delete_confirmation": "Opravdu chcete tento prvek odstranit?",
-		"contact_pm_for_entity_deletion": "Tento prvek může odstranit pouze jeho tvůrce. Obraťte se prosím na správce projektu"
-	},
-	"dialog_task_actions": {
-		"complete_mapping": "DOKONČENÍ MAPOVÁNÍ",
-		"locked_is_complete": "byl uzamčen. Je úloha kompletně zmapována?",
-		"task": "Úloha",
-		"continue_mapping": "POKRAČOVAT V MAPOVÁNÍ"
-	},
-	"pagination": {
-		"go_to_page": "Přejít na stranu"
-	},
-	"qrcode": {
-		"scan_to_open_odk": "Skenovat a otevřít ODK Collect",
-		"moreinfo": "Další informace o ručním importu QR kódu"
-	},
-	"index": {
-		"no_instructions": "Žádné instrukce"
-	},
-	"download": "STÁHNOUT",
-	"error_downloading": "Chyba stahování.",
-	"forms": {
-		"default_language_warning": "Zobrazení formuláře ve výchozím jazyce, protože neexistuje česká verze formuláře.",
-		"uploading": "Nahrávání"
-	},
-	"offline": {
-		"features": "Prvky",
-		"basemaps": "Podkladové mapy",
-		"data": "Zobrazit offline data",
-		"store_features_offline": "Ukládat prvky Offline",
-		"features_offline_info": "Extrakty prvků již uložených v režimu offline",
-		"fetch_projects_offline": "Jste offline a nemůžete načíst další projekty",
-		"ready_offline": "Připraveno k použití offline.",
-		"total_offline_submissions": "Celkem podání offline",
-		"total_failed_submissions": "Celkem neúspěšných podání",
-		"download_csv": "Stáhnout jako CSV"
-	}
+    "common": {
+        "yes": "Ano",
+        "no": "Ne",
+        "zoom_to_task": "Přiblížit na Úlohu",
+        "projects": "PROJEKTY"
+    },
+    "project_states": {
+        "DRAFT": "Koncept",
+        "PUBLISHED": "Zveřejněno",
+        "ARCHIVED": "Archivováno",
+        "COMPLETED": "Dokončeno"
+    },
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "task_states": {
+        "UNLOCKED_TO_MAP": "Připraveno",
+        "LOCKED_FOR_MAPPING": "Uzamčeno pro mapování",
+        "UNLOCKED_TO_VALIDATE": "Připraveno k validaci",
+        "LOCKED_FOR_VALIDATION": "Uzamčeno pro validaci",
+        "UNLOCKED_DONE": "Ověřeno"
+    },
+    "entity_states": {
+        "READY": "Připraveno",
+        "OPENED_IN_ODK": "Otevřeno v ODK",
+        "SURVEY_SUBMITTED": "Průzkum odeslán",
+        "MARKED_BAD": "Označeno jako špatné",
+        "VALIDATED": "Ověřeno"
+    },
+    "header": {
+        "about": "O",
+        "guide_for_mappers": "Průvodce pro mapovače",
+        "support": "Podpora",
+        "download_custom_odk_collect": "Stáhnout vlastní ODK Collect",
+        "sign_in": "PŘIHLÁSIT SE",
+        "sign_out": "ODHLÁSIT SE",
+        "translate": "Pomozte nám překládat!",
+        "download_odk_collect": "Stáhnout ODK Collect"
+    },
+    "map": {
+        "enable_geolocation": "Pro získání nejlepších výsledků zapněte funkci polohy",
+        "enable_geolocation_got_it": "Rozumím!",
+        "exit_navigation": "Ukončení navigace",
+        "click_on_a_task": "KLIKNUTÍM NA ÚLOHU VYBERETE PRVEK PRO MAPOVÁNÍ",
+        "click_on_the_map": "Kliknutím na mapu vytvořte nový bod",
+        "geometry_correct_place": "Je geometrie na správném místě?",
+        "distance": "Vzdálenost",
+        "no_orientation_sensors": "Nelze zpracovat orientaci zařízení. Váš prohlížeč nepodporuje snímače orientace zařízení.",
+        "legend_features": "Legenda (Prvky)",
+        "control_zoom_to_project": "Přiblížit na projekt",
+        "control_geolocation": "Geolokace",
+        "control_basemaps": "Základní mapy",
+        "control_legend": "Legenda",
+        "control_sync_status": "Synchronizovat mapu"
+    },
+    "popup": {
+        "task": "Úloha",
+        "task_id": "ID úlohy",
+        "feature": "Prvek",
+        "start_mapping_task": "Chcete zahájit mapování úlohy #{taskId}?",
+        "map_new_feature": "MAPOVAT NOVÝ PRVEK",
+        "start_mapping": "ZAČÍT MAPOVAT",
+        "cancel_mapping": "ZRUŠIT MAPOVÁNÍ",
+        "cancel": "ZRUŠIT",
+        "navigate_here": "PŘEJÍT SEM",
+        "map_in_odk": "PRVEK MAPY V ODK",
+        "collect_data": "SBĚR DAT",
+        "task_complete_total_mapped": "V oblasti úloh jste zmapovali {totalMapped} prvků.",
+        "task_complete_only_total_mapped": "V oblasti úloh máte namapováno pouze {totalMapped} prvků.",
+        "task_complete_confirm": "Opravdu chcete označit tuto úlohu jako dokončenou?",
+        "select_this_feature": "Vyberte tento prvek",
+        "map_this_feature": "Mapujte tento prvek",
+        "proceed": "POKRAČOVAT",
+        "delete_feature": "Smazat tento prvek",
+        "task_complete_partial_mapped": "V oblasti úlohy jste zmapovali pouze {totalMapped} z {totalFeatures} prvků.",
+        "task_complete_all_mapped": "Zmapovali jste všechny prvky v oblasti úlohy. Pokračovat?"
+    },
+    "stack_group": {
+        "project_information": "Informace o projektu",
+        "comment": "Komentář",
+        "instructions": "Pokyny",
+        "activities": "Aktivity",
+        "my_tasks": "Moje úlohy",
+        "basemaps": "Základní mapy"
+    },
+    "odk": {
+        "open": "Otevřít ODK",
+        "scan_qr_code": "Naskenujte tento QR kód v ODK Collect z telefonu jiného uživatele nebo si jej stáhněte a importujte ručně"
+    },
+    "basemaps": {
+        "manage": "Správa podkladových map",
+        "no_basemaps_available": "Pro tento projekt nejsou k dispozici žádné podkladové mapy.",
+        "ask_pm": "Požádejte projektového manažera o vytvoření podkladových map.",
+        "show_on_map": "Zobrazit na mapě",
+        "store_offline": "Uložit offline",
+        "download_mbtiles": "Stáhnout MBTiles",
+        "add_to_map_layers": "Přidat k vrstvám mapy"
+    },
+    "project_info": {
+        "organization_name": "Název organizace",
+        "description": "Popis",
+        "total_tasks": "Celkem úloh",
+        "project_id": "ID Projektu"
+    },
+    "activities": {
+        "update_status_to": "stav aktualizován na",
+        "no_activities_on_task_yet": "Zatím žádné aktivity v úloze",
+        "no_activities_yet": "Zatím žádné aktivity"
+    },
+    "comment": {
+        "clear": "VYMAZAT",
+        "comment": "KOMENTÁŘ",
+        "no_comments_yet_on_task": "Zatím žádné komentáře k úloze",
+        "no_comments_yet": "Zatím žádné komentáře"
+    },
+    "dialog_entities_actions": {
+        "distance_constraint": "Tento projekt má povoleno omezení vzdálenosti. Pro optimální funkčnost povolte geolokaci zařízení",
+        "feature_must_be": "Prvek musí být uvnitř",
+        "meters_location": "metrů od vaší polohy",
+        "enable_location": "Pro navigaci k subjektu povolte geolokaci.",
+        "map_in_webforms": "MAPA VE WEBOVÝCH FORMULÁŘÍCH ODK",
+        "far_away_confirm": "Jste {distance} daleko od prvku. Opravdu chcete tento prvek zmapovat?",
+        "status": "Stav",
+        "comments": "Komentáře",
+        "entity_uuid": "Uuid entity",
+        "collect_data": "SBĚR DAT",
+        "entity_delete_confirmation": "Opravdu chcete tento prvek odstranit?",
+        "contact_pm_for_entity_deletion": "Tento prvek může odstranit pouze jeho tvůrce. Obraťte se prosím na správce projektu",
+        "unique_id": "Unikátní ID",
+        "created_by": "Vytvořeno",
+        "you_created_this": "Vytvořil jste tento prvek",
+        "view_existing_data": "ZOBRAZIT DATA",
+        "no_data": "Podání neobsahuje žádná data"
+    },
+    "dialog_task_actions": {
+        "complete_mapping": "DOKONČENÍ MAPOVÁNÍ",
+        "locked_is_complete": "byl uzamčen. Je úloha kompletně zmapována?",
+        "task": "Úloha",
+        "continue_mapping": "POKRAČOVAT V MAPOVÁNÍ"
+    },
+    "pagination": {
+        "go_to_page": "Přejít na stranu"
+    },
+    "qrcode": {
+        "scan_to_open_odk": "Skenovat a otevřít ODK Collect",
+        "moreinfo": "Další informace o ručním importu QR kódu"
+    },
+    "index": {
+        "no_instructions": "Žádné instrukce"
+    },
+    "download": "STÁHNOUT",
+    "error_downloading": "Chyba stahování.",
+    "forms": {
+        "default_language_warning": "Zobrazení formuláře ve výchozím jazyce, protože neexistuje česká verze formuláře.",
+        "uploading": "Nahrávání"
+    },
+    "offline": {
+        "features": "Prvky",
+        "basemaps": "Podkladové mapy",
+        "data": "Zobrazit offline data",
+        "store_features_offline": "Ukládat prvky Offline",
+        "features_offline_info": "Extrakty prvků již uložených v režimu offline",
+        "fetch_projects_offline": "Jste offline a nemůžete načíst další projekty",
+        "ready_offline": "Připraveno k použití offline.",
+        "total_offline_submissions": "Celkem podání offline",
+        "total_failed_submissions": "Celkem neúspěšných podání",
+        "download_csv": "Stáhnout jako CSV"
+    },
+    "my_tasks": {
+        "no_tasks_assigned": "Nebyly přiděleny žádné úlohy"
+    }
 }
