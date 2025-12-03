@@ -255,14 +255,11 @@ def detect_languages(xls: Dict[str, pd.DataFrame]) -> Dict[str, List[str] | str 
 
         for col in df.columns:
             col_norm = normalize_col(col)
-            match = re.search(r"::(\w+)$", col_norm)
+            match = re.match(r"^(label|hint|required_message)::(\w+)$", col_norm)
             if match:
-                lang = match.group(1)
+                lang = match.group(2)
                 if lang in INCLUDED_LANGUAGES and lang not in detected:
                     detected.append(lang)
-
-    if default_lang and default_lang not in detected:
-        detected.append(default_lang)
 
     return {
         "detected_languages": detected,
@@ -293,35 +290,16 @@ def get_media_files(xls: Dict[str, pd.DataFrame], langs: Dict[str, List[str] | s
     df = choices.copy()
     df.columns = [normalize_col(c) for c in df.columns]
 
-    detected = langs["detected_languages"]
-    default = langs["default_language"]
+    pattern = re.compile(r"^(image|media::image)(::\w+)?$")
 
-    # Priority 1: default language
-    # Priority 2: first detected language
-    # Priority 3: plain "image" column
-    if default:
-        lang_to_use = default
-    elif detected:
-        lang_to_use = detected[0]
-    else:
-        lang_to_use = None
+    possible_cols = [c for c in df.columns if pattern.match(c)]
 
-    if lang_to_use:
-        possible_cols = [
-            f"image::{lang_to_use}",
-            f"media::image::{lang_to_use}",
-        ]
-    else:
-        possible_cols = [
-            "image",
-            "media::image",
-        ]
-
-    col = next((c for c in possible_cols if c in df.columns), None)
-    if not col:
+    if not possible_cols:
         return []
 
-    return sorted({str(v).strip() for v in df[col].dropna() if str(v).strip()})
+    return sorted(
+        {str(v).strip() for v in df[possible_cols[0]].dropna() if str(v).strip()}
+    )
 
 
 @router.post("/detect-form-languages-and-media")
