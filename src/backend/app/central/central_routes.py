@@ -22,6 +22,7 @@ import re
 from io import BytesIO
 from typing import Annotated
 from uuid import UUID
+from typing import Annotated, Dict, List
 
 import pandas as pd
 from fastapi import APIRouter, Depends, Form, HTTPException
@@ -218,45 +219,139 @@ async def update_project_form(
     )
 
 
-@router.post("/detect-form-languages")
-async def detect_form_languages(
-    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-):
-    """Detect languages available in an uploaded XLSForm."""
-    xlsform = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
-    detected_languages = []
+def normalize_col(col: str) -> str:
+    """Normalize a column name by removing language codes in parentheses."""
+    col = re.sub(r"\([^)]*\)", "", col)
+    return col.strip().lower()
 
-    settings_df = xlsform.get("settings")
-    default_language = (
-        settings_df["default_language"].iloc[0].split("(")[0].strip().lower()
-        if settings_df is not None and "default_language" in settings_df
-        else None
-    )
 
-    for sheet_df in xlsform.values():
-        if sheet_df.empty:
+def detect_languages(xls: Dict[str, pd.DataFrame]) -> Dict[str, List[str] | str | None]:
+    """Detects languages available in an uploaded XLSForm.
+
+    Returns a dictionary with two keys:
+        - "detected_languages": a list of language codes detected in the form, in the
+        order found.
+        - "default_language": the default language of the form, or None if no default
+        language is specified.
+
+    Language detection is done by checking column names in the form for language codes
+    in parentheses, and by checking the "default_language" column in the "settings"
+    sheet.
+
+    NOTE: This function assumes that the uploaded XLSForm is valid and has been parsed
+    into a dictionary with sheet names as keys and pandas DataFrames as values.
+    """
+    detected = []
+    default_lang = None
+
+    settings = xls.get("settings")
+    if settings is not None and "default_language" in settings.columns:
+        raw = str(settings["default_language"].iloc[0]).strip()
+        default_lang = raw.split("(")[0].lower()
+
+    for df in xls.values():
+        if df.empty:
             continue
 
-        sheet_df.columns = sheet_df.columns.str.lower()
-        for col in sheet_df.columns:
-            if any(
-                col.startswith(f"{base_col}::")
-                for base_col in ["label", "hint", "required_message"]
-            ):
-                match = re.match(r"^(label|hint|required_message)::(\w+)", col)
-                if match and match.group(2) in INCLUDED_LANGUAGES:
-                    if match.group(2) not in detected_languages:
-                        detected_languages.append(match.group(2))
+        for col in df.columns:
+            col_norm = normalize_col(col)
+            match = re.search(r"::(\w+)$", col_norm)
+            if match:
+                lang = match.group(1)
+                if lang in INCLUDED_LANGUAGES and lang not in detected:
+                    detected.append(lang)
 
-    if default_language and default_language.lower() not in detected_languages:
-        detected_languages.append(default_language.lower())
+    if default_lang and default_lang not in detected:
+        detected.append(default_lang)
+
+    return {
+        "detected_languages": detected,
+        "default_language": default_lang,
+    }
+
+
+def get_media_files(xls: Dict[str, pd.DataFrame], langs: Dict[str, List[str] | str]):
+    """Extracts a list of media files from an XLSForm.
+
+    The function first checks if the "choices" sheet is present and not empty. If so, it
+    normalizes the column names and checks for the presence of a column to extract from.
+
+    The column to extract from is determined by the following priority rules:
+        1. If a default language is specified, use the column with that language code.
+        2. If no default language is specified, but at least one language is detected,
+        use the first detected language.
+        3. If no default language is specified and no languages are detected, use the
+        plain "image" column.
+
+    If no column is found to extract from, an empty list is returned. Otherwise, the
+    list of media files is sorted and returned.
+    """
+    choices = xls.get("choices")
+    if choices is None or choices.empty:
+        return []
+
+    df = choices.copy()
+    df.columns = [normalize_col(c) for c in df.columns]
+
+    detected = langs["detected_languages"]
+    default = langs["default_language"]
+
+    # Priority 1: default language
+    # Priority 2: first detected language
+    # Priority 3: plain "image" column
+    if default:
+        lang_to_use = default
+    elif detected:
+        lang_to_use = detected[0]
+    else:
+        lang_to_use = None
+
+    if lang_to_use:
+        possible_cols = [
+            f"image::{lang_to_use}",
+            f"media::image::{lang_to_use}",
+        ]
+    else:
+        possible_cols = [
+            "image",
+            "media::image",
+        ]
+
+    col = next((c for c in possible_cols if c in df.columns), None)
+    if not col:
+        return []
+
+    return sorted({str(v).strip() for v in df[col].dropna() if str(v).strip()})
+
+
+@router.post("/detect-form-languages-and-media")
+async def detect_form_languages_and_media(
+    xlsform: BytesIO = Depends(central_deps.read_xlsform),
+):
+    """Detects languages and media files available in an uploaded XLSForm.
+
+    Returns a JSON response with the following keys:
+        - "detected_languages": a list of language codes detected in the
+            form, in the order found.
+        - "default_language": the default language of the form, or None if
+            no default language is specified.
+        - "supported_languages": a list of supported language codes.
+        - "media_files": a list of media files extracted from the form.
+    """
+    xls = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
+
+    langs = detect_languages(xls)
+    media = get_media_files(xls, langs)
 
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={
-            "detected_languages": detected_languages,  # in the order found in form
-            "default_language": [default_language] if default_language else [],
+            "detected_languages": langs["detected_languages"],
+            "default_language": [langs["default_language"]]
+            if langs["default_language"]
+            else [],
             "supported_languages": list(INCLUDED_LANGUAGES.keys()),
+            "media_files": media,
         },
     )
 
