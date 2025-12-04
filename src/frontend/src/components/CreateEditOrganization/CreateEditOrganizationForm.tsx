@@ -257,8 +257,13 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
           )}
           <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
             <FieldLabel label="Upload Logo" />
-            {/* @ts-ignore */}
-            <FileUpload name="logo" setValue={setValue} data={values.logo} />
+            <FileUpload
+              name="logo"
+              // @ts-ignore
+              setValue={setValue}
+              data={values.logo}
+              placeholder="Please upload picture (jpeg, png file format)"
+            />
             {errors?.logo?.message && <ErrorMessage message={errors.logo.message as string} />}
           </div>
         </div>
