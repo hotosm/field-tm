@@ -10,7 +10,12 @@ import FieldLabel from '@/components/common/FieldLabel';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { useDetectFormLanguagesMutation, useGetFormListsQuery } from '@/api/central';
+import {
+  useDetectFormLanguagesMutation,
+  useGetFormListsQuery,
+  // useListFormMediaMutation,
+  // useUploadFormMediaMutation,
+} from '@/api/central';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
@@ -30,10 +35,32 @@ const UploadSurvey = () => {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
+  // TODO:
+  // const { mutate: listFormMediaMutate } = useListFormMediaMutation({
+  //   onSuccess: (data) => {
+  //     // prepare a list of mandatory media if it doesn't exist
+  //     const requiredFormMediaList = data.data.filter((media) => !media.exists).map((media) => media.name);
+  //     setValue('requiredFormMediaList', requiredFormMediaList);
+  //   },
+  //   onError: ({ response }) => {
+  //     dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Failed to get form media' }));
+  //   },
+  // });
+
+  // TODO:
+  // const { mutate: uploadFormMediaMutate, isPending: isUploadFormMediaPending } = useUploadFormMediaMutation({
+  //   onSuccess: (data) => {},
+  // });
+
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, control, setValue, formState, clearErrors } = form;
   const { errors } = formState;
   const values = watch();
+
+  // TODO:
+  // useEffect(() => {
+  //   listFormMediaMutate({ params: { project_id: 47 } });
+  // }, [values.id]);
 
   const { data: formList, isLoading: isGetFormListsLoading } = useGetFormListsQuery({
     options: { queryKey: ['get-form-lists'], staleTime: 60 * 60 * 1000 },
@@ -93,6 +120,12 @@ const UploadSurvey = () => {
       setValue('default_language', defaultLanguage);
     }
   }, [values.advancedConfig, values.formLanguages]);
+
+  // TODO:
+  // uploadFormMediaMutate({
+  //   payload: { media_uploads: selectedFormMedia?.map((file) => file.file) },
+  //   params: { project_id: +projectId! },
+  // });
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
@@ -298,6 +331,22 @@ const UploadSurvey = () => {
             )}
           </div>
         )}
+        {/* TODO: */}
+        {/* {!isEmpty(values.requiredFormMediaList) && (
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+            <FieldLabel label="Upload form attachments" />
+            <FileUpload
+              name="media_uploads"
+              data={values.media_uploads}
+              // @ts-ignore
+              setValue={setValue}
+              fileAccept="*"
+              multiple
+              placeholder="Upload form attachments"
+            />
+            {errors?.media_uploads?.message && <ErrorMessage message={errors.media_uploads.message as string} />}
+          </div>
+        )} */}
       </>
     </div>
   );
