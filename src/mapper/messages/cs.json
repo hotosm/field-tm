@@ -1,7 +1,9 @@
 {
 	"common": {
 		"yes": "Ano",
-		"no": "Ne"
+		"no": "Ne",
+		"zoom_to_task": "Přiblížit na Úlohu",
+		"projects": "PROJEKTY"
 	},
 	"project_states": {
 		"DRAFT": "Koncept",
@@ -31,7 +33,8 @@
 		"download_custom_odk_collect": "Stáhnout vlastní ODK Collect",
 		"sign_in": "PŘIHLÁSIT SE",
 		"sign_out": "ODHLÁSIT SE",
-		"translate": "Pomozte nám překládat!"
+		"translate": "Pomozte nám překládat!",
+		"download_odk_collect": "Stáhnout ODK Collect"
 	},
 	"map": {
 		"enable_geolocation": "Pro získání nejlepších výsledků zapněte funkci polohy",
@@ -42,7 +45,12 @@
 		"geometry_correct_place": "Je geometrie na správném místě?",
 		"distance": "Vzdálenost",
 		"no_orientation_sensors": "Nelze zpracovat orientaci zařízení. Váš prohlížeč nepodporuje snímače orientace zařízení.",
-		"legend_features": "Legenda (Prvky)"
+		"legend_features": "Legenda (Prvky)",
+		"control_zoom_to_project": "Přiblížit na projekt",
+		"control_geolocation": "Geolokace",
+		"control_basemaps": "Základní mapy",
+		"control_legend": "Legenda",
+		"control_sync_status": "Synchronizovat mapu"
 	},
 	"popup": {
 		"task": "Úloha",
@@ -62,13 +70,17 @@
 		"select_this_feature": "Vyberte tento prvek",
 		"map_this_feature": "Mapujte tento prvek",
 		"proceed": "POKRAČOVAT",
-		"delete_feature": "Smazat tento prvek"
+		"delete_feature": "Smazat tento prvek",
+		"task_complete_partial_mapped": "V oblasti úlohy jste zmapovali pouze {totalMapped} z {totalFeatures} prvků.",
+		"task_complete_all_mapped": "Zmapovali jste všechny prvky v oblasti úlohy. Pokračovat?"
 	},
 	"stack_group": {
 		"project_information": "Informace o projektu",
 		"comment": "Komentář",
 		"instructions": "Pokyny",
-		"activities": "Aktivity"
+		"activities": "Aktivity",
+		"my_tasks": "Moje úlohy",
+		"basemaps": "Základní mapy"
 	},
 	"odk": {
 		"open": "Otevřít ODK",
@@ -80,7 +92,8 @@
 		"ask_pm": "Požádejte projektového manažera o vytvoření podkladových map.",
 		"show_on_map": "Zobrazit na mapě",
 		"store_offline": "Uložit offline",
-		"download_mbtiles": "Stáhnout MBTiles"
+		"download_mbtiles": "Stáhnout MBTiles",
+		"add_to_map_layers": "Přidat k vrstvám mapy"
 	},
 	"project_info": {
 		"organization_name": "Název organizace",
@@ -111,7 +124,12 @@
 		"entity_uuid": "Uuid entity",
 		"collect_data": "SBĚR DAT",
 		"entity_delete_confirmation": "Opravdu chcete tento prvek odstranit?",
-		"contact_pm_for_entity_deletion": "Tento prvek může odstranit pouze jeho tvůrce. Obraťte se prosím na správce projektu"
+		"contact_pm_for_entity_deletion": "Tento prvek může odstranit pouze jeho tvůrce. Obraťte se prosím na správce projektu",
+		"unique_id": "Unikátní ID",
+		"created_by": "Vytvořeno",
+		"you_created_this": "Vytvořil jste tento prvek",
+		"view_existing_data": "ZOBRAZIT DATA",
+		"no_data": "Podání neobsahuje žádná data"
 	},
 	"dialog_task_actions": {
 		"complete_mapping": "DOKONČENÍ MAPOVÁNÍ",
@@ -146,5 +164,8 @@
 		"total_offline_submissions": "Celkem podání offline",
 		"total_failed_submissions": "Celkem neúspěšných podání",
 		"download_csv": "Stáhnout jako CSV"
+	},
+	"my_tasks": {
+		"no_tasks_assigned": "Nebyly přiděleny žádné úlohy"
 	}
 }
