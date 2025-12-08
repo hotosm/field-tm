@@ -324,6 +324,7 @@ const MapData = () => {
             onDelete={resetMapDataFile}
             data={values.customDataExtractFile}
             fileAccept=".geojson,.json,.fgb"
+            placeholder="The supported file formats are .geojson, .json, .fgb"
           />
           {errors?.customDataExtractFile?.message && (
             <ErrorMessage message={errors.customDataExtractFile.message as string} />
