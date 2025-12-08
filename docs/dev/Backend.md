@@ -116,24 +116,6 @@ docker compose up -d migrations
 just migrate
 ```
 
-### The Task Scheduler
-
-- The backend runs a lightweight scheduling service via cron.
-- The scripts called and intervals can be found in the `compose.yaml`
-  scheduler service.
-- As of 21th April 2025, we run:
-
-```bash
-# Task unlocking every 3hrs
-* */3 * * * /opt/scheduler/unlock_tasks.py
-
-# Check inactive users every Sunday 00:00
-0 0 * * 0 /opt/scheduler/inactive_users.py
-
-# Run project stats script every 10 mins
-*/10 * * * * /opt/scheduler/project_stats.py
-```
-
 ### Type Checking
 
 - It is a good idea to have your code 'type checked' to avoid potential

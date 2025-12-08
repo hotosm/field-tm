@@ -42,14 +42,12 @@ CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
 -- Required for area-splitter PostGIS StraightSkeleton usage
 CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
 
-
--- Enums
-\i './1-enums.sql'
-
 -- Extra
 SET default_tablespace = '';
 SET default_table_access_method = heap;
 
+-- Enums
+\i './1-enums.sql'
 -- Tables
 \i './2-tables.sql'
 -- Constraints for primary keys
@@ -58,43 +56,6 @@ SET default_table_access_method = heap;
 \i './4-indexes.sql'
 -- Foreign keys
 \i './5-foreign-keys.sql'
-
--- Triggers
-CREATE OR REPLACE FUNCTION public.set_task_state()
-RETURNS TRIGGER AS $$
-BEGIN
-    CASE NEW.event
-        WHEN 'MAP' THEN
-            NEW.state := 'LOCKED_FOR_MAPPING';
-        WHEN 'FINISH' THEN
-            NEW.state := 'UNLOCKED_TO_VALIDATE';
-        WHEN 'VALIDATE' THEN
-            NEW.state := 'LOCKED_FOR_VALIDATION';
-        WHEN 'GOOD' THEN
-            NEW.state := 'UNLOCKED_DONE';
-        WHEN 'BAD' THEN
-            NEW.state := 'UNLOCKED_TO_MAP';
-        WHEN 'SPLIT' THEN
-            NEW.state := 'UNLOCKED_DONE';
-        WHEN 'MERGE' THEN
-            NEW.state := 'UNLOCKED_DONE';
-        WHEN 'ASSIGN' THEN
-            NEW.state := 'LOCKED_FOR_MAPPING';
-        WHEN 'COMMENT' THEN
-            NEW.state := OLD.state;
-        WHEN 'RESET' THEN
-            NEW.state := 'UNLOCKED_TO_MAP';
-        ELSE
-            RAISE EXCEPTION 'Unknown task event type: %', NEW.event;
-    END CASE;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE TRIGGER task_event_state_trigger
-BEFORE INSERT ON public.task_events
-FOR EACH ROW
-EXECUTE FUNCTION public.set_task_state();
 
 -- Finalise
 

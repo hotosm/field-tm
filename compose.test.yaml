@@ -20,11 +20,8 @@
 name: fmtm-test
 
 volumes:
-  fmtm_data:
   fmtm_db_data:
   fmtm_logs:
-  fmtm_images:
-  fmtm_tiles:
   central_db_data:
   central_frontend:
 
@@ -49,8 +46,6 @@ services:
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
-      - ./src/backend/scheduler:/opt/scheduler:ro
-      - ./src/backend/stats:/opt/stats:ro
       # Workspace packages config
       - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
       - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
@@ -100,13 +95,6 @@ services:
   #     file: compose.yaml
   #     service: central-webhook
 
-  s3:
-    extends:
-      file: compose.yaml
-      service: s3
-    # We don't need proxy
-    depends_on: !override []
-
   fmtm-db:
     extends:
       file: compose.yaml
@@ -127,9 +115,3 @@ services:
     extends:
       file: compose.yaml
       service: migrations
-
-  # No need for scheduler during tests
-  scheduler:
-    extends:
-      file: compose.yaml
-      service: scheduler

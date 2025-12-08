@@ -42,18 +42,10 @@ wait_for_s3() {
     exit 1  # Exit with an error code
 }
 
-init_project_stats() {
-    echo "Initializing project stats materialized view..."
-    python /opt/scheduler/project_stats.py
-}
-
 # Start wait in background with tmp log files
 wait_for_db &
 wait_for_s3 &
 # Wait until checks complete
 wait
-
-# Initialize project stats materialized view when the service starts
-init_project_stats
 
 exec "$@"

@@ -18,11 +18,8 @@
 name: fmtm
 
 volumes:
-  fmtm_data:
   fmtm_db_data:
   fmtm_logs:
-  fmtm_images:
-  fmtm_tiles:
   central_db_data:
   central_frontend:
   qfield_db_data:
@@ -117,8 +114,6 @@ services:
       # Frontends must be built and available first
       ui:
         condition: service_started
-      ui-mapper:
-        condition: service_started
       central-ui:
         condition: service_completed_successfully
         required: false
@@ -141,9 +136,6 @@ services:
       WHITELIST_URI: http://fmtm.localhost:7050
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema, electric-cursor
-      KEEP_UPSTREAM_HEADERS: yes
-      REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
       USE_REAL_IP: yes
       SERVE_FILES: yes
@@ -158,27 +150,17 @@ services:
       # On client, brotli is preferred over gzip if both are enabled
       USE_BROTLI: yes
       # Reverse proxy configs
-      SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost qfield.fmtm.localhost
+      SERVER_NAME: fmtm.localhost api.fmtm.localhost odk.fmtm.localhost qfield.fmtm.localhost
       fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
       fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
       fmtm.localhost_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
       # Required for vite websockets / live-reload
       fmtm.localhost_REVERSE_PROXY_WS: yes
-      mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7057
-      mapper.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # Required for vite websockets / live-reload
-      mapper.fmtm.localhost_REVERSE_PROXY_WS: yes
       api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
       api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
       api.fmtm.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
-      s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
-      s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
-      sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
-      sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # Expose-Headers are RESPONSE headers the browser is allowed to access
-      sync.fmtm.localhost_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
       odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
       # Required to allow loading frontend
       odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
@@ -219,8 +201,6 @@ services:
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
-      - ./src/backend/scheduler:/opt/scheduler:ro
-      - ./src/backend/stats:/opt/stats:ro
       # Workspace packages config
       - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
       - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
@@ -242,8 +222,6 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-      s3:
-        condition: service_healthy
     env_file:
       - .env
     ports:
@@ -295,49 +273,17 @@ services:
       - fmtm-net
     restart: "unless-stopped"
 
-  ui-mapper:
-    image: "ghcr.io/hotosm/field-tm/frontend:mapper"
-    build:
-      context: src
-      additional_contexts:
-        - code=src/mapper
-      dockerfile: Dockerfile.ui.debug
-    volumes:
-      - ./src/mapper/messages:/app/messages
-      - ./src/mapper/project.inlang:/app/project.inlang
-      - ./src/mapper/src:/app/src
-      - ./src/mapper/static:/app/static
-      - ./src/mapper/tests:/app/tests
-      - ./src/mapper/package.json:/app/package.json
-      - ./src/mapper/playwright.config.ts:/app/playwright.config.ts
-      - ./src/mapper/svelte.config.js:/app/svelte.config.js
-      - ./src/mapper/uno.config.ts:/app/uno.config.ts
-      - ./src/mapper/vite.config.ts:/app/vite.config.ts
-      # - ../ui:/app/node_modules/@hotosm/ui:ro
-    environment:
-      - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
-      - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
-      - VITE_S3_URL=http://s3.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
-    ports:
-      - "7057:7057"
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    command: pnpm run dev
-
   central:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
     build:
-      context: odkcentral/api
+      context: src/odkcentral/api
       args:
         ODK_CENTRAL_TAG: v2025.2.0
     depends_on:
       proxy:
         condition: service_healthy
       central-db:
-        condition: service_healthy
-      s3:
         condition: service_healthy
       pyxform:
         condition: service_started
@@ -396,55 +342,13 @@ services:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
     build:
-      context: odkcentral/ui
+      context: src/odkcentral/ui
       args:
         ODK_CENTRAL_TAG: v2025.2.0
     volumes:
       - central_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
-
-  central-webhook:
-    profiles: ["", "central"]
-    image: "ghcr.io/hotosm/central-webhook:0.3.0"
-    depends_on:
-      central:
-        condition: service_healthy
-    environment:
-      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER:-odk}:${CENTRAL_DB_USER:-odk}@central-db:5432/${CENTRAL_DB_NAME:-odk}?sslmode=disable
-      CENTRAL_WEBHOOK_UPDATE_ENTITY_URL: http://api:8000/integrations/webhooks/entity-status
-      # CENTRAL_WEBHOOK_REVIEW_SUBMISSION_URL: https://your.domain.com/some/webhook
-      CENTRAL_WEBHOOK_API_KEY: qnyE7ev7OWsfMAaX2fm-PuWYnkAUJw2xlyp72FKCH3Q
-      # CENTRAL_WEBHOOK_LOG_LEVEL: DEBUG
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-
-  s3:
-    image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
-    depends_on:
-      proxy:
-        condition: service_started
-    environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
-      MINIO_VOLUMES: "/mnt/data"
-      MINIO_BROWSER: ${MINIO_BROWSER:-off}
-    volumes:
-      - fmtm_data:/mnt/data
-    # ports:
-    # - 9000:9000
-    # - 9090:9090
-    networks:
-      - fmtm-net
-    command: minio server
-    restart: "unless-stopped"
-    healthcheck:
-      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
-      interval: 5s
-      retries: 3
-      start_period: 5s
-      timeout: 5s
 
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
@@ -469,26 +373,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  electric:
-    image: "electricsql/electric:1.0.22"
-    depends_on:
-      proxy:
-        condition: service_started
-      fmtm-db:
-        condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
-    environment:
-      DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
-      # For development we do not need to include auth token security
-      ELECTRIC_INSECURE: true
-      # OTEL_EXPORT: otlp
-      # OTLP_ENDPOINT: https://...
-      # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
 
   central-db:
     profiles: ["", "central"]
@@ -518,8 +402,6 @@ services:
     depends_on:
       fmtm-db:
         condition: service_healthy
-      s3:
-        condition: service_healthy
     env_file:
       - .env
     # Hardcode some vars for dev, as not necessarily present in the .env file
@@ -535,47 +417,6 @@ services:
     restart: "on-failure:2"
     healthcheck:
       test: ["NONE"] # Set the health check test to NONE to disable it
-
-  scheduler:
-    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      DEBUG: false
-    networks:
-      - fmtm-net
-    entrypoint: ["/bin/sh", "-c"]
-    # The approach below allows us to easily switch to Kubernetes CronJob if needed
-    command: |
-      "
-        # Task unlocking every 3hrs
-        echo '* */3 * * * /opt/scheduler/unlock_tasks.py' > ./crontab
-
-        # Check inactive users every Sunday 00:00
-        echo '0 0 * * 0 /opt/scheduler/inactive_users.py' >> ./crontab
-
-        # Run project stats script every 10 mins
-        echo '*/10 * * * * /opt/scheduler/project_stats.py' >> ./crontab
-
-        # Upload and update project submissions to s3 every hours
-        echo '0 * * * * /opt/scheduler/upload_submissions_to_s3.py' >> ./crontab
-
-        # Refresh user submission counts once a day
-        echo '0 0 * * * /opt/scheduler/user_submission_stats.py' >> ./crontab
-
-        exec /usr/local/bin/supercronic ./crontab
-      "
-    restart: "unless-stopped"
-    # Check the 'supercronic' service is still running
-    healthcheck:
-      test: ["CMD", "pgrep", "supercronic"]
-      interval: 5m
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
   qfield-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216

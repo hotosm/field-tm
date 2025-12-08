@@ -416,9 +416,3 @@ services:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
-
-  scheduler:
-    extends:
-      file: ../compose.yaml
-      service: scheduler
-    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"

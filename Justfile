@@ -23,7 +23,6 @@ mod stop 'contrib/just/stop/Justfile'
 mod build 'contrib/just/build/Justfile'
 mod test 'contrib/just/test/Justfile'
 mod config 'contrib/just/config/Justfile'
-mod stats 'contrib/just/stats/Justfile'
 mod manage 'contrib/just/manage/Justfile'
 mod prep 'contrib/just/prep/Justfile'
 
