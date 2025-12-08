@@ -466,6 +466,7 @@ const ProjectOverview = () => {
                   onDelete={resetFile}
                   data={values.uploadedAOIFile}
                   fileAccept=".geojson, .json"
+                  placeholder="Please upload .geojson, .json file"
                 />
                 {errors?.uploadedAOIFile?.message && (
                   <ErrorMessage message={errors.uploadedAOIFile.message as string} />

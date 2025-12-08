@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import AssetModules from '@/shared/AssetModules';
 import validateFileTypes from '@/utilfunctions/validateFileTypes';
@@ -8,10 +8,7 @@ import { useAppDispatch } from '@/types/reduxTypes';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import type { FieldValues, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 import { FileType } from '@/types';
-
-type FileEvent = ChangeEvent<HTMLInputElement> & {
-  target: EventTarget & { files: FileList };
-};
+import isEmpty from '@/utilfunctions/isEmpty';
 
 type FileUploadProps = {
   name?: string;
@@ -38,6 +35,7 @@ export default function FileUpload({
   onDelete,
   showPreview = true,
 }: FileUploadProps) {
+  const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
 
   const [inputRef, onFileUpload] = useCustomUpload();
@@ -68,11 +66,10 @@ export default function FileUpload({
     register(name);
   }, [register, name, setValue]);
 
-  const handleFileUpload = (event: FileEvent) => {
-    const { files } = event.target;
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files) return;
 
     const isValidFile = validateFileTypes(files, fileAccept);
-
     if (!isValidFile) {
       dispatch(CommonActions.SetSnackBar({ message: 'Invalid file type' }));
       return;
@@ -114,9 +111,32 @@ export default function FileUpload({
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
       <div
-        className="fmtm-flex fmtm-flex-col fmtm-cursor-pointer fmtm-items-center fmtm-justify-center fmtm-rounded-lg fmtm-border-2 fmtm-border-dashed fmtm-py-2.5"
+        ref={inputContainerRef}
+        className="fmtm-flex fmtm-flex-col fmtm-cursor-pointer fmtm-items-center fmtm-justify-center fmtm-rounded-lg fmtm-border-2 fmtm-border-dashed fmtm-py-2.5 hover:fmtm-border-red-medium fmtm-duration-200"
         //   @ts-ignore
         onClick={onFileUpload}
+        onDragEnter={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+          inputContainerRef?.current?.classList.add('fmtm-border-red-medium');
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          inputContainerRef?.current?.classList.remove('fmtm-border-red-medium');
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          inputContainerRef?.current?.classList.remove('fmtm-border-red-medium');
+          if (isEmpty(e.dataTransfer.files)) return;
+          const { files } = e.dataTransfer;
+          if (!multiple && files.length > 1)
+            return dispatch(CommonActions.SetSnackBar({ message: 'Multiple files not allowed' }));
+          handleFileUpload(files);
+        }}
       >
         <AssetModules.CloudUploadOutlinedIcon style={{ fontSize: '24px' }} className="fmtm-text-primaryRed" />
         <p className="fmtm-text-sm fmtm-text-grey-600">
@@ -127,7 +147,7 @@ export default function FileUpload({
           type="file"
           className="fmtm-hidden"
           multiple={multiple}
-          onChange={handleFileUpload}
+          onChange={(e) => handleFileUpload(e.target.files)}
           accept={fileAccept}
         />
       </div>

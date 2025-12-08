@@ -101,7 +101,12 @@ const FormUpdate = ({ project }: formUpdatePropType) => {
           </div>
         </div>
         <div>
-          <FileUpload data={uploadForm} onChange={setUploadForm} fileAccept=".xls, .xlsx, .xml" />
+          <FileUpload
+            data={uploadForm}
+            onChange={setUploadForm}
+            fileAccept=".xls, .xlsx, .xml"
+            placeholder="Please upload .xls, .xlsx, .xml file"
+          />
           {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
         </div>
       </div>
