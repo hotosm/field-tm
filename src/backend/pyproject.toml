@@ -104,7 +104,6 @@ target-version = "py313"
 exclude = [
     ".ruff_cache",
     "app/__version__.py",
-    "stats",
 ]
 [tool.ruff.lint]
 select = ["I", "E", "W", "D", "B", "F", "N", "Q"]

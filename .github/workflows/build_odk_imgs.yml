@@ -7,7 +7,7 @@ on:
       - dev
     paths:
       # Workflow is triggered only if odkcentral dir changes
-      - "odkcentral/**"
+      - "src/odkcentral/**"
   # Allow manual trigger
   workflow_dispatch:
 
@@ -15,7 +15,7 @@ jobs:
   build-odkcentral:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
-      context: odkcentral/api
+      context: src/odkcentral/api
       image_tags: |
         "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
@@ -26,7 +26,7 @@ jobs:
   build-odkcentral-ui:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
-      context: odkcentral/ui
+      context: src/odkcentral/ui
       image_tags: |
         "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"

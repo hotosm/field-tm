@@ -159,13 +159,11 @@ WORKDIR /opt
 # Add app code
 COPY migrations/ /opt/migrations/
 COPY backend/app/ /opt/app/
-COPY backend/stats/ /opt/stats/
-COPY backend/scheduler/ /opt/scheduler/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/qfield \
     && chown -R appuser:appuser /opt /home/appuser \
-    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh /opt/scheduler/*.py
+    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
 # Add volumes for persistence
 VOLUME /opt/logs
 VOLUME /opt/qfield
@@ -194,8 +192,7 @@ CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
     "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
     "--reload", "--reload-dir", "app", "--reload-dir", "tests", \
-    "--reload-dir", "scheduler", "--reload-dir", "stats", "--log-level", \
-    "critical", "--no-access-log"]
+    "--log-level", "critical", "--no-access-log"]
 
 
 # Used during CI workflows (as root), with docs/test dependencies pre-installed

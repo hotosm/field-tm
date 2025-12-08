@@ -4,12 +4,9 @@ bug:
 enhancement:
   - head-branch:
       ["^feature", "feature", "^feat", "feat", "^refactor", "refactor"]
-frontend:management:
+frontend:
   - changed-files:
       - any-glob-to-any-file: src/frontend/**
-frontend:mapper:
-  - changed-files:
-      - any-glob-to-any-file: src/mapper/**
 backend:
   - changed-files:
       - any-glob-to-any-file: src/backend/**
@@ -36,7 +33,10 @@ docs:
           - INSTALL.md
 ODK:
   - changed-files:
-      - any-glob-to-any-file: odkcentral/**
+      - any-glob-to-any-file: src/odkcentral/**
+QField:
+  - changed-files:
+      - any-glob-to-any-file: src/qfield/**
 contrib:
   - changed-files:
       - any-glob-to-any-file: contrib/**
@@ -50,7 +50,7 @@ dependency:osm-fieldwork:
   - changed-files:
       - any-glob-to-any-file:
           - src/backend/packages/osm-fieldwork/**
-dependency:dependency:area-splitter:
+dependency:area-splitter:
   - changed-files:
       - any-glob-to-any-file:
           - src/backend/packages/area-splitter/**
