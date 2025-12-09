@@ -220,8 +220,6 @@ services:
         condition: service_completed_successfully
       qfield-qgis:
         condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
     env_file:
       - .env
     ports:
@@ -396,27 +394,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  migrations:
-    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-    env_file:
-      - .env
-    # Hardcode some vars for dev, as not necessarily present in the .env file
-    environment:
-      # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
-      - S3_ENDPOINT=http://s3:9000
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-"fmtm-data"}
-      - S3_BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME:-"fmtm-db-backups"}
-      - S3_QFIELD_BUCKET_NAME=${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
-    networks:
-      - fmtm-net
-    entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:2"
-    healthcheck:
-      test: ["NONE"] # Set the health check test to NONE to disable it
 
   qfield-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216

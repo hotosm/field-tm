@@ -58,8 +58,6 @@ services:
       central:
         condition: service_healthy
         required: false
-      migrations:
-        condition: service_completed_successfully
       s3:
         condition: service_healthy
 
@@ -110,8 +108,3 @@ services:
     extends:
       file: compose.yaml
       service: central-db
-
-  migrations:
-    extends:
-      file: compose.yaml
-      service: migrations

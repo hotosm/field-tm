@@ -1,1 +1,0 @@
-"""Field-TM submissions API."""

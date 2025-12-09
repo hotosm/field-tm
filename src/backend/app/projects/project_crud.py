@@ -237,7 +237,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
         # Collect all existing XLSForm titles from the database
         select_existing_query = """
-            SELECT title FROM xlsforms;
+            SELECT title FROM template_xlsforms;
         """
         await cur.execute(select_existing_query)
         existing_db_forms = {row[0] for row in await cur.fetchall()}
@@ -266,7 +266,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
             try:
                 insert_query = """
-                    INSERT INTO xlsforms (title, xls)
+                    INSERT INTO template_xlsforms (title, xls)
                     VALUES (%(title)s, %(xls)s)
                     ON CONFLICT (title) DO UPDATE
                     SET xls = EXCLUDED.xls
@@ -288,7 +288,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
         if forms_to_delete:
             delete_query = """
-                DELETE FROM xlsforms WHERE title = ANY(%(titles)s)
+                DELETE FROM template_xlsforms WHERE title = ANY(%(titles)s)
             """
             await cur.execute(delete_query, {"titles": list(forms_to_delete)})
             log.info(f"Deleted XLSForms from the database: {forms_to_delete}")

@@ -35,10 +35,6 @@ default:
 help:
   just --justfile {{justfile()}} --list
 
-# Run database migrations for backend
-migrate:
-  docker compose up -d migrations
-
 # Delete local database, S3, and ODK Central data
 clean:
   docker compose down -v

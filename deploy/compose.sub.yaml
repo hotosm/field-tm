@@ -400,19 +400,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  migrations:
-    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
-    depends_on:
-      proxy:
-        condition: service_healthy
-      fmtm-db:
-        condition: service_healthy
-      s3:
-        condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:2"
