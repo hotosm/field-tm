@@ -13,24 +13,26 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO fmtm;
 
 
-CREATE TABLE public.xlsforms (
+CREATE TABLE public.template_xlsforms (
     id integer NOT NULL,
     title character varying,
     xls bytea
 );
-ALTER TABLE public.xlsforms OWNER TO fmtm;
-CREATE SEQUENCE public.xlsforms_id_seq
+ALTER TABLE public.template_xlsforms OWNER TO fmtm;
+CREATE SEQUENCE public.template_xlsforms_id_seq
 AS integer
 START WITH 1
 INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.xlsforms_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.xlsforms_id_seq OWNED BY public.xlsforms.id;
+ALTER TABLE public.template_xlsforms_id_seq OWNER TO fmtm;
+ALTER SEQUENCE public.template_xlsforms_id_seq
+OWNED BY public.template_xlsforms.id;
 -- Autoincrement PK
-ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval(
-    'public.xlsforms_id_seq'::regclass
+ALTER TABLE ONLY public.template_xlsforms
+ALTER COLUMN id SET DEFAULT nextval(
+    'public.template_xlsforms_id_seq'::regclass
 );
 
 
