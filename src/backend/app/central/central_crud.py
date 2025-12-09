@@ -40,7 +40,7 @@ from pyxform.xls2xform import convert as xform_convert
 from app.central import central_deps, central_schemas
 from app.config import settings
 from app.db.enums import DbGeomType, EntityState, FieldMappingApp, HTTPStatus
-from app.db.models import DbProject, DbXLSForm
+from app.db.models import DbProject, DbTemplateXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
@@ -255,7 +255,7 @@ def list_submissions(
 async def get_form_list(db: Connection) -> list:
     """Returns the list of {id:title} for XLSForms in the database."""
     try:
-        return await DbXLSForm.all(db)
+        return await DbTemplateXLSForm.all(db)
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(

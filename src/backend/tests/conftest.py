@@ -28,6 +28,9 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from app.organisations.organisation_deps import get_organisation
+from app.organisations.organisation_schemas import OrganisationIn
+from app.tasks.task_schemas import TaskEventIn
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
@@ -57,15 +60,12 @@ from app.db.models import (
     slugify,
 )
 from app.main import get_application
-from app.organisations.organisation_deps import get_organisation
-from app.organisations.organisation_schemas import OrganisationIn
 from app.projects import project_crud
 from app.projects.project_schemas import (
     ProjectIn,
     ProjectTeamIn,
     StubProjectIn,
 )
-from app.tasks.task_schemas import TaskEventIn
 from app.users.user_crud import get_or_create_user
 from app.users.user_deps import get_user
 from tests.test_data import test_data_path
