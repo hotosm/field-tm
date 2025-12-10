@@ -11,6 +11,7 @@ import { useGetDownloadSubmissionQuery } from '@/api/submission';
 import { downloadBlobData } from '@/utilfunctions';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { field_mapping_app } from '@/types/enums';
 
 type downloadTypeType = 'form' | 'geojson' | 'extract' | 'submission' | 'qr';
 type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean; show: boolean };
@@ -95,7 +96,7 @@ const ProjectOptions = () => {
       downloadType: 'submission',
       label: 'SUBMISSIONS',
       isLoading: isDownloadSubmissionLoading,
-      show: true,
+      show: projectInfo.field_mapping_app !== field_mapping_app.QField,
     },
     { downloadType: 'qr', label: 'QR CODE', isLoading: false, show: projectInfo.use_odk_collect || false },
   ];
