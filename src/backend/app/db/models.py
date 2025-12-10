@@ -1561,6 +1561,7 @@ class DbProject(BaseModel):
     tasks_validated: Optional[int] = 0
     tasks_bad: Optional[int] = 0
     project_url: Optional[str] = None
+    qfield_project_id: Optional[str] = None
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1661,6 +1662,8 @@ class DbProject(BaseModel):
                     ] AS bbox,
                     project_org.name AS organisation_name,
                     project_org.logo AS organisation_logo,
+                    ext_url.url AS project_url,
+                    ext_url.qfield_project_id AS qfield_project_id,
                     MAX(latest_status_per_task.created_at)::timestamptz AS last_active,
                     COALESCE(
                         NULLIF(p.odk_central_url, ''),
@@ -1713,10 +1716,13 @@ class DbProject(BaseModel):
                 -- Required to get the BBOX object
                 JOIN
                     project_bbox ON project_bbox.bbox IS NOT NULL
+                LEFT JOIN
+                    project_external_urls ext_url ON ext_url.project_id = p.id
                 WHERE
                     p.id = %(project_id)s
                 GROUP BY
-                    p.id, project_org.id, project_bbox.bbox;
+                    p.id, project_org.id, project_bbox.bbox, ext_url.url,
+                    ext_url.qfield_project_id;
             """
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
@@ -2021,7 +2027,8 @@ class DbProject(BaseModel):
                 stats.tasks_mapped,
                 stats.tasks_bad,
                 stats.tasks_validated,
-                ext_url.url AS project_url
+                ext_url.url AS project_url,
+                ext_url.qfield_project_id AS qfield_project_id
 
             FROM
                 filtered_projects fp
@@ -2194,6 +2201,7 @@ class DbProjectExternalURL(BaseModel):
     project_id: int
     source: FieldMappingApp
     url: str
+    qfield_project_id: Optional[str] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
 
@@ -2222,6 +2230,7 @@ class DbProjectExternalURL(BaseModel):
         project_id: int,
         source: FieldMappingApp | str,
         url: str,
+        qfield_project_id: Optional[str] = None,
     ) -> Self:
         """Insert or update the external URL for a project."""
         if not url:
@@ -2234,8 +2243,10 @@ class DbProjectExternalURL(BaseModel):
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
                 """
-                    INSERT INTO project_external_urls (project_id, source, url)
-                    VALUES (%(project_id)s, %(source)s, %(url)s)
+                    INSERT INTO project_external_urls (project_id, source, url,
+                    qfield_project_id)
+                    VALUES (%(project_id)s, %(source)s, %(url)s,
+                    %(qfield_project_id)s)
                     ON CONFLICT (project_id, source) DO UPDATE
                     SET url = EXCLUDED.url, updated_at = NOW()
                     RETURNING *;
@@ -2244,6 +2255,7 @@ class DbProjectExternalURL(BaseModel):
                     "project_id": project_id,
                     "source": source_value,
                     "url": url,
+                    "qfield_project_id": qfield_project_id,
                 },
             )
             return await cur.fetchone()

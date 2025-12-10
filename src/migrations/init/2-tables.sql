@@ -283,5 +283,6 @@ CREATE TABLE IF NOT EXISTS project_external_urls (
     url TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now(),
+    qfield_project_id VARCHAR,
     UNIQUE (project_id, source)
 );

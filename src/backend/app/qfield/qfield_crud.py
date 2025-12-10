@@ -250,7 +250,11 @@ async def create_qfield_project(
 
     # Store QField URL in project_external_urls
     await DbProjectExternalURL.create_or_update(
-        db=db, project_id=project.id, source=FieldMappingApp.QFIELD, url=qfield_url
+        db=db,
+        project_id=project.id,
+        source=FieldMappingApp.QFIELD,
+        url=qfield_url,
+        qfield_project_id=api_project_id,
     )
     await db.commit()
 
