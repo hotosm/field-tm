@@ -114,14 +114,17 @@ const ProjectDetails = () => {
     dispatch(GetOdkEntitiesGeojson(`${VITE_API_URL}/projects/${projectId}/entities`));
   };
 
+  // temporary fix: only call api if field_mapping_app is not QField
   useEffect(() => {
-    getEntityStatusList();
-    getOdkEntitiesGeojson();
+    if (projectId && projectInfo?.id === +projectId && projectInfo?.field_mapping_app !== field_mapping_app.QField) {
+      getEntityStatusList();
+      getOdkEntitiesGeojson();
+    }
 
     return () => {
       dispatch(ProjectActions.ClearProjectFeatures());
     };
-  }, []);
+  }, [projectInfo]);
 
   const getTabContent = (tabState: tabType) => {
     switch (tabState) {
