@@ -8,8 +8,6 @@ import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { UnassignUserFromProject } from '@/api/Project';
-import { field_mapping_app } from '@/types/enums';
-import { fieldMappingAppNameMap } from '@/constants/fieldMapping';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -168,28 +166,17 @@ export const CreateProjectService = (
 
       dispatch(
         CommonActions.SetSnackBar({
-          message: `Project created successfully. ${
-            projectData.field_mapping_app !== field_mapping_app.FieldTM
-              ? `The ${fieldMappingAppNameMap[projectData.field_mapping_app]} project dashboard has been opened in a new tab. You can also access it anytime using this link: ${generateProjectDataResponse}`
-              : 'Redirecting...'
-          }`,
+          message: `Project created successfully. Redirecting...`,
           variant: 'success',
-          duration: projectData.field_mapping_app !== field_mapping_app.FieldTM ? 10000 : 5000,
+          duration: 5000,
         }),
       );
-
-      if (projectData.field_mapping_app !== field_mapping_app.FieldTM)
-        window.open(generateProjectDataResponse, '_blank');
 
       // Add 5-second delay to allow backend Entity generation to catch up
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(5000);
 
-      if (projectData.field_mapping_app === field_mapping_app.QField && !!generateProjectDataResponse) {
-        navigate(`/explore`);
-      } else {
-        navigate(`/project/${id}`);
-      }
+      navigate(`/project/${id}`);
     } catch (error) {
       // revert project status to draft if any error arises during project generation
       await API.patch(url, {
