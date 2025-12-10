@@ -1,4 +1,4 @@
-import { GeoGeomTypesEnum, task_split_type, project_visibility } from '@/types/enums';
+import { GeoGeomTypesEnum, task_split_type, project_visibility, field_mapping_app } from '@/types/enums';
 import type { BBox, Point, Polygon } from 'geojson';
 
 export type projectInfoType = {
@@ -50,6 +50,7 @@ export type projectInfoType = {
   tasks_mapped: number;
   tasks_validated: number;
   tasks_bad: number;
+  field_mapping_app: field_mapping_app;
 };
 
 export type taskType = {

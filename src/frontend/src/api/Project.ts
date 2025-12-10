@@ -60,6 +60,7 @@ export const ProjectById = (projectId: string) => {
             primary_geom_type: projectResp.primary_geom_type,
             new_geom_type: projectResp.new_geom_type,
             status: projectResp.status,
+            field_mapping_app: projectResp.field_mapping_app,
           }),
         );
         dispatch(ProjectActions.SetProjectTaskIdIndexMap(projectTaskIdIndexMap));
