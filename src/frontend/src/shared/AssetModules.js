@@ -116,6 +116,7 @@ import {
   GitHub as GitHubIcon,
   Assignment as AssignmentIcon,
   Warning as WarningIcon,
+  OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -246,4 +247,5 @@ export default {
   GitHubIcon,
   AssignmentIcon,
   WarningIcon,
+  OpenInNewIcon,
 };

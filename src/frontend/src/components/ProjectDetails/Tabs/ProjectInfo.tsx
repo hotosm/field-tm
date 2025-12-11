@@ -8,6 +8,7 @@ import { EntityOsmMap } from '@/models/project/projectModel';
 import CoreModules from '@/shared/CoreModules';
 import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';
 import StatusChip from '@/components/common/StatusChip';
+import QRContainer from '../QRContainer';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -29,6 +30,8 @@ const ProjectInfo: React.FC = () => {
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
   const projectEntities = useAppSelector((state) => state?.project?.entityOsmMap);
   const projectEntitiesLoading = useAppSelector((state) => state?.project?.entityOsmMapLoading);
+  // @ts-ignore
+  const authDetails = useAppSelector((state) => state?.login?.authDetails);
 
   const projectTasks = projectTaskBoundries.find((project) => project.id.toString() === projectId)?.taskBoundries;
 
@@ -166,6 +169,7 @@ const ProjectInfo: React.FC = () => {
           )}
         </div>
       )}
+      <QRContainer projectInfo={projectInfo} />
     </div>
   );
 };
