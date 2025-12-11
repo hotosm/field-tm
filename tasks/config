@@ -126,26 +126,6 @@ custom-favicon:
 
   just _echo-blue "Successfully added custom favicon.svg and favicon.png to frontend"
 
-# Configure web-forms for the mapper frontend (local only)
-[no-cd]
-enable-webforms:
-  #!/usr/bin/env sh
-  set -e
-
-  CONTAINER=fmtm-central-1
-  CONFIG_PATH=src/mapper/static/config.json
-  CONTAINER_CONFIG_PATH=/usr/odk/config.json
-
-  # Copy config into container
-  {{docker}} cp "$CONFIG_PATH" "$CONTAINER":"$CONTAINER_CONFIG_PATH"
-
-  # Modify JSON using jq inside the container
-  {{docker}} exec "$CONTAINER" sh -c \
-    "jq '.enableWebforms = true' '${CONTAINER_CONFIG_PATH}' > '${CONTAINER_CONFIG_PATH}.tmp' && mv '${CONTAINER_CONFIG_PATH}.tmp' '${CONTAINER_CONFIG_PATH}'"
-
-  # Upload updated config to S3
-  {{docker}} exec "$CONTAINER" mc cp "$CONTAINER_CONFIG_PATH" s3/fmtm-data/frontend/config.json
-
 # Merge in translations from weblate
 [no-cd]
 merge-translations:

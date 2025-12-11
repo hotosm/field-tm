@@ -19,8 +19,6 @@
 # to init an admin user at startup
 
 ARG ODK_CENTRAL_TAG
-ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
-FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
 FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG}
@@ -32,8 +30,6 @@ RUN apt-get update --quiet \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
-# Copy minio mc client to create S3 buckets
-COPY --from=minio /usr/bin/mc /usr/local/bin/
 
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
