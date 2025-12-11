@@ -61,6 +61,7 @@ export const ProjectById = (projectId: string) => {
             new_geom_type: projectResp.new_geom_type,
             status: projectResp.status,
             field_mapping_app: projectResp.field_mapping_app,
+            qfield_project_id: projectResp.qfield_project_id,
           }),
         );
         dispatch(ProjectActions.SetProjectTaskIdIndexMap(projectTaskIdIndexMap));

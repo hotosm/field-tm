@@ -51,6 +51,7 @@ export type projectInfoType = {
   tasks_validated: number;
   tasks_bad: number;
   field_mapping_app: field_mapping_app;
+  qfield_project_id: string | null;
 };
 
 export type taskType = {
