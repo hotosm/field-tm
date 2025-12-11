@@ -23,7 +23,6 @@ possible from misused API keys (so the entire API is not accessible).
 API keys are inherently not as secure as OAuth flow / JWT token combo.
 """
 
-from time import time
 from typing import Annotated
 
 from fastapi import (
@@ -31,30 +30,23 @@ from fastapi import (
     Depends,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_deps import login_required
-from app.auth.auth_logic import (
-    create_jwt_tokens,
-    set_cookies,
-)
-from app.auth.auth_schemas import AuthUser, ExternalUserIn, OrgUserDict
-from app.auth.roles import org_admin, super_admin
+from app.auth.roles import super_admin
 from app.central.central_schemas import (
     OdkCentralWebhookRequest,
 )
-from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus, OdkWebhookEvents, UserRole
+from app.db.enums import HTTPStatus, OdkWebhookEvents
 from app.db.models import DbUser
 from app.integrations.integration_crud import (
     generate_api_token,
     update_entity_status_in_fmtm,
     # update_entity_status_in_odk,
 )
-from app.users.user_crud import get_or_create_user
 
 router = APIRouter(
     prefix="/integrations",
@@ -129,46 +121,3 @@ async def update_entity_status_from_webhook(
         )
         log.warning(msg)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=msg)
-
-
-@router.post("/new-user")
-async def create_new_user_from_external_platform(
-    user_data: ExternalUserIn,
-    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Create a new user and generate a login token / cookie.
-
-    This endpoint is used by managers, likely via API Key to generate
-    users from an external system in FieldTM, and authenticate the user
-    in advance for easy access to FieldTM.
-
-    NOTE if the provider & ID combination already exists, the user
-    details will be overwritten (allowing for updates for profile
-    picture, username, etc).
-    """
-    # Create user
-    user_sub = f"{user_data.platform}|{user_data.id}"
-    user_in = AuthUser(
-        sub=user_sub,
-        **user_data.model_dump(exclude=["id", "platform"]),
-    )
-    await get_or_create_user(db, user_in)
-
-    # Create cookies / auth
-    jwt_payload = {
-        "sub": user_in.sub,
-        "aud": settings.FMTM_DOMAIN,
-        "iat": int(time()),
-        "exp": int(time()) + 86400,
-        "username": user_data.username,
-        "email": user_data.email,
-        "picture": user_data.picture,
-        "role": UserRole.MAPPER.name,
-    }
-
-    fmtm_token, refresh_token = create_jwt_tokens(jwt_payload)
-    response = Response(status_code=HTTPStatus.OK)
-    response_plus_cookies = set_cookies(response, fmtm_token, refresh_token)
-
-    return response_plus_cookies
