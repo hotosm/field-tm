@@ -18,7 +18,7 @@
 """Endpoints for users and role."""
 
 from datetime import datetime, timezone
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Literal
 
 from fastapi import (
     APIRouter,
@@ -34,7 +34,6 @@ from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_deps import AuthUser, login_required
-from app.auth.auth_schemas import OrgUserDict
 from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import (
     Mapper,
@@ -47,8 +46,6 @@ from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
 from app.db.models import (
-    DbSubmissionDailyCount,
-    DbSubmissionStatsCache,
     DbTaskEvent,
     DbUser,
     DbUserInvite,
@@ -56,11 +53,9 @@ from app.db.models import (
 )
 from app.users import user_schemas
 from app.users.user_crud import (
-    calculate_submission_stats,
     get_paginated_users,
     process_inactive_users,
     send_invitation_message,
-    update_submission_counts,
 )
 from app.users.user_deps import get_user
 
@@ -71,51 +66,10 @@ router = APIRouter(
 )
 
 
-@router.post("/refresh-submission-count")
-async def refresh_submission_count(db: Annotated[Connection, Depends(db_conn)]):
-    """Refresh user submission counts."""
-    log.info("Start refreshing user submission counts")
-    await update_submission_counts(db)
-    log.info("Finished refreshing user submission counts")
-    return Response(status_code=HTTPStatus.NO_CONTENT)
-
-
-@router.get("/submission-count")
-async def get_user_submission_count(
-    db: Annotated[Connection, Depends(db_conn)],
-    user_sub: Optional[str] = None,
-    project_id: Optional[int] = None,
-    days: Optional[int] = Query(None, description="Number of days back from now"),
-):
-    """Get daily submission counts for the user."""
-    return await DbSubmissionDailyCount.all(db, user_sub, project_id, days)
-
-
-@router.post("/refresh-submission-stats")
-async def refresh_submission_stats(db: Annotated[Connection, Depends(db_conn)]):
-    """Refresh user submission stats."""
-    log.info("Start refreshing user submission stats")
-    await calculate_submission_stats(db)
-    log.info("Finished refreshing user submission stats")
-    return Response(status_code=HTTPStatus.NO_CONTENT)
-
-
-@router.get("/stats")
-async def get_user_submission_stats(
-    db: Annotated[Connection, Depends(db_conn)],
-    user_sub: Optional[str] = None,
-    project_id: Optional[int] = None,
-):
-    """Get submission stats for the user."""
-    return await DbSubmissionStatsCache.all(
-        db, user_sub=user_sub, project_id=project_id
-    )
-
-
 @router.get("", response_model=user_schemas.PaginatedUsers)
 async def get_users(
     db: Annotated[Connection, Depends(db_conn)],
-    _: Annotated[OrgUserDict, Depends(super_admin)],
+    _: Annotated[DbUser, Depends(super_admin)],
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
     search: str = "",

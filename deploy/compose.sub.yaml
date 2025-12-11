@@ -267,6 +267,10 @@ services:
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
       - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
+      - S3_SERVER=http://dummyvalue.com
+      - S3_BUCKET_NAME=dummyvalue
+      - S3_ACCESS_KEY=dummyvalue
+      - S3_SECRET_KEY=dummyvalue
     networks:
       - fmtm-net
     restart: "unless-stopped"

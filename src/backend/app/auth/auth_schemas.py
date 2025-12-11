@@ -21,14 +21,7 @@ from typing import Optional, TypedDict
 from pydantic import BaseModel, ConfigDict, computed_field
 
 from app.db.enums import ProjectRole, UserRole
-from app.db.models import DbOrganisation, DbProject, DbUser
-
-
-class OrgUserDict(TypedDict):
-    """Dict of both DbOrganisation & DbUser."""
-
-    user: DbUser
-    org: DbOrganisation
+from app.db.models import DbProject, DbUser
 
 
 class ProjectUserDict(TypedDict):
