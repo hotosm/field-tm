@@ -34,7 +34,6 @@ from app.auth.auth_logic import (
     set_cookies,
 )
 from app.auth.auth_schemas import AuthUser, FMTMUser
-from app.auth.providers.google import handle_google_callback, init_google_auth
 from app.auth.providers.osm import (
     get_mapper_osm_auth,
     handle_osm_callback,
@@ -91,24 +90,6 @@ async def get_osm_mapper_login_url(osm_auth=Depends(get_mapper_osm_auth)):
     return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
 
 
-@router.get("/login/google")
-async def login_url_google(google_auth=Depends(init_google_auth)):
-    """Get Login URL for Google Oauth Application.
-
-    The application must be registered with Google.
-    Open the URL returned to start Google authorization flow.
-
-    Args:
-        google_auth: The GoogleAuth object.
-
-    Returns:
-        login_url (string): URL to authorize user in Google.
-    """
-    login_url = google_auth.login()
-    log.debug(f"Google Login URL returned: {login_url}")
-    return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
-
-
 @router.get("/callback/osm")
 async def osm_callback(
     request: Request, osm_auth: Annotated[AuthUser, Depends(init_osm_auth)]
@@ -138,23 +119,6 @@ async def mapper_osm_callback(
     try:
         # This includes the main cookie, refresh cookie, osm token cookie
         response_plus_cookies = await handle_osm_callback(request, osm_auth)
-        return response_plus_cookies
-    except Exception as e:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e
-
-
-@router.get("/callback/google")
-async def google_callback(
-    request: Request, google_auth=Depends(init_google_auth)
-) -> JSONResponse:
-    """Performs oauth token exchange with Google.
-
-    Provides an access token that can be used for authenticating other endpoints.
-    Also returns a cookie containing the access token for persistence in frontend apps.
-    """
-    try:
-        # This includes the main cookie, refresh cookie
-        response_plus_cookies = await handle_google_callback(request, google_auth)
         return response_plus_cookies
     except Exception as e:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e

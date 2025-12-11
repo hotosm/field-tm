@@ -163,7 +163,7 @@ COPY backend/app/ /opt/app/
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/qfield \
     && chown -R appuser:appuser /opt /home/appuser \
-    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
+    && chmod +x /app-entrypoint.sh
 # Add volumes for persistence
 VOLUME /opt/logs
 VOLUME /opt/qfield

@@ -311,11 +311,6 @@ services:
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
       - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
-      # Note S3_ENDPOINT is hardcoded here for when we use tunnel config
-      - S3_SERVER="http://s3:9000"
-      - S3_BUCKET_NAME=${S3_ODK_BUCKET_NAME:-"fmtm-odk-media"}
-      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      - S3_SECRET_KEY=${S3_SECRET_KEY}
     # ports:
     #   - "8383:8383"
     networks:
@@ -470,7 +465,7 @@ services:
         condition: service_healthy
     environment:
       <<: *qfield-common-env
-      DEFAULT_ORG_NAME: ${DEFAULT_ORG_NAME}
+      ORG_NAME: HOTOSM
       QFIELDCLOUD_USER: ${QFIELDCLOUD_USER}
       QFIELDCLOUD_PASSWORD: ${QFIELDCLOUD_PASSWORD}
     restart: "on-failure:2"
@@ -493,10 +488,10 @@ services:
         username = os.getenv("QFIELDCLOUD_USER")
         email = "svcfmtm@hotosm.org"
         password = os.getenv("QFIELDCLOUD_PASSWORD")
-        org_name = os.getenv("DEFAULT_ORG_NAME")
+        org_name = os.getenv("ORG_NAME")
 
         if not all([username, password, org_name]):
-            print("QFIELDCLOUD_USER or QFIELDCLOUD_PASSWORD or DEFAULT_ORG_NAME not set")
+            print("QFIELDCLOUD_USER or QFIELDCLOUD_PASSWORD or ORG_NAME not set")
             sys.exit(1)
 
         # Create or get the user (do not use get_or_create, as we need password hashing)

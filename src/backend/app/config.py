@@ -161,13 +161,6 @@ class Settings(BaseSettings):
     FMTM_DEV_PORT: Optional[str] = None
     FMTM_MAPPER_DOMAIN: Optional[str] = None
 
-    DEFAULT_ORG_NAME: Optional[str] = "HOTOSM"
-    DEFAULT_ORG_URL: Optional[str] = "https://hotosm.org"
-    DEFAULT_ORG_EMAIL: Optional[str] = "sysadmin@hotosm.org"
-    DEFAULT_ORG_LOGO_URL: Optional[str] = (
-        "https://raw.githubusercontent.com/hotosm/field-tm/refs/heads/dev/src/frontend/public/hot-org-logo.png"
-    )
-
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
 
     @property
@@ -264,7 +257,6 @@ class Settings(BaseSettings):
     QFIELDCLOUD_URL: Optional[str] = ""
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
-    # NOTE we also reuse DEFAULT_ORG_NAME var for QField
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
@@ -303,9 +295,6 @@ class Settings(BaseSettings):
                 uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
         return uri
 
-    GOOGLE_CLIENT_ID: Optional[str] = ""
-    GOOGLE_CLIENT_SECRET: Optional[SecretStr] = ""
-
     @computed_field
     @property
     def google_login_redirect_uri(self) -> str:
@@ -321,43 +310,6 @@ class Settings(BaseSettings):
             else:
                 uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
         return uri
-
-    S3_ENDPOINT: str
-    S3_ACCESS_KEY: str
-    S3_SECRET_KEY: SecretStr
-    S3_BUCKET_NAME: str = "fmtm-data"
-    S3_DOWNLOAD_ROOT: Optional[str] = None
-
-    @field_validator("S3_DOWNLOAD_ROOT", mode="before")
-    @classmethod
-    def configure_s3_download_root(cls, v: Optional[str], info: ValidationInfo) -> str:
-        """Set S3_DOWNLOAD_ROOT for S3 downloads.
-
-        This is required, when we use a containerised S3 service.
-        The S3_ENDPOINT is a docker compose service name and not
-        resolvable outside of the stack.
-
-        S3_DOWNLOAD_ROOT is equal to S3_ENDPOINT if a public S3 instance
-        is used (e.g. AWS S3).
-        """
-        # If set manually, pass through
-        if v and isinstance(v, str):
-            return v
-
-        # Externally hosted S3
-        s3_endpoint = info.data.get("S3_ENDPOINT")
-        if s3_endpoint and s3_endpoint.startswith("https://"):
-            return s3_endpoint
-
-        # Containerised S3
-        else:
-            fmtm_domain = info.data.get("FMTM_DOMAIN")
-            # Local dev
-            # NOTE for automated tests, this is overridden manually
-            if info.data.get("DEBUG"):
-                dev_port = info.data.get("FMTM_DEV_PORT")
-                return f"http://s3.{fmtm_domain}:{dev_port}"
-            return f"https://s3.{fmtm_domain}"
 
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
     RAW_DATA_API_AUTH_TOKEN: Optional[SecretStr] = None

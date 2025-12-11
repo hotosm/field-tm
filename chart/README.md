@@ -28,21 +28,6 @@ kubectl
     --from-literal=FMTM_DB_NAME=xxxxxxx
   ```
 
-- **s3-fmtm-vars** for Minio S3
-
-  - key: S3_ENDPOINT
-  - key: S3_ACCESS_KEY
-  - key: S3_SECRET_KEY
-  - key: S3_BUCKET_NAME
-
-  ```bash
-  kubectl create secret generic s3-fmtm-vars --namespace fmtm \
-    --from-literal=S3_ENDPOINT=fmtm-s3.fmtm.svc.cluster.local \
-    --from-literal=S3_ACCESS_KEY=fmtm \
-    --from-literal=S3_SECRET_KEY=xxxxxxx \
-    --from-literal=S3_BUCKET_NAME=fmtm-data
-  ```
-
 - **api-fmtm-vars** for FastAPI
 
   - key: ENCRYPTION_KEY

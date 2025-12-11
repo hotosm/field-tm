@@ -7,8 +7,6 @@
 !packages
 !tests
 !app-entrypoint.sh
-!migrate-entrypoint.sh
-!backup-entrypoint.sh
 !pyproject.toml
 !uv.lock
 !migrations
