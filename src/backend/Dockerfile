@@ -16,9 +16,7 @@
 #
 ARG PYTHON_IMG_TAG=3.13
 ARG UV_IMG_TAG=0.5.2
-ARG MINIO_TAG=RELEASE.2025-01-20T14-49-07Z
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
-FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 FROM ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 AS basemap-bins
 
 
@@ -145,8 +143,6 @@ RUN apt-get update --quiet \
     #    apt-get install -y --quiet --no-install-recommends \
     #    "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
-# Copy minio mc client
-COPY --from=minio /usr/bin/mc /usr/local/bin/
 # Copy basemap generation binaries
 COPY --from=basemap-bins /usr/bin/tilepack /usr/local/bin/
 COPY --from=basemap-bins /usr/bin/pmtiles /usr/local/bin/

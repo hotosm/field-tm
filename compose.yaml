@@ -526,7 +526,7 @@ services:
     build: qfield
     volumes:
       - qfield_projects:/opt/qfield
-      - ./qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
+      - ./src/qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
     environment:
       LOG_LEVEL: DEBUG
     networks:

@@ -107,40 +107,6 @@ db:
         cpu: 500m
         memory: 500Mi
 
-s3:
-  # This can be disabled, but an external S3 provider must be configured
-  enabled: true
-  mode: standalone
-  replicas: 1
-  image:
-    repository: quay.io/minio/minio
-    tag: RELEASE.2025-01-20T14-49-07Z
-  environment:
-    MINIO_BROWSER: "off"
-  mountPath: /mnt/data
-  resources:
-    requests:
-      memory: 200Mi
-  users:
-    - accessKey: fmtm
-      existingSecret: s3-fmtm-vars
-      existingSecretKey: S3_SECRET_KEY
-      policy: readwrite
-  ingress:
-    enabled: true
-    ingressClassName: ~
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-      # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    path: /
-    hosts:
-      - api.fmtm.localhost
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
