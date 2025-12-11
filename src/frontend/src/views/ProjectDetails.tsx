@@ -251,10 +251,7 @@ const ProjectDetails = () => {
                     ) : (
                       <>
                         {(isProjectManager || isOrganizationAdmin) && (
-                          <Link
-                            to={`/manage/project/${params?.id}`}
-                            className={`${projectInfo.field_mapping_app !== field_mapping_app.QField ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
-                          >
+                          <Link to={`/manage/project/${params?.id}`} className="fmtm-w-1/2">
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
                               Manage Project
@@ -269,6 +266,17 @@ const ProjectDetails = () => {
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
                               View Statistics
+                            </Button>
+                          </Link>
+                        )}
+                        {projectInfo.field_mapping_app === field_mapping_app.QField && projectInfo?.project_url && (
+                          <Link
+                            target="_"
+                            to={projectInfo?.project_url}
+                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                          >
+                            <Button variant="secondary-grey" className="fmtm-w-full">
+                              <AssetModules.OpenInNewIcon className="!fmtm-text-[1.125rem]" /> Open in QField Cloud
                             </Button>
                           </Link>
                         )}
