@@ -33,7 +33,6 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
-    Request,
     Response,
     UploadFile,
 )
@@ -48,9 +47,8 @@ from psycopg import Connection
 from pyodk.errors import PyODKError
 
 from app.auth.auth_deps import login_required, public_endpoint
-from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
-from app.auth.providers.osm import init_osm_auth
-from app.auth.roles import Mapper, ProjectManager, org_admin
+from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.roles import Mapper, ProjectManager, super_admin
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.database import db_conn
@@ -88,7 +86,6 @@ from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUserContributions
 from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
 from app.s3 import delete_all_objs_under_prefix
-from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
 
 router = APIRouter(
@@ -666,36 +663,6 @@ async def upload_data_extract(
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
 
 
-@router.post("/add-manager")
-async def add_new_project_manager(
-    request: Request,
-    db: Annotated[Connection, Depends(db_conn)],
-    background_tasks: BackgroundTasks,
-    new_manager: Annotated[DbUser, Depends(get_user)],
-    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
-    osm_auth=Depends(init_osm_auth),
-):
-    """Add a new project manager.
-
-    The logged in user must be the admin of the organisation.
-    """
-    await DbUserRole.create(
-        db,
-        org_user_dict["project"].id,
-        new_manager.sub,
-        ProjectRole.PROJECT_MANAGER,
-    )
-
-    background_tasks.add_task(
-        project_crud.send_project_manager_message,
-        request=request,
-        project=org_user_dict["project"],
-        new_manager=new_manager,
-        osm_auth=osm_auth,
-    )
-    return Response(status_code=HTTPStatus.OK)
-
-
 @router.get("/{project_id}/users", response_model=list[UserRolesOut])
 async def get_project_users(
     db: Annotated[Connection, Depends(db_conn)],
@@ -998,24 +965,16 @@ async def upload_project_task_boundaries(
 @router.post("/stub", response_model=project_schemas.ProjectOut)
 async def create_stub_project(
     project_info: project_schemas.StubProjectIn,
-    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+    user_dict: Annotated[DbUser, Depends(super_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
-    """Create a project in the local database.
-
-    The org_id and project_id params are inherited from the org_admin permission.
-    Either param can be passed to determine if the user has admin permission
-    to the organisation (or organisation associated with a project).
-    """
+    """Create a project in the local database."""
     delattr(project_info, "merge")  # Remove merge field as it is not in database
-    db_user = org_user_dict["user"]
-    db_org = org_user_dict["org"]
-    project_info.organisation_id = db_org.id
+    db_user = user_dict["user"]
     project_info.status = ProjectStatus.DRAFT
 
     log.info(
-        f"User {db_user.username} attempting creation of project "
-        f"{project_info.name} in organisation ({db_org.id})"
+        f"User {db_user.username} attempting creation of project {project_info.name}"
     )
     await project_deps.check_project_dup_name(db, project_info.name)
 
@@ -1057,11 +1016,11 @@ async def create_stub_project(
 async def delete_project(
     db: Annotated[Connection, Depends(db_conn)],
     project: Annotated[DbProject, Depends(project_deps.get_project)],
-    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+    user_dict: Annotated[DbUser, Depends(super_admin)],
 ):
     """Delete a project from both ODK Central and the local database."""
     log.info(
-        f"User {org_user_dict.get('user').username} attempting "
+        f"User {user_dict.get('user').username} attempting "
         f"deletion of project {project.id}"
     )
 
@@ -1089,12 +1048,7 @@ async def create_project(
     project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
     db: Annotated[Connection, Depends(db_conn)],
 ):
-    """Create a project in ODK Central and update the local stub project.
-
-    The org_id and project_id params are inherited from the org_admin permission.
-    Either param can be passed to determine if the user has admin permission
-    to the organisation (or organisation associated with a project).
-    """
+    """Create a project in ODK Central and update the local stub project."""
     project_id = project_user.get("project").id
     org_id = project_user.get("project").organisation_id
     db_org = await DbOrganisation.one(db, org_id)

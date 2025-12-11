@@ -17,7 +17,6 @@
 #
 """Logic for user routes."""
 
-import asyncio
 import os
 from datetime import datetime, timedelta, timezone
 from textwrap import dedent
@@ -36,15 +35,11 @@ from app.config import settings
 from app.db.enums import HTTPStatus, UserRole
 from app.db.models import (
     DbProject,
-    DbSubmissionDailyCount,
-    DbSubmissionStatsCache,
     DbUser,
-    DbUserRole,
 )
 from app.db.postgis_utils import timestamp
 from app.helpers.helper_crud import send_email
 from app.projects.project_crud import get_pagination
-from app.submissions import submission_crud
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
 WARNING_INTERVALS = [21, 14, 7]  # Days before deletion
@@ -304,132 +299,3 @@ async def get_active_users(db: Connection) -> list[str]:
     yesterday = timestamp() - timedelta(days=1)
     users = await DbUser.all(db, last_login_after=yesterday)
     return [u.sub for u in users] if users else []
-
-
-async def update_submission_counts(db: Connection):
-    """Insert/update daily submission counts per user per project (incremental)."""
-    active_users = await get_active_users(db)
-    if not active_users:
-        log.info("No active users found, skipping submission count update.")
-        return
-
-    for user_sub in active_users:
-        projects = await DbUserRole.all(db, user_sub=user_sub)
-        project_ids = {p.project_id for p in projects}
-        if not project_ids:
-            log.info(
-                f"No projects found for {user_sub}, skipping submission count update."
-            )
-            continue
-
-        for project_id in project_ids:
-            user_daily_counts = await DbSubmissionDailyCount.all(
-                db, user_sub=user_sub, project_id=project_id
-            )
-            last_date = (
-                user_daily_counts[-1]["submission_date"] if user_daily_counts else None
-            )
-
-            filters = {"$wkt": True}
-            if last_date:
-                filters["$filter"] = (
-                    f"__system/submissionDate gt {last_date.isoformat()}"
-                )
-
-            project = await DbProject.one(db, project_id, minimal=True)
-            data = await submission_crud.get_submission_by_project(
-                project, filters, expand=False
-            )
-
-            daily_counts: dict[str, int] = {}
-            for sub in data.get("value", []):
-                if sub.get("username") != user_sub:
-                    continue
-                sub_date = sub["__system"]["submissionDate"][:10]
-                daily_counts[sub_date] = daily_counts.get(sub_date, 0) + 1
-
-            # Upsert daily counts
-            for date_str, count in daily_counts.items():
-                await DbSubmissionDailyCount.upsert(
-                    db, user_sub, project_id, date_str, count
-                )
-
-
-async def _fetch_submission_data(semaphore, project, user_sub):
-    """Fetch all, approved, and issues submissions for a project."""
-    async with semaphore:
-        all_data = await submission_crud.get_submission_by_project(
-            project, {"$wkt": True}, expand=False
-        )
-    async with semaphore:
-        approved_data = await submission_crud.get_submission_by_project(
-            project,
-            {"$filter": "__system/reviewState eq 'approved'", "$wkt": True},
-            expand=False,
-        )
-    async with semaphore:
-        issues_data = await submission_crud.get_submission_by_project(
-            project,
-            {"$filter": "__system/reviewState eq 'hasIssues'", "$wkt": True},
-            expand=False,
-        )
-
-    approved_subs = [
-        s for s in approved_data.get("value", []) if s.get("username") == user_sub
-    ]
-    issues_subs = [
-        s for s in issues_data.get("value", []) if s.get("username") == user_sub
-    ]
-    user_subs = [s for s in all_data.get("value", []) if s.get("username") == user_sub]
-
-    return approved_subs, issues_subs, user_subs, project
-
-
-async def calculate_submission_stats(db, concurrency_limit=5):
-    """Calculate and cache submission stats for active users."""
-    active_users = await get_active_users(db)
-    if not active_users:
-        return
-
-    semaphore = asyncio.Semaphore(concurrency_limit)
-
-    for user_sub in active_users:
-        projects = await DbUserRole.all(db, user_sub=user_sub)
-        project_ids = {p.project_id for p in projects}
-        if not project_ids:
-            continue
-
-        tasks = [
-            _fetch_submission_data(
-                semaphore, await DbProject.one(db, pid, minimal=True), user_sub
-            )
-            for pid in project_ids
-        ]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        for res in results:
-            if isinstance(res, Exception):
-                continue
-            approved_subs, issues_subs, user_subs_list, project = res
-            total_valid = len(approved_subs)
-            total_invalid = len(issues_subs)
-            total = len(user_subs_list)
-
-            org_counts, loc_counts = {}, {}
-            if user_subs_list:
-                org_counts[project.organisation_name] = len(user_subs_list)
-                loc_counts[project.location_str] = len(user_subs_list)
-
-            await DbSubmissionStatsCache.upsert(
-                db,
-                user_sub=user_sub,
-                project_id=project.id,
-                total_valid_submissions=total_valid,
-                total_invalid_submissions=total_invalid,
-                total_submissions=total,
-                top_organisations=[
-                    {"name": k, "count": v} for k, v in org_counts.items()
-                ],
-                top_locations=[{"name": k, "count": v} for k, v in loc_counts.items()],
-                last_calculated=timestamp(),
-            )

@@ -28,16 +28,14 @@ from fastapi import Depends, HTTPException
 from loguru import logger as log
 from psycopg import Connection
 from psycopg.rows import class_row
-from pydantic import Field
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_logic import get_uid
-from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
+from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, ProjectRole, ProjectStatus, ProjectVisibility
 from app.db.models import DbProject, DbUser
-from app.organisations.organisation_deps import get_organisation
-from app.projects.project_deps import get_project, get_project_by_id
+from app.projects.project_deps import get_project
 
 
 async def check_access(
@@ -184,84 +182,6 @@ async def super_admin(
     raise HTTPException(
         status_code=HTTPStatus.FORBIDDEN, detail="User must be an administrator"
     )
-
-
-async def check_org_admin(
-    db: Connection,
-    user: AuthUser,
-    org_id: int,
-) -> OrgUserDict:
-    """Database check to determine if org admin role.
-
-    Returns:
-        dict: in format {'user': DbUser, 'org': DbOrganisation}.
-    """
-    db_org = await get_organisation(db, org_id)
-
-    # Check if org admin, or super admin
-    db_user = await check_access(
-        user,
-        db,
-        org_id=org_id,
-    )
-
-    if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail="User is not organisation admin",
-        )
-
-    return {"user": db_user, "org": db_org}
-
-
-async def org_admin(
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    project_id: Annotated[Optional[int], Field(gt=0)] = None,
-    org_id: Annotated[Optional[int], Field(gt=0)] = None,
-) -> OrgUserDict:
-    """Organisation admin with full permission for projects in an organisation.
-
-    Returns:
-        dict: in format {'user': DbUser, 'org': DbOrganisation}.
-    """
-    if not (project_id or org_id):
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Either org_id or project_id must be provided",
-        )
-
-    if project_id and org_id:
-        log.error("Both org_id and project_id cannot be passed at the same time")
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Both org_id and project_id cannot be passed at the same time",
-        )
-
-    # Extract org id from project if passed
-    project = None
-    if project_id:
-        # NOTE this is a wrapper around DbProject.one with error handling
-        project = await get_project_by_id(db, project_id)
-        org_id = project.organisation_id
-
-    # Ensure org_id is provided, raise an exception otherwise
-    if not org_id:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="org_id must be provided to check organisation admin role",
-        )
-
-    org_user_dict = await check_org_admin(
-        db,
-        current_user,
-        org_id=org_id,
-    )
-
-    if project:
-        org_user_dict["project"] = project
-
-    return org_user_dict
 
 
 async def wrap_check_access(
