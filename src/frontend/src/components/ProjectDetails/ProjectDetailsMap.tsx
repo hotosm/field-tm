@@ -20,7 +20,7 @@ import getTaskStatusStyle, { getFeatureStatusStyle } from '@/utilfunctions/getTa
 import Button from '@/components/common/Button';
 import { EntityOsmMap } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { entity_state, GeoGeomTypesEnum } from '@/types/enums';
+import { entity_state, field_mapping_app, GeoGeomTypesEnum } from '@/types/enums';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { GetEntityStatusList, GetOdkEntitiesGeojson, SyncTaskState } from '@/api/Project';
 import MapLegends from '@/components/ProjectDetails/MapLegends';
@@ -271,6 +271,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
         }
       } else {
         if (overlappingEntityFeatures.length > 1) setOverlappingEntityFeatures([]);
+        if (projectInfo.field_mapping_app === field_mapping_app.QField) return;
 
         // find task layer
         const taskFeatures = map.getFeaturesAtPixel(evt.pixel, {
@@ -288,7 +289,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
     return () => {
       map.un('click', handleClick);
     };
-  }, [map, overlappingEntityFeatures, entityOsmMapLoading]);
+  }, [map, overlappingEntityFeatures, entityOsmMapLoading, projectInfo]);
 
   useEffect(() => {
     if (!map) return;
@@ -308,7 +309,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           windowSize.width <= 768 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
         }`}
       >
-        <MapLegends defaultTheme={defaultTheme} />
+        {projectInfo?.field_mapping_app !== field_mapping_app.QField && <MapLegends defaultTheme={defaultTheme} />}
         <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
         <MapControlComponent map={map} pmTileLayerUrl={customBasemapUrl} />
 
@@ -379,6 +380,15 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
               }
               getTaskStatusStyle={(feature) => {
                 const geomType = feature.getGeometry().getType();
+
+                if (projectInfo.field_mapping_app === field_mapping_app.QField) {
+                  return getFeatureStatusStyle(
+                    geomType,
+                    mapTheme,
+                    'READY',
+                    feature?.getProperties()?.osm_id === selectedEntityId,
+                  );
+                }
                 const entity = entityOsmMap?.find(
                   (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
                 ) as EntityOsmMap;
@@ -482,16 +492,18 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
           popupId="locked-popup"
           className="fmtm-w-[235px]"
         />
-        <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-10">
-          <Button
-            variant="primary-red"
-            onClick={syncStatus}
-            disabled={entityOsmMapLoading}
-            isLoading={entityOsmMapLoading || syncTaskStateLoading}
-          >
-            Sync Status
-          </Button>
-        </div>
+        {projectInfo.field_mapping_app !== field_mapping_app.QField && (
+          <div className="fmtm-absolute fmtm-bottom-24 md:fmtm-bottom-10 fmtm-left-[50%] fmtm-translate-x-[-50%] fmtm-z-10">
+            <Button
+              variant="primary-red"
+              onClick={syncStatus}
+              disabled={entityOsmMapLoading}
+              isLoading={entityOsmMapLoading || syncTaskStateLoading}
+            >
+              Sync Status
+            </Button>
+          </div>
+        )}
       </MapComponent>
       {/* show entity selection popup only if multiple features overlap at the clicked point */}
       {overlappingEntityFeatures.length > 1 && (
@@ -512,7 +524,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
             const featureProperties = feature.getProperties();
             const id = featureProperties?.entity_id || featureProperties?.osm_id;
             return (
-              <div className="fmtm-py-4 fmtm-border-b">
+              <div key={i} className="fmtm-py-4 fmtm-border-b">
                 <p className="fmtm-font-semibold fmtm-mb-1">
                   {i + 1}. {id}
                 </p>
