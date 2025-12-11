@@ -307,29 +307,6 @@ services:
     network_mode: none
     restart: "on-failure:2"
 
-  s3:
-    image: "docker.io/minio/minio:RELEASE.2025-01-20T14-49-07Z"
-    depends_on:
-      proxy:
-        condition: service_started
-    environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
-      MINIO_VOLUMES: "/mnt/data"
-      MINIO_BROWSER: "off"
-    volumes:
-      - fmtm_data:/mnt/data
-    networks:
-      - fmtm-net
-    command: minio server
-    restart: "unless-stopped"
-    healthcheck:
-      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
-      interval: 5s
-      retries: 3
-      start_period: 5s
-      timeout: 5s
-
   fmtm-db:
     image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     # Low max_connections for better performance.
