@@ -202,11 +202,12 @@ async def create_qfield_project(
     # TODO: Find solution to create organization before creating project.
     # This will be handled while decoupling backend.
     # IF organization is not given then it will use default username as owner.
+    # FIXME this is hardcoded to use HOTOSM org for now
     log.debug(f"Creating QFieldCloud project: {qfc_project_name}")
     async with qfield_client() as client:
         qfield_project = client.create_project(
             qfc_project_name,
-            owner=settings.DEFAULT_ORG_NAME,
+            owner="HOTOSM",
             description="Created by the Field Tasking Manager",
             is_public=True,
         )
