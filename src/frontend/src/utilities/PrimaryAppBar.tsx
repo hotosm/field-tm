@@ -22,7 +22,12 @@ import Button from '@/components/common/Button';
 import { motion } from 'motion/react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/RadixComponents/Dialog';
 
-const WarningDialog = ({ warningDialogOpen, setWarningDialogOpen }) => (
+type warningDialogPropsType = {
+  warningDialogOpen: boolean;
+  setWarningDialogOpen: (status: boolean) => void;
+};
+
+const WarningDialog = ({ warningDialogOpen, setWarningDialogOpen }: warningDialogPropsType) => (
   <Dialog open={warningDialogOpen} onOpenChange={setWarningDialogOpen}>
     <DialogContent>
       <DialogTitle>
@@ -49,7 +54,9 @@ export default function PrimaryAppBar() {
   const { type, windowSize } = windowDimention();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [warningDialogOpen, setWarningDialogOpen] = useState<boolean>(true);
+  const [warningDialogOpen, setWarningDialogOpen] = useState<boolean>(
+    !sessionStorage.getItem('isMigrationWarningShown') ? true : false,
+  );
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   const handleOnSignOut = async () => {
@@ -111,7 +118,15 @@ export default function PrimaryAppBar() {
         type={type}
         setOpen={setOpen}
       />
-      <WarningDialog warningDialogOpen={warningDialogOpen} setWarningDialogOpen={setWarningDialogOpen} />
+      <WarningDialog
+        warningDialogOpen={warningDialogOpen}
+        setWarningDialogOpen={(status) => {
+          setWarningDialogOpen(status);
+          if (!sessionStorage.getItem('isMigrationWarningShown')) {
+            sessionStorage.setItem('isMigrationWarningShown', 'true');
+          }
+        }}
+      />
       <div>
         {/* warning banner */}
         <div className="fmtm-bg-yellow-100 fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-justify-center fmtm-py-1 fmtm-px-4">
