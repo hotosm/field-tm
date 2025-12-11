@@ -11,6 +11,7 @@ import { useGetDownloadSubmissionQuery } from '@/api/submission';
 import { downloadBlobData } from '@/utilfunctions';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { field_mapping_app } from '@/types/enums';
 
 type downloadTypeType = 'form' | 'geojson' | 'extract' | 'submission' | 'qr';
 type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean; show: boolean };
@@ -27,8 +28,6 @@ const ProjectOptions = () => {
   const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectInfo.name, authDetails?.username);
 
   const {
-    data: formBlobData,
-    isSuccess: isDownloadFormSuccess,
     error: downloadFormError,
     isLoading: isDownloadFormLoading,
     refetch: downloadForm,
@@ -38,8 +37,6 @@ const ProjectOptions = () => {
   });
 
   const {
-    data: taskBoundariesBlobData,
-    isSuccess: isDownloadTaskBoundariesSuccess,
     error: downloadTaskBoundariesError,
     isLoading: isDownloadTaskBoundariesLoading,
     refetch: downloadTaskBoundaries,
@@ -49,8 +46,6 @@ const ProjectOptions = () => {
   });
 
   const {
-    data: featuresBlobData,
-    isSuccess: isDownloadFeaturesSuccess,
     error: downloadFeaturesError,
     isLoading: isDownloadFeaturesLoading,
     refetch: downloadFeatures,
@@ -60,8 +55,6 @@ const ProjectOptions = () => {
   });
 
   const {
-    data: submissionBlobData,
-    isSuccess: isDownloadSubmissionSuccess,
     error: downloadSubmissionError,
     isLoading: isDownloadSubmissionLoading,
     refetch: downloadSubmission,
@@ -95,37 +88,10 @@ const ProjectOptions = () => {
       downloadType: 'submission',
       label: 'SUBMISSIONS',
       isLoading: isDownloadSubmissionLoading,
-      show: true,
+      show: projectInfo.field_mapping_app !== field_mapping_app.QField,
     },
     { downloadType: 'qr', label: 'QR CODE', isLoading: false, show: projectInfo.use_odk_collect || false },
   ];
-
-  useEffect(() => {
-    if (isDownloadFormSuccess && formBlobData) {
-      downloadBlobData(formBlobData, `project_form_${projectId}`, 'xlsx');
-    }
-
-    if (isDownloadTaskBoundariesSuccess && taskBoundariesBlobData) {
-      downloadBlobData(taskBoundariesBlobData, `task_boundaries_${projectId}`, 'geojson');
-    }
-
-    if (isDownloadFeaturesSuccess && featuresBlobData) {
-      downloadBlobData(featuresBlobData, `features_${projectId}`, 'geojson');
-    }
-
-    if (isDownloadSubmissionSuccess && submissionBlobData) {
-      downloadBlobData(submissionBlobData, `project_form_${projectId}`, 'geojson');
-    }
-  }, [
-    isDownloadFormSuccess,
-    isDownloadTaskBoundariesSuccess,
-    isDownloadFeaturesSuccess,
-    isDownloadSubmissionSuccess,
-    formBlobData,
-    taskBoundariesBlobData,
-    featuresBlobData,
-    submissionBlobData,
-  ]);
 
   useEffect(() => {
     const handleBlobErrorResponse = async (blob: Blob | undefined) => {
@@ -148,19 +114,23 @@ const ProjectOptions = () => {
     }
   }, [downloadFormError, downloadTaskBoundariesError, downloadFeaturesError, downloadSubmissionError]);
 
-  const handleDownload = (downloadType: downloadTypeType) => {
+  const handleDownload = async (downloadType: downloadTypeType) => {
     switch (downloadType) {
       case 'form':
-        downloadForm();
+        const { data: formBlobData } = await downloadForm();
+        if (formBlobData) downloadBlobData(formBlobData, `project_form_${projectId}`, 'xlsx');
         break;
       case 'geojson':
-        downloadTaskBoundaries();
+        const { data: taskBoundariesBlobData } = await downloadTaskBoundaries();
+        if (taskBoundariesBlobData) downloadBlobData(taskBoundariesBlobData, `task_boundaries_${projectId}`, 'geojson');
         break;
       case 'extract':
-        downloadFeatures();
+        const { data: featuresBlobData } = await downloadFeatures();
+        if (featuresBlobData) downloadBlobData(featuresBlobData, `features_${projectId}`, 'geojson');
         break;
       case 'submission':
-        downloadSubmission();
+        const { data: submissionBlobData } = await downloadSubmission();
+        if (submissionBlobData) downloadBlobData(submissionBlobData, `project_submissions_${projectId}`, 'geojson');
         break;
       case 'qr':
         downloadQr();

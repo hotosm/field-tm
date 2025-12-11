@@ -3,11 +3,13 @@ import AssetModules from '@/shared/AssetModules.js';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { Link, useParams } from 'react-router-dom';
+import { field_mapping_app } from '@/types/enums';
 
 type footerItemType = {
   id: string;
   title: string;
   icon: React.ReactNode;
+  show: boolean;
 };
 
 const MobileFooter = () => {
@@ -15,6 +17,7 @@ const MobileFooter = () => {
   const params = useParams();
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
 
   const footerItem: footerItemType[] = [
     {
@@ -27,6 +30,7 @@ const MobileFooter = () => {
           } fmtm-duration-300`}
         />
       ),
+      show: true,
     },
     {
       id: 'activities',
@@ -38,6 +42,7 @@ const MobileFooter = () => {
           } fmtm-duration-300`}
         />
       ),
+      show: projectInfo.field_mapping_app !== field_mapping_app.QField,
     },
     {
       id: 'instructions',
@@ -49,6 +54,7 @@ const MobileFooter = () => {
           } fmtm-duration-300`}
         />
       ),
+      show: true,
     },
     {
       id: 'comment',
@@ -60,6 +66,7 @@ const MobileFooter = () => {
           } fmtm-duration-300`}
         />
       ),
+      show: projectInfo.field_mapping_app !== field_mapping_app.QField,
     },
   ];
 
@@ -105,12 +112,15 @@ const MobileFooter = () => {
           taskModalStatus ? 'fmtm-grid-cols-5' : 'fmtm-grid-cols-4'
         } fmtm-bg-white fmtm-pb-2 fmtm-pt-2 fmtm-gap-5 fmtm-px-2`}
       >
-        {footerItem.map((item) => (
-          <FooterItemList key={item?.id} item={item} />
-        ))}
-        <Link to={`/project-submissions/${params.id}?tab=infographics`}>
-          <FooterItemList item={infographicFooterItem} />
-        </Link>
+        {footerItem.map((item) => {
+          if (!item?.show) return null;
+          return <FooterItemList key={item?.id} item={item} />;
+        })}
+        {projectInfo?.field_mapping_app !== field_mapping_app.QField && (
+          <Link to={`/project-submissions/${params.id}?tab=infographics`}>
+            <FooterItemList item={infographicFooterItem} />
+          </Link>
+        )}
       </div>
     </div>
   );

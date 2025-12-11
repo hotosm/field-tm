@@ -55,3 +55,23 @@ export const GetProjectQrCode = (
   }, [projectName, odkToken, osmUser]);
   return { qrcode };
 };
+
+export const GetQfieldProjectQrCode = (id: string | null | undefined): { qrcode: string } => {
+  const [qrcode, setQrcode] = useState('');
+
+  useEffect(() => {
+    const fetchProjectFileById = async (id: string | null | undefined) => {
+      if (!id) {
+        setQrcode('');
+        return;
+      }
+      const code = qrcodeGenerator(0, 'L');
+      code.addData(`qfield://cloud?project=${id}`);
+      code.make();
+      setQrcode(code.createDataURL(6, 5));
+    };
+
+    fetchProjectFileById(id);
+  }, [id]);
+  return { qrcode };
+};

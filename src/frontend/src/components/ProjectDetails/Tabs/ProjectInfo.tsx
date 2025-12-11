@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import { useAppSelector } from '@/types/reduxTypes';
-import { project_status } from '@/types/enums';
+import { field_mapping_app, project_status } from '@/types/enums';
 import { EntityOsmMap } from '@/models/project/projectModel';
 import CoreModules from '@/shared/CoreModules';
 import ProjectInfoSkeleton from '@/components/Skeletons/ProjectDetails/ProjectInfoSkeleton';
 import StatusChip from '@/components/common/StatusChip';
+import QRContainer from '../QRContainer';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -29,6 +30,8 @@ const ProjectInfo: React.FC = () => {
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
   const projectEntities = useAppSelector((state) => state?.project?.entityOsmMap);
   const projectEntitiesLoading = useAppSelector((state) => state?.project?.entityOsmMapLoading);
+  // @ts-ignore
+  const authDetails = useAppSelector((state) => state?.login?.authDetails);
 
   const projectTasks = projectTaskBoundries.find((project) => project.id.toString() === projectId)?.taskBoundries;
 
@@ -96,12 +99,14 @@ const ProjectInfo: React.FC = () => {
         <p className="fmtm-button fmtm-text-grey-900">Project Area</p>
         <p className="fmtm-body-md fmtm-text-grey-800">{projectInfo.location_str || '-'}</p>
       </div>
-      <div>
-        <p className="fmtm-button fmtm-text-grey-900">Last Contribution</p>
-        <p className="fmtm-body-md fmtm-text-grey-800">
-          {projectLastActiveDate ? projectLastActiveDate.toLocaleString() : '-'}
-        </p>
-      </div>
+      {projectInfo?.field_mapping_app !== field_mapping_app.QField && (
+        <div>
+          <p className="fmtm-button fmtm-text-grey-900">Last Contribution</p>
+          <p className="fmtm-body-md fmtm-text-grey-800">
+            {projectLastActiveDate ? projectLastActiveDate.toLocaleString() : '-'}
+          </p>
+        </div>
+      )}
       <div>
         <p className="fmtm-button fmtm-text-grey-900">Organized By</p>
         <img
@@ -110,58 +115,61 @@ const ProjectInfo: React.FC = () => {
           className="fmtm-max-w-[2.625rem]"
         />
       </div>
-      <div>
-        {projectEntitiesLoading ? (
-          <CoreModules.Skeleton width={150} height={14} />
-        ) : (
-          <p className="fmtm-body-md fmtm-mb-1">
-            <span className="fmtm-text-red-medium">{projectMappedFeatures}</span>{' '}
-            <span className="fmtm-text-grey-800">/{projectTotalFeatures} Features Mapped</span>
-          </p>
-        )}
-        {projectTasks && taskProgress && (
-          <Tooltip
-            title={
-              <div>
-                <p>{projectTasks?.length} Total Tasks</p>
-                <p>{taskProgress?.mapped} Tasks Mapped</p>
-                <p>{taskProgress?.validated} Tasks Validated</p>
+      {projectInfo?.field_mapping_app !== field_mapping_app.QField && (
+        <div>
+          {projectEntitiesLoading ? (
+            <CoreModules.Skeleton width={150} height={14} />
+          ) : (
+            <p className="fmtm-body-md fmtm-mb-1">
+              <span className="fmtm-text-red-medium">{projectMappedFeatures}</span>{' '}
+              <span className="fmtm-text-grey-800">/{projectTotalFeatures} Features Mapped</span>
+            </p>
+          )}
+          {projectTasks && taskProgress && (
+            <Tooltip
+              title={
+                <div>
+                  <p>{projectTasks?.length} Total Tasks</p>
+                  <p>{taskProgress?.mapped} Tasks Mapped</p>
+                  <p>{taskProgress?.validated} Tasks Validated</p>
+                </div>
+              }
+              placement="top"
+              arrow
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#333333',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#333333',
+                  },
+                },
+              }}
+            >
+              <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
+                <div
+                  style={{
+                    width: `${(taskProgress?.mapped / projectTasks?.length) * 100}%`,
+                  }}
+                  className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
+                />
+                <div
+                  style={{
+                    width: `${(taskProgress?.validated / projectTasks?.length) * 100}%`,
+                  }}
+                  className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
+                />
               </div>
-            }
-            placement="top"
-            arrow
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: '#333333',
-                  color: '#ffffff',
-                  fontSize: '12px',
-                },
-              },
-              arrow: {
-                sx: {
-                  color: '#333333',
-                },
-              },
-            }}
-          >
-            <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
-              <div
-                style={{
-                  width: `${(taskProgress?.mapped / projectTasks?.length) * 100}%`,
-                }}
-                className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
-              />
-              <div
-                style={{
-                  width: `${(taskProgress?.validated / projectTasks?.length) * 100}%`,
-                }}
-                className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
-              />
-            </div>
-          </Tooltip>
-        )}
-      </div>
+            </Tooltip>
+          )}
+        </div>
+      )}
+      <QRContainer projectInfo={projectInfo} />
     </div>
   );
 };
