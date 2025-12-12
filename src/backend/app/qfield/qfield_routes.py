@@ -31,7 +31,11 @@ from app.auth.roles import ProjectManager
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.qfield import qfield_schemas
-from app.qfield.qfield_crud import create_qfield_project, qfc_credentials_test
+from app.qfield.qfield_crud import (
+    create_qfield_project,
+    delete_qfield_project,
+    qfc_credentials_test,
+)
 from app.qfield.qfield_deps import qfield_client
 
 router = APIRouter(
@@ -73,3 +77,14 @@ async def qfc_creds_test(
     """Test QFieldCloud credentials by attempting to open a session."""
     await qfc_credentials_test(qfc_creds)
     return Response(status_code=HTTPStatus.OK)
+
+
+@router.delete("/{project_id}")
+async def trigger_delete_qfield_project(
+    project_id: int,
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
+):
+    """Delete a project from QFieldCloud."""
+    await delete_qfield_project(db, project_id)
+    return Response(status_code=HTTPStatus.NO_CONTENT)
