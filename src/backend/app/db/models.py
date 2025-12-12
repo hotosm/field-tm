@@ -2260,6 +2260,28 @@ class DbProjectExternalURL(BaseModel):
             )
             return await cur.fetchone()
 
+    @classmethod
+    async def one(cls, db: Connection, project_id: int) -> Self:
+        """Fetch a single external URL record for a project."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                SELECT *
+                FROM project_external_urls
+                WHERE project_id = %(project_id)s
+                LIMIT 1;
+                """,
+                {"project_id": project_id},
+            )
+            rec = await cur.fetchone()
+
+        if rec is None:
+            raise KeyError(
+                f"Project external URL for project ({project_id}) not found."
+            )
+
+        return rec
+
 
 class DbOdkEntities(BaseModel):
     """Table odk_entities.

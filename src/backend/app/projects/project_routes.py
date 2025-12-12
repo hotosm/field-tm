@@ -86,7 +86,7 @@ from app.db.postgis_utils import (
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUserContributions
-from app.qfield.qfield_crud import create_qfield_project
+from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_deps import get_user
 from app.users.user_schemas import UserRolesOut
@@ -1064,8 +1064,14 @@ async def delete_project(
         f"User {org_user_dict.get('user').username} attempting "
         f"deletion of project {project.id}"
     )
-    # Delete ODK Central project
-    await central_crud.delete_odk_project(project.odkid, project.odk_credentials)
+
+    # Handle QField projects separately
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        await delete_qfield_project(db, project.id)
+    else:
+        # Delete ODK Central project
+        await central_crud.delete_odk_project(project.odkid, project.odk_credentials)
+
     # Delete S3 resources
     await delete_all_objs_under_prefix(
         settings.S3_BUCKET_NAME, f"/{project.organisation_id}/{project.id}"
