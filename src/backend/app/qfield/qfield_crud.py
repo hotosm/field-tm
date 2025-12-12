@@ -188,6 +188,7 @@ async def create_qfield_project(
     final_project_file = Path(
         f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{qgis_project_name}.qgz"
     )
+    print(f'\n---- final_project_file: "{final_project_file}"----\n')
     if not final_project_file.exists():
         msg = (
             f"QGIS job completed but output file was not created: {final_project_file}"
@@ -282,3 +283,24 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
             status_code=HTTPStatus.BAD_REQUEST,
             detail="QFieldCloud credentials are invalid.",
         ) from e
+
+
+async def delete_qfield_project(db: Connection, project_id: int):
+    """Delete a project from QFieldCloud using the stored `qfield_project_id`."""
+    # Fetch external URL record using model helper
+    try:
+        ext = await DbProjectExternalURL.one(db, project_id)
+    except KeyError as e:
+        raise ValueError(
+            f"No external project URL found for project ID {project_id}"
+        ) from e
+
+    qfield_project_id = ext.qfield_project_id
+    if not qfield_project_id:
+        raise ValueError(f"No QField project id set for project ID {project_id}")
+
+    # Now, delete the project from QFieldCloud
+    async with qfield_client() as client:
+        client.delete_project(qfield_project_id)
+
+    return f"Project {project_id} deleted from QFieldCloud."
