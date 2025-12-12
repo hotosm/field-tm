@@ -55,7 +55,7 @@ dependencies = [
     "osm-fieldwork",
     "area-splitter",
     "pyodk",
-    "yxf",
+    "yxf>=1.0.0",
 ]
 readme = "../../README.md"
 license = {text = "AGPL-3.0-only"}
@@ -157,7 +157,6 @@ write-changes = true
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
-yxf = { git = "https://github.com/spwoodcock/yxf.git", rev = "feat/in-memory-processing"}
 
 [tool.uv.workspace]
 members = ["packages/*"]

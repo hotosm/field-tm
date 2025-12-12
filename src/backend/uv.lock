@@ -612,7 +612,7 @@ requires-dist = [
     { name = "tldextract", specifier = "==5.3.0" },
     { name = "uvicorn", specifier = "==0.34.2" },
     { name = "uvloop", specifier = "==0.21.0" },
-    { name = "yxf", git = "https://github.com/spwoodcock/yxf.git?rev=feat%2Fin-memory-processing" },
+    { name = "yxf", specifier = ">=1.0.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -2498,11 +2498,15 @@ wheels = [
 [[package]]
 name = "yxf"
 version = "1.0.0"
-source = { git = "https://github.com/spwoodcock/yxf.git?rev=feat%2Fin-memory-processing#9d2892cecc5230535193e5acd44f7f55eeb89b58" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "openpyxl" },
     { name = "strictyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/22/c746dc487cf4fe53832658f85dbb17e9b54bebc08f1d94d1d9b8e33f7bf3/yxf-1.0.0.tar.gz", hash = "sha256:e33b77a6a0ca79c69e2917beb7e32424c8d754cb13b3c1bd2690338df7616df5", size = 149941, upload-time = "2025-10-28T22:35:26.06Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/98/4e4dbc571f3c44028198f05d72a0b6d745c72eef3bf4e0f8f1159380062a/yxf-1.0.0-py3-none-any.whl", hash = "sha256:eab0b3121dbaf970799cd192d223254c1029a5c6fe5390006dfabdfe0b90da6a", size = 13556, upload-time = "2025-10-28T22:35:24.391Z" },
 ]
 
 [[package]]
