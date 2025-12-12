@@ -1,23 +1,30 @@
-import os 
+import io
 import logging
 
-from yxf import yaml_string_to_xlsform_bytes
+from yxf.yaml import read_yaml
+from yxf.excel import write_xlsform
 
 logger = logging.getLogger(__name__)
 
 def convert_to_xlsform(yaml_file):
     """
-    Reads a YAML file and converts in-memory to XLSForm bytes using yxf's yaml_string_to_xlsform_bytes.
+    Reads a YAML file and converts in-memory to XLSForm bytes using the yxf library.
     """
     try:
         with open(yaml_file, encoding="utf-8") as file:
             yaml_content = file.read()
         
-        xlsx_bytes = yaml_string_to_xlsform_bytes(yaml_content, source_name=os.path.basename(yaml_file))
+        form_dictionary = read_yaml(yaml_content)
+
+        output_buffer = io.BytesIO()
+
+        write_xlsform(form_dictionary, output_buffer)
+        xlsx_bytes = output_buffer.getvalue()
 
         logger.info(f'Successfully converted YAML file: {yaml_file} to XLSForm bytes.')
 
+        return xlsx_bytes
+
     except Exception as e: 
         logger.exception(f'An error occurred during in-memory conversion for YAML file: {yaml_file}')
-
-    return xlsx_bytes
+        raise
