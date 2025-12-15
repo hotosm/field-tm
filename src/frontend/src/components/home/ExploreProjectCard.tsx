@@ -1,17 +1,26 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
-import defaultOrgLogo from '@/assets/images/project_icon.png';
 import AssetModules from '@/shared/AssetModules';
 import StatusChip from '@/components/common/StatusChip';
-import { project_status } from '@/types/enums';
+import { field_mapping_app, project_status } from '@/types/enums';
 import type { projectSummaryType } from '@/types';
+import defaultOrgLogo from '@/assets/images/project_icon.png';
+import QfieldLogo from '@/assets/images/qfield-logo.svg';
+import ODKLogo from '@/assets/images/odk-logo.svg';
+import HotLogo from '@/assets/images/favicon.svg';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
   [project_status.PUBLISHED]: 'info',
   [project_status.COMPLETED]: 'success',
   [project_status.ARCHIVED]: 'error',
+};
+
+const fieldMappingAppLogoMap: Record<field_mapping_app, string> = {
+  [field_mapping_app.FieldTM]: HotLogo,
+  [field_mapping_app.ODK]: ODKLogo,
+  [field_mapping_app.QField]: QfieldLogo,
 };
 
 export default function ExploreProjectCard({ data, className }: { data: projectSummaryType; className?: string }) {
@@ -37,7 +46,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   return (
     <div
       onClick={handleProjectCardClick}
-      className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer ${className}`}
+      className={`fmtm-relative hover:fmtm-bg-red-light hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-solid fmtm-bg-white fmtm-p-4 fmtm-h-full fmtm-cursor-pointer ${className}`}
     >
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
@@ -48,9 +57,20 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
               <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
             )}
 
-            {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
-              <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
-            )}
+            <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+              {data.project_url && data.status !== project_status.DRAFT && (
+                <Tooltip title={`Project created using ${data.field_mapping_app}`} arrow>
+                  <img
+                    src={fieldMappingAppLogoMap[data.field_mapping_app]}
+                    className="fmtm-h-5 fmtm-max-h-5"
+                    alt="qfield logo"
+                  />
+                </Tooltip>
+              )}
+              {[project_status.DRAFT, project_status.COMPLETED].includes(data.status) && (
+                <StatusChip label={data.status.toLowerCase()} status={projectStatusVariantMap[data.status]} />
+              )}
+            </div>
           </div>
           <div className="fmtm-my-3">
             <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mb-1">
@@ -84,52 +104,54 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
             </p>
           </div>
         </div>
-        <div className="fmtm-mt-4">
-          <div className="fmtm-flex fmtm-justify-between fmtm-mb-1">
-            <p className="fmtm-body-sm-semibold">{data?.total_tasks} Tasks</p>
-            <p className="fmtm-body-sm-semibold">{data?.total_submissions} Submissions</p>
-          </div>
-          <Tooltip
-            title={
-              <div>
-                <p>{data?.total_tasks} Total Tasks</p>
-                <p>{data?.tasks_mapped} Tasks Mapped</p>
-                <p>{data?.tasks_validated} Tasks Validated</p>
-              </div>
-            }
-            placement="top"
-            arrow
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: '#333333',
-                  color: '#ffffff',
-                  fontSize: '12px',
-                },
-              },
-              arrow: {
-                sx: {
-                  color: '#333333',
-                },
-              },
-            }}
-          >
-            <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
-              <div
-                style={{
-                  width: `${(data?.tasks_mapped / data?.total_tasks) * 100}%`,
-                }}
-                className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
-              />
-              <div
-                style={{
-                  width: `${(data?.tasks_validated / data?.total_tasks) * 100}%`,
-                }}
-                className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
-              />
+        {data.field_mapping_app !== field_mapping_app.QField && data.status !== project_status.DRAFT && (
+          <div className="fmtm-mt-4">
+            <div className="fmtm-flex fmtm-justify-between fmtm-mb-1">
+              <p className="fmtm-body-sm-semibold">{data?.total_tasks} Tasks</p>
+              <p className="fmtm-body-sm-semibold">{data?.total_submissions} Submissions</p>
             </div>
-          </Tooltip>
-        </div>
+            <Tooltip
+              title={
+                <div>
+                  <p>{data?.total_tasks} Total Tasks</p>
+                  <p>{data?.tasks_mapped} Tasks Mapped</p>
+                  <p>{data?.tasks_validated} Tasks Validated</p>
+                </div>
+              }
+              placement="top"
+              arrow
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: '#333333',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                  },
+                },
+                arrow: {
+                  sx: {
+                    color: '#333333',
+                  },
+                },
+              }}
+            >
+              <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
+                <div
+                  style={{
+                    width: `${(data?.tasks_mapped / data?.total_tasks) * 100}%`,
+                  }}
+                  className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
+                />
+                <div
+                  style={{
+                    width: `${(data?.tasks_validated / data?.total_tasks) * 100}%`,
+                  }}
+                  className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
+                />
+              </div>
+            </Tooltip>
+          </div>
+        )}
       </div>
     </div>
   );

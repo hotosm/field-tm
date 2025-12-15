@@ -3,6 +3,7 @@ import AssetModules from '@/shared/AssetModules';
 import { projectInfoType } from '@/models/project/projectModel';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import QRContainer from './QRContainer';
 
 const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: Partial<projec
         <p className="fmtm-text-xl">Description:</p>
         <p className="fmtm-text-lg fmtm-text-grey-700">{projectInfo?.description}</p>
       </div>
+      <QRContainer projectInfo={projectInfo} />
     </div>
   );
 };

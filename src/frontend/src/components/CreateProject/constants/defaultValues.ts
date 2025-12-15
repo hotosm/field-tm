@@ -18,7 +18,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   odk_central_password: '',
   project_admins: [],
   uploadAreaSelection: null,
-  uploadedAOIFile: undefined,
+  uploadedAOIFile: [],
   outline: undefined,
   outlineArea: undefined,
   proceedWithLargeOutlineArea: false,
@@ -35,10 +35,17 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
 
   // 03 Upload Survey
   osm_category: '',
-  xlsFormFile: null,
-  isXlsFormFileValid: false,
+  xlsFormFile: [],
   needVerificationFields: true,
   mandatoryPhotoUpload: false,
+  isFormValidAndUploaded: false,
+  advancedConfig: false,
+  default_language: '',
+  formLanguages: {
+    detected_languages: [],
+    default_language: [],
+    supported_languages: [],
+  },
 
   // 04 Map Data
   primary_geom_type: null,
@@ -46,7 +53,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   useMixedGeomTypes: false,
   new_geom_type: null,
   dataExtractType: null,
-  customDataExtractFile: null,
+  customDataExtractFile: [],
   dataExtractGeojson: null,
   use_st_within: false,
 

@@ -34,6 +34,8 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { useDeleteProjectMutation, useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
+import { useUploadProjectXlsformMutation } from '@/api/central';
+import { FileType } from '@/types';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -74,7 +76,7 @@ const CreateProject = () => {
     resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
   });
 
-  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues } = formMethods;
+  const { handleSubmit, watch, setValue, trigger, formState, reset, getValues, setError } = formMethods;
   const { dirtyFields } = formState;
   const values = watch();
 
@@ -160,7 +162,6 @@ const CreateProject = () => {
       organisation_id,
       project_admins,
       outline,
-      uploadedAOIFile,
       odk_central_url,
       odk_central_user,
       odk_central_password,
@@ -175,7 +176,6 @@ const CreateProject = () => {
       description,
       organisation_id,
       outline,
-      uploadedAOIFile,
       merge,
       field_mapping_app,
       use_odk_collect,
@@ -239,7 +239,7 @@ const CreateProject = () => {
     );
     const dataExtractGeojsonFile = convertGeojsonToJsonFile(data.dataExtractGeojson, 'extract');
 
-    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile, xlsFormFile: data.xlsFormFile?.file };
+    const file = { taskSplitGeojsonFile, dataExtractGeojsonFile };
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
@@ -296,9 +296,52 @@ const CreateProject = () => {
     },
   });
 
+  const { mutate: uploadProjectXlsformMutate, isPending: isUploadProjectXlsformPending } =
+    useUploadProjectXlsformMutation({
+      onSuccess: ({ data }) => {
+        setSearchParams({ step: (step + 1).toString() });
+        setValue('isFormValidAndUploaded', true);
+        dispatch(
+          CommonActions.SetSnackBar({ message: data?.message || 'XLSForm uploaded successfully', variant: 'success' }),
+        );
+      },
+      onError: ({ response }) => {
+        setError('xlsFormFile', { message: response?.data?.detail });
+        setValue('isFormValidAndUploaded', false);
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: response?.data?.detail || 'Failed to upload XLSForm form',
+          }),
+        );
+      },
+    });
+
+  const uploadXlsformFile = (file: FileType[]) => {
+    // use_odk_collect is from previous step, while needVerificationFields is from this step
+    const values = getValues();
+    const formData = new FormData();
+    formData.append('xlsform', file?.[0]?.file);
+
+    uploadProjectXlsformMutate({
+      payload: formData,
+      params: {
+        project_id: +projectId!,
+        use_odk_collect: values.use_odk_collect,
+        need_verification_fields: values.needVerificationFields,
+        mandatory_photo_upload: values.mandatoryPhotoUpload,
+        default_language: values.default_language,
+      },
+    });
+  };
+
   const onSubmit = () => {
     if (step === 1 && !projectId) {
       createDraftProject(true);
+      return;
+    }
+
+    if (step === 3 && !values.isFormValidAndUploaded) {
+      uploadXlsformFile(values.xlsFormFile);
       return;
     }
 
@@ -429,7 +472,8 @@ const CreateProject = () => {
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
                     isMinimalProjectLoading ||
-                    isProjectDeleting
+                    isProjectDeleting ||
+                    isUploadProjectXlsformPending
                   }
                   isLoading={
                     (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading
@@ -455,7 +499,7 @@ const CreateProject = () => {
                 ? null
                 : (geojson) => {
                     setValue('outline', JSON.parse(geojson));
-                    setValue('uploadedAOIFile', undefined);
+                    setValue('uploadedAOIFile', []);
                   }
             }
             onModify={
@@ -463,7 +507,7 @@ const CreateProject = () => {
                 ? (geojson) => {
                     setValue('outline', JSON.parse(geojson));
 
-                    if (values.customDataExtractFile) setValue('customDataExtractFile', null);
+                    if (values.customDataExtractFile) setValue('customDataExtractFile', []);
                     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
 
                     if (values.splitGeojsonBySquares) setValue('splitGeojsonBySquares', null);

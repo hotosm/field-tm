@@ -303,8 +303,7 @@ async def get_submission_detail(
             detail="Failed to download submissions",
         )
 
-    submission = json.loads(project_submissions)
-    return submission.get("value", [])[0]
+    return project_submissions.get("value", [])[0]
 
 
 async def create_new_submission(

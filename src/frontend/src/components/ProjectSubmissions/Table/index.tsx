@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Tooltip } from '@mui/material';
 import AssetModules from '@/shared/AssetModules.js';
-import CoreModules from '@/shared/CoreModules.js';
 import { Modal } from '@/components/common/Modal';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/Table/UpdateReviewStatusModal';
 import Filter from '@/components/ProjectSubmissions/Table/Filter';
@@ -14,6 +13,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 import DataTable from '@/components/common/DataTable';
 import { useGetSubmissionFormFieldsQuery, useGetSubmissionTableQuery } from '@/api/submission';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 interface baseFilterType<T> {
   task_id: string | undefined;
@@ -71,9 +71,9 @@ const SubmissionsTable = ({ toggleView }) => {
   });
 
   const dispatch = useAppDispatch();
-  const params = CoreModules.useParams();
+  const params = useParams();
 
-  const projectId = params.projectId;
+  const projectId = params.projectId!;
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
 
@@ -85,7 +85,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id ? +projectInfo.organisation_id : null);
 
   const { data: submissionFormFields, isLoading: isSubmissionFormFieldsLoading } = useGetSubmissionFormFieldsQuery({
-    params: { project_id: projectId },
+    params: { project_id: +projectId },
     options: { queryKey: ['submission-form-fields', +projectId], staleTime: 60 * 60 * 1000 },
   });
 
@@ -95,7 +95,7 @@ const SubmissionsTable = ({ toggleView }) => {
     refetch: refreshTable,
   } = useGetSubmissionTableQuery({
     params: {
-      project_id: projectId,
+      project_id: +projectId,
       review_state: filter.review_state,
       task_id: filter.task_id ? +filter.task_id : undefined,
       submitted_by: filter.submitted_by,
@@ -216,7 +216,7 @@ const SubmissionsTable = ({ toggleView }) => {
                           toggleModalStatus: true,
                           instanceId: currRow?.meta?.instanceID,
                           taskId: currRow?.task_id,
-                          projectId: projectId,
+                          projectId: +projectId,
                           reviewState: currRow?.__system?.reviewState,
                           entity_id: currRow?.feature,
                           label: currRow?.meta?.entity?.label,
@@ -248,7 +248,7 @@ const SubmissionsTable = ({ toggleView }) => {
         }
         open={!!josmEditorError}
         onOpenChange={() => {
-          dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
+          dispatch(TaskActions.SetJosmEditorError(null));
         }}
       />
       <UpdateReviewStatusModal filter={filter} />

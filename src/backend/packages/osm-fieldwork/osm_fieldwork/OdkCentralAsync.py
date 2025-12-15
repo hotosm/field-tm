@@ -15,6 +15,7 @@
 #
 """The async counterpart to OdkCentral.py, an ODK Central API client."""
 
+import asyncio
 import logging
 import os
 from asyncio import gather
@@ -565,10 +566,13 @@ class OdkDataset(OdkCentral):
         # FIXME for adding dataset properties in bulk
         try:
             log.debug(f"Creating properties for dataset ({datasetName}): {properties}")
-            properties_tasks = [self.createDatasetProperty(projectId, field, datasetName) for field in properties]
-            success = await gather(*properties_tasks, return_exceptions=True)  # type: ignore
-            if not success:
-                log.warning(f"No properties were uploaded for ODK project ({projectId}) dataset name ({datasetName})")
+            for field in properties:
+                try:
+                    await self.createDatasetProperty(projectId, field, datasetName)
+                    await asyncio.sleep(0.1)
+                except aiohttp.ClientError as e:
+                    log.error(f"Failed to create property ({field}) for dataset {datasetName}: {e}")
+                    continue
         except aiohttp.ClientError as e:
             msg = f"Failed to create properties: {e}"
             log.error(msg)

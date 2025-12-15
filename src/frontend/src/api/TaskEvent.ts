@@ -1,28 +1,8 @@
 import { AppDispatch } from '@/store/Store';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { task_event as taskEventEnum, task_state as taskStateEnum } from '@/types/enums';
-
-// function getActionFromState(state: taskStateEnum): taskEventEnum {
-//   switch (state) {
-//     case taskStateEnum.UNLOCKED_TO_MAP:
-//       return taskEventEnum.MAP;
-//     case taskStateEnum.LOCKED_FOR_MAPPING:
-//       return taskEventEnum.FINISH;
-//     case taskStateEnum.UNLOCKED_TO_VALIDATE:
-//       return taskEventEnum.VALIDATE;
-//     case taskStateEnum.LOCKED_FOR_VALIDATION:
-//       return taskEventEnum.GOOD;
-//     // NOTE we also need to handle taskEventEnum.BAD somehow
-//     // case taskStateEnum.LOCKED_FOR_VALIDATION:
-//     //   return taskEventEnum.BAD;
-
-//     default:
-//       throw new Error(`Unhandled state: ${state}`);
-//   }
-// }
 
 export const CreateTaskEvent = (
   url: string,
@@ -42,8 +22,6 @@ export const CreateTaskEvent = (
       feature?: Record<string, any>,
     ) => {
       try {
-        dispatch(CommonActions.SetLoading(true));
-
         body = {
           event: action,
           ...body,
@@ -73,7 +51,6 @@ export const CreateTaskEvent = (
           );
         }
 
-        dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: `Task #${taskId} has been updated to ${response.data.state}`,
@@ -81,7 +58,6 @@ export const CreateTaskEvent = (
           }),
         );
       } catch (error) {
-        dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             message: `Failed to update Task #${taskId}`,

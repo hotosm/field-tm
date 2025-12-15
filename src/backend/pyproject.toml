@@ -27,18 +27,18 @@ requires-python = ">=3.13"
 dependencies = [
     "uvicorn==0.34.2",
     "uvloop==0.21.0",
-    "httptools==0.6.4",
+    "httptools==0.7.1",
     "fastapi==0.115.3",
     "asgi-lifespan==2.1.0",
     "pydantic==2.9.2",
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
-    "python-multipart==0.0.12",
-    "psycopg[c,pool]==3.2.6",
+    "python-multipart==0.0.20",
+    "psycopg[c,pool]==3.2.12",
     "geojson==3.1.0",
     "shapely==2.0.6",
     "pyxform==4.0.0",
-    "loguru==0.7.2",
+    "loguru==0.7.3",
     "minio==7.2.9",
     "pyproj==3.7.0",
     "asgiref==3.8.1",
@@ -55,7 +55,7 @@ dependencies = [
     "osm-fieldwork",
     "area-splitter",
     "pyodk",
-    "yxf",
+    "yxf>=1.0.0",
 ]
 readme = "../../README.md"
 license = {text = "AGPL-3.0-only"}
@@ -149,7 +149,7 @@ update_changelog_on_bump = true
 ignored_tag_formats = ["osm-fieldwork-$version", "area-splitter-$version"]
 
 [tool.codespell]
-skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/frontend/src/assets/*"
+skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/frontend/src/assets/*,src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/*"
 ignore-words-list = "ProjectIn, Indien"
 write-changes = true
 
@@ -157,7 +157,6 @@ write-changes = true
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
 pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
-yxf = { git = "https://github.com/spwoodcock/yxf.git", rev = "feat/in-memory-processing"}
 
 [tool.uv.workspace]
 members = ["packages/*"]

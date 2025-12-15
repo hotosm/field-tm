@@ -1,6 +1,7 @@
 import React from 'react';
 import MappingImg from '@/assets/images/landing-pic-2.jpg';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/RadixComponents/Accordion';
+import { motion } from 'motion/react';
 
 type useCaseType = {
   title: string;
@@ -28,24 +29,42 @@ const useCaseList: useCaseType[] = [
 const UseCase = () => {
   return (
     <div className="fmtm-flex fmtm-px-[2rem] sm:fmtm-px-[3rem] md:fmtm-px-[4.5rem] fmtm-gap-10 md:fmtm-flex-row fmtm-flex-col-reverse">
-      <img
+      <motion.img
         src={MappingImg}
         className="fmtm-w-[14rem] md:fmtm-w-[18.75rem] lg:fmtm-w-[22rem] fmtm-h-fit fmtm-rounded-2xl fmtm-mx-auto"
         alt="Field mapping in tokha"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
       />
       <div className="fmtm-flex-1">
-        <h4 className="fmtm-mb-3">Field-TM Use Cases</h4>
+        <motion.h4
+          className="fmtm-mb-3"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          Field-TM Use Cases
+        </motion.h4>
         <div>
           <Accordion type="multiple" defaultValue={['item-0', 'item-1', 'item-2']}>
             {useCaseList.map((useCase, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="hover:fmtm-no-underline">
-                  <h5 className="fmtm-font-medium">{useCase.title}</h5>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="fmtm-text-base">{useCase.description}</p>
-                </AccordionContent>
-              </AccordionItem>
+              <motion.div
+                key={index}
+                initial={{ x: 10, y: 20, opacity: 0 }}
+                whileInView={{ x: 0, y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+              >
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="hover:fmtm-no-underline">
+                    <h5 className="fmtm-font-medium">{useCase.title}</h5>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="fmtm-text-base">{useCase.description}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </motion.div>
             ))}
           </Accordion>
         </div>

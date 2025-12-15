@@ -6,7 +6,6 @@ export const initialState: IOrganisationState = {
   consentDetailsFormData: {
     give_consent: '',
     review_documentation: [],
-    log_into: [],
     participated_in: [],
   },
   consentApproval: false,

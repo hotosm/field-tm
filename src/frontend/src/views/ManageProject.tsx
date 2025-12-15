@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserTab from '@/components/ManageProject/User';
 import AssetModules from '@/shared/AssetModules.js';
-import { GetIndividualProjectDetails } from '@/api/CreateProjectService';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import Button from '@/components/common/Button';
 import InputTextField from '@/components/common/InputTextField';
@@ -14,6 +13,7 @@ import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissi
 import Forbidden from '@/views/Forbidden';
 import ManageProjectSkeleton from '@/components/Skeletons/ManageProject';
 import { project_status } from '@/types/enums';
+import { useGetProjectQuery } from '@/api/project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,11 +21,14 @@ const ManageProject = () => {
   const dispatch = useAppDispatch();
   const params = useParams();
   const navigate = useNavigate();
-  const projectId = params.id;
+  const projectId = +params.id!;
 
-  const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
-  const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
+
+  const { data: project, isLoading: isProjectLoading } = useGetProjectQuery({
+    project_id: projectId,
+    options: { queryKey: ['project', projectId] },
+  });
 
   const tabList = [
     { id: 'details', name: 'Details', icon: <AssetModules.InfoIcon className="!fmtm-text-[1.125rem]" />, show: true },
@@ -33,18 +36,18 @@ const ManageProject = () => {
       id: 'form',
       name: 'Form',
       icon: <AssetModules.SubmissionIcon className="!fmtm-text-[1.125rem]" />,
-      show: editProjectDetails.status === project_status.PUBLISHED,
+      show: project?.status === project_status.PUBLISHED,
     },
     {
       id: 'users',
       name: 'Users',
       icon: <AssetModules.PersonIcon className="!fmtm-text-[1.125rem]" />,
-      show: editProjectDetails.status === project_status.PUBLISHED,
+      show: project?.status === project_status.PUBLISHED,
     },
   ];
 
-  const isProjectManager = useIsProjectManager(projectId as string);
-  const isOrganizationAdmin = useIsOrganizationAdmin(editProjectDetails.organisation_id as null | number);
+  const isProjectManager = useIsProjectManager(projectId);
+  const isOrganizationAdmin = useIsOrganizationAdmin(project ? +project?.organisation_id : null);
 
   const [selectedTab, setSelectedTab] = useState('details');
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
@@ -55,19 +58,15 @@ const ManageProject = () => {
       case 'users':
         return <UserTab />;
       case 'details':
-        return <EditDetails projectId={projectId} />;
+        return <EditDetails project={project} />;
       case 'form':
-        return <FormUpdate projectId={projectId} />;
+        return <FormUpdate project={project} />;
       default:
         return <></>;
     }
   };
 
-  useEffect(() => {
-    dispatch(GetIndividualProjectDetails(`${VITE_API_URL}/projects/${projectId}?project_id=${projectId}`));
-  }, [projectId]);
-
-  if (!projectDetailsLoading && !isProjectManager && !isOrganizationAdmin) return <Forbidden />;
+  if (!isProjectLoading && !isProjectManager && !isOrganizationAdmin) return <Forbidden />;
 
   return (
     <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-py-3 fmtm-gap-5">
@@ -78,7 +77,7 @@ const ManageProject = () => {
         />
         <h4 className="fmtm-text-grey-800">Manage Project</h4>
       </div>
-      {projectDetailsLoading ? (
+      {isProjectLoading ? (
         <ManageProjectSkeleton />
       ) : (
         <div className="sm:fmtm-flex-1 fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-gap-5 sm:fmtm-overflow-hidden">
@@ -130,7 +129,7 @@ const ManageProject = () => {
                     <Button
                       variant="primary-red"
                       isLoading={isProjectDeletePending}
-                      disabled={confirmProjectName !== editProjectDetails?.name}
+                      disabled={confirmProjectName !== project?.name}
                       onClick={() => dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate))}
                     >
                       Delete
@@ -140,6 +139,7 @@ const ManageProject = () => {
               </DialogContent>
             </Dialog>
           </div>
+
           {/* right container */}
           <div
             className={`fmtm-h-full fmtm-rounded-xl fmtm-w-full ${selectedTab !== 'users' ? 'fmtm-max-w-[54rem] sm:fmtm-overflow-y-scroll sm:scrollbar' : 'md:fmtm-w-[calc(100%-17.5rem)]'}`}

@@ -13,3 +13,5 @@ export const updateProjectForm = (payload: updateProjectFormPayloadType, params:
 
 export const downloadForm = (params: { project_id: number }) =>
   api.get('/central/download-form', { params, responseType: 'blob' });
+
+export const detectFormLanguages = (payload: FormData) => api.post('/central/detect-form-languages', payload);

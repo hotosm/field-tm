@@ -4,18 +4,20 @@ import SubmissionsInfographics from '@/components/ProjectSubmissions/Infographic
 import SubmissionsTable from '@/components/ProjectSubmissions/Table';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
 import TableChartViewIcon from '@/components/Icons/TableChartViewIcon';
 import TableIcon from '@/components/Icons/TableIcon';
 import { Tooltip } from '@mui/material';
+import { field_mapping_app } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectSubmissions = () => {
   const dispatch = useAppDispatch();
   const params = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const projectId = params.projectId;
@@ -23,8 +25,15 @@ const ProjectSubmissions = () => {
 
   const state = useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
+  const projectDetailsLoading = useAppSelector((state) => state.project.projectDetailsLoading);
   const entityList = useAppSelector((state) => state.project.entityOsmMap);
   const updatedEntities = entityList?.filter((entity) => entity?.status > 1);
+
+  useEffect(() => {
+    if (projectInfo.field_mapping_app === field_mapping_app.QField && !projectDetailsLoading) {
+      navigate(`/project/${projectId}`);
+    }
+  }, [projectInfo, projectDetailsLoading]);
 
   //Fetch project for the first time
   useEffect(() => {

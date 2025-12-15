@@ -8,7 +8,6 @@ import { AppDispatch } from '@/store/Store';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
 import { UnassignUserFromProject } from '@/api/Project';
-import { field_mapping_app } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -167,7 +166,7 @@ export const CreateProjectService = (
 
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'Project Generation Completed. Redirecting...',
+          message: `Project created successfully. Redirecting...`,
           variant: 'success',
           duration: 5000,
         }),
@@ -177,11 +176,7 @@ export const CreateProjectService = (
       const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(5000);
 
-      if (projectData.field_mapping_app === field_mapping_app.QField && !!generateProjectDataResponse) {
-        window.location.href = generateProjectDataResponse;
-      } else {
-        navigate(`/project/${id}`);
-      }
+      navigate(`/project/${id}`);
     } catch (error) {
       // revert project status to draft if any error arises during project generation
       await API.patch(url, {
@@ -256,8 +251,6 @@ const UploadDataExtractService = (url: string, file: any) => {
 
 const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(CommonActions.SetLoading(true));
-
     try {
       const response = await axios.post(url, {
         combined_features_count: combinedFeaturesCount.toString(),
@@ -282,8 +275,6 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
         }),
       );
       return null;
-    } finally {
-      dispatch(CommonActions.SetLoading(false));
     }
   };
 };
