@@ -287,20 +287,23 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
 
 async def delete_qfield_project(db: Connection, project_id: int):
     """Delete a project from QFieldCloud using the stored `qfield_project_id`."""
-    # Fetch external URL record using model helper
     try:
         ext = await DbProjectExternalURL.one(db, project_id)
-    except KeyError as e:
-        raise ValueError(
-            f"No external project URL found for project ID {project_id}"
-        ) from e
+    except KeyError:
+        return f"No external project URL found for project ID {project_id}"
 
     qfield_project_id = ext.qfield_project_id
     if not qfield_project_id:
-        raise ValueError(f"No QField project id set for project ID {project_id}")
+        return f"No QField project id set for project ID {project_id}"
 
-    # Now, delete the project from QFieldCloud
     async with qfield_client() as client:
-        client.delete_project(qfield_project_id)
+        try:
+            await client.delete_project(qfield_project_id)
+        except Exception:
+            # Remote project may already be deleted
+            return (
+                f"QField project {qfield_project_id} not found "
+                f"(may already be deleted)."
+            )
 
     return f"Project {project_id} deleted from QFieldCloud."
