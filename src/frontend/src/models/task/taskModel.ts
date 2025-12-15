@@ -41,7 +41,6 @@ export type EntityOsmMap = {
   status: number;
   task_id: number;
   updated_at: string;
-  submission_ids: string | null;
   geometry: string | null;
   created_by: string | null;
 };

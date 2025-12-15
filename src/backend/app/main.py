@@ -39,20 +39,15 @@ from app.config import MonitoringTypes, settings
 from app.db.database import db_conn, get_db_connection_pool
 from app.db.enums import HTTPStatus
 from app.helpers import helper_routes
-from app.integrations import integration_routes
 from app.monitoring import (
     add_endpoint_profiler,
     instrument_app_otel,
     set_otel_tracer,
     set_sentry_otel_tracer,
 )
-from app.organisations import organisation_routes
-from app.organisations.organisation_crud import init_admin_org
 from app.projects import project_routes
 from app.projects.project_crud import read_and_insert_xlsforms
 from app.qfield import qfield_routes
-from app.submissions import submission_routes
-from app.tasks import task_routes
 from app.users import user_routes
 
 
@@ -91,8 +86,6 @@ async def lifespan(
     # NOTE we run this outside db pool to avoid competing with pool init
     log.debug("Creating db connection for server initialisation steps")
     async with await AsyncConnection.connect(settings.FMTM_DB_URL) as conn:
-        log.debug("Initialising admin org and user in DB")
-        await init_admin_org(conn)
         log.debug("Reading XLSForms from DB")
         await read_and_insert_xlsforms(conn, xlsforms_path)
         log.debug("Initialising reverse geocoding database")
@@ -148,13 +141,9 @@ def get_application() -> FastAPI:
 
     _app.include_router(user_routes.router)
     _app.include_router(project_routes.router)
-    _app.include_router(task_routes.router)
     _app.include_router(central_routes.router)
     _app.include_router(qfield_routes.router)
     _app.include_router(auth_routes.router)
-    _app.include_router(submission_routes.router)
-    _app.include_router(organisation_routes.router)
-    _app.include_router(integration_routes.router)
     _app.include_router(helper_routes.router)
 
     return _app

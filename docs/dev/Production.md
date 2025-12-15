@@ -40,17 +40,6 @@ Some can be updated manually, as required.
 > is served under, e.g. /api on the domain.
 > However, this isn't the recommended approach, and testing is minimal.
 
-##### CENTRAL_WEBHOOK_API_KEY
-
-- This variable allows central-webhook to make requests to the backend API.
-- We use this to update the feature/entity colours after mapping events occur.
-- Create an API Key for user `svcfmtm`, which will add the key to the database.
-  - To create an API key, first log in as the user to generate a cookie.
-  - Next visit the API docs page, then call endpoint:
-    `/integrations/api-key`, and save the result.
-- Set the key for the `CENTRAL_WEBHOOK_API_KEY` variable.
-- Restart the containers and this should allow the webhook to work.
-
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided
@@ -79,9 +68,6 @@ domains will default to:
 ${FMTM_DOMAIN} --> Frontend
 api.${FMTM_DOMAIN} --> Backend
 odk.${FMTM_DOMAIN} --> ODK Central
-s3.${FMTM_DOMAIN} --> S3 / Minio
-sync.${FMTM_DOMAIN} --> The DB Sync Service
-mapper.${FMTM_DOMAIN} --> The Mapper UI
 ```
 
 These defaults can be overridden with respective environment variables:
@@ -89,9 +75,6 @@ These defaults can be overridden with respective environment variables:
 ```dotenv
 FMTM_API_DOMAIN
 FMTM_ODK_DOMAIN
-FMTM_S3_DOMAIN
-FMTM_SYNC_DOMAIN
-FMTM_MAPPER_DOMAIN
 ```
 
 ### Connecting to a remote database

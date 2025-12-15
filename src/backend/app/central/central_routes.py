@@ -17,23 +17,18 @@
 #
 """Routes to relay requests to ODK Central server."""
 
-import json
 import re
 from io import BytesIO
 from typing import Annotated
-from uuid import UUID
 
 import pandas as pd
 from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response, StreamingResponse
-from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
-from psycopg.rows import dict_row
-from pyodk._endpoints.entities import Entity
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -41,8 +36,7 @@ from app.auth.roles import Mapper, ProjectManager
 from app.central import central_crud, central_deps, central_schemas
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.db.models import DbOdkEntities, DbProject
-from app.db.postgis_utils import add_required_geojson_properties
+from app.db.models import DbProject
 from app.projects.project_schemas import ProjectUpdate
 
 router = APIRouter(
@@ -439,97 +433,6 @@ async def get_form_media(
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=msg,
-        ) from e
-
-
-@router.post("/entity")
-async def add_new_entity(
-    db: Annotated[Connection, Depends(db_conn)],
-    entity_uuid: UUID,
-    project_user_dict: Annotated[
-        ProjectUserDict, Depends(Mapper(check_completed=True))
-    ],
-    geojson: FeatureCollection,
-) -> Entity:
-    """Create an Entity for the project in ODK.
-
-    NOTE a FeatureCollection must be uploaded.
-    NOTE response time is reasonably slow ~500ms due to Central round trip.
-    """
-    try:
-        project = project_user_dict.get("project")
-        project_odk_id = project.odkid
-        project_odk_creds = project.odk_credentials
-
-        featcol_dict = geojson.model_dump()
-        features = featcol_dict.get("features")
-        if not features or not isinstance(features, list):
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST, detail="Invalid GeoJSON format"
-            )
-
-        # Add required properties and extract entity data
-        featcol = add_required_geojson_properties(featcol_dict)
-
-        # Get task_id of the feature if inside task boundary and not set already
-        # NOTE this should come from the frontend, but might have failed
-        if featcol["features"][0]["properties"].get("task_id", None) is None:
-            async with db.cursor(row_factory=dict_row) as cur:
-                await cur.execute(
-                    """
-                    SELECT t.project_task_index AS task_id
-                    FROM tasks t
-                    WHERE t.project_id = %s
-                    AND ST_Within(
-                        ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326),
-                        t.outline
-                    )
-                    LIMIT 1;
-                    """,
-                    (project.id, json.dumps(features[0].get("geometry"))),
-                )
-                result = await cur.fetchone()
-            if result:
-                featcol["features"][0]["properties"]["task_id"] = result.get(
-                    "task_id", ""
-                )
-
-        entities_list = await central_crud.task_geojson_dict_to_entity_values(
-            {featcol["features"][0]["properties"]["task_id"]: featcol}
-        )
-
-        if not entities_list:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST, detail="No valid entities found"
-            )
-
-        # Create entity in ODK
-        new_entity = await central_crud.create_entity(
-            project_odk_creds,
-            entity_uuid,
-            project_odk_id,
-            properties=list(featcol["features"][0]["properties"].keys()),
-            entity=entities_list[0],
-            dataset_name="features",
-        )
-
-        # Sync ODK entities from Central --> FieldTM database (trigger electric sync)
-        project_entities = await central_crud.get_entities_data(
-            project_odk_creds, project_odk_id
-        )
-        await DbOdkEntities.upsert(db, project.id, project_entities)
-
-        return new_entity
-
-    except HTTPException as http_err:
-        log.error(f"HTTP error: {http_err.detail}")
-        raise
-    except Exception as e:
-        log.debug(e)
-        log.exception("Unexpected error during entity creation")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Entity creation failed",
         ) from e
 
 

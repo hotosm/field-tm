@@ -85,7 +85,6 @@ class FMTMUser(BaseUser):
 
     sub: str
     project_roles: Optional[dict[int, ProjectRole]] = None
-    orgs_managed: Optional[list[int]] = None
 
     def model_post_init(self, ctx):
         """Add to picture field, and remove the value for profile_img.

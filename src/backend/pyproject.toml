@@ -140,7 +140,6 @@ version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
     "../frontend/package.json:version",
-    "../mapper/package.json:version",
     "../../chart/Chart.yaml:appVersion",
 ]
 changelog_file = "../../CHANGELOG.md"
@@ -148,7 +147,7 @@ update_changelog_on_bump = true
 ignored_tag_formats = ["osm-fieldwork-$version", "area-splitter-$version"]
 
 [tool.codespell]
-skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*,src/mapper/messages/*,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/frontend/src/assets/*,src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/*"
+skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/frontend/src/assets/*,src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/*"
 ignore-words-list = "ProjectIn, Indien"
 write-changes = true
 

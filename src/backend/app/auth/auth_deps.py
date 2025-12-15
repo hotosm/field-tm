@@ -23,14 +23,12 @@ from typing import Annotated, Optional
 from fastapi import Depends, Header, HTTPException, Request
 from loguru import logger as log
 from psycopg import Connection
-from psycopg.rows import class_row
 
 from app.auth.auth_logic import get_cookie_value, verify_jwt_token
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, UserRole
-from app.db.models import DbUser
 
 
 async def public_endpoint(
@@ -66,22 +64,10 @@ async def login_required(
     request: Request,
     db: Annotated[Connection, Depends(db_conn)],
     access_token: Annotated[Optional[str], Header()] = None,
-    x_api_key: Annotated[Optional[str], Header()] = None,
 ) -> AuthUser:
-    """Dependency for endpoints requiring login.
-
-    Can receive an access_token header, extract from cookie, or use
-    a X-API-Key header for API Key based access.
-    """
+    """Dependency for endpoints requiring login."""
     if settings.DEBUG:
         return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
-
-    # API Key should take priority if provided
-    if x_api_key:
-        if not db:
-            raise RuntimeError("Database connection is required for API key auth")
-        db_user = await _validate_api_token(db, x_api_key)
-        return AuthUser(**db_user.model_dump())
 
     # Else, extract access token only from the Field-TM cookie
     extracted_token = access_token or get_cookie_value(
@@ -95,31 +81,6 @@ async def login_required(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail="Auth cookie or API token must be provided",
     )
-
-
-async def _validate_api_token(
-    db: Annotated[Connection, Depends(db_conn)],
-    x_api_key: str,
-) -> DbUser:
-    """Check the API token is present for an active database user."""
-    async with db.cursor(row_factory=class_row(DbUser)) as cur:
-        await cur.execute(
-            """
-                SELECT *
-                FROM users
-                WHERE api_key = %(api_key)s
-                AND is_email_verified = TRUE;
-            """,
-            {"api_key": x_api_key},
-        )
-        db_user = await cur.fetchone()
-        if not db_user:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED,
-                detail=f"API key invalid: ({x_api_key})",
-            )
-
-    return db_user
 
 
 async def _authenticate_cookie_token(access_token: str) -> AuthUser:

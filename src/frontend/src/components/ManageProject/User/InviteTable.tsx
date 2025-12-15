@@ -78,9 +78,7 @@ const InviteTable = () => {
       header: ' ',
       cell: ({ row }: any) => {
         const data = row?.original;
-        const baseUrl = row?.original?.email
-          ? `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}`
-          : `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+        const baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
         return (
           <>
             <DropdownMenu>

@@ -18,9 +18,7 @@
 """Pydantic schemas for Projects for usage in endpoints."""
 
 from datetime import datetime
-from pathlib import Path
-from typing import Annotated, Literal, Optional, Self, Union
-from uuid import UUID
+from typing import Annotated, Optional, Self, Union
 
 from geojson_pydantic import (
     Feature,
@@ -33,7 +31,6 @@ from pydantic import (
     BaseModel,
     Field,
     ValidationInfo,
-    computed_field,
 )
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator, model_validator
@@ -41,17 +38,13 @@ from pydantic.functional_validators import field_validator, model_validator
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
-    BackgroundTaskStatus,
     FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
     ProjectVisibility,
 )
 from app.db.models import (
-    DbBackgroundTask,
-    DbBasemap,
     DbProject,
-    DbProjectTeam,
     slugify,
 )
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
@@ -64,7 +57,6 @@ class StubProjectIn(BaseModel):
     field_mapping_app: FieldMappingApp
     short_description: str
     description: Optional[str] = None
-    organisation_id: int
     merge: bool = True
     outline: MultiPolygon | Polygon = None
     location_str: Optional[str] = None
@@ -162,8 +154,6 @@ class ProjectInBase(DbProject, StubProjectIn):
     # Exclude (calculated fields)
     centroid: Annotated[Optional[dict], Field(exclude=True)] = None
     tasks: Annotated[Optional[list], Field(exclude=True)] = None
-    organisation_name: Annotated[Optional[str], Field(exclude=True)] = None
-    organisation_logo: Annotated[Optional[str], Field(exclude=True)] = None
     bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
     last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
 
@@ -247,7 +237,6 @@ class ProjectSummary(BaseModel):
 
     id: int
     name: str
-    organisation_id: Optional[int]
     priority: Optional[ProjectPriority]
 
     hashtags: Optional[list[str]]
@@ -261,14 +250,7 @@ class ProjectSummary(BaseModel):
     field_mapping_app: Optional[FieldMappingApp] = None
 
     # Calculated
-    organisation_logo: Optional[str] = None
     centroid: Optional[Point]
-    total_tasks: Optional[int] = 0
-    num_contributors: Optional[int] = 0
-    total_submissions: Optional[int] = 0
-    tasks_mapped: Optional[int] = 0
-    tasks_validated: Optional[int] = 0
-    tasks_bad: Optional[int] = 0
 
 
 class PaginationInfo(BaseModel):
@@ -289,122 +271,3 @@ class PaginatedProjectSummaries(BaseModel):
 
     results: list[ProjectSummary]
     pagination: PaginationInfo
-
-
-class ProjectUserContributions(BaseModel):
-    """A single project contributor and their submission count."""
-
-    user: str
-    submissions: int
-
-
-class BasemapGenerate(BaseModel):
-    """Params to generate a new basemap."""
-
-    tile_source: Annotated[
-        Literal["esri", "bing", "google", "custom"], Field(default="esri")
-    ]
-    file_format: Annotated[
-        Literal["mbtiles", "sqlitedb", "pmtiles"],
-        Field(default="mbtiles"),
-    ]
-    tms_url: Optional[str] = None
-
-
-class BasemapIn(DbBasemap):
-    """Basemap tile creation."""
-
-    # Exclude, as the uuid is generated in the database
-    id: Annotated[Optional[UUID], Field(exclude=True)] = None
-    project_id: int
-    tile_source: str
-    background_task_id: UUID
-    status: BackgroundTaskStatus
-    # 'url' not set to mandatory, as it can be updated after upload
-
-
-class BasemapUpdate(DbBasemap):
-    """Update a background task."""
-
-    id: Annotated[Optional[int], Field(exclude=True)] = None
-
-
-class BasemapOut(DbBasemap):
-    """Basemap tile list for a project."""
-
-    # project_id not needed as called for a specific project
-    project_id: Annotated[Optional[int], Field(exclude=True)] = None
-
-    @computed_field
-    @property
-    def format(self) -> Optional[str]:
-        """Get the basemap format from file extension."""
-        if not self.url:
-            return None
-        return Path(self.url).suffix[1:]
-
-    @computed_field
-    @property
-    def mimetype(self) -> Optional[str]:
-        """Set the mimetype based on the extension."""
-        if not self.url:
-            return None
-
-        file_format = Path(self.url).suffix[1:]
-        if file_format == "mbtiles":
-            return "application/vnd.mapbox-vector-tile"
-        elif file_format == "pmtiles":
-            return "application/vnd.pmtiles"
-        else:
-            return "application/vnd.sqlite3"
-
-
-class BackgroundTaskIn(DbBackgroundTask):
-    """Insert a background task."""
-
-    # Exclude, as the uuid is generated in the database
-    id: Annotated[Optional[UUID], Field(exclude=True)] = None
-    # Make related project_id mandatory
-    project_id: int
-
-
-class BackgroundTaskUpdate(DbBackgroundTask):
-    """Update a background task."""
-
-    id: Annotated[Optional[int], Field(exclude=True)] = None
-    # Make status update mandatory
-    status: BackgroundTaskStatus
-
-
-class BackgroundTaskStatus(BaseModel):
-    """Background task status for project related tasks."""
-
-    status: str
-    message: Optional[str] = None
-
-
-class ProjectTeamUser(BaseModel):
-    """Single user with name and image for project team."""
-
-    sub: str
-    username: str
-    profile_img: Optional[str] = None
-
-
-class ProjectTeam(DbProjectTeam):
-    """Project team."""
-
-    users: list[ProjectTeamUser] = []
-
-
-class ProjectTeamOne(DbProjectTeam):
-    """Project team without users."""
-
-    users: list[ProjectTeamUser] = Field(exclude=True)
-
-
-class ProjectTeamIn(ProjectTeamOne):
-    """Create a new project team."""
-
-    # Exclude, as the uuid is generated in the database
-    team_id: Annotated[Optional[UUID], Field(exclude=True)] = None

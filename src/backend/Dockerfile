@@ -17,7 +17,6 @@
 ARG PYTHON_IMG_TAG=3.13
 ARG UV_IMG_TAG=0.5.2
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
-FROM ghcr.io/hotosm/field-tm/basemap-generator:0.4.0 AS basemap-bins
 
 
 # Includes all labels and timezone info to extend from
@@ -143,9 +142,6 @@ RUN apt-get update --quiet \
     #    apt-get install -y --quiet --no-install-recommends \
     #    "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
-# Copy basemap generation binaries
-COPY --from=basemap-bins /usr/bin/tilepack /usr/local/bin/
-COPY --from=basemap-bins /usr/bin/pmtiles /usr/local/bin/
 COPY --from=supercronic /supercronic /usr/local/bin/
 COPY backend/*-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]

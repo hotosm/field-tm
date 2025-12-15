@@ -159,7 +159,6 @@ class Settings(BaseSettings):
 
     FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = None
-    FMTM_MAPPER_DOMAIN: Optional[str] = None
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
 
@@ -191,24 +190,15 @@ class Settings(BaseSettings):
             )
             # Manager frontend via proxy
             default_origins.append(f"http://{domain}{local_server_port}")
-            # Mapper frontend via proxy
-            default_origins.append(f"http://mapper.{domain}{local_server_port}")
             # Manager frontend direct port access
             default_origins.append("http://localhost:7051")
             # we also include next port, in case already bound by docker
             default_origins.append("http://localhost:7052")
-            # Mapper frontend direct port access
-            default_origins.append("http://localhost:7057")
             # we also include next port, in case already bound by docker
             default_origins.append("http://localhost:7058")
         else:
-            # Add the main Field-TM domains (UI + Mapper UI)
+            # Add the main Field-TM frontend domain
             default_origins.append(f"https://{domain}")
-            mapper_domain = info.data.get("FMTM_MAPPER_DOMAIN")
-            if mapper_domain:
-                default_origins.append(f"https://{mapper_domain}")
-            else:
-                default_origins.append(f"https://mapper.{domain}")
 
         # Process `extra_origins` if provided
         if isinstance(extra_origins, str):
@@ -251,7 +241,6 @@ class Settings(BaseSettings):
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
     ODK_CENTRAL_PASSWD: Optional[SecretStr] = ""
-    CENTRAL_WEBHOOK_API_KEY: Optional[SecretStr] = ""
 
     # QField
     QFIELDCLOUD_URL: Optional[str] = ""
@@ -277,38 +266,6 @@ class Settings(BaseSettings):
             uri = "http://127.0.0.1:7051/osmauth"
         else:
             uri = f"https://{self.FMTM_DOMAIN}/osmauth"
-        return uri
-
-    @computed_field
-    @property
-    def mapper_osm_login_redirect_uri(self) -> str:
-        """The constructed OSM redirect URL for mapper frontend.
-
-        Must be set in the OAuth2 config for the openstreetmap profile.
-        """
-        if self.DEBUG:
-            uri = "http://127.0.0.1:7057/osmauth"
-        else:
-            if self.FMTM_MAPPER_DOMAIN:
-                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/osmauth"
-            else:
-                uri = f"https://mapper.{self.FMTM_DOMAIN}/osmauth"
-        return uri
-
-    @computed_field
-    @property
-    def google_login_redirect_uri(self) -> str:
-        """The constructed Google redirect URL for mapper frontend.
-
-        Must be set in the OAuth2 config for the Google profile.
-        """
-        if self.DEBUG:
-            uri = "http://127.0.0.1:7057/googleauth"
-        else:
-            if self.FMTM_MAPPER_DOMAIN:
-                uri = f"https://{self.FMTM_MAPPER_DOMAIN}/googleauth"
-            else:
-                uri = f"https://mapper.{self.FMTM_DOMAIN}/googleauth"
         return uri
 
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"

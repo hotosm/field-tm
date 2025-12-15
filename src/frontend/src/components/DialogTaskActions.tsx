@@ -40,7 +40,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo?.organisation_id as number);
   const isProjectManager = useIsProjectManager(projectInfo?.id as number);
 
   const currentProjectId: string = params.id!;
@@ -198,21 +197,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                 listOfTaskActions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
               }`}
             >
-              {selectedTask.task_state === taskStateEnum.UNLOCKED_TO_MAP &&
-                (isOrganizationAdmin || isProjectManager) && (
-                  <div>
-                    <Select2
-                      options={userListOptions || []}
-                      value={selectedUser || ''}
-                      onChange={setSelectedUser}
-                      handleApiSearch={setSearchUserText}
-                      isLoading={isUserListLoading}
-                      choose="value"
-                      placeholder="Select a user"
-                    />
-                    {showUserError && <ErrorMessage message="Select a user" />}
-                  </div>
-                )}
               {listOfTaskActions?.map((data, index) => {
                 return isOrganizationAdmin || isProjectManager ? (
                   <Button

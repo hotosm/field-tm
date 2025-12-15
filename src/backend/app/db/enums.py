@@ -71,13 +71,11 @@ class ProjectPriority(StrEnum, Enum):
 class UserRole(StrEnum, Enum):
     """Available roles assigned to a user site-wide in Field-TM.
 
-    Can be used for global user permissions:
-        - READ_ONLY = write access blocked (i.e. banned)
-        - MAPPER = default for all
-        - ADMIN = super admin with access to everything
+    Simplified to two global roles:
+        - MAPPER = default for all authenticated users
+        - ADMIN = global admin with access to all admin endpoints
     """
 
-    READ_ONLY = "READ_ONLY"
     MAPPER = "MAPPER"
     ADMIN = "ADMIN"
 
@@ -85,18 +83,12 @@ class UserRole(StrEnum, Enum):
 class ProjectRole(StrEnum, Enum):
     """Available roles assigned to a user for a specific project.
 
-    All roles must be assigned by someone higher in the hierarchy:
-        - MAPPER = default for all
-        - VALIDATOR = can validate the mappers output
-        - FIELD_MANAGER = can invite mappers and organise people
-        - ASSOCIATE_PROJECT_MANAGER = helps the project manager, cannot delete project
-        - PROJECT_MANAGER = has all permissions to manage a project, including delete
+    Simplified to:
+        - MAPPER = default for all contributors
+        - PROJECT_MANAGER = per-project admin with full control over that project
     """
 
     MAPPER = "MAPPER"
-    VALIDATOR = "VALIDATOR"
-    FIELD_MANAGER = "FIELD_MANAGER"
-    ASSOCIATE_PROJECT_MANAGER = "ASSOCIATE_PROJECT_MANAGER"
     PROJECT_MANAGER = "PROJECT_MANAGER"
 
 
@@ -267,17 +259,8 @@ class SubmissionDownloadType(StrEnum, Enum):
     CSV = "csv"
 
 
-class OdkWebhookEvents(StrEnum, Enum):
-    """Types of events received from ODK Central webhook."""
-
-    UPDATE_ENTITY = "entity.update.version"
-    NEW_SUBMISSION = "submission.create"
-    REVIEW_SUBMISSION = "submission.update"
-
-
 class FieldMappingApp(StrEnum, Enum):
-    """Types of events received from ODK Central webhook."""
+    """Downstream field mapping application type."""
 
     QFIELD = "QField"
     ODK = "ODK"
-    FIELDTM = "FieldTM"
