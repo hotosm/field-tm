@@ -102,6 +102,6 @@ nav:
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: https://xlsform-builder.fmtm.hotosm.org
-  - Roadmap: https://roadmap.fieldtm.hotosm.org
+  - Roadmap: https://github.com/hotosm/field-tm#roadmap
   - Timeline: timeline.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://docs.field.hotosm.org/openapi/openapi.json

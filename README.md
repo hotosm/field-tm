@@ -24,7 +24,7 @@
 | **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev) |
 | **Quality** | | [![Coverage](https://docs.field.hotosm.org/coverage.svg)](https://docs.field.hotosm.org/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
 | **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/contributors/hotosm/field-tm?logo=github)](#contributors-) |
-| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.field.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fieldtm.hotosm.org) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.field.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
+| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.field.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://github.com/hotosm/field-tm#roadmap) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.field.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
 
 </div>
 
@@ -103,7 +103,7 @@ use the convenience script:
 
 ```sh
 # Deprecated approach (for now):
-# curl --proto '=https' --tlsv1.2 -sSf https://get.fieldtm.hotosm.org | bash
+# curl --proto '=https' --tlsv1.2 -sSf https://get.field.hotosm.org | bash
 
 # Development
 just config generate-dotenv
@@ -164,9 +164,6 @@ various deployment guides.
 > 📱 for mobile / mappers
 >
 > 🖥️ for desktop / managers / validators
-
-A more developer-facing roadmap can be found
-[here](https://roadmap.fieldtm.hotosm.org).
 
 ## Contributors ✨
 
