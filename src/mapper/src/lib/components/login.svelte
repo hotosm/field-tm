@@ -9,6 +9,7 @@
 
 	const commonStore = getCommonStore();
 	const loginStore = getLoginStore();
+	const location = window.location;
 
 	type LoginOption = {
 		id: LoginProviderKey;
@@ -37,7 +38,7 @@
 	let dialogRef;
 
 	const handleSignIn = async (selectedOption: LoginProviderKey) => {
-		sessionStorage.setItem('requestedPath', window.location.pathname);
+		sessionStorage.setItem('requestedPath', `${location.pathname}${location.search}`);
 		loginRedirect(selectedOption);
 	};
 </script>
