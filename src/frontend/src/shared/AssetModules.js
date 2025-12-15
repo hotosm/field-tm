@@ -91,6 +91,7 @@ import {
   RotateLeft as RotateLeftIcon,
   RotateRight as RotateRightIcon,
   Sync as SyncIcon,
+  ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
@@ -113,6 +114,9 @@ import {
   Facebook as FacebookIcon,
   Instagram as InstagramIcon,
   GitHub as GitHubIcon,
+  Assignment as AssignmentIcon,
+  Warning as WarningIcon,
+  OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -218,6 +222,7 @@ export default {
   RotateLeftIcon,
   RotateRightIcon,
   SyncIcon,
+  ExpandLessIcon,
   ExpandMoreIcon,
   CheckBoxIcon,
   CheckBoxOutlineBlankIcon,
@@ -240,4 +245,7 @@ export default {
   FacebookIcon,
   InstagramIcon,
   GitHubIcon,
+  AssignmentIcon,
+  WarningIcon,
+  OpenInNewIcon,
 };

@@ -5,7 +5,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/common/Button';
 import RadioButton from '@/components/common/RadioButton';
-import UploadArea from '@/components/common/UploadArea';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import FieldLabel from '@/components/common/FieldLabel';
 import { Input } from '@/components/RadixComponents/Input';
@@ -22,8 +21,9 @@ import { useCreateOrganisationMutation, useUpdateOrganisationMutation } from '@/
 import { appendObjectToFormData } from '@/utilfunctions/commonUtils';
 import { odkTypeOptions, organizationTypeOptions } from './constants';
 import { createOrganizationValidationSchema } from './validation/CreateEditOrganization';
-import { defaultValues } from './constants/defaultValues';
+import { organizationDefaultValues } from './constants/organizationDefaultValues';
 import { useQueryClient } from '@tanstack/react-query';
+import FileUpload from '@/components/common/FileUpload';
 
 const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail?: organisationType }) => {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
       const formData = new FormData();
       appendObjectToFormData(formData, {
         ...data,
-        logo: data.logo ? data.logo?.[0].file : null,
+        logo: !isEmpty(data.logo) ? data.logo?.[0].file : null,
       });
       createOrganisationMutate({
         payload: formData,
@@ -105,7 +105,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
       const formData = new FormData();
       appendObjectToFormData(formData, {
         ...dirtyValues,
-        logo: dirtyValues.logo ? dirtyValues.logo?.[0].file : null,
+        logo: !isEmpty(dirtyValues.logo) ? dirtyValues.logo?.[0].file : null,
       });
       updateOrganisationMutate({
         payload: formData,
@@ -114,7 +114,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
   };
 
   const formMethods = useForm<z.infer<typeof createOrganizationValidationSchema>>({
-    defaultValues: defaultValues,
+    defaultValues: organizationDefaultValues,
     resolver: zodResolver(createOrganizationValidationSchema),
   });
   const { watch, register, control, setValue, formState, handleSubmit, reset, getValues } = formMethods;
@@ -124,12 +124,12 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
   const resetState = (organizationDetail: organisationType) => {
     const { name, associated_email, description, odk_central_url, logo, community_type, url, id } = organizationDetail;
     reset({
-      ...defaultValues,
+      ...organizationDefaultValues,
       name,
       associated_email,
       description,
       odk_central_url,
-      logo,
+      logo: logo ? [logo] : [],
       community_type,
       url,
       id,
@@ -156,7 +156,7 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
     >
       <div className="fmtm-py-5 lg:fmtm-py-10 fmtm-px-5 lg:fmtm-px-9 fmtm-flex-1 fmtm-overflow-y-scroll scrollbar">
         {!orgId && (
-          <h5 className="fmtm-text-[#484848] fmtm-text-2xl fmtm-font-[600] fmtm-pb-3 lg:fmtm-pb-7 fmtm-font-archivo fmtm-tracking-wide">
+          <h5 className="fmtm-text-[#484848] fmtm-text-2xl fmtm-font-[600] fmtm-pb-3 lg:fmtm-pb-7 fmtm-tracking-wide">
             Organizational Details
           </h5>
         )}
@@ -257,14 +257,12 @@ const CreateEditOrganizationForm = ({ organizationDetail }: { organizationDetail
           )}
           <div className="fmtm-my-2 fmtm-flex fmtm-flex-col fmtm-gap-1">
             <FieldLabel label="Upload Logo" />
-            <UploadArea
-              title=""
-              label="Please upload .png, .gif, .jpeg"
+            <FileUpload
+              name="logo"
+              // @ts-ignore
+              setValue={setValue}
               data={values.logo}
-              onUploadFile={(updatedFiles, fileInputRef) => {
-                setValue('logo', updatedFiles, { shouldDirty: true });
-              }}
-              acceptedInput="image/*"
+              placeholder="Please upload picture (jpeg, png file format)"
             />
             {errors?.logo?.message && <ErrorMessage message={errors.logo.message as string} />}
           </div>

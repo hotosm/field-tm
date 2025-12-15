@@ -1,7 +1,7 @@
 import { z } from 'zod/v4';
 import { createOrganizationValidationSchema } from '../validation/CreateEditOrganization';
 
-export const defaultValues: z.infer<typeof createOrganizationValidationSchema> = {
+export const organizationDefaultValues: z.infer<typeof createOrganizationValidationSchema> = {
   name: '',
   url: '',
   associated_email: '',

@@ -18,15 +18,18 @@
 """Routes to relay requests to ODK Central server."""
 
 import json
+import re
 from io import BytesIO
 from typing import Annotated
 from uuid import UUID
 
+import pandas as pd
 from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
+from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import Connection
 from psycopg.rows import dict_row
@@ -84,6 +87,7 @@ async def validate_form(
     use_odk_collect: bool = False,
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
+    default_language: str = "english",
 ):
     """Basic validity check for uploaded XLSForm.
 
@@ -102,6 +106,7 @@ async def validate_form(
             xlsform,
             need_verification_fields=need_verification_fields,
             mandatory_photo_upload=mandatory_photo_upload,
+            default_language=default_language,
             use_odk_collect=use_odk_collect,
         )
         return StreamingResponse(
@@ -116,6 +121,7 @@ async def validate_form(
             xlsform,
             need_verification_fields=need_verification_fields,
             mandatory_photo_upload=mandatory_photo_upload,
+            default_language=default_language,
             use_odk_collect=use_odk_collect,
         )
         return JSONResponse(
@@ -132,6 +138,7 @@ async def upload_project_xlsform(
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
     # FIXME this var should be probably be refactored to project.field_mapping_app
+    default_language: str = "english",
     use_odk_collect: bool = False,
 ):
     """Upload the final XLSForm for the project."""
@@ -147,6 +154,7 @@ async def upload_project_xlsform(
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
+        default_language=default_language,
         use_odk_collect=use_odk_collect,
     )
 
@@ -156,6 +164,7 @@ async def upload_project_xlsform(
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
+        default_language=default_language,
         use_odk_collect=use_odk_collect,
     )
 
@@ -206,6 +215,49 @@ async def update_project_form(
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={"message": f"Successfully updated the form for project {project.id}"},
+    )
+
+
+@router.post("/detect-form-languages")
+async def detect_form_languages(
+    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
+):
+    """Detect languages available in an uploaded XLSForm."""
+    xlsform = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
+    detected_languages = []
+
+    settings_df = xlsform.get("settings")
+    default_language = (
+        settings_df["default_language"].iloc[0].split("(")[0].strip().lower()
+        if settings_df is not None and "default_language" in settings_df
+        else None
+    )
+
+    for sheet_df in xlsform.values():
+        if sheet_df.empty:
+            continue
+
+        sheet_df.columns = sheet_df.columns.str.lower()
+        for col in sheet_df.columns:
+            if any(
+                col.startswith(f"{base_col}::")
+                for base_col in ["label", "hint", "required_message"]
+            ):
+                match = re.match(r"^(label|hint|required_message)::(\w+)", col)
+                if match and match.group(2) in INCLUDED_LANGUAGES:
+                    if match.group(2) not in detected_languages:
+                        detected_languages.append(match.group(2))
+
+    if default_language and default_language.lower() not in detected_languages:
+        detected_languages.append(default_language.lower())
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={
+            "detected_languages": detected_languages,  # in the order found in form
+            "default_language": [default_language] if default_language else [],
+            "supported_languages": list(INCLUDED_LANGUAGES.keys()),
+        },
     )
 
 

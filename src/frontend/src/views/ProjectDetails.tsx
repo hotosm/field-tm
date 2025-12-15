@@ -30,19 +30,11 @@ import TaskList from '@/components/ProjectDetails/Tabs/TaskList';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@/components/Skeletons';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
-import { project_status } from '@/types/enums';
+import { field_mapping_app, project_status } from '@/types/enums';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 type tabType = 'project_info' | 'task_activity' | 'comments' | 'instructions' | 'task_list';
-
-const tabList: { id: tabType; name: string }[] = [
-  { id: 'project_info', name: 'Project Info' },
-  { id: 'task_activity', name: 'Task Activity' },
-  { id: 'comments', name: 'Comments' },
-  { id: 'instructions', name: 'Instructions' },
-  { id: 'task_list', name: 'Task List' },
-];
 
 const ProjectDetails = () => {
   const dispatch = useAppDispatch();
@@ -68,6 +60,14 @@ const ProjectDetails = () => {
 
   const isProjectManager = useIsProjectManager(projectId as string);
   const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
+
+  const tabList: { id: tabType; name: string; show: boolean }[] = [
+    { id: 'project_info', name: 'Project Info', show: true },
+    { id: 'task_activity', name: 'Task Activity', show: projectInfo.field_mapping_app !== field_mapping_app.QField },
+    { id: 'comments', name: 'Comments', show: projectInfo.field_mapping_app !== field_mapping_app.QField },
+    { id: 'instructions', name: 'Instructions', show: true },
+    { id: 'task_list', name: 'Task List', show: projectInfo.field_mapping_app !== field_mapping_app.QField },
+  ];
 
   useDocumentTitle(projectInfo.name && !projectDetailsLoading ? projectInfo.name : 'Project Details');
 
@@ -114,14 +114,17 @@ const ProjectDetails = () => {
     dispatch(GetOdkEntitiesGeojson(`${VITE_API_URL}/projects/${projectId}/entities`));
   };
 
+  // temporary fix: only call api if field_mapping_app is not QField
   useEffect(() => {
-    getEntityStatusList();
-    getOdkEntitiesGeojson();
+    if (projectId && projectInfo?.id === +projectId && projectInfo?.field_mapping_app !== field_mapping_app.QField) {
+      getEntityStatusList();
+      getOdkEntitiesGeojson();
+    }
 
     return () => {
       dispatch(ProjectActions.ClearProjectFeatures());
     };
-  }, []);
+  }, [projectInfo]);
 
   const getTabContent = (tabState: tabType) => {
     switch (tabState) {
@@ -220,17 +223,20 @@ const ProjectDetails = () => {
                 >
                   <div className="fmtm-overflow-y-hidden fmtm-overflow-x-scroll scrollbar fmtm-min-h-fit">
                     <div className="fmtm-flex fmtm-border-b fmtm-border-grey-200 fmtm-gap-3">
-                      {tabList.map((tab) => (
-                        <button
-                          key={tab.id}
-                          className={`fmtm-body-md fmtm-rounded-none fmtm-border-b fmtm-py-1 fmtm-px-5 fmtm-duration-200 fmtm-w-fit fmtm-text-grey-900 fmtm-text-nowrap ${
-                            selectedTab === tab.id ? 'fmtm-border-primaryRed fmtm-button' : 'fmtm-border-transparent'
-                          } ${(taskModalStatus && (tab.id === 'project_info' || tab.id === 'instructions' || tab.id === 'task_list')) || (!taskModalStatus && (tab.id === 'task_activity' || tab.id === 'comments')) ? 'fmtm-hidden' : ''}`}
-                          onClick={() => setSelectedTab(tab.id)}
-                        >
-                          {tab.name}
-                        </button>
-                      ))}
+                      {tabList.map((tab) => {
+                        if (!tab.show) return null;
+                        return (
+                          <button
+                            key={tab.id}
+                            className={`fmtm-body-md fmtm-rounded-none fmtm-border-b fmtm-py-1 fmtm-px-5 fmtm-duration-200 fmtm-w-fit fmtm-text-grey-900 fmtm-text-nowrap ${
+                              selectedTab === tab.id ? 'fmtm-border-primaryRed fmtm-button' : 'fmtm-border-transparent'
+                            } ${(taskModalStatus && (tab.id === 'project_info' || tab.id === 'instructions' || tab.id === 'task_list')) || (!taskModalStatus && (tab.id === 'task_activity' || tab.id === 'comments')) ? 'fmtm-hidden' : ''}`}
+                            onClick={() => setSelectedTab(tab.id)}
+                          >
+                            {tab.name}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   {getTabContent(selectedTab)}
@@ -245,22 +251,35 @@ const ProjectDetails = () => {
                     ) : (
                       <>
                         {(isProjectManager || isOrganizationAdmin) && (
-                          <Link to={`/manage/project/${params?.id}`} className="!fmtm-w-1/2">
+                          <Link to={`/manage/project/${params?.id}`} className="fmtm-w-1/2">
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
                               Manage Project
                             </Button>
                           </Link>
                         )}
-                        <Link
-                          to={`/project-submissions/${projectId}`}
-                          className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
-                        >
-                          <Button variant="secondary-grey" className="fmtm-w-full">
-                            <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
-                            View Statistics
-                          </Button>
-                        </Link>
+                        {projectInfo.field_mapping_app !== field_mapping_app.QField && (
+                          <Link
+                            to={`/project-submissions/${projectId}`}
+                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                          >
+                            <Button variant="secondary-grey" className="fmtm-w-full">
+                              <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
+                              View Statistics
+                            </Button>
+                          </Link>
+                        )}
+                        {projectInfo.field_mapping_app === field_mapping_app.QField && projectInfo?.project_url && (
+                          <Link
+                            target="_"
+                            to={projectInfo?.project_url}
+                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                          >
+                            <Button variant="secondary-grey" className="fmtm-w-full">
+                              <AssetModules.OpenInNewIcon className="!fmtm-text-[1.125rem]" /> Open in QField Cloud
+                            </Button>
+                          </Link>
+                        )}
                       </>
                     )}
                   </div>

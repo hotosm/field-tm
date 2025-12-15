@@ -37,9 +37,11 @@ from python_calamine.pandas import pandas_monkeypatch
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.form_components.choice_fields import get_choice_fields, generate_task_id_choices
 from osm_fieldwork.form_components.mandatory_fields import (
+    get_photo_repeat_end,
     meta_df,
     create_survey_df,
     get_photo_collection_field,
+    get_photo_repeat_field,
     create_entity_df,
 )
 from osm_fieldwork.form_components.digitisation_fields import (
@@ -59,7 +61,7 @@ FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
 
-def standardize_xlsform_sheets(xlsform: dict):
+def standardize_xlsform_sheets(xlsform: dict, default_language: str):
     """Standardizes column headers in both the 'survey' and 'choices' sheets of an XLSForm.
 
     - Strips spaces and lowercases all column headers.
@@ -72,7 +74,7 @@ def standardize_xlsform_sheets(xlsform: dict):
         dict: The updated XLSForm dictionary with standardized column headers.
     """
 
-    def standardize_language_columns(df):
+    def standardize_language_columns(df, default_language):
         """Standardize existing language columns.
 
         :param df: Original DataFrame with existing translations.
@@ -95,8 +97,8 @@ def standardize_xlsform_sheets(xlsform: dict):
                         if lang_name in INCLUDED_LANGUAGES:
                             standardized_col = f"{base_col}::{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
 
-                elif col == base_col and col != "label":  # if only label,hint or required_message then add '::english(en)'
-                    standardized_col = f"{base_col}::english(en)"
+                elif col == base_col:
+                    standardized_col = f"{base_col}::{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})"
 
                 if col != standardized_col:
                     df.rename(columns={col: standardized_col}, inplace=True)
@@ -121,7 +123,7 @@ def standardize_xlsform_sheets(xlsform: dict):
         if sheet_df.empty:
             continue
         # standardize the language columns
-        sheet_df = standardize_language_columns(sheet_df)
+        sheet_df = standardize_language_columns(sheet_df, default_language)
         sheet_df = filter_df_empty_rows(sheet_df)
         label_cols.update(
             [col for col in sheet_df.columns if "label" in col.lower()]
@@ -279,6 +281,7 @@ async def _process_all_form_tabs(
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     label_cols: list[str] = [],
+    default_language: str = "english",
 ) -> tuple[str, pd.DataFrame]:
     if "label" in label_cols:
         add_label = False
@@ -295,7 +298,9 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols)
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
+            add_label_translations(get_photo_repeat_field()),
+            add_label_translations(get_photo_repeat_end())
         ])
     else:
         add_label = True
@@ -312,11 +317,13 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field(mandatory_photo_upload))
+            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
+            add_label_translations(get_photo_repeat_field()),
+            add_label_translations(get_photo_repeat_end())
         ])
 
     # Configure form settings
-    xform_id = _configure_form_settings(custom_sheets, form_name)
+    xform_id = _configure_form_settings(custom_sheets, form_name, default_language)
 
     # Select appropriate form components based on target platform
     form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df, label_cols)
@@ -367,6 +374,7 @@ async def append_field_mapping_fields(
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
+    default_language: str = "english",
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
@@ -397,7 +405,7 @@ async def append_field_mapping_fields(
         log.error(msg)
         raise ValueError(msg)
     
-    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets)  # Also get the label columns
+    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets, default_language)  # Also get the label columns
     xformid, updated_form = await _process_all_form_tabs(
         custom_sheets=custom_sheets,
         form_name=form_name,
@@ -407,6 +415,7 @@ async def append_field_mapping_fields(
         mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,
+        default_language=default_language
     )
     return (xformid, await write_xlsform(updated_form))
 
@@ -612,7 +621,7 @@ def _validate_required_sheet(
         raise ValueError(msg)
 
 
-def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
+def _configure_form_settings(custom_sheets: dict, form_name: str, default_language: str) -> str:
     """Configure form settings and extract/set form ID.
     
     Args:
@@ -631,7 +640,7 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
             "version": current_datetime,
             "form_title": form_name,
             "allow_choice_duplicates": "yes",
-            "default_language": "en"
+            "default_language": f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
         }])
         
         log.debug(f"Created default settings with form_id: {xform_id}")
@@ -652,7 +661,14 @@ def _configure_form_settings(custom_sheets: dict, form_name: str) -> str:
     settings["form_title"] = form_name
     
     if "default_language" not in settings:
-        settings["default_language"] = "en"
+        settings["default_language"] = f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
+    else:
+        default_language_value = settings["default_language"].iloc[0]
+
+        if "(" not in default_language_value:
+            code = INCLUDED_LANGUAGES.get(default_language_value)
+            if code:
+                settings["default_language"] = f"{default_language_value}({code})"
     
     return xform_id
 

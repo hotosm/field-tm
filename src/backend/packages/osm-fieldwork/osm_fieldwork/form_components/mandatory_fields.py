@@ -72,11 +72,23 @@ meta_df = pd.DataFrame(
 
 def get_photo_collection_field(mandatory_photo_upload: bool = False):
     return {
-        "type": "image",
-        "name": "image",
-        "appearance": "minimal",
-        "parameters": "max-pixels=1000",
-        "required": "yes" if mandatory_photo_upload else "no",
+    "type": "begin repeat",
+    "name": "photos",
+    "required": "yes" if mandatory_photo_upload else "no",
+}
+
+def get_photo_repeat_field():
+    return {
+    "type": "image",
+    "name": "image",
+    "appearance": "minimal",
+    "parameters": "max-pixels=1000",
+}
+
+def get_photo_repeat_end():
+    return {
+    "type": "end repeat",
+    "name": "photos",
     }
 
 
@@ -97,6 +109,9 @@ def _get_mandatory_fields(
     Returns:
         List of field definitions for the form
     """
+    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#1a1a1a', '#00ff00'))"
+    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#000000', '#00cc00'))"
+
     status_field_calculation = f"if({FEATURE} != '', 2, "
     if need_verification_fields:
         status_field_calculation += "if(${feature_exists} = 'no', 6, "
@@ -244,6 +259,46 @@ def _get_mandatory_fields(
             "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, 'svcfmtm')" if use_odk_collect else "''",
             "save_to": "created_by",
         },
+        {
+            "type": "calculate",
+            "name": "fill",
+            "notes": "Polygon fill color based on mapping status",
+            "label::english(en)": "Fill Color",
+            "appearance": "minimal",
+            "calculation": color_calc,
+            "save_to": "fill",
+            "default": "#1a1a1a",
+        },
+        {
+            "type": "calculate",
+            "name": "marker-color",
+            "notes": "Point marker color based on mapping status",
+            "label::english(en)": "Marker Color",
+            "appearance": "minimal",
+            "calculation": color_calc,
+            "save_to": "marker-color",
+            "default": "#1a1a1a",
+        },
+        {
+            "type": "calculate",
+            "name": "stroke",
+            "notes": "Line/Polygon border color based on mapping status",
+            "label::english(en)": "Stroke Color",
+            "appearance": "minimal",
+            "calculation": stroke_calc,
+            "save_to": "stroke",
+            "default": "#000000",
+        },
+        {
+            "type": "calculate",
+            "name": "stroke-width",
+            "notes": "Line/Polygon stroke thickness",
+            "label::english(en)": "Stroke Width",
+            "appearance": "minimal",
+            "calculation": "6",
+            "save_to": "stroke-width",
+            "default": "6",
+        }
     ])
     if need_verification_fields:
         fields.append(add_label_translations({

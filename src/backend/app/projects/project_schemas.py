@@ -253,8 +253,11 @@ class ProjectSummary(BaseModel):
     hashtags: Optional[list[str]]
     location_str: Optional[str] = None
     short_description: Optional[str] = None
+    project_url: Optional[str] = None
+    qfield_project_id: Optional[str] = None
     status: Optional[ProjectStatus] = None
     visibility: Optional[ProjectVisibility] = None
+    field_mapping_app: Optional[FieldMappingApp] = None
 
     # Calculated
     organisation_logo: Optional[str] = None

@@ -33,8 +33,8 @@ from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
 from app.config import settings
-from app.db.enums import HTTPStatus
-from app.db.models import DbProject
+from app.db.enums import FieldMappingApp, HTTPStatus
+from app.db.models import DbProject, DbProjectExternalURL
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -188,6 +188,7 @@ async def create_qfield_project(
     final_project_file = Path(
         f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{qgis_project_name}.qgz"
     )
+    print(f'\n---- final_project_file: "{final_project_file}"----\n')
     if not final_project_file.exists():
         msg = (
             f"QGIS job completed but output file was not created: {final_project_file}"
@@ -239,15 +240,26 @@ async def create_qfield_project(
             ) from e
 
     log.info("Finished QFieldCloud project upload")
-    if settings.DEBUG:
-        return (
-            f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
-            f"/a/{api_project_owner}/{api_project_name}"
-        )
-    return (
-        f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
+    # Create QField URL
+    qfield_url = (
+        f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
+        f"/a/{api_project_owner}/{api_project_name}"
+        if settings.DEBUG
+        else f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
         f"/a/{api_project_owner}/{api_project_name}"
     )
+
+    # Store QField URL in project_external_urls
+    await DbProjectExternalURL.create_or_update(
+        db=db,
+        project_id=project.id,
+        source=FieldMappingApp.QFIELD,
+        url=qfield_url,
+        qfield_project_id=api_project_id,
+    )
+    await db.commit()
+
+    return qfield_url
 
 
 async def qfc_credentials_test(qfc_creds: QFieldCloud):
@@ -271,3 +283,27 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
             status_code=HTTPStatus.BAD_REQUEST,
             detail="QFieldCloud credentials are invalid.",
         ) from e
+
+
+async def delete_qfield_project(db: Connection, project_id: int):
+    """Delete a project from QFieldCloud using the stored `qfield_project_id`."""
+    try:
+        ext = await DbProjectExternalURL.one(db, project_id)
+    except KeyError:
+        return f"No external project URL found for project ID {project_id}"
+
+    qfield_project_id = ext.qfield_project_id
+    if not qfield_project_id:
+        return f"No QField project id set for project ID {project_id}"
+
+    async with qfield_client() as client:
+        try:
+            await client.delete_project(qfield_project_id)
+        except Exception:
+            # Remote project may already be deleted
+            return (
+                f"QField project {qfield_project_id} not found "
+                f"(may already be deleted)."
+            )
+
+    return f"Project {project_id} deleted from QFieldCloud."

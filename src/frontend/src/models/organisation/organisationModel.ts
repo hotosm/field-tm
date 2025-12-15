@@ -40,9 +40,8 @@ export type radioOptionsType = {
 };
 
 export type consentDetailsFormDataType = {
-  give_consent: '' | 'yes' | 'no';
+  give_consent: string;
   review_documentation: string[];
-  log_into: string[];
   participated_in: string[];
 };
 

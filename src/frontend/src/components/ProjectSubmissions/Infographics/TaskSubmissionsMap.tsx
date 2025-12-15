@@ -8,7 +8,6 @@ import { Vector as VectorSource } from 'ol/source';
 import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
-import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/Infographics/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
@@ -24,6 +23,7 @@ import { projectInfoType, projectTaskBoundriesType } from '@/models/project/proj
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 export const municipalStyles = {
   ...defaultStyles,
@@ -108,7 +108,7 @@ const TaskSubmissionsMap = () => {
       return;
     }
     const taskGeojsonFeatureCollection = {
-      ...basicGeojsonTemplate,
+      type: 'FeatureCollection',
       features: [
         ...projectTaskBoundries?.[0]?.taskBoundries?.map((task) => ({
           type: 'Feature',
@@ -127,7 +127,7 @@ const TaskSubmissionsMap = () => {
     if (!taskBoundaries) return;
     if (!selectedTask) return;
     const filteredSelectedTaskGeojson = {
-      ...basicGeojsonTemplate,
+      type: 'FeatureCollection',
       features: taskBoundaries?.features?.filter((task) => task?.properties?.fid === selectedTask),
     };
     const vectorSource = new VectorSource({
@@ -147,11 +147,11 @@ const TaskSubmissionsMap = () => {
       constrainResolution: true,
       duration: 2000,
     });
-    dispatch(CoreModules.TaskActions.SetSelectedTask(null));
+    dispatch(TaskActions.SetSelectedTask(null));
   }, [selectedTask]);
 
   const taskOnSelect = (properties, feature) => {
-    dispatch(CoreModules.TaskActions.SetSelectedTask(properties?.fid));
+    dispatch(TaskActions.SetSelectedTask(properties?.fid));
   };
 
   const setChoropleth = useCallback(
@@ -201,70 +201,58 @@ const TaskSubmissionsMap = () => {
   };
 
   return (
-    <CoreModules.Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
+    <MapComponent
+      ref={mapRef}
+      mapInstance={map}
+      className="map"
+      style={{
+        height: '100%',
         width: '100%',
-        gap: 2,
       }}
-      className="fmtm-h-full"
     >
-      <MapComponent
-        ref={mapRef}
-        mapInstance={map}
-        className="map"
-        style={{
-          height: '100%',
-          width: '100%',
-        }}
-      >
-        <div className="fmtm-absolute fmtm-right-2 fmtm-top-3 fmtm-z-20">
-          <LayerSwitchMenu map={map} />
-        </div>
-        <LayerSwitcherControl visible={'osm'} />
-        {taskBoundaries && (
-          <VectorLayer
-            setStyle={(feature, resolution) =>
-              setChoropleth({ ...municipalStyles, lineThickness: 3 }, feature, resolution)
-            }
-            geojson={taskBoundaries}
-            mapOnClick={taskOnSelect}
-            viewProperties={{
-              size: map?.getSize(),
-              padding: [50, 50, 50, 50],
-              constrainResolution: true,
-              duration: 2000,
-            }}
-            zoomToLayer
-            zIndex={5}
-          />
-        )}
-        <div className="fmtm-absolute fmtm-bottom-2 fmtm-left-2 sm:fmtm-bottom-5 sm:fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
-          <Accordion
-            body={<TaskSubmissionsMapLegend legendColorArray={legendColorArray} />}
-            header={
-              <p className="fmtm-text-lg fmtm-font-normal fmtm-my-auto fmtm-mb-[0.35rem] fmtm-ml-2">
-                No. of Submissions
-              </p>
-            }
-            onToggle={() => {}}
-            className="fmtm-py-0 !fmtm-pb-0 fmtm-rounded-lg hover:fmtm-bg-gray-50"
-            collapsed={true}
-          />
-        </div>
-        {taskInfo?.length > 0 && <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="fid" />}
-        {dataExtractUrl && isValidUrl(dataExtractUrl) && (
-          <VectorLayer
-            fgbUrl={dataExtractUrl}
-            // For POLYLINE, show all geoms, else filter by clicked task area (not working)
-            // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
-            fgbExtentFilter={taskAreaExtent}
-            zIndex={15}
-          />
-        )}
-      </MapComponent>
-    </CoreModules.Box>
+      <div className="fmtm-absolute fmtm-right-2 fmtm-top-3 fmtm-z-20">
+        <LayerSwitchMenu map={map} />
+      </div>
+      <LayerSwitcherControl visible={'osm'} />
+      {taskBoundaries && (
+        <VectorLayer
+          setStyle={(feature, resolution) =>
+            setChoropleth({ ...municipalStyles, lineThickness: 3 }, feature, resolution)
+          }
+          geojson={taskBoundaries}
+          mapOnClick={taskOnSelect}
+          viewProperties={{
+            size: map?.getSize(),
+            padding: [50, 50, 50, 50],
+            constrainResolution: true,
+            duration: 2000,
+          }}
+          zoomToLayer
+          zIndex={5}
+        />
+      )}
+      <div className="fmtm-absolute fmtm-bottom-2 fmtm-left-2 sm:fmtm-bottom-5 sm:fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
+        <Accordion
+          body={<TaskSubmissionsMapLegend legendColorArray={legendColorArray} />}
+          header={
+            <p className="fmtm-text-lg fmtm-font-normal fmtm-my-auto fmtm-mb-[0.35rem] fmtm-ml-2">No. of Submissions</p>
+          }
+          onToggle={() => {}}
+          className="fmtm-py-0 !fmtm-pb-0 fmtm-rounded-lg hover:fmtm-bg-gray-50"
+          collapsed={true}
+        />
+      </div>
+      {taskInfo?.length > 0 && <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="fid" />}
+      {dataExtractUrl && isValidUrl(dataExtractUrl) && (
+        <VectorLayer
+          fgbUrl={dataExtractUrl}
+          // For POLYLINE, show all geoms, else filter by clicked task area (not working)
+          // fgbExtentFilter={projectInfo.primary_geom_type === 'POLYLINE' ? null : taskAreaExtent}
+          fgbExtentFilter={taskAreaExtent}
+          zIndex={15}
+        />
+      )}
+    </MapComponent>
   );
 };
 

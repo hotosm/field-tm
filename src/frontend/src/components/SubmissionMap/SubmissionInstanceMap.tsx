@@ -13,9 +13,22 @@ import { Fill } from 'ol/style';
 import { geojsonType } from '@/store/types/ISubmissions';
 import MapControlComponent from '@/components/SubmissionMap/MapControlComponent';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
+import MapLegend from './MapLegend';
 
 type submissionInstanceMapPropType = {
   featureGeojson: { vectorLayerGeojson: geojsonType; clusterLayerGeojson: geojsonType };
+  status: null | 'approved' | 'hasIssues';
+};
+
+const getFeatureColor = (status) => {
+  switch (status) {
+    case 'approved':
+      return '#2d876c';
+    case 'hasIssues':
+      return '#D73F37';
+    default:
+      return '#5e5e5e';
+  }
 };
 
 const getIndividualStyle = (featureProperty) => {
@@ -35,7 +48,7 @@ const getIndividualStyle = (featureProperty) => {
   return style;
 };
 
-const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType) => {
+const SubmissionInstanceMap = ({ featureGeojson, status }: submissionInstanceMapPropType) => {
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
     zoom: 4,
@@ -81,7 +94,13 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
             }}
             zIndex={10}
             zoomToLayer
-            style={{ ...defaultStyles, lineColor: '#D73F37', lineThickness: 2, circleRadius: 10, fillColor: '#D73F37' }}
+            style={{
+              ...defaultStyles,
+              lineThickness: 2,
+              circleRadius: 10,
+              lineColor: getFeatureColor(status),
+              fillColor: getFeatureColor(status),
+            }}
           />
         )}
         {featureGeojson?.clusterLayerGeojson?.type && (
@@ -102,6 +121,7 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
           />
         )}
         <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="label" />
+        <MapLegend />
       </MapComponent>
     </div>
   );

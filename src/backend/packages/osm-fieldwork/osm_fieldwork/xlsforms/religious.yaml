@@ -1,0 +1,185 @@
+survey:
+  - "#":
+      Converted by yxf, from religious.xlsx. Edit the YAML file instead of the Excel
+      file.
+  - type: start
+    name: start
+  - type: end
+    name: end
+  - type: today
+    name: today
+  - type: deviceid
+    name: deviceid
+  - type: phonenumber
+    name: phonenumber
+  - type: username
+    name: username
+  - type: email
+    name: email
+  - type: note
+    name: instructions
+    label::English(en):
+      This is a data and mapping project ofreligious facilities. The
+      data products from the project will provide national government and development
+      actors with reliable open datasets for decision-making.The project is funded and
+      supported technically by the Humanitarian OpenStreetMap Team (HOT) through its
+      Open Mapping Hub for West and Northern Africa region and implemented by OSM Niger.
+      As an Emunerator, you will need to ask a resident of the community to provide
+      answers to several of the questions in the form.
+    label::French(fr):
+      Il s'agit d'un project de données et de cartographie des installations
+      religieuses. Les produits de données du project fourniront au gouvernement national
+      et aux acteurs du développement des ensembles de données ouvertes fiables pour
+      la prise de décision. par OSM Niger. En tant qu'émunérateur, vous devrez demander
+      à un résident de la communauté de fournir des réponses à plusieurs des questions
+      du formulaire.
+  - type: start-geopoint
+    name: warmup
+  - type: begin group
+    name: first_screen
+    label::English(en): First Screen
+    appearance: field-list
+    default: basic
+  - type: select_one model
+    name: model
+    label::English(en): Data Model Level
+    appearance: minimal
+  - type: select_one_from_file religious.geojson
+    name: existing
+    label::English(en): Existing OSM Data
+    required: true()
+    appearance: map
+  - type: calculate
+    name: xid
+    required_message::French(fr): ${existing}
+    appearance: minimal
+    default: ${existing}
+    calculation: instance('religious’)/root/item[id=${existing}]/id
+  - type: calculate
+    name: xlocation
+    required_message::French(fr): ${existing}
+    appearance: minimal
+    default: ${existing}
+    calculation: instance('religious’)/root/item[id=${existing}]/geometry
+  - type: begin group
+    name: facility_details
+    label::English(en): Religious Facility Details
+    appearance: Field-list
+  - type: geopoint
+    name: rfacility_location
+    label::English(en): "Capture the location of this Religious facility:"
+    hint::English(en):
+      Using the GPS, capture the location. Please stand very close
+      to the facility as possible
+    required: yes
+    required_message::English(en): Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    appearance: Placement-map
+  - type: text
+    name: name
+    label::English(en): What is the name of this Religious facility?
+    hint::English(en): Enter name of Religious Facility, if available
+    required: yes
+    required_message::English(en): Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+  - type: select_one rfacility_type
+    name: amenity
+    label::English(en): What is the function of this Religious facility?
+    hint::English(en): Select the purpose of this facility
+    required: yes
+    required_message::English(en): Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    appearance: minimal
+  - type: select_one r_affiliation or_other
+    name: religion
+    label::English(en): What is the affiliation of this Religious facility?
+    hint::English(en): Select the religious affiliation of this facility
+    required: yes
+    required_message::English(en): Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    appearance: minimal
+  - type: select_one rbuilding_type or_other
+    name: building
+    label::English(en): What is the building type of this Religious facility?
+    hint::English(en): Capture this building type from the list
+    required: yes
+    required_message::English(en): Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    appearance: minimal
+  - type: end group
+    name: end of facility_details
+  - type: end group
+    name: end of first_screen
+choices:
+  - list_name: model
+    name: basic
+    label::English(en): Basic Model
+  - list_name: model
+    name: extended
+    label::English(en): Extended Model
+  - list_name: rfacility_type
+    name: place_of_worship
+    label::English(en): Worship (congregation)
+    label::French(fr): Culte (congrégation)
+  - list_name: rfacility_type
+    name: prayer_room
+    label::English(en): Prayer (Individuals)
+    label::French(fr): Prière (individuals)
+  - list_name: rfacility_type
+    name: townhall
+    label::English(en): Meeting (discussions)
+    label::French(fr): Réunion (discussions)
+  - list_name: r_affiliation
+    name: christian
+    label::English(en): Christianity
+    label::French(fr): Christianisme
+  - list_name: r_affiliation
+    name: muslin
+    label::English(en): Islam
+    label::French(fr): Islam
+  - list_name: rbuilding_type
+    name: church
+    label::English(en): Church
+    label::French(fr): Église
+  - list_name: rbuilding_type
+    name: mosque
+    label::English(en): Mosque
+    label::French(fr): Mosquée
+settings:
+  - form_title: Religious Facility
+    form_id: relgious
+    version: =NOW()
+    allow_choice_duplicates: yes
+yxf:
+  headers:
+    survey:
+      - "#"
+      - type
+      - name
+      - label::English(en)
+      - hint::English(en)
+      - label::French(fr)
+      - hint::French(fr)
+      - required
+      - required_message::English(en)
+      - required_message::French(fr)
+      - appearance
+      - default
+      - constraint
+      - constraint_message
+      - calculation
+      - choice_filter
+      - parameters
+      - repeat_count
+      - relevant
+      - note
+    choices:
+      - list_name
+      - name
+      - label::English(en)
+      - label::French(fr)
+    settings:
+      - form_title
+      - form_id
+      - version
+      - allow_choice_duplicates
