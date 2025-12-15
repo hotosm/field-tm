@@ -12,6 +12,7 @@
 
 	const alert = getAlertStore();
 	const loginStore = getLoginStore();
+	let loginRequired = $state(false);
 
 	onMount(async () => {
 		try {
@@ -29,13 +30,10 @@
 			const responseData = await response.json();
 
 			// if user not signed in, status is 401. so set inviteUrl path in session storage & show login modal, and after successful sign-in redirect to inviteUrl
-			if (
-				response.status === 401 ||
-				(response.status === 403 && loginStore?.refreshCookieResponse?.username === 'svcfmtm')
-			) {
-				sessionStorage.setItem('requestedPath', `${location.pathname}${location.search}`);
+			if (response.status === 401) {
 				loginStore.toggleLoginModal(true);
 				loginStore.setRefreshCookieResponse({});
+				loginRequired = true;
 				return;
 			}
 			// throw error besides 401
@@ -48,13 +46,28 @@
 					variant: 'danger',
 					message: error.message || 'Failed to accept invitation',
 				});
+				sessionStorage.removeItem('requestedPath');
 				goto('/');
 			}
+		}
+	});
+
+	// remove requestedPath from session storage if exists to avoid infinite loop of login modal
+	$effect(() => {
+		loginStore.isLoginModalOpen;
+		if (sessionStorage.getItem('requestedPath')) {
+			sessionStorage.removeItem('requestedPath');
 		}
 	});
 </script>
 
 <div class="spinner">
-	<sl-spinner></sl-spinner>
-	<h2>Accepting Invitation...</h2>
+	{#if loginRequired}
+		<div>
+			<h2>Sign in to accept invitation</h2>
+		</div>
+	{:else}
+		<sl-spinner></sl-spinner>
+		<h2>Accepting Invitation...</h2>
+	{/if}
 </div>

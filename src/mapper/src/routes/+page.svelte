@@ -38,8 +38,8 @@
 		const requestedPath = sessionStorage.getItem('requestedPath');
 		if (requestedPath) {
 			goto(requestedPath);
+			sessionStorage.removeItem('requestedPath');
 		}
-
 		// Get the project summaries on load
 		getPaginatedProjects();
 	});
