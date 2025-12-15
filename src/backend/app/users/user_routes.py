@@ -46,7 +46,6 @@ from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
 from app.db.models import (
-    DbTaskEvent,
     DbUser,
     DbUserInvite,
     DbUserRole,
@@ -54,7 +53,6 @@ from app.db.models import (
 from app.users import user_schemas
 from app.users.user_crud import (
     get_paginated_users,
-    process_inactive_users,
     send_invitation_message,
 )
 from app.users.user_deps import get_user
@@ -105,18 +103,6 @@ async def get_user_roles(_: Annotated[DbUser, Depends(Mapper())]):
     for role in UserRoleEnum:
         user_roles[role.name] = role.value
     return user_roles
-
-
-@router.post("/process-inactive-users")
-async def delete_inactive_users(
-    db: Annotated[Connection, Depends(db_conn)],
-    _: Annotated[DbUser, Depends(super_admin)],
-):
-    """Identify inactive users, send warnings, and delete accounts."""
-    log.info("Start processing inactive users")
-    await process_inactive_users(db)
-    log.info("Finished processing inactive users")
-    return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
 @router.get("/invites", response_model=list[DbUserInvite])
@@ -253,19 +239,6 @@ async def update_existing_user(
 ):
     """Change the role of a user."""
     return await DbUser.update(db=db, user_sub=user_sub, user_update=new_user_data)
-
-
-@router.get("/task-history")
-async def get_user_task_event_history(
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    days: int = 10,
-    comments: bool = False,
-):
-    """Get the detailed history for a task."""
-    return await DbTaskEvent.all(
-        db, user_sub=current_user.sub, days=days, comments=comments
-    )
 
 
 @router.get("/{id}", response_model=user_schemas.UserOut)

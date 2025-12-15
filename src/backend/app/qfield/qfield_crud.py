@@ -33,8 +33,8 @@ from psycopg import Connection
 from qfieldcloud_sdk.sdk import FileTransferType
 
 from app.config import settings
-from app.db.enums import FieldMappingApp, HTTPStatus
-from app.db.models import DbProject, DbProjectExternalURL
+from app.db.enums import HTTPStatus
+from app.db.models import DbProject
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -241,22 +241,22 @@ async def create_qfield_project(
             ) from e
 
     log.info("Finished QFieldCloud project upload")
-    # Create QField URL
-    qfield_url = (
+    # Create QField URL (external project dashboard)
+    qfield_url_base = (
         f"http://qfield.{settings.FMTM_DOMAIN}:{settings.FMTM_DEV_PORT}"
-        f"/a/{api_project_owner}/{api_project_name}"
         if settings.DEBUG
-        else f"{settings.QFIELDCLOUD_URL.split('/api/v1/')[0]}"
-        f"/a/{api_project_owner}/{api_project_name}"
+        else settings.QFIELDCLOUD_URL.split("/api/v1/")[0]
     )
+    qfield_url = f"{qfield_url_base}/a/{api_project_owner}/{api_project_name}"
 
-    # Store QField URL in project_external_urls
-    await DbProjectExternalURL.create_or_update(
-        db=db,
-        project_id=project.id,
-        source=FieldMappingApp.QFIELD,
-        url=qfield_url,
-        qfield_project_id=api_project_id,
+    # Store QField project details in projects table
+    await DbProject.update(
+        db,
+        project.id,
+        ProjectUpdate(
+            external_project_id=api_project_id,
+            external_project_instance_url=qfield_url,
+        ),
     )
     await db.commit()
 
@@ -287,13 +287,10 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
 
 
 async def delete_qfield_project(db: Connection, project_id: int):
-    """Delete a project from QFieldCloud using the stored `qfield_project_id`."""
-    try:
-        ext = await DbProjectExternalURL.one(db, project_id)
-    except KeyError:
-        return f"No external project URL found for project ID {project_id}"
+    """Delete a project from QFieldCloud using the stored `external_project_id`."""
+    project = await DbProject.one(db, project_id)
 
-    qfield_project_id = ext.qfield_project_id
+    qfield_project_id = project.external_project_id
     if not qfield_project_id:
         return f"No QField project id set for project ID {project_id}"
 

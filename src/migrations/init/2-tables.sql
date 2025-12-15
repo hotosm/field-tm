@@ -71,14 +71,3 @@ ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
     'public.projects_id_seq'::regclass
 );
-
-CREATE TABLE IF NOT EXISTS project_external_urls (
-    id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-    source TEXT NOT NULL,
-    url TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now(),
-    qfield_project_id VARCHAR,
-    UNIQUE (project_id, source)
-);
