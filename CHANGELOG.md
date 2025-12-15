@@ -1,13 +1,489 @@
 # Changelog
 
-## 2025.6.3 (2025-11-07)
+## 2025.7.0 (2025-12-15)
 
 ### Feat
 
+- **backend**: add column to store qfield project id to generate qrcode (#2979)
+- **primaryAppBar**: field-tm service migration warning dialog & banner add (#2976)
+- **frontend**: support file drag & drop #2946 (#2970)
+- add more form categories for mapping (#2830)
+- **mapper**: compress image file before uploading the submission in client side (#2919)
+- metrics calculation (#2914)
 - **frontend**: search location feature on map (#2888)
+- **mapper**: add basemap loader to 'more' section for custom imagery
+- init qfield org and user at startup
+- **mapper**: allow mapper to view existing collected data from last submission (#2860)
+- **backend**: add option to include media in submission JSON download (#2823)
+- **backend**: save QField server creds (#2849)
+- **osm-fieldwork**: make the photo upload required=True or False (configurable)
+- **backend**: add endpoint to check if qfield cloud credentials are valid
+- **backend**: add endpoint to retry qfield project generation
+- **osm-fieldwork**: add function to append task_id choices to form after created
+- **backend**: QField Cloud integration (#2828)
+- **frontend**: Refactor landing page according to feedback (#2831)
+- **submission**: Add endpoint to edit existing submissions. (#2820)
+- **backend**: allow setting cookie domains not using subdomains (#2822)
+- **project**: add 'use_st_within' option for data extraction and update form handling (#2807)
+- **mapper**: hot matomo tracking component add (#2788)
+- **frontend**: merge AOI by default on upload during proj create (#2782)
+- **frontend**: Update task list after task event action (#2783)
+- **backend**: add merge choice during project creation and default visibility (#2779)
+- **frontend**: Task User Assignment (#2775)
+- **mapper**: remove 'Offline' & Add 'My Tasks' section (#2773)
+- **organisation**: Add project status in organisation stats. (#2771)
+- **backend**: org based submission download and infographics (#2689)
+- **mapper**: clustering if primary geoms are point & update point icon (#2555)
+- **OdkCentral**: add async method to retrieve submission XML content (#2759)
+- **mapper**: remove pglite, rely on svelte store + electric sync (#2732)
+- Role unassign from project and odk cred check endpoint (#2708)
+- **json-models**: Added json model of each yaml data models
+- progressive project creation workflow draft / published (#2680)
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- update project creation to use PATCH method and add stub project fixture for testing
+- add duplicate project name check during patch project creation
+- add highways.xlsx in osm-fieldwork and osm_category in frontend
+- **backend**: Replace osm_rawdata with raw_data_api_py adding highway category
+- **backend**: add highways xlsform for #2630
+- **backend**: implement scheduled upload of project submissions to S3 (#2643)
+- **backend**: add 'SENSITIVE' project and allow public access to public and invite only projects (#2653)
+- **mapper**: display offline submissions in offline tab for debugging (+csv) (#2543)
+- add status chip to project card & details section (#2623)
+- Project Completed Workflow (#2618)
+- **frontend**: request HOT's ODK server workflow (#2595)
+- **backend**: update submission retrieval to use pyodk except in submission detail page (#2599)
+- roadways mapping support
+- **Backend**: Ensure form_id generated is returned
+- **backend**: add project complete status to set it to read only (#2478)
+- migration added to update osm_id type from int to bigint (#2552)
+- **mapper**: fffline entity creation and webform submissions pt2 (#2525)
+- **mapper**: offline entity creation and webform submissions sync when online (#2517)
+- **mapper**: use geom javarosa format for xlocation (#2524)
+- **mapper**: added deviceid to web form submission (#2519)
+- **dependencies**: add markdown package with version >=3.8 to project dependencies (#2509)
+- **backend**: SMTP email functionality and send invite emails to non OSM users (#2503)
+- **mapper**: make project detail data available from local db fallback when offline (#2505)
+- **mapper**: add offline banner notificiation + load project summaries from PGLite first (#2495)
+- **mapper**: load fgb extract offline via opfs (#2502)
+- **mapper**: added caching of odk web forms script (#2498)
+- **mapper**: implement PGLite for local-first database in mapper frontend (#2427)
+- **xlsform**: skip verification question if new feature (#2474)
+- **frontend**: overlapping features selection via ui (#2451)
+- **mapper**: display user-friendly translation names with corresponding country flags (#2469)
+- **users**: add signin_type filter to user retrieval endpoints and allow org admin access (#2468)
+- **backend**: add capability to create new users via api key (#2467)
+- **backend**: add capability to create new users via api key
+- **mapper**: resize image buttons for web form questions (#2452)
+- **backend**: default organization settings and logo handling from env (#2441)
+- **frontend**: add toggle to use odk collect during project creation
+- **users**: add signin type filter to user list retrieval
+- **mapper**: loading spinner when uploading form submission (#2445)
+- **mapper**: default language warning v2 (#2432)
+- **mapper**: auto-open web forms when entity created (#2429)
+- **Details**: project visibility field add to edit project details (#2424)
+- user invite functionality per project (#2391)
+- **mapper**: add sidebar link to help translations via weblate
+- **mapper**: allow configuration of sidebar items
+- **mapper**: web forms image upload question improvements (#2413)
+- **mapper**: allow users to revert mapped task to ready state (#2404)
+- **backend**: allow verification group in form only if there are existing features in the project (#2396)
+- project visibility implementation (#2400)
+- **backend**: enhance user invitation process with user wise invite URL validation (#2399)
+- **mapper**: allow override of using webforms (db var to force OdkCollect)
+- generate data extracts based on the geom type (POINT, LINE, POLYGON) selected (#2382)
+- **backend**: add user invites via URL functionality (#2378)
+- **backend**: add api-key option to all endpoints (respecting auth and user roles) (#2376)
+- **mapper**: make user login methods configurable via config.json
+- **mapper**: added warmup latitude/longitude into form submission (#2372)
+- **frontend**: comment tagging capability, searching list of available users (#2312)
+- delete organisation only if no projects
+- **mapper**: image file choice question image override by css (#2365)
+- **backend**: form media retrieval route (#2354)
+- **mapper**: Nepali language translations & fix more section blank contents issue (#2357)
+- **backend**: role wise access to project summaries (public/private) (#2353)
+- **backend**: allow for download of form media/attachments as list of URLs pt1 (#2348)
+- **mapper**: cache form xml and ODK Web Forms js library across reloads (#2349)
+- **mapper**: hide feature selection question in web forms (as it's prefilled) (#2347)
+- **frontend**: define hashtags as lost of chips for better ux (#2344)
+- add google login option to mapper frontend (#2331)
+- **backend**: trigger s3 upload as soon as submission is made fixes #2339
+- **mapper**: updated stepperLayout to true for webform (#2329)
+- **mapper**: translations for all strings in the mapper app (#2328)
+- **backend**: config to create projects with no existing geoms (new geom only) (#2278)
+- **mapper**: load config from bundled S3, with default fallback (#2323)
+- **mapper**: project summary page if no id specified (#2307)
+- **frontend**: organization dashboard page (#2293)
+- **mapper**: updates to web forms submission image upload (#2292)
+- **backend**: add minimal query option for mapper frontend project summary (#2310)
+- update the version of typescript client to 1.0.0-beta.5
+- **beatend**: enpoint to list the organisation admins
+- **backend**: add org id filter in project summary, calculate total subissions, mapped , bad and validated tasks
+- **backend**: updated pytest related to changes made in backend
+- **migration**: script to move existing raw data api fgb url to fmtm s3 bucket
+- **backend**: return geojson url instead of fgb url, rename upload custom extract to upload data extract
+- **migration**: script to move existing raw data api fgb url to fmtm s3 bucket
+- **backend**: assign users to tasks (+ project team integration) (#2237)
+- **backend**: add endpoint to upload form media such as images, videos, audio (#2275)
+- **mapper**: draft web forms integration via feature flag (#2268)
+- **mapper**: upgrade paraglide for nested translation fields, continue adding translations (#2258)
+- **frontend**: dynamic styling and icons, loaded via config.json (#2255)
+- **backend**: optimise generating project data (#2214)
+- **frontend**: replace file upload button with drop zone (#2259)
+- **mapper**: replace manager frontend PWA with mapper frontend PWA (#2247)
+- **backend**: create separate user endpoints for different purposes (admin, org, project) (#2238)
+- **project**: populate total task field after task creation (#2243)
+- **frontend**: create new feature entities via API prior to ODK collect usage (#2156)
+- separate out primary mapping geometry from new feature geometry (during proj create) (#2225)
+- **frontend**: start user roles integration (#2207)
+- **frontend**: task comments for individual features( #2218)
+- **backend**: add task scheduler to backend services (cron jobs) (#2147)
+- finalise S3 submission photos on backend + frontend (#2211)
+- **backend**: replace custom ODK submission media upload with official external storage (S3) (#1894)
+- **backend**: replace nominatim usage with pg-nearest-city reverse-geocode (#2199)
+- **backend**: extract additional geoms into submission geojson featcol
+- **frontend**: design modifications, project details, home page, header, buttons (#2148)
+- **frontend**: show geometry label popups on submission details page (#2187)
+- **frontend**: download split geojson during proj create (#2186)
+- **frontend**: download filtered submissions, with option for geojson too (#2183)
+- **backend**: endpoints to download form XML and create new form submissions (#2178)
+- create script for generating project stats via API
+- **frontend**: render points on both frontends, with colour determined by status (#2174)
+- **submission**: add date range filter for geojson download (#2176)
+- **mapper**: add i18n (internationalisation) frontend translations via paraglide js (#2155)
+- **tasks**: add task to unlock tasks locked for over 3 days and reset entities after an hour (#1984)
+- **backend**: return entity uuid on create (#2151)
+- **backend**: add endpoint to create an entity in existing project for new geometry (#2145)
+- **frontend**: update user roles list during project creation (#2135)
+- **frontend**: add table component and manage users page (#2133)
+- **backend**: add central-webhook service for triggering entity status updates in FMTM database (#2130)
+- **backend**: migration to add dataset property to old projects (#2126)
+- **users**: add pagination and search functionality (#2124)
+- **backend**: add endpoint to change global user roles (#2117)
+- **frontend**: assign PM during project creation & refactor radix components (#2115)
+- **backend**: warn users and delete user accounts after period of inactivity  (#2088)
+- **backend**: add `integrations` router with API key functionality (external apps) (#2110)
+- entity pulse effect on rejected submissions (#2018)
+- **mapper**: distance constraint add on frontend (#2084)
+- **frontend**: submission table date range filter (#2091)
+- **backend**: get api for project's geometry log (#2090)
+- capability to draw new polygon and linestring geoms (#2082)
+- **backend**: add filters for submission date in submission table and downloads (#2077)
+- **backend**: osm-fieldwork --> 0.18.0 (submission filter param + config new feat geom type)
+- **geolocation**: comments add
+- add submission ids in entities statuses endpoint (#2038)
+- consider every additional entities without clipping them with AOI (#2017)
+- update the version of osm-fieldwork (#2029)
+- **backend**: send org approval message to creator (#2008)
+- add submission ids as a dataset property for the entities (#2007)
+- update the version of fmtm-splitter 2.0.0 (#1996)
+- **mapper**: project details section add to bottom sheet (#1994)
+- **mapper**: prompt user to download custom ODK Collect on first load (#1989)
+- update auth cookie logic for both backend and frontend (#1974)
+- **mapper**: add navigation mode to map (pitch angle / rotate) (#1973)
+- **debug**: add cloudflare tunnel config to simple configurable frontend button
+- **frontend**: add 'Start Mapping' call to action button on homepage cards (#1968)
+- **mapper**: add new point geom in maplibre terradraw, inject to ODK collect (#1966)
+- **projects**: add organisation_logo field to ProjectSummary model (#1956)
+- **mapper**: add zoom to extent button to map (#1947)
+- **frontend**: all uploaded submission features/geometries on submission instance page (#1931)
+- **mapper**: frontend pmtile basemap management pt2 (#1925)
+- **mapper**: set entity (feature) color based on it's mapping status (#1921)
+- **mapper**: basemap control component + opfs pmtile support (pt1) (#1922)
+- **mapper**: frontend login + remove temp auth from React frontend (#1903)
+- **splitTasks**: additional entities feature count add to split tasks section (#1906)
+- **mapper**: basemap layer switcher integration for maplibre (#1835)
+- **submission**: add project_contributors dependency for permission … (#1873)
+- **splitTasks**: add total number of features on split tasks section (#1880)
+- **mapper**: map new feature in odk btn (#1879)
+- **frontend**: visualise submission photos via slider (#1857)
+- **backend**: API to delete user account #1661 (#1848)
+- **mapper**: start improved mapper flow (#1854)
+- **mapper**: flatgeobuf maplibre component for loading features (#1851)
+- update API to use events and task states + fixes to backend refactor (#1838)
+- **backend**: remove SQLAlchemy and replace with async psycopg db driver (#1834)
+- **frontend**: mapper UI frontend refactor (#1830)
+- **frontend**: mapper frontend continuation (#1823)
+- mapper frontend using ElectricSQL ShapeStream (live updates) (#1760)
+- **frontend**: allow selection of additional features during project creation (#1806)
+- **backend**: endpoint to create additional Entity lists on a project (#1799)
+- **backend**: endpoint to retreive submission photos (#1794)
+- **backend**: use XLSForm injection during project creation (#1792)
+- **submissionDetails**: if new feature point add then zoom to the point (#1797)
+- **projectDetailsForm**: tms url description text add (#1795)
+- update form by injecting mandatory fields and validate it (#1763)
+- **frontend**: project not found page (#1768)
+- mark tasks validated + start conflation UI (#1743)
+- add project not found page (#1762)
+- **backend**: capability to send messages to OSM users (notified via email) (#1747)
+- **backend**: ODK submission user photos to S3 for easy access (#1744)
+- **frontend**: add Playwright test for project creation workflow (#1700)
+- **backend**: delete s3 objects on project deletion (#1718)
+- **backend**: updated generate_project_files to bulk upload entities (#1714)
+- **frontend**: working submission comments to submission page  (#1709)
+- **backend**: calculate overlap percentage for the conflation (#1687)
+- **frontend**: add user to task popup (#1670)
+- **backend**: add helper route to convert multipolygon geojson --> polygons
+- **backend**: update split-by-square to avoid creating tasks with no features in it (#1642)
+- **backend**: endpoint to conflate the submission with osm data (#1594)
+- implement global jwt token authentication for login (#1574)
+- add new endpoint to refresh the app user token (#1583)
+- add healthcare form category & minor fixes (#1555)
+- use Matomo tracking web component, with accept/disagree prompt (#1546)
+- **frontend**: upgrade React v17 --> v18 (#1542)
+- add link for interactive xlsform editing during project creation (#1480)
+- update PWA config with 2023 icon requirements and caching (#1474)
+- download submissions in geojson (#1517)
+- add OpenTelemetry configuration for backend API (monitoring) (#1496)
+- prompt user if task area is not fully mapped on mark complete  (#1493)
+- use task index as an user facing task_id (#1470)
+- **frontend**: login options to frontend, OSM or temp auth (#1458)
+- frontend buttons to load Entities in ODK Collect by intent (#1449)
+- distinguish between tasks locked by the current user and tasks locked by others (#1469)
+- append extra hashtag to projects with domain and project id identifier (#1454)
+- endpoints for getting Entity data & updating Entity mapping status (#1445)
+- temporary authentication login for mappers (svcfmtm) (#1410)
+- add /projects/features endpoint for project FeatureCollection (disaster.ninja integration) (#1442)
+- Playwright integration with test cases to be written (#1433)
+- implement ODK Entities for project creation (#1383)
+- OPFS-based offline-first PMTile basemaps (#1395)
+- endpoint to check the validity of login cookie (#1380)
+- add link to custom ODK Collect build in sidebar menu
+- toggleable debug console on mobile in local/dev/stage (#1371)
+- handle geo orientation crash firefox & safari (#1381)
+- raw sql replacing sqlalchemy in auth/me endpoint (#1334)
+- added marker blue dot
+- navigation icon changes
+- uploadArea edit AOI btn add (#1346)
+- navigation WIP
+- submission review status modal (#1246)
+- add rich text editor project creation instructions field (#1311)
+- add task_deps to get xform_name for a task
+- add simple ui to delete projects on frontend (#1314)
+- add helpers router to helper util endpoints
+- cookie check added for auth check
+- improve form validation logic, allow xform xml uploads (#1294)
+- implement opening the generate tiles modal when download in qr is clicked
+- replace local `useState` for generating mb tile modal with global state
+- add global state for `toggleGenerateMbTiles` modal and add types for it
+- add mbtiles btn back in, pie chart progress (#1278)
+- add helper route to convert fgb --> geojson
+- add map popups to data extract geometries (#1266)
+- **manage-organisations**: implement skeleton loader while Organizations are being fetched
+- **manage-organizations**: add `OrganizationCardSkeleton` component
+- flatgeobuf data extracts on frontend & backend (#1241)
+- added bbox in read project's outline (#1244)
+- added approved in get organisation response (#1226)
+- improve submissions dynamic filtering (#1217)
+- api returning details of unapproved org (#1218)
+- filters on submission table (#1191)
+- init public beta org and svcfmtm user migration (#1206)
+- endpoints for task comments (#1171)
+- add community_type for organisations, add unapproved org list endpoint (#1197)
+- osm-rawdata for generating data extracts (#1183)
+- create / edit organization form (#1178)
+- **frontend**: default organisation credentials during proj create  (#1174)
+- task history end point with associated user (#1071)
+- manage / edit project UI (#1154)
+- mapper role (#1163)
+- project admin role (#1133)
+- **frontend**: project deletion capability
+- set project delete endpoint to org_admin only
+- project submissions page (#1150)
+- dynamic qrcode generation via frontend (#1143)
+- add AOI editing to map during project creation (#1135)
+- endpoint to return count of validated and mapped tasks (#1138)
+- added withcredential to include cookies on organization list api
+- paginated submissions per task (#1128)
+- organisation approval and admin endpoints (#1126)
+- add test coverage metric (#1129)
+- paginated submissions by project (#1110)
+- add basic user role support to backend (#1094)
+- cookie based authentication (#1091)
+- use flatgeobuf data extracts (#1047)
+- **backend**: form fields for the submision table (#1072)
+- new project details page (#1070)
+- get contributors by project (#1062)
+- endpoint for submission page count by date (#1051)
+- **backend**: project dashboard endpoint (#1054)
+- cache submissions in s3 (#1035)
+- add mamoto tracking to prod frontend (#1040)
+- integrate fmtm-splitter and remove splitting code in fmtm (#1037)
+- project info legend (#1017)
+- add profiler to calculate route execution time (#1020)
+- capacitor geolocation and orientation (#1016)
+- cluster spread on click (#1007)
+- **frontend**: edit draw AOI in create project (#999)
+- generic endpoint to get task status from db
+- api to get data extracts for the given aoi and category (#960)
+- added Pagination info in the project summary (#959)
+- selection of basemap output formats, TMS input, mobile UI (#896)
+- add Minio to backend compose stack & CI (#908)
+- addressing of project using Nominatim (#913)
+- new UI for create project (#918)
+- backend tests for project endpoints (#900)
+- add map clustering on main page (#905)
+- returned required media name in a response of form validity (#871)
+- remove microfrontend (#831)
+- data extract custom
+- map integration on project list map
+- project centroid api integration on project summary
+- package changes of ol and added to main
+- added alchemy text on centroid api
+- map Component added to main
+- add script to generate openapi.json
+-  Added a new function to perform the conversion of task_boundary from GeoJSON to .osm format.
+- download button for data extract on project details fix Add option to download the data extract fix #779
+- api for download data extract
+- added download data extract loading
+- Enhance GeoJSON Handling and Support for Multiple Formats during task spliting
+- added custom road extract
+- use loguru stdout + json file logging
+- form validation added on custom form
+- added organisation_id on create project frontend
+- organisation Id  on create project api
+- added api to centroid logo
+- added projectId on projectbyid
+- Tailwindcss integrated
+- added mbtiles ui and functionality
+- scale reduced on map icon
+- order change define task and data extract
+- typescript integration
+- api to test the validity of custom form uploaded
+- tile generation process moved into fastapi background task
+- josm zoom and load added
+- bounds in geometry_to_geojson
+- josm zoom and load added
+- bounds in geometry_to_geojson
+- get all submissions
+- submission json of a project
+- Draw AOI
+- added react on import
+- draw in progress
+- Login signup handled for local docker
+- Log Status added on UI
+- edit form with form category WIP
+- HashTag Project Create
+- login osm added
+- removed serviceworker in development
+- app on scheme of intent for redirect to odk collect app
+- webpack changes for pwa
+- added manifest.json for pwa
+- integrated serviceworker for pwa
+- workbox config on webpack
+- added workbox for pwa
+- data extracts on the update project form
+- organization another page redirect
+- popup changed to another file
+- changed head title
+- fmtm dev and prod domain to tracepropagationtargets
+- sentry setup for production but dev dsn missing
+- removed glitchtip test button ui
+- integrated sentry alternative glitchtip
+- update project boundary added constant
+- added outline_geojson on project info
+- added EditProject Area on Webpack exposes
+- fix task_status to String
+- refactored typescript files
+- download form of project
+- forgot password route removed
+- eslint prettier setup
+- new tsconfig setup
+- added back icon on EditProject
+- added ArrowBackIcon on assetmodules
+- backbutton on projectinfo page
+- edit project details
+- added outline css to debug
+- slice for edit project
+- edit project validation
+- edit project sidebarContent constant
+- added patch for project details
+- added nodeenv on environment
+- Added Edit Project button
+- current location trigger
+- create organization button on create project
+- osm auth login completed
+- Improved Auto-Fill for ODK Central URL and Username Fields Resolve #566
+- added slice for uploading area geojson
+- added editproject component
+- set individual project details to slices
+- changed name of modal from create to default
+- individual project detail api
+- routes added for project edit
+- data extract step added
+- accept extension on input of upload area
+- added validation for dataextract step
+- data Extract step added on create project page
+- added input file accept extension
+- Data Extract Step added with functionality changes
+- Added Route For Data Extract Step
+- Modify AOI feature
+- redirected to project specific detail page after project creation
+- project creating loading
+- generate task loader and disable handled
+- organization logo required field removed
+- projection switched to EPSG:3857
+- implemented api logic for loading button of download
+- csv and json loader added with style changes
+- added mui/lab loadingbutton on coremodules
+- added mui/lab package
+- fixed project info download submission
+- condition for empty file submission api
+- form issue fixes on geojson upload
+- added padding on map layers
+- added task locking and disabled showing option to change task status
+- osm auth fix
+- package changes
+- osm auth fix 1
+- removed org type from backend
+- implemented new tab on sidebar
+- Tasks Page For Submission
+- env generation script for easier first setup
+- progress bar integrated
+- fixed form issues
+- submission json api
+- download submission to an individual submission
+- exception in creating a project in odk central
+- added osm extracts into fmtm db
+- submission points api
+- generate app user files is moved in background task
+- dynamic project id based submission
+- download submission api
+- avatar png added for submission by
+- added submission page on webpack to expose
+- form-list api, app users list api
+- basic typescript config will add more config
+- category removed from generate api . Category is taken from project table, of from form itself
+- list submission for the project api created
+- organization dropdown create project
+- route added for basemap selection
+- basemap selection page added
+- removed user input field and added central odk input field
+- added type on Validation of Create project
+- custom pagination function
+- prettier added
+- endpoint to get the qr code by task created
+- endpoint to list the xforms
+- end point to upload multi polygon file to create a task for each polygon in the file
+- missing validation on upload geojson
+- put and patch api for project informations
+- add endpoint load-test-data for local zip import
+- add test_data_path for test data dir
+- replace backend dotenv config with Pydantic BaseSettings
+- add config file for fastapi/pydantic env settings
+- removed listProjects during backend init, partial list central projects endpoint
+- add root_path option to FastAPI for serving behind proxy subpath
 
 ### Fix
 
+- **invite**: fix state handling to avoid infinite login modal loop (#2987)
+- **frontend**: remove redirection to respective mapping apps after project creation or on project card click (#2977)
+- fix minor pre-commit spelling and formatting fails (#2943)
+- **submission**: fix response of submission details page (#2936)
+- **deps**: update dependency httptools to v0.7.1 (#2928)
+- **deps**: update dependency python-multipart to v0.0.20 (#2930)
+- **deps**: update dependency psycopg to v3.2.12 (#2929)
+- **deps**: update dependency loguru to v0.7.3 (#2927)
 - **DbOdkEntities**: adjust default batch size and dynamically compute maximum batch size (#2902)
 - **area-splitter**: issue when splitting by buildings=1 (#2899)
 - **submission**: handle repeat group questions response on submission table (#2885)
