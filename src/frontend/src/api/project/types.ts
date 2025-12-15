@@ -160,6 +160,8 @@ export type projectSummaryType = {
   location_str: string;
   short_description: string;
   project_url: string | null;
+  external_project_id?: number | null;
+  external_project_instance_url?: string | null;
   status: project_status;
   visibility: project_visibility;
   field_mapping_app: field_mapping_app;

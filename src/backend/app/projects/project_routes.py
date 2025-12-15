@@ -66,7 +66,6 @@ from app.db.models import (
     DbOdkEntities,
     DbOrganisation,
     DbProject,
-    DbProjectExternalURL,
     DbProjectTeam,
     DbProjectTeamUser,
     DbTask,
@@ -83,7 +82,7 @@ from app.db.postgis_utils import (
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
-from app.projects.project_schemas import ProjectUserContributions
+from app.projects.project_schemas import ProjectUpdate, ProjectUserContributions
 from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
 from app.s3 import delete_all_objs_under_prefix
 from app.users.user_schemas import UserRolesOut
@@ -902,15 +901,23 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
         odk_url = f"{odk_url}/projects/{odkid}"
 
     try:
-        await DbProjectExternalURL.create_or_update(
-            db=db,
-            project_id=project.id,
-            source=FieldMappingApp.ODK,
-            url=odk_url,
+        await DbProject.update(
+            db,
+            project.id,
+            ProjectUpdate(
+                external_project_instance_url=odk_url,
+                external_project_id=odkid,
+            ),
         )
-        log.debug(f"Stored ODK project URL for project {project.id}: {odk_url}")
+        log.debug(
+            "Stored ODK project external reference for project "
+            f"{project.id}: id={odkid}, url={odk_url}"
+        )
     except Exception as exc:
-        log.warning(f"Failed to store ODK project URL for project {project.id}: {exc}")
+        log.warning(
+            "Failed to store ODK project external reference for project "
+            f"{project.id}: {exc}"
+        )
 
 
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)

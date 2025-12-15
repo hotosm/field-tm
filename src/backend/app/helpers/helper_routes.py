@@ -43,8 +43,6 @@ from loguru import logger as log
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
-from psycopg import Connection
-from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
@@ -56,12 +54,8 @@ from app.central.central_crud import (
 )
 from app.central.central_schemas import ODKCentral
 from app.config import settings
-from app.db.database import db_conn
 from app.db.enums import HTTPStatus, XLSFormType
 from app.db.postgis_utils import (
-    add_required_geojson_properties,
-    featcol_keep_single_geom_type,
-    flatgeobuf_to_featcol,
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
@@ -98,87 +92,6 @@ async def download_template(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Failed to convert YAML form to XLSForm.",
         )
-
-
-@router.get("/convert-fgb-to-geojson")
-async def convert_fgb_to_geojson(
-    url: str,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
-
-    Helper endpoint to test data extracts during project creation.
-    Required as the flatgeobuf files wrapped in GeometryCollection
-    cannot be read in QGIS or other tools.
-
-    Args:
-        url (str): URL to the flatgeobuf file.
-        db (Connection): The database connection.
-        current_user (AuthUser): Check if user is logged in.
-
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
-    """
-    with requests.get(url) as response:
-        if not response.ok:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Download failed for data extract",
-            )
-        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
-
-    if not data_extract_geojson:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=("Failed to convert flatgeobuf --> geojson"),
-        )
-
-    headers = {
-        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
-        "Content-Type": "application/media",
-    }
-
-    return Response(content=json.dumps(data_extract_geojson), headers=headers)
-
-
-@router.post("/append-geojson-properties")
-async def append_required_geojson_properties(
-    geojson: UploadFile,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Append required properties to a GeoJSON file.
-
-    The required properties for Field-TM are:
-    - "id"
-    - "osm_id"
-    - "tags"
-    - "version"
-    - "changeset"
-    - "timestamp"
-
-    These are added automatically if missing during the project creation workflow.
-    However it may be useful to run your file through this endpoint to validation.
-    """
-    featcol = parse_geojson_file_to_featcol(await geojson.read())
-    if not featcol:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No geometries present"
-        )
-    featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
-
-    if featcol_single_geom_type:
-        processed_featcol = add_required_geojson_properties(featcol_single_geom_type)
-        headers = {
-            "Content-Disposition": ("attachment; filename=geojson_withtags.geojson"),
-            "Content-Type": "application/media",
-        }
-        return Response(content=json.dumps(processed_featcol), headers=headers)
-
-    raise HTTPException(
-        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-        detail="Your geojson file is invalid.",
-    )
 
 
 @router.post("/convert-geojson-to-odk-csv")
@@ -412,42 +325,3 @@ async def send_test_email(user_emails: list[str]):
     return Response(
         status_code=HTTPStatus.OK,
     )
-
-
-@router.get("/metrics")
-async def get_metrics(db: Annotated[Connection, Depends(db_conn)]) -> dict:
-    """Return a summary of dashboard like ODK based metrics."""
-    query = """
-        WITH
-        total_features AS (
-            SELECT COUNT(*) AS total_features_surveyed
-            FROM odk_entities
-            WHERE status NOT IN ('READY', 'OPENED_IN_ODK')
-        ),
-        countries AS (
-            SELECT COUNT(DISTINCT SPLIT_PART(location_str, ',', 2)) AS countries_covered
-            FROM projects
-            WHERE location_str IS NOT NULL
-        ),
-        projects_count AS (
-            SELECT COUNT(*) AS total_projects FROM projects
-        ),
-        users_count AS (
-            SELECT COUNT(*) AS total_users FROM users
-        ),
-        organisations AS (
-            SELECT COUNT(*) AS total_organisations
-            FROM organisations
-            WHERE approved IS TRUE
-        )
-        SELECT * FROM
-            total_features,
-            countries,
-            projects_count,
-            users_count,
-            organisations;
-    """
-    async with db.cursor(row_factory=dict_row) as cur:
-        await cur.execute(query)
-        row = await cur.fetchone()
-        return row or {}

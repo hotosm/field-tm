@@ -313,6 +313,8 @@ class DbProject(BaseModel):
         cls,
         db: Connection,
         project_id: int,
+        minimal: Optional[bool] = None,
+        warn_on_missing_token: Optional[bool] = None,
     ) -> Self:
         """Get project by ID."""
         sql = """
@@ -501,7 +503,7 @@ class DbProject(BaseModel):
         return updated_project
 
     @classmethod
-    async def delete(cls, db: Connection, project_id: int) -> bool:
+    async def delete(cls, db: Connection, project_id: int) -> None:
         """Delete a project."""
         async with db.cursor() as cur:
             await cur.execute(
