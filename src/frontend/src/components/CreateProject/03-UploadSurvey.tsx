@@ -149,7 +149,7 @@ const UploadSurvey = () => {
           <p className="fmtm-body-md">
             We add a few additional questions into your form to assess the digitization status. View additional fields{' '}
             <a
-              href="https://docs.fieldtm.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-field-tm-xls-form"
+              href="https://docs.field.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-field-tm-xls-form"
               target="_"
               className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
             >

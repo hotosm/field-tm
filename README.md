@@ -22,9 +22,9 @@
 | :--- | :--- | :--- |
 | **Tech Stack** | | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Svelte](https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
 | **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev) |
-| **Quality** | | [![Coverage](https://docs.fieldtm.hotosm.org/coverage.svg)](https://docs.fieldtm.hotosm.org/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
+| **Quality** | | [![Coverage](https://docs.field.hotosm.org/coverage.svg)](https://docs.field.hotosm.org/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
 | **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/contributors/hotosm/field-tm?logo=github)](#contributors-) |
-| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.fieldtm.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fieldtm.hotosm.org) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.fieldtm.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
+| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.field.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fieldtm.hotosm.org) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.field.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
 
 </div>
 
@@ -42,9 +42,9 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 > More details can be found here:
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
-> [timeline](https://docs.fieldtm.hotosm.org/timeline),
-> [docs](https://docs.fieldtm.hotosm.org) page, and the
-> [FAQ](https://docs.fieldtm.hotosm.org/about/faq).
+> [timeline](https://docs.field.hotosm.org/timeline),
+> [docs](https://docs.field.hotosm.org) page, and the
+> [FAQ](https://docs.field.hotosm.org/about/faq).
 
 ![fmtm-splash][6]
 
@@ -91,7 +91,7 @@ To aid future disaster response, we would really welcome contributions for:
 - Mobile developers
 
 Please take a look at our [Documentation](https://hotosm.github.io/fmtm)
-and [contributor guidance](https://docs.fieldtm.hotosm.org/CONTRIBUTING/)
+and [contributor guidance](https://docs.field.hotosm.org/CONTRIBUTING/)
 for more details!
 
 Reach out to us if any questions!
@@ -114,7 +114,7 @@ just prep machine
 just start prod
 ```
 
-Alternatively see the [docs](https://docs.fieldtm.hotosm.org) for
+Alternatively see the [docs](https://docs.field.hotosm.org) for
 various deployment guides.
 
 ## Roadmap

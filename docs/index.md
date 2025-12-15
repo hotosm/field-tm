@@ -83,4 +83,4 @@ in FieldTM and [click here][2] to for further details about each
 role available.
 
 [1]: https://miro.com/app/board/uXjVPX4XLcI=/?moveToWidget=3458764534814634286&cot=14
-[2]: https://docs.fieldtm.hotosm.org/manuals/user-types-explained
+[2]: https://docs.field.hotosm.org/manuals/user-types-explained

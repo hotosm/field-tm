@@ -51,7 +51,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'About',
-      ref: 'https://docs.fieldtm.hotosm.org/about/about/',
+      ref: 'https://docs.field.hotosm.org/about/about/',
       isExternalLink: true,
       isActive: true,
     },
