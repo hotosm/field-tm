@@ -17,7 +17,7 @@ your own cloud server.
 ### Run the install script
 
 ```bash
-curl -L https://get.fieldtm.hotosm.org -o install.sh
+curl -L https://get.field.hotosm.org -o install.sh
 bash install.sh
 
 # Then follow the prompts
