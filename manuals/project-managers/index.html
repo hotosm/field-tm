@@ -1,0 +1,2241 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Coordinated field mapping for Open Mapping campaigns.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.fieldtm.hotosm.org/manuals/project-managers/">
+      
+      
+        <link rel="prev" href="../mapping/">
+      
+      
+        <link rel="next" href="../videos/">
+      
+      
+      <link rel="icon" href="../../images/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
+    
+    
+      
+        <title>Project Manager Guide - Field-TM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+      <link rel="stylesheet" href="../../css/timeline.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#project-manager-manual-for-field-tm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Field-TM" class="md-header__button md-logo" aria-label="Field-TM" data-md-component="logo">
+      
+  <img src="../../images/hot_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Field-TM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Project Manager Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hotosm/field-tm/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hotosm/field-tm
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Field-TM" class="md-nav__button md-logo" aria-label="Field-TM" data-md-component="logo">
+      
+  <img src="../../images/hot_logo.png" alt="logo">
+
+    </a>
+    Field-TM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hotosm/field-tm/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hotosm/field-tm
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Get Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Get Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../INSTALL/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contribution Guidelines
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.hotosm.org/code-of-conduct" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/team/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The Team
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Manuals
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Manuals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mapping/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mapper Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Project Manager Guide
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Project Manager Guide
+  </span>
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="Page contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Page contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-overview-of-field-tm-in-relation-to-hot-osm-and-odk" class="md-nav__link">
+    <span class="md-ellipsis">
+      An Overview Of Field-TM In Relation To HOT, OSM and ODK
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-join-an-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Join An Organization
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-create-a-project-in-field-tm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps To Create A Project In Field-TM
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps To Create A Project In Field-TM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-project-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create the project details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-a-project-area" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Create a project area
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-upload-the-survey-or-use-an-existing-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Upload the survey (or use an existing one)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-select-the-geometry-type-you-wish-to-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Select the geometry type you wish to map
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-task-splitting" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Task splitting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-creation-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Creation Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Creation Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preparing-map-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preparing Map Features
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xls-form-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      XLS Form Preparation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploading-custom-imagery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uploading Custom Imagery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#odk-central-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      ODK Central Credentials
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-view-your-submissions-and-infographics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps To View Your Submissions and Infographics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps To View Your Submissions and Infographics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mapper-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapper Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapper Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#during-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      During Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#after-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      After Training
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-the-data-to-external-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connecting The Data To External Applications
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manage-project-and-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manage project and users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Manage project and users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-edit-project-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Edit Project Details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invite-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invite Users
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help-and-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Help and Support
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../videos/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Video Guides
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-types-explained/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FieldTM Roles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-diagrams/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workflow Diagrams
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xlsform-design/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    XLSForm Design
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../field-mapping-examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Field Mapping Examples
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.getodk.org/tutorial-mapping-households" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Visualising Data Externally
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.getodk.org/collect-offline-maps" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ODKCollect Offline Maps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Practices
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Practices
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.hotosm.org/dev-practices" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dev Practices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../decisions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tech Decisions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.hotosm.org/dev-guide/repo-management/pre-commit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pre-Commit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://docs.hotosm.org/dev-guide/repo-management/version-control/#creating-releases" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Versioning
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/Troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/release-checklist/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Checklist
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/Setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/Backend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/Frontend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Frontend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/Production/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Production Deployment
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dev/building-mobile-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mobile Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coverage.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code Coverage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Utilities
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Utilities
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://getodk.org/xlsform/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    XLSForm Converter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../qrcode-util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QRCode Converter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://api.stage.fmtm.hotosm.org/docs#/helper" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Helpers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://xlsform-builder.fmtm.hotosm.org" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Example XLSForms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://roadmap.fieldtm.hotosm.org" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roadmap
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../timeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Timeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://hotosm.github.io/swagger/?url=https://docs.fieldtm.hotosm.org/openapi/openapi.json" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Docs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="Page contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Page contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-overview-of-field-tm-in-relation-to-hot-osm-and-odk" class="md-nav__link">
+    <span class="md-ellipsis">
+      An Overview Of Field-TM In Relation To HOT, OSM and ODK
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-join-an-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Join An Organization
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-create-a-project-in-field-tm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps To Create A Project In Field-TM
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps To Create A Project In Field-TM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-project-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create the project details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-a-project-area" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Create a project area
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-upload-the-survey-or-use-an-existing-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Upload the survey (or use an existing one)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-select-the-geometry-type-you-wish-to-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Select the geometry type you wish to map
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-task-splitting" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Task splitting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-creation-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Creation Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Creation Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preparing-map-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preparing Map Features
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xls-form-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      XLS Form Preparation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploading-custom-imagery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uploading Custom Imagery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#odk-central-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      ODK Central Credentials
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-view-your-submissions-and-infographics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps To View Your Submissions and Infographics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps To View Your Submissions and Infographics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mapper-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapper Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapper Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#during-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      During Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#after-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      After Training
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-the-data-to-external-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connecting The Data To External Applications
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manage-project-and-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manage project and users
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Manage project and users">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-edit-project-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps to Edit Project Details
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invite-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invite Users
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help-and-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Help and Support
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="project-manager-manual-for-field-tm">Project Manager Manual for Field-TM<a class="headerlink" href="#project-manager-manual-for-field-tm" title="Permanent link">&para;</a></h1>
+<p>This manual is a step by step guide for the project managers on how to get
+started with the Field Tasking Manager.</p>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>A <strong>Mapping Campaign</strong> refers to an organized effort of collecting data
+from a particular geographic area/feature and creating maps. This may
+involve using various mapping technologies such as; GPS, satellite
+imagery, or crowdsourced data. These technologies are used to gather
+information about the area of interest.</p>
+<p>Mapping campaigns can be carried out for lots of different purposes,
+some examples are:</p>
+<ul>
+<li>Disaster Response and Recovery</li>
+<li>Environmental Conservation</li>
+<li>Urban planning or;</li>
+<li>Social and Political Activism.</li>
+</ul>
+<p>They often involve collaboration between organizations like; Government
+Agencies, Non-profit Groups and volunteers.</p>
+<p>Once the data is collected, it is analyzed and processed to create
+detailed maps that can have a variety of use cases. These could be:</p>
+<ul>
+<li>Identifying areas of need.</li>
+<li>Planning infrastructure and development projects.</li>
+<li>Understanding the impact of environmental changes on the landscape,
+  etc.</li>
+</ul>
+<h2 id="an-overview-of-field-tm-in-relation-to-hot-osm-and-odk">An Overview Of Field-TM In Relation To HOT, OSM and ODK<a class="headerlink" href="#an-overview-of-field-tm-in-relation-to-hot-osm-and-odk" title="Permanent link">&para;</a></h2>
+<p>The <strong>Humanitarian OpenStreetMap Team (HOT</strong>) is a non-profit
+organization that uses open mapping data to support humanitarian and
+disaster response efforts around the world. <strong>The Field Mapping Task
+Manager (Field-TM)</strong> is one of the tools that <strong>HOT</strong> used to coordinate and
+manage mapping projects.</p>
+<p><strong>Field-TM</strong> is a software tool that helps project managers to organize and
+manage mapping tasks. It assigns those tasks to volunteers and tracks
+their progress. The tool includes features for collaborative editing,
+data validation, and error detection. This ensures that the data
+collected by volunteers is accurate and reliable.</p>
+<p><strong>Field-TM</strong> is designed to be used in conjunction with <strong>Open Data Kit
+(ODK)</strong>. <strong>ODK</strong> is a free and open-source set of tools that allows
+users to create, collect, and manage data with mobile devices. The
+<strong>ODK</strong> provides a set of open-source tools that allow users to build
+forms, collect data in the field, and aggregate data on a central
+server. It is commonly used for data collection in research, monitoring
+and evaluation, and other development projects.</p>
+<p>Project managers use <strong>Field-TM</strong> to manage tasks and assign them to
+volunteers. The data collected by the volunteer via ODK is typically
+uploaded to <strong>OpenStreetMap (OSM)</strong> where it is used to create more
+detailed and accurate maps of the affected area. <strong>OSM</strong> is a free and
+open-source map of the world that is created and maintained by
+volunteers.</p>
+<p>Overall, the <strong>Field-TM</strong> tool is an important component of <strong>HOT</strong>'s
+efforts to support disaster response and humanitarian efforts around the
+world. By coordinating mapping activities and ensuring the accuracy and
+reliability of the data collected by volunteers, <strong>Field-TM</strong> helps to
+provide critical information that can be used to support decision-making
+and improve the effectiveness of humanitarian efforts.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Stable Internet connection.</li>
+<li>Basic bnowledge of field mapping. If you are new to mapping we suggest you
+  read <a href="https://tasks.hotosm.org/learn/map" title="If you are new to mapping">this</a>.</li>
+</ul>
+<h2 id="steps-to-join-an-organization">Steps to Join An Organization<a class="headerlink" href="#steps-to-join-an-organization" title="Permanent link">&para;</a></h2>
+<p>You may request to join an existing organization.</p>
+<p>Alternatively, request the creation of a new organization for your team:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="highlight"><pre><span></span><code>If you are already an organization manager, the button to do this will be
+hidden. Please contact the administrator to create a second organization.
+</code></pre></div>
+</div>
+<ol>
+<li>
+<p>Go to the Manage organization tab. You can see the number of organizations.
+   On the top, there is a New button, clicking on which you can request
+   for a new organization.</p>
+</li>
+<li>
+<p>You have to provide your consent and fill up the form by providing
+   necessary details like Organization name, URL, Description of
+   organization, type of organization etc.
+   <img alt="image" src="https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d" /></p>
+</li>
+<li>
+<p>Now submit the form. The request will reach the Admin who will approve your
+   organization and inform you through the email.
+   <img alt="image" src="https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91" /></p>
+</li>
+</ol>
+<p>For small organisations, the organisation manager may also be the main project
+manager.</p>
+<p>All project manager permissions are granted to the organisation manager.</p>
+<h2 id="steps-to-create-a-project-in-field-tm">Steps To Create A Project In Field-TM<a class="headerlink" href="#steps-to-create-a-project-in-field-tm" title="Permanent link">&para;</a></h2>
+<p>Project creation access is provided to users who have organisation admin or
+higher level of permission.</p>
+<p>Go to [fmtm] <a href="https://fmtm.hotosm.org/">https://fmtm.hotosm.org/</a></p>
+<h3 id="1-create-the-project-details">1. Create the project details<a class="headerlink" href="#1-create-the-project-details" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>Login to fmtm first to see the option of creating the project.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975" /></p>
+</li>
+</ul>
+<ul>
+<li>Start by filling in the project basic information such as the name,
+  description,
+  hashtag, etc. This captures essential information about your project.</li>
+</ul>
+<ul>
+<li>If you want to use drone imagery or any other high resolution base imagery,
+  you can add the TMS layer from this step.</li>
+</ul>
+<ul>
+<li>You can also choose whether you want to create public or private project
+  in Field-TM.</li>
+<li>You can also choose the option whether you want mappers to use ODK collect
+  mobile application or webform during this step. By default, webform will be
+  used.</li>
+</ul>
+<ul>
+<li>
+<p>Finally click Next to proceed.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3" /></p>
+</li>
+</ul>
+<h3 id="2-create-a-project-area">2. Create a project area<a class="headerlink" href="#2-create-a-project-area" title="Permanent link">&para;</a></h3>
+<ul>
+<li>You can draw a freehand polygon on a map interface or you can upload
+  the AOI file.</li>
+<li>Click on Upload file button to upload the AOI file. The file is only
+  supported by Geojson format. See <a href="#preparing-map-features">preparing map features</a>.</li>
+<li>Review the displayed map that corresponds to your selected area and
+  click on "Next".<div class="highlight"><pre><span></span><code>!!! tip
+
+      Confirm the exact area for the survey before creating the project,
+      as the project boundary cannot be edited once the project is created.
+
+![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
+</code></pre></div>
+</li>
+</ul>
+<h3 id="3-upload-the-survey-or-use-an-existing-one">3. Upload the survey (or use an existing one)<a class="headerlink" href="#3-upload-the-survey-or-use-an-existing-one" title="Permanent link">&para;</a></h3>
+<ul>
+<li>You may choose to upload a pre-Configured XLSForm or browse the forms.
+  <a href="#xls-form-preparation">XLS Form Preparation</a></li>
+<li>Click the UploadXLSForm if you are uploading the file or download forms
+  by clicking Download form.</li>
+<li>
+<p>Finally click Next to proceed.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f" /></p>
+</li>
+</ul>
+<h3 id="4-select-the-geometry-type-you-wish-to-map">4. Select the geometry type you wish to map<a class="headerlink" href="#4-select-the-geometry-type-you-wish-to-map" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Select an option under 'What type of geometry?'</li>
+<li>If you want to upload your own, click in Upload custom mapdata or else
+  go with the default one of fetch data from OSM.</li>
+<li>You can also go for 'no existing data' option, if you want to collect map
+  features as well in field.</li>
+<li>
+<p>You can also upload additional map feature to have multiple feature
+  selection supported.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89" /></p>
+</li>
+</ul>
+<h3 id="5-task-splitting">5. Task splitting<a class="headerlink" href="#5-task-splitting" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Option 1: Split project into squares.</li>
+<li>Option 2: Use the project area created as the task areas.
+  This could be a single task, or multiple task areas if uploaded.</li>
+<li>Option 3: The task splitting algorithm which splits
+  the tasks with average number of features which is provided by project
+  creator.<ul>
+<li>
+<p>The task splitting may take few seconds to few minutes considering
+  the feature count and size of AOI. Click on "Submit" to create project.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e" /></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="project-creation-tips">Project Creation Tips<a class="headerlink" href="#project-creation-tips" title="Permanent link">&para;</a></h3>
+<h4 id="preparing-map-features">Preparing Map Features<a class="headerlink" href="#preparing-map-features" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Ensure you have the map features ready for the area you plan to
+  survey before starting project creation.</li>
+<li>The files should be in GeoJSON format, use the WGS coordinate
+  system with EPSG 4326, and must not include a Z-coordinate.
+  The map feature file should follow the osm tags structure.</li>
+<li>
+<p>Below is a sample of the required file structure:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;full_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;r9517874&quot;</span><span class="p">,</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;osm_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;9517874&quot;</span><span class="p">,</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;osm_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;relation&quot;</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;building&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;yes&quot;</span><span class="p">},</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;multipolygon&quot;</span><span class="p">,</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="nt">&quot;building:levels&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="nt">&quot;geometry&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MultiPolygon&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;coordinates&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">[</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9618848</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3041323</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9615121</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3041457</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9615028</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3038906</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9618755</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3038772</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9618848</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3041323</span><span class="w"> </span><span class="p">]</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="p">[</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9620167</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3042236</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9620143</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3041258</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9619839</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3041266</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9619757</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3037882</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9614038</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3038019</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9614144</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3042381</span><span class="w"> </span><span class="p">],</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-3.9620167</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3042236</span><span class="w"> </span><span class="p">]</span>
+<span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="p">]</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+</li>
+</ul>
+<ul>
+<li>You may download features from OpenStreetMap (OSM) by clicking on
+  Fetch data from osm with Field-TM project creation; however, note that
+  Field-TM is not responsible for the data quality of features extracted
+  from OSM.</li>
+<li>Currently, available types of survey features are Buildings and
+  Healthcare only. We plan to add more types of features moving ahead.</li>
+<li>Project managers can also upload supporting map features. Note that
+  these secondary features can’t be surveyed but selected for respective
+  primary features.</li>
+</ul>
+<h4 id="xls-form-preparation">XLS Form Preparation<a class="headerlink" href="#xls-form-preparation" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Be prepared with the XLS form for the project.</li>
+<li>If updates are required to the form, you can edit the XLS form even
+  after the project is created.</li>
+<li>Note that a few fields in the beginning and end of the form will be
+  injected to ask for some feature verification.</li>
+<li>So project managers are requested to fill up the form through odk
+  or download the form after the project is created to know about the
+  field injected. You can also get the fields injected from our documentation
+  <a href="https://docs.fieldtm.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form" title="injected fields">here</a></li>
+<li>Also read carefully the overview in the left section of each step to
+  understand the details of the functionalities.</li>
+</ul>
+<h4 id="uploading-custom-imagery">Uploading Custom Imagery<a class="headerlink" href="#uploading-custom-imagery" title="Permanent link">&para;</a></h4>
+<ul>
+<li>If you have custom imagery that you want to use as basemap during field
+  mapping activity, then you have to add the TMS link of that imagery
+  during the first step of project creation.</li>
+</ul>
+<ul>
+<li>Click on <em>I would like to include my own imagery layer for reference</em>
+  in the first step to add TMS URL. You can get URL by uploading it in
+  openaerialmap.</li>
+</ul>
+<h4 id="odk-central-credentials">ODK Central Credentials<a class="headerlink" href="#odk-central-credentials" title="Permanent link">&para;</a></h4>
+<ul>
+<li>To store your submissions in ODK Central, you need to have valid
+  ODK Central credentials.</li>
+<li>One option is to use your own organisations ODK server, if available.</li>
+<li>Another is to request access to use HOT's ODK server, which is free
+  to use for public project creation.</li>
+</ul>
+<h2 id="steps-to-view-your-submissions-and-infographics">Steps To View Your Submissions and Infographics<a class="headerlink" href="#steps-to-view-your-submissions-and-infographics" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Go to the respective project. On the bottom left side,
+   you will see the view infographics button.</li>
+<li>
+<p>Click on the button will lead you to the infographics page.
+   <img alt="image" src="https://github.com/user-attachments/assets/6d48dd40-1be6-4063-9d1c-0276633c6d7a" /></p>
+</li>
+<li>
+<p>On the right side there is an icon which will switch the layout to
+   table view, meaning you can see the submissions in table format.</p>
+</li>
+<li>
+<p>You can see the details of submission and also review the submission
+   and set the submission as accepted, rejected or has issues. Moreover,
+   you can also comment to the submission for mappers.
+   <img alt="image" src="https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a" /></p>
+</li>
+<li>
+<p>Users can also download the submission in Json or CSV format.</p>
+</li>
+<li>The submission can also be uploaded to JOSM. For that, you should
+   have JOSM software installed in your device and should have your remote
+   control enabled.
+   <img alt="image" src="https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3" /></li>
+</ol>
+<h3 id="mapper-training">Mapper Training<a class="headerlink" href="#mapper-training" title="Permanent link">&para;</a></h3>
+<h4 id="during-training">During Training<a class="headerlink" href="#during-training" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Share the link of the project for the mapper to reach<br />
+   to the project easily. The URL be:
+   <a href="https://mapper.fmtm.hotosm.org/project_id">https://mapper.fmtm.hotosm.org/project_id</a></li>
+<li><strong>Updating Metadata</strong><br />
+   If you need mappers to include their email<br />
+   and phone number along with their username, guide them<br />
+   to update their ODK Collect settings:<ul>
+<li>Navigate to <strong>Settings</strong> for the project.</li>
+<li>Click on <strong>User and Device Identity</strong> to update the<br />
+   metadata fields.</li>
+</ul>
+</li>
+<li><strong>Test Submissions</strong><br />
+   Encourage mappers to submit a few test entries to<br />
+   familiarize themselves with the workflow and address<br />
+   any issues during training.</li>
+</ol>
+<h4 id="after-training">After Training<a class="headerlink" href="#after-training" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Collect regular ongoing feedback from mappers to ensure they face no difficulties
+   during fieldwork.</li>
+<li>Prepare clear and detailed instructions for mappers
+   and validators, specific to the project requirements.</li>
+<li>Prepare the checklist for validation. The things to
+   check may depend on the type of project.</li>
+<li>Connect the odk central to powerBI or any other data visualisation tool via Odata
+   link to customise the charts and graphs as per your need.<br />
+<img alt="odk_image" src="image.png" /></li>
+</ol>
+<p>To get more info about project management in odk collect<br />
+follow the guide <a href="https://docs.getodk.org/collect-using" title="Using Collect">Here</a>.</p>
+<h3 id="connecting-the-data-to-external-applications">Connecting The Data To External Applications<a class="headerlink" href="#connecting-the-data-to-external-applications" title="Permanent link">&para;</a></h3>
+<p>If you want to visualise the submissions and create custom charts
+and diagrams using Field-TM submissions, then you can follow the steps
+below and load the submissions on any data analysis platform using <strong>OData</strong>.</p>
+<p>OData endpoints are a standardised way to ingest
+this data into other tools: PowerBI, Tableau, Redash, Grafana.</p>
+<p>Why PowerBI? You can use other tools too like Tableau, Redash, Grafana or even
+Excel. However, PowerBI is free to use, very powerful, and user friendly to use,
+despite being a proprietary Microsoft tool.</p>
+<p>The steps shows how to use PowerBI and create custom visualisations.
+ODK already has good docs on this which you can refer to.
+<a href="https://docs.getodk.org/tutorial-mapping-households/">https://docs.getodk.org/tutorial-mapping-households/</a></p>
+<p>Step 1: Start a new project, add a new data source 'OData Feed'</p>
+<p>[Image here]</p>
+<p>Step 2: Use the OData URLs shown in the ODK docs:
+a. Submission data: /v1/projects/{projectId}/forms/{xmlFormId}.svc
+e.g. <a href="https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc">https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc</a>
+b. Entity data: /v1/projects/{projectId}/datasets/{name}.svc
+e.g. <a href="https://odk.hotosm.org/v1/projects/86/datasets/features.svc">https://odk.hotosm.org/v1/projects/86/datasets/features.svc</a></p>
+<p>Step 3: Enter your credentials using Basic Auth</p>
+<p>Step 4: Preview the data</p>
+<p>Step 5: Transform data as needed, load into charts, graphs, etc, to create the
+dashboard you need.</p>
+<h2 id="manage-project-and-users">Manage project and users<a class="headerlink" href="#manage-project-and-users" title="Permanent link">&para;</a></h2>
+<h3 id="steps-to-edit-project-details">Steps to Edit Project Details<a class="headerlink" href="#steps-to-edit-project-details" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p>Users can also edit a few fields after project creation like basic
+   details like name, description, instructions as well as XLS form.</p>
+</li>
+<li>
+<p>Go to the respective project you want to edit. Click on the
+   manage button to edit basic details and XLS form.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/a3225885-c6cd-4fa9-9352-ccd4a8709eff" /></p>
+</li>
+</ol>
+<h3 id="invite-users">Invite Users<a class="headerlink" href="#invite-users" title="Permanent link">&para;</a></h3>
+<p>You can invite users (mappers and project managers to your project).
+If the user already exists in Feild-TM, they will be directly assigned role.</p>
+<p>If they are not registered on Field-TM,, the email invitation will
+be sent, following which users can get necessary permission to that project.
+You can invite users either through osm username or gmail.</p>
+<ol>
+<li>Choose the mode of invitation, either through osm or gmail.</li>
+<li>Provide respective osm username or email address. You can invite
+   multiple users at a time.</li>
+<li>Assign the role to users and click on invite.</li>
+<li>In case of gmail invitation, copy the link and share to that user
+   through other media.</li>
+</ol>
+<h2 id="help-and-support">Help and Support<a class="headerlink" href="#help-and-support" title="Permanent link">&para;</a></h2>
+<p>If you encounter any issues or need assistance while using Field-TM, you can access
+the following resources:</p>
+<ul>
+<li>Check the <a href="https://docs.fieldtm.hotosm.org/faq" title="FAQs">FAQs</a> .</li>
+<li>Ask your doubts in the <a href="https://hotosm.slack.com/archives/C04PCBFDEGN" title="Slack channel: #field-mapping-tasking-manager">Slack channel: #field-mapping-tasking-manager</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 15, 2025</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/hotosm/" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/hotosm" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.hotosm.org" target="_blank" rel="noopener" title="www.hotosm.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M352 256c0 22.2-1.2 43.6-3.3 64H163.4c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64h185.3c2.2 20.4 3.3 41.8 3.3 64m28.8-64h123.1c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64H380.8c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64m112.6-32H376.7c-10-63.9-29.8-117.4-55.3-151.6 78.3 20.7 142 77.5 171.9 151.6zm-149.1 0H167.7c6.1-36.4 15.5-68.6 27-94.7 10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5 11.6 26 20.9 58.2 27 94.7m-209 0H18.6c30-74.1 93.6-130.9 172-151.6-25.5 34.2-45.3 87.7-55.3 151.6M8.1 192h123.1c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64H8.1C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64m186.6 254.6c-11.6-26-20.9-58.2-27-94.6h176.6c-6.1 36.4-15.5 68.6-27 94.6-10.5 23.6-22.2 40.7-33.5 51.5-11.2 10.7-20.5 13.9-27.8 13.9s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6-78.4-20.7-142-77.5-172-151.6zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6 25.5-34.2 45.2-87.7 55.3-151.6h116.7z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+    
+  </body>
+</html>
