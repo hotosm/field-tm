@@ -502,7 +502,7 @@ wheels = [
 
 [[package]]
 name = "fmtm"
-version = "2025.6.1"
+version = "2025.7.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aiosmtplib" },
