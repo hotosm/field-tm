@@ -48,6 +48,7 @@
 					variant: 'danger',
 					message: error.message || 'Failed to accept invitation',
 				});
+				goto('/');
 			}
 		}
 	});
