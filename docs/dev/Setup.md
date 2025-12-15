@@ -193,14 +193,14 @@ Happy coding!
 The Field-TM Developer Team
 
 [1]: https://docs.getodk.org/central-intro
-[2]: https://docs.fieldtm.hotosm.org/dev/Backend
-[3]: https://docs.fieldtm.hotosm.org/dev/Frontend
-[4]: https://docs.fieldtm.hotosm.org/INSTALL/#software-requirements
-[5]: https://docs.fieldtm.hotosm.org/CONTRIBUTING
+[2]: https://docs.field.hotosm.org/dev/Backend
+[3]: https://docs.field.hotosm.org/dev/Frontend
+[4]: https://docs.field.hotosm.org/INSTALL/#software-requirements
+[5]: https://docs.field.hotosm.org/CONTRIBUTING
 [6]: https://docs.hotosm.org/code-of-conduct
 [7]: https://github.com/hotosm/field-tm
-[8]: https://docs.fieldtm.hotosm.org/INSTALL/#setup-your-local-environment
-[9]: https://docs.fieldtm.hotosm.org/faq
+[8]: https://docs.field.hotosm.org/INSTALL/#setup-your-local-environment
+[9]: https://docs.field.hotosm.org/faq
 [10]: https://hotosm.slack.com/archives/C04PCBFDEGN
 [11]: https://learn.microsoft.com/en-us/windows/wsl/install "official instructions"
 [12]: https://github.com/abiosoft/colima "Colima"

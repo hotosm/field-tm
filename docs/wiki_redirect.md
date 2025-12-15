@@ -1,4 +1,4 @@
 # Field-TM
 
 Please see the docs page at:
-[https://docs.fieldtm.hotosm.org/](https://docs.fieldtm.hotosm.org/)
+[https://docs.field.hotosm.org/](https://docs.field.hotosm.org/)

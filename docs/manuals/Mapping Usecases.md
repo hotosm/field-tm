@@ -51,7 +51,7 @@ src="https://github.com/user-attachments/assets/
 - If you already have Highway data as geojson file, you can select
   "Fetch data from OSM"
   and upload the file. Refer
-  [HERE](https://docs.fieldtm.hotosm.org/manuals/project-managers/#project-creation-tips)
+  [HERE](https://docs.field.hotosm.org/manuals/project-managers/#project-creation-tips)
   for project creation Tips
 - If you are collecting features directly on field, then you can choose
   "No existing feature" and move ahead.
