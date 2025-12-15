@@ -17,43 +17,30 @@
 #
 """Endpoints for users and role."""
 
-from datetime import datetime, timezone
 from typing import Annotated, Literal
 
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
-    HTTPException,
     Query,
-    Request,
     Response,
 )
-from fastapi.responses import JSONResponse
 from loguru import logger as log
 from psycopg import Connection
 
-from app.auth.auth_deps import AuthUser, login_required
-from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import (
     Mapper,
-    ProjectUserDict,
-    field_manager,
     super_admin,
 )
-from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
 from app.db.models import (
     DbUser,
-    DbUserInvite,
-    DbUserRole,
 )
 from app.users import user_schemas
 from app.users.user_crud import (
     get_paginated_users,
-    send_invitation_message,
 )
 from app.users.user_deps import get_user
 
@@ -71,7 +58,7 @@ async def get_users(
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
     search: str = "",
-    signin_type: Literal["osm", "google"] = Query(
+    signin_type: Literal["osm"] = Query(
         None, description="Filter by signin type (osm or google)"
     ),
 ):
@@ -83,7 +70,7 @@ async def get_users(
 async def get_userlist(
     db: Annotated[Connection, Depends(db_conn)],
     search: str = "",
-    signin_type: Literal["osm", "google"] = Query(
+    signin_type: Literal["osm"] = Query(
         None, description="Filter by signin type (osm or google)"
     ),
 ):
@@ -103,131 +90,6 @@ async def get_user_roles(_: Annotated[DbUser, Depends(Mapper())]):
     for role in UserRoleEnum:
         user_roles[role.name] = role.value
     return user_roles
-
-
-@router.get("/invites", response_model=list[DbUserInvite])
-async def get_project_user_invites(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(field_manager)],
-):
-    """Get all user invites for a project."""
-    project_id = project_user_dict.get("project").id
-    return await DbUserInvite.all(db, project_id)
-
-
-@router.post("/invite")
-async def invite_new_user(
-    request: Request,
-    background_tasks: BackgroundTasks,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(field_manager)],
-    user_in: user_schemas.UserInviteIn,
-    osm_auth=Depends(init_osm_auth),
-):
-    """Invite a user to a project.
-
-    If the user already exists, directly assign the role to the user.
-    If the user does not exist, create an invite and send an email or OSM message.
-    The invite URL is user specific with a token that expires after 7 days.
-    - Including `osm_username` will send an OSM message notification (including email).
-    - Including `email` will send an email to the user.
-    - It's also possible to send the returned invite URL to the user via other means
-    (e.g. mobile message).
-    """
-    project = project_user_dict.get("project")
-
-    if user_in.osm_username:
-        if await check_osm_user(user_in.osm_username):
-            username = user_in.osm_username
-            signin_type = "osm"
-            domain = settings.FMTM_DOMAIN
-        else:
-            raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
-                detail=f"OSM user not found: {user_in.osm_username}",
-            )
-    elif user_in.email:
-        username = user_in.email.split("@")[0]
-        signin_type = "google"
-        # We use different domain for non OSM users since they can't access the
-        # management interface
-        if settings.FMTM_MAPPER_DOMAIN:
-            domain = settings.FMTM_MAPPER_DOMAIN
-        else:
-            domain = f"mapper.{settings.FMTM_DOMAIN}"
-    else:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Either osm username or google email must be provided.",
-        )
-
-    # The user is unique by username and auth provider
-    if users := await DbUser.all(db, username=username, signin_type=signin_type):
-        user = users[0]
-        latest_role = await DbUserRole.create(db, project.id, user.sub, user_in.role)
-
-        return JSONResponse(
-            status_code=HTTPStatus.CREATED,
-            content={
-                "message": f"User {user.username} already exists. "
-                f"Role Assigned: {latest_role.role.value}."
-            },
-        )
-
-    # Generate invite URL
-    new_invite = await DbUserInvite.create(db, project.id, user_in)
-
-    if settings.DEBUG:
-        invite_url = (
-            f"http://{domain}:{settings.FMTM_DEV_PORT}/invite?token={new_invite.token}"
-        )
-    else:
-        invite_url = f"https://{domain}/invite?token={new_invite.token}"
-
-    background_tasks.add_task(
-        send_invitation_message,
-        request=request,
-        project=project,
-        invitee_username=username,
-        osm_auth=osm_auth,
-        invite_url=invite_url,
-        user_email=user_in.email,
-        signin_type=signin_type,
-    )
-    return JSONResponse(status_code=HTTPStatus.OK, content={"invite_url": invite_url})
-
-
-@router.get("/invite/{token}")
-async def accept_invite(
-    token: str,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Accept a user invite token and generate relevant DB entries."""
-    invite = await DbUserInvite.one(db, token)
-    if not invite or invite.is_expired():
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail="Invite has expired"
-        )
-
-    if (invite.osm_username and invite.osm_username != current_user.username) or (
-        invite.email and invite.email != current_user.email
-    ):
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail="Invite is not for the current user.",
-        )
-
-    # Create the role for the user / project
-    await DbUserRole.create(db, invite.project_id, current_user.sub, invite.role)
-    # Expire the token
-    await DbUserInvite.update(
-        db,
-        invite.token,
-        user_update=user_schemas.UserInviteUpdate(used_at=datetime.now(timezone.utc)),
-    )
-
-    return Response(status_code=HTTPStatus.OK)
 
 
 @router.patch("/{user_sub}", response_model=user_schemas.UserOut)

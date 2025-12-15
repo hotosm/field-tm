@@ -108,28 +108,6 @@ def set_cookie(
     )
 
 
-def get_cookie_domain() -> str:
-    """Get the appropriate cookie domain, depending on domain structure."""
-    if settings.FMTM_MAPPER_DOMAIN:
-        mapper_domain = settings.FMTM_MAPPER_DOMAIN
-        manager_domain = settings.FMTM_DOMAIN
-
-        # Check if domains are compatible for cookie sharing
-        if domains_compatible_for_cookies(mapper_domain, manager_domain):
-            mapper_root = get_root_domain(mapper_domain)
-            return f".{mapper_root}"  # Leading dot for subdomain sharing
-        else:
-            # Domains are on entirely different root domains - cookies cannot be shared
-            raise ValueError(
-                f"FMTM_MAPPER_DOMAIN ({mapper_domain}) and FMTM_DOMAIN"
-                f"({manager_domain}) are on different root domains. Cookie "
-                "sharing is not possible."
-            )
-    else:
-        # Use the primary manager domain
-        return settings.FMTM_DOMAIN
-
-
 def set_cookies(
     response: Response,
     access_token: str,
@@ -151,7 +129,7 @@ def set_cookies(
         JSONResponse: A response with attached cookies (set-cookie headers).
     """
     secure = not settings.DEBUG
-    cookie_domain = get_cookie_domain()
+    cookie_domain = settings.FMTM_DOMAIN
 
     set_cookie(
         response,
@@ -257,7 +235,7 @@ async def refresh_cookies(
 ):
     """Reusable function to renew the expiry on cookies.
 
-    Used by both management and mapper refresh endpoints.
+    Used the frontend refresh endpoints.
     """
     if settings.DEBUG:
         return JSONResponse(
@@ -307,7 +285,7 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
     """Expire cookies by setting max_age to 0."""
     for cookie_name in cookie_names:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
-        cookie_domain = get_cookie_domain()
+        cookie_domain = settings.FMTM_DOMAIN
         response.set_cookie(
             key=cookie_name,
             value="",

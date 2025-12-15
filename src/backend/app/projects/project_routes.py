@@ -21,8 +21,7 @@ import json
 import os
 from io import BytesIO
 from pathlib import Path
-from typing import Annotated, List, Optional
-from uuid import UUID
+from typing import Annotated, Optional
 
 from area_splitter.splitter import split_by_sql, split_by_square
 from fastapi import (
@@ -44,48 +43,35 @@ from osm_fieldwork.json_data_models import data_models_path, get_choices
 from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
-from pyodk.errors import PyODKError
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import Mapper, ProjectManager, super_admin
-from app.central import central_crud, central_schemas
+from app.central import central_crud
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import (
     DbGeomType,
     HTTPStatus,
-    ProjectRole,
     ProjectStatus,
     XLSFormType,
 )
 from app.db.languages_and_countries import countries
 from app.db.models import (
-    DbBackgroundTask,
-    DbBasemap,
-    DbOdkEntities,
-    DbOrganisation,
     DbProject,
-    DbProjectTeam,
-    DbProjectTeamUser,
-    DbTask,
     DbUser,
-    DbUserRole,
     FieldMappingApp,
 )
 from app.db.postgis_utils import (
     check_crs,
-    featcol_keep_single_geom_type,
     merge_polygons,
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
 )
-from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUpdate, ProjectUserContributions
 from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
 from app.s3 import delete_all_objs_under_prefix
-from app.users.user_schemas import UserRolesOut
 
 router = APIRouter(
     prefix="/projects",
@@ -182,192 +168,6 @@ async def read_project_summaries(
     )
 
 
-@router.get(
-    "/{project_id}/entities", response_model=central_schemas.EntityFeatureCollection
-)
-async def get_odk_entities_geojson(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-    minimal: bool = False,
-):
-    """Get the ODK entities for a project in GeoJSON format.
-
-    NOTE This endpoint should not not be used to display the feature geometries.
-    Rendering multiple GeoJSONs if inefficient.
-    This is done by the flatgeobuf by filtering the task area bbox.
-    """
-    project = project_user.get("project")
-    return await central_crud.get_entities_geojson(
-        project.odk_credentials,
-        project.odkid,
-        minimal=minimal,
-    )
-
-
-@router.get(
-    "/{project_id}/entities/statuses",
-    response_model=list[central_schemas.EntityMappingStatus],
-)
-async def get_odk_entities_mapping_statuses(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Get the ODK entities mapping statuses, i.e. in progress or complete."""
-    project = project_user.get("project")
-    entities = await central_crud.get_entities_data(
-        project.odk_credentials,
-        project.odkid,
-    )
-    await DbOdkEntities.upsert(db, project.id, entities)
-    return entities
-
-
-@router.get(
-    "/{project_id}/entities/osm-ids",
-    response_model=list[central_schemas.EntityOsmID],
-)
-async def get_odk_entities_osm_ids(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Get the ODK entities linked OSM IDs.
-
-    This endpoint is required as we cannot modify the data extract fields
-    when generated via raw-data-api.
-    We need to link Entity UUIDs to OSM/Feature IDs.
-    """
-    project = project_user.get("project")
-    return await central_crud.get_entities_data(
-        project.odk_credentials,
-        project.odkid,
-        fields="osm_id",
-    )
-
-
-@router.get(
-    "/{project_id}/entities/task-ids",
-    response_model=list[central_schemas.EntityTaskID],
-)
-async def get_odk_entities_task_ids(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Get the ODK entities linked Field-TM Task IDs."""
-    project = project_user.get("project")
-    return await central_crud.get_entities_data(
-        project.odk_credentials,
-        project.odkid,
-        fields="task_id",
-    )
-
-
-@router.get(
-    "/{project_id}/entity/status",
-    response_model=central_schemas.EntityMappingStatus,
-)
-async def get_odk_entity_mapping_status(
-    entity_id: str,
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Get the ODK entity mapping status, i.e. in progress or complete."""
-    project = project_user.get("project")
-    return await central_crud.get_entity_mapping_status(
-        project.odk_credentials,
-        project.odkid,
-        entity_id,
-    )
-
-
-@router.post(
-    "/{project_id}/entity/status",
-    response_model=central_schemas.EntityMappingStatus,
-)
-async def set_odk_entities_mapping_status(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper(check_completed=True))],
-    entity_details: central_schemas.EntityMappingStatusIn,
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Set the ODK entities mapping status, i.e. in progress or complete.
-
-    entity_details must be a JSON body with params:
-    {
-        "entity_id": "string",
-        "label": "Feature <FEATURE_ID>",
-        "status": 0
-    }
-    """
-    project = project_user.get("project")
-    return await central_crud.update_entity_mapping_status(
-        project.odk_credentials,
-        project.field_mapping_app,
-        project.odkid,
-        entity_details.entity_id,
-        entity_details.label,
-        entity_details.status,
-        entity_details.submission_ids,
-    )
-
-
-@router.get(
-    "/{project_id}/tiles",
-    response_model=list[project_schemas.BasemapOut],
-)
-async def tiles_list(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Returns the list of tiles for a project.
-
-    Parameters:
-        project_id: int
-        db (Connection): The database connection.
-        current_user (AuthUser): Check if user is logged in.
-
-    Returns:
-        Response: List of generated tiles for a project.
-    """
-    return await DbBasemap.all(db, project_user.get("project").id)
-
-
-# NOTE we no longer need this as tiles are uploaded to S3
-# However, it could be useful if requiring private buckets in
-# the future, with pre-signed URL generation
-# @router.get(
-#     "/{project_id}/tiles/{tile_id}",
-#     response_model=project_schemas.BasemapOut,
-# )
-# async def download_tiles(
-#     tile_id: UUID,
-#     db: Annotated[Connection, Depends(db_conn)],
-#     project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-# ):
-#     """Download the basemap tile archive for a project."""
-#     log.debug("Getting basemap path from DB")
-#     try:
-#         db_basemap = await DbBasemap.one(db, tile_id)
-#     except KeyError as e:
-#         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
-
-#     log.info(f"User requested download for tiles: {db_basemap.url}")
-
-#     project = project_user.get("project")
-#     filename = Path(db_basemap.url).name.replace(f"{project.id}_", f"{project.slug}_")
-#     log.debug(f"Sending tile archive to user: {filename}")
-
-#     if db_basemap.format == "mbtiles":
-#         mimetype = "application/vnd.mapbox-vector-tile"
-#     elif db_basemap.format == "pmtiles":
-#         mimetype = "application/vnd.pmtiles"
-#     else:
-#         mimetype = "application/vnd.sqlite3"
-
-#     return FileResponse(
-#         db_basemap.url,
-#         headers={
-#             "Content-Disposition": f"attachment; filename={filename}",
-#             "Content-Type": mimetype,
-#         },
-#     )
-
-
 @router.get("/categories")
 async def get_categories(current_user: Annotated[AuthUser, Depends(login_required)]):
     """Get api for fetching all the categories.
@@ -408,23 +208,6 @@ async def download_features(
     }
 
     return Response(content=json.dumps(feature_collection), headers=headers)
-
-
-@router.get(
-    "/task-status/{bg_task_id}",
-    response_model=project_schemas.BackgroundTaskStatus,
-)
-async def get_task_status(
-    bg_task_id: str,
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Get the background task status by passing the task ID."""
-    try:
-        return await DbBackgroundTask.one(db, bg_task_id)
-    except KeyError as e:
-        log.warning(str(e))
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
 
 @router.get("/contributors/{project_id}", response_model=list[ProjectUserContributions])
@@ -662,20 +445,6 @@ async def upload_data_extract(
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
 
 
-@router.get("/{project_id}/users", response_model=list[UserRolesOut])
-async def get_project_users(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
-    role: Optional[str] = None,
-):
-    """Get project users and their project role."""
-    project = project_user_dict.get("project")
-    users = await DbUserRole.all(db, project.id, role=role)
-    if not users:
-        return []
-    return users
-
-
 @router.post("/{project_id}/additional-entity")
 async def add_additional_entity_list(
     db: Annotated[Connection, Depends(db_conn)],
@@ -799,68 +568,12 @@ async def generate_files(
             project.odk_form_id,
         )
 
-    # Generate the basemap automatically if custom TMS url provided
-    if project.custom_tms_url:
-        basemap_in = project_schemas.BasemapGenerate(
-            tile_source="custom", file_format="pmtiles", tms_url=project.custom_tms_url
-        )
-        org_id = project.organisation_id
-        await generate_basemap(project_id, org_id, basemap_in, db, background_tasks)
-
     if warning_message:
         return JSONResponse(
             status_code=HTTPStatus.OK,
             content={"message": warning_message},
         )
     return Response(status_code=HTTPStatus.OK)
-
-
-@router.post("/{project_id}/tiles-generate")
-async def generate_project_basemap(
-    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    background_tasks: BackgroundTasks,
-    db: Annotated[Connection, Depends(db_conn)],
-    basemap_in: project_schemas.BasemapGenerate,
-):
-    """Returns basemap tiles for a project."""
-    project_id = project_user.get("project").id
-    org_id = project_user.get("project").organisation_id
-
-    await generate_basemap(project_id, org_id, basemap_in, db, background_tasks)
-    # Create task in db and return uuid
-    return {"Message": "Tile generation started"}
-
-
-async def generate_basemap(
-    project_id: int,
-    org_id: int,
-    basemap_in: project_schemas.BasemapGenerate,
-    db: Connection,
-    background_tasks: BackgroundTasks,
-):
-    """Generate basemap tiles for a project."""
-    log.debug(
-        "Creating generate_project_basemap background task "
-        f"for project ID: {project_id}"
-    )
-    background_task_id = await DbBackgroundTask.create(
-        db,
-        project_schemas.BackgroundTaskIn(
-            project_id=project_id,
-            name="generate_basemap",
-        ),
-    )
-
-    background_tasks.add_task(
-        project_crud.generate_project_basemap,
-        db,
-        project_id,
-        org_id,
-        background_task_id,
-        basemap_in.tile_source,
-        basemap_in.file_format,
-        basemap_in.tms_url,
-    )
 
 
 def _get_local_odk_url() -> str:
@@ -952,13 +665,14 @@ async def upload_project_task_boundaries(
     tasks_featcol = parse_geojson_file_to_featcol(await task_geojson.read())
     await check_crs(tasks_featcol)
     # We only want to allow polygon geometries
-    featcol_single_geom_type = featcol_keep_single_geom_type(
-        tasks_featcol,
-        geom_type="Polygon",
-    )
-    success = await DbTask.create(db, project_id, featcol_single_geom_type)
-    if success:
-        return JSONResponse(content={"message": "success"})
+    # featcol_single_geom_type = featcol_keep_single_geom_type(
+    #     tasks_featcol,
+    #     geom_type="Polygon",
+    # )
+    # FIXME upload to ODK an entity list
+    # success = await DbTask.create(db, project_id, featcol_single_geom_type)
+    # if success:
+    # return JSONResponse(content={"message": "success"})
 
     log.error(f"Failed to create task areas for project {project_id}")
     return JSONResponse(content={"message": "failure"})
@@ -1039,9 +753,7 @@ async def delete_project(
         await central_crud.delete_odk_project(project.odkid, project.odk_credentials)
 
     # Delete S3 resources
-    await delete_all_objs_under_prefix(
-        settings.S3_BUCKET_NAME, f"/{project.organisation_id}/{project.id}"
-    )
+    await delete_all_objs_under_prefix(settings.S3_BUCKET_NAME, f"/{project.id}")
     # Delete Field-TM project
     await DbProject.delete(db, project.id)
 
@@ -1057,20 +769,11 @@ async def create_project(
 ):
     """Create a project in ODK Central and update the local stub project."""
     project_id = project_user.get("project").id
-    org_id = project_user.get("project").organisation_id
-    db_org = await DbOrganisation.one(db, org_id)
     project = await DbProject.one(db, project_id)
 
     if project_info.name:
         await project_deps.check_project_dup_name(db, project_info.name)
-    if project_info.odk_credentials:
-        odk_creds_decrypted = project_info.odk_credentials
-    else:
-        log.debug(
-            "No ODK credentials passed during project creation. "
-            "Defaulting to organisation credentials."
-        )
-        odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
+    odk_creds_decrypted = project_info.odk_credentials
 
     # Create project in ODK Central
     # NOTE runs in separate thread using run_in_threadpool
@@ -1144,184 +847,6 @@ async def download_project_boundary(
             "Content-Type": "application/media",
         },
     )
-
-
-@router.get("/{project_id}/download_tasks")
-async def download_task_boundaries(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Downloads the boundary of the tasks for a project as a GeoJSON file.
-
-    Args:
-        project_id (int): Project ID path param.
-        db (Connection): The database connection.
-        project_user (ProjectUserDict): Check if user has MAPPER permission.
-
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
-    """
-    project_id = project_user.get("project").id
-    task_geojson = await project_crud.get_task_geometry(db, project_id)
-
-    headers = {
-        "Content-Disposition": "attachment; filename=task_boundary.geojson",
-        "Content-Type": "application/media",
-    }
-
-    return Response(content=task_geojson, headers=headers)
-
-
-@router.get("/{project_id}/teams", response_model=List[project_schemas.ProjectTeam])
-async def get_project_teams(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Get the teams associated with a project."""
-    project_id = project_user.get("project").id
-    teams = await DbProjectTeam.all(db, project_id)
-    return teams
-
-
-@router.post("/{project_id}/teams", response_model=project_schemas.ProjectTeamOne)
-async def create_project_team(
-    team: project_schemas.ProjectTeamIn,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Create a new team for a project."""
-    return await DbProjectTeam.create(db, team)
-
-
-@router.get("/{project_id}/teams/{team_id}", response_model=project_schemas.ProjectTeam)
-async def get_team(
-    team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
-):
-    """Get the teams associated with a project."""
-    team = await DbProjectTeam.one(db, team.team_id)
-    return team
-
-
-@router.patch(
-    "/{project_id}/teams/{team_id}", response_model=project_schemas.ProjectTeamOne
-)
-async def update_project_team(
-    team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    team_update: project_schemas.ProjectTeamIn,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Get the teams associated with a project."""
-    team = await DbProjectTeam.update(db, team.team_id, team_update)
-    return team
-
-
-@router.delete("/{project_id}/teams/{team_id}")
-async def delete_project_team(
-    team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Get the teams associated with a project."""
-    team = await DbProjectTeam.delete(db, team.team_id)
-    return team
-
-
-@router.post("/{project_id}/teams/{team_id}/users")
-async def add_team_users(
-    team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    user_subs: List[str],
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Add users to a team."""
-    # Assign mapper user roles to the project
-    for user_sub in user_subs:
-        await DbUserRole.create(
-            db,
-            project_user.get("project").id,
-            user_sub,
-            ProjectRole.MAPPER,
-        )
-    await DbProjectTeamUser.create(db, team.team_id, user_subs)
-    return Response(status_code=HTTPStatus.OK)
-
-
-@router.delete("/{project_id}/teams/{team_id}/users")
-async def remove_team_users(
-    team: Annotated[DbProjectTeam, Depends(project_deps.get_project_team)],
-    user_subs: List[str],
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-):
-    """Add users to a team."""
-    await DbProjectTeamUser.delete(db, team.team_id, user_subs)
-    return Response(status_code=HTTPStatus.NO_CONTENT)
-
-
-@router.delete("/entity/{entity_uuid}")
-async def delete_entity(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(Mapper())],
-    entity_uuid: UUID,
-    dataset_name: str = "features",
-):
-    """Delete an Entity from ODK and local database."""
-    project = project_user_dict.get("project")
-    project_odk_id = project.odkid
-    project_odk_creds = project.odk_credentials
-
-    log.debug(
-        f"Deleting ODK Entity in dataset '{dataset_name}'(ODK ID: {project_odk_id})"
-    )
-
-    # Try deleting from ODK Central first
-    try:
-        await central_crud.delete_entity(
-            odk_creds=project_odk_creds,
-            odk_id=project_odk_id,
-            entity_uuid=entity_uuid,
-            dataset_name=dataset_name,
-        )
-        log.info(f"Entity {entity_uuid} deleted from ODK Central successfully.")
-    except PyODKError as e:
-        # ODK Central 404 means the entity is already gone there, safe to delete locally
-        if "404" in str(e):
-            log.warning(
-                f"Entity {entity_uuid} not found in ODK Central (already deleted). "
-                "Proceeding with local cleanup."
-            )
-        else:
-            log.error(f"Failed to delete entity {entity_uuid} from ODK Central: {e}")
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Failed to delete entity in ODK Central: {str(e)}",
-            ) from e
-
-    # Delete from local database (safe delete)
-    deleted_count = await DbOdkEntities.delete(db, entity_uuid)
-    if deleted_count == 0:
-        log.warning(
-            f"Entity {entity_uuid} not found in local database (nothing to delete)."
-        )
-    else:
-        log.info(f"Entity {entity_uuid} deleted from local database successfully.")
-
-    return {"detail": f"Entity {entity_uuid} deleted successfully"}
 
 
 @router.delete("/{project_id}/users/{user_sub}")

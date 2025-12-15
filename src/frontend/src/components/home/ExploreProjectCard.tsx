@@ -27,19 +27,11 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
   const navigate = useNavigate();
 
   const handleProjectCardClick = () => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile && data.status !== project_status.DRAFT) {
-      // Redirect to mapper frontend on mobile
-      // (we hardcode mapper.xxx for now - open an issue if more flexibility is needed)
-      const { protocol, hostname, port } = window.location;
-      window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/project/${data.id}`;
+    // Else view project via manager frontend (desktop)
+    if (data.status === project_status.DRAFT) {
+      navigate(`/create-project/${data.id}?step=1`);
     } else {
-      // Else view project via manager frontend (desktop)
-      if (data.status === project_status.DRAFT) {
-        navigate(`/create-project/${data.id}?step=1`);
-      } else {
-        navigate(`/project/${data.id}`);
-      }
+      navigate(`/project/${data.id}`);
     }
   };
 

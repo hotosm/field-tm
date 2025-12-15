@@ -365,7 +365,6 @@ def add_required_geojson_properties(
         properties.setdefault("version", 1)
         properties.setdefault("changeset", 1)
         properties.setdefault("timestamp", str(current_date))
-        properties.setdefault("submission_ids", "")
         properties.setdefault("created_by", "")
 
         feature["properties"] = properties

@@ -39,11 +39,9 @@ from app.projects import project_crud
 from tests.test_data import test_data_path
 
 
-async def create_stub_project(client, organisation_id, stub_project_data):
+async def create_stub_project(client, stub_project_data):
     """Create a new project."""
-    response = await client.post(
-        f"/projects/stub?org_id={organisation_id}", json=stub_project_data
-    )
+    response = await client.post("/projects/stub", json=stub_project_data)
     assert response.status_code == HTTPStatus.OK
     return response.json()
 
@@ -221,11 +219,9 @@ async def test_unsupported_crs(stub_project_data, crs):
     assert exc_info.value.status_code == 400
 
 
-async def create_project(client, organisation_id, stub_project_data):
+async def create_project(client, stub_project_data):
     """Create a new project."""
-    response = await client.post(
-        f"/projects/stub?org_id={organisation_id}", json=stub_project_data
-    )
+    response = await client.post("/projects/stub", json=stub_project_data)
     assert response.status_code == HTTPStatus.OK
     return response.json()
 
@@ -434,7 +430,6 @@ async def test_project_summaries(client, project):
     assert first_project["name"] == project.name
     assert first_project["short_description"] == project.short_description
     assert first_project["hashtags"] == project.hashtags
-    assert first_project["organisation_id"] == project.organisation_id
 
 
 async def test_project_by_id(client, project):
@@ -454,7 +449,6 @@ async def test_project_by_id(client, project):
     assert data["status"] == project.status
     assert data["osm_category"] == project.osm_category
     assert data["hashtags"] == project.hashtags
-    assert data["organisation_id"] == project.organisation_id
     assert data["location_str"] == project.location_str
     assert data["tasks"] == []
 
@@ -560,7 +554,6 @@ async def test_read_project(client, project):
     assert data["odkid"] == project.odkid
     assert data["name"] == project.name
     assert data["bbox"] == project.bbox
-    assert data["organisation_logo"] == project.organisation_logo
 
     # Test with minimal param
     response = await client.get(f"/projects/{project.id}/minimal")
@@ -570,7 +563,6 @@ async def test_read_project(client, project):
     assert data["odkid"] == project.odkid
     assert data["name"] == project.name
     assert data["bbox"] is None
-    assert data["organisation_logo"] is None
 
 
 async def test_update_and_download_project_form(client, project):

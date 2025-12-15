@@ -20,7 +20,6 @@
 
 import os
 from time import time
-from typing import Optional
 
 import requests
 from fastapi import Request, Response
@@ -28,7 +27,7 @@ from fastapi.exceptions import HTTPException
 from loguru import logger as log
 from osm_login_python.core import Auth
 
-from app.auth.auth_logic import create_jwt_tokens, get_cookie_domain, set_cookies
+from app.auth.auth_logic import create_jwt_tokens, set_cookies
 from app.config import settings
 from app.db.enums import HTTPStatus, UserRole
 
@@ -37,27 +36,16 @@ if settings.DEBUG:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-async def init_osm_auth(mapper: Optional[bool] = None):
+async def init_osm_auth():
     """Initialize Auth object from osm-login-python."""
-    login_redirect_uri = (
-        settings.mapper_osm_login_redirect_uri
-        if mapper
-        else settings.manager_osm_login_redirect_uri
-    )
-
     return Auth(
         osm_url=settings.OSM_URL,
         client_id=settings.OSM_CLIENT_ID,
         client_secret=settings.OSM_CLIENT_SECRET.get_secret_value(),
         secret_key=settings.OSM_SECRET_KEY.get_secret_value(),
-        login_redirect_uri=login_redirect_uri,
+        login_redirect_uri=settings.manager_osm_login_redirect_uri,
         scope=settings.OSM_SCOPE,
     )
-
-
-async def get_mapper_osm_auth():
-    """Wrapper function to await async dependency."""
-    return await init_osm_auth(mapper=True)
 
 
 async def handle_osm_callback(request: Request, osm_auth: Auth):
@@ -108,7 +96,7 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
     cookie_name = settings.cookie_name
     osm_cookie_name = f"{cookie_name}_osm"
     log.debug(f"Creating cookie '{osm_cookie_name}' with OSM token")
-    cookie_domain = get_cookie_domain()
+    cookie_domain = settings.FMTM_DOMAIN
     response_plus_cookies.set_cookie(
         key=osm_cookie_name,
         value=serialised_osm_token,

@@ -53,13 +53,7 @@ export type updateReviewStateType = {
 
 export type projectSubmissionDashboardType = {
   slug: string;
-  organisation_name: string;
-  total_tasks: number;
   created_at: string;
-  organisation_id: number;
-  organisation_logo: string;
-  total_submissions: number;
-  total_contributors: number;
   last_active: string;
   status: project_status;
 };

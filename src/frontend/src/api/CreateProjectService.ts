@@ -25,9 +25,7 @@ export const CreateDraftProjectService = (
       const { projectPayload, odkPayload, project_admins } = payload;
 
       // 1. Create draft project
-      const response: AxiosResponse = await axios.post(url, projectPayload, {
-        params: { org_id: projectPayload.organisation_id },
-      });
+      const response: AxiosResponse = await axios.post(url, projectPayload, {});
 
       projectId = response.data.id;
 

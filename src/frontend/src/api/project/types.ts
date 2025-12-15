@@ -14,7 +14,6 @@ import type { taskType } from '@/types';
 
 export interface projectBaseType {
   id: number;
-  organisation_id: string;
   odkid: number;
   author_sub: number;
   name: string;
@@ -93,7 +92,7 @@ export type generateFilesPayloadType = {
 
 export type createStubProjectPayloadType = Pick<
   projectBaseType,
-  'name' | 'short_description' | 'description' | 'organisation_id' | 'outline'
+  'name' | 'short_description' | 'description' | 'outline'
 > & {
   merge: boolean;
 };
@@ -106,7 +105,6 @@ export type entitiesMappingStatusPayloadType = {
   entity_id: string;
   status: number;
   label: string;
-  submission_ids?: string;
 };
 
 // PARAMS TYPES
@@ -154,7 +152,6 @@ export type createStubProjectParamsType = {
 export type projectSummaryType = {
   id: number;
   name: string;
-  organisation_id: number;
   priority: number;
   hashtags: string[];
   location_str: string;
@@ -165,7 +162,6 @@ export type projectSummaryType = {
   status: project_status;
   visibility: project_visibility;
   field_mapping_app: field_mapping_app;
-  organisation_logo: string | null;
   centroid: Point;
   total_tasks: number;
   num_contributors: number;
@@ -188,17 +184,8 @@ export type tileType = {
 };
 
 export interface projectType extends projectBaseType {
-  tasks: taskType[];
-  organisation_name: string;
-  organisation_logo: string | null;
   centroid: Point;
   last_active: string;
-  total_tasks: number;
-  num_contributors: number;
-  total_submissions: number;
-  tasks_mapped: number;
-  tasks_validated: number;
-  tasks_bad: number;
 }
 
 export type odkEntitiesGeojsonType = FeatureCollection<Geometry, odkEntitiesGeojsonPropertiesType>;
@@ -220,7 +207,6 @@ export type odkEntitiesMappingStatusesType = {
   task_id: number;
   osm_id: number;
   status: number;
-  submission_ids: string;
   geometry: string;
   created_by: string;
   updated_at: string;

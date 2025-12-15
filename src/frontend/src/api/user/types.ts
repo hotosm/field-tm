@@ -74,7 +74,6 @@ export type userType = {
   tasks_validated: number;
   tasks_invalidated: number;
   projects_mapped: number[] | null;
-  api_key: string | null;
   registered_at: string;
   last_login_at: string;
   project_roles: Record<string, project_roles> | null;

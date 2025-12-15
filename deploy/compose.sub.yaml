@@ -20,8 +20,6 @@ name: fmtm
 volumes:
   fmtm_frontend:
     name: fmtm-frontend
-  fmtm_mapper_frontend:
-    name: fmtm-mapper-frontend
   fmtm_db_data:
     name: fmtm-db-data
   fmtm_data:
@@ -60,7 +58,6 @@ services:
       # - certs:/etc/letsencrypt
       - certs:/data
       - fmtm_frontend:/var/www/html/${FMTM_DOMAIN}:ro
-      - fmtm_mapper_frontend:/var/www/html/${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}:ro
       - central_frontend:/var/www/html/${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}:ro
     environment:
       # General
@@ -109,31 +106,14 @@ services:
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
       # Reverse proxy configs
-      SERVER_NAME: ${FMTM_DOMAIN} ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN} ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN} ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN} ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN} ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
+      SERVER_NAME: ${FMTM_DOMAIN} ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN} ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
       # We need this to allow for client-side routing in the SPA (from index.html)
       ${FMTM_DOMAIN}_ERRORS: 404=/index.html
-      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_ERRORS: 404=/index.html
-      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
-      # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
-      ${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
       # CORS for the backend is configured by FastAPI
       ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
       ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
-      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://s3:9000
-      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 10G
-      # CORS must be enabled for Minio to work
-      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_USE_CORS: yes
-      ${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://${FMTM_DOMAIN}
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://electric:3000
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
-      # CORS must be enabled for Electric to work
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_USE_CORS: yes
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_ALLOW_ORIGIN: https://${FMTM_MAPPER_DOMAIN:-mapper.$FMTM_DOMAIN}
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
-      # Expose-Headers are RESPONSE headers the browser is allowed to access
-      ${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema,electric-cursor,electric-up-to-date
       ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
       ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
@@ -222,11 +202,8 @@ services:
       args:
         APP_VERSION: ${GIT_BRANCH}
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}
-        VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.$FMTM_DOMAIN}
-        VITE_S3_URL: https://${FMTM_S3_DOMAIN:-s3.$FMTM_DOMAIN}
     volumes:
       - fmtm_frontend:/frontend/manager
-      - fmtm_mapper_frontend:/frontend/mapper
     network_mode: none
     restart: "on-failure:2"
 
@@ -280,21 +257,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-
-  central-webhook:
-    image: "ghcr.io/hotosm/central-webhook:0.3.0"
-    depends_on:
-      central:
-        condition: service_healthy
-    environment:
-      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER}:${CENTRAL_DB_PASSWORD}@central-db:5432/${CENTRAL_DB_NAME}?sslmode=disable
-      CENTRAL_WEBHOOK_UPDATE_ENTITY_URL: http://api:8000/integrations/webhooks/entity-status
-      # CENTRAL_WEBHOOK_REVIEW_SUBMISSION_URL: http://api:8000/integrations/webhooks/entity-status
-      CENTRAL_WEBHOOK_API_KEY: ${CENTRAL_WEBHOOK_API_KEY}
-      CENTRAL_WEBHOOK_LOG_LEVEL: ${CENTRAL_WEBHOOK_LOG_LEVEL:-INFO}
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v3.0.0"

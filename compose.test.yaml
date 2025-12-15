@@ -58,18 +58,11 @@ services:
       central:
         condition: service_healthy
         required: false
-      s3:
-        condition: service_healthy
 
   # ui:
   #   extends:
   #     file: compose.yaml
   #     service: ui
-
-  # ui-mapper:
-  #   extends:
-  #     file: compose.yaml
-  #     service: ui-mapper
 
   central:
     extends:
@@ -79,19 +72,11 @@ services:
     depends_on: !override
       central-db:
         condition: service_healthy
-      s3:
-        condition: service_healthy
 
   central-ui:
     extends:
       file: compose.yaml
       service: central-ui
-
-  # No tests involve the webhook, yet
-  # central-webhook:
-  #   extends:
-  #     file: compose.yaml
-  #     service: central-webhook
 
   fmtm-db:
     extends:

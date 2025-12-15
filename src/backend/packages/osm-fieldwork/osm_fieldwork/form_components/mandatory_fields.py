@@ -239,19 +239,6 @@ def _get_mandatory_fields(
         },
         {
             "type": "calculate",
-            "name": "submission_ids",
-            "notes": "Update the submission ids",
-            "label::english(en)": "Submission ids",
-            "appearance": "minimal",
-            "calculation": (
-                f"if({INSTANCE_FEATURE}/submission_ids,"
-                f"concat({INSTANCE_FEATURE}/submission_ids, ',',{INSTANCE_ID}),"
-                f"{INSTANCE_ID})"
-            ),
-            "save_to": "submission_ids",
-        },
-        {
-            "type": "calculate",
             "name": "created_by",
             "notes": "Update the created_by field",
             "label::english(en)": "Created by",

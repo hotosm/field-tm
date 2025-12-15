@@ -19,8 +19,6 @@
 
 import ast
 import json
-import subprocess
-import uuid
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
@@ -30,7 +28,6 @@ from typing import Optional, Union
 import aiohttp
 import geojson
 import geojson_pydantic
-from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from loguru import logger as log
@@ -49,18 +46,14 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import (
-    BackgroundTaskStatus,
     FieldMappingApp,
     HTTPStatus,
     ProjectStatus,
     XLSFormType,
 )
 from app.db.models import (
-    DbBackgroundTask,
-    DbBasemap,
     DbProject,
     DbUser,
-    DbUserRole,
 )
 from app.db.postgis_utils import (
     check_crs,
@@ -70,10 +63,7 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
-from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
-from app.s3 import add_file_to_bucket, add_obj_to_bucket
-from app.submissions import submission_crud
 
 
 async def get_projects_featcol(
@@ -336,51 +326,6 @@ async def get_or_set_data_extract_url(
     return url
 
 
-async def upload_data_extract_to_s3(
-    db: Connection,
-    project_id: int,
-    fgb_content: bytes,
-) -> str:
-    """Uploads custom data extracts to S3.
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): The ID of the project.
-        fgb_content (bytes): Content of read flatgeobuf file.
-
-    Returns:
-        str: URL to fgb file in S3.
-    """
-    project = await project_deps.get_project_by_id(db, project_id)
-    log.debug(f"Uploading custom data extract for project ({project.id})")
-
-    fgb_obj = BytesIO(fgb_content)
-    s3_fgb_path = f"{project.organisation_id}/{project_id}/data_extract.fgb"
-
-    log.debug(f"Uploading fgb to S3 path: /{s3_fgb_path}")
-    add_obj_to_bucket(
-        settings.S3_BUCKET_NAME,
-        fgb_obj,
-        s3_fgb_path,
-        content_type="application/octet-stream",
-    )
-
-    # Add url and type to database
-    s3_fgb_full_url = (
-        f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{s3_fgb_path}"
-    )
-
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(
-            data_extract_url=s3_fgb_full_url,
-        ),
-    )
-
-    return s3_fgb_full_url
-
-
 async def upload_geojson_data_extract(
     db: Connection,
     project_id: int,
@@ -421,11 +366,8 @@ async def upload_geojson_data_extract(
         log.error(msg)
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
-    return await upload_data_extract_to_s3(
-        db,
-        project_id,
-        fgb_data,
-    )
+    # TODO simply post this directly to ODK Central an Entity List
+    return
 
 
 def flatten_dict(d, parent_key="", sep="_"):
@@ -536,7 +478,6 @@ async def generate_project_files(
             # FIXME perhaps this should be done in the SQL code?
             entity_properties = list(first_feature["properties"].keys())
             for field in [
-                "submission_ids",
                 "created_by",
                 "fill",
                 "marker-color",
@@ -563,10 +504,6 @@ async def generate_project_files(
         project_xlsform = project.xlsform_content
         project_odk_form_id = project.odk_form_id
         project_odk_creds = project.odk_credentials
-
-        if not project_odk_creds:
-            # get default credentials
-            project_odk_creds = await get_default_odk_creds()
 
         odk_token = await generate_odk_central_project_content(
             project_odk_id,
@@ -724,217 +661,6 @@ async def get_project_features_geojson(
     return data_extract_geojson
 
 
-# NOTE defined as non-async to run in separate thread
-def generate_project_basemap(
-    db: Connection,
-    project_id: int,
-    org_id: int,
-    background_task_id: uuid.UUID,
-    source: str,
-    output_format: str = "mbtiles",
-    tms: Optional[str] = None,
-):
-    """Get the tiles for a project.
-
-    FIXME waiting on hotosm/basemap-api project to replace this
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): ID of project to create tiles for.
-        org_id (int): Organisation ID that the project falls within.
-        background_task_id (uuid.UUID): UUID of background task to track.
-        source (str): Tile source ("esri", "bing", "google", "custom" (tms)).
-        output_format (str, optional): Default "mbtiles".
-            Other options: "pmtiles", "sqlite3".
-        tms (str, optional): Default None. Custom TMS provider URL.
-    """
-    new_basemap = None
-    mbtiles_file = ""
-    final_tile_file = ""
-
-    # TODO update this for user input or automatic
-    # maxzoom can be determined from OAM: https://tiles.openaerialmap.org/663
-    # c76196049ef00013b8494/0/663c76196049ef00013b8495
-    # TODO should inverted_y be user configurable?
-
-    # NOTE mbtile max supported zoom level is 22 (in GDAL at least)
-    if tms:
-        zooms = "12-22"
-    # While typically satellite imagery TMS only goes to zoom 19
-    else:
-        zooms = "12-19"
-
-    mbtiles_file = Path(f"/tmp/{project_id}_{source}tiles.mbtiles")
-
-    # Set URL based on source (previously in osm-fieldwork)
-    if source == "esri":
-        # ESRI uses inverted zyx convention
-        # the ordering is extracted automatically from the URL, else use
-        # -inverted-y param
-        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
-        tile_format = "jpeg"
-    elif source == "bing":
-        # FIXME this probably doesn't work
-        tms_url = "http://ecn.t0.tiles.virtualearth.net/tiles/h{z}/{x}/{y}.jpg?g=129&mkt=en&stl=H"
-        tile_format = "jpg"
-    elif source == "google":
-        tms_url = "https://mt0.google.com/vt?lyrs=s&x={x}&y={y}&z={z}"
-        tile_format = "jpg"
-    elif source == "custom" and tms:
-        tms_url = tms
-        if not (tile_format := Path(tms_url).suffix.lstrip(".")):
-            # Default to png if suffix not included in URL
-            tile_format = "png"
-    else:
-        raise ValueError("Must select a source from: esri,bing,google,custom")
-
-    # Invert zxy --> zyx for OAM provider
-    # inverted_y = True if tms and "openaerialmap" in tms else False
-    # NOTE the xy ordering is determined from the URL placeholders, by tilepack!
-    inverted_y = False
-
-    # NOTE here we put the connection in autocommit mode to ensure we get
-    # background task db entries if there is an exception.
-    # The default behaviour is to rollback on exception.
-    autocommit_update_sync = async_to_sync(db.set_autocommit)
-    autocommit_update_sync(True)
-
-    try:
-        sync_basemap_create = async_to_sync(DbBasemap.create)
-        new_basemap = sync_basemap_create(
-            db,
-            project_schemas.BasemapIn(
-                project_id=project_id,
-                background_task_id=background_task_id,
-                status=BackgroundTaskStatus.PENDING,
-                tile_source=source,
-            ),
-        )
-
-        min_lon, min_lat, max_lon, max_lat = new_basemap.bbox
-
-        tilepack_cmd = [
-            # "prlimit", f"--as={500 * 1000}", "--",
-            "tilepack",
-            "-dsn",
-            f"{str(mbtiles_file)}",
-            "-url-template",
-            f"{tms_url}",
-            # tilepack requires format: south,west,north,east
-            "-bounds",
-            f"{min_lat},{min_lon},{max_lat},{max_lon}",
-            "-zooms",
-            f"{zooms}",
-            "-output-mode",
-            "mbtiles",  # options: mbtiles or disk
-            "-mbtiles-format",
-            f"{tile_format}",
-            "-ensure-gzip=false",
-            "-tileset-name",
-            f"fmtm_{project_id}_{source}tiles",
-        ]
-        # Add '-inverted-y' only if needed
-        if inverted_y:
-            tilepack_cmd.append("-inverted-y")
-        log.debug(
-            "Creating basemap mbtiles using tilepack with command: "
-            f"{' '.join(tilepack_cmd)}"
-        )
-        subprocess.run(tilepack_cmd, check=True)
-        log.info(
-            f"MBTile basemap created for project ID {project_id}: {str(mbtiles_file)}"
-        )
-        # write to another var so we upload either mbtiles OR pmtiles override below
-        final_tile_file = str(mbtiles_file)
-
-        if output_format == "pmtiles":
-            pmtiles_file = mbtiles_file.with_suffix(".pmtiles")
-            pmtile_command = [
-                # "prlimit", f"--as={500 * 1000}", "--",
-                "pmtiles",
-                "convert",
-                f"{str(mbtiles_file)}",
-                f"{str(pmtiles_file)}",
-            ]
-            log.debug(
-                "Converting mbtiles --> pmtiles file with command: "
-                f"{' '.join(pmtile_command)}"
-            )
-            subprocess.run(pmtile_command, check=True)
-            log.info(
-                f"PMTile basemap created for project ID {project_id}: "
-                f"{str(pmtiles_file)}"
-            )
-            final_tile_file = str(pmtiles_file)
-
-        # Generate S3 urls
-        # We parse as BasemapOut to calculated computed fields (format, mimetype)
-        basemap_out = project_schemas.BasemapOut(
-            **new_basemap.model_dump(exclude=["url"]),
-            url=final_tile_file,
-        )
-        basemap_s3_path = (
-            f"{org_id}/{project_id}/basemaps/{basemap_out.id}.{basemap_out.format}"
-        )
-        log.debug(f"Uploading basemap to S3 path: {basemap_s3_path}")
-        add_file_to_bucket(
-            settings.S3_BUCKET_NAME,
-            basemap_s3_path,
-            final_tile_file,
-            content_type=basemap_out.mimetype,
-        )
-        basemap_external_s3_url = (
-            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{basemap_s3_path}"
-        )
-        log.info(f"Upload of basemap to S3 complete: {basemap_external_s3_url}")
-
-        update_basemap_sync = async_to_sync(DbBasemap.update)
-        update_basemap_sync(
-            db,
-            basemap_out.id,
-            project_schemas.BasemapUpdate(
-                url=basemap_external_s3_url,
-                status=BackgroundTaskStatus.SUCCESS,
-            ),
-        )
-
-        update_bg_task_sync = async_to_sync(DbBackgroundTask.update)
-        update_bg_task_sync(
-            db,
-            background_task_id,
-            project_schemas.BackgroundTaskUpdate(status=BackgroundTaskStatus.SUCCESS),
-        )
-
-        log.info(f"Tiles generation process completed for project id {project_id}")
-
-    except Exception as e:
-        log.debug(str(format_exc()))
-        log.exception(f"Error: {e}", stack_info=True)
-        log.error(f"Tiles generation process failed for project id {project_id}")
-
-        if new_basemap:
-            update_basemap_sync = async_to_sync(DbBasemap.update)
-            update_basemap_sync(
-                db,
-                new_basemap.id,
-                project_schemas.BasemapUpdate(status=BackgroundTaskStatus.FAILED),
-            )
-
-        update_bg_task_sync = async_to_sync(DbBackgroundTask.update)
-        update_bg_task_sync(
-            db,
-            background_task_id,
-            project_schemas.BackgroundTaskUpdate(
-                status=BackgroundTaskStatus.FAILED,
-                message=str(e),
-            ),
-        )
-    finally:
-        Path(mbtiles_file).unlink(missing_ok=True)
-        Path(final_tile_file).unlink(missing_ok=True)
-        log.debug("Cleaning up tile archives on disk")
-
-
 # async def convert_geojson_to_osm(geojson_file: str):
 #     """Convert a GeoJSON file to OSM format."""
 #     jsonin = JsonDump()
@@ -1024,48 +750,6 @@ async def get_paginated_projects(
     return {"results": summaries, "pagination": pagination}
 
 
-async def get_project_users_plus_contributions(db: Connection, project_id: int):
-    """Get the users and their number of submissions for a project.
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): The ID of the project.
-
-    Returns:
-        List[Dict[str, Union[str, int]]]: A list of dictionaries containing
-            the username and the number of submissions made by each user
-            for the specified project.
-    """
-    try:
-        project = await DbProject.one(db, project_id, minimal=False)
-
-        # Fetch all submissions for the project
-        data = await submission_crud.get_submission_by_project(project, {})
-        submissions = data.get("value", [])
-
-        # Count submissions per user
-        submission_counts = {}
-        for sub in submissions:
-            username = sub.get("username")
-            if "|" in username:
-                user = await DbUser.one(db, user_subidentifier=username)
-                username = user.username if user else username
-            if username:
-                submission_counts[username] = submission_counts.get(username, 0) + 1
-
-        # Format as list of dicts, sorted by count desc
-        result = [
-            {"user": user, "submissions": count}
-            for user, count in sorted(
-                submission_counts.items(), key=lambda x: x[1], reverse=True
-            )
-        ]
-        return result
-    except Exception as e:
-        log.error(f"Error in get_project_users_plus_contributions: {e}")
-        return []
-
-
 async def send_project_manager_message(
     request: Request,
     project: DbProject,
@@ -1096,33 +780,3 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
-
-
-async def unassign_user_from_project(db, project_id, user_sub):
-    """Unassigns a user from a project by removing their role.
-
-    Args:
-        db: Database session or connection.
-        project_id: ID of the project.
-        user_sub: Unique user identifier.
-
-    Returns:
-        bool: True if the user was successfully unassigned.
-
-    Raises:
-        HTTPException (404): If the user is not associated with the project.
-    """
-    try:
-        user_role = await DbUserRole.get(db, project_id, user_sub)
-        if not user_role:
-            raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
-                detail=f"User {user_sub} is not associated with project {project_id}.",
-            )
-        return await DbUserRole.delete(db, project_id, user_sub)
-    except Exception as e:
-        log.exception(f"Failed to unassign user {user_sub} from project {project_id}")
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail=f"Failed to unassign user {user_sub} from project {project_id}",
-        ) from e

@@ -18,13 +18,13 @@
 
 set dotenv-load
 
-mod start 'contrib/just/start/Justfile'
-mod stop 'contrib/just/stop/Justfile'
-mod build 'contrib/just/build/Justfile'
-mod test 'contrib/just/test/Justfile'
-mod config 'contrib/just/config/Justfile'
-mod manage 'contrib/just/manage/Justfile'
-mod prep 'contrib/just/prep/Justfile'
+mod start 'tasks/start'
+mod stop 'tasks/stop'
+mod build 'tasks/build'
+mod test 'tasks/test'
+mod config 'tasks/config'
+mod manage 'tasks/manage'
+mod prep 'tasks/prep'
 
 # List available commands
 [private]
@@ -63,23 +63,6 @@ docs:
   cd {{justfile_directory()}}/src/backend
   uv sync --group docs
   uv run mkdocs serve --config-file ../../mkdocs.yml --dev-addr 0.0.0.0:3000
-
-# Mount an S3 bucket on your filesystem
-mount-s3:
-  #!/usr/bin/env sh
-  set -e
-
-  fstab_entry="fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
-  use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
-  url=http://s3.fmtm.localhost:7050 0 0"
-
-  if ! grep -q "$fstab_entry" /etc/fstab; then
-      echo "Mounting local Field-TM S3 permanently in /etc/fstab"
-      echo "$fstab_entry" | sudo tee -a /etc/fstab > /dev/null
-      echo
-  else
-      echo "Local Field-TM S3 is already mounted"
-  fi
 
 # Echo to terminal with blue colour
 [no-cd]

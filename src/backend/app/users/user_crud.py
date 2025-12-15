@@ -38,7 +38,6 @@ from app.db.models import (
     DbUser,
 )
 from app.db.postgis_utils import timestamp
-from app.helpers.helper_crud import send_email
 from app.projects.project_crud import get_pagination
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
@@ -74,7 +73,7 @@ async def get_or_create_user(
                 DO UPDATE SET
                     profile_img = EXCLUDED.profile_img,
                     last_login_at = NOW()
-                RETURNING sub, username, email_address, profile_img, role
+                RETURNING sub, username, email_address, profile_img, role, is_admin
             )
 
             SELECT
@@ -83,11 +82,7 @@ async def get_or_create_user(
                 u.email_address,
                 u.profile_img,
                 u.role,
-
-                -- Aggregate the organisation IDs managed by the user
-                array_agg(
-                    DISTINCT om.organisation_id
-                ) FILTER (WHERE om.organisation_id IS NOT NULL) AS orgs_managed,
+                u.is_admin,
 
                 -- Aggregate project roles for the user, as project:role pairs
                 jsonb_object_agg(
@@ -97,13 +92,13 @@ async def get_or_create_user(
 
             FROM upserted_user u
             LEFT JOIN user_roles ur ON u.sub = ur.user_sub
-            LEFT JOIN organisation_managers om ON u.sub = om.user_sub
             GROUP BY
                 u.sub,
                 u.username,
                 u.email_address,
                 u.profile_img,
-                u.role;
+                u.role,
+                u.is_admin;
         """
 
         async with db.cursor(row_factory=class_row(DbUser)) as cur:
@@ -261,21 +256,13 @@ async def send_invitation_message(
         )
         log.info(f"Invitation message sent to osm user ({invitee_username}).")
 
-    elif signin_type == "google":
-        await send_email(
-            user_emails=[user_email],
-            title=title,
-            message_content=message_content,
-        )
-        log.info(f"Invitation message sent to email user ({user_email}).")
-
 
 async def get_paginated_users(
     db: Connection,
     page: int,
     results_per_page: int,
     search: Optional[str] = None,
-    signin_type: Literal["osm", "google"] = "osm",
+    signin_type: Literal["osm"] = "osm",
 ) -> dict:
     """Helper function to fetch paginated users with optional filters."""
     # Get subset of users
