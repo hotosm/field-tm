@@ -45,26 +45,6 @@ bash install.sh
 If more details are required, check out the
 [dev docs][6]
 
-### Table of Contents
-
-- [Installation](#installation)
-  - [Software Requirements](#software-requirements)
-  - [Easy Install](#easy-install)
-  - [Manual Install](#manual-install)
-    - [Table of Contents](#table-of-contents)
-    - [Clone the Field-TM repository](#clone-the-field-tm-repository)
-    - [Setup Your Local Environment](#setup-your-local-environment)
-      - [1. Setup OSM OAUTH 2.0](#1-setup-osm-oauth-20)
-      - [2. Create an `.env` File](#2-create-an-env-file)
-    - [Start the API with Docker](#start-the-api-with-docker)
-      - [Select the install type](#select-the-install-type)
-      - [Pull the Images](#pull-the-images)
-      - [Build the Frontend](#build-the-frontend)
-      - [Start the Containers](#start-the-containers)
-    - [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
-    - [Set Up Monitoring (Optional)](#set-up-monitoring-optional)
-    - [Check Authentication (Optional)](#check-authentication-optional)
-
 ### Clone the Field-TM repository
 
 Clone the repository to your local machine using the following command:
@@ -109,7 +89,7 @@ To properly configure your Field-TM project, you will need to create keys for OS
 
 4. Now save your Client ID and Client Secret for the next step.
 
-#### 2. Create an `.env` File
+#### 2. Create a dotenv file
 
 Environmental variables are used throughout this project.
 To get started, create `.env` file in the top level dir,
@@ -118,91 +98,18 @@ a sample is located at `.env.example`.
 This can be created interactively by running:
 
 ```bash
-bash scripts/1-environment/gen-env.sh
+just config generate-dotenv
 ```
 
 > Note: If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
 > <http://fmtm.localhost:7050,http://some.other.domain>
->
-> Note: It is possible to generate the auth pub/priv key manually using:
-> openssl genrsa -out field-tm-private.pem 4096
-> openssl rsa -in field-tm-private.pem -pubout -out field-tm-private.pem
 
-### Start the API with Docker
-
-This is the easiest way to get started with Field-TM.
-
-Docker runs each service inside **containers**, fully isolated from your
-host operating system.
-
-#### Select the install type
-
-Determine the what type of Field-TM install you would like:
-
-```text
-main - the latest production
-staging - the latest staging
-dev - the latest development (warning: may be unstable)
-local dev - used during development, or to start a test version
-```
-
-The corresponding docker-compose files are:
-
-```text
-main - deploy/compose.main.yaml
-staging - deploy/compose.staging.yaml
-dev - deploy/compose.dev.yaml
-local test - compose.yaml
-```
-
-Set your selection to a terminal variable to make the next step easier:
+#### 3. Deploy using Just
 
 ```bash
-export COMPOSE_FILE={your_selection}
-
-# E.g.
-export COMPOSE_FILE=deploy/compose.dev.yaml
+just start prod
 ```
-
-#### Pull the Images
-
-```bash
-docker compose -f "${COMPOSE_FILE}" pull
-```
-
-> This will pull the latest containers for the branch you selected.
-
-#### Build the Frontend
-
-Before we can run, you need to build your version of the frontend.
-
-This is because the frontend contains variable specific to your deployment.
-
-```bash
-docker compose -f "${COMPOSE_FILE}" build ui
-```
-
-#### Start the Containers
-
-```bash
-docker compose -f "${COMPOSE_FILE}" up -d
-```
-
-You should see the containers start up in order.
-
-Once complete, you should now be able to **navigate to the project in your browser:**
-
-```text
-https://{YOUR_DOMAIN}
-
-# For the local test setup, this will be
-http://fmtm.localhost:7050
-```
-
-> Note: If those link doesn't work, check the logs with `docker compose logs api`.
->
-> Note: Use `docker ps` to view all container names.
 
 ### Setup ODK Central User (Optional)
 
