@@ -6,7 +6,6 @@ import ProjectSlice from '@/store/slices/ProjectSlice';
 import CreateProjectReducer from '@/store/slices/CreateProjectSlice';
 import CommonSlice from '@/store/slices/CommonSlice';
 import LoginSlice from '@/store/slices/LoginSlice';
-import OrganisationSlice from '@/store/slices/organisationSlice';
 import SubmissionSlice from '@/store/slices/SubmissionSlice';
 import TaskSlice from '@/store/slices/TaskSlice';
 import DataConflationSlice from '@/store/slices/DataConflationSlice';
@@ -33,7 +32,6 @@ const rootReducer = combineReducers({
   theme: ThemeSlice.reducer,
   createproject: CreateProjectReducer,
   // createproject: persist('createproject', ['projectDetails', 'projectInfo'], CreateProjectReducer),
-  organisation: OrganisationSlice.reducer,
   // added common slice in order to handle all the common things like snackbar etc
   common: CommonSlice.reducer,
   submission: SubmissionSlice.reducer,
