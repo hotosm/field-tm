@@ -5,22 +5,13 @@ import Home from '@/views/Home';
 import MainView from '@/views/MainView';
 import ProtectedRoute from '@/utilities/ProtectedRoute';
 import NotFoundPage from '@/views/NotFound404';
-import Organisation from '@/views/Organisation';
-import CreateOrganization from '@/views/CreateOrganization';
-import ApproveOrganization from '@/views/ApproveOrganization';
 import OsmAuth from '@/views/OsmAuth';
 import PlaywrightTempLogin from '@/views/PlaywrightTempLogin';
-import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateProject from '@/views/CreateProject';
-import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetails from '@/views/ProjectDetails';
-import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
 import ManageUsers from '@/views/ManageUsers';
-import DataConflation from '@/views/DataConflation';
-import OrganizationDashboard from '@/views/OrganizationDashboard';
-import ManageOrganization from '@/views/ManageOrganization';
 import Invite from '@/views/Invite';
 
 const routes = createBrowserRouter([
@@ -41,60 +32,6 @@ const routes = createBrowserRouter([
           <ErrorBoundary>
             <Home />
           </ErrorBoundary>
-        ),
-      },
-      {
-        path: '/organization',
-        element: (
-          <ProtectedRoute>
-            <ErrorBoundary>
-              <Organisation />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/organization/new',
-        element: (
-          <ProtectedRoute>
-            <ErrorBoundary>
-              <CreateOrganization />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/organization/approve/:id',
-        element: (
-          <ProtectedRoute>
-            <ErrorBoundary>
-              <ApproveOrganization />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/project-submissions/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div></div>}>
-              <ErrorBoundary>
-                <ProjectSubmissions />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/project-submissions/:projectId/tasks/:taskId/submission/:instanceId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div></div>}>
-              <ErrorBoundary>
-                <SubmissionDetails />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
         ),
       },
       {
@@ -154,26 +91,6 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/under-construction/',
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <UnderConstruction />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/manage/organization/:id',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <ManageOrganization />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: '/manage/project/:id',
         element: (
           <ProtectedRoute>
@@ -192,30 +109,6 @@ const routes = createBrowserRouter([
             <Suspense fallback={<div>Loading...</div>}>
               <ErrorBoundary>
                 <ManageUsers />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/conflate-data/:projectId/:taskId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <DataConflation />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/organization/:id',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <OrganizationDashboard />
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
