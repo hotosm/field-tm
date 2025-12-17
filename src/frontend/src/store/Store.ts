@@ -7,7 +7,6 @@ import CreateProjectReducer from '@/store/slices/CreateProjectSlice';
 import CommonSlice from '@/store/slices/CommonSlice';
 import LoginSlice from '@/store/slices/LoginSlice';
 import TaskSlice from '@/store/slices/TaskSlice';
-import DataConflationSlice from '@/store/slices/DataConflationSlice';
 import UserSlice from '@/store/slices/UserSlice';
 import { persistReducer } from 'redux-persist';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
@@ -34,7 +33,6 @@ const rootReducer = combineReducers({
   // added common slice in order to handle all the common things like snackbar etc
   common: CommonSlice.reducer,
   task: TaskSlice.reducer,
-  dataconflation: DataConflationSlice.reducer,
   user: UserSlice.reducer,
 });
 // Infer the `RootState` and `AppDispatch` types from the store itself
