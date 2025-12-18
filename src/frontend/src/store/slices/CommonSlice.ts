@@ -9,7 +9,6 @@ const initialState: CommonStateTypes = {
     variant: 'info',
     duration: 2000,
   },
-  postOrganisationLoading: false,
   projectNotFound: false,
   previousSelectedOptions: {},
 };
@@ -28,9 +27,6 @@ const CommonSlice = createSlice({
       }>,
     ) {
       state.snackbar = { open: true, variant: 'error', duration: 2000, ...action.payload };
-    },
-    PostOrganisationLoading(state, action: PayloadAction<boolean>) {
-      state.postOrganisationLoading = action.payload;
     },
     SetProjectNotFound(state, action: PayloadAction<boolean>) {
       state.projectNotFound = action.payload;

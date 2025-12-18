@@ -527,7 +527,7 @@ services:
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"
-    build: qfield
+    build: src/qfield
     volumes:
       - qfield_projects:/opt/qfield
       - ./src/qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro

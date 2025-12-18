@@ -7,11 +7,9 @@ import { useAppSelector } from '@/types/reduxTypes';
 import { GetProjectQrCode } from '@/api/Files';
 import { useDownloadFormQuery } from '@/api/central';
 import { useDownloadFeaturesQuery, useDownloadTaskBoundariesQuery } from '@/api/project';
-import { useGetDownloadSubmissionQuery } from '@/api/submission';
 import { downloadBlobData } from '@/utilfunctions';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { field_mapping_app } from '@/types/enums';
 
 type downloadTypeType = 'form' | 'geojson' | 'extract' | 'submission' | 'qr';
 type downloadButtonType = { downloadType: downloadTypeType; label: string; isLoading: boolean; show: boolean };
@@ -54,15 +52,6 @@ const ProjectOptions = () => {
     options: { queryKey: ['get-download-features', +projectId], enabled: false },
   });
 
-  const {
-    error: downloadSubmissionError,
-    isLoading: isDownloadSubmissionLoading,
-    refetch: downloadSubmission,
-  } = useGetDownloadSubmissionQuery({
-    params: { project_id: +projectId, file_type: 'geojson', submitted_date_range: undefined },
-    options: { queryKey: ['get-download-submission', +projectId], enabled: false },
-  });
-
   const downloadQr = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = qrcode;
@@ -84,12 +73,6 @@ const ProjectOptions = () => {
       show: true,
     },
     { downloadType: 'extract', label: 'MAP FEATURES', isLoading: isDownloadFeaturesLoading, show: true },
-    {
-      downloadType: 'submission',
-      label: 'SUBMISSIONS',
-      isLoading: isDownloadSubmissionLoading,
-      show: projectInfo.field_mapping_app !== field_mapping_app.QField,
-    },
     { downloadType: 'qr', label: 'QR CODE', isLoading: false, show: projectInfo.use_odk_collect || false },
   ];
 
@@ -104,15 +87,14 @@ const ProjectOptions = () => {
       );
     };
 
-    if (downloadFormError || downloadTaskBoundariesError || downloadFeaturesError || downloadSubmissionError) {
+    if (downloadFormError || downloadTaskBoundariesError || downloadFeaturesError) {
       handleBlobErrorResponse(
         downloadFormError?.response?.data ||
           downloadTaskBoundariesError?.response?.data ||
-          downloadFeaturesError?.response?.data ||
-          downloadSubmissionError?.response?.data,
+          downloadFeaturesError?.response?.data,
       );
     }
-  }, [downloadFormError, downloadTaskBoundariesError, downloadFeaturesError, downloadSubmissionError]);
+  }, [downloadFormError, downloadTaskBoundariesError, downloadFeaturesError]);
 
   const handleDownload = async (downloadType: downloadTypeType) => {
     switch (downloadType) {
@@ -127,10 +109,6 @@ const ProjectOptions = () => {
       case 'extract':
         const { data: featuresBlobData } = await downloadFeatures();
         if (featuresBlobData) downloadBlobData(featuresBlobData, `features_${projectId}`, 'geojson');
-        break;
-      case 'submission':
-        const { data: submissionBlobData } = await downloadSubmission();
-        if (submissionBlobData) downloadBlobData(submissionBlobData, `project_submissions_${projectId}`, 'geojson');
         break;
       case 'qr':
         downloadQr();
