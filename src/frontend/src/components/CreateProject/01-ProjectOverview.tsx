@@ -22,7 +22,6 @@ import isEmpty from '@/utilfunctions/isEmpty';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
-import { useGetMyOrganisationsQuery, useGetOrganisationsQuery } from '@/api/organisation';
 import { useGetUserListQuery } from '@/api/user';
 import { useTestOdkCredentialsMutation } from '@/api/central';
 import { field_mapping_app } from '@/types/enums';
@@ -68,30 +67,8 @@ const ProjectOverview = () => {
   const { errors } = formState;
   const values = watch();
 
-  const { data: organisationListData, isLoading: isOrganisationListLoading } = useGetOrganisationsQuery({
-    options: { queryKey: ['get-organisation-list'], enabled: isAdmin },
-  });
-
-  const { data: myOrganisationListData, isLoading: isMyOrganisationListLoading } = useGetMyOrganisationsQuery({
-    options: { queryKey: ['get-my-organisation-list'], enabled: !isAdmin },
-  });
-
   // if draft project created, then instead of calling organisation endpoint populate organisation list with project minimal response data
-  const organisationList = values?.id
-    ? [
-        {
-          id: values.organisation_id,
-          label: values.organisation_name,
-          value: values.organisation_id,
-          hasODKCredentials: true,
-        },
-      ]
-    : (isAdmin ? organisationListData : myOrganisationListData)?.map((org) => ({
-        id: org.id,
-        label: org.name,
-        value: org.id,
-        hasODKCredentials: !!org?.odk_central_url,
-      }));
+  const organisationList = [];
 
   const { data: users, isLoading: userListLoading } = useGetUserListQuery({
     params: { search: userSearchText, signin_type: 'osm' },
@@ -107,14 +84,6 @@ const ProjectOverview = () => {
       label: user.username,
       value: user.sub,
     })) || [];
-
-  useEffect(() => {
-    if (!authDetails || isEmpty(organisationList) || isAdmin || authDetails?.orgs_managed?.length > 1 || !!values.id)
-      return;
-
-    setValue('organisation_id', authDetails?.orgs_managed[0]);
-    handleOrganizationChange(authDetails?.orgs_managed[0]);
-  }, [authDetails, organisationListData, myOrganisationListData]);
 
   useEffect(() => {
     const outlineArea = values.outlineArea;
@@ -278,7 +247,6 @@ const ProjectOverview = () => {
                 }}
                 placeholder="Organization Name"
                 disabled={(!isAdmin && authDetails?.orgs_managed?.length === 1) || !!values.id}
-                isLoading={isOrganisationListLoading || isMyOrganisationListLoading}
                 ref={field.ref}
               />
             )}

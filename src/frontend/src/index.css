@@ -251,24 +251,6 @@ button {
   }
 }
 
-/* react-date-picker */
-.react-datepicker-popper {
-  z-index: 9000;
-}
-.react-datepicker__day--selected,
-.react-datepicker__day--in-range {
-  background-color: #d73f3e !important;
-}
-.react-datepicker__day--in-selecting-range {
-  background-color: #df6565 !important;
-}
-.react-datepicker__day--selected:hover {
-  background-color: #bc2c2c !important;
-}
-.react-datepicker__day--keyboard-selected {
-  background-color: #fcc2c2 !important;
-}
-
 /* remove counter on input type of number */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,

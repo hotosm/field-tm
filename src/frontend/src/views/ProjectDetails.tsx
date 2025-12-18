@@ -9,10 +9,6 @@ import GenerateBasemap from '@/components/GenerateBasemap';
 import TaskSelectionPopup from '@/components/ProjectDetails/TaskSelectionPopup';
 import FeatureSelectionPopup from '@/components/ProjectDetails/FeatureSelectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
-import MobileFooter from '@/components/ProjectDetails/MobileFooter';
-import MobileActivitiesContents from '@/components/ProjectDetails/MobileActivitiesContents';
-import BottomSheet from '@/components/common/BottomSheet';
-import MobileProjectInfoContent from '@/components/ProjectDetails/MobileProjectInfoContent';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetails/ProjectOptions';
 import Button from '@/components/common/Button';
@@ -31,6 +27,7 @@ import { Tooltip } from '@mui/material';
 import { Skeleton } from '@/components/Skeletons';
 import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 import { field_mapping_app, project_status } from '@/types/enums';
+import windowDimention from '@/hooks/WindowDimension';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,6 +38,7 @@ const ProjectDetails = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [divRef, toggle, handleToggle] = useOutsideClick();
+  const { windowSize } = windowDimention();
 
   const projectId: string | undefined = params.id;
 
@@ -143,31 +141,6 @@ const ProjectDetails = () => {
     }
   };
 
-  const getMobileBottomSheetContent = (
-    mobileTabState: '' | 'projectInfo' | 'activities' | 'comment' | 'instructions',
-  ) => {
-    switch (mobileTabState) {
-      case 'projectInfo':
-        return <MobileProjectInfoContent projectInfo={projectInfo} />;
-      case 'activities':
-        return <MobileActivitiesContents map={map} />;
-      case 'instructions':
-        return (
-          <div className="fmtm-mb-[10vh]">
-            <Instructions instructions={projectInfo?.instructions} />
-          </div>
-        );
-      case 'comment':
-        return (
-          <div className="fmtm-mb-[10vh]">
-            <Comments />
-          </div>
-        );
-      default:
-        return <></>;
-    }
-  };
-
   return (
     <div className="fmtm-bg-grey-100 !fmtm-h-[100dvh] md:!fmtm-h-full md:fmtm-overflow-hidden">
       {/* Customized Modal For Generate Tiles */}
@@ -214,9 +187,9 @@ const ProjectDetails = () => {
           </div>
         </div>
         <div className="fmtm-flex fmtm-h-[calc(100%-3rem)] fmtm-gap-6 fmtm-mt-0 md:fmtm-mt-2">
-          <ResizablePanelGroup direction="horizontal" className="fmtm-gap-3">
-            <ResizablePanel defaultSize={30} className="fmtm-hidden md:fmtm-flex md:fmtm-min-w-[22rem]">
-              <div className="fmtm-w-full fmtm-h-full fmtm-hidden md:fmtm-flex fmtm-flex-col">
+          <ResizablePanelGroup direction={windowSize.width > 768 ? `horizontal` : `vertical`} className="fmtm-gap-3">
+            <ResizablePanel defaultSize={30} className="md:fmtm-flex md:fmtm-min-w-[22rem]">
+              <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-flex-col">
                 <div
                   className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-flex-1"
                   style={{ height: `${selectedTab === 'comments' ? 'calc(100% - 500px)' : 'calc(100% - 103px)'}` }}
@@ -287,9 +260,9 @@ const ProjectDetails = () => {
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle className="fmtm-bg-grey-200 fmtm-hidden md:fmtm-flex" />
-            <ResizablePanel defaultSize={70} className="md:fmtm-min-w-[22rem] fmtm-relative">
+            <ResizablePanel defaultSize={70} className="fmtm-min-w-[22rem] fmtm-relative">
               {projectId && (
-                <div className="fmtm-relative md:fmtm-static fmtm-flex-grow fmtm-h-full md:fmtm-rounded-xl fmtm-overflow-hidden">
+                <div className="fmtm-static fmtm-flex-grow fmtm-h-full md:fmtm-rounded-xl fmtm-overflow-hidden">
                   <ProjectDetailsMap
                     setSelectedTaskArea={setSelectedTaskArea}
                     setSelectedTaskFeature={setSelectedTaskFeature}
@@ -317,19 +290,6 @@ const ProjectDetails = () => {
               )}
             </ResizablePanel>
           </ResizablePanelGroup>
-          <div
-            className="fmtm-absolute fmtm-top-4 fmtm-left-4 fmtm-bg-white fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-red-50 fmtm-duration-300 fmtm-border-[1px] md:fmtm-hidden fmtm-cursor-pointer"
-            onClick={() => navigate('/explore')}
-          >
-            <AssetModules.ArrowBackIcon className="fmtm-text-grey-800" />
-          </div>
-          {['projectInfo', 'activities', 'instructions', 'comment'].includes(mobileFooterSelection) && (
-            <BottomSheet
-              body={getMobileBottomSheetContent(mobileFooterSelection)}
-              onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
-            />
-          )}
-          <MobileFooter />
         </div>
       </div>
     </div>

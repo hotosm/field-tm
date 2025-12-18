@@ -305,9 +305,7 @@ const ProjectDetailsMap = ({ setSelectedTaskArea, setSelectedTaskFeature, setMap
       <MapComponent
         ref={mapRef}
         mapInstance={map}
-        className={`map naxatw-relative naxatw-min-h-full naxatw-w-full fmtm-cursor-grab active:fmtm-cursor-grabbing ${
-          windowSize.width <= 768 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
-        }`}
+        className={`map naxatw-relative naxatw-min-h-full naxatw-w-full fmtm-cursor-grab active:fmtm-cursor-grabbing !fmtm-h-full`}
       >
         {projectInfo?.field_mapping_app !== field_mapping_app.QField && <MapLegends defaultTheme={defaultTheme} />}
         <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />

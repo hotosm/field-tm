@@ -2,7 +2,6 @@ import { selectOptionsType } from '@/components/common/Select2';
 
 export type CommonStateTypes = {
   snackbar: snackbarTypes;
-  postOrganisationLoading: boolean;
   projectNotFound: boolean;
   previousSelectedOptions: Record<string, selectOptionsType[]>;
 };

@@ -52,11 +52,7 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams === 'true' || (pathname.startsWith('/project/') && windowSize.width <= 768) ? (
-              <div></div>
-            ) : (
-              <PrimaryAppBar />
-            )}
+            {popupInParams === 'true' ? <div></div> : <PrimaryAppBar />}
             {projectNotFound ? (
               <ProjectNotFound />
             ) : (
