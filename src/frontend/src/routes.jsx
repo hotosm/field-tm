@@ -11,7 +11,6 @@ import CreateProject from '@/views/CreateProject';
 import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetails from '@/views/ProjectDetails';
 import ManageUsers from '@/views/ManageUsers';
-import Invite from '@/views/Invite';
 
 const routes = createBrowserRouter([
   {
@@ -104,18 +103,6 @@ const routes = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
-      },
-      {
-        path: '/invite',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <Invite />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
       },
     ],
   },
