@@ -23,11 +23,12 @@ const Description = () => {
       <div>
         <p className={`${!seeMore ? 'fmtm-line-clamp-[7]' : ''} fmtm-body-md fmtm-text-grey-900 `} ref={paraRef}>
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deleniti maiores exercitationem, aspernatur laborum
-          quae velit eaque omnis autem esse. Quisquam, similique obcaecati! Repudiandae error, itaque adipisci cum optio
-          dolore doloremque corrupti totam fugiat aperiam, eveniet autem enim quibusdam odit voluptates. Lorem ipsum
-          dolor sit amet consectetur adipisicing elit. Eius excepturi aliquam impedit consectetur cumque molestias rerum
-          at cupiditate nostrum eos veritatis necessitatibus provident atque neque, similique, reprehenderit voluptatem,
-          numquam laudantium ullam? Nobis, incidunt eos illum ipsam veritatis non magnam deleniti dolor quaerat modi
+          quae velit eaque omnis autem esse. Quisquam, similique obcaecati! Repudiandae error, itaque adipisci cum
+          option dolore doloremque corrupti totam fugiat aperiam, eveniet autem enim quibusdam odit voluptates. Lorem
+          ipsum dolor sit amet consectetur adipisicing elit. Eius excepturi aliquam impedit consectetur cumque molestias
+          rerum at cupiditate nostrum eos veritatis necessitatibus provident atque neque, similique, reprehenderit
+          voluptatem, numquam laudantium ullam? Nobis, incidunt eos illum ipsam veritatis non magnam deleniti dolor
+          quaerat modi
         </p>
         {descLines >= 7 && (
           <p
