@@ -10,7 +10,6 @@ import PlaywrightTempLogin from '@/views/PlaywrightTempLogin';
 import CreateProject from '@/views/CreateProject';
 import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetails from '@/views/ProjectDetails';
-import ManageProject from '@/views/ManageProject';
 import ManageUsers from '@/views/ManageUsers';
 import Invite from '@/views/Invite';
 
@@ -88,18 +87,6 @@ const routes = createBrowserRouter([
               <PlaywrightTempLogin />
             </ErrorBoundary>
           </Suspense>
-        ),
-      },
-      {
-        path: '/manage/project/:id',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <ManageProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
         ),
       },
       {
