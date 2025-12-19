@@ -66,8 +66,6 @@ export type taskType = {
   actioned_by_username: string | null;
 };
 
-export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
-
 export type projectTaskBoundriesType = {
   id: number;
   taskBoundries: taskBoundriesTypes[];
@@ -80,18 +78,6 @@ export type taskBoundriesTypes = {
   task_state: string;
   actioned_by_uid: number | null;
   actioned_by_username: string | null;
-};
-
-export type tileType = {
-  id: string;
-  url: string | null;
-  tile_source: string;
-  background_task_id: string;
-  status: 'SUCCESS' | 'FAILED' | 'PENDING';
-  created_at: string;
-  bbox: any;
-  format: string | null;
-  mimetype: string | null;
 };
 
 export type EntityOsmMap = {
