@@ -117,6 +117,7 @@ import {
   Assignment as AssignmentIcon,
   Warning as WarningIcon,
   OpenInNew as OpenInNewIcon,
+  PlaceOutlined as PlaceOutlinedIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -248,4 +249,5 @@ export default {
   AssignmentIcon,
   WarningIcon,
   OpenInNewIcon,
+  PlaceOutlinedIcon,
 };
