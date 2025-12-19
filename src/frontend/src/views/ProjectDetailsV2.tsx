@@ -5,9 +5,8 @@ import boltIcon from '@/assets/icons/boltIcon.svg';
 import ODKLogo from '@/assets/images/odk-logo.svg';
 import { Tooltip } from '@mui/material';
 
-const ProjectDetailsV2 = () => {
+const Description = () => {
   const paraRef = useRef<HTMLParagraphElement>(null);
-
   const [seeMore, setSeeMore] = useState(false);
   const [descLines, setDescLines] = useState(1);
 
@@ -18,6 +17,32 @@ const ProjectDetailsV2 = () => {
       setDescLines(lines);
     }
   }, [paraRef.current]);
+
+  return (
+    <div>
+      <div>
+        <p className={`${!seeMore ? 'fmtm-line-clamp-[7]' : ''} fmtm-body-md fmtm-text-grey-900 `} ref={paraRef}>
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deleniti maiores exercitationem, aspernatur laborum
+          quae velit eaque omnis autem esse. Quisquam, similique obcaecati! Repudiandae error, itaque adipisci cum optio
+          dolore doloremque corrupti totam fugiat aperiam, eveniet autem enim quibusdam odit voluptates. Lorem ipsum
+          dolor sit amet consectetur adipisicing elit. Eius excepturi aliquam impedit consectetur cumque molestias rerum
+          at cupiditate nostrum eos veritatis necessitatibus provident atque neque, similique, reprehenderit voluptatem,
+          numquam laudantium ullam? Nobis, incidunt eos illum ipsam veritatis non magnam deleniti dolor quaerat modi
+        </p>
+        {descLines >= 7 && (
+          <p
+            className="fmtm-body-md fmtm-text-red-medium hover:fmtm-text-red-dark hover:fmtm-cursor-pointer fmtm-w-fit"
+            onClick={() => setSeeMore(!seeMore)}
+          >
+            ... {!seeMore ? 'See More' : 'See Less'}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ProjectDetailsV2 = () => {
   return (
     <div>
       <div className="fmtm-max-w-7xl fmtm-bg-white fmtm-border-b fmtm-border-border fmtm-px-6 fmtm-py-4 fmtm-rounded-lg fmtm-mx-auto fmtm-mt-2">
@@ -57,33 +82,7 @@ const ProjectDetailsV2 = () => {
               <div className="fmtm-space-y-6">
                 <div>
                   <h4 className="fmtm-text-[#D4183D] fmtm-mb-3">Description</h4>
-                  <div>
-                    <p
-                      className={`${!seeMore ? 'fmtm-line-clamp-[7]' : ''} fmtm-body-md fmtm-text-grey-900 `}
-                      ref={paraRef}
-                    >
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deleniti maiores exercitationem,
-                      aspernatur laborum quae velit eaque omnis autem esse. Quisquam, similique obcaecati! Repudiandae
-                      error, itaque adipisci cum optio dolore doloremque corrupti totam fugiat aperiam, eveniet autem
-                      enim quibusdam odit voluptates. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius
-                      excepturi aliquam impedit consectetur cumque molestias rerum at cupiditate nostrum eos veritatis
-                      necessitatibus provident atque neque, similique, reprehenderit voluptatem, numquam laudantium
-                      ullam? Nobis, incidunt eos illum ipsam veritatis non magnam deleniti dolor quaerat modi amet
-                      accusamus provident officiis odit tenetur labore! Eius excepturi aliquam impedit consectetur
-                      cumque molestias rerum at cupiditate nostrum eos veritatis necessitatibus provident atque neque,
-                      similique, reprehenderit voluptatem, numquam laudantium ullam? Nobis, incidunt eos illum ipsam
-                      veritatis non magnam deleniti dolor quaerat modi amet accusamus provident officiis odit tenetur
-                      labore!
-                    </p>
-                    {descLines >= 7 && (
-                      <p
-                        className="fmtm-body-md fmtm-text-red-medium hover:fmtm-text-red-dark hover:fmtm-cursor-pointer fmtm-w-fit"
-                        onClick={() => setSeeMore(!seeMore)}
-                      >
-                        ... {!seeMore ? 'See More' : 'See Less'}
-                      </p>
-                    )}
-                  </div>
+                  <Description />
                 </div>
                 <div className="fmtm-border-t" />
                 <div className="fmtm-grid fmtm-grid-cols-2 fmtm-gap-6">
