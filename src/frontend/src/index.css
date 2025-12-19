@@ -10,18 +10,6 @@ body {
   margin-top: 20px;
 }
 
-.sweet-loading {
-  position: absolute;
-  top: 50%;
-  z-index: 5;
-  transform: translate(-50%, -50%);
-}
-
-.notFound {
-  height: 93vh;
-  overflow: auto;
-}
-
 .btnLogin {
   width: 100px;
 }
