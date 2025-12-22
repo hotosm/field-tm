@@ -452,7 +452,7 @@ class FMTMSplitter:
             "common/2-group-buildings.sql",
             "common/3-cluster-buildings.sql",
             "straight_skeleton.sql",
-            "common/6-alignment.sql", # TODO: Fix the file numbers
+            "common/6-alignment.sql",  # TODO: Fix the file numbers
             "common/7-extract.sql",
         ]
 
