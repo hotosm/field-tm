@@ -451,9 +451,8 @@ class FMTMSplitter:
             "common/1-linear-features.sql",
             "common/2-group-buildings.sql",
             "common/3-cluster-buildings.sql",
-            "avg_building_voronoi.sql",
-            "common/5-simplify.sql",
-            "common/6-alignment.sql",
+            "straight_skeleton.sql",
+            "common/6-alignment.sql", # TODO: Fix the file numbers
             "common/7-extract.sql",
         ]
 
