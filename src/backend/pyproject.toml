@@ -119,7 +119,7 @@ pythonpath = [
     "package_tests",
 ]
 asyncio_mode="auto"
-asyncio_default_fixture_loop_scope="session"
+asyncio_default_fixture_loop_scope="function"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

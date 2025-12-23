@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DeleteProjectService } from '@/api/CreateProjectService';
 import EditDetails from '@/components/ManageProject/Details';
 import FormUpdate from '@/components/ManageProject/Form';
-import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useIsProjectManager } from '@/hooks/usePermissions';
 import Forbidden from '@/views/Forbidden';
 import ManageProjectSkeleton from '@/components/Skeletons/ManageProject';
 import { project_status } from '@/types/enums';
@@ -47,7 +47,6 @@ const ManageProject = () => {
   ];
 
   const isProjectManager = useIsProjectManager(projectId);
-  const isOrganizationAdmin = useIsOrganizationAdmin(project ? +project?.organisation_id : null);
 
   const [selectedTab, setSelectedTab] = useState('details');
   const [toggleDeleteModal, setToggleDeleteModal] = useState(false);
@@ -66,7 +65,7 @@ const ManageProject = () => {
     }
   };
 
-  if (!isProjectLoading && !isProjectManager && !isOrganizationAdmin) return <Forbidden />;
+  if (!isProjectLoading && !isProjectManager) return <Forbidden />;
 
   return (
     <div className="fmtm-h-full fmtm-flex fmtm-flex-col fmtm-py-3 fmtm-gap-5">

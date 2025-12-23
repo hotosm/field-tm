@@ -67,9 +67,6 @@ const ProjectOverview = () => {
   const { errors } = formState;
   const values = watch();
 
-  // if draft project created, then instead of calling organisation endpoint populate organisation list with project minimal response data
-  const organisationList = [];
-
   const { data: users, isLoading: userListLoading } = useGetUserListQuery({
     params: { search: userSearchText, signin_type: 'osm' },
     options: {
@@ -115,14 +112,6 @@ const ProjectOverview = () => {
   useEffect(() => {
     if (errors.proceedWithLargeOutlineArea) setShowLargeAreaWarning(true);
   }, [errors.proceedWithLargeOutlineArea]);
-
-  const handleOrganizationChange = (orgId: number) => {
-    const orgIdInt = orgId && +orgId;
-    if (!orgIdInt || values.field_mapping_app === field_mapping_app.QField) return;
-    const selectedOrg = organisationList?.find((org) => org.value === orgIdInt);
-    setValue('hasODKCredentials', !!selectedOrg?.hasODKCredentials);
-    setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
-  };
 
   const changeFileHandler = async (file: FileType[]) => {
     if (isEmpty(file)) return;
@@ -215,60 +204,10 @@ const ProjectOverview = () => {
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Short Description" astric />
-          <div className="relative">
-            <Textarea {...register('short_description')} maxLength={200} />
-            <p className="fmtm-text-xs fmtm-absolute fmtm-bottom-1 fmtm-right-2 fmtm-text-gray-400">
-              {values?.short_description?.length}/200
-            </p>
-          </div>
-          {errors?.short_description?.message && <ErrorMessage message={errors.short_description.message as string} />}
-        </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <FieldLabel label="Description" astric />
           <Textarea {...register('description')} />
           {errors?.description?.message && <ErrorMessage message={errors.description.message as string} />}
         </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          {/* preselect organization if user org-admin & manages only one org */}
-          <FieldLabel label="Organization Name" astric />
-          <Controller
-            control={control}
-            name="organisation_id"
-            render={({ field }) => (
-              <Select2
-                options={organisationList || []}
-                value={field.value as number}
-                onChange={(value: any) => {
-                  field.onChange(value);
-                  handleOrganizationChange(value);
-                }}
-                placeholder="Organization Name"
-                disabled={(!isAdmin && authDetails?.orgs_managed?.length === 1) || !!values.id}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.organisation_id?.message && <ErrorMessage message={errors.organisation_id.message as string} />}
-        </div>
-
-        {((values.organisation_id && values.hasODKCredentials) ||
-          values.field_mapping_app === field_mapping_app.QField) &&
-          !values.id && (
-            <CustomCheckbox
-              key="useDefaultODKCredentials"
-              label={`Use default or requested ${values.field_mapping_app === field_mapping_app.QField ? 'QField' : 'ODK'} credentials`}
-              checked={values.useDefaultODKCredentials}
-              onCheckedChange={(value) => {
-                setValue('useDefaultODKCredentials', value);
-                if (!value) setShowODKCredsModal(true);
-              }}
-              className="fmtm-text-black fmtm-button fmtm-text-sm"
-              labelClickable={values.useDefaultODKCredentials}
-            />
-          )}
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <Dialog
@@ -283,13 +222,11 @@ const ProjectOverview = () => {
                 });
             }}
           >
-            {!values.useDefaultODKCredentials && (
-              <DialogTrigger className="fmtm-w-fit">
-                <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
-                  Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
-                </Button>
-              </DialogTrigger>
-            )}
+            <DialogTrigger className="fmtm-w-fit">
+              <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
+                Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
+              </Button>
+            </DialogTrigger>
             <DialogContent>
               <DialogTitle>Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials</DialogTitle>
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">

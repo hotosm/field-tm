@@ -42,7 +42,6 @@ export const ProjectById = (projectId: string) => {
             name: projectResp.name,
             location_str: projectResp.location_str,
             description: projectResp.description,
-            short_description: projectResp.short_description,
             num_contributors: projectResp.num_contributors,
             total_tasks: projectResp.total_tasks,
             osm_category: projectResp.osm_category,

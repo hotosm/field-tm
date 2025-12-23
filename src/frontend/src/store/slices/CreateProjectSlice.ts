@@ -3,19 +3,17 @@ import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
-  editProjectDetails: { name: '', description: '', short_description: '' },
+  editProjectDetails: { name: '', description: '' },
   editProjectResponse: null,
   projectDetails: {
     dimension: 10,
     no_of_buildings: 5,
     hashtags: [],
     name: '',
-    short_description: '',
     odk_central_url: '',
     odk_central_user: '',
     odk_central_password: '',
     description: '',
-    organisation_id: null,
     per_task_instructions: '',
     hasCustomTMS: false,
     custom_tms_url: '',

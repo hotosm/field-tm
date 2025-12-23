@@ -55,20 +55,20 @@ class ODKCentral(BaseModel):
 
     @model_validator(mode="after")
     def all_odk_vars_together(self) -> Self:
-        """Ensure if one ODK variable is set, then all are."""
-        if any(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ) and not all(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ):
+        """Ensure if one ODK variable is set, then all are.
+
+        If all are None/empty, that's allowed (will use default env credentials).
+        """
+        # Only validate if at least one field is set
+        has_any = any(
+            [self.odk_central_url, self.odk_central_user, self.odk_central_password]
+        )
+        has_all = all(
+            [self.odk_central_url, self.odk_central_user, self.odk_central_password]
+        )
+
+        # If any field is set but not all, that's an error
+        if has_any and not has_all:
             err = "All ODK details are required together: url, user, password"
             log.debug(err)
             raise ValueError(err)

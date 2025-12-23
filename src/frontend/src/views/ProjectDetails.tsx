@@ -25,7 +25,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import TaskList from '@/components/ProjectDetails/Tabs/TaskList';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@/components/Skeletons';
-import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useIsProjectManager } from '@/hooks/usePermissions';
 import { field_mapping_app, project_status } from '@/types/enums';
 import windowDimention from '@/hooks/WindowDimension';
 
@@ -57,7 +57,6 @@ const ProjectDetails = () => {
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
 
   const isProjectManager = useIsProjectManager(projectId as string);
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
 
   const tabList: { id: tabType; name: string; show: boolean }[] = [
     { id: 'project_info', name: 'Project Info', show: true },
@@ -223,7 +222,7 @@ const ProjectDetails = () => {
                       </>
                     ) : (
                       <>
-                        {(isProjectManager || isOrganizationAdmin) && (
+                        {isProjectManager && (
                           <Link to={`/manage/project/${params?.id}`} className="fmtm-w-1/2">
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
@@ -234,7 +233,7 @@ const ProjectDetails = () => {
                         {projectInfo.field_mapping_app !== field_mapping_app.QField && (
                           <Link
                             to={`/project-submissions/${projectId}`}
-                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                            className={`${isProjectManager ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
                           >
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
@@ -246,7 +245,7 @@ const ProjectDetails = () => {
                           <Link
                             target="_"
                             to={projectInfo?.project_url}
-                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                            className={`${isProjectManager ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
                           >
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <AssetModules.OpenInNewIcon className="!fmtm-text-[1.125rem]" /> Open in QField Cloud

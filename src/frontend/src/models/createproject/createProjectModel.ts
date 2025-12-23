@@ -5,7 +5,6 @@ export interface ProjectDetailsModel {
   odkid: number;
   default_locale: string;
   name: string;
-  short_description: string;
   description: string;
   instructions: string;
   per_task_instructions: string;
@@ -51,17 +50,6 @@ export interface ProjectDetailsModel {
 export interface FormCategoryListModel {
   id: number;
   title: string;
-}
-export interface OrganisationListModel {
-  id: number;
-  name: string;
-  approved: boolean;
-  type: string;
-  logo: string | null;
-  description: string;
-  slug: string;
-  url: string;
-  odk_central_url: string | null;
 }
 
 export type splittedGeojsonType = {

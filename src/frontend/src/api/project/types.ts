@@ -10,14 +10,12 @@ import {
   field_mapping_app,
 } from '@/types/enums';
 import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
-import type { taskType } from '@/types';
 
 export interface projectBaseType {
   id: number;
   odkid: number;
   author_sub: number;
   name: string;
-  short_description: string;
   description: string;
   per_task_instructions: string;
   slug: string;
@@ -90,10 +88,7 @@ export type generateFilesPayloadType = {
   combined_features_count: number;
 };
 
-export type createStubProjectPayloadType = Pick<
-  projectBaseType,
-  'name' | 'short_description' | 'description' | 'outline'
-> & {
+export type createStubProjectPayloadType = Pick<projectBaseType, 'name' | 'description' | 'outline'> & {
   merge: boolean;
 };
 
@@ -155,7 +150,6 @@ export type projectSummaryType = {
   priority: number;
   hashtags: string[];
   location_str: string;
-  short_description: string;
   project_url: string | null;
   external_project_id?: number | null;
   external_project_instance_url?: string | null;

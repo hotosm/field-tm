@@ -22,8 +22,6 @@ test.skip('create new project', async ({ browserName, page }) => {
   // The project name must be unique when running multiple tests
   const randomId = Math.random() * 10000000000000000;
   await page.locator('#name').fill(`Project Create Playwright ${randomId}`);
-  await page.locator('#short_description').click();
-  await page.locator('#short_description').fill('short');
   await page.locator('#description').click();
   await page.locator('#description').fill('desc');
   await page.getByRole('combobox').click();

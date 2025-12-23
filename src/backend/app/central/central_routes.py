@@ -517,9 +517,17 @@ async def get_form_media(
     },
 )
 async def odk_creds_test(
-    odk_creds: central_schemas.ODKCentral,
+    odk_central_url: str | None = Parameter(default=None),
+    odk_central_user: str | None = Parameter(default=None),
+    odk_central_password: str | None = Parameter(default=None),
 ) -> None:
     """Test ODK Central credentials by attempting to open a session."""
+    # Construct ODKCentral model from individual query parameters
+    odk_creds = central_schemas.ODKCentral(
+        odk_central_url=odk_central_url,
+        odk_central_user=odk_central_user,
+        odk_central_password=odk_central_password,
+    )
     await central_crud.odk_credentials_test(odk_creds)
     return None
 

@@ -366,7 +366,6 @@ class DbProject:
         search: Optional[str] = None,
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
-        my_projects: Optional[bool] = None,
         country: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters."""

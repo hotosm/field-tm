@@ -75,16 +75,7 @@ export const projectOverviewValidationSchema = z
       .trim()
       .min(1, 'Project Name is Required')
       .regex(/^[^_]+$/, 'Project Name should not contain _ (underscore)'),
-    short_description: z.string().trim().min(1, 'Short Description is Required'),
     description: z.string().trim().min(1, 'Description is Required'),
-    organisation_id: z
-      .number()
-      .nullable()
-      .refine((val) => val !== null, {
-        message: 'Organization is Required',
-      }),
-    hasODKCredentials: z.boolean(),
-    useDefaultODKCredentials: z.boolean(),
     odk_central_url: z.string().optional(),
     odk_central_user: z.string().optional(),
     odk_central_password: z.string().optional(),
@@ -96,7 +87,6 @@ export const projectOverviewValidationSchema = z
     }),
     outlineArea: z.string().optional(),
     proceedWithLargeOutlineArea: z.boolean(),
-    organisation_name: z.string(),
     merge: z.boolean(),
     field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
       message: 'Field Mapping App must be selected',
@@ -104,9 +94,6 @@ export const projectOverviewValidationSchema = z
   })
   .check((ctx) => {
     const values = ctx.value;
-    if (values.hasODKCredentials && !values.useDefaultODKCredentials) {
-      validateODKCreds(ctx, values);
-    }
     if (values.uploadAreaSelection === 'upload_file' && isEmpty(values.uploadedAOIFile)) {
       ctx.issues.push({
         input: values.uploadedAOIFile,
@@ -147,6 +134,46 @@ export const projectOverviewValidationSchema = z
         input: values.proceedWithLargeOutlineArea,
         path: ['proceedWithLargeOutlineArea'],
         message: 'Mapping area exceeds 200km²',
+        code: 'custom',
+      });
+    }
+    // Validate ODK credentials: if any are provided, all must be provided
+    const hasAnyODKCred = !!(
+      values.odk_central_url?.trim() ||
+      values.odk_central_user?.trim() ||
+      values.odk_central_password?.trim()
+    );
+    const hasAllODKCred = !!(
+      values.odk_central_url?.trim() &&
+      values.odk_central_user?.trim() &&
+      values.odk_central_password?.trim()
+    );
+
+    if (hasAnyODKCred && !hasAllODKCred) {
+      const missingFields: string[] = [];
+      if (!values.odk_central_url?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} URL`);
+      }
+      if (!values.odk_central_user?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} User`);
+      }
+      if (!values.odk_central_password?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} Password`);
+      }
+
+      ctx.issues.push({
+        input: values.odk_central_url || values.odk_central_user || values.odk_central_password,
+        path: ['odk_central_url'],
+        message: `All ${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} credentials are required together. Missing: ${missingFields.join(', ')}`,
+        code: 'custom',
+      });
+    }
+    // Validate URL format if provided
+    if (values.odk_central_url?.trim() && !isValidUrl(values.odk_central_url)) {
+      ctx.issues.push({
+        input: values.odk_central_url,
+        path: ['odk_central_url'],
+        message: 'Invalid URL format',
         code: 'custom',
       });
     }

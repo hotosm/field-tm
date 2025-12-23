@@ -46,7 +46,6 @@ const EditDetails = ({ project }: editDetailsPropsType) => {
     reset({
       status: project.status,
       name: project.name,
-      short_description: project.short_description,
       description: project.description,
       per_task_instructions: project.per_task_instructions,
       hashtags: project.hashtags,
@@ -131,17 +130,6 @@ const EditDetails = ({ project }: editDetailsPropsType) => {
           <FieldLabel label="Community or Organization Name" astric />
           <Input {...register('name')} />
           {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
-        </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Short Description" astric />
-          <div className="relative">
-            <Textarea {...register('short_description')} maxLength={200} />
-            <p className="fmtm-text-xs fmtm-absolute fmtm-bottom-1 fmtm-right-2 fmtm-text-gray-400">
-              {values?.short_description?.length}/200
-            </p>
-          </div>
-          {errors?.short_description?.message && <ErrorMessage message={errors.short_description.message as string} />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">

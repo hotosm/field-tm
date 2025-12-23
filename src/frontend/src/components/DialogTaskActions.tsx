@@ -10,12 +10,10 @@ import { GetProjectTaskActivity } from '@/api/Project';
 import { Modal } from '@/components/common/Modal';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
-import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useIsProjectManager } from '@/hooks/usePermissions';
 import { useAddNewTaskEventMutation } from '@/api/task/index';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useGetUserListQuery } from '@/api/user';
-import Select2 from '@/components/common/Select2';
-import ErrorMessage from '@/components/common/ErrorMessage';
 
 type dialogPropType = {
   taskId: number;

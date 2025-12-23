@@ -7,8 +7,6 @@ export type projectInfoType = {
   outline: Polygon;
   odkid: number;
   author_sub: number;
-  organisation_id: string;
-  short_description: string;
   description: string;
   per_task_instructions: string;
   slug: string;
@@ -39,8 +37,6 @@ export type projectInfoType = {
   updated_at: string;
   created_at: string;
   tasks: taskType[];
-  organisation_name: string;
-  organisation_logo: string | null;
   centroid: Point;
   bbox: BBox;
   last_active: string | null;

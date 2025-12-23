@@ -290,7 +290,6 @@ const GetIndividualProjectDetails = (url: string) => {
           ...resp,
           name: resp.name,
           description: resp.description,
-          short_description: resp.short_description,
           outline: formattedOutlineGeojson,
           per_task_instructions: resp.per_task_instructions,
         };
