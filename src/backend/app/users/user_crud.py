@@ -17,28 +17,31 @@
 #
 """Logic for user routes."""
 
+import logging
 import os
 from datetime import datetime, timedelta, timezone
 from textwrap import dedent
 from typing import Literal, Optional
 
-from fastapi import Request
-from fastapi.exceptions import HTTPException
-from loguru import logger as log
+from litestar import Request
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_login_python.core import Auth
-from psycopg import Connection
+from psycopg import AsyncConnection
 from psycopg.rows import class_row
 
 from app.auth.auth_schemas import AuthUser
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
-from app.db.enums import HTTPStatus, UserRole
 from app.db.models import (
     DbProject,
     DbUser,
 )
 from app.db.postgis_utils import timestamp
-from app.projects.project_crud import get_pagination
+from app.helpers.helper_schemas import PaginatedResponse, PaginationInfo
+
+log = logging.getLogger(__name__)
+
 
 SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
 WARNING_INTERVALS = [21, 14, 7]  # Days before deletion
@@ -46,7 +49,7 @@ INACTIVITY_THRESHOLD = 2 * 365  # 2 years approx
 
 
 async def get_or_create_user(
-    db: Connection,
+    db: AsyncConnection,
     user_data: AuthUser,
 ) -> DbUser:
     """Get user from User table if exists, else create."""
@@ -58,7 +61,6 @@ async def get_or_create_user(
                     username,
                     email_address,
                     profile_img,
-                    role,
                     registered_at
                 )
                 VALUES (
@@ -66,14 +68,13 @@ async def get_or_create_user(
                     %(username)s,
                     %(email_address)s,
                     %(profile_img)s,
-                    %(role)s,
                     NOW()
                 )
                 ON CONFLICT (sub)
                 DO UPDATE SET
                     profile_img = EXCLUDED.profile_img,
                     last_login_at = NOW()
-                RETURNING sub, username, email_address, profile_img, role, is_admin
+                RETURNING sub, username, email_address, profile_img, is_admin
             )
 
             SELECT
@@ -81,7 +82,6 @@ async def get_or_create_user(
                 u.username,
                 u.email_address,
                 u.profile_img,
-                u.role,
                 u.is_admin,
 
                 -- Aggregate project roles for the user, as project:role pairs
@@ -97,7 +97,6 @@ async def get_or_create_user(
                 u.username,
                 u.email_address,
                 u.profile_img,
-                u.role,
                 u.is_admin;
         """
 
@@ -109,14 +108,13 @@ async def get_or_create_user(
                     "username": user_data.username,
                     "email_address": user_data.email,
                     "profile_img": user_data.profile_img or "",
-                    "role": UserRole(user_data.role).name,
                 },
             )
             db_user_details = await cur.fetchone()
 
         if not db_user_details:
             raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"User ({user_data.sub}) could not be inserted in db",
             )
 
@@ -125,11 +123,13 @@ async def get_or_create_user(
     except Exception as e:
         await db.rollback()
         log.exception(f"Exception occurred: {e}", stack_info=True)
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
 
 async def process_inactive_users(
-    db: Connection,
+    db: AsyncConnection,
 ):
     """Identify inactive users, send warnings, and delete accounts."""
     now = datetime.now(timezone.utc)
@@ -258,12 +258,12 @@ async def send_invitation_message(
 
 
 async def get_paginated_users(
-    db: Connection,
+    db: AsyncConnection,
     page: int,
     results_per_page: int,
     search: Optional[str] = None,
     signin_type: Literal["osm"] = "osm",
-) -> dict:
+) -> PaginatedResponse[DbUser]:
     """Helper function to fetch paginated users with optional filters."""
     # Get subset of users
     users = await DbUser.all(db, search=search, signin_type=signin_type) or []
@@ -275,13 +275,28 @@ async def get_paginated_users(
     else:
         paginated_users = users[start_index:end_index]
 
-    pagination = await get_pagination(
-        page, len(paginated_users), results_per_page, len(users)
+    total_pages = (len(users) + results_per_page - 1) // results_per_page
+    has_next = (page * results_per_page) < len(users)
+    has_prev = page > 1
+
+    pagination = PaginationInfo(
+        has_next=has_next,
+        has_prev=has_prev,
+        next_num=page + 1 if has_next else None,
+        page=page,
+        pages=total_pages,
+        prev_num=page - 1 if has_prev else None,
+        per_page=results_per_page,
+        total=len(users),
     )
-    return {"results": paginated_users, "pagination": pagination}
+
+    return PaginatedResponse[DbUser](
+        results=paginated_users,
+        pagination=pagination,
+    )
 
 
-async def get_active_users(db: Connection) -> list[str]:
+async def get_active_users(db: AsyncConnection) -> list[str]:
     """Fetch users active in the last one day."""
     yesterday = timestamp() - timedelta(days=1)
     users = await DbUser.all(db, last_login_after=yesterday)

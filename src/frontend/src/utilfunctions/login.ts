@@ -18,7 +18,7 @@ export const getUserDetailsFromApi = async () => {
 
 export const refreshCookies = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh/management`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
       credentials: 'include',
     });
 
@@ -34,7 +34,7 @@ export const refreshCookies = async () => {
 
 export const osmLoginRedirect = async () => {
   try {
-    const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm/management`);
+    const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/osm`);
     const data = await resp.json();
     window.location = data.login_url;
   } catch (error) {

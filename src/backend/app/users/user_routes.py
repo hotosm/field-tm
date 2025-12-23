@@ -15,118 +15,155 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Endpoints for users and role."""
+"""Endpoints for users and roles."""
 
-from typing import Annotated, Literal
+import logging
+from typing import Literal
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    Query,
-    Response,
-)
-from loguru import logger as log
-from psycopg import Connection
+from litestar import Router, delete, get, patch
+from litestar import status_codes as status
+from litestar.di import Provide
+from litestar.exceptions import HTTPException
+from litestar.params import Parameter
+from psycopg import AsyncConnection
 
-from app.auth.roles import (
-    Mapper,
-    super_admin,
-)
+from app.auth.auth_deps import login_required
+from app.auth.roles import super_admin
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
-from app.db.enums import UserRole as UserRoleEnum
-from app.db.models import (
-    DbUser,
-)
+from app.db.models import DbUser
+from app.helpers import helper_schemas
 from app.users import user_schemas
-from app.users.user_crud import (
-    get_paginated_users,
+from app.users.user_crud import get_paginated_users
+
+log = logging.getLogger(__name__)
+
+
+@get(
+    "",
+    summary="Get all user details.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
+    return_dto=user_schemas.UserOut,
 )
-from app.users.user_deps import get_user
-
-router = APIRouter(
-    prefix="/users",
-    tags=["users"],
-    responses={404: {"description": "Not found"}},
-)
-
-
-@router.get("", response_model=user_schemas.PaginatedUsers)
 async def get_users(
-    db: Annotated[Connection, Depends(db_conn)],
-    _: Annotated[DbUser, Depends(super_admin)],
-    page: int = Query(1, ge=1),
-    results_per_page: int = Query(13, le=100),
+    db: AsyncConnection,
+    current_user: DbUser,
+    page: int = Parameter(1, ge=1),
+    results_per_page: int = Parameter(13, le=100),
     search: str = "",
-    signin_type: Literal["osm"] = Query(
-        None, description="Filter by signin type (osm or google)"
+    signin_type: Literal["osm"] | None = Parameter(
+        default=None, description="Filter by signin type (osm or google)"
     ),
-):
+) -> helper_schemas.PaginatedResponse[DbUser]:
     """Get all user details."""
     return await get_paginated_users(db, page, results_per_page, search, signin_type)
 
 
-@router.get("/usernames", response_model=list[user_schemas.Usernames])
+@get(
+    "/usernames",
+    summary="Get all user list with info such as id and username.",
+    dependencies={"db": Provide(db_conn)},
+    return_dto=user_schemas.Usernames,
+)
 async def get_userlist(
-    db: Annotated[Connection, Depends(db_conn)],
+    db: AsyncConnection,
     search: str = "",
-    signin_type: Literal["osm"] = Query(
-        None, description="Filter by signin type (osm or google)"
+    signin_type: Literal["osm"] | None = Parameter(
+        default=None, description="Filter by signin type (osm or google)"
     ),
-):
+) -> list[DbUser]:
     """Get all user list with info such as id and username."""
     users = await DbUser.all(db, search=search, signin_type=signin_type)
-    if not users:
-        return []
-    return [
-        user_schemas.Usernames(sub=user.sub, username=user.username) for user in users
-    ]
+    return users or []
 
 
-@router.get("/user-role-options")
-async def get_user_roles(_: Annotated[DbUser, Depends(Mapper())]):
-    """Check for available user role options."""
-    user_roles = {}
-    for role in UserRoleEnum:
-        user_roles[role.name] = role.value
-    return user_roles
-
-
-@router.patch("/{user_sub}", response_model=user_schemas.UserOut)
-async def update_existing_user(
-    user_sub: str,
-    new_user_data: user_schemas.UserUpdate,
-    _: Annotated[DbUser, Depends(super_admin)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Change the role of a user."""
-    return await DbUser.update(db=db, user_sub=user_sub, user_update=new_user_data)
-
-
-@router.get("/{id}", response_model=user_schemas.UserOut)
+@get(
+    "/{user_sub:str}",
+    summary="Get a single user details.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
+    return_dto=user_schemas.UserOut,
+)
 async def get_user_by_identifier(
-    user: Annotated[DbUser, Depends(get_user)],
-    _: Annotated[DbUser, Depends(super_admin)],
-):
+    user_sub: str,
+    current_user: DbUser,
+    db: AsyncConnection,
+) -> DbUser:
     """Get a single users details.
 
-    The OSM ID should be used.
-    If this is not known, the endpoint falls back to searching
-    for the username.
+    The user_sub should be used (OSM ID format like 'osm|123456').
     """
+    try:
+        user = await DbUser.one(db, user_sub)
+    except KeyError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return user
 
 
-@router.delete("/{id}")
-async def delete_user_by_identifier(
-    user: Annotated[DbUser, Depends(get_user)],
-    current_user: Annotated[DbUser, Depends(super_admin)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Delete a single user."""
-    log.info(
-        f"User {current_user.username} attempting deletion of user {user.username}"
+@patch(
+    "/{user_sub:str}",
+    summary="Update an existing user.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
+    dto=user_schemas.UserUpdate,
+    return_dto=user_schemas.UserOut,
+)
+async def update_existing_user(
+    user_sub: str,
+    current_user: DbUser,
+    db: AsyncConnection,
+    data: DbUser,
+) -> DbUser:
+    """Update field for an existing user."""
+    return await DbUser.update(
+        db=db,
+        user_sub=user_sub,
+        user_update=data,
     )
-    await DbUser.delete(db, user.sub)
-    log.info(f"User {user.sub} deleted successfully.")
-    return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@delete(
+    "/{user_sub:str}",
+    summary="Delete a single user.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_user_by_identifier(
+    user_sub: str,
+    current_user: DbUser,
+    db: AsyncConnection,
+) -> None:
+    """Delete a single user."""
+    log.info(f"User {current_user.username} attempting deletion of user {user_sub}")
+
+    user_to_delete = await DbUser.one(db, user_sub)
+    await DbUser.delete(db, user_to_delete.sub)
+
+    log.info(f"User {user_to_delete.sub} deleted successfully.")
+    return None
+
+
+user_router = Router(
+    path="/users",
+    tags=["users"],
+    route_handlers=[
+        get_users,
+        get_userlist,
+        update_existing_user,
+        get_user_by_identifier,
+        delete_user_by_identifier,
+    ],
+)

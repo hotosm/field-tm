@@ -119,8 +119,8 @@ const CreateProject = () => {
 
   const { data: projectManagers } = useGetProjectUsersQuery({
     project_id: projectId!,
-    params: { role: project_roles.PROJECT_MANAGER },
-    options: { queryKey: ['get-project-users', project_roles.PROJECT_MANAGER, projectId], enabled: !!projectId },
+    params: { role: project_roles.PROJECT_ADMIN },
+    options: { queryKey: ['get-project-users', project_roles.PROJECT_ADMIN, projectId], enabled: !!projectId },
   });
 
   // setup project admin select options if project admins are available

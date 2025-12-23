@@ -18,6 +18,7 @@
 """Logic for interaction with QFieldCloud & data."""
 
 import json
+import logging
 import shutil
 from io import BytesIO
 from pathlib import Path
@@ -26,19 +27,21 @@ from uuid import uuid4
 
 import geojson
 from aiohttp import ClientSession
-from fastapi.exceptions import HTTPException
-from loguru import logger as log
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
-from psycopg import Connection
+from psycopg import AsyncConnection
 from qfieldcloud_sdk.sdk import FileTransferType
 
 from app.config import settings
-from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects.project_crud import get_project_features_geojson, get_task_geometry
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
 from app.qfield.qfield_schemas import QFieldCloud
+
+log = logging.getLogger(__name__)
+
 
 # Configuration
 CONTAINER_IMAGE = "ghcr.io/opengisch/qfieldcloud-qgis:25.24"
@@ -92,7 +95,7 @@ def clean_tags_for_qgis(
 
 
 async def create_qfield_project(
-    db: Connection,
+    db: AsyncConnection,
     project: DbProject,
 ):
     """Create QField project in QFieldCloud via QGIS job API."""
@@ -119,7 +122,7 @@ async def create_qfield_project(
     xlsform_bytes = final_form.getvalue()
     if len(xlsform_bytes) == 0:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="There was an error modifying the XLSForm!",
         )
     log.debug(f"Setting project XLSForm db data for project ({project.id})")
@@ -169,7 +172,7 @@ async def create_qfield_project(
                 log.error(msg)
                 shutil.rmtree(job_dir)
                 raise HTTPException(
-                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=msg,
                 )
 
@@ -179,7 +182,7 @@ async def create_qfield_project(
                 log.error(msg)
                 shutil.rmtree(job_dir)
                 raise HTTPException(
-                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=msg,
                 )
     log.debug("Successfully created QGIS project via API")
@@ -188,14 +191,13 @@ async def create_qfield_project(
     final_project_file = Path(
         f"{SHARED_VOLUME_PATH}/{qgis_job_id}/final/{qgis_project_name}.qgz"
     )
-    print(f'\n---- final_project_file: "{final_project_file}"----\n')
     if not final_project_file.exists():
         msg = (
             f"QGIS job completed but output file was not created: {final_project_file}"
         )
         log.error(msg)
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=msg,
         )
 
@@ -236,7 +238,7 @@ async def create_qfield_project(
             # Delete the project if upload fails
             client.delete_project(api_project_id)
             raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=(f"Failed to upload files to project {api_project_id}: {e}"),
             ) from e
 
@@ -276,17 +278,17 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
         )
         async with qfield_client(creds):
             pass
-        return HTTPStatus.OK
+        return status.HTTP_200_OK
     except Exception as e:
         msg = f"QFieldCloud credential test failed: {str(e)}"
         log.debug(msg)
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="QFieldCloud credentials are invalid.",
         ) from e
 
 
-async def delete_qfield_project(db: Connection, project_id: int):
+async def delete_qfield_project(db: AsyncConnection, project_id: int):
     """Delete a project from QFieldCloud using the stored `external_project_id`."""
     project = await DbProject.one(db, project_id)
 

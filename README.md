@@ -33,9 +33,10 @@
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
-Building on the success of HOT's [Tasking Manager](https://tasks.hotosm.org), a tool
-for coordinating remote digitization of map features, the Field-TM was conceived
-with the purpose of tagging the features with _field-verified_ information.
+Building on the success of HOT's [Tasking Manager](https://tasks.hotosm.org), a
+tool for coordinating remote digitization of map features, the Field-TM was
+conceived with the purpose of tagging the features with _field-verified_
+information.
 
 While there are many excellent applications for tagging map features already,
 the Field-TM aims to solve the problem of **coordinating** field mapping campaigns.

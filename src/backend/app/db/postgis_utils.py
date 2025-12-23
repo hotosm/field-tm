@@ -18,17 +18,18 @@
 """PostGIS and geometry handling helper funcs."""
 
 import json
+import logging
 from datetime import datetime, timezone
 from random import getrandbits
 from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
-from fastapi import HTTPException
-from loguru import logger as log
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_data_client import RawDataOutputOptions, get_osm_data
 from osm_fieldwork.data_models import data_models_path
-from psycopg import Connection, ProgrammingError
+from psycopg import AsyncConnection, ProgrammingError
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
 from shapely.geometry import (
@@ -43,7 +44,9 @@ from shapely.geometry import (
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from app.db.enums import HTTPStatus, XLSFormType
+from app.db.enums import XLSFormType
+
+log = logging.getLogger(__name__)
 
 
 def timestamp():
@@ -62,7 +65,7 @@ async def polygon_to_centroid(
 
 
 async def featcol_to_flatgeobuf(
-    db: Connection, geojson: geojson.FeatureCollection
+    db: AsyncConnection, geojson: geojson.FeatureCollection
 ) -> Optional[bytes]:
     """From a given FeatureCollection, return a memory flatgeobuf obj.
 
@@ -130,7 +133,7 @@ async def featcol_to_flatgeobuf(
 
 
 async def flatgeobuf_to_featcol(
-    db: Connection, flatgeobuf: bytes
+    db: AsyncConnection, flatgeobuf: bytes
 ) -> Optional[geojson.FeatureCollection]:
     """Converts FlatGeobuf data to GeoJSON.
 
@@ -209,7 +212,10 @@ async def flatgeobuf_to_featcol(
 
 
 async def split_geojson_by_task_areas(
-    db: Connection, featcol: geojson.FeatureCollection, project_id: int, geom_type: str
+    db: AsyncConnection,
+    featcol: geojson.FeatureCollection,
+    project_id: int,
+    geom_type: str,
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
 
@@ -300,7 +306,7 @@ async def split_geojson_by_task_areas(
                 msg = f"Failed to split project ({project_id}) geojson by task areas."
                 log.exception(msg)
                 raise HTTPException(
-                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=msg,
                 )
 
@@ -510,7 +516,7 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
         if not is_valid_crs(crs):
             log.error(error_message)
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=error_message,
             )
         return
@@ -537,7 +543,10 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
     )
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
-        raise HTTPException(HTTPStatus.BAD_REQUEST, detail=error_message)
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=error_message,
+        )
 
 
 async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
@@ -793,7 +802,7 @@ def merge_polygons(
         )
     except Exception as e:
         raise HTTPException(
-            HTTPStatus.UNPROCESSABLE_ENTITY,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Couldn't merge the geometries into a polygon: {str(e)}",
         ) from e
 

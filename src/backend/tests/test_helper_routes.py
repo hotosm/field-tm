@@ -22,9 +22,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 
-@pytest.mark.asyncio
 async def test_helper_odk_creds_test(client):
-    """Unit tests for the helper routes in the FastAPI application.
+    """Unit tests for the helper routes in the Litestar application.
 
     This module tests the `/central/test-credentials` endpoint,
     mocking the ODK credentials verification logic to ensure the route

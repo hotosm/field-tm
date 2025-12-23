@@ -15,21 +15,29 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Schemas for returned ODK Central objects."""
+"""Schemas and DTOs for ODK Central integration."""
 
+import logging
 import re
 from dataclasses import dataclass
 from typing import Optional, Self, TypedDict
 
-from loguru import logger as log
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
 
+log = logging.getLogger(__name__)
+
+
+# NOTE: These remain as Pydantic models (not DTOs) because they:
+# 1. Have complex validation logic (URL normalization, password encryption, etc.)
+# 2. Are used as input validation models, not output serialization
+# 3. Are used directly as route parameters (Litestar handles Pydantic models natively)
+
 
 class ODKCentral(BaseModel):
-    """ODK Central credentials."""
+    """ODK Central credentials for API input validation."""
 
     odk_central_url: Optional[HttpUrlStr] = None
     odk_central_user: Optional[str] = None
@@ -179,25 +187,3 @@ class EntityDict(TypedDict):
 
     label: str
     data: EntityPropertyDict
-
-
-class EntityProperties(BaseModel):
-    """ODK Entity properties to include in GeoJSON."""
-
-    updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
-
-    # project_id: Optional[str] = None
-    task_id: Optional[str] = None
-    osm_id: Optional[str] = None
-    tags: Optional[str] = None
-    version: Optional[str] = None
-    changeset: Optional[str] = None
-    timestamp: Optional[str] = None
-    status: Optional[str] = None
-    created_by: Optional[str] = None
-
-    @computed_field
-    @property
-    def updated_at(self) -> Optional[str]:
-        """Convert updatedAt field to updated_at."""
-        return self.updatedAt

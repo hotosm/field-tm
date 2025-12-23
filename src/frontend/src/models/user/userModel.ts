@@ -1,20 +1,14 @@
 import { project_roles } from '@/types/enums';
 
-export type roleType = 'READ_ONLY' | 'MAPPER' | 'ADMIN';
-
 export type mappingLevelType = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
-export type projectRoleType =
-  | 'MAPPER'
-  | 'VALIDATOR'
-  | 'FIELD_MANAGER'
-  | 'ASSOCIATE_PROJECT_MANAGER'
-  | 'PROJECT_MANAGER';
+export type projectRoleType = 'MAPPER' | 'PROJECT_ADMIN';
 
 export type userType = {
   sub: string;
   username: string;
-  role: roleType;
+  // Global admin flag from backend; replaces legacy global role enum
+  is_admin: boolean;
   profile_img: string;
   name: string;
   city: string;

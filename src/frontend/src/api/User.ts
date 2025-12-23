@@ -7,7 +7,7 @@ import { NavigateFunction } from 'react-router-dom';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMIN' | 'MAPPER' }) => {
+export const UpdateUserRole = (url: string, payload: { is_admin: boolean }) => {
   return async (dispatch: AppDispatch) => {
     const updateUserRole = async (url: string) => {
       dispatch(UserActions.SetUpdateUserRoleLoading(true));
@@ -15,7 +15,9 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
         const response: AxiosResponse<userType> = await axios.patch(url, payload);
         dispatch(
           CommonActions.SetSnackBar({
-            message: `Updated ${response.data.username}'s role to ${response.data.role} successfully`,
+            message: `Updated ${response.data.username}'s role to ${
+              response.data.is_admin ? 'Admin' : 'Mapper'
+            } successfully`,
             variant: 'success',
           }),
         );

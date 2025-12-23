@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic schemas for Projects for usage in endpoints."""
+"""DTOs and schemas for project endpoints."""
 
 from datetime import datetime
 from typing import Annotated, Optional, Self, Union
@@ -24,34 +24,68 @@ from geojson_pydantic import (
     Feature,
     FeatureCollection,
     MultiPolygon,
-    Point,
     Polygon,
 )
-from pydantic import (
-    BaseModel,
-    Field,
-    ValidationInfo,
-)
-from pydantic.functional_serializers import field_serializer
+from litestar.dto import DataclassDTO, DTOConfig
+from pydantic import BaseModel, Field, ValidationInfo
 from pydantic.functional_validators import field_validator, model_validator
 
-from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
-from app.config import decrypt_value, encrypt_value
+from app.central.central_schemas import ODKCentralIn
+from app.config import encrypt_value
 from app.db.enums import (
     FieldMappingApp,
-    ProjectPriority,
     ProjectStatus,
-    ProjectVisibility,
 )
-from app.db.models import (
-    DbProject,
-    slugify,
-)
+from app.db.models import DbProject, slugify
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
+
+# ============================================================================
+# DTOs for endpoint responses
+# ============================================================================
+
+
+# DTO for project responses (excludes sensitive/internal fields)
+class ProjectOut(DataclassDTO[DbProject]):
+    """DTO that excludes sensitive fields from project responses."""
+
+    config = DTOConfig(
+        exclude={
+            "xlsform_content",  # Don't serialize binary XLSForm content
+            "external_project_password_encrypted",  # Don't expose encrypted passwords
+        },
+    )
+
+
+# DTO for project summaries (subset of DbProject fields for listings)
+# NOTE: For paginated responses, use PaginatedProjectSummariesOut instead
+class ProjectSummary(DataclassDTO[DbProject]):
+    """DTO for project summaries with subset of fields."""
+
+    config = DTOConfig(
+        include={
+            "id",
+            "project_name",
+            "hashtags",
+            "location_str",
+            "description",
+            "external_project_id",
+            "external_project_instance_url",
+            "status",
+            "visibility",
+            "field_mapping_app",
+        },
+    )
+
+
+# ============================================================================
+# Input validation models (used in routes but not DTOs)
+# NOTE: These remain as Pydantic models because they have complex validation
+# logic (hashtag parsing, GeoJSON merging, token encryption, etc.)
+# ============================================================================
 
 
 class StubProjectIn(BaseModel):
-    """Stub project insert."""
+    """Input model for creating a project stub (with validators)."""
 
     name: str
     field_mapping_app: FieldMappingApp
@@ -138,7 +172,7 @@ class StubProjectIn(BaseModel):
         return self
 
 
-class ProjectInBase(DbProject, StubProjectIn):
+class ProjectInBase(StubProjectIn):
     """Base model for project insert / update (validators)."""
 
     # Override hashtag input to allow a single string input
@@ -148,6 +182,9 @@ class ProjectInBase(DbProject, StubProjectIn):
     ] = None
     name: Optional[str] = None
 
+    # Token used for ODK appuser; encrypted at rest
+    odk_token: Optional[str] = None
+
     # Exclude (do not allow update)
     id: Annotated[Optional[int], Field(exclude=True)] = None
     outline: Annotated[Optional[dict], Field(exclude=True)] = None
@@ -156,21 +193,6 @@ class ProjectInBase(DbProject, StubProjectIn):
     tasks: Annotated[Optional[list], Field(exclude=True)] = None
     bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
     last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
-
-    # @field_validator("slug", mode="after")
-    # @classmethod
-    # def set_project_slug(
-    #     cls,
-    #     value: Optional[str],
-    #     info: ValidationInfo,
-    # ) -> str:
-    #     """Set the slug attribute from the name.
-
-    #     NOTE this is a bit of a hack.
-    #     """
-    #     if (name := info.data.get("name")) is None:
-    #         return None
-    #     return name.replace(" ", "_").lower()
 
     @field_validator("odk_token", mode="after")
     @classmethod
@@ -182,92 +204,16 @@ class ProjectInBase(DbProject, StubProjectIn):
 
 
 class ProjectIn(ProjectInBase, ODKCentralIn):
-    """Upload new project."""
+    """Input model for creating a project in ODK Central."""
 
     # Ensure geojson_pydantic.Polygon
     outline: Optional[Polygon] = None
 
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):
-    """Update a project, where all fields are optional."""
+    """Input model for updating a project (all fields optional)."""
 
     # Allow updating the name field
     name: Optional[str] = None
     # Override dict type to parse as Polygon
     outline: Optional[Polygon] = None
-
-
-class ProjectOut(DbProject):
-    """Converters for DbProject serialisation & display."""
-
-    # Parse as geojson_pydantic.Polygon
-    outline: Polygon | MultiPolygon
-    # Parse as geojson_pydantic.Point (sometimes not present, e.g. during create)
-    centroid: Optional[Point] = None
-    bbox: Optional[list[float]] = None
-    # Ensure the ODK password is omitted
-    odk_central_password: Annotated[Optional[str], Field(exclude=True)] = None
-    # We need validate_default to run the validator and set to None
-    odk_credentials: Annotated[
-        Optional[ODKCentralDecrypted],
-        Field(exclude=True, validate_default=True),
-    ] = None
-    # We shouldn't attempt to serialise the xlsform_content bytes
-    xlsform_content: Annotated[Optional[bytes], Field(exclude=True)] = None
-
-    @field_serializer("odk_token")
-    def decrypt_token(self, value: str) -> Optional[str]:
-        """Decrypt the ODK Token extracted from the db."""
-        if not value:
-            return None
-        return decrypt_value(value)
-
-
-# Models for specific endpoints
-
-
-class ProjectOutNoXml(ProjectOut):
-    """For reading all projects, it's overly verbose including XML."""
-
-    odk_form_xml: Annotated[Optional[str], Field(exclude=True)] = None
-
-
-class ProjectSummary(BaseModel):
-    """Project summaries."""
-
-    id: int
-    name: str
-    priority: Optional[ProjectPriority]
-
-    hashtags: Optional[list[str]]
-    location_str: Optional[str] = None
-    short_description: Optional[str] = None
-    project_url: Optional[str] = None
-    external_project_id: Optional[int] = None
-    external_project_instance_url: Optional[str] = None
-    status: Optional[ProjectStatus] = None
-    visibility: Optional[ProjectVisibility] = None
-    field_mapping_app: Optional[FieldMappingApp] = None
-
-    # Calculated
-    centroid: Optional[Point]
-
-
-class PaginationInfo(BaseModel):
-    """Pagination JSON return."""
-
-    has_next: bool
-    has_prev: bool
-    next_num: Optional[int]
-    page: int
-    pages: int
-    prev_num: Optional[int]
-    per_page: int
-    total: int
-
-
-class PaginatedProjectSummaries(BaseModel):
-    """Project summaries + Pagination info."""
-
-    results: list[ProjectSummary]
-    pagination: PaginationInfo

@@ -16,9 +16,9 @@ const roleList = [
     value: project_roles.MAPPER,
   },
   {
-    id: 'PROJECT_MANAGER',
-    label: 'Project Manager',
-    value: project_roles.PROJECT_MANAGER,
+    id: 'PROJECT_ADMIN',
+    label: 'Project Admin',
+    value: project_roles.PROJECT_ADMIN,
   },
 ];
 

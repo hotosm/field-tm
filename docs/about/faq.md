@@ -64,16 +64,16 @@ Generic field mapping:
 
 Field survey-based data collection:
 
-- **KoboCollect**: fork of ODK, same mobile app essentially, but different back end.
-  Has a slightly complicated relationship with ODK, formerly taking from the
+- **KoboCollect**: fork of ODK, same mobile app essentially, but different back
+  end. Has a slightly complicated relationship with ODK, formerly taking from the
   community and not giving back. In our opinion, ODK is more innovative in pushing
-  field data collection forward. Kobo do provide a free public server backed by the
-  UN, as a general public good, and is widely adopted as a result.
+  field data collection forward. Kobo do provide a free public server backed by
+  the UN, as a general public good, and is widely adopted as a result.
 
-- **Ona**: ODK-compatible software that also has a difficult relationship with Kobo.
-  The history is complex, but at some point Ona had to make their front end
-  closed-source. They have a lot of open-source components (like their back end)
-  and have done some great work around data management and analytics, however,
+- **Ona**: ODK-compatible software that also has a difficult relationship with
+  Kobo. The history is complex, but at some point Ona had to make their front
+  end closed-source. They have a lot of open-source components (like their back
+  end) and have done some great work around data management and analytics, however,
   their main objective is not the same as Field-TM: _coordinating_ field mapping.
 
 - **ODK**: I won't cover much here, as we talk about it a lot elsewhere.
@@ -88,12 +88,13 @@ Field survey-based data collection:
   Kobo, and Ona. Very good at collection of "longitudinal data" (data over time),
   which ODK has only recently began to address with Entities.
   However there are two key missing features:
-  (1) it's not well set up to handle geospatial data. It is possible to collect a
-  GPS point of users in the field, but not possible to select geometries to map.
-  (2) it's not configured to coordinate a team of users for field mapping, but more
-  for individual users to map.
-  Despite this we will definitely look for opportunities to learn from / collaborate
-  into the future.
+  (1) it's not well set up to handle geospatial data. It is possible to
+  collect a GPS point of users in the field, but not possible to select
+  geometries to map.
+  (2) it's not configured to coordinate a team of users for field mapping, but
+  more for individual users to map.
+  Despite this we will definitely look for opportunities to learn from /
+  collaborate into the future.
 
 OpenStreetMap tagging:
 
@@ -240,7 +241,7 @@ the project page.
 
 ---
 
-### Can I use the mapping data from the Field-TM Web App for my own research or projects?
+### Can I use the mapping data from Field-TM for my own research or projects?
 
 The mapping data on the Field-TM Web App is generally open and
 available for use, but it is important to check the specific project

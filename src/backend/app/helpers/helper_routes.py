@@ -15,31 +15,22 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Routes to help with common processes in the Field-TM workflow."""
+"""Routes to help with common processes in the Field-TM workflow (Litestar)."""
 
 import csv
 import json
+import logging
 from io import BytesIO, StringIO
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated
 from uuid import uuid4
 
 import requests
-from fastapi import (
-    APIRouter,
-    Depends,
-    Request,
-    UploadFile,
-)
-from fastapi.exceptions import HTTPException
-from fastapi.responses import (
-    JSONResponse,
-    RedirectResponse,
-    Response,
-    StreamingResponse,
-)
-from loguru import logger as log
+from litestar import Request, Response, Router, get, post
+from litestar import status_codes as status
+from litestar.datastructures import UploadFile
+from litestar.di import Provide
+from litestar.exceptions import HTTPException
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
@@ -54,51 +45,52 @@ from app.central.central_crud import (
 )
 from app.central.central_schemas import ODKCentral
 from app.config import settings
-from app.db.enums import HTTPStatus, XLSFormType
+from app.db.enums import XLSFormType
 from app.db.postgis_utils import (
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
-from app.helpers.helper_crud import send_email
 
-router = APIRouter(
-    prefix="/helper",
-    tags=["helper"],
-    responses={404: {"description": "Not found"}},
+log = logging.getLogger(__name__)
+
+
+@get(
+    "/download-template-xlsform",
 )
-
-
-@router.get("/download-template-xlsform")
 async def download_template(
     form_type: XLSFormType,
-):
+) -> Response[bytes]:
     """Download example XLSForm from Field-TM."""
     form_filename = XLSFormType(form_type).name
-    xlsform_path = f"{xlsforms_path}/{form_filename}.yaml"
-    xlsx_bytes = convert_to_xlsform(str(xlsform_path))
+    form_path = f"{xlsforms_path}/{form_filename}.yaml"
+    xlsx_bytes = convert_to_xlsform(str(form_path))
     if xlsx_bytes:
-        return StreamingResponse(
-            BytesIO(xlsx_bytes),
+        return Response(
+            content=xlsx_bytes,
             media_type=(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ),
             headers={
                 "Content-Disposition": f"attachment; filename={form_filename}.xlsx"
             },
+            status_code=status.HTTP_200_OK,
         )
-    else:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail="Failed to convert YAML form to XLSForm.",
-        )
+    msg = "Failed to convert YAML form to XLSForm."
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=msg,
+    )
 
 
-@router.post("/convert-geojson-to-odk-csv")
+@post(
+    "/convert-geojson-to-odk-csv",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def convert_geojson_to_odk_csv_wrapper(
     geojson: UploadFile,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> Response[bytes]:
     """Convert GeoJSON upload media to ODK CSV upload media."""
     filename = Path(geojson.filename)
     file_ext = filename.suffix.lower()
@@ -106,7 +98,7 @@ async def convert_geojson_to_odk_csv_wrapper(
     allowed_extensions = [".json", ".geojson"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Provide a valid .json or .geojson file",
         )
 
@@ -114,17 +106,26 @@ async def convert_geojson_to_odk_csv_wrapper(
     feature_csv = await convert_geojson_to_odk_csv(BytesIO(contents))
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.csv"}
-    return Response(feature_csv.getvalue(), headers=headers)
+    return Response(
+        feature_csv.getvalue(),
+        headers=headers,
+        status_code=status.HTTP_200_OK,
+    )
 
 
-@router.post("/create-entities-from-csv")
+@post(
+    "/create-entities-from-csv",
+    dependencies={
+        "current_user": Provide(login_required),
+    },
+)
 async def create_entities_from_csv(
     csv_file: UploadFile,
     odk_project_id: int,
     entity_name: str,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    odk_creds: ODKCentral = Depends(),
-):
+    current_user: AuthUser,
+    odk_creds: ODKCentral,
+) -> dict:
     """Upload a CSV file to create new ODK Entities in a project.
 
     The Entity must already be defined on the server.
@@ -135,10 +136,11 @@ async def create_entities_from_csv(
 
     if file_ext != ".csv":
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="Provide a valid .csv"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide a valid .csv",
         )
 
-    def parse_csv(csv_bytes):
+    def parse_csv(csv_bytes: bytes):
         parsed_data = []
         csv_str = csv_bytes.decode("utf-8")
         csv_reader = csv.DictReader(StringIO(csv_str))
@@ -150,29 +152,36 @@ async def create_entities_from_csv(
     entities_data_dict = {str(uuid4()): data for data in parsed_data}
 
     async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-        entities = await odk_central.createEntities(
+        create_success = await odk_central.createEntities(
             odk_project_id,
             entity_name,
             entities_data_dict,
         )
 
-    return entities
+    # Response: {"success": true}
+    return create_success
 
 
-@router.post("/javarosa-geom-to-geojson")
+@post(
+    "/javarosa-geom-to-geojson",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def convert_javarosa_geom_to_geojson(
     javarosa_string: str,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> dict:
     """Convert a JavaRosa geometry string to GeoJSON."""
     return await javarosa_to_geojson_geom(javarosa_string)
 
 
-@router.post("/convert-odk-submission-json-to-geojson")
+@post(
+    "/convert-odk-submission-json-to-geojson",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def convert_odk_submission_json_to_geojson_wrapper(
     json_file: UploadFile,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> Response[bytes]:
     """Convert the ODK submission output JSON to GeoJSON.
 
     The submission JSON be downloaded via ODK Central, or osm-fieldwork.
@@ -184,7 +193,8 @@ async def convert_odk_submission_json_to_geojson_wrapper(
     allowed_extensions = [".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="Provide a valid .json file"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide a valid .json file",
         )
 
     contents = await json_file.read()
@@ -192,14 +202,21 @@ async def convert_odk_submission_json_to_geojson_wrapper(
     submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.geojson"}
-    return Response(submission_data.getvalue(), headers=headers)
+    return Response(
+        submission_data.getvalue(),
+        headers=headers,
+        status_code=status.HTTP_200_OK,
+    )
 
 
-@router.get("/view-raw-data-api-token")
+@get(
+    "/view-raw-data-api-token",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def get_raw_data_api_osm_token(
     request: Request,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> Response[None]:
     """Get the OSM OAuth token for a service account for raw-data-api.
 
     The token returned by this endpoint should be used for the
@@ -208,41 +225,49 @@ async def get_raw_data_api_osm_token(
     response = requests.get(f"{settings.RAW_DATA_API_URL}/auth/login")
     if not response.ok:
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not login to raw-data-api",
         )
 
     raw_api_login_url = response.json().get("login_url")
-    return RedirectResponse(raw_api_login_url)
+    return Response(
+        content=b"",
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={"Location": raw_api_login_url},
+    )
 
 
-@router.get("/view-field-tm-api-token")
+@get(
+    "/view-field-tm-api-token",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def view_user_oauth_token(
     request: Request,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> dict[str, str | None]:
     """Get the Field-TM OSM (OAuth) token for a logged in user.
 
     The token is encrypted with a secret key and only usable via
     this Field-TM instance and the osm-login-python module.
     """
     cookie_name = settings.cookie_name
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content={"access_token": request.cookies.get(cookie_name)},
-    )
+    return {"access_token": request.cookies.get(cookie_name)}
 
 
-@router.post("/multipolygons-to-polygons")
+@post(
+    "/multipolygons-to-polygons",
+    dependencies={"current_user": Provide(login_required)},
+)
 async def flatten_multipolygons_to_polygons(
     geojson: UploadFile,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    current_user: AuthUser,
+) -> Response[bytes]:
     """If any MultiPolygons are present, replace with multiple Polygons."""
     featcol = parse_geojson_file_to_featcol(await geojson.read())
     if not featcol:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No geometries present"
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No geometries present",
         )
     multi_to_single_polygons = multigeom_to_singlegeom(featcol)
 
@@ -251,35 +276,47 @@ async def flatten_multipolygons_to_polygons(
             "Content-Disposition": ("attachment; filename=flattened_polygons.geojson"),
             "Content-Type": "application/media",
         }
-        return Response(content=json.dumps(multi_to_single_polygons), headers=headers)
+        return Response(
+            content=json.dumps(multi_to_single_polygons).encode("utf-8"),
+            headers=headers,
+            status_code=status.HTTP_200_OK,
+        )
 
     raise HTTPException(
-        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         detail="Your geojson file is invalid.",
     )
 
 
-@router.post("/send-test-osm-message")
+@post(
+    "/send-test-osm-message",
+    dependencies={
+        "current_user": Provide(login_required),
+        "osm_auth": Provide(init_osm_auth),
+    },
+    status_code=status.HTTP_200_OK,
+)
 async def send_test_osm_message(
     request: Request,
-    current_user: Annotated[AuthUser, Depends(login_required)],
+    current_user: AuthUser,
     # NOTE this is duplicated to access the 'deserialize_data' method
-    osm_auth: Annotated[Auth, Depends(init_osm_auth)],
-):
+    osm_auth: Auth,
+) -> None:
     """Sends a test message to currently logged in OSM user."""
     cookie_name = f"{settings.cookie_name}_osm"
     log.debug(f"Extracting OSM token from cookie {cookie_name}")
     serialised_osm_token = request.cookies.get(cookie_name)
     if not serialised_osm_token:
-        return HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You must be logged in to your OpenStreetMap account.",
         )
 
     # NOTE to get this far, the user must be logged in using OSM
     osm_token = osm_auth.deserialize_data(serialised_osm_token)
     # NOTE message content must be in markdown format
-    message_content = dedent("""
+    message_content = dedent(
+        """
         # Heading 1
 
         ## Heading 2
@@ -289,7 +326,8 @@ async def send_test_osm_message(
         This is a text message in markdown format.
 
         > Notes section
-    """)
+    """
+    )
     # NOTE post body should contain either recipient or recipient_id
     post_body = {
         "recipient_id": 16289154,
@@ -305,23 +343,28 @@ async def send_test_osm_message(
 
     if response.status_code == 200:
         log.info("Message sent successfully")
-    else:
-        msg = "Sending message via OSM failed"
-        log.error(f"{msg}: {response.text}")
-        return HTTPException(status_code=HTTPStatus.CONFLICT, detail=msg)
+        return None
 
-    return Response(status_code=HTTPStatus.OK)
-
-
-@router.post("/send-test-email")
-async def send_test_email(user_emails: list[str]):
-    """Sends a test email using real SMTP settings."""
-    log.info(f"Sending test email to recipients: {user_emails}")
-    await send_email(
-        user_emails=user_emails,
-        title="Test email from Field-TM",
-        message_content="This is a test email sent from Field-TM.",
+    msg = "Sending message via OSM failed"
+    log.error(f"{msg}: {response.text}")
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail=msg,
     )
-    return Response(
-        status_code=HTTPStatus.OK,
-    )
+
+
+helper_router = Router(
+    path="/helper",
+    tags=["helper"],
+    route_handlers=[
+        download_template,
+        convert_geojson_to_odk_csv_wrapper,
+        create_entities_from_csv,
+        convert_javarosa_geom_to_geojson,
+        convert_odk_submission_json_to_geojson_wrapper,
+        get_raw_data_api_osm_token,
+        view_user_oauth_token,
+        flatten_multipolygons_to_polygons,
+        send_test_osm_message,
+    ],
+)

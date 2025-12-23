@@ -18,91 +18,56 @@
 
 """Config for the Field-TM database connection."""
 
+import logging
+from collections.abc import AsyncGenerator
 from typing import cast
 
-from fastapi import Request
-from loguru import logger as log
-from psycopg import Connection
+from litestar import Litestar
+from litestar.datastructures import State
+from psycopg import AsyncConnection
 from psycopg_pool import AsyncConnectionPool
 
 from app.config import settings
 
+log = logging.getLogger(__name__)
 
-def get_db_connection_pool() -> AsyncConnectionPool:
+
+async def get_db_connection_pool(server: Litestar) -> AsyncConnectionPool:
     """Get the connection pool for psycopg.
 
-    NOTE the pool connection is opened in the FastAPI server startup (lifespan).
+    NOTE the pool connection is opened in the Litestar server startup (lifespan).
     """
     log.debug(
         "Creating database connection pool: "
         f"{settings.FMTM_DB_USER}@{settings.FMTM_DB_HOST}"
     )
-    return AsyncConnectionPool(
-        conninfo=settings.FMTM_DB_URL,
-        open=False,
-        min_size=1,
-        max_size=10,  # max 10 concurrent DB connections (less than max_connections)
-        timeout=30.0,  # how long to wait if all connections are busy
-    )
+    if not getattr(server.state, "db_pool", None):
+        new_pool = AsyncConnectionPool(
+            conninfo=settings.FMTM_DB_URL,
+            min_size=1,
+            max_size=10,  # max 10 concurrent DB connections (less than max_connections)
+            timeout=30.0,  # how long to wait if all connections are busy
+            open=False,
+        )
+        server.state.update({"db_pool": new_pool})
+        await server.state.db_pool.open()
+        log.debug("Database connection pool opened")
+    return cast("AsyncConnectionPool", server.state.db_pool)
 
 
-async def db_conn(request: Request) -> Connection:
+async def close_db_connection_pool(server: Litestar) -> None:
+    """Close the psycopg connection pool."""
+    if getattr(server.state, "db_pool", None):
+        await cast("AsyncConnectionPool", server.state.db_pool).close()
+        log.debug("Database connection pool closed")
+
+
+async def db_conn(state: State) -> AsyncGenerator[AsyncConnection, None]:
     """Get a connection from the psycopg pool.
 
-    Info on connections vs cursors:
-    https://www.psycopg.org/psycopg3/docs/advanced/async.html
-
-    Here we are getting a connection from the pool, which will be returned
-    after the session ends / endpoint finishes processing.
-
-    In summary:
-    - Connection is created on endpoint call.
-    - Cursors are used to execute commands throughout endpoint.
-      Note it is possible to create multiple cursors from the connection,
-      but all will be executed in the same db 'transaction'.
-    - Connection is closed on endpoint finish.
-
-    -----------------------------------
-    To use the connection in endpoints:
-    -----------------------------------
-
-    @app.get("/something")
-    async def do_stuff(db = Depends(db_conn)):
-        async with db.cursor() as cursor:
-            await cursor.execute("SELECT * FROM items")
-            result = await cursor.fetchall()
-            return result
-
-    -----------------------------------
-    Additionally, the connection could be passed through to a function to
-    utilise the Pydantic model serialisation on the cursor:
-    -----------------------------------
-
-    from psycopg.rows import class_row
-    async def get_user_by_id(db: Connection, id: int):
-        async with db.cursor(row_factory=class_row(User)) as cur:
-            await cur.execute(
-                '''
-                SELECT id, first_name, last_name, dob
-                FROM (VALUES
-                    (1, 'John', 'Doe', '2000-01-01'::date),
-                    (2, 'Jane', 'White', NULL)
-                ) AS data (id, first_name, last_name, dob)
-                WHERE id = %(id)s;
-                ''',
-                {"id": id},
-            )
-            obj = await cur.fetchone()
-
-            # reveal_type(obj) would return 'Optional[User]' here
-
-            if not obj:
-                raise KeyError(f"user {id} not found")
-
-            # reveal_type(obj) would return 'User' here
-
-            return obj
+    This is an async generator that yields a connection and returns it to the pool
+    when the request handler completes.
     """
-    db_pool = cast(AsyncConnectionPool, request.state.db_pool)
+    db_pool = cast(AsyncConnectionPool, state.db_pool)
     async with db_pool.connection() as conn:
         yield conn

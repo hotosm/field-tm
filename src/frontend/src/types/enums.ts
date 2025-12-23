@@ -48,10 +48,7 @@ export enum user_roles {
 
 export enum project_roles {
   MAPPER = 'MAPPER',
-  VALIDATOR = 'VALIDATOR',
-  FIELD_MANAGER = 'FIELD_MANAGER',
-  PROJECT_MANAGER = 'PROJECT_MANAGER',
-  ASSOCIATE_PROJECT_MANAGER = 'ASSOCIATE_PROJECT_MANAGER',
+  PROJECT_ADMIN = 'PROJECT_ADMIN',
 }
 
 export type MapGeomTypes = {
