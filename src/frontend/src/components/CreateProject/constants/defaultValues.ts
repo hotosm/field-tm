@@ -8,11 +8,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
 
   // 01 Project Overview
   name: '',
-  short_description: '',
   description: '',
-  organisation_id: null,
-  hasODKCredentials: false,
-  useDefaultODKCredentials: false,
   odk_central_url: '',
   odk_central_user: '',
   odk_central_password: '',
@@ -22,7 +18,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   outline: undefined,
   outlineArea: undefined,
   proceedWithLargeOutlineArea: false,
-  organisation_name: '',
   merge: true,
 
   // 02 Project Details

@@ -46,7 +46,6 @@ type EditProjectResponseTypes = {
   id: number;
   odkid: number;
   name: string;
-  short_description: string;
   description: string;
   status: project_status;
   outline: GeoJSONFeatureTypes;
@@ -63,16 +62,13 @@ export type ProjectDetailsTypes = {
   no_of_buildings: number;
   odk_central_user?: string;
   odk_central_password?: string;
-  organisation: number;
   odk_central_url?: string;
   name: string;
   hashtags: string[];
-  short_description: string;
   description: string;
   task_split_type?: number;
   osm_category?: string;
   data_extract_options?: string;
-  organisation_id: number | null;
   formExampleSelection?: string;
   osmFormSelectionName?: string;
   average_buildings_per_task?: number;
@@ -90,7 +86,11 @@ export type ProjectDetailsTypes = {
   use_odk_collect: boolean;
   status: project_status;
   outline: splittedGeojsonType;
-  organisation_name: string;
+};
+
+export type FormCategoryListTypes = {
+  id: number;
+  title: string;
 };
 
 export type DrawnGeojsonTypes = {

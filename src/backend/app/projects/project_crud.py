@@ -713,15 +713,11 @@ async def get_paginated_projects(
     db: AsyncConnection,
     page: int,
     results_per_page: int,
-    current_user: Optional[str] = None,
-    org_id: Optional[int] = None,
     user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
-    minimal: bool = False,
     status: Optional[ProjectStatus] = None,
     field_mapping_app: Optional[FieldMappingApp] = None,
-    my_projects: bool = False,
     country: Optional[str] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
@@ -731,15 +727,11 @@ async def get_paginated_projects(
     # Get subset of projects
     projects = await DbProject.all(
         db,
-        current_user=current_user,
-        org_id=org_id,
         user_sub=user_sub,
         hashtags=hashtags,
         search=search,
-        minimal=minimal,
         status=status,
         field_mapping_app=field_mapping_app,
-        my_projects=my_projects,
         country=country,
     )
     start_index = (page - 1) * results_per_page

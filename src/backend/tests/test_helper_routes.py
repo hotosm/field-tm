@@ -29,16 +29,17 @@ async def test_helper_odk_creds_test(client):
     mocking the ODK credentials verification logic to ensure the route
     responds correctly without making real network calls.
     """
-    odk_creds = {
-        "odk_central_url": "http://central:8383",
-        "odk_central_user": "admin@hotosm.org",
-        "odk_central_password": "Password1234",
-    }
-
     with patch(
         "app.central.central_crud.odk_credentials_test", new_callable=AsyncMock
     ) as mock_test_odk:
-        response = await client.post("/central/test-credentials", json=odk_creds)
+        response = await client.post(
+            "/central/test-credentials",
+            params={
+                "odk_central_url": "http://central:8383",
+                "odk_central_user": "admin@hotosm.org",
+                "odk_central_password": "Password1234",
+            },
+        )
         assert response.status_code == 200
         mock_test_odk.assert_awaited_once()
 

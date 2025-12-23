@@ -5,7 +5,6 @@ export interface ProjectDetailsModel {
   odkid: number;
   default_locale: string;
   name: string;
-  short_description: string;
   description: string;
   instructions: string;
   per_task_instructions: string;
@@ -47,3 +46,17 @@ export interface ProjectDetailsModel {
     qr_code_base64: string;
   }[];
 }
+
+export interface FormCategoryListModel {
+  id: number;
+  title: string;
+}
+
+export type splittedGeojsonType = {
+  type: 'FeatureCollection';
+  features: {
+    type: 'Feature';
+    geometry: { type: 'Polygon'; coordinates: number[][] };
+    properties: Record<string, any>;
+  }[];
+};

@@ -7,8 +7,6 @@ import MapData from '@/components/CreateProject/04-MapData';
 import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useHasManagedAnyOrganization, useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
-import Forbidden from '@/views/Forbidden';
 import Stepper from '@/components/CreateProject/Stepper';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules';
@@ -65,19 +63,13 @@ const CreateProject = () => {
     options: { queryKey: ['get-minimal-project', projectId], enabled: !!projectId },
   });
 
-  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-  const isOrganizationAdmin = useIsOrganizationAdmin(
-    minimalProjectDetails ? +minimalProjectDetails?.organisation_id : null,
-  );
-  const isProjectManager = useIsProjectManager(projectId);
-
   const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
     defaultValues: defaultValues,
     resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
   });
 
   const { handleSubmit, watch, setValue, trigger, formState, reset, getValues, setError } = formMethods;
-  const { dirtyFields } = formState;
+  const { dirtyFields, errors } = formState;
   const values = watch();
 
   useEffect(() => {
@@ -90,28 +82,14 @@ const CreateProject = () => {
 
   useEffect(() => {
     if (!minimalProjectDetails || !projectId) return;
-    const {
-      id,
-      name,
-      short_description,
-      description,
-      organisation_id,
-      outline,
-      hashtags,
-      organisation_name,
-      field_mapping_app,
-      use_odk_collect,
-    } = minimalProjectDetails;
+    const { id, name, description, outline, hashtags, field_mapping_app, use_odk_collect } = minimalProjectDetails;
     reset({
       ...defaultValues,
       id,
       name,
-      short_description,
       description,
-      organisation_id: +organisation_id,
       outline,
       hashtags,
-      organisation_name,
       field_mapping_app,
       use_odk_collect,
     });
@@ -157,9 +135,7 @@ const CreateProject = () => {
     if (!isValidationSuccess) return;
     const {
       name,
-      short_description,
       description,
-      organisation_id,
       project_admins,
       outline,
       odk_central_url,
@@ -172,9 +148,7 @@ const CreateProject = () => {
 
     const projectPayload = {
       name,
-      short_description,
       description,
-      organisation_id,
       outline,
       merge,
       field_mapping_app,
@@ -186,9 +160,8 @@ const CreateProject = () => {
       'odk_central_url' | 'odk_central_user' | 'odk_central_password'
     > | null = null;
 
-    if (values.useDefaultODKCredentials) {
-      odkPayload = null;
-    } else {
+    // Only include ODK credentials if all three are provided
+    if (odk_central_url && odk_central_user && odk_central_password) {
       odkPayload = {
         odk_central_url,
         odk_central_user,
@@ -208,10 +181,10 @@ const CreateProject = () => {
 
   const createProject = async () => {
     const data = getValues();
-    const { name, description, short_description } = data;
+    const { name, description } = data;
 
     // retrieve updated fields from project overview
-    const dirtyValues = getDirtyFieldValues({ name, description, short_description }, dirtyFields);
+    const dirtyValues = getDirtyFieldValues({ name, description }, dirtyFields);
 
     const projectData = {
       ...dirtyValues,
@@ -350,11 +323,51 @@ const CreateProject = () => {
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
   };
 
-  if (
-    (!projectId && !hasManagedAnyOrganization) ||
-    (projectId && !isMinimalProjectLoading && !(isProjectManager || isOrganizationAdmin))
-  )
-    return <Forbidden />;
+  const onError = (validationErrors: any) => {
+    // Get the first error message to show to the user
+    const errorMessages: string[] = [];
+
+    // Collect all error messages
+    Object.keys(validationErrors).forEach((field) => {
+      const error = validationErrors[field];
+      if (error?.message) {
+        errorMessages.push(error.message);
+      } else if (typeof error === 'string') {
+        errorMessages.push(error);
+      } else if (error?.type === 'required') {
+        // Handle Zod required field errors
+        const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+        errorMessages.push(`${fieldName} is required`);
+      } else if (error?.code === 'invalid_type') {
+        // Handle Zod type errors (e.g., "expected string, received undefined")
+        const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+        const expected = error.expected || 'value';
+        const received = error.received || 'undefined';
+        errorMessages.push(`${fieldName}: expected ${expected}, received ${received}`);
+      }
+    });
+
+    // Show a user-friendly error message
+    if (errorMessages.length > 0) {
+      const message =
+        errorMessages.length === 1 ? errorMessages[0] : `Please fix the following errors: ${errorMessages.join(', ')}`;
+
+      dispatch(
+        CommonActions.SetSnackBar({
+          message,
+          variant: 'error',
+        }),
+      );
+    } else {
+      // Fallback message if we can't parse the errors
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: 'Please check the form for errors before continuing',
+          variant: 'error',
+        }),
+      );
+    }
+  };
 
   /* Project type / mapping app selector */
   if (step === 0 && !projectId) {
@@ -432,7 +445,7 @@ const CreateProject = () => {
         {/* form container */}
         <FormProvider {...formMethods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit, onError)}
             className="fmtm-flex fmtm-flex-col fmtm-col-span-12 sm:fmtm-col-span-7 lg:fmtm-col-span-5 sm:fmtm-h-full fmtm-overflow-y-hidden fmtm-rounded-xl fmtm-bg-white fmtm-my-2 sm:fmtm-my-0"
           >
             <div className="fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-px-10 fmtm-py-8">

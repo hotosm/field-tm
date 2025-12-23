@@ -22,6 +22,7 @@ import logging
 import os
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 from anyio import to_thread
 from area_splitter.splitter import split_by_sql, split_by_square
@@ -76,13 +77,13 @@ log = logging.getLogger(__name__)
 )
 async def read_projects(
     db: AsyncConnection,
-    auth_user: AuthUser,
-    user_sub: str | None = None,
-    skip: int = 0,
-    limit: int = 100,
+    user_sub: Optional[str] | None = None,
+    skip: Optional[int] = 0,
+    limit: Optional[int] = 100,
+    hashtags: Optional[list[str]] = None,
 ) -> list[DbProject]:
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, auth_user, user_sub)
+    projects = await DbProject.all(db, skip, limit, user_sub, hashtags)
     return projects or []
 
 
@@ -115,15 +116,11 @@ async def get_tasks_near_me(
 )
 async def read_project_summaries(
     db: AsyncConnection,
-    current_user: AuthUser,
     page: int = Parameter(1, ge=1),
     results_per_page: int = Parameter(13, le=100),
-    org_id: int | None = Parameter(default=None),
     user_sub: str | None = Parameter(default=None),
     hashtags: str | None = Parameter(default=None),
     search: str | None = Parameter(default=None),
-    minimal: bool = Parameter(default=False),
-    my_projects: bool = Parameter(default=False),
     country: str | None = Parameter(default=None),
     status: ProjectStatus | None = Parameter(default=None),
     field_mapping_app: FieldMappingApp | None = Parameter(default=None),
@@ -136,15 +133,11 @@ async def read_project_summaries(
         db,
         page,
         results_per_page,
-        current_user,
-        org_id,
         user_sub,
         hashtags,
         search,
-        minimal,
         status,
         field_mapping_app,
-        my_projects=my_projects,
         country=country,
     )
 

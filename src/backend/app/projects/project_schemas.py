@@ -30,8 +30,8 @@ from litestar.dto import DataclassDTO, DTOConfig
 from pydantic import BaseModel, Field, ValidationInfo
 from pydantic.functional_validators import field_validator, model_validator
 
-from app.central.central_schemas import ODKCentralIn
-from app.config import encrypt_value
+from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
+from app.config import decrypt_value, encrypt_value
 from app.db.enums import (
     FieldMappingApp,
     ProjectStatus,
@@ -89,7 +89,6 @@ class StubProjectIn(BaseModel):
 
     name: str
     field_mapping_app: FieldMappingApp
-    short_description: str
     description: Optional[str] = None
     merge: bool = True
     outline: MultiPolygon | Polygon = None
@@ -208,6 +207,40 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
 
     # Ensure geojson_pydantic.Polygon
     outline: Optional[Polygon] = None
+
+    @property
+    def odk_credentials(self) -> Optional[ODKCentralDecrypted]:
+        """Convert ODK credentials to decrypted format.
+
+        Return None to use defaults.
+        """
+        # If all ODK fields are None/empty, return None to use default env credentials
+        if (
+            not self.odk_central_url
+            and not self.odk_central_user
+            and not self.odk_central_password
+        ):
+            return None
+
+        # Password comes in as plaintext from frontend (ODKCentralIn encrypts it
+        # for storage)
+        # But when reading from ProjectIn, it might already be encrypted if coming
+        # from DB
+        # For new projects, password should be plaintext from frontend
+        password = self.odk_central_password
+        if password:
+            try:
+                # Try to decrypt (if it's encrypted from DB)
+                password = decrypt_value(password)
+            except Exception:
+                # If decryption fails, assume it's already plaintext (from frontend)
+                pass
+
+        return ODKCentralDecrypted(
+            odk_central_url=self.odk_central_url,
+            odk_central_user=self.odk_central_user,
+            odk_central_password=password,
+        )
 
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):

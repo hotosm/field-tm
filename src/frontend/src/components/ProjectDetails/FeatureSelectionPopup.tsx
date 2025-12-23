@@ -9,7 +9,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
 import { entity_state, project_status } from '@/types/enums';
 import { DeleteEntity } from '@/api/Project';
-import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useIsProjectManager } from '@/hooks/usePermissions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -41,7 +41,6 @@ const FeatureSelectionPopup = ({
   const isEntityDeleting = useAppSelector((state) => state.project.isEntityDeleting);
 
   const isProjectManager = useIsProjectManager(projectId);
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo?.organisation_id as number);
 
   const deleteNewEntity = async () => {
     if (!entity?.id) return;

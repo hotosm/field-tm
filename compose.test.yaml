@@ -75,23 +75,19 @@ services:
       central-db:
         condition: service_healthy
 
-  central-ui:
+  migrations:
     extends:
       file: compose.yaml
-      service: central-ui
+      service: migrations
 
   fmtm-db:
     extends:
       file: compose.yaml
       service: fmtm-db
-
-  # Frontend tests may use electric, at some point
-  # electric:
-  #   extends:
-  #     file: compose.yaml
-  #     service: electric
+    ports: []
 
   central-db:
     extends:
       file: compose.yaml
       service: central-db
+    ports: []

@@ -88,12 +88,7 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
             >
               {data.name}
             </p>
-            <p
-              className="fmtm-body-md fmtm-capitalize fmtm-line-clamp-3 fmtm-text-[#2B2B2B] fmtm-min-h-[3.938rem]"
-              title={data.short_description}
-            >
-              {data.short_description}
-            </p>
+            ADD A DESCRIPTION HERE
           </div>
         </div>
         {data.field_mapping_app !== field_mapping_app.QField && data.status !== project_status.DRAFT && (
