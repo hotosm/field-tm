@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Config file for Pydantic and FastAPI, using environment variables."""
+"""Config file for Pydantic and LiteStar, using environment variables."""
 
 import base64
 import os
@@ -213,8 +213,6 @@ class Settings(BaseSettings):
         # Ensure uniqueness and return (remove dups)
         return list(dict.fromkeys(default_origins))
 
-    API_PREFIX: str = ""
-
     FMTM_DB_HOST: Optional[str] = "fmtm-db"
     FMTM_DB_USER: Optional[str] = "fmtm"
     FMTM_DB_PASSWORD: Optional[SecretStr] = "fmtm"
@@ -294,19 +292,6 @@ class Settings(BaseSettings):
         elif self.MONITORING == MonitoringTypes.OPENOBSERVE:
             return OpenObserveSettings()
         return None
-
-    # SMTP Configurations
-    SMTP_HOST: Optional[str] = None
-    SMTP_PORT: int = 587
-    SMTP_USER: Optional[str] = None
-    SMTP_PASSWORD: Optional[SecretStr] = None
-    SMTP_FROM_NAME: Optional[str] = "Field-TM"
-
-    @computed_field
-    @property
-    def emails_enabled(self) -> bool:
-        """Check if email settings are configured."""
-        return bool(self.SMTP_HOST and self.SMTP_USER)
 
 
 @lru_cache

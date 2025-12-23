@@ -19,6 +19,7 @@
 
 import csv
 import json
+import logging
 from asyncio import gather
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -27,18 +28,18 @@ from typing import Optional, Union
 from uuid import UUID, uuid4
 
 import geojson
-from fastapi import HTTPException
-from fastapi.concurrency import run_in_threadpool
-from loguru import logger as log
+from anyio import to_thread
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
-from psycopg import Connection
+from psycopg import AsyncConnection
 from pyodk._endpoints.entities import Entity
 from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import DbGeomType, EntityState, HTTPStatus
+from app.db.enums import DbGeomType, EntityState
 from app.db.models import DbProject, DbTemplateXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -47,6 +48,9 @@ from app.db.postgis_utils import (
 )
 from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
+
+log = logging.getLogger(__name__)
+
 
 STATUS_VISUALS = {
     EntityState.MARKED_BAD.value: {
@@ -91,7 +95,7 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
     except ValueError as e:
         log.error(e)
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(
                 "ODK credentials are invalid, or may have been updated. "
                 "Please update them."
@@ -100,7 +104,7 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
@@ -119,7 +123,7 @@ def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
@@ -149,7 +153,7 @@ def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] 
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
@@ -181,7 +185,7 @@ def create_odk_project(
         if isinstance(result, dict):
             if result.get("code") == 401.2:
                 raise HTTPException(
-                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Could not authenticate to odk central.",
                 )
 
@@ -191,7 +195,7 @@ def create_odk_project(
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
@@ -230,7 +234,7 @@ def create_odk_xform(
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"message": "Connection failed to odk central"},
         ) from e
 
@@ -251,14 +255,14 @@ def list_submissions(
     return submissions
 
 
-async def get_form_list(db: Connection) -> list:
+async def get_form_list(db: AsyncConnection) -> list:
     """Returns the list of {id:title} for XLSForms in the database."""
     try:
         return await DbTemplateXLSForm.all(db)
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e),
         ) from e
 
@@ -283,7 +287,8 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         log.exception(f"Error: {e}", stack_info=True)
         msg = f"XLSForm is invalid: {str(e)}"
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=msg,
         ) from e
 
 
@@ -377,7 +382,7 @@ async def update_odk_central_xform(
 
 
 async def update_project_xlsform(
-    db: Connection,
+    db: AsyncConnection,
     project: DbProject,
     xlsform: BytesIO,
     xform_id: str,
@@ -390,7 +395,7 @@ async def update_project_xlsform(
         xlsform,
         project.odk_credentials,
     )
-    form_xml = await run_in_threadpool(
+    form_xml = await to_thread.run_sync(
         get_project_form_xml,
         project.odk_credentials,
         project.odkid,
@@ -425,7 +430,7 @@ async def convert_geojson_to_odk_csv(
 
     if not parsed_geojson:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Conversion GeoJSON --> CSV failed",
         )
 
@@ -496,7 +501,7 @@ async def convert_odk_submission_json_to_geojson(
 
     if not submission_json:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Project contains no submissions yet",
         )
 
@@ -754,14 +759,15 @@ async def get_appuser_token(
                 msg = f"Failed to update appuser for formId: ({xform_id})"
                 log.error(msg)
                 raise HTTPException(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=msg,
                 ) from None
         return f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
 
     except Exception as e:
         log.exception(f"An error occurred: {str(e)}", stack_info=True)
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the app user token.",
         ) from e
 
@@ -847,13 +853,13 @@ async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
     try:
         async with central_deps.get_odk_dataset(odk_creds):
             pass
-        return HTTPStatus.OK
+        return status.HTTP_200_OK
     except HTTPException as e:
         log.error(f"ODK Central credential test failed: {e.detail}")
         raise
     except Exception as e:
         log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error while testing ODK Central credentials.",
         ) from e

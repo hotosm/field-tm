@@ -24,14 +24,14 @@ from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
-from fastapi import UploadFile
-from fastapi.exceptions import HTTPException
+from litestar import status_codes as status
+from litestar.datastructures import UploadFile
+from litestar.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentralDecrypted
-from app.db.enums import HTTPStatus
 
 
 @asynccontextmanager
@@ -68,7 +68,8 @@ async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
             yield odk_central
     except ConnectionError as conn_error:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(conn_error),
         ) from conn_error
 
 
@@ -84,7 +85,8 @@ async def get_async_odk_form(odk_creds: ODKCentralDecrypted):
             yield odk_central
     except ConnectionError as conn_error:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(conn_error),
         ) from conn_error
 
 
@@ -96,7 +98,7 @@ async def validate_xlsform_extension(xlsform: UploadFile):
     allowed_extensions = [".xls", ".xlsx"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Provide a valid .xls or .xlsx file",
         )
     return BytesIO(await xlsform.read())

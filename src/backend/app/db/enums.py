@@ -20,28 +20,6 @@
 from enum import Enum, IntEnum, StrEnum
 
 
-class HTTPStatus(IntEnum):
-    """All HTTP status codes used in endpoints."""
-
-    # Success
-    OK = 200
-    CREATED = 201
-    ACCEPTED = 202
-    NO_CONTENT = 204
-
-    # Client Error
-    BAD_REQUEST = 400
-    UNAUTHORIZED = 401
-    FORBIDDEN = 403
-    NOT_FOUND = 404
-    CONFLICT = 409
-    UNPROCESSABLE_ENTITY = 422
-
-    # Server Error
-    INTERNAL_SERVER_ERROR = 500
-    NOT_IMPLEMENTED = 501
-
-
 class ProjectStatus(StrEnum, Enum):
     """All possible states of a Mapping Project."""
 
@@ -68,28 +46,16 @@ class ProjectPriority(StrEnum, Enum):
     URGENT = "URGENT"
 
 
-class UserRole(StrEnum, Enum):
-    """Available roles assigned to a user site-wide in Field-TM.
-
-    Simplified to two global roles:
-        - MAPPER = default for all authenticated users
-        - ADMIN = global admin with access to all admin endpoints
-    """
-
-    MAPPER = "MAPPER"
-    ADMIN = "ADMIN"
-
-
 class ProjectRole(StrEnum, Enum):
     """Available roles assigned to a user for a specific project.
 
     Simplified to:
         - MAPPER = default for all contributors
-        - PROJECT_MANAGER = per-project admin with full control over that project
+        - PROJECT_ADMIN = per-project admin with full control over that project
     """
 
     MAPPER = "MAPPER"
-    PROJECT_MANAGER = "PROJECT_MANAGER"
+    PROJECT_ADMIN = "PROJECT_ADMIN"
 
 
 class MappingLevel(StrEnum, Enum):
@@ -130,20 +96,6 @@ class TaskEvent(StrEnum, Enum):
     RESET = "RESET"
 
 
-class MappingState(StrEnum, Enum):
-    """State options for tasks in Field-TM.
-
-    NOTE We no longer have states invalidated / bad, and instead rely on the
-    EntityState.MARKED_BAD buildings to display red on the map.
-    """
-
-    UNLOCKED_TO_MAP = "UNLOCKED_TO_MAP"
-    LOCKED_FOR_MAPPING = "LOCKED_FOR_MAPPING"
-    UNLOCKED_TO_VALIDATE = "UNLOCKED_TO_VALIDATE"
-    LOCKED_FOR_VALIDATION = "LOCKED_FOR_VALIDATION"
-    UNLOCKED_DONE = "UNLOCKED_DONE"
-
-
 class EntityState(IntEnum, Enum):
     """State options for Entities in ODK.
 
@@ -157,23 +109,6 @@ class EntityState(IntEnum, Enum):
     SURVEY_SUBMITTED = 2
     VALIDATED = 5
     MARKED_BAD = 6
-
-
-class ProjectSplitStrategy(StrEnum, Enum):
-    """Task splitting type."""
-
-    GRID = "GRID"
-    OSM_VECTORS = "OSM_VECTORS"
-    OTHER = "OTHER"
-
-
-class BackgroundTaskStatus(StrEnum, Enum):
-    """FastAPI background Task Statuses."""
-
-    PENDING = "PENDING"
-    FAILED = "FAILED"
-    RECEIVED = "RECEIVED"
-    SUCCESS = "SUCCESS"
 
 
 class TaskSplitType(StrEnum, Enum):

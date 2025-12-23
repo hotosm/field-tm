@@ -40,7 +40,6 @@ from area_splitter.db import (
     insert_geom,
 )
 
-# Instantiate logger
 log = logging.getLogger(__name__)
 
 

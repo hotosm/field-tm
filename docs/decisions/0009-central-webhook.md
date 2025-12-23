@@ -4,15 +4,16 @@
 
 We use ODK Central for form delivery and mobile data collection (via ODK Collect),
 but our main system (FieldTM) runs a separate Postgres database and does not share
-state with ODK Central. In FieldTM, we store a subset of ODK submission data in order
-to drive dashboards, analytics, task assignments, and reactive sync through ElectricSQL.
+state with ODK Central. In FieldTM, we store a subset of ODK submission data in
+order to drive dashboards, analytics, task assignments, and reactive sync through
+ElectricSQL.
 
 - ODK Central does not currently offer native webhook support, so there's no
-  built-in way to push events (like new submissions) to an external system such as
-  FieldTM.
-- All current data sharing methods from ODK Central (OData, JSON/CSV APIs, XML downloads)
-  are pull-based and require regular polling, which introduces latency and resource
-  overhead.
+  built-in way to push events (like new submissions) to an external system
+  such as FieldTM.
+- All current data sharing methods from ODK Central (OData, JSON/CSV APIs,
+  XML downloads) are pull-based and require regular polling, which introduces
+  latency and resource overhead.
 
 - We needed a push-based solution to keep FieldTM in sync with new ODK submissions
   in near real-time, without relying on polling or shared databases.
@@ -61,11 +62,16 @@ endpoint hosted by FieldTM.
 ## Consequences
 
 - ✅ Push-based updates enable timely sync into FieldTM without polling.
-- ✅ Compatible with ElectricSQL, letting us stream changes to the frontend instantly.
-- ✅ Works with any Central instance, even if hosted by another team or organization.
-- ✅ Open to supporting other ODK-compatible platforms in the future (e.g. Kobo, Ona).
-- ✅ Very lightweight and stateless, written in Go and deployable via a small container.
-- ✅ No dependence on Central internals beyond the audit log, avoiding tight coupling.
+- ✅ Compatible with ElectricSQL, letting us stream changes to the frontend
+  instantly.
+- ✅ Works with any Central instance, even if hosted by another team or
+  organization.
+- ✅ Open to supporting other ODK-compatible platforms in the future
+  (e.g. Kobo, Ona).
+- ✅ Very lightweight and stateless, written in Go and deployable via a small
+  container.
+- ✅ No dependence on Central internals beyond the audit log, avoiding tight
+  coupling.
 - ❌ Adds one more moving piece to deploy and monitor.
 - ❌ Audit logs were probably not designed for this purpose, but work well for our
   needs.

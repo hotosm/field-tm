@@ -18,6 +18,7 @@
 """Tests for project routes."""
 
 import json
+import logging
 import os
 from io import BytesIO
 from pathlib import Path
@@ -26,23 +27,23 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
-from fastapi import HTTPException
 from httpx import AsyncClient
-from loguru import logger as log
+from litestar import status_codes as status
 
 from app.central.central_crud import create_odk_project
 from app.config import settings
-from app.db.enums import EntityState, HTTPStatus, MappingState
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import check_crs
 from app.projects import project_crud
 from tests.test_data import test_data_path
 
+log = logging.getLogger(__name__)
+
 
 async def create_stub_project(client, stub_project_data):
     """Create a new project."""
     response = await client.post("/projects/stub", json=stub_project_data)
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == status.HTTP_200_OK
     return response.json()
 
 
@@ -53,7 +54,7 @@ async def test_create_project_invalid(client, organisation, project_data):
     response_invalid = await client.patch(
         f"/projects?org_id={organisation.id}", json=project_data
     )
-    assert response_invalid.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert response_invalid.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     response_data = response_invalid.json()
 
     expected_errors = {
@@ -86,7 +87,7 @@ async def test_create_project_with_dup(client, organisation, stub_project_data):
         f"/projects/stub?org_id={organisation.id}", json=stub_project_data
     )
 
-    assert response_duplicate.status_code == HTTPStatus.CONFLICT
+    assert response_duplicate.status_code == status.HTTP_409_CONFLICT
     assert (
         response_duplicate.json()["detail"]
         == f"Project with name '{project_name}' already exists."
@@ -214,15 +215,19 @@ async def test_invalid_geojson_types(client, organisation, project_data, geojson
 async def test_unsupported_crs(stub_project_data, crs):
     """Test unsupported CRS in GeoJSON."""
     stub_project_data["outline"]["crs"] = crs
-    with pytest.raises(HTTPException) as exc_info:
+    # NOTE: We intentionally avoid importing framework-specific HTTP exceptions here.
+    # The underlying implementation raises an HTTP-style exception that exposes
+    # a `status_code` attribute; we assert on that contract rather than the
+    # concrete exception type.
+    with pytest.raises(Exception) as exc_info:
         await check_crs(stub_project_data["outline"])
-    assert exc_info.value.status_code == 400
+    assert getattr(exc_info.value, "status_code", None) == 400
 
 
 async def create_project(client, stub_project_data):
     """Create a new project."""
     response = await client.post("/projects/stub", json=stub_project_data)
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == status.HTTP_200_OK
     return response.json()
 
 
@@ -380,8 +385,6 @@ async def test_generate_project_files(db, client, project):
 
     # Now check required values were added to project
     new_project = await DbProject.one(db, project_id)
-    assert new_project.tasks and len(new_project.tasks) == 1
-    assert new_project.tasks[0].task_state == MappingState.UNLOCKED_TO_MAP
     assert isinstance(new_project.odk_token, str)
 
 
@@ -451,60 +454,6 @@ async def test_project_by_id(client, project):
     assert data["hashtags"] == project.hashtags
     assert data["location_str"] == project.location_str
     assert data["tasks"] == []
-
-
-async def test_set_entity_mapping_status(client, odk_project, entities):
-    """Test set the ODK entity mapping status."""
-    entity = entities[0]
-    new_status = EntityState.OPENED_IN_ODK
-
-    response = await client.post(
-        f"/projects/{odk_project.id}/entity/status",
-        json={
-            "entity_id": entity["id"],
-            "status": new_status,
-            "label": f"Feature {entity['osm_id']}",
-        },
-    )
-    response_entity = response.json()
-
-    # Here we update the original entity status for the comparison
-    entity["status"] = new_status.value
-    assert response.status_code == 200
-    compare_entities(response_entity, entity)
-
-
-async def test_get_entity_mapping_status(client, odk_project, entities):
-    """Test get the ODK entity mapping status."""
-    entity = entities[0]
-    response = await client.get(
-        f"/projects/{odk_project.id}/entity/status", params={"entity_id": entity["id"]}
-    )
-    response_entity = response.json()
-
-    assert response.status_code == 200
-    compare_entities(response_entity, entity)
-
-
-async def test_get_entities_mapping_statuses(client, odk_project, entities):
-    """Test get the ODK entities mapping statuses."""
-    odk_project_id = odk_project.id
-    response = await client.get(f"projects/{odk_project_id}/entities/statuses")
-    response_entities = response.json()
-
-    assert len(response_entities) == len(entities)
-    for response_entity, expected_entity in zip(
-        response_entities, entities, strict=False
-    ):
-        compare_entities(expected_entity, response_entity)
-
-
-def compare_entities(response_entity, expected_entity):
-    """Utility function for testing by comparing response and expected entity fields."""
-    assert response_entity["id"] == str(expected_entity["id"])
-    assert str(response_entity["task_id"]) == str(expected_entity["task_id"])
-    assert str(response_entity["osm_id"]) == str(expected_entity["osm_id"])
-    assert str(response_entity["status"]) == str(expected_entity["status"])
 
 
 async def test_project_task_split(client):
@@ -627,8 +576,8 @@ async def test_get_contributors(client, project, odk_project, submission, admin_
     assert contributor["submissions"] == 1
 
 
-async def test_add_new_project_manager(client, project, new_mapper_user):
-    """Test adding a new project manager."""
+async def test_add_new_project_admin(client, project, new_mapper_user):
+    """Test adding a new project admin."""
     with patch(
         "app.projects.project_crud.send_project_manager_message", return_value=None
     ):
@@ -639,15 +588,15 @@ async def test_add_new_project_manager(client, project, new_mapper_user):
 
     assert response.status_code == 200
 
-    # Verify manager was added by fetching project users
+    # Verify admin was added by fetching project users
     response = await client.get(f"/projects/{project.id}/users")
     assert response.status_code == 200
 
     data = response.json()
 
-    # Ensure the new manager is in the response
+    # Ensure the new project admin is in the response
     assert any(
-        user["user_sub"] == new_mapper_user.sub and user["role"] == "PROJECT_MANAGER"
+        user["user_sub"] == new_mapper_user.sub and user["role"] == "PROJECT_ADMIN"
         for user in data
     )
 

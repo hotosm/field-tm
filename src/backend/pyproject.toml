@@ -26,9 +26,8 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "uvicorn==0.34.2",
-    "uvloop==0.21.0",
-    "httptools==0.7.1",
-    "fastapi==0.115.3",
+    "litestar==2.19.0",
+
     "asgi-lifespan==2.1.0",
     "pydantic==2.9.2",
     "pydantic-settings==2.6.0",
@@ -38,7 +37,6 @@ dependencies = [
     "geojson==3.1.0",
     "shapely==2.0.6",
     "pyxform==4.0.0",
-    "loguru==0.7.3",
     "minio==7.2.9",
     "pyproj==3.7.0",
     "asgiref==3.8.1",
@@ -91,7 +89,7 @@ monitoring = [
     #"opentelemetry-sdk==1.37.0",
     #"opentelemetry-api==1.37.0",
     #"opentelemetry-exporter-otlp==1.37.0",
-    "opentelemetry-instrumentation-fastapi==0.58b0",
+    "opentelemetry-instrumentation-asgi==0.58b0",
     "opentelemetry-instrumentation-logging==0.58b0",
     "opentelemetry-instrumentation-psycopg==0.58b0",
     "opentelemetry-instrumentation-requests==0.58b0",
@@ -110,15 +108,6 @@ select = ["I", "E", "W", "D", "B", "F", "N", "Q"]
 ignore = ["N805", "B008"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-[tool.ruff.lint.flake8-bugbear]
-extend-immutable-calls = [
-    "fastapi.Depends",
-    "fastapi.params.Depends",
-    "fastapi.Query",
-    "fastapi.params.Query",
-    "fastapi.File",
-    "fastapi.Security",
-]
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

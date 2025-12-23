@@ -18,6 +18,7 @@
 """Configuration and fixtures for PyTest."""
 
 import json
+import logging
 import os
 from io import BytesIO
 from pathlib import Path
@@ -28,24 +29,21 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
-from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
-from loguru import logger as log
+from litestar import Litestar
 from psycopg import AsyncConnection
 
 from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.central import central_crud, central_schemas
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
-from app.db.database import db_conn
 from app.db.enums import (
     FieldMappingApp,
-    UserRole,
 )
 from app.db.models import (
     DbProject,
 )
-from app.main import get_application
+from app.main import api as litestar_api
 from app.projects import project_crud
 from app.projects.project_schemas import (
     ProjectIn,
@@ -53,6 +51,8 @@ from app.projects.project_schemas import (
 )
 from app.users.user_crud import get_or_create_user
 from tests.test_data import test_data_path
+
+log = logging.getLogger(__name__)
 
 odk_central_url = os.getenv("ODK_CENTRAL_URL")
 odk_central_user = os.getenv("ODK_CENTRAL_USER")
@@ -67,9 +67,11 @@ def pytest_configure(config):
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def app() -> AsyncGenerator[FastAPI, Any]:
-    """Get the FastAPI test server."""
-    yield get_application()
+async def app() -> AsyncGenerator[Litestar, Any]:
+    """Get the Litestar test server."""
+    # Create a fresh Litestar app instance for each test session using the
+    # configured application factory.
+    yield litestar_api
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -92,14 +94,13 @@ async def admin_user(db):
         AuthUser(
             sub="osm|1",
             username="localadmin",
-            role=UserRole.ADMIN,
+            is_admin=True,
         ),
     )
 
     return FMTMUser(
         sub=db_user.sub,
         username=db_user.username,
-        role=UserRole[db_user.role],
         profile_img=db_user.profile_img,
     )
 
@@ -112,14 +113,13 @@ async def new_mapper_user(db):
         AuthUser(
             sub="osm|2",
             username="local mapper",
-            role=UserRole.MAPPER,
+            is_admin=False,
         ),
     )
 
     return FMTMUser(
         sub=db_user.sub,
         username=db_user.username,
-        role=UserRole[db_user.role],
         profile_img=db_user.profile_img,
     )
 
@@ -300,12 +300,8 @@ async def project_data(stub_project_data):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(app: FastAPI, db: AsyncConnection):
-    """The FastAPI test server."""
-    # Override server db connection to use same as in conftest
-    # NOTE this is marginally slower, but required else tests fail
-    app.dependency_overrides[db_conn] = lambda: db
-
+async def client(app: Litestar, db: AsyncConnection):
+    """The Litestar test server."""
     # NOTE we increase startup_timeout from 5s --> 30s to avoid timeouts
     # during slow initialisation / startup (due to yaml conversion etc)
     async with LifespanManager(app, startup_timeout=30) as manager:

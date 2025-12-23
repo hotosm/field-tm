@@ -55,6 +55,8 @@ services:
     depends_on: !override
       fmtm-db:
         condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
       central:
         condition: service_healthy
         required: false

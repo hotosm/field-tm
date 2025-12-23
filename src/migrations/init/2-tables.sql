@@ -71,3 +71,11 @@ ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
     'public.projects_id_seq'::regclass
 );
+
+
+CREATE TABLE public.user_roles (
+    user_sub character varying NOT NULL,
+    project_id integer NOT NULL,
+    role public.projectrole NOT NULL DEFAULT 'MAPPER'
+);
+ALTER TABLE public.user_roles OWNER TO fmtm;

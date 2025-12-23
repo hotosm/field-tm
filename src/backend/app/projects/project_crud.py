@@ -19,6 +19,7 @@
 
 import ast
 import json
+import logging
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
@@ -28,9 +29,10 @@ from typing import Optional, Union
 import aiohttp
 import geojson
 import geojson_pydantic
-from fastapi import HTTPException, Request
-from fastapi.concurrency import run_in_threadpool
-from loguru import logger as log
+from anyio import to_thread
+from litestar import Request
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_data_client import (
     RawDataClient,
     RawDataClientConfig,
@@ -39,18 +41,13 @@ from osm_data_client import (
 )
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_login_python.core import Auth
-from psycopg import Connection, sql
+from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
-from app.db.enums import (
-    FieldMappingApp,
-    HTTPStatus,
-    ProjectStatus,
-    XLSFormType,
-)
+from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.db.models import (
     DbProject,
     DbUser,
@@ -63,11 +60,14 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
+from app.helpers.helper_schemas import PaginationInfo
 from app.projects import project_deps, project_schemas
+
+log = logging.getLogger(__name__)
 
 
 async def get_projects_featcol(
-    db: Connection,
+    db: AsyncConnection,
     bbox: Optional[str] = None,
 ) -> geojson.FeatureCollection:
     """Get all projects, or a filtered subset."""
@@ -126,7 +126,7 @@ async def get_projects_featcol(
 
     if not featcol:
         return HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Failed to generate project FeatureCollection",
         )
 
@@ -163,8 +163,10 @@ async def generate_data_extract(
     """
     if not config_json:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="To generate a new data extract a extract_config must be specified.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "To generate a new data extract a extract_config must be specified."
+            ),
         )
     config = RawDataClientConfig(
         access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
@@ -206,11 +208,12 @@ async def generate_data_extract(
                 Please select an area smaller than 200 km²."""
 
             raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
             ) from e
 
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to generate data extract from the raw data API.",
         ) from e
 
@@ -220,7 +223,7 @@ async def generate_data_extract(
 # ---------------------------
 
 
-async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
+async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
     """Read the list of XLSForms from the disk and sync them with the database."""
     async with db.cursor() as cur:
         existing_db_forms = set()
@@ -285,7 +288,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
 
 async def get_or_set_data_extract_url(
-    db: Connection,
+    db: AsyncConnection,
     db_project: DbProject,
     url: Optional[str],
 ) -> str:
@@ -312,7 +315,10 @@ async def get_or_set_data_extract_url(
                 "To generate one, call 'projects/generate-data-extract/'"
             )
             log.error(msg)
-            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
         return existing_url
 
     await DbProject.update(
@@ -327,7 +333,7 @@ async def get_or_set_data_extract_url(
 
 
 async def upload_geojson_data_extract(
-    db: Connection,
+    db: AsyncConnection,
     project_id: int,
     geojson_raw: Union[str, bytes],
 ) -> str:
@@ -349,7 +355,7 @@ async def upload_geojson_data_extract(
 
     if not featcol_single_geom_type:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Could not process geojson input",
         )
 
@@ -364,7 +370,10 @@ async def upload_geojson_data_extract(
     if not fgb_data:
         msg = f"Failed converting geojson to flatgeobuf for project ({project_id})"
         log.error(msg)
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=msg,
+        )
 
     # TODO simply post this directly to ODK Central an Entity List
     return
@@ -446,7 +455,7 @@ async def generate_odk_central_project_content(
 
 
 async def generate_project_files(
-    db: Connection,
+    db: AsyncConnection,
     project_id: int,
 ) -> bool:
     """Generate the files for a project.
@@ -515,7 +524,7 @@ async def generate_project_files(
         )
         # Run separate thread in event loop to avoid blocking with sync code
         # Copy the parsed form XML into the FieldTM db for easy easy
-        form_xml = await run_in_threadpool(
+        form_xml = await to_thread.run_sync(
             central_crud.get_project_form_xml,
             project_odk_creds,
             project_odk_id,
@@ -566,7 +575,7 @@ async def generate_project_files(
         return False
 
 
-async def get_task_geometry(db: Connection, project_id: int):
+async def get_task_geometry(db: AsyncConnection, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
     Args:
@@ -604,7 +613,7 @@ async def get_task_geometry(db: Connection, project_id: int):
 
 
 async def get_project_features_geojson(
-    db: Connection,
+    db: AsyncConnection,
     db_project: DbProject,
     task_id: Optional[int] = None,
 ) -> geojson.FeatureCollection:
@@ -616,7 +625,7 @@ async def get_project_features_geojson(
 
     if not data_extract_url:
         # raise HTTPException(
-        #     status_code=HTTPStatus.NOT_FOUND,
+        #     status_code=status.HTTP_404_NOT_FOUND,
         #     detail=f"No data extract exists for project ({project_id})",
         # )
         # Return an empty featcol for projects with no existing features
@@ -634,7 +643,7 @@ async def get_project_features_geojson(
                 msg = f"Download failed for data extract, project ({project_id})"
                 log.error(msg)
                 raise HTTPException(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=msg,
                 )
 
@@ -647,7 +656,7 @@ async def get_project_features_geojson(
         msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
         log.error(msg)
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         )
 
@@ -686,7 +695,7 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
     has_next = (page * results_per_page) < total  # noqa: N806
     has_prev = page > 1  # noqa: N806
 
-    pagination = project_schemas.PaginationInfo(
+    pagination = PaginationInfo(
         has_next=has_next,
         has_prev=has_prev,
         next_num=page + 1 if has_next else None,
@@ -701,7 +710,7 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
 
 
 async def get_paginated_projects(
-    db: Connection,
+    db: AsyncConnection,
     page: int,
     results_per_page: int,
     current_user: Optional[str] = None,
@@ -735,19 +744,21 @@ async def get_paginated_projects(
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
-    paginated_projects = projects[start_index:end_index]
-
-    # Build project summaries with external URLs from the query
-    summaries = [
-        project_schemas.ProjectSummary.model_validate(project, from_attributes=True)
-        for project in paginated_projects
-    ]
+    paginated_projects = projects[start_index:end_index] if projects else []
 
     pagination = await get_pagination(
-        page, len(paginated_projects), results_per_page, len(projects)
+        page,
+        len(paginated_projects),
+        results_per_page,
+        len(projects) if projects else 0,
     )
 
-    return {"results": summaries, "pagination": pagination}
+    from app.helpers.helper_schemas import PaginatedResponse
+
+    return PaginatedResponse[DbProject](
+        results=paginated_projects,
+        pagination=pagination,
+    )
 
 
 async def send_project_manager_message(
