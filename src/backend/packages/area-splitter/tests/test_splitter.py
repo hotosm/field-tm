@@ -157,9 +157,9 @@ def test_split_by_features_geojson(aoi_json):
     assert len(features.get("features")) == 4
 
 
-def test_split_by_sql_fmtm_with_extract(db, aoi_json, extract_json, output_json):
+async def test_split_by_sql_fmtm_with_extract(db, aoi_json, extract_json, output_json):
     """Test divide by square from geojson file."""
-    features = split_by_sql(
+    features = await split_by_sql(
         aoi_json,
         db,
         num_buildings=5,
@@ -169,9 +169,9 @@ def test_split_by_sql_fmtm_with_extract(db, aoi_json, extract_json, output_json)
     assert sorted(features) == sorted(output_json)
 
 
-def test_split_by_sql_fmtm_no_extract(aoi_json):
+async def test_split_by_sql_fmtm_no_extract(aoi_json):
     """Test FMTM splitting algorithm, with no data extract."""
-    features = split_by_sql(
+    features = await split_by_sql(
         aoi_json,
         # Use separate db connection for longer running test
         "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
@@ -182,13 +182,13 @@ def test_split_by_sql_fmtm_no_extract(aoi_json):
     assert len(features.get("features")) >= 60
 
 
-def test_split_by_sql_fmtm_multi_geom(extract_json):
+async def test_split_by_sql_fmtm_multi_geom(extract_json):
     """Test divide by square from geojson file with multiple geometries."""
     with open(f"{TESTDATA_DIR}/kathmandu_split.geojson") as jsonfile:
         parsed_featcol = geojson.load(jsonfile)
-    features = split_by_sql(
-        parsed_featcol,
-        "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+    features = await split_by_sql(
+        aoi=parsed_featcol,
+        db="postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
         num_buildings=10,
         osm_extract=extract_json,
     )

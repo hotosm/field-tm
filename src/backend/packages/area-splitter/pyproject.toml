@@ -12,7 +12,6 @@ dependencies = [
     "geojson>=2.5.0",
     "shapely>=1.8.1",
     "psycopg>=3.1.7",
-    "osm-rawdata>=0.2.2",
 ]
 requires-python = ">=3.10"
 readme = "README.md"

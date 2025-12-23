@@ -233,6 +233,10 @@ async def task_split(
     project_geojson: UploadFile = File(...),
     extract_geojson: Optional[UploadFile] = File(None),
     no_of_buildings: int = Form(50),
+    geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
+    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
+    centroid: Annotated[bool, Form()] = None,
+    use_st_within: Annotated[bool, Form()] = None,
 ):
     """Split a task into subtasks.
 
@@ -246,6 +250,10 @@ async def task_split(
             If not included, an extract is generated automatically.
         no_of_buildings (int, optional): The number of buildings per subtask.
             Defaults to 50.
+        geom_type (DbGeomType, optional): The geometry type to extract.
+        osm_category (XLSFormType, optional): The OSM data category to extract.
+        centroid (bool, optional): Whether to generate centroids for polygon tasks.
+        use_st_within (bool, optional): Include features within the AOI.
 
     Returns:
         The result of splitting the task into subtasks.
@@ -265,15 +273,15 @@ async def task_split(
             log.warning("Parsed geojson file contained no geometries")
 
     log.debug("STARTED task splitting using provided boundary and data extract")
-    # NOTE here we pass the connection string and allow area-splitter to
-    # a use psycopg connection (not async)
-    features = await run_in_threadpool(
-        lambda: split_by_sql(
-            merged_boundary,
-            settings.FMTM_DB_URL,
-            num_buildings=no_of_buildings,
-            osm_extract=parsed_extract,
-        )
+    features = await split_by_sql(
+        merged_boundary,
+        settings.FMTM_DB_URL,
+        num_buildings=no_of_buildings,
+        osm_extract=parsed_extract,
+        geom_type=geom_type,
+        osm_category=osm_category,
+        centroid=centroid,
+        use_st_within=use_st_within,
     )
     log.debug("COMPLETE task splitting")
     return features

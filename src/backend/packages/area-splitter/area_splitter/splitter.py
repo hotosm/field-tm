@@ -15,18 +15,27 @@
 """Class and helper methods for task splitting."""
 
 import argparse
+import ast
+import asyncio
 import json
 import logging
 import math
 import sys
-from io import BytesIO
 from pathlib import Path
-from textwrap import dedent
 from typing import Optional, Tuple, Union
 
 import geojson
+import httpx
+from app.config import settings
+from app.db.enums import DbGeomType, HTTPStatus, XLSFormType
+from fastapi import HTTPException
 from geojson import Feature, FeatureCollection, GeoJSON
-from osm_rawdata.postgres import PostgresClient
+from osm_data_client import (
+    RawDataClient,
+    RawDataClientConfig,
+    RawDataOutputOptions,
+)
+from osm_fieldwork.json_data_models import data_models_path
 from psycopg import Connection
 from shapely.geometry import Polygon, box, shape
 from shapely.ops import unary_union
@@ -603,12 +612,16 @@ def split_by_square(
     return split_features
 
 
-def split_by_sql(
+async def split_by_sql(
     aoi: Union[str, FeatureCollection],
     db: Union[str, Connection],
+    geom_type: Optional[str] = DbGeomType.POLYGON,
+    osm_category: Optional[str] = XLSFormType.buildings,
     num_buildings: Optional[int] = None,
     outfile: Optional[str] = None,
     osm_extract: Optional[Union[str, FeatureCollection]] = None,
+    centroid: Optional[bool] = False,
+    use_st_within: Optional[bool] = None,
 ) -> FeatureCollection:
     """Split an AOI with a field-tm algorithm.
 
@@ -636,10 +649,16 @@ def split_by_sql(
             Optional param, if not included an extract is generated for you.
             It is recommended to leave this param as default, unless you know
             what you are doing.
+        geom_type (str): Type of geometry to extract.
+        osm_category (str): The OSM data category to extract.
+        centroid (bool): Generate centroid of polygons.
+        use_st_within (bool): Include features within the AOI.
 
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
     """
+    print("geom_type:", geom_type)
+    geom_type = geom_type.lower()
     if not num_buildings:
         err = "num_buildings must be passed, until other algorithms are implemented."
         log.error(err)
@@ -651,36 +670,69 @@ def split_by_sql(
 
     # Extracts and parse extract geojson
     if not osm_extract:
-        # We want all polylines for splitting:
-        # buildings, highways, waterways, railways
-        config_data = dedent(
-            """
-            select:
-            from:
-              - nodes
-              - ways_poly
-              - ways_line
-            where:
-              tags:
-                - building: not null
-                  highway: not null
-                  waterway: not null
-                  railway: not null
-                  aeroway: not null
-        """
+        config = RawDataClientConfig(
+            access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
+            if settings.RAW_DATA_API_AUTH_TOKEN
+            else None
         )
-        # Must be a BytesIO JSON object
-        config_bytes = BytesIO(config_data.encode())
+        config_filename = XLSFormType(osm_category).name
+        data_model = f"{data_models_path}/{config_filename}.json"
 
-        pg = PostgresClient(
-            "underpass",
-            config_bytes,
-        )
-        # The total FeatureCollection area merged by osm-rawdata automatically
-        extract_geojson = pg.execQuery(
-            aoi_featcol,
-            extra_params={"fileName": "area_splitter", "useStWithin": False},
-        )
+        with open(data_model, encoding="utf-8") as f:
+            config_data = json.load(f)
+
+        data_config = {
+            ("polygon", False): ["ways_poly"],
+            ("point", True): ["ways_poly", "nodes"],
+            ("point", False): ["nodes"],
+            ("polyline", False): ["ways_line"],
+        }
+
+        config_data["from"] = data_config.get((geom_type, centroid))
+        if geom_type == "polyline":
+            geom_type = "line"  # line is recognized as a geomtype in raw-data-api
+        if not use_st_within:
+            use_st_within = False if geom_type == "line" else True
+
+        extra_params = {
+            "fileName": "area_splitter",
+            "outputType": "geojson",
+            "geometryType": [geom_type],
+            "bindZip": False,
+            "centroid": centroid,
+            "use_st_within": use_st_within,
+            "filters": config_data,
+        }
+
+        try:
+            result = await RawDataClient(config).get_osm_data(
+                aoi,
+                output_options=RawDataOutputOptions(download_file=False),
+                **extra_params,
+            )
+
+            url = result.data.get("download_url")
+            async with httpx.AsyncClient() as client:
+                result = await client.get(url)
+                if result.status_code == 200:
+                    extract_geojson = result.json()
+                else:
+                    log.error("Failed to download OSM extract data")
+        except Exception as e:
+            log.error("Raw data API request failed")
+            if "status 406" in str(e) and "Area" in str(e):
+                try:
+                    # Extract the error dict part
+                    error_str = str(e).split("status 406:")[-1].strip()
+                    error_dict = ast.literal_eval(error_str)
+                    msg = error_dict["detail"][0]["msg"]
+                except Exception:
+                    msg = """Selected area is too large.
+                    Please select an area smaller than 200 km²."""
+
+                raise HTTPException(
+                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                ) from e
 
     else:
         extract_geojson = FMTMSplitter.input_to_geojson(osm_extract)
@@ -694,12 +746,16 @@ def split_by_sql(
     if len(feat_array := aoi_featcol.get("features", [])) > 1:
         features = []
         for index, feat in enumerate(feat_array):
-            featcol = split_by_sql(
-                FeatureCollection(features=[feat]),
-                db,
-                num_buildings,
-                f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
-                osm_extract,
+            featcol = await split_by_sql(
+                aoi=FeatureCollection(features=[feat]),
+                db=db,
+                num_buildings=num_buildings,
+                outfile=f"{Path(outfile).stem}_{index}.geojson" if outfile else None,
+                osm_extract=osm_extract,
+                geom_type=geom_type,
+                osm_category=osm_category,
+                centroid=centroid,
+                use_st_within=use_st_within,
             )
             feats = featcol.get("features", [])
             if feats:
@@ -886,12 +942,14 @@ be either the data extract used by the XLSForm, or a postgresql database.
             osm_extract=args.extract,
         )
     elif args.number:
-        split_by_sql(
-            args.boundary,
-            db=args.dburl,
-            num_buildings=args.number,
-            outfile=args.outfile,
-            osm_extract=args.extract,
+        asyncio.run(
+            split_by_sql(
+                args.boundary,
+                db=args.dburl,
+                num_buildings=args.number,
+                outfile=args.outfile,
+                osm_extract=args.extract,
+            )
         )
     # Split by feature using geojson
     elif args.source and args.source[3:] != "PG:":
