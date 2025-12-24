@@ -146,23 +146,15 @@ export type createStubProjectParamsType = {
 // RESPONSE TYPES
 export type projectSummaryType = {
   id: number;
-  project_name: string;
-  priority: number;
-  hashtags: string[];
-  location_str: string;
-  project_url: string | null;
-  external_project_id?: number | null;
+  field_mapping_app: field_mapping_app;
   external_project_instance_url?: string | null;
+  external_project_id?: number | null;
+  project_name: string;
+  description: string;
+  location_str: string;
   status: project_status;
   visibility: project_visibility;
-  field_mapping_app: field_mapping_app;
-  centroid: Point;
-  total_tasks: number;
-  num_contributors: number;
-  total_submissions: number;
-  tasks_mapped: number;
-  tasks_validated: number;
-  tasks_bad: number;
+  hashtags: string[];
 };
 
 export type tileType = {

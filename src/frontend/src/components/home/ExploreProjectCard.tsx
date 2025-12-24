@@ -43,19 +43,15 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
           <div className="fmtm-flex fmtm-justify-between fmtm-items-start">
-            {data.organisation_logo ? (
-              <img src={data.organisation_logo} className="fmtm-h-7 fmtm-max-h-7" alt="organization logo" />
-            ) : (
-              <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
-            )}
+            <img src={defaultOrgLogo} className="fmtm-h-7 fmtm-max-h-7" alt="default organization logo" />
 
             <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-              {data.project_url && data.status !== project_status.DRAFT && (
+              {data.status !== project_status.DRAFT && (
                 <Tooltip title={`Project created using ${data.field_mapping_app}`} arrow>
                   <img
                     src={fieldMappingAppLogoMap[data.field_mapping_app]}
                     className="fmtm-h-5 fmtm-max-h-5"
-                    alt="qfield logo"
+                    alt={`${data.field_mapping_app} logo`}
                   />
                 </Tooltip>
               )}
@@ -88,57 +84,9 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
             >
               {data.project_name}
             </p>
-            ADD A DESCRIPTION HERE
+            <p className="fmtm-text-sm">{data.description}</p>
           </div>
         </div>
-        {data.field_mapping_app !== field_mapping_app.QField && data.status !== project_status.DRAFT && (
-          <div className="fmtm-mt-4">
-            <div className="fmtm-flex fmtm-justify-between fmtm-mb-1">
-              <p className="fmtm-body-sm-semibold">{data?.total_tasks} Tasks</p>
-              <p className="fmtm-body-sm-semibold">{data?.total_submissions} Submissions</p>
-            </div>
-            <Tooltip
-              title={
-                <div>
-                  <p>{data?.total_tasks} Total Tasks</p>
-                  <p>{data?.tasks_mapped} Tasks Mapped</p>
-                  <p>{data?.tasks_validated} Tasks Validated</p>
-                </div>
-              }
-              placement="top"
-              arrow
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    backgroundColor: '#333333',
-                    color: '#ffffff',
-                    fontSize: '12px',
-                  },
-                },
-                arrow: {
-                  sx: {
-                    color: '#333333',
-                  },
-                },
-              }}
-            >
-              <div className="fmtm-h-[0.375rem] fmtm-w-full fmtm-bg-grey-300 fmtm-rounded-xl fmtm-overflow-hidden fmtm-flex fmtm-cursor-pointer">
-                <div
-                  style={{
-                    width: `${(data?.tasks_mapped / data?.total_tasks) * 100}%`,
-                  }}
-                  className={`fmtm-h-full fmtm-bg-grey-800 fmtm-rounded-r-xl`}
-                />
-                <div
-                  style={{
-                    width: `${(data?.tasks_validated / data?.total_tasks) * 100}%`,
-                  }}
-                  className={`fmtm-h-full fmtm-bg-grey-500 fmtm-rounded-r-xl`}
-                />
-              </div>
-            </Tooltip>
-          </div>
-        )}
       </div>
     </div>
   );
