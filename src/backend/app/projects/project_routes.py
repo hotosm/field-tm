@@ -39,7 +39,7 @@ from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required, public_endpoint
-from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import mapper, project_manager, super_admin
 from app.central import central_crud
 from app.config import settings
@@ -61,7 +61,6 @@ from app.helpers import helper_schemas
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
-from app.s3 import delete_all_objs_under_prefix
 
 log = logging.getLogger(__name__)
 
@@ -178,8 +177,6 @@ async def get_categories() -> dict:
 async def read_project(
     project_id: int,  # noqa: ARG001
     current_user: ProjectUserDict,
-    db: AsyncConnection,
-    auth_user: AuthUser,
 ) -> DbProject:
     """Get a specific project by ID."""
     return current_user.get("project")
@@ -330,8 +327,6 @@ async def preview_split_by_square(
 )
 async def get_data_extract(
     current_user_dict: ProjectUserDict,
-    db: AsyncConnection,
-    auth_user: AuthUser,
     geojson_file: UploadFile,
     project_id: int = Parameter(),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
@@ -393,7 +388,6 @@ async def get_data_extract(
 async def get_or_set_data_extract(
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    auth_user: AuthUser,
     project_id: int = Parameter(),
     url: str | None = Parameter(default=None),
 ) -> dict[str, str | None]:
@@ -419,7 +413,6 @@ async def get_or_set_data_extract(
 async def upload_data_extract(
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    auth_user: AuthUser,
     data_extract_file: UploadFile,
     project_id: int = Parameter(),
 ) -> dict[str, str]:
@@ -480,8 +473,6 @@ async def upload_data_extract(
 async def add_additional_entity_list(
     project_id: int,  # noqa: ARG001
     current_user_dict: ProjectUserDict,
-    db: AsyncConnection,
-    auth_user: AuthUser,
     geojson: UploadFile,
 ) -> None:
     """Add an additional Entity list for the project in ODK.
@@ -490,8 +481,9 @@ async def add_additional_entity_list(
     of the GeoJSON uploaded.
     """
     project = current_user_dict.get("project")
-    project_odk_id = project.odkid
-    project_odk_creds = project.odk_credentials
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
     # NOTE the Entity name is extracted from the filename (without extension)
     entity_name = Path(geojson.filename).stem
 
@@ -526,7 +518,6 @@ async def generate_files(
     project_id: int,  # noqa: ARG001
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    auth_user: AuthUser,
     combined_features_count: int = Parameter(0),
 ) -> None:
     """Generate additional content to initialise the project.
@@ -637,9 +628,9 @@ async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> Non
 
     # Append project ID to URL
     odk_url = odk_url.rstrip("/")
-    odkid = getattr(enriched, "odkid", None)
-    if odkid and "/projects/" not in odk_url:
-        odk_url = f"{odk_url}/projects/{odkid}"
+    external_project_id = getattr(enriched, "external_project_id", None)
+    if external_project_id and "/projects/" not in odk_url:
+        odk_url = f"{odk_url}/projects/{external_project_id}"
 
     try:
         await DbProject.update(
@@ -647,12 +638,12 @@ async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> Non
             project.id,
             ProjectUpdate(
                 external_project_instance_url=odk_url,
-                external_project_id=odkid,
+                external_project_id=external_project_id,
             ),
         )
         log.debug(
             "Stored ODK project external reference for project "
-            f"{project.id}: id={odkid}, url={odk_url}"
+            f"{project.id}: id={external_project_id}, url={odk_url}"
         )
     except Exception as exc:
         log.warning(
@@ -674,7 +665,6 @@ async def upload_project_task_boundaries(
     project_id: int,  # noqa: ARG001
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    auth_user: AuthUser,
     task_geojson: UploadFile,
 ) -> dict[str, str]:
     """Set project task boundaries using split GeoJSON from frontend.
@@ -716,15 +706,14 @@ async def upload_project_task_boundaries(
     return_dto=project_schemas.ProjectOut,
 )
 async def update_project(
-    new_data: project_schemas.ProjectUpdate,
+    data: project_schemas.ProjectUpdate,
     project_id: int,  # noqa: ARG001
     current_user_dict: ProjectUserDict,
     db: AsyncConnection,
-    auth_user: AuthUser,
 ) -> DbProject:
     """Partial update an existing project."""
     # NOTE this does not including updating the ODK project name
-    return await DbProject.update(db, current_user_dict.get("project").id, new_data)
+    return await DbProject.update(db, current_user_dict.get("project").id, data)
 
 
 @post(
@@ -740,37 +729,35 @@ async def update_project(
 async def create_stub_project(
     db: AsyncConnection,
     current_user: DbUser,
-    project_info: project_schemas.StubProjectIn,
+    data: project_schemas.StubProjectIn,
 ) -> DbProject:
     """Create a project in the local database."""
-    if hasattr(project_info, "merge"):
-        delattr(project_info, "merge")  # Remove merge field as it is not in database
+    if hasattr(data, "merge"):
+        delattr(data, "merge")  # Remove merge field as it is not in database
     db_user = current_user
-    project_info.status = ProjectStatus.DRAFT
+    data.status = ProjectStatus.DRAFT
 
     log.info(
-        f"User {db_user.username} attempting creation of project {project_info.name}"
+        f"User {db_user.username} attempting creation of project {data.project_name}"
     )
-    await project_deps.check_project_dup_name(db, project_info.name)
+    await project_deps.check_project_dup_name(db, data.project_name)
 
     # Get the location_str via reverse geocode
     async with AsyncNearestCity(db) as geocoder:
-        centroid = await polygon_to_centroid(project_info.outline.model_dump())
+        centroid = await polygon_to_centroid(data.outline.model_dump())
         latitude, longitude = centroid.y, centroid.x
         location = await geocoder.query(latitude, longitude)
         # Convert to two letter country code --> full name
         country_full_name = (
             countries.get(location.country, location.country) if location else None
         )
-        project_info.location_str = (
-            f"{location.city},{country_full_name}" if location else None
-        )
+        data.location_str = f"{location.city},{country_full_name}" if location else None
 
     # Create the project in the Field-TM DB
-    project_info.author_sub = db_user.sub
+    data.created_by_sub = db_user.sub
     try:
-        log.debug(f"Project details: {project_info}")
-        project = await DbProject.create(db, project_info)
+        log.debug(f"Project details: {data}")
+        project = await DbProject.create(db, data)
     except Exception as e:
         log.error(f"Error posting to /stub: {e}")
         raise HTTPException(
@@ -814,10 +801,9 @@ async def delete_project(
         await delete_qfield_project(db, project.id)
     else:
         # Delete ODK Central project
-        await central_crud.delete_odk_project(project.odkid, project.odk_credentials)
+        # Use None for credentials to fall back to environment variables
+        await central_crud.delete_odk_project(project.external_project_id, None)
 
-    # Delete S3 resources
-    await delete_all_objs_under_prefix(settings.S3_BUCKET_NAME, f"/{project.id}")
     # Delete Field-TM project
     await DbProject.delete(db, project.id)
 
@@ -838,28 +824,27 @@ async def delete_project(
 async def create_project(
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
-    project_info: project_schemas.ProjectIn,
+    data: project_schemas.ProjectIn,
     project_id: int = Parameter(),
 ) -> DbProject:
     """Create a project in ODK Central and update the local stub project."""
     project_id = current_user.get("project").id
     project = await DbProject.one(db, project_id)
 
-    if project_info.name:
-        await project_deps.check_project_dup_name(db, project_info.name)
-    odk_creds_decrypted = project_info.odk_credentials
+    if data.project_name:
+        await project_deps.check_project_dup_name(db, data.project_name)
+    odk_creds_decrypted = data.odk_credentials
 
     # Create project in ODK Central using a background thread
     odkproject = await to_thread.run_sync(
         central_crud.create_odk_project,
-        project.name,
+        project.project_name,
         odk_creds_decrypted,
     )
-    project_info.odkid = odkproject["id"]
+    data.external_project_id = odkproject["id"]
 
     try:
-        project = await DbProject.update(db, project.id, project_info)
+        project = await DbProject.update(db, project.id, data)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

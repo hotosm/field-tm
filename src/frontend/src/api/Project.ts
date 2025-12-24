@@ -39,7 +39,7 @@ export const ProjectById = (projectId: string) => {
             id: projectResp.id,
             outline: projectResp.outline,
             priority: projectResp.priority || 2,
-            name: projectResp.name,
+            project_name: projectResp.project_name,
             location_str: projectResp.location_str,
             description: projectResp.description,
             num_contributors: projectResp.num_contributors,

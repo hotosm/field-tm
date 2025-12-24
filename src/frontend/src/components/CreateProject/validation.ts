@@ -70,7 +70,7 @@ export const projectTypeSelectorValidationSchema = z.object({
 export const projectOverviewValidationSchema = z
   .object({
     id: z.number().optional(),
-    name: z
+    project_name: z
       .string()
       .trim()
       .min(1, 'Project Name is Required')
@@ -186,7 +186,6 @@ export const projectDetailsValidationSchema = z
     hasCustomTMS: z.boolean(),
     custom_tms_url: z.string().optional(),
     per_task_instructions: z.string(),
-    use_odk_collect: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;

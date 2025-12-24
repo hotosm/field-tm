@@ -319,9 +319,10 @@ async def refresh_appuser_token(
     """
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
+    project_odk_id = project.external_project_id
     project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         odk_token = await central_crud.get_appuser_token(
@@ -371,9 +372,10 @@ async def upload_form_media(
     """Upload media attachments to a form in Central."""
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
+    project_odk_id = project.external_project_id
     project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     # Read all uploaded form media for upload to ODK Central
     file_data_dict = {
@@ -434,9 +436,10 @@ async def list_form_media(
     """A list of required media to upload for a form."""
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
+    project_odk_id = project.external_project_id
     project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         form_media = await central_crud.list_form_media(
@@ -475,9 +478,10 @@ async def get_form_media(
     """Return the project form attachments as a list of files."""
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
+    project_odk_id = project.external_project_id
     project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         form_media = await central_crud.get_form_media(

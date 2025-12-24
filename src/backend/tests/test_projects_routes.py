@@ -429,8 +429,8 @@ async def test_project_by_id(client, project):
     data = response.json()
 
     assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
-    assert data["author_sub"] == project.author_sub
+    assert data["external_project_id"] == project.external_project_id
+    assert data["created_by_sub"] == project.created_by_sub
     assert data["name"] == project.name
     assert data["description"] == project.description
     assert data["per_task_instructions"] == project.per_task_instructions
@@ -485,7 +485,7 @@ async def test_read_project(client, project):
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
+    assert data["external_project_id"] == project.external_project_id
     assert data["name"] == project.name
     assert data["bbox"] == project.bbox
 
@@ -494,7 +494,7 @@ async def test_read_project(client, project):
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
+    assert data["external_project_id"] == project.external_project_id
     assert data["name"] == project.name
     assert data["bbox"] is None
 

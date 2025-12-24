@@ -45,7 +45,7 @@ const EditDetails = ({ project }: editDetailsPropsType) => {
   const resetState = (project: projectType) => {
     reset({
       status: project.status,
-      name: project.name,
+      project_name: project.project_name,
       description: project.description,
       per_task_instructions: project.per_task_instructions,
       hashtags: project.hashtags,
@@ -128,8 +128,8 @@ const EditDetails = ({ project }: editDetailsPropsType) => {
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <FieldLabel label="Community or Organization Name" astric />
-          <Input {...register('name')} />
-          {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
+          <Input {...register('project_name')} />
+          {errors?.project_name?.message && <ErrorMessage message={errors.project_name.message as string} />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">

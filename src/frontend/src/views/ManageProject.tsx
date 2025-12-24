@@ -128,7 +128,7 @@ const ManageProject = () => {
                     <Button
                       variant="primary-red"
                       isLoading={isProjectDeletePending}
-                      disabled={confirmProjectName !== project?.name}
+                      disabled={confirmProjectName !== project?.project_name}
                       onClick={() => dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, navigate))}
                     >
                       Delete

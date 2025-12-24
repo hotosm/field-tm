@@ -66,7 +66,7 @@ const ProjectDetails = () => {
     { id: 'task_list', name: 'Task List', show: projectInfo.field_mapping_app !== field_mapping_app.QField },
   ];
 
-  useDocumentTitle(projectInfo.name && !projectDetailsLoading ? projectInfo.name : 'Project Details');
+  useDocumentTitle(projectInfo.project_name && !projectDetailsLoading ? projectInfo.project_name : 'Project Details');
 
   //Fetch project for the first time
   useEffect(() => {
@@ -153,8 +153,8 @@ const ProjectDetails = () => {
               className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer"
               onClick={() => navigate('/explore')}
             />
-            <h5 className="fmtm-line-clamp-1" title={projectInfo.name}>
-              {projectInfo.name}
+            <h5 className="fmtm-line-clamp-1" title={projectInfo.project_name}>
+              {projectInfo.project_name}
             </h5>
             {projectInfo.visibility === 'PRIVATE' && (
               <Tooltip title="Private Project" arrow>

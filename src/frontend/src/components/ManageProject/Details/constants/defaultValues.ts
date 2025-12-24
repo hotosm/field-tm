@@ -4,7 +4,7 @@ import { project_status, project_visibility } from '@/types/enums';
 
 export const defaultValues: z.infer<typeof editProjectSchema> = {
   status: project_status.PUBLISHED,
-  name: '',
+  project_name: '',
   description: '',
   per_task_instructions: '',
   hashtags: [],

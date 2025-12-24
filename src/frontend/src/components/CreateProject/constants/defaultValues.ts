@@ -7,7 +7,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   field_mapping_app: null,
 
   // 01 Project Overview
-  name: '',
+  project_name: '',
   description: '',
   odk_central_url: '',
   odk_central_user: '',
@@ -26,7 +26,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   hasCustomTMS: false,
   custom_tms_url: '',
   per_task_instructions: '',
-  use_odk_collect: false,
 
   // 03 Upload Survey
   osm_category: '',
