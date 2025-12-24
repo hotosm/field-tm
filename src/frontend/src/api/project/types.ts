@@ -13,9 +13,9 @@ import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
 
 export interface projectBaseType {
   id: number;
-  odkid: number;
-  author_sub: number;
-  name: string;
+  external_project_id: number;
+  created_by_sub: number;
+  project_name: string;
   description: string;
   per_task_instructions: string;
   slug: string;
@@ -88,7 +88,7 @@ export type generateFilesPayloadType = {
   combined_features_count: number;
 };
 
-export type createStubProjectPayloadType = Pick<projectBaseType, 'name' | 'description' | 'outline'> & {
+export type createStubProjectPayloadType = Pick<projectBaseType, 'project_name' | 'description' | 'outline'> & {
   merge: boolean;
 };
 
@@ -146,7 +146,7 @@ export type createStubProjectParamsType = {
 // RESPONSE TYPES
 export type projectSummaryType = {
   id: number;
-  name: string;
+  project_name: string;
   priority: number;
   hashtags: string[];
   location_str: string;

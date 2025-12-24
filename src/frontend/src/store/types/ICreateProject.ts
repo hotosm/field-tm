@@ -44,8 +44,8 @@ export type ProjectTaskTypes = {
 
 type EditProjectResponseTypes = {
   id: number;
-  odkid: number;
-  name: string;
+  external_project_id: number;
+  project_name: string;
   description: string;
   status: project_status;
   outline: GeoJSONFeatureTypes;
@@ -63,7 +63,7 @@ export type ProjectDetailsTypes = {
   odk_central_user?: string;
   odk_central_password?: string;
   odk_central_url?: string;
-  name: string;
+  project_name: string;
   hashtags: string[];
   description: string;
   task_split_type?: number;
@@ -101,7 +101,7 @@ export type DrawnGeojsonTypes = {
 };
 
 export type taskSplitOptionsType = {
-  name: string;
+  project_name: string;
   value: string;
   label: string;
   disabled: boolean;
@@ -122,7 +122,7 @@ export type splittedGeojsonType = {
 };
 
 export type projectVisibilityOptionsType = {
-  name: string;
+  project_name: string;
   value: project_visibility;
   label: string;
 };

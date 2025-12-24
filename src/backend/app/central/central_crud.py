@@ -205,7 +205,7 @@ async def delete_odk_project(
 ):
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
-    # odkid in the projects table
+    # external_project_id in the projects table
     try:
         project = get_odk_project(odk_central)
         result = project.deleteProject(project_id)
@@ -293,11 +293,13 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
 
 
 def get_project_form_xml(
-    odk_creds: central_schemas.ODKCentralDecrypted, odkid: int, odk_form_id: str
+    odk_creds: central_schemas.ODKCentralDecrypted,
+    external_project_id: int,
+    odk_form_id: str,
 ) -> str:
     """Get the XForm from ODK Central as raw XML."""
     xform = get_odk_form(odk_creds)
-    return xform.getXml(odkid, odk_form_id)
+    return xform.getXml(external_project_id, odk_form_id)
 
 
 async def append_fields_to_user_xlsform(
@@ -391,14 +393,14 @@ async def update_project_xlsform(
     # Update ODK Central form data
     await update_odk_central_xform(
         xform_id,
-        project.odkid,
+        project.external_project_id,
         xlsform,
-        project.odk_credentials,
+        None,  # ODK credentials not stored on project, use env vars
     )
     form_xml = await to_thread.run_sync(
         get_project_form_xml,
-        project.odk_credentials,
-        project.odkid,
+        None,  # ODK credentials not stored on project, use env vars
+        project.external_project_id,
         xform_id,
     )
 

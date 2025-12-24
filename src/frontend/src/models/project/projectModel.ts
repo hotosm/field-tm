@@ -3,10 +3,10 @@ import type { BBox, Point, Polygon } from 'geojson';
 
 export type projectInfoType = {
   id: number;
-  name: string;
+  project_name: string;
   outline: Polygon;
-  odkid: number;
-  author_sub: number;
+  external_project_id: number;
+  created_by_sub: number;
   description: string;
   per_task_instructions: string;
   slug: string;

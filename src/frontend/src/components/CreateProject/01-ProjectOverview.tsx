@@ -199,8 +199,8 @@ const ProjectOverview = () => {
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <FieldLabel label="Project Name" astric />
-          <Input {...register('name')} />
-          {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
+          <Input {...register('project_name')} />
+          {errors?.project_name?.message && <ErrorMessage message={errors.project_name.message as string} />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">

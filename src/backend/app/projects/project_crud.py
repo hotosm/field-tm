@@ -509,10 +509,11 @@ async def generate_project_files(
             task_extract_dict = {}
 
         # Get ODK Project details
-        project_odk_id = project.odkid
+        project_odk_id = project.external_project_id
         project_xlsform = project.xlsform_content
         project_odk_form_id = project.odk_form_id
-        project_odk_creds = project.odk_credentials
+        # ODK credentials not stored on project, use None to fall back to env vars
+        project_odk_creds = None
 
         odk_token = await generate_odk_central_project_content(
             project_odk_id,

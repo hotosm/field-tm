@@ -26,7 +26,7 @@ import { defaultValues } from '@/components/CreateProject/constants/defaultValue
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
-import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
+import { data_extract_type, field_mapping_app, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -82,16 +82,15 @@ const CreateProject = () => {
 
   useEffect(() => {
     if (!minimalProjectDetails || !projectId) return;
-    const { id, name, description, outline, hashtags, field_mapping_app, use_odk_collect } = minimalProjectDetails;
+    const { id, project_name, description, outline, hashtags, field_mapping_app } = minimalProjectDetails;
     reset({
       ...defaultValues,
       id,
-      name,
+      project_name,
       description,
       outline,
       hashtags,
       field_mapping_app,
-      use_odk_collect,
     });
   }, [minimalProjectDetails]);
 
@@ -134,7 +133,7 @@ const CreateProject = () => {
 
     if (!isValidationSuccess) return;
     const {
-      name,
+      project_name,
       description,
       project_admins,
       outline,
@@ -143,16 +142,14 @@ const CreateProject = () => {
       odk_central_password,
       merge,
       field_mapping_app,
-      use_odk_collect,
     } = values;
 
     const projectPayload = {
-      name,
+      project_name,
       description,
       outline,
       merge,
       field_mapping_app,
-      use_odk_collect,
     };
 
     let odkPayload: Pick<
@@ -181,10 +178,10 @@ const CreateProject = () => {
 
   const createProject = async () => {
     const data = getValues();
-    const { name, description } = data;
+    const { project_name, description } = data;
 
     // retrieve updated fields from project overview
-    const dirtyValues = getDirtyFieldValues({ name, description }, dirtyFields);
+    const dirtyValues = getDirtyFieldValues({ project_name, description }, dirtyFields);
 
     const projectData = {
       ...dirtyValues,
@@ -290,7 +287,7 @@ const CreateProject = () => {
     });
 
   const uploadXlsformFile = (file: FileType[]) => {
-    // use_odk_collect is from previous step, while needVerificationFields is from this step
+    // Derive use_odk_collect from field_mapping_app (ODK projects use ODK Collect)
     const values = getValues();
     const formData = new FormData();
     formData.append('xlsform', file?.[0]?.file);
@@ -299,7 +296,7 @@ const CreateProject = () => {
       payload: formData,
       params: {
         project_id: +projectId!,
-        use_odk_collect: values.use_odk_collect,
+        use_odk_collect: values.field_mapping_app === field_mapping_app.ODK,
         need_verification_fields: values.needVerificationFields,
         mandatory_photo_upload: values.mandatoryPhotoUpload,
         default_language: values.default_language,

@@ -84,9 +84,9 @@ export default function ExploreProjectCard({ data, className }: { data: projectS
           <div>
             <p
               className="fmtm-button fmtm-text-[#090909] fmtm-line-clamp-1 fmtm-capitalize fmtm-mb-1"
-              title={data.name}
+              title={data.project_name}
             >
-              {data.name}
+              {data.project_name}
             </p>
             ADD A DESCRIPTION HERE
           </div>

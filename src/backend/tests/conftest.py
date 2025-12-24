@@ -173,8 +173,8 @@ async def project(db, admin_user):
                 ]
             ],
         },
-        author_sub=admin_user.sub,
-        odkid=odkproject.get("id"),
+        created_by_sub=admin_user.sub,
+        external_project_id=odkproject.get("id"),
         xlsform_content=b"Dummy XLSForm content",
     )
 

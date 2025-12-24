@@ -2,9 +2,9 @@ import { task_state as taskStateEnum } from '@/types/enums';
 
 export interface ProjectDetailsModel {
   id: number;
-  odkid: number;
+  external_project_id: number;
   default_locale: string;
-  name: string;
+  project_name: string;
   description: string;
   instructions: string;
   per_task_instructions: string;

@@ -1,7 +1,19 @@
 import { project_status, project_visibility } from '@/types/enums';
 
+export interface HomeProjectCardModel {
+  id: number;
+  project_name: string;
+  priority: number;
+  location_str: string;
+  description: string;
+  total_tasks: number;
+  tasks_mapped: number;
+  tasks_validated: number;
+  tasks_bad: number;
+}
+
 export type projectType = {
-  name: string;
+  project_name: string;
   centroid: [number, number];
   hashtags: string | null;
   id: number;

@@ -87,17 +87,16 @@ class ProjectSummary(DataclassDTO[DbProject]):
 class StubProjectIn(BaseModel):
     """Input model for creating a project stub (with validators)."""
 
-    name: str
+    project_name: str
     field_mapping_app: FieldMappingApp
     description: Optional[str] = None
     merge: bool = True
     outline: MultiPolygon | Polygon = None
     location_str: Optional[str] = None
     status: Optional[ProjectStatus] = None
-    author_sub: Optional[str] = None
+    created_by_sub: Optional[str] = None
     hashtags: Optional[list[str]] = []
     slug: Optional[str] = None
-    use_odk_collect: bool = False
 
     @field_validator("hashtags", mode="before")
     @classmethod
@@ -162,7 +161,7 @@ class StubProjectIn(BaseModel):
         """Append the #Field-TM hashtag and add URL slug."""
         # NOTE the slug is set here as the field_validator above
         # does not seem to work?
-        self.slug = slugify(self.name)
+        self.slug = slugify(self.project_name)
 
         if not self.hashtags:
             self.hashtags = ["#Field-TM"]
@@ -179,13 +178,20 @@ class ProjectInBase(StubProjectIn):
         Optional[list[str] | str],
         Field(validate_default=True),
     ] = None
-    name: Optional[str] = None
+    project_name: Optional[str] = None
 
     # Token used for ODK appuser; encrypted at rest
     odk_token: Optional[str] = None
 
+    # Add missing vars
+    external_project_instance_url: Optional[str] = None
+    external_project_id: Optional[int] = None
+    external_project_username: Optional[str] = None
+    external_project_password_encrypted: Optional[str] = None
+
     # Exclude (do not allow update)
     id: Annotated[Optional[int], Field(exclude=True)] = None
+    field_mapping_app: Annotated[Optional[FieldMappingApp], Field(exclude=True)] = None
     outline: Annotated[Optional[dict], Field(exclude=True)] = None
     # Exclude (calculated fields)
     centroid: Annotated[Optional[dict], Field(exclude=True)] = None
@@ -222,8 +228,8 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
         ):
             return None
 
-        # Password comes in as plaintext from frontend (ODKCentralIn encrypts it
-        # for storage)
+        # Password comes in as plaintext from frontend (ODKCentralIn encrypts it for
+        # storage)
         # But when reading from ProjectIn, it might already be encrypted if coming
         # from DB
         # For new projects, password should be plaintext from frontend
@@ -245,6 +251,10 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):
     """Input model for updating a project (all fields optional)."""
+
+    # Make required fields from StubProjectIn optional for updates
+    project_name: Optional[str] = None
+    field_mapping_app: Optional[FieldMappingApp] = None
 
     # Allow updating the name field
     name: Optional[str] = None

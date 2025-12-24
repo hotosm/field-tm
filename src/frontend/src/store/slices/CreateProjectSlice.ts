@@ -3,13 +3,13 @@ import { project_visibility } from '@/types/enums';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
-  editProjectDetails: { name: '', description: '' },
+  editProjectDetails: { project_name: '', description: '' },
   editProjectResponse: null,
   projectDetails: {
     dimension: 10,
     no_of_buildings: 5,
     hashtags: [],
-    name: '',
+    project_name: '',
     odk_central_url: '',
     odk_central_user: '',
     odk_central_password: '',
@@ -19,7 +19,6 @@ export const initialState: CreateProjectStateTypes = {
     custom_tms_url: '',
     project_admins: [],
     visibility: project_visibility.PUBLIC,
-    use_odk_collect: false,
     includeCentroid: false,
   },
   projectDetailsResponse: null,
