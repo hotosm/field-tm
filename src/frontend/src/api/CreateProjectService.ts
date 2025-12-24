@@ -5,15 +5,13 @@ import { ProjectDetailsModel } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 import { AppDispatch } from '@/store/Store';
-import isEmpty from '@/utilfunctions/isEmpty';
 import { NavigateFunction } from 'react-router-dom';
-import { UnassignUserFromProject } from '@/api/Project';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 export const CreateDraftProjectService = (
   url: string,
-  payload: { projectPayload: Record<string, any>; odkPayload: Record<string, any> | null; project_admins: string[] },
+  payload: { projectPayload: Record<string, any>; odkPayload: Record<string, any> | null },
   navigate: NavigateFunction,
   continueToNextStep: boolean,
 ) => {
@@ -22,7 +20,7 @@ export const CreateDraftProjectService = (
     try {
       dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
 
-      const { projectPayload, odkPayload, project_admins } = payload;
+      const { projectPayload, odkPayload } = payload;
 
       // 1. Create draft project
       const response: AxiosResponse = await axios.post(url, projectPayload, {});
@@ -33,27 +31,6 @@ export const CreateDraftProjectService = (
       await axios.patch(`${VITE_API_URL}/projects`, odkPayload || {}, {
         params: { project_id: projectId as number },
       });
-
-      // 3. Add project admins
-      if (!isEmpty(project_admins)) {
-        try {
-          const promises = project_admins?.map(async (sub: any) => {
-            await dispatch(
-              AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-                sub,
-                project_id: projectId as number,
-              }),
-            );
-          });
-          await Promise.all(promises);
-        } catch (error) {
-          dispatch(
-            CommonActions.SetSnackBar({
-              message: error?.response?.data?.detail || 'Failed to add project admin',
-            }),
-          );
-        }
-      }
 
       dispatch(
         CommonActions.SetSnackBar({
@@ -83,7 +60,6 @@ export const CreateProjectService = (
   url: string,
   id: number,
   projectData: Record<string, any>,
-  project_admins: { projectAdminToRemove: string[]; projectAdminToAssign: string[] },
   file: { taskSplitGeojsonFile: File; dataExtractGeojsonFile: File },
   combinedFeaturesCount: number,
   isEmptyDataExtract: boolean,
@@ -147,20 +123,6 @@ export const CreateProjectService = (
       );
       APISuccess = !!generateProjectDataResponse;
       if (!APISuccess) stopProjectCreation();
-
-      // 5. assign & remove project managers
-      const addAdminPromises = project_admins.projectAdminToAssign?.map(async (sub: any) => {
-        await dispatch(
-          AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, {
-            sub,
-            project_id: id as number,
-          }),
-        );
-      });
-      const removeAdminPromises = project_admins.projectAdminToRemove?.map(async (sub: any) => {
-        await dispatch(UnassignUserFromProject(`${VITE_API_URL}/projects/${id}/users/${sub}`));
-      });
-      await Promise.all([addAdminPromises, removeAdminPromises]);
 
       dispatch(
         CommonActions.SetSnackBar({

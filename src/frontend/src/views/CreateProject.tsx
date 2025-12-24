@@ -26,12 +26,11 @@ import { defaultValues } from '@/components/CreateProject/constants/defaultValue
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
-import { data_extract_type, field_mapping_app, project_roles, task_split_type } from '@/types/enums';
+import { data_extract_type, field_mapping_app, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import isEmpty from '@/utilfunctions/isEmpty';
-import { useDeleteProjectMutation, useGetProjectQuery, useGetProjectUsersQuery } from '@/api/project';
+import { useDeleteProjectMutation, useGetProjectQuery } from '@/api/project';
 import { useUploadProjectXlsformMutation } from '@/api/central';
 import { FileType } from '@/types';
 
@@ -94,32 +93,6 @@ const CreateProject = () => {
     });
   }, [projectDetails]);
 
-  const { data: projectManagers } = useGetProjectUsersQuery({
-    project_id: projectId!,
-    params: { role: project_roles.PROJECT_ADMIN },
-    options: { queryKey: ['get-project-users', project_roles.PROJECT_ADMIN, projectId], enabled: !!projectId },
-  });
-
-  // setup project admin select options if project admins are available
-  useEffect(() => {
-    // only set project_admins value after basic project details are fetched
-    if (!projectId || !projectManagers || isEmpty(projectManagers) || isProjectLoading) return;
-
-    const projectAdminOptions = projectManagers?.map((admin) => ({
-      id: admin.user_sub,
-      label: admin.username,
-      value: admin.user_sub,
-    }));
-    const project_admins = projectManagers.map((admin) => admin.user_sub);
-    dispatch(
-      CommonActions.SetPreviousSelectedOptions({
-        key: 'project_admins',
-        options: projectAdminOptions,
-      }),
-    );
-    setValue('project_admins', project_admins);
-  }, [projectManagers, projectId, isProjectLoading]);
-
   const form = {
     1: <ProjectOverview />,
     2: <ProjectDetails />,
@@ -135,7 +108,6 @@ const CreateProject = () => {
     const {
       project_name,
       description,
-      project_admins,
       outline,
       odk_central_url,
       odk_central_user,
@@ -169,7 +141,7 @@ const CreateProject = () => {
     dispatch(
       CreateDraftProjectService(
         `${VITE_API_URL}/projects/stub`,
-        { projectPayload, odkPayload, project_admins },
+        { projectPayload, odkPayload },
         navigate,
         continueToNextStep,
       ),
@@ -213,21 +185,11 @@ const CreateProject = () => {
     const combinedFeaturesCount = data.dataExtractGeojson?.features?.length ?? 0;
     const isEmptyDataExtract = data.dataExtractType === data_extract_type.NONE;
 
-    // Project admins that are already assigned during draft project creation
-    const assignedPMs = projectManagers?.map((pm) => pm.user_sub);
-
-    // Identify Project Admins to remove: those who are currently assigned but not included in the new list
-    const pmToRemove = assignedPMs?.filter((pm) => !data.project_admins.includes(pm));
-
-    // Identify Project Admins to assign: those in the new list who are not yet assigned to the project
-    const pmToAssign = data.project_admins.filter((pm) => !assignedPMs?.includes(pm));
-
     dispatch(
       CreateProjectService(
         `${VITE_API_URL}/projects/${projectId}`,
         data.id as number,
         projectData,
-        { projectAdminToRemove: pmToRemove || [], projectAdminToAssign: pmToAssign },
         file,
         combinedFeaturesCount,
         isEmptyDataExtract,

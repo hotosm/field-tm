@@ -9,10 +9,8 @@ import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { createProjectValidationSchema, odkCredentialsValidationSchema } from './validation';
 
-import { CustomCheckbox } from '@/components/common/Checkbox';
 import FieldLabel from '@/components/common/FieldLabel';
 import { Input } from '@/components/RadixComponents/Input';
-import Select2 from '@/components/common/Select2';
 import { Textarea } from '@/components/RadixComponents/TextArea';
 import { uploadAreaOptions } from './constants';
 import Button from '@/components/common/Button';
@@ -273,36 +271,6 @@ const ProjectOverview = () => {
           {errors?.odk_central_url && errors?.odk_central_user && errors?.odk_central_password && (
             <ErrorMessage message="ODK Credentials are required" />
           )}
-        </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Assign Project Admin" />
-          <Controller
-            control={control}
-            name="project_admins"
-            render={({ field }) => (
-              <Select2
-                name="project_admins"
-                options={userList || []}
-                value={field.value}
-                onChange={(value: any) => field.onChange(value)}
-                placeholder="Search for Field-TM users"
-                multiple
-                checkBox
-                isLoading={userListLoading}
-                handleApiSearch={(value) => {
-                  if (value) {
-                    setUserSearchText(value);
-                  } else {
-                    // TODO: CLEAR USER LIST STATE
-                  }
-                }}
-                ref={field.ref}
-                disabled={projectUsersLoading}
-              />
-            )}
-          />
-          {errors?.project_admins?.message && <ErrorMessage message={errors.project_admins.message as string} />}
         </div>
 
         {!values.id && (
