@@ -4,7 +4,6 @@ import { useFormContext } from 'react-hook-form';
 import { createProjectValidationSchema } from './validation';
 import Button from '@/components/common/Button';
 
-import HotLogo from '@/assets/images/favicon.svg';
 import QfieldLogo from '@/assets/images/qfield-logo.svg';
 import OdkLogo from '@/assets/images/odk-logo.svg';
 import { field_mapping_app } from '@/types/enums';
@@ -22,12 +21,6 @@ const mappingApps = [
     title: 'ODK',
     description: 'The ODK Collect mobile application (offline-capable)',
     logo: OdkLogo,
-  },
-  {
-    id: field_mapping_app.FieldTM,
-    title: 'FieldTM',
-    description: 'Online real-time collaborative mapping',
-    logo: HotLogo,
   },
 ];
 

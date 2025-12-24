@@ -39,10 +39,6 @@ const statusOptions: statusOptionType[] = [
 ];
 const fieldMappingAppOptions: fieldMappingAppOptionType[] = [
   {
-    value: field_mapping_app.FieldTM,
-    label: 'FieldTM',
-  },
-  {
     value: field_mapping_app.ODK,
     label: 'ODK',
   },

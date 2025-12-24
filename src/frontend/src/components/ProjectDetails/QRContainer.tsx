@@ -29,23 +29,22 @@ const QRContainer = ({ projectInfo }: QRContainerPropsType) => {
 
   return (
     <div>
-      {projectInfo.field_mapping_app !== field_mapping_app.FieldTM &&
-        ((projectInfo?.field_mapping_app === field_mapping_app.QField && projectInfo?.external_project_id) ||
-          projectInfo?.field_mapping_app === field_mapping_app.ODK) && (
-          <div className="fmtm-flex fmtm-flex-col fmtm-items-center fmtm-bg-white fmtm-w-fit fmtm-mx-auto fmtm-p-4 fmtm-rounded-md fmtm-gap-2">
-            <p className="fmtm-font-medium">Scan this QR via {projectInfo.field_mapping_app} to load the project</p>
-            {projectInfo?.field_mapping_app === field_mapping_app.QField && projectInfo?.external_project_id ? (
-              <img src={qfieldQR} alt="QField QR" />
-            ) : projectInfo?.field_mapping_app === field_mapping_app.ODK ? (
-              <img src={odkQR} alt="ODK QR" />
-            ) : (
-              <></>
-            )}
-            <Button variant="link-red" onClick={downloadQr}>
-              <AssetModules.FileDownloadOutlinedIcon className="!fmtm-text-[20px]" /> Download QR
-            </Button>
-          </div>
-        )}
+      {((projectInfo?.field_mapping_app === field_mapping_app.QField && projectInfo?.external_project_id) ||
+        projectInfo?.field_mapping_app === field_mapping_app.ODK) && (
+        <div className="fmtm-flex fmtm-flex-col fmtm-items-center fmtm-bg-white fmtm-w-fit fmtm-mx-auto fmtm-p-4 fmtm-rounded-md fmtm-gap-2">
+          <p className="fmtm-font-medium">Scan this QR via {projectInfo.field_mapping_app} to load the project</p>
+          {projectInfo?.field_mapping_app === field_mapping_app.QField && projectInfo?.external_project_id ? (
+            <img src={qfieldQR} alt="QField QR" />
+          ) : projectInfo?.field_mapping_app === field_mapping_app.ODK ? (
+            <img src={odkQR} alt="ODK QR" />
+          ) : (
+            <></>
+          )}
+          <Button variant="link-red" onClick={downloadQr}>
+            <AssetModules.FileDownloadOutlinedIcon className="!fmtm-text-[20px]" /> Download QR
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

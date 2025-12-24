@@ -8,7 +8,6 @@ import type { projectSummaryType } from '@/types';
 import defaultOrgLogo from '@/assets/images/project_icon.png';
 import QfieldLogo from '@/assets/images/qfield-logo.svg';
 import ODKLogo from '@/assets/images/odk-logo.svg';
-import HotLogo from '@/assets/images/favicon.svg';
 
 const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'success' | 'error'> = {
   [project_status.DRAFT]: 'default',
@@ -18,7 +17,6 @@ const projectStatusVariantMap: Record<project_status, 'default' | 'info' | 'succ
 };
 
 const fieldMappingAppLogoMap: Record<field_mapping_app, string> = {
-  [field_mapping_app.FieldTM]: HotLogo,
   [field_mapping_app.ODK]: ODKLogo,
   [field_mapping_app.QField]: QfieldLogo,
 };
