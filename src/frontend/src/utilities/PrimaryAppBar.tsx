@@ -83,13 +83,6 @@ export default function PrimaryAppBar() {
       externalLink: false,
     },
     {
-      title: 'Organizations',
-      path: '/organization',
-      active: pathname === '/organization',
-      isVisible: !!authDetails,
-      externalLink: false,
-    },
-    {
       title: 'Manage Users',
       path: '/manage/user',
       active: pathname === '/manage/user',
