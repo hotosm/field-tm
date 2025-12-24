@@ -693,8 +693,8 @@ async def get_project_features_geojson(
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     """Pagination result for splash page."""
     total_pages = (total + results_per_page - 1) // results_per_page
-    has_next = (page * results_per_page) < total  # noqa: N806
-    has_prev = page > 1  # noqa: N806
+    has_next = (page * results_per_page) < total
+    has_prev = page > 1
 
     pagination = PaginationInfo(
         has_next=has_next,

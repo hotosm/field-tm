@@ -175,7 +175,7 @@ async def get_categories() -> dict:
     return_dto=project_schemas.ProjectOut,
 )
 async def read_project(
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     current_user: ProjectUserDict,
 ) -> DbProject:
     """Get a specific project by ID."""
@@ -192,7 +192,7 @@ async def read_project(
     },
 )
 async def download_project_boundary(
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     current_user: ProjectUserDict,
     db: AsyncConnection,
 ) -> Response:
@@ -471,7 +471,7 @@ async def upload_data_extract(
     status_code=status.HTTP_200_OK,
 )
 async def add_additional_entity_list(
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     current_user_dict: ProjectUserDict,
     geojson: UploadFile,
 ) -> None:
@@ -515,7 +515,7 @@ async def add_additional_entity_list(
     status_code=status.HTTP_200_OK,
 )
 async def generate_files(
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
     combined_features_count: int = Parameter(0),
@@ -662,7 +662,7 @@ async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> Non
     },
 )
 async def upload_project_task_boundaries(
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
     task_geojson: UploadFile,
@@ -707,7 +707,7 @@ async def upload_project_task_boundaries(
 )
 async def update_project(
     data: project_schemas.ProjectUpdate,
-    project_id: int,  # noqa: ARG001
+    project_id: int,
     current_user_dict: ProjectUserDict,
     db: AsyncConnection,
 ) -> DbProject:
