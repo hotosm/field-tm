@@ -133,46 +133,6 @@ export const projectOverviewValidationSchema = z
         code: 'custom',
       });
     }
-    // Validate ODK credentials: if any are provided, all must be provided
-    const hasAnyODKCred = !!(
-      values.odk_central_url?.trim() ||
-      values.odk_central_user?.trim() ||
-      values.odk_central_password?.trim()
-    );
-    const hasAllODKCred = !!(
-      values.odk_central_url?.trim() &&
-      values.odk_central_user?.trim() &&
-      values.odk_central_password?.trim()
-    );
-
-    if (hasAnyODKCred && !hasAllODKCred) {
-      const missingFields: string[] = [];
-      if (!values.odk_central_url?.trim()) {
-        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} URL`);
-      }
-      if (!values.odk_central_user?.trim()) {
-        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} User`);
-      }
-      if (!values.odk_central_password?.trim()) {
-        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} Password`);
-      }
-
-      ctx.issues.push({
-        input: values.odk_central_url || values.odk_central_user || values.odk_central_password,
-        path: ['odk_central_url'],
-        message: `All ${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} credentials are required together. Missing: ${missingFields.join(', ')}`,
-        code: 'custom',
-      });
-    }
-    // Validate URL format if provided
-    if (values.odk_central_url?.trim() && !isValidUrl(values.odk_central_url)) {
-      ctx.issues.push({
-        input: values.odk_central_url,
-        path: ['odk_central_url'],
-        message: 'Invalid URL format',
-        code: 'custom',
-      });
-    }
   });
 
 export const projectDetailsValidationSchema = z
@@ -181,7 +141,6 @@ export const projectDetailsValidationSchema = z
     hashtags: z.array(z.string()),
     hasCustomTMS: z.boolean(),
     custom_tms_url: z.string().optional(),
-    per_task_instructions: z.string(),
   })
   .check((ctx) => {
     const values = ctx.value;

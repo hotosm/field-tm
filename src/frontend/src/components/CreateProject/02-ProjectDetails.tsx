@@ -10,7 +10,6 @@ import Button from '@/components/common/Button';
 import Chips from '@/components/common/Chips';
 import { Input } from '@/components/RadixComponents/Input';
 import Switch from '@/components/common/Switch';
-import RichTextEditor from '@/components/common/Editor/Editor';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
@@ -131,17 +130,6 @@ const ProjectDetails = () => {
           {errors?.custom_tms_url?.message && <ErrorMessage message={errors.custom_tms_url.message as string} />}
         </div>
       )}
-
-      <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="Instructions" />
-        <Controller
-          control={control}
-          name="per_task_instructions"
-          render={({ field }) => (
-            <RichTextEditor editorHtmlContent={field.value} setEditorHtmlContent={field.onChange} editable={true} />
-          )}
-        />
-      </div>
     </div>
   );
 };
