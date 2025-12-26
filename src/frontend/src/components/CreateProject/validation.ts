@@ -1,65 +1,6 @@
 import { z } from 'zod/v4';
-import { isValidUrl } from '@/utilfunctions/urlChecker';
-import {
-  data_extract_type,
-  field_mapping_app,
-  GeoGeomTypesEnum,
-  project_visibility,
-  task_split_type,
-} from '@/types/enums';
+import { data_extract_type, field_mapping_app, project_visibility, task_split_type } from '@/types/enums';
 import isEmpty from '@/utilfunctions/isEmpty';
-
-const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
-  ODK: 'ODK Central',
-  FieldTM: 'ODK Central',
-  QField: 'QField Cloud',
-};
-
-const validateODKCreds = (ctx: any, values: Record<string, any>) => {
-  if (!values.odk_central_url?.trim()) {
-    ctx.issues.push({
-      input: values.odk_central_url,
-      path: ['odk_central_url'],
-      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} URL is Required`,
-      code: 'custom',
-    });
-  } else if (!isValidUrl(values.odk_central_url)) {
-    ctx.issues.push({
-      input: values.odk_central_url,
-      path: ['odk_central_url'],
-      message: 'Invalid URL',
-      code: 'custom',
-    });
-  }
-  if (!values.odk_central_user?.trim()) {
-    ctx.issues.push({
-      input: values.odk_central_user,
-      path: ['odk_central_user'],
-      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} User is Required`,
-      code: 'custom',
-    });
-  }
-  if (!values.odk_central_password?.trim()) {
-    ctx.issues.push({
-      input: values.odk_central_password,
-      path: ['odk_central_password'],
-      message: `${MAPPING_APP_LABELS[values.field_mapping_app]} Password is Required`,
-      code: 'custom',
-    });
-  }
-};
-
-export const odkCredentialsValidationSchema = z
-  .object({
-    field_mapping_app: z.enum(field_mapping_app),
-    odk_central_url: z.string(),
-    odk_central_user: z.string().optional(),
-    odk_central_password: z.string().optional(),
-  })
-  .check((ctx) => {
-    const values = ctx.value;
-    validateODKCreds(ctx, values);
-  });
 
 export const projectTypeSelectorValidationSchema = z.object({
   field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
@@ -191,15 +132,6 @@ export const uploadSurveyValidationSchema = z
 
 export const mapDataValidationSchema = z
   .object({
-    primary_geom_type: z
-      .enum(GeoGeomTypesEnum)
-      .nullable()
-      .refine((val) => val !== null, {
-        message: 'Primary Geometry Type must be selected',
-      }),
-    includeCentroid: z.boolean(),
-    useMixedGeomTypes: z.boolean(),
-    new_geom_type: z.union([z.enum(GeoGeomTypesEnum), z.null()]).optional(),
     dataExtractType: z
       .enum(data_extract_type)
       .nullable()
@@ -214,14 +146,6 @@ export const mapDataValidationSchema = z
     const values = ctx.value;
     const featureCount = values.dataExtractGeojson?.features?.length;
 
-    if (values.useMixedGeomTypes && !values.new_geom_type) {
-      ctx.issues.push({
-        input: values.new_geom_type,
-        path: ['new_geom_type'],
-        message: 'New Geometry Type must be selected',
-        code: 'custom',
-      });
-    }
     if (values.dataExtractType === data_extract_type.OSM && !values.dataExtractGeojson) {
       ctx.issues.push({
         input: values.dataExtractGeojson,
@@ -235,18 +159,6 @@ export const mapDataValidationSchema = z
         input: values.customDataExtractFile,
         path: ['customDataExtractFile'],
         message: 'File is Required',
-        code: 'custom',
-      });
-    }
-    if (
-      values.dataExtractGeojson?.id &&
-      values.primary_geom_type !== values.dataExtractGeojson?.id &&
-      isEmpty(values.customDataExtractFile)
-    ) {
-      ctx.issues.push({
-        input: values.dataExtractGeojson,
-        path: ['dataExtractGeojson'],
-        message: `Please generate data extract for ${values.primary_geom_type?.toLowerCase()}`,
         code: 'custom',
       });
     }
