@@ -5,7 +5,6 @@ import { geojson as fgbGeojson } from 'flatgeobuf';
 import { valid } from 'geojson-validation';
 import type { FeatureCollection } from 'geojson';
 
-import { newGeomOptions, primaryGeomOptions } from './constants';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
@@ -174,112 +173,39 @@ const MapData = () => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="What type of geometry do you wish to map?" astric />
+        <FieldLabel
+          label="Upload your own map data or use OSM"
+          astric
+          tooltipMessage={
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+              <p>You may either choose to use OSM data, or upload your own data for the mapping project.</p>
+              <div>
+                <p>The relevant map data that exist on OSM are imported based on the select map area.</p>
+                <p>
+                  You can use these map data to use the &apos;select from map&apos; functionality from ODK that allows
+                  you to select the feature to collect data for.
+                </p>
+              </div>
+            </div>
+          }
+        />
         <Controller
           control={control}
-          name="primary_geom_type"
+          name="dataExtractType"
           render={({ field }) => (
             <RadioButton
               value={field.value || ''}
-              options={primaryGeomOptions}
+              options={dataExtractOptions}
               onChangeData={(value) => {
                 field.onChange(value);
-                if (value === GeoGeomTypesEnum.POLYLINE) setValue('dataExtractType', null);
+                if (value === data_extract_type.NONE) resetMapDataFile();
               }}
               ref={field.ref}
             />
           )}
         />
-        {errors?.primary_geom_type?.message && <ErrorMessage message={errors.primary_geom_type.message as string} />}
+        {errors?.dataExtractType?.message && <ErrorMessage message={errors.dataExtractType.message as string} />}
       </div>
-
-      {values.primary_geom_type === GeoGeomTypesEnum.POINT && (
-        <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-          <FieldLabel label="Include polygon centroids" />
-          <Controller
-            control={control}
-            name="includeCentroid"
-            render={({ field }) => (
-              <Switch ref={field.ref} checked={field.value} onCheckedChange={field.onChange} className="" />
-            )}
-          />
-        </div>
-      )}
-
-      <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-        <FieldLabel label="I want to use a mix of geometry types" />
-        <Controller
-          control={control}
-          name="useMixedGeomTypes"
-          render={({ field }) => (
-            <Switch
-              ref={field.ref}
-              checked={field.value}
-              onCheckedChange={(value) => {
-                field.onChange(value);
-                setValue('new_geom_type', null);
-              }}
-              className=""
-            />
-          )}
-        />
-      </div>
-
-      {values.useMixedGeomTypes && (
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="New geometries collected should be of type" astric />
-          <Controller
-            control={control}
-            name="new_geom_type"
-            render={({ field }) => (
-              <RadioButton
-                value={field.value || ''}
-                options={newGeomOptions}
-                onChangeData={field.onChange}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.new_geom_type?.message && <ErrorMessage message={errors.new_geom_type.message as string} />}
-        </div>
-      )}
-
-      {values.primary_geom_type && (
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel
-            label="Upload your own map data or use OSM"
-            astric
-            tooltipMessage={
-              <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-                <p>You may either choose to use OSM data, or upload your own data for the mapping project.</p>
-                <div>
-                  <p>The relevant map data that exist on OSM are imported based on the select map area.</p>
-                  <p>
-                    You can use these map data to use the &apos;select from map&apos; functionality from ODK that allows
-                    you to select the feature to collect data for.
-                  </p>
-                </div>
-              </div>
-            }
-          />
-          <Controller
-            control={control}
-            name="dataExtractType"
-            render={({ field }) => (
-              <RadioButton
-                value={field.value || ''}
-                options={dataExtractOptions}
-                onChangeData={(value) => {
-                  field.onChange(value);
-                  if (value === data_extract_type.NONE) resetMapDataFile();
-                }}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.dataExtractType?.message && <ErrorMessage message={errors.dataExtractType.message as string} />}
-        </div>
-      )}
 
       {values.dataExtractType === 'osm_data_extract' && (
         <>

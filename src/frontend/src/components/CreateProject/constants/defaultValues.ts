@@ -37,10 +37,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   },
 
   // 04 Map Data
-  primary_geom_type: null,
-  includeCentroid: false,
-  useMixedGeomTypes: false,
-  new_geom_type: null,
   dataExtractType: null,
   customDataExtractFile: [],
   dataExtractGeojson: null,
