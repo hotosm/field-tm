@@ -15,6 +15,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   outlineArea: undefined,
   proceedWithLargeOutlineArea: false,
   merge: true,
+  osm_category: '',
 
   // 02 Project Details
   visibility: project_visibility.PUBLIC,
@@ -23,18 +24,11 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   custom_tms_url: '',
 
   // 03 Upload Survey
-  osm_category: '',
   xlsFormFile: [],
   needVerificationFields: true,
   mandatoryPhotoUpload: false,
   isFormValidAndUploaded: false,
   advancedConfig: false,
-  default_language: '',
-  formLanguages: {
-    detected_languages: [],
-    default_language: [],
-    supported_languages: [],
-  },
 
   // 04 Map Data
   dataExtractType: null,

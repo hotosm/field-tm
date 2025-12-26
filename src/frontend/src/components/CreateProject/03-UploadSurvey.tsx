@@ -1,17 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
-import { useAppDispatch } from '@/types/reduxTypes';
 import { z } from 'zod/v4';
 import { createProjectValidationSchema } from './validation';
-import Select2 from '@/components/common/Select2';
 import FieldLabel from '@/components/common/FieldLabel';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Switch from '@/components/common/Switch';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { useDetectFormLanguagesMutation, useGetFormListsQuery } from '@/api/central';
-import { CommonActions } from '@/store/slices/CommonSlice';
 import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { FileType } from '@/types';
@@ -21,13 +17,8 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-const prepareRadioOptions = (values: string[]): { label: string; value: string }[] => {
-  return values?.map((value) => ({ label: value, value: value }));
-};
-
 const UploadSurvey = () => {
   useDocumentTitle('Create Project: Upload Survey');
-  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
@@ -35,88 +26,21 @@ const UploadSurvey = () => {
   const { errors } = formState;
   const values = watch();
 
-  const { data: formList, isLoading: isGetFormListsLoading } = useGetFormListsQuery({
-    options: { queryKey: ['get-form-lists'], staleTime: 60 * 60 * 1000 },
-  });
-  const sortedFormList =
-    formList
-      ?.slice()
-      .sort((a, b) => a.title.localeCompare(b.title))
-      .map((form) => ({ id: form.id, label: form.title, value: form.id })) || [];
-
-  const { mutate: detectFormLanguagesMutate, isPending: isDetectFormLanguagesPending } = useDetectFormLanguagesMutation(
-    {
-      onSuccess: ({ data }) => {
-        setValue('default_language', '');
-        setValue('formLanguages', data);
-      },
-      onError: ({ response }) => {
-        dispatch(CommonActions.SetSnackBar({ message: response?.data?.message || 'Invalid XLSForm form' }));
-      },
-    },
-  );
-
-  const detectDefaultLanguage = (file) => {
-    const formData = new FormData();
-    formData.append('xlsform', file);
-    detectFormLanguagesMutate({
-      payload: formData,
-    });
-  };
-
   const changeFileHandler = (file: FileType[]): void => {
     if (isEmpty(file)) return;
     setValue('xlsFormFile', file);
     clearErrors();
-    setValue('default_language', '');
     values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
-    detectDefaultLanguage(file?.[0]?.file);
   };
 
   const resetFile = (): void => {
     clearErrors();
     setValue('xlsFormFile', []);
-    setValue('default_language', '');
     values.isFormValidAndUploaded && setValue('isFormValidAndUploaded', false);
   };
 
-  useEffect(() => {
-    if (!values.advancedConfig) {
-      let defaultLanguage = '';
-      if (!isEmpty(values.formLanguages?.default_language)) {
-        defaultLanguage = values.formLanguages?.default_language[0];
-      } else if (!isEmpty(values.formLanguages?.detected_languages)) {
-        defaultLanguage = values.formLanguages?.detected_languages[0];
-      } else {
-        defaultLanguage = 'english';
-      }
-      setValue('default_language', defaultLanguage);
-    }
-  }, [values.advancedConfig, values.formLanguages]);
-
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
-      <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="What are you surveying?" astric />
-        <Controller
-          control={control}
-          name="osm_category"
-          render={({ field }) => (
-            <Select2
-              options={sortedFormList || []}
-              value={field.value as string}
-              choose="label"
-              onChange={(value: any) => {
-                field.onChange(value);
-              }}
-              placeholder="Form Category"
-              isLoading={isGetFormListsLoading}
-              ref={field.ref}
-            />
-          )}
-        />
-        {errors?.osm_category?.message && <ErrorMessage message={errors.osm_category.message as string} />}
-      </div>
       <div className="fmtm-body-md fmtm-inline">
         We have some sample forms for the type of survey category you chose above. You can{' '}
         <Tooltip arrow placement="bottom" title={!values.osm_category ? 'Please select a form category first' : ''}>
@@ -212,12 +136,6 @@ const UploadSurvey = () => {
           data={values.xlsFormFile}
           fileAccept=".xls,.xlsx,.xml"
         />
-        {isDetectFormLanguagesPending && (
-          <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-            <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
-            <p className="fmtm-text-base">Detecting form languages...</p>
-          </div>
-        )}
         {!!queryClient.isMutating({ mutationKey: ['upload-project-xlsform'] }) && (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
@@ -231,7 +149,6 @@ const UploadSurvey = () => {
           className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
           onClick={() => {
             setValue('advancedConfig', !values.advancedConfig);
-            setValue('default_language', '');
           }}
         >
           <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
@@ -263,39 +180,6 @@ const UploadSurvey = () => {
                 )}
               />
             </div>
-            {!isEmpty(values.xlsFormFile) && isEmpty(values.formLanguages?.default_language) && (
-              <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-flex-wrap">
-                <FieldLabel
-                  label="Select Default Form Language"
-                  tooltipMessage="Your form includes multiple languages, but no default is set. Please choose a default language."
-                />
-                <Controller
-                  control={control}
-                  name="default_language"
-                  render={({ field }) => (
-                    <Select2
-                      options={
-                        !isEmpty(values.formLanguages.detected_languages)
-                          ? prepareRadioOptions(values.formLanguages.detected_languages)
-                          : prepareRadioOptions(values.formLanguages.supported_languages)
-                      }
-                      value={field.value as string}
-                      choose="label"
-                      onChange={(value: any) => {
-                        field.onChange(value);
-                        setValue('isFormValidAndUploaded', false);
-                      }}
-                      placeholder="Form Category"
-                      isLoading={isGetFormListsLoading}
-                      ref={field.ref}
-                    />
-                  )}
-                />
-                {errors?.default_language?.message && (
-                  <ErrorMessage message={errors.default_language.message as string} />
-                )}
-              </div>
-            )}
           </div>
         )}
       </>

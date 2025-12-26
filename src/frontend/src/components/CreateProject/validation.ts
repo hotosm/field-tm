@@ -28,6 +28,7 @@ export const projectOverviewValidationSchema = z
     field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
       message: 'Field Mapping App must be selected',
     }),
+    osm_category: z.string().min(1, 'Form Category is must be selected'),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -97,18 +98,11 @@ export const projectDetailsValidationSchema = z
 
 export const uploadSurveyValidationSchema = z
   .object({
-    osm_category: z.string().min(1, 'Form Category is must be selected'),
     xlsFormFile: z.any().optional(),
     needVerificationFields: z.boolean(),
     mandatoryPhotoUpload: z.boolean(),
     isFormValidAndUploaded: z.boolean(),
     advancedConfig: z.boolean(),
-    default_language: z.string(),
-    formLanguages: z.object({
-      detected_languages: z.array(z.string()),
-      default_language: z.array(z.string()),
-      supported_languages: z.array(z.string()),
-    }),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -117,14 +111,6 @@ export const uploadSurveyValidationSchema = z
         input: values.xlsFormFile,
         path: ['xlsFormFile'],
         message: 'File is Required',
-        code: 'custom',
-      });
-    }
-    if (values.advancedConfig && !values.default_language) {
-      ctx.issues.push({
-        input: values.default_language,
-        path: ['default_language'],
-        message: 'Default Language is Required',
         code: 'custom',
       });
     }

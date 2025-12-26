@@ -21,6 +21,8 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
 import FileUpload from '@/components/common/FileUpload';
 import { FileType } from '@/types';
+import Select2 from '@/components/common/Select2';
+import { useGetFormListsQuery } from '@/api/central';
 
 const ProjectOverview = () => {
   useDocumentTitle('Create Project: Project Overview');
@@ -65,6 +67,15 @@ const ProjectOverview = () => {
   useEffect(() => {
     if (errors.proceedWithLargeOutlineArea) setShowLargeAreaWarning(true);
   }, [errors.proceedWithLargeOutlineArea]);
+
+  const { data: formList, isLoading: isGetFormListsLoading } = useGetFormListsQuery({
+    options: { queryKey: ['get-form-lists'], staleTime: 60 * 60 * 1000 },
+  });
+  const sortedFormList =
+    formList
+      ?.slice()
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((form) => ({ id: form.id, label: form.title, value: form.id })) || [];
 
   const changeFileHandler = async (file: FileType[]) => {
     if (isEmpty(file)) return;
@@ -209,6 +220,28 @@ const ProjectOverview = () => {
             )}
           </>
         )}
+
+        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+          <FieldLabel label="What are you surveying?" astric />
+          <Controller
+            control={control}
+            name="osm_category"
+            render={({ field }) => (
+              <Select2
+                options={sortedFormList || []}
+                value={field.value as string}
+                choose="label"
+                onChange={(value: any) => {
+                  field.onChange(value);
+                }}
+                placeholder="Form Category"
+                isLoading={isGetFormListsLoading}
+                ref={field.ref}
+              />
+            )}
+          />
+          {errors?.osm_category?.message && <ErrorMessage message={errors.osm_category.message as string} />}
+        </div>
       </div>
       <Dialog open={showLargeAreaWarning} onOpenChange={(status) => setShowLargeAreaWarning(status)}>
         <DialogContent>
