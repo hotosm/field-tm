@@ -8,7 +8,7 @@ import type { FeatureCollection } from 'geojson';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
-import { data_extract_type, GeoGeomTypesEnum, task_split_type } from '@/types/enums';
+import { data_extract_type, task_split_type } from '@/types/enums';
 import { useAppDispatch } from '@/types/reduxTypes';
 import { createProjectValidationSchema } from './validation';
 import FieldLabel from '@/components/common/FieldLabel';
@@ -88,7 +88,7 @@ const MapData = () => {
   const validateDataExtractGeojson = (extractFeatCol: FeatureCollection<null, Record<string, any>>) => {
     const isGeojsonValid = valid(extractFeatCol, true);
     if (isGeojsonValid?.length === 0 && extractFeatCol) {
-      setValue('dataExtractGeojson', { ...extractFeatCol, id: values.primary_geom_type });
+      setValue('dataExtractGeojson', { ...extractFeatCol, id: values.osm_category });
     } else {
       resetMapDataFile();
       dispatch(
@@ -114,7 +114,7 @@ const MapData = () => {
       const geojsonExtractFile = await fetch(dataExtractGeojsonUrl);
       const geojsonExtract = await geojsonExtractFile.json();
       if ((geojsonExtract && (geojsonExtract as dataExtractGeojsonType))?.features?.length > 0) {
-        setValue('dataExtractGeojson', { ...geojsonExtract, id: values.primary_geom_type });
+        setValue('dataExtractGeojson', { ...geojsonExtract, id: values.osm_category });
       } else {
         dispatch(
           CommonActions.SetSnackBar({
@@ -140,9 +140,6 @@ const MapData = () => {
     dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
     dataExtractRequestFormData.append('osm_category', values.osm_category);
     dataExtractRequestFormData.append('use_st_within', (!values.use_st_within)?.toString() ?? 'false');
-    dataExtractRequestFormData.append('geom_type', values.primary_geom_type as GeoGeomTypesEnum);
-    if (values.primary_geom_type == GeoGeomTypesEnum.POINT)
-      dataExtractRequestFormData.append('centroid', values.includeCentroid ? 'true' : 'false');
 
     generateDataExtractMutate({ payload: dataExtractRequestFormData, params: { project_id: values.id! } });
   };
