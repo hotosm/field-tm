@@ -105,16 +105,7 @@ const CreateProject = () => {
     const isValidationSuccess = await trigger(undefined, { shouldFocus: true });
 
     if (!isValidationSuccess) return;
-    const {
-      project_name,
-      description,
-      outline,
-      odk_central_url,
-      odk_central_user,
-      odk_central_password,
-      merge,
-      field_mapping_app,
-    } = values;
+    const { project_name, description, outline, merge, field_mapping_app } = values;
 
     const projectPayload = {
       project_name,
@@ -124,27 +115,8 @@ const CreateProject = () => {
       field_mapping_app,
     };
 
-    let odkPayload: Pick<
-      z.infer<typeof createProjectValidationSchema>,
-      'odk_central_url' | 'odk_central_user' | 'odk_central_password'
-    > | null = null;
-
-    // Only include ODK credentials if all three are provided
-    if (odk_central_url && odk_central_user && odk_central_password) {
-      odkPayload = {
-        odk_central_url,
-        odk_central_user,
-        odk_central_password,
-      };
-    }
-
     dispatch(
-      CreateDraftProjectService(
-        `${VITE_API_URL}/projects/stub`,
-        { projectPayload, odkPayload },
-        navigate,
-        continueToNextStep,
-      ),
+      CreateDraftProjectService(`${VITE_API_URL}/projects/stub`, { projectPayload }, navigate, continueToNextStep),
     );
   };
 
@@ -252,7 +224,7 @@ const CreateProject = () => {
     // Derive use_odk_collect from field_mapping_app (ODK projects use ODK Collect)
     const values = getValues();
     const formData = new FormData();
-    formData.append('xlsform', file?.[0]?.file);
+    formData.append('xlsform_upload', file?.[0]?.file);
 
     uploadProjectXlsformMutate({
       payload: formData,

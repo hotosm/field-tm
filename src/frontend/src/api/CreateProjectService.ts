@@ -11,7 +11,7 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 export const CreateDraftProjectService = (
   url: string,
-  payload: { projectPayload: Record<string, any>; odkPayload: Record<string, any> | null },
+  payload: { projectPayload: Record<string, any> },
   navigate: NavigateFunction,
   continueToNextStep: boolean,
 ) => {
@@ -20,17 +20,12 @@ export const CreateDraftProjectService = (
     try {
       dispatch(CreateProjectActions.CreateDraftProjectLoading({ loading: true, continue: continueToNextStep }));
 
-      const { projectPayload, odkPayload } = payload;
+      const { projectPayload } = payload;
 
       // 1. Create draft project
       const response: AxiosResponse = await axios.post(url, projectPayload, {});
 
       projectId = response.data.id;
-
-      // 2. Add ODK details (to create project in ODK  patch createProject even if default ODK creds used)
-      await axios.patch(`${VITE_API_URL}/projects`, odkPayload || {}, {
-        params: { project_id: projectId as number },
-      });
 
       dispatch(
         CommonActions.SetSnackBar({

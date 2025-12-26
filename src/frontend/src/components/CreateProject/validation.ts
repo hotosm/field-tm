@@ -76,10 +76,6 @@ export const projectOverviewValidationSchema = z
       .min(1, 'Project Name is Required')
       .regex(/^[^_]+$/, 'Project Name should not contain _ (underscore)'),
     description: z.string().trim().min(1, 'Description is Required'),
-    odk_central_url: z.string().optional(),
-    odk_central_user: z.string().optional(),
-    odk_central_password: z.string().optional(),
-    project_admins: z.array(z.string()),
     uploadAreaSelection: z.enum(['draw', 'upload_file']).nullable(),
     uploadedAOIFile: z.any().optional(),
     outline: z.any().refine((val) => !!val, {

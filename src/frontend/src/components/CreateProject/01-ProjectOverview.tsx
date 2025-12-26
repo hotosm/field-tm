@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { valid } from 'geojson-validation';
-import { useIsAdmin } from '@/hooks/usePermissions';
 import { z } from 'zod/v4';
 
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { createProjectValidationSchema, odkCredentialsValidationSchema } from './validation';
+import { createProjectValidationSchema } from './validation';
 
 import FieldLabel from '@/components/common/FieldLabel';
 import { Input } from '@/components/RadixComponents/Input';
@@ -17,68 +16,24 @@ import Button from '@/components/common/Button';
 import RadioButton from '@/components/common/RadioButton';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/RadixComponents/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Switch from '@/components/common/Switch';
-import { useGetUserListQuery } from '@/api/user';
-import { useTestOdkCredentialsMutation } from '@/api/central';
-import { field_mapping_app } from '@/types/enums';
-import { useTestQFieldCredentialsMutation } from '@/api/qfield';
 import FileUpload from '@/components/common/FileUpload';
 import { FileType } from '@/types';
-
-const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
-  ODK: 'ODK Central',
-  FieldTM: 'ODK Central',
-  QField: 'QField Coud',
-};
 
 const ProjectOverview = () => {
   useDocumentTitle('Create Project: Project Overview');
 
   const dispatch = useAppDispatch();
-  const isAdmin = useIsAdmin();
-
-  const [userSearchText, setUserSearchText] = useState('');
-  const [showODKCredsModal, setShowODKCredsModal] = useState(false);
   const [showLargeAreaWarning, setShowLargeAreaWarning] = useState(false);
-  const [odkCreds, setOdkCreds] = useState({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
-  });
-  const [odkCredsError, setOdkCredsError] = useState<{
-    odk_central_url?: string;
-    odk_central_user?: string;
-    odk_central_password?: string;
-  }>({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
-  });
 
   //@ts-ignore
   const authDetails = useAppSelector((state) => state.login.authDetails);
-  const projectUsersLoading = useAppSelector((state) => state.project.projectUsersLoading);
   const form = useFormContext<z.infer<typeof createProjectValidationSchema>>();
   const { watch, register, control, setValue, formState } = form;
   const { errors } = formState;
   const values = watch();
-
-  const { data: users, isLoading: userListLoading } = useGetUserListQuery({
-    params: { search: userSearchText, signin_type: 'osm' },
-    options: {
-      queryKey: ['get-user-list', userSearchText],
-      enabled: !!userSearchText,
-      staleTime: 60 * 60 * 1000,
-    },
-  });
-  const userList =
-    users?.map((user) => ({
-      id: user.sub,
-      label: user.username,
-      value: user.sub,
-    })) || [];
 
   useEffect(() => {
     const outlineArea = values.outlineArea;
@@ -142,56 +97,6 @@ const ProjectOverview = () => {
     if (values.dataExtractGeojson) setValue('dataExtractGeojson', null);
   };
 
-  const saveServerCredentials = () => {
-    setValue('odk_central_url', odkCreds.odk_central_url);
-    setValue('odk_central_user', odkCreds.odk_central_user);
-    setValue('odk_central_password', odkCreds.odk_central_password);
-    setShowODKCredsModal(false);
-  };
-
-  const { mutate: validateODKCredentialsMutate, isPending: isODKCredentialsValidating } = useTestOdkCredentialsMutation(
-    {
-      onSuccess: saveServerCredentials,
-      onError: ({ response }) => {
-        dispatch(
-          CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to validate ODK credentials' }),
-        );
-      },
-    },
-  );
-
-  const { mutate: validateQFieldCredentialsMutate, isPending: isQFieldCredentialsValidating } =
-    useTestQFieldCredentialsMutation({
-      onSuccess: saveServerCredentials,
-      onError: ({ response }) => {
-        dispatch(
-          CommonActions.SetSnackBar({ message: response?.data?.detail || 'Failed to validate QField credentials' }),
-        );
-      },
-    });
-
-  const validateODKCredentials = async () => {
-    const valid = odkCredentialsValidationSchema.safeParse({
-      field_mapping_app: values.field_mapping_app,
-      ...odkCreds,
-    });
-
-    let errors = {};
-    if (valid.success) {
-      errors = {};
-      if (values.field_mapping_app === field_mapping_app.QField) {
-        validateQFieldCredentialsMutate({ params: odkCreds });
-      } else {
-        validateODKCredentialsMutate({ params: odkCreds });
-      }
-    } else {
-      valid.error.issues.forEach((issue) => {
-        errors[issue.path[0]] = issue.message;
-      });
-    }
-    setOdkCredsError(errors);
-  };
-
   return (
     <>
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
@@ -205,72 +110,6 @@ const ProjectOverview = () => {
           <FieldLabel label="Description" astric />
           <Textarea {...register('description')} />
           {errors?.description?.message && <ErrorMessage message={errors.description.message as string} />}
-        </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <Dialog
-            open={showODKCredsModal}
-            onOpenChange={(open) => {
-              setShowODKCredsModal(open);
-              if (!open)
-                setOdkCreds({
-                  odk_central_url: values.odk_central_url || '',
-                  odk_central_user: values.odk_central_user || '',
-                  odk_central_password: values.odk_central_password || '',
-                });
-            }}
-          >
-            <DialogTrigger className="fmtm-w-fit">
-              <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
-                Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogTitle>Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials</DialogTitle>
-              <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
-                <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                  <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} URL`} astric />
-                  <Input
-                    value={odkCreds.odk_central_url}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_url: e.target.value })}
-                  />
-                  {odkCredsError.odk_central_url && <ErrorMessage message={odkCredsError.odk_central_url as string} />}
-                </div>
-                <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                  <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Email`} astric />
-                  <Input
-                    value={odkCreds.odk_central_user}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_user: e.target.value })}
-                  />
-                  {odkCredsError.odk_central_user && <ErrorMessage message={odkCredsError.odk_central_user} />}
-                </div>
-                <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-                  <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Password`} astric />
-                  <Input
-                    value={odkCreds.odk_central_password}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_password: e.target.value })}
-                    type="password"
-                  />
-                  {odkCredsError.odk_central_password && <ErrorMessage message={odkCredsError.odk_central_password} />}
-                </div>
-              </div>
-              <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
-                <Button variant="link-grey" onClick={() => setShowODKCredsModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="primary-red"
-                  isLoading={isODKCredentialsValidating || isQFieldCredentialsValidating}
-                  onClick={validateODKCredentials}
-                >
-                  Confirm
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          {errors?.odk_central_url && errors?.odk_central_user && errors?.odk_central_password && (
-            <ErrorMessage message="ODK Credentials are required" />
-          )}
         </div>
 
         {!values.id && (

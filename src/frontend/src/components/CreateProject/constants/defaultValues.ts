@@ -9,10 +9,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   // 01 Project Overview
   project_name: '',
   description: '',
-  odk_central_url: '',
-  odk_central_user: '',
-  odk_central_password: '',
-  project_admins: [],
   uploadAreaSelection: null,
   uploadedAOIFile: [],
   outline: undefined,
