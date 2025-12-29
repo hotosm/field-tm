@@ -42,4 +42,9 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   task_num_buildings: 1,
   splitGeojsonBySquares: null,
   splitGeojsonByAlgorithm: null,
+
+  // 06 Create Project Manager
+  has_external_mappingapp_account: false,
+  external_project_username: '',
+  external_project_password: '',
 };

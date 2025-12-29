@@ -227,6 +227,49 @@ export const splitTasksValidationSchema = z
     }
   });
 
+export const assignProjectManagerValidationSchema = z
+  .object({
+    has_external_mappingapp_account: z.boolean(),
+    external_project_username: z.string().trim().min(1, 'Username/Email is Required'),
+    external_project_password: z.string().optional(),
+    external_project_password_confirm: z.string().optional(),
+  })
+  .check((ctx) => {
+    const values = ctx.value;
+
+    if (!values.has_external_mappingapp_account) {
+      if (!values.external_project_password?.trim()) {
+        ctx.issues.push({
+          input: values.external_project_password,
+          path: ['external_project_password'],
+          message: 'Password is Required',
+          code: 'custom',
+        });
+      }
+      if (!values.external_project_password_confirm?.trim()) {
+        ctx.issues.push({
+          input: values.external_project_password_confirm,
+          path: ['external_project_password_confirm'],
+          message: 'Confirmation Password is Required',
+          code: 'custom',
+        });
+      }
+
+      if (
+        values.external_project_password &&
+        values.external_project_password_confirm &&
+        values.external_project_password !== values.external_project_password_confirm
+      ) {
+        ctx.issues.push({
+          message: 'Passwords do not match',
+          input: values.external_project_password_confirm,
+          code: 'custom',
+          path: ['external_project_password_confirm'],
+        });
+      }
+    }
+  });
+
 export const createProjectValidationSchema = z.object({
   ...projectTypeSelectorValidationSchema.shape,
   ...projectOverviewValidationSchema.shape,
@@ -234,4 +277,5 @@ export const createProjectValidationSchema = z.object({
   ...uploadSurveyValidationSchema.shape,
   ...mapDataValidationSchema.shape,
   ...splitTasksValidationSchema.shape,
+  ...assignProjectManagerValidationSchema.shape,
 });
