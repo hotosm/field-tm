@@ -20,30 +20,6 @@ import {
 import { useIsAdmin } from '@/hooks/usePermissions';
 import Button from '@/components/common/Button';
 import { motion } from 'motion/react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/RadixComponents/Dialog';
-
-type warningDialogPropsType = {
-  warningDialogOpen: boolean;
-  setWarningDialogOpen: (status: boolean) => void;
-};
-
-const WarningDialog = ({ warningDialogOpen, setWarningDialogOpen }: warningDialogPropsType) => (
-  <Dialog open={warningDialogOpen} onOpenChange={setWarningDialogOpen}>
-    <DialogContent>
-      <DialogTitle>
-        <div className="fmtm-rounded-2xl fmtm-bg-yellow-100 fmtm-w-[3.5rem] fmtm-h-[3.5rem] fmtm-flex fmtm-items-center fmtm-justify-center">
-          <AssetModules.WarningIcon className="fmtm-text-yellow-500 !fmtm-text-[2.5rem]" />
-        </div>
-      </DialogTitle>
-      <h4>Field-TM Service Migration — Please Backup Your Data</h4>
-      <p className="fmtm-text-blue-dark">
-        Field-TM is moving to a new deployment at <span className="fmtm-font-semibold">field.hotosm.org</span>. The
-        current instance <span className="fmtm-font-semibold">fmtm.hotosm.org</span> will be shut down soon. Please make
-        sure to back up any important project data before the migration completes.
-      </p>
-    </DialogContent>
-  </Dialog>
-);
 
 export default function PrimaryAppBar() {
   const isAdmin = useIsAdmin();
@@ -54,9 +30,6 @@ export default function PrimaryAppBar() {
   const { type, windowSize } = windowDimention();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [warningDialogOpen, setWarningDialogOpen] = useState<boolean>(
-    !sessionStorage.getItem('isMigrationWarningShown') ? true : false,
-  );
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   const handleOnSignOut = async () => {
@@ -111,33 +84,7 @@ export default function PrimaryAppBar() {
         type={type}
         setOpen={setOpen}
       />
-      <WarningDialog
-        warningDialogOpen={warningDialogOpen}
-        setWarningDialogOpen={(status) => {
-          setWarningDialogOpen(status);
-          if (!sessionStorage.getItem('isMigrationWarningShown')) {
-            sessionStorage.setItem('isMigrationWarningShown', 'true');
-          }
-        }}
-      />
       <div>
-        {/* warning banner */}
-        <div className="fmtm-bg-yellow-100 fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-justify-center fmtm-py-1 fmtm-px-4">
-          <AssetModules.WarningIcon className="fmtm-text-yellow-500" />
-          <p className="fmtm-text-sm sm:fmtm-text-base">
-            <span className="fmtm-text-yellow-700 fmtm-mr-2">
-              <span className="fmtm-font-semibold">Important:</span> Field-TM Service Migration — Please Backup Your
-              Data
-            </span>
-            <span
-              role="button"
-              className="fmtm-w-fit fmtm-underline fmtm-text-yellow-700 hover:fmtm-text-yellow-800 fmtm-font-medium sm:fmtm-text-sm fmtm-cursor-pointer"
-              onClick={() => setWarningDialogOpen(true)}
-            >
-              Learn more
-            </span>
-          </p>
-        </div>
         <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-px-5 fmtm-py-2 fmtm-border-y fmtm-border-grey-100">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-4 fmtm-cursor-pointer" onClick={() => navigate('/')}>
             <motion.img
