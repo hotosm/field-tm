@@ -12,7 +12,6 @@ import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { FileType } from '@/types';
 import AssetModules from '@/shared/AssetModules';
-import { motion } from 'motion/react';
 import { useQueryClient } from '@tanstack/react-query';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
@@ -144,45 +143,6 @@ const UploadSurvey = () => {
         )}
         {errors?.xlsFormFile?.message && <ErrorMessage message={errors.xlsFormFile.message as string} />}
       </div>
-      <>
-        <div
-          className="fmtm-flex fmtm-items-center fmtm-gap-x-5 fmtm-group fmtm-w-fit fmtm-cursor-pointer"
-          onClick={() => {
-            setValue('advancedConfig', !values.advancedConfig);
-          }}
-        >
-          <p className="fmtm-button group-hover:fmtm-text-grey-800">Advanced Config</p>
-          <motion.div className="" animate={{ rotate: values.advancedConfig ? 180 : 0 }}>
-            <AssetModules.ExpandLessIcon className={`!fmtm-text-base group-hover:!fmtm-text-grey-800`} />
-          </motion.div>
-        </div>
-        {values.advancedConfig && (
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem]">
-            <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-              <FieldLabel
-                className="fmtm-pr-20"
-                label="Make photo upload mandatory"
-                tooltipMessage="Make photo upload mandatory when submitting the form."
-              />
-              <Controller
-                control={control}
-                name="mandatoryPhotoUpload"
-                render={({ field }) => (
-                  <Switch
-                    ref={field.ref}
-                    checked={field.value}
-                    onCheckedChange={(e) => {
-                      field.onChange(e);
-                      setValue('isFormValidAndUploaded', false);
-                    }}
-                    className=""
-                  />
-                )}
-              />
-            </div>
-          </div>
-        )}
-      </>
     </div>
   );
 };

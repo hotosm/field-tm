@@ -26,9 +26,7 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   // 03 Upload Survey
   xlsFormFile: [],
   needVerificationFields: true,
-  mandatoryPhotoUpload: false,
   isFormValidAndUploaded: false,
-  advancedConfig: false,
 
   // 04 Map Data
   dataExtractType: null,
