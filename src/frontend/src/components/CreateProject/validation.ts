@@ -83,39 +83,11 @@ export const projectDetailsValidationSchema = z
     hashtags: z.array(z.string()),
     hasCustomTMS: z.boolean(),
     custom_tms_url: z.string().optional(),
-  })
-  .check((ctx) => {
-    const values = ctx.value;
-    if (values.hasCustomTMS && !values.custom_tms_url) {
-      ctx.issues.push({
-        input: values.custom_tms_url,
-        path: ['custom_tms_url'],
-        message: 'Custom TMS URL is Required',
-        code: 'custom',
-      });
-    }
-  });
 
-export const uploadSurveyValidationSchema = z
-  .object({
     xlsFormFile: z.any().optional(),
     needVerificationFields: z.boolean(),
     isFormValidAndUploaded: z.boolean(),
-  })
-  .check((ctx) => {
-    const values = ctx.value;
-    if (isEmpty(values.xlsFormFile)) {
-      ctx.issues.push({
-        input: values.xlsFormFile,
-        path: ['xlsFormFile'],
-        message: 'File is Required',
-        code: 'custom',
-      });
-    }
-  });
 
-export const mapDataValidationSchema = z
-  .object({
     dataExtractType: z
       .enum(data_extract_type)
       .nullable()
@@ -129,6 +101,24 @@ export const mapDataValidationSchema = z
   .check((ctx) => {
     const values = ctx.value;
     const featureCount = values.dataExtractGeojson?.features?.length;
+
+    if (values.hasCustomTMS && !values.custom_tms_url) {
+      ctx.issues.push({
+        input: values.custom_tms_url,
+        path: ['custom_tms_url'],
+        message: 'Custom TMS URL is Required',
+        code: 'custom',
+      });
+    }
+
+    if (isEmpty(values.xlsFormFile)) {
+      ctx.issues.push({
+        input: values.xlsFormFile,
+        path: ['xlsFormFile'],
+        message: 'File is Required',
+        code: 'custom',
+      });
+    }
 
     if (values.dataExtractType === data_extract_type.OSM && !values.dataExtractGeojson) {
       ctx.issues.push({
@@ -272,8 +262,6 @@ export const createProjectValidationSchema = z.object({
   ...projectTypeSelectorValidationSchema.shape,
   ...projectOverviewValidationSchema.shape,
   ...projectDetailsValidationSchema.shape,
-  ...uploadSurveyValidationSchema.shape,
-  ...mapDataValidationSchema.shape,
   ...splitTasksValidationSchema.shape,
   ...assignProjectManagerValidationSchema.shape,
 });
