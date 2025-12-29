@@ -13,6 +13,7 @@ import isEmpty from '@/utilfunctions/isEmpty';
 import { FileType } from '@/types';
 import AssetModules from '@/shared/AssetModules';
 import { useQueryClient } from '@tanstack/react-query';
+import { TooltipMessage } from './constants/TooltipMessage';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -101,33 +102,7 @@ const UploadSurvey = () => {
         </div>
       </div>
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel
-          label="Upload Form"
-          astric
-          tooltipMessage={
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-              <span>
-                You may choose to upload a pre-configured XLSForm, or an entirely custom form. Click{' '}
-                <a
-                  href="https://hotosm.github.io/osm-fieldwork/about/xlsforms/"
-                  target="_"
-                  className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer"
-                >
-                  here
-                </a>{' '}
-                to learn more about XLSForm building.{' '}
-              </span>
-
-              <p>
-                <b>Note:</b> Uploading a custom form may make uploading of the final dataset to OSM difficult.
-              </p>
-              <p>
-                <b>Note:</b> Additional questions will be incorporated into your custom form to assess the digitization
-                status.
-              </p>
-            </div>
-          }
-        />
+        <FieldLabel label="Upload Form" astric tooltipMessage={<TooltipMessage name="UploadForm" />} />
         <FileUpload
           placeholder="The supported file formats are .xlsx, .xls, .xml"
           onChange={changeFileHandler}

@@ -21,6 +21,7 @@ import { useGenerateDataExtractMutation } from '@/api/project';
 import FileUpload from '@/components/common/FileUpload';
 import isEmpty from '@/utilfunctions/isEmpty';
 import { FileType } from '@/types';
+import { TooltipMessage } from './constants/TooltipMessage';
 
 const MapData = () => {
   useDocumentTitle('Create Project: Map Data');
@@ -173,18 +174,7 @@ const MapData = () => {
         <FieldLabel
           label="Upload your own map data or use OSM"
           astric
-          tooltipMessage={
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-              <p>You may either choose to use OSM data, or upload your own data for the mapping project.</p>
-              <div>
-                <p>The relevant map data that exist on OSM are imported based on the select map area.</p>
-                <p>
-                  You can use these map data to use the &apos;select from map&apos; functionality from ODK that allows
-                  you to select the feature to collect data for.
-                </p>
-              </div>
-            </div>
-          }
+          tooltipMessage={<TooltipMessage name="UploadMapData" />}
         />
         <Controller
           control={control}

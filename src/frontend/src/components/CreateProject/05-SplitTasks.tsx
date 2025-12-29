@@ -16,6 +16,7 @@ import AssetModules from '@/shared/AssetModules';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { usePreviewSplitBySquareMutation, useTaskSplitMutation } from '@/api/project';
+import { TooltipMessage } from './constants/TooltipMessage';
 
 const SplitTasks = () => {
   useDocumentTitle('Create Project: Split Tasks');
@@ -123,17 +124,7 @@ const SplitTasks = () => {
         <FieldLabel
           label="Select an option to split your project area"
           astric
-          tooltipMessage={
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-              <p>You may choose how to divide an area into tasks for field mapping:</p>
-              <p>i) Divide area on squares split the AOI into squares based on user’s input in dimensions</p>
-              <p>ii) Choose area as task creates the number of tasks based on number of polygons in AOI</p>
-              <p>
-                iii) Task splitting algorithm splits an entire AOI into smallers tasks based on linear networks (road,
-                river) followed by taking into account the input of number of average buildings per task
-              </p>
-            </div>
-          }
+          tooltipMessage={<TooltipMessage name="SplitOption" />}
         />
         <Controller
           control={control}

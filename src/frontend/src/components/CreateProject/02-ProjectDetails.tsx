@@ -12,6 +12,7 @@ import { Input } from '@/components/RadixComponents/Input';
 import Switch from '@/components/common/Switch';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { TooltipMessage } from './constants/TooltipMessage';
 
 const ProjectDetails = () => {
   useDocumentTitle('Create Project: Project Details');
@@ -32,18 +33,7 @@ const ProjectDetails = () => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel
-          label="Project Type"
-          astric
-          tooltipMessage={
-            <span>
-              You can choose the visibility of your project. A{' '}
-              <span className="fmtm-font-semibold">public project</span> is accessible to everyone, while a{' '}
-              <span className="fmtm-font-semibold">private project</span> is only accessible to invited users and
-              admins.
-            </span>
-          }
-        />
+        <FieldLabel label="Project Type" astric tooltipMessage={<TooltipMessage name="ProjectType" />} />
         <Controller
           control={control}
           name="visibility"
@@ -89,31 +79,7 @@ const ProjectDetails = () => {
       </div>
 
       <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-        <FieldLabel
-          label="Use a custom TMS basemap"
-          tooltipMessage={
-            <span>
-              You can use the &apos; Custom TMS URL&apos; option to integrate high-resolution aerial imagery like
-              OpenAerialMap{' '}
-              <a
-                href="https://openaerialmap.org/"
-                className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
-                target="_"
-              >
-                (OAM)
-              </a>
-              . Simply obtain the TMS URL and paste it into the custom TMS field. More details:{' '}
-              <a
-                href="https://docs.openaerialmap.org/"
-                className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
-                target="_"
-              >
-                OpenAerialMap Documentation
-              </a>
-              .
-            </span>
-          }
-        />
+        <FieldLabel label="Use a custom TMS basemap" tooltipMessage={<TooltipMessage name="TMSBasemap" />} />
         <Controller
           control={control}
           name="hasCustomTMS"
