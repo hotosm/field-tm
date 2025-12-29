@@ -2,8 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AssetModules from '@/shared/AssetModules';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { HomeActions } from '@/store/slices/HomeSlice';
-import Switch from '@/components/common/Switch';
 import Searchbar from '@/components/common/SearchBar';
 import Button from '@/components/common/Button';
 import Select2 from '@/components/common/Select2';
@@ -93,15 +91,6 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
         />
       </div>
       <div className="fmtm-flex fmtm-items-center fmtm-justify-end fmtm-gap-3 fmtm-ml-auto sm:fmtm-ml-0">
-        <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
-          <p className="fmtm-button">Show Map</p>
-          <Switch
-            ref={null}
-            className=""
-            checked={showMapStatus}
-            onCheckedChange={() => dispatch(HomeActions.SetShowMapStatus(!showMapStatus))}
-          />
-        </div>
         <Link to={'/create-project?step=1'}>
           <Button variant="primary-red">
             <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />

@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
-import { useAppSelector } from '@/types/reduxTypes';
 import type { field_mapping_app as field_mapping_app_type, project_status } from '@/types/enums';
 import { useGetProjectSummariesQuery } from '@/api/project';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import HomePageFilters from '@/components/home/HomePageFilters';
-import ProjectListMap from '@/components/home/ProjectListMap';
 import Pagination from '@/components/common/Pagination';
 import ProjectCardSkeleton from '@/components/Skeletons/Project/ProjectCardSkeleton';
 
@@ -62,8 +60,6 @@ const Home = () => {
     },
   });
 
-  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
-
   const { data: projectSummaryData, isLoading: isProjectListLoading } = useGetProjectSummariesQuery({
     params: filter,
     options: { queryKey: ['project-summaries', filter] },
@@ -91,16 +87,12 @@ const Home = () => {
         {!isProjectListLoading ? (
           <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-2 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-85px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
-              className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}
+              className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar`}
             >
               {projectList.length > 0 ? (
                 <>
                   <div
-                    className={`fmtm-grid fmtm-gap-3 ${
-                      !showMapStatus
-                        ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
-                        : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-overflow-y-scroll lg:scrollbar'
-                    }`}
+                    className={`fmtm-grid fmtm-gap-3 fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6`}
                   >
                     {projectList.map((value, index) => (
                       <motion.div
@@ -130,7 +122,6 @@ const Home = () => {
               handlePageChange={(page) => setFilter({ ...filter, page: page })}
               className="fmtm-fixed fmtm-left-0 fmtm-w-full"
             />
-            {showMapStatus && <ProjectListMap projectList={projectList} />}
           </div>
         ) : (
           <div

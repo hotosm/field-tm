@@ -4,7 +4,6 @@ import { HomeStateTypes } from '@/store/types/IHome';
 export const initialState: HomeStateTypes = {
   homeProjectSummary: [],
   homeProjectLoading: true,
-  showMapStatus: false,
   homeProjectPagination: {
     has_next: false,
     has_prev: false,
@@ -26,9 +25,6 @@ const HomeSlice = createSlice({
     },
     HomeProjectLoading(state, action: PayloadAction<boolean>) {
       state.homeProjectLoading = action.payload;
-    },
-    SetShowMapStatus(state, action: PayloadAction<boolean>) {
-      state.showMapStatus = action.payload;
     },
     SetHomeProjectPagination(state, action: PayloadAction<HomeStateTypes['homeProjectPagination']>) {
       state.homeProjectPagination = action.payload;
