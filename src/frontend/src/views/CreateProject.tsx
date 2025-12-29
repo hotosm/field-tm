@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ProjectTypeSelector from '@/components/CreateProject/00-ProjectTypeSelector';
-import ProjectOverview from '@/components/CreateProject/01-ProjectOverview';
-import ProjectDetails from '@/components/CreateProject/02-ProjectDetails';
-import UploadSurvey from '@/components/CreateProject/03-UploadSurvey';
-import MapData from '@/components/CreateProject/04-MapData';
-import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Stepper from '@/components/CreateProject/Stepper';
@@ -14,10 +9,9 @@ import Map from '@/components/CreateProject/Map';
 import {
   createProjectValidationSchema,
   projectOverviewValidationSchema,
-  mapDataValidationSchema,
   projectDetailsValidationSchema,
   splitTasksValidationSchema,
-  uploadSurveyValidationSchema,
+  assignProjectManagerValidationSchema,
 } from '@/components/CreateProject/validation';
 import { z } from 'zod/v4';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
@@ -34,14 +28,18 @@ import { useDeleteProjectMutation, useGetProjectQuery } from '@/api/project';
 import { useUploadProjectXlsformMutation } from '@/api/central';
 import { FileType } from '@/types';
 
+import ProjectOverview from '@/components/CreateProject/01-ProjectOverview';
+import ProjectDetails from '@/components/CreateProject/02-ProjectDetails';
+import SplitTasks from '@/components/CreateProject/03-SplitTasks';
+import AssignManager from '@/components/CreateProject/04-AssignManager';
+
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const validationSchema = {
   1: projectOverviewValidationSchema,
   2: projectDetailsValidationSchema,
-  3: uploadSurveyValidationSchema,
-  4: mapDataValidationSchema,
-  5: splitTasksValidationSchema,
+  3: splitTasksValidationSchema,
+  4: assignProjectManagerValidationSchema,
 };
 
 const CreateProject = () => {
@@ -74,7 +72,7 @@ const CreateProject = () => {
   useEffect(() => {
     if (!projectId) {
       setSearchParams({ step: '0' });
-    } else if (projectId && (step < 0 || step > 5 || !values.osm_category)) {
+    } else if (projectId && (step < 0 || step > 4 || !values.osm_category)) {
       setSearchParams({ step: '1' });
     }
   }, []);
@@ -96,16 +94,15 @@ const CreateProject = () => {
   const form = {
     1: <ProjectOverview />,
     2: <ProjectDetails />,
-    3: <UploadSurvey />,
-    4: <MapData />,
-    5: <SplitTasks />,
+    3: <SplitTasks />,
+    4: <AssignManager />,
   };
 
   const createDraftProject = async (continueToNextStep: boolean) => {
     const isValidationSuccess = await trigger(undefined, { shouldFocus: true });
 
     if (!isValidationSuccess) return;
-    const { project_name, description, outline, merge, field_mapping_app } = values;
+    const { project_name, description, outline, merge, field_mapping_app, osm_category } = values;
 
     const projectPayload = {
       project_name,
@@ -113,6 +110,7 @@ const CreateProject = () => {
       outline,
       merge,
       field_mapping_app,
+      osm_category,
     };
 
     dispatch(
@@ -132,10 +130,6 @@ const CreateProject = () => {
       visibility: data.visibility,
       hashtags: data.hashtags,
       custom_tms_url: data.custom_tms_url,
-      per_task_instructions: data.per_task_instructions,
-      osm_category: data.osm_category,
-      primary_geom_type: data.primary_geom_type,
-      new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
       task_split_type: data.task_split_type,
       status: 'PUBLISHED',
       field_mapping_app: data.field_mapping_app,
@@ -232,8 +226,6 @@ const CreateProject = () => {
         project_id: +projectId!,
         use_odk_collect: values.field_mapping_app === field_mapping_app.ODK,
         need_verification_fields: values.needVerificationFields,
-        mandatory_photo_upload: values.mandatoryPhotoUpload,
-        default_language: values.default_language,
       },
     });
   };
@@ -244,14 +236,14 @@ const CreateProject = () => {
       return;
     }
 
-    if (step === 3 && !values.isFormValidAndUploaded) {
+    if (step === 2 && !values.isFormValidAndUploaded) {
       uploadXlsformFile(values.xlsFormFile);
       return;
     }
 
-    if (step === 5) createProject();
+    if (step === 4) createProject();
 
-    if (step < 5) setSearchParams({ step: (step + 1).toString() });
+    if (step < 4) setSearchParams({ step: (step + 1).toString() });
   };
 
   const onError = (validationErrors: any) => {
