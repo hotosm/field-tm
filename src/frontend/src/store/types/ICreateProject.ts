@@ -101,7 +101,7 @@ export type DrawnGeojsonTypes = {
 };
 
 export type taskSplitOptionsType = {
-  project_name: string;
+  name: string;
   value: string;
   label: string;
   disabled: boolean;

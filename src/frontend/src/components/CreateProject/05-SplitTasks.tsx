@@ -33,7 +33,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.DIVIDE_ON_SQUARE,
       label: 'Divide into square tasks',
-      disabled: values.primary_geom_type === 'POLYLINE',
+      disabled: false,
     },
     {
       name: 'define_tasks',
@@ -45,7 +45,7 @@ const SplitTasks = () => {
       name: 'define_tasks',
       value: task_split_type.TASK_SPLITTING_ALGORITHM,
       label: 'Task Splitting Algorithm',
-      disabled: !values.dataExtractGeojson?.features?.length || values.primary_geom_type === 'POLYLINE',
+      disabled: !values.dataExtractGeojson?.features?.length,
     },
   ];
 
