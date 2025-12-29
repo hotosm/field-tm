@@ -54,9 +54,6 @@ const ProjectTypeSelector = () => {
               onClick={() => {
                 setValue('field_mapping_app', app.id);
                 setSearchParams({ step: '1' });
-
-                // NOTE this var may be deprecated in future in favour of simply field_mapping_app
-                setValue('use_odk_collect', app.id === field_mapping_app.ODK);
               }}
               className="fmtm-w-full fmtm-mt-auto"
             >
