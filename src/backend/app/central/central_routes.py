@@ -232,7 +232,7 @@ async def detect_form_languages(
 ) -> dict:
     """Detect languages available in an uploaded XLSForm."""
     xlsform_bytes = await _validate_xlsform_extension(data)
-    xlsform = pd.read_excel(xlsform_bytes, sheet_name=None)
+    xlsform = pd.read_excel(xlsform_bytes, sheet_name=None, engine="calamine")
     detected_languages = []
 
     settings_df = xlsform.get("settings")
