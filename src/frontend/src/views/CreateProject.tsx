@@ -79,7 +79,7 @@ const CreateProject = () => {
 
   useEffect(() => {
     if (!projectDetails || !projectId) return;
-    const { id, project_name, description, outline, hashtags, field_mapping_app } = projectDetails;
+    const { id, project_name, description, outline, hashtags, field_mapping_app, osm_category } = projectDetails;
     reset({
       ...defaultValues,
       id,
@@ -88,6 +88,7 @@ const CreateProject = () => {
       outline,
       hashtags,
       field_mapping_app,
+      osm_category,
     });
   }, [projectDetails]);
 

@@ -207,6 +207,7 @@ const ProjectOverview = () => {
             name="osm_category"
             render={({ field }) => (
               <Select2
+                disabled={!!values?.id}
                 options={sortedFormList || []}
                 value={field.value as string}
                 choose="label"
