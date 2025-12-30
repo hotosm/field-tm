@@ -22,7 +22,7 @@ import logging
 import os
 from io import BytesIO
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 from anyio import to_thread
 from area_splitter.splitter import split_by_sql, split_by_square
@@ -31,8 +31,9 @@ from litestar import Response, Router, delete, get, patch, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.di import Provide
+from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
-from litestar.params import Parameter
+from litestar.params import Body, Parameter
 from osm_fieldwork.json_data_models import data_models_path, get_choices
 from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
@@ -218,35 +219,39 @@ async def download_project_boundary(
     },
 )
 async def task_split(
-    project_geojson: UploadFile,
-    extract_geojson: UploadFile | None = None,
-    no_of_buildings: int = Parameter(50),
+    data: Annotated[
+        project_schemas.SplitFormData, Body(media_type=RequestEncodingType.MULTI_PART)
+    ],
+    no_of_buildings: int = Parameter(default=50),
 ) -> dict:
     """Split a task into subtasks.
 
     NOTE we pass a connection
 
     Args:
-        current_user (AuthUser): the currently logged in user.
-        project_geojson (UploadFile): The geojson (AOI) to split.
-        extract_geojson (UploadFile, optional): Custom data extract geojson
-            containing osm features (should be a FeatureCollection).
-            If not included, an extract is generated automatically.
+        auth_user (AuthUser): the currently logged in user.
+        data (SplitFormData): The form data containing the following fields:
+            project_geojson (UploadFile): The geojson (AOI) to split.
+            extract_geojson (UploadFile, optional): Custom data extract geojson
+                containing osm features (should be a FeatureCollection).
+                If not included, an extract is generated automatically.
         no_of_buildings (int, optional): The number of buildings per subtask.
             Defaults to 50.
 
     Returns:
         The result of splitting the task into subtasks.
     """
-    boundary_featcol = parse_geojson_file_to_featcol(await project_geojson.read())
+    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
     merged_boundary = merge_polygons(boundary_featcol, False)
     # Validatiing Coordinate Reference Systems
     await check_crs(merged_boundary)
 
     # read data extract
     parsed_extract = None
-    if extract_geojson:
-        parsed_extract = parse_geojson_file_to_featcol(await extract_geojson.read())
+    if data.extract_geojson:
+        parsed_extract = parse_geojson_file_to_featcol(
+            await data.extract_geojson.read()
+        )
         if parsed_extract:
             await check_crs(parsed_extract)
         else:
@@ -274,16 +279,17 @@ async def task_split(
     },
 )
 async def preview_split_by_square(
-    project_geojson: UploadFile,
-    extract_geojson: UploadFile | None = None,
-    dimension_meters: int = Parameter(100),
+    data: Annotated[
+        project_schemas.SplitFormData, Body(media_type=RequestEncodingType.MULTI_PART)
+    ],
+    dimension_meters: int = Parameter(default=100),
 ) -> FeatureCollection:
     """Preview splitting by square.
 
     TODO update to use a response_model
     """
     # Validating for .geojson File.
-    file_name = os.path.splitext(project_geojson.filename)
+    file_name = os.path.splitext(data.project_geojson.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
@@ -293,13 +299,15 @@ async def preview_split_by_square(
         )
 
     # read entire file
-    boundary_featcol = parse_geojson_file_to_featcol(await project_geojson.read())
+    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
 
     # Validatiing Coordinate Reference System
     await check_crs(boundary_featcol)
     parsed_extract = None
-    if extract_geojson:
-        parsed_extract = parse_geojson_file_to_featcol(await extract_geojson.read())
+    if data.extract_geojson:
+        parsed_extract = parse_geojson_file_to_featcol(
+            await data.extract_geojson.read()
+        )
         if parsed_extract:
             await check_crs(parsed_extract)
         else:

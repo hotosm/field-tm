@@ -27,8 +27,9 @@ from litestar import Response, Router, get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.di import Provide
+from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
-from litestar.params import Parameter
+from litestar.params import Body, Parameter
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.OdkCentralAsync import OdkCentral
 from psycopg import AsyncConnection
@@ -164,7 +165,7 @@ async def upload_project_xlsform(
     db: AsyncConnection,
     current_user: ProjectUserDict,
     auth_user: AuthUser,
-    xlsform_upload: UploadFile,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
     need_verification_fields: bool = Parameter(default=True),
     mandatory_photo_upload: bool = Parameter(default=False),
@@ -175,16 +176,14 @@ async def upload_project_xlsform(
     """Upload the final XLSForm for the project."""
     project = current_user.get("project")
     project_id = project.id
-    new_geom_type = project.new_geom_type
     form_name = f"FMTM_Project_{project.id}"
 
     # Validate uploaded form
-    xlsform_bytes = await _validate_xlsform_extension(xlsform_upload)
+    xlsform_bytes = await _validate_xlsform_extension(data)
 
     await central_crud.validate_and_update_user_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
-        new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
@@ -194,7 +193,6 @@ async def upload_project_xlsform(
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
-        new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
@@ -230,11 +228,11 @@ async def upload_project_xlsform(
     },
 )
 async def detect_form_languages(
-    xlsform: UploadFile,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
 ) -> dict:
     """Detect languages available in an uploaded XLSForm."""
-    xlsform_bytes = await _validate_xlsform_extension(xlsform)
-    xlsform = pd.read_excel(xlsform_bytes, sheet_name=None, engine="calamine")
+    xlsform_bytes = await _validate_xlsform_extension(data)
+    xlsform = pd.read_excel(xlsform_bytes, sheet_name=None)
     detected_languages = []
 
     settings_df = xlsform.get("settings")
