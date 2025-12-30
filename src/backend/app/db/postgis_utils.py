@@ -44,7 +44,7 @@ from shapely.geometry import (
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from app.db.enums import XLSFormType
+from app.db.enums import DbGeomType, XLSFormType
 
 log = logging.getLogger(__name__)
 
@@ -215,7 +215,7 @@ async def split_geojson_by_task_areas(
     db: AsyncConnection,
     featcol: geojson.FeatureCollection,
     project_id: int,
-    geom_type: str,
+    geom_type: DbGeomType = DbGeomType.POLYGON,
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
 
