@@ -335,7 +335,7 @@ async def preview_split_by_square(
 )
 async def get_data_extract(
     current_user_dict: ProjectUserDict,
-    geojson_file: UploadFile,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
     osm_category: XLSFormType | None = XLSFormType.buildings,
@@ -348,7 +348,7 @@ async def get_data_extract(
     TODO allow config file (YAML/JSON) upload for data extract generation
     TODO alternatively, direct to raw-data-api to generate first, then upload
     """
-    boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
+    boundary_geojson = parse_geojson_file_to_featcol(await data.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
     project = current_user_dict.get("project")
 
@@ -673,7 +673,7 @@ async def upload_project_task_boundaries(
     project_id: int,
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    task_geojson: UploadFile,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
 ) -> dict[str, str]:
     """Set project task boundaries using split GeoJSON from frontend.
 
@@ -687,7 +687,7 @@ async def upload_project_task_boundaries(
         JSONResponse: JSON containing success message.
     """
     project_id = current_user_dict.get("project").id
-    tasks_featcol = parse_geojson_file_to_featcol(await task_geojson.read())
+    tasks_featcol = parse_geojson_file_to_featcol(await data.read())
     await check_crs(tasks_featcol)
     # We only want to allow polygon geometries
     # featcol_single_geom_type = featcol_keep_single_geom_type(
