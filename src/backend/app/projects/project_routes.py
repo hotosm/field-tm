@@ -421,7 +421,7 @@ async def get_or_set_data_extract(
 async def upload_data_extract(
     db: AsyncConnection,
     current_user_dict: ProjectUserDict,
-    data_extract_file: UploadFile,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
 ) -> dict[str, str]:
     """Upload a data extract geojson for a project.
@@ -450,7 +450,7 @@ async def upload_data_extract(
     project_id = current_user_dict.get("project").id
 
     # Validating for .geojson File.
-    file_name = os.path.splitext(data_extract_file.filename)
+    file_name = os.path.splitext(data.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json", ".fgb"]
     if file_ext not in allowed_extensions:
@@ -460,7 +460,7 @@ async def upload_data_extract(
         )
 
     # read entire file
-    extract_data = await data_extract_file.read()
+    extract_data = await data.read()
 
     fgb_url = await project_crud.upload_geojson_data_extract(
         db, project_id, extract_data
