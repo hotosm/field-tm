@@ -399,7 +399,7 @@ async def append_field_mapping_fields(
     """
     log.info("Appending field mapping questions to XLSForm")
 
-    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    custom_sheets = pd.read_excel(custom_form, sheet_name=None)
     if "survey" not in custom_sheets:
         msg = "Survey sheet is required in XLSForm!"
         log.error(msg)
@@ -428,7 +428,7 @@ async def append_task_id_choices(
 
     task_id_choice_df = generate_task_id_choices(task_ids)
 
-    existing_sheets = pd.read_excel(existing_form, sheet_name=None, engine="calamine")
+    existing_sheets = pd.read_excel(existing_form, sheet_name=None)
     if "choices" not in existing_sheets:
         raise ValueError("Choices sheet is required in XLSForm!")
 
@@ -480,7 +480,7 @@ async def modify_form_for_qfield(
     """
     log.info("Modifying XLSForm to work with QField")
 
-    custom_sheets = pd.read_excel(custom_form, sheet_name=None, engine="calamine")
+    custom_sheets = pd.read_excel(custom_form, sheet_name=None)
     if "survey" not in custom_sheets:
         msg = "Survey sheet is required in XLSForm!"
         log.error(msg)
