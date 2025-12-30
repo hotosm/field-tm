@@ -97,6 +97,7 @@ class StubProjectIn(BaseModel):
     created_by_sub: Optional[str] = None
     hashtags: Optional[list[str]] = []
     slug: Optional[str] = None
+    osm_category: Optional[str] = None
 
     @field_validator("hashtags", mode="before")
     @classmethod

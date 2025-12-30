@@ -57,6 +57,8 @@ CREATE TABLE public.projects (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
+ALTER TABLE ONLY public.projects
+ADD COLUMN IF NOT EXISTS osm_category character varying;
 ALTER TABLE public.projects OWNER TO fmtm;
 CREATE SEQUENCE public.projects_id_seq
 AS integer

@@ -323,6 +323,7 @@ class DbProject:
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)
     odk_token: Optional[str] = None
+    osm_category: Optional[str] = None
 
     @classmethod
     async def one(
