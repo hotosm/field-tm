@@ -26,8 +26,9 @@ from geojson_pydantic import (
     MultiPolygon,
     Polygon,
 )
+from litestar.datastructures import UploadFile
 from litestar.dto import DataclassDTO, DTOConfig
-from pydantic import BaseModel, Field, ValidationInfo
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
@@ -38,6 +39,15 @@ from app.db.enums import (
 )
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
+
+
+class SplitFormData(BaseModel):
+    """Form data for split square task split."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    project_geojson: UploadFile
+    extract_geojson: UploadFile | None = None
+
 
 # ============================================================================
 # DTOs for endpoint responses
