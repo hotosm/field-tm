@@ -207,9 +207,11 @@ const UploadDataExtractService = (url: string, file: any) => {
 const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await axios.post(url, {
-        combined_features_count: combinedFeaturesCount.toString(),
-      });
+      const response = await axios.post(
+        url,
+        {},
+        { params: { combined_features_count: combinedFeaturesCount.toString() } },
+      );
 
       if (!isStatusSuccess(response.status)) {
         const msg = `Request failed with status ${response.status}`;
