@@ -619,7 +619,6 @@ async def get_project_features_geojson(
 ) -> geojson.FeatureCollection:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
-    geom_type = db_project.primary_geom_type
 
     data_extract_url = db_project.data_extract_url
 
@@ -663,7 +662,7 @@ async def get_project_features_geojson(
     # Split by task areas if task_id provided
     if task_id:
         split_extract_dict = await split_geojson_by_task_areas(
-            db, data_extract_geojson, project_id, geom_type
+            db, data_extract_geojson, project_id
         )
         return split_extract_dict[task_id]
 
