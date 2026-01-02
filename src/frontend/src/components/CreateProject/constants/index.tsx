@@ -16,22 +16,17 @@ export const createProjectSteps: ICreateProjectSteps[] = [
   {
     step: 2,
     label: '02',
-    name: 'Project Details',
+    name: 'Advance Project Details',
   },
   {
     step: 3,
     label: '03',
-    name: 'Upload Survey',
+    name: 'Split Tasks',
   },
   {
     step: 4,
     label: '04',
-    name: 'Map Data',
-  },
-  {
-    step: 5,
-    label: '05',
-    name: 'Split Tasks',
+    name: 'Create Project Manager',
   },
 ];
 
