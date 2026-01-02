@@ -234,37 +234,6 @@ const GenerateProjectFilesService = (url: string, combinedFeaturesCount: number)
   };
 };
 
-const GetIndividualProjectDetails = (url: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(true));
-
-    const getIndividualProjectDetails = async (url: string) => {
-      try {
-        const getIndividualProjectDetailsResponse = await axios.get(url);
-        const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
-        const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline, id: 1 }] };
-        const modifiedResponse = {
-          ...resp,
-          project_name: resp.project_name,
-          description: resp.description,
-          outline: formattedOutlineGeojson,
-          per_task_instructions: resp.per_task_instructions,
-        };
-
-        dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
-      } catch (error) {
-        if (error.response.status === 404) {
-          dispatch(CommonActions.SetProjectNotFound(true));
-        }
-      } finally {
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
-      }
-    };
-
-    await getIndividualProjectDetails(url);
-  };
-};
-
 const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(true));
@@ -273,7 +242,6 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
       try {
         const getIndividualProjectDetailsResponse = await axios.patch(url, projectData);
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
-        // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         dispatch(CreateProjectActions.SetPatchProjectDetails(resp));
         dispatch(
           CommonActions.SetSnackBar({
@@ -310,7 +278,6 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
 
         const postFormUpdateResponse = await axios.post(url, formFormData);
         const resp: { message: string } = postFormUpdateResponse.data;
-        // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
         dispatch(
           CommonActions.SetSnackBar({
@@ -366,28 +333,9 @@ const DeleteProjectService = (url: string, navigate?: NavigateFunction) => {
   };
 };
 
-const AssignProjectManager = (url: string, params: { sub: number; project_id: number }) => {
-  return async (dispatch: AppDispatch) => {
-    const assignProjectManager = async () => {
-      try {
-        await axios.post(url, {}, { params });
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: error.response.data.detail || 'Could not assign project manager',
-          }),
-        );
-      }
-    };
-
-    return await assignProjectManager();
-  };
-};
-
 export {
   UploadTaskAreasService,
   GenerateProjectFilesService,
-  GetIndividualProjectDetails,
   PatchProjectDetails,
   PostFormUpdate,
   DeleteProjectService,
