@@ -416,7 +416,7 @@ const CreateProject = () => {
                     (createDraftProjectLoading.loading && createDraftProjectLoading.continue) || createProjectLoading
                   }
                 >
-                  {step === 5 ? 'Submit' : step === 1 && !projectId ? 'Save & Continue' : 'Next'}
+                  {step === 4 ? 'Submit' : step === 1 && !projectId ? 'Save & Continue' : 'Next'}
                   <AssetModules.ArrowForwardIosIcon className="!fmtm-text-sm !fmtm-ml-auto" />
                 </Button>
               </>
