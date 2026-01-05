@@ -20,9 +20,9 @@
 import json
 import logging
 import os
+from collections.abc import AsyncIterator
 from io import BytesIO
 from pathlib import Path
-from typing import Any, AsyncGenerator
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -30,13 +30,12 @@ import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
-from litestar import Litestar
-from psycopg import AsyncConnection
 
 from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.central import central_crud, central_schemas
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
+from app.db.database import get_db_connection_pool
 from app.db.enums import (
     FieldMappingApp,
 )
@@ -58,6 +57,8 @@ odk_central_url = os.getenv("ODK_CENTRAL_URL")
 odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
 
+litestar_api.debug = True
+
 
 def pytest_configure(config):
     """Configure pytest runs."""
@@ -66,24 +67,19 @@ def pytest_configure(config):
     # sqlalchemy_log.propagate = False
 
 
-@pytest_asyncio.fixture(autouse=True)
-async def app() -> AsyncGenerator[Litestar, Any]:
-    """Get the Litestar test server."""
-    # Create a fresh Litestar app instance for each test session using the
-    # configured application factory.
-    yield litestar_api
-
-
 @pytest_asyncio.fixture(scope="function")
-async def db() -> AsyncConnection:
-    """The psycopg async database connection using psycopg3."""
-    db_conn = await AsyncConnection.connect(
-        settings.FMTM_DB_URL,
-    )
-    try:
-        yield db_conn
-    finally:
-        await db_conn.close()
+async def db():
+    """Get a database connection from the pool.
+
+    Note: The db_pool is initialized during app startup (lifespan),
+    so we need to ensure it exists and is open before using it.
+    """
+    # Initialize db_pool if it doesn't exist (for tests that don't use client fixture)
+    # This function also handles reopening closed pools
+    pool = await get_db_connection_pool(litestar_api)
+
+    async with pool.connection() as conn:
+        yield conn
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -298,13 +294,13 @@ async def project_data(stub_project_data):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(app: Litestar, db: AsyncConnection):
+async def client() -> AsyncIterator[AsyncClient]:
     """The Litestar test server."""
     # NOTE we increase startup_timeout from 5s --> 30s to avoid timeouts
     # during slow initialisation / startup (due to yaml conversion etc)
     manager = None
     try:
-        async with LifespanManager(app, startup_timeout=30) as manager:
+        async with LifespanManager(litestar_api, startup_timeout=30) as manager:
             async with AsyncClient(
                 transport=ASGITransport(app=manager.app),
                 base_url=f"http://{settings.FMTM_DOMAIN}",

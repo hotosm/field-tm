@@ -41,23 +41,31 @@ async def get_db_connection_pool(server: Litestar) -> AsyncConnectionPool:
         "Creating database connection pool: "
         f"{settings.FMTM_DB_USER}@{settings.FMTM_DB_HOST}"
     )
-    if not getattr(server.state, "db_pool", None):
-        new_pool = AsyncConnectionPool(
+
+    pool = getattr(server.state, "db_pool", None)
+
+    if pool is None or pool.closed:
+        if pool is not None:
+            log.debug("Existing DB pool is closed; creating a new one")
+
+        pool = AsyncConnectionPool(
             conninfo=settings.FMTM_DB_URL,
             min_size=1,
             max_size=10,  # max 10 concurrent DB connections (less than max_connections)
             timeout=30.0,  # how long to wait if all connections are busy
             open=False,
         )
-        server.state.update({"db_pool": new_pool})
-        await server.state.db_pool.open()
+        server.state.db_pool = pool
+        await pool.open()
         log.debug("Database connection pool opened")
-    return cast("AsyncConnectionPool", server.state.db_pool)
+
+    return cast(AsyncConnectionPool, pool)
 
 
 async def close_db_connection_pool(server: Litestar) -> None:
     """Close the psycopg connection pool."""
-    if getattr(server.state, "db_pool", None):
+    pool = getattr(server.state, "db_pool", None)
+    if pool and not pool.closed:
         await cast("AsyncConnectionPool", server.state.db_pool).close()
         log.debug("Database connection pool closed")
 
