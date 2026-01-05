@@ -28,7 +28,6 @@ from typing import Optional, Union
 
 import aiohttp
 import geojson
-import geojson_pydantic
 from anyio import to_thread
 from litestar import Request
 from litestar import status_codes as status
@@ -66,71 +65,76 @@ from app.projects import project_deps, project_schemas
 log = logging.getLogger(__name__)
 
 
-async def get_projects_featcol(
-    db: AsyncConnection,
-    bbox: Optional[str] = None,
-) -> geojson.FeatureCollection:
-    """Get all projects, or a filtered subset."""
-    bbox_condition = ""
-    bbox_params = {}
+# NOTE not used anywhere - delete? (useful code though...)
+# async def get_projects_featcol(
+#     db: AsyncConnection,
+#     #: Optional[str] = None,
+# ) -> geojson.FeatureCollection:
+#     """Get all projects, or a filtered subset."""
+#     bbox_condition = ""
+#     bbox_params = {}
 
-    if bbox:
-        minx, miny, maxx, maxy = map(float, bbox.split(","))
-        bbox_condition = """
-            AND ST_Intersects(
-                p.outline, ST_MakeEnvelope(%(minx)s, %(miny)s, %(maxx)s, %(maxy)s, 4326)
-            )
-        """
-        bbox_params = {"minx": minx, "miny": miny, "maxx": maxx, "maxy": maxy}
+#     if bbox:
+#         minx, miny, maxx, maxy = map(float, bbox.split(","))
+#         bbox_condition = """
+#             AND ST_Intersects(
+#                 p.outline, ST_MakeEnvelope(
+#                     %(minx)s, %(miny)s, %(maxx)s, %(maxy)s, 4326
+#                 )
+#             )
+#         """
+#         bbox_params = {"minx": minx, "miny": miny, "maxx": maxx, "maxy": maxy}
 
-    # FIXME add logic for percentMapped and percentValidated
-    # NOTE alternative logic to build a FeatureCollection
-    """
-        SELECT jsonb_build_object(
-            'type', 'FeatureCollection',
-            'features', COALESCE(jsonb_agg(feature), '[]'::jsonb)
-        ) AS featcol
-        FROM (...
-    """
-    sql = f"""
-            SELECT
-                'FeatureCollection' as type,
-                COALESCE(jsonb_agg(feature), '[]'::jsonb) AS features
-            FROM (
-                SELECT jsonb_build_object(
-                    'type', 'Feature',
-                    'id', p.id,
-                    'geometry', ST_AsGeoJSON(p.outline)::jsonb,
-                    'properties', jsonb_build_object(
-                        'name', p.name,
-                        'percentMapped', 0,
-                        'percentValidated', 0,
-                        'created', p.created_at,
-                        'link', concat('https://', %(domain)s::text, '/project/', p.id)
-                    )
-                ) AS feature
-                FROM projects p
-                WHERE p.visibility = 'PUBLIC'
-                {bbox_condition}
-            ) AS features;
-        """
+#     # FIXME add logic for percentMapped and percentValidated
+#     # NOTE alternative logic to build a FeatureCollection
+#     """
+#         SELECT jsonb_build_object(
+#             'type', 'FeatureCollection',
+#             'features', COALESCE(jsonb_agg(feature), '[]'::jsonb)
+#         ) AS featcol
+#         FROM (...
+#     """
+#     sql = f"""
+#             SELECT
+#                 'FeatureCollection' as type,
+#                 COALESCE(jsonb_agg(feature), '[]'::jsonb) AS features
+#             FROM (
+#                 SELECT jsonb_build_object(
+#                     'type', 'Feature',
+#                     'id', p.id,
+#                     'geometry', ST_AsGeoJSON(p.outline)::jsonb,
+#                     'properties', jsonb_build_object(
+#                         'name', p.project_name,
+#                         'percentMapped', 0,
+#                         'percentValidated', 0,
+#                         'created', p.created_at,
+#                         'link', concat(
+#                             'https://', %(domain)s::text, '/project/', p.id
+#                         )
+#                     )
+#                 ) AS feature
+#                 FROM projects p
+#                 WHERE p.visibility = 'PUBLIC'
+#                 {bbox_condition}
+#             ) AS features;
+#         """
 
-    async with db.cursor(
-        row_factory=class_row(geojson_pydantic.FeatureCollection)
-    ) as cur:
-        query_params = {"domain": settings.FMTM_DOMAIN}
-        if bbox:
-            query_params.update(bbox_params)
-        await cur.execute(sql, query_params)
-        featcol = await cur.fetchone()
+#     async with db.cursor(
+#         row_factory=class_row(geojson_pydantic.FeatureCollection)
+#     ) as cur:
+#         query_params = {"domain": settings.FMTM_DOMAIN}
+#         if bbox:
+#             query_params.update(bbox_params)
+#         await cur.execute(sql, query_params)
+#         featcol = await cur.fetchone()
 
-    if not featcol:
-        return HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Failed to generate project FeatureCollection",
-        )
+#     if not featcol:
+#         return HTTPException(
+#             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+#             detail="Failed to generate project FeatureCollection",
+#         )
 
-    return featcol
+#     return featcol
 
 
 async def generate_data_extract(
@@ -768,7 +772,7 @@ async def send_project_manager_message(
         project_url = f"https://{project_url}"
 
     message_content = dedent(f"""
-        You have been assigned to the project **{project.name}** as a
+        You have been assigned to the project **{project.project_name}** as a
         manager. You can now manage the project and its tasks.
 
         [Click here to view the project]({project_url})
@@ -779,7 +783,7 @@ async def send_project_manager_message(
     send_osm_message(
         osm_token=osm_token,
         osm_sub=new_manager.sub,
-        title=f"You have been assigned to project {project.name} as a manager",
+        title=f"You have been assigned to project {project.project_name} as a manager",
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")

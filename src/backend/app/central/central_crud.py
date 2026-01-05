@@ -74,9 +74,9 @@ STATUS_VISUALS = {
 def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
     """Helper function to get the OdkProject with credentials."""
     if odk_central:
-        url = odk_central.odk_central_url
-        user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
+        url = odk_central.external_project_instance_url
+        user = odk_central.external_project_username
+        pw = odk_central.external_project_password
     else:
         log.debug("ODKCentral connection variables not set in function")
         log.debug("Attempting extraction from environment variables")
@@ -113,9 +113,9 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
 
 def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
     """Helper function to get the OdkForm with credentials."""
-    url = odk_central.odk_central_url
-    user = odk_central.odk_central_user
-    pw = odk_central.odk_central_password
+    url = odk_central.external_project_instance_url
+    user = odk_central.external_project_username
+    pw = odk_central.external_project_password
 
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
@@ -133,9 +133,9 @@ def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
 def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
     """Helper function to get the OdkAppUser with credentials."""
     if odk_central:
-        url = odk_central.odk_central_url
-        user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
+        url = odk_central.external_project_instance_url
+        user = odk_central.external_project_username
+        pw = odk_central.external_project_password
     else:
         log.debug("ODKCentral connection variables not set in function")
         log.debug("Attempting extraction from environment variables")
@@ -739,7 +739,7 @@ async def get_appuser_token(
         appuser_token = appuser_json.get("token")
         appuser_sub = appuser_json.get("id")
 
-        odk_url = odk_credentials.odk_central_url
+        odk_url = odk_credentials.external_project_instance_url
 
         # Update the user role for the created xform
         log.info("Updating XForm role for appuser in ODK Central")

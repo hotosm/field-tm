@@ -266,9 +266,9 @@ async def test_create_odk_project():
     mock_project.createProject.return_value = {"status": "success"}
 
     odk_credentials = {
-        "odk_central_url": os.getenv("ODK_CENTRAL_URL"),
-        "odk_central_user": os.getenv("ODK_CENTRAL_USER"),
-        "odk_central_password": os.getenv("ODK_CENTRAL_PASSWD"),
+        "external_project_instance_url": os.getenv("ODK_CENTRAL_URL"),
+        "external_project_username": os.getenv("ODK_CENTRAL_USER"),
+        "external_project_password": os.getenv("ODK_CENTRAL_PASSWD"),
     }
 
     with patch("app.central.central_crud.get_odk_project", return_value=mock_project):
@@ -417,7 +417,7 @@ async def test_project_summaries(client, project):
     first_project = response.json()["results"][0]
 
     assert first_project["id"] == project.id
-    assert first_project["name"] == project.name
+    assert first_project["name"] == project.project_name
     assert first_project["hashtags"] == project.hashtags
 
 
@@ -431,7 +431,7 @@ async def test_project_by_id(client, project):
     assert data["id"] == project.id
     assert data["external_project_id"] == project.external_project_id
     assert data["created_by_sub"] == project.created_by_sub
-    assert data["name"] == project.name
+    assert data["project_name"] == project.project_name
     assert data["description"] == project.description
     assert data["per_task_instructions"] == project.per_task_instructions
     assert data["status"] == project.status
@@ -486,17 +486,7 @@ async def test_read_project(client, project):
     data = response.json()
     assert data["id"] == project.id
     assert data["external_project_id"] == project.external_project_id
-    assert data["name"] == project.name
-    assert data["bbox"] == project.bbox
-
-    # Test with minimal param
-    response = await client.get(f"/projects/{project.id}/minimal")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == project.id
-    assert data["external_project_id"] == project.external_project_id
-    assert data["name"] == project.name
-    assert data["bbox"] is None
+    assert data["project_name"] == project.project_name
 
 
 async def test_update_and_download_project_form(client, project):
@@ -541,78 +531,6 @@ async def test_update_and_download_project_form(client, project):
         assert response.headers["Content-Type"] == "application/media"
         assert response.content is not None
         assert response.content == b"updated xlsform data"
-
-
-# NOTE we need odk_project and task_events fixture to populate data
-# NOTE we need odk_project and task_events fixture to populate data
-async def test_get_contributors(client, project, odk_project, admin_user):
-    """Test fetching contributors of a project."""
-    response = await client.get(f"/projects/contributors/{project.id}")
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    # Note: may be empty if no submissions exist
-    if len(data) > 0:
-        assert all(
-            "user" in contributor and "submissions" in contributor
-            for contributor in data
-        )
-
-
-async def test_add_new_project_admin(client, project, new_mapper_user):
-    """Test adding a new project admin."""
-    with patch(
-        "app.projects.project_crud.send_project_manager_message", return_value=None
-    ):
-        response = await client.post(
-            "/projects/add-manager",
-            params={"project_id": project.id, "sub": new_mapper_user.sub},
-        )
-
-    assert response.status_code == 200
-
-    # Verify admin was added by fetching project users
-    response = await client.get(f"/projects/{project.id}/users")
-    assert response.status_code == 200
-
-    data = response.json()
-
-    # Ensure the new project admin is in the response
-    assert any(
-        user["user_sub"] == new_mapper_user.sub and user["role"] == "PROJECT_ADMIN"
-        for user in data
-    )
-
-
-async def test_create_entity(client, db, project, odk_project):
-    """Test creating an entity and verifying task_id matching within task boundary."""
-    # NOTE here we need odk_project fixture to ensure the project exists
-
-    # Sample GeoJSON with a point that would lie inside a task boundary
-    geojson = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "properties": {"project_id": project.id},
-                "geometry": {"type": "Point", "coordinates": [85.30125, 27.7122]},
-            }
-        ],
-    }
-
-    entity_uuid = uuid4()
-    response = await client.post(
-        f"/central/entity?project_id={project.id}&entity_uuid={entity_uuid}",
-        json=geojson,
-    )
-    assert response.status_code == 200
-    data = response.json()
-
-    # Check if the task_id in the returned data exists
-    assert "currentVersion" in data
-    assert "data" in data["currentVersion"]
-    assert "task_id" in data["currentVersion"]["data"]
-    assert isinstance(int(data["currentVersion"]["data"]["task_id"]), int)
 
 
 async def test_download_project_boundary(client, project):

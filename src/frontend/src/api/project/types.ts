@@ -11,7 +11,7 @@ import {
 } from '@/types/enums';
 import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
 
-export interface projectBaseType {
+export interface projectType {
   id: number;
   external_project_id: number;
   created_by_sub: number;
@@ -31,9 +31,9 @@ export interface projectBaseType {
   priority: string;
   featured: boolean;
   due_date: null | string;
-  odk_central_url: string;
-  odk_central_user: string;
-  odk_central_password: string;
+  external_project_instance_url: string;
+  external_project_username: string;
+  external_project_password: string;
   odk_token: string;
   data_extract_url: string;
   task_split_type: task_split_type;
@@ -59,7 +59,7 @@ export type generateProjectBasemapPayloadType = {
   tms_url?: string;
 };
 
-export type createProjectPayloadType = Partial<projectBaseType>;
+export type createProjectPayloadType = Partial<projectType>;
 
 export type updateProjectPayloadType = Partial<projectType>;
 
@@ -88,7 +88,7 @@ export type generateFilesPayloadType = {
   combined_features_count: number;
 };
 
-export type createStubProjectPayloadType = Pick<projectBaseType, 'project_name' | 'description' | 'outline'> & {
+export type createStubProjectPayloadType = Pick<projectType, 'project_name' | 'description' | 'outline'> & {
   merge: boolean;
 };
 
@@ -176,11 +176,6 @@ export type tileType = {
   format: tile_output_formats;
   mimetype: string;
 };
-
-export interface projectType extends projectBaseType {
-  centroid: Point;
-  last_active: string;
-}
 
 export type odkEntitiesGeojsonType = FeatureCollection<Geometry, odkEntitiesGeojsonPropertiesType>;
 

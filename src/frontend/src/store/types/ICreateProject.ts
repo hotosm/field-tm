@@ -60,9 +60,9 @@ export type ProjectDetailsTypes = {
   task_split_dimension?: number;
   task_num_buildings?: number;
   no_of_buildings: number;
-  odk_central_user?: string;
-  odk_central_password?: string;
-  odk_central_url?: string;
+  external_project_username?: string;
+  external_project_password?: string;
+  external_project_instance_url?: string;
   project_name: string;
   hashtags: string[];
   description: string;

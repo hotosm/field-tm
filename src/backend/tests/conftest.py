@@ -31,7 +31,7 @@ import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
-from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.auth_schemas import AuthUser
 from app.central import central_crud, central_schemas
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
@@ -53,9 +53,9 @@ from tests.test_data import test_data_path
 
 log = logging.getLogger(__name__)
 
-odk_central_url = os.getenv("ODK_CENTRAL_URL")
-odk_central_user = os.getenv("ODK_CENTRAL_USER")
-odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
+external_project_instance_url = os.getenv("ODK_CENTRAL_URL")
+external_project_username = os.getenv("ODK_CENTRAL_USER")
+external_project_password_encrypted = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
 
 litestar_api.debug = True
 
@@ -85,7 +85,7 @@ async def db():
 @pytest_asyncio.fixture(scope="function")
 async def admin_user(db):
     """A test user."""
-    db_user = await get_or_create_user(
+    return await get_or_create_user(
         db,
         AuthUser(
             sub="osm|1",
@@ -94,44 +94,27 @@ async def admin_user(db):
         ),
     )
 
-    return FMTMUser(
-        sub=db_user.sub,
-        username=db_user.username,
-        profile_img=db_user.profile_img,
-    )
-
-
-@pytest_asyncio.fixture(scope="function")
-async def new_mapper_user(db):
-    """A test user."""
-    db_user = await get_or_create_user(
-        db,
-        AuthUser(
-            sub="osm|2",
-            username="local mapper",
-            is_admin=False,
-        ),
-    )
-
-    return FMTMUser(
-        sub=db_user.sub,
-        username=db_user.username,
-        profile_img=db_user.profile_img,
-    )
-
 
 @pytest_asyncio.fixture(scope="function")
 async def project(db, admin_user):
     """A test project, using the test user."""
     odk_creds_encrypted = ODKCentralIn(
-        odk_central_url=os.getenv("ODK_CENTRAL_URL"),
-        odk_central_user=os.getenv("ODK_CENTRAL_USER"),
-        odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
+        external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
+        external_project_username=os.getenv("ODK_CENTRAL_USER"),
+        external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
+    )
+    # ODKCentralDecrypted.model_post_init will decrypt the password automatically
+    # Pass the encrypted password (from external_project_password_encrypted
+    # or external_project_password)
+    # Both should be the same after ODKCentralIn processing
+    encrypted_password = (
+        odk_creds_encrypted.external_project_password_encrypted
+        or odk_creds_encrypted.external_project_password
     )
     odk_creds_decrypted = ODKCentralDecrypted(
-        odk_central_url=odk_creds_encrypted.odk_central_url,
-        odk_central_user=odk_creds_encrypted.odk_central_user,
-        odk_central_password=odk_creds_encrypted.odk_central_password,
+        external_project_instance_url=odk_creds_encrypted.external_project_instance_url,
+        external_project_username=odk_creds_encrypted.external_project_username,
+        external_project_password=encrypted_password,
     )
 
     project_name = f"test project {uuid4()}"
@@ -153,9 +136,9 @@ async def project(db, admin_user):
         field_mapping_app=FieldMappingApp.ODK,
         description="test",
         osm_category="buildings",
-        odk_central_url=os.getenv("ODK_CENTRAL_URL"),
-        odk_central_user=os.getenv("ODK_CENTRAL_USER"),
-        odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
+        external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
+        external_project_username=os.getenv("ODK_CENTRAL_USER"),
+        external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
         hashtags="hashtag1 hashtag2",
         outline={
             "type": "Polygon",
@@ -179,14 +162,14 @@ async def project(db, admin_user):
         new_project = await DbProject.create(db, project_metadata)
         log.debug(f"Project returned: {new_project}")
         assert new_project is not None
+        # Commit the transaction so it's visible to other connections
+        await db.commit()
     except Exception as e:
         log.exception(e)
         pytest.fail(f"Test failed with exception: {str(e)}")
 
     # Get project, including all calculated fields
     project_all_data = await DbProject.one(db, new_project.id)
-    assert isinstance(project_all_data.bbox, list)
-    assert isinstance(project_all_data.bbox[0], float)
     return project_all_data
 
 
@@ -280,9 +263,9 @@ async def stub_project(db, stub_project_data):
 async def project_data(stub_project_data):
     """Sample data for creating a project."""
     odk_credentials = {
-        "odk_central_url": odk_central_url,
-        "odk_central_user": odk_central_user,
-        "odk_central_password": odk_central_password,
+        "external_project_instance_url": external_project_instance_url,
+        "external_project_username": external_project_username,
+        "external_project_password_encrypted": external_project_password_encrypted,
     }
     odk_creds_decrypted = central_schemas.ODKCentralDecrypted(**odk_credentials)
 

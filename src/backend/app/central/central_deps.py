@@ -42,9 +42,9 @@ async def pyodk_client(odk_creds: ODKCentralDecrypted):
     and avoids blocking the async event loop in the endpoint.
     """
     pyodk_config = CentralConfig(
-        base_url=odk_creds.odk_central_url,
-        username=odk_creds.odk_central_user,
-        password=odk_creds.odk_central_password,
+        base_url=odk_creds.external_project_instance_url,
+        username=odk_creds.external_project_username,
+        password=odk_creds.external_project_password,
     )
 
     loop = get_running_loop()
@@ -61,9 +61,9 @@ async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkDataset(
-            url=odk_creds.odk_central_url,
-            user=odk_creds.odk_central_user,
-            passwd=odk_creds.odk_central_password,
+            url=odk_creds.external_project_instance_url,
+            user=odk_creds.external_project_username,
+            passwd=odk_creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:
@@ -78,9 +78,9 @@ async def get_async_odk_form(odk_creds: ODKCentralDecrypted):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkForm(
-            url=odk_creds.odk_central_url,
-            user=odk_creds.odk_central_user,
-            passwd=odk_creds.odk_central_password,
+            url=odk_creds.external_project_instance_url,
+            user=odk_creds.external_project_username,
+            passwd=odk_creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:

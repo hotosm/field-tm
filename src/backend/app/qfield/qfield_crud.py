@@ -103,6 +103,7 @@ async def create_qfield_project(
     job_dir = Path(SHARED_VOLUME_PATH) / qgis_job_id
     job_dir.mkdir(parents=True, exist_ok=True)
 
+    # FIXME project no longer has bbox defined
     # Get XLSForm and features geojson from project
     bbox_str = ",".join(map(str, project.bbox))
 

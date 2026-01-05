@@ -35,9 +35,9 @@ async def test_helper_odk_creds_test(client):
         response = await client.post(
             "/central/test-credentials",
             params={
-                "odk_central_url": "http://central:8383",
-                "odk_central_user": "admin@hotosm.org",
-                "odk_central_password": "Password1234",
+                "external_project_instance_url": "http://central:8383",
+                "external_project_username": "admin@hotosm.org",
+                "external_project_password": "Password1234",
             },
         )
         assert response.status_code == 200

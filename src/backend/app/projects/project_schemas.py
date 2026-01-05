@@ -17,7 +17,6 @@
 #
 """DTOs and schemas for project endpoints."""
 
-from datetime import datetime
 from typing import Annotated, Optional, Self, Union
 
 from geojson_pydantic import (
@@ -203,11 +202,6 @@ class ProjectInBase(StubProjectIn):
     id: Annotated[Optional[int], Field(exclude=True)] = None
     field_mapping_app: Annotated[Optional[FieldMappingApp], Field(exclude=True)] = None
     outline: Annotated[Optional[dict], Field(exclude=True)] = None
-    # Exclude (calculated fields)
-    centroid: Annotated[Optional[dict], Field(exclude=True)] = None
-    tasks: Annotated[Optional[list], Field(exclude=True)] = None
-    bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
-    last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
 
     @field_validator("odk_token", mode="after")
     @classmethod
@@ -232,9 +226,9 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
         """
         # If all ODK fields are None/empty, return None to use default env credentials
         if (
-            not self.odk_central_url
-            and not self.odk_central_user
-            and not self.odk_central_password
+            not self.external_project_instance_url
+            and not self.external_project_username
+            and not self.external_project_password_encrypted
         ):
             return None
 
@@ -243,19 +237,26 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
         # But when reading from ProjectIn, it might already be encrypted if coming
         # from DB
         # For new projects, password should be plaintext from frontend
-        password = self.odk_central_password
-        if password:
+        # Check if we have encrypted password from DB or plaintext from frontend
+        password = None
+        if self.external_project_password_encrypted:
             try:
                 # Try to decrypt (if it's encrypted from DB)
-                password = decrypt_value(password)
+                password = decrypt_value(self.external_project_password_encrypted)
             except Exception:
                 # If decryption fails, assume it's already plaintext (from frontend)
-                pass
+                password = self.external_project_password_encrypted
+        elif (
+            hasattr(self, "external_project_password")
+            and self.external_project_password
+        ):
+            # Plaintext from frontend (before encryption)
+            password = self.external_project_password
 
         return ODKCentralDecrypted(
-            odk_central_url=self.odk_central_url,
-            odk_central_user=self.odk_central_user,
-            odk_central_password=password,
+            external_project_instance_url=self.external_project_instance_url,
+            external_project_username=self.external_project_username,
+            external_project_password=password,
         )
 
 

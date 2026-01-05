@@ -388,11 +388,29 @@ async def upload_form_media(
             file_data_dict,
         )
 
-        async with OdkCentral(
-            url=project_odk_creds.odk_central_url,
-            user=project_odk_creds.odk_central_user,
-            passwd=project_odk_creds.odk_central_password,
-        ) as odk_central:
+        if project_odk_creds:
+            async with OdkCentral(
+                url=project_odk_creds.external_project_instance_url,
+                user=project_odk_creds.external_project_username,
+                passwd=project_odk_creds.external_project_password,
+            ) as odk_central:
+                try:
+                    await odk_central.s3_sync()
+                except Exception:
+                    log.warning(
+                        "Fails to sync media to S3 - is the linked ODK Central "
+                        "instance correctly configured?"
+                    )
+        else:
+            # Fall back to environment variables if project_odk_creds is None
+            async with OdkCentral() as odk_central:
+                try:
+                    await odk_central.s3_sync()
+                except Exception:
+                    log.warning(
+                        "Fails to sync media to S3 - is the linked ODK Central "
+                        "instance correctly configured?"
+                    )
             try:
                 await odk_central.s3_sync()
             except Exception:
@@ -519,16 +537,16 @@ async def get_form_media(
     },
 )
 async def odk_creds_test(
-    odk_central_url: str | None = Parameter(default=None),
-    odk_central_user: str | None = Parameter(default=None),
-    odk_central_password: str | None = Parameter(default=None),
+    external_project_instance_url: str | None = Parameter(default=None),
+    external_project_username: str | None = Parameter(default=None),
+    external_project_password: str | None = Parameter(default=None),
 ) -> None:
     """Test ODK Central credentials by attempting to open a session."""
     # Construct ODKCentral model from individual query parameters
     odk_creds = central_schemas.ODKCentral(
-        odk_central_url=odk_central_url,
-        odk_central_user=odk_central_user,
-        odk_central_password=odk_central_password,
+        external_project_instance_url=external_project_instance_url,
+        external_project_username=external_project_username,
+        external_project_password=external_project_password,
     )
     await central_crud.odk_credentials_test(odk_creds)
     return None

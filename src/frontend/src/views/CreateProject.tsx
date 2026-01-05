@@ -31,7 +31,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/R
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { useDeleteProjectMutation, useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
+import { useDeleteProjectMutation, useGetProjectUsersQuery } from '@/api/project';
 import { useUploadProjectXlsformMutation } from '@/api/central';
 import { FileType } from '@/types';
 
@@ -58,11 +58,6 @@ const CreateProject = () => {
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
 
-  const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
-    project_id: projectId!,
-    options: { queryKey: ['get-minimal-project', projectId], enabled: !!projectId },
-  });
-
   const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
     defaultValues: defaultValues,
     resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
@@ -80,20 +75,6 @@ const CreateProject = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!minimalProjectDetails || !projectId) return;
-    const { id, project_name, description, outline, hashtags, field_mapping_app } = minimalProjectDetails;
-    reset({
-      ...defaultValues,
-      id,
-      project_name,
-      description,
-      outline,
-      hashtags,
-      field_mapping_app,
-    });
-  }, [minimalProjectDetails]);
-
   const { data: projectManagers } = useGetProjectUsersQuery({
     project_id: projectId!,
     params: { role: project_roles.PROJECT_ADMIN },
@@ -103,7 +84,7 @@ const CreateProject = () => {
   // setup project admin select options if project admins are available
   useEffect(() => {
     // only set project_admins value after basic project details are fetched
-    if (!projectId || !projectManagers || isEmpty(projectManagers) || isMinimalProjectLoading) return;
+    if (!projectId || !projectManagers || isEmpty(projectManagers)) return;
 
     const projectAdminOptions = projectManagers?.map((admin) => ({
       id: admin.user_sub,
@@ -118,7 +99,7 @@ const CreateProject = () => {
       }),
     );
     setValue('project_admins', project_admins);
-  }, [projectManagers, projectId, isMinimalProjectLoading]);
+  }, [projectManagers, projectId]);
 
   const form = {
     1: <ProjectOverview />,
@@ -137,9 +118,9 @@ const CreateProject = () => {
       description,
       project_admins,
       outline,
-      odk_central_url,
-      odk_central_user,
-      odk_central_password,
+      external_project_instance_url,
+      external_project_username,
+      external_project_password,
       merge,
       field_mapping_app,
     } = values;
@@ -154,15 +135,15 @@ const CreateProject = () => {
 
     let odkPayload: Pick<
       z.infer<typeof createProjectValidationSchema>,
-      'odk_central_url' | 'odk_central_user' | 'odk_central_password'
+      'external_project_instance_url' | 'external_project_username' | 'external_project_password'
     > | null = null;
 
     // Only include ODK credentials if all three are provided
-    if (odk_central_url && odk_central_user && odk_central_password) {
+    if (external_project_instance_url && external_project_username && external_project_password) {
       odkPayload = {
-        odk_central_url,
-        odk_central_user,
-        odk_central_password,
+        external_project_instance_url,
+        external_project_username,
+        external_project_password,
       };
     }
 
@@ -417,7 +398,7 @@ const CreateProject = () => {
             <Button
               variant="link-grey"
               onClick={() => setSearchParams({ step: '0' })}
-              disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeletePending}
+              disabled={createProjectLoading || isProjectDeletePending}
               className="!fmtm-py-0"
             >
               <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" />
@@ -446,7 +427,7 @@ const CreateProject = () => {
             className="fmtm-flex fmtm-flex-col fmtm-col-span-12 sm:fmtm-col-span-7 lg:fmtm-col-span-5 sm:fmtm-h-full fmtm-overflow-y-hidden fmtm-rounded-xl fmtm-bg-white fmtm-my-2 sm:fmtm-my-0"
           >
             <div className="fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-px-10 fmtm-py-8">
-              {isMinimalProjectLoading && projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
+              {projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
             </div>
 
             {/* buttons */}
@@ -455,7 +436,7 @@ const CreateProject = () => {
                 <Button
                   variant="link-grey"
                   onClick={() => setSearchParams({ step: (step - 1).toString() })}
-                  disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeleting}
+                  disabled={createProjectLoading || isProjectDeleting}
                 >
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
@@ -481,7 +462,6 @@ const CreateProject = () => {
                   type="submit"
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
-                    isMinimalProjectLoading ||
                     isProjectDeleting ||
                     isUploadProjectXlsformPending
                   }

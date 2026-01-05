@@ -40,7 +40,7 @@ from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required, public_endpoint
-from app.auth.auth_schemas import ProjectUserDict
+from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import mapper, project_manager, super_admin
 from app.central import central_crud
 from app.config import settings
@@ -626,7 +626,7 @@ async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> Non
         enriched = project
 
     creds = getattr(enriched, "odk_credentials", None)
-    odk_url = getattr(creds, "odk_central_url", None) if creds else None
+    odk_url = getattr(creds, "external_project_instance_url", None) if creds else None
 
     if not odk_url:
         return
@@ -730,23 +730,21 @@ async def update_project(
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(super_admin),
     },
     return_dto=project_schemas.ProjectOut,
 )
 async def create_stub_project(
     db: AsyncConnection,
-    current_user: DbUser,
+    auth_user: AuthUser,
     data: project_schemas.StubProjectIn,
 ) -> DbProject:
     """Create a project in the local database."""
     if hasattr(data, "merge"):
         delattr(data, "merge")  # Remove merge field as it is not in database
-    db_user = current_user
     data.status = ProjectStatus.DRAFT
 
     log.info(
-        f"User {db_user.username} attempting creation of project {data.project_name}"
+        f"User {auth_user.username} attempting creation of project {data.project_name}"
     )
     await project_deps.check_project_dup_name(db, data.project_name)
 
@@ -762,7 +760,7 @@ async def create_stub_project(
         data.location_str = f"{location.city},{country_full_name}" if location else None
 
     # Create the project in the Field-TM DB
-    data.created_by_sub = db_user.sub
+    data.created_by_sub = auth_user.sub
     try:
         log.debug(f"Project details: {data}")
         project = await DbProject.create(db, data)

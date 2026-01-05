@@ -231,9 +231,9 @@ async def send_invitation_message(
     if not project_url.startswith("http"):
         project_url = f"https://{project_url}"
 
-    title = f"You have been invited to join the project {project.name}"
+    title = f"You have been invited to join the project {project.project_name}"
     message_content = dedent(f"""
-        You have been invited to join the project **{project.name}**.
+        You have been invited to join the project **{project.project_name}**.
 
         To accept the invitation, please click the link below:
         [Accept Invitation]({invite_url})

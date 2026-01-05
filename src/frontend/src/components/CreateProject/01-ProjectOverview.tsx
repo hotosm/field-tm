@@ -45,18 +45,18 @@ const ProjectOverview = () => {
   const [showODKCredsModal, setShowODKCredsModal] = useState(false);
   const [showLargeAreaWarning, setShowLargeAreaWarning] = useState(false);
   const [odkCreds, setOdkCreds] = useState({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
+    external_project_instance_url: '',
+    external_project_username: '',
+    external_project_password: '',
   });
   const [odkCredsError, setOdkCredsError] = useState<{
-    odk_central_url?: string;
-    odk_central_user?: string;
-    odk_central_password?: string;
+    external_project_instance_url?: string;
+    external_project_username?: string;
+    external_project_password?: string;
   }>({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
+    external_project_instance_url: '',
+    external_project_username: '',
+    external_project_password: '',
   });
 
   //@ts-ignore
@@ -145,9 +145,9 @@ const ProjectOverview = () => {
   };
 
   const saveServerCredentials = () => {
-    setValue('odk_central_url', odkCreds.odk_central_url);
-    setValue('odk_central_user', odkCreds.odk_central_user);
-    setValue('odk_central_password', odkCreds.odk_central_password);
+    setValue('external_project_instance_url', odkCreds.external_project_instance_url);
+    setValue('external_project_username', odkCreds.external_project_username);
+    setValue('external_project_password', odkCreds.external_project_password);
     setShowODKCredsModal(false);
   };
 
@@ -216,9 +216,9 @@ const ProjectOverview = () => {
               setShowODKCredsModal(open);
               if (!open)
                 setOdkCreds({
-                  odk_central_url: values.odk_central_url || '',
-                  odk_central_user: values.odk_central_user || '',
-                  odk_central_password: values.odk_central_password || '',
+                  external_project_instance_url: values.external_project_instance_url || '',
+                  external_project_username: values.external_project_username || '',
+                  external_project_password: values.external_project_password || '',
                 });
             }}
           >
@@ -233,27 +233,33 @@ const ProjectOverview = () => {
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} URL`} astric />
                   <Input
-                    value={odkCreds.odk_central_url}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_url: e.target.value })}
+                    value={odkCreds.external_project_instance_url}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_instance_url: e.target.value })}
                   />
-                  {odkCredsError.odk_central_url && <ErrorMessage message={odkCredsError.odk_central_url as string} />}
+                  {odkCredsError.external_project_instance_url && (
+                    <ErrorMessage message={odkCredsError.external_project_instance_url as string} />
+                  )}
                 </div>
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Email`} astric />
                   <Input
-                    value={odkCreds.odk_central_user}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_user: e.target.value })}
+                    value={odkCreds.external_project_username}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_username: e.target.value })}
                   />
-                  {odkCredsError.odk_central_user && <ErrorMessage message={odkCredsError.odk_central_user} />}
+                  {odkCredsError.external_project_username && (
+                    <ErrorMessage message={odkCredsError.external_project_username} />
+                  )}
                 </div>
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Password`} astric />
                   <Input
-                    value={odkCreds.odk_central_password}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_password: e.target.value })}
+                    value={odkCreds.external_project_password}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_password: e.target.value })}
                     type="password"
                   />
-                  {odkCredsError.odk_central_password && <ErrorMessage message={odkCredsError.odk_central_password} />}
+                  {odkCredsError.external_project_password && (
+                    <ErrorMessage message={odkCredsError.external_project_password} />
+                  )}
                 </div>
               </div>
               <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
@@ -270,9 +276,9 @@ const ProjectOverview = () => {
               </div>
             </DialogContent>
           </Dialog>
-          {errors?.odk_central_url && errors?.odk_central_user && errors?.odk_central_password && (
-            <ErrorMessage message="ODK Credentials are required" />
-          )}
+          {errors?.external_project_instance_url &&
+            errors?.external_project_username &&
+            errors?.external_project_password && <ErrorMessage message="ODK Credentials are required" />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
