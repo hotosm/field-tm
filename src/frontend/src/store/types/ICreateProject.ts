@@ -73,7 +73,6 @@ export type ProjectDetailsTypes = {
   osmFormSelectionName?: string;
   average_buildings_per_task?: number;
   dataExtractType?: string;
-  per_task_instructions?: string;
   custom_tms_url: string;
   hasCustomTMS: boolean;
   xlsFormFileUpload: any;

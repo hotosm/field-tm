@@ -17,7 +17,6 @@ export interface projectType {
   created_by_sub: number;
   project_name: string;
   description: string;
-  per_task_instructions: string;
   slug: string;
   location_str: string;
   outline: Polygon;

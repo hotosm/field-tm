@@ -291,7 +291,6 @@ const GetIndividualProjectDetails = (url: string) => {
           project_name: resp.project_name,
           description: resp.description,
           outline: formattedOutlineGeojson,
-          per_task_instructions: resp.per_task_instructions,
         };
 
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));

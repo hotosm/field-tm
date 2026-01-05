@@ -186,7 +186,6 @@ export const projectDetailsValidationSchema = z
     hashtags: z.array(z.string()),
     hasCustomTMS: z.boolean(),
     custom_tms_url: z.string().optional(),
-    per_task_instructions: z.string(),
   })
   .check((ctx) => {
     const values = ctx.value;

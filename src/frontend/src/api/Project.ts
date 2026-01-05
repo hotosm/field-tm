@@ -47,7 +47,6 @@ export const ProjectById = (projectId: string) => {
             osm_category: projectResp.osm_category,
             odk_form_id: projectResp?.odk_form_id,
             data_extract_url: projectResp.data_extract_url,
-            instructions: projectResp?.per_task_instructions,
             odk_token: projectResp?.odk_token,
             custom_tms_url: projectResp?.custom_tms_url,
             created_at: projectResp?.created_at,

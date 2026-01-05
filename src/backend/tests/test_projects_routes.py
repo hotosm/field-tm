@@ -433,7 +433,6 @@ async def test_project_by_id(client, project):
     assert data["created_by_sub"] == project.created_by_sub
     assert data["project_name"] == project.project_name
     assert data["description"] == project.description
-    assert data["per_task_instructions"] == project.per_task_instructions
     assert data["status"] == project.status
     assert data["osm_category"] == project.osm_category
     assert data["hashtags"] == project.hashtags

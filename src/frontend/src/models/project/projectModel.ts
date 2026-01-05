@@ -8,7 +8,6 @@ export type projectInfoType = {
   external_project_id: number;
   created_by_sub: number;
   description: string;
-  per_task_instructions: string;
   slug: string;
   task_split_type: task_split_type;
   location_str: string;

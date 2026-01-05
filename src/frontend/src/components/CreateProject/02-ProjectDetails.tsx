@@ -131,17 +131,6 @@ const ProjectDetails = () => {
           {errors?.custom_tms_url?.message && <ErrorMessage message={errors.custom_tms_url.message as string} />}
         </div>
       )}
-
-      <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <FieldLabel label="Instructions" />
-        <Controller
-          control={control}
-          name="per_task_instructions"
-          render={({ field }) => (
-            <RichTextEditor editorHtmlContent={field.value} setEditorHtmlContent={field.onChange} editable={true} />
-          )}
-        />
-      </div>
     </div>
   );
 };

@@ -14,7 +14,6 @@ export const initialState: CreateProjectStateTypes = {
     external_project_username: '',
     external_project_password: '',
     description: '',
-    per_task_instructions: '',
     hasCustomTMS: false,
     custom_tms_url: '',
     project_admins: [],

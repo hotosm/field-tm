@@ -169,7 +169,6 @@ const CreateProject = () => {
       visibility: data.visibility,
       hashtags: data.hashtags,
       custom_tms_url: data.custom_tms_url,
-      per_task_instructions: data.per_task_instructions,
       osm_category: data.osm_category,
       primary_geom_type: data.primary_geom_type,
       new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,

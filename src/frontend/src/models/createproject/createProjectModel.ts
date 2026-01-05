@@ -7,7 +7,6 @@ export interface ProjectDetailsModel {
   project_name: string;
   description: string;
   instructions: string;
-  per_task_instructions: string;
   status: number;
   osm_category: string;
   location_str: string;

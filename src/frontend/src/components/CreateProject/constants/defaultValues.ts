@@ -25,7 +25,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   hashtags: [],
   hasCustomTMS: false,
   custom_tms_url: '',
-  per_task_instructions: '',
 
   // 03 Upload Survey
   osm_category: '',
