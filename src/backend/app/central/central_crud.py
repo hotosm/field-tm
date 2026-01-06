@@ -71,7 +71,7 @@ STATUS_VISUALS = {
 }
 
 
-def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
+def get_odk_project(odk_central: Optional[central_schemas.ODKCentral] = None):
     """Helper function to get the OdkProject with credentials."""
     if odk_central:
         url = odk_central.external_project_instance_url
@@ -111,7 +111,7 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
     return project
 
 
-def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
+def get_odk_form(odk_central: central_schemas.ODKCentral):
     """Helper function to get the OdkForm with credentials."""
     url = odk_central.external_project_instance_url
     user = odk_central.external_project_username
@@ -130,7 +130,7 @@ def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
     return form
 
 
-def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
+def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentral] = None):
     """Helper function to get the OdkAppUser with credentials."""
     if odk_central:
         url = odk_central.external_project_instance_url
@@ -161,7 +161,7 @@ def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] 
 
 
 def list_odk_projects(
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentral] = None,
 ):
     """List all projects on a remote ODK Server."""
     project = get_odk_project(odk_central)
@@ -169,7 +169,7 @@ def list_odk_projects(
 
 
 def create_odk_project(
-    name: str, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
+    name: str, odk_central: Optional[central_schemas.ODKCentral] = None
 ):
     """Create a project on a remote ODK Server.
 
@@ -201,7 +201,7 @@ def create_odk_project(
 
 
 async def delete_odk_project(
-    project_id: int, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
+    project_id: int, odk_central: Optional[central_schemas.ODKCentral] = None
 ):
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
@@ -218,14 +218,14 @@ async def delete_odk_project(
 def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
 ) -> None:
     """Create an XForm on a remote ODK Central server.
 
     Args:
         odk_id (str): Project ID for ODK Central.
         xform_data (BytesIO): XForm data to set.
-        odk_credentials (ODKCentralDecrypted): Creds for ODK Central.
+        odk_credentials (ODKCentral): Creds for ODK Central.
 
     Returns: None
     """
@@ -242,7 +242,7 @@ def create_odk_xform(
 
 
 def list_submissions(
-    project_id: int, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
+    project_id: int, odk_central: Optional[central_schemas.ODKCentral] = None
 ):
     """List all submissions for a project, aggregated from associated users."""
     project = get_odk_project(odk_central)
@@ -293,7 +293,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
 
 
 def get_project_form_xml(
-    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentral,
     external_project_id: int,
     odk_form_id: str,
 ) -> str:
@@ -353,7 +353,7 @@ async def update_odk_central_xform(
     xform_id: str,
     odk_id: int,
     xlsform: BytesIO,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
 ) -> None:
     """Update and publish the XForm for a project.
 
@@ -361,7 +361,7 @@ async def update_odk_central_xform(
         xform_id (str): The UUID of the existing XForm in ODK Central.
         odk_id (int): ODK Central form ID.
         xlsform (UploadFile): XForm data.
-        odk_credentials (central_schemas.ODKCentralDecrypted): ODK Central creds.
+        odk_credentials (central_schemas.ODKCentral): ODK Central creds.
 
     Returns: None
     """
@@ -618,7 +618,7 @@ async def task_geojson_dict_to_entity_values(
 
 
 async def create_entity_list(
-    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentral,
     odk_id: int,
     properties: list[str],
     dataset_name: str = "features",
@@ -644,7 +644,7 @@ async def create_entity_list(
 
 
 async def create_entity(
-    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentral,
     entity_uuid: UUID,
     odk_id: int,
     properties: list[str],
@@ -681,7 +681,7 @@ async def create_entity(
 
 
 async def delete_entity(
-    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentral,
     odk_id: int,
     entity_uuid: UUID,
     dataset_name: str = "features",
@@ -705,7 +705,7 @@ async def delete_entity(
 async def get_appuser_token(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
 ):
     """Get the app user token for a specific project.
 
@@ -776,7 +776,7 @@ async def get_appuser_token(
 async def upload_form_media(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
     media_attachments: dict[str, BytesIO],
 ):
     """Upload form media attachments to ODK."""
@@ -802,7 +802,7 @@ async def upload_form_media(
 async def get_form_media(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
 ):
     """Get a list of form media attachments with their URLs."""
     async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
@@ -830,7 +830,7 @@ async def get_form_media(
 async def list_form_media(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
 ) -> list[dict]:
     """Return a list of form media required for upload.
 

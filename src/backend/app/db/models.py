@@ -419,6 +419,25 @@ class DbProject:
     async def create(cls, db: AsyncConnection, project_in: Self) -> Self:
         """Create a new project in the database."""
         model_dump = dump_and_check_model(project_in)
+
+        # Handle ODK credentials encryption
+        if (
+            hasattr(project_in, "external_project_password")
+            and project_in.external_project_password
+        ):
+            from app.central.central_schemas import ODKCentral
+
+            odk_creds = ODKCentral(
+                external_project_instance_url=project_in.external_project_instance_url,
+                external_project_username=project_in.external_project_username,
+                external_project_password=project_in.external_project_password,
+            )
+            odk_data = odk_creds.prepare_for_db()
+            # Update model_dump with encrypted password
+            model_dump.update(odk_data)
+            # Remove plaintext password if present
+            model_dump.pop("external_project_password", None)
+
         columns = []
         value_placeholders = []
 
@@ -489,6 +508,25 @@ class DbProject:
     ) -> Self:
         """Update values for project."""
         model_dump = dump_and_check_model(project_update)
+
+        # Handle ODK credentials encryption
+        if (
+            hasattr(project_update, "external_project_password")
+            and project_update.external_project_password
+        ):
+            from app.central.central_schemas import ODKCentral
+
+            odk_creds = ODKCentral(
+                external_project_instance_url=project_update.external_project_instance_url,
+                external_project_username=project_update.external_project_username,
+                external_project_password=project_update.external_project_password,
+            )
+            odk_data = odk_creds.prepare_for_db()
+            # Update model_dump with encrypted password
+            model_dump.update(odk_data)
+            # Remove plaintext password if present
+            model_dump.pop("external_project_password", None)
+
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
 
         # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
@@ -519,6 +557,26 @@ class DbProject:
             )
 
         return updated_project
+
+    def get_odk_credentials(self) -> Optional["ODKCentral"]:
+        """Get ODK credentials from project (decrypted).
+
+        Returns None if no credentials are set.
+        """
+        from app.central.central_schemas import ODKCentral
+
+        if not (
+            self.external_project_instance_url
+            or self.external_project_username
+            or self.external_project_password_encrypted
+        ):
+            return None
+
+        return ODKCentral.from_db(
+            url=self.external_project_instance_url,
+            username=self.external_project_username,
+            password_encrypted=self.external_project_password_encrypted,
+        )
 
     @classmethod
     async def delete(cls, db: AsyncConnection, project_id: int) -> None:

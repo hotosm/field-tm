@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Field Tasking Manager</title>
+
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="Coordinated field mapping for Open Mapping campaigns."
+    />
+    <meta name="author" content="Humanitarian OpenStreetMap Team" />
+    <meta
+      name="format-detection"
+      content="telephone=no, email=no, address=no"
+    />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <meta name="theme-color" content="#d63f3f" />
+
+    <link rel="icon" href="/favicon.png" sizes="16x16" />
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+
+    <link
+      rel="stylesheet"
+      href="https://ga.jspm.io/npm:@hotosm/ui@0.4.0/dist/style.css"
+    />
+    <script type="importmap">
+      {
+        "imports": {
+          "@hotosm/ui": "https://ga.jspm.io/npm:@hotosm/ui@0.4.0/dist/hotosm-ui.js"
+        },
+        "scopes": {
+          "https://ga.jspm.io/": {
+            "@awesome.me/webawesome/dist/components/": "https://ga.jspm.io/npm:@awesome.me/webawesome@3.0.0/dist/components/",
+            "@lit/reactive-element": "https://ga.jspm.io/npm:@lit/reactive-element@2.1.2/development/reactive-element.js",
+            "@lit/reactive-element/decorators/": "https://ga.jspm.io/npm:@lit/reactive-element@2.1.2/development/decorators/",
+            "@shoelace-style/localize": "https://ga.jspm.io/npm:@shoelace-style/localize@3.2.1/dist/index.js",
+            "lit": "https://ga.jspm.io/npm:lit@3.3.2/index.js",
+            "lit-element/lit-element.js": "https://ga.jspm.io/npm:lit-element@4.2.2/development/lit-element.js",
+            "lit-html": "https://ga.jspm.io/npm:lit-html@3.3.2/development/lit-html.js",
+            "lit-html/": "https://ga.jspm.io/npm:lit-html@3.3.2/development/",
+            "lit/": "https://ga.jspm.io/npm:lit@3.3.2/"
+          }
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <script type="module">
+      import * as Ui from "@hotosm/ui";
+    </script>
+
+    <hot-header title="FieldTM" size="small" show-login="false"></hot-header>
+
+    <div style="padding: 20px; position: relative">
+      <!-- Create Project Button at top right -->
+      <div style="position: absolute; top: 20px; right: 20px">
+        <wa-button href="/new" variant="primary">Create Project</wa-button>
+      </div>
+
+      <!-- Projects Grid -->
+      {% if projects %}
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+        "
+      >
+        {% for project in projects %}
+        <wa-card style="height: 100%">
+          <div slot="header" style="font-weight: bold; font-size: 1.2em">
+            {{ project.project_name or 'Unnamed Project' }}
+          </div>
+          <div style="padding: 10px 0">
+            {% if project.description %}
+            <p style="margin: 0 0 10px 0; color: #666">
+              {{ project.description[:150] }}{% if project.description|length >
+              150 %}...{% endif %}
+            </p>
+            {% endif %} {% if project.location_str %}
+            <p style="margin: 5px 0; font-size: 0.9em; color: #888">
+              <strong>Location:</strong> {{ project.location_str }}
+            </p>
+            {% endif %} {% if project.status %}
+            <p style="margin: 5px 0; font-size: 0.9em; color: #888">
+              <strong>Status:</strong> {{ project.status.value if project.status
+              else 'N/A' }}
+            </p>
+            {% endif %} {% if project.hashtags %}
+            <div style="margin: 10px 0">
+              {% for tag in project.hashtags[:3] %}
+              <wa-badge variant="neutral" style="margin-right: 5px"
+                >{{ tag }}</wa-badge
+              >
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          <div slot="footer">
+            <wa-button
+              href="/projects/{{ project.id }}"
+              variant="default"
+              style="width: 100%"
+              >View Details</wa-button
+            >
+          </div>
+        </wa-card>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="text-align: center; color: #666; margin-top: 40px">
+        No projects found. Create your first project to get started!
+      </p>
+      {% endif %}
+    </div>
+  </body>
+</html>

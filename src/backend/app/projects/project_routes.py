@@ -217,6 +217,7 @@ async def download_project_boundary(
     dependencies={
         "auth_user": Provide(login_required),
     },
+    status_code=status.HTTP_201_CREATED,
 )
 async def task_split(
     data: Annotated[
@@ -417,6 +418,7 @@ async def get_or_set_data_extract(
         "auth_user": Provide(login_required),
         "current_user_dict": Provide(project_manager),
     },
+    status_code=status.HTTP_201_CREATED,
 )
 async def upload_data_extract(
     db: AsyncConnection,
@@ -577,17 +579,51 @@ async def generate_files(
     if project.field_mapping_app == FieldMappingApp.ODK:
         log.info("Appending task_filter choices to XLSForm for ODK Collect project")
         existing_xlsform = BytesIO(project.xlsform_content)
-        if not project.tasks:
-            msg = "Project has no generated tasks. Please try again."
+
+        # Get task IDs from ODK Central task_boundaries dataset
+        task_ids = []
+        if project.external_project_id:
+            try:
+                # ODK credentials not stored on project, use None to fall back to env vars
+                project_odk_creds = None
+                from app.central import central_deps
+
+                async with central_deps.get_odk_dataset(
+                    project_odk_creds
+                ) as odk_central:
+                    # Fetch task boundaries from ODK
+                    entity_data = await odk_central.getEntityData(
+                        project.external_project_id,
+                        "task_boundaries",
+                        include_metadata=False,
+                    )
+
+                    if entity_data and isinstance(entity_data, list):
+                        # Extract task IDs from entities
+                        for entity in entity_data:
+                            task_id = entity.get("task_id")
+                            if task_id:
+                                try:
+                                    task_ids.append(int(task_id))
+                                except (ValueError, TypeError):
+                                    pass
+                        # If no task_id in properties, use index
+                        if not task_ids:
+                            task_ids = list(range(1, len(entity_data) + 1))
+            except Exception as e:
+                log.warning(
+                    f"Could not fetch task boundaries from ODK for project {project.id}: {e}"
+                )
+
+        if not task_ids:
+            msg = "Project has no task boundaries in ODK Central. Please upload task boundaries first."
             log.error(msg)
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=msg,
             )
 
-        # Append task ids to choices sheet
-        task_ids = [task.project_task_index for task in project.tasks]
-        log.debug(f"Found {len(task_ids)} for project ID {project.id}")
+        log.debug(f"Found {len(task_ids)} task boundaries for project ID {project.id}")
         new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
 
         # Update in both db + ODK Central
@@ -600,7 +636,7 @@ async def generate_files(
 
     if warning_message:
         return {"message": warning_message}
-    return None
+    return {}
 
 
 def _get_local_odk_url() -> str:
@@ -668,6 +704,7 @@ async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> Non
         "auth_user": Provide(login_required),
         "current_user_dict": Provide(project_manager),
     },
+    status_code=status.HTTP_201_CREATED,
 )
 async def upload_project_task_boundaries(
     project_id: int,
@@ -686,21 +723,99 @@ async def upload_project_task_boundaries(
     Returns:
         JSONResponse: JSON containing success message.
     """
-    project_id = current_user_dict.get("project").id
+    project = current_user_dict.get("project")
+    project_id = project.id
     tasks_featcol = parse_geojson_file_to_featcol(await data.read())
     await check_crs(tasks_featcol)
-    # We only want to allow polygon geometries
-    # featcol_single_geom_type = featcol_keep_single_geom_type(
-    #     tasks_featcol,
-    #     geom_type="Polygon",
-    # )
-    # FIXME upload to ODK an entity list
-    # success = await DbTask.create(db, project_id, featcol_single_geom_type)
-    # if success:
-    #     return {"message": "success"}
 
-    log.error(f"Failed to create task areas for project {project_id}")
-    return {"message": "failure"}
+    # Send task boundaries directly to ODK/QField, not stored in database
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        # Convert task boundaries to entities and upload to ODK Central
+        project_odk_id = project.external_project_id
+        if not project_odk_id:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Project must have an ODK Central project ID. Please create the project in ODK Central first.",
+            )
+
+        # Convert task boundaries to entity format
+        # Each task boundary becomes an entity in ODK
+        task_entities = []
+        for idx, feature in enumerate(tasks_featcol.get("features", [])):
+            if feature.get("geometry"):
+                entity_dict = await central_crud.feature_geojson_to_entity_dict(
+                    feature, additional_features=True
+                )
+                # Update label to indicate it's a task boundary
+                entity_dict["label"] = f"Task {idx + 1}"
+                # Add task_id to properties
+                if "data" in entity_dict:
+                    entity_dict["data"]["task_id"] = str(idx + 1)
+                task_entities.append(entity_dict)
+
+        # Create entity list for task boundaries in ODK
+        # ODK credentials not stored on project, use None to fall back to env vars
+        project_odk_creds = None
+        try:
+            # Check if dataset already exists, if so delete and recreate
+            from app.central import central_deps
+
+            async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
+                datasets = await odk_central.listDatasets(project_odk_id)
+                if any(ds.get("name") == "task_boundaries" for ds in datasets):
+                    log.info("Task boundaries dataset already exists, will be replaced")
+        except Exception as e:
+            log.warning(f"Could not check existing datasets: {e}")
+
+        await central_crud.create_entity_list(
+            project_odk_creds,
+            project_odk_id,
+            properties=["geometry", "task_id"],
+            dataset_name="task_boundaries",
+            entities_list=task_entities,
+        )
+        log.info(
+            f"Uploaded {len(task_entities)} task boundaries to ODK Central for project {project_id}"
+        )
+    elif project.field_mapping_app == FieldMappingApp.QFIELD:
+        # For QField, boundaries are written to tasks.geojson during project generation
+        # Store temporarily in a temp table for use during generation
+        # They will be written to tasks.geojson file and not stored permanently
+        log.info("Storing task boundaries temporarily for QField project generation")
+
+        # Create temporary table for task boundaries (cleaned up after project generation)
+        async with db.cursor() as cur:
+            # Drop existing temp table if it exists
+            await cur.execute(f"""
+                DROP TABLE IF EXISTS temp_task_boundaries_{project_id} CASCADE;
+            """)
+
+            # Create temp table
+            await cur.execute(f"""
+                CREATE TEMP TABLE temp_task_boundaries_{project_id} (
+                    task_index INTEGER,
+                    outline GEOMETRY(POLYGON, 4326)
+                );
+            """)
+
+            # Insert task boundaries
+            for idx, feature in enumerate(tasks_featcol.get("features", [])):
+                if feature.get("geometry"):
+                    geom_json = json.dumps(feature["geometry"])
+                    await cur.execute(
+                        f"""
+                        INSERT INTO temp_task_boundaries_{project_id} (task_index, outline)
+                        VALUES (%s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326));
+                        """,
+                        (idx + 1, geom_json),
+                    )
+
+            await db.commit()
+            log.info(
+                f"Stored {len(tasks_featcol.get('features', []))} task boundaries in temp table for QField project {project_id}"
+            )
+
+    return {"message": "success"}
 
 
 @patch(
@@ -721,7 +836,18 @@ async def update_project(
 ) -> DbProject:
     """Partial update an existing project."""
     # NOTE this does not including updating the ODK project name
-    return await DbProject.update(db, current_user_dict.get("project").id, data)
+    # If password is None but URL/username are provided, preserve existing encrypted password
+    project = current_user_dict.get("project")
+    if (
+        (data.external_project_instance_url or data.external_project_username)
+        and not data.external_project_password
+        and project.external_project_password_encrypted
+    ):
+        # Password is None, so set password_encrypted to preserve existing encrypted password
+        # This allows the validation to pass and the password to be preserved
+        data.password_encrypted = project.external_project_password_encrypted
+
+    return await DbProject.update(db, project.id, data)
 
 
 @post(
@@ -732,6 +858,7 @@ async def update_project(
         "auth_user": Provide(login_required),
     },
     return_dto=project_schemas.ProjectOut,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_stub_project(
     db: AsyncConnection,
@@ -746,7 +873,16 @@ async def create_stub_project(
     log.info(
         f"User {auth_user.username} attempting creation of project {data.project_name}"
     )
-    await project_deps.check_project_dup_name(db, data.project_name)
+
+    # Check for duplicate project name before creating
+    exists = await project_deps.project_name_does_not_already_exist(
+        db, data.project_name
+    )
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Project with name '{data.project_name}' already exists.",
+        )
 
     # Get the location_str via reverse geocode
     async with AsyncNearestCity(db) as geocoder:
@@ -762,20 +898,15 @@ async def create_stub_project(
     # Create the project in the Field-TM DB
     data.created_by_sub = auth_user.sub
     try:
-        log.debug(f"Project details: {data}")
         project = await DbProject.create(db, data)
+    except HTTPException:
+        raise
     except Exception as e:
         log.error(f"Error posting to /stub: {e}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
         ) from e
-    if not project:
-        log.error("Project creation passed at /stub, but the project is empty")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Project creation failed.",
-        )
 
     return project
 
@@ -840,7 +971,16 @@ async def create_project(
     project = await DbProject.one(db, project_id)
 
     if data.project_name:
-        await project_deps.check_project_dup_name(db, data.project_name)
+        # Check for duplicate project name before creating
+        exists = await project_deps.project_name_does_not_already_exist(
+            db, data.project_name
+        )
+        if exists:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Project with name '{data.project_name}' already exists.",
+            )
+
     odk_creds_decrypted = data.odk_credentials
 
     # Create project in ODK Central using a background thread

@@ -33,7 +33,7 @@ from httpx import ASGITransport, AsyncClient
 
 from app.auth.auth_schemas import AuthUser
 from app.central import central_crud, central_schemas
-from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
+from app.central.central_schemas import ODKCentral
 from app.config import encrypt_value, settings
 from app.db.database import get_db_connection_pool
 from app.db.enums import (
@@ -65,6 +65,10 @@ def pytest_configure(config):
     # Example of stopping sqlalchemy logs
     # sqlalchemy_log = logging.getLogger("sqlalchemy")
     # sqlalchemy_log.propagate = False
+    asyncio_logs = logging.getLogger("asyncio")
+    asyncio_logs.propagate = False
+    faker_factory_logs = logging.getLogger("faker.factory")
+    faker_factory_logs.propagate = False
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -98,24 +102,13 @@ async def admin_user(db):
 @pytest_asyncio.fixture(scope="function")
 async def project(db, admin_user):
     """A test project, using the test user."""
-    odk_creds_encrypted = ODKCentralIn(
+    # Create ODK credentials from environment variables
+    odk_creds = ODKCentral(
         external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
         external_project_username=os.getenv("ODK_CENTRAL_USER"),
         external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
     )
-    # ODKCentralDecrypted.model_post_init will decrypt the password automatically
-    # Pass the encrypted password (from external_project_password_encrypted
-    # or external_project_password)
-    # Both should be the same after ODKCentralIn processing
-    encrypted_password = (
-        odk_creds_encrypted.external_project_password_encrypted
-        or odk_creds_encrypted.external_project_password
-    )
-    odk_creds_decrypted = ODKCentralDecrypted(
-        external_project_instance_url=odk_creds_encrypted.external_project_instance_url,
-        external_project_username=odk_creds_encrypted.external_project_username,
-        external_project_password=encrypted_password,
-    )
+    odk_creds_decrypted = odk_creds
 
     project_name = f"test project {uuid4()}"
     # Create ODK Central Project
@@ -266,7 +259,7 @@ async def project_data(stub_project_data):
         "external_project_username": external_project_username,
         "external_project_password_encrypted": external_project_password_encrypted,
     }
-    odk_creds_decrypted = central_schemas.ODKCentralDecrypted(**odk_credentials)
+    odk_creds_decrypted = central_schemas.ODKCentral(**odk_credentials)
 
     data = stub_project_data.copy()
     data.pop("outline")  # Remove outline from copied data
@@ -284,7 +277,9 @@ async def client() -> AsyncIterator[AsyncClient]:
     try:
         async with LifespanManager(litestar_api, startup_timeout=30) as manager:
             async with AsyncClient(
-                transport=ASGITransport(app=manager.app),
+                transport=ASGITransport(
+                    app=manager.app,
+                ),
                 base_url=f"http://{settings.FMTM_DOMAIN}",
                 follow_redirects=True,
             ) as ac:

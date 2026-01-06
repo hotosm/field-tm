@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Create Project - Field Tasking Manager</title>
+
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="Coordinated field mapping for Open Mapping campaigns."
+    />
+    <meta name="author" content="Humanitarian OpenStreetMap Team" />
+    <meta
+      name="format-detection"
+      content="telephone=no, email=no, address=no"
+    />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <meta name="theme-color" content="#d63f3f" />
+
+    <link rel="icon" href="/favicon.png" sizes="16x16" />
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+
+    <link
+      rel="stylesheet"
+      href="https://ga.jspm.io/npm:@hotosm/ui@0.4.0/dist/style.css"
+    />
+    <script type="importmap">
+      {
+        "imports": {
+          "@hotosm/ui": "https://ga.jspm.io/npm:@hotosm/ui@0.4.0/dist/hotosm-ui.js"
+        },
+        "scopes": {
+          "https://ga.jspm.io/": {
+            "@awesome.me/webawesome/dist/components/": "https://ga.jspm.io/npm:@awesome.me/webawesome@3.0.0/dist/components/",
+            "@lit/reactive-element": "https://ga.jspm.io/npm:@lit/reactive-element@2.1.2/development/reactive-element.js",
+            "@lit/reactive-element/decorators/": "https://ga.jspm.io/npm:@lit/reactive-element@2.1.2/development/decorators/",
+            "@shoelace-style/localize": "https://ga.jspm.io/npm:@shoelace-style/localize@3.2.1/dist/index.js",
+            "lit": "https://ga.jspm.io/npm:lit@3.3.2/index.js",
+            "lit-element/lit-element.js": "https://ga.jspm.io/npm:lit-element@4.2.2/development/lit-element.js",
+            "lit-html": "https://ga.jspm.io/npm:lit-html@3.3.2/development/lit-html.js",
+            "lit-html/": "https://ga.jspm.io/npm:lit-html@3.3.2/development/",
+            "lit/": "https://ga.jspm.io/npm:lit@3.3.2/"
+          }
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <script type="module">
+      import * as Ui from "@hotosm/ui";
+    </script>
+
+    <hot-header title="FieldTM" size="small" show-login="false"></hot-header>
+
+    <div style="padding: 20px; max-width: 800px; margin: 0 auto">
+      <h1 style="margin-bottom: 30px">Create New Project</h1>
+
+      <wa-card>
+        <form action="/projects/stub" method="POST" style="padding: 20px">
+          <div style="margin-bottom: 20px">
+            <wa-input
+              name="project_name"
+              label="Project Name"
+              placeholder="Enter project name"
+              required
+              style="width: 100%"
+            ></wa-input>
+          </div>
+
+          <div style="margin-bottom: 20px">
+            <wa-textarea
+              name="description"
+              label="Description"
+              placeholder="Enter project description"
+              rows="4"
+              style="width: 100%"
+            ></wa-textarea>
+          </div>
+
+          <div style="margin-bottom: 20px">
+            <label
+              style="display: block; margin-bottom: 8px; font-weight: bold"
+            >
+              Field Mapping App <span style="color: red">*</span>
+            </label>
+            <wa-select name="field_mapping_app" required style="width: 100%">
+              <wa-option value="QField">QField</wa-option>
+              <wa-option value="ODK">ODK</wa-option>
+            </wa-select>
+          </div>
+
+          <div style="margin-bottom: 20px">
+            <wa-input
+              name="hashtags"
+              label="Hashtags (comma-separated)"
+              placeholder="e.g., #mapping, #fieldwork"
+              help-text="Separate multiple hashtags with commas"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 30px">
+            <wa-button type="submit" variant="primary"
+              >Create Project</wa-button
+            >
+            <wa-button href="/" variant="default">Cancel</wa-button>
+          </div>
+        </form>
+      </wa-card>
+
+      <div
+        style="
+          margin-top: 20px;
+          padding: 15px;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+        "
+      >
+        <p style="margin: 0; font-size: 0.9em; color: #666">
+          <strong>Note:</strong> After creating the project, you'll be able to
+          add the project area outline and other details.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

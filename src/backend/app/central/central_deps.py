@@ -31,11 +31,11 @@ from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
-from app.central.central_schemas import ODKCentralDecrypted
+from app.central.central_schemas import ODKCentral
 
 
 @asynccontextmanager
-async def pyodk_client(odk_creds: ODKCentralDecrypted):
+async def pyodk_client(odk_creds: ODKCentral):
     """Async-compatible context manager for pyodk.Client.
 
     Offloads blocking Client(...) and client.__exit__ to a separate thread,
@@ -57,7 +57,7 @@ async def pyodk_client(odk_creds: ODKCentralDecrypted):
 
 
 @asynccontextmanager
-async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
+async def get_odk_dataset(odk_creds: ODKCentral):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkDataset(
@@ -74,7 +74,7 @@ async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
 
 
 @asynccontextmanager
-async def get_async_odk_form(odk_creds: ODKCentralDecrypted):
+async def get_async_odk_form(odk_creds: ODKCentral):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkForm(

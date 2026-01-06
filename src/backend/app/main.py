@@ -6,14 +6,19 @@ import json
 import logging
 from pathlib import Path
 
-from litestar import Litestar, Router, get
+from litestar import Litestar, Request, Response, Router, get
 from litestar import status_codes as status
 from litestar.config.cors import CORSConfig
+from litestar.contrib.jinja import JinjaTemplateEngine
 from litestar.di import Provide
-from litestar.exceptions import HTTPException
+from litestar.exceptions import HTTPException, ValidationException
 from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig
+from litestar.plugins.htmx import HTMXPlugin, HTMXRequest, HTMXTemplate
 from litestar.plugins.pydantic import PydanticPlugin
+from litestar.response import Template
+from litestar.status_codes import HTTP_422_UNPROCESSABLE_ENTITY
+from litestar.template.config import TemplateConfig
 from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
@@ -21,7 +26,7 @@ from app.__version__ import __version__
 from app.auth.auth_deps import login_required
 from app.config import MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
-from app.db.models import DbUser
+from app.db.models import DbProject, DbUser
 from app.monitoring import (
     add_endpoint_profiler,
     instrument_app_otel,
@@ -68,6 +73,61 @@ async def create_local_admin_user(server: Litestar) -> None:
         await DbUser.create(conn, admin_user, ignore_conflict=True)
 
 
+def _custom_validation_exception_handler(
+    request: Request, exc: ValidationException
+) -> Response:
+    """Custom handler to return 422 with FastAPI-compatible format for validation errors.
+
+    NOTE this is a temporary FastAPI compatibility handler.
+    NOTE if we use HTMX, this is no longer required
+    """
+    # Transform Litestar's validation errors to FastAPI format
+    detail = []
+
+    if exc.extra:
+        for error in exc.extra:
+            # Litestar uses 'message' and 'key', we need to transform to FastAPI format
+            field_key = error.get("key", "unknown")
+            message = error.get("message", "")
+
+            # Extract the expected values from the message if it's an enum error
+            # Message format: "Input should be 'VALUE1', 'VALUE2' or 'VALUE3'"
+            ctx = {}
+            if "Input should be" in message:
+                # Extract everything after "Input should be "
+                expected = message.replace("Input should be ", "")
+                ctx["expected"] = expected
+
+            detail.append(
+                {
+                    "type": error.get("type", "value_error"),
+                    "loc": [field_key],  # Use the field key as location
+                    "msg": message,
+                    "input": error.get("input"),
+                    "ctx": ctx,
+                }
+            )
+
+    # If no errors in exc.extra, create a generic error
+    if not detail:
+        detail.append(
+            {
+                "type": "validation_error",
+                "loc": ["body"],
+                "msg": str(exc.detail) if exc.detail else "Validation failed",
+                "input": None,
+                "ctx": {},
+            }
+        )
+
+    return Response(
+        content={
+            "detail": detail,
+        },
+        status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+    )
+
+
 def _build_cors_config() -> CORSConfig:
     """Configure CORS for server."""
     cors_config = CORSConfig(
@@ -99,12 +159,25 @@ def _get_logging_config() -> LoggingConfig:
 def configure_root_router() -> Router:
     """The top level root router."""
 
-    @get("/")
-    async def home() -> dict[str, str]:
-        """Root endpoint."""
-        # NOTE Litestar has its own OpenAPI docs under /schema, but we keep a
-        # compatible payload here instead of redirecting.
-        return {"message": "Field-TM backend (Litestar)"}
+    @get(
+        path="/",
+        dependencies={"db": Provide(db_conn)},
+    )
+    async def home(request: HTMXRequest, db: AsyncConnection) -> Template:
+        if request.htmx:  # if request has "HX-Request" header, then
+            print(request.htmx)  # HTMXDetails instance
+            print(request.htmx.current_url)
+        # Fetch all projects from database
+        projects = await DbProject.all(db, limit=12) or []
+        return HTMXTemplate(template_name="home.html", context={"projects": projects})
+
+    @get(
+        path="/new",
+        dependencies={"db": Provide(db_conn)},
+    )
+    async def new_project(request: HTMXRequest, db: AsyncConnection) -> Template:
+        """Render the new project creation form."""
+        return HTMXTemplate(template_name="new_project.html")
 
     @get("/__version__")
     async def deployment_details() -> dict[str, str]:
@@ -159,6 +232,7 @@ def configure_root_router() -> Router:
         tags=["root"],
         route_handlers=[
             home,
+            new_project,
             deployment_details,
             simple_heartbeat,
             heartbeat_plus_db,
@@ -187,12 +261,17 @@ def create_app() -> Litestar:
             helper_router,
             central_router,
         ],
-        plugins=[PydanticPlugin()],
+        plugins=[PydanticPlugin(), HTMXPlugin()],
         on_startup=[get_db_connection_pool, server_init, create_local_admin_user],
         on_shutdown=[close_db_connection_pool],
         cors_config=_build_cors_config(),
         openapi_config=OpenAPIConfig(title="Field-TM", version=__version__),
         logging_config=_get_logging_config(),
+        exception_handlers={ValidationException: _custom_validation_exception_handler},
+        template_config=TemplateConfig(
+            directory=Path(__file__).parent / "templates",
+            engine=JinjaTemplateEngine,
+        ),
         debug=settings.DEBUG,
     )
 

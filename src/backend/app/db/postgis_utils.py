@@ -215,6 +215,7 @@ async def split_geojson_by_task_areas(
     db: AsyncConnection,
     featcol: geojson.FeatureCollection,
     project_id: int,
+    task_boundaries: Optional[dict] = None,
     geom_type: DbGeomType = DbGeomType.POLYGON,
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
@@ -227,12 +228,20 @@ async def split_geojson_by_task_areas(
         db (Connection): Database connection.
         featcol (geojson.FeatureCollection): Data extract feature collection.
         project_id (int): The project ID for associated tasks.
+        task_boundaries (dict): Task boundaries as GeoJSON FeatureCollection (from project.task_boundaries).
         geom_type (str): The geometry type of the features.
 
     Returns:
         dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
     """
     try:
+        # If no task boundaries provided, return empty dict
+        if not task_boundaries or not task_boundaries.get("features"):
+            log.warning(
+                f"No task boundaries found for project {project_id}, returning empty task extract dict"
+            )
+            return {}
+
         features = featcol["features"]
         use_st_intersects = geom_type == "POLYLINE"
 
@@ -245,11 +254,27 @@ async def split_geojson_by_task_areas(
             feature_properties.append(Json(f["properties"]))
             feature_geometries.append(json.dumps(f["geometry"]))
 
+        # Prepare task boundaries for spatial join
+        # Convert task boundaries to temporary table format
+        task_boundary_features = task_boundaries["features"]
+        task_geometries = []
+        task_indices = []
+        for idx, task_feature in enumerate(task_boundary_features):
+            if task_feature.get("geometry"):
+                task_geometries.append(json.dumps(task_feature["geometry"]))
+                task_indices.append(idx + 1)  # 1-based task index
+
+        if not task_geometries:
+            log.warning(
+                f"No valid task boundary geometries found for project {project_id}"
+            )
+            return {}
+
         # Choose spatial join logic based on geometry type
         spatial_join_condition = (
-            "ST_Intersects(f.geom, t.outline)"
+            "ST_Intersects(f.geom, t.geom)"
             if use_st_intersects
-            else "ST_Within(ST_Centroid(f.geom), t.outline)"
+            else "ST_Within(ST_Centroid(f.geom), t.geom)"
         )
 
         async with db.cursor(row_factory=dict_row) as cur:
@@ -261,9 +286,14 @@ async def split_geojson_by_task_areas(
                         unnest(%s::JSONB[]) AS properties,
                         ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
                 ),
+                task_boundaries AS (
+                    SELECT
+                        unnest(%s::INTEGER[]) AS task_index,
+                        ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
+                ),
                 task_features AS (
                     SELECT
-                        t.project_task_index AS task_id,
+                        t.task_index AS task_id,
                         jsonb_build_object(
                             'type', 'Feature',
                             'id', f.id,
@@ -272,15 +302,14 @@ async def split_geojson_by_task_areas(
                                 jsonb_set(
                                     f.properties,
                                     '{{task_id}}',
-                                    to_jsonb(t.project_task_index)
+                                    to_jsonb(t.task_index)
                                 ),
                                 '{{project_id}}', to_jsonb(%s)
                             )
                         ) AS feature
-                    FROM tasks t
+                    FROM task_boundaries t
                     JOIN feature_data f
                     ON {spatial_join_condition}
-                    WHERE t.project_id = %s
                 )
                 SELECT
                     task_id,
@@ -292,7 +321,8 @@ async def split_geojson_by_task_areas(
                     feature_ids,
                     feature_properties,
                     feature_geometries,
-                    project_id,
+                    task_indices,
+                    task_geometries,
                     project_id,
                 ),
             )

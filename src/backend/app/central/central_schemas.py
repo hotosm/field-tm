@@ -22,7 +22,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Self, TypedDict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
@@ -37,11 +37,18 @@ log = logging.getLogger(__name__)
 
 
 class ODKCentral(BaseModel):
-    """ODK Central credentials for API input validation."""
+    """ODK Central credentials model.
+
+    Handles both input (with encryption) and output (with decryption).
+    Use prepare_for_db() to encrypt password before DB insertion.
+    Use from_db() class method to decrypt password when reading from DB.
+    """
 
     external_project_instance_url: Optional[HttpUrlStr] = None
     external_project_username: Optional[str] = None
     external_project_password: Optional[str] = None
+    # Internal field for encrypted password (used in DB, excluded from serialization)
+    password_encrypted: Optional[str] = Field(default=None, exclude=True)
 
     @field_validator("external_project_instance_url", mode="after")
     @classmethod
@@ -58,101 +65,100 @@ class ODKCentral(BaseModel):
         """Ensure if one ODK variable is set, then all are.
 
         If all are None/empty, that's allowed (will use default env credentials).
+        For updates, allow password to be None if password_encrypted exists.
         """
-        # Only validate if at least one field is set
-        has_any = any(
-            [
-                self.external_project_instance_url,
-                self.external_project_username,
-                self.external_project_password,
-            ]
-        )
-        has_all = all(
-            [
-                self.external_project_instance_url,
-                self.external_project_username,
-                self.external_project_password,
-            ]
-        )
+        has_odk_url = bool(self.external_project_instance_url)
+        has_odk_user = bool(self.external_project_username)
+        has_odk_password = bool(self.external_project_password)
+        has_encrypted = bool(self.password_encrypted)
 
-        # If any field is set but not all, that's an error
-        if has_any and not has_all:
+        # If all three are None, that's fine (not updating ODK credentials)
+        if not (has_odk_url or has_odk_user or has_odk_password or has_encrypted):
+            return self
+
+        # For updates, allow password to be None if encrypted password exists
+        if not has_odk_password and has_encrypted:
+            return self
+
+        # If password is explicitly provided, require all three together
+        if has_odk_password:
+            has_all = all([has_odk_url, has_odk_user, has_odk_password])
+            if not has_all:
+                err = "All ODK details are required together: url, user, password"
+                log.debug(err)
+                raise ValueError(err)
+            return self
+
+        # If password is None but URL/username are provided, allow it (for updates)
+        if not has_odk_password and (has_odk_url or has_odk_user):
+            return self
+
+        # If any field is set but not all, that's an error (for new projects)
+        has_any = any([has_odk_url, has_odk_user, has_odk_password])
+        if has_any and not all([has_odk_url, has_odk_user, has_odk_password]):
             err = "All ODK details are required together: url, user, password"
             log.debug(err)
             raise ValueError(err)
+
         return self
 
+    def prepare_for_db(self) -> dict:
+        """Prepare credentials for database insertion (encrypt password).
 
-class ODKCentralIn(ODKCentral):
-    """ODK Central credentials inserted to database."""
-
-    # Map plaintext password input to encrypted field for database
-    external_project_password_encrypted: Optional[str] = None
-
-    @field_validator("external_project_password", mode="after")
-    @classmethod
-    def encrypt_odk_password(cls, value: str) -> Optional[str]:
-        """Encrypt the ODK Central password before db insertion."""
-        if not value:
-            return None
-        return encrypt_value(value)
-
-    @model_validator(mode="after")
-    def map_password_to_encrypted(self) -> Self:
-        """Map encrypted password to the database field name.
-
-        The field_validator already encrypted external_project_password,
-        so we copy it to external_project_password_encrypted for the database.
-        We set external_project_password to None so it's excluded from DB serialization
-        (dump_and_check_model uses exclude_none=True).
+        Returns a dict with external_project_password_encrypted instead of
+        external_project_password. Password field is excluded.
         """
+        data = self.model_dump(
+            exclude={"external_project_password", "password_encrypted"}
+        )
+
+        # Encrypt password if present
         if self.external_project_password:
-            # external_project_password is already encrypted by field_validator
-            self.external_project_password_encrypted = self.external_project_password
-            # Set to None to exclude from DB serialization
-            # (only external_project_password_encrypted goes to DB)
-            self.external_project_password = None
-        return self
+            data["external_project_password_encrypted"] = encrypt_value(
+                self.external_project_password
+            )
+        elif self.password_encrypted:
+            # Keep existing encrypted password if no new password provided
+            data["external_project_password_encrypted"] = self.password_encrypted
 
+        return data
 
-class ODKCentralDecrypted(BaseModel):
-    """ODK Central credentials extracted from database.
-
-    WARNING never return this as a response model.
-    WARNING or log to the terminal.
-    """
-
-    external_project_instance_url: Optional[HttpUrlStr] = None
-    external_project_username: Optional[str] = None
-    external_project_password: Optional[str] = None
-
-    def model_post_init(self, ctx):
-        """Run logic after model object instantiated."""
-        # Decrypt odk central password from database
-        if self.external_project_password:
-            if isinstance(self.external_project_password, str):
-                encrypted_pass = self.external_project_password
-                try:
-                    self.external_project_password = decrypt_value(encrypted_pass)
-                except Exception as e:
-                    # If decryption fails, assume it's already plaintext
-                    # This can happen in tests or if password wasn't encrypted
-                    # Log the error for debugging but don't fail
-                    log.debug(
-                        f"Failed to decrypt password (may already be plaintext): {e}"
-                    )
-                    # Keep the password as-is (assume it's already plaintext)
-                    pass
-
-    @field_validator("external_project_instance_url", mode="after")
     @classmethod
-    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
-        """Remove trailing slash from ODK Central URL."""
-        if not value:
+    def from_db(
+        cls,
+        url: Optional[str] = None,
+        username: Optional[str] = None,
+        password_encrypted: Optional[str] = None,
+    ) -> Optional["ODKCentral"]:
+        """Create ODKCentral instance from database fields (decrypt password).
+
+        Args:
+            url: ODK Central URL from database
+            username: ODK Central username from database
+            password_encrypted: Encrypted password from database
+
+        Returns:
+            ODKCentral instance with decrypted password, or None if all fields are None
+        """
+        if not (url or username or password_encrypted):
             return None
-        if value.endswith("/"):
-            return value[:-1]
-        return value
+
+        # Decrypt password
+        password = None
+        if password_encrypted:
+            try:
+                password = decrypt_value(password_encrypted)
+            except Exception as e:
+                log.debug(f"Failed to decrypt password (may already be plaintext): {e}")
+                # Assume it's already plaintext
+                password = password_encrypted
+
+        return cls(
+            external_project_instance_url=url,
+            external_project_username=username,
+            external_project_password=password,
+            password_encrypted=password_encrypted,
+        )
 
 
 @dataclass

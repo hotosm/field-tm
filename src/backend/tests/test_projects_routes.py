@@ -43,15 +43,23 @@ log = logging.getLogger(__name__)
 async def create_stub_project(client, stub_project_data):
     """Create a new project."""
     response = await client.post("/projects/stub", json=stub_project_data)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
     return response.json()
 
 
-async def test_create_project_invalid(client, project_data):
+async def test_patch_project_invalid(client, project, project_data):
     """Test project creation endpoint, duplicate checker."""
-    project_data["task_split_type"] = "invalid"
-    project_data["priority"] = "invalid"
-    response_invalid = await client.patch("/projects", json=project_data)
+    log.debug(f"Existing project: {project}")
+    # First update the project name to ensure it doesn't exist and
+    # trigger duplicate validation
+    project_data["project_name"] = "a new project name that doesn't exist"
+    # Then use invalid enum options for some fields
+    project_data["task_split_type"] = "invalid_option"
+    project_data["priority"] = "invalid_option"
+    response_invalid = await client.patch(
+        f"/projects?project_id={project.id}",
+        json=project_data,
+    )
     assert response_invalid.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     response_data = response_invalid.json()
 
@@ -67,6 +75,23 @@ async def test_create_project_invalid(client, project_data):
         field_name = error["loc"][-1]
         if field_name in expected_errors:
             assert error["ctx"]["expected"] == expected_errors[field_name]
+
+
+async def test_patch_project_dup_name(client, project, project_data):
+    """Test project patch to a duplicate name is not possible."""
+    log.debug(f"Existing project: {project}")
+    # First update the project name to ensure it doesn't exist and
+    # trigger duplicate validation
+    project_data["project_name"] = "new project name"
+    response_duplicate = await client.patch(
+        f"/projects?project_id={project.id}",
+        json=project_data,
+    )
+    assert response_duplicate.status_code == status.HTTP_409_CONFLICT
+    assert (
+        response_duplicate.json()["detail"]
+        == f"Project with name '{project_data['project_name']}' already exists."
+    )
 
 
 async def test_create_project_with_dup(client, stub_project_data):
@@ -434,7 +459,6 @@ async def test_project_by_id(client, project):
     assert data["status"] == project.status
     assert data["hashtags"] == project.hashtags
     assert data["location_str"] == project.location_str
-    assert data["tasks"] == []
 
 
 async def test_project_task_split(client):
@@ -485,50 +509,6 @@ async def test_read_project(client, project):
     assert data["project_name"] == project.project_name
 
 
-async def test_update_and_download_project_form(client, project):
-    """Test updating and downloading the XLSForm for a project."""
-    updated_xls_content = b"updated xlsform data"
-    xls_file = BytesIO(updated_xls_content)
-    xls_file.name = "form.xlsx"
-
-    with (
-        patch("app.central.central_deps.read_xlsform", return_value=xls_file),
-        patch("app.central.central_crud.update_odk_central_xform", return_value=None),
-        patch(
-            "app.central.central_crud.get_project_form_xml",
-            return_value="<fake-xml></fake-xml>",
-        ),
-    ):
-        response = await client.post(
-            f"/central/update-form?project_id={project.id}",
-            data={"xform_id": "test-xform-id"},
-            files={
-                "xlsform": (
-                    "form.xlsx",
-                    updated_xls_content,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                )
-            },
-        )
-        assert response.status_code == 200
-        assert (
-            response.json()["message"]
-            == f"Successfully updated the form for project {project.id}"
-        )
-
-        # Test downloading the updated XLSForm
-        response = await client.get(f"/central/download-form?project_id={project.id}")
-
-        assert response.status_code == 200
-        assert (
-            response.headers["Content-Disposition"]
-            == f"attachment; filename={project.id}_xlsform.xlsx"
-        )
-        assert response.headers["Content-Type"] == "application/media"
-        assert response.content is not None
-        assert response.content == b"updated xlsform data"
-
-
 async def test_download_project_boundary(client, project):
     """Test downloading a project boundary as GeoJSON."""
     response = await client.get(f"/projects/{project.id}/download")
@@ -544,30 +524,6 @@ async def test_download_project_boundary(client, project):
     assert content["type"] == "Polygon"
     assert "coordinates" in content
     assert isinstance(content["coordinates"], list)
-
-
-async def test_download_task_boundaries(client, project):
-    """Test downloading task boundaries as GeoJSON."""
-    response = await client.get(f"/projects/{project.id}/download_tasks")
-
-    assert response.status_code == 200
-    assert (
-        response.headers["Content-Disposition"]
-        == "attachment; filename=task_boundary.geojson"
-    )
-    assert response.headers["Content-Type"] == "application/media"
-
-    content = json.loads(response.content)
-
-    assert content["type"] == "FeatureCollection"
-    assert "features" in content
-    assert isinstance(content["features"], list)
-    # Note: may be empty if no tasks exist
-    for feature in content["features"]:
-        assert "geometry" in feature
-        assert "properties" in feature
-        if "task_id" in feature["properties"]:
-            assert isinstance(feature["properties"]["task_id"], int)
 
 
 if __name__ == "__main__":

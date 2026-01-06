@@ -40,7 +40,7 @@ async def get_project_by_id(
         ) from e
 
 
-async def check_project_dup_name(db: AsyncConnection, project_name: str):
+async def project_name_does_not_already_exist(db: AsyncConnection, project_name: str):
     """Simple check if project already exists with name."""
     # Check if the project name already exists
     sql = """
@@ -53,10 +53,5 @@ async def check_project_dup_name(db: AsyncConnection, project_name: str):
         await cur.execute(sql, {"project_name": project_name.lower()})
         project_exists = await cur.fetchone()
     if project_exists:
-        project_exists = project_exists[0]
-
-    if project_exists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"project_name '{project_name}' already exists.",
-        )
+        return project_exists[0]
+    return False
