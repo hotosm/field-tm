@@ -71,7 +71,7 @@ async def test_create_project_invalid(client, project_data):
 
 async def test_create_project_with_dup(client, stub_project_data):
     """Test project creation endpoint, duplicate checker."""
-    project_name = stub_project_data["name"]
+    project_name = stub_project_data["project_name"]
 
     new_project = await create_stub_project(client, stub_project_data)
     assert "id" in new_project
@@ -334,7 +334,7 @@ async def test_generate_project_files(db, client, project):
         f"/projects/{project_id}/upload-task-boundaries",
         files=task_geojson_file,
     )
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     # Upload data extracts
     with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
@@ -382,9 +382,8 @@ async def test_generate_project_files(db, client, project):
 async def test_update_project(client, admin_user, project):
     """Test update project metadata."""
     updated_project_data = {
-        "name": f"Updated Test Project {uuid4()}",
+        "project_name": f"Updated Test Project {uuid4()}",
         "description": "updated description",
-        "osm_category": "healthcare",
         "hashtags": "#Field-TM anothertag",
     }
 
@@ -395,10 +394,9 @@ async def test_update_project(client, admin_user, project):
     assert response.status_code == 200
 
     response_data = response.json()
-    assert response_data["name"] == updated_project_data["name"]
+    assert response_data["project_name"] == updated_project_data["project_name"]
     assert response_data["description"] == updated_project_data["description"]
 
-    assert response_data["osm_category"] == updated_project_data["osm_category"]
     assert sorted(response_data["hashtags"]) == sorted(
         [
             "#Field-TM",
@@ -417,7 +415,7 @@ async def test_project_summaries(client, project):
     first_project = response.json()["results"][0]
 
     assert first_project["id"] == project.id
-    assert first_project["name"] == project.project_name
+    assert first_project["project_name"] == project.project_name
     assert first_project["hashtags"] == project.hashtags
 
 
@@ -434,7 +432,6 @@ async def test_project_by_id(client, project):
     assert data["project_name"] == project.project_name
     assert data["description"] == project.description
     assert data["status"] == project.status
-    assert data["osm_category"] == project.osm_category
     assert data["hashtags"] == project.hashtags
     assert data["location_str"] == project.location_str
     assert data["tasks"] == []

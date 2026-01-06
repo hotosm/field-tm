@@ -135,7 +135,6 @@ async def project(db, admin_user):
         name=project_name,
         field_mapping_app=FieldMappingApp.ODK,
         description="test",
-        osm_category="buildings",
         external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
         external_project_username=os.getenv("ODK_CENTRAL_USER"),
         external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
@@ -229,8 +228,8 @@ async def stub_project_data():
     """Sample data for creating a project."""
     project_name = f"Test Project {uuid4()}"
     data = {
-        "name": project_name,
-        "field_mapping_app": "FieldTM",
+        "project_name": project_name,
+        "field_mapping_app": FieldMappingApp.ODK,
         "description": "test",
         "outline": {
             "coordinates": [
@@ -271,7 +270,7 @@ async def project_data(stub_project_data):
 
     data = stub_project_data.copy()
     data.pop("outline")  # Remove outline from copied data
-    data["name"] = "new project name"
+    data["project_name"] = "new project name"
     data.update(**odk_creds_decrypted.model_dump())
     return data
 

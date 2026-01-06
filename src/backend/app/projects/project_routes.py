@@ -804,9 +804,11 @@ async def delete_project(
 
     # Handle QField projects separately
     if project.field_mapping_app == FieldMappingApp.QFIELD:
+        log.info(f"Deleting QFieldCloud project for FieldTM project ({project.id})")
         await delete_qfield_project(db, project.id)
     else:
         # Delete ODK Central project
+        log.info(f"Deleting ODK Central project for FieldTM project ({project.id})")
         # Use None for credentials to fall back to environment variables
         await central_crud.delete_odk_project(project.external_project_id, None)
 

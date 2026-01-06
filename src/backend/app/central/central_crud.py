@@ -353,7 +353,6 @@ async def update_odk_central_xform(
     xform_id: str,
     odk_id: int,
     xlsform: BytesIO,
-    # osm_category: str,
     odk_credentials: central_schemas.ODKCentralDecrypted,
 ) -> None:
     """Update and publish the XForm for a project.

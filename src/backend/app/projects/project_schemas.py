@@ -188,6 +188,7 @@ class ProjectInBase(StubProjectIn):
         Field(validate_default=True),
     ] = None
     project_name: Optional[str] = None
+    field_mapping_app: Optional[FieldMappingApp] = None
 
     # Token used for ODK appuser; encrypted at rest
     odk_token: Optional[str] = None
@@ -200,7 +201,6 @@ class ProjectInBase(StubProjectIn):
 
     # Exclude (do not allow update)
     id: Annotated[Optional[int], Field(exclude=True)] = None
-    field_mapping_app: Annotated[Optional[FieldMappingApp], Field(exclude=True)] = None
     outline: Annotated[Optional[dict], Field(exclude=True)] = None
 
     @field_validator("odk_token", mode="after")
@@ -263,11 +263,10 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
 class ProjectUpdate(ProjectInBase, ODKCentralIn):
     """Input model for updating a project (all fields optional)."""
 
+    # The field mapping app should not be updatable
+    field_mapping_app: Annotated[Optional[FieldMappingApp], Field(exclude=True)] = None
+
     # Make required fields from StubProjectIn optional for updates
     project_name: Optional[str] = None
-    field_mapping_app: Optional[FieldMappingApp] = None
-
-    # Allow updating the name field
-    name: Optional[str] = None
     # Override dict type to parse as Polygon
     outline: Optional[Polygon] = None
