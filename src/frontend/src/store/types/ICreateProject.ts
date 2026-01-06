@@ -93,23 +93,6 @@ export type ProjectDetailsTypes = {
   organisation_name: string;
 };
 
-export type FormCategoryListTypes = {
-  id: number;
-  title: string;
-};
-
-export type OrganisationListTypes = {
-  id: number;
-  name: string;
-  approved: boolean;
-  type: string;
-  logo: string | null;
-  description: string;
-  slug: string;
-  url: string;
-  odk_central_url: string | null;
-};
-
 export type DrawnGeojsonTypes = {
   type: string;
   properties: null;

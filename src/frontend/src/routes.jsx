@@ -10,9 +10,8 @@ import PlaywrightTempLogin from '@/views/PlaywrightTempLogin';
 import CreateProject from '@/views/CreateProject';
 import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetails from '@/views/ProjectDetails';
-import ManageProject from '@/views/ManageProject';
+import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
 import ManageUsers from '@/views/ManageUsers';
-import Invite from '@/views/Invite';
 
 const routes = createBrowserRouter([
   {
@@ -44,6 +43,18 @@ const routes = createBrowserRouter([
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/project-new/:id',
+        element: (
+          // <ProtectedRoute>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ErrorBoundary>
+              <ProjectDetailsV2 />
+            </ErrorBoundary>
+          </Suspense>
+          // </ProtectedRoute>
         ),
       },
       {
@@ -91,18 +102,6 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/manage/project/:id',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <ManageProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: '/manage/user',
         element: (
           <ProtectedRoute>
@@ -117,18 +116,6 @@ const routes = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
-      },
-      {
-        path: '/invite',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <Invite />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
       },
     ],
   },

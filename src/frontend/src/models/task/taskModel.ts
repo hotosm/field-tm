@@ -6,35 +6,6 @@ export type taskSubmissionInfoType = {
   feature_count: number;
 };
 
-export type taskFeaturePropertyType = {
-  fid: number;
-  geometry: any;
-  name: string | null;
-  uid: number;
-};
-
-export type taskWiseSubmissionCount = {
-  code: string;
-  count: number;
-};
-
-export type taskBoundariesType = {
-  type: string;
-  features: Record<string, any>[];
-};
-
-export type colorCodesType = Record<string, colorMinMaxType>;
-type colorMinMaxType = {
-  min: number;
-  max: number;
-};
-
-export type legendColorArrayType = {
-  min: number;
-  max: number;
-  color: string;
-};
-
 export type EntityOsmMap = {
   id: string;
   osm_id: number;
