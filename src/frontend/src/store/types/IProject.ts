@@ -63,9 +63,3 @@ export type featureType = {
   geometry: { type: string; coordinates: number[][][] };
   properties: Record<string, any>;
 };
-
-export type projectStatusOptionsType = {
-  name: string;
-  value: project_status;
-  label: string;
-};

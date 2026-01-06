@@ -47,28 +47,3 @@ export interface ProjectDetailsModel {
     qr_code_base64: string;
   }[];
 }
-
-export interface FormCategoryListModel {
-  id: number;
-  title: string;
-}
-export interface OrganisationListModel {
-  id: number;
-  name: string;
-  approved: boolean;
-  type: string;
-  logo: string | null;
-  description: string;
-  slug: string;
-  url: string;
-  odk_central_url: string | null;
-}
-
-export type splittedGeojsonType = {
-  type: 'FeatureCollection';
-  features: {
-    type: 'Feature';
-    geometry: { type: 'Polygon'; coordinates: number[][] };
-    properties: Record<string, any>;
-  }[];
-};
