@@ -323,6 +323,8 @@ class DbProject:
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)
     odk_token: Optional[str] = None
+    # GeoJSON data extract stored directly in database (replaces S3 URL approach)
+    data_extract_geojson: Optional[dict] = None
 
     @classmethod
     async def one(
@@ -447,6 +449,10 @@ class DbProject:
                 value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
                 # Must be string json for db input
                 model_dump[key] = json.dumps(model_dump[key])
+            elif key == "data_extract_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                value_placeholders.append(f"%({key})s::jsonb")
+                model_dump[key] = json.dumps(model_dump[key])
             else:
                 value_placeholders.append(f"%({key})s")
 
@@ -526,6 +532,12 @@ class DbProject:
             model_dump.update(odk_data)
             # Remove plaintext password if present
             model_dump.pop("external_project_password", None)
+
+        # Convert dict/JSONB fields to JSON strings for database
+        for key in list(model_dump.keys()):
+            if key == "data_extract_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                model_dump[key] = json.dumps(model_dump[key])
 
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
 

@@ -200,22 +200,24 @@ async def upload_project_xlsform(
     )
 
     # Write XLS form content to db
+    # Ensure BytesIO is at the beginning before reading
+    project_xlsform.seek(0)
     xlsform_db_bytes = project_xlsform.getvalue()
     if len(xlsform_db_bytes) == 0 or not xform_id:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="There was an error modifying the XLSForm!",
         )
-    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
+    log.debug(
+        f"Setting project XLSForm db data for xFormId: {xform_id}, bytes length: {len(xlsform_db_bytes)}"
+    )
     await DbProject.update(
         db,
         project_id,
-        ProjectUpdate(
-            xlsform_content=xlsform_db_bytes,
-            odk_form_id=xform_id,
-        ),
+        ProjectUpdate(xlsform_content=xlsform_db_bytes),
     )
     await db.commit()
+    log.debug(f"Successfully saved XLSForm to database for project {project_id}")
 
     return {"message": "Your form is valid"}
 
@@ -318,7 +320,6 @@ async def refresh_appuser_token(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = project.odk_form_id
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -371,7 +372,6 @@ async def upload_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = project.odk_form_id
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -453,7 +453,6 @@ async def list_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = project.odk_form_id
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -495,7 +494,6 @@ async def get_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = project.odk_form_id
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 

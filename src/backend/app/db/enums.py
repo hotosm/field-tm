@@ -17,7 +17,7 @@
 #
 """Enum definitions to translate values into human enum strings."""
 
-from enum import Enum, IntEnum, StrEnum
+from enum import Enum, StrEnum
 
 
 class ProjectStatus(StrEnum, Enum):
@@ -27,14 +27,6 @@ class ProjectStatus(StrEnum, Enum):
     PUBLISHED = "PUBLISHED"
     ARCHIVED = "ARCHIVED"
     COMPLETED = "COMPLETED"
-
-
-class OrganisationType(StrEnum, Enum):
-    """An organisation's subscription type."""
-
-    FREE = "FREE"
-    DISCOUNTED = "DISCOUNTED"
-    FULL_FEE = "FULL_FEE"
 
 
 class ProjectPriority(StrEnum, Enum):
@@ -56,59 +48,6 @@ class ProjectRole(StrEnum, Enum):
 
     MAPPER = "MAPPER"
     PROJECT_ADMIN = "PROJECT_ADMIN"
-
-
-class MappingLevel(StrEnum, Enum):
-    """The mapping level the mapper has achieved."""
-
-    BEGINNER = "BEGINNER"
-    INTERMEDIATE = "INTERMEDIATE"
-    ADVANCED = "ADVANCED"
-
-
-class TaskEvent(StrEnum, Enum):
-    """Task events via API.
-
-    `MAP` -- Set to *locked for mapping*, i.e. mapping in progress.
-    `FINISH` -- Set to *unlocked to validate*, i.e. is mapped.
-    `VALIDATE` -- Set to *locked for validation*, i.e. validation in progress.
-    `GOOD` -- Set the state to *unlocked done*.
-    `BAD` -- Set the state *unlocked to map* again, to be mapped once again.
-    `SPLIT` -- Set the state *unlocked done* then generate additional
-        subdivided task areas.
-    `MERGE` -- Set the state *unlocked done* then generate additional
-        merged task area.
-    `ASSIGN` -- For a requester user to assign a task to another user.
-        Set the state *locked for mapping* passing in the required user id.
-        Also notify the user they should map the area.
-    `COMMENT` -- Keep the state the same, but simply add a comment.
-    """
-
-    MAP = "MAP"
-    FINISH = "FINISH"
-    VALIDATE = "VALIDATE"
-    GOOD = "GOOD"
-    BAD = "BAD"
-    SPLIT = "SPLIT"
-    MERGE = "MERGE"
-    ASSIGN = "ASSIGN"
-    COMMENT = "COMMENT"
-    RESET = "RESET"
-
-
-class EntityState(IntEnum, Enum):
-    """State options for Entities in ODK.
-
-    NOTE here we started with int enums and it's hard to migrate.
-    NOTE we will continue to use int values in the form.
-    NOTE we keep BAD=6 for legacy reasons too.
-    """
-
-    READY = 0
-    OPENED_IN_ODK = 1
-    SURVEY_SUBMITTED = 2
-    VALIDATED = 5
-    MARKED_BAD = 6
 
 
 class TaskSplitType(StrEnum, Enum):

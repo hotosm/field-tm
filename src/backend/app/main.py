@@ -1,7 +1,5 @@
 """Litestar application entrypoint (renamed from litestar_app.py)."""
 
-from __future__ import annotations
-
 import json
 import logging
 from pathlib import Path
@@ -14,11 +12,12 @@ from litestar.di import Provide
 from litestar.exceptions import HTTPException, ValidationException
 from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig
-from litestar.plugins.htmx import HTMXPlugin, HTMXRequest, HTMXTemplate
+from litestar.plugins.htmx import HTMXPlugin
 from litestar.plugins.pydantic import PydanticPlugin
-from litestar.response import Template
 from litestar.status_codes import HTTP_422_UNPROCESSABLE_ENTITY
 from litestar.template.config import TemplateConfig
+from osm_fieldwork.xlsforms import xlsforms_path
+from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
@@ -26,13 +25,14 @@ from app.__version__ import __version__
 from app.auth.auth_deps import login_required
 from app.config import MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
-from app.db.models import DbProject, DbUser
+from app.db.models import DbUser
 from app.monitoring import (
     add_endpoint_profiler,
     instrument_app_otel,
     set_otel_tracer,
     set_sentry_otel_tracer,
 )
+from app.projects.project_crud import read_and_insert_xlsforms
 
 log = logging.getLogger(__name__)
 
@@ -44,11 +44,6 @@ async def server_init(server: Litestar) -> None:
     - XLSForm templates in the db.
     - Database entries for reverse geocoding.
     """
-    from osm_fieldwork.xlsforms import xlsforms_path
-    from pg_nearest_city import AsyncNearestCity
-
-    from app.projects.project_crud import read_and_insert_xlsforms
-
     log.debug("Starting up Litestar server")
 
     async with server.state.db_pool.connection() as conn:
@@ -159,26 +154,6 @@ def _get_logging_config() -> LoggingConfig:
 def configure_root_router() -> Router:
     """The top level root router."""
 
-    @get(
-        path="/",
-        dependencies={"db": Provide(db_conn)},
-    )
-    async def home(request: HTMXRequest, db: AsyncConnection) -> Template:
-        if request.htmx:  # if request has "HX-Request" header, then
-            print(request.htmx)  # HTMXDetails instance
-            print(request.htmx.current_url)
-        # Fetch all projects from database
-        projects = await DbProject.all(db, limit=12) or []
-        return HTMXTemplate(template_name="home.html", context={"projects": projects})
-
-    @get(
-        path="/new",
-        dependencies={"db": Provide(db_conn)},
-    )
-    async def new_project(request: HTMXRequest, db: AsyncConnection) -> Template:
-        """Render the new project creation form."""
-        return HTMXTemplate(template_name="new_project.html")
-
     @get("/__version__")
     async def deployment_details() -> dict[str, str]:
         """Provide deployment metadata."""
@@ -231,8 +206,6 @@ def configure_root_router() -> Router:
         path="/",
         tags=["root"],
         route_handlers=[
-            home,
-            new_project,
             deployment_details,
             simple_heartbeat,
             heartbeat_plus_db,
@@ -247,6 +220,7 @@ def create_app() -> Litestar:
     from app.auth.auth_routes import auth_router
     from app.central.central_routes import central_router
     from app.helpers.helper_routes import helper_router
+    from app.htmx.htmx_routes import htmx_router
     from app.projects.project_routes import project_router
     from app.qfield.qfield_routes import qfield_router
     from app.users.user_routes import user_router
@@ -260,6 +234,7 @@ def create_app() -> Litestar:
             qfield_router,
             helper_router,
             central_router,
+            htmx_router,
         ],
         plugins=[PydanticPlugin(), HTMXPlugin()],
         on_startup=[get_db_connection_pool, server_init, create_local_admin_user],

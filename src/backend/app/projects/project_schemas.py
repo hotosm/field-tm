@@ -305,3 +305,8 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     # Pydantic will automatically validate these enum types
     task_split_type: Optional[TaskSplitType] = None
     priority: Optional[ProjectPriority] = None
+
+    # XLSForm binary content for project
+    xlsform_content: Optional[bytes] = None
+    # GeoJSON data extract stored directly in database
+    data_extract_geojson: Optional[dict] = None

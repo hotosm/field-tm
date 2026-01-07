@@ -39,7 +39,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import DbGeomType, EntityState
+from app.db.enums import DbGeomType
 from app.db.models import DbProject, DbTemplateXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -50,25 +50,6 @@ from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
 
 log = logging.getLogger(__name__)
-
-
-STATUS_VISUALS = {
-    EntityState.MARKED_BAD.value: {
-        "fill": "#ff0000",
-        "marker-color": "#ff0000",
-        "stroke": "#cc0000",
-    },
-    EntityState.SURVEY_SUBMITTED.value: {
-        "fill": "#00ff00",
-        "marker-color": "#00ff00",
-        "stroke": "#00cc00",
-    },
-    EntityState.VALIDATED.value: {
-        "fill": "#008000",
-        "marker-color": "#008000",
-        "stroke": "#006600",
-    },
-}
 
 
 def get_odk_project(odk_central: Optional[central_schemas.ODKCentral] = None):

@@ -1,0 +1,1120 @@
+{% extends "layout.html" %} {% block title %}{% if project %}{{
+project.project_name }} - {% endif %}Field Tasking Manager{% endblock %} {%
+block content %}
+<div style="padding: 20px; max-width: 1200px; margin: 0 auto">
+  <div style="margin-bottom: 20px">
+    <wa-button href="/" variant="default" style="margin-bottom: 20px">
+      ← Back to Projects
+    </wa-button>
+  </div>
+
+  {% if project %}
+  <wa-card>
+    <div
+      slot="header"
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <h1 style="margin: 0">{{ project.project_name or 'Unnamed Project' }}</h1>
+      {% set status_value = project.status.value if project.status and
+      project.status.value else (project.status if project.status is string else
+      'DRAFT') %}
+      <wa-badge
+        variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
+      >
+        {{ status_value }}
+      </wa-badge>
+    </div>
+
+    <div style="padding: 20px">
+      <!-- Description -->
+      {% if project.description %}
+      <div style="margin-bottom: 30px">
+        <h3 style="color: #d63f3f; margin-bottom: 10px">Description</h3>
+        <p style="color: #333; line-height: 1.6">{{ project.description }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Project Details Grid -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin-bottom: 30px;
+        "
+      >
+        <div>
+          <h4
+            style="
+              color: #666;
+              font-size: 0.9em;
+              margin-bottom: 5px;
+              font-weight: bold;
+            "
+          >
+            Project ID
+          </h4>
+          <p style="color: #333; font-size: 1.1em">#{{ project.id }}</p>
+        </div>
+
+        {% if project.location_str %}
+        <div>
+          <h4
+            style="
+              color: #666;
+              font-size: 0.9em;
+              margin-bottom: 5px;
+              font-weight: bold;
+            "
+          >
+            Location
+          </h4>
+          <p style="color: #333; font-size: 1.1em">
+            {{ project.location_str }}
+          </p>
+        </div>
+        {% endif %} {% if project.field_mapping_app %}
+        <div>
+          <h4
+            style="
+              color: #666;
+              font-size: 0.9em;
+              margin-bottom: 5px;
+              font-weight: bold;
+            "
+          >
+            Field Mapping App
+          </h4>
+          <div style="display: flex; align-items: center; gap: 8px">
+            {% if project.field_mapping_app.value %} {% set app_name =
+            project.field_mapping_app.value %} {% else %} {% set app_name =
+            project.field_mapping_app %} {% endif %}
+            <img
+              src="/static/images/{{ app_name.lower() }}-logo.svg"
+              alt="{{ app_name }}"
+              style="width: 32px; height: 32px; object-fit: contain"
+              onerror="this.style.display='none'"
+            />
+            <span style="color: #333; font-size: 1.1em">{{ app_name }}</span>
+          </div>
+        </div>
+        {% endif %} {% if project.created_at %}
+        <div>
+          <h4
+            style="
+              color: #666;
+              font-size: 0.9em;
+              margin-bottom: 5px;
+              font-weight: bold;
+            "
+          >
+            Created
+          </h4>
+          <p style="color: #333; font-size: 1.1em">
+            {{ project.created_at.strftime('%Y-%m-%d %H:%M') if
+            project.created_at else 'N/A' }}
+          </p>
+        </div>
+        {% endif %} {% if project.updated_at %}
+        <div>
+          <h4
+            style="
+              color: #666;
+              font-size: 0.9em;
+              margin-bottom: 5px;
+              font-weight: bold;
+            "
+          >
+            Last Updated
+          </h4>
+          <p style="color: #333; font-size: 1.1em">
+            {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if
+            project.updated_at else 'N/A' }}
+          </p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Hashtags -->
+      {% if project.hashtags %}
+      <div style="margin-bottom: 30px">
+        <h4
+          style="
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-weight: bold;
+          "
+        >
+          Hashtags
+        </h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          {% for tag in project.hashtags %}
+          <wa-badge variant="neutral">{{ tag }}</wa-badge>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- External Project Info -->
+      {% if project.external_project_instance_url %}
+      <div
+        style="
+          margin-bottom: 30px;
+          padding: 15px;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+        "
+      >
+        <h4
+          style="
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-weight: bold;
+          "
+        >
+          External Project
+        </h4>
+        <p style="color: #333; font-size: 0.9em">
+          <strong>Instance:</strong> {{ project.external_project_instance_url
+          }}<br />
+          {% if project.external_project_id %}
+          <strong>Project ID:</strong> {{ project.external_project_id }} {%
+          endif %}
+        </p>
+      </div>
+      {% endif %}
+
+      <!-- Project Setup Steps (only show for DRAFT projects) -->
+      {% set status_value = project.status.value if project.status and
+      project.status.value else (project.status if project.status is string else
+      'DRAFT') %} {% set has_xlsform = project.xlsform_content is not none and
+      project.xlsform_content %} {% set has_data_extract =
+      project.data_extract_geojson is not none and project.data_extract_geojson
+      %} {% if status_value == 'DRAFT' %}
+      <div
+        style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee"
+      >
+        <h2 style="color: #d63f3f; margin-bottom: 20px; font-size: 1.5em">
+          Project Setup
+        </h2>
+
+        <!-- Step 1: Select XLSForm (always show, with completion indicator) -->
+        <div
+          id="step-1-container"
+          style="margin-bottom: 30px; padding: 20px; background-color: {% if has_xlsform %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_xlsform %}#4caf50{% else %}#d63f3f{% endif %};"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 15px;
+            "
+          >
+            <h3 style="color: #333; margin: 0; font-size: 1.2em">
+              Step 1: Select Survey Form {% if has_xlsform %}
+              <span style="color: #4caf50; margin-left: 8px">✓</span>
+              {% endif %}
+            </h3>
+            {% if has_xlsform %}
+            <wa-badge variant="success">Complete</wa-badge>
+            {% endif %}
+          </div>
+          {% if not has_xlsform %}
+          <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+            Choose a category type from existing XLSForms or upload a custom
+            form.
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              margin-bottom: 15px;
+            "
+          >
+            <wa-button
+              id="select-xlsform-btn"
+              variant="default"
+              style="flex: 1; min-width: 200px"
+            >
+              Select Category Type
+            </wa-button>
+            <wa-button
+              id="upload-xlsform-btn"
+              variant="default"
+              style="flex: 1; min-width: 200px"
+            >
+              Upload Custom Form
+            </wa-button>
+          </div>
+
+          <!-- Form Configuration Options (shown after form selection/upload) -->
+          <div
+            id="form-config-container"
+            style="
+              display: none;
+              margin-top: 20px;
+              padding: 15px;
+              background-color: #fff;
+              border-radius: 4px;
+              border: 1px solid #ddd;
+            "
+          >
+            <h4 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
+              Form Configuration
+            </h4>
+            <form
+              id="upload-xlsform-form"
+              hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+              hx-target="#xlsform-status"
+              hx-swap="innerHTML"
+              hx-encoding="multipart/form-data"
+              style="display: flex; flex-direction: column; gap: 12px"
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="need_verification_fields"
+                  value="true"
+                  checked
+                  style="margin: 0; cursor: pointer"
+                />
+                <span style="font-size: 0.95em"
+                  >Include verification fields</span
+                >
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  cursor: pointer;
+                "
+              >
+                <input
+                  type="checkbox"
+                  name="mandatory_photo_upload"
+                  value="true"
+                  style="margin: 0; cursor: pointer"
+                />
+                <span style="font-size: 0.95em"
+                  >Make photo upload mandatory</span
+                >
+              </label>
+              {% if project.field_mapping_app %} {% set app_name =
+              project.field_mapping_app.value if project.field_mapping_app.value
+              else project.field_mapping_app %} {% set is_odk = app_name.upper()
+              == 'ODK' %}
+              <input
+                type="hidden"
+                name="use_odk_collect"
+                value="{{ 'true' if is_odk else 'false' }}"
+              />
+              {% if is_odk %}
+              <div
+                style="
+                  padding: 8px;
+                  background-color: #e8f4f8;
+                  border-radius: 4px;
+                  font-size: 0.95em;
+                  color: #666;
+                "
+              >
+                <span
+                  >✓ ODK Collect-specific components will be included
+                  (automatically set for ODK projects)</span
+                >
+              </div>
+              {% else %}
+              <div
+                style="
+                  padding: 8px;
+                  background-color: #f0f0f0;
+                  border-radius: 4px;
+                  font-size: 0.95em;
+                  color: #666;
+                "
+              >
+                <span
+                  >ODK Collect-specific components disabled (project uses {{
+                  app_name }})</span
+                >
+              </div>
+              {% endif %} {% else %}
+              <input type="hidden" name="use_odk_collect" value="false" />
+              <div
+                style="
+                  padding: 8px;
+                  background-color: #f0f0f0;
+                  border-radius: 4px;
+                  font-size: 0.95em;
+                  color: #666;
+                "
+              >
+                <span
+                  >ODK Collect-specific components disabled (no field mapping
+                  app selected)</span
+                >
+              </div>
+              {% endif %}
+              <div style="margin-top: 10px">
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 5px;
+                    font-size: 0.95em;
+                    font-weight: 500;
+                  "
+                  >Default Language:</label
+                >
+                <select
+                  name="default_language"
+                  style="
+                    width: 100%;
+                    padding: 6px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 0.95em;
+                  "
+                >
+                  <option value="english">English</option>
+                  <option value="spanish">Spanish</option>
+                  <option value="french">French</option>
+                  <option value="portuguese">Portuguese</option>
+                  <option value="swahili">Swahili</option>
+                  <option value="hindi">Hindi</option>
+                </select>
+              </div>
+              <input
+                type="file"
+                name="xlsform"
+                id="xlsform-file-input"
+                accept=".xls,.xlsx"
+                style="display: none"
+              />
+              <input
+                type="hidden"
+                name="template_form_id"
+                id="template-form-id"
+                value=""
+              />
+              <wa-button
+                type="submit"
+                variant="primary"
+                style="margin-top: 10px"
+              >
+                Apply Configuration & Upload
+              </wa-button>
+            </form>
+          </div>
+
+          <div id="xlsform-status" style="margin-top: 10px"></div>
+          {% else %}
+          <div
+            style="
+              padding: 10px;
+              background-color: #fff;
+              border-radius: 4px;
+              color: #4caf50;
+              font-weight: 500;
+            "
+          >
+            ✓ Survey form uploaded successfully
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Step 2: Download/Upload OSM Data (always show if Step 1 is complete) -->
+        {% if has_xlsform %}
+        <div
+          id="step-2-container"
+          style="margin-bottom: 30px; padding: 20px; background-color: {% if has_data_extract %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_data_extract %}#4caf50{% else %}#d63f3f{% endif %};"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 15px;
+            "
+          >
+            <h3 style="color: #333; margin: 0; font-size: 1.2em">
+              Step 2: Get Data {% if has_data_extract %}
+              <span style="color: #4caf50; margin-left: 8px">✓</span>
+              {% endif %}
+            </h3>
+            {% if has_data_extract %}
+            <wa-badge variant="success">Complete</wa-badge>
+            {% endif %}
+          </div>
+          {% if not has_data_extract %}
+          <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+            Download OSM data for the selected category or upload a custom
+            GeoJSON file. Review the data on the map, then submit to ODK/QField.
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              margin-bottom: 15px;
+            "
+          >
+            <button
+              id="download-osm-data-btn"
+              hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}&osm_category=buildings&geom_type=POLYGON"
+              hx-target="#osm-data-status"
+              hx-swap="innerHTML"
+              hx-indicator="#download-spinner"
+              class="wa-button wa-button--default"
+              style="flex: 1; min-width: 200px; position: relative"
+            >
+              <span id="download-btn-text">Download OSM Data</span>
+              <span
+                id="download-spinner"
+                class="htmx-indicator"
+                style="display: none; margin-left: 8px"
+              >
+                <svg
+                  style="
+                    width: 16px;
+                    height: 16px;
+                    display: inline-block;
+                    vertical-align: middle;
+                    animation: spin 1s linear infinite;
+                  "
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 12a9 9 0 11-6.219-8.56" />
+                </svg>
+              </span>
+            </button>
+            <button
+              id="upload-geojson-btn"
+              class="wa-button wa-button--default"
+              style="flex: 1; min-width: 200px"
+            >
+              Upload Custom GeoJSON
+            </button>
+          </div>
+          <div id="osm-data-status" style="margin-top: 10px">
+            <div
+              id="download-loading"
+              class="htmx-indicator"
+              style="display: none; text-align: center; padding: 20px"
+            >
+              <div style="display: inline-block">
+                <svg
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    animation: spin 1s linear infinite;
+                    color: #d63f3f;
+                  "
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 12a9 9 0 11-6.219-8.56" />
+                </svg>
+                <p style="margin-top: 10px; color: #666">
+                  Generating OSM data extract... This may take a moment.
+                </p>
+              </div>
+            </div>
+          </div>
+          <form
+            id="upload-geojson-form"
+            hx-post="/upload-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+            hx-target="#osm-data-status"
+            hx-swap="innerHTML"
+            hx-encoding="multipart/form-data"
+            style="display: none"
+          >
+            <input
+              type="file"
+              name="data"
+              id="geojson-file-input"
+              accept=".geojson,.json"
+              required
+            />
+          </form>
+          <div id="geojson-preview-container" style="margin-top: 15px"></div>
+          {% else %}
+          <div
+            style="
+              padding: 10px;
+              background-color: #fff;
+              border-radius: 4px;
+              color: #4caf50;
+              font-weight: 500;
+            "
+          >
+            ✓ OSM data extract ready
+          </div>
+          <div id="geojson-preview-container" style="margin-top: 15px"></div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Step 3: Split AOI (only show if Step 2 is complete) -->
+        {% if has_data_extract %}
+        <div
+          id="step-3-container"
+          style="
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #d63f3f;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 15px;
+            "
+          >
+            <h3 style="color: #333; margin: 0; font-size: 1.2em">
+              Step 3: Split AOI into Tasks (Optional)
+            </h3>
+          </div>
+          <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+            Generate task areas by splitting the Area of Interest (AOI). Choose
+            an algorithm and parameters, then split. The preview will show
+            automatically after splitting.
+          </p>
+          <form
+            id="split-aoi-form"
+            hx-post="/split-aoi-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+            hx-target="#split-status"
+            hx-swap="innerHTML"
+            hx-indicator="#split-loading"
+            style="margin-bottom: 15px"
+          >
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 15px;
+              "
+            >
+              <div>
+                <label
+                  for="split-algorithm"
+                  style="
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: 500;
+                    color: #333;
+                  "
+                  >Algorithm:</label
+                >
+                <select
+                  id="split-algorithm"
+                  name="algorithm"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                  "
+                >
+                  <option value="TASK_SPLITTING_ALGORITHM" selected>
+                    Task Splitting Algorithm
+                  </option>
+                  <option value="DIVIDE_ON_SQUARE">
+                    Divide into Square Tasks
+                  </option>
+                </select>
+              </div>
+              <div id="algorithm-param-container">
+                <label
+                  for="no-of-buildings"
+                  style="
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: 500;
+                    color: #333;
+                  "
+                  >Avg. Buildings per Task:</label
+                >
+                <input
+                  type="number"
+                  id="no-of-buildings"
+                  name="no_of_buildings"
+                  value="50"
+                  min="1"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                  "
+                />
+              </div>
+              <div style="display: flex; align-items: flex-end">
+                <button
+                  type="submit"
+                  class="wa-button wa-button--primary"
+                  style="width: 100%; position: relative"
+                >
+                  <span id="split-btn-text">Split AOI</span>
+                  <span
+                    id="split-btn-spinner"
+                    class="htmx-indicator"
+                    style="display: none; margin-left: 8px"
+                  >
+                    <svg
+                      style="
+                        width: 16px;
+                        height: 16px;
+                        display: inline-block;
+                        vertical-align: middle;
+                        animation: spin 1s linear infinite;
+                      "
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M21 12a9 9 0 11-6.219-8.56" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              margin-bottom: 15px;
+            "
+          >
+            <button
+              id="skip-task-split-btn"
+              hx-post="/skip-task-split-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+              hx-target="#split-status"
+              hx-swap="innerHTML"
+              class="wa-button wa-button--default"
+              style="flex: 1; min-width: 200px"
+            >
+              Skip (Use Whole AOI)
+            </button>
+          </div>
+          <div id="split-status" style="margin-top: 10px">
+            <div
+              id="split-loading"
+              class="htmx-indicator"
+              style="display: none; text-align: center; padding: 20px"
+            >
+              <div style="display: inline-block">
+                <svg
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    animation: spin 1s linear infinite;
+                    color: #d63f3f;
+                  "
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 12a9 9 0 11-6.219-8.56" />
+                </svg>
+                <p style="margin-top: 10px; color: #666">
+                  Splitting AOI into tasks... This may take a moment.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            id="tasks-and-data-preview-container"
+            style="margin-top: 15px"
+          ></div>
+        </div>
+        {% endif %}
+
+        <!-- Step 4: Finalise Project (only show if Step 3 is complete) -->
+        {% if has_data_extract %}
+        <div
+          id="step-4-container"
+          style="
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid #3388ff;
+          "
+        >
+          <h3 style="color: #333; margin-bottom: 15px; font-size: 1.2em">
+            Step 4: Finalise Project
+          </h3>
+          <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+            Generate project files and submit to {% if project.field_mapping_app
+            %}{% if project.field_mapping_app.value %}{{
+            project.field_mapping_app.value }}{% else %}{{
+            project.field_mapping_app }}{% endif %}{% else %}downstream mapping
+            tool{% endif %}.
+          </p>
+          <wa-button
+            id="finalise-project-btn"
+            variant="primary"
+            style="min-width: 200px"
+          >
+            Finalise & Submit Project
+          </wa-button>
+          <div id="finalise-status" style="margin-top: 10px"></div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div
+      slot="footer"
+      style="display: flex; gap: 10px; justify-content: flex-end"
+    >
+      <wa-button href="/" variant="default">Back to Projects</wa-button>
+    </div>
+  </wa-card>
+  {% else %}
+  <wa-card>
+    <div style="padding: 40px; text-align: center">
+      <h2 style="color: #d63f3f">Project Not Found</h2>
+      <p style="color: #666; margin: 20px 0">
+        The project you're looking for doesn't exist or you don't have
+        permission to view it.
+      </p>
+      <wa-button href="/" variant="primary">Back to Projects</wa-button>
+    </div>
+  </wa-card>
+  {% endif %}
+</div>
+
+<style>
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .htmx-indicator {
+    opacity: 1;
+    transition: opacity 200ms ease-in;
+  }
+  .htmx-request .htmx-indicator {
+    opacity: 1;
+  }
+  .htmx-request.htmx-indicator {
+    opacity: 1;
+  }
+</style>
+<script>
+  (function() {
+    const projectId = {% if project %}{{ project.id }}{% else %}null{% endif %};
+    if (!projectId) return;
+
+    // Step 1: XLSForm Selection
+    const selectXlsformBtn = document.getElementById('select-xlsform-btn');
+    const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
+    const xlsformFileInput = document.getElementById('xlsform-file-input');
+    const xlsformStatus = document.getElementById('xlsform-status');
+    const templateFormIdInput = document.getElementById('template-form-id');
+    const formConfigContainer = document.getElementById('form-config-container');
+    const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
+
+    // Fetch and display XLSForms list
+    if (selectXlsformBtn && !hasXlsform) {
+      selectXlsformBtn.addEventListener('click', async function() {
+        try {
+          const response = await fetch('/central/list-forms');
+          if (!response.ok) {
+            throw new Error('Failed to load forms');
+          }
+          const forms = await response.json();
+
+          if (forms.length === 0) {
+            xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>No XLSForms available.</span></wa-callout>';
+            return;
+          }
+
+          // Create dropdown to select form
+          let optionsHtml = '<div style="margin-bottom: 10px;"><select id="xlsform-select" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em;"><option value="">Select a category...</option>';
+          forms.forEach(form => {
+            optionsHtml += `<option value="${form.id}">${form.title}</option>`;
+          });
+          optionsHtml += '</select></div><wa-button id="confirm-xlsform-btn" variant="primary" style="margin-top: 10px;">Use Selected Form</wa-button>';
+
+          xlsformStatus.innerHTML = optionsHtml;
+
+          // Handle form selection
+          const confirmBtn = document.getElementById('confirm-xlsform-btn');
+
+          if (confirmBtn) {
+            confirmBtn.addEventListener('click', async function() {
+              const select = document.getElementById('xlsform-select');
+              const formId = select?.value;
+              if (!formId) {
+                xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>Please select a form category.</span></wa-callout>';
+                return;
+              }
+
+              // Store selected form ID and show configuration options
+              if (templateFormIdInput) {
+                templateFormIdInput.value = formId;
+              }
+              // Clear file input when template is selected
+              if (xlsformFileInput) {
+                xlsformFileInput.value = '';
+              }
+              if (formConfigContainer) {
+                formConfigContainer.style.display = 'block';
+              }
+              xlsformStatus.innerHTML = '<wa-callout variant="info"><span>Form selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+            });
+          }
+
+        } catch (error) {
+          xlsformStatus.innerHTML = `<wa-callout variant="danger"><span>Error loading forms: ${error.message}</span></wa-callout>`;
+        }
+      });
+    }
+
+    // Handle XLSForm upload button click
+    if (uploadXlsformBtn && xlsformFileInput && !hasXlsform) {
+      uploadXlsformBtn.addEventListener('click', () => {
+        xlsformFileInput.click();
+        // Clear template form ID when uploading custom form
+        if (templateFormIdInput) {
+          templateFormIdInput.value = '';
+        }
+      });
+
+      xlsformFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file extension
+        const validExtensions = ['.xls', '.xlsx'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        if (!validExtensions.includes(fileExtension)) {
+          xlsformStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .xls or .xlsx file.</span></wa-callout>';
+          xlsformFileInput.value = '';
+          return;
+        }
+
+        // Show configuration options for custom upload
+        if (formConfigContainer) {
+          formConfigContainer.style.display = 'block';
+        }
+        xlsformStatus.innerHTML = '<wa-callout variant="info"><span>File selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+      });
+    }
+
+    // Step 2: OSM Data (only enable if Step 1 is complete)
+    const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
+    const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
+    const geojsonFileInput = document.getElementById('geojson-file-input');
+    const osmDataStatus = document.getElementById('osm-data-status');
+    const downloadLoading = document.getElementById('download-loading');
+    const downloadBtnText = document.getElementById('download-btn-text');
+    const downloadSpinner = document.getElementById('download-spinner');
+
+    if (!hasXlsform && downloadOsmDataBtn) {
+      downloadOsmDataBtn.disabled = true;
+    }
+    if (!hasXlsform && uploadGeojsonBtn) {
+      uploadGeojsonBtn.disabled = true;
+    }
+
+    // Show loading spinner when download starts
+    if (downloadOsmDataBtn) {
+      downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
+        if (downloadLoading) downloadLoading.style.display = 'block';
+        if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+        if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
+        if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
+      });
+
+      downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
+        if (downloadLoading) downloadLoading.style.display = 'none';
+        if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
+        if (downloadSpinner) downloadSpinner.style.display = 'none';
+        if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = false;
+      });
+    }
+
+    // Upload custom GeoJSON
+    const uploadGeojsonForm = document.getElementById('upload-geojson-form');
+
+    if (uploadGeojsonBtn) {
+      uploadGeojsonBtn.addEventListener('click', () => {
+        if (geojsonFileInput) {
+          geojsonFileInput.click();
+        }
+      });
+    }
+
+    if (geojsonFileInput && uploadGeojsonForm) {
+      geojsonFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file extension
+        const validExtensions = ['.geojson', '.json'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        if (!validExtensions.includes(fileExtension)) {
+          osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
+          geojsonFileInput.value = '';
+          return;
+        }
+
+        // Submit form via HTMX
+        uploadGeojsonForm.dispatchEvent(new Event('submit', { bubbles: true }));
+      });
+    }
+
+    // Step 3: Split AOI - Handle algorithm selection and parameter visibility
+    const splitAlgorithm = document.getElementById('split-algorithm');
+    const algorithmParamContainer = document.getElementById('algorithm-param-container');
+
+    if (splitAlgorithm && algorithmParamContainer) {
+      splitAlgorithm.addEventListener('change', function() {
+        const algorithm = this.value;
+        if (algorithm === 'DIVIDE_ON_SQUARE') {
+          algorithmParamContainer.innerHTML = `
+            <label for="dimension-meters" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Square Size (meters):</label>
+            <input
+              type="number"
+              id="dimension-meters"
+              name="dimension_meters"
+              value="100"
+              min="10"
+              required
+              style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+            />
+          `;
+        } else {
+          algorithmParamContainer.innerHTML = `
+            <label for="no-of-buildings" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Avg. Buildings per Task:</label>
+            <input
+              type="number"
+              id="no-of-buildings"
+              name="no_of_buildings"
+              value="50"
+              min="1"
+              required
+              style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+            />
+          `;
+        }
+      });
+    }
+
+    // Auto-preview after splitting
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+      if (event.detail.target.id === 'split-status') {
+        // Check if split was successful (contains success message)
+        const content = event.detail.target.innerHTML;
+        if (content.includes('split successfully') || content.includes('Generated')) {
+          // Move preview from split-preview-wrapper to preview container
+          setTimeout(function() {
+            const previewWrapper = document.getElementById('split-preview-wrapper');
+            const previewContainer = document.getElementById('tasks-and-data-preview-container');
+            if (previewWrapper && previewContainer) {
+              previewContainer.innerHTML = previewWrapper.innerHTML;
+              previewWrapper.remove();
+            }
+          }, 100);
+        }
+      }
+    });
+
+    // Show loading spinner on form submission
+    const splitAoiForm = document.getElementById('split-aoi-form');
+    if (splitAoiForm) {
+      splitAoiForm.addEventListener('htmx:beforeRequest', function() {
+        const splitLoading = document.getElementById('split-loading');
+        const splitBtnText = document.getElementById('split-btn-text');
+        const splitBtnSpinner = document.getElementById('split-btn-spinner');
+        if (splitLoading) splitLoading.style.display = 'block';
+        if (splitBtnText) splitBtnText.textContent = 'Splitting...';
+        if (splitBtnSpinner) splitBtnSpinner.style.display = 'inline-block';
+      });
+
+      splitAoiForm.addEventListener('htmx:afterRequest', function() {
+        const splitLoading = document.getElementById('split-loading');
+        const splitBtnText = document.getElementById('split-btn-text');
+        const splitBtnSpinner = document.getElementById('split-btn-spinner');
+        if (splitLoading) splitLoading.style.display = 'none';
+        if (splitBtnText) splitBtnText.textContent = 'Split AOI';
+        if (splitBtnSpinner) splitBtnSpinner.style.display = 'none';
+      });
+    }
+
+    // Step 4: Finalise Project
+    const finaliseProjectBtn = document.getElementById('finalise-project-btn');
+    const finaliseStatus = document.getElementById('finalise-status');
+
+    if (finaliseProjectBtn) {
+      finaliseProjectBtn.addEventListener('click', async function() {
+        if (!confirm('Are you sure you want to finalise this project? This will generate files and submit to the downstream mapping tool.')) {
+          return;
+        }
+
+        try {
+          finaliseStatus.innerHTML = '<wa-callout variant="info"><span>Finalising project and generating files...</span></wa-callout>';
+          finaliseProjectBtn.disabled = true;
+
+          const response = await fetch(`/projects/${projectId}/generate-files?combined_features_count=0`, {
+            method: 'POST'
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.url) {
+              finaliseStatus.innerHTML = `<wa-callout variant="success"><span>Project finalised! <a href="${result.url}" target="_blank">View Project</a></span></wa-callout>`;
+            } else {
+              finaliseStatus.innerHTML = '<wa-callout variant="success"><span>Project finalised successfully!</span></wa-callout>';
+            }
+            // Reload page after a delay to show updated status
+            setTimeout(() => window.location.reload(), 2000);
+          } else {
+            const error = await response.text();
+            finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Failed: ${error}</span></wa-callout>`;
+            finaliseProjectBtn.disabled = false;
+          }
+        } catch (error) {
+          finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
+          finaliseProjectBtn.disabled = false;
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}

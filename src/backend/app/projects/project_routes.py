@@ -616,15 +616,18 @@ async def generate_files(
                 )
 
         if not task_ids:
-            msg = "Project has no task boundaries in ODK Central. Please upload task boundaries first."
-            log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=msg,
+            # Task splitting was skipped - use whole AOI as single task
+            log.info(
+                f"No task boundaries found for project {project.id}. "
+                "Task splitting was skipped - using whole AOI as single task."
             )
-
-        log.debug(f"Found {len(task_ids)} task boundaries for project ID {project.id}")
-        new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
+            # Don't add task filter to XLSForm when there's only one task (the whole AOI)
+            new_xlsform = existing_xlsform
+        else:
+            log.debug(
+                f"Found {len(task_ids)} task boundaries for project ID {project.id}"
+            )
+            new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
 
         # Update in both db + ODK Central
         await central_crud.update_project_xlsform(
