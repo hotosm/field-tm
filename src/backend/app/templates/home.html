@@ -1,0 +1,147 @@
+{% extends "layout.html" %} {% block content %}
+<div style="padding: 20px">
+  <!-- Header with Create Project Button -->
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    "
+  >
+    <h1 style="margin: 0; font-size: 1.8em; color: #333">Projects</h1>
+    <wa-button href="/new" variant="primary">Create Project</wa-button>
+  </div>
+
+  <!-- Projects Grid -->
+  {% if projects %}
+  <div
+    style="
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    "
+  >
+    {% for project in projects %}
+    <wa-card
+      style="
+        height: 100%;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        position: relative;
+      "
+      onclick="window.location.href='/htmxprojects/{{ project.id }}'"
+      onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
+      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+    >
+      <div
+        style="
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          font-size: 0.75em;
+          color: #888;
+          font-weight: 600;
+          z-index: 10;
+        "
+      >
+        #{{ project.id }} {% if project.visibility and project.visibility.value
+        == 'PRIVATE' %}
+        <span style="color: #d63f3f; margin-left: 4px" title="Private Project"
+          >🔒</span
+        >
+        {% endif %}
+      </div>
+      <div
+        slot="header"
+        style="
+          font-weight: bold;
+          font-size: 1.2em;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 24px;
+        "
+      >
+        <span>{{ project.project_name or 'Unnamed Project' }}</span>
+        <div style="display: flex; align-items: center; gap: 8px">
+          {% if project.status %} {% set status_value = project.status.value if
+          project.status.value else (project.status if project.status is string
+          else 'DRAFT') %} {% if status_value != 'PUBLISHED' %}
+          <wa-badge
+            variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
+          >
+            {{ status_value }}
+          </wa-badge>
+          {% endif %} {% endif %} {% if project.field_mapping_app %} {% if
+          project.field_mapping_app.value %} {% set app_name =
+          project.field_mapping_app.value %} {% else %} {% set app_name =
+          project.field_mapping_app %} {% endif %}
+          <img
+            src="/static/images/{{ app_name.lower() }}-logo.svg"
+            alt="{{ app_name }}"
+            style="width: 24px; height: 24px; object-fit: contain"
+            onerror="this.style.display='none'"
+          />
+          {% endif %}
+        </div>
+      </div>
+      <div style="padding: 10px 0">
+        {% if project.location_str %}
+        <div style="margin: 8px 0; font-size: 0.9em; color: #555">
+          <span style="display: flex; align-items: center; gap: 4px">
+            <span style="color: #888">📍</span>
+            <span style="line-height: 1.4">{{ project.location_str }}</span>
+          </span>
+        </div>
+        {% endif %} {% if project.description %}
+        <p
+          style="
+            margin: 10px 0 8px 0;
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95em;
+          "
+        >
+          {{ project.description[:120] }}{% if project.description|length > 120
+          %}...{% endif %}
+        </p>
+        {% endif %} {% if project.hashtags %}
+        <div style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 6px">
+          {% for tag in project.hashtags[:4] %}
+          <wa-badge variant="neutral" style="font-size: 0.8em"
+            >{{ tag }}</wa-badge
+          >
+          {% endfor %} {% if project.hashtags|length > 4 %}
+          <wa-badge variant="neutral" style="font-size: 0.8em"
+            >+{{ project.hashtags|length - 4 }}</wa-badge
+          >
+          {% endif %}
+        </div>
+        {% endif %} {% if project.created_at %}
+        <div
+          style="
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #888;
+          "
+        >
+          Created: {{ project.created_at.strftime('%Y-%m-%d') if
+          project.created_at else 'N/A' }}
+        </div>
+        {% endif %}
+      </div>
+    </wa-card>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="text-align: center; color: #666; margin-top: 40px">
+    No projects found. Create your first project to get started!
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

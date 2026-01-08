@@ -16,33 +16,33 @@ const MAPPING_APP_LABELS: Record<field_mapping_app, string> = {
 };
 
 const validateODKCreds = (ctx: any, values: Record<string, any>) => {
-  if (!values.odk_central_url?.trim()) {
+  if (!values.external_project_instance_url?.trim()) {
     ctx.issues.push({
-      input: values.odk_central_url,
-      path: ['odk_central_url'],
+      input: values.external_project_instance_url,
+      path: ['external_project_instance_url'],
       message: `${MAPPING_APP_LABELS[values.field_mapping_app]} URL is Required`,
       code: 'custom',
     });
-  } else if (!isValidUrl(values.odk_central_url)) {
+  } else if (!isValidUrl(values.external_project_instance_url)) {
     ctx.issues.push({
-      input: values.odk_central_url,
-      path: ['odk_central_url'],
+      input: values.external_project_instance_url,
+      path: ['external_project_instance_url'],
       message: 'Invalid URL',
       code: 'custom',
     });
   }
-  if (!values.odk_central_user?.trim()) {
+  if (!values.external_project_username?.trim()) {
     ctx.issues.push({
-      input: values.odk_central_user,
-      path: ['odk_central_user'],
+      input: values.external_project_username,
+      path: ['external_project_username'],
       message: `${MAPPING_APP_LABELS[values.field_mapping_app]} User is Required`,
       code: 'custom',
     });
   }
-  if (!values.odk_central_password?.trim()) {
+  if (!values.external_project_password?.trim()) {
     ctx.issues.push({
-      input: values.odk_central_password,
-      path: ['odk_central_password'],
+      input: values.external_project_password,
+      path: ['external_project_password'],
       message: `${MAPPING_APP_LABELS[values.field_mapping_app]} Password is Required`,
       code: 'custom',
     });
@@ -52,9 +52,9 @@ const validateODKCreds = (ctx: any, values: Record<string, any>) => {
 export const odkCredentialsValidationSchema = z
   .object({
     field_mapping_app: z.enum(field_mapping_app),
-    odk_central_url: z.string(),
-    odk_central_user: z.string().optional(),
-    odk_central_password: z.string().optional(),
+    external_project_instance_url: z.string(),
+    external_project_username: z.string().optional(),
+    external_project_password: z.string().optional(),
   })
   .check((ctx) => {
     const values = ctx.value;
@@ -70,24 +70,15 @@ export const projectTypeSelectorValidationSchema = z.object({
 export const projectOverviewValidationSchema = z
   .object({
     id: z.number().optional(),
-    name: z
+    project_name: z
       .string()
       .trim()
       .min(1, 'Project Name is Required')
       .regex(/^[^_]+$/, 'Project Name should not contain _ (underscore)'),
-    short_description: z.string().trim().min(1, 'Short Description is Required'),
     description: z.string().trim().min(1, 'Description is Required'),
-    organisation_id: z
-      .number()
-      .nullable()
-      .refine((val) => val !== null, {
-        message: 'Organization is Required',
-      }),
-    hasODKCredentials: z.boolean(),
-    useDefaultODKCredentials: z.boolean(),
-    odk_central_url: z.string().optional(),
-    odk_central_user: z.string().optional(),
-    odk_central_password: z.string().optional(),
+    external_project_instance_url: z.string().optional(),
+    external_project_username: z.string().optional(),
+    external_project_password: z.string().optional(),
     project_admins: z.array(z.string()),
     uploadAreaSelection: z.enum(['draw', 'upload_file']).nullable(),
     uploadedAOIFile: z.any().optional(),
@@ -96,7 +87,6 @@ export const projectOverviewValidationSchema = z
     }),
     outlineArea: z.string().optional(),
     proceedWithLargeOutlineArea: z.boolean(),
-    organisation_name: z.string(),
     merge: z.boolean(),
     field_mapping_app: z.union([z.enum(field_mapping_app), z.null()]).refine((val) => val !== null, {
       message: 'Field Mapping App must be selected',
@@ -104,9 +94,6 @@ export const projectOverviewValidationSchema = z
   })
   .check((ctx) => {
     const values = ctx.value;
-    if (values.hasODKCredentials && !values.useDefaultODKCredentials) {
-      validateODKCreds(ctx, values);
-    }
     if (values.uploadAreaSelection === 'upload_file' && isEmpty(values.uploadedAOIFile)) {
       ctx.issues.push({
         input: values.uploadedAOIFile,
@@ -150,6 +137,47 @@ export const projectOverviewValidationSchema = z
         code: 'custom',
       });
     }
+    // Validate ODK credentials: if any are provided, all must be provided
+    const hasAnyODKCred = !!(
+      values.external_project_instance_url?.trim() ||
+      values.external_project_username?.trim() ||
+      values.external_project_password?.trim()
+    );
+    const hasAllODKCred = !!(
+      values.external_project_instance_url?.trim() &&
+      values.external_project_username?.trim() &&
+      values.external_project_password?.trim()
+    );
+
+    if (hasAnyODKCred && !hasAllODKCred) {
+      const missingFields: string[] = [];
+      if (!values.external_project_instance_url?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} URL`);
+      }
+      if (!values.external_project_username?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} User`);
+      }
+      if (!values.external_project_password?.trim()) {
+        missingFields.push(`${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} Password`);
+      }
+
+      ctx.issues.push({
+        input:
+          values.external_project_instance_url || values.external_project_username || values.external_project_password,
+        path: ['external_project_instance_url'],
+        message: `All ${MAPPING_APP_LABELS[values.field_mapping_app || 'ODK']} credentials are required together. Missing: ${missingFields.join(', ')}`,
+        code: 'custom',
+      });
+    }
+    // Validate URL format if provided
+    if (values.external_project_instance_url?.trim() && !isValidUrl(values.external_project_instance_url)) {
+      ctx.issues.push({
+        input: values.external_project_instance_url,
+        path: ['external_project_instance_url'],
+        message: 'Invalid URL format',
+        code: 'custom',
+      });
+    }
   });
 
 export const projectDetailsValidationSchema = z
@@ -158,8 +186,6 @@ export const projectDetailsValidationSchema = z
     hashtags: z.array(z.string()),
     hasCustomTMS: z.boolean(),
     custom_tms_url: z.string().optional(),
-    per_task_instructions: z.string(),
-    use_odk_collect: z.boolean(),
   })
   .check((ctx) => {
     const values = ctx.value;

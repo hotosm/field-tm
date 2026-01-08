@@ -45,18 +45,18 @@ const ProjectOverview = () => {
   const [showODKCredsModal, setShowODKCredsModal] = useState(false);
   const [showLargeAreaWarning, setShowLargeAreaWarning] = useState(false);
   const [odkCreds, setOdkCreds] = useState({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
+    external_project_instance_url: '',
+    external_project_username: '',
+    external_project_password: '',
   });
   const [odkCredsError, setOdkCredsError] = useState<{
-    odk_central_url?: string;
-    odk_central_user?: string;
-    odk_central_password?: string;
+    external_project_instance_url?: string;
+    external_project_username?: string;
+    external_project_password?: string;
   }>({
-    odk_central_url: '',
-    odk_central_user: '',
-    odk_central_password: '',
+    external_project_instance_url: '',
+    external_project_username: '',
+    external_project_password: '',
   });
 
   //@ts-ignore
@@ -66,9 +66,6 @@ const ProjectOverview = () => {
   const { watch, register, control, setValue, formState } = form;
   const { errors } = formState;
   const values = watch();
-
-  // if draft project created, then instead of calling organisation endpoint populate organisation list with project minimal response data
-  const organisationList = [];
 
   const { data: users, isLoading: userListLoading } = useGetUserListQuery({
     params: { search: userSearchText, signin_type: 'osm' },
@@ -116,14 +113,6 @@ const ProjectOverview = () => {
     if (errors.proceedWithLargeOutlineArea) setShowLargeAreaWarning(true);
   }, [errors.proceedWithLargeOutlineArea]);
 
-  const handleOrganizationChange = (orgId: number) => {
-    const orgIdInt = orgId && +orgId;
-    if (!orgIdInt || values.field_mapping_app === field_mapping_app.QField) return;
-    const selectedOrg = organisationList?.find((org) => org.value === orgIdInt);
-    setValue('hasODKCredentials', !!selectedOrg?.hasODKCredentials);
-    setValue('useDefaultODKCredentials', !!selectedOrg?.hasODKCredentials);
-  };
-
   const changeFileHandler = async (file: FileType[]) => {
     if (isEmpty(file)) return;
 
@@ -156,9 +145,9 @@ const ProjectOverview = () => {
   };
 
   const saveServerCredentials = () => {
-    setValue('odk_central_url', odkCreds.odk_central_url);
-    setValue('odk_central_user', odkCreds.odk_central_user);
-    setValue('odk_central_password', odkCreds.odk_central_password);
+    setValue('external_project_instance_url', odkCreds.external_project_instance_url);
+    setValue('external_project_username', odkCreds.external_project_username);
+    setValue('external_project_password', odkCreds.external_project_password);
     setShowODKCredsModal(false);
   };
 
@@ -210,19 +199,8 @@ const ProjectOverview = () => {
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <FieldLabel label="Project Name" astric />
-          <Input {...register('name')} />
-          {errors?.name?.message && <ErrorMessage message={errors.name.message as string} />}
-        </div>
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <FieldLabel label="Short Description" astric />
-          <div className="relative">
-            <Textarea {...register('short_description')} maxLength={200} />
-            <p className="fmtm-text-xs fmtm-absolute fmtm-bottom-1 fmtm-right-2 fmtm-text-gray-400">
-              {values?.short_description?.length}/200
-            </p>
-          </div>
-          {errors?.short_description?.message && <ErrorMessage message={errors.short_description.message as string} />}
+          <Input {...register('project_name')} />
+          {errors?.project_name?.message && <ErrorMessage message={errors.project_name.message as string} />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -232,91 +210,56 @@ const ProjectOverview = () => {
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          {/* preselect organization if user org-admin & manages only one org */}
-          <FieldLabel label="Organization Name" astric />
-          <Controller
-            control={control}
-            name="organisation_id"
-            render={({ field }) => (
-              <Select2
-                options={organisationList || []}
-                value={field.value as number}
-                onChange={(value: any) => {
-                  field.onChange(value);
-                  handleOrganizationChange(value);
-                }}
-                placeholder="Organization Name"
-                disabled={(!isAdmin && authDetails?.orgs_managed?.length === 1) || !!values.id}
-                ref={field.ref}
-              />
-            )}
-          />
-          {errors?.organisation_id?.message && <ErrorMessage message={errors.organisation_id.message as string} />}
-        </div>
-
-        {((values.organisation_id && values.hasODKCredentials) ||
-          values.field_mapping_app === field_mapping_app.QField) &&
-          !values.id && (
-            <CustomCheckbox
-              key="useDefaultODKCredentials"
-              label={`Use default or requested ${values.field_mapping_app === field_mapping_app.QField ? 'QField' : 'ODK'} credentials`}
-              checked={values.useDefaultODKCredentials}
-              onCheckedChange={(value) => {
-                setValue('useDefaultODKCredentials', value);
-                if (!value) setShowODKCredsModal(true);
-              }}
-              className="fmtm-text-black fmtm-button fmtm-text-sm"
-              labelClickable={values.useDefaultODKCredentials}
-            />
-          )}
-
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <Dialog
             open={showODKCredsModal}
             onOpenChange={(open) => {
               setShowODKCredsModal(open);
               if (!open)
                 setOdkCreds({
-                  odk_central_url: values.odk_central_url || '',
-                  odk_central_user: values.odk_central_user || '',
-                  odk_central_password: values.odk_central_password || '',
+                  external_project_instance_url: values.external_project_instance_url || '',
+                  external_project_username: values.external_project_username || '',
+                  external_project_password: values.external_project_password || '',
                 });
             }}
           >
-            {!values.useDefaultODKCredentials && (
-              <DialogTrigger className="fmtm-w-fit">
-                <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
-                  Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
-                </Button>
-              </DialogTrigger>
-            )}
+            <DialogTrigger className="fmtm-w-fit">
+              <Button variant="primary-red" onClick={() => setShowODKCredsModal(true)}>
+                Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials
+              </Button>
+            </DialogTrigger>
             <DialogContent>
               <DialogTitle>Set {MAPPING_APP_LABELS[values.field_mapping_app!]} Credentials</DialogTitle>
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-[1.125rem] fmtm-w-full">
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} URL`} astric />
                   <Input
-                    value={odkCreds.odk_central_url}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_url: e.target.value })}
+                    value={odkCreds.external_project_instance_url}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_instance_url: e.target.value })}
                   />
-                  {odkCredsError.odk_central_url && <ErrorMessage message={odkCredsError.odk_central_url as string} />}
+                  {odkCredsError.external_project_instance_url && (
+                    <ErrorMessage message={odkCredsError.external_project_instance_url as string} />
+                  )}
                 </div>
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Email`} astric />
                   <Input
-                    value={odkCreds.odk_central_user}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_user: e.target.value })}
+                    value={odkCreds.external_project_username}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_username: e.target.value })}
                   />
-                  {odkCredsError.odk_central_user && <ErrorMessage message={odkCredsError.odk_central_user} />}
+                  {odkCredsError.external_project_username && (
+                    <ErrorMessage message={odkCredsError.external_project_username} />
+                  )}
                 </div>
                 <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
                   <FieldLabel label={`${MAPPING_APP_LABELS[values.field_mapping_app!]} Password`} astric />
                   <Input
-                    value={odkCreds.odk_central_password}
-                    onChange={(e) => setOdkCreds({ ...odkCreds, odk_central_password: e.target.value })}
+                    value={odkCreds.external_project_password}
+                    onChange={(e) => setOdkCreds({ ...odkCreds, external_project_password: e.target.value })}
                     type="password"
                   />
-                  {odkCredsError.odk_central_password && <ErrorMessage message={odkCredsError.odk_central_password} />}
+                  {odkCredsError.external_project_password && (
+                    <ErrorMessage message={odkCredsError.external_project_password} />
+                  )}
                 </div>
               </div>
               <div className="fmtm-flex fmtm-justify-end fmtm-items-center fmtm-mt-4 fmtm-gap-x-2">
@@ -333,9 +276,9 @@ const ProjectOverview = () => {
               </div>
             </DialogContent>
           </Dialog>
-          {errors?.odk_central_url && errors?.odk_central_user && errors?.odk_central_password && (
-            <ErrorMessage message="ODK Credentials are required" />
-          )}
+          {errors?.external_project_instance_url &&
+            errors?.external_project_username &&
+            errors?.external_project_password && <ErrorMessage message="ODK Credentials are required" />}
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">

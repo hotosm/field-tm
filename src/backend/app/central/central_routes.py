@@ -15,52 +15,60 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Routes to relay requests to ODK Central server."""
+"""Routes to relay requests to ODK Central server (Litestar)."""
 
+import logging
 import re
 from io import BytesIO
-from typing import Annotated
 
 import pandas as pd
-from fastapi import APIRouter, Depends, Form, HTTPException
-from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse, Response, StreamingResponse
-from loguru import logger as log
+from anyio import to_thread
+from litestar import Response, Router, get, post
+from litestar import status_codes as status
+from litestar.datastructures import UploadFile
+from litestar.di import Provide
+from litestar.enums import RequestEncodingType
+from litestar.exceptions import HTTPException
+from litestar.params import Body, Parameter
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.OdkCentralAsync import OdkCentral
-from psycopg import Connection
+from psycopg import AsyncConnection
 
-from app.auth.auth_deps import login_required
+from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
-from app.auth.roles import Mapper, ProjectManager
-from app.central import central_crud, central_deps, central_schemas
+from app.auth.roles import mapper, project_manager
+from app.central import central_crud, central_schemas
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects.project_schemas import ProjectUpdate
 
-router = APIRouter(
-    prefix="/central",
-    tags=["central"],
-    responses={404: {"description": "Not found"}},
+log = logging.getLogger(__name__)
+
+
+@get(
+    "/projects",
+    summary="List projects in Central.",
 )
-
-
-@router.get("/projects")
-async def list_projects():
+async def list_projects() -> dict[str, object]:
     """List projects in Central."""
     # TODO update for option to pass credentials by user
-    # NOTE runs in separate thread using run_in_threadpool
-    projects = await run_in_threadpool(lambda: central_crud.list_odk_projects())
+    # NOTE runs in separate thread using anyio.to_thread.run_sync
+    projects = await to_thread.run_sync(central_crud.list_odk_projects)
     if projects is None:
         return {"message": "No projects found"}
-    return JSONResponse(content={"projects": projects})
+    return {"projects": projects}
 
 
-@router.get("/list-forms")
+@get(
+    "/list-forms",
+    summary="Get a list of all XLSForms available in Field-TM.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
 async def get_form_lists(
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    db: Annotated[Connection, Depends(db_conn)],
+    db: AsyncConnection,
 ) -> list:
     """Get a list of all XLSForms available in Field-TM.
 
@@ -71,18 +79,38 @@ async def get_form_lists(
     return forms
 
 
-@router.post("/validate-form")
+async def _validate_xlsform_extension(xlsform: UploadFile) -> BytesIO:
+    """Validate an uploaded XLSForm has .xls or .xlsx extension and return bytes."""
+    from pathlib import Path
+
+    filename = Path(xlsform.filename or "")
+    file_ext = filename.suffix.lower()
+
+    allowed_extensions = [".xls", ".xlsx"]
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Provide a valid .xls or .xlsx file",
+        )
+
+    return BytesIO(await xlsform.read())
+
+
+@post(
+    "/validate-form",
+    summary="Basic validity check for uploaded XLSForm.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
 async def validate_form(
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    debug: bool = False,
-    use_odk_collect: bool = False,
-    need_verification_fields: bool = True,
-    mandatory_photo_upload: bool = False,
-    default_language: str = "english",
-):
+    xlsform: UploadFile,
+    debug: bool = Parameter(default=False),
+    use_odk_collect: bool = Parameter(default=False),
+    need_verification_fields: bool = Parameter(default=True),
+    mandatory_photo_upload: bool = Parameter(default=False),
+    default_language: str = Parameter(default="english"),
+) -> dict:
     """Basic validity check for uploaded XLSForm.
 
     Parses the form using ODK pyxform to check that it is valid.
@@ -95,57 +123,67 @@ async def validate_form(
     so the form is not usable in production:
         - new_geom_type
     """
+    xlsform_bytes = await _validate_xlsform_extension(xlsform)
+
     if debug:
         xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
-            xlsform,
+            xlsform_bytes,
             need_verification_fields=need_verification_fields,
             mandatory_photo_upload=mandatory_photo_upload,
             default_language=default_language,
             use_odk_collect=use_odk_collect,
         )
-        return StreamingResponse(
-            updated_form,
+        return Response(
+            content=updated_form.getvalue(),
             media_type=(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ),
             headers={"Content-Disposition": f"attachment; filename={xform_id}.xlsx"},
-        )
-    else:
-        await central_crud.validate_and_update_user_xlsform(
-            xlsform,
-            need_verification_fields=need_verification_fields,
-            mandatory_photo_upload=mandatory_photo_upload,
-            default_language=default_language,
-            use_odk_collect=use_odk_collect,
-        )
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={"message": "Your form is valid"},
+            status_code=status.HTTP_200_OK,
         )
 
+    await central_crud.validate_and_update_user_xlsform(
+        xlsform_bytes,
+        need_verification_fields=need_verification_fields,
+        mandatory_photo_upload=mandatory_photo_upload,
+        default_language=default_language,
+        use_odk_collect=use_odk_collect,
+    )
+    return {"message": "Your form is valid"}
 
-@router.post("/upload-xlsform")
+
+@post(
+    "/upload-xlsform",
+    summary="Upload the final XLSForm for the project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
 async def upload_project_xlsform(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-    xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    need_verification_fields: bool = True,
-    mandatory_photo_upload: bool = False,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
+    project_id: int = Parameter(),
+    need_verification_fields: bool = Parameter(default=True),
+    mandatory_photo_upload: bool = Parameter(default=False),
     # FIXME this var should be probably be refactored to project.field_mapping_app
-    default_language: str = "english",
-    use_odk_collect: bool = False,
-):
+    default_language: str = Parameter(default="english"),
+    use_odk_collect: bool = Parameter(default=False),
+) -> dict:
     """Upload the final XLSForm for the project."""
-    project = project_user.get("project")
+    project = current_user.get("project")
     project_id = project.id
-    new_geom_type = project.new_geom_type
     form_name = f"FMTM_Project_{project.id}"
 
     # Validate uploaded form
+    xlsform_bytes = await _validate_xlsform_extension(data)
+
     await central_crud.validate_and_update_user_xlsform(
-        xlsform=xlsform_upload,
+        xlsform=xlsform_bytes,
         form_name=form_name,
-        new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
@@ -153,9 +191,8 @@ async def upload_project_xlsform(
     )
 
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-        xlsform=xlsform_upload,
+        xlsform=xlsform_bytes,
         form_name=form_name,
-        new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
@@ -163,61 +200,41 @@ async def upload_project_xlsform(
     )
 
     # Write XLS form content to db
-    xlsform_bytes = project_xlsform.getvalue()
-    if len(xlsform_bytes) == 0 or not xform_id:
+    # Ensure BytesIO is at the beginning before reading
+    project_xlsform.seek(0)
+    xlsform_db_bytes = project_xlsform.getvalue()
+    if len(xlsform_db_bytes) == 0 or not xform_id:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="There was an error modifying the XLSForm!",
         )
-    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
+    log.debug(
+        f"Setting project XLSForm db data for xFormId: {xform_id}, bytes length: {len(xlsform_db_bytes)}"
+    )
     await DbProject.update(
         db,
         project_id,
-        ProjectUpdate(
-            xlsform_content=xlsform_bytes,
-            odk_form_id=xform_id,
-        ),
+        ProjectUpdate(xlsform_content=xlsform_db_bytes),
     )
     await db.commit()
+    log.debug(f"Successfully saved XLSForm to database for project {project_id}")
 
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content={"message": "Your form is valid"},
-    )
+    return {"message": "Your form is valid"}
 
 
-@router.post("/update-form")
-async def update_project_form(
-    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[
-        ProjectUserDict, Depends(ProjectManager(check_completed=True))
-    ],
-    xform_id: str = Form(...),
-    # FIXME add back in capability to update osm_category
-    # osm_category: XLSFormType = Form(...),
-):
-    """Update the XForm data in ODK Central & Field-TM DB."""
-    project = project_user_dict["project"]
-    await central_crud.update_project_xlsform(
-        db,
-        project,
-        xlsform,
-        xform_id,
-    )
-
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content={"message": f"Successfully updated the form for project {project.id}"},
-    )
-
-
-@router.post("/detect-form-languages")
+@post(
+    "/detect-form-languages",
+    summary="Detect languages available in an uploaded XLSForm.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
 async def detect_form_languages(
-    xlsform: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
-):
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
+) -> dict:
     """Detect languages available in an uploaded XLSForm."""
-    xlsform = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
+    xlsform_bytes = await _validate_xlsform_extension(data)
+    xlsform = pd.read_excel(xlsform_bytes, sheet_name=None, engine="calamine")
     detected_languages = []
 
     settings_df = xlsform.get("settings")
@@ -245,22 +262,30 @@ async def detect_form_languages(
     if default_language and default_language.lower() not in detected_languages:
         detected_languages.append(default_language.lower())
 
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content={
-            "detected_languages": detected_languages,  # in the order found in form
-            "default_language": [default_language] if default_language else [],
-            "supported_languages": list(INCLUDED_LANGUAGES.keys()),
-        },
-    )
+    return {
+        "detected_languages": detected_languages,  # in the order found in form
+        "default_language": [default_language] if default_language else [],
+        "supported_languages": list(INCLUDED_LANGUAGES.keys()),
+    }
 
 
-@router.get("/download-form")
+@get(
+    "/download-form",
+    summary="Download the XLSForm for a project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
 async def download_form(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
+    current_user: ProjectUserDict,
+    db: AsyncConnection,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> Response[bytes]:
     """Download the XLSForm for a project."""
-    project = project_user.get("project")
+    project = current_user.get("project")
 
     headers = {
         "Content-Disposition": f"attachment; filename={project.id}_xlsform.xlsx",
@@ -269,24 +294,34 @@ async def download_form(
     return Response(content=project.xlsform_content, headers=headers)
 
 
-@router.post("/refresh-appuser-token")
+@post(
+    "/refresh-appuser-token",
+    summary="Refreshes the token for the app user associated with a specific project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+)
 async def refresh_appuser_token(
-    current_user: Annotated[AuthUser, Depends(ProjectManager())],
-    db: Annotated[Connection, Depends(db_conn)],
-):
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> dict:
     """Refreshes the token for the app user associated with a specific project.
 
     Response:
         {
-            "status_code": HTTPStatus.OK,
+            "status_code": status.HTTP_200_OK,
             "message": "App User token has been successfully refreshed.",
         }
     """
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
-    project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         odk_token = await central_crud.get_appuser_token(
@@ -302,49 +337,80 @@ async def refresh_appuser_token(
             ),
         )
 
-        return JSONResponse(
-            content={
-                "message": "App User token has been successfully refreshed.",
-            }
-        )
+        return {
+            "message": "App User token has been successfully refreshed.",
+        }
 
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         msg = f"failed to refresh the appuser token for project {project_id}"
         log.error(msg)
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
 
 
-@router.post("/upload-form-media")
+@post(
+    "/upload-form-media",
+    summary="Upload media attachments to a form in Central.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+    status_code=status.HTTP_200_OK,
+)
 async def upload_form_media(
-    current_user: Annotated[AuthUser, Depends(ProjectManager())],
-    media_attachments: Annotated[
-        dict[str, BytesIO], Depends(central_deps.read_form_media)
-    ],
-):
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    db: AsyncConnection,
+    media_attachments: list[UploadFile],
+    project_id: int = Parameter(),
+) -> None:
     """Upload media attachments to a form in Central."""
     project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
-    project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
+
+    # Read all uploaded form media for upload to ODK Central
+    file_data_dict = {
+        file.filename: BytesIO(await file.read()) for file in media_attachments
+    }
 
     try:
         await central_crud.upload_form_media(
             project_xform_id,
             project_odk_id,
             project_odk_creds,
-            media_attachments,
+            file_data_dict,
         )
 
-        async with OdkCentral(
-            url=project_odk_creds.odk_central_url,
-            user=project_odk_creds.odk_central_user,
-            passwd=project_odk_creds.odk_central_password,
-        ) as odk_central:
+        if project_odk_creds:
+            async with OdkCentral(
+                url=project_odk_creds.external_project_instance_url,
+                user=project_odk_creds.external_project_username,
+                passwd=project_odk_creds.external_project_password,
+            ) as odk_central:
+                try:
+                    await odk_central.s3_sync()
+                except Exception:
+                    log.warning(
+                        "Fails to sync media to S3 - is the linked ODK Central "
+                        "instance correctly configured?"
+                    )
+        else:
+            # Fall back to environment variables if project_odk_creds is None
+            async with OdkCentral() as odk_central:
+                try:
+                    await odk_central.s3_sync()
+                except Exception:
+                    log.warning(
+                        "Fails to sync media to S3 - is the linked ODK Central "
+                        "instance correctly configured?"
+                    )
             try:
                 await odk_central.s3_sync()
             except Exception:
@@ -353,7 +419,7 @@ async def upload_form_media(
                     "instance correctly configured?"
                 )
 
-        return Response(status_code=HTTPStatus.OK)
+        return None
 
     except Exception as e:
         log.exception(f"Error: {e}")
@@ -363,21 +429,32 @@ async def upload_form_media(
         )
         log.error(msg)
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
 
 
-@router.post("/list-form-media", response_model=list[dict])
+@post(
+    "/list-form-media",
+    summary="A list of required media to upload for a form.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
 async def list_form_media(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
+    current_user: ProjectUserDict,
+    db: AsyncConnection,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> list[dict]:
     """A list of required media to upload for a form."""
-    project = project_user.get("project")
+    project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
-    project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         form_media = await central_crud.list_form_media(
@@ -393,21 +470,32 @@ async def list_form_media(
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
 
 
-@router.post("/get-form-media", response_model=dict[str, str])
+@post(
+    "/get-form-media",
+    summary="Return the project form attachments as a list of files.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
 async def get_form_media(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
+    current_user: ProjectUserDict,
+    db: AsyncConnection,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> dict[str, str]:
     """Return the project form attachments as a list of files."""
-    project = project_user.get("project")
+    project = current_user.get("project")
     project_id = project.id
-    project_odk_id = project.odkid
-    project_xform_id = project.odk_form_id
-    project_odk_creds = project.odk_credentials
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
 
     try:
         form_media = await central_crud.get_form_media(
@@ -420,26 +508,62 @@ async def get_form_media(
             msg = f"Form attachments for project {project_id} may not be uploaded yet!"
             log.warning(msg)
             raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=msg,
             )
 
-        return form_media
+        # form_media is a mapping of filenames to URLs (all strings)
+        return form_media  # type: ignore[return-value]
     except Exception as e:
         msg = (
             f"Failed to get all form media for Field-TM project ({project_id}) "
             f"ODK project ({project_odk_id}) form ID ({project_xform_id})"
         )
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
 
 
-@router.post("/test-credentials")
+@post(
+    "/test-credentials",
+    summary="Test ODK Central credentials by attempting to open a session.",
+    status_code=status.HTTP_200_OK,
+    dependencies={
+        "db": Provide(db_conn),
+        "current_user": Provide(public_endpoint),
+    },
+)
 async def odk_creds_test(
-    odk_creds: Annotated[central_schemas.ODKCentral, Depends()],
-):
+    external_project_instance_url: str | None = Parameter(default=None),
+    external_project_username: str | None = Parameter(default=None),
+    external_project_password: str | None = Parameter(default=None),
+) -> None:
     """Test ODK Central credentials by attempting to open a session."""
+    # Construct ODKCentral model from individual query parameters
+    odk_creds = central_schemas.ODKCentral(
+        external_project_instance_url=external_project_instance_url,
+        external_project_username=external_project_username,
+        external_project_password=external_project_password,
+    )
     await central_crud.odk_credentials_test(odk_creds)
-    return Response(status_code=HTTPStatus.OK)
+    return None
+
+
+central_router = Router(
+    path="/central",
+    tags=["central"],
+    route_handlers=[
+        list_projects,
+        get_form_lists,
+        validate_form,
+        upload_project_xlsform,
+        detect_form_languages,
+        download_form,
+        refresh_appuser_token,
+        upload_form_media,
+        list_form_media,
+        get_form_media,
+        odk_creds_test,
+    ],
+)

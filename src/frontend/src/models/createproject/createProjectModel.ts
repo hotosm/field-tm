@@ -2,13 +2,11 @@ import { task_state as taskStateEnum } from '@/types/enums';
 
 export interface ProjectDetailsModel {
   id: number;
-  odkid: number;
+  external_project_id: number;
   default_locale: string;
-  name: string;
-  short_description: string;
+  project_name: string;
   description: string;
   instructions: string;
-  per_task_instructions: string;
   status: number;
   osm_category: string;
   location_str: string;
@@ -47,3 +45,17 @@ export interface ProjectDetailsModel {
     qr_code_base64: string;
   }[];
 }
+
+export interface FormCategoryListModel {
+  id: number;
+  title: string;
+}
+
+export type splittedGeojsonType = {
+  type: 'FeatureCollection';
+  features: {
+    type: 'Feature';
+    geometry: { type: 'Polygon'; coordinates: number[][] };
+    properties: Record<string, any>;
+  }[];
+};

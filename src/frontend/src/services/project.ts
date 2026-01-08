@@ -72,8 +72,6 @@ export const uploadProjectTaskBoundaries = (project_id: number, payload: uploadP
 export const createStubProject = (payload: createStubProjectPayloadType, params: createStubProjectParamsType) =>
   api.post('/projects/stub', payload, { params });
 
-export const getProjectMinimal = (project_id: number) => api.get(`/projects/${project_id}/minimal`);
-
 export const downloadProjectBoundary = (project_id: number) => api.get(`/projects/${project_id}/download`);
 
 export const downloadTaskBoundaries = (project_id: number) =>

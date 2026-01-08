@@ -14,3 +14,9 @@ CREATE TYPE public.projectvisibility AS ENUM (
     'PRIVATE'
 );
 ALTER TYPE public.projectvisibility OWNER TO fmtm;
+
+CREATE TYPE public.projectrole AS ENUM (
+    'MAPPER',
+    'PROJECT_MANAGER'
+);
+ALTER TYPE public.projectrole OWNER TO fmtm;

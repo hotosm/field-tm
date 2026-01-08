@@ -24,27 +24,27 @@ from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
-from fastapi import UploadFile
-from fastapi.exceptions import HTTPException
+from litestar import status_codes as status
+from litestar.datastructures import UploadFile
+from litestar.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
-from app.central.central_schemas import ODKCentralDecrypted
-from app.db.enums import HTTPStatus
+from app.central.central_schemas import ODKCentral
 
 
 @asynccontextmanager
-async def pyodk_client(odk_creds: ODKCentralDecrypted):
+async def pyodk_client(odk_creds: ODKCentral):
     """Async-compatible context manager for pyodk.Client.
 
     Offloads blocking Client(...) and client.__exit__ to a separate thread,
     and avoids blocking the async event loop in the endpoint.
     """
     pyodk_config = CentralConfig(
-        base_url=odk_creds.odk_central_url,
-        username=odk_creds.odk_central_user,
-        password=odk_creds.odk_central_password,
+        base_url=odk_creds.external_project_instance_url,
+        username=odk_creds.external_project_username,
+        password=odk_creds.external_project_password,
     )
 
     loop = get_running_loop()
@@ -57,34 +57,36 @@ async def pyodk_client(odk_creds: ODKCentralDecrypted):
 
 
 @asynccontextmanager
-async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
+async def get_odk_dataset(odk_creds: ODKCentral):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkDataset(
-            url=odk_creds.odk_central_url,
-            user=odk_creds.odk_central_user,
-            passwd=odk_creds.odk_central_password,
+            url=odk_creds.external_project_instance_url,
+            user=odk_creds.external_project_username,
+            passwd=odk_creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(conn_error),
         ) from conn_error
 
 
 @asynccontextmanager
-async def get_async_odk_form(odk_creds: ODKCentralDecrypted):
+async def get_async_odk_form(odk_creds: ODKCentral):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkForm(
-            url=odk_creds.odk_central_url,
-            user=odk_creds.odk_central_user,
-            passwd=odk_creds.odk_central_password,
+            url=odk_creds.external_project_instance_url,
+            user=odk_creds.external_project_username,
+            passwd=odk_creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(conn_error),
         ) from conn_error
 
 
@@ -96,7 +98,7 @@ async def validate_xlsform_extension(xlsform: UploadFile):
     allowed_extensions = [".xls", ".xlsx"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Provide a valid .xls or .xlsx file",
         )
     return BytesIO(await xlsform.read())

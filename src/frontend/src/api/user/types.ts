@@ -1,4 +1,4 @@
-import { project_roles, user_roles } from '@/types/enums';
+import { project_roles } from '@/types/enums';
 
 // PAYLOAD TYPES
 export type inviteNewUserPayloadType = {
@@ -10,7 +10,6 @@ export type inviteNewUserPayloadType = {
 
 export type updateExistingUserPayloadType = {
   username?: string;
-  role?: user_roles;
   profile_img?: string;
   name?: string;
   city?: string;
@@ -61,7 +60,7 @@ export type getUserListType = {
 export type userType = {
   sub: string;
   username: string;
-  role: user_roles;
+  is_admin: boolean;
   profile_img: string | null;
   name: string;
   city: string | null;

@@ -1,0 +1,875 @@
+{% extends "layout.html" %} {% block title %}Create Project - Field Tasking
+Manager{% endblock %} {% block content %}
+<div style="padding: 20px; max-width: 800px; margin: 0 auto">
+  <h1 style="margin-bottom: 30px">Create New Project</h1>
+
+  <wa-card>
+    <form
+      id="create-project-form"
+      style="padding: 20px"
+      hx-post="/projects/create"
+      hx-target="#form-error-container"
+      hx-swap="innerHTML"
+      hx-indicator="#submit-indicator"
+    >
+      <div id="form-error-container">
+        <div id="form-error" style="margin-bottom: 16px; display: none">
+          <wa-callout variant="danger">
+            <span id="form-error-message"></span>
+          </wa-callout>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label
+          for="project_name_input"
+          style="
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            line-height: 1.5;
+          "
+        >
+          Project Name <span style="color: red; display: inline">*</span>
+        </label>
+        <wa-input
+          name="project_name"
+          id="project_name_input"
+          placeholder="Enter project name"
+          style="width: 100%"
+        ></wa-input>
+        <div id="project-name-error" style="margin-top: 8px"></div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label
+          for="description_input"
+          style="
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            line-height: 1.5;
+          "
+        >
+          Description <span style="color: red; display: inline">*</span>
+        </label>
+        <wa-textarea
+          name="description"
+          id="description_input"
+          placeholder="Enter project description"
+          rows="4"
+          style="width: 100%"
+        ></wa-textarea>
+        <div id="description-error" style="margin-top: 8px"></div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold">
+          Field Mapping App <span style="color: red">*</span>
+        </label>
+        <div
+          id="field-mapping-app-container"
+          style="display: flex; gap: 16px; flex-wrap: wrap"
+        >
+          <label
+            class="app-radio-label"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+              padding: 12px;
+              border: 2px solid #ddd;
+              border-radius: 8px;
+              flex: 1;
+              min-width: 150px;
+              transition: all 0.2s;
+            "
+          >
+            <input
+              type="radio"
+              name="field_mapping_app"
+              value="QField"
+              required
+              style="margin: 0; cursor: pointer"
+            />
+            <img
+              src="/static/images/qfield-logo.svg"
+              alt="QField"
+              style="width: 24px; height: 24px; object-fit: contain"
+              onerror="this.style.display='none'"
+            />
+            <span style="font-weight: 500">QField</span>
+          </label>
+          <label
+            class="app-radio-label"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+              padding: 12px;
+              border: 2px solid #ddd;
+              border-radius: 8px;
+              flex: 1;
+              min-width: 150px;
+              transition: all 0.2s;
+            "
+          >
+            <input
+              type="radio"
+              name="field_mapping_app"
+              value="ODK"
+              required
+              style="margin: 0; cursor: pointer"
+            />
+            <img
+              src="/static/images/odk-logo.svg"
+              alt="ODK"
+              style="width: 24px; height: 24px; object-fit: contain"
+              onerror="this.style.display='none'"
+            />
+            <span style="font-weight: 500">ODK</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold">
+          Project Area <span style="color: red">*</span>
+        </label>
+        <div
+          style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap"
+        >
+          <wa-button
+            type="button"
+            id="draw-polygon-btn"
+            variant="default"
+            style="flex: 1; min-width: 120px"
+          >
+            Draw Area
+          </wa-button>
+          <wa-button
+            type="button"
+            id="upload-geojson-btn"
+            variant="default"
+            style="flex: 1; min-width: 120px"
+          >
+            Upload GeoJSON
+          </wa-button>
+          <wa-button
+            type="button"
+            id="clear-map-btn"
+            variant="default"
+            style="flex: 1; min-width: 120px"
+          >
+            Clear
+          </wa-button>
+        </div>
+        <input
+          type="file"
+          id="geojson-file-input"
+          accept=".geojson,.json"
+          style="display: none"
+        />
+        <div
+          style="
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <input
+            type="checkbox"
+            id="merge-geometries-checkbox"
+            style="margin: 0; cursor: pointer"
+          />
+          <label
+            for="merge-geometries-checkbox"
+            style="
+              cursor: pointer;
+              font-size: 14px;
+              color: #333;
+              user-select: none;
+            "
+          >
+            Merge geometries (use convex hull for multipolygons)
+          </label>
+        </div>
+        <div
+          id="map"
+          style="
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+          "
+        ></div>
+        <div id="map-error" style="margin-top: 8px"></div>
+        <small style="display: block; margin-top: 8px; color: #666">
+          Draw a polygon on the map or upload a GeoJSON file to define your
+          project area.
+        </small>
+        <textarea
+          name="outline"
+          id="outline-geojson"
+          style="display: none"
+        ></textarea>
+      </div>
+
+      <div style="margin-bottom: 20px">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold">
+          Hashtags
+        </label>
+        <wa-input
+          id="hashtag-input"
+          placeholder="Type hashtags and press Enter or comma"
+          style="width: 100%"
+        ></wa-input>
+        <div
+          id="hashtags-container"
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            min-height: 32px;
+          "
+        ></div>
+        <small style="display: block; margin-top: 4px; color: #666">
+          Type hashtags and press Enter or comma to add them. Click the × on a
+          tag to remove it.
+        </small>
+      </div>
+
+      <div
+        style="display: flex; gap: 10px; margin-top: 30px; align-items: center"
+      >
+        <wa-button type="submit" variant="primary" id="submit-btn">
+          Create Project
+        </wa-button>
+        <span id="submit-indicator" style="display: none; margin-left: 10px"
+          >Creating...</span
+        >
+        <wa-button href="/" variant="default">Cancel</wa-button>
+      </div>
+    </form>
+  </wa-card>
+</div>
+
+<script type="module">
+  const form = document.getElementById("create-project-form");
+  const errorContainer = document.getElementById("form-error");
+  const errorMessageEl = document.getElementById("form-error-message");
+  const hashtagInput = document.getElementById("hashtag-input");
+  const hashtagsContainer = document.getElementById("hashtags-container");
+  const hashtags = new Set();
+
+  function showError(message) {
+    if (!errorContainer || !errorMessageEl) return;
+    errorMessageEl.textContent =
+      message || "Something went wrong. Please try again.";
+    errorContainer.style.display = "block";
+  }
+
+  function clearError() {
+    if (!errorContainer || !errorMessageEl) return;
+    errorMessageEl.textContent = "";
+    errorContainer.style.display = "none";
+  }
+
+  function addHashtag(tag) {
+    // Clean up the tag: remove # if present, trim whitespace
+    tag = tag.trim().replace(/^#+/, "");
+    if (!tag) return;
+
+    // Add # prefix if not present
+    const hashtag = tag.startsWith("#") ? tag : `#${tag}`;
+
+    // Don't add duplicates
+    if (hashtags.has(hashtag)) return;
+
+    hashtags.add(hashtag);
+    renderHashtags();
+  }
+
+  function removeHashtag(tag) {
+    hashtags.delete(tag);
+    renderHashtags();
+  }
+
+  function renderHashtags() {
+    hashtagsContainer.innerHTML = "";
+    hashtags.forEach((tag) => {
+      const tagEl = document.createElement("wa-tag");
+      tagEl.setAttribute("with-remove", "");
+      tagEl.textContent = tag;
+      tagEl.dataset.tag = tag; // Store tag value in data attribute
+      hashtagsContainer.appendChild(tagEl);
+    });
+  }
+
+  // Set up event delegation on the container - listen for all events
+  if (hashtagsContainer) {
+    // Listen for click events
+    hashtagsContainer.addEventListener("click", (e) => {
+      const tagEl = e.target.closest("wa-tag");
+      if (tagEl && tagEl.dataset.tag) {
+        // Get the actual clicked element (might be in shadow DOM)
+        const path = e.composedPath ? e.composedPath() : [e.target];
+        const clickedElement = path[0];
+
+        // Check if it's a button, icon, or remove-related element
+        const isRemoveButton =
+          clickedElement.tagName === "BUTTON" ||
+          clickedElement.tagName === "svg" ||
+          clickedElement.tagName === "path" ||
+          clickedElement.getAttribute("part") === "remove" ||
+          clickedElement.classList.contains("remove") ||
+          clickedElement.closest("button") ||
+          clickedElement.closest('[part="remove"]');
+
+        if (isRemoveButton) {
+          e.preventDefault();
+          e.stopPropagation();
+          const tag = tagEl.dataset.tag;
+          removeHashtag(tag);
+          return;
+        }
+      }
+    });
+
+    // Also listen for custom 'remove' event (case-insensitive check)
+    ["remove", "wa-remove", "tag-remove"].forEach((eventName) => {
+      hashtagsContainer.addEventListener(eventName, (e) => {
+        const tagEl = e.target;
+        if (tagEl && tagEl.dataset.tag) {
+          e.preventDefault();
+          e.stopPropagation();
+          const tag = tagEl.dataset.tag;
+          removeHashtag(tag);
+        }
+      });
+    });
+  }
+
+  // Handle input events for hashtag input
+  if (hashtagInput) {
+    hashtagInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault();
+        const value = hashtagInput.value ? hashtagInput.value.trim() : "";
+        if (value) {
+          // Split by comma in case multiple were pasted
+          value.split(",").forEach((tag) => addHashtag(tag));
+          hashtagInput.value = "";
+        }
+      }
+    });
+
+    hashtagInput.addEventListener("blur", () => {
+      const value = hashtagInput.value ? hashtagInput.value.trim() : "";
+      if (value) {
+        value.split(",").forEach((tag) => addHashtag(tag));
+        hashtagInput.value = "";
+      }
+    });
+  }
+
+  // Initialize Leaflet map
+  let map;
+  let drawnLayers;
+  let drawControl;
+
+  function initMap() {
+    // Wait for Leaflet to be available
+    if (typeof L === "undefined") {
+      console.error("Leaflet is not loaded");
+      return;
+    }
+
+    // Initialize map centered on world
+    map = L.map("map").setView([20, 0], 2);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Initialize drawn layers
+    drawnLayers = new L.FeatureGroup();
+    map.addLayer(drawnLayers);
+
+    // Initialize draw control
+    drawControl = new L.Control.Draw({
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+        },
+        rectangle: true,
+        circle: false,
+        marker: false,
+        circlemarker: false,
+        polyline: false,
+      },
+      edit: {
+        featureGroup: drawnLayers,
+        remove: true,
+      },
+    });
+
+    map.addControl(drawControl);
+
+    // Handle draw events
+    map.on(L.Draw.Event.CREATED, function (e) {
+      const layer = e.layer;
+      drawnLayers.clearLayers();
+      drawnLayers.addLayer(layer);
+      updateGeoJSON();
+    });
+
+    map.on(L.Draw.Event.EDITED, function (e) {
+      updateGeoJSON();
+    });
+
+    map.on(L.Draw.Event.DELETED, function (e) {
+      updateGeoJSON();
+    });
+  }
+
+  function updateGeoJSON() {
+    if (!drawnLayers) return;
+
+    const geojson = drawnLayers.toGeoJSON();
+    const outlineTextarea = document.getElementById("outline-geojson");
+
+    if (geojson.features && geojson.features.length > 0) {
+      // If single feature, use it directly; otherwise use FeatureCollection
+      const outline =
+        geojson.features.length === 1 ? geojson.features[0] : geojson;
+      outlineTextarea.value = JSON.stringify(outline, null, 2);
+    } else {
+      outlineTextarea.value = "";
+    }
+  }
+
+  function loadGeoJSONOnMap(geojson) {
+    if (!drawnLayers || !map) return;
+
+    drawnLayers.clearLayers();
+
+    try {
+      const geoJsonLayer = L.geoJSON(geojson, {
+        style: {
+          color: "#3388ff",
+          weight: 3,
+          fillColor: "#3388ff",
+          fillOpacity: 0.2,
+        },
+      });
+
+      drawnLayers.addLayer(geoJsonLayer);
+      map.fitBounds(geoJsonLayer.getBounds());
+      updateGeoJSON();
+    } catch (error) {
+      console.error("Error loading GeoJSON:", error);
+      showError("Invalid GeoJSON format. Please check your file.");
+    }
+  }
+
+  // Initialize map when DOM and Leaflet are ready
+  function waitForLeaflet() {
+    if (
+      typeof L !== "undefined" &&
+      typeof L.Control !== "undefined" &&
+      typeof L.Control.Draw !== "undefined"
+    ) {
+      initMap();
+    } else {
+      setTimeout(waitForLeaflet, 100);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", waitForLeaflet);
+  } else {
+    waitForLeaflet();
+  }
+
+  // Draw polygon button
+  document
+    .getElementById("draw-polygon-btn")
+    ?.addEventListener("click", function () {
+      if (!map) return;
+      const polygonDrawer = new L.Draw.Polygon(map, {
+        allowIntersection: false,
+        showArea: true,
+      });
+      polygonDrawer.enable();
+    });
+
+  // Upload GeoJSON button
+  document
+    .getElementById("upload-geojson-btn")
+    ?.addEventListener("click", function () {
+      document.getElementById("geojson-file-input").click();
+    });
+
+  // Handle file upload
+  document
+    .getElementById("geojson-file-input")
+    ?.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        try {
+          // Parse the file content
+          const geojsonData = JSON.parse(e.target.result);
+
+          // Clear any previous errors
+          clearError();
+          const mapError = document.getElementById("map-error");
+          if (mapError) {
+            mapError.innerHTML = "";
+          }
+
+          // Get merge geometries checkbox value
+          const mergeGeometriesCheckbox = document.getElementById(
+            "merge-geometries-checkbox",
+          );
+          const mergeGeometries = mergeGeometriesCheckbox
+            ? mergeGeometriesCheckbox.checked
+            : false;
+
+          // Send the geojson to API to validate, normalize, and merge into single polygon
+          const response = await fetch("/validate-geojson", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              geojson: geojsonData,
+              merge_geometries: mergeGeometries,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            const errorMsg = result.error || "Failed to validate GeoJSON";
+            console.error("Error validating GeoJSON:", errorMsg);
+            if (mapError) {
+              mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+            } else {
+              showError(errorMsg);
+            }
+            return;
+          }
+
+          // Load the normalized, merged GeoJSON onto the map
+          if (result.geojson) {
+            loadGeoJSONOnMap(result.geojson);
+          } else {
+            throw new Error("No GeoJSON returned from validation");
+          }
+        } catch (error) {
+          console.error("Error processing GeoJSON:", error);
+          const errorMsg =
+            error.message ||
+            "Invalid GeoJSON file. Please check the file format.";
+          const mapError = document.getElementById("map-error");
+          if (mapError) {
+            mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+          } else {
+            showError(errorMsg);
+          }
+        }
+      };
+      reader.readAsText(file);
+    });
+
+  // Clear map button
+  document
+    .getElementById("clear-map-btn")
+    ?.addEventListener("click", function () {
+      if (drawnLayers) {
+        drawnLayers.clearLayers();
+        updateGeoJSON();
+      }
+    });
+
+  // Listen for duplicate project name error
+  document.body.addEventListener("duplicateProjectName", function (event) {
+    // HTMX passes the object as event.detail, so access the property
+    let errorMsg = "";
+    if (event.detail && typeof event.detail === "object") {
+      errorMsg = event.detail.duplicateProjectName || "";
+    } else if (typeof event.detail === "string") {
+      errorMsg = event.detail;
+    }
+
+    const projectNameError = document.getElementById("project-name-error");
+    const projectNameInput = document.getElementById("project_name_input");
+
+    // Show error under project name field
+    if (projectNameError) {
+      if (errorMsg) {
+        projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+      } else {
+        projectNameError.innerHTML =
+          '<wa-callout variant="danger"><span>A project with this name already exists. Please choose a different name.</span></wa-callout>';
+      }
+    }
+
+    // Focus the project name input
+    if (projectNameInput) {
+      setTimeout(() => {
+        projectNameInput.focus();
+        projectNameInput.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
+    }
+  });
+
+  // Listen for missing outline error
+  document.body.addEventListener("missingOutline", function (event) {
+    console.log("missingOutline event received", event.detail);
+    let errorMsg = "";
+    if (event.detail && typeof event.detail === "object") {
+      errorMsg = event.detail.missingOutline || "";
+    } else if (typeof event.detail === "string") {
+      errorMsg = event.detail;
+    }
+
+    const mapError = document.getElementById("map-error");
+    const mapContainer = document.getElementById("map");
+
+    // Show error near the map
+    if (mapError) {
+      if (errorMsg) {
+        mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+      } else {
+        mapError.innerHTML =
+          '<wa-callout variant="danger"><span>You must draw or upload an Area of Interest (AOI) on the map before submitting.</span></wa-callout>';
+      }
+    }
+
+    // Scroll to map
+    if (mapContainer) {
+      setTimeout(() => {
+        mapContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  });
+
+  // Also listen for HTMX afterSwap to handle errors that come in the response
+  document.body.addEventListener("htmx:afterSwap", function (event) {
+    const xhr = event.detail.xhr;
+    const status = xhr.status;
+
+    // Handle 409 (duplicate name) - check if error is in response
+    if (status === 409) {
+      const responseText = xhr.responseText;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(responseText, "text/html");
+      const errorMessage = doc.querySelector(
+        "#form-error-message",
+      )?.textContent;
+
+      if (errorMessage) {
+        const projectNameError = document.getElementById("project-name-error");
+        if (projectNameError) {
+          projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
+        }
+
+        const projectNameInput = document.getElementById("project_name_input");
+        if (projectNameInput) {
+          setTimeout(() => {
+            projectNameInput.focus();
+            projectNameInput.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }, 100);
+        }
+      }
+    }
+
+    // Handle 400 (missing outline)
+    if (status === 400) {
+      const responseText = xhr.responseText;
+      if (
+        responseText.includes("AOI") ||
+        responseText.includes("Area of Interest") ||
+        responseText.includes("outline")
+      ) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(responseText, "text/html");
+        const errorMessage = doc.querySelector(
+          "#form-error-message",
+        )?.textContent;
+
+        if (errorMessage) {
+          const mapError = document.getElementById("map-error");
+          if (mapError) {
+            mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
+          }
+
+          const mapContainer = document.getElementById("map");
+          if (mapContainer) {
+            setTimeout(() => {
+              mapContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }, 100);
+          }
+        }
+      }
+    }
+  });
+
+  // Clear project name error when user starts typing
+  const projectNameInput = document.getElementById("project_name_input");
+  if (projectNameInput) {
+    projectNameInput.addEventListener("input", function () {
+      const projectNameError = document.getElementById("project-name-error");
+      if (projectNameError) {
+        projectNameError.innerHTML = "";
+      }
+    });
+  }
+
+  // Handle radio button styling for field mapping app selection
+  const appRadioLabels = document.querySelectorAll(".app-radio-label");
+  appRadioLabels.forEach((label) => {
+    const radio = label.querySelector('input[type="radio"]');
+
+    // Update styling on change
+    radio.addEventListener("change", function () {
+      appRadioLabels.forEach((l) => {
+        l.style.borderColor = "#ddd";
+        l.style.backgroundColor = "transparent";
+      });
+      if (this.checked) {
+        label.style.borderColor = "#3388ff";
+        label.style.backgroundColor = "#f0f8ff";
+      }
+    });
+
+    // Hover effects
+    label.addEventListener("mouseenter", function () {
+      if (!radio.checked) {
+        this.style.borderColor = "#3388ff";
+        this.style.backgroundColor = "#f0f8ff";
+      }
+    });
+
+    label.addEventListener("mouseleave", function () {
+      if (!radio.checked) {
+        this.style.borderColor = "#ddd";
+        this.style.backgroundColor = "transparent";
+      }
+    });
+  });
+
+  // Update hashtags before form submission (HTMX will handle the rest)
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      // Clear previous errors
+      const projectNameError = document.getElementById("project-name-error");
+      if (projectNameError) {
+        projectNameError.innerHTML = "";
+      }
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) {
+        descriptionError.innerHTML = "";
+      }
+
+      // Validate description
+      const descriptionInput = document.getElementById("description_input");
+      if (!descriptionInput || !descriptionInput.value.trim()) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (descriptionError) {
+          descriptionError.innerHTML =
+            '<wa-callout variant="danger"><span>Description is required.</span></wa-callout>';
+        }
+        if (descriptionInput) {
+          setTimeout(() => {
+            descriptionInput.focus();
+            descriptionInput.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }, 100);
+        }
+        return false;
+      }
+
+      // Update hashtags hidden field
+      const hashtagsArray = Array.from(hashtags);
+      let hashtagsInput = document.getElementById("hashtags-hidden");
+      if (!hashtagsInput) {
+        hashtagsInput = document.createElement("input");
+        hashtagsInput.type = "hidden";
+        hashtagsInput.name = "hashtags";
+        hashtagsInput.id = "hashtags-hidden";
+        form.appendChild(hashtagsInput);
+      }
+      hashtagsInput.value = hashtagsArray.join(", ");
+
+      // Validate outline is present before HTMX submits
+      const outlineValue = document
+        .getElementById("outline-geojson")
+        .value.trim();
+      if (!outlineValue) {
+        e.preventDefault();
+        e.stopPropagation();
+        const mapError = document.getElementById("map-error");
+        const errorMsg =
+          "You must draw or upload an Area of Interest (AOI) on the map before submitting.";
+        if (mapError) {
+          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+        }
+        const mapContainer = document.getElementById("map");
+        if (mapContainer) {
+          setTimeout(() => {
+            mapContainer.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }, 100);
+        }
+        return false;
+      }
+
+      // Clear map error if outline is present
+      const mapError = document.getElementById("map-error");
+      if (mapError) {
+        mapError.innerHTML = "";
+      }
+    });
+  }
+
+  // Clear description error when user starts typing
+  const descriptionInput = document.getElementById("description_input");
+  if (descriptionInput) {
+    descriptionInput.addEventListener("input", function () {
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) {
+        descriptionError.innerHTML = "";
+      }
+    });
+  }
+</script>
+{% endblock %}

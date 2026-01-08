@@ -288,11 +288,9 @@ const GetIndividualProjectDetails = (url: string) => {
         const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline, id: 1 }] };
         const modifiedResponse = {
           ...resp,
-          name: resp.name,
+          project_name: resp.project_name,
           description: resp.description,
-          short_description: resp.short_description,
           outline: formattedOutlineGeojson,
-          per_task_instructions: resp.per_task_instructions,
         };
 
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));

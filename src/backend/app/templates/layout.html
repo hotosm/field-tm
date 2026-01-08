@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>{% block title %}Field Tasking Manager{% endblock %}</title>
+
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="Coordinated field mapping for Open Mapping campaigns."
+    />
+    <meta name="author" content="Humanitarian OpenStreetMap Team" />
+    <meta
+      name="format-detection"
+      content="telephone=no, email=no, address=no"
+    />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+    />
+    <meta name="theme-color" content="#d63f3f" />
+
+    <link rel="icon" href="/favicon.png" sizes="16x16" />
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@awesome.me/webawesome/dist/components/": "https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.0.0/dist-cdn/components/",
+          "svelte": "https://esm.sh/svelte@5"
+        }
+      }
+    </script>
+    <!-- HOT UI + WebAwesome components-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.4.0/dist/style.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.0.0/dist-cdn/webawesome.loader.js"
+    ></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.4.0/dist/hotosm-ui.js"
+    ></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
+
+    <!-- Maps - Leaflet -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body>
+    <hot-header title="FieldTM" size="small" show-login="false"></hot-header>
+
+    {% block content %}{% endblock %}
+  </body>
+</html>

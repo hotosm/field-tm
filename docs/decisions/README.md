@@ -18,3 +18,4 @@ from the projects inception.
 - [0007 - Separate Manager / Mapper Frontends](./0007-separate-frontends.md)
 - [0008 - Sync Layer with ElectricSQL](./0008-sync-layer.md)
 - [0009 - Custom Webhook from ODK Central](./0009-central-webhook.md)
+- [0010 - LiteStar to Replace FastAPI](./0010-litestar.md)

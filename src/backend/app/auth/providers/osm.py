@@ -18,18 +18,20 @@
 
 """Auth methods related to OSM OAuth2."""
 
+import logging
 import os
 from time import time
 
 import requests
-from fastapi import Request, Response
-from fastapi.exceptions import HTTPException
-from loguru import logger as log
+from litestar import Request, Response
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_login_python.core import Auth
 
 from app.auth.auth_logic import create_jwt_tokens, set_cookies
 from app.config import settings
-from app.db.enums import HTTPStatus, UserRole
+
+log = logging.getLogger(__name__)
 
 if settings.DEBUG:
     # Required as callback url is http during dev
@@ -77,14 +79,20 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
             "username": osm_user["username"],
             "email": osm_user.get("email"),
             "picture": osm_user.get("img_url"),
-            "role": UserRole.MAPPER,
+            # All users default to non-admin; admin is controlled via DbUser.is_admin
+            "is_admin": False,
         }
     except Exception as e:
         raise ValueError(f"Invalid OSM token: {e}") from e
 
     # Create our JWT tokens from user data
     fmtm_token, refresh_token = create_jwt_tokens(user_data)
-    response = Response(status_code=HTTPStatus.OK)
+
+    response = Response(
+        status_code=status.HTTP_200_OK,
+        content=b'{"message":"ok"}',
+        media_type="application/json",
+    )
     response_plus_cookies = set_cookies(response, fmtm_token, refresh_token)
 
     # NOTE Here we create a separate cookie to store the OSM token, for later
@@ -119,7 +127,7 @@ def get_osm_token(request: Request, osm_auth: Auth) -> str:
     serialised_osm_token = request.cookies.get(cookie_name)
     if not serialised_osm_token:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You must be logged in to your OpenStreetMap account.",
         )
     return osm_auth.deserialize_data(serialised_osm_token)

@@ -44,9 +44,8 @@ export type ProjectTaskTypes = {
 
 type EditProjectResponseTypes = {
   id: number;
-  odkid: number;
-  name: string;
-  short_description: string;
+  external_project_id: number;
+  project_name: string;
   description: string;
   status: project_status;
   outline: GeoJSONFeatureTypes;
@@ -61,23 +60,19 @@ export type ProjectDetailsTypes = {
   task_split_dimension?: number;
   task_num_buildings?: number;
   no_of_buildings: number;
-  odk_central_user?: string;
-  odk_central_password?: string;
-  organisation: number;
-  odk_central_url?: string;
-  name: string;
+  external_project_username?: string;
+  external_project_password?: string;
+  external_project_instance_url?: string;
+  project_name: string;
   hashtags: string[];
-  short_description: string;
   description: string;
   task_split_type?: number;
   osm_category?: string;
   data_extract_options?: string;
-  organisation_id: number | null;
   formExampleSelection?: string;
   osmFormSelectionName?: string;
   average_buildings_per_task?: number;
   dataExtractType?: string;
-  per_task_instructions?: string;
   custom_tms_url: string;
   hasCustomTMS: boolean;
   xlsFormFileUpload: any;
@@ -90,7 +85,11 @@ export type ProjectDetailsTypes = {
   use_odk_collect: boolean;
   status: project_status;
   outline: splittedGeojsonType;
-  organisation_name: string;
+};
+
+export type FormCategoryListTypes = {
+  id: number;
+  title: string;
 };
 
 export type DrawnGeojsonTypes = {
@@ -101,7 +100,7 @@ export type DrawnGeojsonTypes = {
 };
 
 export type taskSplitOptionsType = {
-  name: string;
+  project_name: string;
   value: string;
   label: string;
   disabled: boolean;
@@ -122,7 +121,7 @@ export type splittedGeojsonType = {
 };
 
 export type projectVisibilityOptionsType = {
-  name: string;
+  project_name: string;
   value: project_visibility;
   label: string;
 };

@@ -19,6 +19,7 @@
 
 import ast
 import json
+import logging
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
@@ -27,10 +28,9 @@ from typing import Optional, Union
 
 import aiohttp
 import geojson
-import geojson_pydantic
-from fastapi import HTTPException, Request
-from fastapi.concurrency import run_in_threadpool
-from loguru import logger as log
+from litestar import Request
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_data_client import (
     RawDataClient,
     RawDataClientConfig,
@@ -39,18 +39,13 @@ from osm_data_client import (
 )
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_login_python.core import Auth
-from psycopg import Connection, sql
+from psycopg import AsyncConnection
 from psycopg.rows import class_row
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
-from app.central import central_crud, central_schemas
+from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
-from app.db.enums import (
-    FieldMappingApp,
-    HTTPStatus,
-    ProjectStatus,
-    XLSFormType,
-)
+from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.db.models import (
     DbProject,
     DbUser,
@@ -60,77 +55,86 @@ from app.db.postgis_utils import (
     featcol_keep_single_geom_type,
     featcol_to_flatgeobuf,
     flatgeobuf_to_featcol,
+    get_featcol_dominant_geom_type,
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
+from app.helpers.helper_schemas import PaginationInfo
 from app.projects import project_deps, project_schemas
 
+log = logging.getLogger(__name__)
 
-async def get_projects_featcol(
-    db: Connection,
-    bbox: Optional[str] = None,
-) -> geojson.FeatureCollection:
-    """Get all projects, or a filtered subset."""
-    bbox_condition = ""
-    bbox_params = {}
 
-    if bbox:
-        minx, miny, maxx, maxy = map(float, bbox.split(","))
-        bbox_condition = """
-            AND ST_Intersects(
-                p.outline, ST_MakeEnvelope(%(minx)s, %(miny)s, %(maxx)s, %(maxy)s, 4326)
-            )
-        """
-        bbox_params = {"minx": minx, "miny": miny, "maxx": maxx, "maxy": maxy}
+# NOTE not used anywhere - delete? (useful code though...)
+# async def get_projects_featcol(
+#     db: AsyncConnection,
+#     #: Optional[str] = None,
+# ) -> geojson.FeatureCollection:
+#     """Get all projects, or a filtered subset."""
+#     bbox_condition = ""
+#     bbox_params = {}
 
-    # FIXME add logic for percentMapped and percentValidated
-    # NOTE alternative logic to build a FeatureCollection
-    """
-        SELECT jsonb_build_object(
-            'type', 'FeatureCollection',
-            'features', COALESCE(jsonb_agg(feature), '[]'::jsonb)
-        ) AS featcol
-        FROM (...
-    """
-    sql = f"""
-            SELECT
-                'FeatureCollection' as type,
-                COALESCE(jsonb_agg(feature), '[]'::jsonb) AS features
-            FROM (
-                SELECT jsonb_build_object(
-                    'type', 'Feature',
-                    'id', p.id,
-                    'geometry', ST_AsGeoJSON(p.outline)::jsonb,
-                    'properties', jsonb_build_object(
-                        'name', p.name,
-                        'percentMapped', 0,
-                        'percentValidated', 0,
-                        'created', p.created_at,
-                        'link', concat('https://', %(domain)s::text, '/project/', p.id)
-                    )
-                ) AS feature
-                FROM projects p
-                WHERE p.visibility = 'PUBLIC'
-                {bbox_condition}
-            ) AS features;
-        """
+#     if bbox:
+#         minx, miny, maxx, maxy = map(float, bbox.split(","))
+#         bbox_condition = """
+#             AND ST_Intersects(
+#                 p.outline, ST_MakeEnvelope(
+#                     %(minx)s, %(miny)s, %(maxx)s, %(maxy)s, 4326
+#                 )
+#             )
+#         """
+#         bbox_params = {"minx": minx, "miny": miny, "maxx": maxx, "maxy": maxy}
 
-    async with db.cursor(
-        row_factory=class_row(geojson_pydantic.FeatureCollection)
-    ) as cur:
-        query_params = {"domain": settings.FMTM_DOMAIN}
-        if bbox:
-            query_params.update(bbox_params)
-        await cur.execute(sql, query_params)
-        featcol = await cur.fetchone()
+#     # FIXME add logic for percentMapped and percentValidated
+#     # NOTE alternative logic to build a FeatureCollection
+#     """
+#         SELECT jsonb_build_object(
+#             'type', 'FeatureCollection',
+#             'features', COALESCE(jsonb_agg(feature), '[]'::jsonb)
+#         ) AS featcol
+#         FROM (...
+#     """
+#     sql = f"""
+#             SELECT
+#                 'FeatureCollection' as type,
+#                 COALESCE(jsonb_agg(feature), '[]'::jsonb) AS features
+#             FROM (
+#                 SELECT jsonb_build_object(
+#                     'type', 'Feature',
+#                     'id', p.id,
+#                     'geometry', ST_AsGeoJSON(p.outline)::jsonb,
+#                     'properties', jsonb_build_object(
+#                         'name', p.project_name,
+#                         'percentMapped', 0,
+#                         'percentValidated', 0,
+#                         'created', p.created_at,
+#                         'link', concat(
+#                             'https://', %(domain)s::text, '/project/', p.id
+#                         )
+#                     )
+#                 ) AS feature
+#                 FROM projects p
+#                 WHERE p.visibility = 'PUBLIC'
+#                 {bbox_condition}
+#             ) AS features;
+#         """
 
-    if not featcol:
-        return HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Failed to generate project FeatureCollection",
-        )
+#     async with db.cursor(
+#         row_factory=class_row(geojson_pydantic.FeatureCollection)
+#     ) as cur:
+#         query_params = {"domain": settings.FMTM_DOMAIN}
+#         if bbox:
+#             query_params.update(bbox_params)
+#         await cur.execute(sql, query_params)
+#         featcol = await cur.fetchone()
 
-    return featcol
+#     if not featcol:
+#         return HTTPException(
+#             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+#             detail="Failed to generate project FeatureCollection",
+#         )
+
+#     return featcol
 
 
 async def generate_data_extract(
@@ -163,8 +167,10 @@ async def generate_data_extract(
     """
     if not config_json:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="To generate a new data extract a extract_config must be specified.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "To generate a new data extract a extract_config must be specified."
+            ),
         )
     config = RawDataClientConfig(
         access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
@@ -206,11 +212,12 @@ async def generate_data_extract(
                 Please select an area smaller than 200 km²."""
 
             raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
             ) from e
 
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to generate data extract from the raw data API.",
         ) from e
 
@@ -220,7 +227,7 @@ async def generate_data_extract(
 # ---------------------------
 
 
-async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
+async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
     """Read the list of XLSForms from the disk and sync them with the database."""
     async with db.cursor() as cur:
         existing_db_forms = set()
@@ -285,7 +292,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
 
 
 async def get_or_set_data_extract_url(
-    db: Connection,
+    db: AsyncConnection,
     db_project: DbProject,
     url: Optional[str],
 ) -> str:
@@ -312,7 +319,10 @@ async def get_or_set_data_extract_url(
                 "To generate one, call 'projects/generate-data-extract/'"
             )
             log.error(msg)
-            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
         return existing_url
 
     await DbProject.update(
@@ -327,7 +337,7 @@ async def get_or_set_data_extract_url(
 
 
 async def upload_geojson_data_extract(
-    db: Connection,
+    db: AsyncConnection,
     project_id: int,
     geojson_raw: Union[str, bytes],
 ) -> str:
@@ -349,7 +359,7 @@ async def upload_geojson_data_extract(
 
     if not featcol_single_geom_type:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Could not process geojson input",
         )
 
@@ -364,7 +374,10 @@ async def upload_geojson_data_extract(
     if not fgb_data:
         msg = f"Failed converting geojson to flatgeobuf for project ({project_id})"
         log.error(msg)
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=msg,
+        )
 
     # TODO simply post this directly to ODK Central an Entity List
     return
@@ -394,7 +407,7 @@ def flatten_dict(d, parent_key="", sep="_"):
 async def generate_odk_central_project_content(
     project_odk_id: int,
     project_odk_form_id: str,
-    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentral,
     xlsform: BytesIO,
     task_extract_dict: Optional[dict[int, geojson.FeatureCollection]] = None,
     entity_properties: Optional[list[str]] = None,
@@ -446,7 +459,7 @@ async def generate_odk_central_project_content(
 
 
 async def generate_project_files(
-    db: Connection,
+    db: AsyncConnection,
     project_id: int,
 ) -> bool:
     """Generate the files for a project.
@@ -463,7 +476,6 @@ async def generate_project_files(
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
-        geom_type = project.primary_geom_type
         log.info(f"Starting generate_project_files for project {project_id}")
 
         # Extract data extract from flatgeobuf
@@ -490,9 +502,102 @@ async def generate_project_files(
             log.debug("Splitting data extract per task area")
             # TODO in future this splitting could be removed if the task_id is
             # no longer used in the XLSForm for the map filter
+            # Get task boundaries from ODK Central (stored as entities) or QField
+            task_boundaries = None
+            if (
+                project.field_mapping_app == FieldMappingApp.ODK
+                and project.external_project_id
+            ):
+                try:
+                    # ODK credentials not stored on project, use None to fall back to env vars
+                    project_odk_creds = None
+                    async with central_deps.get_odk_dataset(
+                        project_odk_creds
+                    ) as odk_central:
+                        # Fetch task boundaries from ODK
+                        entity_data = await odk_central.getEntityData(
+                            project.external_project_id,
+                            "task_boundaries",
+                            include_metadata=False,
+                        )
+
+                        if entity_data and isinstance(entity_data, list):
+                            # Convert ODK entities to GeoJSON FeatureCollection
+                            from app.db.postgis_utils import javarosa_to_geojson_geom
+
+                            features = []
+                            for entity in entity_data:
+                                if entity.get("geometry"):
+                                    geom = await javarosa_to_geojson_geom(
+                                        entity["geometry"]
+                                    )
+                                    features.append(
+                                        {
+                                            "type": "Feature",
+                                            "geometry": geom,
+                                            "properties": entity.get("properties", {}),
+                                        }
+                                    )
+
+                            if features:
+                                task_boundaries = {
+                                    "type": "FeatureCollection",
+                                    "features": features,
+                                }
+                except Exception as e:
+                    log.warning(
+                        f"Could not fetch task boundaries from ODK for project {project_id}: {e}"
+                    )
+            elif project.field_mapping_app == FieldMappingApp.QFIELD:
+                # For QField, boundaries are stored in a temp table during upload
+                # Fetch from temp table for splitting data extract
+                try:
+                    async with db.cursor(row_factory=class_row(dict)) as cur:
+                        await cur.execute(f"""
+                            SELECT
+                                task_index,
+                                ST_AsGeoJSON(outline)::jsonb AS outline
+                            FROM temp_task_boundaries_{project_id}
+                            ORDER BY task_index;
+                        """)
+                        db_tasks = await cur.fetchall()
+
+                        if db_tasks:
+                            features = []
+                            for task in db_tasks:
+                                if task.get("outline"):
+                                    features.append(
+                                        {
+                                            "type": "Feature",
+                                            "geometry": task["outline"],
+                                            "properties": {
+                                                "task_id": task["task_index"]
+                                            },
+                                        }
+                                    )
+
+                            if features:
+                                task_boundaries = {
+                                    "type": "FeatureCollection",
+                                    "features": features,
+                                }
+                except Exception as e:
+                    log.warning(
+                        f"Could not fetch task boundaries from temp table for QField project {project_id}: {e}"
+                    )
+
             task_extract_dict = await split_geojson_by_task_areas(
-                db, feature_collection, project_id, geom_type
+                db, feature_collection, project_id, task_boundaries
             )
+
+            # If task_extract_dict is empty (no task boundaries), use whole AOI as single task
+            if not task_extract_dict and feature_collection:
+                log.info(
+                    f"No task boundaries found for project {project_id}. "
+                    "Using whole AOI as single task."
+                )
+                # Create a single task with all features (task_id = 1)
+                task_extract_dict = {1: feature_collection}
         else:
             # NOTE the entity properties are generated by the form `save_to` field
             # NOTE automatically anyway
@@ -500,62 +605,53 @@ async def generate_project_files(
             task_extract_dict = {}
 
         # Get ODK Project details
-        project_odk_id = project.odkid
+        project_odk_id = project.external_project_id
         project_xlsform = project.xlsform_content
-        project_odk_form_id = project.odk_form_id
-        project_odk_creds = project.odk_credentials
+
+        if not project_xlsform:
+            msg = f"No XLSForm content found for project ({project_id})"
+            log.error(msg)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
+
+        # Extract form_id from the stored XLSForm
+        # The form_id is stored in the XLSForm settings sheet
+        form_name = f"FMTM_Project_{project.id}"
+        xlsform_bytes = BytesIO(project_xlsform)
+
+        # Get the form_id by processing the XLSForm (this extracts it from settings)
+        # We use append_fields_to_user_xlsform which returns (xform_id, updated_form)
+        project_odk_form_id, _ = await central_crud.append_fields_to_user_xlsform(
+            xlsform=xlsform_bytes,
+            form_name=form_name,
+        )
+
+        # Reset BytesIO for use in generate_odk_central_project_content
+        xlsform_bytes.seek(0)
+
+        # ODK credentials not stored on project, use None to fall back to env vars
+        project_odk_creds = None
 
         odk_token = await generate_odk_central_project_content(
             project_odk_id,
             project_odk_form_id,
             project_odk_creds,
-            BytesIO(project_xlsform),
+            xlsform_bytes,
             task_extract_dict,
             entity_properties,
         )
-        # Run separate thread in event loop to avoid blocking with sync code
-        # Copy the parsed form XML into the FieldTM db for easy easy
-        form_xml = await run_in_threadpool(
-            central_crud.get_project_form_xml,
-            project_odk_creds,
-            project_odk_id,
-            project_odk_form_id,
-        )
 
         log.debug(
-            f"Setting encrypted odk token for Field-TM project ({project_id}) "
-            f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15]}...)"
+            f"Generated ODK token for Field-TM project ({project_id}) "
+            f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15] if odk_token else 'None'}...)"
         )
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(
-                odk_token=odk_token,
-                odk_form_xml=form_xml,
-            ),
-        )
-        task_feature_counts = [
-            (
-                task.id,
-                len(
-                    task_extract_dict.get(task.project_task_index, {}).get(
-                        "features", []
-                    )
-                ),
-            )
-            for task in project.tasks
-        ]
 
-        # Use parameterized batch update
-        update_data = [
-            (task_id, feature_count) for task_id, feature_count in task_feature_counts
-        ]
-
-        async with db.cursor() as cur:
-            await cur.executemany(
-                sql.SQL("UPDATE public.tasks SET feature_count = %s WHERE id = %s"),
-                [(fc, tid) for tid, fc in update_data],
-            )
+        # Note: odk_token and odk_form_xml are not stored in the projects table
+        # They are used only for ODK Central operations and not persisted
+        # Tasks are no longer stored in database, so we skip feature count updates
+        # Task boundaries are sent directly to ODK/QField, not stored in database
         return True
     except Exception as e:
         log.debug(str(format_exc()))
@@ -566,8 +662,11 @@ async def generate_project_files(
         return False
 
 
-async def get_task_geometry(db: Connection, project_id: int):
+async def get_task_geometry(db: AsyncConnection, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
+
+    Task boundaries are stored in ODK Central as entities (dataset: "task_boundaries")
+    or in a temporary table for QField projects. They are not stored permanently in the Field-TM database.
 
     Args:
         db (Connection): The database connection.
@@ -576,49 +675,125 @@ async def get_task_geometry(db: Connection, project_id: int):
     Returns:
         str: A geojson of the task boundaries
     """
-    query = """
-        SELECT project_task_index,
-        ST_AsGeoJSON(tasks.outline)::jsonb AS outline
-        FROM tasks
-        WHERE project_id = %(project_id)s
-    """
-    async with db.cursor(row_factory=class_row(dict)) as cur:
-        await cur.execute(query, {"project_id": project_id})
-        db_tasks = await cur.fetchall()
+    # Get project to check if it has ODK project
+    project = await project_deps.get_project_by_id(db, project_id)
 
-    if not db_tasks:
-        raise ValueError(f"No tasks found for project ID {project_id}.")
+    # Try to fetch task boundaries from ODK Central if available
+    if project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id:
+        try:
+            # ODK credentials not stored on project, use None to fall back to env vars
+            project_odk_creds = None
+            async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
+                # Fetch entities from task_boundaries dataset
+                entity_data = await odk_central.getEntityData(
+                    project.external_project_id,
+                    "task_boundaries",
+                    include_metadata=False,
+                )
 
-    features = [
-        {
-            "type": "Feature",
-            "geometry": task["outline"],
-            "properties": {"task_id": task["project_task_index"]},
-        }
-        for task in db_tasks
-        if task["outline"]  # Exclude tasks with no geometry
-    ]
+                if entity_data and isinstance(entity_data, list):
+                    # Convert ODK entities back to GeoJSON
+                    from app.db.postgis_utils import javarosa_to_geojson_geom
 
-    feature_collection = {"type": "FeatureCollection", "features": features}
+                    features = []
+                    for entity in entity_data:
+                        if entity.get("geometry"):
+                            geom = await javarosa_to_geojson_geom(entity["geometry"])
+                            task_id = entity.get("task_id", entity.get("__id", ""))
+                            features.append(
+                                {
+                                    "type": "Feature",
+                                    "geometry": geom,
+                                    "properties": {
+                                        "task_id": task_id,
+                                        **(entity.get("properties", {})),
+                                    },
+                                }
+                            )
+
+                    if features:
+                        feature_collection = {
+                            "type": "FeatureCollection",
+                            "features": features,
+                        }
+                        return json.dumps(feature_collection)
+        except Exception as e:
+            log.warning(
+                f"Failed to fetch task boundaries from ODK for project {project_id}: {e}"
+            )
+    elif project.field_mapping_app == FieldMappingApp.QFIELD:
+        # For QField, fetch from temporary table
+        try:
+            async with db.cursor(row_factory=class_row(dict)) as cur:
+                await cur.execute(f"""
+                    SELECT
+                        task_index,
+                        ST_AsGeoJSON(outline)::jsonb AS outline
+                    FROM temp_task_boundaries_{project_id}
+                    ORDER BY task_index;
+                """)
+                db_tasks = await cur.fetchall()
+
+                if db_tasks:
+                    features = []
+                    for task in db_tasks:
+                        if task.get("outline"):
+                            features.append(
+                                {
+                                    "type": "Feature",
+                                    "geometry": task["outline"],
+                                    "properties": {"task_id": task["task_index"]},
+                                }
+                            )
+
+                    if features:
+                        feature_collection = {
+                            "type": "FeatureCollection",
+                            "features": features,
+                        }
+                        return json.dumps(feature_collection)
+        except Exception as e:
+            log.warning(
+                f"Failed to fetch task boundaries from temp table for QField project {project_id}: {e}"
+            )
+
+    # Return empty FeatureCollection if no boundaries found
+    feature_collection = {"type": "FeatureCollection", "features": []}
     return json.dumps(feature_collection)
 
 
 async def get_project_features_geojson(
-    db: Connection,
+    db: AsyncConnection,
     db_project: DbProject,
     task_id: Optional[int] = None,
 ) -> geojson.FeatureCollection:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
-    geom_type = db_project.primary_geom_type
 
-    data_extract_url = db_project.data_extract_url
+    # Check for stored GeoJSON first (new approach, no S3)
+    if hasattr(db_project, "data_extract_geojson") and db_project.data_extract_geojson:
+        data_extract_geojson = db_project.data_extract_geojson
+        # Ensure it's a proper FeatureCollection
+        if (
+            isinstance(data_extract_geojson, dict)
+            and data_extract_geojson.get("type") == "FeatureCollection"
+        ):
+            # Determine geometry type from the GeoJSON data
+            geom_type = get_featcol_dominant_geom_type(data_extract_geojson)
+            # Split by task areas if task_id provided
+            if task_id:
+                split_extract_dict = await split_geojson_by_task_areas(
+                    db, data_extract_geojson, project_id, geom_type
+                )
+                return split_extract_dict.get(
+                    task_id, {"type": "FeatureCollection", "features": []}
+                )
+            return data_extract_geojson
+
+    # Fallback to URL-based approach (legacy)
+    data_extract_url = getattr(db_project, "data_extract_url", None)
 
     if not data_extract_url:
-        # raise HTTPException(
-        #     status_code=HTTPStatus.NOT_FOUND,
-        #     detail=f"No data extract exists for project ({project_id})",
-        # )
         # Return an empty featcol for projects with no existing features
         return {"type": "FeatureCollection", "features": []}
 
@@ -634,7 +809,7 @@ async def get_project_features_geojson(
                 msg = f"Download failed for data extract, project ({project_id})"
                 log.error(msg)
                 raise HTTPException(
-                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=msg,
                 )
 
@@ -647,9 +822,12 @@ async def get_project_features_geojson(
         msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
         log.error(msg)
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         )
+
+    # Determine geometry type from the GeoJSON data
+    geom_type = get_featcol_dominant_geom_type(data_extract_geojson)
 
     # Split by task areas if task_id provided
     if task_id:
@@ -683,10 +861,10 @@ async def get_project_features_geojson(
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     """Pagination result for splash page."""
     total_pages = (total + results_per_page - 1) // results_per_page
-    has_next = (page * results_per_page) < total  # noqa: N806
-    has_prev = page > 1  # noqa: N806
+    has_next = (page * results_per_page) < total
+    has_prev = page > 1
 
-    pagination = project_schemas.PaginationInfo(
+    pagination = PaginationInfo(
         has_next=has_next,
         has_prev=has_prev,
         next_num=page + 1 if has_next else None,
@@ -701,18 +879,14 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
 
 
 async def get_paginated_projects(
-    db: Connection,
+    db: AsyncConnection,
     page: int,
     results_per_page: int,
-    current_user: Optional[str] = None,
-    org_id: Optional[int] = None,
     user_sub: Optional[str] = None,
     hashtags: Optional[str] = None,
     search: Optional[str] = None,
-    minimal: bool = False,
     status: Optional[ProjectStatus] = None,
     field_mapping_app: Optional[FieldMappingApp] = None,
-    my_projects: bool = False,
     country: Optional[str] = None,
 ) -> dict:
     """Helper function to fetch paginated projects with optional filters."""
@@ -722,32 +896,30 @@ async def get_paginated_projects(
     # Get subset of projects
     projects = await DbProject.all(
         db,
-        current_user=current_user,
-        org_id=org_id,
         user_sub=user_sub,
         hashtags=hashtags,
         search=search,
-        minimal=minimal,
         status=status,
         field_mapping_app=field_mapping_app,
-        my_projects=my_projects,
         country=country,
     )
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
-    paginated_projects = projects[start_index:end_index]
-
-    # Build project summaries with external URLs from the query
-    summaries = [
-        project_schemas.ProjectSummary.model_validate(project, from_attributes=True)
-        for project in paginated_projects
-    ]
+    paginated_projects = projects[start_index:end_index] if projects else []
 
     pagination = await get_pagination(
-        page, len(paginated_projects), results_per_page, len(projects)
+        page,
+        len(paginated_projects),
+        results_per_page,
+        len(projects) if projects else 0,
     )
 
-    return {"results": summaries, "pagination": pagination}
+    from app.helpers.helper_schemas import PaginatedResponse
+
+    return PaginatedResponse[DbProject](
+        results=paginated_projects,
+        pagination=pagination,
+    )
 
 
 async def send_project_manager_message(
@@ -765,7 +937,7 @@ async def send_project_manager_message(
         project_url = f"https://{project_url}"
 
     message_content = dedent(f"""
-        You have been assigned to the project **{project.name}** as a
+        You have been assigned to the project **{project.project_name}** as a
         manager. You can now manage the project and its tasks.
 
         [Click here to view the project]({project_url})
@@ -776,7 +948,7 @@ async def send_project_manager_message(
     send_osm_message(
         osm_token=osm_token,
         osm_sub=new_manager.sub,
-        title=f"You have been assigned to project {project.name} as a manager",
+        title=f"You have been assigned to project {project.project_name} as a manager",
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")

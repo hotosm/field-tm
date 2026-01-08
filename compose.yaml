@@ -213,6 +213,8 @@ services:
         condition: service_healthy
       fmtm-db:
         condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
       central:
         condition: service_healthy
         required: false
@@ -346,6 +348,20 @@ services:
       - central_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
+
+  migrations:
+    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
+    depends_on:
+      fmtm-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    entrypoint: ["/migrate-entrypoint.sh"]
+    restart: "on-failure:2"
+    healthcheck:
+      test: ["NONE"] # Set the health check test to NONE to disable it
 
   fmtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
