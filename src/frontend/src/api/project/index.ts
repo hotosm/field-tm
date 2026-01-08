@@ -20,7 +20,6 @@ import {
   deleteProject,
   uploadProjectTaskBoundaries,
   createStubProject,
-  getProjectMinimal,
   downloadProjectBoundary,
   downloadTaskBoundaries,
   deleteEntity,
@@ -261,19 +260,6 @@ export const useCreateStubProjectMutation = ({
 }) =>
   useMutation({
     mutationFn: (payload: createStubProjectPayloadType) => createStubProject(payload, params),
-    ...options,
-  });
-
-export const useGetProjectMinimalQuery = ({
-  project_id,
-  options,
-}: {
-  project_id: number;
-  options: TQueryOptions<projectType>;
-}) =>
-  useQuery({
-    queryFn: () => getProjectMinimal(project_id),
-    select: (data) => data.data,
     ...options,
   });
 

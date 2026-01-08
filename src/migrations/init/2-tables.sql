@@ -52,6 +52,8 @@ CREATE TABLE public.projects (
     status public.projectstatus NOT NULL DEFAULT 'DRAFT',
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     xlsform_content bytea,
+    data_extract_geojson JSONB,
+    task_areas_geojson JSONB,
     hashtags character varying [],
     custom_tms_url character varying,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -71,3 +73,11 @@ ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
     'public.projects_id_seq'::regclass
 );
+
+
+CREATE TABLE public.user_roles (
+    user_sub character varying NOT NULL,
+    project_id integer NOT NULL,
+    role public.projectrole NOT NULL DEFAULT 'MAPPER'
+);
+ALTER TABLE public.user_roles OWNER TO fmtm;

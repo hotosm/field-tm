@@ -6,10 +6,8 @@ import { HomeActions } from '@/store/slices/HomeSlice';
 import Switch from '@/components/common/Switch';
 import Searchbar from '@/components/common/SearchBar';
 import Button from '@/components/common/Button';
-import { useHasManagedAnyOrganization } from '@/hooks/usePermissions';
 import Select2 from '@/components/common/Select2';
 import { field_mapping_app, project_status } from '@/types/enums';
-import Toggle from '@/components/common/Toggle';
 
 type homePageFiltersPropType = {
   searchText: string;
@@ -20,8 +18,6 @@ type homePageFiltersPropType = {
   onFieldMappingAppChange: (data: field_mapping_app) => void;
   country: string;
   onCountrySearch: (data: string) => void;
-  myProjects: boolean;
-  onMyProjectsToggle: (state: boolean) => void;
 };
 
 type statusOptionType = { value: project_status; label: string };
@@ -57,7 +53,6 @@ const fieldMappingAppOptions: fieldMappingAppOptionType[] = [
 ];
 
 const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
-  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
   const dispatch = useAppDispatch();
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
@@ -100,12 +95,6 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
           wrapperStyle="!fmtm-w-[11.7rem] !fmtm-h-9"
           className="!fmtm-rounded !fmtm-h-9 placeholder:fmtm-text-sm"
         />
-        <Toggle
-          label="My Projects"
-          isToggled={filter.myProjects}
-          onToggle={filter.onMyProjectsToggle}
-          tooltipMessage={`Toggle to view ${!filter.myProjects ? 'your projects' : 'all projects'}`}
-        />
       </div>
       <div className="fmtm-flex fmtm-items-center fmtm-justify-end fmtm-gap-3 fmtm-ml-auto sm:fmtm-ml-0">
         <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
@@ -117,14 +106,12 @@ const HomePageFilters = ({ filter }: { filter: homePageFiltersPropType }) => {
             onCheckedChange={() => dispatch(HomeActions.SetShowMapStatus(!showMapStatus))}
           />
         </div>
-        {hasManagedAnyOrganization && (
-          <Link to={'/create-project?step=1'}>
-            <Button variant="primary-red">
-              <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />
-              <p>New Project</p>
-            </Button>
-          </Link>
-        )}
+        <Link to={'/create-project?step=1'}>
+          <Button variant="primary-red">
+            <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />
+            <p>New Project</p>
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -15,21 +15,18 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Routes to relay requests to QFieldCloud server."""
+"""Routes to relay requests to QFieldCloud server (Litestar)."""
 
-from typing import Annotated
+from litestar import Router, delete, get, post
+from litestar import status_codes as status
+from litestar.di import Provide
+from litestar.params import Parameter
+from psycopg import AsyncConnection
 
-from fastapi import (
-    APIRouter,
-    Depends,
-)
-from fastapi.responses import JSONResponse, Response
-from psycopg import Connection
-
-from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import ProjectManager
+from app.auth.auth_deps import login_required, public_endpoint
+from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.roles import project_manager, super_admin
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
 from app.qfield import qfield_schemas
 from app.qfield.qfield_crud import (
     create_qfield_project,
@@ -38,53 +35,105 @@ from app.qfield.qfield_crud import (
 )
 from app.qfield.qfield_deps import qfield_client
 
-router = APIRouter(
-    prefix="/qfield",
-    tags=["qfield"],
-    responses={404: {"description": "Not found"}},
+
+@get(
+    "/projects",
+    summary="List projects in QFieldCloud.",
+    dependencies={
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
 )
-
-
-@router.get("/projects")
-async def list_projects():
+async def list_projects() -> dict:
     """List projects in QFieldCloud."""
     async with qfield_client() as client:
         projects = client.list_projects()
         return projects
 
 
-@router.post("/projects")
+@post(
+    "/projects",
+    summary="Attempt to generate the QFieldCloud project from FieldTM project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
 async def trigger_qfield_project_create(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-):
+    db: AsyncConnection,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> dict[str, str]:
     """Attempt to generate the QFieldCloud project from FieldTM project.
 
     The QField project should be created in /projects/generate-project-data,
     however, if this fails, we can trigger the project creation again via this
     endpoint.
     """
-    project = project_user_dict.get("project")
-    qfield_url = await create_qfield_project(db, project)
+    # For this endpoint, we need to manually check permissions
+    # since it doesn't have project_id in the path
+    from app.auth.roles import wrap_check_access
+    from app.db.enums import ProjectRole
+    from app.db.models import DbProject
+
+    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
+    project_user = await wrap_check_access(
+        project,
+        db,
+        auth_user,
+        ProjectRole.PROJECT_ADMIN,
+        check_completed=False,
+    )
+    qfield_url = await create_qfield_project(db, project_user.get("project"))
     # Redirect to qfieldcloud project dashboard
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
+    return {"url": qfield_url}
 
 
-@router.post("/test-credentials")
+@post(
+    "/test-credentials",
+    summary="Test QFieldCloud credentials by attempting to open a session.",
+    dependencies={
+        "db": Provide(db_conn),
+        "current_user": Provide(public_endpoint),
+    },
+    status_code=status.HTTP_200_OK,
+)
 async def qfc_creds_test(
-    qfc_creds: Annotated[qfield_schemas.QFieldCloud, Depends()],
-):
+    qfc_creds: qfield_schemas.QFieldCloud,
+) -> None:
     """Test QFieldCloud credentials by attempting to open a session."""
     await qfc_credentials_test(qfc_creds)
-    return Response(status_code=HTTPStatus.OK)
+    return None
 
 
-@router.delete("/{project_id}")
+@delete(
+    "/{project_id:int}",
+    summary="Delete a project from QFieldCloud.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def trigger_delete_qfield_project(
     project_id: int,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-):
+    current_user: ProjectUserDict,
+    db: AsyncConnection,
+    auth_user: AuthUser,
+) -> None:
     """Delete a project from QFieldCloud."""
     await delete_qfield_project(db, project_id)
-    return Response(status_code=HTTPStatus.NO_CONTENT)
+    return None
+
+
+qfield_router = Router(
+    path="/qfield",
+    tags=["qfield"],
+    route_handlers=[
+        list_projects,
+        trigger_qfield_project_create,
+        qfc_creds_test,
+        trigger_delete_qfield_project,
+    ],
+)

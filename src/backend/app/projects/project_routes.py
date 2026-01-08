@@ -15,47 +15,37 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Endpoints for Field-TM projects."""
+"""Endpoints for Field-TM projects (Litestar)."""
 
 import json
+import logging
 import os
 from io import BytesIO
 from pathlib import Path
 from typing import Annotated, Optional
 
+from anyio import to_thread
 from area_splitter.splitter import split_by_sql, split_by_square
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    Query,
-    Response,
-    UploadFile,
-)
-from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse, StreamingResponse
 from geojson_pydantic import FeatureCollection
-from loguru import logger as log
+from litestar import Response, Router, delete, get, patch, post
+from litestar import status_codes as status
+from litestar.datastructures import UploadFile
+from litestar.di import Provide
+from litestar.enums import RequestEncodingType
+from litestar.exceptions import HTTPException
+from litestar.params import Body, Parameter
 from osm_fieldwork.json_data_models import data_models_path, get_choices
 from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
-from psycopg import Connection
+from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
-from app.auth.roles import Mapper, ProjectManager, super_admin
+from app.auth.roles import mapper, project_manager, super_admin
 from app.central import central_crud
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import (
-    DbGeomType,
-    HTTPStatus,
-    ProjectStatus,
-    XLSFormType,
-)
+from app.db.enums import DbGeomType, ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import (
     DbProject,
@@ -68,85 +58,73 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
 )
+from app.helpers import helper_schemas
 from app.projects import project_crud, project_deps, project_schemas
-from app.projects.project_schemas import ProjectUpdate, ProjectUserContributions
+from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_crud import create_qfield_project, delete_qfield_project
-from app.s3 import delete_all_objs_under_prefix
 
-router = APIRouter(
-    prefix="/projects",
-    tags=["projects"],
-    responses={404: {"description": "Not found"}},
+log = logging.getLogger(__name__)
+
+
+@get(
+    "/",
+    summary="Return all projects.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+    return_dto=project_schemas.ProjectOut,
 )
-
-
-@router.get("/features", response_model=FeatureCollection)
-async def read_projects_to_featcol(
-    # NOTE here we add not permissions to make this externally accessible
-    # to scrapers / other projects
-    db: Annotated[Connection, Depends(db_conn)],
-    bbox: Optional[str] = None,
-):
-    """Return all projects as a single FeatureCollection.
-
-    This endpoint is used by disaster.ninja.
-    """
-    return await project_crud.get_projects_featcol(db, bbox)
-
-
-@router.get("", response_model=list[project_schemas.ProjectOutNoXml])
 async def read_projects(
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    db: Annotated[Connection, Depends(db_conn)],
-    user_sub: str = None,
-    skip: int = 0,
-    limit: int = 100,
-):
+    db: AsyncConnection,
+    user_sub: Optional[str] | None = None,
+    skip: Optional[int] = 0,
+    limit: Optional[int] = 100,
+    hashtags: Optional[list[str]] = None,
+) -> list[DbProject]:
     """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, current_user, user_sub)
-    return projects
+    projects = await DbProject.all(db, skip, limit, user_sub, hashtags)
+    return projects or []
 
 
-@router.post("/me", response_model=list[DbProject])
-async def get_projects_for_user(
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Get all projects the user is author of.
-
-    TODO to be implemented in future.
-    """
-    raise HTTPException(status_code=HTTPStatus.NOT_IMPLEMENTED)
-
-
-@router.post("/near_me", response_model=list[project_schemas.ProjectSummary])
+@post(
+    "/near_me",
+    summary="Get projects near the current user.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
 async def get_tasks_near_me(
     lat: float,
     long: float,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+) -> None:
     """Get projects near me.
 
     TODO to be implemented in future.
     """
-    raise HTTPException(status_code=HTTPStatus.NOT_IMPLEMENTED)
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-@router.get("/summaries", response_model=project_schemas.PaginatedProjectSummaries)
+@get(
+    "/summaries",
+    summary="Get a paginated summary of projects.",
+    dependencies={
+        "db": Provide(db_conn),
+        "current_user": Provide(public_endpoint),
+    },
+    return_dto=project_schemas.ProjectSummary,
+)
 async def read_project_summaries(
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(public_endpoint)],
-    page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
-    results_per_page: int = Query(13, le=100),
-    org_id: Optional[int] = None,
-    user_sub: Optional[str] = None,
-    hashtags: Optional[str] = None,
-    search: Optional[str] = None,
-    minimal: bool = False,
-    my_projects: bool = False,
-    country: Optional[str] = None,
-    status: ProjectStatus = None,
-    field_mapping_app: Optional[FieldMappingApp] = None,
-):
+    db: AsyncConnection,
+    page: int = Parameter(1, ge=1),
+    results_per_page: int = Parameter(13, le=100),
+    user_sub: str | None = Parameter(default=None),
+    hashtags: str | None = Parameter(default=None),
+    search: str | None = Parameter(default=None),
+    country: str | None = Parameter(default=None),
+    status: ProjectStatus | None = Parameter(default=None),
+    field_mapping_app: FieldMappingApp | None = Parameter(default=None),
+) -> helper_schemas.PaginatedResponse[DbProject]:
     """Get a paginated summary of projects.
 
     NOTE this is a public endpoint with no auth requirements.
@@ -155,27 +133,29 @@ async def read_project_summaries(
         db,
         page,
         results_per_page,
-        current_user,
-        org_id,
         user_sub,
         hashtags,
         search,
-        minimal,
         status,
         field_mapping_app,
-        my_projects=my_projects,
         country=country,
     )
 
 
-@router.get("/categories")
-async def get_categories(current_user: Annotated[AuthUser, Depends(login_required)]):
+@get(
+    "/categories",
+    summary="Get all project categories.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
+async def get_categories() -> dict:
     """Get api for fetching all the categories.
 
     This endpoint fetches all the categories from osm_fieldwork.
 
     ## Response
-    - Returns a JSON object containing a list of categories and their respoective forms.
+    - Returns a JSON object containing a list of categories and their respective forms.
 
     """
     # FIXME update to use osm-rawdata
@@ -185,80 +165,94 @@ async def get_categories(current_user: Annotated[AuthUser, Depends(login_require
     return categories
 
 
-@router.get("/features/download")
-async def download_features(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-    task_id: Optional[int] = None,
-):
-    """Downloads the features of a project as a GeoJSON file.
+@get(
+    "/{project_id:int}",
+    summary="Get a specific project by ID.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+    return_dto=project_schemas.ProjectOut,
+)
+async def read_project(
+    project_id: int,
+    current_user: ProjectUserDict,
+) -> DbProject:
+    """Get a specific project by ID."""
+    return current_user.get("project")
 
-    Can generate a geojson for the entire project, or specific task areas.
-    """
-    project = project_user.get("project")
-    feature_collection = await project_crud.get_project_features_geojson(
-        db, project, task_id
-    )
 
+@get(
+    "/{project_id:int}/download",
+    summary="Download the project boundary as GeoJSON.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
+async def download_project_boundary(
+    project_id: int,
+    current_user: ProjectUserDict,
+    db: AsyncConnection,
+) -> Response:
+    """Downloads the boundary of a project as a GeoJSON file."""
+    project = current_user.get("project")
+    geojson_bytes = json.dumps(project.outline).encode("utf-8")
     headers = {
-        "Content-Disposition": (
-            f"attachment; filename=fmtm_project_{project.id}_features.geojson"
-        ),
+        "Content-Disposition": f"attachment; filename={project.slug}.geojson",
         "Content-Type": "application/media",
     }
-
-    return Response(content=json.dumps(feature_collection), headers=headers)
-
-
-@router.get("/contributors/{project_id}", response_model=list[ProjectUserContributions])
-async def get_contributors(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Get contributors of a project."""
-    project = project_user.get("project")
-    return await project_crud.get_project_users_plus_contributions(db, project.id)
+    return Response(
+        content=geojson_bytes,
+        headers=headers,
+        status_code=status.HTTP_200_OK,
+    )
 
 
-##################
-# MANAGER ROUTES #
-##################
-
-
-@router.post("/task-split")
+@post(
+    "/task-split",
+    summary="Split a task into subtasks.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+    status_code=status.HTTP_201_CREATED,
+)
 async def task_split(
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    project_geojson: UploadFile = File(...),
-    extract_geojson: Optional[UploadFile] = File(None),
-    no_of_buildings: int = Form(50),
-):
+    data: Annotated[
+        project_schemas.SplitFormData, Body(media_type=RequestEncodingType.MULTI_PART)
+    ],
+    no_of_buildings: int = Parameter(default=50),
+) -> dict:
     """Split a task into subtasks.
 
     NOTE we pass a connection
 
     Args:
-        current_user (AuthUser): the currently logged in user.
-        project_geojson (UploadFile): The geojson (AOI) to split.
-        extract_geojson (UploadFile, optional): Custom data extract geojson
-            containing osm features (should be a FeatureCollection).
-            If not included, an extract is generated automatically.
+        auth_user (AuthUser): the currently logged in user.
+        data (SplitFormData): The form data containing the following fields:
+            project_geojson (UploadFile): The geojson (AOI) to split.
+            extract_geojson (UploadFile, optional): Custom data extract geojson
+                containing osm features (should be a FeatureCollection).
+                If not included, an extract is generated automatically.
         no_of_buildings (int, optional): The number of buildings per subtask.
             Defaults to 50.
 
     Returns:
         The result of splitting the task into subtasks.
     """
-    boundary_featcol = parse_geojson_file_to_featcol(await project_geojson.read())
+    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
     merged_boundary = merge_polygons(boundary_featcol, False)
     # Validatiing Coordinate Reference Systems
     await check_crs(merged_boundary)
 
     # read data extract
     parsed_extract = None
-    if extract_geojson:
-        parsed_extract = parse_geojson_file_to_featcol(await extract_geojson.read())
+    if data.extract_geojson:
+        parsed_extract = parse_geojson_file_to_featcol(
+            await data.extract_geojson.read()
+        )
         if parsed_extract:
             await check_crs(parsed_extract)
         else:
@@ -266,50 +260,55 @@ async def task_split(
 
     log.debug("STARTED task splitting using provided boundary and data extract")
     # NOTE here we pass the connection string and allow area-splitter to
-    # a use psycopg connection (not async)
-    features = await run_in_threadpool(
-        lambda: split_by_sql(
-            merged_boundary,
-            settings.FMTM_DB_URL,
-            num_buildings=no_of_buildings,
-            osm_extract=parsed_extract,
-        )
+    # use a psycopg connection (not async)
+    features = await to_thread.run_sync(
+        split_by_sql,
+        merged_boundary,
+        settings.FMTM_DB_URL,
+        no_of_buildings,
+        parsed_extract,
     )
     log.debug("COMPLETE task splitting")
     return features
 
 
-@router.post("/preview-split-by-square", response_model=FeatureCollection)
+@post(
+    "/preview-split-by-square",
+    summary="Preview splitting a project AOI by square.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
 async def preview_split_by_square(
-    # NOTE we do not set any roles on this endpoint yet
-    # FIXME once sub project creation implemented, this should be manager only
-    current_user: Annotated[AuthUser, Depends(login_required)],
-    project_geojson: UploadFile = File(...),
-    extract_geojson: Optional[UploadFile] = File(None),
-    dimension_meters: int = Form(100),
-):
+    data: Annotated[
+        project_schemas.SplitFormData, Body(media_type=RequestEncodingType.MULTI_PART)
+    ],
+    dimension_meters: int = Parameter(default=100),
+) -> FeatureCollection:
     """Preview splitting by square.
 
     TODO update to use a response_model
     """
     # Validating for .geojson File.
-    file_name = os.path.splitext(project_geojson.filename)
+    file_name = os.path.splitext(data.project_geojson.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            HTTPStatus.BAD_REQUEST,
+            status.HTTP_400_BAD_REQUEST,
             detail="Provide a valid .geojson file",
         )
 
     # read entire file
-    boundary_featcol = parse_geojson_file_to_featcol(await project_geojson.read())
+    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
 
     # Validatiing Coordinate Reference System
     await check_crs(boundary_featcol)
     parsed_extract = None
-    if extract_geojson:
-        parsed_extract = parse_geojson_file_to_featcol(await extract_geojson.read())
+    if data.extract_geojson:
+        parsed_extract = parse_geojson_file_to_featcol(
+            await data.extract_geojson.read()
+        )
         if parsed_extract:
             await check_crs(parsed_extract)
         else:
@@ -326,25 +325,33 @@ async def preview_split_by_square(
     )
 
 
-@router.post("/generate-data-extract")
+@post(
+    "/generate-data-extract",
+    summary="Generate a new data extract for a project AOI.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+)
 async def get_data_extract(
-    # config_file: Optional[str] = Form(None),
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    geojson_file: UploadFile = File(...),
+    current_user_dict: ProjectUserDict,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
+    project_id: int = Parameter(),
     # FIXME this is currently hardcoded but needs to be user configurable via UI
-    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
-    centroid: Annotated[bool, Form()] = False,
-    geom_type: Annotated[DbGeomType, Form()] = DbGeomType.POLYGON,
-    use_st_within: Annotated[bool, Form()] = True,
-):
+    osm_category: XLSFormType | None = XLSFormType.buildings,
+    centroid: bool = False,
+    geom_type: DbGeomType = DbGeomType.POLYGON,
+    use_st_within: bool = True,
+) -> dict[str, str | None]:
     """Get a new data extract for a given project AOI.
 
     TODO allow config file (YAML/JSON) upload for data extract generation
     TODO alternatively, direct to raw-data-api to generate first, then upload
     """
-    boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
+    boundary_geojson = parse_geojson_file_to_featcol(await data.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
-    project = project_user_dict.get("project")
+    project = current_user_dict.get("project")
 
     # Get extract config file from existing data_models
     geom_type = geom_type.name.lower()
@@ -375,33 +382,50 @@ async def get_data_extract(
         use_st_within,
     )
 
-    return JSONResponse(
-        status_code=HTTPStatus.OK, content={"url": result.data.get("download_url")}
-    )
+    return {"url": result.data.get("download_url")}
 
 
-@router.get("/data-extract-url")
+@get(
+    "/data-extract-url",
+    summary="Get or set the data extract URL for a project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+)
 async def get_or_set_data_extract(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    url: Optional[str] = None,
-):
+    db: AsyncConnection,
+    current_user_dict: ProjectUserDict,
+    project_id: int = Parameter(),
+    url: str | None = Parameter(default=None),
+) -> dict[str, str | None]:
     """Get or set the data extract URL for a project."""
-    db_project = project_user_dict.get("project")
+    db_project = current_user_dict.get("project")
     fgb_url = await project_crud.get_or_set_data_extract_url(
         db,
         db_project,
         url,
     )
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
+    return {"url": fgb_url}
 
 
-@router.post("/upload-data-extract")
+@post(
+    "/upload-data-extract",
+    summary="Upload a data extract GeoJSON for a project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+    status_code=status.HTTP_201_CREATED,
+)
 async def upload_data_extract(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    data_extract_file: UploadFile = File(...),
-):
+    db: AsyncConnection,
+    current_user_dict: ProjectUserDict,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
+    project_id: int = Parameter(),
+) -> dict[str, str]:
     """Upload a data extract geojson for a project.
 
     The frontend has the option to upload flatgeobuf, but this must first
@@ -425,40 +449,51 @@ async def upload_data_extract(
     Query Params:
     - 'project_id' (int): the project's id. Required.
     """
-    project_id = project_user_dict.get("project").id
+    project_id = current_user_dict.get("project").id
 
     # Validating for .geojson File.
-    file_name = os.path.splitext(data_extract_file.filename)
+    file_name = os.path.splitext(data.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json", ".fgb"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            HTTPStatus.BAD_REQUEST, detail="Provide a valid .geojson or .fgb file"
+            status.HTTP_400_BAD_REQUEST,
+            detail="Provide a valid .geojson or .fgb file",
         )
 
     # read entire file
-    extract_data = await data_extract_file.read()
+    extract_data = await data.read()
 
     fgb_url = await project_crud.upload_geojson_data_extract(
         db, project_id, extract_data
     )
-    return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
+    return {"url": fgb_url}
 
 
-@router.post("/{project_id}/additional-entity")
+@post(
+    "/{project_id:int}/additional-entity",
+    summary="Add an additional Entity list for the project in ODK.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+    status_code=status.HTTP_200_OK,
+)
 async def add_additional_entity_list(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    geojson: UploadFile = File(...),
-):
+    project_id: int,
+    current_user_dict: ProjectUserDict,
+    geojson: UploadFile,
+) -> None:
     """Add an additional Entity list for the project in ODK.
 
     Note that the Entity list will be named from the filename
     of the GeoJSON uploaded.
     """
-    project = project_user_dict.get("project")
-    project_odk_id = project.odkid
-    project_odk_creds = project.odk_credentials
+    project = current_user_dict.get("project")
+    project_odk_id = project.external_project_id
+    # ODK credentials not stored on project, use None to fall back to env vars
+    project_odk_creds = None
     # NOTE the Entity name is extracted from the filename (without extension)
     entity_name = Path(geojson.filename).stem
 
@@ -476,16 +511,25 @@ async def add_additional_entity_list(
         entities_list=entities_list,
     )
 
-    return Response(status_code=HTTPStatus.OK)
+    return None
 
 
-@router.post("/{project_id}/generate-project-data")
+@post(
+    "/{project_id:int}/generate-project-data",
+    summary="Generate additional project data and files.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+    status_code=status.HTTP_200_OK,
+)
 async def generate_files(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    background_tasks: BackgroundTasks,
-    combined_features_count: Annotated[int, Form()] = 0,
-):
+    project_id: int,
+    db: AsyncConnection,
+    current_user_dict: ProjectUserDict,
+    combined_features_count: int = Parameter(0),
+) -> None:
     """Generate additional content to initialise the project.
 
     Boundary, ODK Central forms, QR codes, etc.
@@ -497,18 +541,8 @@ async def generate_files(
     Some of the other functionality of this api includes converting a xls file
     provided by the user to the xform, generates osm data extracts and uploads
     it to the form.
-
-    Args:
-        combined_features_count (int): Total count of features to be mapped, plus
-            additional dataset features, determined by frontend.
-        db (Connection): The database connection.
-        project_user_dict (ProjectUserDict): Project admin role.
-        background_tasks (BackgroundTasks): FastAPI background tasks.
-
-    Returns:
-        json (JSONResponse): A success message containing the project ID.
     """
-    project = project_user_dict.get("project")
+    project = current_user_dict.get("project")
     project_id = project.id
     log.debug(f"Generating additional files for project: {project.id}")
     warning_message = None
@@ -516,18 +550,28 @@ async def generate_files(
     # Handle QField separately
     if project.field_mapping_app == FieldMappingApp.QFIELD:
         qfield_url = await create_qfield_project(db, project)
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
         # Provide URL for qfieldcloud project dashboard
-        return JSONResponse(status_code=HTTPStatus.OK, content={"url": qfield_url})
+        return {"url": qfield_url}
 
     # Run in background for ODK project with lots of features
     elif combined_features_count > 10000:
-        # Return immediately and run in background if many features
-        background_tasks.add_task(
-            project_crud.generate_project_files,
+        # For many features, we still run this synchronously in Litestar to simplify
+        await project_crud.generate_project_files(db, project_id)
+        warning_message = "There are lots of features to process. Please be patient."
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
             db,
             project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
         )
-        warning_message = "There are lots of features to process. Please be patient 🙏"
+        await db.commit()
 
     else:
         success = await project_crud.generate_project_files(
@@ -536,29 +580,76 @@ async def generate_files(
         )
 
         if not success:
-            return JSONResponse(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                content={
-                    "message": (
-                        f"Failed project ({project_id}) creation. "
-                        "Please contact the server admin."
-                    )
-                },
+            return Response(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content=(
+                    f"Failed project ({project_id}) creation. "
+                    "Please contact the server admin."
+                ).encode(),
+                media_type="application/json",
             )
+
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
 
     # Update the XLSForm if using ODK Collect to add task id choice filter
     if project.field_mapping_app == FieldMappingApp.ODK:
         log.info("Appending task_filter choices to XLSForm for ODK Collect project")
         existing_xlsform = BytesIO(project.xlsform_content)
-        if not project.tasks:
-            msg = "Project has no generated tasks. Please try again."
-            log.error(msg)
-            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
-        # Append task ids to choices sheet
-        task_ids = [task.project_task_index for task in project.tasks]
-        log.debug(f"Found {len(task_ids)} for project ID {project.id}")
-        new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
+        # Get task IDs from ODK Central task_boundaries dataset
+        task_ids = []
+        if project.external_project_id:
+            try:
+                # ODK credentials not stored on project, use None to fall back to env vars
+                project_odk_creds = None
+                from app.central import central_deps
+
+                async with central_deps.get_odk_dataset(
+                    project_odk_creds
+                ) as odk_central:
+                    # Fetch task boundaries from ODK
+                    entity_data = await odk_central.getEntityData(
+                        project.external_project_id,
+                        "task_boundaries",
+                        include_metadata=False,
+                    )
+
+                    if entity_data and isinstance(entity_data, list):
+                        # Extract task IDs from entities
+                        for entity in entity_data:
+                            task_id = entity.get("task_id")
+                            if task_id:
+                                try:
+                                    task_ids.append(int(task_id))
+                                except (ValueError, TypeError):
+                                    pass
+                        # If no task_id in properties, use index
+                        if not task_ids:
+                            task_ids = list(range(1, len(entity_data) + 1))
+            except Exception as e:
+                log.warning(
+                    f"Could not fetch task boundaries from ODK for project {project.id}: {e}"
+                )
+
+        if not task_ids:
+            # Task splitting was skipped - use whole AOI as single task
+            log.info(
+                f"No task boundaries found for project {project.id}. "
+                "Task splitting was skipped - using whole AOI as single task."
+            )
+            # Don't add task filter to XLSForm when there's only one task (the whole AOI)
+            new_xlsform = existing_xlsform
+        else:
+            log.debug(
+                f"Found {len(task_ids)} task boundaries for project ID {project.id}"
+            )
+            new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
 
         # Update in both db + ODK Central
         await central_crud.update_project_xlsform(
@@ -569,11 +660,8 @@ async def generate_files(
         )
 
     if warning_message:
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={"message": warning_message},
-        )
-    return Response(status_code=HTTPStatus.OK)
+        return {"message": warning_message}
+    return {}
 
 
 def _get_local_odk_url() -> str:
@@ -584,7 +672,7 @@ def _get_local_odk_url() -> str:
     return f"http://odk.{domain}:{port}".rstrip(":")
 
 
-async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
+async def _store_odk_project_url(db: AsyncConnection, project: DbProject) -> None:
     """Store the external ODK project URL.
 
     Uses local proxy URL if credentials indicate local Docker setup (central:8383),
@@ -599,7 +687,7 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
         enriched = project
 
     creds = getattr(enriched, "odk_credentials", None)
-    odk_url = getattr(creds, "odk_central_url", None) if creds else None
+    odk_url = getattr(creds, "external_project_instance_url", None) if creds else None
 
     if not odk_url:
         return
@@ -609,9 +697,9 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
 
     # Append project ID to URL
     odk_url = odk_url.rstrip("/")
-    odkid = getattr(enriched, "odkid", None)
-    if odkid and "/projects/" not in odk_url:
-        odk_url = f"{odk_url}/projects/{odkid}"
+    external_project_id = getattr(enriched, "external_project_id", None)
+    if external_project_id and "/projects/" not in odk_url:
+        odk_url = f"{odk_url}/projects/{external_project_id}"
 
     try:
         await DbProject.update(
@@ -619,12 +707,12 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
             project.id,
             ProjectUpdate(
                 external_project_instance_url=odk_url,
-                external_project_id=odkid,
+                external_project_id=external_project_id,
             ),
         )
         log.debug(
             "Stored ODK project external reference for project "
-            f"{project.id}: id={odkid}, url={odk_url}"
+            f"{project.id}: id={external_project_id}, url={odk_url}"
         )
     except Exception as exc:
         log.warning(
@@ -633,23 +721,22 @@ async def _store_odk_project_url(db: Connection, project: DbProject) -> None:
         )
 
 
-@router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
-async def update_project(
-    new_data: project_schemas.ProjectUpdate,
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Partial update an existing project."""
-    # NOTE this does not including updating the ODK project name
-    return await DbProject.update(db, project_user_dict.get("project").id, new_data)
-
-
-@router.post("/{project_id}/upload-task-boundaries")
+@post(
+    "/{project_id:int}/upload-task-boundaries",
+    summary="Upload project task boundaries as GeoJSON.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+    status_code=status.HTTP_201_CREATED,
+)
 async def upload_project_task_boundaries(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    task_geojson: UploadFile = File(...),
-):
+    project_id: int,
+    db: AsyncConnection,
+    current_user_dict: ProjectUserDict,
+    data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
+) -> dict[str, str]:
     """Set project task boundaries using split GeoJSON from frontend.
 
     Each polygon in the uploaded geojson are made into single task.
@@ -661,132 +748,279 @@ async def upload_project_task_boundaries(
     Returns:
         JSONResponse: JSON containing success message.
     """
-    project_id = project_user_dict.get("project").id
-    tasks_featcol = parse_geojson_file_to_featcol(await task_geojson.read())
+    project = current_user_dict.get("project")
+    project_id = project.id
+    tasks_featcol = parse_geojson_file_to_featcol(await data.read())
     await check_crs(tasks_featcol)
-    # We only want to allow polygon geometries
-    # featcol_single_geom_type = featcol_keep_single_geom_type(
-    #     tasks_featcol,
-    #     geom_type="Polygon",
-    # )
-    # FIXME upload to ODK an entity list
-    # success = await DbTask.create(db, project_id, featcol_single_geom_type)
-    # if success:
-    # return JSONResponse(content={"message": "success"})
 
-    log.error(f"Failed to create task areas for project {project_id}")
-    return JSONResponse(content={"message": "failure"})
+    # Send task boundaries directly to ODK/QField, not stored in database
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        # Convert task boundaries to entities and upload to ODK Central
+        project_odk_id = project.external_project_id
+        if not project_odk_id:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Project must have an ODK Central project ID. Please create the project in ODK Central first.",
+            )
+
+        # Convert task boundaries to entity format
+        # Each task boundary becomes an entity in ODK
+        task_entities = []
+        for idx, feature in enumerate(tasks_featcol.get("features", [])):
+            if feature.get("geometry"):
+                entity_dict = await central_crud.feature_geojson_to_entity_dict(
+                    feature, additional_features=True
+                )
+                # Update label to indicate it's a task boundary
+                entity_dict["label"] = f"Task {idx + 1}"
+                # Add task_id to properties
+                if "data" in entity_dict:
+                    entity_dict["data"]["task_id"] = str(idx + 1)
+                task_entities.append(entity_dict)
+
+        # Create entity list for task boundaries in ODK
+        # ODK credentials not stored on project, use None to fall back to env vars
+        project_odk_creds = None
+        try:
+            # Check if dataset already exists, if so delete and recreate
+            from app.central import central_deps
+
+            async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
+                datasets = await odk_central.listDatasets(project_odk_id)
+                if any(ds.get("name") == "task_boundaries" for ds in datasets):
+                    log.info("Task boundaries dataset already exists, will be replaced")
+        except Exception as e:
+            log.warning(f"Could not check existing datasets: {e}")
+
+        await central_crud.create_entity_list(
+            project_odk_creds,
+            project_odk_id,
+            properties=["geometry", "task_id"],
+            dataset_name="task_boundaries",
+            entities_list=task_entities,
+        )
+        log.info(
+            f"Uploaded {len(task_entities)} task boundaries to ODK Central for project {project_id}"
+        )
+    elif project.field_mapping_app == FieldMappingApp.QFIELD:
+        # For QField, boundaries are written to tasks.geojson during project generation
+        # Store temporarily in a temp table for use during generation
+        # They will be written to tasks.geojson file and not stored permanently
+        log.info("Storing task boundaries temporarily for QField project generation")
+
+        # Create temporary table for task boundaries (cleaned up after project generation)
+        async with db.cursor() as cur:
+            # Drop existing temp table if it exists
+            await cur.execute(f"""
+                DROP TABLE IF EXISTS temp_task_boundaries_{project_id} CASCADE;
+            """)
+
+            # Create temp table
+            await cur.execute(f"""
+                CREATE TEMP TABLE temp_task_boundaries_{project_id} (
+                    task_index INTEGER,
+                    outline GEOMETRY(POLYGON, 4326)
+                );
+            """)
+
+            # Insert task boundaries
+            for idx, feature in enumerate(tasks_featcol.get("features", [])):
+                if feature.get("geometry"):
+                    geom_json = json.dumps(feature["geometry"])
+                    await cur.execute(
+                        f"""
+                        INSERT INTO temp_task_boundaries_{project_id} (task_index, outline)
+                        VALUES (%s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326));
+                        """,
+                        (idx + 1, geom_json),
+                    )
+
+            await db.commit()
+            log.info(
+                f"Stored {len(tasks_featcol.get('features', []))} task boundaries in temp table for QField project {project_id}"
+            )
+
+    return {"message": "success"}
 
 
-####################
-# ORG ADMIN ROUTES #
-####################
+@patch(
+    "/{project_id:int}",
+    summary="Partially update an existing project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user_dict": Provide(project_manager),
+    },
+    return_dto=project_schemas.ProjectOut,
+)
+async def update_project(
+    data: project_schemas.ProjectUpdate,
+    project_id: int,
+    current_user_dict: ProjectUserDict,
+    db: AsyncConnection,
+) -> DbProject:
+    """Partial update an existing project."""
+    # NOTE this does not including updating the ODK project name
+    # If password is None but URL/username are provided, preserve existing encrypted password
+    project = current_user_dict.get("project")
+    if (
+        (data.external_project_instance_url or data.external_project_username)
+        and not data.external_project_password
+        and project.external_project_password_encrypted
+    ):
+        # Password is None, so set password_encrypted to preserve existing encrypted password
+        # This allows the validation to pass and the password to be preserved
+        data.password_encrypted = project.external_project_password_encrypted
+
+    return await DbProject.update(db, project.id, data)
 
 
-@router.post("/stub", response_model=project_schemas.ProjectOut)
+@post(
+    "/stub",
+    summary="Create a project stub in the local database.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+    return_dto=project_schemas.ProjectOut,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_stub_project(
-    project_info: project_schemas.StubProjectIn,
-    user_dict: Annotated[DbUser, Depends(super_admin)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
+    db: AsyncConnection,
+    auth_user: AuthUser,
+    data: project_schemas.StubProjectIn,
+) -> DbProject:
     """Create a project in the local database."""
-    delattr(project_info, "merge")  # Remove merge field as it is not in database
-    db_user = user_dict["user"]
-    project_info.status = ProjectStatus.DRAFT
+    if hasattr(data, "merge"):
+        delattr(data, "merge")  # Remove merge field as it is not in database
+    data.status = ProjectStatus.DRAFT
 
     log.info(
-        f"User {db_user.username} attempting creation of project {project_info.name}"
+        f"User {auth_user.username} attempting creation of project {data.project_name}"
     )
-    await project_deps.check_project_dup_name(db, project_info.name)
+
+    # Check for duplicate project name before creating
+    exists = await project_deps.project_name_does_not_already_exist(
+        db, data.project_name
+    )
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Project with name '{data.project_name}' already exists.",
+        )
 
     # Get the location_str via reverse geocode
     async with AsyncNearestCity(db) as geocoder:
-        centroid = await polygon_to_centroid(project_info.outline.model_dump())
+        centroid = await polygon_to_centroid(data.outline.model_dump())
         latitude, longitude = centroid.y, centroid.x
         location = await geocoder.query(latitude, longitude)
         # Convert to two letter country code --> full name
         country_full_name = (
             countries.get(location.country, location.country) if location else None
         )
-        project_info.location_str = (
-            f"{location.city},{country_full_name}" if location else None
-        )
+        data.location_str = f"{location.city},{country_full_name}" if location else None
 
     # Create the project in the Field-TM DB
-    project_info.author_sub = db_user.sub
+    data.created_by_sub = auth_user.sub
     try:
-        log.debug(f"Project details: {project_info}")
-        project = await DbProject.create(db, project_info)
+        project = await DbProject.create(db, data)
+    except HTTPException:
+        raise
     except Exception as e:
         log.error(f"Error posting to /stub: {e}")
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Project creation failed.",
         ) from e
-    if not project:
-        log.error("Project creation passed at /stub, but the project is empty")
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Project creation failed.",
-        )
 
     return project
 
 
-@router.delete("/{project_id}")
+@delete(
+    "/{project_id:int}",
+    summary="Delete a project from ODK Central and the local database.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(super_admin),
+    },
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_project(
-    db: Annotated[Connection, Depends(db_conn)],
-    project: Annotated[DbProject, Depends(project_deps.get_project)],
-    user_dict: Annotated[DbUser, Depends(super_admin)],
-):
+    project_id: int,
+    db: AsyncConnection,
+    current_user: DbUser,
+) -> None:
     """Delete a project from both ODK Central and the local database."""
+    project = await project_deps.get_project_by_id(db, project_id)
+
     log.info(
-        f"User {user_dict.get('user').username} attempting "
-        f"deletion of project {project.id}"
+        f"User {current_user.username} attempting deletion of project {project.id}"
     )
 
     # Handle QField projects separately
     if project.field_mapping_app == FieldMappingApp.QFIELD:
+        log.info(f"Deleting QFieldCloud project for FieldTM project ({project.id})")
         await delete_qfield_project(db, project.id)
     else:
         # Delete ODK Central project
-        await central_crud.delete_odk_project(project.odkid, project.odk_credentials)
+        log.info(f"Deleting ODK Central project for FieldTM project ({project.id})")
+        # Use None for credentials to fall back to environment variables
+        await central_crud.delete_odk_project(project.external_project_id, None)
 
-    # Delete S3 resources
-    await delete_all_objs_under_prefix(settings.S3_BUCKET_NAME, f"/{project.id}")
     # Delete Field-TM project
     await DbProject.delete(db, project.id)
 
     log.info(f"Deletion of project {project.id} successful")
-    return Response(status_code=HTTPStatus.NO_CONTENT)
+    return None
 
 
-@router.patch("", response_model=project_schemas.ProjectOut)
+@patch(
+    "",
+    summary="Create project in ODK Central and update the local stub project.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+    return_dto=project_schemas.ProjectOut,
+)
 async def create_project(
-    project_info: project_schemas.ProjectIn,
-    project_user: Annotated[ProjectUserDict, Depends(ProjectManager())],
-    db: Annotated[Connection, Depends(db_conn)],
-):
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    data: project_schemas.ProjectIn,
+    project_id: int = Parameter(),
+) -> DbProject:
     """Create a project in ODK Central and update the local stub project."""
-    project_id = project_user.get("project").id
+    project_id = current_user.get("project").id
     project = await DbProject.one(db, project_id)
 
-    if project_info.name:
-        await project_deps.check_project_dup_name(db, project_info.name)
-    odk_creds_decrypted = project_info.odk_credentials
+    if data.project_name:
+        # Check for duplicate project name before creating
+        exists = await project_deps.project_name_does_not_already_exist(
+            db, data.project_name
+        )
+        if exists:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Project with name '{data.project_name}' already exists.",
+            )
 
-    # Create project in ODK Central
-    # NOTE runs in separate thread using run_in_threadpool
-    odkproject = await run_in_threadpool(
-        lambda: central_crud.create_odk_project(project.name, odk_creds_decrypted)
+    odk_creds_decrypted = data.odk_credentials
+
+    # Create project in ODK Central using a background thread
+    odkproject = await to_thread.run_sync(
+        central_crud.create_odk_project,
+        project.project_name,
+        odk_creds_decrypted,
     )
-    project_info.odkid = odkproject["id"]
+    data.external_project_id = odkproject["id"]
 
     try:
-        project = await DbProject.update(db, project.id, project_info)
+        project = await DbProject.update(db, project.id, data)
     except Exception as e:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Project update failed.",
         ) from e
 
@@ -795,67 +1029,27 @@ async def create_project(
     return project
 
 
-###############################
-# ENDPOINTS THAT MUST BE LAST #
-###############################
-# NOTE this is due to the /{project_id} which will capture any text
-# NOTE in place of the project_id integer
-
-
-@router.get("/{project_id}", response_model=project_schemas.ProjectOut)
-async def read_project(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Get a specific project by ID."""
-    return project_user.get("project")
-
-
-@router.get("/{project_id}/minimal", response_model=project_schemas.ProjectOut)
-async def read_project_minimal(
-    project_id: int,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-):
-    """Get a specific project by ID, with minimal metadata.
-
-    This endpoint is used for a quick return on the mapper frontend,
-    without all additional calculated fields.
-
-    It can also be accessed via temporary authentication, regardless of
-    project visibility, hence has very minimal metadata included
-    (no sensitive fields).
-
-    NOTE this does mean the odk_token can be retrieved from this endpoint
-    and is a small leak that could be addressed in future if needed.
-    (any user could theoretically submit a contribution via the ODK
-    token, even if this is a private project).
-    """
-    return await project_deps.get_project_by_id(db, project_id, minimal=True)
-
-
-@router.get("/{project_id}/download")
-async def download_project_boundary(
-    project_user: Annotated[ProjectUserDict, Depends(Mapper())],
-) -> StreamingResponse:
-    """Downloads the boundary of a project as a GeoJSON file."""
-    project = project_user.get("project")
-    geojson = json.dumps(project.outline).encode("utf-8")
-    return StreamingResponse(
-        BytesIO(geojson),
-        headers={
-            "Content-Disposition": (f"attachment; filename={project.slug}.geojson"),
-            "Content-Type": "application/media",
-        },
-    )
-
-
-@router.delete("/{project_id}/users/{user_sub}")
-async def unassign_user_from_project(
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[DbUser, Depends(ProjectManager())],
-    user_sub: str,
-):
-    """Unassign a user from a project (remove their role)."""
-    project = project_user_dict.get("project")
-    await project_crud.unassign_user_from_project(db, project.id, user_sub)
-    return {"message": f"User {user_sub} unassigned from project {project.id}."}
+project_router = Router(
+    path="/projects",
+    tags=["projects"],
+    route_handlers=[
+        read_projects,
+        get_tasks_near_me,
+        read_project_summaries,
+        get_categories,
+        read_project,
+        download_project_boundary,
+        task_split,
+        preview_split_by_square,
+        get_data_extract,
+        get_or_set_data_extract,
+        upload_data_extract,
+        add_additional_entity_list,
+        generate_files,
+        upload_project_task_boundaries,
+        update_project,
+        create_stub_project,
+        delete_project,
+        create_project,
+    ],
+)

@@ -64,11 +64,6 @@ const ProjectTypeSelector = () => {
 
                 // NOTE this var may be deprecated in future in favour of simply field_mapping_app
                 setValue('use_odk_collect', app.id === field_mapping_app.ODK);
-
-                if (app.id === field_mapping_app.QField) {
-                  setValue('hasODKCredentials', true);
-                  setValue('useDefaultODKCredentials', true);
-                }
               }}
               className="fmtm-w-full fmtm-mt-auto"
             >

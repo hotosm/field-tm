@@ -16,20 +16,16 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""User dependencies for use in Depends."""
+"""User dependencies and helpers."""
 
-from typing import Annotated
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
+from psycopg import AsyncConnection
 
-from fastapi import Depends
-from fastapi.exceptions import HTTPException
-from psycopg import Connection
-
-from app.db.database import db_conn
-from app.db.enums import HTTPStatus
 from app.db.models import DbUser
 
 
-async def get_user(sub: str, db: Annotated[Connection, Depends(db_conn)]) -> DbUser:
+async def get_user(sub: str, db: AsyncConnection) -> DbUser:
     """Return a user from the DB, else exception.
 
     Args:
@@ -45,4 +41,7 @@ async def get_user(sub: str, db: Annotated[Connection, Depends(db_conn)]) -> DbU
     try:
         return await DbUser.one(db, sub)
     except KeyError as e:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e

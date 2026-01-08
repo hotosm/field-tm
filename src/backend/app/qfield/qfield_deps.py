@@ -18,16 +18,18 @@
 
 """QFieldCloud dependency wrappers."""
 
+import logging
 from asyncio import get_running_loop
 from contextlib import asynccontextmanager
 from functools import partial
 from typing import Optional
 
-from loguru import logger as log
 from qfieldcloud_sdk.sdk import Client
 
 from app.config import settings
 from app.qfield.qfield_schemas import QFieldCloud
+
+log = logging.getLogger(__name__)
 
 
 @asynccontextmanager

@@ -25,7 +25,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import TaskList from '@/components/ProjectDetails/Tabs/TaskList';
 import { Tooltip } from '@mui/material';
 import { Skeleton } from '@/components/Skeletons';
-import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
+import { useIsProjectManager } from '@/hooks/usePermissions';
 import { field_mapping_app, project_status } from '@/types/enums';
 import windowDimention from '@/hooks/WindowDimension';
 
@@ -57,7 +57,6 @@ const ProjectDetails = () => {
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
 
   const isProjectManager = useIsProjectManager(projectId as string);
-  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo.organisation_id as number);
 
   const tabList: { id: tabType; name: string; show: boolean }[] = [
     { id: 'project_info', name: 'Project Info', show: true },
@@ -67,7 +66,7 @@ const ProjectDetails = () => {
     { id: 'task_list', name: 'Task List', show: projectInfo.field_mapping_app !== field_mapping_app.QField },
   ];
 
-  useDocumentTitle(projectInfo.name && !projectDetailsLoading ? projectInfo.name : 'Project Details');
+  useDocumentTitle(projectInfo.project_name && !projectDetailsLoading ? projectInfo.project_name : 'Project Details');
 
   //Fetch project for the first time
   useEffect(() => {
@@ -154,8 +153,8 @@ const ProjectDetails = () => {
               className="!fmtm-w-[1.125rem] fmtm-mx-1 hover:fmtm-text-black hover:fmtm-scale-125 !fmtm-duration-200 fmtm-cursor-pointer"
               onClick={() => navigate('/explore')}
             />
-            <h5 className="fmtm-line-clamp-1" title={projectInfo.name}>
-              {projectInfo.name}
+            <h5 className="fmtm-line-clamp-1" title={projectInfo.project_name}>
+              {projectInfo.project_name}
             </h5>
             {projectInfo.visibility === 'PRIVATE' && (
               <Tooltip title="Private Project" arrow>
@@ -223,7 +222,7 @@ const ProjectDetails = () => {
                       </>
                     ) : (
                       <>
-                        {(isProjectManager || isOrganizationAdmin) && (
+                        {isProjectManager && (
                           <Link to={`/manage/project/${params?.id}`} className="fmtm-w-1/2">
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <img src={FolderManagedIcon} alt="Manage Project" className="fmtm-h-5 fmtm-w-5" />
@@ -234,7 +233,7 @@ const ProjectDetails = () => {
                         {projectInfo.field_mapping_app !== field_mapping_app.QField && (
                           <Link
                             to={`/project-submissions/${projectId}`}
-                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                            className={`${isProjectManager ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
                           >
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <AssetModules.BarChartOutlinedIcon className="fmtm-text-[1.125rem]" />
@@ -246,7 +245,7 @@ const ProjectDetails = () => {
                           <Link
                             target="_"
                             to={projectInfo?.project_url}
-                            className={`${isProjectManager || isOrganizationAdmin ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
+                            className={`${isProjectManager ? 'fmtm-w-1/2' : 'fmtm-w-full'}`}
                           >
                             <Button variant="secondary-grey" className="fmtm-w-full">
                               <AssetModules.OpenInNewIcon className="!fmtm-text-[1.125rem]" /> Open in QField Cloud

@@ -7,22 +7,17 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   field_mapping_app: null,
 
   // 01 Project Overview
-  name: '',
-  short_description: '',
+  project_name: '',
   description: '',
-  organisation_id: null,
-  hasODKCredentials: false,
-  useDefaultODKCredentials: false,
-  odk_central_url: '',
-  odk_central_user: '',
-  odk_central_password: '',
+  external_project_instance_url: '',
+  external_project_username: '',
+  external_project_password: '',
   project_admins: [],
   uploadAreaSelection: null,
   uploadedAOIFile: [],
   outline: undefined,
   outlineArea: undefined,
   proceedWithLargeOutlineArea: false,
-  organisation_name: '',
   merge: true,
 
   // 02 Project Details
@@ -30,8 +25,6 @@ export const defaultValues: z.infer<typeof createProjectValidationSchema> = {
   hashtags: [],
   hasCustomTMS: false,
   custom_tms_url: '',
-  per_task_instructions: '',
-  use_odk_collect: false,
 
   // 03 Upload Survey
   osm_category: '',

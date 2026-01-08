@@ -34,12 +34,6 @@ Some can be updated manually, as required.
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
 > <http://fmtm.localhost:7050,http://some.other.domain>
 
-##### API_PREFIX
-
-> It is also possible to use the API_PREFIX variable if the api
-> is served under, e.g. /api on the domain.
-> However, this isn't the recommended approach, and testing is minimal.
-
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided

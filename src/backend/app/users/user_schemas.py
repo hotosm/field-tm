@@ -15,64 +15,39 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic models overriding base DbUser fields."""
+"""DTO definitions for user endpoints."""
 
-from typing import Annotated, Optional
+from litestar.dto import DataclassDTO, DTOConfig
 
-from pydantic import AwareDatetime, BaseModel, Field
-
-from app.db.enums import ProjectRole, UserRole
 from app.db.models import DbUser
-from app.projects.project_schemas import PaginationInfo
 
 
-class UserIn(DbUser):
-    """User details for insert into DB."""
+# Response DTO for full user details (excluding project_roles relationship)
+class UserOut(DataclassDTO[DbUser]):
+    """DTO that excludes project_roles from user responses."""
 
-    # Only id and username are mandatory
-    # NOTE this is a unique case where the primary key is not auto-generated
-    # NOTE we use the OSM ID in most cases, which is unique from OSM
-    pass
+    config = DTOConfig(exclude={"project_roles"})
 
 
-class UserUpdate(DbUser):
-    """User details for update in DB."""
+# PATCH DTO for partial user updates
+class UserUpdate(DataclassDTO[DbUser]):
+    """DTO for partial user updates."""
 
-    # Exclude (do not allow update)
-    sub: Annotated[Optional[str], Field(exclude=True)] = None
-    username: Annotated[Optional[str], Field(exclude=True)] = None
-    registered_at: Annotated[Optional[AwareDatetime], Field(exclude=True)] = None
-    tasks_mapped: Annotated[Optional[int], Field(exclude=True)] = None
-    tasks_validated: Annotated[Optional[int], Field(exclude=True)] = None
-    tasks_invalidated: Annotated[Optional[int], Field(exclude=True)] = None
-    project_roles: Annotated[Optional[dict[int, ProjectRole]], Field(exclude=True)] = (
-        None
+    config = DTOConfig(
+        include={
+            "is_admin",
+            "name",
+            "city",
+            "country",
+            "profile_img",
+            "email_address",
+        },
+        partial=True,
     )
-    orgs_managed: Annotated[Optional[list[int]], Field(exclude=True)] = None
 
 
-class UserOut(DbUser):
-    """User and role."""
+# DTO for lightweight username listing (sub + username only)
+class Usernames(DataclassDTO[DbUser]):
+    """DTO for lightweight username listing."""
 
-    # Mandatory user role field
-    role: UserRole
-
-
-class UserRole(BaseModel):
-    """User role only."""
-
-    role: UserRole
-
-
-class PaginatedUsers(BaseModel):
-    """Project summaries + Pagination info."""
-
-    results: list[UserOut]
-    pagination: PaginationInfo
-
-
-class Usernames(BaseModel):
-    """User info with username and their id."""
-
-    sub: str
-    username: str
+    config = DTOConfig(include={"sub", "username"})

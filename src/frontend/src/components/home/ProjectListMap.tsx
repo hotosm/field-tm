@@ -43,6 +43,7 @@ const ProjectListMap = ({ projectList }: { projectList: projectSummaryType[] }) 
     maxZoom: 20,
   });
 
+  // FIXME project.centroid no longer exists
   useEffect(() => {
     if (projectList?.length === 0) return;
     const convertedHomeProjectSummaryGeojson: geojsonObjectModelType = {

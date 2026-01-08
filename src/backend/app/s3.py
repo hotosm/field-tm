@@ -1,17 +1,19 @@
 """Initialise the S3 buckets for Field-TM to function."""
 
+import logging
 from io import BytesIO
 from typing import Any
 
-from fastapi import HTTPException
-from loguru import logger as log
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from minio import Minio
 from minio.commonconfig import CopySource
 from minio.deleteobjects import DeleteObject
 from minio.error import S3Error
 
 from app.config import settings
-from app.db.enums import HTTPStatus
+
+log = logging.getLogger(__name__)
 
 
 def s3_client():
@@ -61,7 +63,8 @@ def object_exists(bucket_name: str, s3_path: str) -> bool:
         else:
             # Handle other exceptions
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST, detail=str(e)
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
             ) from e
 
 

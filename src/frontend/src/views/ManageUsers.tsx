@@ -4,7 +4,6 @@ import { UpdateUserRole } from '@/api/User';
 import { useAppDispatch } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { user_roles } from '@/types/enums';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Searchbar from '@/components/common/SearchBar';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
@@ -15,11 +14,9 @@ import { useGetUsersQuery } from '@/api/user';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-type roleType = 'READ_ONLY' | 'ADMIN' | 'MAPPER';
-const roleLabel = {
-  READ_ONLY: 'Read Only',
-  MAPPER: 'Mapper',
-  ADMIN: 'Admin',
+const roleLabelByAdminFlag: Record<boolean, string> = {
+  true: 'Admin',
+  false: 'Mapper',
 };
 
 const ManageUsers = () => {
@@ -29,12 +26,12 @@ const ManageUsers = () => {
   const isAdmin = useIsAdmin();
   if (!isAdmin) return <Forbidden />;
 
-  const updateRole = (userSub: string, currentRole: roleType, newRole: roleType) => {
-    if (currentRole === newRole) {
+  const updateRole = (userSub: string, currentIsAdmin: boolean, newIsAdmin: boolean) => {
+    if (currentIsAdmin === newIsAdmin) {
       dispatch(CommonActions.SetSnackBar({ message: 'Role up-to-date', variant: 'info' }));
       return;
     }
-    dispatch(UpdateUserRole(`${VITE_API_URL}/users/${userSub}`, { role: newRole }));
+    dispatch(UpdateUserRole(`${VITE_API_URL}/users/${userSub}`, { is_admin: newIsAdmin }));
   };
 
   const userDatacolumns = [
@@ -80,9 +77,10 @@ const ManageUsers = () => {
     },
     {
       header: 'Role',
-      accessorKey: 'role',
+      accessorKey: 'is_admin',
       cell: ({ row }: any) => {
-        return <>{roleLabel[row?.original?.role]}</>;
+        const isAdminUser = !!row?.original?.is_admin;
+        return <>{roleLabelByAdminFlag[isAdminUser]}</>;
       },
     },
     {
@@ -97,7 +95,7 @@ const ManageUsers = () => {
       header: ' ',
       cell: ({ row }: any) => {
         const userSub = row?.original?.sub;
-        const currentRole = row?.original?.role;
+        const currentIsAdmin = !!row?.original?.is_admin;
         return (
           <>
             <DropdownMenu>
@@ -105,15 +103,15 @@ const ManageUsers = () => {
                 <AssetModules.ManageAccountsOutlinedIcon className="fmtm-cursor-pointer hover:fmtm-text-primaryRed" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="fmtm-z-[50] fmtm-bg-white" align="end">
-                {Object.keys(user_roles)?.map((role) => (
+                {[false, true].map((isAdminOption) => (
                   <DropdownMenuItem
-                    key={role}
+                    key={String(isAdminOption)}
                     className="hover:fmtm-bg-red-50 fmtm-duration-200 fmtm-outline-none fmtm-py-1 fmtm-px-4 fmtm-cursor-pointer fmtm-rounded"
                     onSelect={() => {
-                      updateRole(userSub, currentRole as roleType, role as roleType);
+                      updateRole(userSub, currentIsAdmin, isAdminOption);
                     }}
                   >
-                    {roleLabel[role]}
+                    {roleLabelByAdminFlag[isAdminOption]}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>

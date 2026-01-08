@@ -25,7 +25,6 @@ async def test_nothing():
 
 
 # import pytest
-# from fastapi import status
 
 # from app.users import user_schemas
 # from app.users.user_crud import create_user
@@ -44,18 +43,24 @@ async def test_nothing():
 
 
 # async def test_create_users(client):
-#     response = await client.post("/users", json={
-# "username": "test3", "password": "test1"})
-#     assert response.status_code == status.HTTP_200_OK
+#     response = await client.post(
+#         "/users",
+#         json={"username": "test3", "password": "test1"},
+#     )
+#     assert response.status_code == 200
 
-#     response = await client.post("/users", json={
-# "username": "niraj", "password": "niraj"})
-#     assert response.status_code == status.HTTP_200_OK
+#     response = await client.post(
+#         "/users",
+#         json={"username": "niraj", "password": "niraj"},
+#     )
+#     assert response.status_code == 200
 
 #     response = await client.post("/users", json={"username": "niraj"})
-#     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+#     assert response.status_code == 422
 
-#     response = await client.post("/users", json={
-# "username": "niraj", "password": "niraj"})
-#     assert response.status_code == status.HTTP_400_BAD_REQUEST
+#     response = await client.post(
+#         "/users",
+#         json={"username": "niraj", "password": "niraj"},
+#     )
+#     assert response.status_code == 400
 #     assert response.json() == {"detail": "Username already registered"}

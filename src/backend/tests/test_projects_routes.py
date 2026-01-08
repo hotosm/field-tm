@@ -18,6 +18,7 @@
 """Tests for project routes."""
 
 import json
+import logging
 import os
 from io import BytesIO
 from pathlib import Path
@@ -26,34 +27,40 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
-from fastapi import HTTPException
 from httpx import AsyncClient
-from loguru import logger as log
+from litestar import status_codes as status
 
 from app.central.central_crud import create_odk_project
 from app.config import settings
-from app.db.enums import EntityState, HTTPStatus, MappingState
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import check_crs
 from app.projects import project_crud
 from tests.test_data import test_data_path
 
+log = logging.getLogger(__name__)
+
 
 async def create_stub_project(client, stub_project_data):
     """Create a new project."""
     response = await client.post("/projects/stub", json=stub_project_data)
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == status.HTTP_201_CREATED
     return response.json()
 
 
-async def test_create_project_invalid(client, organisation, project_data):
+async def test_patch_project_invalid(client, project, project_data):
     """Test project creation endpoint, duplicate checker."""
-    project_data["task_split_type"] = "invalid"
-    project_data["priority"] = "invalid"
+    log.debug(f"Existing project: {project}")
+    # First update the project name to ensure it doesn't exist and
+    # trigger duplicate validation
+    project_data["project_name"] = "a new project name that doesn't exist"
+    # Then use invalid enum options for some fields
+    project_data["task_split_type"] = "invalid_option"
+    project_data["priority"] = "invalid_option"
     response_invalid = await client.patch(
-        f"/projects?org_id={organisation.id}", json=project_data
+        f"/projects?project_id={project.id}",
+        json=project_data,
     )
-    assert response_invalid.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert response_invalid.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     response_data = response_invalid.json()
 
     expected_errors = {
@@ -70,11 +77,28 @@ async def test_create_project_invalid(client, organisation, project_data):
             assert error["ctx"]["expected"] == expected_errors[field_name]
 
 
-async def test_create_project_with_dup(client, organisation, stub_project_data):
-    """Test project creation endpoint, duplicate checker."""
-    project_name = stub_project_data["name"]
+async def test_patch_project_dup_name(client, project, project_data):
+    """Test project patch to a duplicate name is not possible."""
+    log.debug(f"Existing project: {project}")
+    # First update the project name to ensure it doesn't exist and
+    # trigger duplicate validation
+    project_data["project_name"] = "new project name"
+    response_duplicate = await client.patch(
+        f"/projects?project_id={project.id}",
+        json=project_data,
+    )
+    assert response_duplicate.status_code == status.HTTP_409_CONFLICT
+    assert (
+        response_duplicate.json()["detail"]
+        == f"Project with name '{project_data['project_name']}' already exists."
+    )
 
-    new_project = await create_stub_project(client, organisation.id, stub_project_data)
+
+async def test_create_project_with_dup(client, stub_project_data):
+    """Test project creation endpoint, duplicate checker."""
+    project_name = stub_project_data["project_name"]
+
+    new_project = await create_stub_project(client, stub_project_data)
     assert "id" in new_project
     assert isinstance(new_project["id"], int)
     assert isinstance(new_project["slug"], str)
@@ -82,11 +106,9 @@ async def test_create_project_with_dup(client, organisation, stub_project_data):
     assert new_project["location_str"] == "Kathmandu,Nepal"
 
     # Duplicate response to test error condition: project name already exists
-    response_duplicate = await client.post(
-        f"/projects/stub?org_id={organisation.id}", json=stub_project_data
-    )
+    response_duplicate = await client.post("/projects/stub", json=stub_project_data)
 
-    assert response_duplicate.status_code == HTTPStatus.CONFLICT
+    assert response_duplicate.status_code == status.HTTP_409_CONFLICT
     assert (
         response_duplicate.json()["detail"]
         == f"Project with name '{project_name}' already exists."
@@ -174,10 +196,10 @@ async def test_create_project_with_dup(client, organisation, stub_project_data):
         },
     ],
 )
-async def test_valid_geojson_types(client, organisation, project_data, geojson_type):
+async def test_valid_geojson_types(client, project_data, geojson_type):
     """Test valid geojson types."""
     project_data["outline"] = geojson_type
-    response_data = await create_project(client, organisation.id, project_data)
+    response_data = await create_project(client, project_data)
     assert "id" in response_data
 
 
@@ -194,12 +216,10 @@ async def test_valid_geojson_types(client, organisation, project_data, geojson_t
         },
     ],
 )
-async def test_invalid_geojson_types(client, organisation, project_data, geojson_type):
+async def test_invalid_geojson_types(client, project_data, geojson_type):
     """Test invalid geojson types."""
     project_data["outline"] = geojson_type
-    response = await client.patch(
-        f"/projects?org_id={organisation.id}", json=project_data
-    )
+    response = await client.patch("/projects", json=project_data)
     assert response.status_code == 422
 
 
@@ -214,15 +234,19 @@ async def test_invalid_geojson_types(client, organisation, project_data, geojson
 async def test_unsupported_crs(stub_project_data, crs):
     """Test unsupported CRS in GeoJSON."""
     stub_project_data["outline"]["crs"] = crs
-    with pytest.raises(HTTPException) as exc_info:
+    # NOTE: We intentionally avoid importing framework-specific HTTP exceptions here.
+    # The underlying implementation raises an HTTP-style exception that exposes
+    # a `status_code` attribute; we assert on that contract rather than the
+    # concrete exception type.
+    with pytest.raises(Exception) as exc_info:
         await check_crs(stub_project_data["outline"])
-    assert exc_info.value.status_code == 400
+    assert getattr(exc_info.value, "status_code", None) == 400
 
 
-async def create_project(client, stub_project_data):
+async def create_project(client, project_data):
     """Create a new project."""
-    response = await client.post("/projects/stub", json=stub_project_data)
-    assert response.status_code == HTTPStatus.OK
+    response = await client.post("/projects/stub", json=project_data)
+    assert response.status_code == status.HTTP_200_OK
     return response.json()
 
 
@@ -237,7 +261,6 @@ async def create_project(client, stub_project_data):
 )
 async def test_project_hashtags(
     client,
-    organisation,
     project_data,
     stub_project_data,
     hashtag_input,
@@ -245,9 +268,7 @@ async def test_project_hashtags(
 ):
     """Test hashtag parsing."""
     project_data["hashtags"] = hashtag_input
-    response_data = await create_stub_project(
-        client, organisation.id, stub_project_data
-    )
+    response_data = await create_stub_project(client, stub_project_data)
     project_id = response_data["id"]
     assert "id" in response_data
     response = await client.patch(
@@ -270,9 +291,9 @@ async def test_create_odk_project():
     mock_project.createProject.return_value = {"status": "success"}
 
     odk_credentials = {
-        "odk_central_url": os.getenv("ODK_CENTRAL_URL"),
-        "odk_central_user": os.getenv("ODK_CENTRAL_USER"),
-        "odk_central_password": os.getenv("ODK_CENTRAL_PASSWD"),
+        "external_project_instance_url": os.getenv("ODK_CENTRAL_URL"),
+        "external_project_username": os.getenv("ODK_CENTRAL_USER"),
+        "external_project_password": os.getenv("ODK_CENTRAL_PASSWD"),
     }
 
     with patch("app.central.central_crud.get_odk_project", return_value=mock_project):
@@ -338,7 +359,7 @@ async def test_generate_project_files(db, client, project):
         f"/projects/{project_id}/upload-task-boundaries",
         files=task_geojson_file,
     )
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     # Upload data extracts
     with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
@@ -380,18 +401,14 @@ async def test_generate_project_files(db, client, project):
 
     # Now check required values were added to project
     new_project = await DbProject.one(db, project_id)
-    assert new_project.tasks and len(new_project.tasks) == 1
-    assert new_project.tasks[0].task_state == MappingState.UNLOCKED_TO_MAP
     assert isinstance(new_project.odk_token, str)
 
 
 async def test_update_project(client, admin_user, project):
     """Test update project metadata."""
     updated_project_data = {
-        "name": f"Updated Test Project {uuid4()}",
-        "short_description": "updated short description",
+        "project_name": f"Updated Test Project {uuid4()}",
         "description": "updated description",
-        "osm_category": "healthcare",
         "hashtags": "#Field-TM anothertag",
     }
 
@@ -402,13 +419,9 @@ async def test_update_project(client, admin_user, project):
     assert response.status_code == 200
 
     response_data = response.json()
-    assert response_data["name"] == updated_project_data["name"]
-    assert (
-        response_data["short_description"] == updated_project_data["short_description"]
-    )
+    assert response_data["project_name"] == updated_project_data["project_name"]
     assert response_data["description"] == updated_project_data["description"]
 
-    assert response_data["osm_category"] == updated_project_data["osm_category"]
     assert sorted(response_data["hashtags"]) == sorted(
         [
             "#Field-TM",
@@ -427,84 +440,25 @@ async def test_project_summaries(client, project):
     first_project = response.json()["results"][0]
 
     assert first_project["id"] == project.id
-    assert first_project["name"] == project.name
-    assert first_project["short_description"] == project.short_description
+    assert first_project["project_name"] == project.project_name
     assert first_project["hashtags"] == project.hashtags
 
 
 async def test_project_by_id(client, project):
     """Test read project by id."""
-    response = await client.get(f"projects/{project.id}?project_id={project.id}")
+    response = await client.get(f"/projects/{project.id}?project_id={project.id}")
     assert response.status_code == 200
 
     data = response.json()
 
     assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
-    assert data["author_sub"] == project.author_sub
-    assert data["name"] == project.name
-    assert data["short_description"] == project.short_description
+    assert data["external_project_id"] == project.external_project_id
+    assert data["created_by_sub"] == project.created_by_sub
+    assert data["project_name"] == project.project_name
     assert data["description"] == project.description
-    assert data["per_task_instructions"] == project.per_task_instructions
     assert data["status"] == project.status
-    assert data["osm_category"] == project.osm_category
     assert data["hashtags"] == project.hashtags
     assert data["location_str"] == project.location_str
-    assert data["tasks"] == []
-
-
-async def test_set_entity_mapping_status(client, odk_project, entities):
-    """Test set the ODK entity mapping status."""
-    entity = entities[0]
-    new_status = EntityState.OPENED_IN_ODK
-
-    response = await client.post(
-        f"/projects/{odk_project.id}/entity/status",
-        json={
-            "entity_id": entity["id"],
-            "status": new_status,
-            "label": f"Feature {entity['osm_id']}",
-        },
-    )
-    response_entity = response.json()
-
-    # Here we update the original entity status for the comparison
-    entity["status"] = new_status.value
-    assert response.status_code == 200
-    compare_entities(response_entity, entity)
-
-
-async def test_get_entity_mapping_status(client, odk_project, entities):
-    """Test get the ODK entity mapping status."""
-    entity = entities[0]
-    response = await client.get(
-        f"/projects/{odk_project.id}/entity/status", params={"entity_id": entity["id"]}
-    )
-    response_entity = response.json()
-
-    assert response.status_code == 200
-    compare_entities(response_entity, entity)
-
-
-async def test_get_entities_mapping_statuses(client, odk_project, entities):
-    """Test get the ODK entities mapping statuses."""
-    odk_project_id = odk_project.id
-    response = await client.get(f"projects/{odk_project_id}/entities/statuses")
-    response_entities = response.json()
-
-    assert len(response_entities) == len(entities)
-    for response_entity, expected_entity in zip(
-        response_entities, entities, strict=False
-    ):
-        compare_entities(expected_entity, response_entity)
-
-
-def compare_entities(response_entity, expected_entity):
-    """Utility function for testing by comparing response and expected entity fields."""
-    assert response_entity["id"] == str(expected_entity["id"])
-    assert str(response_entity["task_id"]) == str(expected_entity["task_id"])
-    assert str(response_entity["osm_id"]) == str(expected_entity["osm_id"])
-    assert str(response_entity["status"]) == str(expected_entity["status"])
 
 
 async def test_project_task_split(client):
@@ -547,138 +501,12 @@ async def test_project_task_split(client):
 
 async def test_read_project(client, project):
     """Test read project by id."""
-    response = await client.get(f"projects/{project.id}")
+    response = await client.get(f"/projects/{project.id}")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
-    assert data["name"] == project.name
-    assert data["bbox"] == project.bbox
-
-    # Test with minimal param
-    response = await client.get(f"/projects/{project.id}/minimal")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == project.id
-    assert data["odkid"] == project.odkid
-    assert data["name"] == project.name
-    assert data["bbox"] is None
-
-
-async def test_update_and_download_project_form(client, project):
-    """Test updating and downloading the XLSForm for a project."""
-    updated_xls_content = b"updated xlsform data"
-    xls_file = BytesIO(updated_xls_content)
-    xls_file.name = "form.xlsx"
-
-    with (
-        patch("app.central.central_deps.read_xlsform", return_value=xls_file),
-        patch("app.central.central_crud.update_odk_central_xform", return_value=None),
-        patch(
-            "app.central.central_crud.get_project_form_xml",
-            return_value="<fake-xml></fake-xml>",
-        ),
-    ):
-        response = await client.post(
-            f"central/update-form?project_id={project.id}",
-            data={"xform_id": "test-xform-id"},
-            files={
-                "xlsform": (
-                    "form.xlsx",
-                    updated_xls_content,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                )
-            },
-        )
-        assert response.status_code == 200
-        assert (
-            response.json()["message"]
-            == f"Successfully updated the form for project {project.id}"
-        )
-
-        # Test downloading the updated XLSForm
-        response = await client.get(f"central/download-form?project_id={project.id}")
-
-        assert response.status_code == 200
-        assert (
-            response.headers["Content-Disposition"]
-            == f"attachment; filename={project.id}_xlsform.xlsx"
-        )
-        assert response.headers["Content-Type"] == "application/media"
-        assert response.content is not None
-        assert response.content == b"updated xlsform data"
-
-
-# NOTE we need odk_project and task_events fixture to populate data
-# NOTE we need odk_project and task_events fixture to populate data
-async def test_get_contributors(client, project, odk_project, submission, admin_user):
-    """Test fetching contributors of a project."""
-    response = await client.get(f"projects/contributors/{project.id}")
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) > 0
-    assert all(
-        "user" in contributor and "submissions" in contributor for contributor in data
-    )
-
-    contributor = data[0]
-    assert contributor["user"] == admin_user.username
-    assert contributor["submissions"] == 1
-
-
-async def test_add_new_project_manager(client, project, new_mapper_user):
-    """Test adding a new project manager."""
-    with patch(
-        "app.projects.project_crud.send_project_manager_message", return_value=None
-    ):
-        response = await client.post(
-            "projects/add-manager",
-            params={"project_id": project.id, "sub": new_mapper_user.sub},
-        )
-
-    assert response.status_code == 200
-
-    # Verify manager was added by fetching project users
-    response = await client.get(f"/projects/{project.id}/users")
-    assert response.status_code == 200
-
-    data = response.json()
-
-    # Ensure the new manager is in the response
-    assert any(
-        user["user_sub"] == new_mapper_user.sub and user["role"] == "PROJECT_MANAGER"
-        for user in data
-    )
-
-
-async def test_create_entity(client, db, project, odk_project, tasks):
-    """Test creating an entity and verifying task_id matching within task boundary."""
-    # NOTE here we need odk_project fixture to ensure the project exists
-
-    # Sample GeoJSON with a point that would lie inside a task boundary
-    geojson = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "properties": {"project_id": project.id},
-                "geometry": {"type": "Point", "coordinates": [85.30125, 27.7122]},
-            }
-        ],
-    }
-    project_task_index_list = [task.project_task_index for task in tasks]
-
-    entity_uuid = uuid4()
-    response = await client.post(
-        f"central/entity?project_id={project.id}&entity_uuid={entity_uuid}",
-        json=geojson,
-    )
-    assert response.status_code == 200
-    data = response.json()
-
-    # Check if the task_id in the returned data matches the task_id within the boundary
-    assert int(data["currentVersion"]["data"]["task_id"]) in project_task_index_list
+    assert data["external_project_id"] == project.external_project_id
+    assert data["project_name"] == project.project_name
 
 
 async def test_download_project_boundary(client, project):
@@ -696,32 +524,6 @@ async def test_download_project_boundary(client, project):
     assert content["type"] == "Polygon"
     assert "coordinates" in content
     assert isinstance(content["coordinates"], list)
-
-
-async def test_download_task_boundaries(client, project, tasks):
-    """Test downloading task boundaries as GeoJSON."""
-    response = await client.get(f"/projects/{project.id}/download_tasks")
-
-    assert response.status_code == 200
-    assert (
-        response.headers["Content-Disposition"]
-        == "attachment; filename=task_boundary.geojson"
-    )
-    assert response.headers["Content-Type"] == "application/media"
-
-    content = json.loads(response.content)
-
-    assert content["type"] == "FeatureCollection"
-    assert "features" in content
-    assert isinstance(content["features"], list)
-    assert len(content["features"]) == len(tasks)
-
-    project_task_index_list = [task.project_task_index for task in tasks]
-    for feature in content["features"]:
-        assert "geometry" in feature
-        assert "properties" in feature
-        assert "task_id" in feature["properties"]
-        assert feature["properties"]["task_id"] in project_task_index_list
 
 
 if __name__ == "__main__":

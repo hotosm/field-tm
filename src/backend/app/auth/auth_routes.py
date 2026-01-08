@@ -16,42 +16,37 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""Auth routes, to login, logout, and get user details."""
+"""Auth routes, to login, logout, and get user details (Litestar)."""
 
-from time import time
-from typing import Annotated, Optional
+import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
-from loguru import logger as log
-from psycopg import Connection
+from litestar import Request, Response, Router, get
+from litestar import status_codes as status
+from litestar.di import Provide
+from litestar.exceptions import HTTPException
+from osm_login_python.core import Auth
+from psycopg import AsyncConnection
 
-from app.auth.auth_deps import login_required, public_endpoint
-from app.auth.auth_logic import (
-    create_jwt_tokens,
-    expire_cookies,
-    refresh_cookies,
-    set_cookies,
-)
+from app.auth.auth_deps import login_required
+from app.auth.auth_logic import expire_cookies, refresh_cookies
 from app.auth.auth_schemas import AuthUser, FMTMUser
-from app.auth.providers.osm import (
-    handle_osm_callback,
-    init_osm_auth,
-)
+from app.auth.providers.osm import handle_osm_callback, init_osm_auth
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
+from app.db.models import DbUser
 from app.users.user_crud import get_or_create_user
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["auth"],
-    responses={404: {"description": "Not found"}},
+log = logging.getLogger(__name__)
+
+
+@get(
+    "/login/osm",
+    summary="Get Login URL for OSM Oauth Application.",
+    dependencies={"osm_auth": Provide(init_osm_auth)},
 )
-
-
-@router.get("/login/osm/management")
-async def get_osm_management_login_url(osm_auth=Depends(init_osm_auth)):
+async def get_osm_management_login_url(
+    osm_auth: Auth,
+) -> dict[str, str]:
     """Get Login URL for OSM Oauth Application.
 
     The application must be registered on openstreetmap.org.
@@ -66,13 +61,18 @@ async def get_osm_management_login_url(osm_auth=Depends(init_osm_auth)):
     """
     login_url = osm_auth.login()
     log.debug(f"OSM Login URL returned: {login_url}")
-    return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
+    return login_url
 
 
-@router.get("/callback/osm")
+@get(
+    "/callback/osm",
+    summary="Performs oauth token exchange with OpenStreetMap.",
+    dependencies={"osm_auth": Provide(init_osm_auth)},
+)
 async def osm_callback(
-    request: Request, osm_auth: Annotated[AuthUser, Depends(init_osm_auth)]
-) -> JSONResponse:
+    request: Request,
+    osm_auth: Auth,
+) -> Response:
     """Performs oauth token exchange with OpenStreetMap.
 
     Provides an access token that can be used for authenticating other endpoints.
@@ -83,13 +83,24 @@ async def osm_callback(
         response_plus_cookies = await handle_osm_callback(request, osm_auth)
         return response_plus_cookies
     except Exception as e:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+        ) from e
 
 
-@router.get("/logout")
-async def logout():
+@get(
+    "/logout",
+    summary="Reset httpOnly cookie to sign out user.",
+    status_code=status.HTTP_200_OK,
+)
+async def logout() -> Response:
     """Reset httpOnly cookie to sign out user."""
-    response = Response(status_code=HTTPStatus.OK)
+    response = Response(
+        status_code=status.HTTP_200_OK,
+        content=b'{"message":"ok"}',
+        media_type="application/json",
+    )
     # Reset all cookies (logout)
     fmtm_cookie_name = settings.cookie_name
     refresh_cookie_name = f"{fmtm_cookie_name}_refresh"
@@ -105,28 +116,42 @@ async def logout():
     return response
 
 
-@router.get("/me", response_model=FMTMUser)
+@get(
+    "/me",
+    summary="Read access token and get user details.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+    return_dto=FMTMUser,
+)
 async def my_data(
-    db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    db: AsyncConnection,
+    auth_user: AuthUser,
+) -> DbUser:
     """Read access token and get user details.
 
     Args:
         db (Connection): The db connection.
-        current_user (AuthUser): User data provided by authentication.
+        auth_user (AuthUser): User data provided by authentication.
 
     Returns:
-        FMTMUser: The dict of user data.
+        DbUser: The user data with project roles.
     """
-    return await get_or_create_user(db, current_user)
+    return await get_or_create_user(db, auth_user)
 
 
-@router.get("/refresh/management", response_model=FMTMUser)
+@get(
+    "/refresh",
+    summary="Uses the refresh token to generate a new access token.",
+    dependencies={
+        "auth_user": Provide(login_required),
+    },
+)
 async def refresh_management_cookies(
     request: Request,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
+    auth_user: AuthUser,
+) -> Response:
     """Uses the refresh token to generate a new access token.
 
     This endpoint is specific to the management desktop frontend.
@@ -138,11 +163,11 @@ async def refresh_management_cookies(
     """
     # Only allow login via OSM for management frontend
     # and revoke cookies if service account set via mapper frontend
-    user_sub = current_user.sub.lower()
-    if "osm" not in user_sub or current_user.username == "svcfmtm":
+    user_sub = auth_user.sub.lower()
+    if "osm" not in user_sub or auth_user.username == "svcfmtm":
         response = Response(
-            status_code=HTTPStatus.FORBIDDEN,
-            content="Please log in using OSM for management access.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            content=b"Please log in using OSM for management access.",
         )
         cookie_names = [
             settings.cookie_name,
@@ -154,55 +179,20 @@ async def refresh_management_cookies(
 
     return await refresh_cookies(
         request,
-        current_user,
+        auth_user,
         settings.cookie_name,
         f"{settings.cookie_name}_refresh",
     )
 
 
-@router.get("/refresh/mapper", response_model=Optional[FMTMUser])
-async def refresh_mapper_token(
-    request: Request,
-    current_user: Annotated[AuthUser, Depends(public_endpoint)],
-):
-    """Uses the refresh token to generate a new access token.
-
-    This endpoint is specific to the mapper mobile frontend.
-    By default the user will be logged in with a service account.
-    Authentication is optional, if the user wishes to be attributed for contributions.
-
-    NOTE this endpoint has no db calls and returns in ~2ms.
-    """
-    try:
-        # If standard login cookie is passed, use that
-        response = await refresh_cookies(
-            request,
-            current_user,
-            settings.cookie_name,
-            f"{settings.cookie_name}_refresh",
-        )
-        return response
-    except HTTPException:
-        # NOTE we allow for token verification to fail for the main cookie
-        # and fallback to to generate a temp auth cookie
-        pass
-
-    # Refresh the temp cookies (we must re-create the 'sub' field)
-    temp_jwt_details = {
-        **current_user.model_dump(exclude=["id"]),
-        "sub": current_user.sub,
-        "aud": settings.FMTM_DOMAIN,
-        "iat": int(time()),
-        "exp": int(time()) + 86400,  # set token expiry to 1 day
-    }
-
-    fmtm_token, refresh_token = create_jwt_tokens(temp_jwt_details)
-    # NOTE be sure to not append content=current_user.model_dump() to this JSONResponse
-    # as we want the login state on the frontend to remain empty (allowing the user to
-    # log in via OSM instead / override)
-    response = JSONResponse(status_code=HTTPStatus.OK, content=temp_jwt_details)
-    return set_cookies(
-        response,
-        fmtm_token,
-        refresh_token,
-    )
+auth_router = Router(
+    path="/auth",
+    tags=["auth"],
+    route_handlers=[
+        get_osm_management_login_url,
+        osm_callback,
+        logout,
+        my_data,
+        refresh_management_cookies,
+    ],
+)

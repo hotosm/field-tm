@@ -22,57 +22,64 @@ from SQL statements. Sometimes we only need a subset of the fields.
 """
 
 import json
+import logging
+from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from re import sub
-from typing import TYPE_CHECKING, Optional, Self
+from typing import Any, Mapping, Optional, Self
 
-from fastapi import HTTPException
-from loguru import logger as log
-from psycopg import Connection
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
+from psycopg import AsyncConnection
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel
 
 from app.config import settings
 from app.db.enums import (
     FieldMappingApp,
-    HTTPStatus,
+    ProjectRole,
     ProjectStatus,
     ProjectVisibility,
     XLSFormType,
 )
 
-# Avoid cyclical dependencies when only type checking
-if TYPE_CHECKING:
-    from app.projects.project_schemas import (
-        ProjectUpdate,
-        StubProjectIn,
-    )
-    from app.users.user_schemas import (
-        UserIn,
-        UserUpdate,
-    )
+log = logging.getLogger(__name__)
 
 
-def dump_and_check_model(db_model: BaseModel):
+def dump_and_check_model(db_model: Any) -> dict:
     """Dump the Pydantic model, removing None and default values.
 
     Also validates to check the model is not empty for insert / update.
     """
-    model_dump = db_model.model_dump(exclude_none=True, exclude_unset=True)
+    if isinstance(db_model, BaseModel):
+        model_dump = db_model.model_dump(exclude_none=True, exclude_unset=True)
+    elif is_dataclass(db_model):
+        model_dump = {
+            key: value for key, value in asdict(db_model).items() if value is not None
+        }
+    elif isinstance(db_model, Mapping):
+        model_dump = {
+            key: value for key, value in db_model.items() if value is not None
+        }
+    else:
+        raise TypeError(
+            f"Unsupported model type for dump_and_check_model: {type(db_model)!r}"
+        )
 
     if not model_dump:
         log.error("Attempted create or update with no data.")
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="No data provided."
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No data provided."
         )
 
     return model_dump
 
 
-class DbUser(BaseModel):
+@dataclass(slots=True)
+class DbUser:
     """Table users."""
 
-    sub: str
+    sub: Optional[str] = None
     username: Optional[str] = None
     is_admin: Optional[bool] = False
     name: Optional[str] = None
@@ -83,8 +90,11 @@ class DbUser(BaseModel):
     registered_at: Optional[AwareDatetime] = None
     last_login_at: Optional[AwareDatetime] = None
 
+    # Relationships
+    project_roles: Optional[dict[int, ProjectRole]] = None  # project:role pairs
+
     @classmethod
-    async def one(cls, db: Connection, user_subidentifier: str) -> Self:
+    async def one(cls, db: AsyncConnection, user_subidentifier: str) -> Self:
         """Get a user either by ID or username."""
         async with db.cursor(row_factory=class_row(cls)) as cur:
             sql = """
@@ -107,7 +117,7 @@ class DbUser(BaseModel):
     @classmethod
     async def all(
         cls,
-        db: Connection,
+        db: AsyncConnection,
         skip: Optional[int] = None,
         limit: Optional[int] = None,
         search: Optional[str] = None,
@@ -156,7 +166,7 @@ class DbUser(BaseModel):
             return await cur.fetchall()
 
     @classmethod
-    async def delete(cls, db: Connection, user_sub: str) -> bool:
+    async def delete(cls, db: AsyncConnection, user_sub: str) -> bool:
         """Delete a user and their related data."""
         async with db.cursor() as cur:
             await cur.execute(
@@ -177,8 +187,8 @@ class DbUser(BaseModel):
     @classmethod
     async def create(
         cls,
-        db: Connection,
-        user_in: "UserIn",
+        db: AsyncConnection,
+        user_in: Self,
         ignore_conflict: bool = False,
     ) -> Self:
         """Create a new user."""
@@ -214,14 +224,15 @@ class DbUser(BaseModel):
             msg = f"Unknown SQL error for data: {model_dump}"
             log.error(f"Failed user creation: {model_dump}")
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
             )
 
         return new_user
 
     @classmethod
     async def update(
-        cls, db: Connection, user_sub: str, user_update: "UserUpdate"
+        cls, db: AsyncConnection, user_sub: str, user_update: Self
     ) -> Self:
         """Update a specific user record."""
         model_dump = dump_and_check_model(user_update)
@@ -244,26 +255,28 @@ class DbUser(BaseModel):
             msg = f"Failed to update user: {user_sub}"
             log.error(msg)
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
             )
 
         return updated_user
 
 
-class DbTemplateXLSForm(BaseModel):
+@dataclass(slots=True)
+class DbTemplateXLSForm:
     """Table template_xlsforms.
 
     XLSForm templates and custom uploads.
     """
 
-    id: int
-    title: str
+    id: Optional[int] = None
+    title: Optional[str] = None
     xls: Optional[bytes] = None
 
     @classmethod
     async def all(
         cls,
-        db: Connection,
+        db: AsyncConnection,
     ) -> Optional[list[Self]]:
         """Fetch all XLSForms."""
         include_categories = [category.value for category in XLSFormType]
@@ -285,10 +298,11 @@ class DbTemplateXLSForm(BaseModel):
         return [{"id": form.id, "title": form.title} for form in forms]
 
 
-class DbProject(BaseModel):
+@dataclass(slots=True)
+class DbProject:
     """Table projects."""
 
-    id: int
+    id: Optional[int] = None
     field_mapping_app: Optional[FieldMappingApp] = None
     external_project_instance_url: Optional[str] = None
     external_project_id: Optional[int] = None
@@ -307,11 +321,17 @@ class DbProject(BaseModel):
     custom_tms_url: Optional[str] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
+    # Encrypted ODK appuser token (may be null until generated)
+    odk_token: Optional[str] = None
+    # GeoJSON data extract stored directly in database (replaces S3 URL approach)
+    data_extract_geojson: Optional[dict] = None
+    # GeoJSON task areas/boundaries stored directly in database
+    task_areas_geojson: Optional[dict] = None
 
     @classmethod
     async def one(
         cls,
-        db: Connection,
+        db: AsyncConnection,
         project_id: int,
         minimal: Optional[bool] = None,
         warn_on_missing_token: Optional[bool] = None,
@@ -342,7 +362,7 @@ class DbProject(BaseModel):
     @classmethod
     async def all(
         cls,
-        db: Connection,
+        db: AsyncConnection,
         skip: Optional[int] = None,
         limit: Optional[int] = None,
         user_sub: Optional[str] = None,
@@ -350,7 +370,6 @@ class DbProject(BaseModel):
         search: Optional[str] = None,
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
-        my_projects: Optional[bool] = None,
         country: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters."""
@@ -401,9 +420,28 @@ class DbProject(BaseModel):
             return await cur.fetchall()
 
     @classmethod
-    async def create(cls, db: Connection, project_in: "StubProjectIn") -> Self:
+    async def create(cls, db: AsyncConnection, project_in: Self) -> Self:
         """Create a new project in the database."""
         model_dump = dump_and_check_model(project_in)
+
+        # Handle ODK credentials encryption
+        if (
+            hasattr(project_in, "external_project_password")
+            and project_in.external_project_password
+        ):
+            from app.central.central_schemas import ODKCentral
+
+            odk_creds = ODKCentral(
+                external_project_instance_url=project_in.external_project_instance_url,
+                external_project_username=project_in.external_project_username,
+                external_project_password=project_in.external_project_password,
+            )
+            odk_data = odk_creds.prepare_for_db()
+            # Update model_dump with encrypted password
+            model_dump.update(odk_data)
+            # Remove plaintext password if present
+            model_dump.pop("external_project_password", None)
+
         columns = []
         value_placeholders = []
 
@@ -412,6 +450,10 @@ class DbProject(BaseModel):
             if key == "outline":
                 value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
                 # Must be string json for db input
+                model_dump[key] = json.dumps(model_dump[key])
+            elif key == "data_extract_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                value_placeholders.append(f"%({key})s::jsonb")
                 model_dump[key] = json.dumps(model_dump[key])
             else:
                 value_placeholders.append(f"%({key})s")
@@ -435,7 +477,8 @@ class DbProject(BaseModel):
                 msg = f"Unknown SQL error for data: {model_dump}"
                 log.error(f"Project creation failed: {msg}")
                 raise HTTPException(
-                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=msg,
                 )
 
             # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
@@ -458,7 +501,8 @@ class DbProject(BaseModel):
             msg = f"Failed to update hashtags for project ID: {new_project.id}"
             log.error(msg)
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
             )
 
         return updated_project
@@ -466,13 +510,46 @@ class DbProject(BaseModel):
     @classmethod
     async def update(
         cls,
-        db: Connection,
+        db: AsyncConnection,
         project_id: int,
-        project_update: "ProjectUpdate",
+        project_update: Self,
     ) -> Self:
         """Update values for project."""
         model_dump = dump_and_check_model(project_update)
-        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
+
+        # Handle ODK credentials encryption
+        if (
+            hasattr(project_update, "external_project_password")
+            and project_update.external_project_password
+        ):
+            from app.central.central_schemas import ODKCentral
+
+            odk_creds = ODKCentral(
+                external_project_instance_url=project_update.external_project_instance_url,
+                external_project_username=project_update.external_project_username,
+                external_project_password=project_update.external_project_password,
+            )
+            odk_data = odk_creds.prepare_for_db()
+            # Update model_dump with encrypted password
+            model_dump.update(odk_data)
+            # Remove plaintext password if present
+            model_dump.pop("external_project_password", None)
+
+        # Convert dict/JSONB fields to JSON strings for database
+        for key in list(model_dump.keys()):
+            if key == "data_extract_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                model_dump[key] = json.dumps(model_dump[key])
+            elif key == "task_areas_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                model_dump[key] = json.dumps(model_dump[key])
+
+        placeholders = []
+        for key in model_dump.keys():
+            if key == "task_areas_geojson":
+                placeholders.append(f"{key} = %({key})s::jsonb")
+            else:
+                placeholders.append(f"{key} = %({key})s")
 
         # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
         if "hashtags" in model_dump:
@@ -497,13 +574,34 @@ class DbProject(BaseModel):
             msg = f"Failed to update project with ID: {project_id}"
             log.error(msg)
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
             )
 
         return updated_project
 
+    def get_odk_credentials(self) -> Optional["ODKCentral"]:
+        """Get ODK credentials from project (decrypted).
+
+        Returns None if no credentials are set.
+        """
+        from app.central.central_schemas import ODKCentral
+
+        if not (
+            self.external_project_instance_url
+            or self.external_project_username
+            or self.external_project_password_encrypted
+        ):
+            return None
+
+        return ODKCentral.from_db(
+            url=self.external_project_instance_url,
+            username=self.external_project_username,
+            password_encrypted=self.external_project_password_encrypted,
+        )
+
     @classmethod
-    async def delete(cls, db: Connection, project_id: int) -> None:
+    async def delete(cls, db: AsyncConnection, project_id: int) -> None:
         """Delete a project."""
         async with db.cursor() as cur:
             await cur.execute(

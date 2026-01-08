@@ -18,7 +18,6 @@ type filterType = {
   status: project_status | undefined;
   field_mapping_app: field_mapping_app_type | undefined;
   country: string;
-  my_projects: boolean;
 };
 
 const initialData = {
@@ -45,7 +44,6 @@ const Home = () => {
     field_mapping_app: undefined,
     status: undefined,
     country: '',
-    my_projects: false,
   });
 
   const [searchTextData, handleChangeData] = useDebouncedInput({
@@ -88,8 +86,6 @@ const Home = () => {
             onStatusChange: (value) => setFilter({ ...filter, status: value, page: 1 }),
             country: countrySearch,
             onCountrySearch: handleCountrySearchChange,
-            myProjects: filter.my_projects,
-            onMyProjectsToggle: (state) => setFilter({ ...filter, my_projects: state, page: 1 }),
           }}
         />
         {!isProjectListLoading ? (

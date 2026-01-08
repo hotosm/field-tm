@@ -4,7 +4,7 @@ import logging
 from yxf.yaml import read_yaml
 from yxf.excel import write_xlsform
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 def convert_to_xlsform(yaml_file):
     """
@@ -21,10 +21,10 @@ def convert_to_xlsform(yaml_file):
         write_xlsform(form_dictionary, output_buffer)
         xlsx_bytes = output_buffer.getvalue()
 
-        logger.info(f'Successfully converted YAML file: {yaml_file} to XLSForm bytes.')
+        log.info(f'Successfully converted YAML file: {yaml_file} to XLSForm bytes.')
 
         return xlsx_bytes
 
     except Exception as e: 
-        logger.exception(f'An error occurred during in-memory conversion for YAML file: {yaml_file}')
+        log.exception(f'An error occurred during in-memory conversion for YAML file: {yaml_file}')
         raise

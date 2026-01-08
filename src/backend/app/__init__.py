@@ -1,1 +1,1 @@
-"""Root of the FastAPI Field-TM server files."""
+"""Root of the Field-TM backend server files."""

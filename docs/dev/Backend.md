@@ -61,7 +61,8 @@ just start without-central
 
 ## 2. Start the API without Docker
 
-- To run Field-TM without Docker, you will need to start the database, then the API.
+- To run Field-TM without Docker, you will need to start the database,
+  then the API.
 - First start a Postgres database running on a port on your machine.
   - The database must have the Postgis extension installed.
 - After starting the database, from the command line:

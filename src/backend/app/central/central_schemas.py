@@ -15,27 +15,42 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Schemas for returned ODK Central objects."""
+"""Schemas and DTOs for ODK Central integration."""
 
+import logging
 import re
 from dataclasses import dataclass
 from typing import Optional, Self, TypedDict
 
-from loguru import logger as log
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
 
+log = logging.getLogger(__name__)
+
+
+# NOTE: These remain as Pydantic models (not DTOs) because they:
+# 1. Have complex validation logic (URL normalization, password encryption, etc.)
+# 2. Are used as input validation models, not output serialization
+# 3. Are used directly as route parameters (Litestar handles Pydantic models natively)
+
 
 class ODKCentral(BaseModel):
-    """ODK Central credentials."""
+    """ODK Central credentials model.
 
-    odk_central_url: Optional[HttpUrlStr] = None
-    odk_central_user: Optional[str] = None
-    odk_central_password: Optional[str] = None
+    Handles both input (with encryption) and output (with decryption).
+    Use prepare_for_db() to encrypt password before DB insertion.
+    Use from_db() class method to decrypt password when reading from DB.
+    """
 
-    @field_validator("odk_central_url", mode="after")
+    external_project_instance_url: Optional[HttpUrlStr] = None
+    external_project_username: Optional[str] = None
+    external_project_password: Optional[str] = None
+    # Internal field for encrypted password (used in DB, excluded from serialization)
+    password_encrypted: Optional[str] = Field(default=None, exclude=True)
+
+    @field_validator("external_project_instance_url", mode="after")
     @classmethod
     def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
         """Remove trailing slash from ODK Central URL."""
@@ -47,66 +62,103 @@ class ODKCentral(BaseModel):
 
     @model_validator(mode="after")
     def all_odk_vars_together(self) -> Self:
-        """Ensure if one ODK variable is set, then all are."""
-        if any(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ) and not all(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ):
+        """Ensure if one ODK variable is set, then all are.
+
+        If all are None/empty, that's allowed (will use default env credentials).
+        For updates, allow password to be None if password_encrypted exists.
+        """
+        has_odk_url = bool(self.external_project_instance_url)
+        has_odk_user = bool(self.external_project_username)
+        has_odk_password = bool(self.external_project_password)
+        has_encrypted = bool(self.password_encrypted)
+
+        # If all three are None, that's fine (not updating ODK credentials)
+        if not (has_odk_url or has_odk_user or has_odk_password or has_encrypted):
+            return self
+
+        # For updates, allow password to be None if encrypted password exists
+        if not has_odk_password and has_encrypted:
+            return self
+
+        # If password is explicitly provided, require all three together
+        if has_odk_password:
+            has_all = all([has_odk_url, has_odk_user, has_odk_password])
+            if not has_all:
+                err = "All ODK details are required together: url, user, password"
+                log.debug(err)
+                raise ValueError(err)
+            return self
+
+        # If password is None but URL/username are provided, allow it (for updates)
+        if not has_odk_password and (has_odk_url or has_odk_user):
+            return self
+
+        # If any field is set but not all, that's an error (for new projects)
+        has_any = any([has_odk_url, has_odk_user, has_odk_password])
+        if has_any and not all([has_odk_url, has_odk_user, has_odk_password]):
             err = "All ODK details are required together: url, user, password"
             log.debug(err)
             raise ValueError(err)
+
         return self
 
+    def prepare_for_db(self) -> dict:
+        """Prepare credentials for database insertion (encrypt password).
 
-class ODKCentralIn(ODKCentral):
-    """ODK Central credentials inserted to database."""
+        Returns a dict with external_project_password_encrypted instead of
+        external_project_password. Password field is excluded.
+        """
+        data = self.model_dump(
+            exclude={"external_project_password", "password_encrypted"}
+        )
 
-    @field_validator("odk_central_password", mode="after")
+        # Encrypt password if present
+        if self.external_project_password:
+            data["external_project_password_encrypted"] = encrypt_value(
+                self.external_project_password
+            )
+        elif self.password_encrypted:
+            # Keep existing encrypted password if no new password provided
+            data["external_project_password_encrypted"] = self.password_encrypted
+
+        return data
+
     @classmethod
-    def encrypt_odk_password(cls, value: str) -> Optional[str]:
-        """Encrypt the ODK Central password before db insertion."""
-        if not value:
+    def from_db(
+        cls,
+        url: Optional[str] = None,
+        username: Optional[str] = None,
+        password_encrypted: Optional[str] = None,
+    ) -> Optional["ODKCentral"]:
+        """Create ODKCentral instance from database fields (decrypt password).
+
+        Args:
+            url: ODK Central URL from database
+            username: ODK Central username from database
+            password_encrypted: Encrypted password from database
+
+        Returns:
+            ODKCentral instance with decrypted password, or None if all fields are None
+        """
+        if not (url or username or password_encrypted):
             return None
-        return encrypt_value(value)
 
+        # Decrypt password
+        password = None
+        if password_encrypted:
+            try:
+                password = decrypt_value(password_encrypted)
+            except Exception as e:
+                log.debug(f"Failed to decrypt password (may already be plaintext): {e}")
+                # Assume it's already plaintext
+                password = password_encrypted
 
-class ODKCentralDecrypted(BaseModel):
-    """ODK Central credentials extracted from database.
-
-    WARNING never return this as a response model.
-    WARNING or log to the terminal.
-    """
-
-    odk_central_url: Optional[HttpUrlStr] = None
-    odk_central_user: Optional[str] = None
-    odk_central_password: Optional[str] = None
-
-    def model_post_init(self, ctx):
-        """Run logic after model object instantiated."""
-        # Decrypt odk central password from database
-        if self.odk_central_password:
-            if isinstance(self.odk_central_password, str):
-                encrypted_pass = self.odk_central_password
-                self.odk_central_password = decrypt_value(encrypted_pass)
-
-    @field_validator("odk_central_url", mode="after")
-    @classmethod
-    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
-        """Remove trailing slash from ODK Central URL."""
-        if not value:
-            return None
-        if value.endswith("/"):
-            return value[:-1]
-        return value
+        return cls(
+            external_project_instance_url=url,
+            external_project_username=username,
+            external_project_password=password,
+            password_encrypted=password_encrypted,
+        )
 
 
 @dataclass
@@ -179,25 +231,3 @@ class EntityDict(TypedDict):
 
     label: str
     data: EntityPropertyDict
-
-
-class EntityProperties(BaseModel):
-    """ODK Entity properties to include in GeoJSON."""
-
-    updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
-
-    # project_id: Optional[str] = None
-    task_id: Optional[str] = None
-    osm_id: Optional[str] = None
-    tags: Optional[str] = None
-    version: Optional[str] = None
-    changeset: Optional[str] = None
-    timestamp: Optional[str] = None
-    status: Optional[str] = None
-    created_by: Optional[str] = None
-
-    @computed_field
-    @property
-    def updated_at(self) -> Optional[str]:
-        """Convert updatedAt field to updated_at."""
-        return self.updatedAt

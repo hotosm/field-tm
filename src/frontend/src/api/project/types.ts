@@ -10,16 +10,13 @@ import {
   field_mapping_app,
 } from '@/types/enums';
 import type { Point, Polygon, FeatureCollection, Geometry } from 'geojson';
-import type { taskType } from '@/types';
 
-export interface projectBaseType {
+export interface projectType {
   id: number;
-  odkid: number;
-  author_sub: number;
-  name: string;
-  short_description: string;
+  external_project_id: number;
+  created_by_sub: number;
+  project_name: string;
   description: string;
-  per_task_instructions: string;
   slug: string;
   location_str: string;
   outline: Polygon;
@@ -33,9 +30,9 @@ export interface projectBaseType {
   priority: string;
   featured: boolean;
   due_date: null | string;
-  odk_central_url: string;
-  odk_central_user: string;
-  odk_central_password: string;
+  external_project_instance_url: string;
+  external_project_username: string;
+  external_project_password: string;
   odk_token: string;
   data_extract_url: string;
   task_split_type: task_split_type;
@@ -61,7 +58,7 @@ export type generateProjectBasemapPayloadType = {
   tms_url?: string;
 };
 
-export type createProjectPayloadType = Partial<projectBaseType>;
+export type createProjectPayloadType = Partial<projectType>;
 
 export type updateProjectPayloadType = Partial<projectType>;
 
@@ -90,10 +87,7 @@ export type generateFilesPayloadType = {
   combined_features_count: number;
 };
 
-export type createStubProjectPayloadType = Pick<
-  projectBaseType,
-  'name' | 'short_description' | 'description' | 'outline'
-> & {
+export type createStubProjectPayloadType = Pick<projectType, 'project_name' | 'description' | 'outline'> & {
   merge: boolean;
 };
 
@@ -151,11 +145,10 @@ export type createStubProjectParamsType = {
 // RESPONSE TYPES
 export type projectSummaryType = {
   id: number;
-  name: string;
+  project_name: string;
   priority: number;
   hashtags: string[];
   location_str: string;
-  short_description: string;
   project_url: string | null;
   external_project_id?: number | null;
   external_project_instance_url?: string | null;
@@ -182,11 +175,6 @@ export type tileType = {
   format: tile_output_formats;
   mimetype: string;
 };
-
-export interface projectType extends projectBaseType {
-  centroid: Point;
-  last_active: string;
-}
 
 export type odkEntitiesGeojsonType = FeatureCollection<Geometry, odkEntitiesGeojsonPropertiesType>;
 

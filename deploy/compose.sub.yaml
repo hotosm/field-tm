@@ -22,8 +22,6 @@ volumes:
     name: fmtm-frontend
   fmtm_db_data:
     name: fmtm-db-data
-  fmtm_data:
-    name: fmtm-s3-data
   fmtm_logs:
     name: fmtm-logs
   fmtm_images:
@@ -83,9 +81,6 @@ services:
       WHITELIST_URI: https://${FMTM_DOMAIN}
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
-      # Required for electric headers electric-offset, electric-handle, electric-schema,electric-cursor,electric-up-to-date
-      KEEP_UPSTREAM_HEADERS: yes
-      REVERSE_PROXY_INTERCEPT_ERRORS: no
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
       USE_REAL_IP: yes
       SERVE_FILES: yes
@@ -169,8 +164,6 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
-      s3:
-        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -213,8 +206,6 @@ services:
       proxy:
         condition: service_healthy
       central-db:
-        condition: service_healthy
-      s3:
         condition: service_healthy
       pyxform:
         condition: service_started
@@ -273,13 +264,26 @@ services:
     network_mode: none
     restart: "on-failure:2"
 
+  migrations:
+    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
+    depends_on:
+      proxy:
+        condition: service_healthy
+      fmtm-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    entrypoint: ["/migrate-entrypoint.sh"]
+    restart: "on-failure:2"
+
   fmtm-db:
     image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
-    # Plus electric-sql defaults to need 20 connections (64+20)
-    command: -c 'max_connections=84' -c 'wal_level=logical'
+    command: -c 'max_connections=64' -c 'wal_level=logical'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -297,27 +301,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  electric:
-    image: "electricsql/electric:1.0.22"
-    depends_on:
-      proxy:
-        condition: service_started
-      fmtm-db:
-        condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
-    environment:
-      DATABASE_URL: postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
-      # Do not set ELECTRIC_SECRET var for now, until docs are available for how it actually works...
-      # The frontend ShapeStream should then use params.api_secret? Or perhaps set via proxy somehow?
-      ELECTRIC_INSECURE: true
-      # OTEL_EXPORT: otlp
-      # OTLP_ENDPOINT: https://...
-      # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
 
   central-db:
     image: "ghcr.io/hotosm/postgis:14-3.5-alpine"

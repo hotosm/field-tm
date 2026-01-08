@@ -23,7 +23,7 @@ const ProjectOptions = () => {
 
   const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectInfo.name, authDetails?.username);
+  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectInfo.project_name, authDetails?.username);
 
   const {
     error: downloadFormError,

@@ -694,10 +694,8 @@ class OdkDataset(OdkCentral):
                 Format: {"label": "John Doe", "data": {"firstName": "John", "age": "22"}}
 
         Returns:
-            # list: A list of Entity detail JSONs.
-            #     The 'uuid' field includes the unique entity identifier.
             dict: {'success': true}
-                When creating bulk entities ODK Central return this for now.
+                When creating bulk entities ODK Central returns this for now.
         """
         # Validation
         if not isinstance(entities, list):

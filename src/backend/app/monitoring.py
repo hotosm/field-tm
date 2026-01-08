@@ -18,30 +18,83 @@
 """Module to configure different monitoring configs."""
 
 import logging
+from typing import Any
 
-from fastapi import FastAPI
-from fastapi.exceptions import HTTPException
-from fastapi.requests import Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from loguru import logger as log
+from litestar import Litestar, Request, Response
+from litestar.exceptions import HTTPException
+from litestar.types import ASGIApp, Receive, Scope, Send
+
+log = logging.getLogger(__name__)
 
 
-def add_endpoint_profiler(app: FastAPI):
-    """Add endpoint profiler if DEBUG is enabled."""
+def add_endpoint_profiler(app: Litestar) -> None:
+    """Add a simple per-request profiler middleware when DEBUG is enabled.
+
+    Wraps the request in a PyInstrument profiler and returns the profiler
+    HTML instead of the normal response.
+    """
+    from urllib.parse import parse_qs
+
     from pyinstrument import Profiler
 
-    @app.middleware("http")
-    async def _profile_request(request: Request, call_next):  # dead: disable
-        """Calculate the execution time for routes."""
-        profiling = request.query_params.get("profile", False)
-        if profiling:
+    def profiler_middleware(next_app: ASGIApp) -> ASGIApp:
+        async def middleware(scope: Scope, receive: Receive, send: Send) -> None:
+            # Only act on HTTP requests
+            if scope["type"] != "http":
+                await next_app(scope, receive, send)
+                return
+
+            # Parse query string manually from ASGI scope
+            raw_qs = scope.get("query_string", b"").decode()
+            params = parse_qs(raw_qs)
+            raw_profile = (params.get("profile") or [""])[0].lower()
+            profiling = raw_profile in ("1", "true", "yes")
+
+            if not profiling:
+                await next_app(scope, receive, send)
+                return
+
             profiler = Profiler(interval=0.001, async_mode="enabled")
             profiler.start()
-            await call_next(request)
+
+            status_code = 200
+
+            async def send_wrapper(message: dict[str, Any]) -> None:
+                nonlocal status_code
+                # Capture original status code but drop the original body –
+                # we'll return the profiler HTML instead.
+                if message["type"] == "http.response.start":
+                    status_code = message.get("status", status_code)
+                # We intentionally do not forward the original response to `send`.
+
+            # Run the downstream app once just to exercise the code path
+            await next_app(scope, receive, send_wrapper)
             profiler.stop()
-            return HTMLResponse(profiler.output_html())
-        else:
-            return await call_next(request)
+
+            html = profiler.output_html()
+
+            # Return profiler HTML as the final response
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": status_code,
+                    "headers": [
+                        (b"content-type", b"text/html; charset=utf-8"),
+                    ],
+                }
+            )
+            await send(
+                {
+                    "type": "http.response.body",
+                    "body": html.encode("utf-8"),
+                    "more_body": False,
+                }
+            )
+
+        return middleware
+
+    # Register middleware with the Litestar app
+    app.middleware.append(profiler_middleware)
 
 
 def set_sentry_otel_tracer(dsn: str):
@@ -68,7 +121,7 @@ def set_sentry_otel_tracer(dsn: str):
     set_global_textmap(SentryPropagator())
 
 
-def set_otel_tracer(app: FastAPI, endpoint: str):
+def set_otel_tracer(app: Litestar, endpoint: str):
     """Add OpenTelemetry tracing only if environment variables configured."""
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
@@ -115,11 +168,7 @@ def set_otel_tracer(app: FastAPI, endpoint: str):
     )
 
     # Ensure the HTTPException text is included in attributes
-    @app.exception_handler(HTTPException)
-    async def http_exception_handler(
-        request,  # dead: disable
-        exc,
-    ):  # dead: disable
+    async def http_exception_handler(request: Request, exc: HTTPException) -> Response:
         current_span = trace.get_current_span()
         current_span.set_attributes(
             {
@@ -129,23 +178,18 @@ def set_otel_tracer(app: FastAPI, endpoint: str):
                 # "otel.status_code": "ERROR"
             }
         )
-        # current_span.add_event("Test")
         current_span.record_exception(exc)
-        return JSONResponse(
-            status_code=exc.status_code, content={"detail": str(exc.detail)}
+        return Response(
+            content={"detail": str(exc.detail)},
+            status_code=exc.status_code,
         )
+
+    # Register handler with Litestar
+    app.exception_handlers[HTTPException] = http_exception_handler
 
 
 def set_otel_logger(endpoint: str):
-    """Add OpenTelemetry logging only if environment variables configured.
-
-    FIXME not quite functional yet.
-    FIXME requires better interop with loguru.
-    FIXME https://github.com/Delgan/loguru/issues/674
-    FIXME https://github.com/open-telemetry/opentelemetry-python/issues/3615
-    FIXME Details: https://opentelemetry-python-contrib.readthedocs.io
-                    /en/latest/instrumentation/logging/logging.html
-    """
+    """Add OpenTelemetry logging only if environment variables configured."""
     from opentelemetry._logs import set_logger_provider
     from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
     from opentelemetry.instrumentation.logging import LoggingInstrumentor
@@ -160,7 +204,7 @@ def set_otel_logger(endpoint: str):
             msg = self.format(record)
             record.msg = msg
             record.args = None
-            self._logger.emit(self._translate(record))
+            self._log.emit(self._translate(record))
 
     logger_provider = LoggerProvider(resource=Resource.create({}))
     set_logger_provider(logger_provider)
@@ -169,7 +213,7 @@ def set_otel_logger(endpoint: str):
 
     otel_log_handler = FormattedLoggingHandler(logger_provider=logger_provider)
 
-    # This has to be called first before logger.getLogger().addHandler()
+    # This has to be called first before log.getLogger().addHandler()
     # so that it can call logging.basicConfig first to set the logging format
     # based on the environment variable OTEL_PYTHON_LOG_FORMAT
     LoggingInstrumentor().instrument()
@@ -182,22 +226,12 @@ def set_otel_logger(endpoint: str):
     logging.getLogger().addHandler(otel_log_handler)
 
 
-def instrument_app_otel(app: FastAPI):
-    """Add OpenTelemetry FastAPI instrumentation.
+def instrument_app_otel(app: Litestar):
+    """Add OpenTelemetry LiteStar instrumentation.
 
     Only used if environment variables configured.
     """
-    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    from litestar.contrib.opentelemetry import OpenTelemetryConfig, OpenTelemetryPlugin
 
-    # from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
-    from opentelemetry.instrumentation.requests import RequestsInstrumentor
-
-    FastAPIInstrumentor.instrument_app(app)
-    # FastAPIInstrumentor.instrument_app(
-    #   app, tracer_provider=trace.get_tracer_provider()
-    # )
-    # FIXME psycopg enable once linked issue addressed:
-    # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/3793
-    # PsycopgInstrumentor().instrument(enable_commenter=True, commenter_options={})
-    RequestsInstrumentor().instrument()
-    # RequestsInstrumentor().instrument(tracer_provider=tracer_provider)
+    open_telemetry_config = OpenTelemetryConfig()
+    app.plugins.append(OpenTelemetryPlugin(open_telemetry_config))

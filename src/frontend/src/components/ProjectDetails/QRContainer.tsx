@@ -19,7 +19,7 @@ const QRContainer = ({ projectInfo }: QRContainerPropsType) => {
   const authDetails = useAppSelector((state) => state?.login?.authDetails);
 
   const { qrcode: qfieldQR } = GetQfieldProjectQrCode(projectInfo?.external_project_id);
-  const { qrcode: odkQR } = GetProjectQrCode(projectInfo?.odk_token, projectInfo?.name, authDetails?.osm_user);
+  const { qrcode: odkQR } = GetProjectQrCode(projectInfo?.odk_token, projectInfo?.project_name, authDetails?.osm_user);
   const downloadQr = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = projectInfo.field_mapping_app === field_mapping_app.ODK ? odkQR : qfieldQR;

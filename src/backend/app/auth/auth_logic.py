@@ -18,20 +18,22 @@
 
 """Logic for handling authentication, headers, tokens, and cookies."""
 
+import logging
 from time import time
 from typing import Optional
 from urllib.parse import urlparse
 
 import jwt
-from fastapi import HTTPException, Request, Response
-from fastapi.responses import JSONResponse
-from loguru import logger as log
+from litestar import Request, Response
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from tldextract import extract as domain_root_extract
 
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
-from app.db.enums import HTTPStatus
 from app.db.models import DbUser
+
+log = logging.getLogger(__name__)
 
 
 async def get_uid(user_data: AuthUser | DbUser) -> int:
@@ -45,7 +47,7 @@ async def get_uid(user_data: AuthUser | DbUser) -> int:
             stack_info=True,
         )
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Auth failed. No user id present",
         ) from e
 
@@ -114,7 +116,7 @@ def set_cookies(
     refresh_token: str,
     cookie_name: str = settings.cookie_name,
     refresh_cookie_name: str = f"{settings.cookie_name}_refresh",
-) -> JSONResponse:
+) -> Response:
     """Set cookies for the access and refresh tokens.
 
     Args:
@@ -211,18 +213,18 @@ def verify_jwt_token(token: str, ignore_expiry: bool = False) -> dict:
         )
     except jwt.ExpiredSignatureError as e:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token has expired",
         ) from e
     except jwt.PyJWTError as e:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate refresh token",
         ) from e
     except Exception as e:
         log.exception(f"Unknown cookie/jwt error: {e}")
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate refresh token",
         ) from e
 
@@ -238,22 +240,24 @@ async def refresh_cookies(
     Used the frontend refresh endpoints.
     """
     if settings.DEBUG:
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={**current_user.model_dump()},
+        # Minimal, consistent body; caller only cares about status / cookies
+        return Response(
+            status_code=status.HTTP_200_OK,
+            content=b'{"message":"ok"}',
+            media_type="application/json",
         )
 
     access_token = get_cookie_value(request, cookie_name)
     if not access_token:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No access token provided",
         )
 
     refresh_token = get_cookie_value(request, refresh_cookie_name)
     if not refresh_token:
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No refresh token provided",
         )
 
@@ -268,14 +272,15 @@ async def refresh_cookies(
         new_refresh_token = refresh_jwt_token(refresh_token_data)
     except Exception as e:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to refresh tokens: {e}",
         ) from e
 
-    # NOTE Append the user data to the JSONResponse so we can display in the
-    # frontend header. For the mapper frontend this is enough, but for the
-    # management frontend we instead use the return from /auth/me
-    response = JSONResponse(status_code=HTTPStatus.OK, content=access_token_data)
+    response = Response(
+        status_code=status.HTTP_200_OK,
+        content=b'{"message":"ok"}',
+        media_type="application/json",
+    )
     response_plus_cookies = set_cookies(response, new_access_token, new_refresh_token)
 
     return response_plus_cookies

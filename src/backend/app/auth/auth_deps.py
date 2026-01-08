@@ -16,24 +16,26 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""Auth dependencies, for restricted routes and cookie handling."""
+"""Auth dependencies, for restricted routes and cookie handling (Litestar)."""
 
-from typing import Annotated, Optional
+import logging
+from typing import Optional
 
-from fastapi import Depends, Header, HTTPException, Request
-from loguru import logger as log
-from psycopg import Connection
+from litestar import Request
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
+from litestar.params import Parameter
 
 from app.auth.auth_logic import get_cookie_value, verify_jwt_token
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
-from app.db.database import db_conn
-from app.db.enums import HTTPStatus, UserRole
+
+log = logging.getLogger(__name__)
 
 
 async def public_endpoint(
     request: Request,
-    access_token: Annotated[Optional[str], Header()] = None,
+    access_token: Optional[str] = Parameter(default=None, header="access_token"),
 ) -> Optional[AuthUser]:
     """For fully public endpoints.
 
@@ -41,14 +43,14 @@ async def public_endpoint(
     Optional login dependency: returns AuthUser if authenticated, else None.
     """
     if settings.DEBUG:
-        return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
+        return AuthUser(sub="osm|1", username="localadmin", is_admin=True)
 
     extracted_token = access_token or get_cookie_value(request, settings.cookie_name)
 
     svc_account_user = {
         "sub": "osm|20386219",
         "username": "svcfmtm",
-        "role": UserRole.MAPPER,
+        "is_admin": False,
     }
     if not extracted_token:
         return AuthUser(**svc_account_user)
@@ -62,12 +64,11 @@ async def public_endpoint(
 
 async def login_required(
     request: Request,
-    db: Annotated[Connection, Depends(db_conn)],
-    access_token: Annotated[Optional[str], Header()] = None,
+    access_token: Optional[str] = Parameter(default=None, header="access_token"),
 ) -> AuthUser:
     """Dependency for endpoints requiring login."""
     if settings.DEBUG:
-        return AuthUser(sub="osm|1", username="localadmin", role=UserRole.ADMIN)
+        return AuthUser(sub="osm|1", username="localadmin", is_admin=True)
 
     # Else, extract access token only from the Field-TM cookie
     extracted_token = access_token or get_cookie_value(
@@ -78,7 +79,7 @@ async def login_required(
         return await _authenticate_cookie_token(extracted_token)
 
     raise HTTPException(
-        status_code=HTTPStatus.UNAUTHORIZED,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Auth cookie or API token must be provided",
     )
 
@@ -90,7 +91,7 @@ async def _authenticate_cookie_token(access_token: str) -> AuthUser:
     except ValueError as e:
         log.exception(f"Failed to verify access token: {e}", stack_info=True)
         raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Access token not valid",
         ) from e
 

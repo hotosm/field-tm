@@ -14,13 +14,13 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic models for Auth."""
+"""Auth schemas and DTOs."""
 
 from typing import Optional, TypedDict
 
+from litestar.dto import DataclassDTO, DTOConfig
 from pydantic import BaseModel, ConfigDict, computed_field
 
-from app.db.enums import ProjectRole, UserRole
 from app.db.models import DbProject, DbUser
 
 
@@ -31,8 +31,8 @@ class ProjectUserDict(TypedDict):
     project: DbProject
 
 
-class BaseUser(BaseModel):
-    """Base user model to inherit."""
+class AuthUser(BaseModel):
+    """The user model returned from OAuth2."""
 
     model_config = ConfigDict(use_enum_values=True)
 
@@ -43,11 +43,7 @@ class BaseUser(BaseModel):
     profile_img: Optional[str] = None
     email: Optional[str] = None
     picture: Optional[str] = None
-    role: Optional[UserRole] = UserRole.MAPPER
-
-
-class AuthUser(BaseUser):
-    """The user model returned from OAuth2."""
+    is_admin: bool = False
 
     def __init__(self, **data):
         """Initializes the AuthUser class."""
@@ -74,33 +70,8 @@ class AuthUser(BaseUser):
             self.profile_img = self.picture
 
 
-# NOTE we no longer use this, but is present as an example
-# class AuthUserWithToken(AuthUser):
-#     """Add the JWT token variable to AuthUser response."""
-#     token: str
+# DTO for user details returned to frontend (includes project_roles)
+class FMTMUser(DataclassDTO[DbUser]):
+    """DTO for user details returned to frontend (includes project_roles)."""
 
-
-class FMTMUser(BaseUser):
-    """User details returned to the frontend."""
-
-    sub: str
-    project_roles: Optional[dict[int, ProjectRole]] = None
-
-    def model_post_init(self, ctx):
-        """Add to picture field, and remove the value for profile_img.
-
-        We need this workaround as OSM returns profile_img in the response.
-        """
-        if self.profile_img:
-            self.picture = self.profile_img
-            self.profile_img = None
-
-
-class ExternalUserIn(BaseModel):
-    """Create a FieldTM user from an external platform."""
-
-    id: str
-    platform: str  # the name of the platform, used for sub `platform|id`
-    username: str
-    email: Optional[str] = None
-    picture: Optional[str] = None
+    config = DTOConfig()

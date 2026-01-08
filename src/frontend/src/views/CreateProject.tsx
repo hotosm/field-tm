@@ -7,8 +7,6 @@ import MapData from '@/components/CreateProject/04-MapData';
 import SplitTasks from '@/components/CreateProject/05-SplitTasks';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useHasManagedAnyOrganization, useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
-import Forbidden from '@/views/Forbidden';
 import Stepper from '@/components/CreateProject/Stepper';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules';
@@ -28,12 +26,12 @@ import { defaultValues } from '@/components/CreateProject/constants/defaultValue
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import FormFieldSkeletonLoader from '@/components/Skeletons/common/FormFieldSkeleton';
 import { convertGeojsonToJsonFile, getDirtyFieldValues } from '@/utilfunctions';
-import { data_extract_type, project_roles, task_split_type } from '@/types/enums';
+import { data_extract_type, field_mapping_app, project_roles, task_split_type } from '@/types/enums';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/RadixComponents/Dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import isEmpty from '@/utilfunctions/isEmpty';
-import { useDeleteProjectMutation, useGetProjectMinimalQuery, useGetProjectUsersQuery } from '@/api/project';
+import { useDeleteProjectMutation, useGetProjectUsersQuery } from '@/api/project';
 import { useUploadProjectXlsformMutation } from '@/api/central';
 import { FileType } from '@/types';
 
@@ -60,24 +58,13 @@ const CreateProject = () => {
   const createProjectLoading = useAppSelector((state) => state.createproject.createProjectLoading);
   const isProjectDeletePending = useAppSelector((state) => state.createproject.isProjectDeletePending);
 
-  const { data: minimalProjectDetails, isLoading: isMinimalProjectLoading } = useGetProjectMinimalQuery({
-    project_id: projectId!,
-    options: { queryKey: ['get-minimal-project', projectId], enabled: !!projectId },
-  });
-
-  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
-  const isOrganizationAdmin = useIsOrganizationAdmin(
-    minimalProjectDetails ? +minimalProjectDetails?.organisation_id : null,
-  );
-  const isProjectManager = useIsProjectManager(projectId);
-
   const formMethods = useForm<z.infer<typeof createProjectValidationSchema>>({
     defaultValues: defaultValues,
     resolver: zodResolver(validationSchema?.[step] || projectOverviewValidationSchema),
   });
 
   const { handleSubmit, watch, setValue, trigger, formState, reset, getValues, setError } = formMethods;
-  const { dirtyFields } = formState;
+  const { dirtyFields, errors } = formState;
   const values = watch();
 
   useEffect(() => {
@@ -88,45 +75,16 @@ const CreateProject = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!minimalProjectDetails || !projectId) return;
-    const {
-      id,
-      name,
-      short_description,
-      description,
-      organisation_id,
-      outline,
-      hashtags,
-      organisation_name,
-      field_mapping_app,
-      use_odk_collect,
-    } = minimalProjectDetails;
-    reset({
-      ...defaultValues,
-      id,
-      name,
-      short_description,
-      description,
-      organisation_id: +organisation_id,
-      outline,
-      hashtags,
-      organisation_name,
-      field_mapping_app,
-      use_odk_collect,
-    });
-  }, [minimalProjectDetails]);
-
   const { data: projectManagers } = useGetProjectUsersQuery({
     project_id: projectId!,
-    params: { role: project_roles.PROJECT_MANAGER },
-    options: { queryKey: ['get-project-users', project_roles.PROJECT_MANAGER, projectId], enabled: !!projectId },
+    params: { role: project_roles.PROJECT_ADMIN },
+    options: { queryKey: ['get-project-users', project_roles.PROJECT_ADMIN, projectId], enabled: !!projectId },
   });
 
   // setup project admin select options if project admins are available
   useEffect(() => {
     // only set project_admins value after basic project details are fetched
-    if (!projectId || !projectManagers || isEmpty(projectManagers) || isMinimalProjectLoading) return;
+    if (!projectId || !projectManagers || isEmpty(projectManagers)) return;
 
     const projectAdminOptions = projectManagers?.map((admin) => ({
       id: admin.user_sub,
@@ -141,7 +99,7 @@ const CreateProject = () => {
       }),
     );
     setValue('project_admins', project_admins);
-  }, [projectManagers, projectId, isMinimalProjectLoading]);
+  }, [projectManagers, projectId]);
 
   const form = {
     1: <ProjectOverview />,
@@ -156,43 +114,36 @@ const CreateProject = () => {
 
     if (!isValidationSuccess) return;
     const {
-      name,
-      short_description,
+      project_name,
       description,
-      organisation_id,
       project_admins,
       outline,
-      odk_central_url,
-      odk_central_user,
-      odk_central_password,
+      external_project_instance_url,
+      external_project_username,
+      external_project_password,
       merge,
       field_mapping_app,
-      use_odk_collect,
     } = values;
 
     const projectPayload = {
-      name,
-      short_description,
+      project_name,
       description,
-      organisation_id,
       outline,
       merge,
       field_mapping_app,
-      use_odk_collect,
     };
 
     let odkPayload: Pick<
       z.infer<typeof createProjectValidationSchema>,
-      'odk_central_url' | 'odk_central_user' | 'odk_central_password'
+      'external_project_instance_url' | 'external_project_username' | 'external_project_password'
     > | null = null;
 
-    if (values.useDefaultODKCredentials) {
-      odkPayload = null;
-    } else {
+    // Only include ODK credentials if all three are provided
+    if (external_project_instance_url && external_project_username && external_project_password) {
       odkPayload = {
-        odk_central_url,
-        odk_central_user,
-        odk_central_password,
+        external_project_instance_url,
+        external_project_username,
+        external_project_password,
       };
     }
 
@@ -208,17 +159,16 @@ const CreateProject = () => {
 
   const createProject = async () => {
     const data = getValues();
-    const { name, description, short_description } = data;
+    const { project_name, description } = data;
 
     // retrieve updated fields from project overview
-    const dirtyValues = getDirtyFieldValues({ name, description, short_description }, dirtyFields);
+    const dirtyValues = getDirtyFieldValues({ project_name, description }, dirtyFields);
 
     const projectData = {
       ...dirtyValues,
       visibility: data.visibility,
       hashtags: data.hashtags,
       custom_tms_url: data.custom_tms_url,
-      per_task_instructions: data.per_task_instructions,
       osm_category: data.osm_category,
       primary_geom_type: data.primary_geom_type,
       new_geom_type: data.new_geom_type ? data.new_geom_type : data.primary_geom_type,
@@ -317,7 +267,7 @@ const CreateProject = () => {
     });
 
   const uploadXlsformFile = (file: FileType[]) => {
-    // use_odk_collect is from previous step, while needVerificationFields is from this step
+    // Derive use_odk_collect from field_mapping_app (ODK projects use ODK Collect)
     const values = getValues();
     const formData = new FormData();
     formData.append('xlsform', file?.[0]?.file);
@@ -326,7 +276,7 @@ const CreateProject = () => {
       payload: formData,
       params: {
         project_id: +projectId!,
-        use_odk_collect: values.use_odk_collect,
+        use_odk_collect: values.field_mapping_app === field_mapping_app.ODK,
         need_verification_fields: values.needVerificationFields,
         mandatory_photo_upload: values.mandatoryPhotoUpload,
         default_language: values.default_language,
@@ -350,11 +300,51 @@ const CreateProject = () => {
     if (step < 5) setSearchParams({ step: (step + 1).toString() });
   };
 
-  if (
-    (!projectId && !hasManagedAnyOrganization) ||
-    (projectId && !isMinimalProjectLoading && !(isProjectManager || isOrganizationAdmin))
-  )
-    return <Forbidden />;
+  const onError = (validationErrors: any) => {
+    // Get the first error message to show to the user
+    const errorMessages: string[] = [];
+
+    // Collect all error messages
+    Object.keys(validationErrors).forEach((field) => {
+      const error = validationErrors[field];
+      if (error?.message) {
+        errorMessages.push(error.message);
+      } else if (typeof error === 'string') {
+        errorMessages.push(error);
+      } else if (error?.type === 'required') {
+        // Handle Zod required field errors
+        const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+        errorMessages.push(`${fieldName} is required`);
+      } else if (error?.code === 'invalid_type') {
+        // Handle Zod type errors (e.g., "expected string, received undefined")
+        const fieldName = field.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+        const expected = error.expected || 'value';
+        const received = error.received || 'undefined';
+        errorMessages.push(`${fieldName}: expected ${expected}, received ${received}`);
+      }
+    });
+
+    // Show a user-friendly error message
+    if (errorMessages.length > 0) {
+      const message =
+        errorMessages.length === 1 ? errorMessages[0] : `Please fix the following errors: ${errorMessages.join(', ')}`;
+
+      dispatch(
+        CommonActions.SetSnackBar({
+          message,
+          variant: 'error',
+        }),
+      );
+    } else {
+      // Fallback message if we can't parse the errors
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: 'Please check the form for errors before continuing',
+          variant: 'error',
+        }),
+      );
+    }
+  };
 
   /* Project type / mapping app selector */
   if (step === 0 && !projectId) {
@@ -407,7 +397,7 @@ const CreateProject = () => {
             <Button
               variant="link-grey"
               onClick={() => setSearchParams({ step: '0' })}
-              disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeletePending}
+              disabled={createProjectLoading || isProjectDeletePending}
               className="!fmtm-py-0"
             >
               <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" />
@@ -432,11 +422,11 @@ const CreateProject = () => {
         {/* form container */}
         <FormProvider {...formMethods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit, onError)}
             className="fmtm-flex fmtm-flex-col fmtm-col-span-12 sm:fmtm-col-span-7 lg:fmtm-col-span-5 sm:fmtm-h-full fmtm-overflow-y-hidden fmtm-rounded-xl fmtm-bg-white fmtm-my-2 sm:fmtm-my-0"
           >
             <div className="fmtm-flex-1 fmtm-overflow-y-scroll scrollbar fmtm-px-10 fmtm-py-8">
-              {isMinimalProjectLoading && projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
+              {projectId ? <FormFieldSkeletonLoader count={4} /> : form?.[step]}
             </div>
 
             {/* buttons */}
@@ -445,7 +435,7 @@ const CreateProject = () => {
                 <Button
                   variant="link-grey"
                   onClick={() => setSearchParams({ step: (step - 1).toString() })}
-                  disabled={createProjectLoading || isMinimalProjectLoading || isProjectDeleting}
+                  disabled={createProjectLoading || isProjectDeleting}
                 >
                   <AssetModules.ArrowBackIosIcon className="!fmtm-text-sm" /> Previous
                 </Button>
@@ -471,7 +461,6 @@ const CreateProject = () => {
                   type="submit"
                   disabled={
                     (createDraftProjectLoading.loading && !createDraftProjectLoading.continue) ||
-                    isMinimalProjectLoading ||
                     isProjectDeleting ||
                     isUploadProjectXlsformPending
                   }

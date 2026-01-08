@@ -3,14 +3,11 @@ import type { BBox, Point, Polygon } from 'geojson';
 
 export type projectInfoType = {
   id: number;
-  name: string;
+  project_name: string;
   outline: Polygon;
-  odkid: number;
-  author_sub: number;
-  organisation_id: string;
-  short_description: string;
+  external_project_id: number;
+  created_by_sub: number;
   description: string;
-  per_task_instructions: string;
   slug: string;
   task_split_type: task_split_type;
   location_str: string;
@@ -23,8 +20,8 @@ export type projectInfoType = {
   mapper_level: string;
   priority: string;
   featured: boolean;
-  odk_central_url: string;
-  odk_central_user: string;
+  external_project_instance_url: string;
+  external_project_username: string;
   odk_token: string;
   data_extract_url: string;
   task_split_dimension: number | null;
@@ -39,11 +36,6 @@ export type projectInfoType = {
   updated_at: string;
   created_at: string;
   tasks: taskType[];
-  organisation_name: string;
-  organisation_logo: string | null;
-  centroid: Point;
-  bbox: BBox;
-  last_active: string | null;
   total_tasks: number;
   num_contributors: number | null;
   total_submissions: number;

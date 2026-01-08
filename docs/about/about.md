@@ -13,8 +13,8 @@ the data processing is manual and slow, so it doesn't get done.
 
 Ivan Gayton (Senior Humanitarian Advisor at Humanitarian OpenStreetMap Team)
 heard about what Rob was working on and goes "That's the missing piece I
-needed!". He'd been wanting to build Field-TM for years, but lacked the ability to
-process the data.
+needed!". He'd been wanting to build Field-TM for years, but lacked the
+ability to process the data.
 
 A [webinar][1] then took place in September 2022
 that showcased the high interest from the community and the need for
