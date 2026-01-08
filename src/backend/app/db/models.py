@@ -325,6 +325,8 @@ class DbProject:
     odk_token: Optional[str] = None
     # GeoJSON data extract stored directly in database (replaces S3 URL approach)
     data_extract_geojson: Optional[dict] = None
+    # GeoJSON task areas/boundaries stored directly in database
+    task_areas_geojson: Optional[dict] = None
 
     @classmethod
     async def one(
@@ -538,8 +540,16 @@ class DbProject:
             if key == "data_extract_geojson" and isinstance(model_dump[key], dict):
                 # Convert GeoJSON dict to JSON string for JSONB column
                 model_dump[key] = json.dumps(model_dump[key])
+            elif key == "task_areas_geojson" and isinstance(model_dump[key], dict):
+                # Convert GeoJSON dict to JSON string for JSONB column
+                model_dump[key] = json.dumps(model_dump[key])
 
-        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
+        placeholders = []
+        for key in model_dump.keys():
+            if key == "task_areas_geojson":
+                placeholders.append(f"{key} = %({key})s::jsonb")
+            else:
+                placeholders.append(f"{key} = %({key})s")
 
         # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
         if "hashtags" in model_dump:

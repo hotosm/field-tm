@@ -173,6 +173,32 @@ Manager{% endblock %} {% block content %}
           style="display: none"
         />
         <div
+          style="
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <input
+            type="checkbox"
+            id="merge-geometries-checkbox"
+            style="margin: 0; cursor: pointer"
+          />
+          <label
+            for="merge-geometries-checkbox"
+            style="
+              cursor: pointer;
+              font-size: 14px;
+              color: #333;
+              user-select: none;
+            "
+          >
+            Merge geometries (use convex hull for multipolygons)
+          </label>
+        </div>
+        <div
           id="map"
           style="
             width: 100%;
@@ -502,13 +528,68 @@ Manager{% endblock %} {% block content %}
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = async function (e) {
         try {
-          const geojson = JSON.parse(e.target.result);
-          loadGeoJSONOnMap(geojson);
+          // Parse the file content
+          const geojsonData = JSON.parse(e.target.result);
+
+          // Clear any previous errors
+          clearError();
+          const mapError = document.getElementById("map-error");
+          if (mapError) {
+            mapError.innerHTML = "";
+          }
+
+          // Get merge geometries checkbox value
+          const mergeGeometriesCheckbox = document.getElementById(
+            "merge-geometries-checkbox",
+          );
+          const mergeGeometries = mergeGeometriesCheckbox
+            ? mergeGeometriesCheckbox.checked
+            : false;
+
+          // Send the geojson to API to validate, normalize, and merge into single polygon
+          const response = await fetch("/validate-geojson", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              geojson: geojsonData,
+              merge_geometries: mergeGeometries,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            const errorMsg = result.error || "Failed to validate GeoJSON";
+            console.error("Error validating GeoJSON:", errorMsg);
+            if (mapError) {
+              mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+            } else {
+              showError(errorMsg);
+            }
+            return;
+          }
+
+          // Load the normalized, merged GeoJSON onto the map
+          if (result.geojson) {
+            loadGeoJSONOnMap(result.geojson);
+          } else {
+            throw new Error("No GeoJSON returned from validation");
+          }
         } catch (error) {
-          console.error("Error parsing GeoJSON:", error);
-          showError("Invalid GeoJSON file. Please check the file format.");
+          console.error("Error processing GeoJSON:", error);
+          const errorMsg =
+            error.message ||
+            "Invalid GeoJSON file. Please check the file format.";
+          const mapError = document.getElementById("map-error");
+          if (mapError) {
+            mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+          } else {
+            showError(errorMsg);
+          }
         }
       };
       reader.readAsText(file);

@@ -550,6 +550,13 @@ async def generate_files(
     # Handle QField separately
     if project.field_mapping_app == FieldMappingApp.QFIELD:
         qfield_url = await create_qfield_project(db, project)
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
         # Provide URL for qfieldcloud project dashboard
         return {"url": qfield_url}
 
@@ -558,6 +565,13 @@ async def generate_files(
         # For many features, we still run this synchronously in Litestar to simplify
         await project_crud.generate_project_files(db, project_id)
         warning_message = "There are lots of features to process. Please be patient."
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
 
     else:
         success = await project_crud.generate_project_files(
@@ -574,6 +588,14 @@ async def generate_files(
                 ).encode(),
                 media_type="application/json",
             )
+
+        # Set status to PUBLISHED after successful generation
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
 
     # Update the XLSForm if using ODK Collect to add task id choice filter
     if project.field_mapping_app == FieldMappingApp.ODK:

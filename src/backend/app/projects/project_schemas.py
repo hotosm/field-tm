@@ -310,3 +310,5 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     xlsform_content: Optional[bytes] = None
     # GeoJSON data extract stored directly in database
     data_extract_geojson: Optional[dict] = None
+    # GeoJSON task areas/boundaries stored directly in database
+    task_areas_geojson: Optional[dict] = None

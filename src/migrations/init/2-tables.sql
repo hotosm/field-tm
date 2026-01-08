@@ -53,6 +53,7 @@ CREATE TABLE public.projects (
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     xlsform_content bytea,
     data_extract_geojson JSONB,
+    task_areas_geojson JSONB,
     hashtags character varying [],
     custom_tms_url character varying,
     created_at timestamp with time zone NOT NULL DEFAULT now(),

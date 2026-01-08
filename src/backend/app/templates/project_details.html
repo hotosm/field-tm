@@ -192,7 +192,34 @@ block content %}
       'DRAFT') %} {% set has_xlsform = project.xlsform_content is not none and
       project.xlsform_content %} {% set has_data_extract =
       project.data_extract_geojson is not none and project.data_extract_geojson
-      %} {% if status_value == 'DRAFT' %}
+      %} {% set has_task_areas = project.task_areas_geojson is not none %} {% if
+      status_value == 'PUBLISHED' %}
+      <!-- Project Published - Show QR Code -->
+      <div
+        style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee"
+      >
+        <h2 style="color: #4caf50; margin-bottom: 20px; font-size: 1.5em">
+          Project Published ✓
+        </h2>
+        <p style="color: #666; margin-bottom: 20px">
+          Your project has been successfully published and is ready to use. Scan
+          the QR code below with {% if project.field_mapping_app %}{% if
+          project.field_mapping_app.value %}{{ project.field_mapping_app.value
+          }}{% else %}{{ project.field_mapping_app }}{% endif %}{% else %}your
+          mapping app{% endif %} to access it.
+        </p>
+        <div
+          id="qrcode-container"
+          hx-get="/project-qrcode-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+          hx-trigger="load"
+          hx-swap="innerHTML"
+        >
+          <div style="text-align: center; padding: 20px">
+            <p style="color: #666">Loading QR code...</p>
+          </div>
+        </div>
+      </div>
+      {% elif status_value == 'DRAFT' %}
       <div
         style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee"
       >
@@ -539,6 +566,8 @@ block content %}
           </div>
           <form
             id="upload-geojson-form"
+            method="POST"
+            enctype="multipart/form-data"
             hx-post="/upload-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
             hx-target="#osm-data-status"
             hx-swap="innerHTML"
@@ -575,13 +604,7 @@ block content %}
         {% if has_data_extract %}
         <div
           id="step-3-container"
-          style="
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #d63f3f;
-          "
+          style="margin-bottom: 30px; padding: 20px; background-color: {% if has_task_areas %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_task_areas %}#4caf50{% else %}#d63f3f{% endif %};"
         >
           <div
             style="
@@ -592,14 +615,33 @@ block content %}
             "
           >
             <h3 style="color: #333; margin: 0; font-size: 1.2em">
-              Step 3: Split AOI into Tasks (Optional)
+              Step 3: Split AOI into Tasks (Optional) {% if has_task_areas %}
+              <span style="color: #4caf50; margin-left: 8px">✓</span>
+              {% endif %}
             </h3>
+            {% if has_task_areas %}
+            <wa-badge variant="success">Complete</wa-badge>
+            {% endif %}
           </div>
+          {% if has_task_areas %}
+          <div
+            style="
+              padding: 10px;
+              background-color: #fff;
+              border-radius: 4px;
+              color: #4caf50;
+              font-weight: 500;
+            "
+          >
+            ✓ Task splitting complete (or skipped)
+          </div>
+          {% else %}
           <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
             Generate task areas by splitting the Area of Interest (AOI). Choose
             an algorithm and parameters, then split. The preview will show
             automatically after splitting.
           </p>
+          {% endif %} {% if not has_task_areas %}
           <form
             id="split-aoi-form"
             hx-post="/split-aoi-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
@@ -704,6 +746,7 @@ block content %}
               </div>
             </div>
           </form>
+          {% endif %} {% if not has_task_areas %}
           <div
             style="
               display: flex;
@@ -723,6 +766,7 @@ block content %}
               Skip (Use Whole AOI)
             </button>
           </div>
+          {% endif %}
           <div id="split-status" style="margin-top: 10px">
             <div
               id="split-loading"
@@ -757,27 +801,38 @@ block content %}
         </div>
         {% endif %}
 
-        <!-- Step 4: Finalise Project (only show if Step 3 is complete) -->
-        {% if has_data_extract %}
+        <!-- Step 4: Finalise Project (only show if Steps 1, 2, and 3 are complete) -->
+        {% if has_xlsform and has_data_extract and has_task_areas %}
         <div
           id="step-4-container"
           style="
             margin-bottom: 30px;
             padding: 20px;
-            background-color: #f0f8ff;
+            background-color: #e8f5e9;
             border-radius: 8px;
-            border-left: 4px solid #3388ff;
+            border-left: 4px solid #4caf50;
           "
         >
-          <h3 style="color: #333; margin-bottom: 15px; font-size: 1.2em">
-            Step 4: Finalise Project
-          </h3>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 15px;
+            "
+          >
+            <h3 style="color: #333; margin: 0; font-size: 1.2em">
+              Step 4: Finalise Project
+              <span style="color: #4caf50; margin-left: 8px">✓</span>
+            </h3>
+            <wa-badge variant="success">Ready</wa-badge>
+          </div>
           <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
-            Generate project files and submit to {% if project.field_mapping_app
-            %}{% if project.field_mapping_app.value %}{{
-            project.field_mapping_app.value }}{% else %}{{
-            project.field_mapping_app }}{% endif %}{% else %}downstream mapping
-            tool{% endif %}.
+            All prerequisites are complete! Generate project files and submit to
+            {% if project.field_mapping_app %}{% if
+            project.field_mapping_app.value %}{{ project.field_mapping_app.value
+            }}{% else %}{{ project.field_mapping_app }}{% endif %}{% else
+            %}downstream mapping tool{% endif %}.
           </p>
           <wa-button
             id="finalise-project-btn"
@@ -835,286 +890,292 @@ block content %}
   }
 </style>
 <script>
-  (function() {
-    const projectId = {% if project %}{{ project.id }}{% else %}null{% endif %};
-    if (!projectId) return;
+    (function() {
+      const projectId = {% if project %}{{ project.id }}{% else %}null{% endif %};
+      if (!projectId) return;
 
-    // Step 1: XLSForm Selection
-    const selectXlsformBtn = document.getElementById('select-xlsform-btn');
-    const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
-    const xlsformFileInput = document.getElementById('xlsform-file-input');
-    const xlsformStatus = document.getElementById('xlsform-status');
-    const templateFormIdInput = document.getElementById('template-form-id');
-    const formConfigContainer = document.getElementById('form-config-container');
-    const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
+      // Step 1: XLSForm Selection
+      const selectXlsformBtn = document.getElementById('select-xlsform-btn');
+      const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
+      const xlsformFileInput = document.getElementById('xlsform-file-input');
+      const xlsformStatus = document.getElementById('xlsform-status');
+      const templateFormIdInput = document.getElementById('template-form-id');
+      const formConfigContainer = document.getElementById('form-config-container');
+      const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
 
-    // Fetch and display XLSForms list
-    if (selectXlsformBtn && !hasXlsform) {
-      selectXlsformBtn.addEventListener('click', async function() {
-        try {
-          const response = await fetch('/central/list-forms');
-          if (!response.ok) {
-            throw new Error('Failed to load forms');
+      // Fetch and display XLSForms list
+      if (selectXlsformBtn && !hasXlsform) {
+        selectXlsformBtn.addEventListener('click', async function() {
+          try {
+            const response = await fetch('/central/list-forms');
+            if (!response.ok) {
+              throw new Error('Failed to load forms');
+            }
+            const forms = await response.json();
+
+            if (forms.length === 0) {
+              xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>No XLSForms available.</span></wa-callout>';
+              return;
+            }
+
+            // Create dropdown to select form
+            let optionsHtml = '<div style="margin-bottom: 10px;"><select id="xlsform-select" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em;"><option value="">Select a category...</option>';
+            forms.forEach(form => {
+              optionsHtml += `<option value="${form.id}">${form.title}</option>`;
+            });
+            optionsHtml += '</select></div><wa-button id="confirm-xlsform-btn" variant="primary" style="margin-top: 10px;">Use Selected Form</wa-button>';
+
+            xlsformStatus.innerHTML = optionsHtml;
+
+            // Handle form selection
+            const confirmBtn = document.getElementById('confirm-xlsform-btn');
+
+            if (confirmBtn) {
+              confirmBtn.addEventListener('click', async function() {
+                const select = document.getElementById('xlsform-select');
+                const formId = select?.value;
+                if (!formId) {
+                  xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>Please select a form category.</span></wa-callout>';
+                  return;
+                }
+
+                // Store selected form ID and show configuration options
+                if (templateFormIdInput) {
+                  templateFormIdInput.value = formId;
+                }
+                // Clear file input when template is selected
+                if (xlsformFileInput) {
+                  xlsformFileInput.value = '';
+                }
+                if (formConfigContainer) {
+                  formConfigContainer.style.display = 'block';
+                }
+                xlsformStatus.innerHTML = '<wa-callout variant="info"><span>Form selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+              });
+            }
+
+          } catch (error) {
+            xlsformStatus.innerHTML = `<wa-callout variant="danger"><span>Error loading forms: ${error.message}</span></wa-callout>`;
           }
-          const forms = await response.json();
+        });
+      }
 
-          if (forms.length === 0) {
-            xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>No XLSForms available.</span></wa-callout>';
+      // Handle XLSForm upload button click
+      if (uploadXlsformBtn && xlsformFileInput && !hasXlsform) {
+        uploadXlsformBtn.addEventListener('click', () => {
+          xlsformFileInput.click();
+          // Clear template form ID when uploading custom form
+          if (templateFormIdInput) {
+            templateFormIdInput.value = '';
+          }
+        });
+
+        xlsformFileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Validate file extension
+          const validExtensions = ['.xls', '.xlsx'];
+          const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+          if (!validExtensions.includes(fileExtension)) {
+            xlsformStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .xls or .xlsx file.</span></wa-callout>';
+            xlsformFileInput.value = '';
             return;
           }
 
-          // Create dropdown to select form
-          let optionsHtml = '<div style="margin-bottom: 10px;"><select id="xlsform-select" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em;"><option value="">Select a category...</option>';
-          forms.forEach(form => {
-            optionsHtml += `<option value="${form.id}">${form.title}</option>`;
-          });
-          optionsHtml += '</select></div><wa-button id="confirm-xlsform-btn" variant="primary" style="margin-top: 10px;">Use Selected Form</wa-button>';
-
-          xlsformStatus.innerHTML = optionsHtml;
-
-          // Handle form selection
-          const confirmBtn = document.getElementById('confirm-xlsform-btn');
-
-          if (confirmBtn) {
-            confirmBtn.addEventListener('click', async function() {
-              const select = document.getElementById('xlsform-select');
-              const formId = select?.value;
-              if (!formId) {
-                xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>Please select a form category.</span></wa-callout>';
-                return;
-              }
-
-              // Store selected form ID and show configuration options
-              if (templateFormIdInput) {
-                templateFormIdInput.value = formId;
-              }
-              // Clear file input when template is selected
-              if (xlsformFileInput) {
-                xlsformFileInput.value = '';
-              }
-              if (formConfigContainer) {
-                formConfigContainer.style.display = 'block';
-              }
-              xlsformStatus.innerHTML = '<wa-callout variant="info"><span>Form selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
-            });
+          // Show configuration options for custom upload
+          if (formConfigContainer) {
+            formConfigContainer.style.display = 'block';
           }
-
-        } catch (error) {
-          xlsformStatus.innerHTML = `<wa-callout variant="danger"><span>Error loading forms: ${error.message}</span></wa-callout>`;
-        }
-      });
-    }
-
-    // Handle XLSForm upload button click
-    if (uploadXlsformBtn && xlsformFileInput && !hasXlsform) {
-      uploadXlsformBtn.addEventListener('click', () => {
-        xlsformFileInput.click();
-        // Clear template form ID when uploading custom form
-        if (templateFormIdInput) {
-          templateFormIdInput.value = '';
-        }
-      });
-
-      xlsformFileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Validate file extension
-        const validExtensions = ['.xls', '.xlsx'];
-        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-        if (!validExtensions.includes(fileExtension)) {
-          xlsformStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .xls or .xlsx file.</span></wa-callout>';
-          xlsformFileInput.value = '';
-          return;
-        }
-
-        // Show configuration options for custom upload
-        if (formConfigContainer) {
-          formConfigContainer.style.display = 'block';
-        }
-        xlsformStatus.innerHTML = '<wa-callout variant="info"><span>File selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
-      });
-    }
-
-    // Step 2: OSM Data (only enable if Step 1 is complete)
-    const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
-    const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
-    const geojsonFileInput = document.getElementById('geojson-file-input');
-    const osmDataStatus = document.getElementById('osm-data-status');
-    const downloadLoading = document.getElementById('download-loading');
-    const downloadBtnText = document.getElementById('download-btn-text');
-    const downloadSpinner = document.getElementById('download-spinner');
-
-    if (!hasXlsform && downloadOsmDataBtn) {
-      downloadOsmDataBtn.disabled = true;
-    }
-    if (!hasXlsform && uploadGeojsonBtn) {
-      uploadGeojsonBtn.disabled = true;
-    }
-
-    // Show loading spinner when download starts
-    if (downloadOsmDataBtn) {
-      downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
-        if (downloadLoading) downloadLoading.style.display = 'block';
-        if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
-        if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
-        if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
-      });
-
-      downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
-        if (downloadLoading) downloadLoading.style.display = 'none';
-        if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
-        if (downloadSpinner) downloadSpinner.style.display = 'none';
-        if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = false;
-      });
-    }
-
-    // Upload custom GeoJSON
-    const uploadGeojsonForm = document.getElementById('upload-geojson-form');
-
-    if (uploadGeojsonBtn) {
-      uploadGeojsonBtn.addEventListener('click', () => {
-        if (geojsonFileInput) {
-          geojsonFileInput.click();
-        }
-      });
-    }
-
-    if (geojsonFileInput && uploadGeojsonForm) {
-      geojsonFileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Validate file extension
-        const validExtensions = ['.geojson', '.json'];
-        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-        if (!validExtensions.includes(fileExtension)) {
-          osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
-          geojsonFileInput.value = '';
-          return;
-        }
-
-        // Submit form via HTMX
-        uploadGeojsonForm.dispatchEvent(new Event('submit', { bubbles: true }));
-      });
-    }
-
-    // Step 3: Split AOI - Handle algorithm selection and parameter visibility
-    const splitAlgorithm = document.getElementById('split-algorithm');
-    const algorithmParamContainer = document.getElementById('algorithm-param-container');
-
-    if (splitAlgorithm && algorithmParamContainer) {
-      splitAlgorithm.addEventListener('change', function() {
-        const algorithm = this.value;
-        if (algorithm === 'DIVIDE_ON_SQUARE') {
-          algorithmParamContainer.innerHTML = `
-            <label for="dimension-meters" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Square Size (meters):</label>
-            <input
-              type="number"
-              id="dimension-meters"
-              name="dimension_meters"
-              value="100"
-              min="10"
-              required
-              style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-            />
-          `;
-        } else {
-          algorithmParamContainer.innerHTML = `
-            <label for="no-of-buildings" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Avg. Buildings per Task:</label>
-            <input
-              type="number"
-              id="no-of-buildings"
-              name="no_of_buildings"
-              value="50"
-              min="1"
-              required
-              style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-            />
-          `;
-        }
-      });
-    }
-
-    // Auto-preview after splitting
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-      if (event.detail.target.id === 'split-status') {
-        // Check if split was successful (contains success message)
-        const content = event.detail.target.innerHTML;
-        if (content.includes('split successfully') || content.includes('Generated')) {
-          // Move preview from split-preview-wrapper to preview container
-          setTimeout(function() {
-            const previewWrapper = document.getElementById('split-preview-wrapper');
-            const previewContainer = document.getElementById('tasks-and-data-preview-container');
-            if (previewWrapper && previewContainer) {
-              previewContainer.innerHTML = previewWrapper.innerHTML;
-              previewWrapper.remove();
-            }
-          }, 100);
-        }
+          xlsformStatus.innerHTML = '<wa-callout variant="info"><span>File selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+        });
       }
+
+      // Step 2: OSM Data (only enable if Step 1 is complete)
+      const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
+      const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
+      const geojsonFileInput = document.getElementById('geojson-file-input');
+      const osmDataStatus = document.getElementById('osm-data-status');
+  const downloadLoading = document.getElementById('download-loading');
+  const downloadBtnText = document.getElementById('download-btn-text');
+  const downloadSpinner = document.getElementById('download-spinner');
+
+      if (!hasXlsform && downloadOsmDataBtn) {
+        downloadOsmDataBtn.disabled = true;
+      }
+      if (!hasXlsform && uploadGeojsonBtn) {
+        uploadGeojsonBtn.disabled = true;
+      }
+
+  // Show loading spinner when download starts
+      if (downloadOsmDataBtn) {
+    downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
+      if (downloadLoading) downloadLoading.style.display = 'block';
+      if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+      if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
+      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
     });
 
-    // Show loading spinner on form submission
-    const splitAoiForm = document.getElementById('split-aoi-form');
-    if (splitAoiForm) {
-      splitAoiForm.addEventListener('htmx:beforeRequest', function() {
-        const splitLoading = document.getElementById('split-loading');
-        const splitBtnText = document.getElementById('split-btn-text');
-        const splitBtnSpinner = document.getElementById('split-btn-spinner');
-        if (splitLoading) splitLoading.style.display = 'block';
-        if (splitBtnText) splitBtnText.textContent = 'Splitting...';
-        if (splitBtnSpinner) splitBtnSpinner.style.display = 'inline-block';
-      });
+    downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
+      if (downloadLoading) downloadLoading.style.display = 'none';
+      if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
+      if (downloadSpinner) downloadSpinner.style.display = 'none';
+      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = false;
+    });
+  }
 
-      splitAoiForm.addEventListener('htmx:afterRequest', function() {
-        const splitLoading = document.getElementById('split-loading');
-        const splitBtnText = document.getElementById('split-btn-text');
-        const splitBtnSpinner = document.getElementById('split-btn-spinner');
-        if (splitLoading) splitLoading.style.display = 'none';
-        if (splitBtnText) splitBtnText.textContent = 'Split AOI';
-        if (splitBtnSpinner) splitBtnSpinner.style.display = 'none';
-      });
-    }
+  // Upload custom GeoJSON
+  const uploadGeojsonForm = document.getElementById('upload-geojson-form');
 
-    // Step 4: Finalise Project
-    const finaliseProjectBtn = document.getElementById('finalise-project-btn');
-    const finaliseStatus = document.getElementById('finalise-status');
+  if (uploadGeojsonBtn) {
+    uploadGeojsonBtn.addEventListener('click', () => {
+      if (geojsonFileInput) {
+        geojsonFileInput.click();
+          }
+        });
+      }
 
-    if (finaliseProjectBtn) {
-      finaliseProjectBtn.addEventListener('click', async function() {
-        if (!confirm('Are you sure you want to finalise this project? This will generate files and submit to the downstream mapping tool.')) {
-          return;
-        }
+  if (geojsonFileInput && uploadGeojsonForm) {
+    geojsonFileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
 
-        try {
-          finaliseStatus.innerHTML = '<wa-callout variant="info"><span>Finalising project and generating files...</span></wa-callout>';
-          finaliseProjectBtn.disabled = true;
+      // Validate file extension
+      const validExtensions = ['.geojson', '.json'];
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      if (!validExtensions.includes(fileExtension)) {
+        osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
+        geojsonFileInput.value = '';
+        return;
+      }
 
-          const response = await fetch(`/projects/${projectId}/generate-files?combined_features_count=0`, {
-            method: 'POST'
-          });
+      // Submit form via HTMX using requestSubmit (proper form submission)
+      if (uploadGeojsonForm.requestSubmit) {
+        uploadGeojsonForm.requestSubmit();
+      } else {
+        // Fallback for older browsers
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        uploadGeojsonForm.dispatchEvent(submitEvent);
+      }
+    });
+  }
 
-          if (response.ok) {
-            const result = await response.json();
-            if (result.url) {
-              finaliseStatus.innerHTML = `<wa-callout variant="success"><span>Project finalised! <a href="${result.url}" target="_blank">View Project</a></span></wa-callout>`;
+  // Step 3: Split AOI - Handle algorithm selection and parameter visibility
+  const splitAlgorithm = document.getElementById('split-algorithm');
+  const algorithmParamContainer = document.getElementById('algorithm-param-container');
+
+  if (splitAlgorithm && algorithmParamContainer) {
+    splitAlgorithm.addEventListener('change', function() {
+      const algorithm = this.value;
+      if (algorithm === 'DIVIDE_ON_SQUARE') {
+        algorithmParamContainer.innerHTML = `
+          <label for="dimension-meters" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Square Size (meters):</label>
+          <input
+            type="number"
+            id="dimension-meters"
+            name="dimension_meters"
+            value="100"
+            min="10"
+            required
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+          />
+        `;
             } else {
-              finaliseStatus.innerHTML = '<wa-callout variant="success"><span>Project finalised successfully!</span></wa-callout>';
+        algorithmParamContainer.innerHTML = `
+          <label for="no-of-buildings" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Avg. Buildings per Task:</label>
+          <input
+            type="number"
+            id="no-of-buildings"
+            name="no_of_buildings"
+            value="50"
+            min="1"
+            required
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+          />
+        `;
+          }
+        });
+      }
+
+  // Auto-preview after splitting
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'split-status') {
+      // Check if split was successful (contains success message)
+      const content = event.detail.target.innerHTML;
+      if (content.includes('split successfully') || content.includes('Generated')) {
+        // Move preview from split-preview-wrapper to preview container
+        setTimeout(function() {
+          const previewWrapper = document.getElementById('split-preview-wrapper');
+          const previewContainer = document.getElementById('tasks-and-data-preview-container');
+          if (previewWrapper && previewContainer) {
+            previewContainer.innerHTML = previewWrapper.innerHTML;
+            previewWrapper.remove();
+          }
+        }, 100);
+      }
+    }
+  });
+
+  // Show loading spinner on form submission
+  const splitAoiForm = document.getElementById('split-aoi-form');
+  if (splitAoiForm) {
+    splitAoiForm.addEventListener('htmx:beforeRequest', function() {
+      const splitLoading = document.getElementById('split-loading');
+      const splitBtnText = document.getElementById('split-btn-text');
+      const splitBtnSpinner = document.getElementById('split-btn-spinner');
+      if (splitLoading) splitLoading.style.display = 'block';
+      if (splitBtnText) splitBtnText.textContent = 'Splitting...';
+      if (splitBtnSpinner) splitBtnSpinner.style.display = 'inline-block';
+    });
+
+    splitAoiForm.addEventListener('htmx:afterRequest', function() {
+      const splitLoading = document.getElementById('split-loading');
+      const splitBtnText = document.getElementById('split-btn-text');
+      const splitBtnSpinner = document.getElementById('split-btn-spinner');
+      if (splitLoading) splitLoading.style.display = 'none';
+      if (splitBtnText) splitBtnText.textContent = 'Split AOI';
+      if (splitBtnSpinner) splitBtnSpinner.style.display = 'none';
+    });
+  }
+
+      // Step 4: Finalise Project
+      const finaliseProjectBtn = document.getElementById('finalise-project-btn');
+      const finaliseStatus = document.getElementById('finalise-status');
+
+      if (finaliseProjectBtn) {
+        finaliseProjectBtn.addEventListener('click', async function() {
+          if (!confirm('Are you sure you want to finalise this project? This will generate files and submit to the downstream mapping tool.')) {
+            return;
+          }
+
+          try {
+            finaliseStatus.innerHTML = '<wa-callout variant="info"><span>Finalising project and generating files...</span></wa-callout>';
+            finaliseProjectBtn.disabled = true;
+
+            const response = await fetch(`/projects/${projectId}/generate-files?combined_features_count=0`, {
+              method: 'POST'
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.url) {
+                finaliseStatus.innerHTML = `<wa-callout variant="success"><span>Project finalised! <a href="${result.url}" target="_blank">View Project</a></span></wa-callout>`;
+              } else {
+                finaliseStatus.innerHTML = '<wa-callout variant="success"><span>Project finalised successfully!</span></wa-callout>';
+              }
+              // Reload page after a delay to show updated status
+              setTimeout(() => window.location.reload(), 2000);
+            } else {
+              const error = await response.text();
+              finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Failed: ${error}</span></wa-callout>`;
+              finaliseProjectBtn.disabled = false;
             }
-            // Reload page after a delay to show updated status
-            setTimeout(() => window.location.reload(), 2000);
-          } else {
-            const error = await response.text();
-            finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Failed: ${error}</span></wa-callout>`;
+          } catch (error) {
+            finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
             finaliseProjectBtn.disabled = false;
           }
-        } catch (error) {
-          finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
-          finaliseProjectBtn.disabled = false;
-        }
-      });
-    }
-  })();
+        });
+      }
+    })();
 </script>
 {% endblock %}
