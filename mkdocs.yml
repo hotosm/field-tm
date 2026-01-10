@@ -80,7 +80,6 @@ nav:
       - FieldTM Roles: manuals/user-types-explained.md
       - Workflow Diagrams: manuals/workflow-diagrams.md
       - XLSForm Design: manuals/xlsform-design.md
-      - Field Mapping Examples: manuals/field-mapping-examples.md
       - Visualising Data Externally: https://docs.getodk.org/tutorial-mapping-households
       - ODKCollect Offline Maps: https://docs.getodk.org/collect-offline-maps
       - QField Project By Hand: manuals/qfield-by-hand.md
@@ -102,7 +101,7 @@ nav:
       - XLSForm Converter: https://getodk.org/xlsform/
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
-  - Example XLSForms: https://xlsform-builder.fmtm.hotosm.org
+  - Example XLSForms & Builder: https://xlsforms.field.hotosm.org
   - Roadmap: https://github.com/hotosm/field-tm#roadmap
   - Timeline: timeline.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://docs.field.hotosm.org/openapi/openapi.json
