@@ -1,3 +1,10 @@
+-- Build as index on the taskpolygons
+ALTER TABLE taskpolygons ADD PRIMARY KEY (taskid);
+SELECT POPULATE_GEOMETRY_COLUMNS('public.taskpolygons'::regclass);
+CREATE INDEX taskpolygons_idx
+ON taskpolygons
+USING gist (geom);
+
 -- Merge least feature polygons with neighbouring polygons
 DO $$
 DECLARE
