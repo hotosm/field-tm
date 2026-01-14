@@ -47,17 +47,13 @@ axios.interceptors.request.use(
 );
 
 // Initialize Sentry for production monitoring
-const sentryEnabled =
-  import.meta.env.MODE !== 'development' && window.location.hostname === 'fmtm.hotosm.org';
+const sentryEnabled = import.meta.env.MODE !== 'development' && window.location.hostname === 'fmtm.hotosm.org';
 
 if (sentryEnabled) {
   console.log('Adding Sentry');
   Sentry.init({
     dsn: 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
+    integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
     tracePropagationTargets: ['https://fmtm.hotosm.org/'],
     // Performance Monitoring
