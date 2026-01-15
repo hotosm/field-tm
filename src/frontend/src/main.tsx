@@ -3,8 +3,8 @@ import '@/styles/tailwind.css';
 import 'ol/ol.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+import * as Sentry from '@sentry/react';
 import axios from 'axios';
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
@@ -46,41 +46,35 @@ axios.interceptors.request.use(
     Promise.reject(error),
 );
 
-(function sentryInit() {
-  // Immediately invoked function to enable Sentry monitoring
-  if (import.meta.env.MODE === 'development' || window.location.hostname !== 'fmtm.hotosm.org') {
-    return;
-  }
+// Initialize Sentry for production monitoring
+const sentryEnabled = import.meta.env.MODE !== 'development' && window.location.hostname === 'fmtm.hotosm.org';
+
+if (sentryEnabled) {
   console.log('Adding Sentry');
-
-  import('@sentry/react').then((Sentry) => {
-    Sentry.init({
-      dsn: 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
-      integrations: [
-        new Sentry.BrowserTracing({
-          // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-          tracePropagationTargets: ['https://fmtm.hotosm.org/'],
-        }),
-        new Sentry.Replay(),
-      ],
-      // Performance Monitoring
-      tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
-      // Session Replay
-      replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-      replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-    });
+  Sentry.init({
+    dsn: 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
+    integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+    // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+    tracePropagationTargets: ['https://fmtm.hotosm.org/'],
+    // Performance Monitoring
+    tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
   });
-})();
+}
 
-// React 18 setup
+// React 19 setup with Sentry error handlers
 createRoot(document.getElementById('app')!, {
-  // // React 19 exposes hooks for Sentry
-  // // Callback called when an error is thrown and not caught by an Error Boundary.
-  // onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
-  //   console.warn('Uncaught error', error, errorInfo.componentStack);
-  // }),
-  // // Callback called when React catches an error in an Error Boundary.
-  // onCaughtError: Sentry.reactErrorHandler(),
-  // // Callback called when React automatically recovers from errors.
-  // onRecoverableError: Sentry.reactErrorHandler(),
+  // React 19 exposes hooks for Sentry error tracking
+  // Callback called when an error is thrown and not caught by an Error Boundary.
+  onUncaughtError: sentryEnabled
+    ? Sentry.reactErrorHandler((error, errorInfo) => {
+        console.warn('Uncaught error', error, errorInfo.componentStack);
+      })
+    : undefined,
+  // Callback called when React catches an error in an Error Boundary.
+  onCaughtError: sentryEnabled ? Sentry.reactErrorHandler() : undefined,
+  // Callback called when React automatically recovers from errors.
+  onRecoverableError: sentryEnabled ? Sentry.reactErrorHandler() : undefined,
 }).render(<App />);
