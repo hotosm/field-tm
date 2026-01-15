@@ -464,6 +464,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "EricGrill",
+      "name": "Eric Grill",
+      "avatar_url": "https://avatars.githubusercontent.com/u/694055?v=4",
+      "profile": "http://chainbytes.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
