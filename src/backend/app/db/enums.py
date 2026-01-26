@@ -50,14 +50,6 @@ class ProjectRole(StrEnum, Enum):
     PROJECT_ADMIN = "PROJECT_ADMIN"
 
 
-class TaskSplitType(StrEnum, Enum):
-    """Task splitting type for area-splitter."""
-
-    DIVIDE_ON_SQUARE = "DIVIDE_ON_SQUARE"
-    CHOOSE_AREA_AS_TASK = "CHOOSE_AREA_AS_TASK"
-    TASK_SPLITTING_ALGORITHM = "TASK_SPLITTING_ALGORITHM"
-
-
 class ProjectVisibility(StrEnum, Enum):
     """Project visibility to end users.
 
