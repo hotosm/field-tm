@@ -31,6 +31,7 @@ from psycopg import Connection
 from shapely.geometry import Polygon, box, shape
 from shapely.ops import unary_union
 
+from area_splitter import SplittingAlgorithm, algorithms_path
 from area_splitter.db import (
     aoi_to_postgis,
     close_connection,
@@ -349,7 +350,8 @@ class FMTMSplitter:
     def splitBySQL(  # noqa: N802
         self,
         db: Union[str, Connection],
-        buildings: Optional[int] = None,
+        algorithm: SplittingAlgorithm = SplittingAlgorithm.AVG_BUILDING_SKELETON,
+        algorithm_params: Optional[dict] = None,
         osm_extract: Optional[Union[dict, FeatureCollection]] = None,
     ) -> FeatureCollection:
         """Split the polygon by features in the database using an SQL query.
@@ -360,7 +362,9 @@ class FMTMSplitter:
                 OR an psycopg connection object object that is reused.
                 Passing an connection object prevents requiring additional
                 database connections to be spawned.
-            buildings (int): The number of buildings in each task
+            algorithm (SplittingAlgorithm): The algorithm to use.
+            algorithm_params (dict): Dictionary of parameters for the algorithm.
+                For building-based algorithms, should include 'num_buildings'.
             osm_extract (dict, FeatureCollection): an OSM extract geojson,
                 containing building polygons, or linestrings.
 
@@ -368,11 +372,33 @@ class FMTMSplitter:
             data (FeatureCollection): A multipolygon of all the task boundaries.
         """
         # Validation
-        if buildings and not osm_extract:
-            # TODO handle other algorithms
+        # FIXME this wasn't made a required param to maintain backward compatibility,
+        # but should probably be updated
+        if not osm_extract:
             msg = (
                 "To use the FMTM splitting algo, an OSM data extract must be passed "
                 "via param `osm_extract` as a geojson dict or FeatureCollection."
+            )
+            log.error(msg)
+            raise ValueError(msg)
+
+        # Validate that algorithm SQL file exists
+        # Get SQL file path from algorithm
+        if not algorithm.sql_path:
+            msg = f"Algorithm {algorithm} does not have an SQL file path"
+            log.error(msg)
+            raise ValueError(msg)
+
+        # Validate required parameters for the algorithm
+        params = algorithm_params or {}
+        missing_params = [
+            param for param in algorithm.required_params if param not in params
+        ]
+        if missing_params:
+            msg = (
+                f"Algorithm {algorithm.value} requires the following parameters: "
+                f"{', '.join(algorithm.required_params)}. "
+                f"Missing: {', '.join(missing_params)}"
             )
             log.error(msg)
             raise ValueError(msg)
@@ -450,21 +476,28 @@ class FMTMSplitter:
             "common/1-linear-features.sql",
             "common/2-group-buildings.sql",
             "common/3-cluster-buildings.sql",
-            "straight_skeleton.sql",
-            "common/6-alignment.sql",  # TODO: Fix the file numbers
-            "common/7-extract.sql",
+            algorithm.sql_path,
+            "common/5-alignment.sql",
+            "common/6-extract.sql",
         ]
 
         log.info(f"Running task splitting algorithm parts in order: {sql_files}")
 
-        algorithms_path = str(Path(__file__).parent / "algorithms")
         for sql_file in sql_files:
-            with open(f"{algorithms_path}/{sql_file}") as raw_sql:
+            # Handle both Path objects and string paths
+            if isinstance(sql_file, Path):
+                sql_file_path = sql_file
+            else:
+                sql_file_path = algorithms_path / sql_file
+
+            with open(sql_file_path) as raw_sql:
                 query = raw_sql.read()
-                # NOTE can't substitute params into multi statement file
-                # splitter_cursor.execute(sql, {"num_buildings": buildings})
-                # Replace num_buildings param to avoid issues on execute
-                sql_content = query.replace("%(num_buildings)s", str(buildings))
+                # Replace all parameter placeholders in the SQL
+                # Format: %(param_name)s
+                sql_content = query
+                for param_name, param_value in params.items():
+                    placeholder = f"%({param_name})s"
+                    sql_content = sql_content.replace(placeholder, str(param_value))
                 splitter_cursor.execute(sql_content)
 
         features = splitter_cursor.fetchall()[0][0]["features"]
@@ -607,12 +640,14 @@ def split_by_sql(
     num_buildings: Optional[int] = None,
     outfile: Optional[str] = None,
     osm_extract: Optional[Union[str, FeatureCollection]] = None,
+    algorithm: Optional[SplittingAlgorithm] = None,
+    algorithm_params: Optional[dict] = None,
 ) -> FeatureCollection:
     """Split an AOI with a field-tm algorithm.
 
     The query will optimise on the following:
     - Attempt to divide the aoi into tasks that contain approximately the
-        number of buildings from `num_buildings`.
+        number of buildings from `num_buildings` (or algorithm_params).
     - Split the task areas on major features such as roads an rivers, to
       avoid traversal of these features across task areas.
 
@@ -626,20 +661,63 @@ def split_by_sql(
             OR an psycopg connection object that is reused.
             Passing an connection object prevents requiring additional
             database connections to be spawned.
-        num_buildings(str): The number of buildings to optimise the FMTM
+        num_buildings(int, optional): The number of buildings to optimise the FMTM
             splitting algorithm with (approx buildings per generated feature).
+            Deprecated: Use algorithm_params instead. If algorithm_params is provided,
+            this parameter is ignored.
         outfile(str): Output to a GeoJSON file on disk.
         osm_extract (str, FeatureCollection): an OSM extract geojson,
             containing building polygons, or linestrings.
             Optional param, if not included an extract is generated for you.
             It is recommended to leave this param as default, unless you know
             what you are doing.
+        algorithm (SplittingAlgorithm, optional): The algorithm to use.
+            Must be a building-based algorithm
+            (AVG_BUILDING_VORONOI or AVG_BUILDING_SKELETON).
+            Defaults to AVG_BUILDING_SKELETON.
+        algorithm_params (dict, optional): Dictionary of parameters for the algorithm.
+            Should include all parameters required by the algorithm
+            (see algorithm.required_params).
+            If not provided, will be constructed from num_buildings for backward
+            compatibility.
 
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
     """
-    if not num_buildings:
-        err = "num_buildings must be passed, until other algorithms are implemented."
+    # Default algorithm if not provided
+    if algorithm is None:
+        algorithm = SplittingAlgorithm.AVG_BUILDING_SKELETON
+
+    # Validate that algorithm has sql_path defined
+    if not algorithm.sql_path:
+        err = f"SplittingAlgorithm {algorithm} must have an sql_path defined."
+        log.error(err)
+        raise ValueError(err)
+
+    # Prepare algorithm parameters
+    # If algorithm_params is provided, use it; otherwise construct from
+    # num_buildings for backward compatibility
+    if algorithm_params is None:
+        if not num_buildings:
+            err = (
+                f"Algorithm {algorithm.value} requires the following parameters: "
+                f"{', '.join(algorithm.required_params)}. "
+                f"Either provide algorithm_params dict or num_buildings (deprecated)."
+            )
+            log.error(err)
+            raise ValueError(err)
+        algorithm_params = {"num_buildings": num_buildings}
+
+    # Validate required parameters for the algorithm
+    missing_params = [
+        param for param in algorithm.required_params if param not in algorithm_params
+    ]
+    if missing_params:
+        err = (
+            f"Algorithm {algorithm.value} requires the following parameters: "
+            f"{', '.join(algorithm.required_params)}. "
+            f"Missing: {', '.join(missing_params)}"
+        )
         log.error(err)
         raise ValueError(err)
 
@@ -695,9 +773,13 @@ def split_by_sql(
             featcol = split_by_sql(
                 FeatureCollection(features=[feat]),
                 db,
-                num_buildings,
-                f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
-                osm_extract,
+                num_buildings=algorithm_params.get("num_buildings")
+                if "num_buildings" in algorithm_params
+                else None,
+                outfile=f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
+                osm_extract=osm_extract,
+                algorithm=algorithm,
+                algorithm_params=algorithm_params,
             )
             feats = featcol.get("features", [])
             if feats:
@@ -707,7 +789,7 @@ def split_by_sql(
     else:
         splitter = FMTMSplitter(aoi_featcol)
         split_features = splitter.splitBySQL(
-            db, num_buildings, osm_extract=extract_geojson
+            db, algorithm, algorithm_params, osm_extract=extract_geojson
         )
         if not split_features:
             msg = "Failed to generate split features."
