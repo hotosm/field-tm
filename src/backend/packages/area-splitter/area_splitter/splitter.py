@@ -15,18 +15,17 @@
 """Class and helper methods for task splitting."""
 
 import argparse
+import asyncio
 import json
 import logging
 import math
 import sys
-from io import BytesIO
 from pathlib import Path
-from textwrap import dedent
 from typing import Optional, Tuple, Union
 
 import geojson
 from geojson import Feature, FeatureCollection, GeoJSON
-from osm_rawdata.postgres import PostgresClient
+from osm_data_client import get_osm_data
 from psycopg import Connection
 from shapely.geometry import Polygon, box, shape
 from shapely.ops import unary_union
@@ -42,6 +41,34 @@ from area_splitter.db import (
 )
 
 log = logging.getLogger(__name__)
+
+
+def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
+    """Fetch an OSM extract from raw-data-api-py and return parsed GeoJSON."""
+
+    async def _get_data() -> dict:
+        result = await get_osm_data(
+            aoi_geojson,
+            fileName="area_splitter",
+            outputType="geojson",
+            bindZip=False,
+            useStWithin=False,
+            filters={
+                "tags": {
+                    "all_geometry": {
+                        "building": [],
+                        "highway": [],
+                        "waterway": [],
+                        "railway": [],
+                        "aeroway": [],
+                    }
+                }
+            },
+        )
+        with open(result.path, encoding="utf-8") as extract_file:
+            return json.load(extract_file)
+
+    return asyncio.run(_get_data())
 
 
 class FMTMSplitter:
@@ -729,36 +756,7 @@ def split_by_sql(
 
     # Extracts and parse extract geojson
     if not osm_extract:
-        # We want all polylines for splitting:
-        # buildings, highways, waterways, railways
-        config_data = dedent(
-            """
-            select:
-            from:
-              - nodes
-              - ways_poly
-              - ways_line
-            where:
-              tags:
-                - building: not null
-                  highway: not null
-                  waterway: not null
-                  railway: not null
-                  aeroway: not null
-        """
-        )
-        # Must be a BytesIO JSON object
-        config_bytes = BytesIO(config_data.encode())
-
-        pg = PostgresClient(
-            "underpass",
-            config_bytes,
-        )
-        # The total FeatureCollection area merged by osm-rawdata automatically
-        extract_geojson = pg.execQuery(
-            aoi_featcol,
-            extra_params={"fileName": "area_splitter", "useStWithin": False},
-        )
+        extract_geojson = _fetch_extract_from_raw_data_api(aoi_featcol)
 
     else:
         extract_geojson = FMTMSplitter.input_to_geojson(osm_extract)
