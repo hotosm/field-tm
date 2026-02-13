@@ -263,6 +263,115 @@ class DbUser:
 
 
 @dataclass(slots=True)
+class DbApiKey:
+    """Table api_keys."""
+
+    id: Optional[int] = None
+    user_sub: Optional[str] = None
+    key_hash: Optional[str] = None
+    name: Optional[str] = None
+    created_at: Optional[AwareDatetime] = None
+    last_used_at: Optional[AwareDatetime] = None
+    is_active: Optional[bool] = True
+
+    @classmethod
+    async def create(cls, db: AsyncConnection, api_key_in: Self) -> Self:
+        """Create a new API key record."""
+        model_dump = dump_and_check_model(api_key_in)
+        columns = ", ".join(model_dump.keys())
+        value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
+
+        sql = f"""
+            INSERT INTO api_keys
+                ({columns})
+            VALUES
+                ({value_placeholders})
+            RETURNING *;
+        """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(sql, model_dump)
+            new_api_key = await cur.fetchone()
+
+        if new_api_key is None:
+            msg = f"Unknown SQL error for data: {model_dump}"
+            log.error(f"API key creation failed: {msg}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
+            )
+
+        return new_api_key
+
+    @classmethod
+    async def get_by_hash(
+        cls, db: AsyncConnection, key_hash: str, active_only: bool = True
+    ) -> Optional[Self]:
+        """Get API key record by hash."""
+        sql = """
+            SELECT *
+            FROM api_keys
+            WHERE key_hash = %(key_hash)s
+        """
+        params: dict[str, Any] = {"key_hash": key_hash}
+        if active_only:
+            sql += " AND is_active = TRUE"
+        sql += ";"
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(sql, params)
+            return await cur.fetchone()
+
+    @classmethod
+    async def all_for_user(cls, db: AsyncConnection, user_sub: str) -> list[Self]:
+        """List all API keys for a user."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                SELECT *
+                FROM api_keys
+                WHERE user_sub = %(user_sub)s
+                ORDER BY created_at DESC;
+            """,
+                {"user_sub": user_sub},
+            )
+            rows = await cur.fetchall()
+
+        return rows or []
+
+    @classmethod
+    async def deactivate(
+        cls, db: AsyncConnection, key_id: int, user_sub: str
+    ) -> Optional[Self]:
+        """Deactivate an API key owned by a given user."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                UPDATE api_keys
+                SET is_active = FALSE
+                WHERE id = %(key_id)s
+                  AND user_sub = %(user_sub)s
+                RETURNING *;
+            """,
+                {"key_id": key_id, "user_sub": user_sub},
+            )
+            return await cur.fetchone()
+
+    @classmethod
+    async def touch_last_used(cls, db: AsyncConnection, key_id: int) -> None:
+        """Update API key last used timestamp."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                UPDATE api_keys
+                SET last_used_at = NOW()
+                WHERE id = %(key_id)s;
+            """,
+                {"key_id": key_id},
+            )
+
+
+@dataclass(slots=True)
 class DbTemplateXLSForm:
     """Table template_xlsforms.
 
@@ -296,6 +405,25 @@ class DbTemplateXLSForm:
 
         # Don't include 'xls' field in the response
         return [{"id": form.id, "title": form.title} for form in forms]
+
+    @classmethod
+    async def one(cls, db: AsyncConnection, template_id: int) -> Self:
+        """Fetch one XLSForm template by id (includes binary xls content)."""
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                """
+                SELECT id, title, xls
+                FROM template_xlsforms
+                WHERE id = %(template_id)s;
+            """,
+                {"template_id": template_id},
+            )
+            form = await cur.fetchone()
+
+        if form is None:
+            raise KeyError(f"Template XLSForm ({template_id}) not found.")
+
+        return form
 
 
 @dataclass(slots=True)
@@ -418,6 +546,14 @@ class DbProject:
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(sql, params)
             return await cur.fetchall()
+
+    @classmethod
+    async def count(cls, db: AsyncConnection) -> int:
+        """Return total project count."""
+        async with db.cursor() as cur:
+            await cur.execute("SELECT COUNT(*) FROM projects;")
+            result = await cur.fetchone()
+        return int(result[0] if result and result[0] is not None else 0)
 
     @classmethod
     async def create(cls, db: AsyncConnection, project_in: Self) -> Self:

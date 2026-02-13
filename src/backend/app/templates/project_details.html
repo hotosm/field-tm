@@ -3,7 +3,7 @@ project.project_name }} - {% endif %}Field Tasking Manager {% endblock %} {%
 block content %}
 <div style="padding: 20px; max-width: 1200px; margin: 0 auto">
   <div style="margin-bottom: 20px">
-    <wa-button href="/" variant="default" style="margin-bottom: 20px">
+    <wa-button href="/projects" variant="default" style="margin-bottom: 20px">
       ← Back to Projects
     </wa-button>
   </div>
@@ -200,7 +200,7 @@ block content %}
       slot="footer"
       style="display: flex; gap: 10px; justify-content: flex-end"
     >
-      <wa-button href="/" variant="default">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="default">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% else %}
@@ -211,7 +211,7 @@ block content %}
         The project you're looking for doesn't exist or you don't have
         permission to view it.
       </p>
-      <wa-button href="/" variant="primary">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="primary">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% endif %}

@@ -27,6 +27,11 @@ from litestar.exceptions import HTTPException
 from osm_login_python.core import Auth
 from psycopg import AsyncConnection
 
+from app.auth.api_key_routes import (
+    create_api_key_route,
+    list_api_keys_route,
+    revoke_api_key_route,
+)
 from app.auth.auth_deps import login_required
 from app.auth.auth_logic import expire_cookies, refresh_cookies
 from app.auth.auth_schemas import AuthUser, FMTMUser
@@ -194,5 +199,8 @@ auth_router = Router(
         logout,
         my_data,
         refresh_management_cookies,
+        create_api_key_route,
+        list_api_keys_route,
+        revoke_api_key_route,
     ],
 )
