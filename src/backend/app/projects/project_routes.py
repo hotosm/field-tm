@@ -41,7 +41,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required, public_endpoint
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
-from app.auth.roles import mapper, project_manager, super_admin
+from app.auth.roles import project_manager, super_admin
 from app.central import central_crud
 from app.config import settings
 from app.db.database import db_conn
@@ -67,11 +67,11 @@ log = logging.getLogger(__name__)
 
 
 @get(
-    "/",
+    "/all",
     summary="Return all projects.",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
+        "auth_user": Provide(public_endpoint),
     },
     return_dto=project_schemas.ProjectOut,
 )
@@ -146,7 +146,7 @@ async def read_project_summaries(
     "/categories",
     summary="Get all project categories.",
     dependencies={
-        "auth_user": Provide(login_required),
+        "auth_user": Provide(public_endpoint),
     },
 )
 async def get_categories() -> dict:
@@ -170,17 +170,22 @@ async def get_categories() -> dict:
     summary="Get a specific project by ID.",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "auth_user": Provide(public_endpoint),
     },
     return_dto=project_schemas.ProjectOut,
 )
 async def read_project(
     project_id: int,
-    current_user: ProjectUserDict,
+    db: AsyncConnection,
 ) -> DbProject:
     """Get a specific project by ID."""
-    return current_user.get("project")
+    try:
+        return await DbProject.one(db, project_id)
+    except KeyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project ({project_id}) not found.",
+        ) from e
 
 
 @get(
@@ -188,17 +193,22 @@ async def read_project(
     summary="Download the project boundary as GeoJSON.",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "auth_user": Provide(public_endpoint),
     },
 )
 async def download_project_boundary(
     project_id: int,
-    current_user: ProjectUserDict,
     db: AsyncConnection,
 ) -> Response:
     """Downloads the boundary of a project as a GeoJSON file."""
-    project = current_user.get("project")
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project ({project_id}) not found.",
+        ) from e
+
     geojson_bytes = json.dumps(project.outline).encode("utf-8")
     headers = {
         "Content-Disposition": f"attachment; filename={project.slug}.geojson",

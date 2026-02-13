@@ -1,0 +1,108 @@
+{% extends "layout.html" %} {% block title %}FieldTM | Coordinate Field
+Mapping{% endblock %} {% block content %}
+<main style="max-width: 1100px; margin: 0 auto; padding: 24px 20px 56px 20px">
+  <section
+    style="
+      margin-top: 20px;
+      border-radius: 16px;
+      padding: 32px 28px;
+      background: linear-gradient(
+        135deg,
+        #fff4e8 0%,
+        #ffffff 55%,
+        #eef7ff 100%
+      );
+      border: 1px solid #f0e3d5;
+    "
+  >
+    <h1 style="margin: 0 0 12px 0; font-size: 2.2rem; line-height: 1.2">
+      Field Tasking Manager
+    </h1>
+    <p style="margin: 0 0 20px 0; max-width: 760px; color: #4d4d4d">
+      Coordinate field mapping projects with a progressive, server-driven
+      workflow. Build projects in ODK Central or QFieldCloud with clear setup
+      steps and mapper-ready QR codes.
+    </p>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <wa-button href="/projects" variant="brand">Explore Projects</wa-button>
+      <wa-button href="/new" variant="neutral">Create Project</wa-button>
+    </div>
+  </section>
+
+  <section style="margin-top: 24px">
+    <div
+      hx-get="/metrics"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+      aria-live="polite"
+    >
+      <wa-card>
+        <div style="padding: 14px 18px; color: #666">Loading metrics...</div>
+      </wa-card>
+    </div>
+  </section>
+
+  <section
+    style="
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    "
+  >
+    <wa-card>
+      <div slot="header" style="font-weight: 700">Simple Progressive Flow</div>
+      <p style="margin: 0; color: #555">
+        Build projects step-by-step: AOI, form, data extract, optional task
+        split, then publish to your field tool.
+      </p>
+    </wa-card>
+    <wa-card>
+      <div slot="header" style="font-weight: 700">Public Project Discovery</div>
+      <p style="margin: 0; color: #555">
+        Browse active projects without login. Authentication is required only
+        for project creation and management actions.
+      </p>
+    </wa-card>
+    <wa-card>
+      <div slot="header" style="font-weight: 700">Designed For Operations</div>
+      <p style="margin: 0; color: #555">
+        Generate project links and QR codes quickly for field teams using ODK
+        Collect or QField.
+      </p>
+    </wa-card>
+  </section>
+
+  <section style="margin-top: 24px">
+    <wa-card>
+      <div slot="header" style="font-weight: 700">Resources</div>
+      <ul style="margin: 0; padding-left: 18px; color: #555; line-height: 1.6">
+        <li>
+          HOT Export Tool:
+          <a href="https://export.hotosm.org" target="_blank" rel="noopener"
+            >export.hotosm.org</a
+          >
+        </li>
+        <li>
+          ODK Central:
+          <a
+            href="https://docs.getodk.org/central-intro/"
+            target="_blank"
+            rel="noopener"
+            >docs.getodk.org</a
+          >
+        </li>
+        <li>
+          QFieldCloud:
+          <a
+            href="https://docs.qfield.org/get-started/"
+            target="_blank"
+            rel="noopener"
+            >docs.qfield.org</a
+          >
+        </li>
+      </ul>
+    </wa-card>
+  </section>
+</main>
+{% endblock %}

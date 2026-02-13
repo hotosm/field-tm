@@ -23,11 +23,7 @@ import logging
 from io import BytesIO
 from pathlib import Path
 
-import aiohttp
 import geojson
-from anyio import to_thread
-from area_splitter import SplittingAlgorithm
-from area_splitter.splitter import split_by_sql, split_by_square
 from litestar import Router, get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
@@ -38,35 +34,42 @@ from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response, Template
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
-from osm_fieldwork.json_data_models import data_models_path
 from osm_fieldwork.xlsforms import xlsforms_path
-from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import mapper, project_manager
-from app.central import central_crud, central_deps
+from app.central import central_crud
 from app.central.central_routes import _validate_xlsform_extension
 from app.central.central_schemas import ODKCentral
-from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import ProjectStatus, XLSFormType
-from app.db.languages_and_countries import countries
+from app.db.enums import XLSFormType
 from app.db.models import DbProject
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
     geojson_to_featcol,
     merge_polygons,
-    parse_geojson_file_to_featcol,
-    polygon_to_centroid,
 )
 from app.htmx.htmx_schemas import XLSFormUploadData
-from app.projects import project_crud, project_deps, project_schemas
+from app.projects import project_crud, project_schemas
 from app.projects.project_schemas import ProjectUpdate
-from app.qfield.qfield_crud import create_qfield_project
+from app.projects.project_services import (
+    ConflictError,
+    ServiceError,
+    create_project_stub,
+    download_osm_data,
+    finalize_odk_project,
+    finalize_qfield_project,
+    save_data_extract,
+    save_task_areas,
+    split_aoi,
+)
+from app.projects.project_services import (
+    ValidationError as SvcValidationError,
+)
 from app.qfield.qfield_schemas import QFieldCloud
 
 log = logging.getLogger(__name__)
@@ -276,9 +279,32 @@ def render_leaflet_map(
     path="/",
     dependencies={"db": Provide(db_conn)},
 )
-async def home(request: HTMXRequest, db: AsyncConnection) -> Template:
+async def landing(request: HTMXRequest, db: AsyncConnection) -> Template:
+    """Render public landing page."""
+    return HTMXTemplate(template_name="landing.html")
+
+
+@get(
+    path="/projects",
+    dependencies={"db": Provide(db_conn)},
+)
+async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template:
+    """Render public project listing page."""
     projects = await DbProject.all(db, limit=12) or []
     return HTMXTemplate(template_name="home.html", context={"projects": projects})
+
+
+@get(
+    path="/metrics",
+    dependencies={"db": Provide(db_conn)},
+)
+async def metrics_partial(request: HTMXRequest, db: AsyncConnection) -> Template:
+    """Render landing metrics partial."""
+    project_count = await DbProject.count(db)
+    return HTMXTemplate(
+        template_name="partials/metrics.html",
+        context={"project_count": project_count},
+    )
 
 
 @get(
@@ -519,171 +545,79 @@ async def create_project_htmx(
 ) -> Response:
     """Create a project via HTMX form submission."""
     try:
-        # Extract form data
         project_name = data.get("project_name", "").strip()
-        description = data.get("description", "").strip() or None
+        description = data.get("description", "").strip()
         field_mapping_app = data.get("field_mapping_app", "").strip()
         hashtags_str = data.get("hashtags", "").strip()
         outline_str = data.get("outline", "").strip()
 
-        # Validate required fields
-        if not project_name:
-            return Response(
-                content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Project name is required.</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        if not description or not description.strip():
-            return Response(
-                content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Description is required.</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=400,
-                headers={
-                    "HX-Retarget": "#description-error",
-                    "HX-Reswap": "innerHTML",
-                },
-            )
-
-        if not field_mapping_app:
-            return Response(
-                content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Field Mapping App is required.</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=400,
-            )
-
         if not outline_str:
-            error_msg = "You must draw or upload an Area of Interest (AOI) on the map before submitting."
-            return Response(
-                content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{error_msg}</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=400,
-                headers={
-                    "HX-Trigger": json.dumps({"missingOutline": error_msg}),
-                },
-            )
+            outline = {}
+        else:
+            try:
+                outline = json.loads(outline_str)
+            except json.JSONDecodeError:
+                return Response(
+                    content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection).</span></wa-callout></div>',
+                    media_type="text/html",
+                    status_code=400,
+                )
 
-        # Parse outline GeoJSON
-        try:
-            outline = json.loads(outline_str)
-        except json.JSONDecodeError:
-            return Response(
-                content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection).</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=400,
-            )
+        hashtags = (
+            [tag.strip() for tag in hashtags_str.split(",") if tag.strip()]
+            if hashtags_str
+            else []
+        )
 
-        # Parse hashtags
-        hashtags = []
-        if hashtags_str:
-            hashtags = [tag.strip() for tag in hashtags_str.split(",") if tag.strip()]
-
-        # Create StubProjectIn object
-        project_data = project_schemas.StubProjectIn(
+        project = await create_project_stub(
+            db=db,
             project_name=project_name,
             field_mapping_app=field_mapping_app,
-            description=description.strip(),
+            description=description,
             outline=outline,
             hashtags=hashtags,
-            merge=True,
+            user_sub=auth_user.sub,
         )
+        await db.commit()
 
-        # Remove merge field as it is not in database
-        if hasattr(project_data, "merge"):
-            delattr(project_data, "merge")
-        project_data.status = ProjectStatus.DRAFT
-
-        # Check for duplicate project name before creating
-        exists = await project_deps.project_name_does_not_already_exist(
-            db, project_data.project_name
-        )
-        if exists:
-            error_msg = f"Project with name '{project_data.project_name}' already exists. Please choose a different name."
-            return Response(
-                content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{error_msg}</span></wa-callout></div>',
-                media_type="text/html",
-                status_code=status.HTTP_409_CONFLICT,
-                headers={
-                    "HX-Trigger": json.dumps({"duplicateProjectName": error_msg}),
-                },
-            )
-
-        # Get the location_str via reverse geocode
-        try:
-            # Get outline dict - StubProjectIn.outline is a Pydantic model, so use model_dump()
-            outline_dict = project_data.outline.model_dump()
-            async with AsyncNearestCity(db) as geocoder:
-                # polygon_to_centroid can handle Polygon, MultiPolygon, Feature, or FeatureCollection
-                centroid = await polygon_to_centroid(outline_dict)
-                latitude, longitude = centroid.y, centroid.x
-                location = await geocoder.query(latitude, longitude)
-                # Convert to two letter country code --> full name
-                if location:
-                    country_full_name = (
-                        countries.get(location.country, location.country)
-                        if location.country
-                        else None
-                    )
-                    if location.city and country_full_name:
-                        project_data.location_str = (
-                            f"{location.city}, {country_full_name}"
-                        )
-                    elif location.city:
-                        project_data.location_str = location.city
-                    elif country_full_name:
-                        project_data.location_str = country_full_name
-                    else:
-                        project_data.location_str = None
-                    log.info(
-                        f"Geocoded location for project {project_data.project_name}: {project_data.location_str}"
-                    )
-                else:
-                    project_data.location_str = None
-                    log.warning(
-                        f"Could not geocode location for project {project_data.project_name} at {latitude}, {longitude}"
-                    )
-        except Exception as e:
-            log.error(
-                f"Error getting location for project {project_data.project_name}: {e}",
-                exc_info=True,
-            )
-            project_data.location_str = None
-
-        # Create the project in the Field-TM DB
-        project_data.created_by_sub = auth_user.sub
-        try:
-            project = await DbProject.create(db, project_data)
-        except HTTPException:
-            raise
-        except Exception as e:
-            log.error(f"Error creating project via HTMX: {e}")
-            raise HTTPException(
-                status_code=422,
-                detail="Project creation failed.",
-            ) from e
-
-        # Return HTMX redirect response
         return Response(
             content="",
             status_code=200,
-            headers={
-                "HX-Redirect": f"/htmxprojects/{project.id}",
-            },
+            headers={"HX-Redirect": f"/htmxprojects/{project.id}"},
         )
-
-    except HTTPException as e:
-        error_msg = (
-            str(e.detail)
-            if hasattr(e, "detail")
-            else "Project creation failed. Please check your inputs and try again."
-        )
+    except SvcValidationError as e:
+        message = e.message
+        headers = {}
+        if "Description is required" in message:
+            headers.update(
+                {
+                    "HX-Retarget": "#description-error",
+                    "HX-Reswap": "innerHTML",
+                }
+            )
+        if "Area of Interest" in message:
+            headers["HX-Trigger"] = json.dumps({"missingOutline": message})
         return Response(
-            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{error_msg}</span></wa-callout></div>',
+            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{message}</span></wa-callout></div>',
             media_type="text/html",
-            status_code=e.status_code,
+            status_code=400,
+            headers=headers,
+        )
+    except ConflictError as e:
+        return Response(
+            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{e.message}</span></wa-callout></div>',
+            media_type="text/html",
+            status_code=status.HTTP_409_CONFLICT,
+            headers={"HX-Trigger": json.dumps({"duplicateProjectName": e.message})},
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{e.message}</span></wa-callout></div>',
+            media_type="text/html",
+            status_code=400,
         )
     except Exception as e:
-        log.error(f"Error creating project via HTMX: {e}")
+        log.error(f"Error creating project via HTMX: {e}", exc_info=True)
         return Response(
             content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">An unexpected error occurred. Please try again.</span></wa-callout></div>',
             media_type="text/html",
@@ -872,97 +806,13 @@ async def download_osm_data_htmx(
         )
 
     try:
-        # Get project outline
-        outline = project.outline
-        if not outline:
-            return Response(
-                content='<wa-callout variant="danger"><span>Project outline not found.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Convert outline to FeatureCollection format
-        aoi_featcol = {
-            "type": "FeatureCollection",
-            "features": [{"type": "Feature", "geometry": outline, "properties": {}}],
-        }
-
-        # Get extract config
-        try:
-            osm_category_enum = XLSFormType[osm_category.lower()]
-        except (KeyError, AttributeError):
-            osm_category_enum = XLSFormType.buildings
-
-        config_filename = osm_category_enum.name
-        data_model = f"{data_models_path}/{config_filename}.json"
-
-        with open(data_model, encoding="utf-8") as f:
-            config_data = json.load(f)
-
-        geom_type_lower = geom_type.lower()
-        data_config = {
-            ("polygon", False): ["ways_poly"],
-            ("point", True): ["ways_poly", "nodes"],
-            ("point", False): ["nodes"],
-            ("polyline", False): ["ways_line"],
-        }
-
-        config_data["from"] = data_config.get((geom_type_lower, centroid))
-        if geom_type_lower == "polyline":
-            geom_type_lower = "line"
-
-        # Generate data extract
-        result = await project_crud.generate_data_extract(
-            project.id,
-            aoi_featcol,
-            geom_type_lower,
-            config_data,
-            centroid,
-            True,
+        featcol_single_geom_type = await download_osm_data(
+            db=db,
+            project_id=project_id,
+            osm_category=osm_category,
+            geom_type=geom_type,
+            centroid=centroid,
         )
-
-        # Download GeoJSON from URL
-        download_url = result.data.get("download_url")
-        if not download_url:
-            return Response(
-                content='<wa-callout variant="danger"><span>Failed to get download URL from data extract.</span></wa-callout>',
-                media_type="text/html",
-                status_code=500,
-            )
-
-        # Download and parse GeoJSON
-        async with aiohttp.ClientSession() as session:
-            async with session.get(download_url) as response:
-                if not response.ok:
-                    return Response(
-                        content='<wa-callout variant="danger"><span>Failed to download GeoJSON from extract URL.</span></wa-callout>',
-                        media_type="text/html",
-                        status_code=500,
-                    )
-                # Read as text first (handles binary/octet-stream content type)
-                text_content = await response.text()
-                try:
-                    geojson_data = json.loads(text_content)
-                except json.JSONDecodeError:
-                    return Response(
-                        content='<wa-callout variant="danger"><span>Failed to parse GeoJSON data from download.</span></wa-callout>',
-                        media_type="text/html",
-                        status_code=500,
-                    )
-
-        # Validate and clean GeoJSON
-        featcol = parse_geojson_file_to_featcol(json.dumps(geojson_data))
-        featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
-
-        if not featcol_single_geom_type:
-            return Response(
-                content='<wa-callout variant="danger"><span>Could not process GeoJSON data.</span></wa-callout>',
-                media_type="text/html",
-                status_code=422,
-            )
-
-        await check_crs(featcol_single_geom_type)
-
         feature_count = len(featcol_single_geom_type.get("features", []))
 
         # Encode GeoJSON for the Accept button (don't save yet)
@@ -1024,6 +874,18 @@ async def download_osm_data_htmx(
             status_code=200,
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(f"Error downloading OSM data via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1680,32 +1542,6 @@ async def split_aoi_htmx(
             f"Split AOI parameters: algorithm={algorithm}, no_of_buildings={no_of_buildings}, dimension_meters={dimension_meters}"
         )
 
-        # Get project with outline
-        project = await DbProject.one(db, project_id)
-
-        if not project.outline:
-            return Response(
-                content='<wa-callout variant="danger"><span>Project outline not found. Cannot split AOI.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Convert outline to FeatureCollection
-        aoi_featcol = {
-            "type": "FeatureCollection",
-            "features": [
-                {"type": "Feature", "geometry": project.outline, "properties": {}}
-            ],
-        }
-
-        # Get data extract from database
-        parsed_extract = project.data_extract_geojson
-
-        # Check if data extract is empty dict {} (user selected "no data")
-        # Empty dict {} means user explicitly chose "no data" - we can't split without data
-        is_empty_data_extract = parsed_extract == {}
-
-        # Validate algorithm type
         if not algorithm or algorithm == "":
             return Response(
                 content='<wa-callout variant="danger"><span>Please select a splitting option.</span></wa-callout>',
@@ -1713,144 +1549,22 @@ async def split_aoi_htmx(
                 status_code=400,
             )
 
-        try:
-            algorithm_enum = SplittingAlgorithm(algorithm)
-        except ValueError:
+        tasks_featcol = await split_aoi(
+            db=db,
+            project_id=project_id,
+            algorithm=algorithm,
+            no_of_buildings=no_of_buildings,
+            dimension_meters=dimension_meters,
+        )
+
+        if tasks_featcol == {}:
             return Response(
-                content=f'<wa-callout variant="danger"><span>Invalid algorithm type: {algorithm}</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Handle NO_SPLITTING case - save immediately without preview
-        if algorithm_enum == SplittingAlgorithm.NO_SPLITTING:
-            # Store empty dict {} to indicate no splitting (use whole AOI)
-            await DbProject.update(
-                db,
-                project_id,
-                project_schemas.ProjectUpdate(task_areas_geojson={}),
-            )
-            await db.commit()
-
-            log.info(
-                f"No splitting selected for project {project_id}. Will use whole AOI as single task."
-            )
-
-            return Response(
-                content='<wa-callout variant="success"><span>✓ No splitting selected. The whole AOI will be used as a single task. Step 3 is now complete.</span></wa-callout>',
+                content='<wa-callout variant="success"><span>✓ Task splitting is not required for this project setup.</span></wa-callout>',
                 media_type="text/html",
                 status_code=200,
                 headers={"HX-Refresh": "true"},
             )
 
-        # If data extract is empty {}, skip splitting and save empty {} to task areas
-        # (user selected "no data", so we can't split - just use AOI as-is)
-        if is_empty_data_extract:
-            log.info(
-                f"Empty data extract detected for project {project_id}. Skipping split and saving empty task areas."
-            )
-            await DbProject.update(
-                db,
-                project_id,
-                project_schemas.ProjectUpdate(task_areas_geojson={}),
-            )
-            await db.commit()
-
-            return Response(
-                content='<wa-callout variant="success"><span>✓ Task splitting is not relevant without existing data</span></wa-callout>',
-                media_type="text/html",
-                status_code=200,
-                headers={"HX-Refresh": "true"},
-            )
-
-        # Perform splitting based on algorithm
-        log.info(f"Splitting AOI for project {project_id} using algorithm: {algorithm}")
-
-        if algorithm_enum in (
-            SplittingAlgorithm.AVG_BUILDING_VORONOI,
-            SplittingAlgorithm.AVG_BUILDING_SKELETON,
-        ):
-            # Use split_by_sql (average buildings per task)
-            # Check if we have a valid data extract saved in DB (not None, not empty)
-            if (
-                not parsed_extract
-                or not isinstance(parsed_extract, dict)
-                or parsed_extract.get("type") != "FeatureCollection"
-            ):
-                return Response(
-                    content='<wa-callout variant="warning"><span>Data extract required for task splitting algorithm. Please download OSM data or upload GeoJSON first and accept it.</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=400,
-                )
-
-            log.info(
-                f"Using splitting algorithm: {algorithm_enum.value} ({algorithm_enum.label})"
-            )
-            log.debug(
-                f"Using saved data extract from DB with {len(parsed_extract.get('features', []))} features"
-            )
-
-            # Prepare algorithm parameters based on required params
-            algorithm_params = {}
-            for param in algorithm_enum.required_params:
-                if param == "num_buildings":
-                    algorithm_params["num_buildings"] = no_of_buildings
-                # Add other parameter mappings here as needed
-
-            # split_by_sql signature: (aoi, db, num_buildings=None, outfile=None, osm_extract=None, algorithm=None, algorithm_params=None)
-            # Pass the saved data extract from DB - this prevents split_by_sql from downloading a new extract
-            features = await to_thread.run_sync(
-                split_by_sql,
-                aoi_featcol,
-                settings.FMTM_DB_URL,
-                num_buildings=None,  # Deprecated, using algorithm_params instead
-                outfile=None,  # we don't want to write to file
-                osm_extract=parsed_extract,  # Use saved extract from DB (prevents automatic download)
-                algorithm=algorithm_enum,
-                algorithm_params=algorithm_params,
-            )
-        elif algorithm_enum == SplittingAlgorithm.DIVIDE_BY_SQUARE:
-            # Use split_by_square (grid-based)
-            # split_by_square signature: (aoi, db, meters=100, osm_extract=None, outfile=None)
-            # For DIVIDE_BY_SQUARE, osm_extract is optional (can split without data)
-            # But if we have one saved, use it
-            features = await to_thread.run_sync(
-                split_by_square,
-                aoi_featcol,
-                settings.FMTM_DB_URL,
-                dimension_meters,
-                parsed_extract
-                if (
-                    parsed_extract
-                    and isinstance(parsed_extract, dict)
-                    and parsed_extract.get("type") == "FeatureCollection"
-                )
-                else None,  # osm_extract (can be None for grid-based)
-                None,  # outfile - we don't want to write to file
-            )
-        elif algorithm_enum == SplittingAlgorithm.TOTAL_TASKS:
-            return Response(
-                content='<wa-callout variant="warning"><span>Split by Specific Number of Tasks is not yet implemented. Please choose another algorithm.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-        else:
-            return Response(
-                content=f'<wa-callout variant="danger"><span>Algorithm {algorithm} not yet implemented in HTMX interface.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        if not features or not features.get("features"):
-            return Response(
-                content='<wa-callout variant="warning"><span>No task areas generated. Please try different parameters.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Validate and prepare task boundaries (preview only, not saved yet)
-        tasks_featcol = features
-        await check_crs(tasks_featcol)
         task_count = len(tasks_featcol.get("features", []))
 
         # Store preview in a temporary location (we'll save it when user accepts)
@@ -1957,6 +1671,18 @@ async def split_aoi_htmx(
             status_code=200,
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(f"Error splitting AOI via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1993,7 +1719,6 @@ async def accept_data_extract_htmx(
         )
 
     try:
-        # Get data extract GeoJSON from form data (hx-vals sends it as form data)
         geojson_str = data.get("data_extract_geojson", "")
         if not geojson_str:
             log.debug(
@@ -2018,18 +1743,11 @@ async def accept_data_extract_htmx(
                 status_code=400,
             )
 
-        # Validate CRS
-        await check_crs(geojson_data)
-
-        # Save to database
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
+        feature_count = await save_data_extract(
+            db=db,
+            project_id=project_id,
+            geojson_data=geojson_data,
         )
-        await db.commit()
-
-        feature_count = len(geojson_data.get("features", []))
         log.info(
             f"Accepted and saved data extract with {feature_count} features for project {project_id}"
         )
@@ -2041,6 +1759,18 @@ async def accept_data_extract_htmx(
             headers={"HX-Refresh": "true"},
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -2102,22 +1832,12 @@ async def accept_split_htmx(
                 status_code=400,
             )
 
-        # Validate CRS
-        await check_crs(tasks_geojson)
-
-        # Save to database
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(task_areas_geojson=tasks_geojson),
+        task_count = await save_task_areas(
+            db=db,
+            project_id=project_id,
+            tasks_geojson=tasks_geojson,
         )
-        await db.commit()
-
-        # Check if task areas is empty {} (no splitting)
         is_empty_task_areas = tasks_geojson == {}
-        task_count = (
-            len(tasks_geojson.get("features", [])) if not is_empty_task_areas else 0
-        )
 
         log.info(
             f"Accepted and saved task areas for project {project_id} (empty: {is_empty_task_areas}, count: {task_count})"
@@ -2135,6 +1855,18 @@ async def accept_split_htmx(
             headers={"HX-Refresh": "true"},
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(f"Error accepting split via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -2170,246 +1902,63 @@ async def create_project_odk_htmx(
             status_code=404,
         )
 
-    # Get project with latest data
-    project = await DbProject.one(db, project_id)
+    try:
+        custom_odk_creds = None
+        external_url = data.get("external_project_instance_url", "").strip()
+        external_username = data.get("external_project_username", "").strip()
+        external_password = data.get("external_project_password", "").strip()
 
-    # Validate prerequisites
-    if not project.xlsform_content:
-        return Response(
-            content='<wa-callout variant="danger"><span>XLSForm is required. Please upload a form first.</span></wa-callout>',
-            media_type="text/html",
-            status_code=400,
-        )
+        any_custom = any([external_url, external_username, external_password])
+        all_custom = all([external_url, external_username, external_password])
 
-    if not project.data_extract_geojson:
-        return Response(
-            content='<wa-callout variant="danger"><span>Data extract is required. Please download OSM data or upload GeoJSON first.</span></wa-callout>',
-            media_type="text/html",
-            status_code=400,
-        )
-
-    # Get optional custom ODK credentials from form data
-    custom_odk_creds = None
-    external_url = data.get("external_project_instance_url", "").strip()
-    external_username = data.get("external_project_username", "").strip()
-    external_password = data.get("external_project_password", "").strip()
-
-    any_custom = any([external_url, external_username, external_password])
-    all_custom = all([external_url, external_username, external_password])
-
-    if any_custom and not all_custom:
-        return Response(
-            content=(
-                '<wa-callout variant="warning"><span>'
-                "Provide ODK URL, username, and password (all 3), or leave them all blank to use server defaults."
-                "</span></wa-callout>"
-            ),
-            media_type="text/html",
-            status_code=400,
-        )
-
-    if all_custom:
-        custom_odk_creds = ODKCentral(
-            external_project_instance_url=external_url,
-            external_project_username=external_username,
-            external_project_password=external_password,
-        )
-    else:
-        # Use environment variables (None will fall back to env vars in central_deps)
-        if not settings.ODK_CENTRAL_URL or not settings.ODK_CENTRAL_USER:
+        if any_custom and not all_custom:
             return Response(
                 content=(
-                    '<wa-callout variant="danger"><span>'
-                    "ODK Central credentials are not configured on the server. "
-                    "Please use Advanced Options to provide custom ODK credentials."
+                    '<wa-callout variant="warning"><span>'
+                    "Provide ODK URL, username, and password (all 3), or leave them all blank to use server defaults."
                     "</span></wa-callout>"
                 ),
                 media_type="text/html",
                 status_code=400,
             )
 
-    # Step 1: Create ODK project if it doesn't exist
-    project_odk_id = project.external_project_id
-    if not project_odk_id:
-        log.info(f"Creating ODK project for Field-TM project {project_id}")
-        odk_project = await to_thread.run_sync(
-            central_crud.create_odk_project,
-            project.project_name,
-            custom_odk_creds,
-        )
-        project_odk_id = odk_project["id"]
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(external_project_id=project_odk_id),
-        )
-        await db.commit()
-        log.info(
-            f"Created ODK project {project_odk_id} for Field-TM project {project_id}"
-        )
-    # Persist the ODK base URL (so project details can render external links reliably)
-    odk_instance_url = (
-        custom_odk_creds.external_project_instance_url
-        if custom_odk_creds
-        else str(settings.ODK_CENTRAL_URL or "")
-    )
-    if odk_instance_url and odk_instance_url != (
-        project.external_project_instance_url or ""
-    ):
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(
-                external_project_instance_url=odk_instance_url,
-                external_project_id=project_odk_id,
-            ),
-        )
-        await db.commit()
+        if all_custom:
+            custom_odk_creds = ODKCentral(
+                external_project_instance_url=external_url,
+                external_project_username=external_username,
+                external_project_password=external_password,
+            )
 
-    # Step 2: Create entity list "features" from data extract
-    geojson_data = project.data_extract_geojson
-    features = geojson_data.get("features", [])
-    if not features:
+        odk_url = await finalize_odk_project(
+            db=db, project_id=project_id, custom_odk_creds=custom_odk_creds
+        )
+
         return Response(
-            content='<wa-callout variant="danger"><span>Data extract contains no features.</span></wa-callout>',
+            content=f'<wa-callout variant="success"><span>✓ Project successfully created in ODK Central! <a href="{odk_url}" target="_blank">View Project in ODK</a></span></wa-callout>',
+            media_type="text/html",
+            status_code=200,
+            headers={"HX-Refresh": "true"},
+        )
+    except SvcValidationError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
             media_type="text/html",
             status_code=400,
         )
-
-    first_feature = features[0]
-    entity_properties = list(first_feature.get("properties", {}).keys())
-
-    # Add default style properties if not present
-    for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
-        if field not in entity_properties:
-            entity_properties.append(field)
-
-    # Convert GeoJSON to entity list
-    entities_list = await central_crud.task_geojson_dict_to_entity_values(
-        geojson_data, additional_features=True
-    )
-
-    default_style = {
-        "fill": "#1a1a1a",
-        "marker-color": "#1a1a1a",
-        "stroke": "#000000",
-        "stroke-width": "6",
-    }
-
-    for entity in entities_list:
-        data = entity["data"]
-        for key, value in default_style.items():
-            data.setdefault(key, value)
-
-    log.info(f"Creating entity list 'features' for ODK project {project_odk_id}")
-    await central_crud.create_entity_list(
-        custom_odk_creds,
-        project_odk_id,
-        properties=entity_properties,
-        dataset_name="features",
-        entities_list=entities_list,
-    )
-
-    # Step 3: Upload task boundaries if they exist
-    task_areas = project.task_areas_geojson
-    if task_areas and task_areas.get("features"):
-        log.info(
-            f"Uploading {len(task_areas.get('features', []))} task boundaries to ODK"
-        )
-        task_entities = []
-        for idx, feature in enumerate(task_areas.get("features", [])):
-            if feature.get("geometry"):
-                entity_dict = await central_crud.feature_geojson_to_entity_dict(
-                    feature, additional_features=True
-                )
-                entity_dict["label"] = f"Task {idx + 1}"
-                if "data" in entity_dict:
-                    entity_data = {"geometry": entity_dict["data"]["geometry"]}
-                    entity_data["task_id"] = str(idx + 1)
-                    entity_dict["data"] = entity_data
-                task_entities.append(entity_dict)
-
-        # Check if dataset exists
-        try:
-            async with central_deps.get_odk_dataset(custom_odk_creds) as odk_central:
-                datasets = await odk_central.listDatasets(project_odk_id)
-                if any(ds.get("name") == "task_boundaries" for ds in datasets):
-                    log.info("Task boundaries dataset already exists, will be replaced")
-        except Exception as e:
-            log.warning(f"Could not check existing datasets: {e}")
-
-        await central_crud.create_entity_list(
-            custom_odk_creds,
-            project_odk_id,
-            properties=["geometry", "task_id"],
-            dataset_name="task_boundaries",
-            entities_list=task_entities,
-        )
-
-    # Step 4: Upload XLSForm
-    form_name = f"FMTM_Project_{project.id}"
-    xlsform_bytes = BytesIO(project.xlsform_content)
-
-    # Validate and upload form
-    xform = await central_crud.read_and_test_xform(xlsform_bytes)
-    log.info(f"Uploading XLSForm to ODK project {project_odk_id}")
-    central_crud.create_odk_xform(
-        project_odk_id,
-        xform,
-        custom_odk_creds,
-    )
-
-    # Get form ID
-    async with central_deps.get_odk_project(custom_odk_creds) as odk_central:
-        forms = await odk_central.listForms(project_odk_id)
-        form_id = None
-        for form in forms:
-            if form.get("xmlFormId") == form_name:
-                form_id = form.get("id")
-                break
-
-    if form_id:
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(odk_form_id=form_id),
-        )
-        await db.commit()
-
-    # Step 5: Generate project files (appusers, QR codes, etc.)
-    log.info(f"Generating project files for project {project_id}")
-    success = await project_crud.generate_project_files(db, project_id)
-
-    if not success:
+    except ServiceError as e:
         return Response(
-            content='<wa-callout variant="danger"><span>Failed to generate project files. Please contact support.</span></wa-callout>',
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
             media_type="text/html",
             status_code=500,
         )
-
-    # Update project status to PUBLISHED
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
-    )
-    await db.commit()
-
-    # Get ODK project URL
-    odk_url = None
-    if custom_odk_creds:
-        base_url = custom_odk_creds.external_project_instance_url.rstrip("/")
-        odk_url = f"{base_url}/#/projects/{project_odk_id}"
-    else:
-        base_url = settings.ODK_CENTRAL_URL.rstrip("/")
-        odk_url = f"{base_url}/#/projects/{project_odk_id}"
-
-    return Response(
-        content=f'<wa-callout variant="success"><span>✓ Project successfully created in ODK Central! <a href="{odk_url}" target="_blank">View Project in ODK</a></span></wa-callout>',
-        media_type="text/html",
-        status_code=200,
-        headers={"HX-Refresh": "true"},
-    )
+    except Exception as e:
+        log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
+        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
 
 
 @post(
@@ -2438,25 +1987,6 @@ async def create_project_qfield_htmx(
         )
 
     try:
-        # Get project with latest data
-        project = await DbProject.one(db, project_id)
-
-        # Validate prerequisites
-        if not project.xlsform_content:
-            return Response(
-                content='<wa-callout variant="danger"><span>XLSForm is required. Please upload a form first.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        if not project.data_extract_geojson:
-            return Response(
-                content='<wa-callout variant="danger"><span>Data extract is required. Please download OSM data or upload GeoJSON first.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Get optional custom QField credentials from form data
         custom_qfield_creds = None
         qfield_url_param = data.get("qfield_cloud_url", "").strip()
         qfield_user = data.get("qfield_cloud_user", "").strip()
@@ -2468,21 +1998,9 @@ async def create_project_qfield_htmx(
                 qfield_cloud_user=qfield_user,
                 qfield_cloud_password=qfield_password,
             )
-        else:
-            # Use environment variables (None will fall back to env vars)
-            custom_qfield_creds = None
-
-        # Create QField project (this handles all the file generation)
-        log.info(f"Creating QField project for Field-TM project {project_id}")
-        qfield_url = await create_qfield_project(db, project, custom_qfield_creds)
-
-        # Update project status to PUBLISHED
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        qfield_url = await finalize_qfield_project(
+            db=db, project_id=project_id, custom_qfield_creds=custom_qfield_creds
         )
-        await db.commit()
 
         return Response(
             content=f'<wa-callout variant="success"><span>✓ Project successfully created in QField! <a href="{qfield_url}" target="_blank">View Project in QField</a></span></wa-callout>',
@@ -2490,13 +2008,17 @@ async def create_project_qfield_htmx(
             status_code=200,
             headers={"HX-Refresh": "true"},
         )
-
-    except HTTPException as e:
-        error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
+    except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
             media_type="text/html",
-            status_code=e.status_code,
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
         )
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
@@ -2512,35 +2034,28 @@ async def create_project_qfield_htmx(
     path="/project-qrcode-htmx",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
     },
 )
 async def project_qrcode_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
-    current_user: ProjectUserDict,
-    auth_user: AuthUser,
     project_id: int = Parameter(),
+    username: str = Parameter(default="fieldtm_user"),
 ) -> Response:
     """Generate and return QR code for a published project."""
-    project = current_user.get("project")
-    if not project or project.id != project_id:
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content='<wa-callout variant="danger"><span>Project not found.</span></wa-callout>',
             media_type="text/html",
             status_code=404,
         )
 
     try:
-        # Get OSM username from auth_user
-        osm_username = (
-            auth_user.username if hasattr(auth_user, "username") else "fieldtm_user"
-        )
-
         # Use CRUD function to generate QR code
         qr_code_data_url = await project_crud.get_project_qrcode(
-            db, project_id, osm_username
+            db, project_id, username
         )
 
         app_name = (
@@ -2730,7 +2245,9 @@ htmx_router = Router(
         serve_pwa_512,
         serve_pwa_64,
         # Other routes
-        home,
+        landing,
+        project_listing,
+        metrics_partial,
         new_project,
         project_details,
         create_project_htmx,

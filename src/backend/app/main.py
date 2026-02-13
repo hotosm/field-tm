@@ -271,6 +271,7 @@ def create_app() -> Litestar:
     """Configure Litestar app main router."""
     root_router = configure_root_router()
     # Import routers after logger / settings to avoid circular imports
+    from app.api.api_routes import api_router
     from app.auth.auth_routes import auth_router
     from app.central.central_routes import central_router
     from app.helpers.helper_routes import helper_router
@@ -282,6 +283,7 @@ def create_app() -> Litestar:
     app = Litestar(
         route_handlers=[
             root_router,
+            api_router,
             project_router,
             auth_router,
             user_router,

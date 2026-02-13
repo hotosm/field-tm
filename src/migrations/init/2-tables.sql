@@ -81,3 +81,28 @@ CREATE TABLE public.user_roles (
     role public.projectrole NOT NULL DEFAULT 'MAPPER'
 );
 ALTER TABLE public.user_roles OWNER TO fmtm;
+
+
+CREATE TABLE public.api_keys (
+    id integer NOT NULL,
+    user_sub character varying NOT NULL,
+    key_hash character varying NOT NULL,
+    name character varying,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    last_used_at timestamp with time zone,
+    is_active boolean NOT NULL DEFAULT TRUE
+);
+ALTER TABLE public.api_keys OWNER TO fmtm;
+CREATE SEQUENCE public.api_keys_id_seq
+AS integer
+START WITH 1
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+CACHE 1;
+ALTER TABLE public.api_keys_id_seq OWNER TO fmtm;
+ALTER SEQUENCE public.api_keys_id_seq OWNED BY public.api_keys.id;
+-- Autoincrement PK
+ALTER TABLE ONLY public.api_keys ALTER COLUMN id SET DEFAULT nextval(
+    'public.api_keys_id_seq'::regclass
+);
