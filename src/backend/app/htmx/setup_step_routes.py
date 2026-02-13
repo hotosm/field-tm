@@ -2229,4 +2229,3 @@ async def validate_geojson(
             media_type="application/json",
             status_code=500,
         )
-

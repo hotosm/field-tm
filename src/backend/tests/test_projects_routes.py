@@ -20,9 +20,9 @@
 import json
 import logging
 import os
+from contextlib import asynccontextmanager
 from io import BytesIO
 from pathlib import Path
-from contextlib import asynccontextmanager
 from unittest.mock import Mock, patch
 from urllib.parse import urlparse
 from uuid import uuid4

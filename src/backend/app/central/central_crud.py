@@ -28,14 +28,13 @@ from typing import Optional, Union
 from uuid import UUID, uuid4
 
 import geojson
-from anyio import to_thread
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
+from pyodk._endpoints.entities import Entity
 from pyodk._endpoints.form_assignments import FormAssignmentService
 from pyodk._endpoints.project_app_users import ProjectAppUserService
-from pyodk._endpoints.entities import Entity
 from pyodk.errors import PyODKError
 from pyxform.xls2xform import convert as xform_convert
 

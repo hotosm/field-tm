@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from area_splitter import SplittingAlgorithm
 from pydantic import BaseModel, model_validator
 
@@ -19,14 +17,14 @@ class CreateProjectRequest(BaseModel):
     field_mapping_app: FieldMappingApp
     description: str
     outline: dict
-    hashtags: Optional[list[str]] = None
+    hashtags: list[str] | None = None
 
 
 class XLSFormRequest(BaseModel):
     """Step 2 payload to attach XLSForm from template or base64 upload."""
 
-    template_form_id: Optional[int] = None
-    xlsform_base64: Optional[str] = None
+    template_form_id: int | None = None
+    xlsform_base64: str | None = None
     need_verification_fields: bool = True
     mandatory_photo_upload: bool = False
     use_odk_collect: bool = False
@@ -47,9 +45,9 @@ class XLSFormRequest(BaseModel):
 class DataExtractRequest(BaseModel):
     """Step 3 payload to provide project data extract."""
 
-    geojson: Optional[dict] = None
-    osm_category: Optional[XLSFormType] = XLSFormType.buildings
-    geom_type: Optional[DbGeomType] = DbGeomType.POLYGON
+    geojson: dict | None = None
+    osm_category: XLSFormType | None = XLSFormType.buildings
+    geom_type: DbGeomType | None = DbGeomType.POLYGON
     centroid: bool = False
 
     @model_validator(mode="after")

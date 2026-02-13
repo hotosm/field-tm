@@ -31,9 +31,9 @@ from app.htmx.static_routes import (
     serve_favicon_png,
     serve_favicon_svg,
     serve_maskable_icon,
+    serve_pwa_64,
     serve_pwa_192,
     serve_pwa_512,
-    serve_pwa_64,
     serve_static_image,
 )
 

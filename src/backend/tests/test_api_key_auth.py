@@ -45,9 +45,7 @@ async def ensure_api_keys_table(db):
 
 
 @pytest.mark.asyncio
-async def test_api_key_routes_create_list_and_revoke(
-    client, db, ensure_api_keys_table
-):
+async def test_api_key_routes_create_list_and_revoke(client, db, ensure_api_keys_table):
     """Create, list, and revoke API keys via auth routes."""
     create_resp = await client.post(
         "/auth/api-keys",

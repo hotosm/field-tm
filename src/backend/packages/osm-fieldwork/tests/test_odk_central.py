@@ -32,8 +32,9 @@ test_data_dir = Path(__file__).parent / "test_data"
 
 def test_delete_appuser(pyodk_client, appuser_details, project_details):
     """Delete appuser using pyodk-authenticated session."""
+    base_url = str(pyodk_client.session.base_url).rstrip("/")
     response = pyodk_client.session.delete(
-        f"{pyodk_client.session.base_url}/v1/projects/"
+        f"{base_url}/projects/"
         f"{project_details['id']}/app-users/{appuser_details['id']}"
     )
     assert response.ok
@@ -71,8 +72,9 @@ def test_create_form_delete(pyodk_client, odk_form_cleanup):
     forms = [form.model_dump() for form in pyodk_client.forms.list(project_id=odk_id)]
     assert any(form.get("xmlFormId") == form_name for form in forms)
 
+    base_url = str(pyodk_client.session.base_url).rstrip("/")
     response = pyodk_client.session.delete(
-        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/{form_name}"
+        f"{base_url}/projects/{odk_id}/forms/{form_name}"
     )
     assert response.status_code in (200, 204)
 
@@ -94,7 +96,7 @@ def test_create_form_update_version(pyodk_client, odk_form_cleanup):
     form_before = pyodk_client.forms.get(form_id=form_name, project_id=odk_id)
 
     test_xform = test_data_dir / "buildings.xml"
-    with open(test_xform, "r", encoding="utf-8") as fh:
+    with open(test_xform, encoding="utf-8") as fh:
         xml = fh.read()
     new_xml = xml.replace('version="v1"', 'version="v2"', 1)
 
@@ -136,8 +138,9 @@ def test_upload_media_bytesio_publish(odk_form__with_attachment_cleanup):
 def test_form_fields_no_form(pyodk_client, project_details):
     """Attempt form-fields request when form does not exist."""
     odk_id = project_details["id"]
+    base_url = str(pyodk_client.session.base_url).rstrip("/")
     response = pyodk_client.session.get(
-        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/test_form/fields"
+        f"{base_url}/projects/{odk_id}/forms/test_form/fields"
         "?odata=true"
     )
     with pytest.raises(requests.exceptions.HTTPError):
@@ -148,8 +151,9 @@ def test_form_fields(pyodk_client, odk_form_cleanup):
     """Test form fields for created form."""
     odk_id, form_name = odk_form_cleanup
 
+    base_url = str(pyodk_client.session.base_url).rstrip("/")
     response = pyodk_client.session.get(
-        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/{form_name}/fields"
+        f"{base_url}/projects/{odk_id}/forms/{form_name}/fields"
         "?odata=true"
     )
     response.raise_for_status()
