@@ -47,9 +47,6 @@ prod:
   just config generate-dotenv "${GIT_BRANCH}"
   just config custom-favicon
 
-  # Build frontends
-  just build frontends-prod "${GIT_BRANCH}"
-
   # Deploy
   ../envsubst -no-unset -i compose.sub.yaml | \
         {{docker}} compose -f - up --detach \
@@ -75,35 +72,6 @@ backend-no-docker:
   FMTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
   OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
-
-# Start frontend UI (also starts backend)
-[no-cd]
-frontend:
-  {{docker}} compose up -d ui
-
-# Start frontend UI without docker, connected to staging
-[no-cd]
-frontend-dev:
-  #!/usr/bin/env sh
-
-  cd {{justfile_directory()}}/src/frontend
-
-  pnpm install
-  VITE_API_URL=https://api.stage.fmtm.hotosm.org \
-  pnpm run dev
-
-# Start mapper frontend UI without docker, connected to staging
-[no-cd]
-mapper-frontend-dev:
-  #!/usr/bin/env sh
-
-  cd {{justfile_directory()}}/src/mapper
-
-  pnpm install
-  VITE_API_URL=https://api.stage.fmtm.hotosm.org \
-  VITE_SYNC_URL=https://sync.stage.fmtm.hotosm.org \
-  VITE_S3_URL=https://s3.stage.fmtm.hotosm.org \
-  pnpm run dev
 
 # Start Field-TM without ODK Central
 [no-cd]

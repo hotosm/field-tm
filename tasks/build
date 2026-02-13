@@ -24,9 +24,9 @@ docker := env("DOCKER_ALIAS", "docker")
 default:
   just --justfile {{justfile()}} --list build
 
-# Build backend & frontend containers
+# Build backend container
 [no-cd]
-all: backend frontends
+all: backend
 
 # Build backend container
 [no-cd]
@@ -46,23 +46,6 @@ backend-dev:
   COMPOSE_BAKE=true \
   TARGET_OVERRIDE=prod TAG_OVERRIDE=dev \
     {{docker}} compose build api
-
-# Build frontend container
-[no-cd]
-frontends:
-  {{docker}} compose build ui ui-mapper
-
-# Build production frontends (via var substitution)
-frontends-prod branch="dev":
-  #!/usr/bin/env sh
-  set -e
-
-  cd {{justfile_directory()}}
-
-  export COMPOSE_BAKE=true
-  export GIT_BRANCH="{{ branch }}"
-  cd deploy
-  ../envsubst -i compose.sub.yaml | {{docker}} compose -f - build ui
 
 # Set 'dc' alias for docker compose
 alias:

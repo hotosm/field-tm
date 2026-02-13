@@ -147,7 +147,7 @@ docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promo
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1. Navigate to your frontend (e.g. `http://fmtm.localhost:7050`)
+1. Navigate to the app (e.g. `http://fmtm.localhost:7050`)
 
 2. Click the 'Sign In' button and follow the popup prompts.
 
@@ -160,7 +160,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 
 - During deploy, place your `favicon.svg` in the root of the repo.
 - Run the deployment script, and the favicon + generated PNG version
-  will be used in your frontend deployment automatically.
+  will be used in the web app automatically.
 
 That's it, you have successfully set up Field-TM!!
 

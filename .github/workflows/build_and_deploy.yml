@@ -23,11 +23,6 @@ jobs:
       command: "test backend"
     secrets: inherit
 
-  frontend-unit-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@3.3.2
-    with:
-      working_dir: src/frontend
-
   backend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     needs: [backend-test]
@@ -37,16 +32,6 @@ jobs:
       dockerfile: backend/Dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
-
-  frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
-    needs: [frontend-unit-test]
-    with:
-      environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
-      context: src
-      dockerfile: Dockerfile.ui.prod
-      build_target: prod
-      image_name: ghcr.io/${{ github.repository }}/frontend
 
   # smoke-test-backend:
   #   runs-on: ubuntu-latest
@@ -110,47 +95,10 @@ jobs:
   #             exit 1
   #         fi
 
-  smoke-test-frontend:
-    runs-on: ubuntu-latest
-    needs: [frontend-build]
-    environment:
-      name: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Create .env file
-        run: |
-          # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
-          echo "Downloading envsubst"
-          curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
-          chmod +x envsubst
-
-          echo "Substituting variables from .env.example --> .env"
-          ./envsubst < .env.example > .env
-
-      - name: Frontend smoke test
-        run: |
-          if docker compose up --detach \
-              --no-deps --wait --wait-timeout 30 \
-              ui
-          then
-              docker compose logs ui
-              echo "Sleeping 5 seconds to wait for dev server"
-              sleep 5
-              curl --fail http://localhost:7051 || exit 1
-          else
-              echo "Application not healthy after 30s. Exiting."
-              docker compose logs ui
-              exit 1
-          fi
-
   deploy-containers:
     needs:
       # - smoke-test-backend
       - backend-build
-      - smoke-test-frontend
     uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@3.3.2
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
