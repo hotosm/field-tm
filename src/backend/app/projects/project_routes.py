@@ -158,10 +158,8 @@ async def get_categories() -> dict:
     - Returns a JSON object containing a list of categories and their respective forms.
 
     """
-    # FIXME update to use osm-rawdata
-    categories = (
-        get_choices()
-    )  # categories are fetched from osm_fieldwork.data_models.get_choices()
+    # Categories are fetched from osm_fieldwork.data_models.get_choices().
+    categories = get_choices()
     return categories
 
 
