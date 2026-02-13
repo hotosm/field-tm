@@ -26,11 +26,6 @@ act pull_request -W .github/workflows/tests/pytest.yml \
     -e .github/workflows/tests/pr_payload.json \
     --var-file=.env --secret-file=.env
 
-# PR Test Frontend
-act pull_request -W .github/workflows/pr_test_frontend.yml \
-    -e .github/workflows/tests/pr_payload.json \
-    --var-file=.env --secret-file=.env
-
 # Build and deploy
 act push -W .github/workflows/build_and_deploy.yml \
     -e .github/workflows/tests/push_payload.json \

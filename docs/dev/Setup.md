@@ -2,27 +2,21 @@
 
 ## Overview
 
-The Field-TM can be divided into four parts:
+The Field-TM stack is now primarily:
 
-1. An API backend in FastAPI (code in: `src/backend`)
-2. A desktop-based management frontend website in React (code in: `src/frontend`)
-3. A mobile-based mapper frontend website in Svelte (code in: `src/mapper`)
-4. Supporting services that tie everything together:
-   - [ODK Central][1] to collect the survey submissions.
+1. A LiteStar backend with HTMX + server-rendered templates (code in: `src/backend`)
+2. Supporting services:
+   - [ODK Central][1] to collect survey submissions.
    - [Minio][13] to serve static content via S3.
-   - [Electric-SQL][14] to provide a 'sync-layer' for real-time syncing of
-     content between users.
-   - [Bunkerweb][15] a 'web application firewall' (basically Nginx with
-     additional security), to sit in front of everything and add an extra layer
-     of security and load balancing.
+   - [Bunkerweb][15] to provide reverse proxying and extra security controls.
 
 ### Field-TM Backend
 
 To view more details about the backend click [here][2].
 
-### Field-TM Frontend
+### Field-TM Web UI
 
-To view more details about the frontend click [here][3].
+The management UI is served directly by the backend templates.
 
 ## Prerequisites
 

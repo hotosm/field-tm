@@ -111,9 +111,6 @@ services:
   proxy:
     image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
-      # Frontends must be built and available first
-      ui:
-        condition: service_started
       central-ui:
         condition: service_completed_successfully
         required: false
@@ -151,12 +148,10 @@ services:
       USE_BROTLI: yes
       # Reverse proxy configs
       SERVER_NAME: fmtm.localhost api.fmtm.localhost odk.fmtm.localhost qfield.fmtm.localhost
-      fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
+      fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
       fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
       fmtm.localhost_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
-      # Required for vite websockets / live-reload
-      fmtm.localhost_REVERSE_PROXY_WS: yes
       api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
       api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
@@ -245,33 +240,6 @@ services:
         reservations:
           cpus: "0.1"
           memory: 100M
-
-  ui:
-    image: "ghcr.io/hotosm/field-tm/frontend:debug"
-    build:
-      context: src
-      additional_contexts:
-        - code=src/frontend
-      dockerfile: Dockerfile.ui.debug
-      target: build
-    volumes:
-      - ./src/frontend/e2e:/app/e2e
-      - ./src/frontend/public:/app/public
-      - ./src/frontend/src:/app/src
-      - ./src/frontend/tests:/app/tests
-      - ./src/frontend/index.html:/app/index.html
-      - ./src/frontend/package.json:/app/package.json
-      - ./src/frontend/playwright.config.ts:/app/playwright.config.ts
-      - ./src/frontend/postcss.config.js:/app/postcss.config.js
-      - ./src/frontend/tailwind.config.js:/app/tailwind.config.js
-      - ./src/frontend/vite.config.ts:/app/vite.config.ts
-    environment:
-      - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
-    ports:
-      - "7051:7051"
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
 
   central:
     profiles: ["", "central"]

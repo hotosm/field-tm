@@ -102,7 +102,7 @@ custom-favicon:
   fi
 
   echo ""
-  echo "Found favicon.svg in repo root - bundling in frontend build"
+  echo "Found favicon.svg in repo root - bundling in backend static assets"
   echo ""
   # Pull ImageMagick container if not already present
   {{docker}} pull dpokidov/imagemagick:7.1.1-47
@@ -112,19 +112,15 @@ custom-favicon:
       dpokidov/imagemagick:7.1.1-47 \
       -c "magick favicon.svg -resize 32x32 -background none -gravity center -extent 32x32 favicon.png"
 
-  # Copy to frontend and mapper static content
-  cp favicon.svg src/frontend/public/favicon.svg
-  cp favicon.svg src/mapper/static/favicon.svg
-  cp favicon.png src/frontend/public/favicon.png
-  cp favicon.png src/mapper/static/favicon.png
+  # Copy to backend static icons
+  cp favicon.svg src/backend/app/static/icons/favicon.svg
+  cp favicon.png src/backend/app/static/icons/favicon.png
 
   # Then prevent tracking of the changes once overridden
-  git update-index --assume-unchanged src/frontend/public/favicon.svg
-  git update-index --assume-unchanged src/frontend/public/favicon.png
-  git update-index --assume-unchanged src/mapper/static/favicon.svg
-  git update-index --assume-unchanged src/mapper/static/favicon.png
+  git update-index --assume-unchanged src/backend/app/static/icons/favicon.svg
+  git update-index --assume-unchanged src/backend/app/static/icons/favicon.png
 
-  just _echo-blue "Successfully added custom favicon.svg and favicon.png to frontend"
+  just _echo-blue "Successfully added custom favicon.svg and favicon.png to backend static icons"
 
 # Merge in translations from weblate
 [no-cd]

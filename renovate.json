@@ -9,7 +9,6 @@
   },
   "ignoreDeps": [
     "postgres",
-    "pnpm",
     "python",
     "pyodk",
     "@hotosm/ui",

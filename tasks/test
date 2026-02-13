@@ -21,9 +21,9 @@
 default:
   just --justfile {{justfile()}} --list test
 
-# Test backend & frontend
+# Test backend
 [no-cd]
-all: backend frontend
+all: backend
 
 # Test all backend code (including packages)
 [no-cd]
@@ -57,55 +57,6 @@ splitter:
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
   docker compose -f compose.test.yaml down
-
-# Run all frontend tests
-[no-cd]
-frontend:
-  just test frontend-unit
-  just test frontend-e2e
-
-# Test frontend with vitest
-[no-cd]
-frontend-unit:
-  docker compose \
-    run --rm --entrypoint='sh -c' \
-    ui-mapper 'npm run test:unit'
-
-# Test frontend with Playwright
-[no-cd]
-frontend-e2e:
-  docker compose \
-    -f compose.yaml \
-    -f contrib/playwright/compose.yaml \
-  run --rm --service-ports ui-test 'npm run test:e2e-report'
-
-# View Playwright tests as they happen in browser
-[no-cd]
-frontend-e2e-debug:
-  docker compose \
-    -f compose.yaml \
-    -f contrib/playwright/compose.yaml \
-  run --rm ui-test 'npm run test:e2e-debug'
-
-# Create Playwright tests interactively
-[no-cd]
-frontend-e2e-interactive:
-  docker compose \
-    -f compose.yaml \
-    -f contrib/playwright/compose.yaml \
-  run --rm ui-test 'npm run test:e2e-interactive'
-
-# Test mapper frontend build for offline testing
-[no-cd]
-mapper-preview:
-  #!/usr/bin/env sh
-  cd {{justfile_directory()}}/src/mapper
-  pnpm install
-  VITE_API_URL=http://api.fmtm.localhost:7050 \
-    VITE_SYNC_URL=http://sync.fmtm.localhost:7050 \
-    VITE_S3_URL=http://s3.fmtm.localhost:7050 \
-    pnpm run build
-  pnpm run preview
 
 # Copy prod data into current database (WARNING: deletes local db data)
 [no-cd]
@@ -230,7 +181,7 @@ backend-coverage:
   docker rm --force backend-coverage-run
 
   # Start all service and ensure API has finish init process
-  # Note that compose returns exit code 0 for ui builds, but that's ok
+  # Note that compose startup can still return success for partial service startup
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run \
     --name backend-coverage-run \

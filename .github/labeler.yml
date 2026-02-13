@@ -4,9 +4,6 @@ bug:
 enhancement:
   - head-branch:
       ["^feature", "feature", "^feat", "feat", "^refactor", "refactor"]
-frontend:
-  - changed-files:
-      - any-glob-to-any-file: src/frontend/**
 backend:
   - changed-files:
       - any-glob-to-any-file: src/backend/**
@@ -44,8 +41,6 @@ tests:
   - changed-files:
       - any-glob-to-any-file:
           - src/backend/tests/**
-          - src/frontend/tests/**
-          - src/frontend/e2e/**
 dependency:osm-fieldwork:
   - changed-files:
       - any-glob-to-any-file:

@@ -18,8 +18,6 @@
 name: fmtm
 
 volumes:
-  fmtm_frontend:
-    name: fmtm-frontend
   fmtm_db_data:
     name: fmtm-db-data
   fmtm_logs:
@@ -47,15 +45,11 @@ services:
   proxy:
     image: "bunkerity/bunkerweb-all-in-one:1.6.2"
     depends_on:
-      # Frontends must be built and available first
-      ui:
-        condition: service_completed_successfully
       central-ui:
         condition: service_completed_successfully
     volumes:
       # - certs:/etc/letsencrypt
       - certs:/data
-      - fmtm_frontend:/var/www/html/${FMTM_DOMAIN}:ro
       - central_frontend:/var/www/html/${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}:ro
     environment:
       # General
@@ -102,8 +96,7 @@ services:
       # USE_LETS_ENCRYPT_STAGING: yes
       # Reverse proxy configs
       SERVER_NAME: ${FMTM_DOMAIN} ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN} ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
-      # We need this to allow for client-side routing in the SPA (from index.html)
-      ${FMTM_DOMAIN}_ERRORS: 404=/index.html
+      ${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       # CORS for the backend is configured by FastAPI
       ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
@@ -184,21 +177,6 @@ services:
         reservations:
           cpus: "0.1"
           memory: 100M
-
-  ui:
-    # This service simply builds both frontends to volumes
-    # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/frontend:${GIT_BRANCH:-dev}"
-    build:
-      context: ../src
-      dockerfile: Dockerfile.ui.prod
-      args:
-        APP_VERSION: ${GIT_BRANCH}
-        VITE_API_URL: https://${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}
-    volumes:
-      - fmtm_frontend:/frontend/manager
-    network_mode: none
-    restart: "on-failure:2"
 
   central:
     image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"

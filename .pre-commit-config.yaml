@@ -60,7 +60,6 @@ repos:
             "!chart/**",
             "!CHANGELOG.md",
             "!.all-contributorsrc",
-            "!src/frontend/pnpm-lock.yaml",
             "!src/backend/tests/test_data/**",
             "!src/backend/packages/osm-fieldwork/tests/test_data/**",
             "!src/backend/packages/osm-fieldwork/osm_fieldwork/data_models/**",
