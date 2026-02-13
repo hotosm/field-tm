@@ -30,41 +30,24 @@ from osm_fieldwork.OdkCentralAsync import OdkCentral as OdkCentralAsync
 test_data_dir = Path(__file__).parent / "test_data"
 
 
-def test_delete_appuser(appuser, appuser_details, project_details):
-    """Create a QR Code for an appuser."""
-    response = appuser.delete(
-        project_details.get("id"),
-        appuser_details.get("id"),
+def test_delete_appuser(pyodk_client, appuser_details, project_details):
+    """Delete appuser using pyodk-authenticated session."""
+    response = pyodk_client.session.delete(
+        f"{pyodk_client.session.base_url}/v1/projects/"
+        f"{project_details['id']}/app-users/{appuser_details['id']}"
     )
     assert response.ok
-    assert response.json().get("success") == True
-
-
-# def test_update_role(appuser, project_details, appuser_details, xform_details):
-#     """Test updating appuser role."""
-#     response = appuser.updateRole(
-#         projectId=project_details.get("id"), xform=xform_details.get("id"), actorId=appuser_details.get("id")
-#     )
-#     assert response.ok
-
-
-# def test_grant_access(appuser, project_details, appuser_details, xform_details):
-#     """Create granting appuser access to a form."""
-#     response = appuser.grantAccess(
-#         projectId=project_details.get("id"), xform=xform_details.get("id"), actorId=appuser_details.get("id")
-#     )
-#     assert response.ok
+    assert response.json().get("success") is True
 
 
 def test_create_qrcode(appuser, appuser_details):
-    """Create a QR Code for an appuser."""
+    """Create a QR code for an appuser token."""
     qrcode = appuser.createQRCode(
         odk_id=1,
         project_name="test project",
         appuser_token=appuser_details.get("token"),
         basemap="osm",
         osm_username="svchotosm",
-        # save_qrcode = False,
     )
     assert isinstance(qrcode, segno.QRCode)
 
@@ -81,87 +64,53 @@ def test_create_qrcode(appuser, appuser_details):
     qrcode_file.unlink()
 
 
-def test_create_form_delete(project, odk_form):
-    """Create form and delete."""
-    odk_id, xform = odk_form
+def test_create_form_delete(pyodk_client, odk_form_cleanup):
+    """Create form and delete using pyodk APIs."""
+    odk_id, form_name = odk_form_cleanup
+
+    forms = [form.model_dump() for form in pyodk_client.forms.list(project_id=odk_id)]
+    assert any(form.get("xmlFormId") == form_name for form in forms)
+
+    response = pyodk_client.session.delete(
+        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/{form_name}"
+    )
+    assert response.status_code in (200, 204)
+
+    forms = [form.model_dump() for form in pyodk_client.forms.list(project_id=odk_id)]
+    assert all(form.get("xmlFormId") != form_name for form in forms)
+
+
+def test_create_form_and_publish(pyodk_client, odk_form_cleanup):
+    """Create form and verify it is available to submissions (published/open)."""
+    odk_id, form_name = odk_form_cleanup
+    form = pyodk_client.forms.get(form_id=form_name, project_id=odk_id)
+    assert form.xmlFormId == form_name
+    assert form.state in {"open", "closing", "closed"}
+
+
+def test_create_form_update_version(pyodk_client, odk_form_cleanup):
+    """Update form definition using pyodk.forms.update and verify version changed."""
+    odk_id, form_name = odk_form_cleanup
+    form_before = pyodk_client.forms.get(form_id=form_name, project_id=odk_id)
+
     test_xform = test_data_dir / "buildings.xml"
+    with open(test_xform, "r", encoding="utf-8") as fh:
+        xml = fh.read()
+    new_xml = xml.replace('version="v1"', 'version="v2"', 1)
 
-    form_name = xform.createForm(odk_id, str(test_xform))
-    assert form_name == "test_form"
+    pyodk_client.forms.update(
+        form_id=form_name,
+        project_id=odk_id,
+        definition=new_xml,
+    )
+    form_after = pyodk_client.forms.get(form_id=form_name, project_id=odk_id)
 
-    assert len(project.listForms(odk_id)) == 1
-
-    success = xform.deleteForm(odk_id, form_name)
-    assert success
-
-    assert len(project.listForms(odk_id)) == 0
-
-
-def test_create_form_and_publish(project, odk_form_cleanup):
-    """Create form and publish."""
-    odk_id, form_name, xform = odk_form_cleanup
-
-    response_code = xform.publishForm(odk_id, form_name)
-    assert response_code == 200
-    assert xform.published == True
+    assert form_before.version != form_after.version
 
 
-def test_create_form_and_publish_immediately(project, odk_form):
-    """Create form and publish immediately."""
-    odk_id, xform = odk_form
-    test_xform = test_data_dir / "buildings.xml"
-
-    form_name = xform.createForm(odk_id, str(test_xform), publish=True)
-    assert form_name == "test_form"
-    assert xform.published == True
-
-    success = xform.deleteForm(odk_id, form_name)
-    assert success
-
-    assert len(project.listForms(odk_id)) == 0
-
-
-def test_create_form_draft(project, odk_form_cleanup):
-    """Create form draft from existing form."""
-    odk_id, original_form_name, xform = odk_form_cleanup
-    test_xform = test_data_dir / "buildings.xml"
-
-    # Check original form is not draft
-    assert xform.draft == False
-
-    # Publish original form
-    response_code = xform.publishForm(odk_id, original_form_name)
-    assert response_code == 200
-    assert xform.published == True
-
-    # Create draft from original form (sleep 1s first for version increment)
-    draft_form_name = xform.createForm(odk_id, str(test_xform), original_form_name)
-    assert draft_form_name == original_form_name
-    assert xform.draft == True
-
-    # Delete the newly created draft
-    success = xform.deleteForm(odk_id, draft_form_name)
-    assert success
-
-    # Create another draft from original form
-    draft_form_name = xform.createForm(odk_id, str(test_xform), original_form_name)
-    assert draft_form_name == original_form_name
-    assert xform.draft == True
-
-    # Publish newly created version of form
-    response_code = xform.publishForm(odk_id, draft_form_name)
-    assert response_code == 200
-    assert xform.published == True
-    assert xform.draft == False
-
-    assert len(project.listForms(odk_id)) == 1
-
-
-def test_upload_media_filepath(project, odk_form__with_attachment_cleanup):
-    """Create form and upload media."""
-    odk_id, original_form_name, xform = odk_form__with_attachment_cleanup
-
-    # Upload media from filepath
+def test_upload_media_filepath(odk_form__with_attachment_cleanup):
+    """Upload media from filepath via legacy utility (still unique)."""
+    odk_id, _form_name, xform = odk_form__with_attachment_cleanup
     result = xform.uploadMedia(
         odk_id,
         "test_form_geojson",
@@ -170,42 +119,48 @@ def test_upload_media_filepath(project, odk_form__with_attachment_cleanup):
     assert result.status_code == 200
 
 
-def test_upload_media_bytesio_publish(project, odk_form__with_attachment_cleanup):
-    """Create form and upload media."""
-    odk_id, original_form_name, xform = odk_form__with_attachment_cleanup
-
-    # Upload media as object
+def test_upload_media_bytesio_publish(odk_form__with_attachment_cleanup):
+    """Upload media using bytes object via legacy utility."""
+    odk_id, _form_name, xform = odk_form__with_attachment_cleanup
     with open(test_data_dir / "osm_buildings.geojson", "rb") as geojson:
         geojson_bytesio = BytesIO(geojson.read())
-    result = xform.uploadMedia(odk_id, "test_form_geojson", geojson_bytesio, filename="osm_buildings.geojson")
+    result = xform.uploadMedia(
+        odk_id,
+        "test_form_geojson",
+        geojson_bytesio,
+        filename="osm_buildings.geojson",
+    )
     assert result.status_code == 200
 
 
-def test_form_fields_no_form(odk_form_cleanup):
-    """Attempt usage of form_fields when form does not exist."""
-    odk_id, form_name, xform = odk_form_cleanup
-    xform.deleteForm(odk_id, form_name)
+def test_form_fields_no_form(pyodk_client, project_details):
+    """Attempt form-fields request when form does not exist."""
+    odk_id = project_details["id"]
+    response = pyodk_client.session.get(
+        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/test_form/fields"
+        "?odata=true"
+    )
     with pytest.raises(requests.exceptions.HTTPError):
-        xform.formFields(odk_id, "test_form")
-    # NOTE here we create the form again... so cleanup doesn't fail
-    test_xform = test_data_dir / "buildings.xml"
-    xform.createForm(odk_id, str(test_xform))
+        response.raise_for_status()
 
 
-def test_form_fields(odk_form_cleanup):
+def test_form_fields(pyodk_client, odk_form_cleanup):
     """Test form fields for created form."""
-    odk_id, form_name, xform = odk_form_cleanup
+    odk_id, form_name = odk_form_cleanup
 
-    # Get form fields
-    form_fields = xform.formFields(odk_id, form_name)
+    response = pyodk_client.session.get(
+        f"{pyodk_client.session.base_url}/v1/projects/{odk_id}/forms/{form_name}/fields"
+        "?odata=true"
+    )
+    response.raise_for_status()
+    form_fields = response.json()
+
     field_names = {field["name"] for field in form_fields}
     test_field_names = {"xlocation", "status", "survey_questions"}
     missing_fields = test_field_names - field_names
-
     assert not missing_fields, f"Missing form fields: {missing_fields}"
 
     field_dict = {field["name"]: field for field in form_fields}
-
     assert field_dict.get("digitisation_problem") == {
         "path": "/verification/digitisation_problem",
         "name": "digitisation_problem",
@@ -213,7 +168,6 @@ def test_form_fields(odk_form_cleanup):
         "binary": None,
         "selectMultiple": None,
     }, f"Mismatch or missing 'digitisation_problem': {field_dict.get('digitisation_problem')}"
-
     assert field_dict.get("instructions") == {
         "path": "/instructions",
         "name": "instructions",
@@ -225,19 +179,31 @@ def test_form_fields(odk_form_cleanup):
 
 def test_invalid_connection_sync():
     """Test case when connection to Central fails, sync code."""
-    with pytest.raises(ConnectionError, match="Failed to connect to Central. Is the URL valid?"):
+    with pytest.raises(
+        ConnectionError,
+        match="Failed to connect to Central. Is the URL valid?",
+    ):
         OdkCentral("https://somerandominvalidurl546456546.xyz", "test@hotosm.org", "Password1234")
 
-    with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
+    with pytest.raises(
+        ConnectionError,
+        match="ODK credentials are invalid, or may have changed. Please update them.",
+    ):
         OdkCentral("http://central:8383", "thisuser@notexist.org", "Password1234")
 
 
 async def test_invalid_connection_async():
     """Test case when connection to Central fails, async code."""
-    with pytest.raises(ConnectionError, match="Failed to connect to Central. Is the URL valid?"):
+    with pytest.raises(
+        ConnectionError,
+        match="Failed to connect to Central. Is the URL valid?",
+    ):
         async with OdkCentralAsync("https://somerandominvalidurl546456546.xyz", "test@hotosm.org", "Password1234"):
             pass
 
-    with pytest.raises(ConnectionError, match="ODK credentials are invalid, or may have changed. Please update them."):
+    with pytest.raises(
+        ConnectionError,
+        match="ODK credentials are invalid, or may have changed. Please update them.",
+    ):
         async with OdkCentralAsync("http://central:8383", "thisuser@notexist.org", "Password1234"):
             pass

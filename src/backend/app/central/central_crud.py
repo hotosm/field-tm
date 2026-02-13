@@ -31,10 +31,12 @@ import geojson
 from anyio import to_thread
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
+from pyodk._endpoints.form_assignments import FormAssignmentService
+from pyodk._endpoints.project_app_users import ProjectAppUserService
 from pyodk._endpoints.entities import Entity
+from pyodk.errors import PyODKError
 from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
@@ -52,146 +54,45 @@ from app.s3 import strip_presigned_url_for_local_dev
 log = logging.getLogger(__name__)
 
 
-def get_odk_project(odk_central: Optional[central_schemas.ODKCentral] = None):
-    """Helper function to get the OdkProject with credentials."""
-    if odk_central:
-        url = odk_central.external_project_instance_url
-        user = odk_central.external_project_username
-        pw = odk_central.external_project_password
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = (
-            settings.ODK_CENTRAL_PASSWD.get_secret_value()
-            if settings.ODK_CENTRAL_PASSWD
-            else ""
-        )
-
-    try:
-        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
-        project = OdkProject(url, user, pw)
-
-    except ValueError as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=(
-                "ODK credentials are invalid, or may have been updated. "
-                "Please update them."
-            ),
-        ) from e
-    except Exception as e:
-        log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating project on ODK Central: {e}",
-        ) from e
-
-    return project
-
-
-def get_odk_form(odk_central: Optional[central_schemas.ODKCentral] = None):
-    """Helper function to get the OdkForm with credentials."""
-    if odk_central:
-        url = odk_central.external_project_instance_url
-        user = odk_central.external_project_username
-        pw = odk_central.external_project_password
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = (
-            settings.ODK_CENTRAL_PASSWD.get_secret_value()
-            if settings.ODK_CENTRAL_PASSWD
-            else ""
-        )
-
-    if not url or not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "ODK Central credentials are missing. "
-                "Set ODK_CENTRAL_URL and ODK_CENTRAL_USER (and optionally ODK_CENTRAL_PASSWD), "
-                "or provide custom credentials."
-            ),
-        )
-
-    try:
-        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
-        form = OdkForm(url, user, pw)
-    except Exception as e:
-        log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating project on ODK Central: {e}",
-        ) from e
-
-    return form
-
-
-def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentral] = None):
-    """Helper function to get the OdkAppUser with credentials."""
-    if odk_central:
-        url = odk_central.external_project_instance_url
-        user = odk_central.external_project_username
-        pw = odk_central.external_project_password
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = (
-            settings.ODK_CENTRAL_PASSWD.get_secret_value()
-            if settings.ODK_CENTRAL_PASSWD
-            else ""
-        )
-
-    try:
-        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
-        form = OdkAppUser(url, user, pw)
-    except Exception as e:
-        log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating project on ODK Central: {e}",
-        ) from e
-
-    return form
-
-
-def list_odk_projects(
+async def list_odk_projects(
     odk_central: Optional[central_schemas.ODKCentral] = None,
 ):
     """List all projects on a remote ODK Server."""
-    project = get_odk_project(odk_central)
-    return project.listProjects()
+    try:
+        async with central_deps.pyodk_client(odk_central) as client:
+            return [project.model_dump() for project in client.projects.list()]
+    except Exception as e:
+        log.exception(f"Error listing ODK projects: {e}", stack_info=True)
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error listing projects on ODK Central: {e}",
+        ) from e
 
 
-def create_odk_project(
+async def create_odk_project(
     name: str, odk_central: Optional[central_schemas.ODKCentral] = None
 ):
     """Create a project on a remote ODK Server.
 
     Appends Field-TM to the project name to help identify on shared servers.
     """
-    project = get_odk_project(odk_central)
-
     try:
-        log.debug(f"Attempting ODKCentral project creation: Field-TM {name}")
-        result = project.createProject(f"Field-TM {name}")
-
-        # Sometimes createProject returns a list if fails
-        if isinstance(result, dict):
-            if result.get("code") == 401.2:
+        project_name = f"Field-TM {name}"
+        log.debug(f"Attempting ODKCentral project creation: {project_name}")
+        async with central_deps.pyodk_client(odk_central) as client:
+            response = client.session.post(
+                f"{client.session.base_url}/v1/projects",
+                json={"name": project_name},
+            )
+            if not response.ok:
+                detail = response.text or "Could not authenticate to ODK Central."
                 raise HTTPException(
                     status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Could not authenticate to odk central.",
+                    detail=detail,
                 )
+            result = response.json()
 
-        log.debug(f"ODKCentral response: {result}")
+        log.debug(f"ODK Central response: {result}")
         log.info(f"Project {name} available on the ODK Central server.")
         return result
     except Exception as e:
@@ -209,15 +110,19 @@ async def delete_odk_project(
     # FIXME: when a project is deleted from Central, we have to update the
     # external_project_id in the projects table
     try:
-        project = get_odk_project(odk_central)
-        result = project.deleteProject(project_id)
+        async with central_deps.pyodk_client(odk_central) as client:
+            response = client.session.delete(
+                f"{client.session.base_url}/v1/projects/{project_id}"
+            )
+            response.raise_for_status()
+            result = response
         log.info(f"Project {project_id} has been deleted from the ODK Central server.")
         return result
     except Exception:
         return "Could not delete project from central odk"
 
 
-def create_odk_xform(
+async def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
     odk_credentials: Optional[central_schemas.ODKCentral],
@@ -232,29 +137,40 @@ def create_odk_xform(
     Returns: None
     """
     try:
-        xform = get_odk_form(odk_credentials)
+        async with central_deps.pyodk_client(odk_credentials) as client:
+            client.forms.create(
+                definition=xform_data.getvalue(),
+                project_id=odk_id,
+                ignore_warnings=True,
+            )
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "Connection failed to odk central"},
+            detail={"message": "Connection failed to ODK Central"},
         ) from e
 
-    xform.createForm(odk_id, xform_data, publish=True)
 
-
-def list_submissions(
-    project_id: int, odk_central: Optional[central_schemas.ODKCentral] = None
+async def list_submissions(
+    project_id: int,
+    odk_central: Optional[central_schemas.ODKCentral] = None,
+    form_id: Optional[str] = None,
 ):
     """List all submissions for a project, aggregated from associated users."""
-    project = get_odk_project(odk_central)
-    xform = get_odk_form(odk_central)
-    submissions = list()
-    for user in project.listAppUsers(project_id):
-        for subm in xform.listSubmissions(project_id, user["displayName"]):
-            submissions.append(subm)
+    if not form_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="form_id is required to list submissions with pyodk.",
+        )
 
-    return submissions
+    async with central_deps.pyodk_client(odk_central) as client:
+        return [
+            submission.model_dump()
+            for submission in client.submissions.list(
+                project_id=project_id,
+                form_id=form_id,
+            )
+        ]
 
 
 async def get_form_list(db: AsyncConnection) -> list:
@@ -292,16 +208,6 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
         ) from e
-
-
-def get_project_form_xml(
-    odk_creds: Optional[central_schemas.ODKCentral],
-    external_project_id: int,
-    odk_form_id: str,
-) -> str:
-    """Get the XForm from ODK Central as raw XML."""
-    xform = get_odk_form(odk_creds)
-    return xform.getXml(external_project_id, odk_form_id)
 
 
 async def append_fields_to_user_xlsform(
@@ -369,19 +275,12 @@ async def update_odk_central_xform(
     """
     xform_bytesio = await read_and_test_xform(xlsform)
 
-    xform_obj = get_odk_form(odk_credentials)
-
-    # NOTE calling createForm for an existing form will update it
-    xform_obj.createForm(
-        odk_id,
-        xform_bytesio,
-        # NOTE this variable is incorrectly named and should be form_id
-        form_name=xform_id,
-    )
-    # The draft form must be published after upload
-    # NOTE we can't directly publish existing forms
-    # in createForm and need 2 steps
-    xform_obj.publishForm(odk_id, xform_id)
+    async with central_deps.pyodk_client(odk_credentials) as client:
+        client.forms.update(
+            project_id=odk_id,
+            form_id=xform_id,
+            definition=xform_bytesio.getvalue(),
+        )
 
 
 async def update_project_xlsform(
@@ -398,19 +297,12 @@ async def update_project_xlsform(
         xlsform,
         None,  # ODK credentials not stored on project, use env vars
     )
-    form_xml = await to_thread.run_sync(
-        get_project_form_xml,
-        None,  # ODK credentials not stored on project, use env vars
-        project.external_project_id,
-        xform_id,
-    )
 
     await DbProject.update(
         db,
         project.id,
         project_schemas.ProjectUpdate(
             xlsform_content=xlsform.getvalue(),
-            odk_form_xml=form_xml,
         ),
     )
     await db.commit()
@@ -863,28 +755,34 @@ async def get_appuser_token(
         The app user token.
     """
     try:
-        appuser = get_odk_app_user(odk_credentials)
-        odk_project = get_odk_project(odk_credentials)
-        odk_app_user = odk_project.listAppUsers(project_odk_id)
-        log.debug(f"Current project appusers in ODK: {odk_app_user}")
-
-        # delete if app_user already exists
-        if odk_app_user:
-            app_user_sub = odk_app_user[0].get("id")
-            log.debug(f"Removing existing appuser: {app_user_sub}")
-            appuser.delete(project_odk_id, app_user_sub)
-
-        # create new app_user
         appuser_name = "fmtm_user"
         log.info(
             f"Creating ODK appuser ({appuser_name}) for ODK project ({project_odk_id})"
         )
-        appuser_json = appuser.create(project_odk_id, appuser_name)
-        appuser_token = appuser_json.get("token")
-        appuser_sub = appuser_json.get("id")
+        async with central_deps.pyodk_client(odk_credentials) as client:
+            project_app_users = ProjectAppUserService(
+                session=client.session,
+                default_project_id=project_odk_id,
+            )
+            app_user = project_app_users.create(display_name=appuser_name)
+            appuser_token = app_user.token
+            appuser_sub = app_user.id
 
-        # Resolve base ODK URL for returned token link. If explicit credentials
-        # were not provided, fall back to environment configuration.
+            if not appuser_token:
+                msg = "Could not generate token for app user."
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=msg,
+                )
+
+            # Legacy behavior used roleId=2 for form-level app-user access.
+            form_assignments = FormAssignmentService(
+                session=client.session,
+                default_project_id=project_odk_id,
+                default_form_id=xform_id,
+            )
+            form_assignments.assign(role_id=2, user_id=appuser_sub)
+
         if odk_credentials and getattr(
             odk_credentials, "external_project_instance_url", None
         ):
@@ -892,31 +790,14 @@ async def get_appuser_token(
         else:
             odk_url = str(settings.ODK_CENTRAL_URL or "").rstrip("/")
 
-        # Update the user role for the created xform
-        log.info("Updating XForm role for appuser in ODK Central")
-        response = appuser.updateRole(
-            projectId=project_odk_id,
-            xform=xform_id,
-            actorId=appuser_sub,
-        )
-        if not response.ok:
-            try:
-                json_data = response.json()
-                log.error(f"Error updating XForm role {json_data}")
-            except json.decoder.JSONDecodeError:
-                log.error(
-                    "Could not parse response json during appuser update. "
-                    f"status_code={response.status_code}"
-                )
-            finally:
-                msg = f"Failed to update appuser for formId: ({xform_id})"
-                log.error(msg)
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail=msg,
-                ) from None
         return f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
 
+    except PyODKError as e:
+        log.exception(f"PyODK error while creating app user token: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the app user token.",
+        ) from e
     except Exception as e:
         log.exception(f"An error occurred: {str(e)}", stack_info=True)
         raise HTTPException(

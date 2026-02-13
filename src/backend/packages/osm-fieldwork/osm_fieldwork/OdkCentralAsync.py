@@ -27,6 +27,14 @@ import aiohttp
 log = logging.getLogger(__name__)
 
 
+def _pyodk_replacement_stub(legacy_method: str, replacement: str):
+    """Raise a clear migration error for APIs replaced by pyodk."""
+    raise NotImplementedError(
+        f"`{legacy_method}` has been removed from osm-fieldwork. "
+        f"Use pyodk instead: {replacement}"
+    )
+
+
 class EntityIn(TypedDict):
     """Required format for Entity uploads to ODK Central."""
 
@@ -166,18 +174,10 @@ class OdkProject(OdkCentral):
         Returns:
             (list): The list of XForms in this project
         """
-        url = f"{self.base}projects/{projectId}/forms"
-        headers = {}
-        if metadata:
-            headers.update({"X-Extended-Metadata": "true"})
-        try:
-            async with self.session.get(url, ssl=self.verify, headers=headers) as response:
-                self.forms = await response.json()
-                return self.forms
-        except aiohttp.ClientError as e:
-            msg = f"Error fetching forms: {e}"
-            log.error(msg)
-            raise aiohttp.ClientError(msg) from e
+        return _pyodk_replacement_stub(
+            "OdkCentralAsync.OdkProject.listForms",
+            "Client(...).forms.list(project_id=...)",
+        )
 
     async def getAllProjectSubmissions(self, projectId: int, xforms: list = None, filters: dict = None):
         """Fetch a list of submissions in a project on an ODK Central server.
@@ -189,24 +189,10 @@ class OdkProject(OdkCentral):
         Returns:
             (json): All of the submissions for all of the XForm in a project
         """
-        # TODO this function needs more testing!
-
-        log.info(f"Getting all submissions for ODK project ({projectId}) forms ({xforms})")
-        submission_data = []
-
-        async with OdkForm(self.url, self.user, self.passwd) as odk_form:
-            submission_tasks = [odk_form.listSubmissions(projectId, xform, filters) for xform in xforms or []]
-
-            submissions = await gather(*submission_tasks, return_exceptions=True)
-
-        for submission in submissions:
-            if isinstance(submission, Exception):
-                log.error(f"Failed to get submissions: {submission}")
-                continue
-            log.debug(f"There are {len(submission['value'])} submissions")
-            submission_data.extend(submission["value"])
-
-        return submission_data
+        return _pyodk_replacement_stub(
+            "OdkCentralAsync.OdkProject.getAllProjectSubmissions",
+            "Client(...).submissions.list(project_id=..., form_id=...)",
+        )
 
 
 class OdkForm(OdkCentral):
@@ -339,14 +325,10 @@ class OdkForm(OdkCentral):
         Returns:
             (list[dict]): The list of submissions.
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}/submissions"
-        try:
-            async with self.session.get(url, ssl=self.verify) as response:
-                return await response.json()
-        except aiohttp.ClientError as e:
-            msg = f"Error fetching submissions: {e}"
-            log.error(msg)
-            raise aiohttp.ClientError(msg) from e
+        return _pyodk_replacement_stub(
+            "OdkCentralAsync.OdkForm.listSubmissions",
+            "Client(...).submissions.list(project_id=..., form_id=...)",
+        )
 
     async def getSubmissionXml(
         self,

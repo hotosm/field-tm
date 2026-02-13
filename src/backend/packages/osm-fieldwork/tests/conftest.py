@@ -19,77 +19,48 @@
 
 import os
 import uuid
-from pathlib import Path
 from io import BytesIO
-from xml.etree import ElementTree
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import time
+from xml.etree import ElementTree
 
 import pytest
+from pyodk._endpoints.project_app_users import ProjectAppUserService
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
-from app.central.central_deps import pyodk_client
-from app.central.central_schemas import ODKCentral
-from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
-from osm_fieldwork.OdkCentralAsync import OdkDataset
+from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm
 
 test_data_dir = Path(__file__).parent / "test_data"
 
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-# from sqlalchemy_utils import create_database, database_exists
+def _create_project(client: Client, name: str) -> dict:
+    response = client.session.post(
+        f"{client.session.base_url}/v1/projects",
+        json={"name": name},
+    )
+    response.raise_for_status()
+    return response.json()
 
 
-# engine = create_engine("postgres://")
-# TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-# Base.metadata.create_all(bind=engine)
+def _delete_project(client: Client, project_id: int) -> None:
+    response = client.session.delete(f"{client.session.base_url}/v1/projects/{project_id}")
+    # Central returns 404 if already removed; tolerate this in cleanup.
+    if response.status_code not in (200, 204, 404):
+        response.raise_for_status()
 
 
-# def pytest_configure(config):
-#     """Configure pytest runs."""
-#     # Stop sqlalchemy logs
-#     sqlalchemy_log = logging.getLogger("sqlalchemy")
-#     sqlalchemy_log.propagate = False
+def _delete_form(client: Client, project_id: int, form_id: str) -> None:
+    response = client.session.delete(
+        f"{client.session.base_url}/v1/projects/{project_id}/forms/{form_id}"
+    )
+    if response.status_code not in (200, 204, 404):
+        response.raise_for_status()
 
 
-# @pytest.fixture(scope="session")
-# def db_engine():
-#     """The SQLAlchemy database engine to init."""
-#     engine = create_engine(settings.FMTM_DB_URL)
-#     if not database_exists:
-#         create_database(engine.url)
-
-#     Base.metadata.create_all(bind=engine)
-#     yield engine
-
-
-# @pytest.fixture(scope="function")
-# def db(db_engine):
-#     """Database session using db_engine."""
-#     connection = db_engine.connect()
-
-#     # begin a non-ORM transaction
-#     connection.begin()
-
-#     # bind an individual Session to the connection
-#     db = TestingSessionLocal(bind=connection)
-
-#     yield db
-
-#     db.rollback()
-#     connection.close()
-
-
-# @pytest.fixture(scope="function")
-# def token():
-#     """Get persistent ODK Central requests session."""
-#     response = requests.post("http://central:8383/v1/sessions", json={
-#         "email": "admin@hotosm.org",
-#         "password": "Password1234"
-#     })
-#     return response.json().get("token")
+def _list_forms(client: Client, project_id: int) -> list[dict]:
+    return [form.model_dump() for form in client.forms.list(project_id=project_id)]
 
 
 @pytest.fixture(scope="session")
@@ -103,41 +74,40 @@ def pyodk_config() -> CentralConfig:
         password=odk_central_password,
     )
 
-@pytest.fixture(scope="session")
-def project(pyodk_config):
-    """Get persistent ODK Central requests session."""
-    return OdkProject(pyodk_config.base_url, pyodk_config.username, pyodk_config.password)
+
+@pytest.fixture(scope="function")
+def pyodk_client(pyodk_config):
+    with Client(pyodk_config) as client:
+        yield client
 
 
-@pytest.fixture(scope="session")
-def project_details(project):
-    """Get persistent ODK Central requests session."""
-    return project.createProject("test project")
+@pytest.fixture(scope="function")
+def project_details(pyodk_client):
+    project_name = f"test project {uuid.uuid4()}"
+    details = _create_project(pyodk_client, project_name)
+    try:
+        yield details
+    finally:
+        _delete_project(pyodk_client, details["id"])
 
 
 @pytest.fixture(scope="function")
 def appuser(pyodk_config):
-    """Get appuser for a project."""
+    """Legacy helper kept for QR code generation utility."""
     return OdkAppUser(pyodk_config.base_url, pyodk_config.username, pyodk_config.password)
 
 
 @pytest.fixture(scope="function")
-def appuser_details(appuser, project_details):
-    """Get appuser for a project."""
+def appuser_details(pyodk_client, project_details):
     appuser_name = f"test_appuser_{uuid.uuid4()}"
-    response = appuser.create(project_details.get("id"), appuser_name)
-
-    assert response.get("displayName") == appuser_name
-
-    return response
-
-
-@pytest.fixture(scope="function")
-def odk_form(pyodk_config, project_details) -> tuple:
-    """Get appuser for a project."""
-    odk_id = project_details.get("id")
-    form = OdkForm(pyodk_config.base_url, pyodk_config.username, pyodk_config.password)
-    return odk_id, form
+    service = ProjectAppUserService(
+        session=pyodk_client.session,
+        default_project_id=project_details["id"],
+    )
+    response = service.create(display_name=appuser_name)
+    data = response.model_dump()
+    assert data.get("displayName") == appuser_name
+    return data
 
 
 def update_xform_version(xform_bytesio: BytesIO) -> tuple[str, BytesIO]:
@@ -147,7 +117,6 @@ def update_xform_version(xform_bytesio: BytesIO) -> tuple[str, BytesIO]:
         "odk": "http://www.opendatakit.org/xforms",
         "xforms": "http://www.w3.org/2002/xforms",
     }
-    # Get the form version from the XML
     tree = ElementTree.parse(xform_bytesio)
     root = tree.getroot()
 
@@ -156,71 +125,76 @@ def update_xform_version(xform_bytesio: BytesIO) -> tuple[str, BytesIO]:
     for dt in xml_data:
         dt.set("version", new_version)
 
-    # Write updated XML back into BytesIO
     xform_new_version = BytesIO()
     tree.write(xform_new_version, encoding="utf-8", xml_declaration=True)
-
-    # Reset the position for next operations
     xform_new_version.seek(0)
     return new_version, xform_new_version
 
 
 @pytest.fixture(scope="function")
-def odk_form_cleanup(odk_form):
-    """Get xform for project, with automatic cleanup after."""
-    odk_id, xform = odk_form
+def odk_form(pyodk_client, pyodk_config, project_details):
+    """Return project id + legacy OdkForm utility object."""
+    odk_id = project_details["id"]
+    xform = OdkForm(pyodk_config.base_url, pyodk_config.username, pyodk_config.password)
+    return odk_id, xform
+
+
+@pytest.fixture(scope="function")
+def odk_form_cleanup(pyodk_client, project_details):
+    """Create a form with pyodk and clean it up after test."""
+    odk_id = project_details["id"]
     test_xform = test_data_dir / "buildings.xml"
 
-    # Modify the form version so we can publish form if same id existed previously
     with open(test_xform, "rb") as xform_file:
         xform_bytesio = BytesIO(xform_file.read())
-    new_form_version, xform_bytesio_new_version = update_xform_version(xform_bytesio)
+    _new_form_version, xform_bytesio_new_version = update_xform_version(xform_bytesio)
 
-    form_name = xform.createForm(odk_id, xform_bytesio_new_version)
-    assert form_name == "test_form"
+    with NamedTemporaryFile(suffix=".xml", mode="wb") as temp_file:
+        temp_file.write(xform_bytesio_new_version.getvalue())
+        temp_file.flush()
+        form = pyodk_client.forms.create(definition=temp_file.name, project_id=odk_id)
 
-    # Before yield is used in tests
-    yield odk_id, form_name, xform
-    # After yield is test cleanup
-
-    success = xform.deleteForm(odk_id, form_name)
-    assert success
+    form_name = form.xmlFormId
+    try:
+        yield odk_id, form_name
+    finally:
+        _delete_form(pyodk_client, odk_id, form_name)
 
 
 @pytest.fixture(scope="function")
-def odk_form__with_attachment_cleanup(odk_form):
-    """Get xform for project, with automatic cleanup after."""
-    odk_id, xform = odk_form
+def odk_form__with_attachment_cleanup(pyodk_client, pyodk_config, project_details):
+    """Create geojson-upload form and return legacy utility for uploadMedia."""
+    odk_id = project_details["id"]
     test_xform = test_data_dir / "buildings_geojson_upload.xml"
 
-    form_name = xform.createForm(odk_id, str(test_xform))
-    assert form_name == "test_form_geojson"
+    form = pyodk_client.forms.create(definition=str(test_xform), project_id=odk_id)
+    form_name = form.xmlFormId
 
-    # Publish form first
-    response_code = xform.publishForm(odk_id, form_name)
-    assert response_code == 200
-    assert xform.published == True
+    legacy_form = OdkForm(
+        pyodk_config.base_url,
+        pyodk_config.username,
+        pyodk_config.password,
+    )
+    with open(test_xform, "rb") as fh:
+        legacy_form.xml = fh.read()
+    legacy_form.published = True
 
-    # Before yield is used in tests
-    yield odk_id, form_name, xform
-    # After yield is test cleanup
-
-    success = xform.deleteForm(odk_id, form_name)
-    assert success
+    try:
+        yield odk_id, form_name, legacy_form
+    finally:
+        _delete_form(pyodk_client, odk_id, form_name)
 
 
 @pytest.fixture(scope="function")
-async def odk_submission(odk_form_cleanup, pyodk_config) -> tuple:
+async def odk_submission(odk_form_cleanup, pyodk_client) -> tuple:
     """A submission for the project form."""
-    xform_xls_definition = test_data_dir / "buildings.xml"
-    # Modify the form version so we can publish form if same id existed previously
-    with open(xform_xls_definition, "rb") as xform_file:
+    xform_definition = test_data_dir / "buildings.xml"
+    with open(xform_definition, "rb") as xform_file:
         xform_bytesio = BytesIO(xform_file.read())
     new_form_version, xform_bytesio_new_version = update_xform_version(xform_bytesio)
 
-    odk_id, form_name, xform = odk_form_cleanup
+    odk_id, form_name = odk_form_cleanup
 
-    # NOTE this submission does not select an existing entity, but creates a new feature
     submission_id = str(uuid.uuid4())
     submission_xml = f"""
         <data id="{form_name}" version="{new_form_version}">
@@ -273,40 +247,21 @@ async def odk_submission(odk_form_cleanup, pyodk_config) -> tuple:
         </data>
     """
 
-    with Client(pyodk_config) as client:
-        # Update the form to ensure we know the version number for submission
-        # for some reason osm_fieldwork.OdkForm.create does not set the version number
-        with NamedTemporaryFile(suffix=".xml", mode='wb') as temp_file:
-            temp_file.write(xform_bytesio_new_version.getvalue())
-            temp_file.flush()  # Ensure data is written to disk before using it
-            client.forms.update(form_name, project_id=odk_id, definition=temp_file.name)
-
-        client.submissions.create(
+    with NamedTemporaryFile(suffix=".xml", mode="wb") as temp_file:
+        temp_file.write(xform_bytesio_new_version.getvalue())
+        temp_file.flush()
+        pyodk_client.forms.update(
+            form_name,
             project_id=odk_id,
-            form_id=form_name,
-            xml=submission_xml,
-            device_id=None,
-            encoding="utf-8",
+            definition=temp_file.name,
         )
 
-    return odk_id, form_name
+    pyodk_client.submissions.create(
+        project_id=odk_id,
+        form_id=form_name,
+        xml=submission_xml,
+        device_id=None,
+        encoding="utf-8",
+    )
 
-
-@pytest.fixture(scope="session", autouse=True)
-def cleanup(pyodk_config):
-    """Cleanup projects and forms after all tests (session)."""
-    project = OdkProject(pyodk_config.base_url, pyodk_config.username, pyodk_config.password)
-    for item in project.listProjects():
-        project_id = item.get("id")
-        project.deleteProject(project_id)
-
-
-# @pytest.fixture(scope="function")
-# def xform_details(xform, project_details):
-#     """Get appuser for a project."""
-#     xlsform = xls2xform_convert(buildings)
-#     response = xform.createForm(
-#         projectId=project_details.get("id"),
-#         filespec=xlsform,
-#         xform="1",
-#     )
+    return odk_id, form_name, submission_id

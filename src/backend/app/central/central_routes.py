@@ -22,7 +22,6 @@ import re
 from io import BytesIO
 
 import pandas as pd
-from anyio import to_thread
 from litestar import Response, Router, get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
@@ -52,8 +51,7 @@ log = logging.getLogger(__name__)
 async def list_projects() -> dict[str, object]:
     """List projects in Central."""
     # TODO update for option to pass credentials by user
-    # NOTE runs in separate thread using anyio.to_thread.run_sync
-    projects = await to_thread.run_sync(central_crud.list_odk_projects)
+    projects = await central_crud.list_odk_projects()
     if projects is None:
         return {"message": "No projects found"}
     return {"projects": projects}
