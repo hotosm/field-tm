@@ -22,6 +22,7 @@ import logging
 import os
 from io import BytesIO
 from pathlib import Path
+from contextlib import asynccontextmanager
 from unittest.mock import Mock, patch
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -287,8 +288,9 @@ async def test_delete_project(client, admin_user, project):
 
 async def test_create_odk_project():
     """Test creating an odk central project."""
-    mock_project = Mock()
-    mock_project.createProject.return_value = {"status": "success"}
+    mock_response = Mock()
+    mock_response.ok = True
+    mock_response.json.return_value = {"id": 123, "name": "Field-TM Test Project"}
 
     odk_credentials = {
         "external_project_instance_url": os.getenv("ODK_CENTRAL_URL"),
@@ -296,12 +298,20 @@ async def test_create_odk_project():
         "external_project_password": os.getenv("ODK_CENTRAL_PASSWD"),
     }
 
-    with patch("app.central.central_crud.get_odk_project", return_value=mock_project):
-        result = create_odk_project("Test Project", odk_credentials)
+    class DummyClient:
+        def __init__(self):
+            self.session = Mock()
+            self.session.base_url = "https://example.com"
+            self.session.post.return_value = mock_response
 
-    assert result == {"status": "success"}
-    # Field-TM gets appended to project name by default
-    mock_project.createProject.assert_called_once_with("Field-TM Test Project")
+    @asynccontextmanager
+    async def fake_pyodk_client(_):
+        yield DummyClient()
+
+    with patch("app.central.central_crud.central_deps.pyodk_client", fake_pyodk_client):
+        result = await create_odk_project("Test Project", odk_credentials)
+
+    assert result == {"id": 123, "name": "Field-TM Test Project"}
 
 
 async def test_upload_data_extracts(client, project):

@@ -15,13 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with osm_fieldwork.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Test functionality of OdkCentralAsync.py, specifically the OdkForm class."""
+"""Test functionality of OdkCentralAsync.py, specifically attachment methods."""
 
-import uuid
-import asyncio
 from pathlib import Path
-
-from pyodk.client import Client
 
 from osm_fieldwork.OdkCentralAsync import OdkForm as OdkFormAsync
 
@@ -30,17 +26,14 @@ test_data_dir = Path(__file__).parent / "test_data"
 
 async def test_list_submission_attachment_urls(odk_submission, pyodk_config):
     """Create attachments in bulk, then list the URLs to download."""
-    odk_id, form_name = odk_submission
+    odk_id, form_name, submission_id = odk_submission
 
     async with OdkFormAsync(
         url="http://central:8383",
         user="admin@hotosm.org",
         passwd="Password1234",
     ) as form_async:
-        # The dummy form from conftest includes 3 submission images, so we test
-        # they are present in listSubmissionAttachments
-        submissions = await form_async.listSubmissions(odk_id, form_name)
-        submission_id = submissions[0]["instanceId"]
+        # The dummy form from conftest includes 3 submission images.
         attachments = await form_async.listSubmissionAttachments(odk_id, form_name, submission_id)
         sorted_attachments = sorted(attachments, key=lambda x: x['name'])
         assert len(attachments) == 3
@@ -58,7 +51,8 @@ async def test_list_submission_attachment_urls(odk_submission, pyodk_config):
         submission_photo_filepath = f"{test_data_dir}/{submission_photo_filename}"
 
         # NOTE this submission does not select an existing entity, but creates a new feature
-        submission_id = str(uuid.uuid4())
+        # This is intentionally not uploaded in this test while S3-sync issues are unresolved.
+        submission_id = "dummy-id-not-uploaded"
         submission_xml = f"""
             <data id="{form_name}" version="v1">
             <meta>

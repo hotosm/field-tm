@@ -43,6 +43,7 @@ from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_login_python.core import Auth
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
+from pyodk._endpoints.project_app_users import ProjectAppUserService
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_deps, central_schemas
@@ -447,7 +448,7 @@ async def generate_odk_central_project_content(
 
     # Upload survey XForm
     log.info("Uploading survey XForm to ODK Central")
-    central_crud.create_odk_xform(
+    await central_crud.create_odk_xform(
         project_odk_id,
         xform,
         odk_credentials,
@@ -649,11 +650,6 @@ async def generate_project_files(
             f"Generated ODK token for Field-TM project ({project_id}) "
             f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15] if odk_token else 'None'}...)"
         )
-
-        # Note: odk_token and odk_form_xml are not stored in the projects table
-        # They are used only for ODK Central operations and not persisted
-        # Tasks are no longer stored in database, so we skip feature count updates
-        # Task boundaries are sent directly to ODK/QField, not stored in database
         return True
     except Exception as e:
         log.debug(str(format_exc()))
@@ -1028,17 +1024,17 @@ async def get_project_qrcode(
         else:
             odk_central = project_odk_creds
 
-        # Get appuser token from ODK Central
-        odk_project = central_crud.get_odk_project(odk_central)
-        appusers = odk_project.listAppUsers(project.external_project_id)
-
-        if not appusers:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No appuser found for this ODK project.",
+        async with central_deps.pyodk_client(odk_central) as client:
+            project_app_users = ProjectAppUserService(
+                session=client.session,
+                default_project_id=project.external_project_id,
             )
+            appusers = project_app_users.list()
+            appuser_token = next((app_user.token for app_user in appusers), None)
+            if not appuser_token:
+                created_user = project_app_users.create(display_name="fmtm_user")
+                appuser_token = created_user.token
 
-        appuser_token = appusers[0].get("token")
         if not appuser_token:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

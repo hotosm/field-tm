@@ -619,8 +619,7 @@ async def finalize_odk_project(
     project_odk_id = project.external_project_id
     if not project_odk_id:
         log.info(f"Creating ODK project for Field-TM project {project_id}")
-        odk_project = await to_thread.run_sync(
-            central_crud.create_odk_project,
+        odk_project = await central_crud.create_odk_project(
             project.project_name,
             custom_odk_creds,
         )
@@ -731,7 +730,7 @@ async def finalize_odk_project(
     xlsform_bytes = BytesIO(project.xlsform_content)
     xform = await central_crud.read_and_test_xform(xlsform_bytes)
     log.info(f"Uploading XLSForm to ODK project {project_odk_id}")
-    central_crud.create_odk_xform(
+    await central_crud.create_odk_xform(
         project_odk_id,
         xform,
         custom_odk_creds,

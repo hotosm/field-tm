@@ -113,7 +113,7 @@ async def project(db, admin_user):
     project_name = f"test project {uuid4()}"
     # Create ODK Central Project
     try:
-        odkproject = central_crud.create_odk_project(
+        odkproject = await central_crud.create_odk_project(
             project_name,
             odk_creds_decrypted,
         )

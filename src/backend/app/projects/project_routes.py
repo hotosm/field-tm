@@ -1020,8 +1020,7 @@ async def create_project(
     odk_creds_decrypted = data.odk_credentials
 
     # Create project in ODK Central using a background thread
-    odkproject = await to_thread.run_sync(
-        central_crud.create_odk_project,
+    odkproject = await central_crud.create_odk_project(
         project.project_name,
         odk_creds_decrypted,
     )

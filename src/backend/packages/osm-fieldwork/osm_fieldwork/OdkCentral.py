@@ -48,6 +48,14 @@ logging.getLogger("urllib3").setLevel(log_level)
 log = logging.getLogger(__name__)
 
 
+def _pyodk_replacement_stub(legacy_method: str, replacement: str):
+    """Raise a clear migration error for APIs replaced by pyodk."""
+    raise NotImplementedError(
+        f"`{legacy_method}` has been removed from osm-fieldwork. "
+        f"Use pyodk instead: {replacement}"
+    )
+
+
 class OdkCentral:
     def __init__(
         self,
@@ -190,17 +198,10 @@ class OdkCentral:
         Returns:
             (list): A list of projects on a ODK Central server
         """
-        log.info("Getting a list of projects from %s" % self.url)
-        url = f"{self.base}projects"
-        result = self.session.get(url, verify=self.verify)
-        projects = result.json()
-        for project in projects:
-            if isinstance(project, dict):
-                if project.get("id") is not None:
-                    self.projects[project["id"]] = project
-            else:
-                log.info("No projects returned. Is this a first run?")
-        return projects
+        return _pyodk_replacement_stub(
+            "OdkCentral.listProjects",
+            "Client(...).projects.list()",
+        )
 
     def findProject(
         self,
@@ -215,23 +216,10 @@ class OdkCentral:
         Returns:
             (dict): the project data from ODK Central
         """
-        # First, populate self.projects
-        self.listProjects()
-
-        if self.projects:
-            if name:
-                log.debug(f"Finding project by name: {name}")
-                for _key, value in self.projects.items():
-                    if name == value["name"]:
-                        log.info(f"ODK project found: {name}")
-                        return value
-            if project_id:
-                log.debug(f"Finding project by id: {project_id}")
-                for _key, value in self.projects.items():
-                    if project_id == value["id"]:
-                        log.info(f"ODK project found: {project_id}")
-                        return value
-        return None
+        return _pyodk_replacement_stub(
+            "OdkCentral.findProject",
+            "Client(...).projects.list()/projects.get() and filter in caller",
+        )
 
     def createProject(
         self,
@@ -246,25 +234,10 @@ class OdkCentral:
         Returns:
             (json): The response from ODK Central
         """
-        log.debug(f"Checking if project named {name} exists already")
-        exists = self.findProject(name=name)
-        if exists:
-            log.debug(f"Project named {name} already exists.")
-            return exists
-        else:
-            url = f"{self.base}projects"
-            log.debug(f"POSTing project {name} to {url} with verify={self.verify}")
-            try:
-                result = self.session.post(url, json={"name": name}, verify=self.verify, timeout=4)
-                result.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                log.error(e)
-                log.error("Failed to submit to ODKCentral")
-            json_response = result.json()
-            log.debug(f"Returned: {json_response}")
-            # update the internal list of projects
-            self.listProjects()
-            return json_response
+        return _pyodk_replacement_stub(
+            "OdkCentral.createProject",
+            "Client(...).session.post(f'{client.session.base_url}/v1/projects', json={'name': ...})",
+        )
 
     def deleteProject(
         self,
@@ -278,11 +251,10 @@ class OdkCentral:
         Returns:
             (str): The project name
         """
-        url = f"{self.base}projects/{project_id}"
-        self.session.delete(url, verify=self.verify)
-        # update the internal list of projects
-        self.listProjects()
-        return self.findProject(project_id=project_id)
+        return _pyodk_replacement_stub(
+            "OdkCentral.deleteProject",
+            "Client(...).session.delete(f'{client.session.base_url}/v1/projects/{project_id}')",
+        )
 
 
 class OdkProject(OdkCentral):
@@ -318,12 +290,10 @@ class OdkProject(OdkCentral):
         Returns:
             (list): The list of XForms in this project
         """
-        url = f"{self.base}projects/{project_id}/forms"
-        if metadata:
-            self.session.headers.update({"X-Extended-Metadata": "true"})
-        result = self.session.get(url, verify=self.verify)
-        self.forms = result.json()
-        return self.forms
+        return _pyodk_replacement_stub(
+            "OdkProject.listForms",
+            "Client(...).forms.list(project_id=...)",
+        )
 
     def listAppUsers(
         self,
@@ -337,10 +307,10 @@ class OdkProject(OdkCentral):
         Returns:
             (list): A list of app-users on ODK Central for this project
         """
-        url = f"{self.base}projects/{projectId}/app-users"
-        result = self.session.get(url, verify=self.verify)
-        self.appusers = result.json()
-        return self.appusers
+        return _pyodk_replacement_stub(
+            "OdkProject.listAppUsers",
+            "ProjectAppUserService(session=client.session, default_project_id=...).list()",
+        )
 
     def getDetails(
         self,
@@ -354,10 +324,10 @@ class OdkProject(OdkCentral):
         Returns:
             (json): Get the data about a project on ODK Central
         """
-        url = f"{self.base}projects/{projectId}"
-        result = self.session.get(url, verify=self.verify)
-        self.data = result.json()
-        return self.data
+        return _pyodk_replacement_stub(
+            "OdkProject.getDetails",
+            "Client(...).projects.get(project_id=...)",
+        )
 
     def getFullDetails(
         self,
@@ -371,10 +341,10 @@ class OdkProject(OdkCentral):
         Returns:
             (json): Get the data about a project on ODK Central
         """
-        url = f"{self.base}projects/{projectId}"
-        self.session.headers.update({"X-Extended-Metadata": "true"})
-        result = self.session.get(url, verify=self.verify)
-        return result.json()
+        return _pyodk_replacement_stub(
+            "OdkProject.getFullDetails",
+            "Client(...).projects.get(project_id=...)",
+        )
 
     def updateReviewState(self, projectId: int, xmlFormId: str, instanceId: str, review_state: dict) -> dict:
         """Updates the review state of a submission in ODK Central.
@@ -385,14 +355,10 @@ class OdkProject(OdkCentral):
             instanceId (str): The ID of the submission instance.
             review_state (dict): The updated review state.
         """
-        try:
-            url = f"{self.base}projects/{projectId}/forms/{xmlFormId}/submissions/{instanceId}"
-            result = self.session.patch(url, json=review_state)
-            result.raise_for_status()
-            return result.json()
-        except Exception as e:
-            log.error(f"Error updating review state: {e}")
-            return {}
+        return _pyodk_replacement_stub(
+            "OdkProject.updateReviewState",
+            "Client(...).submissions.review(...) / submissions.edit(...)",
+        )
 
 
 class OdkForm(OdkCentral):
@@ -439,10 +405,10 @@ class OdkForm(OdkCentral):
         Returns:
             (json): The data for this XForm
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}"
-        result = self.session.get(url, verify=self.verify)
-        self.data = result.json()
-        return result.json()
+        return _pyodk_replacement_stub(
+            "OdkForm.getDetails",
+            "Client(...).forms.get(form_id=..., project_id=...)",
+        )
 
     def getFullDetails(
         self,
@@ -458,10 +424,10 @@ class OdkForm(OdkCentral):
         Returns:
             (json): The data for this XForm
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}"
-        self.session.headers.update({"X-Extended-Metadata": "true"})
-        result = self.session.get(url, verify=self.verify)
-        return result.json()
+        return _pyodk_replacement_stub(
+            "OdkForm.getFullDetails",
+            "Client(...).forms.get(form_id=..., project_id=...)",
+        )
 
     def getXml(
         self,
@@ -503,15 +469,10 @@ class OdkForm(OdkCentral):
         Returns:
             (json): The JSON of Submissions.
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}.svc/Submissions"
-        try:
-            result = self.session.get(url, params=filters, verify=self.verify)
-            result.raise_for_status()  # Raise an error for non-2xx status codes
-            self.submissions = result.json()
-            return self.submissions
-        except Exception as e:
-            log.error(f"Error fetching submissions: {e}")
-            return {}
+        return _pyodk_replacement_stub(
+            "OdkForm.listSubmissions",
+            "Client(...).submissions.list(project_id=..., form_id=...)",
+        )
 
     def getSubmissions(
         self,
@@ -775,9 +736,28 @@ class OdkForm(OdkCentral):
             log.error(msg)
             raise ValueError(msg)
 
-        # Publish the draft by default
+        # Publish draft directly if requested, without using deprecated wrapper.
         if self.published:
-            self.publishForm(projectId, form_name)
+            version = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+            publish_url = (
+                f"{self.base}projects/{projectId}/forms/{form_name}/draft/publish"
+                f"?version={version}"
+            )
+            publish_result = self.session.post(publish_url, verify=self.verify)
+            if publish_result.status_code != 200:
+                try:
+                    status = publish_result.json()
+                    log.error(
+                        f"Couldn't publish {form_name} on Central: {status.get('message')}"
+                    )
+                except json.decoder.JSONDecodeError:
+                    log.error(
+                        f"Couldn't publish {form_name} on Central: "
+                        "Error decoding JSON response"
+                    )
+            else:
+                self.draft = False
+                self.published = True
 
         # Add to the form var
         self.media[filename] = media
@@ -812,73 +792,10 @@ class OdkForm(OdkCentral):
         Returns:
             (str, Optional): The form name, else None if failure.
         """
-        # BytesIO memory object
-        if isinstance(data, BytesIO):
-            self.xml = data.getvalue().decode("utf-8")
-        # Filepath
-        elif isinstance(data, str) or isinstance(data, Path):
-            xml_path = Path(data)
-            if not xml_path.exists():
-                log.error(f"File does not exist on disk: {data}")
-                return None
-            # Read the XML or XLS file
-            with open(xml_path, "rb") as xml_file:
-                self.xml = xml_file.read()
-            log.debug("Read %d bytes from %s" % (len(self.xml), data))
-
-        if form_name or self.draft:
-            self.draft = True
-            log.debug(f"Creating draft from template form: {form_name}")
-            url = f"{self.base}projects/{projectId}/forms/{form_name}/draft?ignoreWarnings=true"
-        else:
-            # This is not a draft form, its an entirely new form (even if publish=false)
-            log.debug("Creating new form, with name determined from form_id field")
-            self.published = True if publish else False
-            url = f"{self.base}projects/{projectId}/forms?ignoreWarnings=true&{'publish=true' if publish else ''}"
-
-        result = self.session.post(
-            url, data=self.xml, headers=dict({"Content-Type": "application/xml"}, **self.session.headers), verify=self.verify
+        return _pyodk_replacement_stub(
+            "OdkForm.createForm",
+            "Client(...).forms.create(...) or Client(...).forms.update(...)",
         )
-
-        if result.status_code != 200:
-            try:
-                status = result.json()
-                msg = status.get("message", "Unknown error")
-                if result.status_code == 409:
-                    log.warning(msg)
-                    last_full_stop_index = msg.rfind(".")
-                    last_comma_index = msg.rfind(",")
-                    if last_full_stop_index != -1 and last_comma_index != -1:
-                        # Extract xmlFormId from error msg
-                        xmlFormId = msg[last_comma_index + 1 : last_full_stop_index].strip()
-                        return xmlFormId
-                    else:
-                        log.warning("Unable to extract xmlFormId from error message")
-                        return None
-                else:
-                    log.error(f"Couldn't create {form_name} on Central: {msg}")
-                    return None
-            except json.decoder.JSONDecodeError:
-                log.error(f"Couldn't create {form_name} on Central: Error decoding JSON response")
-                return None
-
-        try:
-            # Log response to terminal
-            json_data = result.json()
-        except json.decoder.JSONDecodeError:
-            log.error("Could not parse response json during form creation")
-            return None
-
-        # epdb.st()
-        # FIXME: should update self.forms with the new form
-
-        if "success" in json_data:
-            log.debug(f"Created draft XForm on ODK server: ({form_name})")
-            return form_name
-
-        new_form_name = json_data.get("xmlFormId")
-        log.info(f"Created XForm on ODK server: ({new_form_name})")
-        return new_form_name
 
     def deleteForm(
         self,
@@ -893,31 +810,10 @@ class OdkForm(OdkCentral):
         Returns:
             (bool): did it get deleted
         """
-        # FIXME: If your goal is to prevent it from showing up on survey clients like ODK Collect, consider
-        # setting its state to closing or closed
-        if self.draft:
-            log.debug(f"Deleting draft form on ODK server: ({xform})")
-            url = f"{self.base}projects/{projectId}/forms/{xform}/draft"
-        else:
-            log.debug(f"Deleting form on ODK server: ({xform})")
-            url = f"{self.base}projects/{projectId}/forms/{xform}"
-
-        result = self.session.delete(url, verify=self.verify)
-        if not result.ok:
-            try:
-                # Log response to terminal
-                json_data = result.json()
-                log.warning(json_data)
-                return False
-            except json.decoder.JSONDecodeError:
-                log.error(f"Could not parse response json during form deletion. status_code={result.status_code}")
-            finally:
-                return False
-
-        self.draft = False
-        self.published = False
-
-        return True
+        return _pyodk_replacement_stub(
+            "OdkForm.deleteForm",
+            "Client(...).session.delete(.../forms/{form_id})",
+        )
 
     def publishForm(
         self,
@@ -933,20 +829,10 @@ class OdkForm(OdkCentral):
         Returns:
             (int): The status code from ODK Central
         """
-        version = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
-
-        url = f"{self.base}projects/{projectId}/forms/{xform}/draft/publish?version={version}"
-        result = self.session.post(url, verify=self.verify)
-        if result.status_code != 200:
-            status = result.json()
-            log.error(f"Couldn't publish {xform} on Central: {status['message']}")
-        else:
-            log.info(f"Published {xform} on Central.")
-
-        self.draft = False
-        self.published = True
-
-        return result.status_code
+        return _pyodk_replacement_stub(
+            "OdkForm.publishForm",
+            "Client(...).forms.update(form_id=..., definition=...) with updated version",
+        )
 
     def formFields(self, projectId: int, xform: str):
         """Retrieves the form fields for a xform from odk central.
@@ -959,19 +845,10 @@ class OdkForm(OdkCentral):
             dict: A json object containing the form fields.
 
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}/fields?odata=true"
-        response = self.session.get(url, verify=self.verify)
-
-        # TODO wrap this logic and put in every method requiring form name
-        if response.status_code != 200:
-            if response.status_code == 404:
-                msg = f"The ODK form you referenced does not exist yet: {xform}"
-                log.debug(msg)
-                raise requests.exceptions.HTTPError(msg)
-            log.debug(f"Failed to retrieve form fields. Status code: {response.status_code}")
-            response.raise_for_status()
-
-        return response.json()
+        return _pyodk_replacement_stub(
+            "OdkForm.formFields",
+            "Client(...).session.get(.../forms/{form_id}/fields?odata=true)",
+        )
 
 
 class OdkAppUser(OdkCentral):
@@ -1023,12 +900,10 @@ class OdkAppUser(OdkCentral):
         Returns:
             (dict): The response JSON from ODK Central
         """
-        url = f"{self.base}projects/{projectId}/app-users"
-        response = self.session.post(url, json={"displayName": name}, verify=self.verify)
-        self.user = name
-        if response.ok:
-            return response.json()
-        return {}
+        return _pyodk_replacement_stub(
+            "OdkAppUser.create",
+            "ProjectAppUserService(session=client.session, default_project_id=...).create(display_name=...)",
+        )
 
     def delete(
         self,
@@ -1044,9 +919,10 @@ class OdkAppUser(OdkCentral):
         Returns:
             (bool): Whether the user got deleted or not
         """
-        url = f"{self.base}projects/{projectId}/app-users/{userId}"
-        result = self.session.delete(url, verify=self.verify)
-        return result
+        return _pyodk_replacement_stub(
+            "OdkAppUser.delete",
+            "Client(...).session.delete(.../projects/{project_id}/app-users/{user_id})",
+        )
 
     def updateRole(
         self,
@@ -1066,10 +942,10 @@ class OdkAppUser(OdkCentral):
         Returns:
             (bool): Whether it was update or not
         """
-        log.info(f"Update access to XForm ({xform}) for {actorId}")
-        url = f"{self.base}projects/{projectId}/forms/{xform}/assignments/{roleId}/{actorId}"
-        result = self.session.post(url, verify=self.verify)
-        return result
+        return _pyodk_replacement_stub(
+            "OdkAppUser.updateRole",
+            "FormAssignmentService(session=client.session, ...).assign(role_id=..., user_id=...)",
+        )
 
     def grantAccess(self, projectId: int, roleId: int = 2, userId: int = None, xform: str = None, actorId: int = None):
         """Grant access to an app user for a form.
@@ -1084,9 +960,10 @@ class OdkAppUser(OdkCentral):
         Returns:
             (bool): Whether access was granted or not
         """
-        url = f"{self.base}projects/{projectId}/forms/{xform}/assignments/{roleId}/{actorId}"
-        result = self.session.post(url, verify=self.verify)
-        return result
+        return _pyodk_replacement_stub(
+            "OdkAppUser.grantAccess",
+            "FormAssignmentService(session=client.session, ...).assign(role_id=..., user_id=...)",
+        )
 
     def createQRCode(
         self,
