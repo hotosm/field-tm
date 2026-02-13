@@ -261,12 +261,15 @@ async def task_split(
     log.debug("STARTED task splitting using provided boundary and data extract")
     # NOTE here we pass the connection string and allow area-splitter to
     # use a psycopg connection (not async)
+    # Prepare algorithm parameters
+    algorithm_params = {"num_buildings": no_of_buildings}
     features = await to_thread.run_sync(
         split_by_sql,
         merged_boundary,
         settings.FMTM_DB_URL,
-        no_of_buildings,
-        parsed_extract,
+        osm_extract=parsed_extract,
+        algorithm=None,  # Will default to AVG_BUILDING_SKELETON
+        algorithm_params=algorithm_params,
     )
     log.debug("COMPLETE task splitting")
     return features

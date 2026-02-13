@@ -31,7 +31,7 @@ const SplitTasks = () => {
   const taskSplitOptions: taskSplitOptionsType[] = [
     {
       name: 'define_tasks',
-      value: task_split_type.DIVIDE_ON_SQUARE,
+      value: task_split_type.DIVIDE_BY_SQUARE,
       label: 'Divide into square tasks',
       disabled: values.primary_geom_type === 'POLYLINE',
     },
@@ -83,7 +83,7 @@ const SplitTasks = () => {
     setValue('splitGeojsonBySquares', null);
     setValue('splitGeojsonByAlgorithm', null);
 
-    if (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE) {
+    if (values.task_split_type === task_split_type.DIVIDE_BY_SQUARE) {
       const dividedTaskFormData = new FormData();
       dividedTaskFormData.append('project_geojson', drawnGeojsonFile);
       dividedTaskFormData.append('dimension_meters', values?.task_split_dimension?.toString() || '0');
@@ -163,7 +163,7 @@ const SplitTasks = () => {
         </p>
       </div>
 
-      {values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && (
+      {values.task_split_type === task_split_type.DIVIDE_BY_SQUARE && (
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <FieldLabel label="Dimension of square in metres:" />
@@ -192,7 +192,7 @@ const SplitTasks = () => {
       )}
 
       {values.task_split_type &&
-        [task_split_type.DIVIDE_ON_SQUARE, task_split_type.TASK_SPLITTING_ALGORITHM].includes(
+        [task_split_type.DIVIDE_BY_SQUARE, task_split_type.TASK_SPLITTING_ALGORITHM].includes(
           values.task_split_type,
         ) && (
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -202,7 +202,7 @@ const SplitTasks = () => {
               isLoading={isPreviewSplitBySquarePending || isTaskSplitPending}
               onClick={generateTaskBasedOnSelection}
               disabled={
-                (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.task_split_dimension) ||
+                (values.task_split_type === task_split_type.DIVIDE_BY_SQUARE && !values.task_split_dimension) ||
                 (values.task_split_type === task_split_type.TASK_SPLITTING_ALGORITHM && !values.task_num_buildings)
                   ? true
                   : false

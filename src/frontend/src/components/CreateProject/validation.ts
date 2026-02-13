@@ -331,7 +331,7 @@ export const splitTasksValidationSchema = z
     const values = ctx.value;
 
     if (
-      values.task_split_type === task_split_type.DIVIDE_ON_SQUARE &&
+      values.task_split_type === task_split_type.DIVIDE_BY_SQUARE &&
       values.task_split_dimension !== undefined &&
       values.task_split_dimension < 10
     ) {
@@ -356,7 +356,7 @@ export const splitTasksValidationSchema = z
         path: ['task_num_buildings'],
       });
     }
-    if (values.task_split_type === task_split_type.DIVIDE_ON_SQUARE && !values.splitGeojsonBySquares) {
+    if (values.task_split_type === task_split_type.DIVIDE_BY_SQUARE && !values.splitGeojsonBySquares) {
       ctx.issues.push({
         message: 'Please generate the task using Divide into squares',
         input: values.splitGeojsonBySquares,

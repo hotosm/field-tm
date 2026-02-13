@@ -28,6 +28,7 @@ from typing import Optional, Union
 
 import aiohttp
 import geojson
+import segno
 from litestar import Request
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -38,6 +39,7 @@ from osm_data_client import (
     RawDataResult,
 )
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_login_python.core import Auth
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
@@ -665,8 +667,9 @@ async def generate_project_files(
 async def get_task_geometry(db: AsyncConnection, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
-    Task boundaries are stored in ODK Central as entities (dataset: "task_boundaries")
-    or in a temporary table for QField projects. They are not stored permanently in the Field-TM database.
+    Task boundaries are stored in the database as task_areas_geojson (for preview),
+    or in ODK Central as entities (dataset: "task_boundaries") after finalization,
+    or in a temporary table for QField projects.
 
     Args:
         db (Connection): The database connection.
@@ -675,14 +678,35 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
     Returns:
         str: A geojson of the task boundaries
     """
-    # Get project to check if it has ODK project
+    # Get project to check if it has task areas stored in database
     project = await project_deps.get_project_by_id(db, project_id)
 
-    # Try to fetch task boundaries from ODK Central if available
+    # First, check if task areas are stored in the database (for preview)
+    if project.task_areas_geojson is not None:
+        # If it's an empty dict, return empty FeatureCollection
+        if project.task_areas_geojson == {}:
+            feature_collection = {"type": "FeatureCollection", "features": []}
+            return json.dumps(feature_collection)
+        # Otherwise, return the stored GeoJSON
+        if isinstance(project.task_areas_geojson, dict):
+            return json.dumps(project.task_areas_geojson)
+        elif isinstance(project.task_areas_geojson, str):
+            return project.task_areas_geojson
+
+    # Try to fetch task boundaries from ODK Central if available (only if not in database)
     if project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id:
         try:
-            # ODK credentials not stored on project, use None to fall back to env vars
-            project_odk_creds = None
+            # ODK credentials not stored on project, create from env vars
+            from app.central.central_schemas import ODKCentral
+            from app.core.config import settings
+
+            project_odk_creds = ODKCentral(
+                external_project_instance_url=settings.ODK_CENTRAL_URL,
+                external_project_username=settings.ODK_CENTRAL_USER,
+                external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
+                if settings.ODK_CENTRAL_PASSWD
+                else "",
+            )
             async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
                 # Fetch entities from task_boundaries dataset
                 entity_data = await odk_central.getEntityData(
@@ -952,3 +976,108 @@ async def send_project_manager_message(
         body=message_content,
     )
     log.info(f"Message sent to new project manager ({new_manager.username}).")
+
+
+async def get_project_qrcode(
+    db: AsyncConnection,
+    project_id: int,
+    username: str = "fieldtm_user",
+) -> str:
+    """Generate and return QR code for a published project.
+
+    Args:
+        db (AsyncConnection): Database connection.
+        project_id (int): Project ID.
+        username (str, optional): OSM username for ODK metadata. Defaults to "fieldtm_user".
+
+    Returns:
+        str: Base64 data URL of the QR code image.
+
+    Raises:
+        HTTPException: If project or required data is missing.
+    """
+    # Get fresh project data
+    project = await project_deps.get_project_by_id(db, project_id)
+
+    if not project.project_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Project name not found.",
+        )
+
+    qr_code_data_url = None
+
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        # For ODK, generate QR code using appuser token
+        if not project.external_project_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="ODK project ID not found.",
+            )
+
+        # Get ODK credentials (use None to fall back to env vars)
+        project_odk_creds = project.get_odk_credentials()
+        if project_odk_creds is None:
+            odk_central = central_schemas.ODKCentral(
+                external_project_instance_url=settings.ODK_CENTRAL_URL,
+                external_project_username=settings.ODK_CENTRAL_USER,
+                external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
+                if settings.ODK_CENTRAL_PASSWD
+                else "",
+            )
+        else:
+            odk_central = project_odk_creds
+
+        # Get appuser token from ODK Central
+        odk_project = central_crud.get_odk_project(odk_central)
+        appusers = odk_project.listAppUsers(project.external_project_id)
+
+        if not appusers:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No appuser found for this ODK project.",
+            )
+
+        appuser_token = appusers[0].get("token")
+        if not appuser_token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Appuser token not found.",
+            )
+
+        # Generate QR code using OdkAppUser.createQRCode
+        appuser_obj = OdkAppUser(
+            odk_central.external_project_instance_url,
+            odk_central.external_project_username,
+            odk_central.external_project_password,
+        )
+
+        qrcode = appuser_obj.createQRCode(
+            odk_id=project.external_project_id,
+            project_name=project.project_name,
+            appuser_token=appuser_token,
+            basemap="osm",
+            osm_username=username,
+        )
+        # Convert to base64 data URL
+        qr_code_data_url = qrcode.png_data_uri(scale=5)
+
+    elif project.field_mapping_app == FieldMappingApp.QFIELD:
+        # For QField, generate QR code with qfield://cloud?project=ID
+        if not project.external_project_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="QField project ID not found.",
+            )
+
+        qfield_url = f"qfield://cloud?project={project.external_project_id}"
+        qrcode = segno.make(qfield_url, micro=False)
+        qr_code_data_url = qrcode.png_data_uri(scale=6)
+
+    if not qr_code_data_url:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate QR code.",
+        )
+
+    return qr_code_data_url

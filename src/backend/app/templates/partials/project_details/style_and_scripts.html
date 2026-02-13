@@ -1,0 +1,648 @@
+<style>
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .htmx-indicator {
+    opacity: 1;
+    transition: opacity 200ms ease-in;
+  }
+  .htmx-request .htmx-indicator {
+    opacity: 1;
+  }
+  .htmx-request.htmx-indicator {
+    opacity: 1;
+  }
+</style>
+<script>
+    (function() {
+      const projectId = {% if project %}{{ project.id }}{% else %}null{% endif %};
+      if (!projectId) return;
+
+      // Step 1: XLSForm Selection
+      const selectXlsformBtn = document.getElementById('select-xlsform-btn');
+      const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
+      const xlsformFileInput = document.getElementById('xlsform-file-input');
+      const xlsformStatus = document.getElementById('xlsform-status');
+      const templateFormIdInput = document.getElementById('template-form-id');
+      const formConfigContainer = document.getElementById('form-config-container');
+      const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
+
+      // Fetch and display XLSForms list
+      if (selectXlsformBtn && !hasXlsform) {
+        selectXlsformBtn.addEventListener('click', async function() {
+          try {
+            const response = await fetch('/central/list-forms');
+            if (!response.ok) {
+              throw new Error('Failed to load forms');
+            }
+            const forms = await response.json();
+
+            if (forms.length === 0) {
+              xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>No XLSForms available.</span></wa-callout>';
+              return;
+            }
+
+            // Create dropdown to select form
+            let optionsHtml = '<div style="margin-bottom: 10px;"><select id="xlsform-select" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em;"><option value="">Select a category...</option>';
+            forms.forEach(form => {
+              optionsHtml += `<option value="${form.id}">${form.title}</option>`;
+            });
+            optionsHtml += '</select></div><wa-button id="confirm-xlsform-btn" variant="primary" style="margin-top: 10px;">Use Selected Form</wa-button>';
+
+            xlsformStatus.innerHTML = optionsHtml;
+
+            // Handle form selection
+            const confirmBtn = document.getElementById('confirm-xlsform-btn');
+
+            if (confirmBtn) {
+              confirmBtn.addEventListener('click', async function() {
+                const select = document.getElementById('xlsform-select');
+                const formId = select?.value;
+                if (!formId) {
+                  xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>Please select a form category.</span></wa-callout>';
+                  return;
+                }
+
+                // Store selected form ID and show configuration options
+                if (templateFormIdInput) {
+                  templateFormIdInput.value = formId;
+                }
+                // Clear file input when template is selected
+                if (xlsformFileInput) {
+                  xlsformFileInput.value = '';
+                }
+                if (formConfigContainer) {
+                  formConfigContainer.style.display = 'block';
+                }
+                xlsformStatus.innerHTML = '<wa-callout variant="info"><span>Form selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+              });
+            }
+
+          } catch (error) {
+            xlsformStatus.innerHTML = `<wa-callout variant="danger"><span>Error loading forms: ${error.message}</span></wa-callout>`;
+          }
+        });
+      }
+
+      // Handle XLSForm upload button click
+      if (uploadXlsformBtn && xlsformFileInput && !hasXlsform) {
+        uploadXlsformBtn.addEventListener('click', () => {
+          xlsformFileInput.click();
+          // Clear template form ID when uploading custom form
+          if (templateFormIdInput) {
+            templateFormIdInput.value = '';
+          }
+        });
+
+        xlsformFileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Validate file extension
+          const validExtensions = ['.xls', '.xlsx'];
+          const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+          if (!validExtensions.includes(fileExtension)) {
+            xlsformStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .xls or .xlsx file.</span></wa-callout>';
+            xlsformFileInput.value = '';
+            return;
+          }
+
+          // Show configuration options for custom upload
+          if (formConfigContainer) {
+            formConfigContainer.style.display = 'block';
+          }
+          xlsformStatus.innerHTML = '<wa-callout variant="info"><span>File selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+        });
+      }
+
+      // Step 2: OSM Data (only enable if Step 1 is complete)
+      const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
+      const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
+      const geojsonFileInput = document.getElementById('geojson-file-input');
+      const osmDataStatus = document.getElementById('osm-data-status');
+  const downloadLoading = document.getElementById('download-loading');
+  const downloadBtnText = document.getElementById('download-btn-text');
+  const downloadSpinner = document.getElementById('download-spinner');
+
+      if (!hasXlsform && downloadOsmDataBtn) {
+        downloadOsmDataBtn.disabled = true;
+      }
+      if (!hasXlsform && uploadGeojsonBtn) {
+        uploadGeojsonBtn.disabled = true;
+      }
+
+  // Show loading spinner when download starts
+      if (downloadOsmDataBtn) {
+    downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
+      if (downloadLoading) downloadLoading.style.display = 'block';
+      if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+      if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
+      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
+    });
+
+    downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
+      if (downloadLoading) downloadLoading.style.display = 'none';
+      if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
+      if (downloadSpinner) downloadSpinner.style.display = 'none';
+      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = false;
+    });
+  }
+
+  // Upload custom GeoJSON
+  const uploadGeojsonForm = document.getElementById('upload-geojson-form');
+
+  if (uploadGeojsonBtn) {
+    uploadGeojsonBtn.addEventListener('click', () => {
+      if (geojsonFileInput) {
+        geojsonFileInput.click();
+          }
+        });
+      }
+
+  if (geojsonFileInput && uploadGeojsonForm) {
+    geojsonFileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+      // Validate file extension
+      const validExtensions = ['.geojson', '.json'];
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      if (!validExtensions.includes(fileExtension)) {
+        osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
+        geojsonFileInput.value = '';
+        return;
+      }
+
+      // Submit form via HTMX using requestSubmit (proper form submission)
+      if (uploadGeojsonForm.requestSubmit) {
+        uploadGeojsonForm.requestSubmit();
+      } else {
+        // Fallback for older browsers
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        uploadGeojsonForm.dispatchEvent(submitEvent);
+      }
+    });
+  }
+
+  // Step 2: Data extract preview (collapsed by default when Step 2 is complete)
+  const previewDataExtractBtn = document.getElementById('preview-data-extract-btn');
+  const hideDataExtractPreviewBtn = document.getElementById('hide-data-extract-preview-btn');
+  const geojsonPreviewWrapper = document.getElementById('geojson-preview-wrapper');
+  const geojsonPreviewContainer = document.getElementById('geojson-preview-container');
+
+  if (previewDataExtractBtn && geojsonPreviewWrapper) {
+    previewDataExtractBtn.addEventListener('click', () => {
+      geojsonPreviewWrapper.style.display = 'block';
+      if (hideDataExtractPreviewBtn) hideDataExtractPreviewBtn.style.display = 'inline-flex';
+    });
+  }
+
+  if (hideDataExtractPreviewBtn && geojsonPreviewWrapper && geojsonPreviewContainer) {
+    hideDataExtractPreviewBtn.addEventListener('click', () => {
+      geojsonPreviewWrapper.style.display = 'none';
+      hideDataExtractPreviewBtn.style.display = 'none';
+      geojsonPreviewContainer.innerHTML = '';
+    });
+  }
+
+  // Step 3: Split AOI - Handle algorithm selection and parameter visibility
+  const splitAlgorithm = document.getElementById('split-algorithm');
+  const paramBuildings = document.getElementById('param-buildings');
+  const paramDimension = document.getElementById('param-dimension');
+  const noOfBuildingsInput = document.getElementById('no-of-buildings');
+  const dimensionMetersInput = document.getElementById('dimension-meters');
+
+  if (splitAlgorithm) {
+    // Function to update parameter visibility
+    function updateParameterVisibility() {
+      const algorithm = splitAlgorithm.value;
+      if (algorithm === 'DIVIDE_BY_SQUARE') {
+        if (paramBuildings) paramBuildings.style.display = 'none';
+        if (paramDimension) paramDimension.style.display = 'block';
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.removeAttribute('required');
+          noOfBuildingsInput.disabled = true; // Disable so it's not sent
+        }
+        if (dimensionMetersInput) {
+          dimensionMetersInput.setAttribute('required', 'required');
+          dimensionMetersInput.disabled = false;
+        }
+      } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
+        if (paramBuildings) paramBuildings.style.display = 'block';
+        if (paramDimension) paramDimension.style.display = 'none';
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.setAttribute('required', 'required');
+          noOfBuildingsInput.disabled = false;
+        }
+        if (dimensionMetersInput) {
+          dimensionMetersInput.removeAttribute('required');
+          dimensionMetersInput.disabled = true; // Disable so it's not sent
+        }
+      } else {
+        // NO_SPLITTING, TOTAL_TASKS, or other options
+        if (paramBuildings) paramBuildings.style.display = 'none';
+        if (paramDimension) paramDimension.style.display = 'none';
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.removeAttribute('required');
+          noOfBuildingsInput.disabled = true; // Disable so it's not sent
+        }
+        if (dimensionMetersInput) {
+          dimensionMetersInput.removeAttribute('required');
+          dimensionMetersInput.disabled = true; // Disable so it's not sent
+        }
+      }
+    }
+
+    // Initialize visibility on page load
+    updateParameterVisibility();
+
+    // Update on change
+    splitAlgorithm.addEventListener('change', updateParameterVisibility);
+  }
+
+  // Scroll to map after successful split
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'split-status') {
+      // Check if split was successful (contains success message)
+      const content = event.detail.target.innerHTML;
+      if (content.includes('split successfully') || content.includes('Generated')) {
+        // Scroll to the map preview after a short delay to allow map to render
+        setTimeout(function() {
+          const mapContainer = document.getElementById('leaflet-map-split-preview');
+          if (mapContainer) {
+            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            // Fallback: scroll to split-status container
+            event.detail.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 500);
+      }
+    }
+  });
+
+  // Handle form submission and HTMX events
+  const splitAoiForm = document.getElementById('split-aoi-form');
+  if (splitAoiForm) {
+    // Function to update UI based on algorithm selection
+    function updateAlgorithmUI() {
+      const algorithm = splitAlgorithm?.value;
+      const paramContainer = document.getElementById('algorithm-param-container');
+      const splitBtn = splitAoiForm.querySelector('button[type="submit"]');
+      const splitBtnText = document.getElementById('split-btn-text');
+
+      // Show/hide parameter container based on algorithm
+      if (paramContainer) {
+        if (algorithm === 'NO_SPLITTING' || !algorithm) {
+          paramContainer.style.display = 'none';
+        } else {
+          paramContainer.style.display = 'block';
+        }
+      }
+
+      // Update button text based on algorithm and current state
+      if (splitBtnText) {
+        if (algorithm === 'NO_SPLITTING') {
+          splitBtnText.textContent = 'Confirm No Splitting';
+        } else if (algorithm === 'DIVIDE_BY_SQUARE') {
+          splitBtnText.textContent = 'Split by Square';
+        } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
+          splitBtnText.textContent = 'Split by Buildings';
+        } else if (algorithm && algorithm !== '') {
+          splitBtnText.textContent = 'Split AOI';
+        } else {
+          splitBtnText.textContent = 'Select Option';
+        }
+      }
+
+      // Disable/enable button based on selection
+      if (splitBtn) {
+        splitBtn.disabled = !algorithm || algorithm === '';
+      }
+
+      // Disable the parameter that's not needed so it's not sent in form data
+      if (algorithm === 'DIVIDE_BY_SQUARE') {
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.disabled = true;
+        }
+        if (dimensionMetersInput) {
+          dimensionMetersInput.disabled = false;
+        }
+      } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
+        if (dimensionMetersInput) {
+          dimensionMetersInput.disabled = true;
+        }
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.disabled = false;
+        }
+      } else if (algorithm === 'NO_SPLITTING' || !algorithm) {
+        if (noOfBuildingsInput) {
+          noOfBuildingsInput.disabled = true;
+        }
+        if (dimensionMetersInput) {
+          dimensionMetersInput.disabled = true;
+        }
+      }
+    }
+
+    // Update UI on algorithm change
+    if (splitAlgorithm) {
+      splitAlgorithm.addEventListener('change', updateAlgorithmUI);
+      // Initialize UI on page load
+      updateAlgorithmUI();
+    }
+
+    // Handle form submission - ensure correct parameter is sent
+    splitAoiForm.addEventListener('submit', function(e) {
+      const algorithm = splitAlgorithm?.value;
+
+      if (!algorithm || algorithm === '') {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // Show loading spinner on form submission
+    splitAoiForm.addEventListener('htmx:beforeRequest', function() {
+      const splitLoading = document.getElementById('split-loading');
+      const splitBtnText = document.getElementById('split-btn-text');
+      const splitBtnSpinner = document.getElementById('split-btn-spinner');
+      if (splitLoading) splitLoading.style.display = 'block';
+      const algorithm = splitAlgorithm?.value;
+      if (splitBtnText) {
+        if (algorithm === 'NO_SPLITTING') {
+          splitBtnText.textContent = 'Confirming...';
+        } else {
+          splitBtnText.textContent = 'Splitting...';
+        }
+      }
+      if (splitBtnSpinner) splitBtnSpinner.style.display = 'inline-block';
+    });
+
+    splitAoiForm.addEventListener('htmx:afterRequest', function(event) {
+      const splitLoading = document.getElementById('split-loading');
+      const splitBtnText = document.getElementById('split-btn-text');
+      const splitBtnSpinner = document.getElementById('split-btn-spinner');
+      if (splitLoading) splitLoading.style.display = 'none';
+      if (splitBtnSpinner) splitBtnSpinner.style.display = 'none';
+
+      // Update UI after request
+      updateAlgorithmUI();
+
+      // Check if operation was successful (status 200)
+      if (event.detail.xhr.status === 200) {
+        const responseText = event.detail.xhr.responseText;
+        // If page refresh is triggered, the UI will update automatically
+        if (responseText.includes('HX-Refresh') || responseText.includes('proceed to Step 4')) {
+          // Page will refresh, no need to update button text
+        } else {
+          // Update button text based on current algorithm selection
+          updateAlgorithmUI();
+        }
+      }
+    });
+  }
+
+  // Step 4: Finalise Project - Unified button with advanced options
+  const finaliseProjectBtn = document.getElementById('finalise-project-btn');
+  const advancedOptionsToggle = document.getElementById('advanced-options-toggle');
+  const finaliseStatus = document.getElementById('finalise-status');
+  const credentialsModal = document.getElementById('credentials-modal');
+  const cancelCredsBtn = document.getElementById('cancel-creds-btn');
+  const testCredsBtn = document.getElementById('test-creds-btn');
+  const saveCredsBtn = document.getElementById('save-creds-btn');
+  const credentialsForm = document.getElementById('credentials-form');
+  const credentialsError = document.getElementById('credentials-error');
+  const credentialsModalTitle = document.getElementById('credentials-modal-title');
+  const odkCredentialsFields = document.getElementById('odk-credentials-fields');
+  const qfieldCredentialsFields = document.getElementById('qfield-credentials-fields');
+
+  // Determine project type
+  const projectType = {% if field_mapping_app_value %}"{{ field_mapping_app_value|e }}"{% else %}null{% endif %};
+
+  const isOdk = projectType === 'ODK';
+  const isQField = projectType === 'QField';
+  let customCreds = null;
+
+  // Helper function to show error message
+  function showError(message, variant = 'danger') {
+    if (credentialsError) {
+      credentialsError.innerHTML = `<wa-callout variant="${variant}"><span>${message}</span></wa-callout>`;
+    }
+  }
+
+  // Helper function to get current credentials
+  function getCredentials() {
+    if (isOdk) {
+      return {
+        url: document.getElementById('odk-url-input')?.value?.trim(),
+        username: document.getElementById('odk-username-input')?.value?.trim(),
+        password: document.getElementById('odk-password-input')?.value?.trim()
+      };
+    } else if (isQField) {
+      return {
+        url: document.getElementById('qfield-url-input')?.value?.trim(),
+        username: document.getElementById('qfield-username-input')?.value?.trim(),
+        password: document.getElementById('qfield-password-input')?.value?.trim()
+      };
+    }
+    return null;
+  }
+
+  // Helper function to reset modal
+  function resetModal() {
+    if (credentialsModal) credentialsModal.style.display = 'none';
+    if (credentialsForm) credentialsForm.reset();
+    if (credentialsError) credentialsError.innerHTML = '';
+    customCreds = null;
+  }
+
+  // Open credentials modal
+  if (advancedOptionsToggle && credentialsModal) {
+    advancedOptionsToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Check if project type is set
+      if (!isOdk && !isQField) {
+        showError('Project type not set. Please set the field mapping app first.', 'warning');
+        credentialsModal.style.display = 'flex';
+        return;
+      }
+
+      // Configure modal based on project type
+      if (isOdk) {
+        credentialsModalTitle.textContent = 'Custom ODK Credentials';
+        if (odkCredentialsFields) odkCredentialsFields.style.display = 'block';
+        if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = 'none';
+      } else if (isQField) {
+        credentialsModalTitle.textContent = 'Custom QField Credentials';
+        if (odkCredentialsFields) odkCredentialsFields.style.display = 'none';
+        if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = 'block';
+      }
+
+      credentialsModal.style.display = 'flex';
+    });
+  }
+
+  // Close modal when clicking outside
+  if (credentialsModal) {
+    credentialsModal.addEventListener('click', function(e) {
+      if (e.target === credentialsModal) {
+        resetModal();
+      }
+    });
+  }
+
+  // Cancel button
+  if (cancelCredsBtn) {
+    cancelCredsBtn.addEventListener('click', resetModal);
+  }
+
+  // Test credentials
+  if (testCredsBtn) {
+    testCredsBtn.addEventListener('click', async function() {
+      const creds = getCredentials();
+
+      if (!creds || !creds.url || !creds.username || !creds.password) {
+        showError('Please fill in all fields.', 'danger');
+        return;
+      }
+
+      try {
+        testCredsBtn.disabled = true;
+        testCredsBtn.textContent = 'Testing...';
+        showError('Testing credentials...', 'info');
+
+        let response;
+
+        if (isOdk) {
+          const params = new URLSearchParams({
+            external_project_instance_url: creds.url,
+            external_project_username: creds.username,
+            external_project_password: creds.password
+          });
+          response = await fetch(`/central/test-credentials?${params}`, {
+            method: 'POST'
+          });
+        } else if (isQField) {
+          response = await fetch('/qfield/test-credentials', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              qfield_cloud_url: creds.url,
+              qfield_cloud_user: creds.username,
+              qfield_cloud_password: creds.password
+            })
+          });
+        }
+
+        if (response.ok) {
+          showError('✓ Credentials are valid!', 'success');
+          customCreds = creds;
+        } else {
+          const error = await response.json();
+          showError(error.detail || 'Invalid credentials. Please check and try again.', 'danger');
+          customCreds = null;
+        }
+      } catch (error) {
+        showError(`Error testing credentials: ${error.message}`, 'danger');
+        customCreds = null;
+      } finally {
+        testCredsBtn.disabled = false;
+        testCredsBtn.textContent = 'Test Credentials';
+      }
+    });
+  }
+
+  // Save credentials and proceed
+  if (saveCredsBtn && credentialsForm) {
+    credentialsForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!customCreds) {
+        showError('Please test credentials first before continuing.', 'warning');
+        return;
+      }
+
+      credentialsModal.style.display = 'none';
+
+      // Finalise project with custom credentials
+      await finaliseProject();
+    });
+  }
+
+      // Finalise Project (unified function)
+      async function finaliseProject() {
+        const projectTypeName = isOdk ? 'ODK Central' : (isQField ? 'QField' : 'the mapping tool');
+        if (!confirm(`Are you sure you want to finalise this project in ${projectTypeName}? This will create the project, upload forms, and generate all necessary files.`)) {
+          return;
+        }
+
+        try {
+          finaliseStatus.innerHTML = `<wa-callout variant="info"><span>Creating project in ${projectTypeName}... This may take a moment.</span></wa-callout>`;
+          if (finaliseProjectBtn) finaliseProjectBtn.disabled = true;
+          if (advancedOptionsToggle) advancedOptionsToggle.disabled = true;
+
+          const formData = new FormData();
+          if (customCreds) {
+            if (isOdk) {
+              formData.append('external_project_instance_url', customCreds.url);
+              formData.append('external_project_username', customCreds.username);
+              formData.append('external_project_password', customCreds.password);
+            } else if (isQField) {
+              formData.append('qfield_cloud_url', customCreds.url);
+              formData.append('qfield_cloud_user', customCreds.username);
+              formData.append('qfield_cloud_password', customCreds.password);
+            }
+          }
+
+          let endpoint;
+          if (isOdk) {
+            endpoint = `/create-project-odk-htmx?project_id=${projectId}`;
+          } else if (isQField) {
+            endpoint = `/create-project-qfield-htmx?project_id=${projectId}`;
+          } else {
+            finaliseStatus.innerHTML = '<wa-callout variant="danger"><span>Project type not set. Please set the field mapping app first.</span></wa-callout>';
+            if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
+            if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
+            return;
+          }
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.text();
+          finaliseStatus.innerHTML = result;
+
+          if (response.ok) {
+            setTimeout(() => window.location.reload(), 2000);
+          } else {
+            if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
+            if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
+          }
+        } catch (error) {
+          finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
+          if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
+          if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
+        }
+      }
+
+      // Finalise Project button
+      if (finaliseProjectBtn) {
+        finaliseProjectBtn.addEventListener('click', function() {
+          // Use default credentials (server bundled) if no custom credentials set
+          finaliseProject();
+        });
+      }
+
+      // NOTE: We intentionally do not auto-load Leaflet previews on page load.
+      // This keeps Step 2 "completed" state collapsed (no reserved space for the map).
+    })();
+</script>

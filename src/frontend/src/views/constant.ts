@@ -11,7 +11,7 @@ export const projectDetailsConstant = {
   per_task_instructions:
     '<p><strong>Upon arriving at a building:</strong></p><ul><li><p>Identify a respondent</p></li><li><p>Introduce yourself</p></li><li><p>Provide a summary description of the project (Reference project description in the form)</p></li><li><p>Once you complete the form, proofread your responses before submitting</p></li></ul>',
   slug: 'freetown-cbd-regeneration-poi-mapping-phase-3',
-  task_split_type: 'DIVIDE_ON_SQUARE',
+  task_split_type: 'DIVIDE_BY_SQUARE',
   location_str: 'Freetown,Sierra Leone',
   custom_tms_url: '',
   status: 'PUBLISHED',

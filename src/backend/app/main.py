@@ -1,5 +1,6 @@
 """Litestar application entrypoint (renamed from litestar_app.py)."""
 
+import html
 import json
 import logging
 from pathlib import Path
@@ -123,6 +124,59 @@ def _custom_validation_exception_handler(
     )
 
 
+def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
+    """Handle exceptions for HTMX requests to prevent proxy interception.
+
+    Returns a 200 OK response with an error component that HTMX can swap in.
+    This prevents bunkerweb from intercepting 500 errors and showing its own error page.
+    """
+    # Check if this is an HTMX request
+    is_htmx = request.headers.get("HX-Request") == "true"
+
+    # Determine error message
+    user_msg = "An unexpected error occurred. Please contact an admin."
+    if isinstance(exc, HTTPException):
+        if exc.status_code < 500:
+            # Show specific details for client errors (4xx)
+            user_msg = str(exc.detail) if exc.detail else user_msg
+        status_code = exc.status_code
+    else:
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    # Log the full exception for server errors
+    if status_code >= 500:
+        log.exception(f"Server error intercepted: {str(exc)}")
+
+    # For HTMX requests, return 200 OK with error component to prevent bunkerweb interception
+    # By returning 200 instead of 500, bunkerweb won't intercept and show its own error page
+    if is_htmx:
+        # Use wa-callout component to match the pattern used in HTMX routes
+        # Escape the message for HTML safety
+        escaped_msg = html.escape(user_msg)
+        error_html = (
+            f'<wa-callout variant="danger"><span>{escaped_msg}</span></wa-callout>'
+        )
+
+        return Response(
+            content=error_html,
+            media_type="text/html",
+            status_code=status.HTTP_200_OK,
+            # HTMX will swap this into the target element specified in the request
+            # This prevents bunkerweb from intercepting 500 errors
+        )
+
+    # For non-HTMX requests, return standard error response
+    return Response(
+        content={
+            "detail": str(exc)
+            if not isinstance(exc, HTTPException)
+            else str(exc.detail)
+        },
+        status_code=status_code,
+        media_type="application/json",
+    )
+
+
 def _build_cors_config() -> CORSConfig:
     """Configure CORS for server."""
     cors_config = CORSConfig(
@@ -242,7 +296,11 @@ def create_app() -> Litestar:
         cors_config=_build_cors_config(),
         openapi_config=OpenAPIConfig(title="Field-TM", version=__version__),
         logging_config=_get_logging_config(),
-        exception_handlers={ValidationException: _custom_validation_exception_handler},
+        exception_handlers={
+            ValidationException: _custom_validation_exception_handler,
+            HTTPException: _htmx_exception_handler,
+            Exception: _htmx_exception_handler,
+        },
         template_config=TemplateConfig(
             directory=Path(__file__).parent / "templates",
             engine=JinjaTemplateEngine,

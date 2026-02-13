@@ -65,7 +65,7 @@ async def test_patch_project_invalid(client, project, project_data):
 
     expected_errors = {
         "task_split_type": (
-            "'DIVIDE_ON_SQUARE', 'CHOOSE_AREA_AS_TASK' or 'TASK_SPLITTING_ALGORITHM'"
+            "'DIVIDE_BY_SQUARE', 'CHOOSE_AREA_AS_TASK' or 'TASK_SPLITTING_ALGORITHM'"
         ),
         "priority": "'MEDIUM', 'LOW', 'HIGH' or 'URGENT'",
     }

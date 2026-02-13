@@ -17,10 +17,12 @@
 #
 """Module to configure different monitoring configs."""
 
+import html
 import logging
 from typing import Any
 
 from litestar import Litestar, Request, Response
+from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from litestar.types import ASGIApp, Receive, Scope, Send
 
@@ -179,6 +181,24 @@ def set_otel_tracer(app: Litestar, endpoint: str):
             }
         )
         current_span.record_exception(exc)
+
+        # Check if this is an HTMX request - if so, return 200 OK to prevent bunkerweb interception
+        is_htmx = request.headers.get("HX-Request") == "true"
+        if is_htmx:
+            # For HTMX requests, return 200 OK with error component to prevent bunkerweb interception
+            escaped_msg = html.escape(
+                str(exc.detail) if exc.detail else "An unexpected error occurred"
+            )
+            error_html = (
+                f'<wa-callout variant="danger"><span>{escaped_msg}</span></wa-callout>'
+            )
+            return Response(
+                content=error_html,
+                media_type="text/html",
+                status_code=status.HTTP_200_OK,
+            )
+
+        # For non-HTMX requests, return standard error response
         return Response(
             content={"detail": str(exc.detail)},
             status_code=exc.status_code,

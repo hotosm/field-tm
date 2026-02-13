@@ -92,11 +92,32 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentral] = None):
     return project
 
 
-def get_odk_form(odk_central: central_schemas.ODKCentral):
+def get_odk_form(odk_central: Optional[central_schemas.ODKCentral] = None):
     """Helper function to get the OdkForm with credentials."""
-    url = odk_central.external_project_instance_url
-    user = odk_central.external_project_username
-    pw = odk_central.external_project_password
+    if odk_central:
+        url = odk_central.external_project_instance_url
+        user = odk_central.external_project_username
+        pw = odk_central.external_project_password
+    else:
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = (
+            settings.ODK_CENTRAL_PASSWD.get_secret_value()
+            if settings.ODK_CENTRAL_PASSWD
+            else ""
+        )
+
+    if not url or not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "ODK Central credentials are missing. "
+                "Set ODK_CENTRAL_URL and ODK_CENTRAL_USER (and optionally ODK_CENTRAL_PASSWD), "
+                "or provide custom credentials."
+            ),
+        )
 
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
@@ -199,7 +220,7 @@ async def delete_odk_project(
 def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
-    odk_credentials: central_schemas.ODKCentral,
+    odk_credentials: Optional[central_schemas.ODKCentral],
 ) -> None:
     """Create an XForm on a remote ODK Central server.
 
@@ -274,7 +295,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
 
 
 def get_project_form_xml(
-    odk_creds: central_schemas.ODKCentral,
+    odk_creds: Optional[central_schemas.ODKCentral],
     external_project_id: int,
     odk_form_id: str,
 ) -> str:
@@ -599,33 +620,176 @@ async def task_geojson_dict_to_entity_values(
 
 
 async def create_entity_list(
-    odk_creds: central_schemas.ODKCentral,
+    odk_creds: Optional[central_schemas.ODKCentral],
     odk_id: int,
     properties: list[str],
     dataset_name: str = "features",
     entities_list: list[central_schemas.EntityDict] = None,
 ) -> None:
-    """Create a new Entity list in ODK."""
+    """Create a new Entity list (dataset) in ODK and upsert entities.
+
+    Notes on implementation:
+    - Dataset creation uses the async ODK client (`osm_fieldwork.OdkCentralAsync`)
+      because it is already used elsewhere and is async-friendly.
+    - Entity upsert uses **official `pyodk`** (sync) via `Client.entities.merge()` to
+      provide idempotent behavior on retries (insert/update; optionally delete).
+    """
     log.info("Creating ODK Entity properties list")
     properties = central_schemas.entity_fields_to_list(properties)
 
-    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-        # Step 1: create the Entity list, with properties
-        await odk_central.createDataset(
-            odk_id, datasetName=dataset_name, properties=properties
+    if odk_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ODK project_id is missing; cannot create/merge entity lists.",
         )
-        # Step 2: populate the Entities
-        if entities_list:
-            log.debug(f"Creating project ODK entities for dataset: {dataset_name}")
-            await odk_central.createEntities(
-                odk_id,
-                dataset_name,
-                entities_list,
+
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
+        # Step 1: ensure dataset exists (idempotent)
+        dataset_exists = False
+        try:
+            datasets = await odk_central.listDatasets(odk_id)
+            dataset_exists = any(
+                ds.get("name") == dataset_name for ds in (datasets or [])
+            )
+        except Exception as exc:
+            log.warning(f"Could not list datasets for ODK project {odk_id}: {exc}")
+
+        if not dataset_exists:
+            await odk_central.createDataset(
+                odk_id, datasetName=dataset_name, properties=properties
+            )
+        else:
+            log.info(
+                f"Dataset '{dataset_name}' already exists for ODK project {odk_id}; will reuse it."
+            )
+
+    # Step 2: upsert entities (idempotent) using pyodk merge
+    if not entities_list:
+        return
+
+    # Convert EntityDict format: {"label": str, "data": {...}} -> {"label": str, **data}
+    merge_rows = []
+    for ent in entities_list:
+        label = ent.get("label")
+        data = ent.get("data") or {}
+        if not label:
+            continue
+        merge_rows.append({"label": label, **data})
+
+    if not merge_rows:
+        return
+
+    async with central_deps.pyodk_client(odk_creds) as client:
+        # NOTE:
+        # - pyodk.entities.merge() internally calls get_table() *without* passing project_id,
+        #   so we set the default on the service.
+        # - pyodk.entities.merge(add_new_properties=True) can raise on property create 409
+        #   when a property exists but no current entities have that key populated (so it
+        #   isn't present in the OData table columns). To make this idempotent, we
+        #   pre-create properties (ignoring 409) and then do an explicit upsert.
+        client.entities.default_project_id = int(odk_id)
+
+        from pyodk._endpoints.entity_list_properties import EntityListPropertyService
+        from pyodk.errors import PyODKError
+
+        pid = int(odk_id)
+
+        # 1) Ensure all required properties exist (ignore 409 conflicts)
+        elps = EntityListPropertyService(
+            session=client.session,
+            default_project_id=pid,
+            default_entity_list_name=dataset_name,
+        )
+
+        required_keys = set(properties)
+        # Also include any keys present in data (minus label)
+        for row in merge_rows:
+            required_keys.update(k for k in row.keys() if k != "label")
+
+        for key in sorted(required_keys):
+            if key in {"__id", "__system", "label"}:
+                continue
+            try:
+                elps.create(name=key)
+            except PyODKError as exc:
+                # Treat "already exists" conflicts as OK (idempotent).
+                msg = str(exc)
+                if "Status: 409" in msg or '"code":409' in msg or 'code":409' in msg:
+                    continue
+                raise
+
+        # 2) Read existing entities and upsert by label
+        table = client.entities.get_table(entity_list_name=dataset_name, project_id=pid)
+        target_rows = table.get("value", []) if isinstance(table, dict) else []
+        target_by_label = {
+            r.get("label"): r
+            for r in target_rows
+            if isinstance(r, dict) and r.get("label")
+        }
+
+        to_insert = []
+        for src in merge_rows:
+            label = src.get("label")
+            if not label:
+                continue
+            tgt = target_by_label.get(label)
+            if not tgt:
+                to_insert.append(src)
+                continue
+
+            # Compute minimal update payload
+            update_data = {}
+            for k, v in src.items():
+                if k == "label":
+                    continue
+                existing_val = tgt.get(k)
+                # OData responses may omit keys when null; treat that as different.
+                if existing_val is None and k not in tgt:
+                    update_data[k] = v
+                elif str(v) != str(existing_val):
+                    update_data[k] = v
+
+            if update_data:
+                try:
+                    client.entities.update(
+                        uuid=tgt["__id"],
+                        entity_list_name=dataset_name,
+                        project_id=pid,
+                        label=label,
+                        data=update_data,
+                        base_version=tgt["__system"]["version"],
+                    )
+                except PyODKError as exc:
+                    msg = str(exc)
+                    # Handle concurrent update / version mismatch (409.15) gracefully:
+                    # if the Entity has been updated elsewhere between our table read
+                    # and this update call, Central requires a newer base_version or
+                    # ?force=true. For idempotent regeneration, we treat this as a
+                    # non-fatal warning and skip the update.
+                    if "Status: 409" in msg and "version" in msg:
+                        log.warning(
+                            "Skipping Entity update due to version conflict for "
+                            "label='%s' in dataset '%s' (ODK project %s): %s",
+                            label,
+                            dataset_name,
+                            pid,
+                            msg,
+                        )
+                    else:
+                        raise
+
+        if to_insert:
+            client.entities.create_many(
+                data=to_insert,
+                entity_list_name=dataset_name,
+                project_id=pid,
+                create_source="Field-TM",
+                source_size=len(to_insert),
             )
 
 
 async def create_entity(
-    odk_creds: central_schemas.ODKCentral,
+    odk_creds: Optional[central_schemas.ODKCentral],
     entity_uuid: UUID,
     odk_id: int,
     properties: list[str],
@@ -686,7 +850,7 @@ async def delete_entity(
 async def get_appuser_token(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentral,
+    odk_credentials: Optional[central_schemas.ODKCentral],
 ):
     """Get the app user token for a specific project.
 
@@ -719,7 +883,14 @@ async def get_appuser_token(
         appuser_token = appuser_json.get("token")
         appuser_sub = appuser_json.get("id")
 
-        odk_url = odk_credentials.external_project_instance_url
+        # Resolve base ODK URL for returned token link. If explicit credentials
+        # were not provided, fall back to environment configuration.
+        if odk_credentials and getattr(
+            odk_credentials, "external_project_instance_url", None
+        ):
+            odk_url = odk_credentials.external_project_instance_url
+        else:
+            odk_url = str(settings.ODK_CENTRAL_URL or "").rstrip("/")
 
         # Update the user role for the created xform
         log.info("Updating XForm role for appuser in ODK Central")

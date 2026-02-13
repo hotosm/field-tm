@@ -27,24 +27,46 @@ from typing import Optional
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.exceptions import HTTPException
-from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
+from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm, OdkProject
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentral
+from app.config import settings
+
+
+def _resolve_odk_creds(odk_creds: Optional[ODKCentral]) -> ODKCentral:
+    """Resolve ODK credentials.
+
+    The codebase often passes None to indicate "use env vars". Central client
+    constructors require concrete credentials, so we materialize them here.
+    """
+    if odk_creds:
+        return odk_creds
+
+    return ODKCentral(
+        external_project_instance_url=str(settings.ODK_CENTRAL_URL or ""),
+        external_project_username=str(settings.ODK_CENTRAL_USER or ""),
+        external_project_password=(
+            settings.ODK_CENTRAL_PASSWD.get_secret_value()
+            if settings.ODK_CENTRAL_PASSWD
+            else ""
+        ),
+    )
 
 
 @asynccontextmanager
-async def pyodk_client(odk_creds: ODKCentral):
+async def pyodk_client(odk_creds: Optional[ODKCentral]):
     """Async-compatible context manager for pyodk.Client.
 
     Offloads blocking Client(...) and client.__exit__ to a separate thread,
     and avoids blocking the async event loop in the endpoint.
     """
+    creds = _resolve_odk_creds(odk_creds)
     pyodk_config = CentralConfig(
-        base_url=odk_creds.external_project_instance_url,
-        username=odk_creds.external_project_username,
-        password=odk_creds.external_project_password,
+        base_url=creds.external_project_instance_url,
+        username=creds.external_project_username,
+        password=creds.external_project_password,
     )
 
     loop = get_running_loop()
@@ -57,13 +79,14 @@ async def pyodk_client(odk_creds: ODKCentral):
 
 
 @asynccontextmanager
-async def get_odk_dataset(odk_creds: ODKCentral):
+async def get_odk_dataset(odk_creds: Optional[ODKCentral]):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
+    creds = _resolve_odk_creds(odk_creds)
     try:
         async with OdkDataset(
-            url=odk_creds.external_project_instance_url,
-            user=odk_creds.external_project_username,
-            passwd=odk_creds.external_project_password,
+            url=creds.external_project_instance_url,
+            user=creds.external_project_username,
+            passwd=creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:
@@ -74,13 +97,32 @@ async def get_odk_dataset(odk_creds: ODKCentral):
 
 
 @asynccontextmanager
-async def get_async_odk_form(odk_creds: ODKCentral):
+async def get_odk_project(odk_creds: Optional[ODKCentral]):
+    """Wrap getting an OdkProject object with ConnectionError handling."""
+    creds = _resolve_odk_creds(odk_creds)
+    try:
+        async with OdkProject(
+            url=creds.external_project_instance_url,
+            user=creds.external_project_username,
+            passwd=creds.external_project_password,
+        ) as odk_central:
+            yield odk_central
+    except ConnectionError as conn_error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(conn_error),
+        ) from conn_error
+
+
+@asynccontextmanager
+async def get_async_odk_form(odk_creds: Optional[ODKCentral]):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
+    creds = _resolve_odk_creds(odk_creds)
     try:
         async with OdkForm(
-            url=odk_creds.external_project_instance_url,
-            user=odk_creds.external_project_username,
-            passwd=odk_creds.external_project_password,
+            url=creds.external_project_instance_url,
+            user=creds.external_project_username,
+            passwd=creds.external_project_password,
         ) as odk_central:
             yield odk_central
     except ConnectionError as conn_error:
