@@ -36,8 +36,9 @@ test_data_dir = Path(__file__).parent / "test_data"
 
 
 def _create_project(client: Client, name: str) -> dict:
+    base_url = str(client.session.base_url).rstrip("/")
     response = client.session.post(
-        f"{client.session.base_url}/v1/projects",
+        f"{base_url}/projects",
         json={"name": name},
     )
     response.raise_for_status()
@@ -45,15 +46,17 @@ def _create_project(client: Client, name: str) -> dict:
 
 
 def _delete_project(client: Client, project_id: int) -> None:
-    response = client.session.delete(f"{client.session.base_url}/v1/projects/{project_id}")
+    base_url = str(client.session.base_url).rstrip("/")
+    response = client.session.delete(f"{base_url}/projects/{project_id}")
     # Central returns 404 if already removed; tolerate this in cleanup.
     if response.status_code not in (200, 204, 404):
         response.raise_for_status()
 
 
 def _delete_form(client: Client, project_id: int, form_id: str) -> None:
+    base_url = str(client.session.base_url).rstrip("/")
     response = client.session.delete(
-        f"{client.session.base_url}/v1/projects/{project_id}/forms/{form_id}"
+        f"{base_url}/projects/{project_id}/forms/{form_id}"
     )
     if response.status_code not in (200, 204, 404):
         response.raise_for_status()

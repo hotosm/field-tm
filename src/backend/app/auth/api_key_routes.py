@@ -19,14 +19,12 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from litestar import delete, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
-from pydantic import BaseModel
 from psycopg import AsyncConnection
+from pydantic import BaseModel
 
 from app.auth.api_key import generate_api_key, hash_api_key
 from app.auth.auth_deps import login_required
@@ -38,7 +36,7 @@ from app.db.models import DbApiKey
 class ApiKeyCreateRequest(BaseModel):
     """Input payload for creating an API key."""
 
-    name: Optional[str] = None
+    name: str | None = None
 
 
 @post(

@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import hashlib
 import secrets
-from typing import Optional
 
 from litestar import Request
 from litestar import status_codes as status
@@ -82,7 +81,7 @@ async def _authenticate_api_key(db: AsyncConnection, raw_api_key: str) -> AuthUs
 async def api_key_required(
     request: Request,  # noqa: ARG001 - required for Litestar dependency signature
     db: AsyncConnection,
-    x_api_key: Optional[str] = Parameter(default=None, header="X-API-KEY"),
+    x_api_key: str | None = Parameter(default=None, header="X-API-KEY"),
 ) -> AuthUser:
     """Dependency that authenticates requests via X-API-KEY header."""
     if not x_api_key:
@@ -96,8 +95,8 @@ async def api_key_required(
 async def login_or_api_key(
     request: Request,
     db: AsyncConnection,
-    x_api_key: Optional[str] = Parameter(default=None, header="X-API-KEY"),
-    access_token: Optional[str] = Parameter(default=None, header="access_token"),
+    x_api_key: str | None = Parameter(default=None, header="X-API-KEY"),
+    access_token: str | None = Parameter(default=None, header="access_token"),
 ) -> AuthUser:
     """Allow either cookie-based auth or API key auth."""
     if x_api_key:
