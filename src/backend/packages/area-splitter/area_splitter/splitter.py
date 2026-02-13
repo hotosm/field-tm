@@ -448,6 +448,8 @@ class FMTMSplitter:
             common_args = dict(osm_id=osm_id, geom=wkb_element, tags=tags)
 
             # Insert building polygons
+            # FIXME suggestion by @amitdkhan-pg
+            # if "building" in tags:
             if tags.get("building") == "yes":
                 insert_geom(cur, "ways_poly", **common_args)
 

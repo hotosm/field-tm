@@ -97,6 +97,7 @@ def clean_tags_for_qgis(
 async def create_qfield_project(
     db: AsyncConnection,
     project: DbProject,
+    custom_qfield_creds: QFieldCloud | None = None,
 ):
     """Create QField project in QFieldCloud via QGIS job API."""
     qgis_job_id = str(uuid4())
@@ -222,7 +223,7 @@ async def create_qfield_project(
     # IF organization is not given then it will use default username as owner.
     # FIXME this is hardcoded to use HOTOSM org for now
     log.debug(f"Creating QFieldCloud project: {qfc_project_name}")
-    async with qfield_client() as client:
+    async with qfield_client(custom_qfield_creds) as client:
         qfield_project = client.create_project(
             qfc_project_name,
             owner="HOTOSM",

@@ -19,6 +19,7 @@
 
 from typing import Annotated, Optional, Self, Union
 
+from area_splitter import SplittingAlgorithm
 from geojson_pydantic import (
     Feature,
     FeatureCollection,
@@ -36,7 +37,6 @@ from app.db.enums import (
     FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
-    TaskSplitType,
 )
 from app.db.models import DbProject, slugify
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
@@ -265,7 +265,7 @@ class ProjectIn(ProjectInBase, ODKCentral):
 
     # Add task_split_type and priority with enum validation
     # Pydantic will automatically validate these enum types
-    task_split_type: Optional[TaskSplitType] = None
+    task_split_type: Optional[SplittingAlgorithm] = None
     priority: Optional[ProjectPriority] = None
 
     @property
@@ -303,7 +303,7 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
 
     # Add task_split_type and priority with enum validation
     # Pydantic will automatically validate these enum types
-    task_split_type: Optional[TaskSplitType] = None
+    task_split_type: Optional[SplittingAlgorithm] = None
     priority: Optional[ProjectPriority] = None
 
     # XLSForm binary content for project

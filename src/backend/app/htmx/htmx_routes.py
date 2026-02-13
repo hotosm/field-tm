@@ -25,8 +25,8 @@ from pathlib import Path
 
 import aiohttp
 import geojson
-import segno
 from anyio import to_thread
+from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql, split_by_square
 from litestar import Router, get, post
 from litestar import status_codes as status
@@ -39,7 +39,6 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response, Template
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.json_data_models import data_models_path
-from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -47,13 +46,13 @@ from psycopg.rows import dict_row
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
-from app.auth.roles import mapper
+from app.auth.roles import mapper, project_manager
 from app.central import central_crud, central_deps
 from app.central.central_routes import _validate_xlsform_extension
 from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import FieldMappingApp, ProjectStatus, TaskSplitType, XLSFormType
+from app.db.enums import ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
 from app.db.postgis_utils import (
@@ -67,6 +66,8 @@ from app.db.postgis_utils import (
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_schemas import ProjectUpdate
+from app.qfield.qfield_crud import create_qfield_project
+from app.qfield.qfield_schemas import QFieldCloud
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +95,11 @@ def render_leaflet_map(
     Returns:
         HTML string with Leaflet map including CSS and JS
     """
+    import time
+
+    # Generate unique map ID to avoid conflicts with previous maps
+    unique_map_id = f"{map_id}-{int(time.time() * 1000)}"
+
     # Escape GeoJSON for JavaScript
     escaped_layers = []
     for layer in geojson_layers:
@@ -111,71 +117,154 @@ def render_leaflet_map(
     layers_json = json.dumps(escaped_layers).replace("</script>", "<\\/script>")
 
     map_html = f"""
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <div id="{map_id}" style="height: {height}; width: 100%; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;"></div>
+    <div id="{unique_map_id}" style="height: {height}; width: 100%; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;"></div>
     <script>
         (function() {{
-            // Initialize Leaflet map
-            const map = L.map('{map_id}').setView([0, 0], 2);
-            
-            // Add OpenStreetMap tile layer
-            L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }}).addTo(map);
-            
-            // Load and display GeoJSON layers
-            const layersConfig = {layers_json};
-            const layers = [];
-            let allBounds = [];
-            
-            layersConfig.forEach(function(layerConfig, index) {{
-                const geojsonData = JSON.parse(layerConfig.data);
-                const geojsonLayer = L.geoJSON(geojsonData, {{
-                    style: function(feature) {{
-                        return {{
-                            color: layerConfig.color,
-                            weight: layerConfig.weight,
-                            opacity: layerConfig.opacity,
-                            fillOpacity: layerConfig.fillOpacity
-                        }};
-                    }},
-                    onEachFeature: function(feature, layer) {{
-                        if (feature.properties) {{
-                            const props = Object.keys(feature.properties).slice(0, 5).map(k => 
-                                '<strong>' + k + ':</strong> ' + feature.properties[k]
-                            ).join('<br>');
-                            layer.bindPopup('<strong>' + layerConfig.name + '</strong><br>' + (props || 'No properties'));
+            // Clean up any existing maps with the same base ID pattern
+            const baseMapId = '{map_id}';
+            const existingContainers = document.querySelectorAll('[id^="' + baseMapId + '-"]');
+            existingContainers.forEach(function(container) {{
+                if (container._leaflet_id && typeof L !== 'undefined') {{
+                    try {{
+                        const oldMap = L.Map.prototype.get(container._leaflet_id);
+                        if (oldMap) {{
+                            oldMap.remove();
                         }}
+                    }} catch (e) {{
+                        // Map already removed or doesn't exist
                     }}
-                }});
-                
-                geojsonLayer.addTo(map);
-                layers.push({{name: layerConfig.name, layer: geojsonLayer}});
-                
-                // Collect bounds for fitting
-                if (geojsonLayer.getBounds().isValid()) {{
-                    allBounds.push(geojsonLayer.getBounds());
                 }}
             }});
             
-            // Add layer control if multiple layers and controls enabled
-            if (layers.length > 1 && {str(show_controls).lower()}) {{
-                const layerControl = L.control.layers({{}}, {{}});
-                layers.forEach(function(l) {{
-                    layerControl.addOverlay(l.layer, l.name);
-                }});
-                layerControl.addTo(map);
+            // Function to initialize the map
+            function initMap() {{
+                const mapContainer = document.getElementById('{unique_map_id}');
+                if (!mapContainer) {{
+                    setTimeout(initMap, 50);
+                    return;
+                }}
+                
+                // Check if Leaflet is loaded
+                if (typeof L === 'undefined') {{
+                    // Load Leaflet if not already loaded
+                    if (!document.querySelector('link[href*="leaflet.css"]')) {{
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                        document.head.appendChild(link);
+                    }}
+                    if (!document.querySelector('script[src*="leaflet.js"]')) {{
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                        script.onload = function() {{
+                            setTimeout(initMap, 100);
+                        }};
+                        document.head.appendChild(script);
+                        return;
+                    }}
+                    setTimeout(initMap, 100);
+                    return;
+                }}
+                
+                // Check if container already has a map
+                if (mapContainer._leaflet_id) {{
+                    try {{
+                        const existingMap = L.Map.prototype.get(mapContainer._leaflet_id);
+                        if (existingMap) {{
+                            existingMap.remove();
+                        }}
+                    }} catch (e) {{
+                        // Ignore errors
+                    }}
+                }}
+                
+                // Small delay to ensure container is fully rendered
+                setTimeout(function() {{
+                    try {{
+                        // Initialize Leaflet map
+                        const map = L.map('{unique_map_id}').setView([0, 0], 2);
+                        
+                        // Add OpenStreetMap tile layer
+                        L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+                            attribution: '© OpenStreetMap contributors',
+                            maxZoom: 19
+                        }}).addTo(map);
+                        
+                        // Load and display GeoJSON layers
+                        const layersConfig = {layers_json};
+                        const layers = [];
+                        let allBounds = [];
+                        
+                        layersConfig.forEach(function(layerConfig, index) {{
+                            const geojsonData = JSON.parse(layerConfig.data);
+                            const geojsonLayer = L.geoJSON(geojsonData, {{
+                                style: function(feature) {{
+                                    return {{
+                                        color: layerConfig.color,
+                                        weight: layerConfig.weight,
+                                        opacity: layerConfig.opacity,
+                                        fillOpacity: layerConfig.fillOpacity
+                                    }};
+                                }},
+                                onEachFeature: function(feature, layer) {{
+                                    if (feature.properties) {{
+                                        const props = Object.keys(feature.properties).slice(0, 5).map(k => 
+                                            '<strong>' + k + ':</strong> ' + feature.properties[k]
+                                        ).join('<br>');
+                                        layer.bindPopup('<strong>' + layerConfig.name + '</strong><br>' + (props || 'No properties'));
+                                    }}
+                                }}
+                            }});
+                            
+                            geojsonLayer.addTo(map);
+                            layers.push({{name: layerConfig.name, layer: geojsonLayer}});
+                            
+                            // Collect bounds for fitting
+                            if (geojsonLayer.getBounds().isValid()) {{
+                                allBounds.push(geojsonLayer.getBounds());
+                            }}
+                        }});
+                        
+                        // Add layer control if multiple layers and controls enabled
+                        if (layers.length > 1 && {str(show_controls).lower()}) {{
+                            const layerControl = L.control.layers({{}}, {{}});
+                            layers.forEach(function(l) {{
+                                layerControl.addOverlay(l.layer, l.name);
+                            }});
+                            layerControl.addTo(map);
+                        }}
+                        
+                        // Fit map to all layer bounds
+                        if (allBounds.length > 0) {{
+                            let combinedBounds = allBounds[0];
+                            for (let i = 1; i < allBounds.length; i++) {{
+                                combinedBounds = combinedBounds.extend(allBounds[i]);
+                            }}
+                            map.fitBounds(combinedBounds);
+                        }}
+                        
+                        // Trigger resize to ensure map renders correctly
+                        setTimeout(function() {{
+                            map.invalidateSize();
+                        }}, 100);
+                    }} catch (error) {{
+                        console.error('Error initializing Leaflet map:', error);
+                    }}
+                }}, 100);
             }}
             
-            // Fit map to all layer bounds
-            if (allBounds.length > 0) {{
-                let combinedBounds = allBounds[0];
-                for (let i = 1; i < allBounds.length; i++) {{
-                    combinedBounds = combinedBounds.extend(allBounds[i]);
-                }}
-                map.fitBounds(combinedBounds);
+            // Initialize map after HTMX swap
+            if (document.getElementById('{unique_map_id}')) {{
+                initMap();
+            }} else {{
+                // Wait for HTMX to swap content
+                const initAfterSwap = function(event) {{
+                    if (document.getElementById('{unique_map_id}')) {{
+                        initMap();
+                        document.body.removeEventListener('htmx:afterSwap', initAfterSwap);
+                    }}
+                }};
+                document.body.addEventListener('htmx:afterSwap', initAfterSwap);
             }}
         }})();
     </script>
@@ -874,14 +963,10 @@ async def download_osm_data_htmx(
 
         await check_crs(featcol_single_geom_type)
 
-        # Don't save to database yet - only save after successful ODK upload
-        # Store in hidden input for submission
         feature_count = len(featcol_single_geom_type.get("features", []))
-        geojson_json = (
-            json.dumps(featcol_single_geom_type)
-            .replace("'", "&#39;")
-            .replace('"', "&quot;")
-        )
+
+        # Encode GeoJSON for the Accept button (don't save yet)
+        geojson_str = json.dumps(featcol_single_geom_type).replace('"', "&quot;")
 
         # Automatically show preview after successful download
         # Get the project again to check field_mapping_app for button text
@@ -909,32 +994,30 @@ async def download_osm_data_htmx(
             show_controls=False,
         )
 
-        # Return success message with embedded map preview
+        # Return success message with embedded map preview and Accept button
         return Response(
             content=f"""<wa-callout variant="success"><span>✓ OSM data downloaded successfully! Found {feature_count} features.</span></wa-callout>
             <div id="geojson-preview-container" style="margin-top: 15px;">
                 <div style="margin-bottom: 10px;">
                     <wa-callout variant="info">
-                        <span>Previewing {feature_count} features on map. Review the data, then submit to {app_name} when ready.</span>
+                        <span>Previewing {feature_count} features on map. Review the data below. If satisfied, click "Accept Data Extract" to save. Otherwise, try downloading again with different parameters.</span>
                     </wa-callout>
                 </div>
                 {map_html_content}
-                <form id="submit-data-extract-form" style="margin-top: 15px;">
-                    <input type="hidden" name="geojson-data" value='{geojson_json}' />
-                    <div style="display: flex; gap: 10px;">
-                        <button 
-                            id="submit-data-extract-btn" 
-                            hx-post="/submit-geojson-data-extract-htmx?project_id={project_id}"
-                            hx-target="#submit-status"
-                            hx-swap="innerHTML"
-                            hx-include="#submit-data-extract-form"
-                            class="wa-button wa-button--primary"
-                            style="flex: 1;"
-                        >
-                            Upload Data Extract to {app_name}
-                        </button>
-                    </div>
-                    <div id="submit-status" style="margin-top: 10px;"></div>
+                <form id="accept-data-extract-form" style="margin-top: 15px; display: flex; gap: 10px;">
+                    <input type="hidden" name="data_extract_geojson" value='{geojson_str}' />
+                    <button 
+                        id="accept-data-extract-btn"
+                        type="submit"
+                        hx-post="/accept-data-extract-htmx?project_id={project_id}"
+                        hx-target="#osm-data-status"
+                        hx-swap="innerHTML"
+                        hx-include="#accept-data-extract-form"
+                        class="wa-button wa-button--primary"
+                        style="flex: 1;"
+                    >
+                        Accept Data Extract
+                    </button>
                 </form>
             </div>""",
             media_type="text/html",
@@ -1027,14 +1110,10 @@ async def upload_geojson_htmx(
                 status_code=422,
             )
 
-        # Don't save to database yet - only save after successful ODK upload
-        # Store in hidden input for submission
         feature_count = len(featcol_single_geom_type.get("features", []))
-        geojson_json = (
-            json.dumps(featcol_single_geom_type)
-            .replace("'", "&#39;")
-            .replace('"', "&quot;")
-        )
+
+        # Encode GeoJSON for the Accept button (don't save yet)
+        geojson_str = json.dumps(featcol_single_geom_type).replace('"', "&quot;")
 
         # Get project to determine app name
         project = await DbProject.one(db, project_id)
@@ -1066,26 +1145,24 @@ async def upload_geojson_htmx(
             <div id="geojson-preview-container" style="margin-top: 15px;">
                 <div style="margin-bottom: 10px;">
                     <wa-callout variant="info">
-                        <span>Previewing {feature_count} features on map. Review the data, then submit to {app_name} when ready.</span>
+                        <span>Previewing {feature_count} features on map. Review the data below. If satisfied, click "Accept Data Extract" to save. Otherwise, try uploading a different file.</span>
                     </wa-callout>
                 </div>
                 {map_html_content}
-                <form id="submit-data-extract-form" style="margin-top: 15px;">
-                    <input type="hidden" name="geojson-data" value='{geojson_json}' />
-                    <div style="display: flex; gap: 10px;">
-                        <button 
-                            id="submit-data-extract-btn" 
-                            hx-post="/submit-geojson-data-extract-htmx?project_id={project_id}"
-                            hx-target="#submit-status"
-                            hx-swap="innerHTML"
-                            hx-include="#submit-data-extract-form"
-                            class="wa-button wa-button--primary"
-                            style="flex: 1;"
-                        >
-                            Upload Data Extract to {app_name}
-                        </button>
-                    </div>
-                    <div id="submit-status" style="margin-top: 10px;"></div>
+                <form id="accept-data-extract-form" style="margin-top: 15px; display: flex; gap: 10px;">
+                    <input type="hidden" name="data_extract_geojson" value='{geojson_str}' />
+                    <button 
+                        id="accept-data-extract-btn"
+                        type="submit"
+                        hx-post="/accept-data-extract-htmx?project_id={project_id}"
+                        hx-target="#osm-data-status"
+                        hx-swap="innerHTML"
+                        hx-include="#accept-data-extract-form"
+                        class="wa-button wa-button--primary"
+                        style="flex: 1;"
+                    >
+                        Accept Data Extract
+                    </button>
                 </form>
             </div>""",
             media_type="text/html",
@@ -1139,54 +1216,58 @@ async def preview_geojson_htmx(
             )
 
         feature_count = len(geojson_data.get("features", []))
-        geojson_json = json.dumps(geojson_data)
 
-        # Determine app name for button
-        app_name = "QField"
-        if project.field_mapping_app:
-            app_str = str(project.field_mapping_app).lower()
-            if "odk" in app_str:
-                app_name = "ODK"
+        # Prepare layers for map
+        geojson_layers = []
+
+        # Add AOI outline layer (always show)
+        if project.outline:
+            aoi_featcol = {
+                "type": "FeatureCollection",
+                "features": [
+                    {"type": "Feature", "geometry": project.outline, "properties": {}}
+                ],
+            }
+            geojson_layers.append(
+                {
+                    "data": aoi_featcol,
+                    "name": "Project AOI",
+                    "color": "#d63f3f",
+                    "weight": 2,
+                    "opacity": 0.8,
+                    "fillOpacity": 0.1,
+                }
+            )
+
+        # Add data extract layer
+        geojson_layers.append(
+            {
+                "data": geojson_data,
+                "name": f"Data Extract ({feature_count} features)",
+                "color": "#3388ff",
+                "weight": 2,
+                "opacity": 0.8,
+                "fillOpacity": 0.3,
+            }
+        )
 
         # Use reusable map rendering function
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-preview",
-            geojson_layers=[
-                {
-                    "data": geojson_data,
-                    "name": "Data Extract",
-                    "color": "#3388ff",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.3,
-                }
-            ],
+            geojson_layers=geojson_layers,
             height="500px",
-            show_controls=False,
+            show_controls=True,
         )
 
         # Return HTML with Leaflet map
         map_html = f"""
-        <div id="geojson-preview-container" style="margin-top: 15px;">
+        <div style="margin-top: 15px;">
             <div style="margin-bottom: 10px;">
                 <wa-callout variant="info">
-                    <span>Previewing {feature_count} features on map. Review the data, then submit to ODK/QField when ready.</span>
+                    <span>Previewing {feature_count} data features on map. Review the data, then continue to the next step.</span>
                 </wa-callout>
             </div>
             {map_html_content}
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button 
-                    id="submit-data-extract-btn" 
-                    hx-post="/submit-geojson-data-extract-htmx?project_id={project_id}"
-                    hx-target="#submit-status"
-                    hx-swap="innerHTML"
-                    class="wa-button wa-button--primary"
-                    style="flex: 1;"
-                >
-                    Upload Data Extract to {app_name}
-                </button>
-            </div>
-            <div id="submit-status" style="margin-top: 10px;"></div>
         </div>
         """
 
@@ -1222,10 +1303,10 @@ async def submit_geojson_data_extract_htmx(
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
-    """Submit GeoJSON data extract to ODK/QField as entity list/layer (Step 2).
+    """Save GeoJSON data extract to database (Step 2).
 
-    This only creates the entity list in ODK or uploads to QField project.
-    Full project submission happens in Step 4.
+    Entity list creation is deferred to the final project creation step.
+    This endpoint only saves the geometry data to the database.
     """
     project = current_user.get("project")
     if not project or project.id != project_id:
@@ -1282,45 +1363,10 @@ async def submit_geojson_data_extract_htmx(
                 status_code=404,
             )
 
-        # Get project for other fields
+        # Get project for validation
         project = await DbProject.one(db, project_id)
 
-        # Determine field mapping app
-        field_mapping_app = project.field_mapping_app
-        app_name = "QField"
-        is_odk = False
-        if field_mapping_app:
-            app_str = str(field_mapping_app).lower()
-            if "odk" in app_str:
-                app_name = "ODK"
-                is_odk = True
-
-        # ODK credentials not stored on project, use None to fall back to env vars
-        project_odk_creds = None
-
-        # For ODK: Create project if it doesn't exist, then create entity list
-        if is_odk:
-            project_odk_id = project.external_project_id
-            if not project_odk_id:
-                # Create ODK project if it doesn't exist
-                odk_project = await to_thread.run_sync(
-                    central_crud.create_odk_project,
-                    project.project_name,
-                    project_odk_creds,
-                )
-                project_odk_id = odk_project["id"]
-                # Update project with ODK project ID
-                await DbProject.update(
-                    db,
-                    project_id,
-                    project_schemas.ProjectUpdate(external_project_id=project_odk_id),
-                )
-                await db.commit()
-                log.info(
-                    f"Created ODK project {project_odk_id} for Field-TM project {project_id}"
-                )
-
-        # Extract properties from first feature
+        # Validate that we have features
         features = geojson_data.get("features", [])
         if not features:
             return Response(
@@ -1329,90 +1375,19 @@ async def submit_geojson_data_extract_htmx(
                 status_code=400,
             )
 
-        first_feature = features[0]
-        entity_properties = list(first_feature.get("properties", {}).keys())
-
-        # Add default style properties if not present
-        for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
-            if field not in entity_properties:
-                entity_properties.append(field)
-
-        if app_name == "ODK":
-            # Create entity list in ODK Central
-            entities_list = await central_crud.task_geojson_dict_to_entity_values(
-                geojson_data, additional_features=True
-            )
-
-            default_style = {
-                "fill": "#1a1a1a",
-                "marker-color": "#1a1a1a",
-                "stroke": "#000000",
-                "stroke-width": "6",
-            }
-
-            for entity in entities_list:
-                data = entity["data"]
-                for key, value in default_style.items():
-                    data.setdefault(key, value)
-
-            log.debug("Creating ODK entity list 'features' from data extract")
-            expected_entity_count = len(entities_list)
-
-            await central_crud.create_entity_list(
-                project_odk_creds,
-                project_odk_id,
-                properties=entity_properties,
-                dataset_name="features",
-                entities_list=entities_list,
-            )
-
-            # Verify that entities were actually created in ODK
-            # This ensures we can guarantee the upload succeeded
-            async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
-                actual_entity_count = await odk_central.getEntityCount(
-                    project_odk_id, "features"
-                )
-
-            if actual_entity_count != expected_entity_count:
-                error_msg = (
-                    f"Upload verification failed: Expected {expected_entity_count} entities "
-                    f"but only {actual_entity_count} were found in ODK. "
-                    "The data extract may not have been fully uploaded."
-                )
-                log.error(error_msg)
-                return Response(
-                    content=f'<wa-callout variant="danger"><span>{error_msg}</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=500,
-                )
-
-            log.info(
-                f"Verified {actual_entity_count} entities successfully uploaded to ODK "
-                f"for project {project_id}"
-            )
-
-            # Only save to database AFTER successful ODK upload and verification
-            await DbProject.update(
-                db,
-                project_id,
-                project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
-            )
-            await db.commit()
-            log.info(
-                f"Saved data extract to database for project {project_id} after successful ODK upload"
-            )
-        else:
-            # For QField, we would upload to QField project here
-            # This is a placeholder - QField upload logic would go here
-            log.debug("QField data extract upload not yet implemented")
-            return Response(
-                content='<wa-callout variant="info"><span>QField data extract upload will be implemented in a future update.</span></wa-callout>',
-                media_type="text/html",
-                status_code=200,
-            )
+        # Save GeoJSON to database (entity list creation deferred to final step)
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
+        )
+        await db.commit()
+        log.info(
+            f"Saved data extract to database for project {project_id} (entity list creation deferred to final step)"
+        )
 
         return Response(
-            content=f'<wa-callout variant="success"><span>✓ Data extract successfully uploaded to {app_name}! You can now proceed to Step 3 (task splitting) or Step 4 (final submission).</span></wa-callout><script>setTimeout(() => window.location.reload(), 2000);</script>',
+            content='<wa-callout variant="success"><span>✓ Data extract successfully saved! You can now proceed to Step 3 (upload XLSForm) and then Step 4 (split tasks).</span></wa-callout><script>setTimeout(() => window.location.reload(), 2000);</script>',
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
@@ -1470,6 +1445,8 @@ async def preview_tasks_and_data_htmx(
         # Get task boundaries
         task_boundaries_json = await project_crud.get_task_geometry(db, project_id)
         task_boundaries = None
+        is_no_splitting = False
+
         if task_boundaries_json:
             if isinstance(task_boundaries_json, str):
                 try:
@@ -1481,15 +1458,44 @@ async def preview_tasks_and_data_htmx(
             elif isinstance(task_boundaries_json, dict):
                 task_boundaries = task_boundaries_json
 
-        if not task_boundaries or not task_boundaries.get("features"):
-            return Response(
-                content='<wa-callout variant="warning"><span>No task boundaries found. Please split the project into tasks first using the "Split AOI" button above.</span></wa-callout>',
-                media_type="text/html",
-                status_code=200,  # Return 200 instead of 404 to show message
-            )
+        # Check if NO_SPLITTING was selected (empty dict or empty features)
+        if (
+            not task_boundaries
+            or not task_boundaries.get("features")
+            or len(task_boundaries.get("features", [])) == 0
+        ):
+            # Check if task_areas_geojson is explicitly set to {} (NO_SPLITTING)
+            if project.task_areas_geojson == {}:
+                is_no_splitting = True
+            else:
+                # No splitting has been done yet
+                return Response(
+                    content='<wa-callout variant="warning"><span>No task boundaries found. Please split the project into tasks first using the "Split AOI" button above.</span></wa-callout>',
+                    media_type="text/html",
+                    status_code=200,  # Return 200 instead of 404 to show message
+                )
 
         # Prepare layers for map
         geojson_layers = []
+
+        # Add AOI outline layer (always show)
+        if project.outline:
+            aoi_featcol = {
+                "type": "FeatureCollection",
+                "features": [
+                    {"type": "Feature", "geometry": project.outline, "properties": {}}
+                ],
+            }
+            geojson_layers.append(
+                {
+                    "data": aoi_featcol,
+                    "name": "Project AOI",
+                    "color": "#d63f3f",
+                    "weight": 2,
+                    "opacity": 0.8,
+                    "fillOpacity": 0.1,
+                }
+            )
 
         # Add data extract layer
         data_feature_count = len(data_extract.get("features", []))
@@ -1504,18 +1510,19 @@ async def preview_tasks_and_data_htmx(
             }
         )
 
-        # Add task boundaries layer
-        task_count = len(task_boundaries.get("features", []))
-        geojson_layers.append(
-            {
-                "data": task_boundaries,
-                "name": f"Task Boundaries ({task_count} tasks)",
-                "color": "#ff7800",
-                "weight": 3,
-                "opacity": 1.0,
-                "fillOpacity": 0.1,
-            }
-        )
+        # Add task boundaries layer (only if splitting was done)
+        if not is_no_splitting and task_boundaries and task_boundaries.get("features"):
+            task_count = len(task_boundaries.get("features", []))
+            geojson_layers.append(
+                {
+                    "data": task_boundaries,
+                    "name": f"Task Boundaries ({task_count} tasks)",
+                    "color": "#ff7800",
+                    "weight": 3,
+                    "opacity": 1.0,
+                    "fillOpacity": 0.1,
+                }
+            )
 
         # Use reusable map rendering function
         map_html_content = render_leaflet_map(
@@ -1525,12 +1532,19 @@ async def preview_tasks_and_data_htmx(
             show_controls=True,
         )
 
+        # Generate preview message
+        if is_no_splitting:
+            preview_message = f"Previewing whole AOI (no splitting) with {data_feature_count} data features. The entire AOI will be used as a single task."
+        else:
+            task_count = len(task_boundaries.get("features", []))
+            preview_message = f"Previewing {task_count} task boundaries and {data_feature_count} data features together."
+
         return Response(
             content=f"""
             <div style="margin-top: 15px;">
                 <div style="margin-bottom: 10px;">
                     <wa-callout variant="info">
-                        <span>Previewing {task_count} task boundaries and {data_feature_count} data features together.</span>
+                        <span>{preview_message}</span>
                     </wa-callout>
                 </div>
                 {map_html_content}
@@ -1633,12 +1647,10 @@ async def split_aoi_htmx(
     db: AsyncConnection,
     current_user: ProjectUserDict,
     auth_user: AuthUser,
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
-    algorithm: str = Parameter(default="TASK_SPLITTING_ALGORITHM"),
-    no_of_buildings: int = Parameter(default=50),
-    dimension_meters: int = Parameter(default=100),
 ) -> Response:
-    """Split AOI into tasks using selected algorithm and upload to ODK/QField."""
+    """Split AOI into tasks using selected algorithm and return preview map."""
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
@@ -1648,6 +1660,26 @@ async def split_aoi_htmx(
         )
 
     try:
+        # Extract form data
+        log.debug(
+            f"Split AOI request data keys: {list(data.keys()) if data else 'None'}"
+        )
+        algorithm = data.get("algorithm", "").strip() if data else ""
+
+        try:
+            no_of_buildings = int(data.get("no_of_buildings", 50)) if data else 50
+        except (ValueError, TypeError):
+            no_of_buildings = 50
+
+        try:
+            dimension_meters = int(data.get("dimension_meters", 100)) if data else 100
+        except (ValueError, TypeError):
+            dimension_meters = 100
+
+        log.debug(
+            f"Split AOI parameters: algorithm={algorithm}, no_of_buildings={no_of_buildings}, dimension_meters={dimension_meters}"
+        )
+
         # Get project with outline
         project = await DbProject.one(db, project_id)
 
@@ -1666,12 +1698,23 @@ async def split_aoi_htmx(
             ],
         }
 
-        # Get data extract if available
+        # Get data extract from database
         parsed_extract = project.data_extract_geojson
 
+        # Check if data extract is empty dict {} (user selected "no data")
+        # Empty dict {} means user explicitly chose "no data" - we can't split without data
+        is_empty_data_extract = parsed_extract == {}
+
         # Validate algorithm type
+        if not algorithm or algorithm == "":
+            return Response(
+                content='<wa-callout variant="danger"><span>Please select a splitting option.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
         try:
-            algorithm_enum = TaskSplitType(algorithm)
+            algorithm_enum = SplittingAlgorithm(algorithm)
         except ValueError:
             return Response(
                 content=f'<wa-callout variant="danger"><span>Invalid algorithm type: {algorithm}</span></wa-callout>',
@@ -1679,37 +1722,117 @@ async def split_aoi_htmx(
                 status_code=400,
             )
 
+        # Handle NO_SPLITTING case - save immediately without preview
+        if algorithm_enum == SplittingAlgorithm.NO_SPLITTING:
+            # Store empty dict {} to indicate no splitting (use whole AOI)
+            await DbProject.update(
+                db,
+                project_id,
+                project_schemas.ProjectUpdate(task_areas_geojson={}),
+            )
+            await db.commit()
+
+            log.info(
+                f"No splitting selected for project {project_id}. Will use whole AOI as single task."
+            )
+
+            return Response(
+                content='<wa-callout variant="success"><span>✓ No splitting selected. The whole AOI will be used as a single task. Step 3 is now complete.</span></wa-callout>',
+                media_type="text/html",
+                status_code=200,
+                headers={"HX-Refresh": "true"},
+            )
+
+        # If data extract is empty {}, skip splitting and save empty {} to task areas
+        # (user selected "no data", so we can't split - just use AOI as-is)
+        if is_empty_data_extract:
+            log.info(
+                f"Empty data extract detected for project {project_id}. Skipping split and saving empty task areas."
+            )
+            await DbProject.update(
+                db,
+                project_id,
+                project_schemas.ProjectUpdate(task_areas_geojson={}),
+            )
+            await db.commit()
+
+            return Response(
+                content='<wa-callout variant="success"><span>✓ Task splitting is not relevant without existing data</span></wa-callout>',
+                media_type="text/html",
+                status_code=200,
+                headers={"HX-Refresh": "true"},
+            )
+
         # Perform splitting based on algorithm
         log.info(f"Splitting AOI for project {project_id} using algorithm: {algorithm}")
 
-        if algorithm_enum == TaskSplitType.TASK_SPLITTING_ALGORITHM:
+        if algorithm_enum in (
+            SplittingAlgorithm.AVG_BUILDING_VORONOI,
+            SplittingAlgorithm.AVG_BUILDING_SKELETON,
+        ):
             # Use split_by_sql (average buildings per task)
-            if not parsed_extract:
+            # Check if we have a valid data extract saved in DB (not None, not empty)
+            if (
+                not parsed_extract
+                or not isinstance(parsed_extract, dict)
+                or parsed_extract.get("type") != "FeatureCollection"
+            ):
                 return Response(
-                    content='<wa-callout variant="warning"><span>Data extract required for task splitting algorithm. Please download OSM data or upload GeoJSON first.</span></wa-callout>',
+                    content='<wa-callout variant="warning"><span>Data extract required for task splitting algorithm. Please download OSM data or upload GeoJSON first and accept it.</span></wa-callout>',
                     media_type="text/html",
                     status_code=400,
                 )
 
-            # split_by_sql signature: (aoi, db, num_buildings, outfile=None, osm_extract=None)
+            log.info(
+                f"Using splitting algorithm: {algorithm_enum.value} ({algorithm_enum.label})"
+            )
+            log.debug(
+                f"Using saved data extract from DB with {len(parsed_extract.get('features', []))} features"
+            )
+
+            # Prepare algorithm parameters based on required params
+            algorithm_params = {}
+            for param in algorithm_enum.required_params:
+                if param == "num_buildings":
+                    algorithm_params["num_buildings"] = no_of_buildings
+                # Add other parameter mappings here as needed
+
+            # split_by_sql signature: (aoi, db, num_buildings=None, outfile=None, osm_extract=None, algorithm=None, algorithm_params=None)
+            # Pass the saved data extract from DB - this prevents split_by_sql from downloading a new extract
             features = await to_thread.run_sync(
                 split_by_sql,
                 aoi_featcol,
                 settings.FMTM_DB_URL,
-                no_of_buildings,
-                None,  # outfile - we don't want to write to file
-                parsed_extract,  # osm_extract
+                num_buildings=None,  # Deprecated, using algorithm_params instead
+                outfile=None,  # we don't want to write to file
+                osm_extract=parsed_extract,  # Use saved extract from DB (prevents automatic download)
+                algorithm=algorithm_enum,
+                algorithm_params=algorithm_params,
             )
-        elif algorithm_enum == TaskSplitType.DIVIDE_ON_SQUARE:
+        elif algorithm_enum == SplittingAlgorithm.DIVIDE_BY_SQUARE:
             # Use split_by_square (grid-based)
             # split_by_square signature: (aoi, db, meters=100, osm_extract=None, outfile=None)
+            # For DIVIDE_BY_SQUARE, osm_extract is optional (can split without data)
+            # But if we have one saved, use it
             features = await to_thread.run_sync(
                 split_by_square,
                 aoi_featcol,
                 settings.FMTM_DB_URL,
                 dimension_meters,
-                parsed_extract,  # osm_extract (can be None)
+                parsed_extract
+                if (
+                    parsed_extract
+                    and isinstance(parsed_extract, dict)
+                    and parsed_extract.get("type") == "FeatureCollection"
+                )
+                else None,  # osm_extract (can be None for grid-based)
                 None,  # outfile - we don't want to write to file
+            )
+        elif algorithm_enum == SplittingAlgorithm.TOTAL_TASKS:
+            return Response(
+                content='<wa-callout variant="warning"><span>Split by Specific Number of Tasks is not yet implemented. Please choose another algorithm.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
             )
         else:
             return Response(
@@ -1725,120 +1848,42 @@ async def split_aoi_htmx(
                 status_code=400,
             )
 
-        # Upload task boundaries to ODK/QField
+        # Validate and prepare task boundaries (preview only, not saved yet)
         tasks_featcol = features
         await check_crs(tasks_featcol)
-
-        # Upload to ODK or QField
-        if project.field_mapping_app == FieldMappingApp.ODK:
-            project_odk_id = project.external_project_id
-            if not project_odk_id:
-                # Create ODK project if it doesn't exist
-                odk_project = await to_thread.run_sync(
-                    central_crud.create_odk_project,
-                    project.project_name,
-                    None,  # Use env vars for credentials
-                )
-                project_odk_id = odk_project["id"]
-                await DbProject.update(
-                    db,
-                    project_id,
-                    project_schemas.ProjectUpdate(external_project_id=project_odk_id),
-                )
-                await db.commit()
-
-            # Convert task boundaries to entities
-            task_entities = []
-            for idx, feature in enumerate(tasks_featcol.get("features", [])):
-                if feature.get("geometry"):
-                    entity_dict = await central_crud.feature_geojson_to_entity_dict(
-                        feature, additional_features=True
-                    )
-                    entity_dict["label"] = f"Task {idx + 1}"
-                    if "data" in entity_dict:
-                        # Only keep geometry and task_id properties for task boundaries
-                        # Filter out any other properties that might cause issues
-                        entity_data = {"geometry": entity_dict["data"]["geometry"]}
-                        entity_data["task_id"] = str(idx + 1)
-                        entity_dict["data"] = entity_data
-                    task_entities.append(entity_dict)
-
-            # Create ODKCentral credentials from environment variables
-            # ODK credentials not stored on project, use env vars
-            project_odk_creds = ODKCentral(
-                external_project_instance_url=settings.ODK_CENTRAL_URL,
-                external_project_username=settings.ODK_CENTRAL_USER,
-                external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
-                if settings.ODK_CENTRAL_PASSWD
-                else "",
-            )
-
-            try:
-                async with central_deps.get_odk_dataset(
-                    project_odk_creds
-                ) as odk_central:
-                    datasets = await odk_central.listDatasets(project_odk_id)
-                    if any(ds.get("name") == "task_boundaries" for ds in datasets):
-                        log.info(
-                            "Task boundaries dataset already exists, will be replaced"
-                        )
-            except Exception as e:
-                log.warning(f"Could not check existing datasets: {e}")
-
-            await central_crud.create_entity_list(
-                project_odk_creds,
-                project_odk_id,
-                properties=["geometry", "task_id"],
-                dataset_name="task_boundaries",
-                entities_list=task_entities,
-            )
-            log.info(
-                f"Uploaded {len(task_entities)} task boundaries to ODK Central for project {project_id}"
-            )
-        elif project.field_mapping_app == FieldMappingApp.QFIELD:
-            # For QField, store in temp table
-            async with db.cursor() as cur:
-                await cur.execute(f"""
-                    DROP TABLE IF EXISTS temp_task_boundaries_{project_id} CASCADE;
-                """)
-                await cur.execute(f"""
-                    CREATE TEMP TABLE temp_task_boundaries_{project_id} (
-                        task_index INTEGER,
-                        outline GEOMETRY(POLYGON, 4326)
-                    );
-                """)
-                for idx, feature in enumerate(tasks_featcol.get("features", [])):
-                    if feature.get("geometry"):
-                        geom_json = json.dumps(feature["geometry"])
-                        await cur.execute(
-                            f"""
-                            INSERT INTO temp_task_boundaries_{project_id} (task_index, outline)
-                            VALUES (%s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326));
-                            """,
-                            (idx + 1, geom_json),
-                        )
-                await db.commit()
-            log.info(
-                f"Stored {len(tasks_featcol.get('features', []))} task boundaries in temp table for QField project {project_id}"
-            )
-
-        # Store task boundaries GeoJSON in database (for both ODK and QField)
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(task_areas_geojson=tasks_featcol),
-        )
-        await db.commit()
-
         task_count = len(tasks_featcol.get("features", []))
 
-        # Auto-preview: Get data extract and show map
-        data_extract = project.data_extract_geojson
-        if data_extract:
-            # Prepare layers for map
-            geojson_layers = []
+        # Store preview in a temporary location (we'll save it when user accepts)
+        # For now, we'll encode it in the response and save it when Accept is clicked
 
-            # Add data extract layer
+        # Get project outline and data extract for map preview
+        project = await DbProject.one(db, project_id)
+        data_extract = project.data_extract_geojson
+
+        # Prepare layers for map
+        geojson_layers = []
+
+        # Add AOI outline layer
+        if project.outline:
+            aoi_featcol = {
+                "type": "FeatureCollection",
+                "features": [
+                    {"type": "Feature", "geometry": project.outline, "properties": {}}
+                ],
+            }
+            geojson_layers.append(
+                {
+                    "data": aoi_featcol,
+                    "name": "Project AOI",
+                    "color": "#d63f3f",
+                    "weight": 2,
+                    "opacity": 0.8,
+                    "fillOpacity": 0.1,
+                }
+            )
+
+        # Add data extract layer if available
+        if data_extract:
             data_feature_count = len(data_extract.get("features", []))
             geojson_layers.append(
                 {
@@ -1851,53 +1896,610 @@ async def split_aoi_htmx(
                 }
             )
 
-            # Add task boundaries layer
-            geojson_layers.append(
-                {
-                    "data": tasks_featcol,
-                    "name": f"Task Boundaries ({task_count} tasks)",
-                    "color": "#ff7800",
-                    "weight": 3,
-                    "opacity": 1.0,
-                    "fillOpacity": 0.1,
-                }
-            )
+        # Add task boundaries layer
+        geojson_layers.append(
+            {
+                "data": tasks_featcol,
+                "name": f"Task Boundaries ({task_count} tasks)",
+                "color": "#ff7800",
+                "weight": 3,
+                "opacity": 1.0,
+                "fillOpacity": 0.1,
+            }
+        )
 
-            map_html_content = render_leaflet_map(
-                map_id="leaflet-map-split-preview",
-                geojson_layers=geojson_layers,
-                height="600px",
-                show_controls=True,
-            )
+        map_html_content = render_leaflet_map(
+            map_id="leaflet-map-split-preview",
+            geojson_layers=geojson_layers,
+            height="600px",
+            show_controls=True,
+        )
 
-            preview_html = f"""
-            <div style="margin-top: 15px;">
-                <div style="margin-bottom: 10px;">
-                    <wa-callout variant="info">
-                        <span>Previewing {task_count} task boundaries and {data_feature_count} data features together.</span>
-                    </wa-callout>
-                </div>
-                {map_html_content}
-            </div>
-            """
-        else:
-            preview_html = ""
+        # Encode the task areas GeoJSON for the Accept button
+        tasks_geojson_str = json.dumps(tasks_featcol).replace('"', "&quot;")
 
-        # Return success message in split-status, and preview will be moved to preview container
+        # Return success message with preview and Accept button
+        data_extract_info = ""
+        if data_extract:
+            data_feature_count = len(data_extract.get("features", []))
+            data_extract_info = f" and {data_feature_count} data features"
+
         return Response(
             content=f"""
             <wa-callout variant="success">
                 <span>✓ AOI split successfully! Generated {task_count} task areas using {algorithm.replace("_", " ").title()}.</span>
             </wa-callout>
-            <div id="split-preview-wrapper" style="display: none;">{preview_html}</div>
+            <div style="margin-top: 20px;">
+                <div style="margin-bottom: 10px;">
+                    <wa-callout variant="info">
+                        <span>Previewing {task_count} task boundaries{data_extract_info}. Review the results below. If satisfied, click "Accept Task Choices" to save. Otherwise, adjust parameters above and click "Split Again" to regenerate.</span>
+                    </wa-callout>
+                </div>
+                {map_html_content}
+                <form id="accept-split-form" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <input type="hidden" name="tasks_geojson" value='{tasks_geojson_str}' />
+                    <button 
+                        id="accept-split-btn"
+                        type="submit"
+                        hx-post="/accept-split-htmx?project_id={project_id}"
+                        hx-target="#split-status"
+                        hx-swap="innerHTML"
+                        hx-include="#accept-split-form"
+                        class="wa-button wa-button--primary"
+                        style="min-width: 200px"
+                    >
+                        Accept Task Choices
+                    </button>
+                </form>
+            </div>
             """,
+            media_type="text/html",
+            status_code=200,
+        )
+
+    except Exception as e:
+        log.error(f"Error splitting AOI via HTMX: {e}", exc_info=True)
+        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
+
+
+@post(
+    path="/accept-data-extract-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
+async def accept_data_extract_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
+    project_id: int = Parameter(),
+) -> Response:
+    """Accept and save the data extract to the database."""
+    project = current_user.get("project")
+    if not project or project.id != project_id:
+        return Response(
+            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            media_type="text/html",
+            status_code=404,
+        )
+
+    try:
+        # Get data extract GeoJSON from form data (hx-vals sends it as form data)
+        geojson_str = data.get("data_extract_geojson", "")
+        if not geojson_str:
+            log.debug(
+                f"Accept data extract data keys: {list(data.keys()) if data else 'None'}"
+            )
+            return Response(
+                content='<wa-callout variant="danger"><span>No data extract provided.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        # Parse the GeoJSON
+        try:
+            geojson_data = json.loads(geojson_str)
+        except (json.JSONDecodeError, TypeError) as e:
+            log.error(
+                f"Error parsing data extract GeoJSON: {e}, type: {type(geojson_str)}, value: {geojson_str[:100] if isinstance(geojson_str, str) else geojson_str}"
+            )
+            return Response(
+                content='<wa-callout variant="danger"><span>Invalid data extract format.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        # Validate CRS
+        await check_crs(geojson_data)
+
+        # Save to database
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
+        )
+        await db.commit()
+
+        feature_count = len(geojson_data.get("features", []))
+        log.info(
+            f"Accepted and saved data extract with {feature_count} features for project {project_id}"
+        )
+
+        return Response(
+            content=f'<wa-callout variant="success"><span>✓ Data extract accepted! Saved {feature_count} features. Step 2 is now complete.</span></wa-callout>',
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
         )
 
     except Exception as e:
-        log.error(f"Error splitting AOI via HTMX: {e}", exc_info=True)
+        log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
+        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
+
+
+@post(
+    path="/accept-split-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
+async def accept_split_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
+    project_id: int = Parameter(),
+) -> Response:
+    """Accept and save the task split results to the database."""
+    project = current_user.get("project")
+    if not project or project.id != project_id:
+        return Response(
+            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            media_type="text/html",
+            status_code=404,
+        )
+
+    try:
+        # Get task areas GeoJSON from form data (hx-vals sends it as form data)
+        tasks_geojson_str = data.get("tasks_geojson", "")
+        if not tasks_geojson_str:
+            log.debug(
+                f"Accept split data keys: {list(data.keys()) if data else 'None'}"
+            )
+            return Response(
+                content='<wa-callout variant="danger"><span>No task areas data provided.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        # Parse the GeoJSON
+        try:
+            tasks_geojson = json.loads(tasks_geojson_str)
+        except (json.JSONDecodeError, TypeError) as e:
+            log.error(
+                f"Error parsing task areas GeoJSON: {e}, type: {type(tasks_geojson_str)}, value: {tasks_geojson_str[:100] if isinstance(tasks_geojson_str, str) else tasks_geojson_str}"
+            )
+            return Response(
+                content='<wa-callout variant="danger"><span>Invalid task areas data format.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        # Validate CRS
+        await check_crs(tasks_geojson)
+
+        # Save to database
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(task_areas_geojson=tasks_geojson),
+        )
+        await db.commit()
+
+        # Check if task areas is empty {} (no splitting)
+        is_empty_task_areas = tasks_geojson == {}
+        task_count = (
+            len(tasks_geojson.get("features", [])) if not is_empty_task_areas else 0
+        )
+
+        log.info(
+            f"Accepted and saved task areas for project {project_id} (empty: {is_empty_task_areas}, count: {task_count})"
+        )
+
+        if is_empty_task_areas:
+            success_message = '<wa-callout variant="success"><span>✓ Split tasks saved successfully</span></wa-callout>'
+        else:
+            success_message = '<wa-callout variant="success"><span>✓ Split tasks saved successfully</span></wa-callout>'
+
+        return Response(
+            content=success_message,
+            media_type="text/html",
+            status_code=200,
+            headers={"HX-Refresh": "true"},
+        )
+
+    except Exception as e:
+        log.error(f"Error accepting split via HTMX: {e}", exc_info=True)
+        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
+
+
+@post(
+    path="/create-project-odk-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+)
+async def create_project_odk_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
+) -> Response:
+    """Final step: Create project in ODK Central with all data (entity lists, forms, task boundaries)."""
+    project = current_user.get("project")
+    if not project or project.id != project_id:
+        return Response(
+            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            media_type="text/html",
+            status_code=404,
+        )
+
+    # Get project with latest data
+    project = await DbProject.one(db, project_id)
+
+    # Validate prerequisites
+    if not project.xlsform_content:
+        return Response(
+            content='<wa-callout variant="danger"><span>XLSForm is required. Please upload a form first.</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+
+    if not project.data_extract_geojson:
+        return Response(
+            content='<wa-callout variant="danger"><span>Data extract is required. Please download OSM data or upload GeoJSON first.</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+
+    # Get optional custom ODK credentials from form data
+    custom_odk_creds = None
+    external_url = data.get("external_project_instance_url", "").strip()
+    external_username = data.get("external_project_username", "").strip()
+    external_password = data.get("external_project_password", "").strip()
+
+    any_custom = any([external_url, external_username, external_password])
+    all_custom = all([external_url, external_username, external_password])
+
+    if any_custom and not all_custom:
+        return Response(
+            content=(
+                '<wa-callout variant="warning"><span>'
+                "Provide ODK URL, username, and password (all 3), or leave them all blank to use server defaults."
+                "</span></wa-callout>"
+            ),
+            media_type="text/html",
+            status_code=400,
+        )
+
+    if all_custom:
+        custom_odk_creds = ODKCentral(
+            external_project_instance_url=external_url,
+            external_project_username=external_username,
+            external_project_password=external_password,
+        )
+    else:
+        # Use environment variables (None will fall back to env vars in central_deps)
+        if not settings.ODK_CENTRAL_URL or not settings.ODK_CENTRAL_USER:
+            return Response(
+                content=(
+                    '<wa-callout variant="danger"><span>'
+                    "ODK Central credentials are not configured on the server. "
+                    "Please use Advanced Options to provide custom ODK credentials."
+                    "</span></wa-callout>"
+                ),
+                media_type="text/html",
+                status_code=400,
+            )
+
+    # Step 1: Create ODK project if it doesn't exist
+    project_odk_id = project.external_project_id
+    if not project_odk_id:
+        log.info(f"Creating ODK project for Field-TM project {project_id}")
+        odk_project = await to_thread.run_sync(
+            central_crud.create_odk_project,
+            project.project_name,
+            custom_odk_creds,
+        )
+        project_odk_id = odk_project["id"]
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(external_project_id=project_odk_id),
+        )
+        await db.commit()
+        log.info(
+            f"Created ODK project {project_odk_id} for Field-TM project {project_id}"
+        )
+    # Persist the ODK base URL (so project details can render external links reliably)
+    odk_instance_url = (
+        custom_odk_creds.external_project_instance_url
+        if custom_odk_creds
+        else str(settings.ODK_CENTRAL_URL or "")
+    )
+    if odk_instance_url and odk_instance_url != (
+        project.external_project_instance_url or ""
+    ):
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(
+                external_project_instance_url=odk_instance_url,
+                external_project_id=project_odk_id,
+            ),
+        )
+        await db.commit()
+
+    # Step 2: Create entity list "features" from data extract
+    geojson_data = project.data_extract_geojson
+    features = geojson_data.get("features", [])
+    if not features:
+        return Response(
+            content='<wa-callout variant="danger"><span>Data extract contains no features.</span></wa-callout>',
+            media_type="text/html",
+            status_code=400,
+        )
+
+    first_feature = features[0]
+    entity_properties = list(first_feature.get("properties", {}).keys())
+
+    # Add default style properties if not present
+    for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
+        if field not in entity_properties:
+            entity_properties.append(field)
+
+    # Convert GeoJSON to entity list
+    entities_list = await central_crud.task_geojson_dict_to_entity_values(
+        geojson_data, additional_features=True
+    )
+
+    default_style = {
+        "fill": "#1a1a1a",
+        "marker-color": "#1a1a1a",
+        "stroke": "#000000",
+        "stroke-width": "6",
+    }
+
+    for entity in entities_list:
+        data = entity["data"]
+        for key, value in default_style.items():
+            data.setdefault(key, value)
+
+    log.info(f"Creating entity list 'features' for ODK project {project_odk_id}")
+    await central_crud.create_entity_list(
+        custom_odk_creds,
+        project_odk_id,
+        properties=entity_properties,
+        dataset_name="features",
+        entities_list=entities_list,
+    )
+
+    # Step 3: Upload task boundaries if they exist
+    task_areas = project.task_areas_geojson
+    if task_areas and task_areas.get("features"):
+        log.info(
+            f"Uploading {len(task_areas.get('features', []))} task boundaries to ODK"
+        )
+        task_entities = []
+        for idx, feature in enumerate(task_areas.get("features", [])):
+            if feature.get("geometry"):
+                entity_dict = await central_crud.feature_geojson_to_entity_dict(
+                    feature, additional_features=True
+                )
+                entity_dict["label"] = f"Task {idx + 1}"
+                if "data" in entity_dict:
+                    entity_data = {"geometry": entity_dict["data"]["geometry"]}
+                    entity_data["task_id"] = str(idx + 1)
+                    entity_dict["data"] = entity_data
+                task_entities.append(entity_dict)
+
+        # Check if dataset exists
+        try:
+            async with central_deps.get_odk_dataset(custom_odk_creds) as odk_central:
+                datasets = await odk_central.listDatasets(project_odk_id)
+                if any(ds.get("name") == "task_boundaries" for ds in datasets):
+                    log.info("Task boundaries dataset already exists, will be replaced")
+        except Exception as e:
+            log.warning(f"Could not check existing datasets: {e}")
+
+        await central_crud.create_entity_list(
+            custom_odk_creds,
+            project_odk_id,
+            properties=["geometry", "task_id"],
+            dataset_name="task_boundaries",
+            entities_list=task_entities,
+        )
+
+    # Step 4: Upload XLSForm
+    form_name = f"FMTM_Project_{project.id}"
+    xlsform_bytes = BytesIO(project.xlsform_content)
+
+    # Validate and upload form
+    xform = await central_crud.read_and_test_xform(xlsform_bytes)
+    log.info(f"Uploading XLSForm to ODK project {project_odk_id}")
+    central_crud.create_odk_xform(
+        project_odk_id,
+        xform,
+        custom_odk_creds,
+    )
+
+    # Get form ID
+    async with central_deps.get_odk_project(custom_odk_creds) as odk_central:
+        forms = await odk_central.listForms(project_odk_id)
+        form_id = None
+        for form in forms:
+            if form.get("xmlFormId") == form_name:
+                form_id = form.get("id")
+                break
+
+    if form_id:
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(odk_form_id=form_id),
+        )
+        await db.commit()
+
+    # Step 5: Generate project files (appusers, QR codes, etc.)
+    log.info(f"Generating project files for project {project_id}")
+    success = await project_crud.generate_project_files(db, project_id)
+
+    if not success:
+        return Response(
+            content='<wa-callout variant="danger"><span>Failed to generate project files. Please contact support.</span></wa-callout>',
+            media_type="text/html",
+            status_code=500,
+        )
+
+    # Update project status to PUBLISHED
+    await DbProject.update(
+        db,
+        project_id,
+        project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+    )
+    await db.commit()
+
+    # Get ODK project URL
+    odk_url = None
+    if custom_odk_creds:
+        base_url = custom_odk_creds.external_project_instance_url.rstrip("/")
+        odk_url = f"{base_url}/#/projects/{project_odk_id}"
+    else:
+        base_url = settings.ODK_CENTRAL_URL.rstrip("/")
+        odk_url = f"{base_url}/#/projects/{project_odk_id}"
+
+    return Response(
+        content=f'<wa-callout variant="success"><span>✓ Project successfully created in ODK Central! <a href="{odk_url}" target="_blank">View Project in ODK</a></span></wa-callout>',
+        media_type="text/html",
+        status_code=200,
+        headers={"HX-Refresh": "true"},
+    )
+
+
+@post(
+    path="/create-project-qfield-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+)
+async def create_project_qfield_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
+) -> Response:
+    """Final step: Create project in QField with all data."""
+    project = current_user.get("project")
+    if not project or project.id != project_id:
+        return Response(
+            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            media_type="text/html",
+            status_code=404,
+        )
+
+    try:
+        # Get project with latest data
+        project = await DbProject.one(db, project_id)
+
+        # Validate prerequisites
+        if not project.xlsform_content:
+            return Response(
+                content='<wa-callout variant="danger"><span>XLSForm is required. Please upload a form first.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        if not project.data_extract_geojson:
+            return Response(
+                content='<wa-callout variant="danger"><span>Data extract is required. Please download OSM data or upload GeoJSON first.</span></wa-callout>',
+                media_type="text/html",
+                status_code=400,
+            )
+
+        # Get optional custom QField credentials from form data
+        custom_qfield_creds = None
+        qfield_url_param = data.get("qfield_cloud_url", "").strip()
+        qfield_user = data.get("qfield_cloud_user", "").strip()
+        qfield_password = data.get("qfield_cloud_password", "").strip()
+
+        if qfield_url_param and qfield_user and qfield_password:
+            custom_qfield_creds = QFieldCloud(
+                qfield_cloud_url=qfield_url_param,
+                qfield_cloud_user=qfield_user,
+                qfield_cloud_password=qfield_password,
+            )
+        else:
+            # Use environment variables (None will fall back to env vars)
+            custom_qfield_creds = None
+
+        # Create QField project (this handles all the file generation)
+        log.info(f"Creating QField project for Field-TM project {project_id}")
+        qfield_url = await create_qfield_project(db, project, custom_qfield_creds)
+
+        # Update project status to PUBLISHED
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+        )
+        await db.commit()
+
+        return Response(
+            content=f'<wa-callout variant="success"><span>✓ Project successfully created in QField! <a href="{qfield_url}" target="_blank">View Project in QField</a></span></wa-callout>',
+            media_type="text/html",
+            status_code=200,
+            headers={"HX-Refresh": "true"},
+        )
+
+    except HTTPException as e:
+        error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=e.status_code,
+        )
+    except Exception as e:
+        log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
             content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
@@ -1931,100 +2533,15 @@ async def project_qrcode_htmx(
         )
 
     try:
-        # Get fresh project data
-        project = await DbProject.one(db, project_id)
+        # Get OSM username from auth_user
+        osm_username = (
+            auth_user.username if hasattr(auth_user, "username") else "fieldtm_user"
+        )
 
-        if not project.project_name:
-            return Response(
-                content='<wa-callout variant="danger"><span>Project name not found.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
-            )
-
-        qr_code_data_url = None
-
-        if project.field_mapping_app == FieldMappingApp.ODK:
-            # For ODK, generate QR code using appuser token
-            if not project.external_project_id:
-                return Response(
-                    content='<wa-callout variant="danger"><span>ODK project ID not found.</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=400,
-                )
-
-            # Get ODK credentials (use None to fall back to env vars)
-            project_odk_creds = project.get_odk_credentials()
-            if project_odk_creds is None:
-                odk_central = ODKCentral(
-                    external_project_instance_url=settings.ODK_CENTRAL_URL,
-                    external_project_username=settings.ODK_CENTRAL_USER,
-                    external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
-                    if settings.ODK_CENTRAL_PASSWD
-                    else "",
-                )
-            else:
-                odk_central = project_odk_creds
-
-            # Get appuser token from ODK Central
-            from app.central.central_crud import get_odk_app_user, get_odk_project
-
-            appuser = get_odk_app_user(odk_central)
-            odk_project = get_odk_project(odk_central)
-            appusers = odk_project.listAppUsers(project.external_project_id)
-
-            if not appusers:
-                return Response(
-                    content='<wa-callout variant="danger"><span>No appuser found for this ODK project.</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=400,
-                )
-
-            appuser_token = appusers[0].get("token")
-            if not appuser_token:
-                return Response(
-                    content='<wa-callout variant="danger"><span>Appuser token not found.</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=400,
-                )
-
-            # Generate QR code using OdkAppUser.createQRCode
-            appuser_obj = OdkAppUser(
-                odk_central.external_project_instance_url,
-                odk_central.external_project_username,
-                odk_central.external_project_password,
-            )
-            osm_username = (
-                auth_user.username if hasattr(auth_user, "username") else "fieldtm_user"
-            )
-            qrcode = appuser_obj.createQRCode(
-                odk_id=project.external_project_id,
-                project_name=project.project_name,
-                appuser_token=appuser_token,
-                basemap="osm",
-                osm_username=osm_username,
-            )
-            # Convert to base64 data URL
-            qr_code_data_url = qrcode.png_data_uri(scale=5)
-
-        elif project.field_mapping_app == FieldMappingApp.QFIELD:
-            # For QField, generate QR code with qfield://cloud?project=ID
-            if not project.external_project_id:
-                return Response(
-                    content='<wa-callout variant="danger"><span>QField project ID not found.</span></wa-callout>',
-                    media_type="text/html",
-                    status_code=400,
-                )
-
-            qfield_url = f"qfield://cloud?project={project.external_project_id}"
-            qrcode = segno.make(qfield_url, micro=False)
-            qr_code_data_url = qrcode.png_data_uri(scale=6)
-
-        if not qr_code_data_url:
-            return Response(
-                content='<wa-callout variant="danger"><span>Failed to generate QR code.</span></wa-callout>',
-                media_type="text/html",
-                status_code=500,
-            )
+        # Use CRUD function to generate QR code
+        qr_code_data_url = await project_crud.get_project_qrcode(
+            db, project_id, osm_username
+        )
 
         app_name = (
             project.field_mapping_app.value
@@ -2064,6 +2581,13 @@ async def project_qrcode_htmx(
             status_code=200,
         )
 
+    except HTTPException as e:
+        error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
+        return Response(
+            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            media_type="text/html",
+            status_code=e.status_code,
+        )
     except Exception as e:
         log.error(f"Error generating QR code via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -2222,5 +2746,7 @@ htmx_router = Router(
         split_aoi_htmx,
         project_qrcode_htmx,
         validate_geojson,
+        accept_data_extract_htmx,
+        create_project_odk_htmx,
     ],
 )

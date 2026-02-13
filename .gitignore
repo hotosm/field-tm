@@ -97,3 +97,5 @@ src/translations/**/*
 # Favicon overrides
 favicon.svg
 favicon.png
+
+config
