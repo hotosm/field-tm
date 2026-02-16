@@ -48,8 +48,10 @@ from osm_fieldwork.form_components.translations import add_label_translations
 
 NEW_FEATURE = "${new_feature}"
 FEATURE = "${feature}"
+TASK = "${task}"
 INSTANCE_ID = "${instanceID}"
 INSTANCE_FEATURE = "instance('features')/root/item[name=${feature}]"
+INSTANCE_TASK = "instance('tasks')/root/item[name=${task}]"
 USERNAME = "${username}"
 RANDOM_NEG_ID = "int(-1 * random() * 1073741823)"
 
@@ -109,17 +111,17 @@ def _get_mandatory_fields(
     Returns:
         List of field definitions for the form
     """
-    color_calc = "if(${status}=6, '#ff0000', if(${status}=0, '#1a1a1a', '#00ff00'))"
-    stroke_calc = "if(${status}=6, '#cc0000', if(${status}=0, '#000000', '#00cc00'))"
+    color_calc = "if(${status}='invalid', '#ff0000', if(${status}='unmapped', '#1a1a1a', '#00ff00'))"
+    stroke_calc = "if(${status}='invalid', '#cc0000', if(${status}='unmapped', '#000000', '#00cc00'))"
 
-    status_field_calculation = f"if({FEATURE} != '', 2, "
+    status_field_calculation = f"if({FEATURE} != '', 'mapped', "
     if need_verification_fields:
-        status_field_calculation += "if(${feature_exists} = 'no', 6, "
-        status_field_calculation += "if(${digitisation_correct} = 'no', 6, "
+        status_field_calculation += "if(${feature_exists} = 'no', 'invalid', "
+        status_field_calculation += "if(${digitisation_correct} = 'no', 'invalid', "
     if use_odk_collect:
-        status_field_calculation += f"if({NEW_FEATURE} != '', 2, 6)"
+        status_field_calculation += f"if({NEW_FEATURE} != '', 'mapped', 'invalid')"
     else:
-        status_field_calculation += "6"
+        status_field_calculation += "'invalid'"
     if need_verification_fields:
         status_field_calculation += "))"
     status_field_calculation += ")"
@@ -148,21 +150,26 @@ def _get_mandatory_fields(
                 label_cols=label_cols
             ),
             add_label_translations({
-                "type": "select_one task_ids",
-                "name": "task_filter",
+                "type": "select_one_from_file tasks.csv",
+                "name": "task",
+                "appearance": "map",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "no",
             },
                 label_cols=label_cols
             ),
+            {
+                "type": "calculate",
+                "name": "selected_task_id",
+                "calculation": f"if({TASK} != '', {INSTANCE_TASK}/task_id, '')",
+            },
             add_label_translations({
                 "type": "select_one_from_file features.csv",
                 "name": "feature",
                 "appearance": "map",
                 "relevant": "${mapping_mode} = 'existing'",
                 "required": "yes",
-                # This removes the choice filter if selection is 'None', else applies
-                "choice_filter": "${task_filter} = 'None' or task_id = ${task_filter}",
+                "choice_filter": "${selected_task_id} = '' or task_id = ${selected_task_id}",
             },
                 label_cols=label_cols
             ),
@@ -233,7 +240,7 @@ def _get_mandatory_fields(
             "label::english(en)": "Mapping Status",
             "appearance": "minimal",
             "calculation": f"{status_field_calculation}",
-            "default": "2",
+            "default": "mapped",
             "trigger": f"{NEW_FEATURE}" if use_odk_collect else "",
             "save_to": "status",
         },
@@ -317,10 +324,9 @@ def create_survey_df(
 def create_entity_df(use_odk_collect: bool) -> pd.DataFrame:
     """Get the entities sheet for the dataframe."""
     status_label_expr = """concat(
-        if(${status} = '1', "🔒 ",
-        if(${status} = '2', "✅ ",
-        if(${status} = '5', "🏁 ",
-        if(${status} = '6', "❌ ", '')))),
+        if(${status} = 'mapped', "✅ ",
+        if(${status} = 'verified', "🏁 ",
+        if(${status} = 'invalid', "❌ ", ''))),
         "Task ", ${task_id},
         " Feature ", if(${xid} != ' ', ${xid}, ' ')
     )"""

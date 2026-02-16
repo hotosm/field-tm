@@ -124,7 +124,7 @@ def update_xform_version(xform_bytesio: BytesIO) -> tuple[str, BytesIO]:
     root = tree.getroot()
 
     xml_data = root.findall(".//xforms:data[@version]", namespaces)
-    new_version = str(int(time()))
+    new_version = str(int(time() * 1000))
     for dt in xml_data:
         dt.set("version", new_version)
 

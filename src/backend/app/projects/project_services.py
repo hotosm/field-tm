@@ -691,38 +691,63 @@ async def finalize_odk_project(
         entities_list=entities_list,
     )
 
-    # Step 3: Upload task boundaries if they exist
+    # Step 3: Upload task entities (always needed for entity-based task selection)
     task_areas = project.task_areas_geojson
+    task_entities = []
     if task_areas and task_areas.get("features"):
         log.info(
             f"Uploading {len(task_areas.get('features', []))} task boundaries to ODK"
         )
-        task_entities = []
         for idx, feature in enumerate(task_areas.get("features", [])):
             if feature.get("geometry"):
                 entity_dict = await central_crud.feature_geojson_to_entity_dict(
                     feature, additional_features=True
                 )
                 entity_dict["label"] = f"Task {idx + 1}"
-                if "data" in entity_dict:
-                    entity_data = {"geometry": entity_dict["data"]["geometry"]}
-                    entity_data["task_id"] = str(idx + 1)
-                    entity_dict["data"] = entity_data
+                entity_dict["data"] = {
+                    "geometry": entity_dict["data"]["geometry"],
+                    "task_id": str(idx + 1),
+                    "status": "ready",
+                    "fill": "#3388ff33",
+                    "stroke": "#3388ff",
+                    "stroke-width": "3",
+                }
                 task_entities.append(entity_dict)
 
+    if not task_entities:
+        # Create a single task from the project outline so tasks.csv always has data
+        log.info("No task areas found, creating single task entity from project outline")
+        outline_geojson = project.outline_geojson
+        if outline_geojson and outline_geojson.get("features"):
+            outline_feature = outline_geojson["features"][0]
+            entity_dict = await central_crud.feature_geojson_to_entity_dict(
+                outline_feature, additional_features=True
+            )
+            entity_dict["label"] = "Task 1"
+            entity_dict["data"] = {
+                "geometry": entity_dict["data"]["geometry"],
+                "task_id": "1",
+                "status": "ready",
+                "fill": "#3388ff33",
+                "stroke": "#3388ff",
+                "stroke-width": "3",
+            }
+            task_entities.append(entity_dict)
+
+    if task_entities:
         try:
             async with central_deps.get_odk_dataset(custom_odk_creds) as odk_central:
                 datasets = await odk_central.listDatasets(project_odk_id)
-                if any(ds.get("name") == "task_boundaries" for ds in datasets):
-                    log.info("Task boundaries dataset already exists, will be replaced")
+                if any(ds.get("name") == "tasks" for ds in datasets):
+                    log.info("Tasks dataset already exists, will be replaced")
         except Exception as e:
             log.warning(f"Could not check existing datasets: {e}")
 
         await central_crud.create_entity_list(
             custom_odk_creds,
             project_odk_id,
-            properties=["geometry", "task_id"],
-            dataset_name="task_boundaries",
+            properties=["geometry", "task_id", "status", "fill", "stroke", "stroke-width"],
+            dataset_name="tasks",
             entities_list=task_entities,
         )
 
