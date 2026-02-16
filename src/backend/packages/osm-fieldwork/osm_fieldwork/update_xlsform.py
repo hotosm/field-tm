@@ -35,7 +35,7 @@ import pandas as pd
 from python_calamine.pandas import pandas_monkeypatch
 
 from osm_fieldwork.enums import DbGeomType
-from osm_fieldwork.form_components.choice_fields import get_choice_fields, generate_task_id_choices
+from osm_fieldwork.form_components.choice_fields import get_choice_fields
 from osm_fieldwork.form_components.mandatory_fields import (
     get_photo_repeat_end,
     meta_df,
@@ -202,7 +202,7 @@ def merge_dataframes(
         survey_group_field = {
             "type": ["begin group"],
             "name": ["survey_questions"],
-            "relevant": "(${feature_exists} = 'yes') or (${status} = '2')",
+            "relevant": "(${feature_exists} = 'yes') or (${status} = 'mapped')",
         }
         if add_label:
             survey_group_field = add_label_translations(survey_group_field)
@@ -418,47 +418,6 @@ async def append_field_mapping_fields(
         default_language=default_language
     )
     return (xformid, await write_xlsform(updated_form))
-
-
-async def append_task_id_choices(
-    existing_form: BytesIO,
-    task_ids: list[int],
-) -> BytesIO:
-    """From the previously modified form, add the final task_filter choices."""
-
-    task_id_choice_df = generate_task_id_choices(task_ids)
-
-    existing_sheets = pd.read_excel(existing_form, sheet_name=None, engine="calamine")
-    if "choices" not in existing_sheets:
-        raise ValueError("Choices sheet is required in XLSForm!")
-
-    choices_df = existing_sheets["choices"]
-
-    # Ensure translation columns exist in BOTH dataframes
-    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
-        label_key = f"label::{lang_name}({lang_key})"
-        if label_key not in choices_df.columns:
-            choices_df[label_key] = ""
-        if label_key not in task_id_choice_df.columns:
-            task_id_choice_df[label_key] = ""
-
-    # Append new rows
-    choices_df = pd.concat([choices_df, task_id_choice_df], ignore_index=True)
-
-    # Fill translations for new rows (string compare to avoid int/str mismatch)
-    for lang_name, lang_key in INCLUDED_LANGUAGES.items():
-        label_key = f"label::{lang_name}({lang_key})"
-        for task_id in task_ids:
-            mask = choices_df["name"].astype(str) == str(task_id)
-            choices_df.loc[mask, label_key] = str(task_id)
-
-    # Drop plain "label" if translations exist
-    if "label" in choices_df.columns:
-        choices_df = choices_df.drop(columns=["label"])
-
-    existing_sheets["choices"] = choices_df
-
-    return await write_xlsform(existing_sheets)
 
 
 async def modify_form_for_qfield(

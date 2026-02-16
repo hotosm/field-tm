@@ -472,7 +472,7 @@ async def feature_geojson_to_entity_dict(
     if additional_features:
         entity_label = f"Additional Feature {uuid4()}"
     else:
-        properties["status"] = "0"
+        properties["status"] = "unmapped"
         feature_id = feature.get("id", None)
         entity_label = f"Feature {feature_id}"
 

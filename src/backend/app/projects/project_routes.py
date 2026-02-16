@@ -35,7 +35,6 @@ from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
 from litestar.params import Body, Parameter
 from osm_fieldwork.json_data_models import data_models_path, get_choices
-from osm_fieldwork.update_xlsform import append_task_id_choices
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 
@@ -608,68 +607,6 @@ async def generate_files(
         )
         await db.commit()
 
-    # Update the XLSForm if using ODK Collect to add task id choice filter
-    if project.field_mapping_app == FieldMappingApp.ODK:
-        log.info("Appending task_filter choices to XLSForm for ODK Collect project")
-        existing_xlsform = BytesIO(project.xlsform_content)
-
-        # Get task IDs from ODK Central task_boundaries dataset
-        task_ids = []
-        if project.external_project_id:
-            try:
-                # ODK credentials not stored on project, use None to fall back to env vars
-                project_odk_creds = None
-                from app.central import central_deps
-
-                async with central_deps.get_odk_dataset(
-                    project_odk_creds
-                ) as odk_central:
-                    # Fetch task boundaries from ODK
-                    entity_data = await odk_central.getEntityData(
-                        project.external_project_id,
-                        "task_boundaries",
-                        include_metadata=False,
-                    )
-
-                    if entity_data and isinstance(entity_data, list):
-                        # Extract task IDs from entities
-                        for entity in entity_data:
-                            task_id = entity.get("task_id")
-                            if task_id:
-                                try:
-                                    task_ids.append(int(task_id))
-                                except (ValueError, TypeError):
-                                    pass
-                        # If no task_id in properties, use index
-                        if not task_ids:
-                            task_ids = list(range(1, len(entity_data) + 1))
-            except Exception as e:
-                log.warning(
-                    f"Could not fetch task boundaries from ODK for project {project.id}: {e}"
-                )
-
-        if not task_ids:
-            # Task splitting was skipped - use whole AOI as single task
-            log.info(
-                f"No task boundaries found for project {project.id}. "
-                "Task splitting was skipped - using whole AOI as single task."
-            )
-            # Don't add task filter to XLSForm when there's only one task (the whole AOI)
-            new_xlsform = existing_xlsform
-        else:
-            log.debug(
-                f"Found {len(task_ids)} task boundaries for project ID {project.id}"
-            )
-            new_xlsform = await append_task_id_choices(existing_xlsform, task_ids)
-
-        # Update in both db + ODK Central
-        await central_crud.update_project_xlsform(
-            db,
-            project,
-            new_xlsform,
-            project.odk_form_id,
-        )
-
     if warning_message:
         return {"message": warning_message}
     return {}
@@ -782,14 +719,18 @@ async def upload_project_task_boundaries(
                 entity_dict = await central_crud.feature_geojson_to_entity_dict(
                     feature, additional_features=True
                 )
-                # Update label to indicate it's a task boundary
                 entity_dict["label"] = f"Task {idx + 1}"
-                # Add task_id to properties
-                if "data" in entity_dict:
-                    entity_dict["data"]["task_id"] = str(idx + 1)
+                entity_dict["data"] = {
+                    "geometry": entity_dict["data"]["geometry"],
+                    "task_id": str(idx + 1),
+                    "status": "ready",
+                    "fill": "#3388ff33",
+                    "stroke": "#3388ff",
+                    "stroke-width": "3",
+                }
                 task_entities.append(entity_dict)
 
-        # Create entity list for task boundaries in ODK
+        # Create entity list for tasks in ODK
         # ODK credentials not stored on project, use None to fall back to env vars
         project_odk_creds = None
         try:
@@ -798,16 +739,16 @@ async def upload_project_task_boundaries(
 
             async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
                 datasets = await odk_central.listDatasets(project_odk_id)
-                if any(ds.get("name") == "task_boundaries" for ds in datasets):
-                    log.info("Task boundaries dataset already exists, will be replaced")
+                if any(ds.get("name") == "tasks" for ds in datasets):
+                    log.info("Tasks dataset already exists, will be replaced")
         except Exception as e:
             log.warning(f"Could not check existing datasets: {e}")
 
         await central_crud.create_entity_list(
             project_odk_creds,
             project_odk_id,
-            properties=["geometry", "task_id"],
-            dataset_name="task_boundaries",
+            properties=["geometry", "task_id", "status", "fill", "stroke", "stroke-width"],
+            dataset_name="tasks",
             entities_list=task_entities,
         )
         log.info(

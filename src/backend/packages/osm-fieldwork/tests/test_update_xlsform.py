@@ -98,6 +98,88 @@ async def test_healthcare_xlsform():
     xform_convert(updated_form)
 
 
+async def test_odk_collect_entity_task_selection():
+    """Test that ODK Collect forms use entity-based task selection."""
+    form_bytes = io.BytesIO(convert_to_xlsform(str(buildings)))
+    xformid, updated_form = await append_field_mapping_fields(
+        form_bytes, "buildings", use_odk_collect=True
+    )
+    workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
+    survey_sheet = workbook["survey"]
+
+    # Extract column values
+    type_col = [cell.value for cell in survey_sheet["A"]]
+    name_col = [cell.value for cell in survey_sheet["B"]]
+
+    # Check select_one_from_file tasks.csv is present
+    assert "select_one_from_file tasks.csv" in type_col, (
+        "select_one_from_file tasks.csv not found in survey types"
+    )
+
+    # Check the task field name is 'task' (not 'task_filter')
+    task_type_idx = type_col.index("select_one_from_file tasks.csv")
+    assert name_col[task_type_idx] == "task", (
+        f"Expected field name 'task', got '{name_col[task_type_idx]}'"
+    )
+
+    # Check selected_task_id calculated field exists
+    assert "selected_task_id" in name_col, (
+        "selected_task_id calculated field not found"
+    )
+
+    # Check no task_ids in choices sheet
+    choices_sheet = workbook["choices"]
+    list_name_col = [cell.value for cell in choices_sheet["A"]]
+    assert "task_ids" not in list_name_col, (
+        "task_ids should not be in choices sheet"
+    )
+
+    # Check feature choice_filter references selected_task_id
+    feature_idx = name_col.index("feature")
+    # Find the choice_filter column
+    header = [cell.value for cell in next(survey_sheet.iter_rows(min_row=1, max_row=1))]
+    if "choice_filter" in header:
+        cf_col_idx = header.index("choice_filter") + 1
+        choice_filter_val = survey_sheet.cell(row=feature_idx + 1, column=cf_col_idx).value
+        assert "${selected_task_id}" in choice_filter_val, (
+            f"Feature choice_filter should reference ${{selected_task_id}}, got: {choice_filter_val}"
+        )
+
+
+async def test_status_values_are_text():
+    """Test that status values use text instead of integers."""
+    form_bytes = io.BytesIO(convert_to_xlsform(str(buildings)))
+    xformid, updated_form = await append_field_mapping_fields(
+        form_bytes, "buildings", use_odk_collect=True
+    )
+    workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
+    survey_sheet = workbook["survey"]
+
+    name_col = [cell.value for cell in survey_sheet["B"]]
+    header = [cell.value for cell in next(survey_sheet.iter_rows(min_row=1, max_row=1))]
+
+    # Find calculation column
+    calc_col_idx = header.index("calculation") + 1
+
+    # Check status field uses text values
+    status_idx = name_col.index("status")
+    status_calc = survey_sheet.cell(row=status_idx + 1, column=calc_col_idx).value
+    assert "'mapped'" in status_calc, f"Status calculation should use 'mapped', got: {status_calc}"
+    assert "'invalid'" in status_calc, f"Status calculation should use 'invalid', got: {status_calc}"
+
+    # Check default is text
+    if "default" in header:
+        default_col_idx = header.index("default") + 1
+        status_default = survey_sheet.cell(row=status_idx + 1, column=default_col_idx).value
+        assert status_default == "mapped", f"Status default should be 'mapped', got: {status_default}"
+
+    # Check color calculations use text status
+    fill_idx = name_col.index("fill")
+    fill_calc = survey_sheet.cell(row=fill_idx + 1, column=calc_col_idx).value
+    assert "'unmapped'" in fill_calc, f"Fill calculation should reference 'unmapped', got: {fill_calc}"
+    assert "'invalid'" in fill_calc, f"Fill calculation should reference 'invalid', got: {fill_calc}"
+
+
 def check_survey_sheet(workbook: Workbook) -> None:
     """Check the 'survey' sheet values and ensure no duplicates in 'name' column."""
     survey_sheet = get_sheet(workbook, "survey")

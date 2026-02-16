@@ -520,7 +520,7 @@ async def generate_project_files(
                         # Fetch task boundaries from ODK
                         entity_data = await odk_central.getEntityData(
                             project.external_project_id,
-                            "task_boundaries",
+                            "tasks",
                             include_metadata=False,
                         )
 
@@ -664,7 +664,7 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
     Task boundaries are stored in the database as task_areas_geojson (for preview),
-    or in ODK Central as entities (dataset: "task_boundaries") after finalization,
+    or in ODK Central as entities (dataset: "tasks") after finalization,
     or in a temporary table for QField projects.
 
     Args:
@@ -707,7 +707,7 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
                 # Fetch entities from task_boundaries dataset
                 entity_data = await odk_central.getEntityData(
                     project.external_project_id,
-                    "task_boundaries",
+                    "tasks",
                     include_metadata=False,
                 )
 
