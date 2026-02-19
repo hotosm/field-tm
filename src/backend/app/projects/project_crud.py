@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
 from traceback import format_exc
-from typing import Optional, Union
+from typing import Optional
 
 import aiohttp
 import geojson
@@ -53,93 +53,17 @@ from app.db.models import (
     DbUser,
 )
 from app.db.postgis_utils import (
-    featcol_to_flatgeobuf,
     flatgeobuf_to_featcol,
     split_geojson_by_task_areas,
 )
 from app.helpers.geometry_utils import (
-    check_crs,
-    featcol_keep_single_geom_type,
     get_featcol_dominant_geom_type,
     javarosa_to_geojson_geom,
-    parse_geojson_file_to_featcol,
 )
 from app.helpers.helper_schemas import PaginationInfo
-from app.projects import project_deps, project_schemas
+from app.projects import project_deps
 
 log = logging.getLogger(__name__)
-
-
-# NOTE not used anywhere - delete? (useful code though...)
-# async def get_projects_featcol(
-#     db: AsyncConnection,
-#     #: Optional[str] = None,
-# ) -> geojson.FeatureCollection:
-#     """Get all projects, or a filtered subset."""
-#     bbox_condition = ""
-#     bbox_params = {}
-
-#     if bbox:
-#         minx, miny, maxx, maxy = map(float, bbox.split(","))
-#         bbox_condition = """
-#             AND ST_Intersects(
-#                 p.outline, ST_MakeEnvelope(
-#                     %(minx)s, %(miny)s, %(maxx)s, %(maxy)s, 4326
-#                 )
-#             )
-#         """
-#         bbox_params = {"minx": minx, "miny": miny, "maxx": maxx, "maxy": maxy}
-
-#     # FIXME add logic for percentMapped and percentValidated
-#     # NOTE alternative logic to build a FeatureCollection
-#     """
-#         SELECT jsonb_build_object(
-#             'type', 'FeatureCollection',
-#             'features', COALESCE(jsonb_agg(feature), '[]'::jsonb)
-#         ) AS featcol
-#         FROM (...
-#     """
-#     sql = f"""
-#             SELECT
-#                 'FeatureCollection' as type,
-#                 COALESCE(jsonb_agg(feature), '[]'::jsonb) AS features
-#             FROM (
-#                 SELECT jsonb_build_object(
-#                     'type', 'Feature',
-#                     'id', p.id,
-#                     'geometry', ST_AsGeoJSON(p.outline)::jsonb,
-#                     'properties', jsonb_build_object(
-#                         'name', p.project_name,
-#                         'percentMapped', 0,
-#                         'percentValidated', 0,
-#                         'created', p.created_at,
-#                         'link', concat(
-#                             'https://', %(domain)s::text, '/project/', p.id
-#                         )
-#                     )
-#                 ) AS feature
-#                 FROM projects p
-#                 WHERE p.visibility = 'PUBLIC'
-#                 {bbox_condition}
-#             ) AS features;
-#         """
-
-#     async with db.cursor(
-#         row_factory=class_row(geojson_pydantic.FeatureCollection)
-#     ) as cur:
-#         query_params = {"domain": settings.FMTM_DOMAIN}
-#         if bbox:
-#             query_params.update(bbox_params)
-#         await cur.execute(sql, query_params)
-#         featcol = await cur.fetchone()
-
-#     if not featcol:
-#         return HTTPException(
-#             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-#             detail="Failed to generate project FeatureCollection",
-#         )
-
-#     return featcol
 
 
 async def generate_data_extract(
@@ -296,119 +220,6 @@ async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
             log.info(f"Deleted XLSForms from the database: {forms_to_delete}")
 
 
-async def get_or_set_data_extract_url(
-    db: AsyncConnection,
-    db_project: DbProject,
-    url: Optional[str],
-) -> str:
-    """Get or set the data extract URL for a project.
-
-    Args:
-        db (Connection): The database connection.
-        db_project (DbProject): The project object.
-        url (str): URL to the streamable flatgeobuf data extract.
-            If not passed, a new extract is generated.
-
-    Returns:
-        str: URL to fgb file in S3.
-    """
-    project_id = db_project.id
-    # If url passed, get extract
-    # If no url passed, get new extract / set in db
-    if not url:
-        existing_url = db_project.data_extract_url
-
-        if not existing_url:
-            msg = (
-                f"No data extract exists for project ({project_id}). "
-                "To generate one, call 'projects/generate-data-extract/'"
-            )
-            log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=msg,
-            )
-        return existing_url
-
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(
-            data_extract_url=url,
-        ),
-    )
-
-    return url
-
-
-async def upload_geojson_data_extract(
-    db: AsyncConnection,
-    project_id: int,
-    geojson_raw: Union[str, bytes],
-) -> str:
-    """Upload a geojson data extract.
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): The ID of the project.
-        geojson_raw (str): The data extracts contents.
-
-    Returns:
-        str: URL to fgb file in S3.
-    """
-    project = await project_deps.get_project_by_id(db, project_id)
-    log.debug(f"Uploading data extract for project ({project.id})")
-
-    featcol = parse_geojson_file_to_featcol(geojson_raw)
-    featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
-
-    if not featcol_single_geom_type:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Could not process geojson input",
-        )
-
-    await check_crs(featcol_single_geom_type)
-
-    log.debug(
-        "Generating fgb object from geojson with "
-        f"{len(featcol_single_geom_type.get('features', []))} features"
-    )
-    fgb_data = await featcol_to_flatgeobuf(db, featcol_single_geom_type)
-
-    if not fgb_data:
-        msg = f"Failed converting geojson to flatgeobuf for project ({project_id})"
-        log.error(msg)
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=msg,
-        )
-
-    # TODO simply post this directly to ODK Central an Entity List
-    return
-
-
-def flatten_dict(d, parent_key="", sep="_"):
-    """Recursively flattens a nested dictionary into a single-level dictionary.
-
-    Args:
-        d (dict): The input dictionary.
-        parent_key (str): The parent key (used for recursion).
-        sep (str): The separator character to use in flattened keys.
-
-    Returns:
-        dict: The flattened dictionary.
-    """
-    items = {}
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, dict):
-            items.update(flatten_dict(v, new_key, sep=sep))
-        else:
-            items[new_key] = v
-    return items
-
-
 async def generate_odk_central_project_content(
     project_odk_id: int,
     project_odk_form_id: str,
@@ -514,7 +325,8 @@ async def generate_project_files(
                 and project.external_project_id
             ):
                 try:
-                    # ODK credentials not stored on project, use None to fall back to env vars
+                    # ODK creds not stored on project, use None
+                    # to fall back to env vars
                     project_odk_creds = None
                     async with central_deps.get_odk_dataset(
                         project_odk_creds
@@ -549,7 +361,8 @@ async def generate_project_files(
                                 }
                 except Exception as e:
                     log.warning(
-                        f"Could not fetch task boundaries from ODK for project {project_id}: {e}"
+                        "Could not fetch task boundaries "
+                        f"from ODK for project {project_id}: {e}"
                     )
             elif project.field_mapping_app == FieldMappingApp.QFIELD:
                 # For QField, boundaries are stored in a temp table during upload
@@ -586,14 +399,15 @@ async def generate_project_files(
                                 }
                 except Exception as e:
                     log.warning(
-                        f"Could not fetch task boundaries from temp table for QField project {project_id}: {e}"
+                        "Could not fetch task boundaries from "
+                        f"temp table for QField project {project_id}: {e}"
                     )
 
             task_extract_dict = await split_geojson_by_task_areas(
                 db, feature_collection, project_id, task_boundaries
             )
 
-            # If task_extract_dict is empty (no task boundaries), use whole AOI as single task
+            # If empty (no task boundaries), use whole AOI
             if not task_extract_dict and feature_collection:
                 log.info(
                     f"No task boundaries found for project {project_id}. "
@@ -648,7 +462,9 @@ async def generate_project_files(
 
         log.debug(
             f"Generated ODK token for Field-TM project ({project_id}) "
-            f"ODK project {project_odk_id}: {type(odk_token)} ({odk_token[:15] if odk_token else 'None'}...)"
+            f"ODK project {project_odk_id}: "
+            f"{type(odk_token)} "
+            f"({odk_token[:15] if odk_token else 'None'}...)"
         )
         return True
     except Exception as e:
@@ -689,7 +505,7 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
         elif isinstance(project.task_areas_geojson, str):
             return project.task_areas_geojson
 
-    # Try to fetch task boundaries from ODK Central if available (only if not in database)
+    # Fetch task boundaries from ODK Central if not in database
     if project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id:
         try:
             # ODK credentials not stored on project, create from env vars
@@ -737,7 +553,8 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
                         return json.dumps(feature_collection)
         except Exception as e:
             log.warning(
-                f"Failed to fetch task boundaries from ODK for project {project_id}: {e}"
+                "Failed to fetch task boundaries from "
+                f"ODK for project {project_id}: {e}"
             )
     elif project.field_mapping_app == FieldMappingApp.QFIELD:
         # For QField, fetch from temporary table
@@ -772,7 +589,8 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
                         return json.dumps(feature_collection)
         except Exception as e:
             log.warning(
-                f"Failed to fetch task boundaries from temp table for QField project {project_id}: {e}"
+                "Failed to fetch task boundaries from temp table "
+                f"for QField project {project_id}: {e}"
             )
 
     # Return empty FeatureCollection if no boundaries found
@@ -855,25 +673,6 @@ async def get_project_features_geojson(
         return split_extract_dict[task_id]
 
     return data_extract_geojson
-
-
-# async def convert_geojson_to_osm(geojson_file: str):
-#     """Convert a GeoJSON file to OSM format."""
-#     jsonin = JsonDump()
-#     geojson_path = Path(geojson_file)
-#     data = jsonin.parse(geojson_path)
-
-#     osmoutfile = f"{geojson_path.stem}.osm"
-#     jsonin.createOSM(osmoutfile)
-
-#     for entry in data:
-#         feature = jsonin.createEntry(entry)
-
-#     # TODO add json2osm back in
-#     # https://github.com/hotosm/osm-fieldwork/blob/1a94afff65c4653190d735
-#     # f104c0644dcfb71e64/osm_fieldwork/json2osm.py#L363
-
-#     return json2osm(geojson_file)
 
 
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
@@ -982,7 +781,8 @@ async def get_project_qrcode(
     Args:
         db (AsyncConnection): Database connection.
         project_id (int): Project ID.
-        username (str, optional): OSM username for ODK metadata. Defaults to "fieldtm_user".
+        username (str, optional): OSM username for ODK metadata.
+            Defaults to "fieldtm_user".
 
     Returns:
         str: Base64 data URL of the QR code image.

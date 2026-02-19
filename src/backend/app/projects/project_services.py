@@ -32,6 +32,7 @@ import aiohttp
 from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql, split_by_square
+from geojson_aoi import parse_aoi
 from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -45,7 +46,6 @@ from app.db.models import DbProject
 from app.helpers.geometry_utils import (
     check_crs,
     featcol_keep_single_geom_type,
-    parse_geojson_file_to_featcol,
     polygon_to_centroid,
 )
 from app.projects import project_crud, project_deps, project_schemas
@@ -62,6 +62,7 @@ class ServiceError(Exception):
     """Base exception for service layer errors."""
 
     def __init__(self, message: str, code: str = "error"):
+        """Initialize with message and error code."""
         self.message = message
         self.code = code
         super().__init__(message)
@@ -71,6 +72,7 @@ class ValidationError(ServiceError):
     """Input validation failed."""
 
     def __init__(self, message: str):
+        """Initialize with message."""
         super().__init__(message, code="validation_error")
 
 
@@ -78,6 +80,7 @@ class NotFoundError(ServiceError):
     """Resource not found."""
 
     def __init__(self, message: str):
+        """Initialize with message."""
         super().__init__(message, code="not_found")
 
 
@@ -85,6 +88,7 @@ class ConflictError(ServiceError):
     """Resource conflict (e.g. duplicate name)."""
 
     def __init__(self, message: str):
+        """Initialize with message."""
         super().__init__(message, code="conflict")
 
 
@@ -354,7 +358,7 @@ async def download_osm_data(
                 raise ServiceError("Failed to parse GeoJSON data from download.") from e
 
     # Validate and clean GeoJSON
-    featcol = parse_geojson_file_to_featcol(json.dumps(geojson_data))
+    featcol = parse_aoi(settings.FMTM_DB_URL, json.dumps(geojson_data))
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if not featcol_single_geom_type:
@@ -441,8 +445,8 @@ async def split_aoi(
 
     try:
         algorithm_enum = SplittingAlgorithm(algorithm)
-    except ValueError:
-        raise ValidationError(f"Invalid algorithm type: {algorithm}")
+    except ValueError as err:
+        raise ValidationError(f"Invalid algorithm type: {algorithm}") from err
 
     # Handle NO_SPLITTING case
     if algorithm_enum == SplittingAlgorithm.NO_SPLITTING:
@@ -614,7 +618,8 @@ async def finalize_odk_project(
         raise ValidationError("XLSForm is required. Please upload a form first.")
     if not project.data_extract_geojson:
         raise ValidationError(
-            "Data extract is required. Please download OSM data or upload GeoJSON first."
+            "Data extract is required. "
+            "Please download OSM data or upload GeoJSON first."
         )
 
     # Validate ODK credentials
@@ -850,7 +855,8 @@ async def finalize_qfield_project(
         raise ValidationError("XLSForm is required. Please upload a form first.")
     if not project.data_extract_geojson:
         raise ValidationError(
-            "Data extract is required. Please download OSM data or upload GeoJSON first."
+            "Data extract is required. "
+            "Please download OSM data or upload GeoJSON first."
         )
 
     log.info(f"Creating QField project for Field-TM project {project_id}")

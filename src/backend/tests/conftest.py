@@ -17,13 +17,9 @@
 #
 """Configuration and fixtures for PyTest."""
 
-import json
 import logging
 import os
 from collections.abc import AsyncIterator
-from io import BytesIO
-from pathlib import Path
-from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
@@ -43,13 +39,11 @@ from app.db.models import (
     DbProject,
 )
 from app.main import api as litestar_api
-from app.projects import project_crud
 from app.projects.project_schemas import (
     ProjectIn,
     StubProjectIn,
 )
 from app.users.user_crud import get_or_create_user
-from tests.test_data import test_data_path
 
 log = logging.getLogger(__name__)
 
@@ -163,57 +157,6 @@ async def project(db, admin_user):
     # Get project, including all calculated fields
     project_all_data = await DbProject.one(db, new_project.id)
     return project_all_data
-
-
-@pytest_asyncio.fixture(scope="function")
-async def odk_project(db, client, project):
-    """Create ODK Central resources for a project and generate the necessary files."""
-    with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
-        data_extracts = json.dumps(json.load(f))
-    log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_s3_path = await project_crud.upload_geojson_data_extract(
-        db,
-        project.id,
-        data_extracts,
-    )
-
-    internal_s3_url = f"{settings.S3_ENDPOINT}{urlparse(data_extract_s3_path).path}"
-
-    async with AsyncClient() as client_httpx:
-        response = await client_httpx.head(internal_s3_url, follow_redirects=True)
-        assert response.status_code < 400, (
-            f"HEAD request failed with status {response.status_code}"
-        )
-
-    xlsform_file = Path(f"{test_data_path}/buildings.xls")
-    with open(xlsform_file, "rb") as xlsform_data:
-        xlsform_obj = BytesIO(xlsform_data.read())
-
-    try:
-        response = await client.post(
-            f"/central/upload-xlsform?project_id={project.id}",
-            files={
-                "xlsform": (
-                    "buildings.xls",
-                    xlsform_obj,
-                )
-            },
-        )
-        log.debug(f"Uploaded XLSForm for project: {project.id}")
-    except Exception as e:
-        log.exception(e)
-        pytest.fail(f"Failed to upload XLSForm for project: {str(e)}")
-
-    try:
-        response = await client.post(
-            f"/projects/{project.id}/generate-project-data",
-        )
-        log.debug(f"Generated project files for project: {project.id}")
-    except Exception as e:
-        log.exception(e)
-        pytest.fail(f"Failed to generate project files: {str(e)}")
-
-    yield project
 
 
 @pytest_asyncio.fixture(scope="function")

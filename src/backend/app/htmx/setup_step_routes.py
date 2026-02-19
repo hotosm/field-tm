@@ -74,35 +74,68 @@ from app.qfield.qfield_schemas import QFieldCloud
 log = logging.getLogger(__name__)
 
 
+def _callout(variant: str, msg: str) -> str:
+    """Build a wa-callout HTML snippet."""
+    return f'<wa-callout variant="{variant}"><span>{msg}</span></wa-callout>'
+
+
 def _build_odk_finalize_success_html(
     result: ODKFinalizeResult,
     qr_code_data_url: str,
 ) -> str:
-    """Build success markup returned by HTMX ODK finalization step."""
+    """Build success markup returned by HTMX ODK finalize."""
+    box_style = (
+        "margin-top: 12px; padding: 16px;"
+        " background-color: #f5f5f5; border-radius: 8px;"
+    )
+    link_style = "color: #d63f3f; text-decoration: none; font-weight: 600;"
+    img_box = (
+        "display: inline-block; background-color: white;"
+        " padding: 10px; border-radius: 6px;"
+    )
+    usr = result.manager_username
+    pwd = result.manager_password
     return f"""
     <wa-callout variant="success">
-      <span>Project successfully created in ODK Central.</span>
+      <span>Project created in ODK Central.</span>
     </wa-callout>
-    <div style="margin-top: 12px; padding: 16px; background-color: #f5f5f5; border-radius: 8px;">
-      <h4 style="margin: 0 0 10px 0;">Manager Access (ODK Central UI)</h4>
+    <div style="{box_style}">
+      <h4 style="margin: 0 0 10px 0;">
+        Manager Access (ODK Central UI)
+      </h4>
       <p style="margin: 0 0 8px 0;">
-        <a href="{result.odk_url}" target="_blank" style="color: #d63f3f; text-decoration: none; font-weight: 600;">
+        <a href="{result.odk_url}"
+           target="_blank" style="{link_style}">
           Open project in ODK Central
         </a>
       </p>
-      <p style="margin: 0;"><strong>Username:</strong> <code>{result.manager_username}</code></p>
-      <p style="margin: 6px 0 0 0;"><strong>Password:</strong> <code>{result.manager_password}</code></p>
-      <p style="margin: 8px 0 0 0; color: #666;">Save these credentials now. They are only shown once.</p>
+      <p style="margin: 0;">
+        <strong>Username:</strong> <code>{usr}</code>
+      </p>
+      <p style="margin: 6px 0 0 0;">
+        <strong>Password:</strong> <code>{pwd}</code>
+      </p>
+      <p style="margin: 8px 0 0 0; color: #666;">
+        Save these credentials now. Only shown once.
+      </p>
     </div>
-    <div style="margin-top: 12px; padding: 16px; background-color: #f5f5f5; border-radius: 8px;">
-      <h4 style="margin: 0 0 10px 0;">ODK Collect App User Access</h4>
-      <p style="margin: 0 0 10px 0; color: #666;">Scan this QR code in ODK Collect to submit data.</p>
-      <div style="display: inline-block; background-color: white; padding: 10px; border-radius: 6px;">
-        <img src="{qr_code_data_url}" alt="ODK Collect QR Code" style="max-width: 260px; height: auto;" />
+    <div style="{box_style}">
+      <h4 style="margin: 0 0 10px 0;">
+        ODK Collect App User Access
+      </h4>
+      <p style="margin: 0 0 10px 0; color: #666;">
+        Scan this QR code in ODK Collect.
+      </p>
+      <div style="{img_box}">
+        <img src="{qr_code_data_url}"
+             alt="ODK Collect QR Code"
+             style="max-width: 260px; height: auto;"
+        />
       </div>
     </div>
     <div style="margin-top: 12px;">
-      <wa-button type="button" variant="default" onclick="window.location.reload()">
+      <wa-button type="button" variant="default"
+        onclick="window.location.reload()">
         Reload Project Page
       </wa-button>
     </div>
@@ -153,155 +186,185 @@ def render_leaflet_map(
 
     layers_json = json.dumps(escaped_layers).replace("</script>", "<\\/script>")
 
+    div_style = (  # noqa: E501
+        f"height: {height}; width: 100%;"
+        " border: 1px solid #ddd;"
+        " border-radius: 4px; margin-bottom: 15px;"
+    )
+    tile_url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     map_html = f"""
-    <div id="{unique_map_id}" style="height: {height}; width: 100%; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px;"></div>
+    <div id="{unique_map_id}" style="{div_style}"></div>
     <script>
         (function() {{
-            // Clean up any existing maps with the same base ID pattern
-            const baseMapId = '{map_id}';
-            const existingContainers = document.querySelectorAll('[id^="' + baseMapId + '-"]');
-            existingContainers.forEach(function(container) {{
-                if (container._leaflet_id && typeof L !== 'undefined') {{
+            var baseMapId = '{map_id}';
+            var sel = '[id^="' + baseMapId + '-"]';
+            var ecs = document.querySelectorAll(sel);
+            ecs.forEach(function(container) {{
+                if (container._leaflet_id
+                    && typeof L !== 'undefined') {{
                     try {{
-                        const oldMap = L.Map.prototype.get(container._leaflet_id);
-                        if (oldMap) {{
-                            oldMap.remove();
-                        }}
+                        var om = L.Map.prototype.get(
+                            container._leaflet_id);
+                        if (om) {{ om.remove(); }}
                     }} catch (e) {{
-                        // Map already removed or doesn't exist
                     }}
                 }}
             }});
-            
-            // Function to initialize the map
+
             function initMap() {{
-                const mapContainer = document.getElementById('{unique_map_id}');
-                if (!mapContainer) {{
+                var mc = document.getElementById(
+                    '{unique_map_id}');
+                if (!mc) {{
                     setTimeout(initMap, 50);
                     return;
                 }}
-                
-                // Check if Leaflet is loaded
+
                 if (typeof L === 'undefined') {{
-                    // Load Leaflet if not already loaded
-                    if (!document.querySelector('link[href*="leaflet.css"]')) {{
-                        const link = document.createElement('link');
+                    var cssQ = 'link[href*="leaflet.css"]';
+                    if (!document.querySelector(cssQ)) {{
+                        var link = document.createElement(
+                            'link');
                         link.rel = 'stylesheet';
-                        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                        link.href =
+                            'https://unpkg.com/leaflet'
+                            + '@1.9.4/dist/leaflet.css';
                         document.head.appendChild(link);
                     }}
-                    if (!document.querySelector('script[src*="leaflet.js"]')) {{
-                        const script = document.createElement('script');
-                        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-                        script.onload = function() {{
+                    var jsQ = 'script[src*="leaflet.js"]';
+                    if (!document.querySelector(jsQ)) {{
+                        var s = document.createElement(
+                            'script');
+                        s.src =
+                            'https://unpkg.com/leaflet'
+                            + '@1.9.4/dist/leaflet.js';
+                        s.onload = function() {{
                             setTimeout(initMap, 100);
                         }};
-                        document.head.appendChild(script);
+                        document.head.appendChild(s);
                         return;
                     }}
                     setTimeout(initMap, 100);
                     return;
                 }}
-                
-                // Check if container already has a map
-                if (mapContainer._leaflet_id) {{
+
+                if (mc._leaflet_id) {{
                     try {{
-                        const existingMap = L.Map.prototype.get(mapContainer._leaflet_id);
-                        if (existingMap) {{
-                            existingMap.remove();
-                        }}
+                        var em = L.Map.prototype.get(
+                            mc._leaflet_id);
+                        if (em) {{ em.remove(); }}
                     }} catch (e) {{
-                        // Ignore errors
                     }}
                 }}
-                
-                // Small delay to ensure container is fully rendered
+
                 setTimeout(function() {{
                     try {{
-                        // Initialize Leaflet map
-                        const map = L.map('{unique_map_id}').setView([0, 0], 2);
-                        
-                        // Add OpenStreetMap tile layer
-                        L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-                            attribution: '© OpenStreetMap contributors',
+                        var map = L.map(
+                            '{unique_map_id}'
+                        ).setView([0, 0], 2);
+
+                        L.tileLayer(
+                            '{tile_url}', {{
+                            attribution:
+                                '© OSM contributors',
                             maxZoom: 19
                         }}).addTo(map);
-                        
-                        // Load and display GeoJSON layers
-                        const layersConfig = {layers_json};
-                        const layers = [];
-                        let allBounds = [];
-                        
-                        layersConfig.forEach(function(layerConfig, index) {{
-                            const geojsonData = JSON.parse(layerConfig.data);
-                            const geojsonLayer = L.geoJSON(geojsonData, {{
-                                style: function(feature) {{
+
+                        var lc = {layers_json};
+                        var layers = [];
+                        var allBounds = [];
+
+                        lc.forEach(function(cfg, i) {{
+                            var gd = JSON.parse(cfg.data);
+                            var gl = L.geoJSON(gd, {{
+                                style: function(f) {{
                                     return {{
-                                        color: layerConfig.color,
-                                        weight: layerConfig.weight,
-                                        opacity: layerConfig.opacity,
-                                        fillOpacity: layerConfig.fillOpacity
+                                        color: cfg.color,
+                                        weight: cfg.weight,
+                                        opacity: cfg.opacity,
+                                        fillOpacity:
+                                            cfg.fillOpacity
                                     }};
                                 }},
-                                onEachFeature: function(feature, layer) {{
-                                    if (feature.properties) {{
-                                        const props = Object.keys(feature.properties).slice(0, 5).map(k => 
-                                            '<strong>' + k + ':</strong> ' + feature.properties[k]
-                                        ).join('<br>');
-                                        layer.bindPopup('<strong>' + layerConfig.name + '</strong><br>' + (props || 'No properties'));
+                                onEachFeature:
+                                  function(f, layer) {{
+                                    if (f.properties) {{
+                                        var ks = Object.keys(
+                                            f.properties
+                                        ).slice(0, 5);
+                                        var ps = ks.map(
+                                            function(k) {{
+                                            return '<b>'
+                                                + k
+                                                + ':</b> '
+                                                + f.properties[k];
+                                        }}).join('<br>');
+                                        var h = '<b>'
+                                            + cfg.name
+                                            + '</b><br>'
+                                            + (ps || 'None');
+                                        layer.bindPopup(h);
                                     }}
                                 }}
                             }});
-                            
-                            geojsonLayer.addTo(map);
-                            layers.push({{name: layerConfig.name, layer: geojsonLayer}});
-                            
-                            // Collect bounds for fitting
-                            if (geojsonLayer.getBounds().isValid()) {{
-                                allBounds.push(geojsonLayer.getBounds());
-                            }}
-                        }});
-                        
-                        // Add layer control if multiple layers and controls enabled
-                        if (layers.length > 1 && {str(show_controls).lower()}) {{
-                            const layerControl = L.control.layers({{}}, {{}});
-                            layers.forEach(function(l) {{
-                                layerControl.addOverlay(l.layer, l.name);
+
+                            gl.addTo(map);
+                            layers.push({{
+                                name: cfg.name,
+                                layer: gl
                             }});
-                            layerControl.addTo(map);
+
+                            if (gl.getBounds().isValid())
+                                allBounds.push(
+                                    gl.getBounds());
+                        }});
+
+                        var sc = {str(show_controls).lower()};
+                        if (layers.length > 1 && sc) {{
+                            var ctrl = L.control.layers(
+                                {{}}, {{}});
+                            layers.forEach(function(l) {{
+                                ctrl.addOverlay(
+                                    l.layer, l.name);
+                            }});
+                            ctrl.addTo(map);
                         }}
-                        
-                        // Fit map to all layer bounds
+
                         if (allBounds.length > 0) {{
-                            let combinedBounds = allBounds[0];
-                            for (let i = 1; i < allBounds.length; i++) {{
-                                combinedBounds = combinedBounds.extend(allBounds[i]);
+                            var cb = allBounds[0];
+                            for (var i = 1;
+                                 i < allBounds.length;
+                                 i++) {{
+                                cb = cb.extend(
+                                    allBounds[i]);
                             }}
-                            map.fitBounds(combinedBounds);
+                            map.fitBounds(cb);
                         }}
-                        
-                        // Trigger resize to ensure map renders correctly
+
                         setTimeout(function() {{
                             map.invalidateSize();
                         }}, 100);
                     }} catch (error) {{
-                        console.error('Error initializing Leaflet map:', error);
+                        console.error(
+                            'Map init error:', error);
                     }}
                 }}, 100);
             }}
-            
-            // Initialize map after HTMX swap
-            if (document.getElementById('{unique_map_id}')) {{
+
+            if (document.getElementById(
+                    '{unique_map_id}')) {{
                 initMap();
             }} else {{
-                // Wait for HTMX to swap content
-                const initAfterSwap = function(event) {{
-                    if (document.getElementById('{unique_map_id}')) {{
+                var ias = function(event) {{
+                    if (document.getElementById(
+                            '{unique_map_id}')) {{
                         initMap();
-                        document.body.removeEventListener('htmx:afterSwap', initAfterSwap);
+                        document.body
+                            .removeEventListener(
+                            'htmx:afterSwap', ias);
                     }}
                 }};
-                document.body.addEventListener('htmx:afterSwap', initAfterSwap);
+                document.body.addEventListener(
+                    'htmx:afterSwap', ias);
             }}
         }})();
     </script>
@@ -591,8 +654,21 @@ async def create_project_htmx(
             try:
                 outline = json.loads(outline_str)
             except json.JSONDecodeError:
+                err = (
+                    "Project area must be valid JSON"
+                    " (GeoJSON Polygon, MultiPolygon,"
+                    " Feature, or FeatureCollection)."
+                )
                 return Response(
-                    content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection).</span></wa-callout></div>',
+                    content=(
+                        '<div id="form-error"'
+                        ' style="margin-bottom: 16px;'
+                        ' display: block;">'
+                        '<wa-callout variant="danger">'
+                        '<span id="form-error-message">'
+                        f"{err}"
+                        "</span></wa-callout></div>"
+                    ),
                     media_type="text/html",
                     status_code=400,
                 )
@@ -631,29 +707,70 @@ async def create_project_htmx(
             )
         if "Area of Interest" in message:
             headers["HX-Trigger"] = json.dumps({"missingOutline": message})
+        err_div = (
+            '<div id="form-error"'
+            ' style="margin-bottom: 16px;'
+            ' display: block;">'
+            '<wa-callout variant="danger">'
+            '<span id="form-error-message">'
+            f"{message}"
+            "</span></wa-callout></div>"
+        )
         return Response(
-            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{message}</span></wa-callout></div>',
+            content=err_div,
             media_type="text/html",
             status_code=400,
             headers=headers,
         )
     except ConflictError as e:
+        err_div = (
+            '<div id="form-error"'
+            ' style="margin-bottom: 16px;'
+            ' display: block;">'
+            '<wa-callout variant="danger">'
+            '<span id="form-error-message">'
+            f"{e.message}"
+            "</span></wa-callout></div>"
+        )
+        hx_trigger = json.dumps({"duplicateProjectName": e.message})
         return Response(
-            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{e.message}</span></wa-callout></div>',
+            content=err_div,
             media_type="text/html",
             status_code=status.HTTP_409_CONFLICT,
-            headers={"HX-Trigger": json.dumps({"duplicateProjectName": e.message})},
+            headers={"HX-Trigger": hx_trigger},
         )
     except ServiceError as e:
+        err_div = (
+            '<div id="form-error"'
+            ' style="margin-bottom: 16px;'
+            ' display: block;">'
+            '<wa-callout variant="danger">'
+            '<span id="form-error-message">'
+            f"{e.message}"
+            "</span></wa-callout></div>"
+        )
         return Response(
-            content=f'<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">{e.message}</span></wa-callout></div>',
+            content=err_div,
             media_type="text/html",
             status_code=400,
         )
     except Exception as e:
-        log.error(f"Error creating project via HTMX: {e}", exc_info=True)
+        log.error(
+            f"Error creating project via HTMX: {e}",
+            exc_info=True,
+        )
+        err_div = (
+            '<div id="form-error"'
+            ' style="margin-bottom: 16px;'
+            ' display: block;">'
+            '<wa-callout variant="danger">'
+            '<span id="form-error-message">'
+            "An unexpected error occurred."
+            " Please try again."
+            "</span></wa-callout></div>"
+        )
         return Response(
-            content='<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="danger"><span id="form-error-message">An unexpected error occurred. Please try again.</span></wa-callout></div>',
+            content=err_div,
             media_type="text/html",
             status_code=500,
         )
@@ -679,7 +796,7 @@ async def upload_xlsform_htmx(
     project = current_user.get("project")
     if not project:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found.</span></wa-callout>',
+            content=_callout("danger", "Project not found."),
             media_type="text/html",
             status_code=404,
         )
@@ -687,7 +804,10 @@ async def upload_xlsform_htmx(
     # Verify project_id matches the user's project for security
     if project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project ID mismatch. You do not have access to this project.</span></wa-callout>',
+            content=_callout(
+                "danger",
+                "Project ID mismatch. You do not have access to this project.",
+            ),
             media_type="text/html",
             status_code=403,
         )
@@ -731,7 +851,10 @@ async def upload_xlsform_htmx(
             )
             if not template_bytes:
                 return Response(
-                    content='<wa-callout variant="danger"><span>Failed to load template form.</span></wa-callout>',
+                    content=_callout(
+                        "danger",
+                        "Failed to load template form.",
+                    ),
                     media_type="text/html",
                     status_code=404,
                 )
@@ -742,7 +865,10 @@ async def upload_xlsform_htmx(
             # Handle custom file upload
             if not xlsform_file:
                 return Response(
-                    content='<wa-callout variant="danger"><span>Please select a form or upload a file.</span></wa-callout>',
+                    content=_callout(
+                        "danger",
+                        "Please select a form or upload a file.",
+                    ),
                     media_type="text/html",
                     status_code=400,
                 )
@@ -776,13 +902,18 @@ async def upload_xlsform_htmx(
         xlsform_db_bytes = project_xlsform.getvalue()
         if len(xlsform_db_bytes) == 0 or not xform_id:
             return Response(
-                content='<wa-callout variant="danger"><span>There was an error modifying the XLSForm!</span></wa-callout>',
+                content=_callout(
+                    "danger",
+                    "There was an error modifying the XLSForm!",
+                ),
                 media_type="text/html",
                 status_code=422,
             )
 
         log.debug(
-            f"Setting project XLSForm db data for xFormId: {xform_id}, bytes length: {len(xlsform_db_bytes)}"
+            "Setting project XLSForm db data for"
+            f" xFormId: {xform_id},"
+            f" bytes length: {len(xlsform_db_bytes)}"
         )
         await DbProject.update(
             db,
@@ -794,7 +925,10 @@ async def upload_xlsform_htmx(
 
         # Return success response with HTMX redirect
         return Response(
-            content='<wa-callout variant="success"><span>✓ Form validated and uploaded successfully! Reloading page...</span></wa-callout>',
+            content=_callout(
+                "success",
+                "Form validated and uploaded successfully! Reloading page...",
+            ),
             media_type="text/html",
             status_code=200,
             headers={
@@ -806,7 +940,7 @@ async def upload_xlsform_htmx(
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -834,7 +968,7 @@ async def download_osm_data_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -853,20 +987,14 @@ async def download_osm_data_htmx(
         geojson_str = json.dumps(featcol_single_geom_type).replace('"', "&quot;")
 
         # Automatically show preview after successful download
-        # Get the project again to check field_mapping_app for button text
         project = await DbProject.one(db, project_id)
-        app_name = "QField"
-        if project.field_mapping_app:
-            app_str = str(project.field_mapping_app).lower()
-            if "odk" in app_str:
-                app_name = "ODK"
 
         # Use reusable map rendering function
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-download",
             geojson_layers=[
                 {
-                    "data": featcol,
+                    "data": featcol_single_geom_type,
                     "name": "Data Extract",
                     "color": "#3388ff",
                     "weight": 2,
@@ -878,45 +1006,61 @@ async def download_osm_data_htmx(
             show_controls=False,
         )
 
-        # Return success message with embedded map preview and Accept button
+        # Return success with map preview and Accept btn
+        success_msg = _callout(
+            "success",
+            f"OSM data downloaded successfully! Found {feature_count} features.",
+        )
+        info_msg = (
+            f"Previewing {feature_count} features"
+            " on map. Review the data below."
+            ' If satisfied, click "Accept Data'
+            ' Extract" to save. Otherwise, try'
+            " downloading again with different"
+            " parameters."
+        )
+        form_style = "margin-top: 15px; display: flex; gap: 10px;"
+        hx_url = f"/accept-data-extract-htmx?project_id={project_id}"
+        html = f"""{success_msg}
+<div id="geojson-preview-container"
+     style="margin-top: 15px;">
+    <div style="margin-bottom: 10px;">
+        {_callout("info", info_msg)}
+    </div>
+    {map_html_content}
+    <form id="accept-data-extract-form"
+          style="{form_style}">
+        <input type="hidden"
+               name="data_extract_geojson"
+               value='{geojson_str}' />
+        <button
+            id="accept-data-extract-btn"
+            type="submit"
+            hx-post="{hx_url}"
+            hx-target="#osm-data-status"
+            hx-swap="innerHTML"
+            hx-include="#accept-data-extract-form"
+            class="wa-button wa-button--primary"
+            style="flex: 1;">
+            Accept Data Extract
+        </button>
+    </form>
+</div>"""
         return Response(
-            content=f"""<wa-callout variant="success"><span>✓ OSM data downloaded successfully! Found {feature_count} features.</span></wa-callout>
-            <div id="geojson-preview-container" style="margin-top: 15px;">
-                <div style="margin-bottom: 10px;">
-                    <wa-callout variant="info">
-                        <span>Previewing {feature_count} features on map. Review the data below. If satisfied, click "Accept Data Extract" to save. Otherwise, try downloading again with different parameters.</span>
-                    </wa-callout>
-                </div>
-                {map_html_content}
-                <form id="accept-data-extract-form" style="margin-top: 15px; display: flex; gap: 10px;">
-                    <input type="hidden" name="data_extract_geojson" value='{geojson_str}' />
-                    <button 
-                        id="accept-data-extract-btn"
-                        type="submit"
-                        hx-post="/accept-data-extract-htmx?project_id={project_id}"
-                        hx-target="#osm-data-status"
-                        hx-swap="innerHTML"
-                        hx-include="#accept-data-extract-form"
-                        class="wa-button wa-button--primary"
-                        style="flex: 1;"
-                    >
-                        Accept Data Extract
-                    </button>
-                </form>
-            </div>""",
+            content=html,
             media_type="text/html",
             status_code=200,
         )
 
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -924,7 +1068,7 @@ async def download_osm_data_htmx(
         log.error(f"Error downloading OSM data via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -950,7 +1094,7 @@ async def upload_geojson_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -962,7 +1106,10 @@ async def upload_geojson_htmx(
         # Validate file extension
         if not data.filename.lower().endswith((".geojson", ".json")):
             return Response(
-                content='<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>',
+                content=_callout(
+                    "danger",
+                    "Invalid file type. Please upload a .geojson or .json file.",
+                ),
                 media_type="text/html",
                 status_code=400,
             )
@@ -976,7 +1123,7 @@ async def upload_geojson_htmx(
             )
         except ValueError as e:
             return Response(
-                content=f'<wa-callout variant="danger"><span>{str(e)}</span></wa-callout>',
+                content=_callout("danger", str(e)),
                 media_type="text/html",
                 status_code=422,
             )
@@ -984,7 +1131,10 @@ async def upload_geojson_htmx(
         # Check if we have any features
         if not featcol.get("features", []):
             return Response(
-                content='<wa-callout variant="danger"><span>No valid geometries found in GeoJSON.</span></wa-callout>',
+                content=_callout(
+                    "danger",
+                    "No valid geometries found in GeoJSON.",
+                ),
                 media_type="text/html",
                 status_code=422,
             )
@@ -997,20 +1147,12 @@ async def upload_geojson_htmx(
         # Encode GeoJSON for the Accept button (don't save yet)
         geojson_str = json.dumps(featcol).replace('"', "&quot;")
 
-        # Get project to determine app name
-        project = await DbProject.one(db, project_id)
-        app_name = "QField"
-        if project.field_mapping_app:
-            app_str = str(project.field_mapping_app).lower()
-            if "odk" in app_str:
-                app_name = "ODK"
-
         # Use reusable map rendering function
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-upload",
             geojson_layers=[
                 {
-                    "data": featcol_single_geom_type,
+                    "data": featcol,
                     "name": "Data Extract",
                     "color": "#3388ff",
                     "weight": 2,
@@ -1022,18 +1164,32 @@ async def upload_geojson_htmx(
             show_controls=False,
         )
 
+        upload_success_msg = (
+            f"✓ GeoJSON uploaded successfully! Found {feature_count} features."
+        )
+        upload_preview_msg = (
+            f"Previewing {feature_count} features on map. Review the data below. "
+            'If satisfied, click "Accept Data Extract" to save. '
+            "Otherwise, try uploading a different file."
+        )
         return Response(
-            content=f"""<wa-callout variant="success"><span>✓ GeoJSON uploaded successfully! Found {feature_count} features.</span></wa-callout>
+            content=f"""
+            {_callout("success", upload_success_msg)}
             <div id="geojson-preview-container" style="margin-top: 15px;">
                 <div style="margin-bottom: 10px;">
-                    <wa-callout variant="info">
-                        <span>Previewing {feature_count} features on map. Review the data below. If satisfied, click "Accept Data Extract" to save. Otherwise, try uploading a different file.</span>
-                    </wa-callout>
+                    {_callout("info", upload_preview_msg)}
                 </div>
                 {map_html_content}
-                <form id="accept-data-extract-form" style="margin-top: 15px; display: flex; gap: 10px;">
-                    <input type="hidden" name="data_extract_geojson" value='{geojson_str}' />
-                    <button 
+                <form
+                    id="accept-data-extract-form"
+                    style="margin-top: 15px; display: flex; gap: 10px;"
+                >
+                    <input
+                        type="hidden"
+                        name="data_extract_geojson"
+                        value='{geojson_str}'
+                    />
+                    <button
                         id="accept-data-extract-btn"
                         type="submit"
                         hx-post="/accept-data-extract-htmx?project_id={project_id}"
@@ -1046,7 +1202,8 @@ async def upload_geojson_htmx(
                         Accept Data Extract
                     </button>
                 </form>
-            </div>""",
+            </div>
+            """,
             media_type="text/html",
             status_code=200,
         )
@@ -1055,7 +1212,7 @@ async def upload_geojson_htmx(
         log.error(f"Error uploading GeoJSON via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1080,7 +1237,7 @@ async def preview_geojson_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1092,7 +1249,11 @@ async def preview_geojson_htmx(
 
         if not geojson_data:
             return Response(
-                content='<wa-callout variant="warning"><span>No GeoJSON data found. Please download OSM data or upload a GeoJSON file first.</span></wa-callout>',
+                content=_callout(
+                    "warning",
+                    "No GeoJSON data found. Please download OSM data "
+                    "or upload a GeoJSON file first.",
+                ),
                 media_type="text/html",
                 status_code=404,
             )
@@ -1142,12 +1303,14 @@ async def preview_geojson_htmx(
         )
 
         # Return HTML with Leaflet map
+        preview_msg = (
+            f"Previewing {feature_count} data features on map. "
+            "Review the data, then continue to the next step."
+        )
         map_html = f"""
         <div style="margin-top: 15px;">
             <div style="margin-bottom: 10px;">
-                <wa-callout variant="info">
-                    <span>Previewing {feature_count} data features on map. Review the data, then continue to the next step.</span>
-                </wa-callout>
+                {_callout("info", preview_msg)}
             </div>
             {map_html_content}
         </div>
@@ -1163,7 +1326,7 @@ async def preview_geojson_htmx(
         log.error(f"Error previewing GeoJSON via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1193,7 +1356,7 @@ async def submit_geojson_data_extract_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1203,32 +1366,37 @@ async def submit_geojson_data_extract_htmx(
         # or fall back to database if not in request (for backwards compatibility)
         geojson_data = None
 
-        log.debug(
-            f"Submit data extract request received. Keys in data: {list(data.keys()) if data else 'None'}"
-        )
+        request_keys = list(data.keys()) if data else "None"
+        log.debug(f"Submit data extract request received. Keys in data: {request_keys}")
 
         if "geojson-data" in data:
             # Get from request body (new flow - not saved to DB yet)
             try:
                 geojson_str = data["geojson-data"]
-                log.debug(
-                    f"Received geojson-data, length: {len(geojson_str) if geojson_str else 0}"
-                )
+                geojson_len = len(geojson_str) if geojson_str else 0
+                log.debug(f"Received geojson-data, length: {geojson_len}")
                 geojson_data = json.loads(geojson_str)
+                parsed_feature_count = len(geojson_data.get("features", []))
                 log.debug(
-                    f"Successfully parsed GeoJSON with {len(geojson_data.get('features', []))} features"
+                    f"Successfully parsed GeoJSON with {parsed_feature_count} features"
                 )
             except json.JSONDecodeError as e:
                 log.error(f"Failed to parse GeoJSON from request: {e}")
                 return Response(
-                    content='<wa-callout variant="danger"><span>Invalid GeoJSON data in request. Please try uploading again.</span></wa-callout>',
+                    content=_callout(
+                        "danger",
+                        "Invalid GeoJSON data in request. Please try uploading again.",
+                    ),
                     media_type="text/html",
                     status_code=400,
                 )
             except (TypeError, KeyError) as e:
                 log.error(f"Error accessing geojson-data from request: {e}")
                 return Response(
-                    content='<wa-callout variant="danger"><span>Error reading GeoJSON data from request.</span></wa-callout>',
+                    content=_callout(
+                        "danger",
+                        "Error reading GeoJSON data from request.",
+                    ),
                     media_type="text/html",
                     status_code=400,
                 )
@@ -1240,7 +1408,11 @@ async def submit_geojson_data_extract_htmx(
 
         if not geojson_data:
             return Response(
-                content='<wa-callout variant="warning"><span>No GeoJSON data found. Please download OSM data or upload a GeoJSON file first.</span></wa-callout>',
+                content=_callout(
+                    "warning",
+                    "No GeoJSON data found. Please download OSM data "
+                    "or upload a GeoJSON file first.",
+                ),
                 media_type="text/html",
                 status_code=404,
             )
@@ -1252,7 +1424,7 @@ async def submit_geojson_data_extract_htmx(
         features = geojson_data.get("features", [])
         if not features:
             return Response(
-                content='<wa-callout variant="warning"><span>GeoJSON data contains no features.</span></wa-callout>',
+                content=_callout("warning", "GeoJSON data contains no features."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1265,11 +1437,20 @@ async def submit_geojson_data_extract_htmx(
         )
         await db.commit()
         log.info(
-            f"Saved data extract to database for project {project_id} (entity list creation deferred to final step)"
+            f"Saved data extract to database for project {project_id} "
+            "(entity list creation deferred to final step)"
         )
 
+        saved_message = (
+            "✓ Data extract successfully saved! You can now proceed to Step 3 "
+            "(upload XLSForm) and then Step 4 (split tasks)."
+        )
         return Response(
-            content='<wa-callout variant="success"><span>✓ Data extract successfully saved! You can now proceed to Step 3 (upload XLSForm) and then Step 4 (split tasks).</span></wa-callout><script>setTimeout(() => window.location.reload(), 2000);</script>',
+            content=(
+                _callout("success", saved_message) + "<script>"
+                "setTimeout(() => window.location.reload(), 2000);"
+                "</script>"
+            ),
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
@@ -1282,7 +1463,7 @@ async def submit_geojson_data_extract_htmx(
         )
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1307,7 +1488,7 @@ async def preview_tasks_and_data_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1319,7 +1500,11 @@ async def preview_tasks_and_data_htmx(
 
         if not data_extract:
             return Response(
-                content='<wa-callout variant="warning"><span>No data extract found. Please download OSM data or upload a GeoJSON file first.</span></wa-callout>',
+                content=_callout(
+                    "warning",
+                    "No data extract found. Please download OSM data "
+                    "or upload a GeoJSON file first.",
+                ),
                 media_type="text/html",
                 status_code=404,
             )
@@ -1352,7 +1537,11 @@ async def preview_tasks_and_data_htmx(
             else:
                 # No splitting has been done yet
                 return Response(
-                    content='<wa-callout variant="warning"><span>No task boundaries found. Please split the project into tasks first using the "Split AOI" button above.</span></wa-callout>',
+                    content=_callout(
+                        "warning",
+                        "No task boundaries found. Please split the project into "
+                        'tasks first using the "Split AOI" button above.',
+                    ),
                     media_type="text/html",
                     status_code=200,  # Return 200 instead of 404 to show message
                 )
@@ -1416,10 +1605,17 @@ async def preview_tasks_and_data_htmx(
 
         # Generate preview message
         if is_no_splitting:
-            preview_message = f"Previewing whole AOI (no splitting) with {data_feature_count} data features. The entire AOI will be used as a single task."
+            preview_message = (
+                f"Previewing whole AOI (no splitting) with "
+                f"{data_feature_count} data features. "
+                "The entire AOI will be used as a single task."
+            )
         else:
             task_count = len(task_boundaries.get("features", []))
-            preview_message = f"Previewing {task_count} task boundaries and {data_feature_count} data features together."
+            preview_message = (
+                f"Previewing {task_count} task boundaries and "
+                f"{data_feature_count} data features together."
+            )
 
         return Response(
             content=f"""
@@ -1442,7 +1638,7 @@ async def preview_tasks_and_data_htmx(
         )
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1467,7 +1663,7 @@ async def skip_task_split_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1478,7 +1674,10 @@ async def skip_task_split_htmx(
 
         if not project.outline:
             return Response(
-                content='<wa-callout variant="danger"><span>Project outline not found. Cannot skip task splitting.</span></wa-callout>',
+                content=_callout(
+                    "danger",
+                    "Project outline not found. Cannot skip task splitting.",
+                ),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1496,11 +1695,16 @@ async def skip_task_split_htmx(
         await db.commit()
 
         log.info(
-            f"Task splitting skipped for project {project_id}. Will use whole AOI as single task."
+            f"Task splitting skipped for project {project_id}. "
+            "Will use whole AOI as single task."
         )
 
         return Response(
-            content='<wa-callout variant="success"><span>✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 4.</span></wa-callout>',
+            content=_callout(
+                "success",
+                "✓ Task splitting skipped. The whole AOI will be used as a "
+                "single task. You can proceed to Step 4.",
+            ),
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
@@ -1510,7 +1714,7 @@ async def skip_task_split_htmx(
         log.error(f"Error skipping task split via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1536,7 +1740,7 @@ async def split_aoi_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1559,12 +1763,15 @@ async def split_aoi_htmx(
             dimension_meters = 100
 
         log.debug(
-            f"Split AOI parameters: algorithm={algorithm}, no_of_buildings={no_of_buildings}, dimension_meters={dimension_meters}"
+            "Split AOI parameters: "
+            f"algorithm={algorithm}, "
+            f"no_of_buildings={no_of_buildings}, "
+            f"dimension_meters={dimension_meters}"
         )
 
         if not algorithm or algorithm == "":
             return Response(
-                content='<wa-callout variant="danger"><span>Please select a splitting option.</span></wa-callout>',
+                content=_callout("danger", "Please select a splitting option."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1579,7 +1786,10 @@ async def split_aoi_htmx(
 
         if tasks_featcol == {}:
             return Response(
-                content='<wa-callout variant="success"><span>✓ Task splitting is not required for this project setup.</span></wa-callout>',
+                content=_callout(
+                    "success",
+                    "✓ Task splitting is not required for this project setup.",
+                ),
                 media_type="text/html",
                 status_code=200,
                 headers={"HX-Refresh": "true"},
@@ -1658,21 +1868,36 @@ async def split_aoi_htmx(
             data_feature_count = len(data_extract.get("features", []))
             data_extract_info = f" and {data_feature_count} data features"
 
+        split_success_msg = (
+            "✓ AOI split successfully! Generated "
+            f"{task_count} task areas using "
+            f"{algorithm.replace('_', ' ').title()}."
+        )
+        split_preview_msg = (
+            f"Previewing {task_count} task boundaries{data_extract_info}. "
+            "Review the results below. If satisfied, click "
+            '"Accept Task Choices" to save. Otherwise, adjust parameters '
+            'above and click "Split Again" to regenerate.'
+        )
         return Response(
             content=f"""
-            <wa-callout variant="success">
-                <span>✓ AOI split successfully! Generated {task_count} task areas using {algorithm.replace("_", " ").title()}.</span>
-            </wa-callout>
+            {_callout("success", split_success_msg)}
             <div style="margin-top: 20px;">
                 <div style="margin-bottom: 10px;">
-                    <wa-callout variant="info">
-                        <span>Previewing {task_count} task boundaries{data_extract_info}. Review the results below. If satisfied, click "Accept Task Choices" to save. Otherwise, adjust parameters above and click "Split Again" to regenerate.</span>
-                    </wa-callout>
+                    {_callout("info", split_preview_msg)}
                 </div>
                 {map_html_content}
-                <form id="accept-split-form" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-                    <input type="hidden" name="tasks_geojson" value='{tasks_geojson_str}' />
-                    <button 
+                <form
+                    id="accept-split-form"
+                    style="margin-top: 20px; display: flex; gap: 10px;
+                    justify-content: center;"
+                >
+                    <input
+                        type="hidden"
+                        name="tasks_geojson"
+                        value='{tasks_geojson_str}'
+                    />
+                    <button
                         id="accept-split-btn"
                         type="submit"
                         hx-post="/accept-split-htmx?project_id={project_id}"
@@ -1693,13 +1918,13 @@ async def split_aoi_htmx(
 
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -1707,7 +1932,7 @@ async def split_aoi_htmx(
         log.error(f"Error splitting AOI via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1733,7 +1958,7 @@ async def accept_data_extract_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1741,11 +1966,10 @@ async def accept_data_extract_htmx(
     try:
         geojson_str = data.get("data_extract_geojson", "")
         if not geojson_str:
-            log.debug(
-                f"Accept data extract data keys: {list(data.keys()) if data else 'None'}"
-            )
+            data_keys = list(data.keys()) if data else "None"
+            log.debug(f"Accept data extract data keys: {data_keys}")
             return Response(
-                content='<wa-callout variant="danger"><span>No data extract provided.</span></wa-callout>',
+                content=_callout("danger", "No data extract provided."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1754,11 +1978,15 @@ async def accept_data_extract_htmx(
         try:
             geojson_data = json.loads(geojson_str)
         except (json.JSONDecodeError, TypeError) as e:
+            geojson_preview = (
+                geojson_str[:100] if isinstance(geojson_str, str) else geojson_str
+            )
             log.error(
-                f"Error parsing data extract GeoJSON: {e}, type: {type(geojson_str)}, value: {geojson_str[:100] if isinstance(geojson_str, str) else geojson_str}"
+                "Error parsing data extract GeoJSON: "
+                f"{e}, type: {type(geojson_str)}, value: {geojson_preview}"
             )
             return Response(
-                content='<wa-callout variant="danger"><span>Invalid data extract format.</span></wa-callout>',
+                content=_callout("danger", "Invalid data extract format."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1769,11 +1997,16 @@ async def accept_data_extract_htmx(
             geojson_data=geojson_data,
         )
         log.info(
-            f"Accepted and saved data extract with {feature_count} features for project {project_id}"
+            f"Accepted and saved data extract with {feature_count} "
+            f"features for project {project_id}"
         )
 
+        accepted_msg = (
+            f"✓ Data extract accepted! Saved {feature_count} features. "
+            "Step 2 is now complete."
+        )
         return Response(
-            content=f'<wa-callout variant="success"><span>✓ Data extract accepted! Saved {feature_count} features. Step 2 is now complete.</span></wa-callout>',
+            content=_callout("success", accepted_msg),
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
@@ -1781,13 +2014,13 @@ async def accept_data_extract_htmx(
 
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -1795,7 +2028,7 @@ async def accept_data_extract_htmx(
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1821,7 +2054,7 @@ async def accept_split_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1830,11 +2063,10 @@ async def accept_split_htmx(
         # Get task areas GeoJSON from form data (hx-vals sends it as form data)
         tasks_geojson_str = data.get("tasks_geojson", "")
         if not tasks_geojson_str:
-            log.debug(
-                f"Accept split data keys: {list(data.keys()) if data else 'None'}"
-            )
+            data_keys = list(data.keys()) if data else "None"
+            log.debug(f"Accept split data keys: {data_keys}")
             return Response(
-                content='<wa-callout variant="danger"><span>No task areas data provided.</span></wa-callout>',
+                content=_callout("danger", "No task areas data provided."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1843,11 +2075,17 @@ async def accept_split_htmx(
         try:
             tasks_geojson = json.loads(tasks_geojson_str)
         except (json.JSONDecodeError, TypeError) as e:
+            tasks_preview = (
+                tasks_geojson_str[:100]
+                if isinstance(tasks_geojson_str, str)
+                else tasks_geojson_str
+            )
             log.error(
-                f"Error parsing task areas GeoJSON: {e}, type: {type(tasks_geojson_str)}, value: {tasks_geojson_str[:100] if isinstance(tasks_geojson_str, str) else tasks_geojson_str}"
+                "Error parsing task areas GeoJSON: "
+                f"{e}, type: {type(tasks_geojson_str)}, value: {tasks_preview}"
             )
             return Response(
-                content='<wa-callout variant="danger"><span>Invalid task areas data format.</span></wa-callout>',
+                content=_callout("danger", "Invalid task areas data format."),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1860,13 +2098,10 @@ async def accept_split_htmx(
         is_empty_task_areas = tasks_geojson == {}
 
         log.info(
-            f"Accepted and saved task areas for project {project_id} (empty: {is_empty_task_areas}, count: {task_count})"
+            f"Accepted and saved task areas for project {project_id} "
+            f"(empty: {is_empty_task_areas}, count: {task_count})"
         )
-
-        if is_empty_task_areas:
-            success_message = '<wa-callout variant="success"><span>✓ Split tasks saved successfully</span></wa-callout>'
-        else:
-            success_message = '<wa-callout variant="success"><span>✓ Split tasks saved successfully</span></wa-callout>'
+        success_message = _callout("success", "✓ Split tasks saved successfully")
 
         return Response(
             content=success_message,
@@ -1877,13 +2112,13 @@ async def accept_split_htmx(
 
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -1891,7 +2126,7 @@ async def accept_split_htmx(
         log.error(f"Error accepting split via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -1913,11 +2148,11 @@ async def create_project_odk_htmx(
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
-    """Final step: Create project in ODK Central with all data (entity lists, forms, task boundaries)."""
+    """Final step: Create project in ODK Central with all setup data."""
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -1932,12 +2167,12 @@ async def create_project_odk_htmx(
         all_custom = all([external_url, external_username, external_password])
 
         if any_custom and not all_custom:
+            custom_creds_msg = (
+                "Provide ODK URL, username, and password (all 3), or leave "
+                "them all blank to use server defaults."
+            )
             return Response(
-                content=(
-                    '<wa-callout variant="warning"><span>'
-                    "Provide ODK URL, username, and password (all 3), or leave them all blank to use server defaults."
-                    "</span></wa-callout>"
-                ),
+                content=_callout("warning", custom_creds_msg),
                 media_type="text/html",
                 status_code=400,
             )
@@ -1961,13 +2196,13 @@ async def create_project_odk_htmx(
         )
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -1975,7 +2210,7 @@ async def create_project_odk_htmx(
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -2001,7 +2236,7 @@ async def create_project_qfield_htmx(
     project = current_user.get("project")
     if not project or project.id != project_id:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found or access denied.</span></wa-callout>',
+            content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
             status_code=404,
         )
@@ -2022,21 +2257,28 @@ async def create_project_qfield_htmx(
             db=db, project_id=project_id, custom_qfield_creds=custom_qfield_creds
         )
 
+        qfield_success_html = (
+            '<wa-callout variant="success"><span>'
+            "✓ Project successfully created in QField! "
+            f'<a href="{qfield_url}" target="_blank">'
+            "View Project in QField"
+            "</a></span></wa-callout>"
+        )
         return Response(
-            content=f'<wa-callout variant="success"><span>✓ Project successfully created in QField! <a href="{qfield_url}" target="_blank">View Project in QField</a></span></wa-callout>',
+            content=qfield_success_html,
             media_type="text/html",
             status_code=200,
             headers={"HX-Refresh": "true"},
         )
     except SvcValidationError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=400,
         )
     except ServiceError as e:
         return Response(
-            content=f'<wa-callout variant="danger"><span>{e.message}</span></wa-callout>',
+            content=_callout("danger", e.message),
             media_type="text/html",
             status_code=500,
         )
@@ -2044,7 +2286,7 @@ async def create_project_qfield_htmx(
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -2067,7 +2309,7 @@ async def project_qrcode_htmx(
         project = await DbProject.one(db, project_id)
     except KeyError:
         return Response(
-            content='<wa-callout variant="danger"><span>Project not found.</span></wa-callout>',
+            content=_callout("danger", "Project not found."),
             media_type="text/html",
             status_code=404,
         )
@@ -2084,16 +2326,31 @@ async def project_qrcode_htmx(
             else str(project.field_mapping_app)
         )
 
+        qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
         html_content = f"""
-        <div style="text-align: center; padding: 20px; background-color: #f9f9f9; border-radius: 8px; margin-top: 20px;">
-            <h3 style="color: #333; margin-bottom: 15px;">Scan QR Code to Access Project</h3>
-            <p style="color: #666; margin-bottom: 20px;">Use {app_name} to scan this QR code and load the project</p>
-            <div style="display: inline-block; padding: 15px; background-color: white; border-radius: 8px; margin-bottom: 15px;">
-                <img src="{qr_code_data_url}" alt="Project QR Code" style="max-width: 300px; height: auto;" />
+        <div
+            style="text-align: center; padding: 20px; background-color: #f9f9f9;
+            border-radius: 8px; margin-top: 20px;"
+        >
+            <h3 style="color: #333; margin-bottom: 15px;">
+                Scan QR Code to Access Project
+            </h3>
+            <p style="color: #666; margin-bottom: 20px;">
+                Use {app_name} to scan this QR code and load the project
+            </p>
+            <div
+                style="display: inline-block; padding: 15px; background-color: white;
+                border-radius: 8px; margin-bottom: 15px;"
+            >
+                <img
+                    src="{qr_code_data_url}"
+                    alt="Project QR Code"
+                    style="max-width: 300px; height: auto;"
+                />
             </div>
             <div>
-                <wa-button 
-                    onclick="downloadQRCode('{qr_code_data_url}', '{project.project_name}_{app_name}_{project_id}')"
+                <wa-button
+                    onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
                     variant="default"
                 >
                     Download QR Code
@@ -2119,7 +2376,7 @@ async def project_qrcode_htmx(
     except HTTPException as e:
         error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=e.status_code,
         )
@@ -2127,7 +2384,7 @@ async def project_qrcode_htmx(
         log.error(f"Error generating QR code via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
         return Response(
-            content=f'<wa-callout variant="danger"><span>Error: {error_msg}</span></wa-callout>',
+            content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
             status_code=500,
         )
@@ -2153,6 +2410,9 @@ async def validate_geojson(
     as a project area of interest (AOI).
 
     Args:
+        request: Incoming HTMX request (unused, kept for route signature).
+        db: Async DB connection provided by dependency injection.
+        auth_user: Authenticated user context from `login_required`.
         data: Request body containing:
             - geojson: The GeoJSON to validate and normalize
             - merge_geometries: Optional boolean to merge geometries using convex hull
@@ -2179,7 +2439,10 @@ async def validate_geojson(
             return Response(
                 content=json.dumps(
                     {
-                        "error": "No polygon geometries found. Project area must be a polygon."
+                        "error": (
+                            "No polygon geometries found. "
+                            "Project area must be a polygon."
+                        )
                     }
                 ),
                 media_type="application/json",

@@ -182,10 +182,10 @@ def set_otel_tracer(app: Litestar, endpoint: str):
         )
         current_span.record_exception(exc)
 
-        # Check if this is an HTMX request - if so, return 200 OK to prevent bunkerweb interception
+        # Check if HTMX request - return 200 to avoid bunkerweb
         is_htmx = request.headers.get("HX-Request") == "true"
         if is_htmx:
-            # For HTMX requests, return 200 OK with error component to prevent bunkerweb interception
+            # Return 200 with error component to avoid bunkerweb
             escaped_msg = html.escape(
                 str(exc.detail) if exc.detail else "An unexpected error occurred"
             )

@@ -200,7 +200,8 @@ async def split_geojson_by_task_areas(
         db (Connection): Database connection.
         featcol (geojson.FeatureCollection): Data extract feature collection.
         project_id (int): The project ID for associated tasks.
-        task_boundaries (dict): Task boundaries as GeoJSON FeatureCollection (from project.task_boundaries).
+        task_boundaries (dict): Task boundaries as GeoJSON
+            FeatureCollection.
         geom_type (str): The geometry type of the features.
 
     Returns:
@@ -210,7 +211,8 @@ async def split_geojson_by_task_areas(
         # If no task boundaries provided, return empty dict
         if not task_boundaries or not task_boundaries.get("features"):
             log.warning(
-                f"No task boundaries found for project {project_id}, returning empty task extract dict"
+                "No task boundaries found for project "
+                f"{project_id}, returning empty task extract dict"
             )
             return {}
 

@@ -30,7 +30,8 @@ async def ensure_api_keys_table(db):
             """
             CREATE TABLE IF NOT EXISTS public.api_keys (
                 id SERIAL PRIMARY KEY,
-                user_sub character varying NOT NULL REFERENCES public.users(sub) ON DELETE CASCADE,
+                user_sub character varying NOT NULL
+                    REFERENCES public.users(sub) ON DELETE CASCADE,
                 key_hash character varying NOT NULL UNIQUE,
                 name character varying,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
