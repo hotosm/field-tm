@@ -43,7 +43,6 @@ from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_login_python.core import Auth
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
-from pyodk._endpoints.project_app_users import ProjectAppUserService
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_deps, central_schemas
@@ -54,13 +53,16 @@ from app.db.models import (
     DbUser,
 )
 from app.db.postgis_utils import (
-    check_crs,
-    featcol_keep_single_geom_type,
     featcol_to_flatgeobuf,
     flatgeobuf_to_featcol,
-    get_featcol_dominant_geom_type,
-    parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
+)
+from app.helpers.geometry_utils import (
+    check_crs,
+    featcol_keep_single_geom_type,
+    get_featcol_dominant_geom_type,
+    javarosa_to_geojson_geom,
+    parse_geojson_file_to_featcol,
 )
 from app.helpers.helper_schemas import PaginationInfo
 from app.projects import project_deps, project_schemas
@@ -526,8 +528,6 @@ async def generate_project_files(
 
                         if entity_data and isinstance(entity_data, list):
                             # Convert ODK entities to GeoJSON FeatureCollection
-                            from app.db.postgis_utils import javarosa_to_geojson_geom
-
                             features = []
                             for entity in entity_data:
                                 if entity.get("geometry"):
@@ -713,8 +713,6 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
 
                 if entity_data and isinstance(entity_data, list):
                     # Convert ODK entities back to GeoJSON
-                    from app.db.postgis_utils import javarosa_to_geojson_geom
-
                     features = []
                     for entity in entity_data:
                         if entity.get("geometry"):
@@ -1025,15 +1023,26 @@ async def get_project_qrcode(
             odk_central = project_odk_creds
 
         async with central_deps.pyodk_client(odk_central) as client:
-            project_app_users = ProjectAppUserService(
-                session=client.session,
-                default_project_id=project.external_project_id,
+            appusers_response = client.session.get(
+                f"projects/{project.external_project_id}/app-users"
             )
-            appusers = project_app_users.list()
-            appuser_token = next((app_user.token for app_user in appusers), None)
+            appusers_response.raise_for_status()
+            appusers = appusers_response.json() or []
+            appuser_token = next(
+                (
+                    app_user.get("token")
+                    for app_user in appusers
+                    if app_user.get("token")
+                ),
+                None,
+            )
             if not appuser_token:
-                created_user = project_app_users.create(display_name="fmtm_user")
-                appuser_token = created_user.token
+                created_user = client.session.post(
+                    f"projects/{project.external_project_id}/app-users",
+                    json={"displayName": "fmtm_user"},
+                )
+                created_user.raise_for_status()
+                appuser_token = (created_user.json() or {}).get("token")
 
         if not appuser_token:
             raise HTTPException(

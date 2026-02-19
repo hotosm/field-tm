@@ -511,6 +511,7 @@ dependencies = [
     { name = "asgiref" },
     { name = "cryptography" },
     { name = "geojson" },
+    { name = "geojson-aoi-parser" },
     { name = "geojson-pydantic" },
     { name = "litestar" },
     { name = "markdown" },
@@ -577,6 +578,7 @@ requires-dist = [
     { name = "asgiref", specifier = "==3.8.1" },
     { name = "cryptography", specifier = "==43.0.3" },
     { name = "geojson", specifier = "==3.1.0" },
+    { name = "geojson-aoi-parser", specifier = ">=0.3.5" },
     { name = "geojson-pydantic", specifier = "==1.1.2" },
     { name = "litestar", specifier = "==2.19.0" },
     { name = "markdown", specifier = "==3.8" },
@@ -588,7 +590,7 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=feat%2Fenv-var-config" },
+    { name = "pyodk", specifier = ">=1.2.1" },
     { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.20" },
     { name = "pyxform", specifier = "==4.0.0" },
@@ -683,6 +685,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/34/0ea653dec93d3a360856e629a897a1d3ab534f2952852bb59d55853055ed/geojson-3.1.0.tar.gz", hash = "sha256:58a7fa40727ea058efc28b0e9ff0099eadf6d0965e04690830208d3ef571adac", size = 24492, upload-time = "2023-11-05T21:06:50.615Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8e/1b/4f57660aa148d3e3043d048b7e1ab87dfeb85204d0fdb5b4e19c08202162/geojson-3.1.0-py3-none-any.whl", hash = "sha256:68a9771827237adb8c0c71f8527509c8f5bef61733aa434cefc9c9d4f0ebe8f3", size = 15044, upload-time = "2023-11-05T21:15:41.659Z" },
+]
+
+[[package]]
+name = "geojson-aoi-parser"
+version = "0.3.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "psycopg" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6a/72/23ea59fc5d8408e1b20de9c7d45b7977b8979e1ea2d50278c44082182bfa/geojson_aoi_parser-0.3.5.tar.gz", hash = "sha256:4005883ab0eab4b2f8273ac19277e75e521e4aeafcbabcd106a01019f826e783", size = 76172, upload-time = "2025-10-10T23:02:03.242Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/a3/73b1d460a243939221815e3d65710cd13fce0f26c0621a44cb7c43ca8813/geojson_aoi_parser-0.3.5-py3-none-any.whl", hash = "sha256:37d73f096c34ba12dba653198fd52369edf6edc713a3591284ececdb4093296e", size = 29266, upload-time = "2025-10-10T23:02:02.093Z" },
 ]
 
 [[package]]
@@ -1807,11 +1821,15 @@ wheels = [
 [[package]]
 name = "pyodk"
 version = "1.2.1"
-source = { git = "https://github.com/hotosm/pyodk?rev=feat%2Fenv-var-config#d8614a34008346e67f8d49d1cb9cc647cf28fc40" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "requests" },
     { name = "toml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/c4/ad3dafdba993c0ce8f137359e7faaa395856e3a2fb29ec0cd58dea0ffd1f/pyodk-1.2.1.tar.gz", hash = "sha256:1a535f983ca938da7bc714a453936abd5d811e9c84a4f1c277a1b4b8cb3b8fe4", size = 34309, upload-time = "2025-06-13T19:12:42.815Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/21/76/4f801b125cb48695f39df9302777e603966311c21df75ee379cf2ad72816/pyodk-1.2.1-py3-none-any.whl", hash = "sha256:b83d4d7a64c21d30866038e18a5491ef63cfbe53025c13f0051ce7a853de1e76", size = 43030, upload-time = "2025-06-13T19:12:41.594Z" },
 ]
 
 [[package]]

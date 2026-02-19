@@ -45,14 +45,15 @@ dependencies = [
     "aiosmtplib==4.0.1",
     "markdown==3.8",
     "tldextract==5.3.0",
+    "yxf>=1.0.0",
+    "pyodk>=1.2.1",
     "qfieldcloud-sdk==0.10.0",
     "osm-login-python==2.0.0",
     "pg-nearest-city==0.2.1",
     "raw-data-api-py==0.3.0",
+    "geojson-aoi-parser>=0.3.5",
     "osm-fieldwork",
     "area-splitter",
-    "pyodk",
-    "yxf>=1.0.0",
 ]
 readme = "../../README.md"
 license = {text = "AGPL-3.0-only"}
@@ -141,7 +142,6 @@ write-changes = true
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
-pyodk = { git = "https://github.com/hotosm/pyodk", rev = "feat/env-var-config" }
 
 [tool.uv.workspace]
 members = ["packages/*"]

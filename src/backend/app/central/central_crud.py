@@ -20,6 +20,8 @@
 import csv
 import json
 import logging
+import secrets
+import string
 from asyncio import gather
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -32,9 +34,6 @@ from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
-from pyodk._endpoints.entities import Entity
-from pyodk._endpoints.form_assignments import FormAssignmentService
-from pyodk._endpoints.project_app_users import ProjectAppUserService
 from pyodk.errors import PyODKError
 from pyxform.xls2xform import convert as xform_convert
 
@@ -42,7 +41,7 @@ from app.central import central_deps, central_schemas
 from app.config import settings
 from app.db.enums import DbGeomType
 from app.db.models import DbProject, DbTemplateXLSForm
-from app.db.postgis_utils import (
+from app.helpers.geometry_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
     parse_geojson_file_to_featcol,
@@ -571,27 +570,9 @@ async def create_entity_list(
         return
 
     async with central_deps.pyodk_client(odk_creds) as client:
-        # NOTE:
-        # - pyodk.entities.merge() internally calls get_table() *without* passing project_id,
-        #   so we set the default on the service.
-        # - pyodk.entities.merge(add_new_properties=True) can raise on property create 409
-        #   when a property exists but no current entities have that key populated (so it
-        #   isn't present in the OData table columns). To make this idempotent, we
-        #   pre-create properties (ignoring 409) and then do an explicit upsert.
-        client.entities.default_project_id = int(odk_id)
-
-        from pyodk._endpoints.entity_list_properties import EntityListPropertyService
-        from pyodk.errors import PyODKError
-
         pid = int(odk_id)
 
         # 1) Ensure all required properties exist (ignore 409 conflicts)
-        elps = EntityListPropertyService(
-            session=client.session,
-            default_project_id=pid,
-            default_entity_list_name=dataset_name,
-        )
-
         required_keys = set(properties)
         # Also include any keys present in data (minus label)
         for row in merge_rows:
@@ -601,8 +582,13 @@ async def create_entity_list(
             if key in {"__id", "__system", "label"}:
                 continue
             try:
-                elps.create(name=key)
-            except PyODKError as exc:
+                create_property = client.session.post(
+                    f"projects/{pid}/datasets/{dataset_name}/properties",
+                    json={"name": key},
+                )
+                if create_property.status_code >= 400:
+                    create_property.raise_for_status()
+            except Exception as exc:
                 # Treat "already exists" conflicts as OK (idempotent).
                 msg = str(exc)
                 if "Status: 409" in msg or '"code":409' in msg or 'code":409' in msg:
@@ -686,7 +672,7 @@ async def create_entity(
     properties: list[str],
     entity: central_schemas.EntityDict,
     dataset_name: str = "features",
-) -> Entity:
+) -> dict:
     """Create a new Entity in ODK."""
     log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
     try:
@@ -759,15 +745,16 @@ async def get_appuser_token(
             f"Creating ODK appuser ({appuser_name}) for ODK project ({project_odk_id})"
         )
         async with central_deps.pyodk_client(odk_credentials) as client:
-            project_app_users = ProjectAppUserService(
-                session=client.session,
-                default_project_id=project_odk_id,
+            app_user_response = client.session.post(
+                f"projects/{project_odk_id}/app-users",
+                json={"displayName": appuser_name},
             )
-            app_user = project_app_users.create(display_name=appuser_name)
-            appuser_token = app_user.token
-            appuser_sub = app_user.id
+            app_user_response.raise_for_status()
+            app_user = app_user_response.json()
+            appuser_token = app_user.get("token")
+            appuser_sub = app_user.get("id")
 
-            if not appuser_token:
+            if not appuser_token or not appuser_sub:
                 msg = "Could not generate token for app user."
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -775,12 +762,16 @@ async def get_appuser_token(
                 )
 
             # Legacy behavior used roleId=2 for form-level app-user access.
-            form_assignments = FormAssignmentService(
-                session=client.session,
-                default_project_id=project_odk_id,
-                default_form_id=xform_id,
+            assignment_response = client.session.post(
+                f"projects/{project_odk_id}/forms/{xform_id}/assignments/2/{appuser_sub}"
             )
-            form_assignments.assign(role_id=2, user_id=appuser_sub)
+            assignment_response.raise_for_status()
+            assignment_result = assignment_response.json()
+            if not assignment_result.get("success"):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Could not assign form role to app user.",
+                )
 
         if odk_credentials and getattr(
             odk_credentials, "external_project_instance_url", None
@@ -802,6 +793,90 @@ async def get_appuser_token(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the app user token.",
+        ) from e
+
+
+def _build_manager_user_email(project_odk_id: int) -> str:
+    """Create a deterministic-ish unique email for generated Central web users."""
+    suffix = secrets.token_hex(4)
+    return f"fmtm-manager-{project_odk_id}-{suffix}@fieldtm.local"
+
+
+def _build_manager_user_password() -> str:
+    """Generate a strong password for generated Central web users."""
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*()-_=+"
+    return "".join(secrets.choice(alphabet) for _ in range(20))
+
+
+async def create_project_manager_user(
+    project_odk_id: int,
+    project_name: str,
+    odk_credentials: Optional[central_schemas.ODKCentral],
+) -> tuple[str, str]:
+    """Create a Central web user and grant access to one project only.
+
+    Returns:
+        tuple[str, str]: (manager_email, manager_password)
+    """
+    try:
+        async with central_deps.pyodk_client(odk_credentials) as client:
+            roles_response = client.session.get("roles")
+            roles_response.raise_for_status()
+            roles = roles_response.json() or []
+
+            project_manager_role = next(
+                (
+                    role
+                    for role in roles
+                    if str(role.get("name", "")).strip().lower() == "project manager"
+                ),
+                None,
+            )
+            if not project_manager_role or "id" not in project_manager_role:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Could not find 'Project Manager' role in ODK Central.",
+                )
+
+            role_id = int(project_manager_role["id"])
+            manager_email = _build_manager_user_email(project_odk_id)
+            manager_password = _build_manager_user_password()
+            display_name = f"FMTM Manager - {project_name}"
+
+            create_response = client.session.post(
+                "users",
+                json={
+                    "email": manager_email,
+                    "password": manager_password,
+                    "displayName": display_name,
+                },
+            )
+            create_response.raise_for_status()
+            created_user = create_response.json() or {}
+            manager_user_id = created_user.get("id")
+            if not manager_user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="ODK Central did not return the created user ID.",
+                )
+
+            assignment_response = client.session.post(
+                f"projects/{project_odk_id}/assignments/{role_id}/{manager_user_id}",
+            )
+            assignment_response.raise_for_status()
+            return manager_email, manager_password
+    except HTTPException:
+        raise
+    except Exception as e:
+        log.exception(
+            "Failed to create project manager user for ODK project %s: %s",
+            project_odk_id,
+            e,
+            stack_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create ODK Central manager user.",
         ) from e
 
 

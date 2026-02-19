@@ -17,8 +17,10 @@
 #
 """Configuration and fixtures for PyTest."""
 
+import json
 import os
 import uuid
+from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -26,13 +28,18 @@ from time import time
 from xml.etree import ElementTree
 
 import pytest
-from pyodk._endpoints.project_app_users import ProjectAppUserService
-from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm
 
 test_data_dir = Path(__file__).parent / "test_data"
+
+
+@dataclass
+class PyODKTestConfig:
+    base_url: str
+    username: str
+    password: str
 
 
 def _create_project(client: Client, name: str) -> dict:
@@ -67,11 +74,11 @@ def _list_forms(client: Client, project_id: int) -> list[dict]:
 
 
 @pytest.fixture(scope="session")
-def pyodk_config() -> CentralConfig:
-    odk_central_url = os.getenv("ODK_CENTRAL_URL")
-    odk_central_user = os.getenv("ODK_CENTRAL_USER")
+def pyodk_config() -> PyODKTestConfig:
+    odk_central_url = os.getenv("ODK_CENTRAL_URL", "")
+    odk_central_user = os.getenv("ODK_CENTRAL_USER", "")
     odk_central_password = os.getenv("ODK_CENTRAL_PASSWD", "")
-    return CentralConfig(
+    return PyODKTestConfig(
         base_url=odk_central_url,
         username=odk_central_user,
         password=odk_central_password,
@@ -80,8 +87,17 @@ def pyodk_config() -> CentralConfig:
 
 @pytest.fixture(scope="function")
 def pyodk_client(pyodk_config):
-    with Client(pyodk_config) as client:
-        yield client
+    if not pyodk_config.base_url or not pyodk_config.username:
+        pytest.skip("ODK_CENTRAL_URL and ODK_CENTRAL_USER are required for ODK tests.")
+
+    with NamedTemporaryFile(mode="w", suffix=".toml", encoding="utf-8") as cfg:
+        cfg.write("[central]\n")
+        cfg.write(f"base_url = {json.dumps(pyodk_config.base_url)}\n")
+        cfg.write(f"username = {json.dumps(pyodk_config.username)}\n")
+        cfg.write(f"password = {json.dumps(pyodk_config.password)}\n")
+        cfg.flush()
+        with Client(config_path=cfg.name) as client:
+            yield client
 
 
 @pytest.fixture(scope="function")
@@ -103,12 +119,12 @@ def appuser(pyodk_config):
 @pytest.fixture(scope="function")
 def appuser_details(pyodk_client, project_details):
     appuser_name = f"test_appuser_{uuid.uuid4()}"
-    service = ProjectAppUserService(
-        session=pyodk_client.session,
-        default_project_id=project_details["id"],
+    response = pyodk_client.session.post(
+        f"projects/{project_details['id']}/app-users",
+        json={"displayName": appuser_name},
     )
-    response = service.create(display_name=appuser_name)
-    data = response.model_dump()
+    response.raise_for_status()
+    data = response.json()
     assert data.get("displayName") == appuser_name
     return data
 

@@ -235,9 +235,10 @@ async def api_finalize(
                 and data.external_project_password
             )
             custom_odk = data if has_custom_odk else None
-            downstream_url = await finalize_odk_project(
+            odk_result = await finalize_odk_project(
                 db=db, project_id=project_id, custom_odk_creds=custom_odk
             )
+            downstream_url = odk_result.odk_url
         else:
             has_custom_qfield = (
                 data.qfield_cloud_url

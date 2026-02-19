@@ -46,7 +46,7 @@ from app.central.central_crud import (
 from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import XLSFormType
-from app.db.postgis_utils import (
+from app.helpers.geometry_utils import (
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,

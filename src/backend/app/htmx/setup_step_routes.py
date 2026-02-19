@@ -23,7 +23,7 @@ import logging
 from io import BytesIO
 from pathlib import Path
 
-import geojson
+from geojson_aoi import parse_aoi
 from litestar import get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
@@ -44,20 +44,19 @@ from app.auth.roles import mapper, project_manager
 from app.central import central_crud
 from app.central.central_routes import _validate_xlsform_extension
 from app.central.central_schemas import ODKCentral
+from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import XLSFormType
 from app.db.models import DbProject
-from app.db.postgis_utils import (
+from app.helpers.geometry_utils import (
     check_crs,
-    featcol_keep_single_geom_type,
-    geojson_to_featcol,
-    merge_polygons,
 )
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.projects import project_crud, project_schemas
 from app.projects.project_schemas import ProjectUpdate
 from app.projects.project_services import (
     ConflictError,
+    ODKFinalizeResult,
     ServiceError,
     create_project_stub,
     download_osm_data,
@@ -73,6 +72,41 @@ from app.projects.project_services import (
 from app.qfield.qfield_schemas import QFieldCloud
 
 log = logging.getLogger(__name__)
+
+
+def _build_odk_finalize_success_html(
+    result: ODKFinalizeResult,
+    qr_code_data_url: str,
+) -> str:
+    """Build success markup returned by HTMX ODK finalization step."""
+    return f"""
+    <wa-callout variant="success">
+      <span>Project successfully created in ODK Central.</span>
+    </wa-callout>
+    <div style="margin-top: 12px; padding: 16px; background-color: #f5f5f5; border-radius: 8px;">
+      <h4 style="margin: 0 0 10px 0;">Manager Access (ODK Central UI)</h4>
+      <p style="margin: 0 0 8px 0;">
+        <a href="{result.odk_url}" target="_blank" style="color: #d63f3f; text-decoration: none; font-weight: 600;">
+          Open project in ODK Central
+        </a>
+      </p>
+      <p style="margin: 0;"><strong>Username:</strong> <code>{result.manager_username}</code></p>
+      <p style="margin: 6px 0 0 0;"><strong>Password:</strong> <code>{result.manager_password}</code></p>
+      <p style="margin: 8px 0 0 0; color: #666;">Save these credentials now. They are only shown once.</p>
+    </div>
+    <div style="margin-top: 12px; padding: 16px; background-color: #f5f5f5; border-radius: 8px;">
+      <h4 style="margin: 0 0 10px 0;">ODK Collect App User Access</h4>
+      <p style="margin: 0 0 10px 0; color: #666;">Scan this QR code in ODK Collect to submit data.</p>
+      <div style="display: inline-block; background-color: white; padding: 10px; border-radius: 6px;">
+        <img src="{qr_code_data_url}" alt="ODK Collect QR Code" style="max-width: 260px; height: auto;" />
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <wa-button type="button" variant="default" onclick="window.location.reload()">
+        Reload Project Page
+      </wa-button>
+    </div>
+    """
 
 
 def render_leaflet_map(
@@ -285,7 +319,7 @@ async def landing(request: HTMXRequest, db: AsyncConnection) -> Template:
 
 
 @get(
-    path="/projects",
+    path="/htmxprojects",
     dependencies={"db": Provide(db_conn)},
 )
 async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template:
@@ -832,7 +866,7 @@ async def download_osm_data_htmx(
             map_id="leaflet-map-download",
             geojson_layers=[
                 {
-                    "data": featcol_single_geom_type,
+                    "data": featcol,
                     "name": "Data Extract",
                     "color": "#3388ff",
                     "weight": 2,
@@ -933,20 +967,19 @@ async def upload_geojson_htmx(
                 status_code=400,
             )
 
-        # Parse and validate GeoJSON using the same logic as validate-geojson endpoint
-        # First, parse the file content to get the raw GeoJSON
+        # Parse and validate with geojson-aoi-parser (same as validate-geojson endpoint)
         try:
-            geojson_input = json.loads(file_content)
-        except json.JSONDecodeError as e:
-            return Response(
-                content=f'<wa-callout variant="danger"><span>Invalid JSON format: {str(e)}. Please ensure the file contains valid JSON.</span></wa-callout>',
-                media_type="text/html",
-                status_code=400,
+            featcol = parse_aoi(
+                settings.FMTM_DB_URL,
+                file_content,
+                merge=False,
             )
-
-        # Convert to FeatureCollection and normalize (same as validate-geojson)
-        # This handles Feature, FeatureCollection, or Geometry types
-        featcol = geojson_to_featcol(geojson_input)
+        except ValueError as e:
+            return Response(
+                content=f'<wa-callout variant="danger"><span>{str(e)}</span></wa-callout>',
+                media_type="text/html",
+                status_code=422,
+            )
 
         # Check if we have any features
         if not featcol.get("features", []):
@@ -959,23 +992,10 @@ async def upload_geojson_htmx(
         # Validate CRS (same as validate-geojson)
         await check_crs(featcol)
 
-        # For data extracts, keep single geometry type (points, lines, or polygons)
-        # Unlike validate-geojson which filters to polygons only for AOI
-        featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
-
-        if not featcol_single_geom_type or not featcol_single_geom_type.get(
-            "features", []
-        ):
-            return Response(
-                content='<wa-callout variant="danger"><span>Could not process GeoJSON. Please ensure it contains features with a single geometry type (all points, all lines, or all polygons).</span></wa-callout>',
-                media_type="text/html",
-                status_code=422,
-            )
-
-        feature_count = len(featcol_single_geom_type.get("features", []))
+        feature_count = len(featcol.get("features", []))
 
         # Encode GeoJSON for the Accept button (don't save yet)
-        geojson_str = json.dumps(featcol_single_geom_type).replace('"', "&quot;")
+        geojson_str = json.dumps(featcol).replace('"', "&quot;")
 
         # Get project to determine app name
         project = await DbProject.one(db, project_id)
@@ -1929,15 +1949,15 @@ async def create_project_odk_htmx(
                 external_project_password=external_password,
             )
 
-        odk_url = await finalize_odk_project(
+        odk_result = await finalize_odk_project(
             db=db, project_id=project_id, custom_odk_creds=custom_odk_creds
         )
+        qr_code_data_url = await project_crud.get_project_qrcode(db, project_id)
 
         return Response(
-            content=f'<wa-callout variant="success"><span>✓ Project successfully created in ODK Central! <a href="{odk_url}" target="_blank">View Project in ODK</a></span></wa-callout>',
+            content=_build_odk_finalize_success_html(odk_result, qr_code_data_url),
             media_type="text/html",
             status_code=200,
-            headers={"HX-Refresh": "true"},
         )
     except SvcValidationError as e:
         return Response(
@@ -2113,7 +2133,6 @@ async def project_qrcode_htmx(
         )
 
 
-# TODO Luke replace the logic here with geojson-aoi-parser
 @post(
     path="/validate-geojson",
     dependencies={
@@ -2149,29 +2168,14 @@ async def validate_geojson(
                 status_code=400,
             )
 
-        # Convert to FeatureCollection and normalize
-        featcol = geojson_to_featcol(geojson_input)
+        # Normalize and validate AOI using geojson-aoi-parser (PostGIS-backed).
+        merged_featcol = parse_aoi(
+            settings.FMTM_DB_URL,
+            geojson_input,
+            merge=bool(merge_geometries),
+        )
 
-        # Check if we have any features
-        if not featcol.get("features", []):
-            return Response(
-                content=json.dumps({"error": "No valid geometries found in GeoJSON"}),
-                media_type="application/json",
-                status_code=422,
-            )
-
-        # Validate CRS
-        await check_crs(featcol)
-
-        # Keep only polygons (filter out points and linestrings)
-        # For project AOI, we want polygons
-        polygon_features = [
-            f
-            for f in featcol.get("features", [])
-            if f.get("geometry", {}).get("type") in ("Polygon", "MultiPolygon")
-        ]
-
-        if not polygon_features:
+        if not merged_featcol.get("features", []):
             return Response(
                 content=json.dumps(
                     {
@@ -2181,24 +2185,6 @@ async def validate_geojson(
                 media_type="application/json",
                 status_code=422,
             )
-
-        # Create FeatureCollection with only polygons
-        polygon_featcol = geojson.FeatureCollection(features=polygon_features)
-
-        if merge_geometries:
-            # TODO: Implement convex hull logic for multipolygons
-            # When merge_geometries is True, use convex hull to merge any multipolygon
-            # geometries into a single polygon. This should:
-            # 1. Detect if there are MultiPolygon geometries
-            # 2. Apply convex hull to create a single bounding polygon
-            # 3. Merge all polygons (including single polygons) into one
-            # For now, use the existing merge_polygons function
-            merged_featcol = merge_polygons(
-                polygon_featcol, merge=True, dissolve_polygon=False
-            )
-        else:
-            # Don't merge, just return normalized polygons
-            merged_featcol = polygon_featcol
 
         # Return normalized GeoJSON
         # If single feature, return it directly; otherwise return FeatureCollection
@@ -2220,6 +2206,12 @@ async def validate_geojson(
             content=json.dumps({"error": e.detail}),
             media_type="application/json",
             status_code=e.status_code,
+        )
+    except ValueError as e:
+        return Response(
+            content=json.dumps({"error": str(e)}),
+            media_type="application/json",
+            status_code=422,
         )
     except Exception as e:
         log.error(f"Error validating GeoJSON: {e}", exc_info=True)

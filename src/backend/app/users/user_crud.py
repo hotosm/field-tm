@@ -37,7 +37,6 @@ from app.db.models import (
     DbProject,
     DbUser,
 )
-from app.db.postgis_utils import timestamp
 from app.helpers.helper_schemas import PaginatedResponse, PaginationInfo
 
 log = logging.getLogger(__name__)
@@ -298,6 +297,6 @@ async def get_paginated_users(
 
 async def get_active_users(db: AsyncConnection) -> list[str]:
     """Fetch users active in the last one day."""
-    yesterday = timestamp() - timedelta(days=1)
+    yesterday = datetime.now(timezone.utc) - timedelta(days=1)
     users = await DbUser.all(db, last_login_after=yesterday)
     return [u.sub for u in users] if users else []

@@ -622,7 +622,8 @@
           finaliseStatus.innerHTML = result;
 
           if (response.ok) {
-            setTimeout(() => window.location.reload(), 2000);
+            if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
+            if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
           } else {
             if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
             if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
