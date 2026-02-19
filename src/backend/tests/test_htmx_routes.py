@@ -1,3 +1,5 @@
+"""Tests for HTMX routes."""
+
 from unittest.mock import AsyncMock, patch
 
 from litestar import status_codes as status
@@ -5,9 +7,9 @@ from litestar import status_codes as status
 from app.htmx.setup_step_routes import _build_odk_finalize_success_html
 from app.projects.project_services import ODKFinalizeResult
 
-# We don't import project_crud here directly for patching usually, but we patch where it is used or defined.
-# Since htmx_routes imports it as `from app.projects import project_crud`
-# We should patch `app.projects.project_crud.get_project_qrcode`
+# We patch where project_crud is used/defined.
+# htmx_routes imports `from app.projects import project_crud`
+# so we patch `app.projects.project_crud.get_project_qrcode`
 
 
 async def test_create_project_htmx(client, stub_project_data):
@@ -42,7 +44,7 @@ async def test_project_qrcode_htmx(client, project):
         assert "Scan QR Code" in response.text
 
         mock_get_qrcode.assert_called_once()
-        # Verify arguments if needed, but simple call check is good start for integration test
+        # Simple call check is a good start for integration test
 
 
 async def test_project_qrcode_htmx_not_found(client):

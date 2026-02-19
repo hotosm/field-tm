@@ -72,7 +72,7 @@ async def create_local_admin_user(server: Litestar) -> None:
 def _custom_validation_exception_handler(
     request: Request, exc: ValidationException
 ) -> Response:
-    """Custom handler to return 422 with FastAPI-compatible format for validation errors.
+    """Return 422 with FastAPI-compatible validation errors.
 
     NOTE this is a temporary FastAPI compatibility handler.
     NOTE if we use HTMX, this is no longer required
@@ -147,8 +147,8 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
     if status_code >= 500:
         log.exception(f"Server error intercepted: {str(exc)}")
 
-    # For HTMX requests, return 200 OK with error component to prevent bunkerweb interception
-    # By returning 200 instead of 500, bunkerweb won't intercept and show its own error page
+    # For HTMX requests, return 200 OK with error component
+    # to prevent bunkerweb interception of error pages
     if is_htmx:
         # Use wa-callout component to match the pattern used in HTMX routes
         # Escape the message for HTML safety

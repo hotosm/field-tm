@@ -37,7 +37,8 @@ class XLSFormRequest(BaseModel):
         has_upload = bool(self.xlsform_base64)
         if has_template == has_upload:
             raise ValueError(
-                "Provide exactly one XLSForm source: template_form_id or xlsform_base64."
+                "Provide exactly one XLSForm source: "
+                "template_form_id or xlsform_base64."
             )
         return self
 

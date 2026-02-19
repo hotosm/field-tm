@@ -30,6 +30,7 @@ from typing import Optional, Union
 from uuid import UUID, uuid4
 
 import geojson
+from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
@@ -44,7 +45,6 @@ from app.db.models import DbProject, DbTemplateXLSForm
 from app.helpers.geometry_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
-    parse_geojson_file_to_featcol,
 )
 from app.projects import project_schemas
 from app.s3 import strip_presigned_url_for_local_dev
@@ -319,7 +319,7 @@ async def convert_geojson_to_odk_csv(
     Returns:
         feature_csv (StringIO): CSV of features in XLSForm format for ODK.
     """
-    parsed_geojson = parse_geojson_file_to_featcol(input_geojson.getvalue())
+    parsed_geojson = parse_aoi(settings.FMTM_DB_URL, input_geojson.getvalue())
 
     if not parsed_geojson:
         raise HTTPException(
@@ -550,7 +550,8 @@ async def create_entity_list(
             )
         else:
             log.info(
-                f"Dataset '{dataset_name}' already exists for ODK project {odk_id}; will reuse it."
+                f"Dataset '{dataset_name}' already exists "
+                f"for ODK project {odk_id}; will reuse it."
             )
 
     # Step 2: upsert entities (idempotent) using pyodk merge

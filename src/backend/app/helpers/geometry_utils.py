@@ -17,7 +17,6 @@
 #
 """GeoJSON and geometry helper functions."""
 
-import json
 import logging
 from typing import Optional, Union
 
@@ -25,15 +24,10 @@ import geojson
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from shapely.geometry import (
-    LineString,
-    MultiLineString,
-    MultiPolygon,
     Point,
-    Polygon,
     mapping,
     shape,
 )
-from shapely.ops import unary_union
 
 log = logging.getLogger(__name__)
 
@@ -43,86 +37,6 @@ async def polygon_to_centroid(
 ) -> Point:
     """Convert GeoJSON to shapely geometry."""
     return shape(polygon).centroid
-
-
-def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureCollection:
-    """Normalise a FeatureCollection into a standardised format.
-
-    The final FeatureCollection will only contain:
-    - Polygon
-    - LineString
-    - Point
-
-    Processed:
-    - MultiPolygons will be divided out into individual polygons.
-    - GeometryCollections wrappers will be stripped out.
-    - Removes any z-dimension coordinates, e.g. [43, 32, 0.0]
-
-    Args:
-        featcol: A parsed FeatureCollection.
-
-    Returns:
-        geojson.FeatureCollection: A normalised FeatureCollection.
-    """
-
-    def strip_z_coord(coords):
-        if isinstance(coords[0], (int, float)):  # single coordinate [x, y, z?]
-            return coords[:2]  # drop z if present
-        return [strip_z_coord(c) for c in coords]
-
-    for feat in featcol.get("features", []):
-        geom = feat.get("geometry")
-
-        # Strip out GeometryCollection wrappers
-        if (
-            geom.get("type") == "GeometryCollection"
-            and len(geom.get("geometries", [])) == 1
-        ):
-            feat["geometry"] = geom.get("geometries")[0]
-
-        # Remove any z-dimension coordinates recursively, for any geom type
-        coords = geom.get("coordinates")
-        if coords is not None:
-            geom["coordinates"] = strip_z_coord(coords)
-
-    # Convert MultiPolygon type --> individual Polygons
-    return multigeom_to_singlegeom(featcol)
-
-
-def geojson_to_featcol(geojson_obj: dict) -> geojson.FeatureCollection:
-    """Enforce GeoJSON is wrapped in FeatureCollection.
-
-    The type check is done directly from the GeoJSON to allow parsing
-    from different upstream libraries (e.g. geojson_pydantic).
-    """
-    # We do a dumps/loads cycle to strip any extra obj logic
-    geojson_type = json.loads(json.dumps(geojson_obj)).get("type")
-
-    if geojson_type == "FeatureCollection":
-        log.debug("Already in FeatureCollection format, reparsing")
-        features = geojson_obj.get("features")
-    elif geojson_type == "Feature":
-        log.debug("Converting Feature to FeatureCollection")
-        features = [geojson_obj]
-    else:
-        log.debug("Converting Geometry to FeatureCollection")
-        features = [geojson.Feature(geometry=geojson_obj)]
-
-    featcol = geojson.FeatureCollection(features=features)
-
-    return normalise_featcol(featcol)
-
-
-def parse_geojson_file_to_featcol(
-    geojson_raw: Union[str, bytes],
-) -> Optional[geojson.FeatureCollection]:
-    """Parse geojson string or file content to FeatureCollection."""
-    geojson_parsed = geojson.loads(geojson_raw)
-    featcol = geojson_to_featcol(geojson_parsed)
-    # Exit early if no geoms
-    if not featcol.get("features", []):
-        return None
-    return featcol
 
 
 def featcol_keep_single_geom_type(

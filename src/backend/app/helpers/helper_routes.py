@@ -26,6 +26,7 @@ from textwrap import dedent
 from uuid import uuid4
 
 import requests
+from geojson_aoi import parse_aoi
 from litestar import Request, Response, Router, get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
@@ -49,7 +50,6 @@ from app.db.enums import XLSFormType
 from app.helpers.geometry_utils import (
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
-    parse_geojson_file_to_featcol,
 )
 
 log = logging.getLogger(__name__)
@@ -263,7 +263,7 @@ async def flatten_multipolygons_to_polygons(
     current_user: AuthUser,
 ) -> Response[bytes]:
     """If any MultiPolygons are present, replace with multiple Polygons."""
-    featcol = parse_geojson_file_to_featcol(await geojson.read())
+    featcol = parse_aoi(settings.FMTM_DB_URL, await geojson.read())
     if not featcol:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

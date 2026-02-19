@@ -33,8 +33,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentral
-from app.config import encrypt_value
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db.enums import (
     FieldMappingApp,
     ProjectPriority,

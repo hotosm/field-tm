@@ -1,3 +1,5 @@
+"""Tests for ODK Central CRUD operations."""
+
 from contextlib import asynccontextmanager
 from unittest.mock import patch
 
@@ -11,26 +13,36 @@ from app.db.models import DbProject
 
 
 class DummyResponse:
+    """Fake HTTP response for testing."""
+
     def __init__(self, payload: dict | list):
+        """Initialize with a JSON payload."""
         self._payload = payload
 
     def json(self):
+        """Return the stored payload."""
         return self._payload
 
     def raise_for_status(self):
+        """No-op status check."""
         return None
 
 
 class DummySession:
+    """Fake HTTP session recording calls."""
+
     def __init__(self):
+        """Initialize with empty call log."""
         self.post_calls = []
 
     def get(self, path: str):
+        """Handle GET requests with canned responses."""
         if path == "roles":
             return DummyResponse([{"id": 7, "name": "Project Manager"}])
         raise AssertionError(f"Unexpected GET path: {path}")
 
     def post(self, path: str, json: dict | None = None):
+        """Handle POST requests with canned responses."""
         self.post_calls.append((path, json))
         if path == "users":
             return DummyResponse({"id": 1234})
@@ -40,7 +52,10 @@ class DummySession:
 
 
 class DummyClient:
+    """Fake ODK client wrapping a DummySession."""
+
     def __init__(self):
+        """Initialize with a DummySession."""
         self.session = DummySession()
 
 

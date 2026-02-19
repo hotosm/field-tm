@@ -26,7 +26,7 @@ import logging
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from re import sub
-from typing import Any, Mapping, Optional, Self
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Self
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -42,6 +42,9 @@ from app.db.enums import (
     ProjectVisibility,
     XLSFormType,
 )
+
+if TYPE_CHECKING:
+    from app.central.central_schemas import ODKCentral
 
 log = logging.getLogger(__name__)
 
