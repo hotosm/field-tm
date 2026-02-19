@@ -18,17 +18,18 @@
 
 """ODK Central dependency wrappers."""
 
+import json
 from asyncio import get_running_loop
 from contextlib import asynccontextmanager
 from io import BytesIO
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Optional
 
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm, OdkProject
-from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentral
@@ -63,19 +64,24 @@ async def pyodk_client(odk_creds: Optional[ODKCentral]):
     and avoids blocking the async event loop in the endpoint.
     """
     creds = _resolve_odk_creds(odk_creds)
-    pyodk_config = CentralConfig(
-        base_url=creds.external_project_instance_url,
-        username=creds.external_project_username,
-        password=creds.external_project_password,
-    )
 
-    loop = get_running_loop()
-    client = await loop.run_in_executor(None, Client, pyodk_config)
+    with NamedTemporaryFile(mode="w", suffix=".toml", encoding="utf-8") as cfg:
+        cfg.write("[central]\n")
+        cfg.write(f"base_url = {json.dumps(creds.external_project_instance_url)}\n")
+        cfg.write(f"username = {json.dumps(creds.external_project_username)}\n")
+        cfg.write(f"password = {json.dumps(creds.external_project_password)}\n")
+        cfg.flush()
 
-    try:
-        yield client
-    finally:
-        await loop.run_in_executor(None, client.__exit__, None, None, None)
+        loop = get_running_loop()
+        client = await loop.run_in_executor(
+            None,
+            lambda: Client(config_path=cfg.name).open(),
+        )
+
+        try:
+            yield client
+        finally:
+            await loop.run_in_executor(None, client.close, None, None, None)
 
 
 @asynccontextmanager

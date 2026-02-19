@@ -723,11 +723,15 @@ class DbProject:
         """
         from app.central.central_schemas import ODKCentral
 
-        if not (
-            self.external_project_instance_url
-            or self.external_project_username
-            or self.external_project_password_encrypted
-        ):
+        has_complete_creds = all(
+            [
+                self.external_project_instance_url,
+                self.external_project_username,
+                self.external_project_password_encrypted,
+            ]
+        )
+
+        if not has_complete_creds:
             return None
 
         return ODKCentral.from_db(

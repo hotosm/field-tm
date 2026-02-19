@@ -24,6 +24,7 @@ and REST API routes. They accept typed arguments and raise domain exceptions
 
 import json
 import logging
+from dataclasses import dataclass
 from io import BytesIO
 from typing import Optional
 
@@ -41,7 +42,7 @@ from app.config import settings
 from app.db.enums import ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
-from app.db.postgis_utils import (
+from app.helpers.geometry_utils import (
     check_crs,
     featcol_keep_single_geom_type,
     parse_geojson_file_to_featcol,
@@ -85,6 +86,15 @@ class ConflictError(ServiceError):
 
     def __init__(self, message: str):
         super().__init__(message, code="conflict")
+
+
+@dataclass(slots=True)
+class ODKFinalizeResult:
+    """Details returned after ODK finalization."""
+
+    odk_url: str
+    manager_username: str
+    manager_password: str
 
 
 # ============================================================================
@@ -583,7 +593,7 @@ async def finalize_odk_project(
     db: AsyncConnection,
     project_id: int,
     custom_odk_creds: Optional[ODKCentral] = None,
-) -> str:
+) -> ODKFinalizeResult:
     """Create project in ODK Central with all data.
 
     Args:
@@ -592,7 +602,7 @@ async def finalize_odk_project(
         custom_odk_creds: Optional custom ODK credentials (None uses env vars).
 
     Returns:
-        URL to the ODK Central project.
+        Finalization details including Central URL and manager credentials.
 
     Raises:
         ValidationError: If prerequisites are missing.
@@ -716,7 +726,9 @@ async def finalize_odk_project(
 
     if not task_entities:
         # Create a single task from the project outline so tasks.csv always has data
-        log.info("No task areas found, creating single task entity from project outline")
+        log.info(
+            "No task areas found, creating single task entity from project outline"
+        )
         outline_geojson = project.outline_geojson
         if outline_geojson and outline_geojson.get("features"):
             outline_feature = outline_geojson["features"][0]
@@ -746,7 +758,14 @@ async def finalize_odk_project(
         await central_crud.create_entity_list(
             custom_odk_creds,
             project_odk_id,
-            properties=["geometry", "task_id", "status", "fill", "stroke", "stroke-width"],
+            properties=[
+                "geometry",
+                "task_id",
+                "status",
+                "fill",
+                "stroke",
+                "stroke-width",
+            ],
             dataset_name="tasks",
             entities_list=task_entities,
         )
@@ -783,7 +802,25 @@ async def finalize_odk_project(
         base_url = settings.ODK_CENTRAL_URL.rstrip("/")
     odk_url = f"{base_url}/#/projects/{project_odk_id}"
 
-    return odk_url
+    try:
+        (
+            manager_username,
+            manager_password,
+        ) = await central_crud.create_project_manager_user(
+            project_odk_id=project_odk_id,
+            project_name=project.project_name or f"Project {project_id}",
+            odk_credentials=custom_odk_creds,
+        )
+    except Exception as e:
+        raise ServiceError(
+            f"Project created in ODK, but failed to create manager user: {e}"
+        ) from e
+
+    return ODKFinalizeResult(
+        odk_url=odk_url,
+        manager_username=manager_username,
+        manager_password=manager_password,
+    )
 
 
 async def finalize_qfield_project(

@@ -26,6 +26,7 @@ from typing import Annotated, Optional
 
 from anyio import to_thread
 from area_splitter.splitter import split_by_sql, split_by_square
+from geojson_aoi import parse_aoi
 from geojson_pydantic import FeatureCollection
 from litestar import Response, Router, delete, get, patch, post
 from litestar import status_codes as status
@@ -51,9 +52,8 @@ from app.db.models import (
     DbUser,
     FieldMappingApp,
 )
-from app.db.postgis_utils import (
+from app.helpers.geometry_utils import (
     check_crs,
-    merge_polygons,
     parse_geojson_file_to_featcol,
     polygon_to_centroid,
 )
@@ -249,8 +249,17 @@ async def task_split(
     Returns:
         The result of splitting the task into subtasks.
     """
-    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
-    merged_boundary = merge_polygons(boundary_featcol, False)
+    try:
+        merged_boundary = parse_aoi(
+            settings.FMTM_DB_URL,
+            await data.project_geojson.read(),
+            merge=False,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e),
+        ) from e
     # Validatiing Coordinate Reference Systems
     await check_crs(merged_boundary)
 
@@ -310,7 +319,17 @@ async def preview_split_by_square(
         )
 
     # read entire file
-    boundary_featcol = parse_geojson_file_to_featcol(await data.project_geojson.read())
+    try:
+        boundary_featcol = parse_aoi(
+            settings.FMTM_DB_URL,
+            await data.project_geojson.read(),
+            merge=True,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e),
+        ) from e
 
     # Validatiing Coordinate Reference System
     await check_crs(boundary_featcol)
@@ -323,9 +342,6 @@ async def preview_split_by_square(
             await check_crs(parsed_extract)
         else:
             log.warning("Parsed geojson file contained no geometries")
-
-    if len(boundary_featcol["features"]) > 0:
-        boundary_featcol = merge_polygons(boundary_featcol)
 
     return split_by_square(
         boundary_featcol,
@@ -359,8 +375,17 @@ async def get_data_extract(
     TODO allow config file (YAML/JSON) upload for data extract generation
     TODO alternatively, direct to raw-data-api to generate first, then upload
     """
-    boundary_geojson = parse_geojson_file_to_featcol(await data.read())
-    clean_boundary_geojson = merge_polygons(boundary_geojson)
+    try:
+        clean_boundary_geojson = parse_aoi(
+            settings.FMTM_DB_URL,
+            await data.read(),
+            merge=True,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e),
+        ) from e
     project = current_user_dict.get("project")
 
     # Get extract config file from existing data_models
@@ -698,7 +723,17 @@ async def upload_project_task_boundaries(
     """
     project = current_user_dict.get("project")
     project_id = project.id
-    tasks_featcol = parse_geojson_file_to_featcol(await data.read())
+    try:
+        tasks_featcol = parse_aoi(
+            settings.FMTM_DB_URL,
+            await data.read(),
+            merge=False,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e),
+        ) from e
     await check_crs(tasks_featcol)
 
     # Send task boundaries directly to ODK/QField, not stored in database

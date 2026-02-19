@@ -34,7 +34,7 @@ from litestar import status_codes as status
 from app.central.central_crud import create_odk_project
 from app.config import settings
 from app.db.models import DbProject, slugify
-from app.db.postgis_utils import check_crs
+from app.helpers.geometry_utils import check_crs
 from app.projects import project_crud
 from tests.test_data import test_data_path
 

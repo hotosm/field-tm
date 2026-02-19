@@ -20,6 +20,7 @@
 from typing import Annotated, Optional, Self, Union
 
 from area_splitter import SplittingAlgorithm
+from geojson_aoi import parse_aoi
 from geojson_pydantic import (
     Feature,
     FeatureCollection,
@@ -33,13 +34,13 @@ from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentral
 from app.config import encrypt_value
+from app.config import settings
 from app.db.enums import (
     FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
 )
 from app.db.models import DbProject, slugify
-from app.db.postgis_utils import geojson_to_featcol, merge_polygons
 
 
 class SplitFormData(BaseModel):
@@ -176,7 +177,7 @@ class StubProjectIn(BaseModel):
             # Handle geojson_pydantic geometry objects
             geom_type = getattr(value, "type", None)
 
-        if geom_type in ["Point", "MultiPoint"]:
+        if geom_type in ["Point", "MultiPoint", "LineString", "MultiLineString"]:
             from pydantic import ValidationError
 
             # Raise ValidationError that will result in 422 status code
@@ -186,19 +187,21 @@ class StubProjectIn(BaseModel):
                     {
                         "type": "value_error",
                         "loc": ("outline",),
-                        "msg": f"Invalid geometry type: {geom_type}. Only Polygon, MultiPolygon, LineString, and MultiLineString are supported.",
+                        "msg": (
+                            f"Invalid geometry type: {geom_type}. "
+                            "Only Polygon and MultiPolygon are supported."
+                        ),
                         "input": value,
                     }
                 ],
             )
 
-        # FIXME also handle geometry collection type here
-        # geojson_pydantic.GeometryCollection
-        # FIXME update this to remove the Featcol parsing at some point
-        featcol = geojson_to_featcol(value)
         merge = info.data.get("merge", True)
-        merged_geojson = merge_polygons(
-            featcol=featcol, merge=merge, dissolve_polygon=True
+        input_geojson = value.model_dump() if hasattr(value, "model_dump") else value
+        merged_geojson = parse_aoi(
+            settings.FMTM_DB_URL,
+            input_geojson,
+            merge=merge,
         )
 
         if merge:

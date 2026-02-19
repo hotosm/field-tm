@@ -2,6 +2,9 @@ from unittest.mock import AsyncMock, patch
 
 from litestar import status_codes as status
 
+from app.htmx.setup_step_routes import _build_odk_finalize_success_html
+from app.projects.project_services import ODKFinalizeResult
+
 # We don't import project_crud here directly for patching usually, but we patch where it is used or defined.
 # Since htmx_routes imports it as `from app.projects import project_crud`
 # We should patch `app.projects.project_crud.get_project_qrcode`
@@ -48,3 +51,21 @@ async def test_project_qrcode_htmx_not_found(client):
         "/project-qrcode-htmx?project_id=999999", headers={"HX-Request": "true"}
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_build_odk_finalize_success_html_includes_manager_and_qr():
+    """Test ODK finalize response includes manager credentials and QR markup."""
+    result = ODKFinalizeResult(
+        odk_url="https://central.example.org/#/projects/17",
+        manager_username="fmtm-manager@example.org",
+        manager_password="StrongPass123!",
+    )
+    qr_data = "data:image/png;base64,mocked_qr"
+
+    html = _build_odk_finalize_success_html(result, qr_data)
+
+    assert "Manager Access (ODK Central UI)" in html
+    assert "fmtm-manager@example.org" in html
+    assert "StrongPass123!" in html
+    assert "ODK Collect App User Access" in html
+    assert qr_data in html
