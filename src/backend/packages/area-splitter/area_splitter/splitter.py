@@ -49,10 +49,10 @@ def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
     async def _get_data() -> dict:
         result = await get_osm_data(
             aoi_geojson,
-            fileName="area_splitter",
-            outputType="geojson",
-            bindZip=False,
-            useStWithin=False,
+            file_name="area_splitter",
+            output_type="geojson",
+            bind_zip=False,
+            use_st_within=False,
             filters={
                 "tags": {
                     "all_geometry": {

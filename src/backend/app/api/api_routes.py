@@ -66,6 +66,11 @@ def _map_service_error(exc: ServiceError) -> HTTPException:
     )
 
 
+def _enum_to_value(value):
+    """Convert enum-like values to plain JSON-serializable primitives."""
+    return value.value if hasattr(value, "value") else value
+
+
 @post(
     "/projects",
     dependencies={
@@ -92,8 +97,8 @@ async def api_create_project(
         return ProjectResponse(
             id=project.id,
             project_name=project.project_name,
-            field_mapping_app=project.field_mapping_app,
-            status=project.status,
+            field_mapping_app=_enum_to_value(project.field_mapping_app),
+            status=str(_enum_to_value(project.status)),
         )
     except ServiceError as exc:
         raise _map_service_error(exc) from exc
@@ -284,8 +289,8 @@ async def api_list_projects(db: AsyncConnection) -> list[dict]:
             "id": project.id,
             "project_name": project.project_name,
             "description": project.description,
-            "status": project.status,
-            "field_mapping_app": project.field_mapping_app,
+            "status": _enum_to_value(project.status),
+            "field_mapping_app": _enum_to_value(project.field_mapping_app),
         }
         for project in (projects or [])
     ]
@@ -305,8 +310,8 @@ async def api_get_project(project_id: int, db: AsyncConnection) -> dict:
         "id": project.id,
         "project_name": project.project_name,
         "description": project.description,
-        "status": project.status,
-        "field_mapping_app": project.field_mapping_app,
+        "status": _enum_to_value(project.status),
+        "field_mapping_app": _enum_to_value(project.field_mapping_app),
         "outline": project.outline,
         "hashtags": project.hashtags,
         "location_str": project.location_str,

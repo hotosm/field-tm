@@ -79,8 +79,8 @@ async def read_projects(
 )
 async def read_project_summaries(
     db: AsyncConnection,
-    page: int = Parameter(1, ge=1),
-    results_per_page: int = Parameter(13, le=100),
+    page: int = Parameter(default=1, ge=1),
+    results_per_page: int = Parameter(default=13, le=100),
     user_sub: str | None = Parameter(default=None),
     hashtags: str | None = Parameter(default=None),
     search: str | None = Parameter(default=None),

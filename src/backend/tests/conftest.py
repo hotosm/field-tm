@@ -28,8 +28,7 @@ from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
 from app.auth.auth_schemas import AuthUser
-from app.central import central_crud, central_schemas
-from app.central.central_schemas import ODKCentral
+from app.central import central_schemas
 from app.config import encrypt_value, settings
 from app.db.database import get_db_connection_pool
 from app.db.enums import (
@@ -96,27 +95,10 @@ async def admin_user(db):
 @pytest_asyncio.fixture(scope="function")
 async def project(db, admin_user):
     """A test project, using the test user."""
-    # Create ODK credentials from environment variables
-    odk_creds = ODKCentral(
-        external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
-        external_project_username=os.getenv("ODK_CENTRAL_USER"),
-        external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
-    )
-    odk_creds_decrypted = odk_creds
-
     project_name = f"test project {uuid4()}"
-    # Create ODK Central Project
-    try:
-        odkproject = await central_crud.create_odk_project(
-            project_name,
-            odk_creds_decrypted,
-        )
-        log.debug(f"ODK project returned: {odkproject}")
-        assert odkproject is not None
-        assert odkproject.get("id") is not None
-    except Exception as e:
-        log.exception(e)
-        pytest.fail(f"Test failed with exception: {str(e)}")
+    # Keep tests hermetic by not creating remote ODK resources.
+    # This value only needs to be a valid integer for route/service tests.
+    fake_external_project_id = (uuid4().int % 2_000_000_000) + 1
 
     project_metadata = ProjectIn(
         name=project_name,
@@ -139,7 +121,7 @@ async def project(db, admin_user):
             ],
         },
         created_by_sub=admin_user.sub,
-        external_project_id=odkproject.get("id"),
+        external_project_id=fake_external_project_id,
         xlsform_content=b"Dummy XLSForm content",
     )
 
