@@ -398,10 +398,52 @@ async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template
 )
 async def metrics_partial(request: HTMXRequest, db: AsyncConnection) -> Template:
     """Render landing metrics partial."""
-    project_count = await DbProject.count(db)
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT
+                (SELECT COUNT(*) FROM projects) AS project_count,
+                (SELECT COUNT(*) FROM users) AS user_count,
+                (
+                    SELECT COALESCE(
+                        SUM(
+                            CASE
+                                WHEN data_extract_geojson IS NULL THEN 0
+                                WHEN jsonb_typeof(
+                                    data_extract_geojson -> 'features'
+                                ) = 'array'
+                                    THEN jsonb_array_length(
+                                        data_extract_geojson -> 'features'
+                                    )
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                    FROM projects
+                ) AS mapped_features_count,
+                (
+                    SELECT COUNT(DISTINCT country)
+                    FROM users
+                    WHERE country IS NOT NULL
+                      AND TRIM(country) <> ''
+                ) AS countries_covered;
+            """
+        )
+        metrics_row = await cur.fetchone()
+
+    project_count, user_count, mapped_features_count, countries_covered = (
+        metrics_row if metrics_row else (0, 0, 0, 0)
+    )
+
     return HTMXTemplate(
         template_name="partials/metrics.html",
-        context={"project_count": project_count},
+        context={
+            "project_count": int(project_count),
+            "user_count": int(user_count),
+            "mapped_features_count": int(mapped_features_count),
+            "countries_covered": int(countries_covered),
+        },
     )
 
 
@@ -517,12 +559,19 @@ async def get_template_xlsform(
 @get("/static/images/{filename:str}")
 async def serve_static_image(filename: str) -> Response:
     """Serve static image files."""
+    allowed_media_types = {
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+    }
     static_dir = Path(__file__).parent.parent / "static" / "images"
     file_path = static_dir / filename
+    suffix = Path(filename).suffix.lower()
 
-    # Security: only allow SVG files and ensure no path traversal
+    # Security: only allow known image extensions and ensure no path traversal
     if (
-        not filename.endswith(".svg")
+        suffix not in allowed_media_types
         or ".." in filename
         or "/" in filename
         or "\\" in filename
@@ -543,7 +592,7 @@ async def serve_static_image(filename: str) -> Response:
 
     return Response(
         content=content,
-        media_type="image/svg+xml",
+        media_type=allowed_media_types[suffix],
         headers={"Cache-Control": "public, max-age=3600"},
     )
 

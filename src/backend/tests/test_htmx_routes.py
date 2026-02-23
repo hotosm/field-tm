@@ -55,6 +55,27 @@ async def test_project_qrcode_htmx_not_found(client):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+async def test_metrics_partial(client):
+    """Test landing metrics partial route."""
+    response = await client.get("/metrics", headers={"HX-Request": "true"})
+    assert response.status_code == status.HTTP_200_OK
+    assert "Projects Created" in response.text
+    assert "Features Surveyed" in response.text
+
+
+async def test_static_landing_image_served(client):
+    """Test static landing JPG assets are served."""
+    response = await client.get("/static/images/landing-bg.jpg")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("content-type", "").startswith("image/jpeg")
+
+
+async def test_static_image_rejects_unsupported_extension(client):
+    """Test static image route blocks unsupported extensions."""
+    response = await client.get("/static/images/not-allowed.gif")
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
 def test_build_odk_finalize_success_html_includes_manager_and_qr():
     """Test ODK finalize response includes manager credentials and QR markup."""
     result = ODKFinalizeResult(
