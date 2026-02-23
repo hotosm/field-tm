@@ -18,6 +18,7 @@
 
 """HTMX routes for server-rendered HTML interactions."""
 
+import ast
 import json
 import logging
 from io import BytesIO
@@ -46,7 +47,7 @@ from app.central.central_routes import _validate_xlsform_extension
 from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import XLSFormType
+from app.db.enums import FieldMappingApp, XLSFormType
 from app.db.models import DbProject
 from app.helpers.geometry_utils import (
     check_crs,
@@ -642,18 +643,70 @@ async def create_project_htmx(
 ) -> Response:
     """Create a project via HTMX form submission."""
     try:
+
+        def _normalize_field_mapping_app(value: object) -> str:
+            if isinstance(value, FieldMappingApp):
+                return value.value
+            value_str = str(value or "").strip()
+            if not value_str:
+                return ""
+            if "." in value_str:
+                value_str = value_str.split(".")[-1]
+            normalized = value_str.upper()
+            if normalized == "QFIELD":
+                return FieldMappingApp.QFIELD.value
+            if normalized == "ODK":
+                return FieldMappingApp.ODK.value
+            return value_str
+
         project_name = data.get("project_name", "").strip()
         description = data.get("description", "").strip()
-        field_mapping_app = data.get("field_mapping_app", "").strip()
+        field_mapping_app = _normalize_field_mapping_app(
+            data.get("field_mapping_app", "")
+        )
         hashtags_str = data.get("hashtags", "").strip()
-        outline_str = data.get("outline", "").strip()
+        outline_raw = data.get("outline", "")
+        outline: dict = {}
+        if isinstance(outline_raw, dict):
+            outline = outline_raw
+        elif isinstance(outline_raw, str):
+            outline_str = outline_raw.strip()
+            if not outline_str:
+                outline = {}
+            else:
+                try:
+                    outline = json.loads(outline_str)
+                except json.JSONDecodeError:
+                    try:
+                        parsed_outline = ast.literal_eval(outline_str)
+                    except (SyntaxError, ValueError):
+                        parsed_outline = None
 
-        if not outline_str:
-            outline = {}
-        else:
+                    if isinstance(parsed_outline, dict):
+                        outline = parsed_outline
+                    else:
+                        err = (
+                            "Project area must be valid JSON"
+                            " (GeoJSON Polygon, MultiPolygon,"
+                            " Feature, or FeatureCollection)."
+                        )
+                        return Response(
+                            content=(
+                                '<div id="form-error"'
+                                ' style="margin-bottom: 16px;'
+                                ' display: block;">'
+                                '<wa-callout variant="danger">'
+                                '<span id="form-error-message">'
+                                f"{err}"
+                                "</span></wa-callout></div>"
+                            ),
+                            media_type="text/html",
+                            status_code=400,
+                        )
+        elif outline_raw:
             try:
-                outline = json.loads(outline_str)
-            except json.JSONDecodeError:
+                outline = json.loads(str(outline_raw))
+            except (TypeError, ValueError):
                 err = (
                     "Project area must be valid JSON"
                     " (GeoJSON Polygon, MultiPolygon,"

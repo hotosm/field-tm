@@ -289,6 +289,11 @@ class DbApiKey:
                 ({columns})
             VALUES
                 ({value_placeholders})
+            ON CONFLICT (key_hash) DO UPDATE
+            SET
+                user_sub = EXCLUDED.user_sub,
+                name = EXCLUDED.name,
+                is_active = TRUE
             RETURNING *;
         """
 

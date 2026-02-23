@@ -255,15 +255,10 @@ Thanks goes to these wonderful people:
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-## Repo Activity
-
-![Field-TM Repo Activity][5]
-
 [1]: https://github.com/hotosm/field-tm/releases/tag/2024.4.0 "Beta Release"
 [2]: https://github.com/hotosm/field-tm/releases/tag/2024.5.0 "Mapper Frontend"
 [3]: https://github.com/hotosm/field-tm/releases/tag/2025.1.0 "New Geoms"
 [4]: https://github.com/hotosm/field-tm/releases/tag/2025.2.0 "Web Forms"
-[5]: https://repobeats.axiom.co/api/embed/4c670cc740c638c52d6c2e822fe78a999d3994fc.svg "Repobeats analytics image"
 [6]: https://raw.githubusercontent.com/hotosm/field-tm/dev/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
 [8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
