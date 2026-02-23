@@ -1,11 +1,36 @@
-<wa-card>
-  <div style="padding: 12px 16px">
-    <div style="font-size: 0.9rem; color: #666; margin-bottom: 4px">
-      Project Metrics
+<div class="landing-metrics-grid">
+  <wa-card class="landing-metric-card">
+    <div class="landing-metric-inner">
+      <p class="landing-metric-value">{{ mapped_features_count }}+</p>
+      <p class="landing-metric-label">Features Surveyed (Approximate)</p>
     </div>
-    <div style="font-size: 1.8rem; font-weight: 700; line-height: 1.1">
-      {{ project_count }}
+  </wa-card>
+
+  <wa-card class="landing-metric-card">
+    <div class="landing-metric-inner">
+      <p class="landing-metric-value">{{ project_count }}</p>
+      <p class="landing-metric-label">Projects Created</p>
     </div>
-    <div style="font-size: 0.92rem; color: #666">projects on the platform</div>
-  </div>
-</wa-card>
+  </wa-card>
+
+  <wa-card class="landing-metric-card">
+    <div class="landing-metric-inner">
+      <p class="landing-metric-value">{{ countries_covered }}</p>
+      <p class="landing-metric-label">Countries Covered</p>
+    </div>
+  </wa-card>
+
+  <wa-card class="landing-metric-card">
+    <div class="landing-metric-inner">
+      <p class="landing-metric-value">{{ user_count }}</p>
+      <p class="landing-metric-label">Users Registered</p>
+    </div>
+  </wa-card>
+
+  <wa-card class="landing-metric-card">
+    <div class="landing-metric-inner">
+      <p class="landing-metric-value">2</p>
+      <p class="landing-metric-label">Supported Mapping Apps</p>
+    </div>
+  </wa-card>
+</div>
