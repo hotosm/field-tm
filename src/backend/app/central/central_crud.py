@@ -52,6 +52,56 @@ from app.s3 import strip_presigned_url_for_local_dev
 log = logging.getLogger(__name__)
 
 
+def _extract_dataset_property_names(payload: object) -> set[str]:
+    """Extract dataset property names from Central API payloads."""
+    if isinstance(payload, dict):
+        payload = payload.get("value", payload.get("properties", payload))
+
+    if not isinstance(payload, list):
+        return set()
+
+    names: set[str] = set()
+    for item in payload:
+        if isinstance(item, dict):
+            name = item.get("name")
+            if isinstance(name, str) and name:
+                names.add(name)
+        elif isinstance(item, str) and item:
+            names.add(item)
+
+    return names
+
+
+def _is_duplicate_form_conflict(exc: Exception) -> bool:
+    """Check whether an ODK error means the form already exists."""
+    if isinstance(exc, PyODKError):
+        try:
+            if exc.is_central_error(409.3):
+                return True
+        except Exception:
+            pass
+
+        if len(exc.args) >= 2:
+            response = exc.args[1]
+            if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
+                try:
+                    body = response.json()
+                except Exception:
+                    body = {}
+
+                details = body.get("details", {}) if isinstance(body, dict) else {}
+                fields = details.get("fields", []) if isinstance(details, dict) else []
+                if "projectId" in fields and "xmlFormId" in fields:
+                    return True
+
+                message = body.get("message", "") if isinstance(body, dict) else ""
+                if "xmlFormId" in str(message):
+                    return True
+
+    msg = str(exc)
+    return "409" in msg and "already exists" in msg and "xmlFormId" in msg
+
+
 async def list_odk_projects(
     odk_central: Optional[central_schemas.ODKCentral] = None,
 ):
@@ -130,17 +180,35 @@ async def create_odk_xform(
     Returns: None
     """
     try:
+        form_definition: str | bytes = xform_data.getvalue()
+        # pyodk validates bytes as XLS/XLSX only; XML must be passed as text.
+        try:
+            form_definition = form_definition.decode("utf-8")
+        except UnicodeDecodeError:
+            # Keep bytes for binary XLS/XLSX payloads.
+            pass
+
         async with central_deps.pyodk_client(odk_credentials) as client:
-            client.forms.create(
-                definition=xform_data.getvalue(),
-                project_id=odk_id,
-                ignore_warnings=True,
-            )
+            try:
+                client.forms.create(
+                    definition=form_definition,
+                    project_id=odk_id,
+                    ignore_warnings=True,
+                )
+            except PyODKError as e:
+                if _is_duplicate_form_conflict(e):
+                    log.info(
+                        "Form already exists in ODK project %s; "
+                        "treating upload as idempotent success.",
+                        odk_id,
+                    )
+                    return
+                raise
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": "Connection failed to ODK Central"},
+            detail={"message": f"Failed to upload form to ODK Central: {e}"},
         ) from e
 
 
@@ -568,26 +636,59 @@ async def create_entity_list(
     async with central_deps.pyodk_client(odk_creds) as client:
         pid = int(odk_id)
 
-        # 1) Ensure all required properties exist (ignore 409 conflicts)
+        # 1) Ensure all required properties exist.
         required_keys = set(properties)
         # Also include any keys present in data (minus label)
         for row in merge_rows:
             required_keys.update(k for k in row.keys() if k != "label")
 
+        existing_property_names: set[str] = set()
+        try:
+            existing_properties = client.session.get(
+                f"projects/{pid}/datasets/{dataset_name}/properties"
+            )
+            if existing_properties.status_code < 400:
+                existing_property_names = _extract_dataset_property_names(
+                    existing_properties.json()
+                )
+            elif existing_properties.status_code != status.HTTP_404_NOT_FOUND:
+                existing_properties.raise_for_status()
+        except Exception as exc:
+            log.warning(
+                "Could not list properties for dataset '%s' in ODK project %s: %s",
+                dataset_name,
+                pid,
+                exc,
+            )
+
         for key in sorted(required_keys):
             if key in {"__id", "__system", "label"}:
                 continue
+            if key in existing_property_names:
+                continue
+
             try:
                 create_property = client.session.post(
                     f"projects/{pid}/datasets/{dataset_name}/properties",
                     json={"name": key},
                 )
+                if create_property.status_code == status.HTTP_409_CONFLICT:
+                    continue
                 if create_property.status_code >= 400:
                     create_property.raise_for_status()
             except Exception as exc:
                 # Treat "already exists" conflicts as OK (idempotent).
+                response = getattr(exc, "response", None)
+                if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
+                    continue
+
                 msg = str(exc)
-                if "Status: 409" in msg or '"code":409' in msg or 'code":409' in msg:
+                if (
+                    "409 Client Error" in msg
+                    or "Status: 409" in msg
+                    or '"code":409' in msg
+                    or 'code":409' in msg
+                ):
                     continue
                 raise
 
@@ -774,7 +875,9 @@ async def get_appuser_token(
         ):
             odk_url = odk_credentials.external_project_instance_url
         else:
-            odk_url = str(settings.ODK_CENTRAL_URL or "").rstrip("/")
+            odk_url = str(
+                settings.ODK_CENTRAL_PUBLIC_URL or settings.ODK_CENTRAL_URL or ""
+            ).rstrip("/")
 
         return f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
 
@@ -793,15 +896,21 @@ async def get_appuser_token(
 
 
 def _build_manager_user_email(project_odk_id: int) -> str:
-    """Create a deterministic-ish unique email for generated Central web users."""
-    suffix = secrets.token_hex(4)
-    return f"fmtm-manager-{project_odk_id}-{suffix}@fieldtm.local"
+    """Create the default manager email for a project."""
+    return f"fmtm-manager-{project_odk_id}@example.org"
 
 
 def _build_manager_user_password() -> str:
     """Generate a strong password for generated Central web users."""
-    alphabet = string.ascii_letters + string.digits + "!@#$%^&*()-_=+"
+    # Keep to alphanumeric for widest compatibility across Central deployments.
+    alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(20))
+
+
+def _build_manager_user_email_fallback(project_odk_id: int) -> str:
+    """Create a fallback manager email variant when the primary is already taken."""
+    suffix = secrets.token_hex(4)
+    return f"fmtm-manager-{project_odk_id}-{suffix}@example.org"
 
 
 async def create_project_manager_user(
@@ -809,22 +918,31 @@ async def create_project_manager_user(
     project_name: str,
     odk_credentials: Optional[central_schemas.ODKCentral],
 ) -> tuple[str, str]:
-    """Create a Central web user and grant access to one project only.
+    """Create a Central web user scoped to one project as Project Manager.
+
+    The user is created with email + password so they can log directly into
+    the ODK Central UI.  Credentials are returned once and never stored.
+
+    ODK Central sends a welcome email on creation; a local mail-catcher
+    (the 'mail' service) must be reachable in development so that delivery
+    does not fail.  In production point EMAIL_HOST / EMAIL_PORT at a real
+    SMTP server via environment variables.
 
     Returns:
         tuple[str, str]: (manager_email, manager_password)
     """
     try:
         async with central_deps.pyodk_client(odk_credentials) as client:
+            # ── 1. Resolve the Project Manager role ID ──────────────────────
             roles_response = client.session.get("roles")
             roles_response.raise_for_status()
             roles = roles_response.json() or []
 
             project_manager_role = next(
                 (
-                    role
-                    for role in roles
-                    if str(role.get("name", "")).strip().lower() == "project manager"
+                    r
+                    for r in roles
+                    if str(r.get("name", "")).strip().lower() == "project manager"
                 ),
                 None,
             )
@@ -835,39 +953,113 @@ async def create_project_manager_user(
                 )
 
             role_id = int(project_manager_role["id"])
-            manager_email = _build_manager_user_email(project_odk_id)
-            manager_password = _build_manager_user_password()
             display_name = f"FMTM Manager - {project_name}"
 
-            create_response = client.session.post(
-                "users",
-                json={
-                    "email": manager_email,
-                    "password": manager_password,
-                    "displayName": display_name,
-                },
-            )
-            create_response.raise_for_status()
-            created_user = create_response.json() or {}
-            manager_user_id = created_user.get("id")
+            # ── 2. Create the web user ──────────────────────────────────────
+            # Use a deterministic primary email; fall back to a randomised
+            # variant only if the primary address is already taken (e.g. on
+            # a re-run of finalization).
+            primary_email = _build_manager_user_email(project_odk_id)
+            candidates = [
+                primary_email,
+                _build_manager_user_email_fallback(project_odk_id),
+            ]
+
+            manager_user_id = None
+            manager_email = ""
+            manager_password = ""
+
+            for candidate_email in candidates:
+                candidate_password = _build_manager_user_password()
+                create_response = client.session.post(
+                    "users",
+                    json={
+                        "email": candidate_email,
+                        "password": candidate_password,
+                    },
+                )
+                create_status = getattr(create_response, "status_code", 200)
+
+                if create_status < 400:
+                    created_user = create_response.json() or {}
+                    created_user_id = created_user.get("id")
+                    if not created_user_id:
+                        raise HTTPException(
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="ODK Central did not return a user ID after creation.",
+                        )
+                    manager_user_id = created_user_id
+                    manager_email = candidate_email
+                    manager_password = candidate_password
+                    break
+
+                if create_status == status.HTTP_409_CONFLICT:
+                    # Email already registered; try the randomised fallback.
+                    log.info(
+                        "Manager email %s already exists in ODK Central; "
+                        "trying fallback address.",
+                        candidate_email,
+                    )
+                    continue
+
+                # Any other error (4xx / 5xx) is fatal.
+                body = getattr(create_response, "text", "")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=(
+                        f"ODK Central returned {create_status} when creating "
+                        f"manager user. Body: {body}"
+                    ),
+                )
+
             if not manager_user_id:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="ODK Central did not return the created user ID.",
+                    detail=(
+                        "Could not create an ODK Central manager user: "
+                        "both the primary and fallback email addresses are already taken."
+                    ),
                 )
 
+            # ── 3. Set a human-readable display name (cosmetic, non-fatal) ──
+            display_name_response = client.session.patch(
+                f"users/{manager_user_id}",
+                json={"displayName": display_name},
+            )
+            if getattr(display_name_response, "status_code", 200) >= 400:
+                log.warning(
+                    "Could not set display name for manager user %s on ODK project %s.",
+                    manager_user_id,
+                    project_odk_id,
+                )
+
+            # ── 4. Assign Project Manager role scoped to this project ───────
             assignment_response = client.session.post(
                 f"projects/{project_odk_id}/assignments/{role_id}/{manager_user_id}",
             )
-            assignment_response.raise_for_status()
+            assignment_status = getattr(assignment_response, "status_code", 200)
+            if assignment_status == status.HTTP_409_CONFLICT:
+                log.info(
+                    "Manager user %s already assigned to ODK project %s.",
+                    manager_user_id,
+                    project_odk_id,
+                )
+            elif assignment_status >= 400:
+                assignment_response.raise_for_status()
+
+            log.info(
+                "Created ODK Central manager user %s for project %s.",
+                manager_email,
+                project_odk_id,
+            )
             return manager_email, manager_password
+
     except HTTPException:
         raise
     except Exception as e:
         log.exception(
-            "Failed to create project manager user for ODK project %s: %s",
+            "Failed to create project manager user for ODK project %s.",
             project_odk_id,
-            e,
             stack_info=True,
         )
         raise HTTPException(

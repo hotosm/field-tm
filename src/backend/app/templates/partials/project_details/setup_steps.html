@@ -8,128 +8,16 @@ set is_empty_data_extract = project.data_extract_geojson == {} %} {% set
 has_task_areas = project.task_areas_geojson is not none %} {% set
 is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 'PUBLISHED' %}
-<!-- Project Published - Show Completed Sections and QR Code -->
-<div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee">
-  <h2 style="color: #4caf50; margin-bottom: 20px; font-size: 1.5em">
-    Project Published ✓
-  </h2>
+<!-- Project Published - Prioritize access and QR, keep setup summary below -->
+<div class="ftm-published-divider">
+  <h2 class="ftm-published-header">Project Published ✓</h2>
   <p style="color: #666; margin-bottom: 20px">
     Your project has been successfully published and is ready to use.
   </p>
 
-  <!-- Show all sections as Complete -->
-  <div style="margin-bottom: 30px">
-    <!-- Step 1: XLSForm -->
-    <div
-      style="
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: #e8f5e9;
-        border-radius: 8px;
-        border-left: 4px solid #4caf50;
-      "
-    >
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <h3 style="color: #333; margin: 0; font-size: 1.1em">
-          Step 1: Upload XLSForm
-          <span style="color: #4caf50; margin-left: 8px">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 2: Get Data -->
-    <div
-      style="
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: #e8f5e9;
-        border-radius: 8px;
-        border-left: 4px solid #4caf50;
-      "
-    >
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <h3 style="color: #333; margin: 0; font-size: 1.1em">
-          Step 2: Get Data
-          <span style="color: #4caf50; margin-left: 8px">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 3: Split into Tasks -->
-    <div
-      style="
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: #e8f5e9;
-        border-radius: 8px;
-        border-left: 4px solid #4caf50;
-      "
-    >
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <h3 style="color: #333; margin: 0; font-size: 1.1em">
-          Step 3: Split into Tasks
-          <span style="color: #4caf50; margin-left: 8px">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 4: Finalise Project -->
-    <div
-      style="
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: #e8f5e9;
-        border-radius: 8px;
-        border-left: 4px solid #4caf50;
-      "
-    >
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <h3 style="color: #333; margin: 0; font-size: 1.1em">
-          Step 4: Finalise Project
-          <span style="color: #4caf50; margin-left: 8px">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-  </div>
-
   <!-- External Project Link -->
   {% if project.external_project_instance_url %}
-  <div
-    style="
-      margin-bottom: 30px;
-      padding: 15px;
-      background-color: #f5f5f5;
-      border-radius: 8px;
-    "
-  >
+  <div class="ftm-external-info" style="border-radius: 8px">
     <h3 style="color: #333; margin-bottom: 10px; font-size: 1.1em">
       Access Project
     </h3>
@@ -139,7 +27,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       <a
         href="{{ project.external_project_instance_url }}"
         target="_blank"
-        style="color: #d63f3f; text-decoration: none; font-weight: 500"
+        class="ftm-link--brand"
       >
         View Project in ODK Central →
       </a>
@@ -147,7 +35,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       <a
         href="{{ project.external_project_instance_url.rstrip('/') }}/#/projects/{{ project.external_project_id }}"
         target="_blank"
-        style="color: #d63f3f; text-decoration: none; font-weight: 500"
+        class="ftm-link--brand"
       >
         View Project in ODK Central →
       </a>
@@ -155,7 +43,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       <a
         href="{{ project.external_project_instance_url }}"
         target="_blank"
-        style="color: #d63f3f; text-decoration: none; font-weight: 500"
+        class="ftm-link--brand"
       >
         View Project in QField Cloud →
       </a>
@@ -163,7 +51,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       <a
         href="{{ project.external_project_instance_url }}"
         target="_blank"
-        style="color: #d63f3f; text-decoration: none; font-weight: 500"
+        class="ftm-link--brand"
       >
         View Project Externally →
       </a>
@@ -193,29 +81,86 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </div>
     </div>
   </div>
+
+  <h3 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
+    Setup Summary
+  </h3>
+  <p style="color: #666; margin-bottom: 15px">
+    The project setup flow is complete and shown below for reference.
+  </p>
+
+  <!-- Show all setup sections as complete -->
+  <div class="ftm-section">
+    <!-- Step 1: XLSForm -->
+    <div
+      class="ftm-step ftm-step--complete"
+      style="margin-bottom: 20px; padding: 15px"
+    >
+      <div class="ftm-step__header" style="margin-bottom: 0">
+        <h3 class="ftm-step__title" style="font-size: 1.1em">
+          Step 1: Upload XLSForm
+          <span class="ftm-step__check">✓</span>
+        </h3>
+        <wa-badge variant="success">Complete</wa-badge>
+      </div>
+    </div>
+
+    <!-- Step 2: Get Data -->
+    <div
+      class="ftm-step ftm-step--complete"
+      style="margin-bottom: 20px; padding: 15px"
+    >
+      <div class="ftm-step__header" style="margin-bottom: 0">
+        <h3 class="ftm-step__title" style="font-size: 1.1em">
+          Step 2: Get Data
+          <span class="ftm-step__check">✓</span>
+        </h3>
+        <wa-badge variant="success">Complete</wa-badge>
+      </div>
+    </div>
+
+    <!-- Step 3: Split into Tasks -->
+    <div
+      class="ftm-step ftm-step--complete"
+      style="margin-bottom: 20px; padding: 15px"
+    >
+      <div class="ftm-step__header" style="margin-bottom: 0">
+        <h3 class="ftm-step__title" style="font-size: 1.1em">
+          Step 3: Split into Tasks
+          <span class="ftm-step__check">✓</span>
+        </h3>
+        <wa-badge variant="success">Complete</wa-badge>
+      </div>
+    </div>
+
+    <!-- Step 4: Finalise Project -->
+    <div
+      class="ftm-step ftm-step--complete"
+      style="margin-bottom: 20px; padding: 15px"
+    >
+      <div class="ftm-step__header" style="margin-bottom: 0">
+        <h3 class="ftm-step__title" style="font-size: 1.1em">
+          Step 4: Finalise Project
+          <span class="ftm-step__check">✓</span>
+        </h3>
+        <wa-badge variant="success">Complete</wa-badge>
+      </div>
+    </div>
+  </div>
 </div>
 {% elif status_value == 'DRAFT' %}
-<div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee">
-  <h2 style="color: #d63f3f; margin-bottom: 20px; font-size: 1.5em">
-    Project Setup
-  </h2>
+<div class="ftm-published-divider">
+  <h2 class="ftm-setup-header">Project Setup</h2>
 
   <!-- Step 1: Select XLSForm (always show, with completion indicator) -->
   <div
     id="step-1-container"
-    style="margin-bottom: 30px; padding: 20px; background-color: {% if has_xlsform %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_xlsform %}#4caf50{% else %}#d63f3f{% endif %};"
+    class="ftm-step {% if has_xlsform %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      "
-    >
-      <h3 style="color: #333; margin: 0; font-size: 1.2em">
+    <div class="ftm-step__header">
+      <h3 class="ftm-step__title">
         Step 1: Select Survey Form {% if has_xlsform %}
-        <span style="color: #4caf50; margin-left: 8px">✓</span>
+        <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
       {% if has_xlsform %}
@@ -223,10 +168,10 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       {% endif %}
     </div>
     {% if not has_xlsform %}
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+    <p class="ftm-step__description">
       Choose a category type from existing XLSForms or upload a custom form.
     </p>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px">
+    <div class="ftm-step__actions">
       <wa-button
         id="select-xlsform-btn"
         variant="default"
@@ -244,17 +189,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     </div>
 
     <!-- Form Configuration Options (shown after form selection/upload) -->
-    <div
-      id="form-config-container"
-      style="
-        display: none;
-        margin-top: 20px;
-        padding: 15px;
-        background-color: #fff;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-      "
-    >
+    <div id="form-config-container" class="ftm-form-config">
       <h4 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
         Form Configuration
       </h4>
@@ -267,7 +202,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         style="display: flex; flex-direction: column; gap: 12px"
       >
         <label
-          style="display: flex; align-items: center; gap: 8px; cursor: pointer"
+          class="ftm-checkbox-label"
+          style="display: flex; align-items: center; gap: 8px"
         >
           <input
             type="checkbox"
@@ -279,7 +215,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           <span style="font-size: 0.95em">Include verification fields</span>
         </label>
         <label
-          style="display: flex; align-items: center; gap: 8px; cursor: pointer"
+          class="ftm-checkbox-label"
+          style="display: flex; align-items: center; gap: 8px"
         >
           <input
             type="checkbox"
@@ -298,30 +235,14 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           value="{{ 'true' if is_odk else 'false' }}"
         />
         {% if is_odk %}
-        <div
-          style="
-            padding: 8px;
-            background-color: #e8f4f8;
-            border-radius: 4px;
-            font-size: 0.95em;
-            color: #666;
-          "
-        >
+        <div class="ftm-config-note ftm-config-note--info">
           <span
             >✓ ODK Collect-specific components will be included (automatically
             set for ODK projects)</span
           >
         </div>
         {% else %}
-        <div
-          style="
-            padding: 8px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            font-size: 0.95em;
-            color: #666;
-          "
-        >
+        <div class="ftm-config-note ftm-config-note--muted">
           <span
             >ODK Collect-specific components disabled (project uses {{ app_name
             }})</span
@@ -329,15 +250,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         </div>
         {% endif %} {% else %}
         <input type="hidden" name="use_odk_collect" value="false" />
-        <div
-          style="
-            padding: 8px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            font-size: 0.95em;
-            color: #666;
-          "
-        >
+        <div class="ftm-config-note ftm-config-note--muted">
           <span
             >ODK Collect-specific components disabled (no field mapping app
             selected)</span
@@ -345,25 +258,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         </div>
         {% endif %}
         <div style="margin-top: 10px">
-          <label
-            style="
-              display: block;
-              margin-bottom: 5px;
-              font-size: 0.95em;
-              font-weight: 500;
-            "
-            >Default Language:</label
-          >
-          <select
-            name="default_language"
-            style="
-              width: 100%;
-              padding: 6px;
-              border: 1px solid #ddd;
-              border-radius: 4px;
-              font-size: 0.95em;
-            "
-          >
+          <label class="ftm-split-label">Default Language:</label>
+          <select name="default_language" class="ftm-split-select">
             <option value="english">English</option>
             <option value="spanish">Spanish</option>
             <option value="french">French</option>
@@ -391,19 +287,9 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </form>
     </div>
 
-    <div id="xlsform-status" style="margin-top: 10px"></div>
+    <div id="xlsform-status" class="ftm-step__status"></div>
     {% else %}
-    <div
-      style="
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 4px;
-        color: #4caf50;
-        font-weight: 500;
-      "
-    >
-      ✓ Survey form uploaded successfully
-    </div>
+    <div class="ftm-step__success">✓ Survey form uploaded successfully</div>
     {% endif %}
   </div>
 
@@ -411,19 +297,12 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
   {% if has_xlsform %}
   <div
     id="step-2-container"
-    style="margin-bottom: 30px; padding: 20px; background-color: {% if has_data_extract %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_data_extract %}#4caf50{% else %}#d63f3f{% endif %};"
+    class="ftm-step {% if has_data_extract %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      "
-    >
-      <h3 style="color: #333; margin: 0; font-size: 1.2em">
+    <div class="ftm-step__header">
+      <h3 class="ftm-step__title">
         Step 2: Get Data {% if has_data_extract %}
-        <span style="color: #4caf50; margin-left: 8px">✓</span>
+        <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
       {% if has_data_extract %}
@@ -431,11 +310,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       {% endif %}
     </div>
     {% if not has_data_extract %}
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+    <p class="ftm-step__description">
       Download OSM data for the selected category or upload a custom GeoJSON
       file. Review the data on the map, then continue to the next step.
     </p>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px">
+    <div class="ftm-step__actions">
       <button
         id="download-osm-data-btn"
         hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}&osm_category=buildings&geom_type=POLYGON"
@@ -452,13 +331,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           style="display: none; margin-left: 8px"
         >
           <svg
-            style="
-              width: 16px;
-              height: 16px;
-              display: inline-block;
-              vertical-align: middle;
-              animation: spin 1s linear infinite;
-            "
+            class="ftm-spinner"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -476,20 +349,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         Upload Custom GeoJSON
       </button>
     </div>
-    <div id="osm-data-status" style="margin-top: 10px">
-      <div
-        id="download-loading"
-        class="htmx-indicator"
-        style="display: none; text-align: center; padding: 20px"
-      >
+    <div id="osm-data-status" class="ftm-step__status">
+      <div id="download-loading" class="htmx-indicator ftm-loading">
         <div style="display: inline-block">
           <svg
-            style="
-              width: 32px;
-              height: 32px;
-              animation: spin 1s linear infinite;
-              color: #d63f3f;
-            "
+            class="ftm-spinner ftm-spinner--lg"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -523,18 +387,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     </form>
     <div id="geojson-preview-container" style="margin-top: 15px"></div>
     {% else %}
-    <div
-      style="
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 4px;
-        color: #4caf50;
-        font-weight: 500;
-      "
-    >
-      ✓ OSM data extract ready
-    </div>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px">
+    <div class="ftm-step__success">✓ OSM data extract ready</div>
+    <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 0">
       <button
         id="preview-data-extract-btn"
         hx-get="/preview-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
@@ -566,19 +420,12 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
   is_empty_data_extract) %}
   <div
     id="step-3-container"
-    style="margin-bottom: 30px; padding: 20px; background-color: {% if has_task_areas %}#e8f5e9{% else %}#f9f9f9{% endif %}; border-radius: 8px; border-left: 4px solid {% if has_task_areas %}#4caf50{% else %}#d63f3f{% endif %};"
+    class="ftm-step {% if has_task_areas %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      "
-    >
-      <h3 style="color: #333; margin: 0; font-size: 1.2em">
+    <div class="ftm-step__header">
+      <h3 class="ftm-step__title">
         Step 3: Split into Tasks (Optional) {% if has_task_areas %}
-        <span style="color: #4caf50; margin-left: 8px">✓</span>
+        <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
       {% if has_task_areas %}
@@ -586,31 +433,13 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       {% endif %}
     </div>
     {% if has_task_areas %} {% if is_empty_data_extract and is_no_splitting %}
-    <div
-      style="
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 4px;
-        color: #4caf50;
-        font-weight: 500;
-      "
-    >
+    <div class="ftm-step__success">
       ✓ Task splitting is not relevant without existing data
     </div>
     {% else %}
-    <div
-      style="
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 4px;
-        color: #4caf50;
-        font-weight: 500;
-      "
-    >
-      ✓ Split tasks saved successfully
-    </div>
+    <div class="ftm-step__success">✓ Split tasks saved successfully</div>
     {% endif %} {% else %}
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+    <p class="ftm-step__description">
       Generate task areas by splitting the Area of Interest (AOI). Choose an
       algorithm and parameters, then split. Review the preview, and click
       "Accept Task Choices" to save.
@@ -623,35 +452,16 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       hx-indicator="#split-loading"
       style="margin-bottom: 15px"
     >
-      <div
-        style="
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 15px;
-          margin-bottom: 15px;
-        "
-      >
+      <div class="ftm-split-grid">
         <div>
-          <label
-            for="split-algorithm"
-            style="
-              display: block;
-              margin-bottom: 5px;
-              font-weight: 500;
-              color: #333;
-            "
+          <label for="split-algorithm" class="ftm-split-label"
             >Algorithm:</label
           >
           <select
             id="split-algorithm"
             name="algorithm"
             required
-            style="
-              width: 100%;
-              padding: 8px;
-              border: 1px solid #ddd;
-              border-radius: 4px;
-            "
+            class="ftm-split-select"
           >
             <option
               value=""
@@ -697,14 +507,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         <div id="algorithm-param-container">
           <!-- Dynamic parameter field based on algorithm selection -->
           <div id="param-buildings" style="display: none">
-            <label
-              for="no-of-buildings"
-              style="
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 500;
-                color: #333;
-              "
+            <label for="no-of-buildings" class="ftm-split-label"
               >Avg. Buildings per Task:</label
             >
             <input
@@ -713,23 +516,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               name="no_of_buildings"
               value="50"
               min="1"
-              style="
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
+              class="ftm-split-input"
             />
           </div>
           <div id="param-dimension" style="display: none">
-            <label
-              for="dimension-meters"
-              style="
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 500;
-                color: #333;
-              "
+            <label for="dimension-meters" class="ftm-split-label"
               >Dimension (meters):</label
             >
             <input
@@ -738,16 +529,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               name="dimension_meters"
               value="100"
               min="10"
-              style="
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
+              class="ftm-split-input"
             />
           </div>
         </div>
-        <div style="display: flex; align-items: flex-end">
+        <div class="ftm-split-submit">
           <button
             type="submit"
             class="wa-button wa-button--primary"
@@ -763,13 +549,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               style="display: none; margin-left: 8px"
             >
               <svg
-                style="
-                  width: 16px;
-                  height: 16px;
-                  display: inline-block;
-                  vertical-align: middle;
-                  animation: spin 1s linear infinite;
-                "
+                class="ftm-spinner"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -783,20 +563,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </div>
     </form>
     {% endif %} {% if not has_task_areas %}
-    <div id="split-status" style="margin-top: 10px">
-      <div
-        id="split-loading"
-        class="htmx-indicator"
-        style="display: none; text-align: center; padding: 20px"
-      >
+    <div id="split-status" class="ftm-step__status">
+      <div id="split-loading" class="htmx-indicator ftm-loading">
         <div style="display: inline-block">
           <svg
-            style="
-              width: 32px;
-              height: 32px;
-              animation: spin 1s linear infinite;
-              color: #d63f3f;
-            "
+            class="ftm-spinner ftm-spinner--lg"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -818,35 +589,17 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 
   <!-- Step 4: Finalise Project (only show if Steps 1, 2, and 3 are complete) -->
   {% if has_xlsform and has_data_extract and has_task_areas %}
-  <div
-    id="step-4-container"
-    style="
-      margin-bottom: 30px;
-      padding: 20px;
-      background-color: #e8f5e9;
-      border-radius: 8px;
-      border-left: 4px solid #4caf50;
-    "
-  >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      "
-    >
-      <h3 style="color: #333; margin: 0; font-size: 1.2em">
-        Step 4: Finalise Project
-      </h3>
+  <div id="step-4-container" class="ftm-step ftm-step--complete">
+    <div class="ftm-step__header">
+      <h3 class="ftm-step__title">Step 4: Finalise Project</h3>
       <wa-badge variant="success">Ready</wa-badge>
     </div>
-    <p style="color: #666; margin-bottom: 15px; font-size: 0.95em">
+    <p class="ftm-step__description">
       All prerequisites are complete! Create the project in your chosen mapping
       tool.
     </p>
 
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px">
+    <div class="ftm-step__actions">
       <wa-button
         id="finalise-project-btn"
         variant="primary"
@@ -863,7 +616,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </wa-button>
     </div>
 
-    <div id="finalise-status" style="margin-top: 10px"></div>
+    <div id="finalise-status" class="ftm-step__status"></div>
 
     <!-- Finalise Confirmation Dialog -->
     <wa-dialog
@@ -877,10 +630,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       >
         Are you sure you want to finalise this project?
       </p>
-      <div
-        slot="footer"
-        style="display: flex; justify-content: flex-end; gap: 10px"
-      >
+      <div slot="footer" class="ftm-flex-end">
         <wa-button id="finalise-cancel-btn" variant="default">Cancel</wa-button>
         <wa-button id="finalise-confirm-btn" variant="primary">
           Confirm & Finalise
@@ -889,36 +639,9 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     </wa-dialog>
 
     <!-- Credentials Modal (for ODK or QField) -->
-    <div
-      id="credentials-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-      "
-    >
-      <div
-        style="
-          background: white;
-          padding: 30px;
-          border-radius: 8px;
-          max-width: 500px;
-          width: 90%;
-          max-height: 90vh;
-          overflow-y: auto;
-        "
-      >
-        <h3
-          id="credentials-modal-title"
-          style="margin-top: 0; margin-bottom: 20px"
-        >
+    <div id="credentials-modal" class="ftm-modal-backdrop">
+      <div class="ftm-modal">
+        <h3 id="credentials-modal-title" class="ftm-modal__title">
           Custom Credentials
         </h3>
         <form
@@ -928,10 +651,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           <!-- ODK Credentials Fields -->
           <div id="odk-credentials-fields" style="display: none">
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                ODK Central URL <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                ODK Central URL <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="url"
@@ -942,10 +663,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               ></wa-input>
             </div>
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                Username <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                Username <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="text"
@@ -956,10 +675,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               ></wa-input>
             </div>
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                Password <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                Password <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="password"
@@ -974,10 +691,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           <!-- QField Credentials Fields -->
           <div id="qfield-credentials-fields" style="display: none">
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                QField Cloud URL <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                QField Cloud URL <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="url"
@@ -988,10 +703,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               ></wa-input>
             </div>
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                Username <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                Username <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="text"
@@ -1002,10 +715,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               ></wa-input>
             </div>
             <div>
-              <label
-                style="display: block; margin-bottom: 5px; font-weight: 500"
-              >
-                Password <span style="color: red">*</span>
+              <label class="ftm-split-label">
+                Password <span class="ftm-form-required">*</span>
               </label>
               <wa-input
                 type="password"
@@ -1018,14 +729,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           </div>
 
           <div id="credentials-error" style="margin-top: 10px"></div>
-          <div
-            style="
-              display: flex;
-              gap: 10px;
-              justify-content: flex-end;
-              margin-top: 10px;
-            "
-          >
+          <div class="ftm-modal__footer">
             <wa-button type="button" id="cancel-creds-btn" variant="default">
               Cancel
             </wa-button>

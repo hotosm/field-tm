@@ -24,6 +24,34 @@ from litestar import get
 from litestar.response import Response
 
 
+@get("/static/css/{filename:str}")
+async def serve_static_css(filename: str) -> Response:
+    """Serve static CSS files."""
+    static_dir = Path(__file__).parent.parent / "static" / "css"
+    file_path = static_dir / filename
+
+    # Security: only allow .css and no path traversal
+    if (
+        not filename.endswith(".css")
+        or ".." in filename
+        or "/" in filename
+        or "\\" in filename
+    ):
+        return Response(content="Forbidden", status_code=403)
+
+    if not file_path.exists():
+        return Response(content="Not Found", status_code=404)
+
+    with open(file_path, "rb") as f:
+        content = f.read()
+
+    return Response(
+        content=content,
+        media_type="text/css",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
 @get("/static/images/{filename:str}")
 async def serve_static_image(filename: str) -> Response:
     """Serve static image files."""

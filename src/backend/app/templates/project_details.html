@@ -1,7 +1,7 @@
 {% extends "layout.html" %} {% block title %} {% if project %}{{
 project.project_name }} - {% endif %}Field Tasking Manager {% endblock %} {%
 block content %}
-<div style="padding: 20px; max-width: 1200px; margin: 0 auto">
+<div class="ftm-page ftm-page--wide">
   <div style="margin-bottom: 20px">
     <wa-button
       href="/htmxprojects"
@@ -14,10 +14,7 @@ block content %}
 
   {% if project %}
   <wa-card>
-    <div
-      slot="header"
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
+    <div slot="header" class="ftm-flex-between">
       <h1 style="margin: 0">{{ project.project_name or 'Unnamed Project' }}</h1>
       {% set status_value = project.status.value if project.status and
       project.status.value else (project.status if project.status is string else
@@ -43,104 +40,50 @@ block content %}
     <div style="padding: 20px">
       <!-- Description -->
       {% if project.description %}
-      <div style="margin-bottom: 30px">
-        <h3 style="color: #d63f3f; margin-bottom: 10px">Description</h3>
+      <div class="ftm-section">
+        <h3 class="ftm-section-title">Description</h3>
         <p style="color: #333; line-height: 1.6">{{ project.description }}</p>
       </div>
       {% endif %}
 
       <!-- Project Details Grid -->
-      <div
-        style="
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-          margin-bottom: 30px;
-        "
-      >
+      <div class="ftm-detail-grid">
         <div>
-          <h4
-            style="
-              color: #666;
-              font-size: 0.9em;
-              margin-bottom: 5px;
-              font-weight: bold;
-            "
-          >
-            Project ID
-          </h4>
-          <p style="color: #333; font-size: 1.1em">#{{ project.id }}</p>
+          <h4 class="ftm-detail-label">Project ID</h4>
+          <p class="ftm-detail-value">#{{ project.id }}</p>
         </div>
 
         {% if project.location_str %}
         <div>
-          <h4
-            style="
-              color: #666;
-              font-size: 0.9em;
-              margin-bottom: 5px;
-              font-weight: bold;
-            "
-          >
-            Location
-          </h4>
-          <p style="color: #333; font-size: 1.1em">
-            {{ project.location_str }}
-          </p>
+          <h4 class="ftm-detail-label">Location</h4>
+          <p class="ftm-detail-value">{{ project.location_str }}</p>
         </div>
         {% endif %} {% if field_mapping_app_value %}
         <div>
-          <h4
-            style="
-              color: #666;
-              font-size: 0.9em;
-              margin-bottom: 5px;
-              font-weight: bold;
-            "
-          >
-            Field Mapping App
-          </h4>
-          <div style="display: flex; align-items: center; gap: 8px">
+          <h4 class="ftm-detail-label">Field Mapping App</h4>
+          <div class="ftm-flex-center">
             {% set app_name = field_mapping_app_value %}
             <img
               src="/static/images/{{ app_name.lower() }}-logo.svg"
               alt="{{ app_name }}"
-              style="width: 32px; height: 32px; object-fit: contain"
+              class="ftm-app-logo ftm-app-logo--lg"
               onerror="this.style.display='none'"
             />
-            <span style="color: #333; font-size: 1.1em">{{ app_name }}</span>
+            <span class="ftm-detail-value">{{ app_name }}</span>
           </div>
         </div>
         {% endif %} {% if project.created_at %}
         <div>
-          <h4
-            style="
-              color: #666;
-              font-size: 0.9em;
-              margin-bottom: 5px;
-              font-weight: bold;
-            "
-          >
-            Created
-          </h4>
-          <p style="color: #333; font-size: 1.1em">
+          <h4 class="ftm-detail-label">Created</h4>
+          <p class="ftm-detail-value">
             {{ project.created_at.strftime('%Y-%m-%d %H:%M') if
             project.created_at else 'N/A' }}
           </p>
         </div>
         {% endif %} {% if project.updated_at %}
         <div>
-          <h4
-            style="
-              color: #666;
-              font-size: 0.9em;
-              margin-bottom: 5px;
-              font-weight: bold;
-            "
-          >
-            Last Updated
-          </h4>
-          <p style="color: #333; font-size: 1.1em">
+          <h4 class="ftm-detail-label">Last Updated</h4>
+          <p class="ftm-detail-value">
             {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if
             project.updated_at else 'N/A' }}
           </p>
@@ -150,18 +93,9 @@ block content %}
 
       <!-- Hashtags -->
       {% if project.hashtags %}
-      <div style="margin-bottom: 30px">
-        <h4
-          style="
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-            font-weight: bold;
-          "
-        >
-          Hashtags
-        </h4>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <div class="ftm-section">
+        <h4 class="ftm-detail-label">Hashtags</h4>
+        <div class="ftm-flex-wrap">
           {% for tag in project.hashtags %}
           <wa-badge variant="neutral">{{ tag }}</wa-badge>
           {% endfor %}
@@ -171,24 +105,8 @@ block content %}
 
       <!-- External Project Info -->
       {% if project.external_project_instance_url %}
-      <div
-        style="
-          margin-bottom: 30px;
-          padding: 15px;
-          background-color: #f5f5f5;
-          border-radius: 4px;
-        "
-      >
-        <h4
-          style="
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-            font-weight: bold;
-          "
-        >
-          External Project
-        </h4>
+      <div class="ftm-external-info">
+        <h4 class="ftm-detail-label">External Project</h4>
         <p style="color: #333; font-size: 0.9em">
           <strong>Instance:</strong> {{ project.external_project_instance_url
           }}<br />
@@ -200,10 +118,7 @@ block content %}
       {% endif %} {% include "partials/project_details/setup_steps.html" %}
     </div>
 
-    <div
-      slot="footer"
-      style="display: flex; gap: 10px; justify-content: flex-end"
-    >
+    <div slot="footer" class="ftm-flex-end">
       <wa-button href="/htmxprojects" variant="default"
         >Back to Projects</wa-button
       >
@@ -212,7 +127,7 @@ block content %}
   {% else %}
   <wa-card>
     <div style="padding: 40px; text-align: center">
-      <h2 style="color: #d63f3f">Project Not Found</h2>
+      <h2 class="ftm-section-title">Project Not Found</h2>
       <p style="color: #666; margin: 20px 0">
         The project you're looking for doesn't exist or you don't have
         permission to view it.

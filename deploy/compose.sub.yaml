@@ -53,9 +53,9 @@ services:
       - central_frontend:/var/www/html/${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}:ro
     environment:
       # General
-      BUNKERWEB_INSTANCES: proxy:5000
+      BUNKERWEB_INSTANCES: proxy
       LOG_LEVEL: notice
-      UI_WIZARD: no
+      USE_UI: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
       # Increase domain name max size (for long domain names)
@@ -164,7 +164,7 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
-      start_period: 60s
+      start_period: 30s
       interval: 10s
       timeout: 5s
       retries: 10

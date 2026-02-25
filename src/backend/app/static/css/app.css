@@ -1,0 +1,553 @@
+/* ============================================================
+   Field-TM — Shared Application Styles
+   ============================================================
+   Reusable utility classes used across all server-rendered
+   templates. Keeps templates thin and style changes centralized.
+
+   Naming convention:  .ftm-<component>[-modifier]
+   ============================================================ */
+
+/* --- Design tokens (custom properties) -------------------- */
+:root {
+  --ftm-brand: #d63f3f;
+  --ftm-text: #333;
+  --ftm-text-muted: #666;
+  --ftm-text-light: #888;
+  --ftm-border: #ddd;
+  --ftm-bg-success: #e8f5e9;
+  --ftm-bg-muted: #f9f9f9;
+  --ftm-bg-info: #e8f4f8;
+  --ftm-color-success: #4caf50;
+  --ftm-radius: 8px;
+  --ftm-radius-sm: 4px;
+}
+
+/* --- Page layouts ----------------------------------------- */
+.ftm-page {
+  padding: 20px;
+}
+
+.ftm-page--narrow {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ftm-page--wide {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Page header ------------------------------------------ */
+.ftm-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.ftm-page-title {
+  margin: 0;
+  font-size: 1.8em;
+  color: var(--ftm-text);
+}
+
+/* --- Card grid (project listing) -------------------------- */
+.ftm-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* --- Project card ----------------------------------------- */
+.ftm-project-card {
+  height: 100%;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  position: relative;
+}
+
+.ftm-project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ftm-project-card__id {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 0.75em;
+  color: var(--ftm-text-light);
+  font-weight: 600;
+  z-index: 10;
+}
+
+.ftm-project-card__header {
+  font-weight: bold;
+  font-size: 1.2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+}
+
+.ftm-project-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ftm-project-card__body {
+  padding: 10px 0;
+}
+
+.ftm-project-card__location {
+  margin: 8px 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.ftm-project-card__location-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ftm-project-card__description {
+  margin: 10px 0 8px 0;
+  color: var(--ftm-text-muted);
+  line-height: 1.5;
+  font-size: 0.95em;
+}
+
+.ftm-project-card__tags {
+  margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ftm-project-card__footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 0.85em;
+  color: var(--ftm-text-light);
+}
+
+.ftm-empty-state {
+  text-align: center;
+  color: var(--ftm-text-muted);
+  margin-top: 40px;
+}
+
+/* --- Detail page ------------------------------------------ */
+.ftm-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.ftm-detail-label {
+  color: var(--ftm-text-muted);
+  font-size: 0.9em;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.ftm-detail-value {
+  color: var(--ftm-text);
+  font-size: 1.1em;
+}
+
+.ftm-section-title {
+  color: var(--ftm-brand);
+  margin-bottom: 10px;
+}
+
+.ftm-section {
+  margin-bottom: 30px;
+}
+
+.ftm-external-info {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: var(--ftm-radius-sm);
+}
+
+/* --- Flex/layout utilities -------------------------------- */
+.ftm-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ftm-flex-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ftm-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ftm-flex-gap {
+  display: flex;
+  gap: 10px;
+}
+
+.ftm-flex-end {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* --- Form styles ------------------------------------------ */
+.ftm-form-group {
+  margin-bottom: 20px;
+}
+
+.ftm-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.ftm-form-required {
+  color: red;
+  display: inline;
+}
+
+.ftm-form-help {
+  display: block;
+  margin-top: 8px;
+  color: var(--ftm-text-muted);
+  font-size: 0.875em;
+}
+
+.ftm-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+  align-items: center;
+}
+
+.ftm-radio-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ftm-radio-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px;
+  border: 2px solid var(--ftm-border);
+  border-radius: var(--ftm-radius);
+  flex: 1;
+  min-width: 150px;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.ftm-radio-card:hover,
+.ftm-radio-card--selected {
+  border-color: #3388ff;
+  background-color: #f0f8ff;
+}
+
+.ftm-map-container {
+  width: 100%;
+  height: 400px;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
+  margin-top: 10px;
+}
+
+.ftm-map-actions {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ftm-checkbox-row {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ftm-checkbox-label {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ftm-text);
+  user-select: none;
+}
+
+.ftm-hashtags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 32px;
+}
+
+/* --- Setup steps ------------------------------------------ */
+.ftm-setup-header {
+  color: var(--ftm-brand);
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.ftm-step {
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: var(--ftm-radius);
+}
+
+.ftm-step--pending {
+  background-color: var(--ftm-bg-muted);
+  border-left: 4px solid var(--ftm-brand);
+}
+
+.ftm-step--complete {
+  background-color: var(--ftm-bg-success);
+  border-left: 4px solid var(--ftm-color-success);
+}
+
+.ftm-step__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.ftm-step__title {
+  color: var(--ftm-text);
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.ftm-step__check {
+  color: var(--ftm-color-success);
+  margin-left: 8px;
+}
+
+.ftm-step__description {
+  color: var(--ftm-text-muted);
+  margin-bottom: 15px;
+  font-size: 0.95em;
+}
+
+.ftm-step__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.ftm-step__success {
+  padding: 10px;
+  background-color: #fff;
+  border-radius: var(--ftm-radius-sm);
+  color: var(--ftm-color-success);
+  font-weight: 500;
+}
+
+.ftm-step__status {
+  margin-top: 10px;
+}
+
+/* --- Split form ------------------------------------------- */
+.ftm-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.ftm-split-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--ftm-text);
+}
+
+.ftm-split-select,
+.ftm-split-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
+}
+
+.ftm-split-submit {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* --- Form config ------------------------------------------ */
+.ftm-form-config {
+  display: none;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: var(--ftm-radius-sm);
+  border: 1px solid var(--ftm-border);
+}
+
+.ftm-form-config--visible {
+  display: block;
+}
+
+.ftm-config-note {
+  padding: 8px;
+  border-radius: var(--ftm-radius-sm);
+  font-size: 0.95em;
+  color: var(--ftm-text-muted);
+}
+
+.ftm-config-note--info {
+  background-color: var(--ftm-bg-info);
+}
+
+.ftm-config-note--muted {
+  background-color: #f0f0f0;
+}
+
+/* --- Published project ------------------------------------ */
+.ftm-published-header {
+  color: var(--ftm-color-success);
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.ftm-published-divider {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid #eee;
+}
+
+/* --- Loading / spinner ------------------------------------ */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ftm-spinner {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  animation: spin 1s linear infinite;
+}
+
+.ftm-spinner--lg {
+  width: 32px;
+  height: 32px;
+  color: var(--ftm-brand);
+}
+
+.ftm-loading {
+  display: none;
+  text-align: center;
+  padding: 20px;
+}
+
+.htmx-indicator {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.htmx-request .htmx-indicator {
+  opacity: 1;
+}
+
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}
+
+/* --- Credentials modal ------------------------------------ */
+.ftm-modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.ftm-modal-backdrop--visible {
+  display: flex;
+}
+
+.ftm-modal {
+  background: white;
+  padding: 30px;
+  border-radius: var(--ftm-radius);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.ftm-modal__title {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.ftm-modal__footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* --- App logo -------------------------------------------- */
+.ftm-app-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.ftm-app-logo--lg {
+  width: 32px;
+  height: 32px;
+}
+
+/* --- Private badge ---------------------------------------- */
+.ftm-private-icon {
+  color: var(--ftm-brand);
+  margin-left: 4px;
+}
+
+/* --- Link styles ----------------------------------------- */
+.ftm-link--brand {
+  color: var(--ftm-brand);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ftm-link--brand:hover {
+  text-decoration: underline;
+}

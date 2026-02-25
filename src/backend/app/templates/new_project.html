@@ -1,6 +1,6 @@
 {% extends "layout.html" %} {% block title %}Create Project - Field Tasking
 Manager{% endblock %} {% block content %}
-<div style="padding: 20px; max-width: 800px; margin: 0 auto">
+<div class="ftm-page ftm-page--narrow">
   <h1 style="margin-bottom: 30px">Create New Project</h1>
 
   <wa-card>
@@ -20,17 +20,9 @@ Manager{% endblock %} {% block content %}
         </div>
       </div>
 
-      <div style="margin-bottom: 20px">
-        <label
-          for="project_name_input"
-          style="
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            line-height: 1.5;
-          "
-        >
-          Project Name <span style="color: red; display: inline">*</span>
+      <div class="ftm-form-group">
+        <label for="project_name_input" class="ftm-form-label">
+          Project Name <span class="ftm-form-required">*</span>
         </label>
         <wa-input
           name="project_name"
@@ -41,17 +33,9 @@ Manager{% endblock %} {% block content %}
         <div id="project-name-error" style="margin-top: 8px"></div>
       </div>
 
-      <div style="margin-bottom: 20px">
-        <label
-          for="description_input"
-          style="
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            line-height: 1.5;
-          "
-        >
-          Description <span style="color: red; display: inline">*</span>
+      <div class="ftm-form-group">
+        <label for="description_input" class="ftm-form-label">
+          Description <span class="ftm-form-required">*</span>
         </label>
         <wa-textarea
           name="description"
@@ -63,29 +47,12 @@ Manager{% endblock %} {% block content %}
         <div id="description-error" style="margin-top: 8px"></div>
       </div>
 
-      <div style="margin-bottom: 20px">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold">
-          Field Mapping App <span style="color: red">*</span>
+      <div class="ftm-form-group">
+        <label class="ftm-form-label">
+          Field Mapping App <span class="ftm-form-required">*</span>
         </label>
-        <div
-          id="field-mapping-app-container"
-          style="display: flex; gap: 16px; flex-wrap: wrap"
-        >
-          <label
-            class="app-radio-label"
-            style="
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              cursor: pointer;
-              padding: 12px;
-              border: 2px solid #ddd;
-              border-radius: 8px;
-              flex: 1;
-              min-width: 150px;
-              transition: all 0.2s;
-            "
-          >
+        <div id="field-mapping-app-container" class="ftm-radio-group">
+          <label class="app-radio-label ftm-radio-card">
             <input
               type="radio"
               name="field_mapping_app"
@@ -96,26 +63,12 @@ Manager{% endblock %} {% block content %}
             <img
               src="/static/images/qfield-logo.svg"
               alt="QField"
-              style="width: 24px; height: 24px; object-fit: contain"
+              class="ftm-app-logo"
               onerror="this.style.display='none'"
             />
             <span style="font-weight: 500">QField</span>
           </label>
-          <label
-            class="app-radio-label"
-            style="
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              cursor: pointer;
-              padding: 12px;
-              border: 2px solid #ddd;
-              border-radius: 8px;
-              flex: 1;
-              min-width: 150px;
-              transition: all 0.2s;
-            "
-          >
+          <label class="app-radio-label ftm-radio-card">
             <input
               type="radio"
               name="field_mapping_app"
@@ -126,7 +79,7 @@ Manager{% endblock %} {% block content %}
             <img
               src="/static/images/odk-logo.svg"
               alt="ODK"
-              style="width: 24px; height: 24px; object-fit: contain"
+              class="ftm-app-logo"
               onerror="this.style.display='none'"
             />
             <span style="font-weight: 500">ODK</span>
@@ -134,13 +87,11 @@ Manager{% endblock %} {% block content %}
         </div>
       </div>
 
-      <div style="margin-bottom: 20px">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold">
-          Project Area <span style="color: red">*</span>
+      <div class="ftm-form-group">
+        <label class="ftm-form-label">
+          Project Area <span class="ftm-form-required">*</span>
         </label>
-        <div
-          style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap"
-        >
+        <div class="ftm-map-actions">
           <wa-button
             type="button"
             id="draw-polygon-btn"
@@ -172,45 +123,20 @@ Manager{% endblock %} {% block content %}
           accept=".geojson,.json"
           style="display: none"
         />
-        <div
-          style="
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          "
-        >
+        <div class="ftm-checkbox-row">
           <input
             type="checkbox"
             id="merge-geometries-checkbox"
             style="margin: 0; cursor: pointer"
           />
-          <label
-            for="merge-geometries-checkbox"
-            style="
-              cursor: pointer;
-              font-size: 14px;
-              color: #333;
-              user-select: none;
-            "
-          >
+          <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
             Merge geometries (use convex hull for multipolygons)
           </label>
         </div>
-        <div
-          id="map"
-          style="
-            width: 100%;
-            height: 400px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-top: 10px;
-          "
-        ></div>
+        <div id="map" class="ftm-map-container"></div>
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
-        <small style="display: block; margin-top: 8px; color: #666">
+        <small class="ftm-form-help">
           Draw a polygon on the map or upload a GeoJSON file to define your
           project area. Maximum project size is 1,000&nbsp;km². Areas over
           100&nbsp;km² will show a warning. The OSM data extract API is limited
@@ -223,34 +149,21 @@ Manager{% endblock %} {% block content %}
         ></textarea>
       </div>
 
-      <div style="margin-bottom: 20px">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold">
-          Hashtags
-        </label>
+      <div class="ftm-form-group">
+        <label class="ftm-form-label">Hashtags</label>
         <wa-input
           id="hashtag-input"
           placeholder="Type hashtags and press Enter or comma"
           style="width: 100%"
         ></wa-input>
-        <div
-          id="hashtags-container"
-          style="
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-            min-height: 32px;
-          "
-        ></div>
-        <small style="display: block; margin-top: 4px; color: #666">
+        <div id="hashtags-container" class="ftm-hashtags-container"></div>
+        <small class="ftm-form-help">
           Type hashtags and press Enter or comma to add them. Click the × on a
           tag to remove it.
         </small>
       </div>
 
-      <div
-        style="display: flex; gap: 10px; margin-top: 30px; align-items: center"
-      >
+      <div class="ftm-form-actions">
         <wa-button type="submit" variant="primary" id="submit-btn">
           Create Project
         </wa-button>
@@ -451,10 +364,12 @@ Manager{% endblock %} {% block content %}
       drawnLayers.clearLayers();
       drawnLayers.addLayer(layer);
       updateGeoJSON();
+      validateAndShowAreaInfo();
     });
 
     map.on(L.Draw.Event.EDITED, function (e) {
       updateGeoJSON();
+      validateAndShowAreaInfo();
     });
 
     map.on(L.Draw.Event.DELETED, function (e) {
@@ -475,6 +390,60 @@ Manager{% endblock %} {% block content %}
       outlineTextarea.value = JSON.stringify(outline, null, 2);
     } else {
       outlineTextarea.value = "";
+      showAreaInfo(null);
+    }
+  }
+
+  async function validateAndShowAreaInfo() {
+    const outlineTextarea = document.getElementById("outline-geojson");
+    const outlineValue = outlineTextarea.value.trim();
+    const mapError = document.getElementById("map-error");
+
+    if (!outlineValue) {
+      showAreaInfo(null);
+      return;
+    }
+
+    try {
+      const geojsonData = JSON.parse(outlineValue);
+      const mergeCheckbox = document.getElementById(
+        "merge-geometries-checkbox",
+      );
+      const mergeGeometries = mergeCheckbox ? mergeCheckbox.checked : false;
+
+      const response = await fetch("/validate-geojson", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          geojson: geojsonData,
+          merge_geometries: mergeGeometries,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMsg = result.error || "Invalid geometry";
+        if (mapError) {
+          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+        }
+        showAreaInfo(null);
+        return;
+      }
+
+      // Update textarea with normalized/validated geometry
+      if (result.geojson) {
+        outlineTextarea.value = JSON.stringify(result.geojson, null, 2);
+      }
+
+      showAreaInfo(result.area_km2, result.warning);
+
+      // Clear any previous map errors on success
+      if (mapError) {
+        mapError.innerHTML = "";
+      }
+    } catch (err) {
+      console.error("Error validating drawn geometry:", err);
     }
   }
 
@@ -726,13 +695,15 @@ Manager{% endblock %} {% block content %}
       }
     }
 
-    // Handle 400 (missing outline)
+    // Handle 400 (map/area-related errors)
     if (status === 400) {
       const responseText = xhr.responseText;
       if (
         responseText.includes("AOI") ||
         responseText.includes("Area of Interest") ||
-        responseText.includes("outline")
+        responseText.includes("outline") ||
+        responseText.includes("Project area") ||
+        responseText.includes("too large")
       ) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(responseText, "text/html");
@@ -779,27 +750,10 @@ Manager{% endblock %} {% block content %}
     // Update styling on change
     radio.addEventListener("change", function () {
       appRadioLabels.forEach((l) => {
-        l.style.borderColor = "#ddd";
-        l.style.backgroundColor = "transparent";
+        l.classList.remove("ftm-radio-card--selected");
       });
       if (this.checked) {
-        label.style.borderColor = "#3388ff";
-        label.style.backgroundColor = "#f0f8ff";
-      }
-    });
-
-    // Hover effects
-    label.addEventListener("mouseenter", function () {
-      if (!radio.checked) {
-        this.style.borderColor = "#3388ff";
-        this.style.backgroundColor = "#f0f8ff";
-      }
-    });
-
-    label.addEventListener("mouseleave", function () {
-      if (!radio.checked) {
-        this.style.borderColor = "#ddd";
-        this.style.backgroundColor = "transparent";
+        label.classList.add("ftm-radio-card--selected");
       }
     });
   });

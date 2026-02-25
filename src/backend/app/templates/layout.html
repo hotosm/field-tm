@@ -45,7 +45,15 @@
       src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.4.0/dist/hotosm-ui.js"
     ></script>
 
+    <!-- App styles -->
+    <link rel="stylesheet" href="/static/css/app.css" />
+
     <!-- HTMX -->
+    <!-- Config required to swap 4xx server responses, so error messages are displayed in UI -->
+    <meta
+      name="htmx-config"
+      content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}'
+    />
     <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
 
     <!-- Maps - Leaflet -->
