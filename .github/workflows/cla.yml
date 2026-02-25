@@ -29,7 +29,7 @@ jobs:
           # Allowlist for bot accounts (won't need to sign CLA)
           allowlist: "bot*,*[bot],renovate*,github-actions*"
           # The message signers must type and submit
-          custom-pr-sign-comment: "I have read the CONTRIBUTION.md document and I hereby sign and agree with the guidelines"
+          custom-pr-sign-comment: "I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines"
           # Lock PR while waiting for CLA signature
           lock-pullrequest-aftermerge: false
           # Use issues to store signatures (alternative to branch storage)
@@ -40,7 +40,7 @@ jobs:
 
             Thank you for your contribution!
 
-            Before we can accept your pull request, you need to sign our [Contribution Policy](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTION.md).
+            Before we can accept your pull request, you need to sign our [Contribution Policy](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md).
 
             ### Why do I need to do this?
 
@@ -53,7 +53,7 @@ jobs:
             To sign the agreement, please comment on this PR with:
 
             ```
-            I have read the CONTRIBUTION.md document and I hereby sign and agree with the guidelines
+            I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines
             ```
 
             ---
