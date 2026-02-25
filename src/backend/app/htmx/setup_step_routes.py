@@ -39,11 +39,15 @@ from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.database import db_conn
 from app.db.models import DbProject
-from app.helpers.geometry_utils import check_crs
+from app.helpers.geometry_utils import (
+    AREA_LIMIT_KM2,
+    AREA_WARN_KM2,
+    check_crs,
+    geojson_area_km2,
+)
 from app.htmx.map_helpers import render_leaflet_map
 from app.projects import project_crud, project_schemas
 from app.projects.project_services import (
-    ConflictError,
     ODKFinalizeResult,
     ServiceError,
     download_osm_data,
@@ -1542,8 +1546,35 @@ async def validate_geojson(
             else merged_featcol
         )
 
+        # Calculate area and include size feedback
+        response_body: dict = {"geojson": result_geojson}
+        try:
+            geom = result_geojson
+            if geom.get("type") == "Feature":
+                geom = geom.get("geometry", geom)
+            elif geom.get("type") == "FeatureCollection":
+                features = geom.get("features", [])
+                if features:
+                    geom = features[0].get("geometry", features[0])
+            area_km2 = geojson_area_km2(geom)
+            response_body["area_km2"] = round(area_km2, 2)
+            if area_km2 > AREA_LIMIT_KM2:
+                response_body["warning"] = (
+                    f"Area is {area_km2:,.0f} km², which exceeds the "
+                    f"{AREA_LIMIT_KM2:,} km² limit. "
+                    "Please select a smaller area."
+                )
+            elif area_km2 > AREA_WARN_KM2:
+                response_body["warning"] = (
+                    f"Area is {area_km2:,.0f} km². Large areas "
+                    f"(>{AREA_WARN_KM2} km²) may take longer to process. "
+                    f"The data extract API is limited to 200 km²."
+                )
+        except Exception as e:
+            log.warning(f"Could not calculate area: {e}")
+
         return Response(
-            content=json.dumps({"geojson": result_geojson}),
+            content=json.dumps(response_body),
             media_type="application/json",
             status_code=200,
         )

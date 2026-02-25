@@ -23,6 +23,7 @@ from typing import Optional, Union
 import geojson
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
+from pyproj import Geod
 from shapely.geometry import (
     Point,
     mapping,
@@ -30,6 +31,21 @@ from shapely.geometry import (
 )
 
 log = logging.getLogger(__name__)
+
+# Project area limits (km²)
+AREA_WARN_KM2 = 100
+AREA_LIMIT_KM2 = 1000
+
+
+def geojson_area_km2(geojson_geom: dict) -> float:
+    """Calculate the geodesic area of a GeoJSON geometry in km².
+
+    Uses the WGS84 ellipsoid for accurate results regardless of location.
+    """
+    geom = shape(geojson_geom)
+    geod = Geod(ellps="WGS84")
+    area_m2 = abs(geod.geometry_area_perimeter(geom)[0])
+    return area_m2 / 1_000_000
 
 
 async def polygon_to_centroid(

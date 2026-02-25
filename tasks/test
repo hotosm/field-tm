@@ -34,6 +34,11 @@ backend:
   docker compose -f compose.test.yaml run --rm api pytest
   docker compose -f compose.test.yaml down
 
+# Cleanup orphan backend tests
+[no-cd]
+backend-cleanup:
+    docker compose -f compose.test.yaml down --remove-orphans
+
 # Test backend API only
 [no-cd]
 api:

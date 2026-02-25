@@ -45,8 +45,10 @@ from app.db.enums import ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
 from app.helpers.geometry_utils import (
+    AREA_LIMIT_KM2,
     check_crs,
     featcol_keep_single_geom_type,
+    geojson_area_km2,
     polygon_to_centroid,
 )
 from app.projects import project_crud, project_deps, project_schemas
@@ -164,9 +166,25 @@ async def create_project_stub(
     )
 
     # Remove merge field as it is not in database
+    # TODO check this is still needed?
     if hasattr(project_data, "merge"):
         delattr(project_data, "merge")
     project_data.status = ProjectStatus.DRAFT
+
+    # Check project area size (outline is already parsed by geojson-aoi-parser)
+    try:
+        outline_dict = project_data.outline.model_dump()
+        area_km2 = geojson_area_km2(outline_dict)
+        if area_km2 > AREA_LIMIT_KM2:
+            raise ValidationError(
+                f"Project area is too large ({area_km2:,.0f} km²). "
+                f"The maximum allowed size is {AREA_LIMIT_KM2:,} km². "
+                "Please select a smaller area."
+            )
+    except ValidationError:
+        raise
+    except Exception as e:
+        log.warning(f"Could not calculate area for size check: {e}")
 
     # Get the location_str via reverse geocode
     try:

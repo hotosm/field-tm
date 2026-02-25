@@ -141,6 +141,7 @@ endblock %} {% block extra_head %}
 
   .landing-about,
   .landing-features,
+  .landing-users,
   .landing-use-cases,
   .landing-resources {
     margin-bottom: 68px;
@@ -200,6 +201,68 @@ endblock %} {% block extra_head %}
     margin: 0;
     color: #5a6f83;
     line-height: 1.6;
+  }
+
+  .landing-users-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .landing-user-card {
+    border-radius: 18px;
+    border: 1px solid #d9e4ef;
+    background-color: #ffffff;
+    box-shadow: 0 12px 26px rgba(16, 39, 67, 0.08);
+    padding: 30px 26px;
+  }
+
+  .landing-user-role {
+    display: inline-block;
+    margin: 0 0 10px 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .landing-user-role--manager {
+    background-color: #fce8e8;
+    color: #a92727;
+  }
+
+  .landing-user-role--mapper {
+    background-color: #e6f0fb;
+    color: #1b5fa0;
+  }
+
+  .landing-user-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.22rem;
+    color: var(--landing-text);
+  }
+
+  .landing-user-card p {
+    margin: 0 0 10px 0;
+    color: var(--landing-muted);
+    line-height: 1.65;
+  }
+
+  .landing-user-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .landing-user-steps {
+    margin: 6px 0 0 0;
+    padding: 0 0 0 20px;
+    color: var(--landing-muted);
+    line-height: 1.7;
+  }
+
+  .landing-user-steps li {
+    margin-bottom: 4px;
   }
 
   .landing-use-cases-content {
@@ -378,7 +441,8 @@ endblock %} {% block extra_head %}
     .landing-about,
     .landing-use-cases-content,
     .landing-resources-grid,
-    .landing-features-grid {
+    .landing-features-grid,
+    .landing-users-grid {
       grid-template-columns: 1fr;
     }
 
@@ -403,6 +467,7 @@ endblock %} {% block extra_head %}
 
     .landing-about,
     .landing-features,
+    .landing-users,
     .landing-use-cases,
     .landing-resources {
       margin-bottom: 52px;
@@ -417,6 +482,7 @@ endblock %} {% block extra_head %}
     .landing-hero-content,
     .landing-about,
     .landing-features,
+    .landing-users,
     .landing-use-cases,
     .landing-resources,
     .landing-resource-card {
@@ -509,6 +575,46 @@ endblock %} {% block extra_head %}
     </div>
   </section>
 
+  <section class="landing-shell landing-users">
+    <h2 class="landing-section-title">Who is it for?</h2>
+    <div class="landing-users-grid">
+      <article class="landing-user-card">
+        <span class="landing-user-role landing-user-role--manager"
+          >Project Manager</span
+        >
+        <h3>Create and coordinate field campaigns</h3>
+        <p>
+          Project managers use Field-TM to set up mapping projects, define areas
+          of interest, design survey forms, and split work into manageable
+          tasks.
+        </p>
+        <ol class="landing-user-steps">
+          <li>Define a project area and upload or choose a survey form</li>
+          <li>Split the area into tasks and generate a data extract</li>
+          <li>Publish the project to ODK Central or QFieldCloud</li>
+          <li>Share a QR code so mappers can start collecting data</li>
+        </ol>
+      </article>
+      <article class="landing-user-card">
+        <span class="landing-user-role landing-user-role--mapper"
+          >Field Mapper</span
+        >
+        <h3>Collect data in the field with your phone</h3>
+        <p>
+          Mappers do not need to log in to Field-TM. Once a project manager
+          publishes a project, mappers access it directly in their mobile app of
+          choice.
+        </p>
+        <ol class="landing-user-steps">
+          <li>Scan the QR code shared by your project manager</li>
+          <li>The project loads automatically in ODK Collect or QField</li>
+          <li>Navigate to your assigned task area and collect data</li>
+          <li>Submit your survey, which goes straight to the server</li>
+        </ol>
+      </article>
+    </div>
+  </section>
+
   <section class="landing-shell landing-use-cases">
     <h2 class="landing-section-title">Field-TM Use Cases</h2>
     <div class="landing-use-cases-content">
@@ -595,12 +701,18 @@ endblock %} {% block extra_head %}
       </div>
       <div class="landing-footer-bottom">
         <div class="landing-footer-help">
-          Want any assistance?<br />
+          Need assistance?<br />
           Email:
           <a href="mailto:tech-data@hotosm.org">tech-data@hotosm.org</a>
         </div>
         <div class="landing-footer-social">
-          <a href="https://x.com/hotosm" target="_blank" rel="noopener">X</a>
+          <a
+            href="https://bsky.app/profile/hotosm.org"
+            target="_blank"
+            rel="noopener"
+          >
+            Bluesky
+          </a>
           <a
             href="https://www.linkedin.com/company/humanitarian-openstreetmap-team"
             target="_blank"
