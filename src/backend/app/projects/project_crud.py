@@ -277,6 +277,7 @@ async def generate_odk_central_project_content(
 async def generate_project_files(
     db: AsyncConnection,
     project_id: int,
+    odk_credentials: Optional[central_schemas.ODKCentral] = None,
 ) -> bool:
     """Generate the files for a project.
 
@@ -284,8 +285,8 @@ async def generate_project_files(
 
     Args:
         project_id(int): id of the Field-TM project.
-        background_task_id (uuid): the task_id of the background task.
         db (Connection): The database connection, newly generated.
+        odk_credentials: Optional custom ODK credentials (None uses env vars).
 
     Returns:
         bool: True if success.
@@ -325,9 +326,7 @@ async def generate_project_files(
                 and project.external_project_id
             ):
                 try:
-                    # ODK creds not stored on project, use None
-                    # to fall back to env vars
-                    project_odk_creds = None
+                    project_odk_creds = odk_credentials
                     async with central_deps.get_odk_dataset(
                         project_odk_creds
                     ) as odk_central:
@@ -448,8 +447,7 @@ async def generate_project_files(
         # Reset BytesIO for use in generate_odk_central_project_content
         xlsform_bytes.seek(0)
 
-        # ODK credentials not stored on project, use None to fall back to env vars
-        project_odk_creds = None
+        project_odk_creds = odk_credentials
 
         odk_token = await generate_odk_central_project_content(
             project_odk_id,

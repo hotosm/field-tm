@@ -237,6 +237,7 @@ class Settings(BaseSettings):
 
     # ODK
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
+    ODK_CENTRAL_PUBLIC_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
     ODK_CENTRAL_PASSWD: Optional[SecretStr] = ""
 

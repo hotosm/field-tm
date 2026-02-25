@@ -104,6 +104,39 @@ class ODKFinalizeResult:
     manager_password: str
 
 
+def _first_outline_feature(outline: Optional[dict]) -> Optional[dict]:
+    """Normalize a project outline to a single GeoJSON Feature."""
+    if not outline or not isinstance(outline, dict):
+        return None
+
+    outline_type = str(outline.get("type", "")).strip()
+    if outline_type == "FeatureCollection":
+        features = outline.get("features", [])
+        if isinstance(features, list) and features:
+            first_feature = features[0]
+            if isinstance(first_feature, dict):
+                return first_feature
+        return None
+
+    if outline_type == "Feature":
+        return outline
+
+    # Stored project outlines are typically geometry objects from PostGIS.
+    if "coordinates" in outline:
+        return {"type": "Feature", "geometry": outline, "properties": {}}
+
+    return None
+
+
+def _resolve_odk_public_url(custom_odk_creds: Optional[ODKCentral]) -> str:
+    """Resolve public ODK base URL used for UI links and persisted instance URL."""
+    if custom_odk_creds and custom_odk_creds.external_project_instance_url:
+        return custom_odk_creds.external_project_instance_url.rstrip("/")
+    return str(
+        settings.ODK_CENTRAL_PUBLIC_URL or settings.ODK_CENTRAL_URL or ""
+    ).rstrip("/")
+
+
 # ============================================================================
 # Service functions
 # ============================================================================
@@ -670,11 +703,7 @@ async def finalize_odk_project(
         )
 
     # Persist the ODK base URL
-    odk_instance_url = (
-        custom_odk_creds.external_project_instance_url
-        if custom_odk_creds
-        else str(settings.ODK_CENTRAL_URL or "")
-    )
+    odk_instance_url = _resolve_odk_public_url(custom_odk_creds)
     if odk_instance_url and odk_instance_url != (
         project.external_project_instance_url or ""
     ):
@@ -754,9 +783,8 @@ async def finalize_odk_project(
         log.info(
             "No task areas found, creating single task entity from project outline"
         )
-        outline_geojson = project.outline_geojson
-        if outline_geojson and outline_geojson.get("features"):
-            outline_feature = outline_geojson["features"][0]
+        outline_feature = _first_outline_feature(project.outline)
+        if outline_feature and outline_feature.get("geometry"):
             entity_dict = await central_crud.feature_geojson_to_entity_dict(
                 outline_feature, additional_features=True
             )
@@ -770,6 +798,11 @@ async def finalize_odk_project(
                 "stroke-width": "3",
             }
             task_entities.append(entity_dict)
+        else:
+            raise ValidationError(
+                "Project outline is missing or invalid. "
+                "Cannot create fallback task for ODK finalization."
+            )
 
     if task_entities:
         try:
@@ -807,25 +840,15 @@ async def finalize_odk_project(
 
     # Step 5: Generate project files (appusers, QR codes, etc.)
     log.info(f"Generating project files for project {project_id}")
-    success = await project_crud.generate_project_files(db, project_id)
+    success = await project_crud.generate_project_files(
+        db, project_id, odk_credentials=custom_odk_creds
+    )
 
     if not success:
         raise ServiceError("Failed to generate project files. Please contact support.")
 
-    # Update project status to PUBLISHED
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
-    )
-    await db.commit()
-
     # Build ODK project URL
-    if custom_odk_creds:
-        base_url = custom_odk_creds.external_project_instance_url.rstrip("/")
-    else:
-        base_url = settings.ODK_CENTRAL_URL.rstrip("/")
-    odk_url = f"{base_url}/#/projects/{project_odk_id}"
+    odk_url = f"{_resolve_odk_public_url(custom_odk_creds)}/#/projects/{project_odk_id}"
 
     try:
         (
@@ -837,9 +860,18 @@ async def finalize_odk_project(
             odk_credentials=custom_odk_creds,
         )
     except Exception as e:
+        manager_error = getattr(e, "detail", str(e))
         raise ServiceError(
-            f"Project created in ODK, but failed to create manager user: {e}"
+            f"Failed to create ODK Central manager user. {manager_error}"
         ) from e
+
+    # Update project status to PUBLISHED only after manager account exists.
+    await DbProject.update(
+        db,
+        project_id,
+        project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+    )
+    await db.commit()
 
     return ODKFinalizeResult(
         odk_url=odk_url,

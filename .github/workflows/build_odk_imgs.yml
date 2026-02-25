@@ -20,7 +20,7 @@ jobs:
         "ghcr.io/${{ github.repository }}/odkcentral:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=v2025.2.0
+        ODK_CENTRAL_TAG=v2025.4.2
       multi_arch: true
 
   build-odkcentral-ui:
@@ -31,7 +31,7 @@ jobs:
         "ghcr.io/${{ github.repository }}/odkcentral-ui:v2025.2.1"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"
       extra_build_args: |
-        ODK_CENTRAL_TAG=v2025.2.0
+        ODK_CENTRAL_TAG=v2025.4.2
       multi_arch: true
       # Allow usage of ADD directive in this specific use case
       skip_cve: "CKV_DOCKER_8,CKV_DOCKER_2,CKV_DOCKER_3,CKV_DOCKER_5,CKV_DOCKER_4"

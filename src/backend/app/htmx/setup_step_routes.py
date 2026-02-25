@@ -62,30 +62,21 @@ from app.projects.project_services import (
 )
 from app.qfield.qfield_schemas import QFieldCloud
 
+from .htmx_helpers import callout as _callout
+
 log = logging.getLogger(__name__)
 
 
-def _callout(variant: str, msg: str) -> str:
-    """Build a wa-callout HTML snippet."""
-    return f'<wa-callout variant="{variant}"><span>{msg}</span></wa-callout>'
-
-
-def _build_odk_finalize_success_html(
-    result: ODKFinalizeResult,
-    qr_code_data_url: str,
-) -> str:
+def _build_odk_finalize_success_html(result: ODKFinalizeResult) -> str:
     """Build success markup returned by HTMX ODK finalize."""
     box_style = (
         "margin-top: 12px; padding: 16px;"
         " background-color: #f5f5f5; border-radius: 8px;"
     )
     link_style = "color: #d63f3f; text-decoration: none; font-weight: 600;"
-    img_box = (
-        "display: inline-block; background-color: white;"
-        " padding: 10px; border-radius: 6px;"
-    )
     usr = result.manager_username
     pwd = result.manager_password
+
     return f"""
     <wa-callout variant="success">
       <span>Project created in ODK Central.</span>
@@ -107,22 +98,8 @@ def _build_odk_finalize_success_html(
         <strong>Password:</strong> <code>{pwd}</code>
       </p>
       <p style="margin: 8px 0 0 0; color: #666;">
-        Save these credentials now. Only shown once.
+        Save these credentials now. They will only be shown once.
       </p>
-    </div>
-    <div style="{box_style}">
-      <h4 style="margin: 0 0 10px 0;">
-        ODK Collect App User Access
-      </h4>
-      <p style="margin: 0 0 10px 0; color: #666;">
-        Scan this QR code in ODK Collect.
-      </p>
-      <div style="{img_box}">
-        <img src="{qr_code_data_url}"
-             alt="ODK Collect QR Code"
-             style="max-width: 260px; height: auto;"
-        />
-      </div>
     </div>
     <div style="margin-top: 12px;">
       <wa-button type="button" variant="default"
@@ -604,25 +581,12 @@ async def submit_geojson_data_extract_htmx(
                 status_code=404,
             )
 
-        # Get project for validation
-        project = await DbProject.one(db, project_id)
-
-        # Validate that we have features
-        features = geojson_data.get("features", [])
-        if not features:
-            return Response(
-                content=_callout("warning", "GeoJSON data contains no features."),
-                media_type="text/html",
-                status_code=400,
-            )
-
-        # Save GeoJSON to database (entity list creation deferred to final step)
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
+        # Delegate to shared service function (used by both HTMX and API routes)
+        await save_data_extract(
+            db=db,
+            project_id=project_id,
+            geojson_data=geojson_data,
         )
-        await db.commit()
         log.info(
             f"Saved data extract to database for project {project_id} "
             "(entity list creation deferred to final step)"
@@ -643,9 +607,21 @@ async def submit_geojson_data_extract_htmx(
             headers={"HX-Refresh": "true"},
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=_callout("danger", e.message),
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=_callout("danger", e.message),
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(
-            f"Error submitting GeoJSON data extract to ODK/QField via HTMX: {e}",
+            f"Error submitting GeoJSON data extract via HTMX: {e}",
             exc_info=True,
         )
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1374,10 +1350,9 @@ async def create_project_odk_htmx(
         odk_result = await finalize_odk_project(
             db=db, project_id=project_id, custom_odk_creds=custom_odk_creds
         )
-        qr_code_data_url = await project_crud.get_project_qrcode(db, project_id)
 
         return Response(
-            content=_build_odk_finalize_success_html(odk_result, qr_code_data_url),
+            content=_build_odk_finalize_success_html(odk_result),
             media_type="text/html",
             status_code=200,
         )

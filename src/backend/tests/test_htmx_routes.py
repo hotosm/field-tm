@@ -1,9 +1,12 @@
 """Tests for HTMX routes."""
 
+import json
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from litestar import status_codes as status
 
+from app.htmx.project_create_routes import _parse_outline_payload
 from app.htmx.setup_step_routes import _build_odk_finalize_success_html
 from app.projects.project_services import ODKFinalizeResult
 
@@ -76,19 +79,85 @@ async def test_static_image_rejects_unsupported_extension(client):
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_build_odk_finalize_success_html_includes_manager_and_qr():
-    """Test ODK finalize response includes manager credentials and QR markup."""
+def test_build_odk_finalize_success_html_includes_manager_credentials():
+    """Test ODK finalize response includes manager credentials."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
         manager_username="fmtm-manager@example.org",
         manager_password="StrongPass123!",
     )
-    qr_data = "data:image/png;base64,mocked_qr"
 
-    html = _build_odk_finalize_success_html(result, qr_data)
+    html = _build_odk_finalize_success_html(result)
 
     assert "Manager Access (ODK Central UI)" in html
     assert "fmtm-manager@example.org" in html
     assert "StrongPass123!" in html
-    assert "ODK Collect App User Access" in html
-    assert qr_data in html
+    assert "Save these credentials now. Only shown once." in html
+
+
+def test_build_odk_finalize_success_html_does_not_render_qr_markup():
+    """Finalize response should not include mapper QR code markup."""
+    result = ODKFinalizeResult(
+        odk_url="https://central.example.org/#/projects/17",
+        manager_username="fmtm-manager@example.org",
+        manager_password="StrongPass123!",
+    )
+
+    html = _build_odk_finalize_success_html(result)
+    html_normalized = " ".join(html.split())
+
+    assert "ODK Collect App User Access" not in html_normalized
+    assert "Project QR Code" not in html_normalized
+    assert "project details page" in html_normalized
+
+
+def test_parse_outline_payload_accepts_feature_json_string():
+    """Parse a drawn-map style single Feature JSON string."""
+    outline = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.317028828, 27.7052522097],
+                    [85.317028828, 27.7041424888],
+                    [85.318844411, 27.7041424888],
+                    [85.318844411, 27.7052522097],
+                    [85.317028828, 27.7052522097],
+                ]
+            ],
+        },
+    }
+
+    parsed = _parse_outline_payload(json.dumps(outline))
+    assert parsed == outline
+
+
+def test_parse_outline_payload_accepts_single_item_list_wrapper():
+    """Parse list-wrapped form values from URL-encoded body parsers."""
+    outline = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.317028828, 27.7052522097],
+                    [85.317028828, 27.7041424888],
+                    [85.318844411, 27.7041424888],
+                    [85.318844411, 27.7052522097],
+                    [85.317028828, 27.7052522097],
+                ]
+            ],
+        },
+    }
+
+    parsed = _parse_outline_payload([json.dumps(outline)])
+    assert parsed == outline
+
+
+def test_parse_outline_payload_rejects_invalid_json():
+    """Reject invalid outline strings with a clear validation error."""
+    with pytest.raises(ValueError, match="Project area must be valid JSON"):
+        _parse_outline_payload("not-valid-geojson")

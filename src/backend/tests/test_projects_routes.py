@@ -21,12 +21,14 @@ import json
 import logging
 import os
 from contextlib import asynccontextmanager
-from unittest.mock import Mock, patch
+from io import BytesIO
+from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
 import pytest
 
 from app.central.central_crud import create_odk_project
+from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.helpers.geometry_utils import check_crs
 
@@ -275,6 +277,173 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     assert callable(captured.get("func"))
     assert result["type"] == "FeatureCollection"
     assert len(result["features"]) == 1
+
+
+async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
+    monkeypatch,
+):
+    """Finalize should create fallback task from DbProject.outline geometry."""
+    from app.projects import project_services
+
+    project = Mock(
+        id=1,
+        project_name="Test Project",
+        xlsform_content=b"xlsform-bytes",
+        data_extract_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [85.30, 27.71],
+                                [85.30, 27.70],
+                                [85.31, 27.70],
+                                [85.31, 27.71],
+                                [85.30, 27.71],
+                            ]
+                        ],
+                    },
+                    "properties": {"osm_id": 1},
+                }
+            ],
+        },
+        task_areas_geojson=None,
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.40, 27.81],
+                    [85.40, 27.80],
+                    [85.41, 27.80],
+                    [85.41, 27.81],
+                    [85.40, 27.81],
+                ]
+            ],
+        },
+        external_project_id=17,
+        external_project_instance_url="https://central.example.org",
+    )
+
+    async def fake_project_one(_db, _project_id):
+        return project
+
+    fake_update = AsyncMock(return_value=project)
+    fake_commit = AsyncMock()
+    created_datasets: list[dict] = []
+    captured_outline_feature: dict = {}
+
+    async def fake_task_geojson_dict_to_entity_values(
+        _geojson, additional_features=True
+    ):
+        return [{"label": "Feature 1", "data": {"geometry": "g"}}]
+
+    async def fake_feature_geojson_to_entity_dict(feature, additional_features=True):
+        captured_outline_feature["value"] = feature
+        return {"label": "Outline Task", "data": {"geometry": "outline-geom"}}
+
+    async def fake_create_entity_list(
+        _odk_creds,
+        _odk_id,
+        properties,
+        dataset_name,
+        entities_list,
+    ):
+        created_datasets.append(
+            {
+                "dataset_name": dataset_name,
+                "properties": properties,
+                "entities_list": entities_list,
+            }
+        )
+
+    async def fake_read_and_test_xform(_xlsform_bytes):
+        return BytesIO(b"<xml></xml>")
+
+    async def fake_create_odk_xform(*_args, **_kwargs):
+        return None
+
+    async def fake_generate_project_files(_db, _project_id):
+        return True
+
+    async def fake_create_project_manager_user(**_kwargs):
+        return ("fmtm-manager-17@example.org", "StrongPass123")
+
+    class FakeDatasetClient:
+        async def listDatasets(self, _project_odk_id):
+            return []
+
+    @asynccontextmanager
+    async def fake_get_odk_dataset(_creds):
+        yield FakeDatasetClient()
+
+    db = Mock()
+    db.commit = fake_commit
+
+    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(project_services.DbProject, "update", fake_update)
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "task_geojson_dict_to_entity_values",
+        fake_task_geojson_dict_to_entity_values,
+    )
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "feature_geojson_to_entity_dict",
+        fake_feature_geojson_to_entity_dict,
+    )
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "create_entity_list",
+        fake_create_entity_list,
+    )
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "read_and_test_xform",
+        fake_read_and_test_xform,
+    )
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "create_odk_xform",
+        fake_create_odk_xform,
+    )
+    monkeypatch.setattr(
+        project_services.central_crud,
+        "create_project_manager_user",
+        fake_create_project_manager_user,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_project_files",
+        fake_generate_project_files,
+    )
+    monkeypatch.setattr(
+        project_services.central_deps,
+        "get_odk_dataset",
+        fake_get_odk_dataset,
+    )
+
+    result = await project_services.finalize_odk_project(
+        db=db,
+        project_id=1,
+        custom_odk_creds=ODKCentral(
+            external_project_instance_url="https://central.example.org",
+            external_project_username="admin@example.org",
+            external_project_password="password",
+        ),
+    )
+
+    assert captured_outline_feature["value"]["type"] == "Feature"
+    assert captured_outline_feature["value"]["geometry"] == project.outline
+
+    tasks_dataset = next(ds for ds in created_datasets if ds["dataset_name"] == "tasks")
+    assert tasks_dataset["entities_list"][0]["label"] == "Task 1"
+
+    assert result.odk_url == "https://central.example.org/#/projects/17"
+    assert result.manager_username == "fmtm-manager-17@example.org"
+    assert result.manager_password == "StrongPass123"
 
 
 async def test_delete_project(client, admin_user, project):

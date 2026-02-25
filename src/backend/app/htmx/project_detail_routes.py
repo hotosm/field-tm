@@ -32,12 +32,9 @@ from app.db.database import db_conn
 from app.db.models import DbProject
 from app.projects import project_crud
 
+from .htmx_helpers import callout as _callout
+
 log = logging.getLogger(__name__)
-
-
-def _callout(variant: str, msg: str) -> str:
-    """Build a wa-callout HTML snippet."""
-    return f'<wa-callout variant="{variant}"><span>{msg}</span></wa-callout>'
 
 
 @get(

@@ -38,28 +38,91 @@ from psycopg.rows import dict_row
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import mapper
-from app.central import central_crud
 from app.central.central_routes import _validate_xlsform_extension
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
-from app.db.models import DbProject
 from app.htmx.htmx_schemas import XLSFormUploadData
-from app.projects.project_schemas import ProjectUpdate
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
     create_project_stub,
+    process_xlsform,
 )
 from app.projects.project_services import (
     ValidationError as SvcValidationError,
 )
 
+from .htmx_helpers import callout as _callout
+
 log = logging.getLogger(__name__)
 
 
-def _callout(variant: str, msg: str) -> str:
-    """Build a wa-callout HTML snippet."""
-    return f'<wa-callout variant="{variant}"><span>{msg}</span></wa-callout>'
+_OUTLINE_JSON_ERROR = (
+    "Project area must be valid JSON "
+    "(GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection)."
+)
+
+
+def _first_form_value(value: object) -> str:
+    """Normalize URL-encoded form values to a stripped string."""
+    while isinstance(value, (list, tuple)):
+        if not value:
+            return ""
+        value = next((item for item in value if item not in (None, "")), value[0])
+
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="ignore")
+
+    return str(value or "").strip()
+
+
+def _parse_outline_payload(raw_value: object) -> dict:
+    """Parse and normalize a GeoJSON outline payload from form data.
+
+    Required for handling str, bytes, list wrapped values etc --> geojson.
+    """
+    if isinstance(raw_value, dict):
+        return raw_value
+
+    value: object = raw_value
+    while isinstance(value, (list, tuple)):
+        if not value:
+            return {}
+        value = next((item for item in value if item not in (None, "")), value[0])
+
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="ignore")
+    if value is None:
+        return {}
+
+    if isinstance(value, str):
+        value_str = value.strip()
+        if not value_str:
+            return {}
+
+        parsed: object | None = None
+        try:
+            parsed = json.loads(value_str)
+        except json.JSONDecodeError:
+            try:
+                parsed = ast.literal_eval(value_str)
+            except (SyntaxError, ValueError):
+                parsed = None
+    else:
+        try:
+            parsed = json.loads(str(value))
+        except (TypeError, ValueError):
+            parsed = None
+
+    if isinstance(parsed, dict):
+        return parsed
+
+    if isinstance(parsed, (list, tuple)) and len(parsed) == 1:
+        return _parse_outline_payload(parsed[0])
+
+    raise ValueError(_OUTLINE_JSON_ERROR)
 
 
 @get(
@@ -180,72 +243,29 @@ async def create_project_htmx(
                 return FieldMappingApp.ODK.value
             return value_str
 
-        project_name = data.get("project_name", "").strip()
-        description = data.get("description", "").strip()
+        project_name = _first_form_value(data.get("project_name", ""))
+        description = _first_form_value(data.get("description", ""))
         field_mapping_app = _normalize_field_mapping_app(
-            data.get("field_mapping_app", "")
+            _first_form_value(data.get("field_mapping_app", ""))
         )
-        hashtags_str = data.get("hashtags", "").strip()
-        outline_raw = data.get("outline", "")
-        outline: dict = {}
-        if isinstance(outline_raw, dict):
-            outline = outline_raw
-        elif isinstance(outline_raw, str):
-            outline_str = outline_raw.strip()
-            if not outline_str:
-                outline = {}
-            else:
-                try:
-                    outline = json.loads(outline_str)
-                except json.JSONDecodeError:
-                    try:
-                        parsed_outline = ast.literal_eval(outline_str)
-                    except (SyntaxError, ValueError):
-                        parsed_outline = None
+        hashtags_str = _first_form_value(data.get("hashtags", ""))
 
-                    if isinstance(parsed_outline, dict):
-                        outline = parsed_outline
-                    else:
-                        err = (
-                            "Project area must be valid JSON"
-                            " (GeoJSON Polygon, MultiPolygon,"
-                            " Feature, or FeatureCollection)."
-                        )
-                        return Response(
-                            content=(
-                                '<div id="form-error"'
-                                ' style="margin-bottom: 16px;'
-                                ' display: block;">'
-                                '<wa-callout variant="danger">'
-                                '<span id="form-error-message">'
-                                f"{err}"
-                                "</span></wa-callout></div>"
-                            ),
-                            media_type="text/html",
-                            status_code=400,
-                        )
-        elif outline_raw:
-            try:
-                outline = json.loads(str(outline_raw))
-            except (TypeError, ValueError):
-                err = (
-                    "Project area must be valid JSON"
-                    " (GeoJSON Polygon, MultiPolygon,"
-                    " Feature, or FeatureCollection)."
-                )
-                return Response(
-                    content=(
-                        '<div id="form-error"'
-                        ' style="margin-bottom: 16px;'
-                        ' display: block;">'
-                        '<wa-callout variant="danger">'
-                        '<span id="form-error-message">'
-                        f"{err}"
-                        "</span></wa-callout></div>"
-                    ),
-                    media_type="text/html",
-                    status_code=400,
-                )
+        try:
+            outline = _parse_outline_payload(data.get("outline", ""))
+        except ValueError:
+            return Response(
+                content=(
+                    '<div id="form-error"'
+                    ' style="margin-bottom: 16px;'
+                    ' display: block;">'
+                    '<wa-callout variant="danger">'
+                    '<span id="form-error-message">'
+                    f"{_OUTLINE_JSON_ERROR}"
+                    "</span></wa-callout></div>"
+                ),
+                media_type="text/html",
+                status_code=400,
+            )
 
         hashtags = (
             [tag.strip() for tag in hashtags_str.split(",") if tag.strip()]
@@ -279,7 +299,7 @@ async def create_project_htmx(
                     "HX-Reswap": "innerHTML",
                 }
             )
-        if "Area of Interest" in message:
+        if "Area of Interest" in message or "too large" in message:
             headers["HX-Trigger"] = json.dumps({"missingOutline": message})
         err_div = (
             '<div id="form-error"'
@@ -449,53 +469,16 @@ async def upload_xlsform_htmx(
             # Validate and read file bytes
             xlsform_bytes = await _validate_xlsform_extension(xlsform_file)
 
-        # Call the existing upload endpoint logic
-        form_name = f"FMTM_Project_{project.id}"
-
-        # Validate and process the form
-        await central_crud.validate_and_update_user_xlsform(
-            xlsform=xlsform_bytes,
-            form_name=form_name,
+        # Delegate to shared service function (used by both HTMX and API routes)
+        await process_xlsform(
+            db=db,
+            project_id=project_id,
+            xlsform_bytes=xlsform_bytes,
             need_verification_fields=need_verification_fields_bool,
             mandatory_photo_upload=mandatory_photo_upload_bool,
-            default_language=default_language,
             use_odk_collect=use_odk_collect_bool,
-        )
-
-        xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-            xlsform=xlsform_bytes,
-            form_name=form_name,
-            need_verification_fields=need_verification_fields_bool,
-            mandatory_photo_upload=mandatory_photo_upload_bool,
             default_language=default_language,
-            use_odk_collect=use_odk_collect_bool,
         )
-
-        # Write XLS form content to db
-        project_xlsform.seek(0)
-        xlsform_db_bytes = project_xlsform.getvalue()
-        if len(xlsform_db_bytes) == 0 or not xform_id:
-            return Response(
-                content=_callout(
-                    "danger",
-                    "There was an error modifying the XLSForm!",
-                ),
-                media_type="text/html",
-                status_code=422,
-            )
-
-        log.debug(
-            "Setting project XLSForm db data for"
-            f" xFormId: {xform_id},"
-            f" bytes length: {len(xlsform_db_bytes)}"
-        )
-        await DbProject.update(
-            db,
-            project_id,
-            ProjectUpdate(xlsform_content=xlsform_db_bytes),
-        )
-        await db.commit()
-        log.debug(f"Successfully saved XLSForm to database for project {project_id}")
 
         # Return success response with HTMX redirect
         return Response(
@@ -510,6 +493,18 @@ async def upload_xlsform_htmx(
             },
         )
 
+    except SvcValidationError as e:
+        return Response(
+            content=_callout("danger", e.message),
+            media_type="text/html",
+            status_code=400,
+        )
+    except ServiceError as e:
+        return Response(
+            content=_callout("danger", e.message),
+            media_type="text/html",
+            status_code=500,
+        )
     except Exception as e:
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"

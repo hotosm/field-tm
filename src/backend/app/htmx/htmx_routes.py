@@ -34,6 +34,7 @@ from app.htmx.static_routes import (
     serve_pwa_64,
     serve_pwa_192,
     serve_pwa_512,
+    serve_static_css,
     serve_static_image,
 )
 
@@ -55,6 +56,7 @@ htmx_router = Router(
         new_project,
         project_details,
         create_project_htmx,
+        serve_static_css,
         serve_static_image,
         get_template_xlsform,
         upload_xlsform_htmx,
