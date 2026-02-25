@@ -57,6 +57,15 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </a>
       {% endif %}
     </p>
+    {% if field_mapping_app_upper == 'ODK' %}
+    <wa-callout variant="warning">
+      <span>
+        If you need to upload additional media files to this project, such as
+        images and videos, log into ODK Central and upload them in the form
+        settings.
+      </span>
+    </wa-callout>
+    {% endif %}
   </div>
   {% endif %}
 
