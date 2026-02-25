@@ -17,5 +17,6 @@
   "end_note": "You can't proceed with data acquisition, if the building doesn't exist",
   "lumped": "Lumped - one polygon (more than one building digitized as one)",
   "split": "Split - one building (one building digitized as more than one polygon)",
-  "other": "OTHER"
+  "other": "OTHER",
+  "osm_username": "What is your OSM username (if you wish to be credited for edits)?"
 }

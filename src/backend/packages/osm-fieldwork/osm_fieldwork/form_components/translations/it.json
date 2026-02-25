@@ -17,5 +17,6 @@
   "end_note": "Non puoi procedere con la raccolta dei dati se l'edificio non esiste.",
   "lumped": "Raggruppato - un poligono (più edifici digitalizzati come uno solo)",
   "split": "Diviso - un edificio (un edificio digitalizzato come più poligoni)",
-  "other": "ALTRO"
+  "other": "ALTRO",
+  "osm_username": "Qual è il tuo nome utente OSM (se desideri essere accreditato per le modifiche)?"
 }

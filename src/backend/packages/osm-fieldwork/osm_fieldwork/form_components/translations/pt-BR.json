@@ -17,5 +17,6 @@
   "end_note": "Não é possível prosseguir com a aquisição de dados se o edifício não existir.",
   "lumped": "Agrupado - um polígono (mais de um edifício digitalizado como um só)",
   "split": "Split - um edifício (um edifício digitalizado como mais de um polígono)",
-  "other": "OUTROS"
+  "other": "OUTROS",
+  "osm_username": "Qual é o seu nome de usuário OSM (se desejar ser creditado pelas edições)?"
 }

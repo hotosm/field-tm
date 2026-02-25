@@ -17,5 +17,6 @@
   "end_note": "Huwezi kuendelea na ukusanyaji wa data ikiwa jengo halipo.",
   "lumped": "Imeunganishwa - poligoni moja (majengo mengi yameakisiwa kama moja)",
   "split": "Imetenganishwa - jengo moja (jengo moja limeakisiwa kama poligoni nyingi)",
-  "other": "NYINGINE"
+  "other": "NYINGINE",
+  "osm_username": "Jina lako la mtumiaji la OSM ni nani (ikiwa unataka kutambuliwa kwa mabadiliko yako)?"
 }

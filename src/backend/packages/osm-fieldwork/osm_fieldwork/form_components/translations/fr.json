@@ -17,5 +17,6 @@
   "end_note": "Vous ne pouvez pas poursuivre la collecte de données si le bâtiment n'existe pas.",
   "lumped": "Regroupé - un polygone (plusieurs bâtiments numérisés comme un seul)",
   "split": "Divisé - un bâtiment (un bâtiment numérisé comme plusieurs polygones)",
-  "other": "AUTRE"
+  "other": "AUTRE",
+  "osm_username": "Quel est votre nom d'utilisateur OSM (si vous souhaitez être crédité pour vos modifications) ?"
 }
