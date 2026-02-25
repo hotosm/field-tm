@@ -372,7 +372,7 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
         return ("fmtm-manager-17@example.org", "StrongPass123")
 
     class FakeDatasetClient:
-        async def listDatasets(self, _project_odk_id):
+        async def listDatasets(self, _project_odk_id):  # noqa: N802
             return []
 
     @asynccontextmanager

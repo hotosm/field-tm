@@ -986,7 +986,7 @@ async def create_project_manager_user(
                     if not created_user_id:
                         raise HTTPException(
                             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="ODK Central did not return a user ID after creation.",
+                            detail="ODK Central returned no user ID after creation.",
                         )
                     manager_user_id = created_user_id
                     manager_email = candidate_email
@@ -1017,7 +1017,7 @@ async def create_project_manager_user(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=(
                         "Could not create an ODK Central manager user: "
-                        "both the primary and fallback email addresses are already taken."
+                        "both primary and fallback email addresses are already taken."
                     ),
                 )
 
