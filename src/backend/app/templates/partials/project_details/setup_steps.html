@@ -865,6 +865,29 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 
     <div id="finalise-status" style="margin-top: 10px"></div>
 
+    <!-- Finalise Confirmation Dialog -->
+    <wa-dialog
+      id="finalise-confirm-dialog"
+      label="Confirm Project Finalisation"
+      with-header
+    >
+      <p
+        id="finalise-confirm-message"
+        style="margin: 0; line-height: 1.6; color: #444"
+      >
+        Are you sure you want to finalise this project?
+      </p>
+      <div
+        slot="footer"
+        style="display: flex; justify-content: flex-end; gap: 10px"
+      >
+        <wa-button id="finalise-cancel-btn" variant="default">Cancel</wa-button>
+        <wa-button id="finalise-confirm-btn" variant="primary">
+          Confirm & Finalise
+        </wa-button>
+      </div>
+    </wa-dialog>
+
     <!-- Credentials Modal (for ODK or QField) -->
     <div
       id="credentials-modal"

@@ -411,6 +411,10 @@
   const finaliseProjectBtn = document.getElementById('finalise-project-btn');
   const advancedOptionsToggle = document.getElementById('advanced-options-toggle');
   const finaliseStatus = document.getElementById('finalise-status');
+  const finaliseConfirmDialog = document.getElementById('finalise-confirm-dialog');
+  const finaliseConfirmMessage = document.getElementById('finalise-confirm-message');
+  const finaliseConfirmBtn = document.getElementById('finalise-confirm-btn');
+  const finaliseCancelBtn = document.getElementById('finalise-cancel-btn');
   const credentialsModal = document.getElementById('credentials-modal');
   const cancelCredsBtn = document.getElementById('cancel-creds-btn');
   const testCredsBtn = document.getElementById('test-creds-btn');
@@ -427,6 +431,54 @@
   const isOdk = projectType === 'ODK';
   const isQField = projectType === 'QField';
   let customCreds = null;
+
+  function getProjectTypeName() {
+    if (isOdk) return 'ODK Central';
+    if (isQField) return 'QField';
+    return 'the mapping tool';
+  }
+
+  function showFinaliseConfirmDialog() {
+    if (!isOdk && !isQField) {
+      if (finaliseStatus) {
+        finaliseStatus.innerHTML = (
+          '<wa-callout variant="danger"><span>'
+          + 'Project type not set. Please set the field mapping app first.'
+          + '</span></wa-callout>'
+        );
+      }
+      return;
+    }
+
+    const projectTypeName = getProjectTypeName();
+    if (finaliseConfirmMessage) {
+      finaliseConfirmMessage.textContent = (
+        `Are you sure you want to finalise this project in ${projectTypeName}? `
+        + 'This will create the project, upload forms, and generate all necessary files.'
+      );
+    }
+
+    if (!finaliseConfirmDialog) {
+      submitFinaliseProject();
+      return;
+    }
+
+    if (typeof finaliseConfirmDialog.show === 'function') {
+      finaliseConfirmDialog.show();
+    } else {
+      finaliseConfirmDialog.setAttribute('open', '');
+    }
+  }
+
+  function hideFinaliseConfirmDialog() {
+    if (!finaliseConfirmDialog) return;
+
+    if (typeof finaliseConfirmDialog.hide === 'function') {
+      finaliseConfirmDialog.hide();
+    } else {
+      finaliseConfirmDialog.removeAttribute('open');
+    }
+  }
 
   // Helper function to show error message
   function showError(message, variant = 'danger') {
@@ -571,22 +623,20 @@
 
       credentialsModal.style.display = 'none';
 
-      // Finalise project with custom credentials
-      await finaliseProject();
+      // Ask for confirmation before finalising with saved custom credentials.
+      showFinaliseConfirmDialog();
     });
   }
 
-      // Finalise Project (unified function)
-      async function finaliseProject() {
-        const projectTypeName = isOdk ? 'ODK Central' : (isQField ? 'QField' : 'the mapping tool');
-        if (!confirm(`Are you sure you want to finalise this project in ${projectTypeName}? This will create the project, upload forms, and generate all necessary files.`)) {
-          return;
-        }
-
+      // Finalise Project (unified submit function)
+      async function submitFinaliseProject() {
+        const projectTypeName = getProjectTypeName();
         try {
           finaliseStatus.innerHTML = `<wa-callout variant="info"><span>Creating project in ${projectTypeName}... This may take a moment.</span></wa-callout>`;
           if (finaliseProjectBtn) finaliseProjectBtn.disabled = true;
           if (advancedOptionsToggle) advancedOptionsToggle.disabled = true;
+          if (finaliseConfirmBtn) finaliseConfirmBtn.disabled = true;
+          if (finaliseCancelBtn) finaliseCancelBtn.disabled = true;
 
           const formData = new FormData();
           if (customCreds) {
@@ -632,14 +682,31 @@
           finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
           if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
           if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
+        } finally {
+          if (finaliseConfirmBtn) finaliseConfirmBtn.disabled = false;
+          if (finaliseCancelBtn) finaliseCancelBtn.disabled = false;
         }
+      }
+
+      // Finalise confirmation controls
+      if (finaliseCancelBtn) {
+        finaliseCancelBtn.addEventListener('click', function() {
+          hideFinaliseConfirmDialog();
+        });
+      }
+
+      if (finaliseConfirmBtn) {
+        finaliseConfirmBtn.addEventListener('click', function() {
+          hideFinaliseConfirmDialog();
+          submitFinaliseProject();
+        });
       }
 
       // Finalise Project button
       if (finaliseProjectBtn) {
         finaliseProjectBtn.addEventListener('click', function() {
           // Use default credentials (server bundled) if no custom credentials set
-          finaliseProject();
+          showFinaliseConfirmDialog();
         });
       }
 

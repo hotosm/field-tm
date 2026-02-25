@@ -131,3 +131,69 @@ def test_get_odk_credentials_requires_complete_fields():
     creds = project.get_odk_credentials()
     assert creds is not None
     assert creds.external_project_username == "manager@example.org"
+
+
+@pytest.mark.asyncio
+async def test_create_odk_project_uses_relative_projects_path():
+    """Create project should post to relative 'projects' path (no duplicated /v1)."""
+
+    class CreateSession:
+        def __init__(self):
+            self.post_calls = []
+
+        def post(self, path: str, json: dict | None = None):
+            self.post_calls.append((path, json))
+            response = DummyResponse({"id": 77, "name": "Field-TM Test"})
+            response.ok = True
+            response.text = ""
+            return response
+
+    class CreateClient:
+        def __init__(self):
+            self.session = CreateSession()
+
+    fake_client = CreateClient()
+
+    @asynccontextmanager
+    async def fake_pyodk_client(_):
+        yield fake_client
+
+    with patch("app.central.central_deps.pyodk_client", fake_pyodk_client):
+        result = await central_crud.create_odk_project("Test")
+
+    assert result["id"] == 77
+    assert fake_client.session.post_calls[0][0] == "projects"
+    assert fake_client.session.post_calls[0][1] == {"name": "Field-TM Test"}
+
+
+@pytest.mark.asyncio
+async def test_delete_odk_project_uses_relative_projects_path():
+    """Delete project should use relative 'projects/{id}' path."""
+
+    class DeleteResponse:
+        def raise_for_status(self):
+            return None
+
+    class DeleteSession:
+        def __init__(self):
+            self.delete_calls = []
+
+        def delete(self, path: str):
+            self.delete_calls.append(path)
+            return DeleteResponse()
+
+    class DeleteClient:
+        def __init__(self):
+            self.session = DeleteSession()
+
+    fake_client = DeleteClient()
+
+    @asynccontextmanager
+    async def fake_pyodk_client(_):
+        yield fake_client
+
+    with patch("app.central.central_deps.pyodk_client", fake_pyodk_client):
+        response = await central_crud.delete_odk_project(42)
+
+    assert fake_client.session.delete_calls == ["projects/42"]
+    assert response is not None
