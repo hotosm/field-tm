@@ -17,5 +17,6 @@
   "end_note": "Pokud budova neexistuje, nelze pokračovat v získávání dat",
   "lumped": "Seskupené - jeden polygon (více než jedna budova digitalizovaná jako jedna)",
   "split": "Rozdělení – jedna budova (jedna budova digitalizovaná jako více než jeden polygon)",
-  "other": "OSTATNÍ"
+  "other": "OSTATNÍ",
+  "osm_username": "Jaké je vaše uživatelské jméno OSM (pokud chcete být uveden jako autor úprav)?"
 }

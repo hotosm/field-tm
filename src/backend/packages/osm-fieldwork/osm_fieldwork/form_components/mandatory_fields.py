@@ -53,6 +53,7 @@ INSTANCE_ID = "${instanceID}"
 INSTANCE_FEATURE = "instance('features')/root/item[name=${feature}]"
 INSTANCE_TASK = "instance('tasks')/root/item[name=${task}]"
 USERNAME = "${username}"
+OSM_USERNAME = "${osm_username}"
 RANDOM_NEG_ID = "int(-1 * random() * 1073741823)"
 
 
@@ -142,6 +143,14 @@ def _get_mandatory_fields(
 
         fields = [
             {"type": "start-geopoint", "name": "warmup", "notes": "collects location on form start"},
+            add_label_translations({
+                "type": "text",
+                "name": "osm_username",
+                "required": "no",
+                "default": "${last-saved#osm_username}",
+            },
+                label_cols=label_cols
+            ),
             add_label_translations({
                 "type": "select_one mapping_mode",
                 "name": "mapping_mode",
@@ -250,7 +259,11 @@ def _get_mandatory_fields(
             "notes": "Update the created_by field",
             "label::english(en)": "Created by",
             "appearance": "minimal",
-            "calculation": f"if({NEW_FEATURE} != '', {USERNAME}, 'svcfmtm')" if use_odk_collect else "''",
+            "calculation": (
+                f"if({NEW_FEATURE} != '', if({OSM_USERNAME} != '', {OSM_USERNAME}, {USERNAME}), 'svcfmtm')"
+                if use_odk_collect
+                else "''"
+            ),
             "save_to": "created_by",
         },
         {
