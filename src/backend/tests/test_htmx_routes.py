@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from litestar import status_codes as status
 
+from app.db.enums import ProjectStatus
+from app.db.models import DbProject
 from app.htmx.project_create_routes import _parse_outline_payload
 from app.htmx.setup_step_routes import _build_odk_finalize_success_html
 from app.projects.project_services import ODKFinalizeResult
@@ -27,6 +29,32 @@ async def test_create_project_htmx(client, stub_project_data):
     assert "HX-Redirect" in response.headers
     location = response.headers["HX-Redirect"]
     assert "/htmxprojects/" in location
+
+
+async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
+    """Published ODK projects should show guidance for form media uploads."""
+    await DbProject.update(
+        db,
+        project.id,
+        DbProject(
+            status=ProjectStatus.PUBLISHED,
+            external_project_instance_url="https://central.example.org",
+            external_project_id=17,
+        ),
+    )
+    await db.commit()
+
+    response = await client.get(
+        f"/htmxprojects/{project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "View Project in ODK Central" in response.text
+    assert (
+        "If you need to upload additional media files to this project" in response.text
+    )
+    assert "log into ODK Central and upload them in the form settings." in response.text
 
 
 async def test_project_qrcode_htmx(client, project):
