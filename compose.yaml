@@ -109,7 +109,7 @@ x-qfield-common: &qfield-common
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.8"
     depends_on:
       central-ui:
         condition: service_completed_successfully
@@ -121,9 +121,9 @@ services:
       - ${FMTM_DEV_PORT:-7050}:8080
     environment:
       # General
-      BUNKERWEB_INSTANCES: proxy:5000
+      BUNKERWEB_INSTANCES: proxy
       LOG_LEVEL: notice
-      UI_WIZARD: no
+      USE_UI: no
       USE_BUNKERNET: no
       DISABLE_DEFAULT_SERVER: yes
       USE_REDIS: no
@@ -156,14 +156,36 @@ services:
       api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
       api.fmtm.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
-      odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
-      # Required to allow loading frontend
-      odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
-      odk.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # Override X-Forwarded-Proto during local dev to allow auth over http
-      odk.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http"
+      # Prevent bunkerweb page handling login errors (handle via Vue router)
+      odk.fmtm.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
+      odk.fmtm.localhost_ERRORS: "404=/index.html"
+      # Disable BunkerWeb's default location / block so we can provide our own below.
+      # The default uses try_files ... =404 which doesn't support SPA routing.
+      odk.fmtm.localhost_SERVE_FILES: "no"
+      # SPA fallback: serve index.html for any path that doesn't match a static file,
+      # so the Vue router can handle client-side routes (e.g. /login?next=/).
+      # NOTE: we need double $$ to avoid compose env var substitution
+      odk.fmtm.localhost_CUSTOM_CONF_SERVER_HTTP_spa_routing: |
+        location / {
+          root /var/www/html/odk.fmtm.localhost;
+          try_files $$uri $$uri/ /index.html;
+        }
+      # ODK API routing to central backend.
+      odk.fmtm.localhost_CUSTOM_CONF_SERVER_HTTP_api_routing: |
+        location ^~ /v1/ {
+          proxy_set_header Host $$http_host;
+          proxy_set_header X-Forwarded-Host $$http_host;
+          # Trick server into thinking it's https - required...
+          proxy_set_header X-Forwarded-Proto https;
+          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+          proxy_pass http://central:8383;
+          proxy_redirect off;
+
+          # Buffer requests, but not responses, so streaming out works.
+          proxy_request_buffering on;
+          proxy_buffering off;
+          proxy_read_timeout 2m;
+        }
       qfield.fmtm.localhost_REVERSE_PROXY_HOST: http://qfield-app:8000
       # Required to allow loading staticfiles (else route to reverse proxy)
       qfield.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/(?!staticfiles)
