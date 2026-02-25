@@ -795,14 +795,14 @@ class FakeOdkDataset:
         """Initialize with call tracking."""
         self.create_dataset_calls = []
 
-    async def listDatasets(self, odk_id: int):
+    async def listDatasets(self, odk_id: int):  # noqa: N802
         """Return existing dataset names."""
         return [{"name": "features"}]
 
-    async def createDataset(
+    async def createDataset(  # noqa: N802
         self,
         odk_id: int,
-        datasetName: str,
+        datasetName: str,  # noqa: N803
         properties: list[str],
     ):
         """Record unexpected create calls."""

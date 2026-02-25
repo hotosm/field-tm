@@ -215,7 +215,7 @@ async def test_finalize_odk_project_returns_manager_credentials():
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
         class FakeDataset:
-            async def listDatasets(self, odk_id):
+            async def listDatasets(self, odk_id):  # noqa: N802
                 return []
 
         yield FakeDataset()
@@ -326,7 +326,7 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
         class FakeDataset:
-            async def listDatasets(self, odk_id):
+            async def listDatasets(self, odk_id):  # noqa: N802
                 return []
 
         yield FakeDataset()
@@ -420,7 +420,7 @@ async def test_finalize_odk_project_generate_files_failure():
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
         class FakeDataset:
-            async def listDatasets(self, odk_id):
+            async def listDatasets(self, odk_id):  # noqa: N802
                 return []
 
         yield FakeDataset()
@@ -510,7 +510,7 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
         class FakeDataset:
-            async def listDatasets(self, odk_id):
+            async def listDatasets(self, odk_id):  # noqa: N802
                 return []
 
         yield FakeDataset()
