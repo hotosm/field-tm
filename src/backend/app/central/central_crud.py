@@ -78,10 +78,7 @@ async def create_odk_project(
         project_name = f"Field-TM {name}"
         log.debug(f"Attempting ODKCentral project creation: {project_name}")
         async with central_deps.pyodk_client(odk_central) as client:
-            response = client.session.post(
-                f"{client.session.base_url}/v1/projects",
-                json={"name": project_name},
-            )
+            response = client.session.post("projects", json={"name": project_name})
             if not response.ok:
                 detail = response.text or "Could not authenticate to ODK Central."
                 raise HTTPException(
@@ -109,9 +106,7 @@ async def delete_odk_project(
     # external_project_id in the projects table
     try:
         async with central_deps.pyodk_client(odk_central) as client:
-            response = client.session.delete(
-                f"{client.session.base_url}/v1/projects/{project_id}"
-            )
+            response = client.session.delete(f"projects/{project_id}")
             response.raise_for_status()
             result = response
         log.info(f"Project {project_id} has been deleted from the ODK Central server.")

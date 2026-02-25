@@ -25,6 +25,7 @@ and REST API routes. They accept typed arguments and raise domain exceptions
 import json
 import logging
 from dataclasses import dataclass
+from functools import partial
 from io import BytesIO
 from typing import Optional
 
@@ -358,7 +359,7 @@ async def download_osm_data(
                 raise ServiceError("Failed to parse GeoJSON data from download.") from e
 
     # Validate and clean GeoJSON
-    featcol = parse_aoi(settings.FMTM_DB_URL, json.dumps(geojson_data))
+    featcol = parse_aoi(settings.FMTM_DB_URL, geojson_data)
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if not featcol_single_geom_type:
@@ -510,7 +511,7 @@ async def split_aoi(
             if param == "num_buildings":
                 algorithm_params["num_buildings"] = no_of_buildings
 
-        features = await to_thread.run_sync(
+        split_sql_call = partial(
             split_by_sql,
             aoi_featcol,
             settings.FMTM_DB_URL,
@@ -520,6 +521,7 @@ async def split_aoi(
             algorithm=algorithm_enum,
             algorithm_params=algorithm_params,
         )
+        features = await to_thread.run_sync(split_sql_call)
     elif algorithm_enum == SplittingAlgorithm.DIVIDE_BY_SQUARE:
         features = await to_thread.run_sync(
             split_by_square,

@@ -81,6 +81,202 @@ async def test_create_odk_project():
     assert result == {"id": 123, "name": "Field-TM Test Project"}
 
 
+async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
+    """Ensure OSM extract parsing passes GeoJSON object, not JSON string path."""
+    from app.projects import project_services
+
+    downloaded_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [85.30, 27.71],
+                            [85.30, 27.70],
+                            [85.31, 27.70],
+                            [85.31, 27.71],
+                            [85.30, 27.71],
+                        ]
+                    ],
+                },
+                "properties": {"osm_id": 1},
+            }
+        ],
+    }
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return Mock(
+            id=1,
+            outline={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.30, 27.71],
+                        [85.30, 27.70],
+                        [85.31, 27.70],
+                        [85.31, 27.71],
+                        [85.30, 27.71],
+                    ]
+                ],
+            },
+        )
+
+    async def fake_generate_data_extract(*_args, **_kwargs):
+        return Mock(data={"download_url": "https://example.test/extract.geojson"})
+
+    class FakeResponse:
+        ok = True
+
+        async def text(self):
+            return json.dumps(downloaded_geojson)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+    class FakeSession:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def get(self, _url):
+            return FakeResponse()
+
+    captured_input: dict = {}
+
+    def fake_parse_aoi(_db_url, input_geojson, merge=True):
+        captured_input["value"] = input_geojson
+        return input_geojson
+
+    def fake_featcol_keep_single_geom_type(featcol):
+        return featcol
+
+    async def fake_check_crs(_featcol):
+        return None
+
+    monkeypatch.setattr(
+        project_services.project_deps,
+        "get_project_by_id",
+        fake_get_project_by_id,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_data_extract",
+        fake_generate_data_extract,
+    )
+    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(
+        project_services,
+        "featcol_keep_single_geom_type",
+        fake_featcol_keep_single_geom_type,
+    )
+    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+
+    result = await project_services.download_osm_data(
+        db=Mock(),
+        project_id=1,
+        osm_category="buildings",
+        geom_type="POLYGON",
+        centroid=False,
+    )
+
+    assert isinstance(captured_input.get("value"), dict)
+    assert result["type"] == "FeatureCollection"
+
+
+@pytest.mark.parametrize(
+    "algorithm",
+    ["AVG_BUILDING_VORONOI", "AVG_BUILDING_SKELETON"],
+)
+async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
+    monkeypatch, algorithm
+):
+    """Ensure split_aoi does not pass kwargs to anyio.to_thread.run_sync."""
+    from app.projects import project_services
+
+    project = Mock(
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.30, 27.71],
+                    [85.30, 27.70],
+                    [85.31, 27.70],
+                    [85.31, 27.71],
+                    [85.30, 27.71],
+                ]
+            ],
+        },
+        data_extract_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [85.30, 27.71],
+                                [85.30, 27.70],
+                                [85.31, 27.70],
+                                [85.31, 27.71],
+                                [85.30, 27.71],
+                            ]
+                        ],
+                    },
+                    "properties": {"osm_id": 1},
+                }
+            ],
+        },
+    )
+
+    async def fake_project_one(_db, _project_id):
+        return project
+
+    captured: dict = {}
+
+    async def fake_run_sync(func, *args):
+        # Intentionally no **kwargs: old buggy code passes kwargs here.
+        captured["func"] = func
+        captured["args"] = args
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": project.outline,
+                    "properties": {"task_id": 1},
+                }
+            ],
+        }
+
+    async def fake_check_crs(_featcol):
+        return None
+
+    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(project_services.to_thread, "run_sync", fake_run_sync)
+    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+
+    result = await project_services.split_aoi(
+        db=Mock(),
+        project_id=1,
+        algorithm=algorithm,
+        no_of_buildings=50,
+    )
+
+    assert callable(captured.get("func"))
+    assert result["type"] == "FeatureCollection"
+    assert len(result["features"]) == 1
+
+
 async def test_delete_project(client, admin_user, project):
     """Test deleting a Field-TM project, plus ODK Central project."""
     response = await client.delete(f"/projects/{project.id}")
