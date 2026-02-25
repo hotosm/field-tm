@@ -1,4 +1,4 @@
-name: "📜 Contribution Guidelines"
+name: 📜 Contribution Guidelines
 
 on:
   issue_comment:
@@ -6,7 +6,6 @@ on:
   pull_request_target:
     types: [opened, closed, synchronize]
 
-# Permissions needed for the workflow
 permissions:
   actions: write
   contents: write
@@ -14,48 +13,8 @@ permissions:
   statuses: write
 
 jobs:
-  Sign:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Signature
-        if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines') || github.event_name == 'pull_request_target'
-        uses: contributor-assistant/github-action@v2.6.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          path-to-signatures: "cla.json"
-          path-to-document: "https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md"
-          branch: "main"
-          # Allowlist for bot accounts (won't need to sign CLA)
-          allowlist: "bot*,*[bot],renovate*,github-actions*"
-          # The message signers must type and submit
-          custom-pr-sign-comment: "I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines"
-          # Lock PR while waiting for CLA signature
-          lock-pullrequest-aftermerge: false
-          # Use issues to store signatures (alternative to branch storage)
-          use-dco-flag: false
-          # Custom messages
-          custom-notsigned-prcomment: |
-            ## Contributor Signature Required
-
-            Thank you for your contribution!
-
-            Before we can accept your pull request, you need to sign our [Contribution Policy](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md).
-
-            ### Why do I need to do this?
-
-            - Ensures you have read and will abide by our contribution guidelines.
-            - Adds a small barrier for bot / AI account contribution, which we do not allow.
-            - We care deeply about our community at HOT, and want everyone to be on the same page.
-
-            ### How to sign
-
-            To sign the agreement, please comment on this PR with:
-
-            ```
-            I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines
-            ```
-
-            ---
-
-            ⚠️ **Note**: You only need to sign once. Future contributions to this repository will not require re-signing.
+  sign:
+    uses: hotosm/gh-workflows/.github/workflows/cla_sign.yml@3.5.0
+    with:
+      push_branch: dev
+    secrets: inherit
