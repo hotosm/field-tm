@@ -232,6 +232,9 @@ async def api_finalize(
             detail="Project field mapping app is not set.",
         )
 
+    manager_username = None
+    manager_password = None
+
     try:
         if project.field_mapping_app == FieldMappingApp.ODK:
             has_custom_odk = (
@@ -244,6 +247,8 @@ async def api_finalize(
                 db=db, project_id=project_id, custom_odk_creds=custom_odk
             )
             downstream_url = odk_result.odk_url
+            manager_username = odk_result.manager_username
+            manager_password = odk_result.manager_password
         else:
             has_custom_qfield = (
                 data.qfield_cloud_url
@@ -262,7 +267,11 @@ async def api_finalize(
         await db.commit()
 
     return FinalizeResponse(
-        project_id=project_id, downstream_url=downstream_url, cleanup=data.cleanup
+        project_id=project_id,
+        downstream_url=downstream_url,
+        cleanup=data.cleanup,
+        manager_username=manager_username,
+        manager_password=manager_password,
     )
 
 
