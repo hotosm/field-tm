@@ -209,9 +209,12 @@ Manager{% endblock %} {% block content %}
           "
         ></div>
         <div id="map-error" style="margin-top: 8px"></div>
+        <div id="area-info" style="margin-top: 8px"></div>
         <small style="display: block; margin-top: 8px; color: #666">
           Draw a polygon on the map or upload a GeoJSON file to define your
-          project area.
+          project area. Maximum project size is 1,000&nbsp;km². Areas over
+          100&nbsp;km² will show a warning. The OSM data extract API is limited
+          to 200&nbsp;km².
         </small>
         <textarea
           name="outline"
@@ -279,6 +282,23 @@ Manager{% endblock %} {% block content %}
     if (!errorContainer || !errorMessageEl) return;
     errorMessageEl.textContent = "";
     errorContainer.style.display = "none";
+  }
+
+  function showAreaInfo(areaKm2, warning) {
+    const areaInfo = document.getElementById("area-info");
+    if (!areaInfo) return;
+    if (areaKm2 == null) {
+      areaInfo.innerHTML = "";
+      return;
+    }
+    const formatted = areaKm2.toLocaleString(undefined, {
+      maximumFractionDigits: 1,
+    });
+    if (warning) {
+      areaInfo.innerHTML = `<wa-callout variant="warning"><span>${warning}</span></wa-callout>`;
+    } else {
+      areaInfo.innerHTML = `<small style="color: #666;">Area: ${formatted} km²</small>`;
+    }
   }
 
   function addHashtag(tag) {
@@ -576,6 +596,7 @@ Manager{% endblock %} {% block content %}
           // Load the normalized, merged GeoJSON onto the map
           if (result.geojson) {
             loadGeoJSONOnMap(result.geojson);
+            showAreaInfo(result.area_km2, result.warning);
           } else {
             throw new Error("No GeoJSON returned from validation");
           }
@@ -602,6 +623,7 @@ Manager{% endblock %} {% block content %}
       if (drawnLayers) {
         drawnLayers.clearLayers();
         updateGeoJSON();
+        showAreaInfo(null);
       }
     });
 
