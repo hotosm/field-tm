@@ -56,6 +56,20 @@ def _resolve_odk_creds(odk_creds: Optional[ODKCentral]) -> ODKCentral:
     )
 
 
+def _strip_api_version(url: str) -> str:
+    """Strip trailing /v1 or /v1/ from a URL.
+
+    PyODK's Session.base_url_validate always appends /v1/, so we must
+    ensure the base_url we provide does not already contain it.
+    Without this, URLs like http://central:8383/v1 become
+    http://central:8383/v1/v1/ causing 404 errors.
+    """
+    url = url.rstrip("/")
+    if url.endswith("/v1"):
+        url = url[:-3]
+    return url
+
+
 @asynccontextmanager
 async def pyodk_client(odk_creds: Optional[ODKCentral]):
     """Async-compatible context manager for pyodk.Client.
@@ -64,10 +78,11 @@ async def pyodk_client(odk_creds: Optional[ODKCentral]):
     and avoids blocking the async event loop in the endpoint.
     """
     creds = _resolve_odk_creds(odk_creds)
+    base_url = _strip_api_version(creds.external_project_instance_url or "")
 
     with NamedTemporaryFile(mode="w", suffix=".toml", encoding="utf-8") as cfg:
         cfg.write("[central]\n")
-        cfg.write(f"base_url = {json.dumps(creds.external_project_instance_url)}\n")
+        cfg.write(f"base_url = {json.dumps(base_url)}\n")
         cfg.write(f"username = {json.dumps(creds.external_project_username)}\n")
         cfg.write(f"password = {json.dumps(creds.external_project_password)}\n")
         cfg.flush()
