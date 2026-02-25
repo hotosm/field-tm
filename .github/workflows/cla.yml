@@ -1,4 +1,4 @@
-name: "📜 CLA Assistant"
+name: "📜 Contribution Guidelines"
 
 on:
   issue_comment:
@@ -14,11 +14,11 @@ permissions:
   statuses: write
 
 jobs:
-  CLAAssistant:
+  Sign:
     runs-on: ubuntu-latest
     steps:
-      - name: "Contributor Signature"
-        if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'
+      - name: Signature
+        if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CONTRIBUTING.md document and I hereby sign and agree with the guidelines') || github.event_name == 'pull_request_target'
         uses: contributor-assistant/github-action@v2.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
