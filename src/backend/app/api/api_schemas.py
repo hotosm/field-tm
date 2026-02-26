@@ -107,3 +107,5 @@ class FinalizeResponse(BaseModel):
     project_id: int
     downstream_url: str
     cleanup: bool
+    manager_username: str | None = None
+    manager_password: str | None = None
