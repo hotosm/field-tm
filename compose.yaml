@@ -267,7 +267,7 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.2"
     build:
       context: src/odkcentral/api
       args:
@@ -325,7 +325,7 @@ services:
       retries: 10
 
   pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v3.0.0"
+    image: "ghcr.io/getodk/pyxform-http:v4.2.0"
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -347,7 +347,7 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.4.2"
     build:
       context: src/odkcentral/ui
       args:
