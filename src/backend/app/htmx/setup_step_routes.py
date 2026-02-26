@@ -497,6 +497,60 @@ async def preview_geojson_htmx(
 
 
 @post(
+    path="/collect-new-data-only-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
+async def collect_new_data_only_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: AuthUser,
+    project_id: int = Parameter(),
+) -> Response:
+    """Set setup to collect new data only without preloaded feature extract."""
+    project = current_user.get("project")
+    if not project or project.id != project_id:
+        return Response(
+            content=_callout("danger", "Project not found or access denied."),
+            media_type="text/html",
+            status_code=404,
+        )
+
+    try:
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(
+                data_extract_geojson={"type": "FeatureCollection", "features": []},
+                task_areas_geojson={},
+            ),
+        )
+        await db.commit()
+        return Response(
+            content=_callout(
+                "success",
+                "✓ Collect-new-data mode selected. "
+                "Task splitting is skipped and you can continue.",
+            ),
+            media_type="text/html",
+            status_code=200,
+            headers={"HX-Refresh": "true"},
+        )
+    except Exception as e:
+        log.error(f"Error enabling collect-new-data mode via HTMX: {e}", exc_info=True)
+        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        return Response(
+            content=_callout("danger", f"Error: {error_msg}"),
+            media_type="text/html",
+            status_code=500,
+        )
+
+
+@post(
     path="/submit-geojson-data-extract-htmx",
     dependencies={
         "db": Provide(db_conn),
@@ -915,21 +969,48 @@ async def split_aoi_htmx(
         )
         algorithm = data.get("algorithm", "").strip() if data else ""
 
+        def parse_bool_flag(raw_value, default: bool = True) -> bool:
+            """Parse truthy form values from URL-encoded payload."""
+            if raw_value is None:
+                return default
+            if isinstance(raw_value, list):
+                raw_value = raw_value[-1] if raw_value else default
+            if isinstance(raw_value, bool):
+                return raw_value
+            return str(raw_value).strip().lower() in {"1", "true", "yes", "on"}
+
         try:
-            no_of_buildings = int(data.get("no_of_buildings", 50)) if data else 50
+            no_of_buildings = int(data.get("no_of_buildings", 10)) if data else 10
         except (ValueError, TypeError):
-            no_of_buildings = 50
+            no_of_buildings = 10
 
         try:
             dimension_meters = int(data.get("dimension_meters", 100)) if data else 100
         except (ValueError, TypeError):
             dimension_meters = 100
 
+        include_roads = parse_bool_flag(
+            data.get("include_roads") if data else None, default=True
+        )
+        include_rivers = parse_bool_flag(
+            data.get("include_rivers") if data else None, default=True
+        )
+        include_railways = parse_bool_flag(
+            data.get("include_railways") if data else None, default=True
+        )
+        include_aeroways = parse_bool_flag(
+            data.get("include_aeroways") if data else None, default=True
+        )
+
         log.debug(
             "Split AOI parameters: "
             f"algorithm={algorithm}, "
             f"no_of_buildings={no_of_buildings}, "
-            f"dimension_meters={dimension_meters}"
+            f"dimension_meters={dimension_meters}, "
+            f"include_roads={include_roads}, "
+            f"include_rivers={include_rivers}, "
+            f"include_railways={include_railways}, "
+            f"include_aeroways={include_aeroways}"
         )
 
         if not algorithm or algorithm == "":
@@ -945,6 +1026,10 @@ async def split_aoi_htmx(
             algorithm=algorithm,
             no_of_buildings=no_of_buildings,
             dimension_meters=dimension_meters,
+            include_roads=include_roads,
+            include_rivers=include_rivers,
+            include_railways=include_railways,
+            include_aeroways=include_aeroways,
         )
 
         if tasks_featcol == {}:

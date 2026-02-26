@@ -42,6 +42,48 @@ from area_splitter.db import (
 
 log = logging.getLogger(__name__)
 
+NON_TRAVERSABLE_BARRIER_VALUES = {
+    "fence",
+    "wire_fence",
+    "wall",
+    "city_wall",
+    "ditch",
+}
+NON_TRAVERSABLE_NATURAL_VALUES = {"cliff"}
+NON_TRAVERSABLE_MAN_MADE_VALUES = {"embankment", "dyke", "dike"}
+
+
+def _normalize_tag_value(value) -> set[str]:
+    """Normalize a tag value into a lowercase string set."""
+    if value is None:
+        return set()
+    if isinstance(value, (list, tuple, set)):
+        return {str(item).strip().lower() for item in value if item}
+    return {str(value).strip().lower()}
+
+
+def _is_linear_split_feature(tags: dict) -> bool:
+    """Return True when tags represent a linear feature used for splitting."""
+    if not isinstance(tags, dict) or not tags:
+        return False
+
+    if any(key in tags for key in ("highway", "waterway", "railway", "aeroway")):
+        return True
+
+    barrier_values = _normalize_tag_value(tags.get("barrier"))
+    if barrier_values & NON_TRAVERSABLE_BARRIER_VALUES:
+        return True
+
+    natural_values = _normalize_tag_value(tags.get("natural"))
+    if natural_values & NON_TRAVERSABLE_NATURAL_VALUES:
+        return True
+
+    man_made_values = _normalize_tag_value(tags.get("man_made"))
+    if man_made_values & NON_TRAVERSABLE_MAN_MADE_VALUES:
+        return True
+
+    return False
+
 
 def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
     """Fetch an OSM extract from raw-data-api-py and return parsed GeoJSON."""
@@ -61,6 +103,15 @@ def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
                         "waterway": [],
                         "railway": [],
                         "aeroway": [],
+                        "barrier": [
+                            "fence",
+                            "wire_fence",
+                            "wall",
+                            "city_wall",
+                            "ditch",
+                        ],
+                        "natural": ["cliff"],
+                        "man_made": ["embankment", "dyke", "dike"],
                     }
                 }
             },
@@ -480,8 +531,8 @@ class FMTMSplitter:
             if tags.get("building") == "yes":
                 insert_geom(cur, "ways_poly", **common_args)
 
-            # Insert highway/waterway/railway polylines
-            elif any(key in tags for key in ["highway", "waterway", "railway"]):
+            # Insert line-like split features (including non-traversable barriers).
+            elif _is_linear_split_feature(tags):
                 insert_geom(cur, "ways_line", **common_args)
 
         # Use raw sql for view generation & remainder of script
@@ -749,6 +800,12 @@ def split_by_sql(
         )
         log.error(err)
         raise ValueError(err)
+
+    # Default to including all linear-feature types when not explicitly configured.
+    algorithm_params.setdefault("include_roads", "TRUE")
+    algorithm_params.setdefault("include_rivers", "TRUE")
+    algorithm_params.setdefault("include_railways", "TRUE")
+    algorithm_params.setdefault("include_aeroways", "TRUE")
 
     # Parse AOI
     parsed_aoi = FMTMSplitter.input_to_geojson(aoi)

@@ -23,6 +23,7 @@ import pytest
 
 from area_splitter.splitter import (
     FMTMSplitter,
+    _is_linear_split_feature,
     main,
     split_by_features,
     split_by_sql,
@@ -31,6 +32,30 @@ from area_splitter.splitter import (
 
 log = logging.getLogger(__name__)
 TESTDATA_DIR = str(Path(__file__).parent / "testdata")
+
+
+@pytest.mark.parametrize(
+    ("tags", "expected"),
+    [
+        ({"highway": "primary"}, True),
+        ({"waterway": "stream"}, True),
+        ({"railway": "rail"}, True),
+        ({"aeroway": "runway"}, True),
+        ({"barrier": "fence"}, True),
+        ({"barrier": "wire_fence"}, True),
+        ({"barrier": "hedge"}, False),
+        ({"natural": "cliff"}, True),
+        ({"natural": "tree_row"}, False),
+        ({"man_made": "embankment"}, True),
+        ({"man_made": "dyke"}, True),
+        ({"man_made": "dike"}, True),
+        ({"man_made": "pier"}, False),
+        ({}, False),
+    ],
+)
+def test_is_linear_split_feature_tag_classification(tags, expected):
+    """Classify supported linear/non-traversable tags for split features."""
+    assert _is_linear_split_feature(tags) is expected
 
 
 def test_init_splitter_types(aoi_json):

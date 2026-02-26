@@ -392,6 +392,10 @@
   margin-bottom: 15px;
 }
 
+.ftm-step__actions > button.wa-button {
+  min-width: 180px;
+}
+
 .ftm-step__success {
   padding: 10px;
   background-color: #fff;
@@ -410,6 +414,15 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 15px;
   margin-bottom: 15px;
+}
+
+.ftm-split-grid--advanced {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 8px;
+}
+
+.ftm-split-grid--advanced > div:last-child {
+  grid-column: 1 / -1;
 }
 
 .ftm-split-label {
@@ -446,6 +459,52 @@
   display: block;
 }
 
+.ftm-advanced-config {
+  margin-top: 8px;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
+  background-color: #fcfdfe;
+  padding: 10px 12px;
+}
+
+.ftm-advanced-toggle {
+  background-color: #f4f7fa;
+  border-color: #d2dbe4;
+  color: #425468;
+}
+
+.ftm-advanced-toggle:hover {
+  background-color: #e9eff5;
+}
+
+.ftm-advanced-config--hidden {
+  display: none;
+}
+
+.ftm-advanced-config__summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ftm-text);
+}
+
+.ftm-advanced-config__content {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ftm-split-feature-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin-top: 6px;
+}
+
+.ftm-split-feature-options .ftm-checkbox-label {
+  display: flex;
+  align-items: center;
+}
+
 .ftm-config-note {
   padding: 8px;
   border-radius: var(--ftm-radius-sm);
@@ -459,6 +518,17 @@
 
 .ftm-config-note--muted {
   background-color: #f0f0f0;
+}
+
+@media (max-width: 900px) {
+  .ftm-split-grid,
+  .ftm-split-grid--advanced {
+    grid-template-columns: 1fr;
+  }
+
+  .ftm-split-feature-options {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --- Published project ------------------------------------ */

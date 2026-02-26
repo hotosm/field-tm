@@ -3,171 +3,415 @@
       const projectId = {% if project %}{{ project.id }}{% else %}null{% endif %};
       if (!projectId) return;
 
-      // Step 1: XLSForm Selection
-      const selectXlsformBtn = document.getElementById('select-xlsform-btn');
-      const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
-      const xlsformFileInput = document.getElementById('xlsform-file-input');
-      const xlsformStatus = document.getElementById('xlsform-status');
-      const templateFormIdInput = document.getElementById('template-form-id');
-      const formConfigContainer = document.getElementById('form-config-container');
+      // Shared setup preference for streamlined defaults across steps.
+      const setupPreferenceKey = `ftm-project-setup-preference-${projectId}`;
       const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
+      const OSM_FORM_TITLE_TO_PRESET = {
+        'OSM Buildings': { category: 'buildings', geomType: 'POLYGON', centroid: false },
+        'OSM Highways': { category: 'highways', geomType: 'POLYLINE', centroid: false },
+        'OSM Healthcare': { category: 'health', geomType: 'POINT', centroid: false },
+        'OSM Toilets': { category: 'toilets', geomType: 'POINT', centroid: false },
+        'OSM Religious': { category: 'religious', geomType: 'POINT', centroid: false },
+        'OSM Landuse': { category: 'landusage', geomType: 'POLYGON', centroid: false },
+        'OSM Waterways': { category: 'waterways', geomType: 'POLYLINE', centroid: false },
+        'OSM Water Points': { category: 'waterpoints', geomType: 'POINT', centroid: false },
+        'OSM Waste Disposal': { category: 'wastedisposal', geomType: 'POINT', centroid: false },
+        'OSM Education': { category: 'education', geomType: 'POINT', centroid: false },
+        'OSM Cemeteries': { category: 'cemeteries', geomType: 'POLYGON', centroid: false },
+        'OSM Amenities': { category: 'amenities', geomType: 'POINT', centroid: false },
+      };
 
-      // Fetch and display XLSForms list
-      if (selectXlsformBtn && !hasXlsform) {
-        selectXlsformBtn.addEventListener('click', async function() {
-          try {
-            const response = await fetch('/central/list-forms');
-            if (!response.ok) {
-              throw new Error('Failed to load forms');
-            }
-            const forms = await response.json();
+      function defaultDownloadPreset() {
+        return { category: 'buildings', geomType: 'POLYGON', centroid: false };
+      }
 
-            if (forms.length === 0) {
-              xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>No XLSForms available.</span></wa-callout>';
-              return;
-            }
+      function presetForFormTitle(formTitle) {
+        return OSM_FORM_TITLE_TO_PRESET[formTitle] || defaultDownloadPreset();
+      }
 
-            // Create dropdown to select form
-            let optionsHtml = '<div style="margin-bottom: 10px;"><select id="xlsform-select" style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95em;"><option value="">Select a category...</option>';
-            forms.forEach(form => {
-              optionsHtml += `<option value="${form.id}">${form.title}</option>`;
-            });
-            optionsHtml += '</select></div><wa-button id="confirm-xlsform-btn" variant="primary" style="margin-top: 10px;">Use Selected Form</wa-button>';
+      function parseSetupPreference() {
+        try {
+          const raw = window.localStorage.getItem(setupPreferenceKey);
+          return raw ? JSON.parse(raw) : null;
+        } catch (_) {
+          return null;
+        }
+      }
 
-            xlsformStatus.innerHTML = optionsHtml;
+      function saveSetupPreference(preference) {
+        try {
+          window.localStorage.setItem(setupPreferenceKey, JSON.stringify(preference));
+        } catch (_) {
+          // Ignore storage failures to keep setup flow resilient.
+        }
+      }
 
-            // Handle form selection
-            const confirmBtn = document.getElementById('confirm-xlsform-btn');
-
-            if (confirmBtn) {
-              confirmBtn.addEventListener('click', async function() {
-                const select = document.getElementById('xlsform-select');
-                const formId = select?.value;
-                if (!formId) {
-                  xlsformStatus.innerHTML = '<wa-callout variant="warning"><span>Please select a form category.</span></wa-callout>';
-                  return;
-                }
-
-                // Store selected form ID and show configuration options
-                if (templateFormIdInput) {
-                  templateFormIdInput.value = formId;
-                }
-                // Clear file input when template is selected
-                if (xlsformFileInput) {
-                  xlsformFileInput.value = '';
-                }
-                if (formConfigContainer) {
-                  formConfigContainer.classList.add('ftm-form-config--visible');
-                }
-                xlsformStatus.innerHTML = '<wa-callout variant="info"><span>Form selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
-              });
-            }
-
-          } catch (error) {
-            xlsformStatus.innerHTML = `<wa-callout variant="danger"><span>Error loading forms: ${error.message}</span></wa-callout>`;
-          }
+      function bindAdvancedToggle(toggleElement, panelElement) {
+        if (!toggleElement || !panelElement) return;
+        toggleElement.addEventListener('click', function() {
+          panelElement.classList.toggle('ftm-advanced-config--hidden');
         });
       }
 
-      // Handle XLSForm upload button click
+      // Step 1: XLSForm Selection
+      const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
+      const formAdvancedConfigToggle = document.getElementById('form-advanced-config-toggle');
+      const formAdvancedConfigPanel = document.getElementById('form-advanced-config-panel');
+      const uploadXlsformForm = document.getElementById('upload-xlsform-form');
+      const uploadXlsformSubmitBtn = document.getElementById('upload-xlsform-submit-btn');
+      const selectedXlsformName = document.getElementById('selected-xlsform-name');
+      const xlsformFileInput = document.getElementById('xlsform-file-input');
+      const xlsformSelect = document.getElementById('xlsform-select');
+      const xlsformStatus = document.getElementById('xlsform-status');
+      const templateFormIdInput = document.getElementById('template-form-id');
+      const formTemplatesById = new Map();
+
+      bindAdvancedToggle(formAdvancedConfigToggle, formAdvancedConfigPanel);
+
+      function setStep1Status(message, variant = 'info') {
+        if (!xlsformStatus) return;
+        xlsformStatus.innerHTML = `<wa-callout variant="${variant}"><span>${message}</span></wa-callout>`;
+      }
+
+      function setStep1Ready(isReady) {
+        if (!uploadXlsformSubmitBtn) return;
+        uploadXlsformSubmitBtn.disabled = !isReady;
+      }
+
+      function clearTemplateSelection() {
+        if (templateFormIdInput) {
+          templateFormIdInput.value = '';
+        }
+      }
+
+      function setSurveyTypeOptions(forms) {
+        if (!xlsformSelect) return;
+        xlsformSelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select a survey type...';
+        xlsformSelect.appendChild(placeholder);
+
+        forms.forEach((form) => {
+          const option = document.createElement('option');
+          option.value = String(form.id);
+          option.textContent = form.title;
+          xlsformSelect.appendChild(option);
+        });
+      }
+
+      async function loadSurveyTypes() {
+        if (!xlsformSelect) return;
+        xlsformSelect.disabled = true;
+        xlsformSelect.innerHTML = '<option value="">Loading survey types...</option>';
+
+        try {
+          const response = await fetch('/central/list-forms');
+          if (!response.ok) {
+            throw new Error('Failed to load forms');
+          }
+
+          const forms = await response.json();
+          formTemplatesById.clear();
+          forms.forEach((form) => formTemplatesById.set(String(form.id), form));
+
+          if (forms.length === 0) {
+            xlsformSelect.innerHTML = '<option value="">No survey types available</option>';
+            setStep1Status(
+              'No survey forms are available. Upload a custom form in Advanced Config.',
+              'warning',
+            );
+            return;
+          }
+
+          setSurveyTypeOptions(forms);
+          xlsformSelect.disabled = false;
+          setStep1Status(
+            'Select a survey type, or upload a custom form in Advanced Config.',
+            'info',
+          );
+        } catch (error) {
+          xlsformSelect.innerHTML = '<option value="">Failed to load survey types</option>';
+          setStep1Status(`Error loading forms: ${error.message}`, 'danger');
+        }
+      }
+
+      if (!hasXlsform) {
+        setStep1Ready(false);
+        loadSurveyTypes();
+      }
+
+      if (xlsformSelect && !hasXlsform) {
+        xlsformSelect.addEventListener('change', function() {
+          const formId = xlsformSelect.value;
+          if (!formId) {
+            clearTemplateSelection();
+            setStep1Ready(false);
+            return;
+          }
+
+          if (templateFormIdInput) {
+            templateFormIdInput.value = formId;
+          }
+          if (xlsformFileInput) {
+            xlsformFileInput.value = '';
+          }
+          if (selectedXlsformName) {
+            selectedXlsformName.textContent = '';
+          }
+
+          const selectedForm = formTemplatesById.get(String(formId));
+          const preset = presetForFormTitle(selectedForm?.title);
+          saveSetupPreference({
+            mode: 'template',
+            templateFormId: formId,
+            templateTitle: selectedForm?.title || null,
+            category: preset.category,
+            geomType: preset.geomType,
+            centroid: preset.centroid,
+          });
+
+          setStep1Ready(true);
+          setStep1Status('Survey type selected. Click "Continue".', 'info');
+        });
+      }
+
+      // Handle custom XLSForm uploads from advanced config
       if (uploadXlsformBtn && xlsformFileInput && !hasXlsform) {
         uploadXlsformBtn.addEventListener('click', () => {
           xlsformFileInput.click();
-          // Clear template form ID when uploading custom form
-          if (templateFormIdInput) {
-            templateFormIdInput.value = '';
-          }
         });
 
         xlsformFileInput.addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (!file) return;
 
-          // Validate file extension
           const validExtensions = ['.xls', '.xlsx'];
           const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
           if (!validExtensions.includes(fileExtension)) {
-            xlsformStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .xls or .xlsx file.</span></wa-callout>';
+            setStep1Status('Invalid file type. Please upload a .xls or .xlsx file.', 'danger');
             xlsformFileInput.value = '';
+            setStep1Ready(false);
             return;
           }
 
-          // Show configuration options for custom upload
-          if (formConfigContainer) {
-            formConfigContainer.classList.add('ftm-form-config--visible');
+          clearTemplateSelection();
+          if (xlsformSelect) {
+            xlsformSelect.value = '';
           }
-          xlsformStatus.innerHTML = '<wa-callout variant="info"><span>File selected. Configure options below and click "Apply Configuration & Upload".</span></wa-callout>';
+          if (selectedXlsformName) {
+            selectedXlsformName.textContent = `Selected file: ${file.name}`;
+          }
+
+          saveSetupPreference({
+            mode: 'custom',
+            templateFormId: null,
+            templateTitle: null,
+            category: 'buildings',
+            geomType: 'POLYGON',
+            centroid: false,
+          });
+
+          setStep1Ready(true);
+          setStep1Status(
+            'Custom form selected. Click "Continue" to upload it.',
+            'info',
+          );
         });
       }
 
-      // Step 2: OSM Data (only enable if Step 1 is complete)
+      if (uploadXlsformForm && !hasXlsform) {
+        uploadXlsformForm.addEventListener('submit', function(e) {
+          const hasTemplateSelection = Boolean(templateFormIdInput?.value);
+          const hasUploadedFile = Boolean(xlsformFileInput?.files?.length);
+
+          if (!hasTemplateSelection && !hasUploadedFile) {
+            e.preventDefault();
+            setStep1Status(
+              'Choose a survey type first, or upload a custom form in Advanced Config.',
+              'warning',
+            );
+            setStep1Ready(false);
+            return false;
+          }
+        });
+      }
+
+      // Step 2: OSM Data
       const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
+      const collectNewDataBtn = document.getElementById('collect-new-data-btn');
       const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
       const geojsonFileInput = document.getElementById('geojson-file-input');
       const osmDataStatus = document.getElementById('osm-data-status');
-  const downloadLoading = document.getElementById('download-loading');
-  const downloadBtnText = document.getElementById('download-btn-text');
-  const downloadSpinner = document.getElementById('download-spinner');
+      const downloadLoading = document.getElementById('download-loading');
+      const downloadBtnText = document.getElementById('download-btn-text');
+      const downloadSpinner = document.getElementById('download-spinner');
+      const dataAdvancedConfigToggle = document.getElementById('data-advanced-config-toggle');
+      const dataAdvancedConfigPanel = document.getElementById('data-advanced-config-panel');
+      const recommendedDataNoteText = document.getElementById('recommended-data-note-text');
+      const osmCategorySelect = document.getElementById('osm-category-select');
+      const osmGeomTypeSelect = document.getElementById('osm-geom-type-select');
+      const osmCentroidCheckbox = document.getElementById('osm-centroid-checkbox');
+
+      bindAdvancedToggle(dataAdvancedConfigToggle, dataAdvancedConfigPanel);
+
+      function formatGeomType(geomType) {
+        if (geomType === 'POLYGON') return 'polygons';
+        if (geomType === 'POLYLINE') return 'polylines';
+        if (geomType === 'POINT') return 'points';
+        return 'features';
+      }
+
+      function toFormTitle(category) {
+        return Object.keys(OSM_FORM_TITLE_TO_PRESET).find(
+          (title) => OSM_FORM_TITLE_TO_PRESET[title]?.category === category,
+        );
+      }
+
+      function buildDownloadUrl(config) {
+        const params = new URLSearchParams({
+          project_id: String(projectId),
+          osm_category: config.category || 'buildings',
+          geom_type: config.geomType || 'POLYGON',
+        });
+        if (config.centroid) {
+          params.set('centroid', 'true');
+        }
+        return `/download-osm-data-htmx?${params.toString()}`;
+      }
+
+      function readStep2DownloadConfig() {
+        return {
+          category: osmCategorySelect?.value || 'buildings',
+          geomType: osmGeomTypeSelect?.value || 'POLYGON',
+          centroid: Boolean(osmCentroidCheckbox?.checked),
+        };
+      }
+
+      function applyStep2DownloadConfig(config, sourceMode = 'template') {
+        if (osmCategorySelect) osmCategorySelect.value = config.category || 'buildings';
+        if (osmGeomTypeSelect) osmGeomTypeSelect.value = config.geomType || 'POLYGON';
+        if (osmCentroidCheckbox) osmCentroidCheckbox.checked = Boolean(config.centroid);
+
+        if (downloadOsmDataBtn) {
+          downloadOsmDataBtn.setAttribute('hx-post', buildDownloadUrl(config));
+        }
+
+        if (!recommendedDataNoteText) return;
+
+        const title = toFormTitle(config.category);
+        const geomLabel = formatGeomType(config.geomType);
+        if (sourceMode === 'custom') {
+          recommendedDataNoteText.textContent = (
+            'You uploaded a custom form, so this OSM download is optional. '
+            + 'Use Advanced Config to upload your own GeoJSON or adjust download settings.'
+          );
+        } else if (title) {
+          recommendedDataNoteText.textContent = `Recommended source: ${title} (${geomLabel}). Review the data on the map, then continue.`;
+        } else {
+          recommendedDataNoteText.textContent = `Recommended source updated (${geomLabel}). Review the data on the map, then continue.`;
+        }
+      }
 
       if (!hasXlsform && downloadOsmDataBtn) {
         downloadOsmDataBtn.disabled = true;
+      }
+      if (!hasXlsform && collectNewDataBtn) {
+        collectNewDataBtn.disabled = true;
       }
       if (!hasXlsform && uploadGeojsonBtn) {
         uploadGeojsonBtn.disabled = true;
       }
 
-  // Show loading spinner when download starts
       if (downloadOsmDataBtn) {
-    downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
-      if (downloadLoading) downloadLoading.style.display = 'block';
-      if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
-      if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
-      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
-    });
+        const preference = parseSetupPreference();
+        if (preference && preference.category && preference.geomType) {
+          applyStep2DownloadConfig(
+            {
+              category: preference.category,
+              geomType: preference.geomType,
+              centroid: Boolean(preference.centroid),
+            },
+            preference.mode === 'custom' ? 'custom' : 'template',
+          );
+        } else {
+          applyStep2DownloadConfig(defaultDownloadPreset(), 'template');
+        }
 
-    downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
-      if (downloadLoading) downloadLoading.style.display = 'none';
-      if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
-      if (downloadSpinner) downloadSpinner.style.display = 'none';
-      if (downloadOsmDataBtn) downloadOsmDataBtn.disabled = false;
-    });
-  }
+        downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
+          if (downloadLoading) downloadLoading.style.display = 'block';
+          if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+          if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
+          downloadOsmDataBtn.disabled = true;
+        });
 
-  // Upload custom GeoJSON
-  const uploadGeojsonForm = document.getElementById('upload-geojson-form');
+        downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
+          if (downloadLoading) downloadLoading.style.display = 'none';
+          if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
+          if (downloadSpinner) downloadSpinner.style.display = 'none';
+          downloadOsmDataBtn.disabled = false;
+        });
+      }
 
-  if (uploadGeojsonBtn) {
-    uploadGeojsonBtn.addEventListener('click', () => {
-      if (geojsonFileInput) {
-        geojsonFileInput.click();
+      if (osmCategorySelect || osmGeomTypeSelect || osmCentroidCheckbox) {
+        const onAdvancedDownloadConfigChange = function() {
+          const previous = parseSetupPreference() || {};
+          const sourceMode = previous.mode === 'custom' ? 'custom' : 'template';
+          const config = readStep2DownloadConfig();
+          applyStep2DownloadConfig(config, sourceMode);
+          saveSetupPreference({
+            ...previous,
+            mode: sourceMode,
+            category: config.category,
+            geomType: config.geomType,
+            centroid: config.centroid,
+          });
+        };
+
+        if (osmCategorySelect) {
+          osmCategorySelect.addEventListener('change', onAdvancedDownloadConfigChange);
+        }
+        if (osmGeomTypeSelect) {
+          osmGeomTypeSelect.addEventListener('change', onAdvancedDownloadConfigChange);
+        }
+        if (osmCentroidCheckbox) {
+          osmCentroidCheckbox.addEventListener('change', onAdvancedDownloadConfigChange);
+        }
+      }
+
+      // Upload custom GeoJSON
+      const uploadGeojsonForm = document.getElementById('upload-geojson-form');
+
+      if (uploadGeojsonBtn) {
+        uploadGeojsonBtn.addEventListener('click', () => {
+          if (geojsonFileInput) {
+            geojsonFileInput.click();
           }
         });
       }
 
-  if (geojsonFileInput && uploadGeojsonForm) {
-    geojsonFileInput.addEventListener('change', function(e) {
+      if (geojsonFileInput && uploadGeojsonForm) {
+        geojsonFileInput.addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (!file) return;
 
-      // Validate file extension
-      const validExtensions = ['.geojson', '.json'];
-      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-      if (!validExtensions.includes(fileExtension)) {
-        osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
-        geojsonFileInput.value = '';
-        return;
-      }
+          const validExtensions = ['.geojson', '.json'];
+          const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+          if (!validExtensions.includes(fileExtension)) {
+            osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
+            geojsonFileInput.value = '';
+            return;
+          }
 
-      // Submit form via HTMX using requestSubmit (proper form submission)
-      if (uploadGeojsonForm.requestSubmit) {
-        uploadGeojsonForm.requestSubmit();
-      } else {
-        // Fallback for older browsers
-        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-        uploadGeojsonForm.dispatchEvent(submitEvent);
+          if (uploadGeojsonForm.requestSubmit) {
+            uploadGeojsonForm.requestSubmit();
+          } else {
+            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+            uploadGeojsonForm.dispatchEvent(submitEvent);
+          }
+        });
       }
-    });
-  }
 
   // Step 2: Data extract preview (collapsed by default when Step 2 is complete)
   const previewDataExtractBtn = document.getElementById('preview-data-extract-btn');
@@ -196,6 +440,40 @@
   const paramDimension = document.getElementById('param-dimension');
   const noOfBuildingsInput = document.getElementById('no-of-buildings');
   const dimensionMetersInput = document.getElementById('dimension-meters');
+  const splitAdvancedConfigToggle = document.getElementById('split-advanced-config-toggle');
+  const splitAdvancedConfigPanel = document.getElementById('split-advanced-config-panel');
+  const splitIncludeRoadsCheckbox = document.getElementById('split-include-roads-checkbox');
+  const splitIncludeRiversCheckbox = document.getElementById('split-include-rivers-checkbox');
+  const splitIncludeRailwaysCheckbox = document.getElementById('split-include-railways-checkbox');
+  const splitIncludeAerowaysCheckbox = document.getElementById('split-include-aeroways-checkbox');
+  const splitIncludeRoadsValue = document.getElementById('split-include-roads-value');
+  const splitIncludeRiversValue = document.getElementById('split-include-rivers-value');
+  const splitIncludeRailwaysValue = document.getElementById('split-include-railways-value');
+  const splitIncludeAerowaysValue = document.getElementById('split-include-aeroways-value');
+
+  bindAdvancedToggle(splitAdvancedConfigToggle, splitAdvancedConfigPanel);
+
+  function syncSplitLinearFeatureOptions() {
+    if (splitIncludeRoadsValue && splitIncludeRoadsCheckbox) {
+      splitIncludeRoadsValue.value = splitIncludeRoadsCheckbox.checked ? 'true' : 'false';
+    }
+    if (splitIncludeRiversValue && splitIncludeRiversCheckbox) {
+      splitIncludeRiversValue.value = splitIncludeRiversCheckbox.checked ? 'true' : 'false';
+    }
+    if (splitIncludeRailwaysValue && splitIncludeRailwaysCheckbox) {
+      splitIncludeRailwaysValue.value = splitIncludeRailwaysCheckbox.checked ? 'true' : 'false';
+    }
+    if (splitIncludeAerowaysValue && splitIncludeAerowaysCheckbox) {
+      splitIncludeAerowaysValue.value = splitIncludeAerowaysCheckbox.checked ? 'true' : 'false';
+    }
+  }
+
+  [splitIncludeRoadsCheckbox, splitIncludeRiversCheckbox, splitIncludeRailwaysCheckbox, splitIncludeAerowaysCheckbox]
+    .filter(Boolean)
+    .forEach((checkbox) => {
+      checkbox.addEventListener('change', syncSplitLinearFeatureOptions);
+    });
+  syncSplitLinearFeatureOptions();
 
   if (splitAlgorithm) {
     // Function to update parameter visibility
@@ -338,6 +616,7 @@
 
     // Handle form submission - ensure correct parameter is sent
     splitAoiForm.addEventListener('submit', function(e) {
+      syncSplitLinearFeatureOptions();
       const algorithm = splitAlgorithm?.value;
 
       if (!algorithm || algorithm === '') {

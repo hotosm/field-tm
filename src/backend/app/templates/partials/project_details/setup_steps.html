@@ -4,7 +4,10 @@ project.status.value else (project.status if project.status is string else
 'DRAFT') %} {% set has_xlsform = project.xlsform_content is not none and
 project.xlsform_content %} {% set has_data_extract =
 project.data_extract_geojson is not none and project.data_extract_geojson %} {%
-set is_empty_data_extract = project.data_extract_geojson == {} %} {% set
+set is_empty_data_extract = project.data_extract_geojson == {} or
+(project.data_extract_geojson and project.data_extract_geojson.get('type') ==
+'FeatureCollection' and project.data_extract_geojson.get('features') is not none
+and project.data_extract_geojson.get('features') | length == 0) %} {% set
 has_task_areas = project.task_areas_geojson is not none %} {% set
 is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 'PUBLISHED' %}
@@ -47,125 +50,137 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     </div>
     {% if not has_xlsform %}
     <p class="ftm-step__description">
-      Choose a category type from existing XLSForms or upload a custom form.
+      Choose a survey type and continue with recommended defaults.
     </p>
-    <div class="ftm-step__actions">
-      <wa-button
-        id="select-xlsform-btn"
-        variant="default"
-        style="flex: 1; min-width: 200px"
-      >
-        Select Category Type
-      </wa-button>
-      <wa-button
-        id="upload-xlsform-btn"
-        variant="default"
-        style="flex: 1; min-width: 200px"
-      >
-        Upload Custom Form
-      </wa-button>
-    </div>
-
-    <!-- Form Configuration Options (shown after form selection/upload) -->
-    <div id="form-config-container" class="ftm-form-config">
-      <h4 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
-        Form Configuration
-      </h4>
-      <form
-        id="upload-xlsform-form"
-        hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
-        hx-target="#xlsform-status"
-        hx-swap="innerHTML"
-        hx-encoding="multipart/form-data"
-        style="display: flex; flex-direction: column; gap: 12px"
-      >
-        <label
-          class="ftm-checkbox-label"
-          style="display: flex; align-items: center; gap: 8px"
-        >
-          <input
-            type="checkbox"
-            name="need_verification_fields"
-            value="true"
-            checked
-            style="margin: 0; cursor: pointer"
-          />
-          <span style="font-size: 0.95em">Include verification fields</span>
+    <form
+      id="upload-xlsform-form"
+      hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+      hx-target="#xlsform-status"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      style="display: flex; flex-direction: column; gap: 12px"
+    >
+      <div class="ftm-step__status">
+        <label for="xlsform-select" class="ftm-split-label">
+          Choose Survey Type:
         </label>
-        <label
-          class="ftm-checkbox-label"
-          style="display: flex; align-items: center; gap: 8px"
-        >
-          <input
-            type="checkbox"
-            name="mandatory_photo_upload"
-            value="true"
-            style="margin: 0; cursor: pointer"
-          />
-          <span style="font-size: 0.95em">Make photo upload mandatory</span>
-        </label>
-        {% if field_mapping_app_value %} {% set app_name =
-        field_mapping_app_value %} {% set is_odk = field_mapping_app_upper ==
-        'ODK' %}
-        <input
-          type="hidden"
-          name="use_odk_collect"
-          value="{{ 'true' if is_odk else 'false' }}"
-        />
-        {% if is_odk %}
-        <div class="ftm-config-note ftm-config-note--info">
-          <span
-            >✓ ODK Collect-specific components will be included (automatically
-            set for ODK projects)</span
-          >
-        </div>
-        {% else %}
-        <div class="ftm-config-note ftm-config-note--muted">
-          <span
-            >ODK Collect-specific components disabled (project uses {{ app_name
-            }})</span
-          >
-        </div>
-        {% endif %} {% else %}
-        <input type="hidden" name="use_odk_collect" value="false" />
-        <div class="ftm-config-note ftm-config-note--muted">
-          <span
-            >ODK Collect-specific components disabled (no field mapping app
-            selected)</span
-          >
-        </div>
-        {% endif %}
-        <div style="margin-top: 10px">
-          <label class="ftm-split-label">Default Language:</label>
-          <select name="default_language" class="ftm-split-select">
-            <option value="english">English</option>
-            <option value="spanish">Spanish</option>
-            <option value="french">French</option>
-            <option value="portuguese">Portuguese</option>
-            <option value="swahili">Swahili</option>
-            <option value="hindi">Hindi</option>
-          </select>
-        </div>
-        <input
-          type="file"
-          name="xlsform"
-          id="xlsform-file-input"
-          accept=".xls,.xlsx"
-          style="display: none"
-        />
-        <input
-          type="hidden"
-          name="template_form_id"
-          id="template-form-id"
-          value=""
-        />
-        <wa-button type="submit" variant="primary" style="margin-top: 10px">
-          Apply Configuration & Upload
-        </wa-button>
-      </form>
-    </div>
+        <select id="xlsform-select" class="ftm-split-select" disabled>
+          <option value="">Loading survey types...</option>
+        </select>
+      </div>
 
-    <div id="xlsform-status" class="ftm-step__status"></div>
+      <input type="hidden" name="need_verification_fields" value="true" />
+      {% if field_mapping_app_value %} {% set app_name = field_mapping_app_value
+      %} {% set is_odk = field_mapping_app_upper == 'ODK' %}
+      <input
+        type="hidden"
+        name="use_odk_collect"
+        value="{{ 'true' if is_odk else 'false' }}"
+      />
+      {% if is_odk %}
+      <div class="ftm-config-note ftm-config-note--info">
+        <span
+          >Recommended defaults are active for ODK projects, including ODK
+          Collect compatibility.</span
+        >
+      </div>
+      {% else %}
+      <div class="ftm-config-note ftm-config-note--muted">
+        <span
+          >Recommended defaults are active for {{ app_name }} projects.</span
+        >
+      </div>
+      {% endif %} {% else %}
+      <input type="hidden" name="use_odk_collect" value="false" />
+      <div class="ftm-config-note ftm-config-note--muted">
+        <span>Recommended defaults are active for this project.</span>
+      </div>
+      {% endif %}
+
+      <div id="xlsform-status" class="ftm-step__status"></div>
+
+      <div class="ftm-step__actions" style="margin-bottom: 8px">
+        <button
+          type="button"
+          id="form-advanced-config-toggle"
+          class="wa-button wa-button--default ftm-advanced-toggle"
+        >
+          Advanced Config
+        </button>
+      </div>
+
+      <div
+        id="form-advanced-config-panel"
+        class="ftm-advanced-config ftm-advanced-config--hidden"
+      >
+        <div class="ftm-advanced-config__content">
+          <p class="ftm-step__description" style="margin-bottom: 10px">
+            Upload a custom XLSForm or adjust form-processing options.
+          </p>
+
+          <div class="ftm-step__actions" style="margin-bottom: 12px">
+            <button
+              type="button"
+              id="upload-xlsform-btn"
+              class="wa-button wa-button--default"
+              style="min-width: 220px"
+            >
+              Upload Custom Form
+            </button>
+            <small id="selected-xlsform-name" class="ftm-form-help"></small>
+          </div>
+
+          <label
+            class="ftm-checkbox-label"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <input
+              type="checkbox"
+              name="mandatory_photo_upload"
+              value="true"
+              style="margin: 0; cursor: pointer"
+            />
+            <span style="font-size: 0.95em">Make photo upload mandatory</span>
+          </label>
+
+          <div style="margin-top: 10px">
+            <label class="ftm-split-label">Default Language:</label>
+            <select name="default_language" class="ftm-split-select">
+              <option value="english">English</option>
+              <option value="spanish">Spanish</option>
+              <option value="french">French</option>
+              <option value="portuguese">Portuguese</option>
+              <option value="swahili">Swahili</option>
+              <option value="hindi">Hindi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <input
+        type="file"
+        name="xlsform"
+        id="xlsform-file-input"
+        accept=".xls,.xlsx"
+        style="display: none"
+      />
+      <input
+        type="hidden"
+        name="template_form_id"
+        id="template-form-id"
+        value=""
+      />
+
+      <wa-button
+        id="upload-xlsform-submit-btn"
+        type="submit"
+        variant="primary"
+        style="margin-top: 4px"
+        disabled
+      >
+        Continue
+      </wa-button>
+    </form>
     {% else %}
     <div class="ftm-step__success">✓ Survey form uploaded successfully</div>
     {% endif %}
@@ -189,8 +204,10 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     </div>
     {% if not has_data_extract %}
     <p class="ftm-step__description">
-      Download OSM data for the selected category or upload a custom GeoJSON
-      file. Review the data on the map, then continue to the next step.
+      Download the recommended OSM data for your survey form.
+      <span id="recommended-data-note-text"
+        >Review the data on the map, then continue.</span
+      >
     </p>
     <div class="ftm-step__actions">
       <button
@@ -199,8 +216,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         hx-target="#osm-data-status"
         hx-swap="innerHTML"
         hx-indicator="#download-spinner"
-        class="wa-button wa-button--default"
-        style="flex: 1; min-width: 200px; position: relative"
+        class="wa-button wa-button--primary"
+        style="min-width: 200px; position: relative"
       >
         <span id="download-btn-text">Download OSM Data</span>
         <span
@@ -220,13 +237,100 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         </span>
       </button>
       <button
-        id="upload-geojson-btn"
+        id="collect-new-data-btn"
+        type="button"
+        hx-post="/collect-new-data-only-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
         class="wa-button wa-button--default"
-        style="flex: 1; min-width: 200px"
+        style="min-width: 200px"
       >
-        Upload Custom GeoJSON
+        Collect New Data Only
       </button>
     </div>
+
+    <div class="ftm-step__actions" style="margin-top: 12px; margin-bottom: 8px">
+      <button
+        id="data-advanced-config-toggle"
+        type="button"
+        class="wa-button wa-button--default ftm-advanced-toggle"
+      >
+        Advanced Config
+      </button>
+    </div>
+
+    <div
+      id="data-advanced-config-panel"
+      class="ftm-advanced-config ftm-advanced-config--hidden"
+    >
+      <div class="ftm-advanced-config__content">
+        <p class="ftm-step__description" style="margin-bottom: 10px">
+          Use custom data inputs or override the default OSM download options.
+        </p>
+
+        <div class="ftm-split-grid ftm-split-grid--advanced">
+          <div>
+            <label for="osm-category-select" class="ftm-split-label"
+              >OSM Category:</label
+            >
+            <select id="osm-category-select" class="ftm-split-select">
+              <option value="buildings">OSM Buildings</option>
+              <option value="highways">OSM Highways</option>
+              <option value="health">OSM Healthcare</option>
+              <option value="toilets">OSM Toilets</option>
+              <option value="religious">OSM Religious</option>
+              <option value="landusage">OSM Landuse</option>
+              <option value="waterways">OSM Waterways</option>
+              <option value="waterpoints">OSM Water Points</option>
+              <option value="wastedisposal">OSM Waste Disposal</option>
+              <option value="education">OSM Education</option>
+              <option value="cemeteries">OSM Cemeteries</option>
+              <option value="amenities">OSM Amenities</option>
+            </select>
+          </div>
+          <div>
+            <label for="osm-geom-type-select" class="ftm-split-label"
+              >Geometry Type:</label
+            >
+            <select id="osm-geom-type-select" class="ftm-split-select">
+              <option value="POLYGON">Polygon</option>
+              <option value="POLYLINE">Polyline</option>
+              <option value="POINT">Point</option>
+            </select>
+          </div>
+          <div>
+            <label
+              class="ftm-checkbox-label"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 28px;
+              "
+            >
+              <input
+                type="checkbox"
+                id="osm-centroid-checkbox"
+                style="margin: 0; cursor: pointer"
+              />
+              <span style="font-size: 0.95em">Use centroids</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="ftm-step__actions" style="margin-bottom: 0">
+          <button
+            id="upload-geojson-btn"
+            class="wa-button wa-button--default"
+            style="min-width: 220px"
+            type="button"
+          >
+            Upload Custom GeoJSON
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="osm-data-status" class="ftm-step__status">
       <div id="download-loading" class="htmx-indicator ftm-loading">
         <div style="display: inline-block">
@@ -320,8 +424,17 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     <p class="ftm-step__description">
       Generate task areas by splitting the Area of Interest (AOI). Choose an
       algorithm and parameters, then split. Review the preview, and click
-      "Accept Task Choices" to save.
+      "Accept Task Areas" to save.
     </p>
+    <div class="ftm-step__actions" style="margin-top: 0; margin-bottom: 8px">
+      <button
+        id="split-advanced-config-toggle"
+        type="button"
+        class="wa-button wa-button--default ftm-advanced-toggle"
+      >
+        Advanced Config
+      </button>
+    </div>
     <form
       id="split-aoi-form"
       hx-post="/split-aoi-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
@@ -330,6 +443,79 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       hx-indicator="#split-loading"
       style="margin-bottom: 15px"
     >
+      <div
+        id="split-advanced-config-panel"
+        class="ftm-advanced-config ftm-advanced-config--hidden"
+      >
+        <div class="ftm-advanced-config__content">
+          <p class="ftm-step__description" style="margin-bottom: 10px">
+            Choose which linear features influence building-based task
+            splitting.
+          </p>
+          <input
+            type="hidden"
+            id="split-include-roads-value"
+            name="include_roads"
+            value="true"
+          />
+          <input
+            type="hidden"
+            id="split-include-rivers-value"
+            name="include_rivers"
+            value="true"
+          />
+          <input
+            type="hidden"
+            id="split-include-railways-value"
+            name="include_railways"
+            value="true"
+          />
+          <input
+            type="hidden"
+            id="split-include-aeroways-value"
+            name="include_aeroways"
+            value="true"
+          />
+          <div class="ftm-split-feature-options">
+            <label class="ftm-checkbox-label">
+              <input
+                type="checkbox"
+                id="split-include-roads-checkbox"
+                checked
+                style="margin-right: 8px; cursor: pointer"
+              />
+              Include roads
+            </label>
+            <label class="ftm-checkbox-label">
+              <input
+                type="checkbox"
+                id="split-include-rivers-checkbox"
+                checked
+                style="margin-right: 8px; cursor: pointer"
+              />
+              Include rivers
+            </label>
+            <label class="ftm-checkbox-label">
+              <input
+                type="checkbox"
+                id="split-include-railways-checkbox"
+                checked
+                style="margin-right: 8px; cursor: pointer"
+              />
+              Include railways
+            </label>
+            <label class="ftm-checkbox-label">
+              <input
+                type="checkbox"
+                id="split-include-aeroways-checkbox"
+                checked
+                style="margin-right: 8px; cursor: pointer"
+              />
+              Include aeroways
+            </label>
+          </div>
+        </div>
+      </div>
       <div class="ftm-split-grid">
         <div>
           <label for="split-algorithm" class="ftm-split-label"
@@ -392,7 +578,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
               type="number"
               id="no-of-buildings"
               name="no_of_buildings"
-              value="50"
+              value="10"
               min="1"
               class="ftm-split-input"
             />
@@ -415,7 +601,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           <button
             type="submit"
             class="wa-button wa-button--primary"
-            style="width: 100%; position: relative"
+            style="min-width: 180px; position: relative"
           >
             <span id="split-btn-text"
               >{% if has_task_areas %}Split Again{% else %}Split AOI{% endif
@@ -485,13 +671,14 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       >
         Finalise Project
       </wa-button>
-      <wa-button
+      <button
         id="advanced-options-toggle"
-        variant="default"
+        type="button"
+        class="wa-button wa-button--default ftm-advanced-toggle"
         style="min-width: 200px"
       >
-        Advanced Options
-      </wa-button>
+        Advanced Config
+      </button>
     </div>
 
     <div id="finalise-status" class="ftm-step__status"></div>
