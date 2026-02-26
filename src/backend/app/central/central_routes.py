@@ -94,6 +94,29 @@ async def _validate_xlsform_extension(xlsform: UploadFile) -> BytesIO:
     return BytesIO(await xlsform.read())
 
 
+def _normalize_xlsform_column(column: object) -> str:
+    """Normalize XLSForm column names for language detection."""
+    normalized = re.sub(r"\([^)]*\)", "", str(column))
+    return normalized.strip().lower()
+
+
+def _extract_default_language(xlsform: dict[str, pd.DataFrame]) -> str | None:
+    """Extract the default language from the XLSForm settings sheet."""
+    settings_df = xlsform.get("settings")
+    if (
+        settings_df is None
+        or settings_df.empty
+        or "default_language" not in settings_df.columns
+    ):
+        return None
+
+    raw_default_language = str(settings_df["default_language"].iloc[0]).strip()
+    if not raw_default_language or raw_default_language.lower() == "nan":
+        return None
+
+    return raw_default_language.split("(")[0].strip().lower()
+
+
 @post(
     "/validate-form",
     summary="Basic validity check for uploaded XLSForm.",
@@ -235,28 +258,21 @@ async def detect_form_languages(
     xlsform_bytes = await _validate_xlsform_extension(data)
     xlsform = pd.read_excel(xlsform_bytes, sheet_name=None, engine="calamine")
     detected_languages = []
-
-    settings_df = xlsform.get("settings")
-    default_language = (
-        settings_df["default_language"].iloc[0].split("(")[0].strip().lower()
-        if settings_df is not None and "default_language" in settings_df
-        else None
-    )
+    default_language = _extract_default_language(xlsform)
 
     for sheet_df in xlsform.values():
         if sheet_df.empty:
             continue
 
-        sheet_df.columns = sheet_df.columns.str.lower()
         for col in sheet_df.columns:
-            if any(
-                col.startswith(f"{base_col}::")
-                for base_col in ["label", "hint", "required_message"]
-            ):
-                match = re.match(r"^(label|hint|required_message)::(\w+)", col)
-                if match and match.group(2) in INCLUDED_LANGUAGES:
-                    if match.group(2) not in detected_languages:
-                        detected_languages.append(match.group(2))
+            col_norm = _normalize_xlsform_column(col)
+            match = re.match(
+                r"^(label|hint|required_message)::([a-z0-9_-]+)$",
+                col_norm,
+            )
+            if match and match.group(2) in INCLUDED_LANGUAGES:
+                if match.group(2) not in detected_languages:
+                    detected_languages.append(match.group(2))
 
     if default_language and default_language.lower() not in detected_languages:
         detected_languages.append(default_language.lower())
