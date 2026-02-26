@@ -67,8 +67,12 @@ class SplitRequest(BaseModel):
     """Step 4 payload to split AOI into tasks."""
 
     algorithm: SplittingAlgorithm
-    no_of_buildings: int = 50
+    no_of_buildings: int = 10
     dimension_meters: int = 100
+    include_roads: bool = True
+    include_rivers: bool = True
+    include_railways: bool = True
+    include_aeroways: bool = True
 
 
 class FinalizeRequest(ODKCentral, QFieldCloud):

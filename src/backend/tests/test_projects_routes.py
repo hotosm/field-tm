@@ -35,6 +35,21 @@ from app.helpers.geometry_utils import check_crs
 log = logging.getLogger(__name__)
 
 
+def test_split_request_default_no_of_buildings_is_10():
+    """API split defaults should match the onboarding UI default."""
+    from area_splitter import SplittingAlgorithm
+
+    from app.api.api_schemas import SplitRequest
+
+    payload = SplitRequest(algorithm=SplittingAlgorithm.NO_SPLITTING)
+
+    assert payload.no_of_buildings == 10
+    assert payload.include_roads is True
+    assert payload.include_rivers is True
+    assert payload.include_railways is True
+    assert payload.include_aeroways is True
+
+
 @pytest.mark.parametrize(
     "crs",
     [
@@ -194,6 +209,83 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
     assert result["type"] == "FeatureCollection"
 
 
+async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch):
+    """Null features from extract API should return a validation error."""
+    from app.projects import project_services
+
+    downloaded_geojson = {"type": "FeatureCollection", "features": None}
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return Mock(
+            id=1,
+            outline={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.30, 27.71],
+                        [85.30, 27.70],
+                        [85.31, 27.70],
+                        [85.31, 27.71],
+                        [85.30, 27.71],
+                    ]
+                ],
+            },
+        )
+
+    async def fake_generate_data_extract(*_args, **_kwargs):
+        return Mock(data={"download_url": "https://example.test/extract.geojson"})
+
+    class FakeResponse:
+        ok = True
+
+        async def text(self):
+            return json.dumps(downloaded_geojson)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+    class FakeSession:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def get(self, _url):
+            return FakeResponse()
+
+    def parse_aoi_should_not_run(*_args, **_kwargs):
+        raise AssertionError("parse_aoi should not be called for empty extract results")
+
+    monkeypatch.setattr(
+        project_services.project_deps,
+        "get_project_by_id",
+        fake_get_project_by_id,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_data_extract",
+        fake_generate_data_extract,
+    )
+    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "parse_aoi", parse_aoi_should_not_run)
+
+    with pytest.raises(
+        project_services.ValidationError,
+        match="No matching OSM features were found",
+    ):
+        await project_services.download_osm_data(
+            db=Mock(),
+            project_id=1,
+            osm_category="highways",
+            geom_type="POLYLINE",
+            centroid=False,
+        )
+
+
 @pytest.mark.parametrize(
     "algorithm",
     ["AVG_BUILDING_VORONOI", "AVG_BUILDING_SKELETON"],
@@ -275,6 +367,12 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     )
 
     assert callable(captured.get("func"))
+    algorithm_params = captured["func"].keywords["algorithm_params"]
+    assert algorithm_params["num_buildings"] == 50
+    assert algorithm_params["include_roads"] == "TRUE"
+    assert algorithm_params["include_rivers"] == "TRUE"
+    assert algorithm_params["include_railways"] == "TRUE"
+    assert algorithm_params["include_aeroways"] == "TRUE"
     assert result["type"] == "FeatureCollection"
     assert len(result["features"]) == 1
 
@@ -444,6 +542,47 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
     assert result.odk_url == "https://central.example.org/#/projects/17"
     assert result.manager_username == "fmtm-manager-17@example.org"
     assert result.manager_password == "StrongPass123"
+
+
+async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeypatch):
+    """Finalize should allow an explicitly empty FeatureCollection for QField."""
+    from app.db.enums import ProjectStatus
+    from app.projects import project_services
+
+    project = Mock(
+        id=1,
+        xlsform_content=b"xlsform-bytes",
+        data_extract_geojson={"type": "FeatureCollection", "features": []},
+    )
+
+    async def fake_project_one(_db, _project_id):
+        return project
+
+    fake_update = AsyncMock(return_value=project)
+    fake_commit = AsyncMock()
+
+    async def fake_create_qfield_project(_db, _project, _custom_qfield_creds=None):
+        return "https://qfield.example.org/projects/1"
+
+    db = Mock()
+    db.commit = fake_commit
+
+    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(project_services.DbProject, "update", fake_update)
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.create_qfield_project",
+        fake_create_qfield_project,
+    )
+
+    result = await project_services.finalize_qfield_project(
+        db=db,
+        project_id=1,
+    )
+
+    assert result == "https://qfield.example.org/projects/1"
+    fake_update.assert_awaited_once()
+    assert fake_update.await_args.args[2].status == ProjectStatus.PUBLISHED
+    fake_commit.assert_awaited_once()
 
 
 async def test_delete_project(client, admin_user, project):

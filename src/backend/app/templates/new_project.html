@@ -123,16 +123,6 @@ Manager{% endblock %} {% block content %}
           accept=".geojson,.json"
           style="display: none"
         />
-        <div class="ftm-checkbox-row">
-          <input
-            type="checkbox"
-            id="merge-geometries-checkbox"
-            style="margin: 0; cursor: pointer"
-          />
-          <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
-            Merge geometries (use convex hull for multipolygons)
-          </label>
-        </div>
         <div id="map" class="ftm-map-container"></div>
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
@@ -142,6 +132,35 @@ Manager{% endblock %} {% block content %}
           100&nbsp;km² will show a warning. The OSM data extract API is limited
           to 200&nbsp;km².
         </small>
+        <div
+          class="ftm-step__actions"
+          style="margin-top: 10px; margin-bottom: 8px"
+        >
+          <button
+            type="button"
+            id="aoi-advanced-config-toggle"
+            class="wa-button wa-button--default ftm-advanced-toggle"
+          >
+            Advanced Config
+          </button>
+        </div>
+        <div
+          id="aoi-advanced-config-panel"
+          class="ftm-advanced-config ftm-advanced-config--hidden"
+        >
+          <div class="ftm-advanced-config__content">
+            <div class="ftm-checkbox-row">
+              <input
+                type="checkbox"
+                id="merge-geometries-checkbox"
+                style="margin: 0; cursor: pointer"
+              />
+              <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
+                Merge geometries (use convex hull for multipolygons)
+              </label>
+            </div>
+          </div>
+        </div>
         <textarea
           name="outline"
           id="outline-geojson"
@@ -182,7 +201,19 @@ Manager{% endblock %} {% block content %}
   const errorMessageEl = document.getElementById("form-error-message");
   const hashtagInput = document.getElementById("hashtag-input");
   const hashtagsContainer = document.getElementById("hashtags-container");
+  const aoiAdvancedConfigToggle = document.getElementById(
+    "aoi-advanced-config-toggle",
+  );
+  const aoiAdvancedConfigPanel = document.getElementById(
+    "aoi-advanced-config-panel",
+  );
   const hashtags = new Set();
+
+  if (aoiAdvancedConfigToggle && aoiAdvancedConfigPanel) {
+    aoiAdvancedConfigToggle.addEventListener("click", () => {
+      aoiAdvancedConfigPanel.classList.toggle("ftm-advanced-config--hidden");
+    });
+  }
 
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;

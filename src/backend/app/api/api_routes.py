@@ -203,6 +203,10 @@ async def api_split(
             algorithm=data.algorithm.value,
             no_of_buildings=data.no_of_buildings,
             dimension_meters=data.dimension_meters,
+            include_roads=data.include_roads,
+            include_rivers=data.include_rivers,
+            include_railways=data.include_railways,
+            include_aeroways=data.include_aeroways,
         )
         task_count = await save_task_areas(
             db=db, project_id=project_id, tasks_geojson=tasks_geojson

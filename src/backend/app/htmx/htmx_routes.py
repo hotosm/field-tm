@@ -14,6 +14,7 @@ from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     accept_data_extract_htmx,
     accept_split_htmx,
+    collect_new_data_only_htmx,
     create_project_odk_htmx,
     create_project_qfield_htmx,
     download_osm_data_htmx,
@@ -61,6 +62,7 @@ htmx_router = Router(
         get_template_xlsform,
         upload_xlsform_htmx,
         download_osm_data_htmx,
+        collect_new_data_only_htmx,
         upload_geojson_htmx,
         preview_geojson_htmx,
         submit_geojson_data_extract_htmx,

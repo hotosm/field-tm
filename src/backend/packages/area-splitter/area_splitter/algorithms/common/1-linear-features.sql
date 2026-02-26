@@ -9,10 +9,26 @@ BEGIN
     SELECT COUNT(*) INTO lines_count
     FROM "ways_line" l
     WHERE (
-        (l.tags->>'highway' IS NOT NULL AND 
-        l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway'))
-        OR l.tags->>'waterway' IS NOT NULL
-        OR l.tags->>'railway' IS NOT NULL
+        (
+            %(include_roads)s
+            AND l.tags->>'highway' IS NOT NULL
+            AND l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway')
+        )
+        OR (
+            %(include_rivers)s
+            AND l.tags->>'waterway' IS NOT NULL
+        )
+        OR (
+            %(include_railways)s
+            AND l.tags->>'railway' IS NOT NULL
+        )
+        OR (
+            %(include_aeroways)s
+            AND l.tags->>'aeroway' IS NOT NULL
+        )
+        OR l.tags->>'barrier' IN ('fence','wire_fence','wall','city_wall','ditch')
+        OR l.tags->>'natural' IN ('cliff')
+        OR l.tags->>'man_made' IN ('embankment','dyke','dike')
     );
     IF lines_count > 0 THEN
     CREATE TABLE polygonsnocount AS (
@@ -32,10 +48,26 @@ BEGIN
             FROM aoi a
             JOIN "ways_line" l ON ST_Intersects(a.geom, l.geom)
             WHERE (
-                (l.tags->>'highway' IS NOT NULL AND 
-                l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway')) -- TODO: update(add/remove) this based on the requirements later
-                OR l.tags->>'waterway' IS NOT NULL
-                OR l.tags->>'railway' IS NOT NULL
+                (
+                    %(include_roads)s
+                    AND l.tags->>'highway' IS NOT NULL
+                    AND l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway')
+                ) -- TODO: update(add/remove) this based on the requirements later
+                OR (
+                    %(include_rivers)s
+                    AND l.tags->>'waterway' IS NOT NULL
+                )
+                OR (
+                    %(include_railways)s
+                    AND l.tags->>'railway' IS NOT NULL
+                )
+                OR (
+                    %(include_aeroways)s
+                    AND l.tags->>'aeroway' IS NOT NULL
+                )
+                OR l.tags->>'barrier' IN ('fence','wire_fence','wall','city_wall','ditch')
+                OR l.tags->>'natural' IN ('cliff')
+                OR l.tags->>'man_made' IN ('embankment','dyke','dike')
             )
         )
             

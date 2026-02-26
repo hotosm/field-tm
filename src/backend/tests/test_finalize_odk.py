@@ -137,6 +137,110 @@ async def test_finalize_odk_project_requires_data_extract():
 
 
 @pytest.mark.asyncio
+async def test_finalize_odk_project_allows_collect_new_data_only_mode():
+    """Finalize should allow an explicitly empty FeatureCollection extract."""
+    project = FakeProject(
+        data_extract_geojson={"type": "FeatureCollection", "features": []},
+        external_project_id=None,
+    )
+
+    fake_db = AsyncMock()
+    fake_db.commit = AsyncMock()
+
+    async def fake_create_odk_project(name, creds):
+        return {"id": 42}
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "Task 1", "data": {"geometry": "geom"}}
+
+    async def fake_read_and_test_xform(xlsform_bytes):
+        return BytesIO(b"<xform/>")
+
+    async def fake_create_odk_xform(*args, **kwargs):
+        pass
+
+    async def fake_generate_project_files(db, project_id, odk_credentials=None):
+        return True
+
+    async def fake_create_project_manager_user(
+        project_odk_id, project_name, odk_credentials
+    ):
+        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+
+    @asynccontextmanager
+    async def fake_get_odk_dataset(_):
+        class FakeDataset:
+            async def listDatasets(self, odk_id):  # noqa: N802
+                return []
+
+        yield FakeDataset()
+
+    mock_create_entity_list = AsyncMock()
+
+    creds = ODKCentral(
+        external_project_instance_url="https://central.example.org",
+        external_project_username="admin@example.org",
+        external_project_password="secret",
+    )
+
+    with (
+        patch(
+            "app.projects.project_services.DbProject.one",
+            return_value=project,
+        ),
+        patch(
+            "app.projects.project_services.DbProject.update",
+            new_callable=AsyncMock,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_odk_project",
+            side_effect=fake_create_odk_project,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_entity_list",
+            mock_create_entity_list,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            side_effect=fake_feature_geojson_to_entity_dict,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.read_and_test_xform",
+            side_effect=fake_read_and_test_xform,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_odk_xform",
+            side_effect=fake_create_odk_xform,
+        ),
+        patch(
+            "app.projects.project_services.project_crud.generate_project_files",
+            side_effect=fake_generate_project_files,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_project_manager_user",
+            side_effect=fake_create_project_manager_user,
+        ),
+        patch(
+            "app.projects.project_services.central_deps.get_odk_dataset",
+            fake_get_odk_dataset,
+        ),
+    ):
+        result = await finalize_odk_project(
+            db=fake_db,
+            project_id=1,
+            custom_odk_creds=creds,
+        )
+
+    assert isinstance(result, ODKFinalizeResult)
+    assert result.odk_url == "https://central.example.org/#/projects/42"
+    assert mock_create_entity_list.await_count == 2
+
+    features_call = mock_create_entity_list.await_args_list[0]
+    assert features_call.kwargs["dataset_name"] == "features"
+    assert features_call.kwargs["entities_list"] == []
+
+
+@pytest.mark.asyncio
 async def test_finalize_odk_project_requires_odk_credentials():
     """Finalize should reject when no ODK credentials are available."""
     project = FakeProject()

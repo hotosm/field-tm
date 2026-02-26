@@ -409,6 +409,23 @@ async def download_osm_data(
             except json.JSONDecodeError as e:
                 raise ServiceError("Failed to parse GeoJSON data from download.") from e
 
+    if not isinstance(geojson_data, dict):
+        raise ServiceError("Downloaded extract is not valid GeoJSON data.")
+
+    # Some extract responses may return `"features": null` for empty results.
+    features = geojson_data.get("features")
+    if features is None:
+        features = []
+        geojson_data["features"] = features
+    if not isinstance(features, list):
+        raise ServiceError("Downloaded GeoJSON has invalid feature structure.")
+    if len(features) == 0:
+        raise ValidationError(
+            "No matching OSM features were found for this area and selection. "
+            "Try different extract options, upload custom GeoJSON, "
+            "or choose Collect New Data Only."
+        )
+
     # Validate and clean GeoJSON
     featcol = parse_aoi(settings.FMTM_DB_URL, geojson_data)
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
@@ -453,7 +470,11 @@ async def save_data_extract(
     await DbProject.update(
         db,
         project_id,
-        project_schemas.ProjectUpdate(data_extract_geojson=geojson_data),
+        project_schemas.ProjectUpdate(
+            data_extract_geojson=geojson_data,
+            # Reset split status when a new extract is accepted.
+            task_areas_geojson=None,
+        ),
     )
     await db.commit()
 
@@ -468,8 +489,12 @@ async def split_aoi(
     db: AsyncConnection,
     project_id: int,
     algorithm: str,
-    no_of_buildings: int = 50,
+    no_of_buildings: int = 10,
     dimension_meters: int = 100,
+    include_roads: bool = True,
+    include_rivers: bool = True,
+    include_railways: bool = True,
+    include_aeroways: bool = True,
 ) -> dict:
     """Split a project AOI into task areas.
 
@@ -479,6 +504,10 @@ async def split_aoi(
         algorithm: Splitting algorithm name.
         no_of_buildings: Number of buildings per task (for building-based algorithms).
         dimension_meters: Grid dimension in meters (for square splitting).
+        include_roads: Include road lines for building-based split guidance.
+        include_rivers: Include river lines for building-based split guidance.
+        include_railways: Include railway lines for building-based split guidance.
+        include_aeroways: Include aeroway lines for building-based split guidance.
 
     Returns:
         A GeoJSON FeatureCollection of task areas, or empty dict for NO_SPLITTING.
@@ -524,7 +553,11 @@ async def split_aoi(
 
     # Get data extract from database
     parsed_extract = project.data_extract_geojson
-    is_empty_data_extract = parsed_extract == {}
+    is_empty_data_extract = parsed_extract == {} or (
+        isinstance(parsed_extract, dict)
+        and parsed_extract.get("type") == "FeatureCollection"
+        and len(parsed_extract.get("features", [])) == 0
+    )
 
     # If data extract is empty, skip splitting
     if is_empty_data_extract:
@@ -557,10 +590,13 @@ async def split_aoi(
                 "Please download OSM data or upload GeoJSON first and accept it."
             )
 
-        algorithm_params = {}
-        for param in algorithm_enum.required_params:
-            if param == "num_buildings":
-                algorithm_params["num_buildings"] = no_of_buildings
+        algorithm_params = {
+            "num_buildings": no_of_buildings,
+            "include_roads": "TRUE" if include_roads else "FALSE",
+            "include_rivers": "TRUE" if include_rivers else "FALSE",
+            "include_railways": "TRUE" if include_railways else "FALSE",
+            "include_aeroways": "TRUE" if include_aeroways else "FALSE",
+        }
 
         split_sql_call = partial(
             split_by_sql,
@@ -669,7 +705,7 @@ async def finalize_odk_project(
 
     if not project.xlsform_content:
         raise ValidationError("XLSForm is required. Please upload a form first.")
-    if not project.data_extract_geojson:
+    if project.data_extract_geojson is None:
         raise ValidationError(
             "Data extract is required. "
             "Please download OSM data or upload GeoJSON first."
@@ -718,33 +754,42 @@ async def finalize_odk_project(
         await db.commit()
 
     # Step 2: Create entity list "features" from data extract
-    geojson_data = project.data_extract_geojson
-    features = geojson_data.get("features", [])
-    if not features:
-        raise ValidationError("Data extract contains no features.")
-
-    first_feature = features[0]
-    entity_properties = list(first_feature.get("properties", {}).keys())
-
-    for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
-        if field not in entity_properties:
-            entity_properties.append(field)
-
-    entities_list = await central_crud.task_geojson_dict_to_entity_values(
-        geojson_data, additional_features=True
+    geojson_data = project.data_extract_geojson or {}
+    features = (
+        geojson_data.get("features", []) if isinstance(geojson_data, dict) else []
     )
+    entity_properties: list[str] = []
+    entities_list: list[dict] = []
 
-    default_style = {
-        "fill": "#1a1a1a",
-        "marker-color": "#1a1a1a",
-        "stroke": "#000000",
-        "stroke-width": "6",
-    }
+    if features:
+        first_feature = features[0]
+        entity_properties = list(first_feature.get("properties", {}).keys())
 
-    for entity in entities_list:
-        data = entity["data"]
-        for key, value in default_style.items():
-            data.setdefault(key, value)
+        for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
+            if field not in entity_properties:
+                entity_properties.append(field)
+
+        entities_list = await central_crud.task_geojson_dict_to_entity_values(
+            geojson_data, additional_features=True
+        )
+
+        default_style = {
+            "fill": "#1a1a1a",
+            "marker-color": "#1a1a1a",
+            "stroke": "#000000",
+            "stroke-width": "6",
+        }
+
+        for entity in entities_list:
+            data = entity["data"]
+            for key, value in default_style.items():
+                data.setdefault(key, value)
+    else:
+        log.info(
+            "No existing features supplied for project %s. "
+            "Creating empty 'features' dataset for collect-new-data workflow.",
+            project_id,
+        )
 
     log.info(f"Creating entity list 'features' for ODK project {project_odk_id}")
     await central_crud.create_entity_list(
@@ -905,7 +950,7 @@ async def finalize_qfield_project(
 
     if not project.xlsform_content:
         raise ValidationError("XLSForm is required. Please upload a form first.")
-    if not project.data_extract_geojson:
+    if project.data_extract_geojson is None:
         raise ValidationError(
             "Data extract is required. "
             "Please download OSM data or upload GeoJSON first."

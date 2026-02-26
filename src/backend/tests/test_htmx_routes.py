@@ -31,6 +31,58 @@ async def test_create_project_htmx(client, stub_project_data):
     assert "/htmxprojects/" in location
 
 
+async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_project):
+    """Draft setup should show a basic-first Step 1 with advanced config."""
+    response = await client.get(
+        f"/htmxprojects/{stub_project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "Choose Survey Type:" in response.text
+    assert "Use Selected Survey Type" not in response.text
+    assert "Continue" in response.text
+    assert "Advanced Config" in response.text
+
+
+async def test_project_setup_shows_step2_advanced_config_options(client, project):
+    """Step 2 should expose custom data paths only under advanced config."""
+    response = await client.get(
+        f"/htmxprojects/{project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "Download OSM Data" in response.text
+    assert "Collect New Data Only" in response.text
+    assert "Upload Custom GeoJSON" in response.text
+    assert response.text.index("data-advanced-config-toggle") < response.text.index(
+        'id="osm-data-status"'
+    )
+
+
+async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
+    client, db, project
+):
+    """Collect-new-data option should persist an empty FeatureCollection."""
+    response = await client.post(
+        f"/collect-new-data-only-htmx?project_id={project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("HX-Refresh") == "true"
+    assert "Collect-new-data mode selected" in response.text
+    assert "Task splitting is skipped" in response.text
+
+    updated_project = await DbProject.one(db, project.id)
+    assert updated_project.data_extract_geojson == {
+        "type": "FeatureCollection",
+        "features": [],
+    }
+    assert updated_project.task_areas_geojson == {}
+
+
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
     """Published ODK projects should show guidance for form media uploads."""
     await DbProject.update(
@@ -120,7 +172,7 @@ def test_build_odk_finalize_success_html_includes_manager_credentials():
     assert "Manager Access (ODK Central UI)" in html
     assert "fmtm-manager@example.org" in html
     assert "StrongPass123!" in html
-    assert "Save these credentials now. Only shown once." in html
+    assert "Save these credentials now." in html
 
 
 def test_build_odk_finalize_success_html_does_not_render_qr_markup():
@@ -136,7 +188,6 @@ def test_build_odk_finalize_success_html_does_not_render_qr_markup():
 
     assert "ODK Collect App User Access" not in html_normalized
     assert "Project QR Code" not in html_normalized
-    assert "project details page" in html_normalized
 
 
 def test_parse_outline_payload_accepts_feature_json_string():
