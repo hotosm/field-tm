@@ -1,7 +1,7 @@
 """Tests for HTMX routes."""
 
 import json
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from litestar import status_codes as status
@@ -81,6 +81,77 @@ async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
         "features": [],
     }
     assert updated_project.task_areas_geojson == {}
+
+
+async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypatch):
+    """Upload should accept OSM-style GeoJSON properties including UTF-8 tags."""
+    from app.htmx import setup_step_routes
+    from app.htmx.setup_step_routes import upload_geojson_htmx
+
+    uploaded_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [85.3000, 27.7140],
+                                [85.3000, 27.7130],
+                                [85.3010, 27.7130],
+                                [85.3010, 27.7140],
+                                [85.3000, 27.7140],
+                            ]
+                        ]
+                    ],
+                },
+                "properties": {
+                    "osm_id": 24691221,
+                    "tags": {
+                        "name": "पुष्पलाल पथ ;स्वयम्भु मार्ग",
+                        "name:en": "Pushpalal Path;Swoyambhu Marg",
+                    },
+                },
+            }
+        ],
+    }
+    uploaded_bytes = json.dumps(uploaded_geojson, ensure_ascii=False).encode("utf-8")
+    captured: dict = {}
+    project = Mock(id=42)
+
+    def fake_parse_aoi(_db_url, input_geojson, merge=True):
+        captured["payload"] = input_geojson
+        captured["merge"] = merge
+        return uploaded_geojson
+
+    async def fake_check_crs(_featcol):
+        return None
+
+    class FakeUploadFile:
+        filename = "osm-export.geojson"
+
+        async def read(self):
+            return uploaded_bytes
+
+    monkeypatch.setattr(setup_step_routes, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(setup_step_routes, "check_crs", fake_check_crs)
+
+    response = await upload_geojson_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        data=FakeUploadFile(),
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "GeoJSON uploaded successfully! Found 1 features." in response.content
+    assert "Accept Data Extract" in response.content
+    assert captured["payload"] == uploaded_bytes
+    assert captured["merge"] is False
 
 
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
