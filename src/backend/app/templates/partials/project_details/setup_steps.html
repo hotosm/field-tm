@@ -1,4 +1,4 @@
-<!-- Project Setup Steps (only show for DRAFT projects) -->
+<!-- Project setup flow and published mapper access -->
 {% set status_value = project.status.value if project.status and
 project.status.value else (project.status if project.status is string else
 'DRAFT') %} {% set has_xlsform = project.xlsform_content is not none and
@@ -8,151 +8,20 @@ set is_empty_data_extract = project.data_extract_geojson == {} %} {% set
 has_task_areas = project.task_areas_geojson is not none %} {% set
 is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 'PUBLISHED' %}
-<!-- Project Published - Prioritize access and QR, keep setup summary below -->
-<div class="ftm-published-divider">
-  <h2 class="ftm-published-header">Project Published ✓</h2>
-  <p style="color: #666; margin-bottom: 20px">
-    Your project has been successfully published and is ready to use.
-  </p>
+<!-- Project Published - Mapper-first access -->
+<div class="ftm-published-divider ftm-published-divider--top">
+  <h2 class="ftm-published-header">Ready for Mapping</h2>
 
-  <!-- External Project Link -->
-  {% if project.external_project_instance_url %}
-  <div class="ftm-external-info" style="border-radius: 8px">
-    <h3 style="color: #333; margin-bottom: 10px; font-size: 1.1em">
-      Access Project
-    </h3>
-    <p style="color: #666; margin-bottom: 10px">
-      {% if field_mapping_app_upper == 'ODK' and project.external_project_id %}
-      {% if '/projects/' in project.external_project_instance_url %}
-      <a
-        href="{{ project.external_project_instance_url }}"
-        target="_blank"
-        class="ftm-link--brand"
-      >
-        View Project in ODK Central →
-      </a>
-      {% else %}
-      <a
-        href="{{ project.external_project_instance_url.rstrip('/') }}/#/projects/{{ project.external_project_id }}"
-        target="_blank"
-        class="ftm-link--brand"
-      >
-        View Project in ODK Central →
-      </a>
-      {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %}
-      <a
-        href="{{ project.external_project_instance_url }}"
-        target="_blank"
-        class="ftm-link--brand"
-      >
-        View Project in QField Cloud →
-      </a>
-      {% else %}
-      <a
-        href="{{ project.external_project_instance_url }}"
-        target="_blank"
-        class="ftm-link--brand"
-      >
-        View Project Externally →
-      </a>
-      {% endif %}
-    </p>
-    {% if field_mapping_app_upper == 'ODK' %}
-    <wa-callout variant="warning">
-      <span>
-        If you need to upload additional media files to this project, such as
-        images and videos, log into ODK Central and upload them in the form
-        settings.
-      </span>
-    </wa-callout>
-    {% endif %}
-  </div>
-  {% endif %}
-
-  <!-- QR Code -->
-  <div style="margin-bottom: 20px">
-    <h3 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
-      Scan QR Code
-    </h3>
-    <p style="color: #666; margin-bottom: 15px">
-      Scan the QR code below with {% if field_mapping_app_value %}{{
-      field_mapping_app_value }}{% else %}your mapping app{% endif %} to access
-      it.
-    </p>
+  <div class="ftm-qr-hero">
     <div
       id="qrcode-container"
+      class="ftm-qr-hero__container"
       hx-get="/project-qrcode-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
       hx-trigger="load"
       hx-swap="innerHTML"
     >
-      <div style="text-align: center; padding: 20px">
+      <div class="ftm-qr-hero__loading">
         <p style="color: #666">Loading QR code...</p>
-      </div>
-    </div>
-  </div>
-
-  <h3 style="color: #333; margin-bottom: 15px; font-size: 1.1em">
-    Setup Summary
-  </h3>
-  <p style="color: #666; margin-bottom: 15px">
-    The project setup flow is complete and shown below for reference.
-  </p>
-
-  <!-- Show all setup sections as complete -->
-  <div class="ftm-section">
-    <!-- Step 1: XLSForm -->
-    <div
-      class="ftm-step ftm-step--complete"
-      style="margin-bottom: 20px; padding: 15px"
-    >
-      <div class="ftm-step__header" style="margin-bottom: 0">
-        <h3 class="ftm-step__title" style="font-size: 1.1em">
-          Step 1: Upload XLSForm
-          <span class="ftm-step__check">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 2: Get Data -->
-    <div
-      class="ftm-step ftm-step--complete"
-      style="margin-bottom: 20px; padding: 15px"
-    >
-      <div class="ftm-step__header" style="margin-bottom: 0">
-        <h3 class="ftm-step__title" style="font-size: 1.1em">
-          Step 2: Get Data
-          <span class="ftm-step__check">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 3: Split into Tasks -->
-    <div
-      class="ftm-step ftm-step--complete"
-      style="margin-bottom: 20px; padding: 15px"
-    >
-      <div class="ftm-step__header" style="margin-bottom: 0">
-        <h3 class="ftm-step__title" style="font-size: 1.1em">
-          Step 3: Split into Tasks
-          <span class="ftm-step__check">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
-      </div>
-    </div>
-
-    <!-- Step 4: Finalise Project -->
-    <div
-      class="ftm-step ftm-step--complete"
-      style="margin-bottom: 20px; padding: 15px"
-    >
-      <div class="ftm-step__header" style="margin-bottom: 0">
-        <h3 class="ftm-step__title" style="font-size: 1.1em">
-          Step 4: Finalise Project
-          <span class="ftm-step__check">✓</span>
-        </h3>
-        <wa-badge variant="success">Complete</wa-badge>
       </div>
     </div>
   </div>

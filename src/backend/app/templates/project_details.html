@@ -15,7 +15,6 @@ block content %}
   {% if project %}
   <wa-card>
     <div slot="header" class="ftm-flex-between">
-      <h1 style="margin: 0">{{ project.project_name or 'Unnamed Project' }}</h1>
       {% set status_value = project.status.value if project.status and
       project.status.value else (project.status if project.status is string else
       'DRAFT') %} {% set field_mapping_app_value = (
@@ -30,6 +29,19 @@ block content %}
       %} {% set is_empty_data_extract = project.data_extract_geojson == {} %} {%
       set has_task_areas = project.task_areas_geojson is not none %} {% set
       is_no_splitting = project.task_areas_geojson == {} %}
+      <div class="ftm-project-title-wrap">
+        {% if field_mapping_app_value %}
+        <img
+          src="/static/images/{{ field_mapping_app_value.lower() }}-logo.svg"
+          alt="{{ field_mapping_app_value }}"
+          class="ftm-app-logo ftm-app-logo--header"
+          onerror="this.style.display='none'"
+        />
+        {% endif %}
+        <h1 style="margin: 0">
+          {{ project.project_name or 'Unnamed Project' }}
+        </h1>
+      </div>
       <wa-badge
         variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
       >
@@ -38,6 +50,17 @@ block content %}
     </div>
 
     <div style="padding: 20px">
+      {% if status_value == 'PUBLISHED' %} {% include
+      "partials/project_details/setup_steps.html" %}
+
+      <div class="ftm-manager-section">
+        <h2 class="ftm-manager-section__title">Project Metadata</h2>
+        <p class="ftm-manager-section__subtitle">
+          Project metadata and setup information for managers.
+        </p>
+      </div>
+      {% endif %}
+
       <!-- Description -->
       {% if project.description %}
       <div class="ftm-section">
@@ -57,20 +80,6 @@ block content %}
         <div>
           <h4 class="ftm-detail-label">Location</h4>
           <p class="ftm-detail-value">{{ project.location_str }}</p>
-        </div>
-        {% endif %} {% if field_mapping_app_value %}
-        <div>
-          <h4 class="ftm-detail-label">Field Mapping App</h4>
-          <div class="ftm-flex-center">
-            {% set app_name = field_mapping_app_value %}
-            <img
-              src="/static/images/{{ app_name.lower() }}-logo.svg"
-              alt="{{ app_name }}"
-              class="ftm-app-logo ftm-app-logo--lg"
-              onerror="this.style.display='none'"
-            />
-            <span class="ftm-detail-value">{{ app_name }}</span>
-          </div>
         </div>
         {% endif %} {% if project.created_at %}
         <div>
@@ -114,8 +123,46 @@ block content %}
           <strong>Project ID:</strong> {{ project.external_project_id }} {%
           endif %}
         </p>
+        <p style="margin: 0">
+          {% if field_mapping_app_upper == 'ODK' and project.external_project_id
+          %} {% if '/projects/' in project.external_project_instance_url %}
+          <a
+            href="{{ project.external_project_instance_url }}"
+            target="_blank"
+            class="ftm-link--brand"
+          >
+            View Project in ODK Central →
+          </a>
+          {% else %}
+          <a
+            href="{{ project.external_project_instance_url.rstrip('/') }}/#/projects/{{ project.external_project_id }}"
+            target="_blank"
+            class="ftm-link--brand"
+          >
+            View Project in ODK Central →
+          </a>
+          {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %}
+          <a
+            href="{{ project.external_project_instance_url }}"
+            target="_blank"
+            class="ftm-link--brand"
+          >
+            View Project in QField Cloud →
+          </a>
+          {% else %}
+          <a
+            href="{{ project.external_project_instance_url }}"
+            target="_blank"
+            class="ftm-link--brand"
+          >
+            View Project Externally →
+          </a>
+          {% endif %}
+        </p>
       </div>
-      {% endif %} {% include "partials/project_details/setup_steps.html" %}
+      {% endif %} {% if status_value == 'PUBLISHED' %} {% include
+      "partials/project_details/manager_setup_summary.html" %} {% else %} {%
+      include "partials/project_details/setup_steps.html" %} {% endif %}
     </div>
 
     <div slot="footer" class="ftm-flex-end">
