@@ -179,7 +179,7 @@ services:
           memory: 100M
 
   central:
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.2.1"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.2"
     depends_on:
       proxy:
         condition: service_healthy
@@ -228,7 +228,7 @@ services:
       retries: 10
 
   pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v3.0.0"
+    image: "ghcr.io/getodk/pyxform-http:v4.2.0"
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -236,7 +236,7 @@ services:
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.2.1"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.4.2"
     volumes:
       - central_frontend:/frontend
     network_mode: none
