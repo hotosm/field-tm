@@ -12,7 +12,6 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
       context: src
-      dockerfile: backend/Dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
       multi_arch: true

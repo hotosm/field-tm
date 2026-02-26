@@ -29,7 +29,6 @@ jobs:
     with:
       environment: ${{ github.ref_name == 'dev' && 'development' || github.ref_name }}
       context: src
-      dockerfile: backend/Dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
 
