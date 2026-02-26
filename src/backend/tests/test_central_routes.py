@@ -17,9 +17,28 @@
 #
 """Tests for central routes."""
 
-import pytest
+from io import BytesIO
 
+import pandas as pd
+import pytest
+from litestar.datastructures import UploadFile
+
+from app.central.central_routes import detect_form_languages
 from app.db.enums import XLSFormType
+
+
+def _build_xlsform_bytes(
+    survey: pd.DataFrame,
+    settings: pd.DataFrame | None = None,
+) -> bytes:
+    """Build an in-memory XLSForm file for route tests."""
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        survey.to_excel(writer, sheet_name="survey", index=False)
+        if settings is not None:
+            settings.to_excel(writer, sheet_name="settings", index=False)
+    output.seek(0)
+    return output.getvalue()
 
 
 async def test_list_forms(client):
@@ -32,6 +51,61 @@ async def test_list_forms(client):
     for form in forms_json:
         assert "id" in form
         assert form["title"] in supported_form_categories
+
+
+async def test_detect_form_languages():
+    """Detect translation columns and default language from XLSForm."""
+    survey_df = pd.DataFrame(
+        {
+            "type": ["text"],
+            "name": ["q1"],
+            "label::english(en)": ["Question in English"],
+            "hint::french(fr)": ["Indice en francais"],
+            "required_message::spanish(es)": ["Mensaje requerido"],
+        }
+    )
+    settings_df = pd.DataFrame({"default_language": ["english(en)"]})
+    xlsform_bytes = _build_xlsform_bytes(survey=survey_df, settings=settings_df)
+
+    response_data = await detect_form_languages.fn(
+        data=UploadFile(
+            filename="form.xlsx",
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            file_data=xlsform_bytes,
+        )
+    )
+
+    assert response_data["detected_languages"] == ["english", "french", "spanish"]
+    assert response_data["default_language"] == ["english"]
+    assert "english" in response_data["supported_languages"]
+
+
+async def test_detect_form_languages_with_blank_default():
+    """Blank/NaN settings default language should not break detection."""
+    survey_df = pd.DataFrame(
+        {
+            "type": ["text"],
+            "name": ["q1"],
+            "label::french(fr)": ["Question en francais"],
+        }
+    )
+    settings_df = pd.DataFrame({"default_language": [float("nan")]})
+    xlsform_bytes = _build_xlsform_bytes(survey=survey_df, settings=settings_df)
+
+    response_data = await detect_form_languages.fn(
+        data=UploadFile(
+            filename="form.xlsx",
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            file_data=xlsform_bytes,
+        )
+    )
+
+    assert response_data["detected_languages"] == ["french"]
+    assert response_data["default_language"] == []
 
 
 if __name__ == "__main__":
