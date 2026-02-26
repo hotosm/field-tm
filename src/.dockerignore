@@ -1,0 +1,13 @@
+# Ignore everything
+**
+
+# Allow files and directories
+!backend/**/*.py
+!backend/app
+!backend/packages
+!backend/tests
+!backend/pyproject.toml
+!backend/uv.lock
+!app-entrypoint.sh
+!migrate-entrypoint.sh
+!migrations

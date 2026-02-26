@@ -10,7 +10,7 @@ on:
     paths:
       # Workflow is triggered only if deps change
       - "src/backend/pyproject.toml"
-      - "src/backend/Dockerfile"
+      - "src/Dockerfile"
   # Allow manual trigger
   workflow_dispatch:
 
@@ -19,7 +19,6 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
     with:
       context: src
-      dockerfile: backend/Dockerfile
       build_target: ci
       image_tags: |
         "ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}"

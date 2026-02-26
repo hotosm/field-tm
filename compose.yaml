@@ -205,7 +205,6 @@ services:
     image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     build:
       context: src
-      dockerfile: backend/Dockerfile
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"

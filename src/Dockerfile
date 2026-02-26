@@ -15,7 +15,7 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 ARG PYTHON_IMG_TAG=3.13
-ARG UV_IMG_TAG=0.5.2
+ARG UV_IMG_TAG=0.10.6
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 
 
@@ -42,7 +42,6 @@ RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 # - Silence uv complaining about not being able to use hard links,
 # - tell uv to byte-compile packages for faster application startups,
 # - prevent uv from accidentally downloading isolated Python builds,
-# - use a temp dir instead of cache during install,
 # - select system python version,
 # - declare `/opt/python` as the target for `uv sync` (i.e. instead of .venv).
 ENV LANG=en_US.UTF-8 \
@@ -51,7 +50,6 @@ ENV LANG=en_US.UTF-8 \
     UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
     UV_PYTHON_DOWNLOADS=never \
-    UV_NO_CACHE=1 \
     UV_PYTHON="python$PYTHON_IMG_TAG" \
     UV_PROJECT_ENVIRONMENT=/opt/python
 STOPSIGNAL SIGINT
@@ -86,11 +84,28 @@ RUN apt-get update --quiet \
         "git" \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /usr/local/bin/uv
+RUN mkdir -p /_lock
+# Install third-party deps first (workspace members excluded) for better cache hits.
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
+    --mount=type=bind,source=backend/pyproject.toml,target=/_lock/pyproject.toml \
+    --mount=type=bind,source=backend/uv.lock,target=/_lock/uv.lock <<EOT
+    UV_CACHE_DIR=/root/.cache/uv uv sync \
+        --project /_lock \
+        --frozen \
+        --no-editable \
+        --no-dev \
+        --no-install-workspace \
+    $(if [ -z "$MONITORING" ]; then \
+        echo ""; \
+    else \
+        echo "--group monitoring"; \
+    fi)
+EOT
 COPY backend/pyproject.toml backend/uv.lock /_lock/
 COPY backend/packages /_lock/packages
-# Ensure caching & install with or without monitoring, depending on flag
-RUN --mount=type=cache,target=/root/.cache <<EOT
-    uv sync \
+# Install workspace members without reinstalling the project package.
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv <<EOT
+    UV_CACHE_DIR=/root/.cache/uv uv sync \
         --project /_lock \
         --locked \
         --no-editable \
@@ -104,8 +119,8 @@ RUN --mount=type=cache,target=/root/.cache <<EOT
 EOT
 
 
-# Run stage will minimal dependencies required to run Python libraries
-FROM base AS runtime
+# Runtime base stage with all shared dependencies and entrypoints
+FROM base AS runtime-base
 ARG PYTHON_IMG_TAG
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -143,17 +158,14 @@ RUN apt-get update --quiet \
     #    "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=supercronic /supercronic /usr/local/bin/
-COPY backend/*-entrypoint.sh /
+COPY ./*-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
-# Copy Python deps from build to runtime
+# Copy Python deps from build to runtime base
 COPY --from=build /opt/python /opt/python
 WORKDIR /opt
-# Add app code
-COPY migrations/ /opt/migrations/
-COPY backend/app/ /opt/app/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
-    && mkdir -p /opt/logs /opt/qfield \
+    && mkdir -p /opt/logs /opt/qfield /opt/migrations /opt/app \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh
 # Add volumes for persistence
@@ -163,14 +175,20 @@ VOLUME /opt/qfield
 USER appuser
 
 
+# Runtime stage with app code, used for deployment
+FROM runtime-base AS runtime
+COPY --chown=appuser:appuser migrations/ /opt/migrations/
+COPY --chown=appuser:appuser backend/app/ /opt/app/
+
+
 # Stage to use during local development
-FROM runtime AS debug
-USER appuser
+FROM runtime-base AS debug
+USER root
 COPY --from=uv /uv /usr/local/bin/uv
 COPY backend/pyproject.toml backend/uv.lock /_lock/
 COPY backend/packages /_lock/packages
-RUN --mount=type=cache,target=/root/.cache <<EOT
-    uv sync \
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv <<EOT
+    UV_CACHE_DIR=/root/.cache/uv uv sync \
         --project /_lock \
         --locked \
         --no-editable \
@@ -180,6 +198,9 @@ RUN --mount=type=cache,target=/root/.cache <<EOT
         --group docs \
         --group dev
 EOT
+COPY --chown=appuser:appuser migrations/ /opt/migrations/
+COPY --chown=appuser:appuser backend/app/ /opt/app/
+USER appuser
 CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
     "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
