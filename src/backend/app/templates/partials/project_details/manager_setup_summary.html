@@ -1,0 +1,78 @@
+<div class="ftm-manager-summary-section">
+  <details class="ftm-setup-summary">
+    <summary class="ftm-setup-summary__summary">Manager Setup Summary</summary>
+    <div class="ftm-setup-summary__content">
+      <p class="ftm-setup-summary__description">
+        The project setup flow is complete and shown below for reference.
+      </p>
+
+      <div class="ftm-section">
+        <!-- Step 1: XLSForm -->
+        <div
+          class="ftm-step ftm-step--complete"
+          style="margin-bottom: 20px; padding: 15px"
+        >
+          <div class="ftm-step__header" style="margin-bottom: 0">
+            <h3 class="ftm-step__title" style="font-size: 1.1em">
+              Step 1: Upload XLSForm
+              <span class="ftm-step__check">✓</span>
+            </h3>
+            <wa-badge variant="success">Complete</wa-badge>
+          </div>
+        </div>
+
+        <!-- Step 2: Get Data -->
+        <div
+          class="ftm-step ftm-step--complete"
+          style="margin-bottom: 20px; padding: 15px"
+        >
+          <div class="ftm-step__header" style="margin-bottom: 0">
+            <h3 class="ftm-step__title" style="font-size: 1.1em">
+              Step 2: Get Data
+              <span class="ftm-step__check">✓</span>
+            </h3>
+            <wa-badge variant="success">Complete</wa-badge>
+          </div>
+        </div>
+
+        <!-- Step 3: Split into Tasks -->
+        <div
+          class="ftm-step ftm-step--complete"
+          style="margin-bottom: 20px; padding: 15px"
+        >
+          <div class="ftm-step__header" style="margin-bottom: 0">
+            <h3 class="ftm-step__title" style="font-size: 1.1em">
+              Step 3: Split into Tasks
+              <span class="ftm-step__check">✓</span>
+            </h3>
+            <wa-badge variant="success">Complete</wa-badge>
+          </div>
+        </div>
+
+        <!-- Step 4: Finalise Project -->
+        <div
+          class="ftm-step ftm-step--complete"
+          style="margin-bottom: 20px; padding: 15px"
+        >
+          <div class="ftm-step__header" style="margin-bottom: 0">
+            <h3 class="ftm-step__title" style="font-size: 1.1em">
+              Step 4: Finalise Project
+              <span class="ftm-step__check">✓</span>
+            </h3>
+            <wa-badge variant="success">Complete</wa-badge>
+          </div>
+        </div>
+      </div>
+
+      {% if field_mapping_app_upper == 'ODK' %}
+      <wa-callout variant="warning">
+        <span>
+          If you need to upload additional media files to this project, such as
+          images and videos, log into ODK Central and upload them in the form
+          settings.
+        </span>
+      </wa-callout>
+      {% endif %}
+    </div>
+  </details>
+</div>

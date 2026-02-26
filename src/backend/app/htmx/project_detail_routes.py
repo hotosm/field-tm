@@ -95,24 +95,16 @@ async def project_qrcode_htmx(
 
         qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
         html_content = f"""
-        <div
-            style="text-align: center; padding: 20px; background-color: #f9f9f9;
-            border-radius: 8px; margin-top: 20px;"
-        >
-            <h3 style="color: #333; margin-bottom: 15px;">
-                Scan QR Code to Access Project
-            </h3>
-            <p style="color: #666; margin-bottom: 20px;">
-                Use {app_name} to scan this QR code and load the project
+        <div class="ftm-qr-panel">
+            <h3 class="ftm-qr-panel__title">Scan QR Code</h3>
+            <p class="ftm-qr-panel__description">
+                Use {app_name} to scan this QR code and load the project.
             </p>
-            <div
-                style="display: inline-block; padding: 15px; background-color: white;
-                border-radius: 8px; margin-bottom: 15px;"
-            >
+            <div class="ftm-qr-panel__image-wrap">
                 <img
                     src="{qr_code_data_url}"
                     alt="Project QR Code"
-                    style="max-width: 300px; height: auto;"
+                    class="ftm-qr-panel__image"
                 />
             </div>
             <div>
@@ -125,11 +117,13 @@ async def project_qrcode_htmx(
             </div>
         </div>
         <script>
-            function downloadQRCode(dataUrl, filename) {{
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                link.download = filename + '.png';
-                link.click();
+            if (typeof window.downloadQRCode !== "function") {{
+                window.downloadQRCode = function downloadQRCode(dataUrl, filename) {{
+                    const link = document.createElement("a");
+                    link.href = dataUrl;
+                    link.download = filename + ".png";
+                    link.click();
+                }};
             }}
         </script>
         """
