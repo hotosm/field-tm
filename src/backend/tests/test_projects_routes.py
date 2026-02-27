@@ -35,13 +35,30 @@ from app.helpers.geometry_utils import check_crs
 log = logging.getLogger(__name__)
 
 
-def test_split_request_default_no_of_buildings_is_10():
+def test_create_project_request_split_defaults():
     """API split defaults should match the onboarding UI default."""
-    from area_splitter import SplittingAlgorithm
+    import base64
 
-    from app.api.api_schemas import SplitRequest
+    from app.api.api_schemas import CreateProjectRequest
 
-    payload = SplitRequest(algorithm=SplittingAlgorithm.NO_SPLITTING)
+    payload = CreateProjectRequest(
+        project_name="test",
+        field_mapping_app="ODK",
+        description="test",
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.317, 27.705],
+                    [85.317, 27.704],
+                    [85.318, 27.704],
+                    [85.318, 27.705],
+                    [85.317, 27.705],
+                ]
+            ],
+        },
+        xlsform_base64=base64.b64encode(b"dummy").decode(),
+    )
 
     assert payload.no_of_buildings == 10
     assert payload.include_roads is True
@@ -583,6 +600,94 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
     fake_update.assert_awaited_once()
     assert fake_update.await_args.args[2].status == ProjectStatus.PUBLISHED
     fake_commit.assert_awaited_once()
+
+
+async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
+    """QR payload should use project external URL, not internal docker URL."""
+    from app.db.enums import FieldMappingApp
+    from app.projects import project_crud
+
+    project = Mock(
+        id=2,
+        project_name="ODK Tunnel Project",
+        field_mapping_app=FieldMappingApp.ODK,
+        external_project_id=2,
+        external_project_instance_url="https://example-odk.trycloudflare.com",
+    )
+    project.get_odk_credentials = Mock(return_value=None)
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return project
+
+    class DummyResponse:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return self._payload
+
+    class DummySession:
+        def get(self, path):
+            assert path == "projects/2/app-users"
+            return DummyResponse([{"token": "app-token"}])
+
+        def post(self, path, json=None):
+            return DummyResponse({"token": "new-token"})
+
+    class DummyClient:
+        def __init__(self):
+            self.session = DummySession()
+
+    captured = {}
+
+    @asynccontextmanager
+    async def fake_pyodk_client(odk_creds):
+        captured["resolved_url"] = odk_creds.external_project_instance_url
+        yield DummyClient()
+
+    class DummyQRCode:
+        def png_data_uri(self, scale=5):
+            return "data:image/png;base64,fake"
+
+    class DummyOdkAppUser:
+        def __init__(self, url, user, password):
+            captured["qr_url"] = url
+
+        def createQRCode(  # noqa: N802
+            self,
+            odk_id,
+            project_name,
+            appuser_token,
+            basemap,
+            osm_username,
+        ):
+            return DummyQRCode()
+
+    monkeypatch.setattr(
+        project_crud.project_deps, "get_project_by_id", fake_get_project_by_id
+    )
+    monkeypatch.setattr(project_crud.central_deps, "pyodk_client", fake_pyodk_client)
+    monkeypatch.setattr(project_crud, "OdkAppUser", DummyOdkAppUser)
+    monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_PUBLIC_URL", "")
+    monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_URL", "http://central:8383")
+    monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_USER", "admin@example.org")
+    monkeypatch.setattr(
+        project_crud.settings,
+        "ODK_CENTRAL_PASSWD",
+        Mock(get_secret_value=Mock(return_value="env-pass")),
+    )
+
+    qr_data_url = await project_crud.get_project_qrcode(
+        db=Mock(),
+        project_id=2,
+    )
+
+    assert qr_data_url == "data:image/png;base64,fake"
+    assert captured["resolved_url"] == "https://example-odk.trycloudflare.com"
+    assert captured["qr_url"] == "https://example-odk.trycloudflare.com"
 
 
 async def test_delete_project(client, admin_user, project):

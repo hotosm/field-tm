@@ -166,6 +166,44 @@ _print-post-data-load-instructions:
   just _echo-yellow " ############################################################################"
   echo
 
+# Start tunnel + create a test ODK buildings project for mobile testing with ODK Collect
+[no-cd]
+odk-collect:
+  #!/usr/bin/env sh
+  set -e
+
+  cd {{justfile_directory()}}
+
+  # Start all services + cloudflare quick tunnels
+  just start tunnel
+
+  # Get the ODK Central tunnel URL
+  odk_tunnel_url=$(just start _get-tunnel-url 'central')
+  if [ -z "$odk_tunnel_url" ]; then
+    echo "ERROR: Could not determine ODK Central tunnel URL."
+    exit 1
+  fi
+  echo "ODK Central tunnel: ${odk_tunnel_url}"
+
+  # Restart API with tunnel URL exported for any env-based fallback paths.
+  # Primary routing for this flow is handled by explicit advanced ODK config
+  # passed to the API call in create_test_project.py.
+  ODK_CENTRAL_PUBLIC_URL="${odk_tunnel_url}" \
+  docker compose \
+    -f compose.yaml \
+    -f contrib/tunnel/compose.yaml \
+    up -d api
+
+  # Give the API a moment to finish restarting
+  sleep 5
+
+  # Create a test buildings project using the service layer inside the container.
+  # The script is passed via stdin to avoid justfile heredoc indentation issues.
+  echo "Creating ODK test project..."
+  docker compose exec -T \
+    -e ODK_CENTRAL_TUNNEL_URL="${odk_tunnel_url}" \
+    api python3 - < tasks/scripts/create_test_project.py
+
 # Run load test on backend API (e.g. just test load projects/62/minimal)
 [no-cd]
 load url_path:

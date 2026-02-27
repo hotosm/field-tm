@@ -1,4 +1,4 @@
-"""External REST API routes for progressive project creation."""
+"""External REST API routes for project creation."""
 
 from __future__ import annotations
 
@@ -13,20 +13,16 @@ from psycopg import AsyncConnection
 
 from app.api.api_schemas import (
     CreateProjectRequest,
-    DataExtractRequest,
-    DataExtractResponse,
-    FinalizeRequest,
-    FinalizeResponse,
-    ProjectResponse,
-    SplitRequest,
-    SplitResponse,
-    XLSFormRequest,
+    CreateProjectResponse,
 )
 from app.auth.api_key import api_key_required
 from app.auth.auth_schemas import AuthUser
+from app.central.central_schemas import ODKCentral
+from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject, DbTemplateXLSForm
+from app.projects.project_schemas import ProjectUpdate
 from app.projects.project_services import (
     ConflictError,
     NotFoundError,
@@ -71,6 +67,14 @@ def _enum_to_value(value):
     return value.value if hasattr(value, "value") else value
 
 
+def _build_fmtm_url(project_id: int) -> str:
+    """Build the FieldTM project page URL."""
+    domain = settings.FMTM_DOMAIN
+    port_suffix = f":{settings.FMTM_DEV_PORT}" if settings.FMTM_DEV_PORT else ""
+    scheme = "http" if "localhost" in domain else "https"
+    return f"{scheme}://{domain}{port_suffix}/projects/{project_id}"
+
+
 @post(
     "/projects",
     dependencies={
@@ -81,9 +85,16 @@ def _enum_to_value(value):
 )
 async def api_create_project(
     db: AsyncConnection, auth_user: AuthUser, data: CreateProjectRequest
-) -> ProjectResponse:
-    """Step 1: Create a project stub."""
+) -> CreateProjectResponse:
+    """Create a complete project end-to-end in a single request.
+
+    Runs all five steps — stub, XLSForm, data extract, split, finalize —
+    and returns the FieldTM project URL plus downstream credentials.
+    """
+    project_id: int | None = None
+
     try:
+        # Step 1: Create project stub
         project = await create_project_stub(
             db=db,
             project_name=data.project_name,
@@ -94,28 +105,9 @@ async def api_create_project(
             user_sub=auth_user.sub,
         )
         await db.commit()
-        return ProjectResponse(
-            id=project.id,
-            project_name=project.project_name,
-            field_mapping_app=_enum_to_value(project.field_mapping_app),
-            status=str(_enum_to_value(project.status)),
-        )
-    except ServiceError as exc:
-        raise _map_service_error(exc) from exc
+        project_id = project.id
 
-
-@post(
-    "/projects/{project_id:int}/xlsform",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(api_key_required),
-    },
-)
-async def api_attach_xlsform(
-    project_id: int, db: AsyncConnection, data: XLSFormRequest
-) -> dict:
-    """Step 2: Attach XLSForm from template or base64 payload."""
-    try:
+        # Step 2: Attach XLSForm
         if data.template_form_id is not None:
             template = await DbTemplateXLSForm.one(db, data.template_form_id)
             if not template.xls:
@@ -137,36 +129,15 @@ async def api_attach_xlsform(
             use_odk_collect=data.use_odk_collect,
             default_language=data.default_language,
         )
-        return {"project_id": project_id, "xlsform_attached": True}
-    except (ValueError, TypeError) as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid xlsform_base64 payload.",
-        ) from exc
-    except KeyError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
-    except ServiceError as exc:
-        raise _map_service_error(exc) from exc
+        await db.commit()
 
-
-@post(
-    "/projects/{project_id:int}/data-extract",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(api_key_required),
-    },
-)
-async def api_data_extract(
-    project_id: int, db: AsyncConnection, data: DataExtractRequest
-) -> DataExtractResponse:
-    """Step 3: Save provided geojson or fetch OSM data then save extract."""
-    try:
+        # Step 3: Data extract
         if data.geojson is not None:
-            geojson = data.geojson
-        else:
+            await save_data_extract(
+                db=db, project_id=project_id, geojson_data=data.geojson
+            )
+            await db.commit()
+        elif data.osm_category is not None:
             geojson = await download_osm_data(
                 db=db,
                 project_id=project_id,
@@ -174,79 +145,57 @@ async def api_data_extract(
                 geom_type=data.geom_type.value,
                 centroid=data.centroid,
             )
+            await save_data_extract(db=db, project_id=project_id, geojson_data=geojson)
+            await db.commit()
+        else:
+            # Collect-new-data mode: store an empty FeatureCollection directly.
+            # save_data_extract rejects empty collections, so update the model directly.
+            await DbProject.update(
+                db,
+                project_id,
+                ProjectUpdate(
+                    data_extract_geojson={"type": "FeatureCollection", "features": []}
+                ),
+            )
+            await db.commit()
 
-        feature_count = await save_data_extract(
-            db=db,
-            project_id=project_id,
-            geojson_data=geojson,
-        )
-        return DataExtractResponse(project_id=project_id, feature_count=feature_count)
-    except ServiceError as exc:
-        raise _map_service_error(exc) from exc
+        # Step 4: Split AOI (optional)
+        if data.algorithm is not None:
+            tasks_geojson = await split_aoi(
+                db=db,
+                project_id=project_id,
+                algorithm=data.algorithm.value,
+                no_of_buildings=data.no_of_buildings,
+                dimension_meters=data.dimension_meters,
+                include_roads=data.include_roads,
+                include_rivers=data.include_rivers,
+                include_railways=data.include_railways,
+                include_aeroways=data.include_aeroways,
+            )
+            await save_task_areas(
+                db=db, project_id=project_id, tasks_geojson=tasks_geojson
+            )
+            await db.commit()
 
+        # Step 5: Finalize
+        manager_username = None
+        manager_password = None
 
-@post(
-    "/projects/{project_id:int}/split",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(api_key_required),
-    },
-)
-async def api_split(
-    project_id: int, db: AsyncConnection, data: SplitRequest
-) -> SplitResponse:
-    """Step 4: Split AOI and save task areas."""
-    try:
-        tasks_geojson = await split_aoi(
-            db=db,
-            project_id=project_id,
-            algorithm=data.algorithm.value,
-            no_of_buildings=data.no_of_buildings,
-            dimension_meters=data.dimension_meters,
-            include_roads=data.include_roads,
-            include_rivers=data.include_rivers,
-            include_railways=data.include_railways,
-            include_aeroways=data.include_aeroways,
-        )
-        task_count = await save_task_areas(
-            db=db, project_id=project_id, tasks_geojson=tasks_geojson
-        )
-        return SplitResponse(
-            project_id=project_id, task_count=task_count, is_empty=(tasks_geojson == {})
-        )
-    except ServiceError as exc:
-        raise _map_service_error(exc) from exc
-
-
-@post(
-    "/projects/{project_id:int}/finalize",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(api_key_required),
-    },
-)
-async def api_finalize(
-    project_id: int, db: AsyncConnection, data: FinalizeRequest
-) -> FinalizeResponse:
-    """Step 5: Finalize project creation in ODK/QField."""
-    project = await DbProject.one(db, project_id)
-    if not project.field_mapping_app:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Project field mapping app is not set.",
-        )
-
-    manager_username = None
-    manager_password = None
-
-    try:
         if project.field_mapping_app == FieldMappingApp.ODK:
             has_custom_odk = (
                 data.external_project_instance_url
                 and data.external_project_username
                 and data.external_project_password
             )
-            custom_odk = data if has_custom_odk else None
+            custom_odk = (
+                ODKCentral(
+                    external_project_instance_url=data.external_project_instance_url,
+                    external_project_username=data.external_project_username,
+                    external_project_password=data.external_project_password,
+                )
+                if has_custom_odk
+                else None
+            )
             odk_result = await finalize_odk_project(
                 db=db, project_id=project_id, custom_odk_creds=custom_odk
             )
@@ -263,17 +212,38 @@ async def api_finalize(
             downstream_url = await finalize_qfield_project(
                 db=db, project_id=project_id, custom_qfield_creds=custom_qfield
             )
+
+        await db.commit()
+
+    except (ValueError, TypeError) as exc:
+        if project_id is not None:
+            await DbProject.delete(db, project_id)
+            await db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except HTTPException:
+        if project_id is not None:
+            await DbProject.delete(db, project_id)
+            await db.commit()
+        raise
     except ServiceError as exc:
+        if project_id is not None:
+            await DbProject.delete(db, project_id)
+            await db.commit()
         raise _map_service_error(exc) from exc
+
+    fmtm_url = None if data.cleanup else _build_fmtm_url(project_id)
 
     if data.cleanup:
         await DbProject.delete(db, project_id)
         await db.commit()
 
-    return FinalizeResponse(
+    return CreateProjectResponse(
         project_id=project_id,
+        fmtm_url=fmtm_url,
         downstream_url=downstream_url,
-        cleanup=data.cleanup,
         manager_username=manager_username,
         manager_password=manager_password,
     )
@@ -336,10 +306,6 @@ api_router = Router(
     tags=["api"],
     route_handlers=[
         api_create_project,
-        api_attach_xlsform,
-        api_data_extract,
-        api_split,
-        api_finalize,
         api_delete_project,
         api_list_projects,
         api_get_project,

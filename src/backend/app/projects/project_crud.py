@@ -807,11 +807,18 @@ async def get_project_qrcode(
                 detail="ODK project ID not found.",
             )
 
-        # Get ODK credentials (use None to fall back to env vars)
+        # Resolve ODK credentials for API calls and QR payload generation.
+        # If project-specific credentials are unavailable, prefer the project's
+        # stored external URL (if any) over internal docker-only service URLs.
         project_odk_creds = project.get_odk_credentials()
         if project_odk_creds is None:
+            odk_base_url = (
+                project.external_project_instance_url
+                or settings.ODK_CENTRAL_PUBLIC_URL
+                or settings.ODK_CENTRAL_URL
+            )
             odk_central = central_schemas.ODKCentral(
-                external_project_instance_url=settings.ODK_CENTRAL_URL,
+                external_project_instance_url=odk_base_url,
                 external_project_username=settings.ODK_CENTRAL_USER,
                 external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
                 if settings.ODK_CENTRAL_PASSWD
