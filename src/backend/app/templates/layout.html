@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="wa-theme-default wa-palette-hotosm">
   <head>
     <title>{% block title %}Field Tasking Manager{% endblock %}</title>
 
@@ -23,27 +23,43 @@
     <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
 
+    <!-- WebAwesome CSS - loaded from CDN so the browser caches it across all HOT tools -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/native.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/utilities.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/themes/default.css"
+    />
+
+    <!-- HOT UI theme (fonts + HOT design tokens + WebAwesome overrides) -->
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.6.1/dist/style-core.css"
+    /> -->
+    <link rel="stylesheet" href="http://127.0.0.1:4173/style-core.css" />
+
+    <!-- Import map: lets the browser resolve WebAwesome bare-module specifiers used -->
+    <!-- inside hotosm-ui.js so WA components load correctly (incl. inside Shadow DOM). -->
     <script type="importmap">
       {
         "imports": {
-          "@awesome.me/webawesome/dist/components/": "https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.0.0/dist-cdn/components/",
-          "svelte": "https://esm.sh/svelte@5"
+          "@awesome.me/webawesome/dist/components/": "https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist-cdn/components/"
         }
       }
     </script>
-    <!-- HOT UI + WebAwesome components-->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.4.0/dist/style.css"
-    />
-    <script
+
+    <!-- HOT UI web components -->
+    <!-- <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.0.0/dist-cdn/webawesome.loader.js"
-    ></script>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.4.0/dist/hotosm-ui.js"
-    ></script>
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.6.1/dist/hotosm-ui.js"
+    ></script> -->
+    <script type="module" src="http://127.0.0.1:4173/hotosm-ui.js"></script>
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -78,7 +94,7 @@
   </head>
 
   <body>
-    <hot-header title="FieldTM" size="small" show-login="false"></hot-header>
+    <hot-header title="FieldTM" size="small" show-login></hot-header>
 
     {% block content %}{% endblock %}
   </body>

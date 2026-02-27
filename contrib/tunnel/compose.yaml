@@ -1,0 +1,50 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Cloudflare Quick Tunnels for external access during local development.
+# Used by `just start tunnel` to expose local services over the internet,
+# primarily for testing ODK Collect on a physical mobile device.
+#
+# Each service creates an ephemeral HTTPS tunnel and prints the public URL to logs.
+# Retrieve URLs with: `just start view-tunnel-url`
+
+name: fmtm
+
+x-tunnel: &tunnel
+  image: docker.io/cloudflare/cloudflared:2026.2.0
+  networks: [fmtm-net]
+  restart: unless-stopped
+  healthcheck:
+    test:
+      ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
+    interval: 30s
+    timeout: 30s
+    retries: 3
+
+services:
+  central-tunnel:
+    <<: *tunnel
+    command: tunnel --url http://central:8383
+
+  # qfield-tunnel:
+  #   extends: x-tunnel
+  #   command: tunnel --url http://qfield-app:8000
+
+networks:
+  fmtm-net:
+    external: true
+    name: fmtm-local

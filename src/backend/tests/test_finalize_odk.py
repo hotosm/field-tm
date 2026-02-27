@@ -389,6 +389,122 @@ async def test_finalize_odk_project_returns_manager_credentials():
 
 
 @pytest.mark.asyncio
+async def test_finalize_odk_project_persists_custom_odk_credentials():
+    """Finalize should persist custom ODK URL + username + encrypted password source."""
+    project = FakeProject(external_project_id=None)
+
+    fake_db = AsyncMock()
+    fake_db.commit = AsyncMock()
+
+    async def fake_create_odk_project(name, creds):
+        return {"id": 42}
+
+    async def fake_create_entity_list(*args, **kwargs):
+        pass
+
+    async def fake_task_geojson_dict_to_entity_values(geojson, **kwargs):
+        return [
+            {
+                "label": "Feature 1",
+                "data": {"geometry": "geom", "osm_id": "1", "building": "yes"},
+            }
+        ]
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "Task 1", "data": {"geometry": "geom"}}
+
+    async def fake_read_and_test_xform(xlsform_bytes):
+        return BytesIO(b"<xform/>")
+
+    async def fake_create_odk_xform(*args, **kwargs):
+        pass
+
+    async def fake_generate_project_files(db, project_id, odk_credentials=None):
+        return True
+
+    async def fake_create_project_manager_user(
+        project_odk_id, project_name, odk_credentials
+    ):
+        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+
+    @asynccontextmanager
+    async def fake_get_odk_dataset(_):
+        class FakeDataset:
+            async def listDatasets(self, odk_id):  # noqa: N802
+                return []
+
+        yield FakeDataset()
+
+    mock_update = AsyncMock()
+
+    creds = ODKCentral(
+        external_project_instance_url="https://example-odk.trycloudflare.com",
+        external_project_username="admin@example.org",
+        external_project_password="secret",
+    )
+
+    with (
+        patch(
+            "app.projects.project_services.DbProject.one",
+            return_value=project,
+        ),
+        patch(
+            "app.projects.project_services.DbProject.update",
+            mock_update,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_odk_project",
+            side_effect=fake_create_odk_project,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_entity_list",
+            side_effect=fake_create_entity_list,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            side_effect=fake_task_geojson_dict_to_entity_values,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            side_effect=fake_feature_geojson_to_entity_dict,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.read_and_test_xform",
+            side_effect=fake_read_and_test_xform,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_odk_xform",
+            side_effect=fake_create_odk_xform,
+        ),
+        patch(
+            "app.projects.project_services.project_crud.generate_project_files",
+            side_effect=fake_generate_project_files,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_project_manager_user",
+            side_effect=fake_create_project_manager_user,
+        ),
+        patch(
+            "app.projects.project_services.central_deps.get_odk_dataset",
+            fake_get_odk_dataset,
+        ),
+    ):
+        await finalize_odk_project(
+            db=fake_db,
+            project_id=1,
+            custom_odk_creds=creds,
+        )
+
+    payloads = [call.args[2] for call in mock_update.await_args_list]
+    assert any(
+        payload.external_project_instance_url == "https://example-odk.trycloudflare.com"
+        and payload.external_project_username == "admin@example.org"
+        and payload.external_project_password == "secret"
+        for payload in payloads
+    )
+
+
+@pytest.mark.asyncio
 async def test_finalize_odk_project_prefers_public_url_for_manager_link():
     """Use public ODK URL for returned manager link when using env credentials."""
     project = FakeProject(

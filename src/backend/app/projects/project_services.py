@@ -738,18 +738,35 @@ async def finalize_odk_project(
             f"Created ODK project {project_odk_id} for Field-TM project {project_id}"
         )
 
-    # Persist the ODK base URL
+    # Persist ODK connection details used for this project.
+    # Custom advanced config should remain available for future QR/token refresh.
     odk_instance_url = _resolve_odk_public_url(custom_odk_creds)
+    should_update_odk_details = False
+    update_payload = project_schemas.ProjectUpdate(external_project_id=project_odk_id)
+
     if odk_instance_url and odk_instance_url != (
         project.external_project_instance_url or ""
     ):
+        update_payload.external_project_instance_url = odk_instance_url
+        should_update_odk_details = True
+
+    if custom_odk_creds:
+        if custom_odk_creds.external_project_username:
+            update_payload.external_project_username = (
+                custom_odk_creds.external_project_username
+            )
+            should_update_odk_details = True
+        if custom_odk_creds.external_project_password:
+            update_payload.external_project_password = (
+                custom_odk_creds.external_project_password
+            )
+            should_update_odk_details = True
+
+    if should_update_odk_details:
         await DbProject.update(
             db,
             project_id,
-            project_schemas.ProjectUpdate(
-                external_project_instance_url=odk_instance_url,
-                external_project_id=project_odk_id,
-            ),
+            update_payload,
         )
         await db.commit()
 

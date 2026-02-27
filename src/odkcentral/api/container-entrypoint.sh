@@ -23,10 +23,15 @@ echo "Running ODKCentral start script to init environment and migrate DB"
 echo "The server will not start on this run"
 ./init-odk-db.sh
 
-echo "Modify local.json config to use HTTP (insecure during development)"
-jq '.default.env.domain |= sub("^https:"; "http:")' \
-    /usr/odk/config/local.json > /usr/odk/config/local.json.tmp && \
-    mv /usr/odk/config/local.json.tmp /usr/odk/config/local.json
+# NOTE we modify this to ensure ODK Central tunnel works in dev
+if echo "${DOMAIN:-}" | grep -Eq 'localhost|\.local($|:)'; then
+    echo "Modify local.json config to use HTTP (insecure local development)"
+    jq '.default.env.domain |= sub("^https:"; "http:")' \
+        /usr/odk/config/local.json > /usr/odk/config/local.json.tmp && \
+        mv /usr/odk/config/local.json.tmp /usr/odk/config/local.json
+else
+    echo "Keeping HTTPS domain in local.json for non-local deployment domain: ${DOMAIN:-unset}"
+fi
 
 # Ensure all necessary extensions installed
 # https://docs.getodk.org/central-install-digital-ocean/#using-a-custom-database-server

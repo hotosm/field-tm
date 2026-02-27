@@ -129,18 +129,18 @@ tunnel:
   sleep 5
 
   odk_url=$(just start _get-tunnel-url 'central')
-  button_url=$(just start _get-tunnel-url 'button')
-  qfc_url=$(just start _get-tunnel-url 'qfield')
 
-  # Restart Central with DOMAIN var set to new tunnel URL.
-  # Is is required to correctly download forms from Collect
-  CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
+  # Restart Central with DOMAIN set to tunnel host.
+  # Also force :443 so generated URLs match the public HTTPS tunnel.
+  # This is required for ODK Collect form download links to be reachable.
+  FMTM_ODK_DOMAIN="$(echo "${odk_url}" | sed -E 's|^https://([^/:]+).*$|\1|')" \
+  FMTM_DEV_PORT=443 \
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     up -d central
 
-  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
+  just start _print-tunnel-url "$odk_url"
 
 # View the URLs for created tunnels
 [no-cd]
@@ -148,9 +148,7 @@ view-tunnel-url:
   #!/usr/bin/env sh
 
   odk_url=$(just start _get-tunnel-url 'central')
-  button_url=$(just start _get-tunnel-url 'button')
-  qfc_url=$(just start _get-tunnel-url 'qfield')
-  just start _print-tunnel-url "$odk_url" "$button_url" "$qfc_url"
+  just start _print-tunnel-url "$odk_url"
 
 [no-cd]
 _get-tunnel-url service_name:
@@ -166,18 +164,12 @@ _get-tunnel-url service_name:
   echo "$service_url"
 
 [no-cd]
-_print-tunnel-url odk_url button_url qfc_url:
+_print-tunnel-url odk_url:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
   @echo "\033[0;34m ODK Central URL: \033[0m"
   @echo " {{odk_url}}"
-  @echo
-  @echo "\033[0;34m Frontend Button URL: \033[0m"
-  @echo " {{button_url}}"
-  @echo
-  @echo "\033[0;34m QFieldCloud URL: \033[0m"
-  @echo " {{qfc_url}}"
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
