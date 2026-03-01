@@ -94,11 +94,11 @@ def clean_tags_for_qgis(
     return geojson_data
 
 
-async def create_qfield_project(
+async def create_qfield_project(  # noqa: PLR0915
     db: AsyncConnection,
     project: DbProject,
     custom_qfield_creds: QFieldCloud | None = None,
-):
+):  # noqa: PLR0915
     """Create QField project in QFieldCloud via QGIS job API."""
     qgis_job_id = str(uuid4())
     job_dir = Path(SHARED_VOLUME_PATH) / qgis_job_id
@@ -160,8 +160,9 @@ async def create_qfield_project(
     qfc_project_name = f"FieldTM-{qgis_project_name}-{getrandbits(32)}"
     log.info(f"Creating QGIS project via API: {qgis_container_url}")
 
-    async with ClientSession() as http_client:
-        async with http_client.post(
+    async with (
+        ClientSession() as http_client,
+        http_client.post(
             f"{qgis_container_url}/",
             json={
                 "project_dir": str(job_dir),
@@ -169,25 +170,26 @@ async def create_qfield_project(
                 "language": form_language,
                 "extent": bbox_str,
             },
-        ) as response:
-            if response.status != 200:
-                msg = f"QGIS API request failed: {await response.text()}"
-                log.error(msg)
-                shutil.rmtree(job_dir)
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=msg,
-                )
+        ) as response,
+    ):
+        if response.status != status.HTTP_200_OK:
+            msg = f"QGIS API request failed: {await response.text()}"
+            log.error(msg)
+            shutil.rmtree(job_dir)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
+            )
 
-            result = await response.json()
-            if result.get("status") != "success":
-                msg = f"Failed to generate QGIS project: {result.get('message')}"
-                log.error(msg)
-                shutil.rmtree(job_dir)
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=msg,
-                )
+        result = await response.json()
+        if result.get("status") != "success":
+            msg = f"Failed to generate QGIS project: {result.get('message')}"
+            log.error(msg)
+            shutil.rmtree(job_dir)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=msg,
+            )
     log.debug("Successfully created QGIS project via API")
 
     # Clean up temp task boundaries table after project generation

@@ -215,7 +215,7 @@ class Settings(BaseSettings):
 
     FMTM_DB_HOST: Optional[str] = "fmtm-db"
     FMTM_DB_USER: Optional[str] = "fmtm"
-    FMTM_DB_PASSWORD: Optional[SecretStr] = "fmtm"
+    FMTM_DB_PASSWORD: Optional[SecretStr] = SecretStr("fmtm")
     FMTM_DB_NAME: Optional[str] = "fmtm"
 
     FMTM_DB_URL: Optional[str] = None

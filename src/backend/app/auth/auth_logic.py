@@ -92,7 +92,7 @@ def set_cookie(
     max_age: int,
     secure: bool,
     domain: str,
-) -> None:
+) -> None:  # noqa: PLR0913
     """Helper function to set a cookie on a response.
 
     For now, samesite is set lax, max_age equals expiry.
@@ -209,7 +209,7 @@ def verify_jwt_token(token: str, ignore_expiry: bool = False) -> dict:
             settings.ENCRYPTION_KEY.get_secret_value(),
             algorithms=[settings.JWT_ENCRYPTION_ALGORITHM],
             audience=settings.FMTM_DOMAIN,
-            options={"verify_exp": False if ignore_expiry else True},
+            options={"verify_exp": not ignore_expiry},
         )
     except jwt.ExpiredSignatureError as e:
         raise HTTPException(
@@ -298,7 +298,7 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
             expires=0,  # Set to expire immediately
             path="/",
             domain=cookie_domain,
-            secure=False if settings.DEBUG else True,
+            secure=not settings.DEBUG,
             httponly=True,
             samesite="lax",
         )

@@ -32,6 +32,13 @@ from shapely.geometry import (
 
 log = logging.getLogger(__name__)
 
+MIN_LONGITUDE = -180
+MAX_LONGITUDE = 180
+MIN_LATITUDE = -90
+MAX_LATITUDE = 90
+MIN_LAT_LON_PARTS = 2
+MIN_POLYGON_POINTS = 4
+
 # Project area limits (km²)
 AREA_WARN_KM2 = 100
 AREA_LIMIT_KM2 = 1000
@@ -87,7 +94,9 @@ def get_featcol_dominant_geom_type(featcol: geojson.FeatureCollection) -> str:
     return max(geometry_counts, key=lambda key: geometry_counts[key])
 
 
-async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
+async def check_crs(  # noqa: C901
+    input_geojson: Union[dict, geojson.FeatureCollection],
+):
     """Validate CRS is valid for a geojson."""
     log.debug("validating coordinate reference system")
 
@@ -102,7 +111,10 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
     def is_valid_coordinate(coord):
         if coord is None:
             return False
-        return -180 <= coord[0] <= 180 and -90 <= coord[1] <= 90
+        return (
+            MIN_LONGITUDE <= coord[0] <= MAX_LONGITUDE
+            and MIN_LATITUDE <= coord[1] <= MAX_LATITUDE
+        )
 
     error_message = (
         "ERROR: Unsupported coordinate system, it is recommended to use a "
@@ -216,7 +228,7 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
         parts = point_str.strip().split()
 
         # Expect at least lat and lon
-        if len(parts) < 2:
+        if len(parts) < MIN_LAT_LON_PARTS:
             continue
 
         try:
@@ -234,7 +246,7 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
         geom_type = "Point"
         coordinates = coordinates[0]  # Flatten for Point
     elif (
-        coordinates[0] == coordinates[-1] and len(coordinates) >= 4
+        coordinates[0] == coordinates[-1] and len(coordinates) >= MIN_POLYGON_POINTS
     ):  # Check if closed loop
         geom_type = "Polygon"
         coordinates = [coordinates]  # Wrap in extra list for Polygon

@@ -118,7 +118,7 @@ def _build_odk_finalize_success_html(result: ODKFinalizeResult) -> str:
         "current_user": Provide(mapper),
     },
 )
-async def download_osm_data_htmx(
+async def download_osm_data_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -246,7 +246,7 @@ async def download_osm_data_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def upload_geojson_htmx(
+async def upload_geojson_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -558,7 +558,7 @@ async def collect_new_data_only_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def submit_geojson_data_extract_htmx(
+async def submit_geojson_data_extract_htmx(  # noqa: PLR0911, PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -694,7 +694,7 @@ async def submit_geojson_data_extract_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def preview_tasks_and_data_htmx(
+async def preview_tasks_and_data_htmx(  # noqa: C901, PLR0912
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -945,7 +945,7 @@ async def skip_task_split_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def split_aoi_htmx(
+async def split_aoi_htmx(  # noqa: C901, PLR0911, PLR0913, PLR0915
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1194,7 +1194,7 @@ async def split_aoi_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def accept_data_extract_htmx(
+async def accept_data_extract_htmx(  # noqa: PLR0911, PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1290,7 +1290,7 @@ async def accept_data_extract_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def accept_split_htmx(
+async def accept_split_htmx(  # noqa: PLR0911, PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1388,7 +1388,7 @@ async def accept_split_htmx(
         "current_user": Provide(project_manager),
     },
 )
-async def create_project_odk_htmx(
+async def create_project_odk_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1471,7 +1471,7 @@ async def create_project_odk_htmx(
         "current_user": Provide(project_manager),
     },
 )
-async def create_project_qfield_htmx(
+async def create_project_qfield_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1546,7 +1546,7 @@ async def create_project_qfield_htmx(
         "auth_user": Provide(login_required),
     },
 )
-async def validate_geojson(
+async def validate_geojson(  # noqa: C901
     request: HTMXRequest,
     db: AsyncConnection,
     auth_user: AuthUser,

@@ -131,7 +131,7 @@ async def validate_form(
     need_verification_fields: bool = Parameter(default=True),
     mandatory_photo_upload: bool = Parameter(default=False),
     default_language: str = Parameter(default="english"),
-) -> dict:
+) -> dict:  # noqa: PLR0913
     """Basic validity check for uploaded XLSForm.
 
     Parses the form using ODK pyxform to check that it is valid.
@@ -182,7 +182,7 @@ async def validate_form(
         "current_user": Provide(mapper),
     },
 )
-async def upload_project_xlsform(
+async def upload_project_xlsform(  # noqa: PLR0913
     db: AsyncConnection,
     current_user: ProjectUserDict,
     auth_user: AuthUser,
@@ -193,7 +193,7 @@ async def upload_project_xlsform(
     # FIXME this var should be probably be refactored to project.field_mapping_app
     default_language: str = Parameter(default="english"),
     use_odk_collect: bool = Parameter(default=False),
-) -> dict:
+) -> dict:  # noqa: PLR0913
     """Upload the final XLSForm for the project."""
     project = current_user.get("project")
     project_id = project.id
@@ -270,9 +270,12 @@ async def detect_form_languages(
                 r"^(label|hint|required_message)::([a-z0-9_-]+)$",
                 col_norm,
             )
-            if match and match.group(2) in INCLUDED_LANGUAGES:
-                if match.group(2) not in detected_languages:
-                    detected_languages.append(match.group(2))
+            if (
+                match
+                and match.group(2) in INCLUDED_LANGUAGES
+                and match.group(2) not in detected_languages
+            ):
+                detected_languages.append(match.group(2))
 
     if default_language and default_language.lower() not in detected_languages:
         detected_languages.append(default_language.lower())
@@ -566,7 +569,6 @@ async def odk_creds_test(
         external_project_password=external_project_password,
     )
     await central_crud.odk_credentials_test(odk_creds)
-    return None
 
 
 central_router = Router(

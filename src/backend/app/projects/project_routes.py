@@ -77,7 +77,7 @@ async def read_projects(
     },
     return_dto=project_schemas.ProjectSummary,
 )
-async def read_project_summaries(
+async def read_project_summaries(  # noqa: PLR0913
     db: AsyncConnection,
     page: int = Parameter(default=1, ge=1),
     results_per_page: int = Parameter(default=13, le=100),
@@ -251,7 +251,6 @@ async def delete_project(
     await DbProject.delete(db, project.id)
 
     log.info(f"Deletion of project {project.id} successful")
-    return None
 
 
 project_router = Router(

@@ -104,10 +104,19 @@ exclude = [
     "app/__version__.py",
 ]
 [tool.ruff.lint]
-select = ["I", "E", "W", "D", "B", "F", "N", "Q"]
+select = ["I", "E", "W", "D", "B", "F", "N", "Q", "C90","B","S","SIM","PLR","C4","PERF"]
 ignore = ["N805", "B008"]
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "PLR2004", "S105", "S106","C901", "SIM117"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+[tool.ruff.lint.pylint]
+max-args = 8
+max-branches = 12
+max-returns = 6
+max-statements = 50
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

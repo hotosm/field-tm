@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Optional, Self
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from psycopg import AsyncConnection
+from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel
 
@@ -118,7 +118,7 @@ class DbUser:
         return db_user
 
     @classmethod
-    async def all(
+    async def all(  # noqa: PLR0913
         cls,
         db: AsyncConnection,
         skip: Optional[int] = None,
@@ -127,7 +127,7 @@ class DbUser:
         username: Optional[str] = None,
         signin_type: Optional[str] = None,
         last_login_after: Optional[date] = None,
-    ) -> Optional[list[Self]]:
+    ) -> Optional[list[Self]]:  # noqa: PLR0913
         """Fetch all users."""
         filters = []
         params = {"offset": skip, "limit": limit} if skip and limit else {}
@@ -148,24 +148,17 @@ class DbUser:
             filters.append("last_login_at >= %(last_login_after)s")
             params["last_login_after"] = last_login_after
 
-        sql = f"""
-            SELECT * FROM users
-            {"WHERE " + " AND ".join(filters) if filters else ""}
-            ORDER BY registered_at DESC
-        """
-        sql += (
-            """
-            OFFSET %(offset)s
-            LIMIT %(limit)s;
-        """
-            if skip and limit
-            else ";"
-        )
+        query = sql.SQL("SELECT * FROM users")
+        if filters:
+            query += sql.SQL(" WHERE ")
+            query += sql.SQL(" AND ").join(sql.SQL(clause) for clause in filters)
+        query += sql.SQL(" ORDER BY registered_at DESC")
+        if skip and limit:
+            query += sql.SQL(" OFFSET %(offset)s LIMIT %(limit)s;")
+        else:
+            query += sql.SQL(";")
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                sql,
-                params,
-            )
+            await cur.execute(query, params)
             return await cur.fetchall()
 
     @classmethod
@@ -196,9 +189,12 @@ class DbUser:
     ) -> Self:
         """Create a new user."""
         model_dump = dump_and_check_model(user_in)
-        columns = ", ".join(model_dump.keys())
-        value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
-        conflict_statement = """
+        columns = sql.SQL(", ").join(sql.Identifier(key) for key in model_dump)
+        value_placeholders = sql.SQL(", ").join(
+            sql.Placeholder(key) for key in model_dump
+        )
+        conflict_statement = sql.SQL(
+            """
             ON CONFLICT (sub) DO UPDATE
             SET
                 username = EXCLUDED.username,
@@ -209,18 +205,18 @@ class DbUser:
                 profile_img = EXCLUDED.profile_img,
                 email_address = EXCLUDED.email_address
         """
+        )
 
-        sql = f"""
-            INSERT INTO users
-                ({columns})
-            VALUES
-                ({value_placeholders})
-            {conflict_statement if ignore_conflict else ""}
-            RETURNING *;
-        """
+        query = sql.SQL(
+            "INSERT INTO users ({columns}) VALUES ({values}) {conflict} RETURNING *;"
+        ).format(
+            columns=columns,
+            values=value_placeholders,
+            conflict=conflict_statement if ignore_conflict else sql.SQL(""),
+        )
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, model_dump)
+            await cur.execute(query, model_dump)
             new_user = await cur.fetchone()
 
         if new_user is None:
@@ -239,17 +235,20 @@ class DbUser:
     ) -> Self:
         """Update a specific user record."""
         model_dump = dump_and_check_model(user_update)
-        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
-        sql = f"""
-            UPDATE users
-            SET {", ".join(placeholders)}
-            WHERE sub = %(user_sub)s
-            RETURNING *;
-        """
+        placeholders = sql.SQL(", ").join(
+            sql.SQL("{column} = {value}").format(
+                column=sql.Identifier(key),
+                value=sql.Placeholder(key),
+            )
+            for key in model_dump
+        )
+        query = sql.SQL(
+            "UPDATE users SET {placeholders} WHERE sub = %(user_sub)s RETURNING *;"
+        ).format(placeholders=placeholders)
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
-                sql,
+                query,
                 {"user_sub": user_sub, **model_dump},
             )
             updated_user = await cur.fetchone()
@@ -281,14 +280,15 @@ class DbApiKey:
     async def create(cls, db: AsyncConnection, api_key_in: Self) -> Self:
         """Create a new API key record."""
         model_dump = dump_and_check_model(api_key_in)
-        columns = ", ".join(model_dump.keys())
-        value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
+        columns = sql.SQL(", ").join(sql.Identifier(key) for key in model_dump)
+        value_placeholders = sql.SQL(", ").join(
+            sql.Placeholder(key) for key in model_dump
+        )
 
-        sql = f"""
-            INSERT INTO api_keys
-                ({columns})
-            VALUES
-                ({value_placeholders})
+        query = sql.SQL(
+            """
+            INSERT INTO api_keys ({columns})
+            VALUES ({values})
             ON CONFLICT (key_hash) DO UPDATE
             SET
                 user_sub = EXCLUDED.user_sub,
@@ -296,9 +296,10 @@ class DbApiKey:
                 is_active = TRUE
             RETURNING *;
         """
+        ).format(columns=columns, values=value_placeholders)
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, model_dump)
+            await cur.execute(query, model_dump)
             new_api_key = await cur.fetchone()
 
         if new_api_key is None:
@@ -391,7 +392,7 @@ class DbTemplateXLSForm:
     xls: Optional[bytes] = None
 
     @classmethod
-    async def all(
+    async def all(  # noqa: PLR0913
         cls,
         db: AsyncConnection,
     ) -> Optional[list[Self]]:
@@ -496,7 +497,7 @@ class DbProject:
         return db_project
 
     @classmethod
-    async def all(
+    async def all(  # noqa: PLR0913
         cls,
         db: AsyncConnection,
         skip: Optional[int] = None,
@@ -507,7 +508,7 @@ class DbProject:
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
         country: Optional[str] = None,
-    ) -> Optional[list[Self]]:
+    ) -> Optional[list[Self]]:  # noqa: PLR0913
         """Fetch all projects with optional filters."""
         filters = []
         params = {}
@@ -530,29 +531,28 @@ class DbProject:
             )
             params["search"] = f"%{search}%"
 
-        where_clause = f"WHERE {' AND '.join(filters)}" if filters else ""
-
-        sql = f"""
+        query = sql.SQL(
+            """
             SELECT
                 p.*,
                 ST_AsGeoJSON(p.outline)::jsonb AS outline
             FROM projects p
-            {where_clause}
-            ORDER BY created_at DESC
         """
+        )
+        if filters:
+            query += sql.SQL(" WHERE ")
+            query += sql.SQL(" AND ").join(sql.SQL(clause) for clause in filters)
+        query += sql.SQL(" ORDER BY created_at DESC")
 
         if skip is not None and limit is not None:
-            sql += """
-                OFFSET %(offset)s
-                LIMIT %(limit)s;
-            """
+            query += sql.SQL(" OFFSET %(offset)s LIMIT %(limit)s;")
             params["offset"] = skip
             params["limit"] = limit
         else:
-            sql += ";"
+            query += sql.SQL(";")
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, params)
+            await cur.execute(query, params)
             return await cur.fetchall()
 
     @classmethod
@@ -587,34 +587,41 @@ class DbProject:
             model_dump.pop("external_project_password", None)
 
         columns = []
-        value_placeholders = []
+        value_placeholders: list[sql.Composable] = []
 
-        for key in model_dump.keys():
+        for key in model_dump:
             columns.append(key)
             if key == "outline":
-                value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
+                value_placeholders.append(
+                    sql.SQL("ST_GeomFromGeoJSON({})").format(sql.Placeholder(key))
+                )
                 # Must be string json for db input
                 model_dump[key] = json.dumps(model_dump[key])
             elif key == "data_extract_geojson" and isinstance(model_dump[key], dict):
                 # Convert GeoJSON dict to JSON string for JSONB column
-                value_placeholders.append(f"%({key})s::jsonb")
+                value_placeholders.append(
+                    sql.SQL("{}::jsonb").format(sql.Placeholder(key))
+                )
                 model_dump[key] = json.dumps(model_dump[key])
             else:
-                value_placeholders.append(f"%({key})s")
+                value_placeholders.append(sql.Placeholder(key))
 
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                f"""
+        insert_sql = sql.SQL(
+            """
                 INSERT INTO projects
-                    ({", ".join(columns)})
+                    ({columns})
                 VALUES
-                    ({", ".join(value_placeholders)})
+                    ({values})
                 RETURNING
                     *,
                     ST_AsGeoJSON(outline)::jsonb AS outline;
-            """,
-                model_dump,
-            )
+            """
+        ).format(
+            columns=sql.SQL(", ").join(sql.Identifier(key) for key in columns),
+            values=sql.SQL(", ").join(value_placeholders),
+        )
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(insert_sql, model_dump)
             new_project = await cur.fetchone()
 
             if new_project is None:
@@ -681,19 +688,31 @@ class DbProject:
 
         # Convert dict/JSONB fields to JSON strings for database
         for key in list(model_dump.keys()):
-            if key == "data_extract_geojson" and isinstance(model_dump[key], dict):
-                # Convert GeoJSON dict to JSON string for JSONB column
-                model_dump[key] = json.dumps(model_dump[key])
-            elif key == "task_areas_geojson" and isinstance(model_dump[key], dict):
+            if (
+                key == "data_extract_geojson"
+                and isinstance(model_dump[key], dict)
+                or key == "task_areas_geojson"
+                and isinstance(model_dump[key], dict)
+            ):
                 # Convert GeoJSON dict to JSON string for JSONB column
                 model_dump[key] = json.dumps(model_dump[key])
 
-        placeholders = []
-        for key in model_dump.keys():
+        placeholders: list[sql.Composable] = []
+        for key in model_dump:
             if key == "task_areas_geojson":
-                placeholders.append(f"{key} = %({key})s::jsonb")
+                placeholders.append(
+                    sql.SQL("{column} = {value}::jsonb").format(
+                        column=sql.Identifier(key),
+                        value=sql.Placeholder(key),
+                    )
+                )
             else:
-                placeholders.append(f"{key} = %({key})s")
+                placeholders.append(
+                    sql.SQL("{column} = {value}").format(
+                        column=sql.Identifier(key),
+                        value=sql.Placeholder(key),
+                    )
+                )
 
         # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
         if "hashtags" in model_dump:
@@ -701,17 +720,19 @@ class DbProject:
             if fmtm_hashtag not in model_dump["hashtags"]:
                 model_dump["hashtags"].append(fmtm_hashtag)
 
-        sql = f"""
+        query = sql.SQL(
+            """
             UPDATE projects
-            SET {", ".join(placeholders)}
+            SET {placeholders}
             WHERE id = %(project_id)s
             RETURNING
                 *,
                 ST_AsGeoJSON(outline)::jsonb AS outline;
         """
+        ).format(placeholders=sql.SQL(", ").join(placeholders))
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, {"project_id": project_id, **model_dump})
+            await cur.execute(query, {"project_id": project_id, **model_dump})
             updated_project = await cur.fetchone()
 
         if updated_project is None:

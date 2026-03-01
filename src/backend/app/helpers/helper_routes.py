@@ -54,6 +54,8 @@ from app.helpers.geometry_utils import (
 
 log = logging.getLogger(__name__)
 
+REQUEST_TIMEOUT_SECONDS = 30
+
 
 @get(
     "/download-template-xlsform",
@@ -141,12 +143,9 @@ async def create_entities_from_csv(
         )
 
     def parse_csv(csv_bytes: bytes):
-        parsed_data = []
         csv_str = csv_bytes.decode("utf-8")
         csv_reader = csv.DictReader(StringIO(csv_str))
-        for row in csv_reader:
-            parsed_data.append(dict(row))
-        return parsed_data
+        return [dict(row) for row in csv_reader]
 
     parsed_data = parse_csv(await csv_file.read())
     entities_data_dict = {str(uuid4()): data for data in parsed_data}
@@ -222,7 +221,10 @@ async def get_raw_data_api_osm_token(
     The token returned by this endpoint should be used for the
     RAW_DATA_API_AUTH_TOKEN environment variable.
     """
-    response = requests.get(f"{settings.RAW_DATA_API_URL}/auth/login")
+    response = requests.get(
+        f"{settings.RAW_DATA_API_URL}/auth/login",
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
     if not response.ok:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -339,9 +341,14 @@ async def send_test_osm_message(
     email_url = f"{settings.OSM_URL}api/0.6/user/messages"
     headers = {"Authorization": f"Bearer {osm_token}"}
     log.debug(f"Sending message to user ({current_user.sub}) via OSM API: {email_url}")
-    response = requests.post(email_url, headers=headers, data=post_body)
+    response = requests.post(
+        email_url,
+        headers=headers,
+        data=post_body,
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
 
-    if response.status_code == 200:
+    if response.status_code == status.HTTP_200_OK:
         log.info("Message sent successfully")
         return None
 

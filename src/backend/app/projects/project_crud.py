@@ -41,7 +41,7 @@ from osm_data_client import (
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_login_python.core import Auth
-from psycopg import AsyncConnection
+from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
@@ -73,7 +73,7 @@ async def generate_data_extract(
     config_json=None,
     centroid: bool = False,
     use_st_within: bool = True,
-) -> RawDataResult:
+) -> RawDataResult:  # noqa: PLR0913
     """Request a new data extract in flatgeobuf format.
 
     Args:
@@ -227,7 +227,7 @@ async def generate_odk_central_project_content(
     xlsform: BytesIO,
     task_extract_dict: Optional[dict[int, geojson.FeatureCollection]] = None,
     entity_properties: Optional[list[str]] = None,
-) -> str:
+) -> str:  # noqa: PLR0913
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
     entities_list = []
     if task_extract_dict:
@@ -274,11 +274,11 @@ async def generate_odk_central_project_content(
     )
 
 
-async def generate_project_files(
+async def generate_project_files(  # noqa: C901, PLR0912, PLR0915
     db: AsyncConnection,
     project_id: int,
     odk_credentials: Optional[central_schemas.ODKCentral] = None,
-) -> bool:
+) -> bool:  # noqa: C901, PLR0912, PLR0915
     """Generate the files for a project.
 
     QR code (appuser), ODK XForm, ODK Entities from OSM data extract.
@@ -368,13 +368,20 @@ async def generate_project_files(
                 # Fetch from temp table for splitting data extract
                 try:
                     async with db.cursor(row_factory=class_row(dict)) as cur:
-                        await cur.execute(f"""
+                        temp_table_sql = sql.SQL(
+                            """
                             SELECT
                                 task_index,
                                 ST_AsGeoJSON(outline)::jsonb AS outline
-                            FROM temp_task_boundaries_{project_id}
+                            FROM {table_name}
                             ORDER BY task_index;
-                        """)
+                        """
+                        ).format(
+                            table_name=sql.Identifier(
+                                f"temp_task_boundaries_{project_id}"
+                            )
+                        )
+                        await cur.execute(temp_table_sql)
                         db_tasks = await cur.fetchall()
 
                         if db_tasks:
@@ -474,7 +481,9 @@ async def generate_project_files(
         return False
 
 
-async def get_task_geometry(db: AsyncConnection, project_id: int):
+async def get_task_geometry(  # noqa: C901, PLR0912
+    db: AsyncConnection, project_id: int
+):
     """Retrieves the geometry of tasks associated with a project.
 
     Task boundaries are stored in the database as task_areas_geojson (for preview),
@@ -558,13 +567,18 @@ async def get_task_geometry(db: AsyncConnection, project_id: int):
         # For QField, fetch from temporary table
         try:
             async with db.cursor(row_factory=class_row(dict)) as cur:
-                await cur.execute(f"""
+                temp_table_sql = sql.SQL(
+                    """
                     SELECT
                         task_index,
                         ST_AsGeoJSON(outline)::jsonb AS outline
-                    FROM temp_task_boundaries_{project_id}
+                    FROM {table_name}
                     ORDER BY task_index;
-                """)
+                """
+                ).format(
+                    table_name=sql.Identifier(f"temp_task_boundaries_{project_id}")
+                )
+                await cur.execute(temp_table_sql)
                 db_tasks = await cur.fetchall()
 
                 if db_tasks:
@@ -637,20 +651,20 @@ async def get_project_features_geojson(
         settings.S3_ENDPOINT,
     )
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(data_extract_url) as response:
-            if not response.ok:
-                msg = f"Download failed for data extract, project ({project_id})"
-                log.error(msg)
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail=msg,
-                )
-
-            log.debug("Converting FlatGeobuf to GeoJSON")
-            data_extract_geojson = await flatgeobuf_to_featcol(
-                db, await response.read()
+    async with (
+        aiohttp.ClientSession() as session,
+        session.get(data_extract_url) as response,
+    ):
+        if not response.ok:
+            msg = f"Download failed for data extract, project ({project_id})"
+            log.error(msg)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=msg,
             )
+
+        log.debug("Converting FlatGeobuf to GeoJSON")
+        data_extract_geojson = await flatgeobuf_to_featcol(db, await response.read())
 
     if not data_extract_geojson:
         msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
@@ -693,7 +707,7 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
     return pagination
 
 
-async def get_paginated_projects(
+async def get_paginated_projects(  # noqa: PLR0913
     db: AsyncConnection,
     page: int,
     results_per_page: int,
@@ -703,7 +717,7 @@ async def get_paginated_projects(
     status: Optional[ProjectStatus] = None,
     field_mapping_app: Optional[FieldMappingApp] = None,
     country: Optional[str] = None,
-) -> dict:
+) -> dict:  # noqa: PLR0913
     """Helper function to fetch paginated projects with optional filters."""
     if hashtags:
         hashtags = hashtags.split(",")

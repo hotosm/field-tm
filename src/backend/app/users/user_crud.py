@@ -224,7 +224,7 @@ async def send_invitation_message(
     invite_url: str,
     user_email: str,
     signin_type: str,
-):
+):  # noqa: PLR0913
     """Send an invitation message to a user to join a project."""
     project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
     if not project_url.startswith("http"):
@@ -269,10 +269,7 @@ async def get_paginated_users(
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
 
-    if not users:
-        paginated_users = []
-    else:
-        paginated_users = users[start_index:end_index]
+    paginated_users = [] if not users else users[start_index:end_index]
 
     total_pages = (len(users) + results_per_page - 1) // results_per_page
     has_next = (page * results_per_page) < len(users)

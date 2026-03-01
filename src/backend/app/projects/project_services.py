@@ -142,7 +142,7 @@ def _resolve_odk_public_url(custom_odk_creds: Optional[ODKCentral]) -> str:
 # ============================================================================
 
 
-async def create_project_stub(
+async def create_project_stub(  # noqa: C901, PLR0912, PLR0913, PLR0915
     db: AsyncConnection,
     project_name: str,
     field_mapping_app: str,
@@ -150,7 +150,7 @@ async def create_project_stub(
     outline: dict,
     hashtags: list[str],
     user_sub: str,
-) -> DbProject:
+) -> DbProject:  # noqa: C901, PLR0912, PLR0913, PLR0915
     """Create a new project stub in the database.
 
     Args:
@@ -268,7 +268,7 @@ async def process_xlsform(
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     default_language: str = "english",
-) -> None:
+) -> None:  # noqa: PLR0913
     """Validate, process, and store an XLSForm for a project.
 
     Args:
@@ -324,13 +324,13 @@ async def process_xlsform(
     log.debug(f"Successfully saved XLSForm to database for project {project_id}")
 
 
-async def download_osm_data(
+async def download_osm_data(  # noqa: C901
     db: AsyncConnection,
     project_id: int,
     osm_category: str = "buildings",
     geom_type: str = "POLYGON",
     centroid: bool = False,
-) -> dict:
+) -> dict:  # noqa: C901
     """Download OSM data extract for a project and return the GeoJSON.
 
     Args:
@@ -399,15 +399,17 @@ async def download_osm_data(
         raise ServiceError("Failed to get download URL from data extract.")
 
     # Download and parse GeoJSON
-    async with aiohttp.ClientSession() as session:
-        async with session.get(download_url) as response:
-            if not response.ok:
-                raise ServiceError("Failed to download GeoJSON from extract URL.")
-            text_content = await response.text()
-            try:
-                geojson_data = json.loads(text_content)
-            except json.JSONDecodeError as e:
-                raise ServiceError("Failed to parse GeoJSON data from download.") from e
+    async with (
+        aiohttp.ClientSession() as session,
+        session.get(download_url) as response,
+    ):
+        if not response.ok:
+            raise ServiceError("Failed to download GeoJSON from extract URL.")
+        text_content = await response.text()
+        try:
+            geojson_data = json.loads(text_content)
+        except json.JSONDecodeError as e:
+            raise ServiceError("Failed to parse GeoJSON data from download.") from e
 
     if not isinstance(geojson_data, dict):
         raise ServiceError("Downloaded extract is not valid GeoJSON data.")
@@ -485,7 +487,7 @@ async def save_data_extract(
     return feature_count
 
 
-async def split_aoi(
+async def split_aoi(  # noqa: C901, PLR0913
     db: AsyncConnection,
     project_id: int,
     algorithm: str,
@@ -495,7 +497,7 @@ async def split_aoi(
     include_rivers: bool = True,
     include_railways: bool = True,
     include_aeroways: bool = True,
-) -> dict:
+) -> dict:  # noqa: C901, PLR0913
     """Split a project AOI into task areas.
 
     Args:
@@ -682,11 +684,11 @@ async def save_task_areas(
     return task_count
 
 
-async def finalize_odk_project(
+async def finalize_odk_project(  # noqa: C901, PLR0912, PLR0915
     db: AsyncConnection,
     project_id: int,
     custom_odk_creds: Optional[ODKCentral] = None,
-) -> ODKFinalizeResult:
+) -> ODKFinalizeResult:  # noqa: C901, PLR0912, PLR0915
     """Create project in ODK Central with all data.
 
     Args:
@@ -712,12 +714,13 @@ async def finalize_odk_project(
         )
 
     # Validate ODK credentials
-    if not custom_odk_creds:
-        if not settings.ODK_CENTRAL_URL or not settings.ODK_CENTRAL_USER:
-            raise ValidationError(
-                "ODK Central credentials are not configured on the server. "
-                "Please provide custom ODK credentials."
-            )
+    if not custom_odk_creds and (
+        not settings.ODK_CENTRAL_URL or not settings.ODK_CENTRAL_USER
+    ):
+        raise ValidationError(
+            "ODK Central credentials are not configured on the server. "
+            "Please provide custom ODK credentials."
+        )
 
     # Step 1: Create ODK project if it doesn't exist
     project_odk_id = project.external_project_id

@@ -103,7 +103,6 @@ async def qfc_creds_test(
 ) -> None:
     """Test QFieldCloud credentials by attempting to open a session."""
     await qfc_credentials_test(qfc_creds)
-    return None
 
 
 @delete(
@@ -124,7 +123,6 @@ async def trigger_delete_qfield_project(
 ) -> None:
     """Delete a project from QFieldCloud."""
     await delete_qfield_project(db, project_id)
-    return None
 
 
 qfield_router = Router(
