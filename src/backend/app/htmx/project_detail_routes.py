@@ -143,9 +143,29 @@ async def project_qrcode_htmx(
         )
     except Exception as e:
         log.error(f"Error generating QR code via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        raw = str(e).lower()
+        if any(
+            kw in raw
+            for kw in (
+                "connection",
+                "connect",
+                "refused",
+                "timeout",
+                "unreachable",
+                "network",
+            )
+        ):
+            friendly = "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is running."
+        elif any(kw in raw for kw in ("500", "server error", "internal")):
+            friendly = (
+                "The mapping server returned an error. Check its logs for details."
+            )
+        elif any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
+            friendly = "Authentication failed connecting to the mapping server. Check the configured credentials."
+        else:
+            friendly = "An unexpected error occurred while generating the QR code."
         return Response(
-            content=_callout("danger", f"Error: {error_msg}"),
+            content=_callout("warning", friendly),
             media_type="text/html",
-            status_code=500,
+            status_code=200,
         )

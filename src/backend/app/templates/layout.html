@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="wa-theme-default wa-palette-hotosm">
+<html lang="en" class="hot-theme-light wa-theme-default wa-palette-hotosm">
   <head>
     <title>{% block title %}Field Tasking Manager{% endblock %}</title>
 
@@ -19,9 +19,53 @@
     />
     <meta name="theme-color" content="#d63f3f" />
 
+    <!-- Resource hints to reduce first-paint theme/font flash -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link rel="icon" href="/favicon.png" sizes="16x16" />
     <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+
+    <!-- Load Google Fonts directly so the browser applies the stylesheet immediately. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;700&family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    />
+
+    <!-- Critical tokens inlined so the page looks correct before any CDN CSS arrives. -->
+    <!-- Also hides undefined web-component elements until they upgrade (avoids FOUC  -->
+    <!-- without blanking the whole page — each element pops in individually).        -->
+    <style>
+      :root {
+        /* HOT brand red — set before theme CSS loads so buttons never flash blue/grey */
+        --wa-color-brand-fill-loud: #d43f3f;
+        --wa-color-brand-border-loud: #ed5c5e;
+        --wa-color-brand-on-loud: #ffffff;
+        /* Core neutrals so body text and backgrounds look right immediately */
+        --hot-color-neutral-900: #404248;
+        --hot-color-neutral-50: #f3f3f3;
+        --hot-color-neutral-100: #e8e8e8;
+      }
+
+      /* Hide only web-component elements until they are defined/upgraded.
+         visibility:hidden (not display:none) preserves layout so the page
+         doesn't jump as each component registers. */
+      wa-button:not(:defined),
+      wa-card:not(:defined),
+      wa-badge:not(:defined),
+      wa-callout:not(:defined),
+      wa-input:not(:defined),
+      wa-textarea:not(:defined),
+      wa-select:not(:defined),
+      wa-tag:not(:defined),
+      wa-dialog:not(:defined),
+      hot-header:not(:defined) {
+        visibility: hidden;
+      }
+    </style>
 
     <!-- WebAwesome CSS - loaded from CDN so the browser caches it across all HOT tools -->
     <link
@@ -37,13 +81,6 @@
       href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/themes/default.css"
     />
 
-    <!-- HOT UI theme (fonts + HOT design tokens + WebAwesome overrides) -->
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.6.1/dist/style-core.css"
-    /> -->
-    <link rel="stylesheet" href="http://127.0.0.1:4173/style-core.css" />
-
     <!-- Import map: lets the browser resolve WebAwesome bare-module specifiers used -->
     <!-- inside hotosm-ui.js so WA components load correctly (incl. inside Shadow DOM). -->
     <script type="importmap">
@@ -53,13 +90,33 @@
         }
       }
     </script>
+    <script type="module">
+      import "@awesome.me/webawesome/dist/components/badge/badge.js";
+      import "@awesome.me/webawesome/dist/components/button/button.js";
+      import "@awesome.me/webawesome/dist/components/callout/callout.js";
+      import "@awesome.me/webawesome/dist/components/card/card.js";
+      import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+      import "@awesome.me/webawesome/dist/components/input/input.js";
+      import "@awesome.me/webawesome/dist/components/select/select.js";
+      import "@awesome.me/webawesome/dist/components/tag/tag.js";
+      import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
+    </script>
 
-    <!-- HOT UI web components -->
-    <!-- <script
+    <!-- HOT UI theme + components -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/style-core.css"
+    />
+    <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
+    <!-- so custom elements are defined as soon as possible after the page loads. -->
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/hotosm-ui.js"
+    />
+    <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.6.1/dist/hotosm-ui.js"
-    ></script> -->
-    <script type="module" src="http://127.0.0.1:4173/hotosm-ui.js"></script>
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/hotosm-ui.js"
+    ></script>
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -94,8 +151,30 @@
   </head>
 
   <body>
-    <hot-header title="FieldTM" size="small" show-login></hot-header>
+    <hot-header id="app-header" title="FieldTM" size="small"></hot-header>
 
     {% block content %}{% endblock %}
+
+    <script>
+      // hot-header tabs must be set as a JS property (not an HTML attribute)
+      // because tab objects contain clickEvent functions that can't be serialised.
+      const appHeader = document.getElementById("app-header");
+      if (appHeader) {
+        appHeader.tabs = [
+          {
+            label: "Projects",
+            clickEvent: () => {
+              window.location.href = "/htmxprojects";
+            },
+          },
+          {
+            label: "Create Project",
+            clickEvent: () => {
+              window.location.href = "/new";
+            },
+          },
+        ];
+      }
+    </script>
   </body>
 </html>

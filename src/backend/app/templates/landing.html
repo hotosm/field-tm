@@ -3,14 +3,19 @@ endblock %} {% block extra_head %}
 <style>
   .landing-page {
     --landing-shell-width: min(1150px, 92vw);
-    --landing-brand-red: #d63f3f;
-    --landing-navy: #102743;
-    --landing-surface: #f6f8fb;
-    --landing-text: #17324f;
-    --landing-muted: #587188;
-    font-family: "Barlow", "Segoe UI", sans-serif;
+    --landing-brand-red: var(--hot-color-primary-600);
+    --landing-navy: var(--hot-color-blue-900);
+    --landing-surface: var(--hot-color-neutral-50);
+    --landing-text: var(--hot-color-blue-900);
+    --landing-muted: var(--hot-color-blue-400);
+    font-family: var(--hot-font-sans-variant);
     color: var(--landing-text);
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 72%, #f4f7fa 100%);
+    background: linear-gradient(
+      180deg,
+      white 0%,
+      var(--hot-color-blue-50) 72%,
+      var(--hot-color-neutral-50) 100%
+    );
   }
 
   .landing-shell {
@@ -107,9 +112,9 @@ endblock %} {% block extra_head %}
 
   .landing-metric-card {
     border-radius: 16px;
-    border: 1px solid #dce7f2;
+    border: 1px solid var(--hot-color-blue-100);
     box-shadow: 0 14px 30px rgba(16, 39, 67, 0.08);
-    background-color: #ffffff;
+    background-color: white;
   }
 
   .landing-metric-inner {
@@ -135,7 +140,7 @@ endblock %} {% block extra_head %}
 
   .landing-loading {
     padding: 20px;
-    color: #60778f;
+    color: var(--hot-color-blue-300);
     text-align: center;
   }
 
@@ -172,7 +177,7 @@ endblock %} {% block extra_head %}
   .landing-about img {
     width: 100%;
     border-radius: 20px;
-    border: 1px solid #d5e1ed;
+    border: 1px solid var(--hot-color-blue-100);
     box-shadow: 0 20px 36px rgba(16, 39, 67, 0.18);
     object-fit: cover;
   }
@@ -184,8 +189,12 @@ endblock %} {% block extra_head %}
   }
 
   .landing-feature-card {
-    background: linear-gradient(165deg, #fff3f3 0%, #fffdfd 100%);
-    border: 1px solid #f1d7d7;
+    background: linear-gradient(
+      165deg,
+      var(--hot-color-primary-50) 0%,
+      white 100%
+    );
+    border: 1px solid var(--hot-color-primary-100);
     border-radius: 18px;
     padding: 24px 22px;
     box-shadow: 0 10px 24px rgba(214, 63, 63, 0.11);
@@ -193,13 +202,13 @@ endblock %} {% block extra_head %}
 
   .landing-feature-card h3 {
     margin: 0 0 9px 0;
-    color: #a92727;
-    font-size: 1.08rem;
+    color: var(--hot-color-primary-800);
+    font-size: var(--hot-font-size-medium);
   }
 
   .landing-feature-card p {
     margin: 0;
-    color: #5a6f83;
+    color: var(--landing-muted);
     line-height: 1.6;
   }
 
@@ -211,8 +220,8 @@ endblock %} {% block extra_head %}
 
   .landing-user-card {
     border-radius: 18px;
-    border: 1px solid #d9e4ef;
-    background-color: #ffffff;
+    border: 1px solid var(--hot-color-blue-100);
+    background-color: white;
     box-shadow: 0 12px 26px rgba(16, 39, 67, 0.08);
     padding: 30px 26px;
   }
@@ -229,13 +238,13 @@ endblock %} {% block extra_head %}
   }
 
   .landing-user-role--manager {
-    background-color: #fce8e8;
-    color: #a92727;
+    background-color: var(--hot-color-primary-50);
+    color: var(--hot-color-primary-800);
   }
 
   .landing-user-role--mapper {
-    background-color: #e6f0fb;
-    color: #1b5fa0;
+    background-color: var(--hot-color-blue-50);
+    color: var(--hot-color-blue-700);
   }
 
   .landing-user-card h3 {
@@ -275,7 +284,7 @@ endblock %} {% block extra_head %}
   .landing-use-cases-image {
     width: 100%;
     border-radius: 18px;
-    border: 1px solid #d5e1ed;
+    border: 1px solid var(--hot-color-blue-100);
     box-shadow: 0 16px 32px rgba(16, 39, 67, 0.14);
     object-fit: cover;
   }
@@ -283,8 +292,8 @@ endblock %} {% block extra_head %}
   .landing-use-case-item {
     margin: 0 0 12px 0;
     border-radius: 12px;
-    border: 1px solid #d9e4ef;
-    background-color: #ffffff;
+    border: 1px solid var(--hot-color-blue-100);
+    background-color: white;
     box-shadow: 0 9px 20px rgba(16, 39, 67, 0.07);
     overflow: hidden;
   }
@@ -336,12 +345,8 @@ endblock %} {% block extra_head %}
     text-decoration: none;
     padding: 22px;
     border-radius: 16px;
-    border: 1px solid #d7e2ee;
-    background: linear-gradient(
-      145deg,
-      #ffffff 0%,
-      var(--landing-surface) 100%
-    );
+    border: 1px solid var(--hot-color-blue-100);
+    background: linear-gradient(145deg, white 0%, var(--landing-surface) 100%);
     box-shadow: 0 12px 24px rgba(16, 39, 67, 0.08);
     transition: transform 170ms ease;
   }
@@ -352,11 +357,11 @@ endblock %} {% block extra_head %}
 
   .landing-resource-type {
     margin: 0;
-    color: #7890a8;
+    color: var(--hot-color-blue-300);
     text-transform: uppercase;
     letter-spacing: 0.11em;
-    font-size: 0.69rem;
-    font-weight: 700;
+    font-size: var(--hot-font-size-2x-small);
+    font-weight: var(--hot-font-weight-bold);
   }
 
   .landing-resource-title {
@@ -373,8 +378,8 @@ endblock %} {% block extra_head %}
   }
 
   .landing-footer {
-    background-color: var(--landing-navy);
-    color: #ffffff;
+    background-color: var(--hot-color-primary-900);
+    color: white;
     padding: 34px 0 36px 0;
   }
 
@@ -695,10 +700,6 @@ endblock %} {% block extra_head %}
 
   <footer class="landing-footer">
     <div class="landing-shell">
-      <div class="landing-footer-top">
-        <a href="/htmxprojects">Explore Projects</a>
-        <a href="/new">Create Project</a>
-      </div>
       <div class="landing-footer-bottom">
         <div class="landing-footer-help">
           Need assistance?<br />

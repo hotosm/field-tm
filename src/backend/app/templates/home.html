@@ -1,9 +1,9 @@
 {% extends "layout.html" %} {% block content %}
-<div class="ftm-page">
+<div class="ftm-page ftm-page--muted">
   <!-- Header with Create Project Button -->
   <div class="ftm-page-header">
     <h1 class="ftm-page-title">Projects</h1>
-    <wa-button href="/new" variant="primary">Create Project</wa-button>
+    <wa-button href="/new" variant="brand">Create Project</wa-button>
   </div>
 
   <!-- Projects Grid -->
@@ -12,37 +12,42 @@
     {% for project in projects %}
     <wa-card
       class="ftm-project-card"
+      with-header
       onclick="window.location.href='/htmxprojects/{{ project.id }}'"
     >
-      <div class="ftm-project-card__id">
-        #{{ project.id }} {% if project.visibility and project.visibility.value
-        == 'PRIVATE' %}
-        <span class="ftm-private-icon" title="Private Project">🔒</span>
-        {% endif %}
-      </div>
       <div slot="header" class="ftm-project-card__header">
-        <span>{{ project.project_name or 'Unnamed Project' }}</span>
-        <div class="ftm-project-card__badges">
-          {% if project.status %} {% set status_value = project.status.value if
-          project.status.value else (project.status if project.status is string
-          else 'DRAFT') %} {% if status_value != 'PUBLISHED' %}
-          <wa-badge
-            variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
-          >
-            {{ status_value }}
-          </wa-badge>
-          {% endif %} {% endif %} {% if project.field_mapping_app %} {% if
-          project.field_mapping_app.value %} {% set app_name =
-          project.field_mapping_app.value %} {% else %} {% set app_name =
-          project.field_mapping_app %} {% endif %}
-          <img
-            src="/static/images/{{ app_name.lower() }}-logo.svg"
-            alt="{{ app_name }}"
-            class="ftm-app-logo"
-            onerror="this.style.display='none'"
-          />
-          {% endif %}
+        <div class="ftm-project-card__header-meta">
+          <span class="ftm-project-card__id">
+            #{{ project.id }}{% if project.visibility and
+            project.visibility.value == 'PRIVATE' %}
+            <span class="ftm-private-icon" title="Private Project">🔒</span>{%
+            endif %}
+          </span>
+          <div class="ftm-project-card__badges">
+            {% if project.status %} {% set status_value = project.status.value
+            if project.status.value else (project.status if project.status is
+            string else 'DRAFT') %} {% if status_value != 'PUBLISHED' %}
+            <wa-badge
+              variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
+            >
+              {{ status_value }}
+            </wa-badge>
+            {% endif %} {% endif %} {% if project.field_mapping_app %} {% if
+            project.field_mapping_app.value %} {% set app_name =
+            project.field_mapping_app.value %} {% else %} {% set app_name =
+            project.field_mapping_app %} {% endif %}
+            <img
+              src="/static/images/{{ app_name.lower() }}-logo.svg"
+              alt="{{ app_name }}"
+              class="ftm-app-logo"
+              onerror="this.style.display='none'"
+            />
+            {% endif %}
+          </div>
         </div>
+        <span class="ftm-project-card__name"
+          >{{ project.project_name or 'Unnamed Project' }}</span
+        >
       </div>
       <div class="ftm-project-card__body">
         {% if project.location_str %}
