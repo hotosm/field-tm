@@ -113,12 +113,14 @@ async def test_finalize_odk_project_requires_xlsform():
 
     fake_db = AsyncMock()
 
-    with patch(
-        "app.projects.project_services.DbProject.one",
-        return_value=project,
+    with (
+        patch(
+            "app.projects.project_services.DbProject.one",
+            return_value=project,
+        ),
+        pytest.raises(ValidationError, match="XLSForm is required"),
     ):
-        with pytest.raises(ValidationError, match="XLSForm is required"):
-            await finalize_odk_project(fake_db, project_id=1)
+        await finalize_odk_project(fake_db, project_id=1)
 
 
 @pytest.mark.asyncio
@@ -128,12 +130,14 @@ async def test_finalize_odk_project_requires_data_extract():
 
     fake_db = AsyncMock()
 
-    with patch(
-        "app.projects.project_services.DbProject.one",
-        return_value=project,
+    with (
+        patch(
+            "app.projects.project_services.DbProject.one",
+            return_value=project,
+        ),
+        pytest.raises(ValidationError, match="Data extract is required"),
     ):
-        with pytest.raises(ValidationError, match="Data extract is required"):
-            await finalize_odk_project(fake_db, project_id=1)
+        await finalize_odk_project(fake_db, project_id=1)
 
 
 @pytest.mark.asyncio
@@ -818,10 +822,10 @@ async def test_finalize_odk_project_empty_data_extract_features():
             "app.projects.project_services.DbProject.update",
             new_callable=AsyncMock,
         ),
+        pytest.raises(ValidationError, match="no features"),
     ):
-        with pytest.raises(ValidationError, match="no features"):
-            await finalize_odk_project(
-                db=fake_db,
-                project_id=1,
-                custom_odk_creds=creds,
-            )
+        await finalize_odk_project(
+            db=fake_db,
+            project_id=1,
+            custom_odk_creds=creds,
+        )

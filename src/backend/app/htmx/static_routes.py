@@ -108,12 +108,11 @@ async def _serve_icon_file(filename: str, media_type: str) -> Response:
                 status_code=404,
             )
         media_type = "image/png"
-    else:
-        if not file_path.exists():
-            return Response(
-                content="Not Found",
-                status_code=404,
-            )
+    elif not file_path.exists():
+        return Response(
+            content="Not Found",
+            status_code=404,
+        )
 
     with open(file_path, "rb") as f:
         content = f.read()

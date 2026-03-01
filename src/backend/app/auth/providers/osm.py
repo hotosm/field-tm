@@ -33,6 +33,8 @@ from app.config import settings
 
 log = logging.getLogger(__name__)
 
+REQUEST_TIMEOUT_SECONDS = 30
+
 if settings.DEBUG:
     # Required as callback url is http during dev
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -112,7 +114,7 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
         expires=864000,  # expiry set for 10 days
         path="/",
         domain=cookie_domain,
-        secure=False if settings.DEBUG else True,
+        secure=not settings.DEBUG,
         httponly=True,
         samesite="lax",
     )
@@ -159,9 +161,14 @@ def send_osm_message(
     log.debug(
         f"Sending message to user ({osm_sub or osm_username}) via OSM API: {email_url}"
     )
-    response = requests.post(email_url, headers=headers, data=post_body)
+    response = requests.post(
+        email_url,
+        headers=headers,
+        data=post_body,
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
 
-    if response.status_code == 200:
+    if response.status_code == status.HTTP_200_OK:
         log.info("Message sent successfully")
     else:
         msg = "Sending message via OSM failed"
@@ -174,8 +181,8 @@ async def check_osm_user(osm_username: str):
 
     user_exists = False
     try:
-        response = requests.get(osm_url)
-        if response.status_code == 200:
+        response = requests.get(osm_url, timeout=REQUEST_TIMEOUT_SECONDS)
+        if response.status_code == status.HTTP_200_OK:
             user_exists = True
     except Exception as e:
         log.exception(

@@ -23,6 +23,7 @@ import logging
 import secrets
 import string
 from asyncio import gather
+from contextlib import suppress
 from io import BytesIO, StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -51,6 +52,9 @@ from app.s3 import strip_presigned_url_for_local_dev
 
 log = logging.getLogger(__name__)
 
+MIN_PYODK_ERROR_ARGS = 2
+HTTP_ERROR_STATUS_CODE = 400
+
 
 def _extract_dataset_property_names(payload: object) -> set[str]:
     """Extract dataset property names from Central API payloads."""
@@ -78,10 +82,10 @@ def _is_duplicate_form_conflict(exc: Exception) -> bool:
         try:
             if exc.is_central_error(409.3):
                 return True
-        except Exception:
-            pass
+        except Exception as err:
+            log.debug("Unable to inspect PyODK conflict details: %s", err)
 
-        if len(exc.args) >= 2:
+        if len(exc.args) >= MIN_PYODK_ERROR_ARGS:
             response = exc.args[1]
             if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
                 try:
@@ -182,11 +186,8 @@ async def create_odk_xform(
     try:
         form_definition: str | bytes = xform_data.getvalue()
         # pyodk validates bytes as XLS/XLSX only; XML must be passed as text.
-        try:
+        with suppress(UnicodeDecodeError):
             form_definition = form_definition.decode("utf-8")
-        except UnicodeDecodeError:
-            # Keep bytes for binary XLS/XLSX payloads.
-            pass
 
         async with central_deps.pyodk_client(odk_credentials) as client:
             try:
@@ -279,7 +280,7 @@ async def append_fields_to_user_xlsform(
     mandatory_photo_upload: bool = False,
     default_language: str = "english",
     use_odk_collect: bool = False,
-) -> tuple[str, BytesIO]:
+) -> tuple[str, BytesIO]:  # noqa: PLR0913
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory Field-TM fields to XLSForm")
     return await append_field_mapping_fields(
@@ -301,7 +302,7 @@ async def validate_and_update_user_xlsform(
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
-) -> BytesIO:
+) -> BytesIO:  # noqa: PLR0913
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
         xlsform,
@@ -572,13 +573,13 @@ async def task_geojson_dict_to_entity_values(
     return await gather(*asyncio_tasks)
 
 
-async def create_entity_list(
+async def create_entity_list(  # noqa: C901, PLR0912, PLR0915
     odk_creds: Optional[central_schemas.ODKCentral],
     odk_id: int,
     properties: list[str],
     dataset_name: str = "features",
     entities_list: list[central_schemas.EntityDict] = None,
-) -> None:
+) -> None:  # noqa: C901, PLR0912, PLR0915
     """Create a new Entity list (dataset) in ODK and upsert entities.
 
     Notes on implementation:
@@ -640,14 +641,14 @@ async def create_entity_list(
         required_keys = set(properties)
         # Also include any keys present in data (minus label)
         for row in merge_rows:
-            required_keys.update(k for k in row.keys() if k != "label")
+            required_keys.update(k for k in row if k != "label")
 
         existing_property_names: set[str] = set()
         try:
             existing_properties = client.session.get(
                 f"projects/{pid}/datasets/{dataset_name}/properties"
             )
-            if existing_properties.status_code < 400:
+            if existing_properties.status_code < HTTP_ERROR_STATUS_CODE:
                 existing_property_names = _extract_dataset_property_names(
                     existing_properties.json()
                 )
@@ -674,7 +675,7 @@ async def create_entity_list(
                 )
                 if create_property.status_code == status.HTTP_409_CONFLICT:
                     continue
-                if create_property.status_code >= 400:
+                if create_property.status_code >= HTTP_ERROR_STATUS_CODE:
                     create_property.raise_for_status()
             except Exception as exc:
                 # Treat "already exists" conflicts as OK (idempotent).
@@ -718,9 +719,7 @@ async def create_entity_list(
                     continue
                 existing_val = tgt.get(k)
                 # OData responses may omit keys when null; treat that as different.
-                if existing_val is None and k not in tgt:
-                    update_data[k] = v
-                elif str(v) != str(existing_val):
+                if existing_val is None and k not in tgt or str(v) != str(existing_val):
                     update_data[k] = v
 
             if update_data:
@@ -769,7 +768,7 @@ async def create_entity(
     properties: list[str],
     entity: central_schemas.EntityDict,
     dataset_name: str = "features",
-) -> dict:
+) -> dict:  # noqa: PLR0913
     """Create a new Entity in ODK."""
     log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
     try:
@@ -913,11 +912,11 @@ def _build_manager_user_email_fallback(project_odk_id: int) -> str:
     return f"fmtm-manager-{project_odk_id}-{suffix}@example.org"
 
 
-async def create_project_manager_user(
+async def create_project_manager_user(  # noqa: C901, PLR0915
     project_odk_id: int,
     project_name: str,
     odk_credentials: Optional[central_schemas.ODKCentral],
-) -> tuple[str, str]:
+) -> tuple[str, str]:  # noqa: C901, PLR0915
     """Create a Central web user scoped to one project as Project Manager.
 
     The user is created with email + password so they can log directly into
@@ -980,7 +979,7 @@ async def create_project_manager_user(
                 )
                 create_status = getattr(create_response, "status_code", 200)
 
-                if create_status < 400:
+                if create_status < HTTP_ERROR_STATUS_CODE:
                     created_user = create_response.json() or {}
                     created_user_id = created_user.get("id")
                     if not created_user_id:
@@ -1026,7 +1025,10 @@ async def create_project_manager_user(
                 f"users/{manager_user_id}",
                 json={"displayName": display_name},
             )
-            if getattr(display_name_response, "status_code", 200) >= 400:
+            if (
+                getattr(display_name_response, "status_code", status.HTTP_200_OK)
+                >= HTTP_ERROR_STATUS_CODE
+            ):
                 log.warning(
                     "Could not set display name for manager user %s on ODK project %s.",
                     manager_user_id,
@@ -1044,7 +1046,7 @@ async def create_project_manager_user(
                     manager_user_id,
                     project_odk_id,
                 )
-            elif assignment_status >= 400:
+            elif assignment_status >= HTTP_ERROR_STATUS_CODE:
                 assignment_response.raise_for_status()
 
             log.info(

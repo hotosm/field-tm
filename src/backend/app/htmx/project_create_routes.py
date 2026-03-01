@@ -76,7 +76,7 @@ def _first_form_value(value: object) -> str:
     return str(value or "").strip()
 
 
-def _parse_outline_payload(raw_value: object) -> dict:
+def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, PLR0912
     """Parse and normalize a GeoJSON outline payload from form data.
 
     Required for handling str, bytes, list wrapped values etc --> geojson.
@@ -219,7 +219,7 @@ async def get_template_xlsform(
         "auth_user": Provide(login_required),
     },
 )
-async def create_project_htmx(
+async def create_project_htmx(  # noqa: C901
     request: HTMXRequest,
     db: AsyncConnection,
     auth_user: AuthUser,
@@ -378,7 +378,7 @@ async def create_project_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def upload_xlsform_htmx(
+async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,

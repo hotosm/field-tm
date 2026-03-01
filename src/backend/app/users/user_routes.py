@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
     },
     return_dto=user_schemas.UserOut,
 )
-async def get_users(
+async def get_users(  # noqa: PLR0913
     db: AsyncConnection,
     current_user: DbUser,
     page: int = Parameter(1, ge=1),
@@ -153,7 +153,6 @@ async def delete_user_by_identifier(
     await DbUser.delete(db, user_to_delete.sub)
 
     log.info(f"User {user_to_delete.sub} deleted successfully.")
-    return None
 
 
 user_router = Router(

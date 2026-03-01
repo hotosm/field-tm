@@ -15,7 +15,10 @@ from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig
 from litestar.plugins.htmx import HTMXPlugin
 from litestar.plugins.pydantic import PydanticPlugin
-from litestar.status_codes import HTTP_422_UNPROCESSABLE_ENTITY
+from litestar.status_codes import (
+    HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from litestar.template.config import TemplateConfig
 from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
@@ -136,7 +139,7 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
     # Determine error message
     user_msg = "An unexpected error occurred. Please contact an admin."
     if isinstance(exc, HTTPException):
-        if exc.status_code < 500:
+        if exc.status_code < HTTP_500_INTERNAL_SERVER_ERROR:
             # Show specific details for client errors (4xx)
             user_msg = str(exc.detail) if exc.detail else user_msg
         status_code = exc.status_code
@@ -144,7 +147,7 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # Log the full exception for server errors
-    if status_code >= 500:
+    if status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
         log.exception(f"Server error intercepted: {str(exc)}")
 
     # For HTMX requests, return 200 OK with error component

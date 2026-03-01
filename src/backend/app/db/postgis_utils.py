@@ -27,7 +27,7 @@ import geojson
 import geojson_pydantic
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from psycopg import AsyncConnection, ProgrammingError
+from psycopg import AsyncConnection, ProgrammingError, sql
 from psycopg.rows import class_row, dict_row
 from psycopg.types.json import Json
 
@@ -250,8 +250,8 @@ async def split_geojson_by_task_areas(
         )
 
         async with db.cursor(row_factory=dict_row) as cur:
-            await cur.execute(
-                f"""
+            query = sql.SQL(
+                """
                 WITH feature_data AS (
                     SELECT DISTINCT ON (geom)
                         unnest(%s::TEXT[]) AS id,
@@ -288,7 +288,10 @@ async def split_geojson_by_task_areas(
                     jsonb_agg(feature) AS features
                 FROM task_features
                 GROUP BY task_id;
-                """,
+                """
+            ).format(spatial_join_condition=sql.SQL(spatial_join_condition))
+            await cur.execute(
+                query,
                 (
                     feature_ids,
                     feature_properties,

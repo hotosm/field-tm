@@ -155,13 +155,19 @@ async def project_qrcode_htmx(
                 "network",
             )
         ):
-            friendly = "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is running."
+            friendly = (
+                "Cannot reach the mapping server. Check that ODK Central or "
+                "QFieldCloud is running."
+            )
         elif any(kw in raw for kw in ("500", "server error", "internal")):
             friendly = (
                 "The mapping server returned an error. Check its logs for details."
             )
         elif any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
-            friendly = "Authentication failed connecting to the mapping server. Check the configured credentials."
+            friendly = (
+                "Authentication failed connecting to the mapping server. "
+                "Check the configured credentials."
+            )
         else:
             friendly = "An unexpected error occurred while generating the QR code."
         return Response(

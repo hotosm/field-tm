@@ -83,7 +83,7 @@ def _build_fmtm_url(project_id: int) -> str:
     },
     status_code=status.HTTP_201_CREATED,
 )
-async def api_create_project(
+async def api_create_project(  # noqa: C901, PLR0912, PLR0915
     db: AsyncConnection, auth_user: AuthUser, data: CreateProjectRequest
 ) -> CreateProjectResponse:
     """Create a complete project end-to-end in a single request.
