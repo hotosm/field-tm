@@ -183,7 +183,7 @@ Manager{% endblock %} {% block content %}
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="primary" id="submit-btn">
+        <wa-button type="submit" variant="brand" id="submit-btn">
           Create Project
         </wa-button>
         <span id="submit-indicator" style="display: none; margin-left: 10px"
@@ -803,8 +803,9 @@ Manager{% endblock %} {% block content %}
       }
 
       // Validate description
+      // wa-textarea value can be undefined before the element upgrades
       const descriptionInput = document.getElementById("description_input");
-      if (!descriptionInput || !descriptionInput.value.trim()) {
+      if (!descriptionInput || !(descriptionInput.value ?? "").trim()) {
         e.preventDefault();
         e.stopPropagation();
         if (descriptionError) {

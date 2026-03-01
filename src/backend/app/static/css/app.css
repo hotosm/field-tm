@@ -5,26 +5,43 @@
    templates. Keeps templates thin and style changes centralized.
 
    Naming convention:  .ftm-<component>[-modifier]
+
+   Tokens: references HOT design system tokens from hot.css /
+   hot-wa.css which are loaded via @hotosm/ui style-core.css.
    ============================================================ */
+
+/* --- Body typography -------------------------------------- */
+body {
+  font-family: var(
+    --hot-font-sans,
+    Archivo,
+    -apple-system,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
+  color: var(--hot-color-neutral-900, #404248);
+}
 
 /* --- Design tokens (custom properties) -------------------- */
 :root {
-  --ftm-brand: #d63f3f;
-  --ftm-text: #333;
-  --ftm-text-muted: #666;
-  --ftm-text-light: #888;
-  --ftm-border: #ddd;
-  --ftm-bg-success: #e8f5e9;
-  --ftm-bg-muted: #f9f9f9;
-  --ftm-bg-info: #e8f4f8;
-  --ftm-color-success: #4caf50;
-  --ftm-radius: 8px;
-  --ftm-radius-sm: 4px;
+  --ftm-brand: var(--hot-color-primary-600, #d73f3f);
+  --ftm-text: var(--hot-color-neutral-900, #404248);
+  --ftm-text-muted: var(--hot-color-neutral-600, #716f73);
+  --ftm-text-light: var(--hot-color-neutral-500, #828085);
+  --ftm-border: var(--hot-color-neutral-200, #c4c3c5);
+  --ftm-bg-success: var(--hot-color-success-50, #e3f8f8);
+  --ftm-bg-muted: var(--hot-color-neutral-50, #f3f3f3);
+  --ftm-bg-info: var(--hot-color-cyan-50, #e3f8f8);
+  --ftm-color-success: var(--hot-color-success-500, #50c1cb);
+  --ftm-radius: var(--hot-border-radius-large, 0.5rem);
+  --ftm-radius-sm: var(--hot-border-radius-medium, 0.25rem);
 }
 
 /* --- Page layouts ----------------------------------------- */
 .ftm-page {
-  padding: 20px;
+  padding: 24px;
 }
 
 .ftm-page--narrow {
@@ -37,6 +54,12 @@
   margin: 0 auto;
 }
 
+/* Muted background — used only on list/index pages where cards need to pop */
+.ftm-page--muted {
+  background-color: var(--hot-color-neutral-100, #e8e8e8);
+  min-height: calc(100vh - 60px);
+}
+
 /* --- Page header ------------------------------------------ */
 .ftm-page-header {
   display: flex;
@@ -47,7 +70,8 @@
 
 .ftm-page-title {
   margin: 0;
-  font-size: 1.8em;
+  font-size: var(--hot-font-size-x-large);
+  font-family: var(--hot-font-sans-variant-condensed);
   color: var(--ftm-text);
 }
 
@@ -55,47 +79,58 @@
 .ftm-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 /* --- Project card ----------------------------------------- */
+/* wa-card has no "base" part — style the host element directly.           */
+/* External styles win over shadow-DOM :host styles per CSS Scoping spec.  */
 .ftm-project-card {
+  display: block;
   height: 100%;
   cursor: pointer;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px
+    color-mix(in oklab, var(--hot-color-neutral-950) 6%, transparent);
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-  position: relative;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .ftm-project-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px
+    color-mix(in oklab, var(--hot-color-neutral-950) 12%, transparent);
 }
 
 .ftm-project-card__id {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  font-size: 0.75em;
+  font-size: var(--hot-font-size-x-small);
   color: var(--ftm-text-light);
-  font-weight: 600;
-  z-index: 10;
+  font-weight: var(--hot-font-weight-semibold);
 }
 
 .ftm-project-card__header {
-  font-weight: bold;
-  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ftm-project-card__header-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 24px;
+}
+
+.ftm-project-card__name {
+  font-weight: var(--hot-font-weight-bold);
+  font-size: var(--hot-font-size-large);
 }
 
 .ftm-project-card__badges {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
 }
 
 .ftm-project-card__body {
@@ -104,35 +139,35 @@
 
 .ftm-project-card__location {
   margin: 8px 0;
-  font-size: 0.9em;
-  color: #555;
+  font-size: var(--hot-font-size-small);
+  color: var(--hot-color-neutral-700);
 }
 
 .ftm-project-card__location-inner {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--hot-spacing-2x-small);
 }
 
 .ftm-project-card__description {
   margin: 10px 0 8px 0;
   color: var(--ftm-text-muted);
-  line-height: 1.5;
-  font-size: 0.95em;
+  line-height: var(--hot-line-height-normal);
+  font-size: var(--hot-font-size-small);
 }
 
 .ftm-project-card__tags {
   margin: 10px 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--hot-spacing-x-small);
 }
 
 .ftm-project-card__footer {
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid #eee;
-  font-size: 0.85em;
+  border-top: 1px solid var(--ftm-border);
+  font-size: var(--hot-font-size-x-small);
   color: var(--ftm-text-light);
 }
 
@@ -152,18 +187,19 @@
 
 .ftm-detail-label {
   color: var(--ftm-text-muted);
-  font-size: 0.9em;
+  font-size: var(--hot-font-size-small);
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: var(--hot-font-weight-bold);
 }
 
 .ftm-detail-value {
   color: var(--ftm-text);
-  font-size: 1.1em;
+  font-size: var(--hot-font-size-large);
 }
 
 .ftm-section-title {
   color: var(--ftm-brand);
+  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 10px;
 }
 
@@ -174,26 +210,27 @@
 .ftm-external-info {
   margin-bottom: 30px;
   padding: 15px;
-  background-color: #f5f5f5;
+  background-color: var(--ftm-bg-muted);
   border-radius: var(--ftm-radius-sm);
 }
 
 .ftm-manager-section {
   margin: 40px 0 20px;
   padding-top: 24px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--ftm-border);
 }
 
 .ftm-manager-section__title {
   margin: 0 0 8px;
   color: var(--ftm-text);
-  font-size: 1.25em;
+  font-size: var(--hot-font-size-large);
+  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-manager-section__subtitle {
   margin: 0;
   color: var(--ftm-text-muted);
-  font-size: 0.95em;
+  font-size: var(--hot-font-size-small);
 }
 
 .ftm-project-title-wrap {
@@ -222,13 +259,13 @@
 .ftm-flex-center {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
 }
 
 .ftm-flex-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
 }
 
 .ftm-flex-gap {
@@ -250,12 +287,12 @@
 .ftm-form-label {
   display: block;
   margin-bottom: 8px;
-  font-weight: bold;
-  line-height: 1.5;
+  font-weight: var(--hot-font-weight-bold);
+  line-height: var(--hot-line-height-dense);
 }
 
 .ftm-form-required {
-  color: red;
+  color: var(--hot-color-danger-500);
   display: inline;
 }
 
@@ -263,7 +300,7 @@
   display: block;
   margin-top: 8px;
   color: var(--ftm-text-muted);
-  font-size: 0.875em;
+  font-size: var(--hot-font-size-small);
 }
 
 .ftm-form-actions {
@@ -282,7 +319,7 @@
 .ftm-radio-card {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
   cursor: pointer;
   padding: 12px;
   border: 2px solid var(--ftm-border);
@@ -296,8 +333,8 @@
 
 .ftm-radio-card:hover,
 .ftm-radio-card--selected {
-  border-color: #3388ff;
-  background-color: #f0f8ff;
+  border-color: var(--hot-color-primary-600);
+  background-color: var(--hot-color-primary-50);
 }
 
 .ftm-map-container {
@@ -320,12 +357,12 @@
   margin-bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
 }
 
 .ftm-checkbox-label {
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--hot-font-size-small);
   color: var(--ftm-text);
   user-select: none;
 }
@@ -333,7 +370,7 @@
 .ftm-hashtags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--hot-spacing-x-small);
   margin-top: 12px;
   min-height: 32px;
 }
@@ -341,8 +378,9 @@
 /* --- Setup steps ------------------------------------------ */
 .ftm-setup-header {
   color: var(--ftm-brand);
+  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 20px;
-  font-size: 1.5em;
+  font-size: var(--hot-font-size-x-large);
 }
 
 .ftm-step {
@@ -371,7 +409,8 @@
 .ftm-step__title {
   color: var(--ftm-text);
   margin: 0;
-  font-size: 1.2em;
+  font-size: var(--hot-font-size-large);
+  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-step__check {
@@ -382,7 +421,7 @@
 .ftm-step__description {
   color: var(--ftm-text-muted);
   margin-bottom: 15px;
-  font-size: 0.95em;
+  font-size: var(--hot-font-size-small);
 }
 
 .ftm-step__actions {
@@ -398,10 +437,10 @@
 
 .ftm-step__success {
   padding: 10px;
-  background-color: #fff;
+  background-color: white;
   border-radius: var(--ftm-radius-sm);
   color: var(--ftm-color-success);
-  font-weight: 500;
+  font-weight: var(--hot-font-weight-semibold);
 }
 
 .ftm-step__status {
@@ -428,7 +467,7 @@
 .ftm-split-label {
   display: block;
   margin-bottom: 5px;
-  font-weight: 500;
+  font-weight: var(--hot-font-weight-semibold);
   color: var(--ftm-text);
 }
 
@@ -450,7 +489,7 @@
   display: none;
   margin-top: 20px;
   padding: 15px;
-  background-color: #fff;
+  background-color: white;
   border-radius: var(--ftm-radius-sm);
   border: 1px solid var(--ftm-border);
 }
@@ -463,18 +502,18 @@
   margin-top: 8px;
   border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius-sm);
-  background-color: #fcfdfe;
+  background-color: var(--hot-color-neutral-50);
   padding: 10px 12px;
 }
 
 .ftm-advanced-toggle {
-  background-color: #f4f7fa;
-  border-color: #d2dbe4;
-  color: #425468;
+  background-color: var(--hot-color-neutral-50);
+  border-color: var(--hot-color-neutral-200);
+  color: var(--hot-color-neutral-700);
 }
 
 .ftm-advanced-toggle:hover {
-  background-color: #e9eff5;
+  background-color: var(--hot-color-neutral-100);
 }
 
 .ftm-advanced-config--hidden {
@@ -483,7 +522,7 @@
 
 .ftm-advanced-config__summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--hot-font-weight-semibold);
   color: var(--ftm-text);
 }
 
@@ -508,7 +547,7 @@
 .ftm-config-note {
   padding: 8px;
   border-radius: var(--ftm-radius-sm);
-  font-size: 0.95em;
+  font-size: var(--hot-font-size-small);
   color: var(--ftm-text-muted);
 }
 
@@ -517,7 +556,7 @@
 }
 
 .ftm-config-note--muted {
-  background-color: #f0f0f0;
+  background-color: var(--hot-color-neutral-100);
 }
 
 @media (max-width: 900px) {
@@ -534,14 +573,15 @@
 /* --- Published project ------------------------------------ */
 .ftm-published-header {
   color: var(--ftm-color-success);
+  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 10px;
-  font-size: 1.5em;
+  font-size: var(--hot-font-size-x-large);
 }
 
 .ftm-published-divider {
   margin-top: 40px;
   padding-top: 30px;
-  border-top: 2px solid #eee;
+  border-top: 2px solid var(--ftm-border);
 }
 
 .ftm-published-divider--top {
@@ -566,7 +606,7 @@
   padding: 20px;
   border: 1px dashed var(--ftm-border);
   border-radius: var(--ftm-radius);
-  background-color: #fafafa;
+  background-color: var(--ftm-bg-muted);
 }
 
 .ftm-setup-summary {
@@ -574,12 +614,12 @@
   padding: 0 16px;
   border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius);
-  background-color: #fff;
+  background-color: white;
 }
 
 .ftm-setup-summary__summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--hot-font-weight-semibold);
   color: var(--ftm-text);
   margin: 0;
   padding: 12px 0;
@@ -587,7 +627,7 @@
 
 .ftm-setup-summary[open] .ftm-setup-summary__summary {
   margin-bottom: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--ftm-border);
 }
 
 .ftm-setup-summary__content {
@@ -597,21 +637,22 @@
 .ftm-setup-summary__description {
   margin: 0 0 12px;
   color: var(--ftm-text-muted);
-  font-size: 0.95em;
+  font-size: var(--hot-font-size-small);
 }
 
 .ftm-qr-panel {
   text-align: center;
   padding: 24px;
-  background-color: #f8fafb;
-  border: 1px solid #e8ecef;
+  background-color: var(--hot-color-neutral-50);
+  border: 1px solid var(--hot-color-neutral-100);
   border-radius: var(--ftm-radius);
 }
 
 .ftm-qr-panel__title {
   color: var(--ftm-text);
   margin: 0 0 12px;
-  font-size: 1.2em;
+  font-size: var(--hot-font-size-large);
+  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-qr-panel__description {
@@ -622,8 +663,8 @@
 .ftm-qr-panel__image-wrap {
   display: inline-flex;
   padding: 16px;
-  background-color: #fff;
-  border: 1px solid #eee;
+  background-color: white;
+  border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius-sm);
   margin-bottom: 16px;
 }
@@ -635,7 +676,7 @@
 
 @media (max-width: 640px) {
   .ftm-published-header {
-    font-size: 1.3em;
+    font-size: var(--hot-font-size-large);
   }
 
   .ftm-qr-panel {
@@ -698,7 +739,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--wa-color-overlay-modal);
   z-index: 1000;
   align-items: center;
   justify-content: center;
@@ -758,7 +799,7 @@
 .ftm-link--brand {
   color: var(--ftm-brand);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--hot-font-weight-semibold);
 }
 
 .ftm-link--brand:hover {

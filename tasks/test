@@ -185,6 +185,9 @@ odk-collect:
   fi
   echo "ODK Central tunnel: ${odk_tunnel_url}"
 
+  # Ensure Central DOMAIN always matches the current public tunnel host.
+  just test _override-central-domain-for-tunnel "${odk_tunnel_url}"
+
   # Restart API with tunnel URL exported for any env-based fallback paths.
   # Primary routing for this flow is handled by explicit advanced ODK config
   # passed to the API call in create_test_project.py.
@@ -203,6 +206,28 @@ odk-collect:
   docker compose exec -T \
     -e ODK_CENTRAL_TUNNEL_URL="${odk_tunnel_url}" \
     api python3 - < tasks/scripts/create_test_project.py
+
+# Backward-compatible alias for ODK Central mobile testing workflow
+[no-cd]
+odk-central:
+  just test odk-collect
+
+[no-cd]
+_override-central-domain-for-tunnel odk_tunnel_url:
+  #!/usr/bin/env sh
+  tunnel_host="$(echo "{{odk_tunnel_url}}" | sed -E 's|^https?://([^/:]+).*$|\1|')"
+  if [ -z "$tunnel_host" ]; then
+    echo "ERROR: Failed to parse tunnel host from URL: {{odk_tunnel_url}}"
+    exit 1
+  fi
+
+  # Override the DOMAIN env used by ODK Central so Collect receives reachable URLs.
+  FMTM_ODK_DOMAIN="$tunnel_host" \
+  FMTM_DEV_PORT=443 \
+  docker compose \
+    -f compose.yaml \
+    -f contrib/tunnel/compose.yaml \
+    up -d central
 
 # Run load test on backend API (e.g. just test load projects/62/minimal)
 [no-cd]

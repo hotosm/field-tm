@@ -217,6 +217,34 @@ async def test_metrics_partial(client):
     assert "Features Surveyed" in response.text
 
 
+async def test_project_listing_renders_cards_and_component_bootstrap(client, project):
+    """Project listing should render saved projects and register WA components."""
+    response = await client.get("/htmxprojects", headers={"HX-Request": "true"})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert project.project_name in response.text
+    assert f"/htmxprojects/{project.id}" in response.text
+    assert (
+        'rel="stylesheet"\n      href="https://fonts.googleapis.com/css2?family=Archivo'
+    ) in response.text
+    assert "@awesome.me/webawesome/dist/components/card/card.js" in response.text
+
+
+async def test_project_listing_shows_empty_state_when_no_projects(client):
+    """Project listing should show the empty-state copy when no projects exist."""
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_projects:
+        mock_projects.return_value = []
+
+        response = await client.get("/htmxprojects", headers={"HX-Request": "true"})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert (
+        "No projects found. Create your first project to get started!" in response.text
+    )
+
+
 async def test_static_landing_image_served(client):
     """Test static landing JPG assets are served."""
     response = await client.get("/static/images/landing-bg.jpg")
