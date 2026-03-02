@@ -42,8 +42,10 @@ def hash_api_key(raw_key: str) -> str:
     return hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
 
 
-def _extract_api_key_from_request(request: Request) -> str | None:
+def _extract_api_key_from_request(request: Request | None) -> str | None:
     """Get API key from common header variants."""
+    if request is None:
+        return None
     for header in ("x-api-key", "X-API-KEY", "x_api_key", "X_API_KEY"):
         value = request.headers.get(header)
         if value:
@@ -87,11 +89,12 @@ async def _authenticate_api_key(db: AsyncConnection, raw_api_key: str) -> AuthUs
 
 
 async def api_key_required(
-    request: Request,  # noqa: ARG001 - required for Litestar dependency signature
+    request: Request | None,  # noqa: ARG001 - required for Litestar dependency signature
     db: AsyncConnection,
+    x_api_key: str | None = None,
 ) -> AuthUser:
     """Dependency that authenticates requests via X-API-KEY header."""
-    raw_api_key = _extract_api_key_from_request(request)
+    raw_api_key = x_api_key or _extract_api_key_from_request(request)
     if not raw_api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -101,11 +104,12 @@ async def api_key_required(
 
 
 async def login_or_api_key(
-    request: Request,
+    request: Request | None,
     db: AsyncConnection,
+    x_api_key: str | None = None,
 ) -> AuthUser:
     """Allow either cookie-based auth or API key auth."""
-    raw_api_key = _extract_api_key_from_request(request)
+    raw_api_key = x_api_key or _extract_api_key_from_request(request)
     if raw_api_key:
         return await _authenticate_api_key(db, raw_api_key)
     return await login_required(request=request)

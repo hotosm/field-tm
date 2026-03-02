@@ -22,11 +22,13 @@ import ast
 import json
 import logging
 from io import BytesIO
+from pathlib import Path
 
 from litestar import get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
+from litestar.exceptions import HTTPException
 from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response, Template
@@ -38,7 +40,6 @@ from psycopg.rows import dict_row
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
 from app.auth.roles import mapper
-from app.central.central_routes import _validate_xlsform_extension
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
 from app.htmx.htmx_schemas import XLSFormUploadData
@@ -183,6 +184,20 @@ def _to_bool_form_value(value: object, default: bool = False) -> bool:
     if isinstance(value, str):
         return value.lower() == "true"
     return bool(value)
+
+
+async def _validate_xlsform_extension(data) -> BytesIO:
+    """Validate an uploaded XLSForm has .xls or .xlsx extension and return bytes."""
+    filename = Path(data.filename or "")
+    file_ext = filename.suffix.lower()
+
+    if file_ext not in [".xls", ".xlsx"]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Provide a valid .xls or .xlsx file",
+        )
+
+    return BytesIO(await data.read())
 
 
 async def _resolve_uploaded_xlsform_bytes(

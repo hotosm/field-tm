@@ -64,6 +64,7 @@
       const xlsformSelect = document.getElementById('xlsform-select');
       const xlsformStatus = document.getElementById('xlsform-status');
       const templateFormIdInput = document.getElementById('template-form-id');
+      const initialFormTemplates = {{ form_templates_json|safe if form_templates_json else '[]' }};
       const formTemplatesById = new Map();
 
       bindAdvancedToggle(formAdvancedConfigToggle, formAdvancedConfigPanel);
@@ -101,40 +102,28 @@
         });
       }
 
-      async function loadSurveyTypes() {
+      function loadSurveyTypes() {
         if (!xlsformSelect) return;
         xlsformSelect.disabled = true;
-        xlsformSelect.innerHTML = '<option value="">Loading survey types...</option>';
 
-        try {
-          const response = await fetch('/central/list-forms');
-          if (!response.ok) {
-            throw new Error('Failed to load forms');
-          }
+        formTemplatesById.clear();
+        initialFormTemplates.forEach((form) => formTemplatesById.set(String(form.id), form));
 
-          const forms = await response.json();
-          formTemplatesById.clear();
-          forms.forEach((form) => formTemplatesById.set(String(form.id), form));
-
-          if (forms.length === 0) {
-            xlsformSelect.innerHTML = '<option value="">No survey types available</option>';
-            setStep1Status(
-              'No survey forms are available. Upload a custom form in Advanced Config.',
-              'warning',
-            );
-            return;
-          }
-
-          setSurveyTypeOptions(forms);
-          xlsformSelect.disabled = false;
+        if (initialFormTemplates.length === 0) {
+          xlsformSelect.innerHTML = '<option value="">No survey types available</option>';
           setStep1Status(
-            'Select a survey type, or upload a custom form in Advanced Config.',
-            'info',
+            'No survey forms are available. Upload a custom form in Advanced Config.',
+            'warning',
           );
-        } catch (error) {
-          xlsformSelect.innerHTML = '<option value="">Failed to load survey types</option>';
-          setStep1Status(`Error loading forms: ${error.message}`, 'danger');
+          return;
         }
+
+        setSurveyTypeOptions(initialFormTemplates);
+        xlsformSelect.disabled = false;
+        setStep1Status(
+          'Select a survey type, or upload a custom form in Advanced Config.',
+          'info',
+        );
       }
 
       if (!hasXlsform) {

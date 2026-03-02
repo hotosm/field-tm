@@ -17,6 +17,8 @@
 #
 """Tests for API key auth dependencies and key management routes."""
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
 from litestar.exceptions import HTTPException
 
@@ -77,29 +79,48 @@ async def test_api_key_routes_create_list_and_revoke(client, db, ensure_api_keys
 
 
 @pytest.mark.asyncio
-async def test_api_key_required_validates_and_updates_last_used(
-    db, admin_user, ensure_api_keys_table
-):
+async def test_api_key_required_validates_and_updates_last_used():
     """api_key_required authenticates valid keys and rejects invalid keys."""
     raw_key = "ftm_test-valid-key"
-    db_key = await DbApiKey.create(
-        db,
-        DbApiKey(
-            user_sub=admin_user.sub,
-            key_hash=hash_api_key(raw_key),
-            name="unit-key",
-        ),
+    db = Mock()
+    db.commit = AsyncMock()
+    db_key = Mock(id=17, user_sub="osm|1", key_hash=hash_api_key(raw_key))
+    db_user = Mock(
+        sub="osm|1",
+        username="localadmin",
+        is_admin=True,
+        profile_img=None,
     )
-    await db.commit()
 
-    auth_user = await api_key_required(request=None, db=db, x_api_key=raw_key)
-    assert auth_user.sub == admin_user.sub
-    assert auth_user.username == admin_user.username
+    with (
+        patch(
+            "app.auth.api_key.DbApiKey.get_by_hash",
+            new_callable=AsyncMock,
+            return_value=db_key,
+        ) as mock_get_by_hash,
+        patch(
+            "app.auth.api_key.DbApiKey.touch_last_used",
+            new_callable=AsyncMock,
+        ) as mock_touch_last_used,
+        patch(
+            "app.auth.api_key.DbUser.one",
+            new_callable=AsyncMock,
+            return_value=db_user,
+        ),
+    ):
+        auth_user = await api_key_required(request=None, db=db, x_api_key=raw_key)
 
-    refreshed = await DbApiKey.get_by_hash(db, db_key.key_hash, active_only=False)
-    assert refreshed is not None
-    assert refreshed.last_used_at is not None
+    assert auth_user.sub == db_user.sub
+    assert auth_user.username == db_user.username
+    mock_get_by_hash.assert_awaited_once_with(db, hash_api_key(raw_key))
+    mock_touch_last_used.assert_awaited_once_with(db, db_key.id)
+    db.commit.assert_awaited_once()
 
-    with pytest.raises(HTTPException) as exc_info:
-        await api_key_required(request=None, db=db, x_api_key="ftm_invalid_key")
+    with patch(
+        "app.auth.api_key.DbApiKey.get_by_hash",
+        new_callable=AsyncMock,
+        return_value=None,
+    ):
+        with pytest.raises(HTTPException) as exc_info:
+            await api_key_required(request=None, db=db, x_api_key="ftm_invalid_key")
     assert exc_info.value.status_code == 401

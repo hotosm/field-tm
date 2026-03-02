@@ -20,28 +20,22 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from app.central.central_routes import odk_creds_test
 
 
-async def test_helper_odk_creds_test(client):
-    """Unit tests for the helper routes in the Litestar application.
-
-    This module tests the `/central/test-credentials` endpoint,
-    mocking the ODK credentials verification logic to ensure the route
-    responds correctly without making real network calls.
-    """
+async def test_helper_odk_creds_test():
+    """The surviving ODK JSON route should still validate credentials."""
     with patch(
-        "app.central.central_crud.odk_credentials_test", new_callable=AsyncMock
+        "app.central.central_routes.central_crud.odk_credentials_test",
+        new_callable=AsyncMock,
     ) as mock_test_odk:
-        response = await client.post(
-            "/central/test-credentials",
-            params={
-                "external_project_instance_url": "http://central:8383",
-                "external_project_username": "admin@hotosm.org",
-                "external_project_password": "Password1234",
-            },
+        await odk_creds_test.fn(
+            external_project_instance_url="http://central:8383",
+            external_project_username="admin@hotosm.org",
+            external_project_password="Password1234",
         )
-        assert response.status_code == 200
-        mock_test_odk.assert_awaited_once()
+
+    mock_test_odk.assert_awaited_once()
 
 
 if __name__ == "__main__":

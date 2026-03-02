@@ -45,8 +45,15 @@ async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_pro
     assert "Advanced Config" in response.text
 
 
-async def test_project_setup_shows_step2_advanced_config_options(client, project):
+async def test_project_setup_shows_step2_advanced_config_options(client, db, project):
     """Step 2 should expose custom data paths only under advanced config."""
+    await DbProject.update(
+        db,
+        project.id,
+        DbProject(xlsform_content=b"test xlsform"),
+    )
+    await db.commit()
+
     response = await client.get(
         f"/htmxprojects/{project.id}",
         headers={"HX-Request": "true"},
