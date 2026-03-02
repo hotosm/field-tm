@@ -17,6 +17,8 @@
 #
 """Routes to relay requests to QFieldCloud server (Litestar)."""
 
+from asyncio import get_running_loop
+
 from litestar import Router, delete, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
@@ -46,8 +48,9 @@ from app.qfield.qfield_deps import qfield_client
 )
 async def list_projects() -> dict:
     """List projects in QFieldCloud."""
+    loop = get_running_loop()
     async with qfield_client() as client:
-        projects = client.list_projects()
+        projects = await loop.run_in_executor(None, client.list_projects)
         return projects
 
 
@@ -70,8 +73,6 @@ async def trigger_qfield_project_create(
     however, if this fails, we can trigger the project creation again via this
     endpoint.
     """
-    # For this endpoint, we need to manually check permissions
-    # since it doesn't have project_id in the path
     from app.auth.roles import wrap_check_access
     from app.db.enums import ProjectRole
     from app.db.models import DbProject
@@ -85,7 +86,6 @@ async def trigger_qfield_project_create(
         check_completed=False,
     )
     qfield_url = await create_qfield_project(db, project_user.get("project"))
-    # Redirect to qfieldcloud project dashboard
     return {"url": qfield_url}
 
 

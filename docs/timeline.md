@@ -9,6 +9,12 @@ In reverse chronological order, with most recent events first.
 
 > <div class="timeline-container">
 >     <div class="timeline-entry">
+>         <div class="timeline-date">2026-03</div>
+>         <h3>FieldTM Re-design</h3>
+>         🎨 After many successful projects and feedback, FieldTM was re-designed and re-released.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
 >         <div class="timeline-date">2025-06</div>
 >         <h3>Project: Mapa das Periferias</h3>
 >         💼 Pilot project in Brazil to map favelas country-wide.

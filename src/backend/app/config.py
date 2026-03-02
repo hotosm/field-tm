@@ -59,7 +59,7 @@ class OtelSettings(BaseSettings):
     These mostly set environment variables set by the OTEL SDK.
     """
 
-    FMTM_DOMAIN: Optional[str] = Field(exclude=True)
+    FTM_DOMAIN: Optional[str] = Field(exclude=True)
     LOG_LEVEL: Optional[str] = Field(exclude=True)
     ODK_CENTRAL_URL: Optional[str] = Field(exclude=True)
 
@@ -80,9 +80,9 @@ class OtelSettings(BaseSettings):
     def otel_service_name(self) -> Optional[HttpUrlStr]:
         """Set OpenTelemetry service name for traces."""
         service_name = "unknown"
-        if self.FMTM_DOMAIN:
+        if self.FTM_DOMAIN:
             # Return domain with underscores
-            service_name = self.FMTM_DOMAIN.replace(".", "_")
+            service_name = self.FTM_DOMAIN.replace(".", "_")
             # Export to environment for OTEL instrumentation
             os.environ["OTEL_SERVICE_NAME"] = service_name
         return service_name
@@ -157,15 +157,15 @@ class Settings(BaseSettings):
     # existing Fernet based database value encryption
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
-    FMTM_DOMAIN: str
-    FMTM_DEV_PORT: Optional[str] = None
+    FTM_DOMAIN: str
+    FTM_DEV_PORT: Optional[str] = None
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
 
     @property
     def cookie_name(self) -> str:
         """Get the cookie name for the domain."""
-        return self.FMTM_DOMAIN.replace(".", "_")
+        return self.FTM_DOMAIN.replace(".", "_")
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
@@ -176,13 +176,13 @@ class Settings(BaseSettings):
     ) -> list[str]:
         """Build and validate CORS origins list."""
         # Initialize default origins
-        default_origins = ["https://xlsform-editor.fmtm.hotosm.org"]
+        default_origins = ["https://xlsform-editor.field.hotosm.org"]
 
         # Handle localhost/testing scenario
-        domain = info.data.get("FMTM_DOMAIN", "fmtm.localhost")
-        dev_port = info.data.get("FMTM_DEV_PORT")
-        # NOTE fmtm.dev.test is used as the Playwright test domain
-        if "localhost" in domain or "fmtm.dev.test" in domain:
+        domain = info.data.get("FTM_DOMAIN", "field.localhost")
+        dev_port = info.data.get("FTM_DEV_PORT")
+        # NOTE field-tm.dev.test is used as the Playwright test domain
+        if "localhost" in domain or "field-tm.dev.test" in domain:
             local_server_port = (
                 f":{dev_port}"
                 if dev_port and dev_port.lower() not in ("0", "no", "false")
@@ -213,14 +213,14 @@ class Settings(BaseSettings):
         # Ensure uniqueness and return (remove dups)
         return list(dict.fromkeys(default_origins))
 
-    FMTM_DB_HOST: Optional[str] = "fmtm-db"
-    FMTM_DB_USER: Optional[str] = "fmtm"
-    FMTM_DB_PASSWORD: Optional[SecretStr] = SecretStr("fmtm")
-    FMTM_DB_NAME: Optional[str] = "fmtm"
+    FTM_DB_HOST: Optional[str] = "fieldtm-db"
+    FTM_DB_USER: Optional[str] = "fieldtm"
+    FTM_DB_PASSWORD: Optional[SecretStr] = SecretStr("fieldtm")
+    FTM_DB_NAME: Optional[str] = "fieldtm"
 
-    FMTM_DB_URL: Optional[str] = None
+    FTM_DB_URL: Optional[str] = None
 
-    @field_validator("FMTM_DB_URL", mode="before")
+    @field_validator("FTM_DB_URL", mode="before")
     @classmethod
     def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> str:
         """Build Postgres connection from environment variables."""
@@ -228,10 +228,10 @@ class Settings(BaseSettings):
             return v
         pg_url = PostgresDsn.build(
             scheme="postgresql",
-            username=info.data.get("FMTM_DB_USER"),
-            password=info.data.get("FMTM_DB_PASSWORD").get_secret_value(),
-            host=info.data.get("FMTM_DB_HOST"),
-            path=info.data.get("FMTM_DB_NAME", ""),
+            username=info.data.get("FTM_DB_USER"),
+            password=info.data.get("FTM_DB_PASSWORD").get_secret_value(),
+            host=info.data.get("FTM_DB_HOST"),
+            path=info.data.get("FTM_DB_NAME", ""),
         )
         return pg_url.unicode_string()
 
@@ -264,7 +264,7 @@ class Settings(BaseSettings):
         if self.DEBUG:
             uri = "http://127.0.0.1:7051/osmauth"
         else:
-            uri = f"https://{self.FMTM_DOMAIN}/osmauth"
+            uri = f"https://{self.FTM_DOMAIN}/osmauth"
         return uri
 
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"

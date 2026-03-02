@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "fmtm.fullname" . }}
+  name: {{ include "field-tm.fullname" . }}
   labels:
-    {{- include "fmtm.labels" . | nindent 4 }}
+    {{- include "field-tm.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "fmtm.selectorLabels" . | nindent 6 }}
+      {{- include "field-tm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "fmtm.labels" . | nindent 8 }}
+        {{- include "field-tm.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "fmtm.serviceAccountName" . }}
+      serviceAccountName: {{ include "field-tm.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -36,13 +36,13 @@ spec:
           image: {{ .Values.db.image.registry }}/{{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}
           imagePullPolicy: IfNotPresent
           env:
-            - name: FMTM_DB_HOST
+            - name: FTM_DB_HOST
               value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
           command:
             - /bin/bash
             - -c
             - |
-              until pg_isready -h "$FMTM_DB_HOST"; do
+              until pg_isready -h "$FTM_DB_HOST"; do
                   echo "waiting for database to be ready";
                   sleep 2;
               done;
@@ -51,7 +51,7 @@ spec:
           image: "{{ .Values.image.repository }}/backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: FMTM_DB_HOST
+            - name: FTM_DB_HOST
               value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
           envFrom:
             {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}
@@ -73,9 +73,9 @@ spec:
           resources:
             {{- toYaml .Values.backend.resources | nindent 12 }}
           env:
-            - name: FMTM_DOMAIN
+            - name: FTM_DOMAIN
               value: {{ .Values.domain | quote }}
-            - name: FMTM_DB_HOST
+            - name: FTM_DB_HOST
               value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
           envFrom:
             {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}

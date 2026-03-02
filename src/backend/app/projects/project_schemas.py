@@ -198,7 +198,7 @@ class StubProjectIn(BaseModel):
         merge = info.data.get("merge", True)
         input_geojson = value.model_dump() if hasattr(value, "model_dump") else value
         merged_geojson = parse_aoi(
-            settings.FMTM_DB_URL,
+            settings.FTM_DB_URL,
             input_geojson,
             merge=merge,
         )
@@ -213,7 +213,7 @@ class StubProjectIn(BaseModel):
             return {"type": "MultiPolygon", "coordinates": geometries}
 
     @model_validator(mode="after")
-    def append_fmtm_hashtag_and_slug(self) -> Self:
+    def append_ftm_hashtag_and_slug(self) -> Self:
         """Append the #Field-TM hashtag and add URL slug."""
         # NOTE the slug is set here as the field_validator above
         # does not seem to work?

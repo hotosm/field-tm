@@ -34,7 +34,13 @@ log = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def qfield_client(creds: Optional[QFieldCloud] = None):
-    """Login to QFieldCloud using session token."""
+    """Async context manager that yields an authenticated QFieldCloud SDK Client.
+
+    The SDK ``Client`` exposes *synchronous* methods, so callers must wrap them
+    with ``loop.run_in_executor(…)`` when calling from async code.
+
+    The yielded client has a ``username`` attribute set for downstream use.
+    """
     if creds:
         qfc_url = creds.qfield_cloud_url
         qfc_user = creds.qfield_cloud_user
@@ -42,34 +48,47 @@ async def qfield_client(creds: Optional[QFieldCloud] = None):
     else:
         qfc_url = settings.QFIELDCLOUD_URL
         qfc_user = settings.QFIELDCLOUD_USER
-        qfc_password = settings.QFIELDCLOUD_PASSWORD.get_secret_value()
+        qfc_password = (
+            settings.QFIELDCLOUD_PASSWORD.get_secret_value()
+            if settings.QFIELDCLOUD_PASSWORD
+            else ""
+        )
+
+    if not all([qfc_url, qfc_user, qfc_password]):
+        raise ValueError(
+            "QFieldCloud credentials (URL, user, password) are not configured. "
+            "Set QFIELDCLOUD_URL, QFIELDCLOUD_USER, and QFIELDCLOUD_PASSWORD, "
+            "or provide custom credentials."
+        )
+
     loop = get_running_loop()
-    client = await loop.run_in_executor(
+    login_client = await loop.run_in_executor(
         None,
         partial(Client, url=qfc_url),
     )
 
     try:
-        # First generate a token in the client object state
+        # Authenticate to obtain a session token
         await loop.run_in_executor(
             None,
-            partial(client.login, qfc_user, qfc_password),
+            partial(login_client.login, qfc_user, qfc_password),
         )
 
-        if not client.token:
-            msg = "QFieldCloud login failed. No token set."
-            log.exception(msg)
-            raise ValueError(msg)
+        if not login_client.token:
+            raise ValueError("QFieldCloud login failed: no token received.")
 
-        # Return a client with token explicitly set
-        yield await loop.run_in_executor(
+        # Build a fresh client with the token (avoids credential leakage)
+        authed_client = await loop.run_in_executor(
             None,
-            partial(Client, url=qfc_url, token=client.token),
+            partial(Client, url=qfc_url, token=login_client.token),
         )
+        # Attach the username so callers can resolve project ownership
+        authed_client.username = qfc_user
+        yield authed_client
 
     finally:
         try:
-            await loop.run_in_executor(None, client.logout)
+            await loop.run_in_executor(None, login_client.logout)
         except Exception as e:
-            # Log but don’t suppress main exception
-            log.warning(f"Failed to logout QFieldCloud client: {e}")
+            # Log but never suppress the main exception
+            log.warning("Failed to logout QFieldCloud client: %s", e)

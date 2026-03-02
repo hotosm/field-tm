@@ -34,7 +34,7 @@ from app.auth.api_key_routes import (
 )
 from app.auth.auth_deps import login_required
 from app.auth.auth_logic import expire_cookies, refresh_cookies
-from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.auth_schemas import AuthUser, FTMUser
 from app.auth.providers.osm import handle_osm_callback, init_osm_auth
 from app.config import settings
 from app.db.database import db_conn
@@ -107,12 +107,12 @@ async def logout() -> Response:
         media_type="application/json",
     )
     # Reset all cookies (logout)
-    fmtm_cookie_name = settings.cookie_name
-    refresh_cookie_name = f"{fmtm_cookie_name}_refresh"
-    osm_cookie_name = f"{fmtm_cookie_name}_osm"
+    ftm_cookie_name = settings.cookie_name
+    refresh_cookie_name = f"{ftm_cookie_name}_refresh"
+    osm_cookie_name = f"{ftm_cookie_name}_osm"
 
     cookie_names = [
-        fmtm_cookie_name,
+        ftm_cookie_name,
         refresh_cookie_name,
         osm_cookie_name,
     ]
@@ -128,7 +128,7 @@ async def logout() -> Response:
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
     },
-    return_dto=FMTMUser,
+    return_dto=FTMUser,
 )
 async def my_data(
     db: AsyncConnection,
@@ -169,7 +169,7 @@ async def refresh_management_cookies(
     # Only allow login via OSM for management frontend
     # and revoke cookies if service account set via mapper frontend
     user_sub = auth_user.sub.lower()
-    if "osm" not in user_sub or auth_user.username == "svcfmtm":
+    if "osm" not in user_sub or auth_user.username == "svcftm":
         response = Response(
             status_code=status.HTTP_403_FORBIDDEN,
             content=b"Please log in using OSM for management access.",

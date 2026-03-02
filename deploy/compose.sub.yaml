@@ -15,27 +15,27 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-name: fmtm
+name: field-tm
 
 volumes:
-  fmtm_db_data:
-    name: fmtm-db-data
-  fmtm_logs:
-    name: fmtm-logs
-  fmtm_images:
-    name: fmtm-images
-  fmtm_tiles:
-    name: fmtm-tiles
+  ftm_db_data:
+    name: field-tm-db-data
+  ftm_logs:
+    name: field-tm-logs
+  ftm_images:
+    name: field-tm-images
+  ftm_tiles:
+    name: field-tm-tiles
   certs:
-    name: fmtm-certs
+    name: field-tm-certs
   central_db_data:
-    name: fmtm-central-db-data
+    name: field-tm-central-db-data
   central_frontend:
-    name: fmtm-central-frontend
+    name: field-tm-central-frontend
 
 networks:
-  fmtm-net:
-    name: fmtm
+  ftm-net:
+    name: field-tm
     ipam:
       driver: default
       config:
@@ -50,7 +50,7 @@ services:
     volumes:
       # - certs:/etc/letsencrypt
       - certs:/data
-      - central_frontend:/var/www/html/${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}:ro
+      - central_frontend:/var/www/html/${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}:ro
     environment:
       # General
       BUNKERWEB_INSTANCES: proxy
@@ -72,7 +72,7 @@ services:
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
-      WHITELIST_URI: https://${FMTM_DOMAIN}
+      WHITELIST_URI: https://${FTM_DOMAIN}
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -95,23 +95,23 @@ services:
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
       # Reverse proxy configs
-      SERVER_NAME: ${FMTM_DOMAIN} ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN} ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
-      ${FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN} ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}
+      ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       # CORS for the backend is configured by FastAPI
-      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
-      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
-      ${FMTM_API_DOMAIN:-api.$FMTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
-      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
-      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
+      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
+      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
+      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
       # buffer requests, but not responses, so streaming out works
-      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_REVERSE_PROXY_BUFFERING: no
-      ${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_BUFFERING: no
+      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
       - 443:8443
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
 
   # Required as nginx via nerdctl cannot resolve container aliases
@@ -136,7 +136,7 @@ services:
         "--hosts=/etc/hosts", # use /etc/hosts injected by nerdctl
       ]
     networks:
-      fmtm-net:
+      ftm-net:
         ipv4_address: 10.20.30.53
     restart: unless-stopped
     healthcheck:
@@ -149,18 +149,18 @@ services:
   api:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     volumes:
-      - fmtm_logs:/opt/logs
+      - ftm_logs:/opt/logs
     depends_on:
       proxy:
         condition: service_healthy
-      fmtm-db:
+      fieldtm-db:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
     env_file:
       - .env
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
@@ -188,7 +188,7 @@ services:
       pyxform:
         condition: service_started
     environment:
-      - DOMAIN=${FMTM_ODK_DOMAIN:-odk.$FMTM_DOMAIN}
+      - DOMAIN=${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}
       - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
@@ -218,7 +218,7 @@ services:
       - S3_ACCESS_KEY=dummyvalue
       - S3_SECRET_KEY=dummyvalue
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: nc -z localhost 8383 || exit 1
@@ -230,7 +230,7 @@ services:
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v4.2.0"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
 
   central-ui:
@@ -247,34 +247,34 @@ services:
     depends_on:
       proxy:
         condition: service_healthy
-      fmtm-db:
+      fieldtm-db:
         condition: service_healthy
     env_file:
       - .env
     networks:
-      - fmtm-net
+      - ftm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
 
-  fmtm-db:
+  fieldtm-db:
     image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
     command: -c 'max_connections=64' -c 'wal_level=logical'
     volumes:
-      - fmtm_db_data:/var/lib/postgresql/data/
+      - ftm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
-      - POSTGRES_DB=${FMTM_DB_NAME}
+      - POSTGRES_USER=${FTM_DB_USER}
+      - POSTGRES_PASSWORD=${FTM_DB_PASSWORD}
+      - POSTGRES_DB=${FTM_DB_NAME}
     ports:
       - "5433:5432"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+      test: pg_isready -U ${FTM_DB_USER} -d ${FTM_DB_NAME}
       start_period: 5s
       interval: 10s
       timeout: 5s
@@ -292,7 +292,7 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: pg_isready -U ${CENTRAL_DB_USER} -d ${CENTRAL_DB_NAME}

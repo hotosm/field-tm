@@ -67,10 +67,10 @@ def _enum_to_value(value):
     return value.value if hasattr(value, "value") else value
 
 
-def _build_fmtm_url(project_id: int) -> str:
+def _build_ftm_url(project_id: int) -> str:
     """Build the FieldTM project page URL."""
-    domain = settings.FMTM_DOMAIN
-    port_suffix = f":{settings.FMTM_DEV_PORT}" if settings.FMTM_DEV_PORT else ""
+    domain = settings.FTM_DOMAIN
+    port_suffix = f":{settings.FTM_DEV_PORT}" if settings.FTM_DEV_PORT else ""
     scheme = "http" if "localhost" in domain else "https"
     return f"{scheme}://{domain}{port_suffix}/projects/{project_id}"
 
@@ -279,14 +279,14 @@ async def api_create_project(
         await _cleanup_project(db, project_id)
         raise _map_service_error(exc) from exc
 
-    fmtm_url = None if data.cleanup else _build_fmtm_url(project_id)
+    ftm_url = None if data.cleanup else _build_ftm_url(project_id)
 
     if data.cleanup:
         await _cleanup_project(db, project_id)
 
     return CreateProjectResponse(
         project_id=project_id,
-        fmtm_url=fmtm_url,
+        ftm_url=ftm_url,
         downstream_url=downstream_url,
         manager_username=manager_username,
         manager_password=manager_password,

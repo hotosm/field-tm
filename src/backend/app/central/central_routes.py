@@ -197,7 +197,7 @@ async def upload_project_xlsform(  # noqa: PLR0913
     """Upload the final XLSForm for the project."""
     project = current_user.get("project")
     project_id = project.id
-    form_name = f"FMTM_Project_{project.id}"
+    form_name = f"FTM_Project_{project.id}"
 
     # Validate uploaded form
     xlsform_bytes = await _validate_xlsform_extension(data)
@@ -338,7 +338,7 @@ async def refresh_appuser_token(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = f"FMTM_Project_{project.id}"
+    project_xform_id = f"FTM_Project_{project.id}"
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -391,7 +391,7 @@ async def upload_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = f"FMTM_Project_{project.id}"
+    project_xform_id = f"FTM_Project_{project.id}"
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -473,7 +473,7 @@ async def list_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = f"FMTM_Project_{project.id}"
+    project_xform_id = f"FTM_Project_{project.id}"
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 
@@ -515,7 +515,7 @@ async def get_form_media(
     project = current_user.get("project")
     project_id = project.id
     project_odk_id = project.external_project_id
-    project_xform_id = f"FMTM_Project_{project.id}"
+    project_xform_id = f"FTM_Project_{project.id}"
     # ODK credentials not stored on project, use None to fall back to env vars
     project_odk_creds = None
 

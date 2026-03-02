@@ -24,12 +24,12 @@ FROM docker.io/python:${PYTHON_IMG_TAG}-slim-trixie AS base
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG PYTHON_IMG_TAG
-LABEL org.hotosm.fmtm.app-name="backend" \
-      org.hotosm.fmtm.app-version="${APP_VERSION}" \
-      org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
-      org.hotosm.fmtm.python-img-tag="${PYTHON_IMG_TAG}" \
-      org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
-      org.hotosm.fmtm.api-port="8000"
+LABEL org.hotosm.field-tm.app-name="backend" \
+      org.hotosm.field-tm.app-version="${APP_VERSION}" \
+      org.hotosm.field-tm.git-commit-ref="${COMMIT_REF:-none}" \
+      org.hotosm.field-tm.python-img-tag="${PYTHON_IMG_TAG}" \
+      org.hotosm.field-tm.maintainer="sysadmin@hotosm.org" \
+      org.hotosm.field-tm.api-port="8000"
 RUN apt-get update --quiet \
     && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --quiet --no-install-recommends \
@@ -164,7 +164,7 @@ ENTRYPOINT ["/app-entrypoint.sh"]
 COPY --from=build /opt/python /opt/python
 WORKDIR /opt
 # Add non-root user, permissions
-RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
+RUN useradd -u 1001 -m -c "field-tm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/qfield /opt/migrations /opt/app \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh

@@ -14,7 +14,7 @@
   if you have disjoint polygons, we suggest to create multiple projects
 
 <img width="800" height="500" alt="FireShot Capture 1470 -
-project creation test - HOT Field Tasking Manager -  dev fmtm hotosm org"
+project creation test - HOT Field Tasking Manager -  dev field-tm hotosm org"
  src="https://github.com/user-attachments/assets/
  ba189993-9283-48c2-8495-80164e5c1d2b" />
 

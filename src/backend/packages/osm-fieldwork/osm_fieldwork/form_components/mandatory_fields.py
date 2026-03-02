@@ -260,7 +260,7 @@ def _get_mandatory_fields(
             "label::english(en)": "Created by",
             "appearance": "minimal",
             "calculation": (
-                f"if({NEW_FEATURE} != '', if({OSM_USERNAME} != '', {OSM_USERNAME}, {USERNAME}), 'svcfmtm')"
+                f"if({NEW_FEATURE} != '', if({OSM_USERNAME} != '', {OSM_USERNAME}, {USERNAME}), 'svcftm')"
                 if use_odk_collect
                 else "''"
             ),

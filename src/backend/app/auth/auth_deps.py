@@ -49,7 +49,7 @@ async def public_endpoint(
 
     svc_account_user = {
         "sub": "osm|20386219",
-        "username": "svcfmtm",
+        "username": "svcftm",
         "is_admin": False,
     }
     if not extracted_token:

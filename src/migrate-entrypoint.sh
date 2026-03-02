@@ -21,28 +21,28 @@ pretty_echo() {
 }
 
 check_all_db_vars_present() {
-    if [ -z "${FMTM_DB_HOST}" ]; then
-        echo "Environment variable FMTM_DB_HOST is not set."
+    if [ -z "${FTM_DB_HOST}" ]; then
+        echo "Environment variable FTM_DB_HOST is not set."
         exit 1
     fi
-    if [ -z "${FMTM_DB_USER}" ]; then
-        echo "Environment variable FMTM_DB_USER is not set."
+    if [ -z "${FTM_DB_USER}" ]; then
+        echo "Environment variable FTM_DB_USER is not set."
         exit 1
     fi
-    if [ -z "${FMTM_DB_PASSWORD}" ]; then
-        echo "Environment variable FMTM_DB_PASSWORD is not set."
+    if [ -z "${FTM_DB_PASSWORD}" ]; then
+        echo "Environment variable FTM_DB_PASSWORD is not set."
         exit 1
     fi
-    if [ -z "${FMTM_DB_NAME}" ]; then
-        echo "Environment variable FMTM_DB_NAME is not set."
+    if [ -z "${FTM_DB_NAME}" ]; then
+        echo "Environment variable FTM_DB_NAME is not set."
         exit 1
     fi
 
     # Strip any extra unrequired "quotes"
-    export FMTM_DB_HOST="${FMTM_DB_HOST//\"/}"
-    export FMTM_DB_USER="${FMTM_DB_USER//\"/}"
-    export FMTM_DB_PASSWORD="${FMTM_DB_PASSWORD//\"/}"
-    export FMTM_DB_NAME="${FMTM_DB_NAME//\"/}"
+    export FTM_DB_HOST="${FTM_DB_HOST//\"/}"
+    export FTM_DB_USER="${FTM_DB_USER//\"/}"
+    export FTM_DB_PASSWORD="${FTM_DB_PASSWORD//\"/}"
+    export FTM_DB_NAME="${FTM_DB_NAME//\"/}"
 }
 
 wait_for_db() {
@@ -50,7 +50,7 @@ wait_for_db() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if </dev/tcp/"${FMTM_DB_HOST:-fmtm-db}"/5432; then
+        if </dev/tcp/"${FTM_DB_HOST:-fieldtm-db}"/5432; then
             echo "✓ Database is available."
             return 0  # Database is available, exit successfully
         fi
@@ -94,7 +94,7 @@ create_migrations_table_if_missing() {
             date_executed timestamp without time zone,
             CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name)
         );
-        ALTER TABLE IF EXISTS public."_migrations" OWNER TO fmtm;
+        ALTER TABLE IF EXISTS public."_migrations" OWNER TO fieldtm;
         RAISE NOTICE 'Table "_migrations" successfully added to database.';
     EXCEPTION
         WHEN OTHERS THEN
@@ -170,7 +170,7 @@ scripts_to_execute=()
 # DB startup
 check_all_db_vars_present; echo "✓ DB vars check complete"
 wait_for_db
-db_url="postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}/${FMTM_DB_NAME}"
+db_url="postgresql://${FTM_DB_USER}:${FTM_DB_PASSWORD}@${FTM_DB_HOST}/${FTM_DB_NAME}"
 
 # Apply schema, if needed
 create_db_schema_if_missing

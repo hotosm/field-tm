@@ -613,7 +613,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
         # Parse and validate with geojson-aoi-parser (same as validate-geojson endpoint)
         try:
             featcol = parse_aoi(
-                settings.FMTM_DB_URL,
+                settings.FTM_DB_URL,
                 file_content,
                 merge=False,
             )
@@ -1560,7 +1560,7 @@ async def validate_geojson(
 
         # Normalize and validate AOI using geojson-aoi-parser (PostGIS-backed).
         merged_featcol = parse_aoi(
-            settings.FMTM_DB_URL,
+            settings.FTM_DB_URL,
             geojson_input,
             merge=bool(merge_geometries),
         )

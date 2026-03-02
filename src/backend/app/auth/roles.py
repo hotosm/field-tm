@@ -161,11 +161,11 @@ async def wrap_check_access(
 
     if not db_user:
         msg = "User does not have permission to access the project."
-        # NOTE workaround to allow a mix of svcfmtm access on mapper frontend
-        # for public projects, but also blocking access for svcfmtm on
+        # NOTE workaround to allow a mix of svcftm access on mapper frontend
+        # for public projects, but also blocking access for svcftm on
         # mapper frontend if the project is private. We must send 401 and
         # not 403 to make managing this easier
-        if user_data.username == "svcfmtm":
+        if user_data.username == "svcftm":
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=msg)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=msg)
@@ -241,7 +241,7 @@ async def mapper(
             "project": project,
         }
 
-    # As the default user for temp auth (svcfmtm) does not have valid permissions
+    # As the default user for temp auth (svcftm) does not have valid permissions
     # on any project, this will block access for temp login users on projects
     # that are not public
     return await wrap_check_access(

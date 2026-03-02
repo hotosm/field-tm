@@ -75,7 +75,7 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
         osm_user = osm_auth.deserialize_data(serialised_user_data)
         user_data = {
             "sub": f"osm|{osm_user['id']}",
-            "aud": settings.FMTM_DOMAIN,
+            "aud": settings.FTM_DOMAIN,
             "iat": int(time()),
             "exp": int(time()) + 86400,  # expiry set to 1 day
             "username": osm_user["username"],
@@ -88,14 +88,14 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
         raise ValueError(f"Invalid OSM token: {e}") from e
 
     # Create our JWT tokens from user data
-    fmtm_token, refresh_token = create_jwt_tokens(user_data)
+    ftm_token, refresh_token = create_jwt_tokens(user_data)
 
     response = Response(
         status_code=status.HTTP_200_OK,
         content=b'{"message":"ok"}',
         media_type="application/json",
     )
-    response_plus_cookies = set_cookies(response, fmtm_token, refresh_token)
+    response_plus_cookies = set_cookies(response, ftm_token, refresh_token)
 
     # NOTE Here we create a separate cookie to store the OSM token, for later
     # workflows such as conflation (OSM changesets) or OSM messaging.
@@ -106,7 +106,7 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
     cookie_name = settings.cookie_name
     osm_cookie_name = f"{cookie_name}_osm"
     log.debug(f"Creating cookie '{osm_cookie_name}' with OSM token")
-    cookie_domain = settings.FMTM_DOMAIN
+    cookie_domain = settings.FTM_DOMAIN
     response_plus_cookies.set_cookie(
         key=osm_cookie_name,
         value=serialised_osm_token,

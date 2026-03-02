@@ -265,7 +265,7 @@ async def flatten_multipolygons_to_polygons(
     current_user: AuthUser,
 ) -> Response[bytes]:
     """If any MultiPolygons are present, replace with multiple Polygons."""
-    featcol = parse_aoi(settings.FMTM_DB_URL, await geojson.read())
+    featcol = parse_aoi(settings.FTM_DB_URL, await geojson.read())
     if not featcol:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

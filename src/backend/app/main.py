@@ -65,7 +65,7 @@ async def create_local_admin_user(server: Litestar) -> None:
         username="localadmin",
         is_admin=True,
         name="Admin",
-        email_address="admin@fmtm.dev",
+        email_address="admin@field-tm.dev",
     )
     async with server.state.db_pool.connection() as conn:
         log.debug(f"Creating admin user {admin_user.username}")

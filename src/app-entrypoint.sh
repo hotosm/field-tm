@@ -7,7 +7,7 @@ wait_for_db() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if </dev/tcp/"${FMTM_DB_HOST:-fmtm-db}"/5432; then
+        if </dev/tcp/"${FTM_DB_HOST:-fieldtm-db}"/5432; then
             echo "✓ Database is available."
             return 0  # Database is available, exit successfully
         fi

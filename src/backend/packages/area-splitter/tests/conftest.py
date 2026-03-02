@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 @pytest.fixture(scope="session")
 def db():
     """Existing psycopg connection."""
-    return psycopg.connect("postgresql://fmtm:fmtm@fmtm-db:5432/fmtm")
+    return psycopg.connect("postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm")
 
 
 @pytest.fixture(scope="session")
@@ -122,7 +122,7 @@ def extract_json():
 
 @pytest.fixture(scope="session")
 def output_json():
-    """Processed JSON using FMTM Algo on dummy AOI."""
+    """Processed JSON using Field-TM algo on dummy AOI."""
     path = Path(__file__).parent / "testdata" / "kathmandu_processed.geojson"
     with open(path) as jsonfile:
         return geojson.load(jsonfile)

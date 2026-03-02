@@ -486,7 +486,7 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
         return True
 
     async def fake_create_project_manager_user(**_kwargs):
-        return ("fmtm-manager-17@example.org", "StrongPass123")
+        return ("field-tm-manager-17@example.org", "StrongPass123")
 
     class FakeDatasetClient:
         async def listDatasets(self, _project_odk_id):  # noqa: N802
@@ -559,7 +559,7 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
     assert tasks_dataset["entities_list"][0]["label"] == "Task 1"
 
     assert result.odk_url == "https://central.example.org/#/projects/17"
-    assert result.manager_username == "fmtm-manager-17@example.org"
+    assert result.manager_username == "field-tm-manager-17@example.org"
     assert result.manager_password == "StrongPass123"
 
 
@@ -717,7 +717,7 @@ async def test_update_project(client, admin_user, project):
     assert sorted(response_data["hashtags"]) == sorted(
         [
             "#Field-TM",
-            f"#{settings.FMTM_DOMAIN}-{response_data['id']}",
+            f"#{settings.FTM_DOMAIN}-{response_data['id']}",
             "#anothertag",
         ]
     )

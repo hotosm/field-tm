@@ -42,12 +42,12 @@ While there are many excellent applications for tagging map features already,
 the Field-TM aims to solve the problem of **coordinating** field mapping campaigns.
 
 > More details can be found here:
-> [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
+> [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-field-tm),
 > [timeline](https://docs.field.hotosm.org/timeline),
 > [docs](https://docs.field.hotosm.org) page, and the
 > [FAQ](https://docs.field.hotosm.org/about/faq).
 
-![fmtm-splash][6]
+![field-tm-splash][6]
 
 ## How Field-TM Works
 
@@ -91,7 +91,7 @@ To aid future disaster response, we would really welcome contributions for:
 - XLSForm creators
 - Mobile developers
 
-Please take a look at our [Documentation](https://hotosm.github.io/fmtm)
+Please take a look at our [Documentation](https://hotosm.github.io/field-tm)
 and [contributor guidance](https://docs.field.hotosm.org/CONTRIBUTING/)
 for more details!
 

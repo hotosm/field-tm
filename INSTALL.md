@@ -31,7 +31,7 @@ On a Linux-based machine with `bash` installed, run the script:
 
 > Note: it is best to run this script as a user other than root.
 >
-> However, if you run as root, a user svcfmtm will be created for you.
+> However, if you run as root, a user svcftm will be created for you.
 
 ```bash
 curl -L https://get.field.hotosm.org -o install.sh
@@ -103,7 +103,7 @@ just config generate-dotenv
 
 > Note: If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
-> <http://fmtm.localhost:7050,http://some.other.domain>
+> <http://field.localhost:7050,http://some.other.domain>
 
 #### 3. Deploy using Just
 
@@ -147,7 +147,7 @@ docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promo
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1. Navigate to the app (e.g. `http://fmtm.localhost:7050`)
+1. Navigate to the app (e.g. `http://field.localhost:7050`)
 
 2. Click the 'Sign In' button and follow the popup prompts.
 

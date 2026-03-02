@@ -1,10 +1,10 @@
-# Default values for fmtm.
+# Default values for field-tm.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
-domain: fmtm.localhost
+domain: field.localhost
 
 image:
   repository: ghcr.io/hotosm/field-tm
@@ -18,14 +18,14 @@ backend:
   dbHostOverride: ""
 
   # Secrets to load env vars from. The following keys are expected:
-  #   db-fmtm-vars: FMTM_DB_USER, FMTM_DB_PASSWORD, FMTM_DB_NAME
-  #   api-fmtm-vars: ENCRYPTION_KEY, OSM_CLIENT_ID, OSM_CLIENT_SECRET, OSM_SECRET_KEY,
+  #   db-ftm-vars: FTM_DB_USER, FTM_DB_PASSWORD, FTM_DB_NAME
+  #   api-ftm-vars: ENCRYPTION_KEY, OSM_CLIENT_ID, OSM_CLIENT_SECRET, OSM_SECRET_KEY,
   #                  ODK_CENTRAL_URL, ODK_CENTRAL_PUBLIC_URL, ODK_CENTRAL_USER, ODK_CENTRAL_PASSWD
   extraEnvFrom:
     - secretRef:
-        name: db-fmtm-vars
+        name: db-ftm-vars
     - secretRef:
-        name: api-fmtm-vars
+        name: api-ftm-vars
 
   service:
     type: ClusterIP
@@ -92,12 +92,12 @@ db:
     tag: 14-debian-12
   auth:
     enablePostgresUser: false
-    username: fmtm
-    database: fmtm
+    username: fieldtm
+    database: fieldtm
     # Must contain keys postgres-password and password
-    existingSecret: db-fmtm-vars
+    existingSecret: db-ftm-vars
     secretKeys:
-      userPasswordKey: FMTM_DB_PASSWORD
+      userPasswordKey: FTM_DB_PASSWORD
   initdb:
     scripts:
       01-enable-postgis.sql: |

@@ -336,7 +336,7 @@ async def process_xlsform(
         ValidationError: If the form is invalid or processing fails.
     """
     project = await project_deps.get_project_by_id(db, project_id)
-    form_name = f"FMTM_Project_{project.id}"
+    form_name = f"FTM_Project_{project.id}"
 
     # Validate and process the form
     await central_crud.validate_and_update_user_xlsform(
@@ -503,7 +503,7 @@ async def download_osm_data(
     geojson_data = _validate_downloaded_geojson(geojson_data)
 
     # Validate and clean GeoJSON
-    featcol = parse_aoi(settings.FMTM_DB_URL, geojson_data)
+    featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if not featcol_single_geom_type:
@@ -624,7 +624,7 @@ async def _split_with_building_algorithm(
     split_sql_call = partial(
         split_by_sql,
         aoi_featcol,
-        settings.FMTM_DB_URL,
+        settings.FTM_DB_URL,
         num_buildings=None,
         outfile=None,
         osm_extract=parsed_extract,
@@ -652,7 +652,7 @@ async def _split_with_square_algorithm(
     return await to_thread.run_sync(
         split_by_square,
         aoi_featcol,
-        settings.FMTM_DB_URL,
+        settings.FTM_DB_URL,
         dimension_meters,
         valid_extract,
         None,

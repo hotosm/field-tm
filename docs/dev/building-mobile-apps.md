@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = WebViewClient()
 
         // Load Web App
-        webView.loadUrl("https://mapper.fmtm.hotosm.org")
+        webView.loadUrl("https://mapper.field-tm.hotosm.org")
     }
 }
 ```
@@ -100,7 +100,7 @@ class ViewController: UIViewController {
         webView = WKWebView(frame: self.view.frame)
         self.view.addSubview(webView)
         // Load Web App
-        if let url = URL(string: "https://mapper.fmtm.hotosm.org") {
+        if let url = URL(string: "https://mapper.field-tm.hotosm.org") {
             let request = URLRequest(url: url)
             webView.load(request)
         }

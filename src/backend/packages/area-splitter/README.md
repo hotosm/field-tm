@@ -21,7 +21,7 @@
 
 ---
 
-📖 **Documentation**: <a href="https://hotosm.github.io/fmtm-splitter/" target="_blank">https://hotosm.github.io/fmtm-splitter/</a>
+📖 **Documentation**: <a href="https://hotosm.github.io/area-splitter/" target="_blank">https://hotosm.github.io/area-splitter/</a>
 
 🖥️ **Source Code**: <a href="https://github.com/hotosm/field-tm/blob/main/src/backend/packages/area-splitter" target="_blank">https://github.com/hotosm/field-tm/blob/main/src/backend/packages/area-splitter</a>
 
@@ -32,7 +32,7 @@
 This is a program to split polygons into tasks using a variety of
 algorithms. It is a class that can be used by other projects, but also
 a standalone program. It was originally developed for the
-[FMTM](https://github.com/hotosm/fmtm/wiki) project, but then
+[Field-TM](https://github.com/hotosm/field-tm/wiki) project, but then
 converted so it can be used by multiple projects.
 
 The class takes GeoJson Polygon as an input, and returns a GeoJson
@@ -65,7 +65,7 @@ and uses it to generate non square task boundaries. It can also be
 adjusted to use the number of buildings in a task to adjust it's
 size.
 
-![Split By Feature](https://github.com/hotosm/fmtm-splitter/blob/main/docs/images/Screenshot%20from%202023-08-06%2018-26-34.png)
+![Split By Feature](https://github.com/hotosm/area-splitter/blob/main/docs/images/Screenshot%20from%202023-08-06%2018-26-34.png)
 
 ### Custom SQL query
 
@@ -74,7 +74,7 @@ tasks.
 
 ## Usage In Code
 
-- Either the FMTMSplitter class can be used directly, or the wrapper/
+- Either the AreaSplitter class can be used directly, or the wrapper/
   helper functions can be used for splitting.
 
 By square:
@@ -91,7 +91,7 @@ split_features = split_by_square(
 )
 ```
 
-The FMTM splitter algorithm:
+The Field-TM splitter algorithm:
 
 ```python
 import json
@@ -158,6 +158,6 @@ area-splitter -v -b AOI -s data.geojson
 area-splitter -v -b AOI -s PG:colorado
 
 # Where AOI is the boundary of the project as a polygon
-# And OUTFILE is a MultiPolygon output file,which defaults to fmtm.geojson
+# And OUTFILE is a MultiPolygon output file,which defaults to field-tm.geojson
 # The task splitting defaults to squares, 50 meters across
 ```

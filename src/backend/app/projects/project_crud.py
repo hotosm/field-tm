@@ -107,9 +107,9 @@ async def generate_data_extract(
     )
     extra_params = {
         "fileName": (
-            f"fmtm_{settings.FMTM_DOMAIN}_data_extract_{project_id}"
+            f"ftm_{settings.FTM_DOMAIN}_data_extract_{project_id}"
             if settings.RAW_DATA_API_AUTH_TOKEN
-            else f"fmtm_extract_{project_id}"
+            else f"ftm_extract_{project_id}"
         ),
         "outputType": "geojson",
         "geometryType": [geom_type],
@@ -439,7 +439,7 @@ async def _resolve_project_form_upload(
     xlsform_bytes = BytesIO(project.xlsform_content)
     project_odk_form_id, _ = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform_bytes,
-        form_name=f"FMTM_Project_{project.id}",
+        form_name=f"FTM_Project_{project.id}",
     )
     xlsform_bytes.seek(0)
     return project.external_project_id, project_odk_form_id, xlsform_bytes
@@ -754,7 +754,7 @@ async def send_project_manager_message(
     log.info(f"Sending message to new project manager ({new_manager.username}).")
 
     osm_token = get_osm_token(request, osm_auth)
-    project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
+    project_url = f"{settings.FTM_DOMAIN}/project/{project.id}"
     if not project_url.startswith("http"):
         project_url = f"https://{project_url}"
 
@@ -816,7 +816,7 @@ async def _get_or_create_appuser_token(
 
         created_user = client.session.post(
             f"projects/{project.external_project_id}/app-users",
-            json={"displayName": "fmtm_user"},
+            json={"displayName": "fieldtm_user"},
         )
         created_user.raise_for_status()
         return (created_user.json() or {}).get("token")

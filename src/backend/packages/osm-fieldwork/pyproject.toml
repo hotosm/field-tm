@@ -21,7 +21,7 @@ dependencies = [
 requires-python = ">=3.10"
 readme = "README.md"
 license = "GPL-3.0-only"
-keywords = ["hot", "odk", "openstreetmap", "fmtm"]
+keywords = ["hot", "odk", "openstreetmap", "field-tm"]
 classifiers = [
     "Topic :: Utilities",
     "Topic :: Scientific/Engineering :: GIS",
@@ -43,7 +43,7 @@ osm2favorites = "osm_fieldwork.osm2favorities:main"
 odk2osm = "osm_fieldwork.odk2osm:main"
 odk_client = "osm_fieldwork.odk_client:main"
 make_data_extract = "osm_fieldwork.make_data_extract:main"
-fmtm_xlsform = "osm_fieldwork.update_xlsform:run"
+ftm_xlsform = "osm_fieldwork.update_xlsform:run"
 
 [build-system]
 requires = ["hatchling"]

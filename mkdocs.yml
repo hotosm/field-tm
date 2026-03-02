@@ -100,7 +100,7 @@ nav:
   - Utilities:
       - XLSForm Converter: https://getodk.org/xlsform/
       - QRCode Converter: qrcode-util.md
-      - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
+      - Helpers: https://field.hotosm.org/schema/swagger#helper
   - Example XLSForms & Builder: https://xlsforms.field.hotosm.org
   - Roadmap: https://github.com/hotosm/field-tm#roadmap
   - Timeline: timeline.md

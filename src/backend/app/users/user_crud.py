@@ -226,7 +226,7 @@ async def send_invitation_message(
     signin_type: str,
 ):  # noqa: PLR0913
     """Send an invitation message to a user to join a project."""
-    project_url = f"{settings.FMTM_DOMAIN}/project/{project.id}"
+    project_url = f"{settings.FTM_DOMAIN}/project/{project.id}"
     if not project_url.startswith("http"):
         project_url = f"https://{project_url}"
 

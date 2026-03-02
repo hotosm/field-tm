@@ -29,8 +29,8 @@ classifiers = [
 ]
 
 [project.urls]
-homepage = "https://hotosm.github.io/fmtm-splitter"
-documentation = "https://hotosm.github.io/fmtm-splitter"
+homepage = "https://hotosm.github.io/area-splitter"
+documentation = "https://hotosm.github.io/area-splitter"
 repository = "https://github.com/hotosm/field-tm/blob/main/src/backend/packages/area-splitter"
 
 [project.scripts]

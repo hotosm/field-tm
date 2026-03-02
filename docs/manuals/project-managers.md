@@ -106,11 +106,11 @@ All project manager permissions are granted to the organisation manager.
 Project creation access is provided to users who have organisation admin or
 higher level of permission.
 
-Go to [fmtm] <https://fmtm.hotosm.org/>
+Go to [field-tm] <https://field-tm.hotosm.org/>
 
 ### 1. Create the project details
 
-- Login to fmtm first to see the option of creating the project.
+- Login to field-tm first to see the option of creating the project.
 
   ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
 
@@ -292,7 +292,7 @@ Go to [fmtm] <https://fmtm.hotosm.org/>
 
 1. Share the link of the project for the mapper to reach  
    to the project easily. The URL be:
-   [https://mapper.fmtm.hotosm.org/project_id](https://mapper.fmtm.hotosm.org/project_id)
+   [https://mapper.field-tm.hotosm.org/project_id](https://mapper.field-tm.hotosm.org/project_id)
 2. **Updating Metadata**  
    If you need mappers to include their email  
    and phone number along with their username, guide them  
@@ -391,7 +391,7 @@ the following resources:
 - Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][4]
 
 [1]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
-[2]: https://docs.field.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form "injected fields"
+[2]: https://docs.field.hotosm.org/manuals/xlsform-design/#injected-fields-in-the-field-tm-xls-form "injected fields"
 [3]: https://docs.field.hotosm.org/faq "FAQs"
 [4]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
 [5]: https://docs.getodk.org/collect-using "Using Collect"

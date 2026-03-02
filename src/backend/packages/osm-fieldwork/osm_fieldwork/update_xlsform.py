@@ -291,7 +291,7 @@ def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.Da
 
 async def _process_all_form_tabs(
     custom_sheets: pd.DataFrame,
-    form_name: str = f"fmtm_{uuid4()}",
+    form_name: str = f"ftm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
@@ -386,7 +386,7 @@ async def write_xlsform(form_content: pd.DataFrame) -> BytesIO:
 
 async def append_field_mapping_fields(
     custom_form: BytesIO,
-    form_name: str = f"fmtm_{uuid4()}",
+    form_name: str = f"ftm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
@@ -664,7 +664,7 @@ def _add_additional_entities(
 
 
 async def main():
-    """Used for the `fmtm_xlsform` CLI command."""
+    """Used for the `ftm_xlsform` CLI command."""
     def str2bool(v):
         if isinstance(v, bool):
             return v
@@ -749,7 +749,7 @@ async def main():
 
     form_id, form_bytes = await append_field_mapping_fields(
         custom_form=input_xlsform,
-        form_name=f"fmtm_{uuid4()}",
+        form_name=f"ftm_{uuid4()}",
         additional_entities=args.additional_dataset_names,
         new_geom_type=args.new_geom_type,
         need_verification_fields=args.need_verification_fields,
