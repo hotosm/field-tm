@@ -81,6 +81,8 @@ async def test_get_appuser_token_prefers_public_url_for_returned_link():
         def post(self, path: str, json: dict | None = None):
             if path == "projects/17/app-users":
                 return DummyResponse({"token": "app-token", "id": "app-sub"})
+            if path == "projects/17/assignments/2/app-sub":
+                return DummyResponse({"success": True})
             if path == "projects/17/forms/sample-form/assignments/2/app-sub":
                 return DummyResponse({"success": True})
             raise AssertionError(f"Unexpected POST path: {path}")
@@ -743,6 +745,25 @@ class FakeEntities:
         self.create_many_calls.append(kwargs)
 
 
+class FakeExistingEntityRows(FakeEntities):
+    """Fake entities wrapper returning one existing row."""
+
+    def get_table(self, entity_list_name: str, project_id: int):
+        """Return one existing entity for update-path tests."""
+        return {
+            "value": [
+                {
+                    "__id": "entity-1",
+                    "__system": {"version": 4},
+                    "label": "Task 1",
+                    "geometry": "g",
+                    "status": "unmapped",
+                    "task_id": "1",
+                }
+            ]
+        }
+
+
 class FakePropertySession:
     """Fake pyodk session handling dataset property requests."""
 
@@ -782,10 +803,10 @@ class FakeConflictPropertySession(FakePropertySession):
 class FakePyODKClient:
     """Minimal pyodk client with session + entities endpoints."""
 
-    def __init__(self, session):
+    def __init__(self, session, entities=None):
         """Initialize fake client."""
         self.session = session
-        self.entities = FakeEntities()
+        self.entities = entities or FakeEntities()
 
 
 class FakeOdkDataset:
@@ -882,3 +903,43 @@ async def test_create_entity_list_ignores_409_property_conflicts():
     # 409 property conflict should be tolerated and entity upload should proceed.
     assert len(fake_client.session.post_calls) >= 1
     assert len(fake_client.entities.create_many_calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_create_entity_list_updates_only_changed_fields():
+    """Existing rows should send only changed fields to pyodk update."""
+    fake_dataset = FakeOdkDataset()
+    fake_client = FakePyODKClient(
+        FakePropertySession(),
+        entities=FakeExistingEntityRows(),
+    )
+
+    @asynccontextmanager
+    async def fake_get_odk_dataset(_):
+        yield fake_dataset
+
+    @asynccontextmanager
+    async def fake_pyodk_client(_):
+        yield fake_client
+
+    with patch("app.central.central_deps.get_odk_dataset", fake_get_odk_dataset):
+        with patch("app.central.central_deps.pyodk_client", fake_pyodk_client):
+            await central_crud.create_entity_list(
+                odk_creds=None,
+                odk_id=1,
+                properties=["geometry", "status", "task_id"],
+                dataset_name="features",
+                entities_list=[
+                    {
+                        "label": "Task 1",
+                        "data": {"geometry": "g", "status": "ready", "task_id": "1"},
+                    }
+                ],
+            )
+
+    assert len(fake_client.entities.update_calls) == 1
+    update_call = fake_client.entities.update_calls[0]
+    assert update_call["uuid"] == "entity-1"
+    assert update_call["base_version"] == 4
+    assert update_call["data"] == {"status": "ready"}
+    assert fake_client.entities.create_many_calls == []

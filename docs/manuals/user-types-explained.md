@@ -31,7 +31,7 @@ The **Project Manager** has to consider 3 main activities:
 3. **Post-field data collection activities**
    - Daily review of data
    - Giving and receiving team feedback
-   - Updating tools and methodoligies
+   - Updating tools and methodologies
 
 ## Field Mappers
 

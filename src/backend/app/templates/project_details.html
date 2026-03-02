@@ -1,13 +1,8 @@
-{% extends "layout.html" %} {% block title %} {% if project %}{{
-project.project_name }} - {% endif %}Field Tasking Manager {% endblock %} {%
-block content %}
+{% extends "layout.html" %} {% block title %} {% if project %}{{ project.project_name }} - {% endif
+%}Field Tasking Manager {% endblock %} {% block content %}
 <div class="ftm-page ftm-page--wide">
   <div style="margin-bottom: 20px">
-    <wa-button
-      href="/htmxprojects"
-      variant="default"
-      style="margin-bottom: 20px"
-    >
+    <wa-button href="/htmxprojects" variant="default" style="margin-bottom: 20px">
       ← Back to Projects
     </wa-button>
   </div>
@@ -15,32 +10,27 @@ block content %}
   {% if project %}
   <wa-card>
     <div slot="header" class="ftm-flex-between">
-      {% set status_value = project.status.value if project.status and
-      project.status.value else (project.status if project.status is string else
-      'DRAFT') %} {% set field_mapping_app_value = (
-      project.field_mapping_app.value if project.field_mapping_app and
-      (project.field_mapping_app is not string) and
-      project.field_mapping_app.value else (project.field_mapping_app if
+      {% set status_value = project.status.value if project.status and project.status.value else
+      (project.status if project.status is string else 'DRAFT') %} {% set field_mapping_app_value =
+      ( project.field_mapping_app.value if project.field_mapping_app and (project.field_mapping_app
+      is not string) and project.field_mapping_app.value else (project.field_mapping_app if
       project.field_mapping_app else none) ) %} {% set field_mapping_app_upper =
-      field_mapping_app_value.upper() if field_mapping_app_value else none %} {%
-      set has_xlsform = project.xlsform_content is not none and
-      project.xlsform_content %} {% set has_data_extract =
-      project.data_extract_geojson is not none and project.data_extract_geojson
-      %} {% set is_empty_data_extract = project.data_extract_geojson == {} %} {%
-      set has_task_areas = project.task_areas_geojson is not none %} {% set
-      is_no_splitting = project.task_areas_geojson == {} %}
+      field_mapping_app_value.upper() if field_mapping_app_value else none %} {% set has_xlsform =
+      project.xlsform_content is not none and project.xlsform_content %} {% set has_data_extract =
+      project.data_extract_geojson is not none and project.data_extract_geojson %} {% set
+      is_empty_data_extract = project.data_extract_geojson == {} %} {% set has_task_areas =
+      project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_areas_geojson
+      == {} %}
       <div class="ftm-project-title-wrap">
         {% if field_mapping_app_value %}
         <img
           src="/static/images/{{ field_mapping_app_value.lower() }}-logo.svg"
           alt="{{ field_mapping_app_value }}"
           class="ftm-app-logo ftm-app-logo--header"
-          onerror="this.style.display='none'"
+          onerror="this.style.display = 'none'"
         />
         {% endif %}
-        <h1 style="margin: 0">
-          {{ project.project_name or 'Unnamed Project' }}
-        </h1>
+        <h1 style="margin: 0">{{ project.project_name or 'Unnamed Project' }}</h1>
       </div>
       <wa-badge
         variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
@@ -50,8 +40,7 @@ block content %}
     </div>
 
     <div style="padding: 20px">
-      {% if status_value == 'PUBLISHED' %} {% include
-      "partials/project_details/setup_steps.html" %}
+      {% if status_value == 'PUBLISHED' %} {% include "partials/project_details/setup_steps.html" %}
 
       <div class="ftm-manager-section">
         <h2 class="ftm-manager-section__title">Project Metadata</h2>
@@ -85,16 +74,14 @@ block content %}
         <div>
           <h4 class="ftm-detail-label">Created</h4>
           <p class="ftm-detail-value">
-            {{ project.created_at.strftime('%Y-%m-%d %H:%M') if
-            project.created_at else 'N/A' }}
+            {{ project.created_at.strftime('%Y-%m-%d %H:%M') if project.created_at else 'N/A' }}
           </p>
         </div>
         {% endif %} {% if project.updated_at %}
         <div>
           <h4 class="ftm-detail-label">Last Updated</h4>
           <p class="ftm-detail-value">
-            {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if
-            project.updated_at else 'N/A' }}
+            {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if project.updated_at else 'N/A' }}
           </p>
         </div>
         {% endif %}
@@ -117,15 +104,13 @@ block content %}
       <div class="ftm-external-info">
         <h4 class="ftm-detail-label">External Project</h4>
         <p style="color: #333; font-size: 0.9em">
-          <strong>Instance:</strong> {{ project.external_project_instance_url
-          }}<br />
+          <strong>Instance:</strong> {{ project.external_project_instance_url }}<br />
           {% if project.external_project_id %}
-          <strong>Project ID:</strong> {{ project.external_project_id }} {%
-          endif %}
+          <strong>Project ID:</strong> {{ project.external_project_id }} {% endif %}
         </p>
         <p style="margin: 0">
-          {% if field_mapping_app_upper == 'ODK' and project.external_project_id
-          %} {% if '/projects/' in project.external_project_instance_url %}
+          {% if field_mapping_app_upper == 'ODK' and project.external_project_id %} {% if
+          '/projects/' in project.external_project_instance_url %}
           <a
             href="{{ project.external_project_instance_url }}"
             target="_blank"
@@ -161,14 +146,12 @@ block content %}
         </p>
       </div>
       {% endif %} {% if status_value == 'PUBLISHED' %} {% include
-      "partials/project_details/manager_setup_summary.html" %} {% else %} {%
-      include "partials/project_details/setup_steps.html" %} {% endif %}
+      "partials/project_details/manager_setup_summary.html" %} {% else %} {% include
+      "partials/project_details/setup_steps.html" %} {% endif %}
     </div>
 
     <div slot="footer" class="ftm-flex-end">
-      <wa-button href="/htmxprojects" variant="default"
-        >Back to Projects</wa-button
-      >
+      <wa-button href="/htmxprojects" variant="default">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% else %}
@@ -176,12 +159,9 @@ block content %}
     <div style="padding: 40px; text-align: center">
       <h2 class="ftm-section-title">Project Not Found</h2>
       <p style="color: #666; margin: 20px 0">
-        The project you're looking for doesn't exist or you don't have
-        permission to view it.
+        The project you're looking for doesn't exist or you don't have permission to view it.
       </p>
-      <wa-button href="/htmxprojects" variant="primary"
-        >Back to Projects</wa-button
-      >
+      <wa-button href="/htmxprojects" variant="primary">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% endif %}

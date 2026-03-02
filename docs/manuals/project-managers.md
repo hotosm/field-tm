@@ -369,7 +369,7 @@ dashboard you need.
 ### Invite Users
 
 You can invite users (mappers and project managers to your project).
-If the user already exists in Feild-TM, they will be directly assigned role.
+If the user already exists in Field-TM, they will be directly assigned role.
 
 If they are not registered on Field-TM,, the email invitation will
 be sent, following which users can get necessary permission to that project.

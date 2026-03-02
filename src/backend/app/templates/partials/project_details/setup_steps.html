@@ -1,16 +1,14 @@
 <!-- Project setup flow and published mapper access -->
-{% set status_value = project.status.value if project.status and
-project.status.value else (project.status if project.status is string else
-'DRAFT') %} {% set has_xlsform = project.xlsform_content is not none and
-project.xlsform_content %} {% set has_data_extract =
-project.data_extract_geojson is not none and project.data_extract_geojson %} {%
-set is_empty_data_extract = project.data_extract_geojson == {} or
-(project.data_extract_geojson and project.data_extract_geojson.get('type') ==
-'FeatureCollection' and project.data_extract_geojson.get('features') is not none
-and project.data_extract_geojson.get('features') | length == 0) %} {% set
-has_task_areas = project.task_areas_geojson is not none %} {% set
-is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
-'PUBLISHED' %}
+{% set status_value = project.status.value if project.status and project.status.value else
+(project.status if project.status is string else 'DRAFT') %} {% set has_xlsform =
+project.xlsform_content is not none and project.xlsform_content %} {% set has_data_extract =
+project.data_extract_geojson is not none and project.data_extract_geojson %} {% set
+is_empty_data_extract = project.data_extract_geojson == {} or (project.data_extract_geojson and
+project.data_extract_geojson.get('type') == 'FeatureCollection' and
+project.data_extract_geojson.get('features') is not none and
+project.data_extract_geojson.get('features') | length == 0) %} {% set has_task_areas =
+project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_areas_geojson == {}
+%} {% if status_value == 'PUBLISHED' %}
 <!-- Project Published - Mapper-first access -->
 <div class="ftm-published-divider ftm-published-divider--top">
   <h2 class="ftm-published-header">Ready for Mapping</h2>
@@ -61,34 +59,26 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       style="display: flex; flex-direction: column; gap: 12px"
     >
       <div class="ftm-step__status">
-        <label for="xlsform-select" class="ftm-split-label">
-          Choose Survey Type:
-        </label>
+        <label for="xlsform-select" class="ftm-split-label"> Choose Survey Type: </label>
         <select id="xlsform-select" class="ftm-split-select" disabled>
           <option value="">Loading survey types...</option>
         </select>
       </div>
 
       <input type="hidden" name="need_verification_fields" value="true" />
-      {% if field_mapping_app_value %} {% set app_name = field_mapping_app_value
-      %} {% set is_odk = field_mapping_app_upper == 'ODK' %}
-      <input
-        type="hidden"
-        name="use_odk_collect"
-        value="{{ 'true' if is_odk else 'false' }}"
-      />
+      {% if field_mapping_app_value %} {% set app_name = field_mapping_app_value %} {% set is_odk =
+      field_mapping_app_upper == 'ODK' %}
+      <input type="hidden" name="use_odk_collect" value="{{ 'true' if is_odk else 'false' }}" />
       {% if is_odk %}
       <div class="ftm-config-note ftm-config-note--info">
         <span
-          >Recommended defaults are active for ODK projects, including ODK
-          Collect compatibility.</span
+          >Recommended defaults are active for ODK projects, including ODK Collect
+          compatibility.</span
         >
       </div>
       {% else %}
       <div class="ftm-config-note ftm-config-note--muted">
-        <span
-          >Recommended defaults are active for {{ app_name }} projects.</span
-        >
+        <span>Recommended defaults are active for {{ app_name }} projects.</span>
       </div>
       {% endif %} {% else %}
       <input type="hidden" name="use_odk_collect" value="false" />
@@ -109,10 +99,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         </button>
       </div>
 
-      <div
-        id="form-advanced-config-panel"
-        class="ftm-advanced-config ftm-advanced-config--hidden"
-      >
+      <div id="form-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
         <div class="ftm-advanced-config__content">
           <p class="ftm-step__description" style="margin-bottom: 10px">
             Upload a custom XLSForm or adjust form-processing options.
@@ -130,10 +117,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
             <small id="selected-xlsform-name" class="ftm-form-help"></small>
           </div>
 
-          <label
-            class="ftm-checkbox-label"
-            style="display: flex; align-items: center; gap: 8px"
-          >
+          <label class="ftm-checkbox-label" style="display: flex; align-items: center; gap: 8px">
             <input
               type="checkbox"
               name="mandatory_photo_upload"
@@ -164,12 +148,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         accept=".xls,.xlsx"
         style="display: none"
       />
-      <input
-        type="hidden"
-        name="template_form_id"
-        id="template-form-id"
-        value=""
-      />
+      <input type="hidden" name="template_form_id" id="template-form-id" value="" />
 
       <wa-button
         id="upload-xlsform-submit-btn"
@@ -205,9 +184,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     {% if not has_data_extract %}
     <p class="ftm-step__description">
       Download the recommended OSM data for your survey form.
-      <span id="recommended-data-note-text"
-        >Review the data on the map, then continue.</span
-      >
+      <span id="recommended-data-note-text">Review the data on the map, then continue.</span>
     </p>
     <div class="ftm-step__actions">
       <button
@@ -220,11 +197,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         style="min-width: 200px; position: relative"
       >
         <span id="download-btn-text">Download OSM Data</span>
-        <span
-          id="download-spinner"
-          class="htmx-indicator"
-          style="display: none; margin-left: 8px"
-        >
+        <span id="download-spinner" class="htmx-indicator" style="display: none; margin-left: 8px">
           <svg
             class="ftm-spinner"
             viewBox="0 0 24 24"
@@ -259,10 +232,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </button>
     </div>
 
-    <div
-      id="data-advanced-config-panel"
-      class="ftm-advanced-config ftm-advanced-config--hidden"
-    >
+    <div id="data-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
       <div class="ftm-advanced-config__content">
         <p class="ftm-step__description" style="margin-bottom: 10px">
           Use custom data inputs or override the default OSM download options.
@@ -270,9 +240,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 
         <div class="ftm-split-grid ftm-split-grid--advanced">
           <div>
-            <label for="osm-category-select" class="ftm-split-label"
-              >OSM Category:</label
-            >
+            <label for="osm-category-select" class="ftm-split-label">OSM Category:</label>
             <select id="osm-category-select" class="ftm-split-select">
               <option value="buildings">OSM Buildings</option>
               <option value="highways">OSM Highways</option>
@@ -289,9 +257,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
             </select>
           </div>
           <div>
-            <label for="osm-geom-type-select" class="ftm-split-label"
-              >Geometry Type:</label
-            >
+            <label for="osm-geom-type-select" class="ftm-split-label">Geometry Type:</label>
             <select id="osm-geom-type-select" class="ftm-split-select">
               <option value="POLYGON">Polygon</option>
               <option value="POLYLINE">Polyline</option>
@@ -301,12 +267,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
           <div>
             <label
               class="ftm-checkbox-label"
-              style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                margin-top: 28px;
-              "
+              style="display: flex; align-items: center; gap: 8px; margin-top: 28px"
             >
               <input
                 type="checkbox"
@@ -359,17 +320,131 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       hx-encoding="multipart/form-data"
       style="display: none"
     >
-      <input
-        type="file"
-        name="data"
-        id="geojson-file-input"
-        accept=".geojson,.json"
-        required
-      />
+      <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
     </form>
     <div id="geojson-preview-container" style="margin-top: 15px"></div>
     {% else %}
     <div class="ftm-step__success">✓ OSM data extract ready</div>
+    <p class="ftm-step__description" style="margin-top: 10px">
+      You can preview the current extract below, or replace it with a new download, collect-new-data
+      mode, or a custom GeoJSON upload.
+    </p>
+    <div class="ftm-step__actions">
+      <button
+        id="download-osm-data-btn"
+        hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}&osm_category=buildings&geom_type=POLYGON"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
+        hx-indicator="#download-spinner"
+        class="wa-button wa-button--brand"
+        style="min-width: 200px; position: relative"
+      >
+        <span id="download-btn-text">Download OSM Data</span>
+        <span id="download-spinner" class="htmx-indicator" style="display: none; margin-left: 8px">
+          <svg
+            class="ftm-spinner"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 12a9 9 0 11-6.219-8.56" />
+          </svg>
+        </span>
+      </button>
+      <button
+        id="collect-new-data-btn"
+        type="button"
+        hx-post="/collect-new-data-only-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
+        class="wa-button wa-button--default"
+        style="min-width: 200px"
+      >
+        Collect New Data Only
+      </button>
+    </div>
+    <div class="ftm-step__actions" style="margin-top: 12px; margin-bottom: 8px">
+      <button
+        id="data-advanced-config-toggle"
+        type="button"
+        class="wa-button wa-button--default ftm-advanced-toggle"
+      >
+        Advanced Config
+      </button>
+    </div>
+    <div id="data-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
+      <div class="ftm-advanced-config__content">
+        <p class="ftm-step__description" style="margin-bottom: 10px">
+          Use custom data inputs or override the default OSM download options.
+        </p>
+
+        <div class="ftm-split-grid ftm-split-grid--advanced">
+          <div>
+            <label for="osm-category-select" class="ftm-split-label">OSM Category:</label>
+            <select id="osm-category-select" class="ftm-split-select">
+              <option value="buildings">OSM Buildings</option>
+              <option value="highways">OSM Highways</option>
+              <option value="health">OSM Healthcare</option>
+              <option value="toilets">OSM Toilets</option>
+              <option value="religious">OSM Religious</option>
+              <option value="landusage">OSM Landuse</option>
+              <option value="waterways">OSM Waterways</option>
+              <option value="waterpoints">OSM Water Points</option>
+              <option value="wastedisposal">OSM Waste Disposal</option>
+              <option value="education">OSM Education</option>
+              <option value="cemeteries">OSM Cemeteries</option>
+              <option value="amenities">OSM Amenities</option>
+            </select>
+          </div>
+          <div>
+            <label for="osm-geom-type-select" class="ftm-split-label">Geometry Type:</label>
+            <select id="osm-geom-type-select" class="ftm-split-select">
+              <option value="POLYGON">Polygon</option>
+              <option value="POLYLINE">Polyline</option>
+              <option value="POINT">Point</option>
+            </select>
+          </div>
+          <div>
+            <label
+              class="ftm-checkbox-label"
+              style="display: flex; align-items: center; gap: 8px; margin-top: 28px"
+            >
+              <input
+                type="checkbox"
+                id="osm-centroid-checkbox"
+                style="margin: 0; cursor: pointer"
+              />
+              <span style="font-size: 0.95em">Use centroids</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="ftm-step__actions" style="margin-bottom: 0">
+          <button
+            id="upload-geojson-btn"
+            class="wa-button wa-button--default"
+            style="min-width: 220px"
+            type="button"
+          >
+            Upload Custom GeoJSON
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="osm-data-status" class="ftm-step__status"></div>
+    <form
+      id="upload-geojson-form"
+      method="POST"
+      enctype="multipart/form-data"
+      hx-post="/upload-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+      hx-target="#osm-data-status"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      style="display: none"
+    >
+      <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
+    </form>
     <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 0">
       <button
         id="preview-data-extract-btn"
@@ -398,8 +473,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
   {% endif %}
 
   <!-- Step 3: Split AOI (only show if Step 2 is complete, including empty data extract) -->
-  {% if has_data_extract or (project.data_extract_geojson is not none and
-  is_empty_data_extract) %}
+  {% if has_data_extract or (project.data_extract_geojson is not none and is_empty_data_extract) %}
   <div
     id="step-3-container"
     class="ftm-step {% if has_task_areas %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
@@ -415,16 +489,13 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       {% endif %}
     </div>
     {% if has_task_areas %} {% if is_empty_data_extract and is_no_splitting %}
-    <div class="ftm-step__success">
-      ✓ Task splitting is not relevant without existing data
-    </div>
+    <div class="ftm-step__success">✓ Task splitting is not relevant without existing data</div>
     {% else %}
     <div class="ftm-step__success">✓ Split tasks saved successfully</div>
     {% endif %} {% else %}
     <p class="ftm-step__description">
-      Generate task areas by splitting the Area of Interest (AOI). Choose an
-      algorithm and parameters, then split. Review the preview, and click
-      "Accept Task Areas" to save.
+      Generate task areas by splitting the Area of Interest (AOI). Choose an algorithm and
+      parameters, then split. Review the preview, and click "Accept Task Areas" to save.
     </p>
     <div class="ftm-step__actions" style="margin-top: 0; margin-bottom: 8px">
       <button
@@ -443,27 +514,13 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       hx-indicator="#split-loading"
       style="margin-bottom: 15px"
     >
-      <div
-        id="split-advanced-config-panel"
-        class="ftm-advanced-config ftm-advanced-config--hidden"
-      >
+      <div id="split-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
         <div class="ftm-advanced-config__content">
           <p class="ftm-step__description" style="margin-bottom: 10px">
-            Choose which linear features influence building-based task
-            splitting.
+            Choose which linear features influence building-based task splitting.
           </p>
-          <input
-            type="hidden"
-            id="split-include-roads-value"
-            name="include_roads"
-            value="true"
-          />
-          <input
-            type="hidden"
-            id="split-include-rivers-value"
-            name="include_rivers"
-            value="true"
-          />
+          <input type="hidden" id="split-include-roads-value" name="include_roads" value="true" />
+          <input type="hidden" id="split-include-rivers-value" name="include_rivers" value="true" />
           <input
             type="hidden"
             id="split-include-railways-value"
@@ -518,15 +575,8 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       </div>
       <div class="ftm-split-grid">
         <div>
-          <label for="split-algorithm" class="ftm-split-label"
-            >Algorithm:</label
-          >
-          <select
-            id="split-algorithm"
-            name="algorithm"
-            required
-            class="ftm-split-select"
-          >
+          <label for="split-algorithm" class="ftm-split-label">Algorithm:</label>
+          <select id="split-algorithm" name="algorithm" required class="ftm-split-select">
             <option
               value=""
               disabled
@@ -545,24 +595,12 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
             >
               Select splitting option...
             </option>
-            <option
-              value="NO_SPLITTING"
-              {%
-              if
-              is_no_splitting
-              %}selected{%
-              endif
-              %}
-            >
+            <option value="NO_SPLITTING" {% if is_no_splitting %}selected{% endif %}>
               No Splitting (Use Whole AOI)
             </option>
             <option value="DIVIDE_BY_SQUARE">Split by Square</option>
-            <option value="AVG_BUILDING_VORONOI">
-              Average Buildings v1 (Voronoi)
-            </option>
-            <option value="AVG_BUILDING_SKELETON">
-              Average Buildings v2 (Straight Skeleton)
-            </option>
+            <option value="AVG_BUILDING_VORONOI">Average Buildings v1 (Voronoi)</option>
+            <option value="AVG_BUILDING_SKELETON">Average Buildings v2 (Straight Skeleton)</option>
             <option value="TOTAL_TASKS" disabled>
               Split by Specific Number of Tasks (Coming Soon)
             </option>
@@ -571,9 +609,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
         <div id="algorithm-param-container">
           <!-- Dynamic parameter field based on algorithm selection -->
           <div id="param-buildings" style="display: none">
-            <label for="no-of-buildings" class="ftm-split-label"
-              >Avg. Buildings per Task:</label
-            >
+            <label for="no-of-buildings" class="ftm-split-label">Avg. Buildings per Task:</label>
             <input
               type="number"
               id="no-of-buildings"
@@ -584,9 +620,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
             />
           </div>
           <div id="param-dimension" style="display: none">
-            <label for="dimension-meters" class="ftm-split-label"
-              >Dimension (meters):</label
-            >
+            <label for="dimension-meters" class="ftm-split-label">Dimension (meters):</label>
             <input
               type="number"
               id="dimension-meters"
@@ -604,8 +638,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
             style="min-width: 180px; position: relative"
           >
             <span id="split-btn-text"
-              >{% if has_task_areas %}Split Again{% else %}Split AOI{% endif
-              %}</span
+              >{% if has_task_areas %}Split Again{% else %}Split AOI{% endif %}</span
             >
             <span
               id="split-btn-spinner"
@@ -659,16 +692,11 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
       <wa-badge variant="success">Ready</wa-badge>
     </div>
     <p class="ftm-step__description">
-      All prerequisites are complete! Create the project in your chosen mapping
-      tool.
+      All prerequisites are complete! Create the project in your chosen mapping tool.
     </p>
 
     <div class="ftm-step__actions">
-      <wa-button
-        id="finalise-project-btn"
-        variant="brand"
-        style="min-width: 200px"
-      >
+      <wa-button id="finalise-project-btn" variant="brand" style="min-width: 200px">
         Finalise Project
       </wa-button>
       <button
@@ -684,35 +712,21 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
     <div id="finalise-status" class="ftm-step__status"></div>
 
     <!-- Finalise Confirmation Dialog -->
-    <wa-dialog
-      id="finalise-confirm-dialog"
-      label="Confirm Project Finalisation"
-      with-header
-    >
-      <p
-        id="finalise-confirm-message"
-        style="margin: 0; line-height: 1.6; color: #444"
-      >
+    <wa-dialog id="finalise-confirm-dialog" label="Confirm Project Finalisation" with-header>
+      <p id="finalise-confirm-message" style="margin: 0; line-height: 1.6; color: #444">
         Are you sure you want to finalise this project?
       </p>
       <div slot="footer" class="ftm-flex-end">
         <wa-button id="finalise-cancel-btn" variant="default">Cancel</wa-button>
-        <wa-button id="finalise-confirm-btn" variant="brand">
-          Confirm & Finalise
-        </wa-button>
+        <wa-button id="finalise-confirm-btn" variant="brand"> Confirm & Finalise </wa-button>
       </div>
     </wa-dialog>
 
     <!-- Credentials Modal (for ODK or QField) -->
     <div id="credentials-modal" class="ftm-modal-backdrop">
       <div class="ftm-modal">
-        <h3 id="credentials-modal-title" class="ftm-modal__title">
-          Custom Credentials
-        </h3>
-        <form
-          id="credentials-form"
-          style="display: flex; flex-direction: column; gap: 15px"
-        >
+        <h3 id="credentials-modal-title" class="ftm-modal__title">Custom Credentials</h3>
+        <form id="credentials-form" style="display: flex; flex-direction: column; gap: 15px">
           <!-- ODK Credentials Fields -->
           <div id="odk-credentials-fields" style="display: none">
             <div>
@@ -795,9 +809,7 @@ is_no_splitting = project.task_areas_geojson == {} %} {% if status_value ==
 
           <div id="credentials-error" style="margin-top: 10px"></div>
           <div class="ftm-modal__footer">
-            <wa-button type="button" id="cancel-creds-btn" variant="default">
-              Cancel
-            </wa-button>
+            <wa-button type="button" id="cancel-creds-btn" variant="default"> Cancel </wa-button>
             <wa-button type="button" id="test-creds-btn" variant="default">
               Test Credentials
             </wa-button>

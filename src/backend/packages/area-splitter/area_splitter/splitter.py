@@ -122,6 +122,156 @@ def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
     return asyncio.run(_get_data())
 
 
+def _outfile_variant(outfile: Optional[str], index: int) -> Optional[str]:
+    """Build a per-feature output filename variant."""
+    if not outfile:
+        return None
+    outfile_path = Path(outfile)
+    return str(outfile_path.with_name(f"{outfile_path.stem}_{index}.geojson"))
+
+
+def _merge_recursive_split_features(
+    feat_array: list[Feature],
+    split_func,
+) -> FeatureCollection:
+    """Apply a split function to each AOI feature and merge results."""
+    features = []
+    for index, feat in enumerate(feat_array):
+        featcol = split_func(index, feat)
+        feats = featcol.get("features", [])
+        if feats:
+            features += feats
+    return FeatureCollection(features)
+
+
+def _require_split_output(
+    split_features: Optional[FeatureCollection],
+) -> FeatureCollection:
+    """Validate that a split operation returned features."""
+    if split_features:
+        return split_features
+    msg = "Failed to generate split features."
+    log.error(msg)
+    raise ValueError(msg)
+
+
+def _validate_algorithm_selection(algorithm: SplittingAlgorithm) -> None:
+    """Ensure the selected splitting algorithm has a SQL path."""
+    if algorithm.sql_path:
+        return
+    err = f"SplittingAlgorithm {algorithm} must have an sql_path defined."
+    log.error(err)
+    raise ValueError(err)
+
+
+def _resolve_algorithm_params(
+    algorithm: SplittingAlgorithm,
+    num_buildings: Optional[int],
+    algorithm_params: Optional[dict],
+) -> dict:
+    """Normalize and validate algorithm parameters."""
+    params = dict(algorithm_params or {})
+    if not params:
+        if not num_buildings:
+            err = (
+                f"Algorithm {algorithm.value} requires the following parameters: "
+                f"{', '.join(algorithm.required_params)}. "
+                f"Either provide algorithm_params dict or num_buildings (deprecated)."
+            )
+            log.error(err)
+            raise ValueError(err)
+        params["num_buildings"] = num_buildings
+
+    missing_params = [
+        param for param in algorithm.required_params if param not in params
+    ]
+    if missing_params:
+        err = (
+            f"Algorithm {algorithm.value} requires the following parameters: "
+            f"{', '.join(algorithm.required_params)}. "
+            f"Missing: {', '.join(missing_params)}"
+        )
+        log.error(err)
+        raise ValueError(err)
+
+    params.setdefault("include_roads", "TRUE")
+    params.setdefault("include_rivers", "TRUE")
+    params.setdefault("include_railways", "TRUE")
+    params.setdefault("include_aeroways", "TRUE")
+    return params
+
+
+def _resolve_extract_geojson(
+    aoi_featcol: FeatureCollection,
+    osm_extract: Optional[Union[str, FeatureCollection]],
+) -> FeatureCollection:
+    """Resolve the OSM extract payload, fetching it if needed."""
+    extract_geojson = (
+        _fetch_extract_from_raw_data_api(aoi_featcol)
+        if not osm_extract
+        else FMTMSplitter.input_to_geojson(osm_extract)
+    )
+    if extract_geojson:
+        return extract_geojson
+
+    err = "A valid data extract must be provided."
+    log.error(err)
+    raise ValueError(err)
+
+
+def _json_str_to_dict(json_item: Union[str, dict]) -> dict:
+    """Convert a JSON string payload to a dict."""
+    if isinstance(json_item, dict):
+        return json_item
+    if isinstance(json_item, str):
+        try:
+            return json.loads(json_item)
+        except json.JSONDecodeError:
+            msg = f"Error decoding key in GeoJSON: {json_item}"
+            log.error(msg)
+    return {}
+
+
+def _parse_aoi_feature_collection(
+    aoi: Union[str, FeatureCollection],
+) -> FeatureCollection:
+    """Parse the AOI input into a normalized FeatureCollection."""
+    parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
+    return FMTMSplitter.geojson_to_featcol(parsed_aoi)
+
+
+def _parse_optional_geojson_input(
+    input_data: Optional[Union[str, FeatureCollection]],
+) -> Optional[GeoJSON]:
+    """Parse an optional GeoJSON input."""
+    if not input_data:
+        return None
+    return FMTMSplitter.input_to_geojson(input_data)
+
+
+def _parse_feature_split_input(
+    geojson_input: Optional[Union[str, FeatureCollection]],
+    db_table: Optional[str] = None,
+) -> FeatureCollection:
+    """Parse and validate feature-based split input."""
+    if db_table:
+        raise NotImplementedError("Splitting from db features it not implemented yet.")
+    if not geojson_input:
+        err = "Either geojson_input or db_table must be passed."
+        log.error(err)
+        raise ValueError(err)
+
+    input_featcol = FMTMSplitter.geojson_to_featcol(
+        FMTMSplitter.input_to_geojson(geojson_input)
+    )
+    if isinstance(input_featcol, FeatureCollection):
+        return input_featcol
+
+    msg = f"Could not parse geojson data from {geojson_input}"
+    log.error(msg)
+    raise ValueError(msg)
+
+
 class FMTMSplitter:
     """A class to split polygons."""
 
@@ -275,6 +425,204 @@ class FMTMSplitter:
             yield x
             x += step
 
+    def _square_grid_axes(self, meters: int) -> tuple[list[float], list[float]]:
+        """Build the x/y grid axes used for square splitting."""
+        xmin, ymin, xmax, ymax = self.aoi.bounds
+        reference_lat = (ymin + ymax) / 2
+        length_deg, width_deg = self.meters_to_degrees(meters, reference_lat)
+        cols = list(self.frange(xmin, xmax + width_deg, width_deg))
+        rows = list(self.frange(ymin, ymax + length_deg, length_deg))
+        return cols, rows
+
+    def _extract_split_geometries(
+        self,
+        extract_geojson: Optional[Union[dict, FeatureCollection]] = None,
+    ) -> list:
+        """Return shapely geometries from the optional extract."""
+        if not extract_geojson:
+            return []
+        features = (
+            extract_geojson.get("features", extract_geojson)
+            if isinstance(extract_geojson, dict)
+            else extract_geojson.features
+        )
+        return [shape(feature["geometry"]) for feature in features]
+
+    def _square_polygons_for_insert(
+        self,
+        cols: list[float],
+        rows: list[float],
+        extract_geoms: list,
+    ) -> list[tuple[str, str]]:
+        """Generate clipped grid polygons, filtered by extract geometry if present."""
+        polygons = []
+        for x in cols[:-1]:
+            for y in rows[:-1]:
+                grid_polygon = box(
+                    x, y, x + (cols[1] - cols[0]), y + (rows[1] - rows[0])
+                )
+                clipped_polygon = grid_polygon.intersection(self.aoi)
+                if clipped_polygon.is_empty:
+                    continue
+                if extract_geoms and not any(
+                    geom.centroid.within(clipped_polygon) for geom in extract_geoms
+                ):
+                    continue
+                polygons.append((clipped_polygon.wkt, clipped_polygon.wkt))
+        return polygons
+
+    def _insert_square_polygons(
+        self,
+        cur,
+        polygons: list[tuple[str, str]],
+        meters: int,
+    ) -> None:
+        """Insert generated polygons and merge small neighbors."""
+        insert_query = """
+                INSERT INTO temp_polygons (geom, area)
+                SELECT ST_GeomFromText(%s, 4326),
+                ST_Area(ST_GeomFromText(%s, 4326)::geography)
+            """
+        if polygons:
+            cur.executemany(insert_query, polygons)
+
+        area_threshold = 0.35 * (meters**2)
+        cur.execute(
+            f"""
+            DO $$
+            DECLARE
+                small_polygon RECORD;
+                nearest_neighbor RECORD;
+            BEGIN
+            DROP TABLE IF EXISTS small_polygons;
+            CREATE TEMP TABLE small_polygons As
+                SELECT id, geom, area
+                FROM temp_polygons
+                WHERE area < {area_threshold};
+            FOR small_polygon IN SELECT * FROM small_polygons
+            LOOP
+                FOR nearest_neighbor IN
+                SELECT
+                    id,
+                    lp.geom AS large_geom,
+                    ST_LENGTH2D(
+                    ST_INTERSECTION(small_polygon.geom, geom)
+                ) AS shared_bound
+                FROM temp_polygons lp
+                WHERE id NOT IN (SELECT id FROM small_polygons)
+                AND ST_Touches(small_polygon.geom, lp.geom)
+                AND ST_GEOMETRYTYPE(
+                    ST_INTERSECTION(small_polygon.geom, geom)
+                ) != 'ST_Point'
+                ORDER BY shared_bound DESC
+                LIMIT 1
+                LOOP
+                    UPDATE temp_polygons
+                    SET geom = ST_UNION(small_polygon.geom, geom)
+                    WHERE id = nearest_neighbor.id;
+
+                    DELETE FROM temp_polygons WHERE id = small_polygon.id;
+                    EXIT;
+                END LOOP;
+            END LOOP;
+            END $$;
+        """
+        )
+
+    def _fetch_square_split_features(self, cur) -> FeatureCollection:
+        """Fetch the generated square split features from the temp table."""
+        cur.execute(
+            """
+            SELECT
+            JSONB_BUILD_OBJECT(
+                'type', 'FeatureCollection',
+                'features', JSONB_AGG(feature)
+            )
+            FROM(
+                SELECT JSONB_BUILD_OBJECT(
+                    'type', 'Feature',
+                    'properties', JSONB_BUILD_OBJECT('area', (t.area)),
+                    'geometry', ST_ASGEOJSON(t.geom)::json
+                ) AS feature
+                FROM temp_polygons as t
+            ) AS features;
+            """
+        )
+        return cur.fetchone()[0]
+
+    def _validate_split_sql_inputs(
+        self,
+        algorithm: SplittingAlgorithm,
+        params: dict,
+        osm_extract: Optional[Union[dict, FeatureCollection]] = None,
+    ) -> None:
+        """Validate required inputs for SQL-based splitting."""
+        if not osm_extract:
+            msg = (
+                "To use the FMTM splitting algo, an OSM data extract must be passed "
+                "via param `osm_extract` as a geojson dict or FeatureCollection."
+            )
+            log.error(msg)
+            raise ValueError(msg)
+        if not algorithm.sql_path:
+            msg = f"Algorithm {algorithm} does not have an SQL file path"
+            log.error(msg)
+            raise ValueError(msg)
+        missing_params = [
+            param for param in algorithm.required_params if param not in params
+        ]
+        if missing_params:
+            msg = (
+                f"Algorithm {algorithm.value} requires the following parameters: "
+                f"{', '.join(algorithm.required_params)}. "
+                f"Missing: {', '.join(missing_params)}"
+            )
+            log.error(msg)
+            raise ValueError(msg)
+
+    def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
+        """Insert the OSM extract into the temporary split tables."""
+        for feature in osm_extract["features"]:
+            wkb_element = shape(feature["geometry"]).wkb_hex
+            properties = feature.get("properties", {})
+            tags = properties.get("tags", {}) if "tags" in properties else properties
+            tags = _json_str_to_dict(tags).get("tags", _json_str_to_dict(tags))
+            osm_id = properties.get("osm_id")
+            common_args = dict(osm_id=osm_id, geom=wkb_element, tags=tags)
+
+            if tags.get("building") == "yes":
+                insert_geom(cur, "ways_poly", **common_args)
+            elif _is_linear_split_feature(tags):
+                insert_geom(cur, "ways_line", **common_args)
+
+    def _run_split_sql_files(
+        self,
+        splitter_cursor,
+        algorithm: SplittingAlgorithm,
+        params: dict,
+    ) -> list:
+        """Execute the ordered SQL algorithm files and return feature rows."""
+        sql_files = [
+            "common/1-linear-features.sql",
+            "common/2-group-buildings.sql",
+            "common/3-cluster-buildings.sql",
+            algorithm.sql_path,
+            "common/5-alignment.sql",
+            "common/6-extract.sql",
+        ]
+        log.info(f"Running task splitting algorithm parts in order: {sql_files}")
+        for sql_file in sql_files:
+            sql_file_path = (
+                sql_file if isinstance(sql_file, Path) else algorithms_path / sql_file
+            )
+            with open(sql_file_path) as raw_sql:
+                sql_content = raw_sql.read()
+                for param_name, param_value in params.items():
+                    placeholder = f"%({param_name})s"
+                    sql_content = sql_content.replace(placeholder, str(param_value))
+                splitter_cursor.execute(sql_content)
+        return splitter_cursor.fetchall()[0][0]["features"]
+
     def splitBySquare(  # noqa: N802
         self,
         meters: int,
@@ -297,15 +645,7 @@ class FMTMSplitter:
             data (FeatureCollection): A multipolygon of all the task boundaries.
         """
         log.debug("Splitting the AOI by squares")
-
-        xmin, ymin, xmax, ymax = self.aoi.bounds
-
-        reference_lat = (ymin + ymax) / 2
-        length_deg, width_deg = self.meters_to_degrees(meters, reference_lat)
-
-        # Create grid columns and rows based on the AOI bounds
-        cols = list(self.frange(xmin, xmax + width_deg, width_deg))
-        rows = list(self.frange(ymin, ymax + length_deg, length_deg))
+        cols, rows = self._square_grid_axes(meters)
 
         # Get existing db engine, or create new one
         conn = create_connection(db)
@@ -321,108 +661,10 @@ class FMTMSplitter:
                     area DOUBLE PRECISION
                 );
             """)
-
-            extract_geoms = []
-            if extract_geojson:
-                features = (
-                    extract_geojson.get("features", extract_geojson)
-                    if isinstance(extract_geojson, dict)
-                    else extract_geojson.features
-                )
-                extract_geoms = [shape(feature["geometry"]) for feature in features]
-
-            # Generate grid polygons and clip them by AOI
-            polygons = []
-            for x in cols[:-1]:
-                for y in rows[:-1]:
-                    grid_polygon = box(x, y, x + width_deg, y + length_deg)
-                    clipped_polygon = grid_polygon.intersection(self.aoi)
-
-                    if clipped_polygon.is_empty:
-                        continue
-
-                    # Check intersection with extract geometries if available
-                    if extract_geoms:
-                        if any(
-                            geom.centroid.within(clipped_polygon)
-                            for geom in extract_geoms
-                        ):
-                            polygons.append((clipped_polygon.wkt, clipped_polygon.wkt))
-
-                    else:
-                        polygons.append((clipped_polygon.wkt, clipped_polygon.wkt))
-
-            insert_query = """
-                    INSERT INTO temp_polygons (geom, area)
-                    SELECT ST_GeomFromText(%s, 4326),
-                    ST_Area(ST_GeomFromText(%s, 4326)::geography)
-                """
-
-            if polygons:
-                cur.executemany(insert_query, polygons)
-
-            area_threshold = 0.35 * (meters**2)
-
-            cur.execute(
-                f"""
-                DO $$
-                DECLARE
-                    small_polygon RECORD;
-                    nearest_neighbor RECORD;
-                BEGIN
-                DROP TABLE IF EXISTS small_polygons;
-                CREATE TEMP TABLE small_polygons As
-                    SELECT id, geom, area
-                    FROM temp_polygons
-                    WHERE area < {area_threshold};
-                FOR small_polygon IN SELECT * FROM small_polygons
-                LOOP
-                    FOR nearest_neighbor IN
-                    SELECT
-                        id,
-                        lp.geom AS large_geom,
-                        ST_LENGTH2D(
-                        ST_INTERSECTION(small_polygon.geom, geom)
-                    ) AS shared_bound
-                    FROM temp_polygons lp
-                    WHERE id NOT IN (SELECT id FROM small_polygons)
-                    AND ST_Touches(small_polygon.geom, lp.geom)
-                    AND ST_GEOMETRYTYPE(
-                        ST_INTERSECTION(small_polygon.geom, geom)
-                    ) != 'ST_Point'
-                    ORDER BY shared_bound DESC
-                    LIMIT 1
-                    LOOP
-                        UPDATE temp_polygons
-                        SET geom = ST_UNION(small_polygon.geom, geom)
-                        WHERE id = nearest_neighbor.id;
-
-                        DELETE FROM temp_polygons WHERE id = small_polygon.id;
-                        EXIT;
-                    END LOOP;
-                END LOOP;
-                END $$;
-            """
-            )
-
-            cur.execute(
-                """
-                SELECT
-                JSONB_BUILD_OBJECT(
-                    'type', 'FeatureCollection',
-                    'features', JSONB_AGG(feature)
-                )
-                FROM(
-                    SELECT JSONB_BUILD_OBJECT(
-                        'type', 'Feature',
-                        'properties', JSONB_BUILD_OBJECT('area', (t.area)),
-                        'geometry', ST_ASGEOJSON(t.geom)::json
-                    ) AS feature
-                    FROM temp_polygons as t
-                ) AS features;
-                """
-            )
-            self.split_features = cur.fetchone()[0]
+            extract_geoms = self._extract_split_geometries(extract_geojson)
+            polygons = self._square_polygons_for_insert(cols, rows, extract_geoms)
+            self._insert_square_polygons(cur, polygons, meters)
+            self.split_features = self._fetch_square_split_features(cur)
         return self.split_features
 
     def splitBySQL(  # noqa: N802
@@ -449,37 +691,8 @@ class FMTMSplitter:
         Returns:
             data (FeatureCollection): A multipolygon of all the task boundaries.
         """
-        # Validation
-        # FIXME this wasn't made a required param to maintain backward compatibility,
-        # but should probably be updated
-        if not osm_extract:
-            msg = (
-                "To use the FMTM splitting algo, an OSM data extract must be passed "
-                "via param `osm_extract` as a geojson dict or FeatureCollection."
-            )
-            log.error(msg)
-            raise ValueError(msg)
-
-        # Validate that algorithm SQL file exists
-        # Get SQL file path from algorithm
-        if not algorithm.sql_path:
-            msg = f"Algorithm {algorithm} does not have an SQL file path"
-            log.error(msg)
-            raise ValueError(msg)
-
-        # Validate required parameters for the algorithm
         params = algorithm_params or {}
-        missing_params = [
-            param for param in algorithm.required_params if param not in params
-        ]
-        if missing_params:
-            msg = (
-                f"Algorithm {algorithm.value} requires the following parameters: "
-                f"{', '.join(algorithm.required_params)}. "
-                f"Missing: {', '.join(missing_params)}"
-            )
-            log.error(msg)
-            raise ValueError(msg)
+        self._validate_split_sql_inputs(algorithm, params, osm_extract)
 
         # Get existing db engine, or create new one
         conn = create_connection(db)
@@ -491,49 +704,10 @@ class FMTMSplitter:
         # Add aoi to project_aoi table
         aoi_to_postgis(conn, self.aoi)
 
-        def json_str_to_dict(json_item: Union[str, dict]) -> dict:
-            """Convert a JSON string to dict."""
-            if isinstance(json_item, dict):
-                return json_item
-            if isinstance(json_item, str):
-                try:
-                    return json.loads(json_item)
-                except json.JSONDecodeError:
-                    msg = f"Error decoding key in GeoJSON: {json_item}"
-                    log.error(msg)
-                    # Set tags to empty, skip feature
-                    return {}
-
         # Insert data extract into db, using same cursor
         log.debug("Inserting data extract into db")
         cur = conn.cursor()
-        for feature in osm_extract["features"]:
-            # NOTE must handle format generated from FMTMSplitter __init__
-            wkb_element = shape(feature["geometry"]).wkb_hex
-            properties = feature.get("properties", {})
-            if "tags" in properties.keys():
-                # Sometimes tags are placed under tags key
-                tags = properties.get("tags", {})
-            else:
-                # Sometimes tags are directly in properties
-                tags = properties
-
-            # Handle nested 'tags' key if present
-            tags = json_str_to_dict(tags).get("tags", json_str_to_dict(tags))
-            osm_id = properties.get("osm_id")
-
-            # Common attributes for db tables
-            common_args = dict(osm_id=osm_id, geom=wkb_element, tags=tags)
-
-            # Insert building polygons
-            # FIXME suggestion by @amitdkhan-pg
-            # if "building" in tags:
-            if tags.get("building") == "yes":
-                insert_geom(cur, "ways_poly", **common_args)
-
-            # Insert line-like split features (including non-traversable barriers).
-            elif _is_linear_split_feature(tags):
-                insert_geom(cur, "ways_line", **common_args)
+        self._insert_split_sql_extract(cur, osm_extract)
 
         # Use raw sql for view generation & remainder of script
         log.debug("Creating db view with intersecting polylines")
@@ -551,36 +725,7 @@ class FMTMSplitter:
 
         splitter_cursor = conn.cursor()
         log.debug("Collecting task splitting algorithm")
-
-        sql_files = [
-            "common/1-linear-features.sql",
-            "common/2-group-buildings.sql",
-            "common/3-cluster-buildings.sql",
-            algorithm.sql_path,
-            "common/5-alignment.sql",
-            "common/6-extract.sql",
-        ]
-
-        log.info(f"Running task splitting algorithm parts in order: {sql_files}")
-
-        for sql_file in sql_files:
-            # Handle both Path objects and string paths
-            if isinstance(sql_file, Path):
-                sql_file_path = sql_file
-            else:
-                sql_file_path = algorithms_path / sql_file
-
-            with open(sql_file_path) as raw_sql:
-                query = raw_sql.read()
-                # Replace all parameter placeholders in the SQL
-                # Format: %(param_name)s
-                sql_content = query
-                for param_name, param_value in params.items():
-                    placeholder = f"%({param_name})s"
-                    sql_content = sql_content.replace(placeholder, str(param_value))
-                splitter_cursor.execute(sql_content)
-
-        features = splitter_cursor.fetchall()[0][0]["features"]
+        features = self._run_split_sql_files(splitter_cursor, algorithm, params)
         if features:
             log.info(f"Query returned {len(features)} features")
         else:
@@ -608,31 +753,30 @@ class FMTMSplitter:
             data (FeatureCollection): A multipolygon of all the task boundaries.
         """
         log.debug("Polygonising the FeatureCollection features")
-        # Extract all geometries from the input features
-        geometries = []
-        for feature in features["features"]:
-            geom = feature["geometry"]
-            if geom["type"] == "Polygon":
-                geometries.append(shape(geom))
-            elif geom["type"] == "LineString":
-                geometries.append(shape(geom))
-            else:
-                log.warning(f"Ignoring unsupported geometry type: {geom['type']}")
-
-        # Create a single MultiPolygon from all the polygons and linestrings
+        geometries = self._feature_split_geometries(features)
         multi_polygon = unary_union(geometries)
-
-        # Clip the multi_polygon by the AOI boundary
         clipped_multi_polygon = multi_polygon.intersection(self.aoi)
-
-        polygon_features = [
-            Feature(geometry=polygon) for polygon in list(clipped_multi_polygon.geoms)
-        ]
-
-        # Convert the Polygon Features into a FeatureCollection
+        polygon_features = self._polygon_features_from_clipped(clipped_multi_polygon)
         self.split_features = FeatureCollection(features=polygon_features)
 
         return self.split_features
+
+    def _feature_split_geometries(self, features: FeatureCollection) -> list:
+        """Extract supported geometries for feature-based splitting."""
+        geometries = []
+        for feature in features["features"]:
+            geom = feature["geometry"]
+            if geom["type"] in {"Polygon", "LineString"}:
+                geometries.append(shape(geom))
+                continue
+            log.warning(f"Ignoring unsupported geometry type: {geom['type']}")
+        return geometries
+
+    def _polygon_features_from_clipped(self, clipped_multi_polygon) -> list[Feature]:
+        """Convert clipped geometry collections into GeoJSON features."""
+        return [
+            Feature(geometry=polygon) for polygon in list(clipped_multi_polygon.geoms)
+        ]
 
     def outputGeojson(  # noqa: N802
         self,
@@ -678,39 +822,28 @@ def split_by_square(
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
     """
-    # Parse AOI
-    parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
-    aoi_featcol = FMTMSplitter.geojson_to_featcol(parsed_aoi)
-    extract_geojson = None
-
-    if osm_extract:
-        extract_geojson = FMTMSplitter.input_to_geojson(osm_extract)
+    aoi_featcol = _parse_aoi_feature_collection(aoi)
+    extract_geojson = _parse_optional_geojson_input(osm_extract)
 
     # Handle multiple geometries passed
     if len(feat_array := aoi_featcol.get("features", [])) > 1:
-        features = []
-        for index, feat in enumerate(feat_array):
-            featcol = split_by_square(
+        return _merge_recursive_split_features(
+            feat_array,
+            lambda index, feat: split_by_square(
                 FeatureCollection(features=[feat]),
                 db,
                 meters,
                 None,
-                f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
-            )
-            if feats := featcol.get("features", []):
-                features += feats
-        # Parse FeatCols into single FeatCol
-        split_features = FeatureCollection(features)
-    else:
-        splitter = FMTMSplitter(aoi_featcol)
-        split_features = splitter.splitBySquare(meters, db, extract_geojson)
-        if not split_features:
-            msg = "Failed to generate split features."
-            log.error(msg)
-            raise ValueError(msg)
-        if outfile:
-            splitter.outputGeojson(outfile)
+                _outfile_variant(outfile, index),
+            ),
+        )
 
+    splitter = FMTMSplitter(aoi_featcol)
+    split_features = _require_split_output(
+        splitter.splitBySquare(meters, db, extract_geojson)
+    )
+    if outfile:
+        splitter.outputGeojson(outfile)
     return split_features
 
 
@@ -764,97 +897,41 @@ def split_by_sql(
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
     """
-    # Default algorithm if not provided
-    if algorithm is None:
-        algorithm = SplittingAlgorithm.AVG_BUILDING_SKELETON
-
-    # Validate that algorithm has sql_path defined
-    if not algorithm.sql_path:
-        err = f"SplittingAlgorithm {algorithm} must have an sql_path defined."
-        log.error(err)
-        raise ValueError(err)
-
-    # Prepare algorithm parameters
-    # If algorithm_params is provided, use it; otherwise construct from
-    # num_buildings for backward compatibility
-    if algorithm_params is None:
-        if not num_buildings:
-            err = (
-                f"Algorithm {algorithm.value} requires the following parameters: "
-                f"{', '.join(algorithm.required_params)}. "
-                f"Either provide algorithm_params dict or num_buildings (deprecated)."
-            )
-            log.error(err)
-            raise ValueError(err)
-        algorithm_params = {"num_buildings": num_buildings}
-
-    # Validate required parameters for the algorithm
-    missing_params = [
-        param for param in algorithm.required_params if param not in algorithm_params
-    ]
-    if missing_params:
-        err = (
-            f"Algorithm {algorithm.value} requires the following parameters: "
-            f"{', '.join(algorithm.required_params)}. "
-            f"Missing: {', '.join(missing_params)}"
-        )
-        log.error(err)
-        raise ValueError(err)
-
-    # Default to including all linear-feature types when not explicitly configured.
-    algorithm_params.setdefault("include_roads", "TRUE")
-    algorithm_params.setdefault("include_rivers", "TRUE")
-    algorithm_params.setdefault("include_railways", "TRUE")
-    algorithm_params.setdefault("include_aeroways", "TRUE")
-
-    # Parse AOI
-    parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
-    aoi_featcol = FMTMSplitter.geojson_to_featcol(parsed_aoi)
-
-    # Extracts and parse extract geojson
-    if not osm_extract:
-        extract_geojson = _fetch_extract_from_raw_data_api(aoi_featcol)
-
-    else:
-        extract_geojson = FMTMSplitter.input_to_geojson(osm_extract)
-
-    if not extract_geojson:
-        err = "A valid data extract must be provided."
-        log.error(err)
-        raise ValueError(err)
+    algorithm = algorithm or SplittingAlgorithm.AVG_BUILDING_SKELETON
+    _validate_algorithm_selection(algorithm)
+    algorithm_params = _resolve_algorithm_params(
+        algorithm,
+        num_buildings,
+        algorithm_params,
+    )
+    aoi_featcol = _parse_aoi_feature_collection(aoi)
+    extract_geojson = _resolve_extract_geojson(aoi_featcol, osm_extract)
 
     # Handle multiple geometries passed
     if len(feat_array := aoi_featcol.get("features", [])) > 1:
-        features = []
-        for index, feat in enumerate(feat_array):
-            featcol = split_by_sql(
+        return _merge_recursive_split_features(
+            feat_array,
+            lambda index, feat: split_by_sql(
                 FeatureCollection(features=[feat]),
                 db,
                 num_buildings=algorithm_params.get("num_buildings")
                 if "num_buildings" in algorithm_params
                 else None,
-                outfile=f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
+                outfile=_outfile_variant(outfile, index),
                 osm_extract=osm_extract,
                 algorithm=algorithm,
                 algorithm_params=algorithm_params,
-            )
-            feats = featcol.get("features", [])
-            if feats:
-                features += feats
-        # Parse FeatCols into single FeatCol
-        split_features = FeatureCollection(features)
-    else:
-        splitter = FMTMSplitter(aoi_featcol)
-        split_features = splitter.splitBySQL(
+            ),
+        )
+
+    splitter = FMTMSplitter(aoi_featcol)
+    split_features = _require_split_output(
+        splitter.splitBySQL(
             db, algorithm, algorithm_params, osm_extract=extract_geojson
         )
-        if not split_features:
-            msg = "Failed to generate split features."
-            log.error(msg)
-            raise ValueError(msg)
-        if outfile:
-            splitter.outputGeojson(outfile)
-
+    )
+    if outfile:
+        splitter.outputGeojson(outfile)
     return split_features
 
 
@@ -883,62 +960,25 @@ def split_by_features(
         features (FeatureCollection): A multipolygon of all the task boundaries.
 
     """
-    if not geojson_input and not db_table:
-        err = "Either geojson_input or db_table must be passed."
-        log.error(err)
-        raise ValueError(err)
-
-    # Parse AOI
-    parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
-    aoi_featcol = FMTMSplitter.geojson_to_featcol(parsed_aoi)
-
-    # Features from database
-    if db_table:
-        # data = f"PG:{db_table}"
-        # TODO get input_features from db
-        # input_features =
-        # featcol = FMTMSplitter.geojson_to_featcol(input_features)
-        raise NotImplementedError("Splitting from db features it not implemented yet.")
-
-    # Features from geojson
-    if geojson_input:
-        input_parsed = FMTMSplitter.input_to_geojson(geojson_input)
-        input_featcol = FMTMSplitter.geojson_to_featcol(input_parsed)
-
-    if not isinstance(input_featcol, FeatureCollection):
-        msg = (
-            f"Could not parse geojson data from {geojson_input}"
-            if geojson_input
-            else f"Could not parse database data from {db_table}"
-        )
-        log.error(msg)
-        raise ValueError(msg)
+    aoi_featcol = _parse_aoi_feature_collection(aoi)
+    input_featcol = _parse_feature_split_input(geojson_input, db_table)
 
     # Handle multiple geometries passed
     if len(feat_array := aoi_featcol.get("features", [])) > 1:
-        features = []
-        for index, feat in enumerate(feat_array):
-            featcol = split_by_features(
+        return _merge_recursive_split_features(
+            feat_array,
+            lambda index, feat: split_by_features(
                 FeatureCollection(features=[feat]),
                 db_table,
                 input_featcol,
-                f"{Path(outfile).stem}_{index}.geojson)" if outfile else None,
-            )
-            feats = featcol.get("features", [])
-            if feats:
-                features += feats
-        # Parse FeatCols into single FeatCol
-        split_features = FeatureCollection(features)
-    else:
-        splitter = FMTMSplitter(aoi_featcol)
-        split_features = splitter.splitByFeature(input_featcol)
-        if not split_features:
-            msg = "Failed to generate split features."
-            log.error(msg)
-            raise ValueError(msg)
-        if outfile:
-            splitter.outputGeojson(outfile)
+                _outfile_variant(outfile, index),
+            ),
+        )
 
+    splitter = FMTMSplitter(aoi_featcol)
+    split_features = _require_split_output(splitter.splitByFeature(input_featcol))
+    if outfile:
+        splitter.outputGeojson(outfile)
     return split_features
 
 

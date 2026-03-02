@@ -208,7 +208,6 @@ async def split_geojson_by_task_areas(
         dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
     """
     try:
-        # If no task boundaries provided, return empty dict
         if not task_boundaries or not task_boundaries.get("features"):
             log.warning(
                 "No task boundaries found for project "
@@ -216,117 +215,154 @@ async def split_geojson_by_task_areas(
             )
             return {}
 
-        features = featcol["features"]
-        use_st_intersects = geom_type == "POLYLINE"
-
-        feature_ids = []
-        feature_properties = []
-        feature_geometries = []
-        for f in features:
-            feature_ids.append(str(f["properties"].get("osm_id")))
-            feature_properties.append(Json(f["properties"]))
-            feature_geometries.append(json.dumps(f["geometry"]))
-
-        # Prepare task boundaries for spatial join
-        task_boundary_features = task_boundaries["features"]
-        task_geometries = []
-        task_indices = []
-        for idx, task_feature in enumerate(task_boundary_features):
-            if task_feature.get("geometry"):
-                task_geometries.append(json.dumps(task_feature["geometry"]))
-                task_indices.append(idx + 1)  # 1-based task index
-
+        feature_ids, feature_properties, feature_geometries = _split_feature_arrays(
+            featcol["features"]
+        )
+        task_indices, task_geometries = _split_task_boundary_arrays(
+            task_boundaries["features"],
+        )
         if not task_geometries:
             log.warning(
                 f"No valid task boundary geometries found for project {project_id}"
             )
             return {}
 
-        # Choose spatial join logic based on geometry type
-        spatial_join_condition = (
-            "ST_Intersects(f.geom, t.geom)"
-            if use_st_intersects
-            else "ST_Within(ST_Centroid(f.geom), t.geom)"
+        records = await _split_task_feature_records(
+            db,
+            feature_ids,
+            feature_properties,
+            feature_geometries,
+            task_indices,
+            task_geometries,
+            project_id,
+            geom_type == "POLYLINE",
         )
-
-        async with db.cursor(row_factory=dict_row) as cur:
-            query = sql.SQL(
-                """
-                WITH feature_data AS (
-                    SELECT DISTINCT ON (geom)
-                        unnest(%s::TEXT[]) AS id,
-                        unnest(%s::JSONB[]) AS properties,
-                        ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
-                ),
-                task_boundaries AS (
-                    SELECT
-                        unnest(%s::INTEGER[]) AS task_index,
-                        ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
-                ),
-                task_features AS (
-                    SELECT
-                        t.task_index AS task_id,
-                        jsonb_build_object(
-                            'type', 'Feature',
-                            'id', f.id,
-                            'geometry', ST_AsGeoJSON(f.geom)::jsonb,
-                            'properties', jsonb_set(
-                                jsonb_set(
-                                    f.properties,
-                                    '{{task_id}}',
-                                    to_jsonb(t.task_index)
-                                ),
-                                '{{project_id}}', to_jsonb(%s)
-                            )
-                        ) AS feature
-                    FROM task_boundaries t
-                    JOIN feature_data f
-                    ON {spatial_join_condition}
-                )
-                SELECT
-                    task_id,
-                    jsonb_agg(feature) AS features
-                FROM task_features
-                GROUP BY task_id;
-                """
-            ).format(spatial_join_condition=sql.SQL(spatial_join_condition))
-            await cur.execute(
-                query,
-                (
-                    feature_ids,
-                    feature_properties,
-                    feature_geometries,
-                    task_indices,
-                    task_geometries,
-                    project_id,
-                ),
-            )
-
-            result_dict = {
-                rec["task_id"]: geojson.FeatureCollection(features=rec["features"])
-                for rec in await cur.fetchall()
-            }
-            if not result_dict:
-                msg = f"Failed to split project ({project_id}) geojson by task areas."
-                log.exception(msg)
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=msg,
-                )
-
-            if len(result_dict) < 1:
-                msg = (
-                    f"Attempted splitting project ({project_id}) geojson by task areas,"
-                    "but no data was returned."
-                )
-                log.warning(msg)
-                return None
-            return result_dict
-
+        return _split_records_to_feature_collections(records, project_id)
     except ProgrammingError as e:
         log.error(e)
         log.error("Attempted geojson task splitting failed")
         return None
+
+
+def _split_feature_arrays(
+    features: list[dict],
+) -> tuple[list[str], list[Json], list[str]]:
+    """Convert source features into array payloads for SQL unnest."""
+    feature_ids = []
+    feature_properties = []
+    feature_geometries = []
+    for feature in features:
+        feature_ids.append(str(feature["properties"].get("osm_id")))
+        feature_properties.append(Json(feature["properties"]))
+        feature_geometries.append(json.dumps(feature["geometry"]))
+    return feature_ids, feature_properties, feature_geometries
+
+
+def _split_task_boundary_arrays(
+    task_boundary_features: list[dict],
+) -> tuple[list[int], list[str]]:
+    """Convert task boundaries into array payloads for SQL unnest."""
+    task_indices = []
+    task_geometries = []
+    for idx, task_feature in enumerate(task_boundary_features, start=1):
+        if not task_feature.get("geometry"):
+            continue
+        task_geometries.append(json.dumps(task_feature["geometry"]))
+        task_indices.append(idx)
+    return task_indices, task_geometries
+
+
+def _split_spatial_join_condition(use_st_intersects: bool) -> str:
+    """Return the spatial join SQL predicate for the feature geometry type."""
+    if use_st_intersects:
+        return "ST_Intersects(f.geom, t.geom)"
+    return "ST_Within(ST_Centroid(f.geom), t.geom)"
+
+
+async def _split_task_feature_records(
+    db: AsyncConnection,
+    feature_ids: list[str],
+    feature_properties: list[Json],
+    feature_geometries: list[str],
+    task_indices: list[int],
+    task_geometries: list[str],
+    project_id: int,
+    use_st_intersects: bool,
+) -> list[dict]:
+    """Execute the SQL split query and return raw task-feature records."""
+    spatial_join_condition = _split_spatial_join_condition(use_st_intersects)
+    async with db.cursor(row_factory=dict_row) as cur:
+        query = sql.SQL(
+            """
+            WITH feature_data AS (
+                SELECT DISTINCT ON (geom)
+                    unnest(%s::TEXT[]) AS id,
+                    unnest(%s::JSONB[]) AS properties,
+                    ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
+            ),
+            task_boundaries AS (
+                SELECT
+                    unnest(%s::INTEGER[]) AS task_index,
+                    ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::TEXT[])), 4326) AS geom
+            ),
+            task_features AS (
+                SELECT
+                    t.task_index AS task_id,
+                    jsonb_build_object(
+                        'type', 'Feature',
+                        'id', f.id,
+                        'geometry', ST_AsGeoJSON(f.geom)::jsonb,
+                        'properties', jsonb_set(
+                            jsonb_set(
+                                f.properties,
+                                '{{task_id}}',
+                                to_jsonb(t.task_index)
+                            ),
+                            '{{project_id}}', to_jsonb(%s)
+                        )
+                    ) AS feature
+                FROM task_boundaries t
+                JOIN feature_data f
+                ON {spatial_join_condition}
+            )
+            SELECT
+                task_id,
+                jsonb_agg(feature) AS features
+            FROM task_features
+            GROUP BY task_id;
+            """
+        ).format(spatial_join_condition=sql.SQL(spatial_join_condition))
+        await cur.execute(
+            query,
+            (
+                feature_ids,
+                feature_properties,
+                feature_geometries,
+                task_indices,
+                task_geometries,
+                project_id,
+            ),
+        )
+        return await cur.fetchall()
+
+
+def _split_records_to_feature_collections(
+    records: list[dict],
+    project_id: int,
+) -> Optional[dict[int, geojson.FeatureCollection]]:
+    """Convert raw SQL rows into task-id keyed feature collections."""
+    result_dict = {
+        rec["task_id"]: geojson.FeatureCollection(features=rec["features"])
+        for rec in records
+    }
+    if not result_dict:
+        msg = f"Failed to split project ({project_id}) geojson by task areas."
+        log.exception(msg)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=msg,
+        )
+    return result_dict
 
 
 def add_required_geojson_properties(

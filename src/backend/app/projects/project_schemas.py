@@ -29,7 +29,7 @@ from geojson_pydantic import (
 )
 from litestar.datastructures import UploadFile
 from litestar.dto import DataclassDTO, DTOConfig
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentral
@@ -112,7 +112,7 @@ class StubProjectIn(BaseModel):
         Field(exclude=True),
     ] = None
 
-    project_name: str
+    project_name: str = Field(validation_alias=AliasChoices("project_name", "name"))
     field_mapping_app: FieldMappingApp
     description: Optional[str] = None
     merge: bool = True
@@ -234,7 +234,10 @@ class ProjectInBase(StubProjectIn):
         Optional[list[str] | str],
         Field(validate_default=True),
     ] = None
-    project_name: Optional[str] = None
+    project_name: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("project_name", "name"),
+    )
     field_mapping_app: Optional[FieldMappingApp] = None
 
     # Token used for ODK appuser; encrypted at rest
@@ -299,7 +302,10 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     field_mapping_app: Annotated[Optional[FieldMappingApp], Field(exclude=True)] = None
 
     # Make required fields from StubProjectIn optional for updates
-    project_name: Optional[str] = None
+    project_name: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("project_name", "name"),
+    )
     # Override dict type to parse as Polygon
     outline: Optional[Polygon] = None
 

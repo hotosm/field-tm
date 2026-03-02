@@ -68,30 +68,27 @@ def clean_tags_for_qgis(
 
     for feature in geojson_data.get("features", []):
         properties = feature.get("properties", {})
-        tags = properties.get("tags")
-
-        if tags:
-            if isinstance(tags, str) and tags.startswith("{") and tags.endswith("}"):
-                try:
-                    tags_dict = json.loads(tags)
-                    if isinstance(tags_dict, dict):
-                        # Convert to "key=value;key2=value2" format
-                        tags_str = ";".join([f"{k}={v}" for k, v in tags_dict.items()])
-                        properties["tags"] = tags_str
-                    else:
-                        # If it's not a dict, keep as string
-                        properties["tags"] = str(tags)
-                except (json.JSONDecodeError, TypeError):
-                    # If JSON parsing fails, keep as string
-                    properties["tags"] = str(tags)
-            else:
-                properties["tags"] = str(tags) if tags else ""
-        else:
-            properties["tags"] = ""
-
+        properties["tags"] = _qgis_safe_tags_value(properties.get("tags"))
         feature["properties"] = properties
 
     return geojson_data
+
+
+def _qgis_safe_tags_value(tags) -> str:
+    """Normalize the `tags` property to a QGIS-safe string."""
+    if not tags:
+        return ""
+    if not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
+        return str(tags)
+
+    try:
+        tags_dict = json.loads(tags)
+    except (json.JSONDecodeError, TypeError):
+        return str(tags)
+
+    if not isinstance(tags_dict, dict):
+        return str(tags)
+    return ";".join(f"{k}={v}" for k, v in tags_dict.items())
 
 
 async def create_qfield_project(  # noqa: PLR0915

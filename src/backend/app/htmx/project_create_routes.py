@@ -76,7 +76,27 @@ def _first_form_value(value: object) -> str:
     return str(value or "").strip()
 
 
-def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, PLR0912
+def _coerce_single_form_value(value: object) -> object:
+    """Unwrap list/tuple form values to a single payload item."""
+    while isinstance(value, (list, tuple)):
+        if not value:
+            return {}
+        value = next((item for item in value if item not in (None, "")), value[0])
+    return value
+
+
+def _parse_outline_json_string(value_str: str) -> object | None:
+    """Parse a string outline payload via JSON first, then Python literal syntax."""
+    try:
+        return json.loads(value_str)
+    except json.JSONDecodeError:
+        try:
+            return ast.literal_eval(value_str)
+        except (SyntaxError, ValueError):
+            return None
+
+
+def _parse_outline_payload(raw_value: object) -> dict:
     """Parse and normalize a GeoJSON outline payload from form data.
 
     Required for handling str, bytes, list wrapped values etc --> geojson.
@@ -84,11 +104,7 @@ def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, P
     if isinstance(raw_value, dict):
         return raw_value
 
-    value: object = raw_value
-    while isinstance(value, (list, tuple)):
-        if not value:
-            return {}
-        value = next((item for item in value if item not in (None, "")), value[0])
+    value: object = _coerce_single_form_value(raw_value)
 
     if isinstance(value, dict):
         return value
@@ -101,15 +117,7 @@ def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, P
         value_str = value.strip()
         if not value_str:
             return {}
-
-        parsed: object | None = None
-        try:
-            parsed = json.loads(value_str)
-        except json.JSONDecodeError:
-            try:
-                parsed = ast.literal_eval(value_str)
-            except (SyntaxError, ValueError):
-                parsed = None
+        parsed = _parse_outline_json_string(value_str)
     else:
         try:
             parsed = json.loads(str(value))
@@ -125,6 +133,86 @@ def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, P
     raise ValueError(_OUTLINE_JSON_ERROR)
 
 
+def _normalize_field_mapping_app(value: object) -> str:
+    """Normalize field-mapping app form values to canonical enum values."""
+    if isinstance(value, FieldMappingApp):
+        return value.value
+    value_str = str(value or "").strip()
+    if not value_str:
+        return ""
+    if "." in value_str:
+        value_str = value_str.split(".")[-1]
+    normalized = value_str.upper()
+    if normalized == "QFIELD":
+        return FieldMappingApp.QFIELD.value
+    if normalized == "ODK":
+        return FieldMappingApp.ODK.value
+    return value_str
+
+
+def _project_form_error(message: str) -> str:
+    """Build the standard project-create form error block."""
+    return (
+        '<div id="form-error"'
+        ' style="margin-bottom: 16px;'
+        ' display: block;">'
+        '<wa-callout variant="danger">'
+        '<span id="form-error-message">'
+        f"{message}"
+        "</span></wa-callout></div>"
+    )
+
+
+def _parse_project_create_form(data: dict) -> tuple[str, str, str, list[str], dict]:
+    """Normalize the HTMX project-create form payload."""
+    project_name = _first_form_value(data.get("project_name", ""))
+    description = _first_form_value(data.get("description", ""))
+    field_mapping_app = _normalize_field_mapping_app(
+        _first_form_value(data.get("field_mapping_app", ""))
+    )
+    hashtags_str = _first_form_value(data.get("hashtags", ""))
+    outline = _parse_outline_payload(data.get("outline", ""))
+    hashtags = [tag.strip() for tag in hashtags_str.split(",") if tag.strip()]
+    return project_name, description, field_mapping_app, hashtags, outline
+
+
+def _to_bool_form_value(value: object, default: bool = False) -> bool:
+    """Normalize string/bool form values."""
+    if value in ("", None):
+        return default
+    if isinstance(value, str):
+        return value.lower() == "true"
+    return bool(value)
+
+
+async def _resolve_uploaded_xlsform_bytes(
+    data: XLSFormUploadData,
+    db: AsyncConnection,
+) -> tuple[BytesIO | None, Response | None]:
+    """Load XLSForm bytes from a chosen template or uploaded file."""
+    template_form_id_str = str(data.template_form_id) if data.template_form_id else ""
+    if template_form_id_str:
+        template_bytes = await _get_template_xlsform_bytes(
+            int(template_form_id_str), db
+        )
+        if not template_bytes:
+            return None, Response(
+                content=_callout("danger", "Failed to load template form."),
+                media_type="text/html",
+                status_code=404,
+            )
+        return BytesIO(template_bytes), None
+
+    if not data.xlsform:
+        return None, Response(
+            content=_callout("danger", "Please select a form or upload a file."),
+            media_type="text/html",
+            status_code=400,
+        )
+
+    return await _validate_xlsform_extension(data.xlsform), None
+
+
 @get(
     path="/new",
     dependencies={"db": Provide(db_conn)},
@@ -132,6 +220,16 @@ def _parse_outline_payload(raw_value: object) -> dict:  # noqa: C901, PLR0911, P
 async def new_project(request: HTMXRequest, db: AsyncConnection) -> Template:
     """Render the new project creation form."""
     return HTMXTemplate(template_name="new_project.html")
+
+
+def _template_form_type_from_title(form_title: str | None) -> XLSFormType | None:
+    """Resolve a template title to an XLSFormType enum member."""
+    if not form_title:
+        return None
+    return next(
+        (xls_type for xls_type in XLSFormType if xls_type.value == form_title),
+        None,
+    )
 
 
 async def _get_template_xlsform_bytes(
@@ -160,25 +258,17 @@ async def _get_template_xlsform_bytes(
     if result.get("xls"):
         return result["xls"]
 
-    # If not in database, try to get from osm-fieldwork by title
-    form_title = result.get("title")
-    if form_title:
-        try:
-            # Map title to XLSFormType enum value
-            form_type = None
-            for xls_type in XLSFormType:
-                if xls_type.value == form_title:
-                    form_type = xls_type
-                    break
+    form_type = _template_form_type_from_title(result.get("title"))
+    if not form_type:
+        return None
 
-            if form_type:
-                form_filename = form_type.name
-                form_path = f"{xlsforms_path}/{form_filename}.yaml"
-                xlsx_bytes = convert_to_xlsform(str(form_path))
-                if xlsx_bytes:
-                    return xlsx_bytes
-        except Exception as e:
-            log.error(f"Error converting YAML to XLSForm: {e}", exc_info=True)
+    try:
+        form_path = f"{xlsforms_path}/{form_type.name}.yaml"
+        xlsx_bytes = convert_to_xlsform(str(form_path))
+        if xlsx_bytes:
+            return xlsx_bytes
+    except Exception as e:
+        log.error(f"Error converting YAML to XLSForm: {e}", exc_info=True)
 
     return None
 
@@ -219,7 +309,7 @@ async def get_template_xlsform(
         "auth_user": Provide(login_required),
     },
 )
-async def create_project_htmx(  # noqa: C901
+async def create_project_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     auth_user: AuthUser,
@@ -227,51 +317,16 @@ async def create_project_htmx(  # noqa: C901
 ) -> Response:
     """Create a project via HTMX form submission."""
     try:
-
-        def _normalize_field_mapping_app(value: object) -> str:
-            if isinstance(value, FieldMappingApp):
-                return value.value
-            value_str = str(value or "").strip()
-            if not value_str:
-                return ""
-            if "." in value_str:
-                value_str = value_str.split(".")[-1]
-            normalized = value_str.upper()
-            if normalized == "QFIELD":
-                return FieldMappingApp.QFIELD.value
-            if normalized == "ODK":
-                return FieldMappingApp.ODK.value
-            return value_str
-
-        project_name = _first_form_value(data.get("project_name", ""))
-        description = _first_form_value(data.get("description", ""))
-        field_mapping_app = _normalize_field_mapping_app(
-            _first_form_value(data.get("field_mapping_app", ""))
-        )
-        hashtags_str = _first_form_value(data.get("hashtags", ""))
-
         try:
-            outline = _parse_outline_payload(data.get("outline", ""))
+            project_name, description, field_mapping_app, hashtags, outline = (
+                _parse_project_create_form(data)
+            )
         except ValueError:
             return Response(
-                content=(
-                    '<div id="form-error"'
-                    ' style="margin-bottom: 16px;'
-                    ' display: block;">'
-                    '<wa-callout variant="danger">'
-                    '<span id="form-error-message">'
-                    f"{_OUTLINE_JSON_ERROR}"
-                    "</span></wa-callout></div>"
-                ),
+                content=_project_form_error(_OUTLINE_JSON_ERROR),
                 media_type="text/html",
                 status_code=400,
             )
-
-        hashtags = (
-            [tag.strip() for tag in hashtags_str.split(",") if tag.strip()]
-            if hashtags_str
-            else []
-        )
 
         project = await create_project_stub(
             db=db,
@@ -301,50 +356,23 @@ async def create_project_htmx(  # noqa: C901
             )
         if "Area of Interest" in message or "too large" in message:
             headers["HX-Trigger"] = json.dumps({"missingOutline": message})
-        err_div = (
-            '<div id="form-error"'
-            ' style="margin-bottom: 16px;'
-            ' display: block;">'
-            '<wa-callout variant="danger">'
-            '<span id="form-error-message">'
-            f"{message}"
-            "</span></wa-callout></div>"
-        )
         return Response(
-            content=err_div,
+            content=_project_form_error(message),
             media_type="text/html",
             status_code=400,
             headers=headers,
         )
     except ConflictError as e:
-        err_div = (
-            '<div id="form-error"'
-            ' style="margin-bottom: 16px;'
-            ' display: block;">'
-            '<wa-callout variant="danger">'
-            '<span id="form-error-message">'
-            f"{e.message}"
-            "</span></wa-callout></div>"
-        )
         hx_trigger = json.dumps({"duplicateProjectName": e.message})
         return Response(
-            content=err_div,
+            content=_project_form_error(e.message),
             media_type="text/html",
             status_code=status.HTTP_409_CONFLICT,
             headers={"HX-Trigger": hx_trigger},
         )
     except ServiceError as e:
-        err_div = (
-            '<div id="form-error"'
-            ' style="margin-bottom: 16px;'
-            ' display: block;">'
-            '<wa-callout variant="danger">'
-            '<span id="form-error-message">'
-            f"{e.message}"
-            "</span></wa-callout></div>"
-        )
         return Response(
-            content=err_div,
+            content=_project_form_error(e.message),
             media_type="text/html",
             status_code=400,
         )
@@ -353,18 +381,10 @@ async def create_project_htmx(  # noqa: C901
             f"Error creating project via HTMX: {e}",
             exc_info=True,
         )
-        err_div = (
-            '<div id="form-error"'
-            ' style="margin-bottom: 16px;'
-            ' display: block;">'
-            '<wa-callout variant="danger">'
-            '<span id="form-error-message">'
-            "An unexpected error occurred."
-            " Please try again."
-            "</span></wa-callout></div>"
-        )
         return Response(
-            content=err_div,
+            content=_project_form_error(
+                "An unexpected error occurred. Please try again."
+            ),
             media_type="text/html",
             status_code=500,
         )
@@ -409,65 +429,19 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
     # Use project.id from current_user (more secure)
     project_id = project.id
 
-    # Extract form fields from schema with defaults
-    xlsform_file = data.xlsform
-    need_verification_fields = data.need_verification_fields or "true"
-    mandatory_photo_upload = data.mandatory_photo_upload or "false"
-    use_odk_collect = data.use_odk_collect or "false"
+    need_verification_fields_bool = _to_bool_form_value(
+        data.need_verification_fields, default=True
+    )
+    mandatory_photo_upload_bool = _to_bool_form_value(
+        data.mandatory_photo_upload, default=False
+    )
+    use_odk_collect_bool = _to_bool_form_value(data.use_odk_collect, default=False)
     default_language = data.default_language or "english"
-    template_form_id = data.template_form_id or ""
-
-    # Get form configuration options (convert string to bool)
-    need_verification_fields_bool = (
-        need_verification_fields.lower() == "true"
-        if isinstance(need_verification_fields, str)
-        else bool(need_verification_fields)
-    )
-    mandatory_photo_upload_bool = (
-        mandatory_photo_upload.lower() == "true"
-        if isinstance(mandatory_photo_upload, str)
-        else bool(mandatory_photo_upload)
-    )
-    use_odk_collect_bool = (
-        use_odk_collect.lower() == "true"
-        if isinstance(use_odk_collect, str)
-        else bool(use_odk_collect)
-    )
-    template_form_id_str = str(template_form_id) if template_form_id else ""
 
     try:
-        # Handle template form selection
-        if template_form_id_str:
-            # Fetch template form bytes
-            template_bytes = await _get_template_xlsform_bytes(
-                int(template_form_id_str),
-                db,
-            )
-            if not template_bytes:
-                return Response(
-                    content=_callout(
-                        "danger",
-                        "Failed to load template form.",
-                    ),
-                    media_type="text/html",
-                    status_code=404,
-                )
-
-            # Create BytesIO from template bytes (template files are already validated)
-            xlsform_bytes = BytesIO(template_bytes)
-        else:
-            # Handle custom file upload
-            if not xlsform_file:
-                return Response(
-                    content=_callout(
-                        "danger",
-                        "Please select a form or upload a file.",
-                    ),
-                    media_type="text/html",
-                    status_code=400,
-                )
-            # Validate and read file bytes
-            xlsform_bytes = await _validate_xlsform_extension(xlsform_file)
+        xlsform_bytes, error_response = await _resolve_uploaded_xlsform_bytes(data, db)
+        if error_response:
+            return error_response
 
         # Delegate to shared service function (used by both HTMX and API routes)
         await process_xlsform(

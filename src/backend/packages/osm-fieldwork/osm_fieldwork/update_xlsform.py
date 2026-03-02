@@ -61,8 +61,70 @@ FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
 
+def _standardized_language_column(
+    col: str,
+    base_col: str,
+    default_language: str,
+) -> str:
+    """Return the standardized name for one multilingual XLSForm column."""
+    if col.startswith(f"{base_col}::"):
+        match = re.match(rf"{base_col}::\s*(\w+)", col)
+        if not match:
+            return col
+        lang_name = match.group(1)
+        if lang_name not in INCLUDED_LANGUAGES:
+            return col
+        return f"{base_col}::{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
+
+    if col == base_col:
+        return (
+            f"{base_col}::{default_language}"
+            f"({INCLUDED_LANGUAGES.get(default_language, 'en')})"
+        )
+
+    return col
+
+
+def _standardize_one_column(col: str, default_language: str) -> str:
+    """Normalize one XLSForm column name against supported base columns."""
+    for base_col in ["label", "hint", "required_message"]:
+        standardized = _standardized_language_column(col, base_col, default_language)
+        if standardized != col:
+            return standardized
+    return col
+
+
+def _standardize_language_columns(
+    df: pd.DataFrame,
+    default_language: str,
+) -> pd.DataFrame:
+    """Standardize multilingual XLSForm column names."""
+    df.columns = df.columns.str.lower()
+
+    for col in df.columns.tolist():
+        standardized_col = _standardize_one_column(col, default_language)
+        if col != standardized_col:
+            df.rename(columns={col: standardized_col}, inplace=True)
+    return df
+
+
+def _filter_df_empty_rows(
+    df: pd.DataFrame,
+    column: str = NAME_COLUMN,
+) -> pd.DataFrame:
+    """Remove empty rows while retaining group boundaries."""
+    if column not in df.columns:
+        return df
+
+    if "type" not in df.columns:
+        return df[df[column].notna()]
+
+    valid_group_types = ["begin group", "end group", "begin_group", "end_group"]
+    return df[(df[column].notna()) | (df["type"].isin(valid_group_types))]
+
+
 def standardize_xlsform_sheets(xlsform: dict, default_language: str):
-    """Standardizes column headers in both the 'survey' and 'choices' sheets of an XLSForm.
+    """Standardize column headers in the survey and choices sheets of an XLSForm.
 
     - Strips spaces and lowercases all column headers.
     - Fixes formatting for columns with '::' (e.g., multilingual labels).
@@ -74,57 +136,12 @@ def standardize_xlsform_sheets(xlsform: dict, default_language: str):
         dict: The updated XLSForm dictionary with standardized column headers.
     """
 
-    def standardize_language_columns(df, default_language):
-        """Standardize existing language columns.
-
-        :param df: Original DataFrame with existing translations.
-        :param DEFAULT_LANGAUGES: List of DEFAULT_LANGAUGES with their short codes, e.g., {"english": "en", "french": "fr"}.
-        :param base_columns: List of base columns to check (e.g., 'label', 'hint', 'required_message').
-        :return: Updated DataFrame with standardized and complete language columns.
-        """
-        base_columns = ["label", "hint", "required_message"]
-        df.columns = df.columns.str.lower()
-        existing_columns = df.columns.tolist()
-
-        # Map existing columns and standardize their names
-        for col in existing_columns:
-            standardized_col = col
-            for base_col in base_columns:
-                if col.startswith(f"{base_col}::"):
-                    match = re.match(rf"{base_col}::\s*(\w+)", col)
-                    if match:
-                        lang_name = match.group(1)
-                        if lang_name in INCLUDED_LANGUAGES:
-                            standardized_col = f"{base_col}::{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
-
-                elif col == base_col:
-                    standardized_col = f"{base_col}::{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})"
-
-                if col != standardized_col:
-                    df.rename(columns={col: standardized_col}, inplace=True)
-        return df
-
-    def filter_df_empty_rows(df: pd.DataFrame, column: str = NAME_COLUMN):
-        """Remove rows with None values in the specified column.
-
-        NOTE We retain 'end group' and 'end group' rows even if they have no name.
-        NOTE A generic df.dropna(how="all") would not catch accidental spaces etc.
-        """
-        if column in df.columns:
-            # Only retain 'begin group' and 'end group' if 'type' column exists
-            if "type" in df.columns:
-                return df[(df[column].notna()) | (df["type"].isin(["begin group", "end group", "begin_group", "end_group"]))]
-            else:
-                return df[df[column].notna()]
-        return df
-
     label_cols = set()
     for sheet_name, sheet_df in xlsform.items():
         if sheet_df.empty:
             continue
-        # standardize the language columns
-        sheet_df = standardize_language_columns(sheet_df, default_language)
-        sheet_df = filter_df_empty_rows(sheet_df)
+        sheet_df = _standardize_language_columns(sheet_df, default_language)
+        sheet_df = _filter_df_empty_rows(sheet_df)
         label_cols.update(
             [col for col in sheet_df.columns if "label" in col.lower()]
         )

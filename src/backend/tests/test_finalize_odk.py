@@ -70,6 +70,7 @@ SAMPLE_DATA_EXTRACT = {
 }
 
 DUMMY_XLSFORM = b"dummy xlsform bytes"
+_UNSET = object()
 
 
 @dataclass
@@ -79,9 +80,9 @@ class FakeProject:
     id: int = 1
     project_name: str = "Test Project"
     xlsform_content: bytes = DUMMY_XLSFORM
-    data_extract_geojson: Optional[dict] = None
+    data_extract_geojson: Optional[dict] | object = _UNSET
     outline: Optional[dict] = None
-    outline_geojson: Optional[dict] = None
+    outline_geojson: Optional[dict] | object = _UNSET
     task_areas_geojson: Optional[dict] = None
     external_project_id: Optional[int] = None
     external_project_instance_url: Optional[str] = None
@@ -91,9 +92,9 @@ class FakeProject:
 
     def __post_init__(self):
         """Set default data extract if not provided."""
-        if self.data_extract_geojson is None:
+        if self.data_extract_geojson is _UNSET:
             self.data_extract_geojson = SAMPLE_DATA_EXTRACT
-        if self.outline_geojson is None:
+        if self.outline_geojson is _UNSET:
             self.outline_geojson = SAMPLE_OUTLINE
         if self.outline is None and self.outline_geojson:
             features = self.outline_geojson.get("features", [])
@@ -798,34 +799,18 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
 
 
 @pytest.mark.asyncio
-async def test_finalize_odk_project_empty_data_extract_features():
-    """Finalize should reject data extract with zero features."""
+async def test_build_feature_dataset_payload_allows_empty_data_extract_features():
+    """Collect-new-data mode should generate an empty features dataset payload."""
+    from app.projects.project_services import _build_feature_dataset_payload
+
     project = FakeProject(
         data_extract_geojson={"type": "FeatureCollection", "features": []}
     )
 
-    fake_db = AsyncMock()
-    fake_db.commit = AsyncMock()
-
-    creds = ODKCentral(
-        external_project_instance_url="https://central.example.org",
-        external_project_username="admin@example.org",
-        external_project_password="secret",
+    entity_properties, entities_list = await _build_feature_dataset_payload(
+        project_id=1,
+        project=project,
     )
 
-    with (
-        patch(
-            "app.projects.project_services.DbProject.one",
-            return_value=project,
-        ),
-        patch(
-            "app.projects.project_services.DbProject.update",
-            new_callable=AsyncMock,
-        ),
-        pytest.raises(ValidationError, match="no features"),
-    ):
-        await finalize_odk_project(
-            db=fake_db,
-            project_id=1,
-            custom_odk_creds=creds,
-        )
+    assert entity_properties == []
+    assert entities_list == []

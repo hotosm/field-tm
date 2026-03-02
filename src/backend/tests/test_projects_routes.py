@@ -379,8 +379,10 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     result = await project_services.split_aoi(
         db=Mock(),
         project_id=1,
-        algorithm=algorithm,
-        no_of_buildings=50,
+        options=project_services.SplitAoiOptions(
+            algorithm=algorithm,
+            no_of_buildings=50,
+        ),
     )
 
     assert callable(captured.get("func"))
