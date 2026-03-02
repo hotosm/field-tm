@@ -25,6 +25,7 @@ from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Optional
+from urllib.parse import urlparse
 
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
@@ -36,6 +37,29 @@ from app.central.central_schemas import ODKCentral
 from app.config import settings
 
 
+def _resolve_backend_odk_url(url: str) -> str:
+    """Prefer the internal ODK URL for local public hostnames.
+
+    In local Docker-based development, the backend cannot resolve public
+    `*.localhost` hostnames used by the browser / proxy. In that case we keep
+    the public URL for links and QR payloads, but route backend API calls
+    through the internal service URL configured in `ODK_CENTRAL_URL`.
+    """
+    internal_url = str(settings.ODK_CENTRAL_URL or "")
+    if not url or not internal_url:
+        return url
+
+    public_host = (urlparse(url).hostname or "").lower()
+    internal_host = (urlparse(internal_url).hostname or "").lower()
+    if not public_host or not internal_host or public_host == internal_host:
+        return url
+
+    if public_host == "localhost" or public_host.endswith(".localhost"):
+        return internal_url
+
+    return url
+
+
 def _resolve_odk_creds(odk_creds: Optional[ODKCentral]) -> ODKCentral:
     """Resolve ODK credentials.
 
@@ -43,7 +67,16 @@ def _resolve_odk_creds(odk_creds: Optional[ODKCentral]) -> ODKCentral:
     constructors require concrete credentials, so we materialize them here.
     """
     if odk_creds:
-        return odk_creds
+        backend_url = _resolve_backend_odk_url(
+            str(odk_creds.external_project_instance_url or "")
+        )
+        if backend_url == odk_creds.external_project_instance_url:
+            return odk_creds
+        return ODKCentral(
+            external_project_instance_url=backend_url,
+            external_project_username=odk_creds.external_project_username,
+            external_project_password=odk_creds.external_project_password,
+        )
 
     return ODKCentral(
         external_project_instance_url=str(settings.ODK_CENTRAL_URL or ""),
