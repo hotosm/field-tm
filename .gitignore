@@ -85,8 +85,9 @@ envsubst
 # Scripts
 **/openapi.json
 
-# Chart dependencies
+# Chart dependencies + pkgs
 chart/charts
+field-tm-*.tgz
 
 # Secrets / keys
 **/**/*.pem

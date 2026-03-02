@@ -27,7 +27,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    - host: "api.{{ .Values.domain }}"
+    - host: {{ .Values.domain | quote }}
       http:
         paths:
           - path: /
