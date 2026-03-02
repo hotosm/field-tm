@@ -13,13 +13,17 @@ image:
   tag: ""
 
 backend:
+  # Override the DB host when using an external database instead of the bundled PostgreSQL.
+  # When db.enabled is true, the host is automatically derived from the release name.
   dbHostOverride: ""
 
+  # Secrets to load env vars from. The following keys are expected:
+  #   db-fmtm-vars: FMTM_DB_USER, FMTM_DB_PASSWORD, FMTM_DB_NAME
+  #   api-fmtm-vars: ENCRYPTION_KEY, OSM_CLIENT_ID, OSM_CLIENT_SECRET, OSM_SECRET_KEY,
+  #                  ODK_CENTRAL_URL, ODK_CENTRAL_PUBLIC_URL, ODK_CENTRAL_USER, ODK_CENTRAL_PASSWD
   extraEnvFrom:
     - secretRef:
         name: db-fmtm-vars
-    - secretRef:
-        name: s3-fmtm-vars
     - secretRef:
         name: api-fmtm-vars
 
@@ -52,11 +56,11 @@ backend:
 
   livenessProbe:
     httpGet:
-      path: /
+      path: /__lbheartbeat__
       port: http
   readinessProbe:
     httpGet:
-      path: /
+      path: /__lbheartbeat__
       port: http
 
   autoscaling:

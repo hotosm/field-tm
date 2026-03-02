@@ -25,6 +25,7 @@ mod test 'tasks/test'
 mod config 'tasks/config'
 mod manage 'tasks/manage'
 mod prep 'tasks/prep'
+mod chart 'tasks/chart'
 
 # List available commands
 [private]
