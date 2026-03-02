@@ -606,6 +606,9 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
 
 async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
     """QR payload should use project external URL, not internal docker URL."""
+    import base64
+    import zlib
+
     from app.db.enums import FieldMappingApp
     from app.projects import project_crud
 
@@ -654,25 +657,16 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
         def png_data_uri(self, scale=5):
             return "data:image/png;base64,fake"
 
-    class DummyOdkAppUser:
-        def __init__(self, url, user, password):
-            captured["qr_url"] = url
-
-        def createQRCode(  # noqa: N802
-            self,
-            odk_id,
-            project_name,
-            appuser_token,
-            basemap,
-            osm_username,
-        ):
-            return DummyQRCode()
+    def fake_segno_make(qr_data, micro=False):
+        captured["qr_settings"] = json.loads(zlib.decompress(base64.b64decode(qr_data)))
+        captured["qr_micro"] = micro
+        return DummyQRCode()
 
     monkeypatch.setattr(
         project_crud.project_deps, "get_project_by_id", fake_get_project_by_id
     )
     monkeypatch.setattr(project_crud.central_deps, "pyodk_client", fake_pyodk_client)
-    monkeypatch.setattr(project_crud, "OdkAppUser", DummyOdkAppUser)
+    monkeypatch.setattr(project_crud.segno, "make", fake_segno_make)
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_PUBLIC_URL", "")
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_URL", "http://central:8383")
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_USER", "admin@example.org")
@@ -689,7 +683,11 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
 
     assert qr_data_url == "data:image/png;base64,fake"
     assert captured["resolved_url"] == "https://example-odk.trycloudflare.com"
-    assert captured["qr_url"] == "https://example-odk.trycloudflare.com"
+    assert (
+        captured["qr_settings"]["general"]["server_url"]
+        == "https://example-odk.trycloudflare.com/v1/key/app-token/projects/2"
+    )
+    assert captured["qr_micro"] is False
 
 
 async def test_delete_project(client, admin_user, project):

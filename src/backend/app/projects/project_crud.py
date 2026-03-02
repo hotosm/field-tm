@@ -20,6 +20,8 @@
 import ast
 import json
 import logging
+import zlib
+from base64 import b64encode
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
@@ -38,7 +40,6 @@ from osm_data_client import (
     RawDataResult,
 )
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
-from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_login_python.core import Auth
 from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
@@ -828,18 +829,24 @@ def _odk_qrcode_data_url(
     username: str,
 ) -> str:
     """Generate the ODK QR code data URL."""
-    appuser_obj = OdkAppUser(
-        odk_central.external_project_instance_url,
-        odk_central.external_project_username,
-        odk_central.external_project_password,
-    )
-    qrcode = appuser_obj.createQRCode(
-        odk_id=project.external_project_id,
-        project_name=project.project_name,
-        appuser_token=appuser_token,
-        basemap="osm",
-        osm_username=username,
-    )
+    odk_base_url = (odk_central.external_project_instance_url or "").rstrip("/")
+    settings_payload = {
+        "general": {
+            "server_url": (
+                f"{odk_base_url}/v1/key/{appuser_token}/projects"
+                f"/{project.external_project_id}"
+            ),
+            "form_update_mode": "manual",
+            "basemap_source": "osm",
+            "autosend": "wifi_and_cellular",
+            "metadata_username": username,
+            "metadata_email": "",
+        },
+        "project": {"name": f"{project.project_name}"},
+        "admin": {},
+    }
+    qr_data = b64encode(zlib.compress(json.dumps(settings_payload).encode("utf-8")))
+    qrcode = segno.make(qr_data, micro=False)
     return qrcode.png_data_uri(scale=5)
 
 
