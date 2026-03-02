@@ -416,9 +416,7 @@ async def _upload_to_qfieldcloud(
 
         try:
             # Upload files (sync SDK call → run in executor)
-            log.info(
-                "Uploading files to QFieldCloud project %s", api_project_name
-            )
+            log.info("Uploading files to QFieldCloud project %s", api_project_name)
             upload_info = await loop.run_in_executor(
                 None,
                 partial(
@@ -443,9 +441,7 @@ async def _upload_to_qfieldcloud(
                     partial(client.delete_project, api_project_id),
                 )
             except Exception:
-                log.warning(
-                    "Failed to clean up QFieldCloud project %s", api_project_id
-                )
+                log.warning("Failed to clean up QFieldCloud project %s", api_project_id)
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=f"Failed to upload files to QFieldCloud: {e}",
