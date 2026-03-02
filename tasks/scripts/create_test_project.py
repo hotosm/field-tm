@@ -127,7 +127,7 @@ def _post_json(url: str, payload: dict, api_key: str) -> dict:
 
 async def main():
     async with await psycopg.AsyncConnection.connect(
-        settings.FMTM_DB_URL, autocommit=False
+        settings.FTM_DB_URL, autocommit=False
     ) as db:
         print("Setting up local admin user and API key...", flush=True)
         api_key = await _get_or_create_api_key(db)
@@ -194,12 +194,12 @@ async def main():
         print(f"ERROR {exc.code}: {body}", flush=True)
         sys.exit(1)
 
-    fmtm_domain = settings.FMTM_DOMAIN or "fmtm.localhost"
-    fmtm_port = f":{settings.FMTM_DEV_PORT}" if settings.FMTM_DEV_PORT else ""
-    scheme = "http" if "localhost" in fmtm_domain else "https"
+    ftm_domain = settings.FTM_DOMAIN or "field.localhost"
+    ftm_port = f":{settings.FTM_DEV_PORT}" if settings.FTM_DEV_PORT else ""
+    scheme = "http" if "localhost" in ftm_domain else "https"
 
-    project_url = result.get("fmtm_url") or (
-        f"{scheme}://{fmtm_domain}{fmtm_port}/projects/{result.get('project_id', 'n/a')}"
+    project_url = result.get("ftm_url") or (
+        f"{scheme}://{ftm_domain}{ftm_port}/projects/{result.get('project_id', 'n/a')}"
     )
 
     print("", flush=True)

@@ -131,7 +131,7 @@ def set_cookies(
         JSONResponse: A response with attached cookies (set-cookie headers).
     """
     secure = not settings.DEBUG
-    cookie_domain = settings.FMTM_DOMAIN
+    cookie_domain = settings.FTM_DOMAIN
 
     set_cookie(
         response,
@@ -208,7 +208,7 @@ def verify_jwt_token(token: str, ignore_expiry: bool = False) -> dict:
             token,
             settings.ENCRYPTION_KEY.get_secret_value(),
             algorithms=[settings.JWT_ENCRYPTION_ALGORITHM],
-            audience=settings.FMTM_DOMAIN,
+            audience=settings.FTM_DOMAIN,
             options={"verify_exp": not ignore_expiry},
         )
     except jwt.ExpiredSignatureError as e:
@@ -290,7 +290,7 @@ async def expire_cookies(response: Response, cookie_names: list[str]) -> Respons
     """Expire cookies by setting max_age to 0."""
     for cookie_name in cookie_names:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
-        cookie_domain = settings.FMTM_DOMAIN
+        cookie_domain = settings.FTM_DOMAIN
         response.set_cookie(
             key=cookie_name,
             value="",

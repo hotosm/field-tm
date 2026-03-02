@@ -39,7 +39,7 @@ async def get_db_connection_pool(server: Litestar) -> AsyncConnectionPool:
     """
     log.debug(
         "Creating database connection pool: "
-        f"{settings.FMTM_DB_USER}@{settings.FMTM_DB_HOST}"
+        f"{settings.FTM_DB_USER}@{settings.FTM_DB_HOST}"
     )
 
     pool = getattr(server.state, "db_pool", None)
@@ -49,7 +49,7 @@ async def get_db_connection_pool(server: Litestar) -> AsyncConnectionPool:
             log.debug("Existing DB pool is closed; creating a new one")
 
         pool = AsyncConnectionPool(
-            conninfo=settings.FMTM_DB_URL,
+            conninfo=settings.FTM_DB_URL,
             min_size=1,
             max_size=10,  # max 10 concurrent DB connections (less than max_connections)
             timeout=30.0,  # how long to wait if all connections are busy

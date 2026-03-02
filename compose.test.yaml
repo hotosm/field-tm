@@ -17,17 +17,17 @@
 
 # For testing the entire stack, with only the required services
 
-name: fmtm-test
+name: field-tm-test
 
 volumes:
-  fmtm_db_data:
-  fmtm_logs:
+  ftm_db_data:
+  ftm_logs:
   central_db_data:
   central_frontend:
 
 networks:
-  fmtm-net:
-    name: fmtm-test
+  ftm-net:
+    name: field-tm-test
 
 services:
   # Frontend tests may rely on the proxy, at some point
@@ -42,7 +42,7 @@ services:
       file: compose.yaml
       service: api
     volumes: !override
-      - fmtm_logs:/opt/logs
+      - ftm_logs:/opt/logs
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
@@ -53,7 +53,7 @@ services:
       - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     # We don't need proxy
     depends_on: !override
-      fmtm-db:
+      fieldtm-db:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
@@ -80,10 +80,10 @@ services:
       file: compose.yaml
       service: migrations
 
-  fmtm-db:
+  fieldtm-db:
     extends:
       file: compose.yaml
-      service: fmtm-db
+      service: fieldtm-db
     ports: []
 
   central-db:

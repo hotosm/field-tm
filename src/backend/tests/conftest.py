@@ -206,7 +206,7 @@ async def client() -> AsyncIterator[AsyncClient]:
                 transport=ASGITransport(
                     app=manager.app,
                 ),
-                base_url=f"http://{settings.FMTM_DOMAIN}",
+                base_url=f"http://{settings.FTM_DOMAIN}",
                 follow_redirects=True,
             ) as ac:
                 yield ac

@@ -100,7 +100,7 @@ async def test_get_appuser_token_prefers_public_url_for_returned_link():
         patch("app.central.central_crud.settings") as mock_settings,
     ):
         mock_settings.ODK_CENTRAL_URL = "http://central:8383"
-        mock_settings.ODK_CENTRAL_PUBLIC_URL = "http://odk.fmtm.localhost:7050"
+        mock_settings.ODK_CENTRAL_PUBLIC_URL = "http://odk.field.localhost:7050"
 
         token_link = await central_crud.get_appuser_token(
             xform_id="sample-form",
@@ -108,7 +108,7 @@ async def test_get_appuser_token_prefers_public_url_for_returned_link():
             odk_credentials=None,
         )
 
-    assert token_link == "http://odk.fmtm.localhost:7050/v1/key/app-token/projects/17"
+    assert token_link == "http://odk.field.localhost:7050/v1/key/app-token/projects/17"
 
 
 @pytest.mark.asyncio
@@ -133,11 +133,11 @@ async def test_create_project_manager_user_success():
             odk_credentials=creds,
         )
 
-    assert username == "fmtm-manager-17@example.org"
+    assert username == "field-tm-manager-17@example.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[0][0] == "users"
     assert fake_client.session.post_calls[0][1] == {
-        "email": "fmtm-manager-17@example.org",
+        "email": "field-tm-manager-17@example.org",
         "password": password,
     }
     assert fake_client.session.patch_calls[0][0] == "users/1234"
@@ -211,13 +211,13 @@ async def test_create_project_manager_user_fallback_email_on_conflict():
             odk_credentials=None,
         )
 
-    assert username.startswith("fmtm-manager-17")
+    assert username.startswith("field-tm-manager-17")
     assert username.endswith("@example.org")
-    assert username != "fmtm-manager-17@example.org"
+    assert username != "field-tm-manager-17@example.org"
     assert len(password) == 20
     first_payload = fake_client.session.post_calls[0][1]
     assert fake_client.session.post_calls[0][0] == "users"
-    assert first_payload["email"] == "fmtm-manager-17@example.org"
+    assert first_payload["email"] == "field-tm-manager-17@example.org"
     assert len(first_payload["password"]) == 20
     assert fake_client.session.post_calls[1][0] == "users"
     assert fake_client.session.post_calls[2][0] == "projects/17/assignments/7/999"
@@ -376,7 +376,7 @@ async def test_create_project_manager_user_display_name_failure_non_fatal():
         )
 
     # Should still succeed despite display name failure
-    assert username == "fmtm-manager-25@example.org"
+    assert username == "field-tm-manager-25@example.org"
     assert len(password) == 20
     # PATCH was attempted
     assert len(fake_client.session.patch_calls) == 1
@@ -442,7 +442,7 @@ async def test_create_project_manager_user_assignment_conflict_idempotent():
         )
 
     # Should succeed even with 409 on assignment
-    assert username == "fmtm-manager-42@example.org"
+    assert username == "field-tm-manager-42@example.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[1][0] == "projects/42/assignments/7/333"
 
@@ -485,7 +485,7 @@ async def test_create_project_manager_user_display_name_set():
 
     assert len(fake_client.session.patch_calls) == 1
     patch_payload = fake_client.session.patch_calls[0][1]
-    assert patch_payload == {"displayName": "FMTM Manager - Riverside Survey"}
+    assert patch_payload == {"displayName": "Field-TM Manager - Riverside Survey"}
 
 
 def test_get_odk_credentials_requires_complete_fields():

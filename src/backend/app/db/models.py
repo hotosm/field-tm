@@ -633,7 +633,7 @@ class DbProject:
                 )
 
             # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
-            new_project.hashtags.append(f"#{settings.FMTM_DOMAIN}-{new_project.id}")
+            new_project.hashtags.append(f"#{settings.FTM_DOMAIN}-{new_project.id}")
 
             await cur.execute(
                 """
@@ -716,9 +716,9 @@ class DbProject:
 
         # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
         if "hashtags" in model_dump:
-            fmtm_hashtag = f"#{settings.FMTM_DOMAIN}-{project_id}"
-            if fmtm_hashtag not in model_dump["hashtags"]:
-                model_dump["hashtags"].append(fmtm_hashtag)
+            ftm_hashtag = f"#{settings.FTM_DOMAIN}-{project_id}"
+            if ftm_hashtag not in model_dump["hashtags"]:
+                model_dump["hashtags"].append(ftm_hashtag)
 
         query = sql.SQL(
             """

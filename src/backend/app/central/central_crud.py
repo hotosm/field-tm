@@ -417,7 +417,7 @@ async def convert_geojson_to_odk_csv(
     Returns:
         feature_csv (StringIO): CSV of features in XLSForm format for ODK.
     """
-    parsed_geojson = parse_aoi(settings.FMTM_DB_URL, input_geojson.getvalue())
+    parsed_geojson = parse_aoi(settings.FTM_DB_URL, input_geojson.getvalue())
 
     if not parsed_geojson:
         raise HTTPException(
@@ -939,7 +939,7 @@ async def get_appuser_token(
         The app user token.
     """
     try:
-        appuser_name = "fmtm_user"
+        appuser_name = "fieldtm_user"
         log.info(
             f"Creating ODK appuser ({appuser_name}) for ODK project ({project_odk_id})"
         )
@@ -1012,7 +1012,7 @@ def _assign_appuser_role(client, path: str, scope: str) -> None:
 
 def _build_manager_user_email(project_odk_id: int) -> str:
     """Create the default manager email for a project."""
-    return f"fmtm-manager-{project_odk_id}@example.org"
+    return f"field-tm-manager-{project_odk_id}@example.org"
 
 
 def _build_manager_user_password() -> str:
@@ -1025,7 +1025,7 @@ def _build_manager_user_password() -> str:
 def _build_manager_user_email_fallback(project_odk_id: int) -> str:
     """Create a fallback manager email variant when the primary is already taken."""
     suffix = secrets.token_hex(4)
-    return f"fmtm-manager-{project_odk_id}-{suffix}@example.org"
+    return f"field-tm-manager-{project_odk_id}-{suffix}@example.org"
 
 
 def _get_project_manager_role_id(client) -> int:
@@ -1168,7 +1168,7 @@ async def create_project_manager_user(
     try:
         async with central_deps.pyodk_client(odk_credentials) as client:
             role_id = _get_project_manager_role_id(client)
-            display_name = f"FMTM Manager - {project_name}"
+            display_name = f"Field-TM Manager - {project_name}"
             manager_user_id, manager_email, manager_password = _create_manager_user(
                 client,
                 project_odk_id,

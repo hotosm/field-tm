@@ -15,11 +15,11 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-name: fmtm
+name: field-tm
 
 volumes:
-  fmtm_db_data:
-  fmtm_logs:
+  ftm_db_data:
+  ftm_logs:
   central_db_data:
   central_frontend:
   qfield_db_data:
@@ -28,8 +28,8 @@ volumes:
   qfield_transformation_grids:
 
 networks:
-  fmtm-net:
-    name: fmtm-local
+  ftm-net:
+    name: field-tm-local
     ipam:
       driver: default
       config:
@@ -39,8 +39,8 @@ x-qfield-common-env: &qfield-common-env
   DJANGO_SETTINGS_MODULE: qfieldcloud.settings
   DEBUG: 1
   ENVIRONMENT: development
-  QFIELDCLOUD_HOST: qfield.fmtm.localhost
-  DJANGO_ALLOWED_HOSTS: "qfield.fmtm.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
+  QFIELDCLOUD_HOST: qfield.field.localhost
+  DJANGO_ALLOWED_HOSTS: "qfield.field.localhost localhost 127.0.0.1 0.0.0.0 qfield-app proxy"
   DJANGO_SUPERUSER_USERNAME: admin
   DJANGO_SUPERUSER_EMAIL: sysadmin@hotosm.org
   DJANGO_SUPERUSER_PASSWORD: ${QFIELDCLOUD_ADMIN_PASSWORD}
@@ -49,7 +49,7 @@ x-qfield-common-env: &qfield-common-env
   ACCOUNT_EMAIL_VERIFICATION: none
   QFIELDCLOUD_PASSWORD_LOGIN_IS_ENABLED: 1
   # TODO fix injecting S3 vars into STORAGES
-  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fmtm}
+  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fieldtm}
   # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-somelongpassword}
   # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
   # STORAGE_ENDPOINT_URL: http://s3:9000
@@ -57,7 +57,7 @@ x-qfield-common-env: &qfield-common-env
     "default": {
     "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
     "OPTIONS": {
-    "access_key": "fmtm",
+    "access_key": "fieldtm",
     "secret_key": "somelongpassword",
     "bucket_name": "qfield-cloud",
     "region_name": "",
@@ -66,9 +66,9 @@ x-qfield-common-env: &qfield-common-env
     "QFC_IS_LEGACY": false
     }
     }'
-  POSTGRES_USER: ${FMTM_DB_USER:-fmtm}
-  POSTGRES_PASSWORD: ${FMTM_DB_PASSWORD:-fmtm}
-  POSTGRES_DB: ${FMTM_DB_NAME:-fmtm}
+  POSTGRES_USER: ${FTM_DB_USER:-fieldtm}
+  POSTGRES_PASSWORD: ${FTM_DB_PASSWORD:-fieldtm}
+  POSTGRES_DB: ${FTM_DB_NAME:-fieldtm}
   POSTGRES_HOST: qfield-db
   POSTGRES_PORT: 5432
   # EMAIL_HOST: ${EMAIL_HOST}
@@ -85,7 +85,7 @@ x-qfield-common-env: &qfield-common-env
   QFIELDCLOUD_USE_I18N: 0
   QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
   QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
-  QFIELDCLOUD_DEFAULT_NETWORK: fmtm-local
+  QFIELDCLOUD_DEFAULT_NETWORK: field-tm-local
   QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_qfield_transformation_grids
   # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
   # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
@@ -97,7 +97,7 @@ x-qfield-common: &qfield-common
   volumes:
     - qfield_static:/usr/src/app/staticfiles
   networks:
-    - fmtm-net
+    - ftm-net
   restart: "unless-stopped"
   environment: *qfield-common-env
   healthcheck:
@@ -115,10 +115,10 @@ services:
         condition: service_completed_successfully
         required: false
     volumes:
-      - central_frontend:/var/www/html/odk.fmtm.localhost:ro
-      - qfield_static:/var/www/html/qfield.fmtm.localhost/staticfiles:ro
+      - central_frontend:/var/www/html/odk.field.localhost:ro
+      - qfield_static:/var/www/html/qfield.field.localhost/staticfiles:ro
     ports:
-      - ${FMTM_DEV_PORT:-7050}:8080
+      - ${FTM_DEV_PORT:-7050}:8080
     environment:
       # General
       BUNKERWEB_INSTANCES: proxy
@@ -130,7 +130,7 @@ services:
       API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
       # Avoid running ModSec rules on internal service calls
       WHITELIST_IP: 10.20.30.0/24
-      WHITELIST_URI: http://fmtm.localhost:7050
+      WHITELIST_URI: http://field.localhost:7050
       MULTISITE: yes
       USE_REVERSE_PROXY: yes
       ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
@@ -147,31 +147,27 @@ services:
       # On client, brotli is preferred over gzip if both are enabled
       USE_BROTLI: yes
       # Reverse proxy configs
-      SERVER_NAME: fmtm.localhost api.fmtm.localhost odk.fmtm.localhost qfield.fmtm.localhost mail.fmtm.localhost
-      fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
-      fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      # We allow accelerometer, camera, fullscreen, geolocation, magnetometer, gyroscope
-      fmtm.localhost_PERMISSIONS_POLICY: accelerometer=(self), ambient-light-sensor=(), attribution-reporting=(), autoplay=(), battery=(), bluetooth=(), browsing-topics=(), camera=(self), compute-pressure=(), display-capture=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(self), gamepad=(), geolocation=(self), gyroscope=(self), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(self), microphone=(), midi=(), otp-credentials=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=(), interest-cohort=()
-      api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
-      api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+      SERVER_NAME: field.localhost odk.field.localhost qfield.field.localhost mail.field.localhost
+      field.localhost_REVERSE_PROXY_HOST: http://api:8000
+      field.localhost_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
-      api.fmtm.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
+      field.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
       # Prevent bunkerweb page handling login errors (handle via Vue router)
-      odk.fmtm.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
-      odk.fmtm.localhost_ERRORS: "404=/index.html"
+      odk.field.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
+      odk.field.localhost_ERRORS: "404=/index.html"
       # Disable BunkerWeb's default location / block so we can provide our own below.
       # The default uses try_files ... =404 which doesn't support SPA routing.
-      odk.fmtm.localhost_SERVE_FILES: "no"
+      odk.field.localhost_SERVE_FILES: "no"
       # SPA fallback: serve index.html for any path that doesn't match a static file,
       # so the Vue router can handle client-side routes (e.g. /login?next=/).
       # NOTE: we need double $$ to avoid compose env var substitution
-      odk.fmtm.localhost_CUSTOM_CONF_SERVER_HTTP_spa_routing: |
+      odk.field.localhost_CUSTOM_CONF_SERVER_HTTP_spa_routing: |
         location / {
-          root /var/www/html/odk.fmtm.localhost;
+          root /var/www/html/odk.field.localhost;
           try_files $$uri $$uri/ /index.html;
         }
       # ODK API routing to central backend.
-      odk.fmtm.localhost_CUSTOM_CONF_SERVER_HTTP_api_routing: |
+      odk.field.localhost_CUSTOM_CONF_SERVER_HTTP_api_routing: |
         location ^~ /v1/ {
           proxy_set_header Host $$http_host;
           proxy_set_header X-Forwarded-Host $$http_host;
@@ -186,18 +182,18 @@ services:
           proxy_buffering off;
           proxy_read_timeout 2m;
         }
-      qfield.fmtm.localhost_REVERSE_PROXY_HOST: http://qfield-app:8000
+      qfield.field.localhost_REVERSE_PROXY_HOST: http://qfield-app:8000
       # Required to allow loading staticfiles (else route to reverse proxy)
-      qfield.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/(?!staticfiles)
+      qfield.field.localhost_REVERSE_PROXY_URL: ~ ^/(?!staticfiles)
       # Sometimes we have large base imagery mbtile layers...
-      qfield.fmtm.localhost_MAX_CLIENT_SIZE: 2G
+      qfield.field.localhost_MAX_CLIENT_SIZE: 2G
       # Override X-Forwarded-Proto during local dev to allow auth over http
       # https://docs.djangoproject.com/en/4.2/ref/settings/#secure-proxy-ssl-header
       # NOTE we also override the origin to remove the port & prefer CSRF issues
-      qfield.fmtm.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http; Origin http://qfield.fmtm.localhost"
-      mail.fmtm.localhost_REVERSE_PROXY_HOST: http://mail:8025
+      qfield.field.localhost_REVERSE_PROXY_HEADERS: "X-Forwarded-Proto http; Origin http://qfield.field.localhost"
+      mail.field.localhost_REVERSE_PROXY_HOST: http://mail:8025
     networks:
-      fmtm-net:
+      ftm-net:
         ipv4_address: 10.20.30.50
     restart: "unless-stopped"
 
@@ -209,11 +205,11 @@ services:
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
     # Uncomment these to debug with a terminal debugger like pdb
-    # Then `docker attach fmtm_api` to debug
+    # Then `docker attach field_tm_api` to debug
     # stdin_open: true
     # tty: true
     volumes:
-      - fmtm_logs:/opt/logs
+      - ftm_logs:/opt/logs
       - qfield_projects:/opt/qfield
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
@@ -225,11 +221,11 @@ services:
       - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     environment:
       DEBUG: ${DEBUG:-True}
-      ODK_CENTRAL_PUBLIC_URL: http://${FMTM_ODK_DOMAIN:-odk.fmtm.localhost}:${FMTM_DEV_PORT:-7050}
+      ODK_CENTRAL_PUBLIC_URL: http://${FTM_ODK_DOMAIN:-odk.field.localhost}:${FTM_DEV_PORT:-7050}
     depends_on:
       proxy:
         condition: service_healthy
-      fmtm-db:
+      fieldtm-db:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
@@ -246,7 +242,7 @@ services:
       - "7052-7055:8000"
       - "5678-5679:5678"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
@@ -279,7 +275,7 @@ services:
       pyxform:
         condition: service_started
     environment:
-      - DOMAIN=${FMTM_ODK_DOMAIN:-odk.fmtm.localhost}:${FMTM_DEV_PORT:-7050}
+      - DOMAIN=${FTM_ODK_DOMAIN:-odk.field.localhost}:${FTM_DEV_PORT:-7050}
       - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
@@ -314,7 +310,7 @@ services:
     # ports:
     #   - "8383:8383"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: nc -z localhost 8383 || exit 1
@@ -326,12 +322,12 @@ services:
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v4.2.0"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
 
   # Local mail catcher for development: captures emails sent by ODK Central
   # (e.g. welcome emails on user creation) without actually delivering them.
-  # Web UI available via proxy at http://mail.fmtm.localhost:${FMTM_DEV_PORT:-7050}
+  # Web UI available via proxy at http://mail.field.localhost:${FTM_DEV_PORT:-7050}
   # to view captured emails.
   # In production, set EMAIL_HOST / EMAIL_PORT to a real SMTP server instead.
   # NOTE: this is required, else Central gives 500 response on user creation
@@ -339,7 +335,7 @@ services:
     profiles: ["", "central"]
     image: "axllent/mailpit:latest"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
 
   central-ui:
@@ -359,36 +355,36 @@ services:
   migrations:
     image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
     depends_on:
-      fmtm-db:
+      fieldtm-db:
         condition: service_healthy
     env_file:
       - .env
     networks:
-      - fmtm-net
+      - ftm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
     healthcheck:
       test: ["NONE"] # Set the health check test to NONE to disable it
 
-  fmtm-db:
+  fieldtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
     image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
     volumes:
-      - fmtm_db_data:/var/lib/postgresql/data/
+      - ftm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
-      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+      - POSTGRES_USER=${FTM_DB_USER:-fieldtm}
+      - POSTGRES_PASSWORD=${FTM_DB_PASSWORD:-fieldtm}
+      - POSTGRES_DB=${FTM_DB_NAME:-fieldtm}
     ports:
       - "5438:5432"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     # We don't need to optimise connections like the prod deploy here.
     # Conversely, we increase connections for test runners.
     command: -c 'max_connections=300' -c 'wal_level=logical'
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
+      test: pg_isready -U ${FTM_DB_USER:-fieldtm} -d ${FTM_DB_NAME:-fieldtm}
       start_period: 5s
       interval: 10s
       timeout: 5s
@@ -406,9 +402,9 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
-    # Optimise to a low number of connections, see fmtm-db service
+    # Optimise to a low number of connections, see fieldtm-db service
     command: -c 'max_connections=64'
     healthcheck:
       test: pg_isready -U ${CENTRAL_DB_USER:-odk} -d ${CENTRAL_DB_NAME:-odk}
@@ -423,18 +419,18 @@ services:
     volumes:
       - qfield_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
-      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+      - POSTGRES_USER=${FTM_DB_USER:-fieldtm}
+      - POSTGRES_PASSWORD=${FTM_DB_PASSWORD:-fieldtm}
+      - POSTGRES_DB=${FTM_DB_NAME:-fieldtm}
     ports:
       - "5435:5432"
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
-    # Optimise to a low number of connections, see fmtm-db service
+    # Optimise to a low number of connections, see fieldtm-db service
     command: -c 'max_connections=64'
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
+      test: pg_isready -U ${FTM_DB_USER:-fieldtm} -d ${FTM_DB_NAME:-fieldtm}
       start_period: 5s
       interval: 10s
       timeout: 5s
@@ -513,7 +509,7 @@ services:
         from qfieldcloud.core.models import Organization, Person, User
 
         username = os.getenv("QFIELDCLOUD_USER")
-        email = "svcfmtm@hotosm.org"
+        email = "svcftm@hotosm.org"
         password = os.getenv("QFIELDCLOUD_PASSWORD")
         org_name = os.getenv("ORG_NAME")
 
@@ -557,7 +553,7 @@ services:
     environment:
       LOG_LEVEL: DEBUG
     networks:
-      - fmtm-net
+      - ftm-net
     restart: "unless-stopped"
     healthcheck:
       test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1

@@ -1,4 +1,4 @@
-"""FMTM Splitter module."""
+"""Area splitter module."""
 
 from enum import StrEnum
 from pathlib import Path

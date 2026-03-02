@@ -170,7 +170,7 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
     async def fake_create_project_manager_user(
         project_odk_id, project_name, odk_credentials
     ):
-        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+        return ("field-tm-manager-42@example.org", "SecurePass12345abcde")
 
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
@@ -318,7 +318,7 @@ async def test_finalize_odk_project_returns_manager_credentials():
     async def fake_create_project_manager_user(
         project_odk_id, project_name, odk_credentials
     ):
-        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+        return ("field-tm-manager-42@example.org", "SecurePass12345abcde")
 
     # Mock dataset check
     @asynccontextmanager
@@ -389,7 +389,7 @@ async def test_finalize_odk_project_returns_manager_credentials():
 
     assert isinstance(result, ODKFinalizeResult)
     assert result.odk_url == "https://central.example.org/#/projects/42"
-    assert result.manager_username == "fmtm-manager-42@example.org"
+    assert result.manager_username == "field-tm-manager-42@example.org"
     assert result.manager_password == "SecurePass12345abcde"
 
 
@@ -430,7 +430,7 @@ async def test_finalize_odk_project_persists_custom_odk_credentials():
     async def fake_create_project_manager_user(
         project_odk_id, project_name, odk_credentials
     ):
-        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+        return ("field-tm-manager-42@example.org", "SecurePass12345abcde")
 
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
@@ -546,7 +546,7 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
     async def fake_create_project_manager_user(
         project_odk_id, project_name, odk_credentials
     ):
-        return ("fmtm-manager-42@example.org", "SecurePass12345abcde")
+        return ("field-tm-manager-42@example.org", "SecurePass12345abcde")
 
     @asynccontextmanager
     async def fake_get_odk_dataset(_):
@@ -600,7 +600,7 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
         patch("app.projects.project_services.settings") as mock_settings,
     ):
         mock_settings.ODK_CENTRAL_URL = "http://central:8383"
-        mock_settings.ODK_CENTRAL_PUBLIC_URL = "http://odk.fmtm.localhost:7050"
+        mock_settings.ODK_CENTRAL_PUBLIC_URL = "http://odk.field.localhost:7050"
         mock_settings.ODK_CENTRAL_USER = "admin@example.org"
 
         result = await finalize_odk_project(
@@ -609,8 +609,8 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
             custom_odk_creds=None,
         )
 
-    assert result.odk_url == "http://odk.fmtm.localhost:7050/#/projects/42"
-    assert result.manager_username == "fmtm-manager-42@example.org"
+    assert result.odk_url == "http://odk.field.localhost:7050/#/projects/42"
+    assert result.manager_username == "field-tm-manager-42@example.org"
     assert result.manager_password == "SecurePass12345abcde"
 
 

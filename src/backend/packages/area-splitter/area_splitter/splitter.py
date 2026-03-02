@@ -209,7 +209,7 @@ def _resolve_extract_geojson(
     extract_geojson = (
         _fetch_extract_from_raw_data_api(aoi_featcol)
         if not osm_extract
-        else FMTMSplitter.input_to_geojson(osm_extract)
+        else AreaSplitter.input_to_geojson(osm_extract)
     )
     if extract_geojson:
         return extract_geojson
@@ -236,8 +236,8 @@ def _parse_aoi_feature_collection(
     aoi: Union[str, FeatureCollection],
 ) -> FeatureCollection:
     """Parse the AOI input into a normalized FeatureCollection."""
-    parsed_aoi = FMTMSplitter.input_to_geojson(aoi)
-    return FMTMSplitter.geojson_to_featcol(parsed_aoi)
+    parsed_aoi = AreaSplitter.input_to_geojson(aoi)
+    return AreaSplitter.geojson_to_featcol(parsed_aoi)
 
 
 def _parse_optional_geojson_input(
@@ -246,7 +246,7 @@ def _parse_optional_geojson_input(
     """Parse an optional GeoJSON input."""
     if not input_data:
         return None
-    return FMTMSplitter.input_to_geojson(input_data)
+    return AreaSplitter.input_to_geojson(input_data)
 
 
 def _parse_feature_split_input(
@@ -261,8 +261,8 @@ def _parse_feature_split_input(
         log.error(err)
         raise ValueError(err)
 
-    input_featcol = FMTMSplitter.geojson_to_featcol(
-        FMTMSplitter.input_to_geojson(geojson_input)
+    input_featcol = AreaSplitter.geojson_to_featcol(
+        AreaSplitter.input_to_geojson(geojson_input)
     )
     if isinstance(input_featcol, FeatureCollection):
         return input_featcol
@@ -272,7 +272,7 @@ def _parse_feature_split_input(
     raise ValueError(msg)
 
 
-class FMTMSplitter:
+class AreaSplitter:
     """A class to split polygons."""
 
     def __init__(
@@ -286,7 +286,7 @@ class FMTMSplitter:
                 or GeoJSON string.
 
         Returns:
-            instance (FMTMSplitter): An instance of this class
+            instance (AreaSplitter): An instance of this class
         """
         # Parse AOI, merge if multiple geometries
         if aoi_obj:
@@ -361,7 +361,7 @@ class FMTMSplitter:
         The GeoJSON may be of type FeatureCollection, Feature, or Polygon,
         but should only contain one Polygon geometry in total.
         """
-        features = FMTMSplitter.geojson_to_featcol(geojson).get("features", [])
+        features = AreaSplitter.geojson_to_featcol(geojson).get("features", [])
         log.debug("Converting AOI to Shapely geometry")
 
         if len(features) == 0:
@@ -559,7 +559,7 @@ class FMTMSplitter:
         """Validate required inputs for SQL-based splitting."""
         if not osm_extract:
             msg = (
-                "To use the FMTM splitting algo, an OSM data extract must be passed "
+                "To use the Field-TM splitting algo, an OSM data extract must be passed "
                 "via param `osm_extract` as a geojson dict or FeatureCollection."
             )
             log.error(msg)
@@ -838,7 +838,7 @@ def split_by_square(
             ),
         )
 
-    splitter = FMTMSplitter(aoi_featcol)
+    splitter = AreaSplitter(aoi_featcol)
     split_features = _require_split_output(
         splitter.splitBySquare(meters, db, extract_geojson)
     )
@@ -874,7 +874,7 @@ def split_by_sql(
             OR an psycopg connection object that is reused.
             Passing an connection object prevents requiring additional
             database connections to be spawned.
-        num_buildings(int, optional): The number of buildings to optimise the FMTM
+        num_buildings(int, optional): The number of buildings to optimise the Field-TM
             splitting algorithm with (approx buildings per generated feature).
             Deprecated: Use algorithm_params instead. If algorithm_params is provided,
             this parameter is ignored.
@@ -924,7 +924,7 @@ def split_by_sql(
             ),
         )
 
-    splitter = FMTMSplitter(aoi_featcol)
+    splitter = AreaSplitter(aoi_featcol)
     split_features = _require_split_output(
         splitter.splitBySQL(
             db, algorithm, algorithm_params, osm_extract=extract_geojson
@@ -975,7 +975,7 @@ def split_by_features(
             ),
         )
 
-    splitter = FMTMSplitter(aoi_featcol)
+    splitter = AreaSplitter(aoi_featcol)
     split_features = _require_split_output(splitter.splitByFeature(input_featcol))
     if outfile:
         splitter.outputGeojson(outfile)
@@ -998,7 +998,7 @@ be either the data extract used by the XLSForm, or a postgresql database.
         area-splitter -b AOI.geojson -o out.geojson --meters 100
 
         Where AOI is the boundary of the project as a polygon
-        And OUTFILE is a MultiPolygon output file,which defaults to fmtm.geojson
+        And OUTFILE is a MultiPolygon output file,which defaults to field-tm.geojson
         The task splitting defaults to squares, 50 meters across. If -m is used
         then that also defaults to square splitting.
         """,
@@ -1006,7 +1006,7 @@ be either the data extract used by the XLSForm, or a postgresql database.
     # The default SQL query for feature splitting
     parser.add_argument("-v", "--verbose", action="store_true", help="verbose output")
     parser.add_argument(
-        "-o", "--outfile", default="fmtm.geojson", help="Output file from splitting"
+        "-o", "--outfile", default="field-tm.geojson", help="Output file from splitting"
     )
     parser.add_argument(
         "-m",
@@ -1024,11 +1024,11 @@ be either the data extract used by the XLSForm, or a postgresql database.
     parser.add_argument(
         "-db",
         "--dburl",
-        default="postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+        default="postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
         help="The database url string",
     )
     parser.add_argument(
-        "-e", "--extract", help="The OSM data extract for fmtm splitter"
+        "-e", "--extract", help="The OSM data extract for field-tm splitter"
     )
 
     # Accept command line args, or func params

@@ -22,11 +22,11 @@
 # Each service creates an ephemeral HTTPS tunnel and prints the public URL to logs.
 # Retrieve URLs with: `just start view-tunnel-url`
 
-name: fmtm
+name: field-tm
 
 x-tunnel: &tunnel
   image: docker.io/cloudflare/cloudflared:2026.2.0
-  networks: [fmtm-net]
+  networks: [ftm-net]
   restart: unless-stopped
   healthcheck:
     test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
@@ -44,6 +44,6 @@ services:
   #   command: tunnel --url http://qfield-app:8000
 
 networks:
-  fmtm-net:
+  ftm-net:
     external: true
-    name: fmtm-local
+    name: field-tm-local

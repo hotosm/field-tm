@@ -262,14 +262,14 @@ def test_build_odk_finalize_success_html_includes_manager_credentials():
     """Test ODK finalize response includes manager credentials."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
-        manager_username="fmtm-manager@example.org",
+        manager_username="field-tm-manager@example.org",
         manager_password="StrongPass123!",
     )
 
     html = _build_odk_finalize_success_html(result)
 
     assert "Manager Access (ODK Central UI)" in html
-    assert "fmtm-manager@example.org" in html
+    assert "field-tm-manager@example.org" in html
     assert "StrongPass123!" in html
     assert "Save these credentials now." in html
 
@@ -278,7 +278,7 @@ def test_build_odk_finalize_success_html_does_not_render_qr_markup():
     """Finalize response should not include mapper QR code markup."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
-        manager_username="fmtm-manager@example.org",
+        manager_username="field-tm-manager@example.org",
         manager_password="StrongPass123!",
     )
 

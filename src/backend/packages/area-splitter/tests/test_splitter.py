@@ -22,7 +22,7 @@ import geojson
 import pytest
 
 from area_splitter.splitter import (
-    FMTMSplitter,
+    AreaSplitter,
     _is_linear_split_feature,
     main,
     split_by_features,
@@ -59,26 +59,26 @@ def test_is_linear_split_feature_tag_classification(tags, expected):
 
 
 def test_init_splitter_types(aoi_json):
-    """Test parsing different types with FMTMSplitter."""
+    """Test parsing different types with AreaSplitter."""
     # FeatureCollection
-    FMTMSplitter(aoi_json)
+    AreaSplitter(aoi_json)
     # GeoJSON String
     geojson_str = geojson.dumps(aoi_json)
-    FMTMSplitter(geojson_str)
+    AreaSplitter(geojson_str)
     # GeoJSON File
-    FMTMSplitter(f"{TESTDATA_DIR}/kathmandu.geojson")
+    AreaSplitter(f"{TESTDATA_DIR}/kathmandu.geojson")
     # GeoJSON Dict FeatureCollection
     geojson_dict = dict(aoi_json)
-    FMTMSplitter(geojson_dict)
+    AreaSplitter(geojson_dict)
     # GeoJSON Dict Feature
     feature = geojson_dict.get("features")[0]
-    FMTMSplitter(feature)
+    AreaSplitter(feature)
     # GeoJSON Dict Polygon
     polygon = feature.get("geometry")
-    FMTMSplitter(polygon)
+    AreaSplitter(polygon)
     # FeatureCollection multiple geoms (4 polygons)
     with pytest.raises(ValueError) as error:
-        FMTMSplitter(f"{TESTDATA_DIR}/kathmandu_split.geojson")
+        AreaSplitter(f"{TESTDATA_DIR}/kathmandu_split.geojson")
     assert str(error.value) == "The input AOI cannot contain multiple geometries."
 
 
@@ -183,7 +183,7 @@ def test_split_by_features_geojson(aoi_json):
     assert len(features.get("features")) == 4
 
 
-def test_split_by_sql_fmtm_with_extract(db, aoi_json, extract_json):
+def test_split_by_sql_ftm_with_extract(db, aoi_json, extract_json):
     """Test divide by square from geojson file."""
     features = split_by_sql(
         aoi_json,
@@ -200,26 +200,26 @@ def test_split_by_sql_fmtm_with_extract(db, aoi_json, extract_json):
     )
 
 
-def test_split_by_sql_fmtm_no_extract(aoi_json):
-    """Test FMTM splitting algorithm, with no data extract."""
+def test_split_by_sql_ftm_no_extract(aoi_json):
+    """Test Field-TM splitting algorithm, with no data extract."""
     features = split_by_sql(
         aoi_json,
         # Use separate db connection for longer running test
-        "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+        "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
         num_buildings=5,
     )
     # NOTE This may change over time as it calls the live API
-    # so we set to > the output from test_split_by_sql_fmtm_with_extract
+    # so we set to > the output from test_split_by_sql_ftm_with_extract
     assert len(features.get("features")) >= 60
 
 
-def test_split_by_sql_fmtm_multi_geom(extract_json):
+def test_split_by_sql_ftm_multi_geom(extract_json):
     """Test divide by square from geojson file with multiple geometries."""
     with open(f"{TESTDATA_DIR}/kathmandu_split.geojson") as jsonfile:
         parsed_featcol = geojson.load(jsonfile)
     features = split_by_sql(
         parsed_featcol,
-        "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+        "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
         num_buildings=10,
         osm_extract=extract_json,
     )
@@ -268,7 +268,7 @@ def test_split_by_square_cli():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
                 "--meters",
                 "100",
                 "--extract",
@@ -329,7 +329,7 @@ def test_split_by_sql_cli():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
                 "--number",
                 "10",
                 "--extract",
@@ -361,7 +361,7 @@ def test_split_by_sql_cli_no_extract():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fmtm:fmtm@fmtm-db:5432/fmtm",
+                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
                 "--number",
                 "10",
                 "--outfile",

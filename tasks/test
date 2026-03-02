@@ -80,25 +80,25 @@ init-prod-data:
   docker compose down -v
   echo "Starting S3 and local databases only"
   # Note cannot start electric as the logical replication slot cannot be used
-  docker compose up -d s3 fmtm-db central-db
+  docker compose up -d s3 fieldtm-db central-db
 
   # Set Minio aliases for connection (no creds needed for prod backup download currently)
-  docker compose exec --no-TTY s3 mc alias set fmtm-prod https://s3.fmtm.hotosm.org "" ""
+  docker compose exec --no-TTY s3 mc alias set field-tm-prod https://s3.field.hotosm.org "" ""
   docker compose exec --no-TTY s3 mc alias set local "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
   docker compose exec --no-TTY s3 mc alias set odk-prod \
     "$CENTRAL_BACKUP_S3_ENDPOINT" "$CENTRAL_BACKUP_S3_ACCESS_KEY" "$CENTRAL_BACKUP_S3_SECRET_KEY"
-  # We also need to create the fmtm-data bucket, as the migration service has not ran
+  # We also need to create the ftm-data bucket, as the migration service has not ran
   docker compose exec --no-TTY s3 mc mb "local/${S3_BUCKET_NAME}" --ignore-existing
   docker compose exec --no-TTY s3 mc anonymous set download "local/${S3_BUCKET_NAME}"
 
   # Load database data
-  just test _load-prod-db-data fmtm-prod/fmtm-db-backups/fmtm fmtm-db ${FMTM_DB_NAME} ${FMTM_DB_USER} ${FMTM_DB_PASSWORD}
+  just test _load-prod-db-data field-tm-prod/ftm-db-backups/ftm fieldtm-db ${FTM_DB_NAME} ${FTM_DB_USER} ${FTM_DB_PASSWORD}
   just test _load-prod-db-data odk-prod/odkbackup central-db ${CENTRAL_DB_NAME} ${CENTRAL_DB_USER} ${CENTRAL_DB_PASSWORD}
 
   # Copy S3 data to local
-  just test _mirror-s3-bucket fmtm-prod/fmtm-data local/fmtm-data
+  just test _mirror-s3-bucket field-tm-prod/ftm-data local/ftm-data
   # We skip the hotosm-odk-uploads as it could be large >10GB in prod
-  # just test _mirror-s3-bucket odk-prod/hotosm-odk-uploads local/fmtm-odk-media
+  # just test _mirror-s3-bucket odk-prod/hotosm-odk-uploads local/ftm-odk-media
 
   just test _print-post-data-load-instructions
 
@@ -226,8 +226,8 @@ _override-central-domain-for-tunnel odk_tunnel_url:
   fi
 
   # Override the DOMAIN env used by ODK Central so Collect receives reachable URLs.
-  FMTM_ODK_DOMAIN="$tunnel_host" \
-  FMTM_DEV_PORT=443 \
+  FTM_ODK_DOMAIN="$tunnel_host" \
+  FTM_DEV_PORT=443 \
   docker compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \

@@ -1,1 +1,1 @@
-"""Tests for FMTM Splitter."""
+"""Tests for the Field-TM splitter."""

@@ -105,7 +105,7 @@ async def test_list_submission_attachment_urls(odk_submission, pyodk_config):
     # FIXME fix this test
     # FIXME for some reason they aren't accessing minio for the submission upload?
     # FIXME setup an alias for minio connection, then
-    # FIXME mc admin trace fmtm
+    # FIXME mc admin trace field-tm
 
     # with Client(pyodk_config) as client:
     #     client.submissions.create(

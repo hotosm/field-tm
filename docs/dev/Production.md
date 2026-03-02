@@ -10,7 +10,7 @@ your own cloud server.
 - Get a cloud server (tested with Ubuntu 22.04).
 - Set up a domain name, and point the DNS to your cloud server.
 - SSH into your server. Set up a user with sudo called
-  svcfmtm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04)
+  svcftm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04)
   is a good guide for basic server setup including creation of a
   user.
 
@@ -32,7 +32,7 @@ Some can be updated manually, as required.
 
 > If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
-> <http://fmtm.localhost:7050,http://some.other.domain>
+> <http://field.localhost:7050,http://some.other.domain>
 
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
@@ -59,16 +59,16 @@ If you run Field-TM with ODK and Minio (S3) included, then the
 domains will default to:
 
 ```dotenv
-${FMTM_DOMAIN} --> Frontend
-api.${FMTM_DOMAIN} --> Backend
-odk.${FMTM_DOMAIN} --> ODK Central
+${FTM_DOMAIN} --> Frontend
+api.${FTM_DOMAIN} --> Backend
+odk.${FTM_DOMAIN} --> ODK Central
 ```
 
 These defaults can be overridden with respective environment variables:
 
 ```dotenv
-FMTM_API_DOMAIN
-FMTM_ODK_DOMAIN
+FTM_API_DOMAIN
+FTM_ODK_DOMAIN
 ```
 
 ### Connecting to a remote database
@@ -81,7 +81,7 @@ FMTM_ODK_DOMAIN
 ssh username@server.domain -N -f -L {local_port}:localhost:{remote_port}
 
 # Example
-ssh root@fmtm.hotosm.org -N -f -L 5430:localhost:5433
+ssh root@field-tm.hotosm.org -N -f -L 5430:localhost:5433
 ```
 
 This will map port 5432 on the remote machine to port 5430 on your local machine.
@@ -92,12 +92,12 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
   ```bash
   GIT_BRANCH=dev
-  backup_filename="fmtm-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
+  backup_filename="field-tm-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
   echo $backup_filename
 
   docker exec -i -e PGPASSWORD=PASSWORD_HERE \
-  fmtm-${GIT_BRANCH}-fmtm-db-1 \
-  pg_dump --verbose --encoding utf8 --format c -U fmtm fmtm \
+  field-tm-${GIT_BRANCH}-fieldtm-db-1 \
+  pg_dump --verbose --encoding utf8 --format c -U fieldtm fieldtm \
   | gzip -9 > "$backup_filename"
   ```
 
@@ -111,11 +111,11 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
   ```bash
   GIT_BRANCH=dev
-  backup_filename="fmtm-odk-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
+  backup_filename="field-tm-odk-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
   echo $backup_filename
 
   docker exec -i -e PGPASSWORD=PASSWORD_HERE \
-  fmtm-${GIT_BRANCH}-central-db-1 \
+  field-tm-${GIT_BRANCH}-central-db-1 \
   pg_dump --verbose --encoding utf8 --format c -U odk odk | \
   gzip -9 > "$backup_filename"
   ```
@@ -124,13 +124,13 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
 ```bash
 GIT_BRANCH=dev
-backup_filename="fmtm-s3-${GIT_BRANCH}-$(date +'%Y-%m-%d').tar.gz"
+backup_filename="field-tm-s3-${GIT_BRANCH}-$(date +'%Y-%m-%d').tar.gz"
 echo $backup_filename
 
 docker run --rm -i --entrypoint=tar \
 -u 0:0 \
 -v $PWD:/backups -v \
-fmtm-s3-data-${GIT_BRANCH}:/mnt/data \
+field-tm-s3-data-${GIT_BRANCH}:/mnt/data \
 ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH} \
 -cvzf "/backups/$backup_filename" /mnt/data/
 ```
@@ -142,22 +142,22 @@ The restore should be as easy as:
 ```bash
 # On a different machine (else change the container name)
 GIT_BRANCH=dev
-backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
+backup_filename=field-tm-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
 
 cat "$backup_filename" | gunzip | \
 docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE \
-fmtm-${GIT_BRANCH}-fmtm-db-1 \
-pg_restore --verbose -U fmtm -d fmtm
+field-tm-${GIT_BRANCH}-fieldtm-db-1 \
+pg_restore --verbose -U fieldtm -d fieldtm
 
 # For ODK
-backup_filename=fmtm-odk-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
+backup_filename=field-tm-odk-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
 cat "$backup_filename" | gunzip | \
 docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE \
-fmtm-${GIT_BRANCH}-central-db-1 \
+field-tm-${GIT_BRANCH}-central-db-1 \
 pg_restore --verbose -U odk -d odk
 
 # For S3 (with the backup file in current dir)
-backup_filename=fmtm-s3-${GIT_BRANCH}-XXXX-XX-XX.tar.gz
+backup_filename=field-tm-s3-${GIT_BRANCH}-XXXX-XX-XX.tar.gz
 docker run --rm -i --entrypoint=tar \
 -u 0:0 --working-dir=/ \
 -v $backup_filename:/$backup_filename -v \
@@ -180,23 +180,23 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml down -v
 
 # First, ensure you have a suitable .env with database vars
 # Start the databases only
-docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d fmtm-db central-db
+docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d fieldtm-db central-db
 
 # (Optional) restore odk central from the backup
-backup_filename=fmtm-central-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
+backup_filename=field-tm-central-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
 
 cat "$backup_filename" | gunzip | \
 docker exec -i \
-fmtm-${GIT_BRANCH}-central-db-1 \
+field-tm-${GIT_BRANCH}-central-db-1 \
 pg_restore --verbose -U odk -d odk
 
-# Restore fmtm from the backup
-backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
+# Restore field-tm from the backup
+backup_filename=field-tm-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
 
 cat "$backup_filename" | gunzip | \
 docker exec -i \
-fmtm-${GIT_BRANCH}-fmtm-db-1 \
-pg_restore --verbose -U fmtm -d fmtm
+field-tm-${GIT_BRANCH}-fieldtm-db-1 \
+pg_restore --verbose -U fieldtm -d fieldtm
 
 # Run the entire docker compose stack
 docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
@@ -206,13 +206,13 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
 
 ### Debugging
 
-- Log into the production server, fmtm.hotosm.org and view the container logs:
+- Log into the production server, field-tm.hotosm.org and view the container logs:
 
   ```bash
-  docker logs fmtm-main-api-1
-  docker logs fmtm-main-api-2
-  docker logs fmtm-main-api-3
-  docker logs fmtm-main-api-4
+  docker logs field-tm-main-api-1
+  docker logs field-tm-main-api-2
+  docker logs field-tm-main-api-3
+  docker logs field-tm-main-api-4
   ```
 
   > Note there are four replica containers running, and any one of them

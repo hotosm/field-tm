@@ -33,11 +33,11 @@ URLs defined in the docker-compose file and your env file.
    `docker compose up -d api`
 6. If everything goes well you should now be able to
    **navigate to the project in your browser:**
-   `http://api.fmtm.localhost:7050/docs`
+   `http://field.localhost:7050/docs`
 
 > Note: If that link doesn't work, check the logs with
 > `docker compose logs api`.
-> Note: the database host `fmtm-db` is automatically
+> Note: the database host `fieldtm-db` is automatically
 > resolved by docker compose to the database container IP.
 
 ### Bundled ODK Central
@@ -73,7 +73,7 @@ just start without-central
 4. Run the Fast API backend with:
    `uv run uvicorn app.main:api --host 0.0.0.0 --port 8000`
 
-The API should now be accessible at: <http://api.fmtm.localhost:7050/docs>
+The API should now be accessible at: <http://field.localhost:7050/docs>
 
 ## Backend Tips
 
@@ -164,21 +164,21 @@ Mount your bucket:
 > If you wish for this to be permanent, see below.
 
 ```bash
-sudo mkdir /mnt/fmtm/local
-sudo chown $(whoami):$(whoami) /mnt/fmtm/local
-s3fs fmtm-data /mnt/fmtm/local \
-  -o passwd_file=/home/$(whoami)/s3-creds/fmtm-local \
-  -o url=http://s3.fmtm.localhost:7050 \
+sudo mkdir /mnt/field-tm/local
+sudo chown $(whoami):$(whoami) /mnt/field-tm/local
+s3fs ftm-data /mnt/field-tm/local \
+  -o passwd_file=/home/$(whoami)/s3-creds/field-tm-local \
+  -o url=http://s3.field.localhost:7050 \
   -o use_path_request_style
 ```
 
-Access the files like a directory under: `/mnt/fmtm/local`.
+Access the files like a directory under: `/mnt/field-tm/local`.
 
 To mount permanently, add the following to `/etc/fstab`:
 
-`fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
-use_path_request_style,passwd_file=/home/USERNAME/s3-creds/fmtm-local,\
-url=http://s3.fmtm.localhost:7050 0 0`
+`ftm-data /mnt/field-tm/local fuse.s3fs _netdev,allow_other,\
+use_path_request_style,passwd_file=/home/USERNAME/s3-creds/field-tm-local,\
+url=http://s3.field.localhost:7050 0 0`
 
 > Note: you should replace USERNAME with your linux username.
 

@@ -63,7 +63,7 @@ class CreateProjectResponse(BaseModel):
     """Response after full project creation."""
 
     project_id: int
-    fmtm_url: str | None = None
+    ftm_url: str | None = None
     downstream_url: str
     manager_username: str | None = None
     manager_password: str | None = None

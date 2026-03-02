@@ -84,7 +84,7 @@ upgrade-db:
 
   just manage _install_envsubst
 
-  export VOLUME_NAME=fmtm-db-data-${GIT_BRANCH}
+  export VOLUME_NAME=field-tm-db-data-${GIT_BRANCH}
 
   ./envsubst -i contrib/pg-upgrade/compose.yaml | \
     docker compose -f - up --abort-on-container-failure

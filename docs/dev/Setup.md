@@ -54,7 +54,7 @@ Make sure to replace `<work-dir>` with the name of your directory.
 
 Clone the forked repository to your local machine using the following command:
 
-`git clone https://github.com/<your-username>/fmtm.git`
+`git clone https://github.com/<your-username>/field-tm.git`
 
 Make sure to replace `<your-username>` with your GitHub username.
 

@@ -9,7 +9,7 @@ from app.central.central_schemas import ODKCentral
 def test_resolve_odk_creds_prefers_internal_url_for_local_public_hostname():
     """Backend ODK clients should use the internal URL for local proxy hosts."""
     creds = ODKCentral(
-        external_project_instance_url="http://odk.fmtm.localhost:7050",
+        external_project_instance_url="http://odk.field.localhost:7050",
         external_project_username="admin@example.org",
         external_project_password="secret",
     )

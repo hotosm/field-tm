@@ -26,7 +26,7 @@ just start backend-no-docker
 
 Then open:
 
-- `http://fmtm.localhost:7050` (docker stack), or
+- `http://field.localhost:7050` (docker stack), or
 - `http://localhost:8000` (backend only)
 
 ## Testing

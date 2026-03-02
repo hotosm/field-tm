@@ -22,18 +22,18 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER SCHEMA public OWNER TO fmtm;
+ALTER SCHEMA public OWNER TO fieldtm;
 
 -- PostGIS
 
 CREATE SCHEMA IF NOT EXISTS tiger;
-ALTER SCHEMA tiger OWNER TO fmtm;
+ALTER SCHEMA tiger OWNER TO fieldtm;
 
 CREATE SCHEMA IF NOT EXISTS tiger_data;
-ALTER SCHEMA tiger_data OWNER TO fmtm;
+ALTER SCHEMA tiger_data OWNER TO fieldtm;
 
 CREATE SCHEMA IF NOT EXISTS topology;
-ALTER SCHEMA topology OWNER TO fmtm;
+ALTER SCHEMA topology OWNER TO fieldtm;
 
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;

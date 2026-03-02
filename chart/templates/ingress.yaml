@@ -1,5 +1,5 @@
 {{- if .Values.backend.ingress.enabled -}}
-{{- $fullName := include "fmtm.fullname" . -}}
+{{- $fullName := include "field-tm.fullname" . -}}
 {{- $svcPort := .Values.backend.service.port -}}
 {{- if not (hasKey .Values.backend.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.backend.ingress.annotations "kubernetes.io/ingress.class" .Values.backend.ingress.className}}
@@ -9,7 +9,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "fmtm.labels" . | nindent 4 }}
+    {{- include "field-tm.labels" . | nindent 4 }}
   {{- with .Values.backend.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

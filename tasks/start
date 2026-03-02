@@ -69,7 +69,7 @@ backend-no-docker:
 
   cd {{justfile_directory()}}/src/backend
 
-  FMTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
+  FTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
   OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
 
@@ -133,8 +133,8 @@ tunnel:
   # Restart Central with DOMAIN set to tunnel host.
   # Also force :443 so generated URLs match the public HTTPS tunnel.
   # This is required for ODK Collect form download links to be reachable.
-  FMTM_ODK_DOMAIN="$(echo "${odk_url}" | sed -E 's|^https://([^/:]+).*$|\1|')" \
-  FMTM_DEV_PORT=443 \
+  FTM_ODK_DOMAIN="$(echo "${odk_url}" | sed -E 's|^https://([^/:]+).*$|\1|')" \
+  FTM_DEV_PORT=443 \
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \

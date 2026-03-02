@@ -71,7 +71,7 @@ class AuthUser(BaseModel):
 
 
 # DTO for user details returned to frontend (includes project_roles)
-class FMTMUser(DataclassDTO[DbUser]):
+class FTMUser(DataclassDTO[DbUser]):
     """DTO for user details returned to frontend (includes project_roles)."""
 
     config = DTOConfig()

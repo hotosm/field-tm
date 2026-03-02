@@ -10,7 +10,7 @@ CREATE TABLE public.users (
     registered_at timestamp with time zone DEFAULT now(),
     last_login_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE public.users OWNER TO fmtm;
+ALTER TABLE public.users OWNER TO fieldtm;
 
 
 CREATE TABLE public.template_xlsforms (
@@ -18,7 +18,7 @@ CREATE TABLE public.template_xlsforms (
     title character varying,
     xls bytea
 );
-ALTER TABLE public.template_xlsforms OWNER TO fmtm;
+ALTER TABLE public.template_xlsforms OWNER TO fieldtm;
 CREATE SEQUENCE public.template_xlsforms_id_seq
 AS integer
 START WITH 1
@@ -26,7 +26,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.template_xlsforms_id_seq OWNER TO fmtm;
+ALTER TABLE public.template_xlsforms_id_seq OWNER TO fieldtm;
 ALTER SEQUENCE public.template_xlsforms_id_seq
 OWNED BY public.template_xlsforms.id;
 -- Autoincrement PK
@@ -59,7 +59,7 @@ CREATE TABLE public.projects (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE public.projects OWNER TO fmtm;
+ALTER TABLE public.projects OWNER TO fieldtm;
 CREATE SEQUENCE public.projects_id_seq
 AS integer
 START WITH 1
@@ -67,7 +67,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.projects_id_seq OWNER TO fmtm;
+ALTER TABLE public.projects_id_seq OWNER TO fieldtm;
 ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 -- Autoincrement PK
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
@@ -80,7 +80,7 @@ CREATE TABLE public.user_roles (
     project_id integer NOT NULL,
     role public.projectrole NOT NULL DEFAULT 'MAPPER'
 );
-ALTER TABLE public.user_roles OWNER TO fmtm;
+ALTER TABLE public.user_roles OWNER TO fieldtm;
 
 
 CREATE TABLE public.api_keys (
@@ -92,7 +92,7 @@ CREATE TABLE public.api_keys (
     last_used_at timestamp with time zone,
     is_active boolean NOT NULL DEFAULT TRUE
 );
-ALTER TABLE public.api_keys OWNER TO fmtm;
+ALTER TABLE public.api_keys OWNER TO fieldtm;
 CREATE SEQUENCE public.api_keys_id_seq
 AS integer
 START WITH 1
@@ -100,7 +100,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.api_keys_id_seq OWNER TO fmtm;
+ALTER TABLE public.api_keys_id_seq OWNER TO fieldtm;
 ALTER SEQUENCE public.api_keys_id_seq OWNED BY public.api_keys.id;
 -- Autoincrement PK
 ALTER TABLE ONLY public.api_keys ALTER COLUMN id SET DEFAULT nextval(
