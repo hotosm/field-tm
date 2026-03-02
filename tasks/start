@@ -130,15 +130,7 @@ tunnel:
 
   odk_url=$(just start _get-tunnel-url 'central')
 
-  # Restart Central with DOMAIN set to tunnel host.
-  # Also force :443 so generated URLs match the public HTTPS tunnel.
-  # This is required for ODK Collect form download links to be reachable.
-  FTM_ODK_DOMAIN="$(echo "${odk_url}" | sed -E 's|^https://([^/:]+).*$|\1|')" \
-  FTM_DEV_PORT=443 \
-  {{docker}} compose \
-    -f compose.yaml \
-    -f contrib/tunnel/compose.yaml \
-    up -d central
+  just start _restart-central-with-tunnel-domain "$odk_url"
 
   just start _print-tunnel-url "$odk_url"
 
@@ -149,6 +141,22 @@ view-tunnel-url:
 
   odk_url=$(just start _get-tunnel-url 'central')
   just start _print-tunnel-url "$odk_url"
+
+# Restart ODK Central with the public tunnel hostname as DOMAIN (no port).
+# Used by `just start tunnel` and `just test odk-collect`.
+[no-cd]
+_restart-central-with-tunnel-domain url:
+  #!/usr/bin/env sh
+
+  # FTM_CENTRAL_DOMAIN = hostname only (no port).
+  # HTTPS is implied by the tunnel so omitting :443 keeps generated URLs clean.
+  # We do NOT touch FTM_DEV_PORT here; that controls the proxy host-port binding
+  # and must stay at its local value (port 443 is already owned by the tunnel container).
+  FTM_CENTRAL_DOMAIN="$(echo "{{ url }}" | sed -E 's|^https://([^/:]+).*$|\1|')" \
+  {{docker}} compose \
+    -f compose.yaml \
+    -f contrib/tunnel/compose.yaml \
+    up -d --wait --force-recreate central
 
 [no-cd]
 _get-tunnel-url service_name:
