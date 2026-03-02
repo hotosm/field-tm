@@ -26,7 +26,6 @@ from textwrap import dedent
 from traceback import format_exc
 from typing import Optional
 
-import aiohttp
 import geojson
 import segno
 from litestar import Request
@@ -53,7 +52,6 @@ from app.db.models import (
     DbUser,
 )
 from app.db.postgis_utils import (
-    flatgeobuf_to_featcol,
     split_geojson_by_task_areas,
 )
 from app.helpers.geometry_utils import (
@@ -74,7 +72,7 @@ async def generate_data_extract(
     centroid: bool = False,
     use_st_within: bool = True,
 ) -> RawDataResult:  # noqa: PLR0913
-    """Request a new data extract in flatgeobuf format.
+    """Request a new data extract in GeoJSON format.
 
     Args:
         project_id (int): Id (primary key) of the project.
@@ -467,8 +465,7 @@ async def generate_project_files(
         project = await project_deps.get_project_by_id(db, project_id)
         log.info(f"Starting generate_project_files for project {project_id}")
 
-        # Extract data extract from flatgeobuf
-        log.debug("Getting data extract geojson from flatgeobuf")
+        log.debug("Getting stored data extract GeoJSON")
         feature_collection = await get_project_features_geojson(db, project)
         entity_properties, task_extract_dict = await _build_task_extracts(
             db,
@@ -634,11 +631,6 @@ async def get_project_features_geojson(
     project_id = db_project.id
     data_extract_geojson = _stored_data_extract_geojson(db_project)
     if data_extract_geojson is None:
-        data_extract_geojson = await _download_data_extract_geojson(db, db_project)
-        use_empty_default = False
-    else:
-        use_empty_default = True
-    if data_extract_geojson is None:
         return {"type": "FeatureCollection", "features": []}
 
     return await _task_filtered_feature_collection(
@@ -646,7 +638,7 @@ async def get_project_features_geojson(
         data_extract_geojson,
         project_id,
         task_id,
-        use_empty_default=use_empty_default,
+        use_empty_default=True,
     )
 
 
@@ -659,45 +651,6 @@ def _stored_data_extract_geojson(db_project: DbProject) -> dict | None:
     ):
         return data_extract_geojson
     return None
-
-
-async def _download_data_extract_geojson(
-    db: AsyncConnection,
-    db_project: DbProject,
-) -> dict | None:
-    """Download and convert the legacy flatgeobuf extract when needed."""
-    data_extract_url = getattr(db_project, "data_extract_url", None)
-    if not data_extract_url:
-        return None
-
-    project_id = db_project.id
-    data_extract_url = data_extract_url.replace(
-        settings.S3_DOWNLOAD_ROOT,
-        settings.S3_ENDPOINT,
-    )
-    async with (
-        aiohttp.ClientSession() as session,
-        session.get(data_extract_url) as response,
-    ):
-        if not response.ok:
-            msg = f"Download failed for data extract, project ({project_id})"
-            log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=msg,
-            )
-        log.debug("Converting FlatGeobuf to GeoJSON")
-        data_extract_geojson = await flatgeobuf_to_featcol(db, await response.read())
-
-    if data_extract_geojson:
-        return data_extract_geojson
-
-    msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
-    log.error(msg)
-    raise HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail=msg,
-    )
 
 
 async def _task_filtered_feature_collection(
