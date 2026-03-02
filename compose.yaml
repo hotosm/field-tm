@@ -275,7 +275,7 @@ services:
       pyxform:
         condition: service_started
     environment:
-      - DOMAIN=${FTM_ODK_DOMAIN:-odk.field.localhost}:${FTM_DEV_PORT:-7050}
+      - DOMAIN=${FTM_CENTRAL_DOMAIN:-odk.field.localhost:7050}
       - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
