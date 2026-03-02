@@ -22,7 +22,6 @@ import os
 from contextlib import asynccontextmanager
 from io import BytesIO
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
 
 import pytest
 
