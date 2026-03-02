@@ -166,17 +166,25 @@ def install_logger_hook(qgis_app: Any, log: logging.Logger) -> None:
 
 
 def validate_geometry_file(file_path: Path, log: logging.Logger) -> bool:
-    """Validate that geometry file exists and is readable."""
+    """Validate that geometry file exists and is readable by QGIS."""
     if not file_path.exists():
         log.error(f"File does not exist: {file_path}")
         return False
-    
+
     try:
         from qgis.core import QgsVectorLayer
         layer = QgsVectorLayer(str(file_path), "layer", "ogr")
-        return layer.isValid() and layer.featureCount() > 0
+        if not layer.isValid():
+            log.error(f"QGIS cannot read file as a vector layer: {file_path}")
+            return False
+        count = layer.featureCount()
+        if count == 0:
+            log.warning(f"File has 0 features: {file_path}")
+            return False
+        log.debug(f"Validated {file_path}: {count} features")
+        return True
     except Exception as e:
-        log.error(e)
+        log.error(f"Error validating geometry file {file_path}: {e}")
         return False
 
 
@@ -346,16 +354,25 @@ def set_project_file_permissions(project_path: str | Path) -> None:
 
 def xlsform_to_project(
     final_output_dir: Path,
-    features_gpkg_path: str,
+    features_gpkg_path: Optional[str],
     extent_bbox: list[float],
     title: str,
     language: str,
-    log: logging.Logger
+    log: logging.Logger,
 ) -> str:
     """Using a defined XLSForm create a project via xlsformconverter.
-    
+
+    Args:
+        final_output_dir: Directory for the generated project output.
+        features_gpkg_path: Path to the features GeoPackage, or None if
+            there are no features (collect-new-data workflow).
+        extent_bbox: Project extent as [xmin, ymin, xmax, ymax].
+        title: Project title (used for the .qgz filename).
+        language: Preferred form language.
+        log: Logger instance.
+
     Returns:
-        str: Path to the final qgz project file.
+        str: Path to the final .qgz project file.
     """
     from qgis.core import (
         QgsCoordinateReferenceSystem,
@@ -370,41 +387,18 @@ def xlsform_to_project(
     xlsform_path = project_path / "xlsform.xlsx"
     if not xlsform_path.exists():
         raise FileNotFoundError(f"XLSForm file not found: {xlsform_path}")
-    
+
     # Generate project
     final_output_dir = project_path / "final"
     final_output_dir.mkdir(mode=0o777, exist_ok=True)
     crs = QgsCoordinateReferenceSystem("EPSG:4326")
     extent_rect = QgsReferencedRectangle(QgsRectangle(*extent_bbox), crs)
-    features_layer = QgsVectorLayer(features_gpkg_path, "features_valid", "ogr")
-    if not features_layer.isValid():
-        raise RuntimeError(f"Failed to load vector layer from {features_gpkg_path}")
-
-    # FIXME running via QGIS processing didn't work!
-    # FIXME Issue: Project generation failed: Error creating algorithm from createInstance()
-    # FIXME instead we import the converter algorithm directly below
-    # params = {
-    #     "INPUT": str(xlsform_path),
-    #     "TITLE": title,
-    #     "LANGUAGE": language,
-    #     "BASEMAP": 0,
-    #     "GROUPS_AS_TABS": True,
-    #     "UPLOAD_TO_QFIELDCLOUD": False,
-    #     "CRS": crs,
-    #     "EXTENT": f"{extent} [EPSG:4326]",
-    #     "GEOMETRIES": f"{features_gpkg_path}|layername=features_valid",
-    #     "OUTPUT": str(final_output_dir),
-    # }
-    # log.info(f"Generating QGIS project with params: {params}")
-    # result = processing.run("xlsformconverter:xlsformconverter", params)
-    # log.info(f"Project generated: {result['OUTPUT']}")
 
     from xlsformconverter.XLSFormConverter import XLSFormConverter
     converter = XLSFormConverter(str(xlsform_path))
 
     if not converter.is_valid():
-        log.error("The provided XLSForm is invalid, aborting.")
-        sys.exit(1)
+        raise RuntimeError("The provided XLSForm is invalid, aborting.")
     converter.info.connect(lambda message: log.info(message))
     converter.warning.connect(lambda message: log.warning(message))
     converter.error.connect(lambda message: log.error(message))
@@ -412,10 +406,21 @@ def xlsform_to_project(
     converter.set_custom_title(title)
     converter.set_preferred_language(language)
     converter.set_basemap("OpenStreetMap")
-    converter.set_geometries(features_layer)
     converter.set_groups_as_tabs(True)
     converter.set_crs(crs)
     converter.set_extent(extent_rect)
+
+    if features_gpkg_path:
+        features_layer = QgsVectorLayer(features_gpkg_path, "features_valid", "ogr")
+        if features_layer.isValid():
+            converter.set_geometries(features_layer)
+        else:
+            log.warning(
+                "Could not load features layer from %s, "
+                "proceeding without features",
+                features_gpkg_path,
+            )
+
     return converter.convert(str(final_output_dir))
 
 
@@ -508,16 +513,15 @@ def configure_project_settings(qgis_project: "qgis.core.QgsProject", log: loggin
     # Configure tasks layer
     task_layers = qgis_project.mapLayersByName("tasks")
     if task_layers:
-        configure_task_layer_style(qgis_project, log)
+        configure_task_layer_style(task_layers, log)
         log.info("Tasks layer styled successfully")
     else:
         log.warning("Tasks layer not found in project")
-    
-    
+
     # Configure features layer (survey layer with purple fill, no stroke)
     survey_layers = qgis_project.mapLayersByName("survey")
     if survey_layers:
-        configure_survey_layer_style(qgis_project, log)
+        configure_survey_layer_style(survey_layers, log)
         log.info("Survey/features layer styled successfully")
     else:
         log.warning("Survey layer not found in project")
@@ -541,7 +545,6 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
         Result dictionary with status and message
     """
     try:
-        # from qgis import processing
         from qgis.core import QgsProject, QgsVectorLayer
 
         # Validate inputs
@@ -550,37 +553,53 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
             raise FileNotFoundError(f"Project directory not found: {project_dir}")
 
         extent_bbox = parse_and_validate_extent(extent)
- 
-        # Process feature geometries
-        log.info("Adding feature geometries")
+
+        # Process feature geometries (may be empty for collect-new-data workflows)
+        log.info("Processing feature geometries")
         features_geojson_path = project_path / "features.geojson"
-        features_gpkg_path = analyse_and_fix_geometries(str(features_geojson_path), log)
-        
+        features_gpkg_path = None
+        if features_geojson_path.exists() and validate_geometry_file(features_geojson_path, log):
+            features_gpkg_path = analyse_and_fix_geometries(str(features_geojson_path), log)
+        else:
+            log.warning("No valid feature geometries found, creating project without features layer")
+
         # XLSForm --> QGIS project
         log.info("Converting XLSForm --> project")
         final_output_dir = project_path / "final"
         project_file = xlsform_to_project(final_output_dir, features_gpkg_path, extent_bbox, title, language, log)
 
         # Add task geometries to project dir
-        log.info("Adding task geometries")
-        set_project_file_permissions(project_path) # Ensure permissions are permissive
+        log.info("Processing task geometries")
+        set_project_file_permissions(project_path)
         tasks_geojson_path = project_path / "tasks.geojson"
-        tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
-        tasks_gpkg_path_final = str(final_output_dir / "tasks.gpkg")
-        log.debug(f"Moving {tasks_gpkg_path_input} --> {tasks_gpkg_path_final}")
-        shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
-        set_project_file_permissions(project_path) # Ensure permissions are permissive
 
-        # Add task layer to project
-        log.info("Adding task layer to project, then re-adding survey on top")
+        tasks_gpkg_path_final = None
+        if tasks_geojson_path.exists() and validate_geometry_file(tasks_geojson_path, log):
+            tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
+            tasks_gpkg_path_final = str(final_output_dir / "tasks.gpkg")
+            log.debug(f"Moving {tasks_gpkg_path_input} --> {tasks_gpkg_path_final}")
+            shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
+            set_project_file_permissions(project_path)
+        else:
+            log.warning("No valid task geometries found, project will not have a tasks layer")
+
+        # Open generated project and add task layer
+        log.info("Opening generated QGIS project to add task layer")
         project = QgsProject.instance()
         project.clear()
-        project.read(project_file)
+        if not project.read(project_file):
+            raise RuntimeError(f"Failed to read generated QGIS project: {project_file}")
 
-        # Add the task layer, then ensure the survey layer is on top
-        task_layer = QgsVectorLayer(tasks_gpkg_path_final, 'tasks', 'ogr')
-        project.addMapLayer(task_layer)
-        # Find the 'survey' layer
+        # Add the task layer if available, then ensure the survey layer is on top
+        if tasks_gpkg_path_final:
+            task_layer = QgsVectorLayer(tasks_gpkg_path_final, 'tasks', 'ogr')
+            if task_layer.isValid():
+                project.addMapLayer(task_layer)
+                log.info("Tasks layer added to project")
+            else:
+                log.warning("Tasks GeoPackage is not a valid QGIS layer")
+
+        # Ensure the survey layer stays on top of the layer tree
         survey_layers = project.mapLayersByName("survey")
         if survey_layers:
             survey_layer = survey_layers[0]
@@ -588,10 +607,8 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
             survey_node = layer_root.findLayer(survey_layer.id())
             if survey_node:
                 parent = survey_node.parent()
-                # Get current index
                 current_index = parent.children().index(survey_node)
                 if current_index != 0:
-                    # Move survey layer to the top by re-inserting via insertLayer
                     parent.insertLayer(0, survey_layer)
                     parent.removeChildNode(survey_node)
 
