@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %}FieldTM | Field Tasking Manager{%
-endblock %} {% block extra_head %}
+{% extends "layout.html" %} {% block title %}FieldTM | Field Tasking Manager{% endblock %} {% block
+extra_head %}
 <style>
   .landing-page {
     --landing-shell-width: min(1150px, 92vw);
@@ -44,16 +44,8 @@ endblock %} {% block extra_head %}
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(
-        circle at 78% 22%,
-        rgba(214, 63, 63, 0.22),
-        transparent 44%
-      ),
-      radial-gradient(
-        circle at 18% 78%,
-        rgba(255, 255, 255, 0.14),
-        transparent 42%
-      );
+      radial-gradient(circle at 78% 22%, rgba(214, 63, 63, 0.22), transparent 44%),
+      radial-gradient(circle at 18% 78%, rgba(255, 255, 255, 0.14), transparent 42%);
   }
 
   .landing-hero-content {
@@ -189,11 +181,7 @@ endblock %} {% block extra_head %}
   }
 
   .landing-feature-card {
-    background: linear-gradient(
-      165deg,
-      var(--hot-color-primary-50) 0%,
-      white 100%
-    );
+    background: linear-gradient(165deg, var(--hot-color-primary-50) 0%, white 100%);
     border: 1px solid var(--hot-color-primary-100);
     border-radius: 18px;
     padding: 24px 22px;
@@ -503,27 +491,17 @@ endblock %} {% block extra_head %}
       <p class="landing-eyebrow">Coordinate field campaigns</p>
       <h1 class="landing-title">FIELD - TASKING MANAGER</h1>
       <p class="landing-subtitle">
-        Enhancing field mapping efficiency and accuracy through seamless
-        coordination.
+        Enhancing field mapping efficiency and accuracy through seamless coordination.
       </p>
       <div class="landing-hero-actions">
-        <wa-button href="/htmxprojects" variant="brand" size="large"
-          >Explore Projects</wa-button
-        >
-        <wa-button href="/new" variant="neutral" size="large"
-          >Create Project</wa-button
-        >
+        <wa-button href="/htmxprojects" variant="brand" size="large">Explore Projects</wa-button>
+        <wa-button href="/new" variant="neutral" size="large">Create Project</wa-button>
       </div>
     </div>
   </section>
 
   <section class="landing-shell landing-metrics-shell">
-    <div
-      hx-get="/metrics"
-      hx-trigger="load"
-      hx-swap="innerHTML"
-      aria-live="polite"
-    >
+    <div hx-get="/metrics" hx-trigger="load" hx-swap="innerHTML" aria-live="polite">
       <div class="landing-metrics-grid">
         <wa-card class="landing-metric-card">
           <div class="landing-loading">Loading metrics...</div>
@@ -536,14 +514,13 @@ endblock %} {% block extra_head %}
     <div>
       <h2 class="landing-section-title">What is it?</h2>
       <p>
-        The Field Tasking Manager (Field-TM) helps teams add local knowledge to
-        map features by coordinating mapping in the field.
+        The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by
+        coordinating mapping in the field.
       </p>
       <p>
-        Field-TM facilitates collaborative mapping by supporting and extending
-        mature tools like ODK and QField. It is a standalone mobile and web
-        workflow that helps teams collect geospatial data efficiently with
-        commonly available Android devices.
+        Field-TM facilitates collaborative mapping by supporting and extending mature tools like ODK
+        and QField. It is a standalone mobile and web workflow that helps teams collect geospatial
+        data efficiently with commonly available Android devices.
       </p>
     </div>
     <img
@@ -559,22 +536,21 @@ endblock %} {% block extra_head %}
       <article class="landing-feature-card">
         <h3>Flexible Data Collection</h3>
         <p>
-          Support diverse survey forms, multiple data formats, and adaptable
-          workflows that fit different operational needs.
+          Support diverse survey forms, multiple data formats, and adaptable workflows that fit
+          different operational needs.
         </p>
       </article>
       <article class="landing-feature-card">
         <h3>Open Source and Customizable</h3>
         <p>
-          Adapt Field-TM to your own survey logic, data structures, and
-          integration requirements.
+          Adapt Field-TM to your own survey logic, data structures, and integration requirements.
         </p>
       </article>
       <article class="landing-feature-card">
         <h3>Entity-Level Tracking</h3>
         <p>
-          Monitor survey progress at task and feature level so managers can make
-          informed decisions quickly.
+          Monitor survey progress at task and feature level so managers can make informed decisions
+          quickly.
         </p>
       </article>
     </div>
@@ -584,14 +560,11 @@ endblock %} {% block extra_head %}
     <h2 class="landing-section-title">Who is it for?</h2>
     <div class="landing-users-grid">
       <article class="landing-user-card">
-        <span class="landing-user-role landing-user-role--manager"
-          >Project Manager</span
-        >
+        <span class="landing-user-role landing-user-role--manager">Project Manager</span>
         <h3>Create and coordinate field campaigns</h3>
         <p>
-          Project managers use Field-TM to set up mapping projects, define areas
-          of interest, design survey forms, and split work into manageable
-          tasks.
+          Project managers use Field-TM to set up mapping projects, define areas of interest, design
+          survey forms, and split work into manageable tasks.
         </p>
         <ol class="landing-user-steps">
           <li>Define a project area and upload or choose a survey form</li>
@@ -601,14 +574,11 @@ endblock %} {% block extra_head %}
         </ol>
       </article>
       <article class="landing-user-card">
-        <span class="landing-user-role landing-user-role--mapper"
-          >Field Mapper</span
-        >
+        <span class="landing-user-role landing-user-role--mapper">Field Mapper</span>
         <h3>Collect data in the field with your phone</h3>
         <p>
-          Mappers do not need to log in to Field-TM. Once a project manager
-          publishes a project, mappers access it directly in their mobile app of
-          choice.
+          Mappers do not need to log in to Field-TM. Once a project manager publishes a project,
+          mappers access it directly in their mobile app of choice.
         </p>
         <ol class="landing-user-steps">
           <li>Scan the QR code shared by your project manager</li>
@@ -633,23 +603,22 @@ endblock %} {% block extra_head %}
         <details class="landing-use-case-item" open>
           <summary>1. Community Mapping</summary>
           <p>
-            Field Tasking Manager empowers communities to map informal
-            settlements, public facilities, and local services for inclusive
-            planning.
+            Field Tasking Manager empowers communities to map informal settlements, public
+            facilities, and local services for inclusive planning.
           </p>
         </details>
         <details class="landing-use-case-item" open>
           <summary>2. Urban Planning and Management</summary>
           <p>
-            Build smarter cities with coordinated surveys of houses, roads, and
-            utilities through clear, manageable mapping tasks.
+            Build smarter cities with coordinated surveys of houses, roads, and utilities through
+            clear, manageable mapping tasks.
           </p>
         </details>
         <details class="landing-use-case-item" open>
           <summary>3. Disaster Response and Recovery</summary>
           <p>
-            Rapidly map damaged infrastructure after disasters, coordinate
-            volunteers, and deliver reliable data for relief operations.
+            Rapidly map damaged infrastructure after disasters, coordinate volunteers, and deliver
+            reliable data for relief operations.
           </p>
         </details>
       </div>
@@ -707,43 +676,17 @@ endblock %} {% block extra_head %}
           <a href="mailto:tech-data@hotosm.org">tech-data@hotosm.org</a>
         </div>
         <div class="landing-footer-social">
-          <a
-            href="https://bsky.app/profile/hotosm.org"
-            target="_blank"
-            rel="noopener"
-          >
-            Bluesky
-          </a>
+          <a href="https://bsky.app/profile/hotosm.org" target="_blank" rel="noopener"> Bluesky </a>
           <a
             href="https://www.linkedin.com/company/humanitarian-openstreetmap-team"
             target="_blank"
             rel="noopener"
             >LinkedIn</a
           >
-          <a
-            href="https://www.facebook.com/hotosm"
-            target="_blank"
-            rel="noopener"
-            >Facebook</a
-          >
-          <a
-            href="https://www.instagram.com/_hotosm/"
-            target="_blank"
-            rel="noopener"
-            >Instagram</a
-          >
-          <a
-            href="https://www.youtube.com/user/hotosm"
-            target="_blank"
-            rel="noopener"
-            >YouTube</a
-          >
-          <a
-            href="https://github.com/hotosm/field-tm"
-            target="_blank"
-            rel="noopener"
-            >GitHub</a
-          >
+          <a href="https://www.facebook.com/hotosm" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.instagram.com/_hotosm/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.youtube.com/user/hotosm" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
         </div>
       </div>
     </div>

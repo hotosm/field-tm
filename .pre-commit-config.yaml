@@ -33,6 +33,12 @@ repos:
     hooks:
       - id: pyupgrade
 
+  # Lint: code cognitive complexity
+  - repo: https://github.com/rohaquinlop/complexipy-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: complexipy
+
   # # Dead code: Python usused code detection
   # - repo: https://github.com/asottile/dead
   #   rev: v1.5.2
@@ -48,22 +54,45 @@ repos:
         types: [text]
         args: [--toml, src/backend/pyproject.toml]
 
+  # # Spelling: Checks for common misspellings in text files.
+  # - repo: https://github.com/crate-ci/typos
+  #   rev: v1.44.0
+  #   hooks:
+  #     - id: typos
+  #       pass_filenames: false
+
   # Autoformat: YAML, JSON, Markdown, etc.
-  - repo: https://github.com/pycontribs/mirrors-prettier
-    rev: v3.6.2
+  - repo: local
     hooks:
-      - id: prettier
+      - id: oxfmt
+        name: oxfmt
+        files: ^
+        entry: bash -c 'test "$#" -gt 0 && oxfmt --write "$@" || exit 0' --
+        language: node
+        "types": [text]
+        additional_dependencies: ["oxfmt@0.35.0"]
         args:
           [
-            --ignore-unknown,
-            --no-error-on-unmatched-pattern,
             "!chart/**",
             "!CHANGELOG.md",
             "!.all-contributorsrc",
+            "!renovate.json",
             "!src/backend/tests/test_data/**",
+            "!src/backend/pyproject.toml",
             "!src/backend/packages/osm-fieldwork/tests/test_data/**",
+            "!src/backend/packages/osm-fieldwork/pyproject.toml",
             "!src/backend/packages/osm-fieldwork/osm_fieldwork/data_models/**",
+            "!src/backend/packages/osm-fieldwork/osm_fieldwork/json_data_models/**",
+            "!src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/**",
+            "!src/backend/packages/area-splitter/pyproject.toml",
           ]
+
+  # # Lint: YAML, JSON, Markdown, etc.
+  # - repo: https://github.com/oxc-project/mirrors-oxlint
+  #   rev: v1.50.0
+  #   hooks:
+  #     - id: oxlint
+  #       args: [--fix]
 
   # # Lint: Dockerfile (disabled until binary is bundled)
   # - repo: https://github.com/hadolint/hadolint.git
@@ -105,6 +134,13 @@ repos:
       - id: shellcheck
         files: ^(?!.*(?:^|/)contrib(?:/|$)).*$
         args: ["-x", "--exclude=SC2317,SC2188,SC2143,SC2086,SC1091"]
+
+  # Lint: GH Workflows
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.11
+    hooks:
+      - id: actionlint
+        args: [-ignore, SC]
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli

@@ -274,11 +274,183 @@ async def generate_odk_central_project_content(
     )
 
 
-async def generate_project_files(  # noqa: C901, PLR0912, PLR0915
+def _with_default_entity_properties(entity_properties: list[str]) -> list[str]:
+    """Append the standard styling/system fields expected by generated entities."""
+    default_fields = [
+        "created_by",
+        "fill",
+        "marker-color",
+        "stroke",
+        "stroke-width",
+    ]
+    for field in default_fields:
+        if field not in entity_properties:
+            entity_properties.append(field)
+    return entity_properties
+
+
+def _feature_collection_from_features(features: list[dict]) -> dict | None:
+    """Wrap features as a FeatureCollection when non-empty."""
+    if not features:
+        return None
+    return {"type": "FeatureCollection", "features": features}
+
+
+async def _task_boundaries_from_odk(
+    project: DbProject,
+    odk_credentials: Optional[central_schemas.ODKCentral],
+) -> dict | None:
+    """Fetch task boundaries from ODK entities when available."""
+    if not (
+        project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id
+    ):
+        return None
+
+    try:
+        async with central_deps.get_odk_dataset(odk_credentials) as odk_central:
+            entity_data = await odk_central.getEntityData(
+                project.external_project_id,
+                "tasks",
+                include_metadata=False,
+            )
+    except Exception as e:
+        log.warning(
+            "Could not fetch task boundaries from ODK for project %s: %s",
+            project.id,
+            e,
+        )
+        return None
+
+    if not isinstance(entity_data, list):
+        return None
+
+    features = []
+    for entity in entity_data:
+        if not entity.get("geometry"):
+            continue
+        geom = await javarosa_to_geojson_geom(entity["geometry"])
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": geom,
+                "properties": entity.get("properties", {}),
+            }
+        )
+
+    return _feature_collection_from_features(features)
+
+
+async def _task_boundaries_from_qfield(
+    db: AsyncConnection,
+    project_id: int,
+) -> dict | None:
+    """Fetch task boundaries from the temporary QField table when present."""
+    try:
+        async with db.cursor(row_factory=class_row(dict)) as cur:
+            temp_table_sql = sql.SQL(
+                """
+                SELECT
+                    task_index,
+                    ST_AsGeoJSON(outline)::jsonb AS outline
+                FROM {table_name}
+                ORDER BY task_index;
+            """
+            ).format(table_name=sql.Identifier(f"temp_task_boundaries_{project_id}"))
+            await cur.execute(temp_table_sql)
+            db_tasks = await cur.fetchall()
+    except Exception as e:
+        log.warning(
+            "Could not fetch task boundaries from temp table for QField project %s: %s",
+            project_id,
+            e,
+        )
+        return None
+
+    features = [
+        {
+            "type": "Feature",
+            "geometry": task["outline"],
+            "properties": {"task_id": task["task_index"]},
+        }
+        for task in db_tasks
+        if task.get("outline")
+    ]
+    return _feature_collection_from_features(features)
+
+
+async def _get_task_boundaries(
+    db: AsyncConnection,
+    project: DbProject,
+    odk_credentials: Optional[central_schemas.ODKCentral],
+) -> dict | None:
+    """Resolve task boundaries from the active downstream storage."""
+    odk_boundaries = await _task_boundaries_from_odk(project, odk_credentials)
+    if odk_boundaries:
+        return odk_boundaries
+
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        return await _task_boundaries_from_qfield(db, project.id)
+
+    return None
+
+
+async def _build_task_extracts(
+    db: AsyncConnection,
+    project: DbProject,
+    feature_collection: dict,
+    odk_credentials: Optional[central_schemas.ODKCentral],
+) -> tuple[list[str], dict[int, dict]]:
+    """Build entity property names and per-task extracts from the data extract."""
+    first_feature = next(iter(feature_collection.get("features", [])), {})
+    if not (first_feature and "properties" in first_feature):
+        return [], {}
+
+    entity_properties = _with_default_entity_properties(
+        list(first_feature["properties"].keys())
+    )
+    task_boundaries = await _get_task_boundaries(db, project, odk_credentials)
+    task_extract_dict = await split_geojson_by_task_areas(
+        db,
+        feature_collection,
+        project.id,
+        task_boundaries,
+    )
+    if task_extract_dict or not feature_collection:
+        return entity_properties, task_extract_dict
+
+    log.info(
+        "No task boundaries found for project %s. Using whole AOI as single task.",
+        project.id,
+    )
+    return entity_properties, {1: feature_collection}
+
+
+async def _resolve_project_form_upload(
+    project: DbProject,
+) -> tuple[int, str, BytesIO]:
+    """Validate project XLSForm content and extract the ODK form id."""
+    if not project.xlsform_content:
+        msg = f"No XLSForm content found for project ({project.id})"
+        log.error(msg)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=msg,
+        )
+
+    xlsform_bytes = BytesIO(project.xlsform_content)
+    project_odk_form_id, _ = await central_crud.append_fields_to_user_xlsform(
+        xlsform=xlsform_bytes,
+        form_name=f"FMTM_Project_{project.id}",
+    )
+    xlsform_bytes.seek(0)
+    return project.external_project_id, project_odk_form_id, xlsform_bytes
+
+
+async def generate_project_files(
     db: AsyncConnection,
     project_id: int,
     odk_credentials: Optional[central_schemas.ODKCentral] = None,
-) -> bool:  # noqa: C901, PLR0912, PLR0915
+) -> bool:
     """Generate the files for a project.
 
     QR code (appuser), ODK XForm, ODK Entities from OSM data extract.
@@ -298,168 +470,22 @@ async def generate_project_files(  # noqa: C901, PLR0912, PLR0915
         # Extract data extract from flatgeobuf
         log.debug("Getting data extract geojson from flatgeobuf")
         feature_collection = await get_project_features_geojson(db, project)
-
-        first_feature = next(
-            iter(feature_collection.get("features", [])), {}
-        )  # Get first feature or {}
-
-        if first_feature and "properties" in first_feature:  # Check if properties exist
-            # FIXME perhaps this should be done in the SQL code?
-            entity_properties = list(first_feature["properties"].keys())
-            for field in [
-                "created_by",
-                "fill",
-                "marker-color",
-                "stroke",
-                "stroke-width",
-            ]:
-                if field not in entity_properties:
-                    entity_properties.append(field)
-
-            log.debug("Splitting data extract per task area")
-            # TODO in future this splitting could be removed if the task_id is
-            # no longer used in the XLSForm for the map filter
-            # Get task boundaries from ODK Central (stored as entities) or QField
-            task_boundaries = None
-            if (
-                project.field_mapping_app == FieldMappingApp.ODK
-                and project.external_project_id
-            ):
-                try:
-                    project_odk_creds = odk_credentials
-                    async with central_deps.get_odk_dataset(
-                        project_odk_creds
-                    ) as odk_central:
-                        # Fetch task boundaries from ODK
-                        entity_data = await odk_central.getEntityData(
-                            project.external_project_id,
-                            "tasks",
-                            include_metadata=False,
-                        )
-
-                        if entity_data and isinstance(entity_data, list):
-                            # Convert ODK entities to GeoJSON FeatureCollection
-                            features = []
-                            for entity in entity_data:
-                                if entity.get("geometry"):
-                                    geom = await javarosa_to_geojson_geom(
-                                        entity["geometry"]
-                                    )
-                                    features.append(
-                                        {
-                                            "type": "Feature",
-                                            "geometry": geom,
-                                            "properties": entity.get("properties", {}),
-                                        }
-                                    )
-
-                            if features:
-                                task_boundaries = {
-                                    "type": "FeatureCollection",
-                                    "features": features,
-                                }
-                except Exception as e:
-                    log.warning(
-                        "Could not fetch task boundaries "
-                        f"from ODK for project {project_id}: {e}"
-                    )
-            elif project.field_mapping_app == FieldMappingApp.QFIELD:
-                # For QField, boundaries are stored in a temp table during upload
-                # Fetch from temp table for splitting data extract
-                try:
-                    async with db.cursor(row_factory=class_row(dict)) as cur:
-                        temp_table_sql = sql.SQL(
-                            """
-                            SELECT
-                                task_index,
-                                ST_AsGeoJSON(outline)::jsonb AS outline
-                            FROM {table_name}
-                            ORDER BY task_index;
-                        """
-                        ).format(
-                            table_name=sql.Identifier(
-                                f"temp_task_boundaries_{project_id}"
-                            )
-                        )
-                        await cur.execute(temp_table_sql)
-                        db_tasks = await cur.fetchall()
-
-                        if db_tasks:
-                            features = []
-                            for task in db_tasks:
-                                if task.get("outline"):
-                                    features.append(
-                                        {
-                                            "type": "Feature",
-                                            "geometry": task["outline"],
-                                            "properties": {
-                                                "task_id": task["task_index"]
-                                            },
-                                        }
-                                    )
-
-                            if features:
-                                task_boundaries = {
-                                    "type": "FeatureCollection",
-                                    "features": features,
-                                }
-                except Exception as e:
-                    log.warning(
-                        "Could not fetch task boundaries from "
-                        f"temp table for QField project {project_id}: {e}"
-                    )
-
-            task_extract_dict = await split_geojson_by_task_areas(
-                db, feature_collection, project_id, task_boundaries
-            )
-
-            # If empty (no task boundaries), use whole AOI
-            if not task_extract_dict and feature_collection:
-                log.info(
-                    f"No task boundaries found for project {project_id}. "
-                    "Using whole AOI as single task."
-                )
-                # Create a single task with all features (task_id = 1)
-                task_extract_dict = {1: feature_collection}
-        else:
-            # NOTE the entity properties are generated by the form `save_to` field
-            # NOTE automatically anyway
-            entity_properties = []
-            task_extract_dict = {}
-
-        # Get ODK Project details
-        project_odk_id = project.external_project_id
-        project_xlsform = project.xlsform_content
-
-        if not project_xlsform:
-            msg = f"No XLSForm content found for project ({project_id})"
-            log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=msg,
-            )
-
-        # Extract form_id from the stored XLSForm
-        # The form_id is stored in the XLSForm settings sheet
-        form_name = f"FMTM_Project_{project.id}"
-        xlsform_bytes = BytesIO(project_xlsform)
-
-        # Get the form_id by processing the XLSForm (this extracts it from settings)
-        # We use append_fields_to_user_xlsform which returns (xform_id, updated_form)
-        project_odk_form_id, _ = await central_crud.append_fields_to_user_xlsform(
-            xlsform=xlsform_bytes,
-            form_name=form_name,
+        entity_properties, task_extract_dict = await _build_task_extracts(
+            db,
+            project,
+            feature_collection,
+            odk_credentials,
         )
-
-        # Reset BytesIO for use in generate_odk_central_project_content
-        xlsform_bytes.seek(0)
-
-        project_odk_creds = odk_credentials
+        (
+            project_odk_id,
+            project_odk_form_id,
+            xlsform_bytes,
+        ) = await _resolve_project_form_upload(project)
 
         odk_token = await generate_odk_central_project_content(
             project_odk_id,
             project_odk_form_id,
-            project_odk_creds,
+            odk_credentials,
             xlsform_bytes,
             task_extract_dict,
             entity_properties,
@@ -481,9 +507,93 @@ async def generate_project_files(  # noqa: C901, PLR0912, PLR0915
         return False
 
 
-async def get_task_geometry(  # noqa: C901, PLR0912
-    db: AsyncConnection, project_id: int
-):
+def _empty_feature_collection_json() -> str:
+    """Return an empty GeoJSON feature collection as JSON text."""
+    return json.dumps({"type": "FeatureCollection", "features": []})
+
+
+def _serialize_stored_task_areas(task_areas_geojson) -> str | None:
+    """Serialize task areas stored directly on the project row."""
+    if task_areas_geojson is None:
+        return None
+    if task_areas_geojson == {}:
+        return _empty_feature_collection_json()
+    if isinstance(task_areas_geojson, dict):
+        return json.dumps(task_areas_geojson)
+    if isinstance(task_areas_geojson, str):
+        return task_areas_geojson
+    return None
+
+
+def _project_odk_credentials_from_settings() -> central_schemas.ODKCentral:
+    """Build ODK credentials from environment settings."""
+    return central_schemas.ODKCentral(
+        external_project_instance_url=settings.ODK_CENTRAL_URL,
+        external_project_username=settings.ODK_CENTRAL_USER,
+        external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
+        if settings.ODK_CENTRAL_PASSWD
+        else "",
+    )
+
+
+async def _task_geometry_from_odk(project: DbProject) -> str | None:
+    """Load task geometry from ODK entities and serialize as GeoJSON."""
+    if not (
+        project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id
+    ):
+        return None
+
+    try:
+        async with central_deps.get_odk_dataset(
+            _project_odk_credentials_from_settings()
+        ) as odk_central:
+            entity_data = await odk_central.getEntityData(
+                project.external_project_id,
+                "tasks",
+                include_metadata=False,
+            )
+    except Exception as e:
+        log.warning(
+            "Failed to fetch task boundaries from ODK for project %s: %s",
+            project.id,
+            e,
+        )
+        return None
+
+    if not isinstance(entity_data, list):
+        return None
+
+    features = []
+    for entity in entity_data:
+        if not entity.get("geometry"):
+            continue
+        geom = await javarosa_to_geojson_geom(entity["geometry"])
+        task_id = entity.get("task_id", entity.get("__id", ""))
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": geom,
+                "properties": {"task_id": task_id, **(entity.get("properties", {}))},
+            }
+        )
+
+    if not features:
+        return None
+    return json.dumps({"type": "FeatureCollection", "features": features})
+
+
+async def _task_geometry_from_qfield(
+    db: AsyncConnection,
+    project_id: int,
+) -> str | None:
+    """Load task geometry from the temporary QField task boundary table."""
+    feature_collection = await _task_boundaries_from_qfield(db, project_id)
+    if not feature_collection:
+        return None
+    return json.dumps(feature_collection)
+
+
+async def get_task_geometry(db: AsyncConnection, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
     Task boundaries are stored in the database as task_areas_geojson (for preview),
@@ -499,115 +609,20 @@ async def get_task_geometry(  # noqa: C901, PLR0912
     """
     # Get project to check if it has task areas stored in database
     project = await project_deps.get_project_by_id(db, project_id)
+    stored_task_areas = _serialize_stored_task_areas(project.task_areas_geojson)
+    if stored_task_areas is not None:
+        return stored_task_areas
 
-    # First, check if task areas are stored in the database (for preview)
-    if project.task_areas_geojson is not None:
-        # If it's an empty dict, return empty FeatureCollection
-        if project.task_areas_geojson == {}:
-            feature_collection = {"type": "FeatureCollection", "features": []}
-            return json.dumps(feature_collection)
-        # Otherwise, return the stored GeoJSON
-        if isinstance(project.task_areas_geojson, dict):
-            return json.dumps(project.task_areas_geojson)
-        elif isinstance(project.task_areas_geojson, str):
-            return project.task_areas_geojson
+    odk_task_geometry = await _task_geometry_from_odk(project)
+    if odk_task_geometry is not None:
+        return odk_task_geometry
 
-    # Fetch task boundaries from ODK Central if not in database
-    if project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id:
-        try:
-            # ODK credentials not stored on project, create from env vars
-            from app.central.central_schemas import ODKCentral
-            from app.core.config import settings
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        qfield_task_geometry = await _task_geometry_from_qfield(db, project_id)
+        if qfield_task_geometry is not None:
+            return qfield_task_geometry
 
-            project_odk_creds = ODKCentral(
-                external_project_instance_url=settings.ODK_CENTRAL_URL,
-                external_project_username=settings.ODK_CENTRAL_USER,
-                external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
-                if settings.ODK_CENTRAL_PASSWD
-                else "",
-            )
-            async with central_deps.get_odk_dataset(project_odk_creds) as odk_central:
-                # Fetch entities from task_boundaries dataset
-                entity_data = await odk_central.getEntityData(
-                    project.external_project_id,
-                    "tasks",
-                    include_metadata=False,
-                )
-
-                if entity_data and isinstance(entity_data, list):
-                    # Convert ODK entities back to GeoJSON
-                    features = []
-                    for entity in entity_data:
-                        if entity.get("geometry"):
-                            geom = await javarosa_to_geojson_geom(entity["geometry"])
-                            task_id = entity.get("task_id", entity.get("__id", ""))
-                            features.append(
-                                {
-                                    "type": "Feature",
-                                    "geometry": geom,
-                                    "properties": {
-                                        "task_id": task_id,
-                                        **(entity.get("properties", {})),
-                                    },
-                                }
-                            )
-
-                    if features:
-                        feature_collection = {
-                            "type": "FeatureCollection",
-                            "features": features,
-                        }
-                        return json.dumps(feature_collection)
-        except Exception as e:
-            log.warning(
-                "Failed to fetch task boundaries from "
-                f"ODK for project {project_id}: {e}"
-            )
-    elif project.field_mapping_app == FieldMappingApp.QFIELD:
-        # For QField, fetch from temporary table
-        try:
-            async with db.cursor(row_factory=class_row(dict)) as cur:
-                temp_table_sql = sql.SQL(
-                    """
-                    SELECT
-                        task_index,
-                        ST_AsGeoJSON(outline)::jsonb AS outline
-                    FROM {table_name}
-                    ORDER BY task_index;
-                """
-                ).format(
-                    table_name=sql.Identifier(f"temp_task_boundaries_{project_id}")
-                )
-                await cur.execute(temp_table_sql)
-                db_tasks = await cur.fetchall()
-
-                if db_tasks:
-                    features = []
-                    for task in db_tasks:
-                        if task.get("outline"):
-                            features.append(
-                                {
-                                    "type": "Feature",
-                                    "geometry": task["outline"],
-                                    "properties": {"task_id": task["task_index"]},
-                                }
-                            )
-
-                    if features:
-                        feature_collection = {
-                            "type": "FeatureCollection",
-                            "features": features,
-                        }
-                        return json.dumps(feature_collection)
-        except Exception as e:
-            log.warning(
-                "Failed to fetch task boundaries from temp table "
-                f"for QField project {project_id}: {e}"
-            )
-
-    # Return empty FeatureCollection if no boundaries found
-    feature_collection = {"type": "FeatureCollection", "features": []}
-    return json.dumps(feature_collection)
+    return _empty_feature_collection_json()
 
 
 async def get_project_features_geojson(
@@ -617,40 +632,49 @@ async def get_project_features_geojson(
 ) -> geojson.FeatureCollection:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
-
-    # Check for stored GeoJSON first (new approach, no S3)
-    if hasattr(db_project, "data_extract_geojson") and db_project.data_extract_geojson:
-        data_extract_geojson = db_project.data_extract_geojson
-        # Ensure it's a proper FeatureCollection
-        if (
-            isinstance(data_extract_geojson, dict)
-            and data_extract_geojson.get("type") == "FeatureCollection"
-        ):
-            # Determine geometry type from the GeoJSON data
-            geom_type = get_featcol_dominant_geom_type(data_extract_geojson)
-            # Split by task areas if task_id provided
-            if task_id:
-                split_extract_dict = await split_geojson_by_task_areas(
-                    db, data_extract_geojson, project_id, geom_type
-                )
-                return split_extract_dict.get(
-                    task_id, {"type": "FeatureCollection", "features": []}
-                )
-            return data_extract_geojson
-
-    # Fallback to URL-based approach (legacy)
-    data_extract_url = getattr(db_project, "data_extract_url", None)
-
-    if not data_extract_url:
-        # Return an empty featcol for projects with no existing features
+    data_extract_geojson = _stored_data_extract_geojson(db_project)
+    if data_extract_geojson is None:
+        data_extract_geojson = await _download_data_extract_geojson(db, db_project)
+        use_empty_default = False
+    else:
+        use_empty_default = True
+    if data_extract_geojson is None:
         return {"type": "FeatureCollection", "features": []}
 
-    # If local debug URL, replace with Docker service name
+    return await _task_filtered_feature_collection(
+        db,
+        data_extract_geojson,
+        project_id,
+        task_id,
+        use_empty_default=use_empty_default,
+    )
+
+
+def _stored_data_extract_geojson(db_project: DbProject) -> dict | None:
+    """Return the stored FeatureCollection when available."""
+    data_extract_geojson = getattr(db_project, "data_extract_geojson", None)
+    if (
+        isinstance(data_extract_geojson, dict)
+        and data_extract_geojson.get("type") == "FeatureCollection"
+    ):
+        return data_extract_geojson
+    return None
+
+
+async def _download_data_extract_geojson(
+    db: AsyncConnection,
+    db_project: DbProject,
+) -> dict | None:
+    """Download and convert the legacy flatgeobuf extract when needed."""
+    data_extract_url = getattr(db_project, "data_extract_url", None)
+    if not data_extract_url:
+        return None
+
+    project_id = db_project.id
     data_extract_url = data_extract_url.replace(
         settings.S3_DOWNLOAD_ROOT,
         settings.S3_ENDPOINT,
     )
-
     async with (
         aiohttp.ClientSession() as session,
         session.get(data_extract_url) as response,
@@ -662,29 +686,44 @@ async def get_project_features_geojson(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=msg,
             )
-
         log.debug("Converting FlatGeobuf to GeoJSON")
         data_extract_geojson = await flatgeobuf_to_featcol(db, await response.read())
 
-    if not data_extract_geojson:
-        msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
-        log.error(msg)
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=msg,
-        )
+    if data_extract_geojson:
+        return data_extract_geojson
 
-    # Determine geometry type from the GeoJSON data
+    msg = f"Failed to convert flatgeobuf --> geojson for project ({project_id})"
+    log.error(msg)
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail=msg,
+    )
+
+
+async def _task_filtered_feature_collection(
+    db: AsyncConnection,
+    data_extract_geojson: dict,
+    project_id: int,
+    task_id: int | None,
+    use_empty_default: bool = True,
+) -> geojson.FeatureCollection:
+    """Return either the full extract or the task-specific split subset."""
+    if not task_id:
+        return data_extract_geojson
+
     geom_type = get_featcol_dominant_geom_type(data_extract_geojson)
-
-    # Split by task areas if task_id provided
-    if task_id:
-        split_extract_dict = await split_geojson_by_task_areas(
-            db, data_extract_geojson, project_id, geom_type
+    split_extract_dict = await split_geojson_by_task_areas(
+        db,
+        data_extract_geojson,
+        project_id,
+        geom_type=geom_type,
+    )
+    if use_empty_default:
+        return split_extract_dict.get(
+            task_id,
+            {"type": "FeatureCollection", "features": []},
         )
-        return split_extract_dict[task_id]
-
-    return data_extract_geojson
+    return split_extract_dict[task_id]
 
 
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
@@ -783,6 +822,87 @@ async def send_project_manager_message(
     log.info(f"Message sent to new project manager ({new_manager.username}).")
 
 
+def _project_odk_qr_credentials(project: DbProject) -> central_schemas.ODKCentral:
+    """Resolve ODK credentials for QR-code generation and app-user lookup."""
+    project_odk_creds = project.get_odk_credentials()
+    if project_odk_creds is not None:
+        return project_odk_creds
+
+    odk_base_url = (
+        project.external_project_instance_url
+        or settings.ODK_CENTRAL_PUBLIC_URL
+        or settings.ODK_CENTRAL_URL
+    )
+    return central_schemas.ODKCentral(
+        external_project_instance_url=odk_base_url,
+        external_project_username=settings.ODK_CENTRAL_USER,
+        external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
+        if settings.ODK_CENTRAL_PASSWD
+        else "",
+    )
+
+
+async def _get_or_create_appuser_token(
+    project: DbProject,
+    odk_central: central_schemas.ODKCentral,
+) -> str:
+    """Get an existing app-user token or create one if none exists."""
+    async with central_deps.pyodk_client(odk_central) as client:
+        appusers_response = client.session.get(
+            f"projects/{project.external_project_id}/app-users"
+        )
+        appusers_response.raise_for_status()
+        appusers = appusers_response.json() or []
+        appuser_token = next(
+            (app_user.get("token") for app_user in appusers if app_user.get("token")),
+            None,
+        )
+        if appuser_token:
+            return appuser_token
+
+        created_user = client.session.post(
+            f"projects/{project.external_project_id}/app-users",
+            json={"displayName": "fmtm_user"},
+        )
+        created_user.raise_for_status()
+        return (created_user.json() or {}).get("token")
+
+
+def _odk_qrcode_data_url(
+    project: DbProject,
+    odk_central: central_schemas.ODKCentral,
+    appuser_token: str,
+    username: str,
+) -> str:
+    """Generate the ODK QR code data URL."""
+    appuser_obj = OdkAppUser(
+        odk_central.external_project_instance_url,
+        odk_central.external_project_username,
+        odk_central.external_project_password,
+    )
+    qrcode = appuser_obj.createQRCode(
+        odk_id=project.external_project_id,
+        project_name=project.project_name,
+        appuser_token=appuser_token,
+        basemap="osm",
+        osm_username=username,
+    )
+    return qrcode.png_data_uri(scale=5)
+
+
+def _qfield_qrcode_data_url(project: DbProject) -> str:
+    """Generate the QField QR code data URL."""
+    if not project.external_project_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="QField project ID not found.",
+        )
+
+    qfield_url = f"qfield://cloud?project={project.external_project_id}"
+    qrcode = segno.make(qfield_url, micro=False)
+    return qrcode.png_data_uri(scale=6)
+
+
 async def get_project_qrcode(
     db: AsyncConnection,
     project_id: int,
@@ -811,57 +931,15 @@ async def get_project_qrcode(
             detail="Project name not found.",
         )
 
-    qr_code_data_url = None
-
     if project.field_mapping_app == FieldMappingApp.ODK:
-        # For ODK, generate QR code using appuser token
         if not project.external_project_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="ODK project ID not found.",
             )
 
-        # Resolve ODK credentials for API calls and QR payload generation.
-        # If project-specific credentials are unavailable, prefer the project's
-        # stored external URL (if any) over internal docker-only service URLs.
-        project_odk_creds = project.get_odk_credentials()
-        if project_odk_creds is None:
-            odk_base_url = (
-                project.external_project_instance_url
-                or settings.ODK_CENTRAL_PUBLIC_URL
-                or settings.ODK_CENTRAL_URL
-            )
-            odk_central = central_schemas.ODKCentral(
-                external_project_instance_url=odk_base_url,
-                external_project_username=settings.ODK_CENTRAL_USER,
-                external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
-                if settings.ODK_CENTRAL_PASSWD
-                else "",
-            )
-        else:
-            odk_central = project_odk_creds
-
-        async with central_deps.pyodk_client(odk_central) as client:
-            appusers_response = client.session.get(
-                f"projects/{project.external_project_id}/app-users"
-            )
-            appusers_response.raise_for_status()
-            appusers = appusers_response.json() or []
-            appuser_token = next(
-                (
-                    app_user.get("token")
-                    for app_user in appusers
-                    if app_user.get("token")
-                ),
-                None,
-            )
-            if not appuser_token:
-                created_user = client.session.post(
-                    f"projects/{project.external_project_id}/app-users",
-                    json={"displayName": "fmtm_user"},
-                )
-                created_user.raise_for_status()
-                appuser_token = (created_user.json() or {}).get("token")
+        odk_central = _project_odk_qr_credentials(project)
+        appuser_token = await _get_or_create_appuser_token(project, odk_central)
 
         if not appuser_token:
             raise HTTPException(
@@ -869,34 +947,16 @@ async def get_project_qrcode(
                 detail="Appuser token not found.",
             )
 
-        # Generate QR code using OdkAppUser.createQRCode
-        appuser_obj = OdkAppUser(
-            odk_central.external_project_instance_url,
-            odk_central.external_project_username,
-            odk_central.external_project_password,
+        qr_code_data_url = _odk_qrcode_data_url(
+            project,
+            odk_central,
+            appuser_token,
+            username,
         )
-
-        qrcode = appuser_obj.createQRCode(
-            odk_id=project.external_project_id,
-            project_name=project.project_name,
-            appuser_token=appuser_token,
-            basemap="osm",
-            osm_username=username,
-        )
-        # Convert to base64 data URL
-        qr_code_data_url = qrcode.png_data_uri(scale=5)
-
     elif project.field_mapping_app == FieldMappingApp.QFIELD:
-        # For QField, generate QR code with qfield://cloud?project=ID
-        if not project.external_project_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="QField project ID not found.",
-            )
-
-        qfield_url = f"qfield://cloud?project={project.external_project_id}"
-        qrcode = segno.make(qfield_url, micro=False)
-        qr_code_data_url = qrcode.png_data_uri(scale=6)
+        qr_code_data_url = _qfield_qrcode_data_url(project)
+    else:
+        qr_code_data_url = None
 
     if not qr_code_data_url:
         raise HTTPException(

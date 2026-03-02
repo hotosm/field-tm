@@ -25,7 +25,6 @@ import secrets
 from litestar import Request
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from litestar.params import Parameter
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required
@@ -90,10 +89,9 @@ async def _authenticate_api_key(db: AsyncConnection, raw_api_key: str) -> AuthUs
 async def api_key_required(
     request: Request,  # noqa: ARG001 - required for Litestar dependency signature
     db: AsyncConnection,
-    x_api_key: str | None = Parameter(default=None, header="X-API-KEY"),
 ) -> AuthUser:
     """Dependency that authenticates requests via X-API-KEY header."""
-    raw_api_key = x_api_key or _extract_api_key_from_request(request)
+    raw_api_key = _extract_api_key_from_request(request)
     if not raw_api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -105,11 +103,9 @@ async def api_key_required(
 async def login_or_api_key(
     request: Request,
     db: AsyncConnection,
-    x_api_key: str | None = Parameter(default=None, header="X-API-KEY"),
-    access_token: str | None = Parameter(default=None, header="access_token"),
 ) -> AuthUser:
     """Allow either cookie-based auth or API key auth."""
-    raw_api_key = x_api_key or _extract_api_key_from_request(request)
+    raw_api_key = _extract_api_key_from_request(request)
     if raw_api_key:
         return await _authenticate_api_key(db, raw_api_key)
-    return await login_required(request=request, access_token=access_token)
+    return await login_required(request=request)

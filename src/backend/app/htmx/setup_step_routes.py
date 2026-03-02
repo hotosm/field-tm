@@ -50,6 +50,7 @@ from app.projects import project_crud, project_schemas
 from app.projects.project_services import (
     ODKFinalizeResult,
     ServiceError,
+    SplitAoiOptions,
     download_osm_data,
     finalize_odk_project,
     finalize_qfield_project,
@@ -65,6 +66,337 @@ from app.qfield.qfield_schemas import QFieldCloud
 from .htmx_helpers import callout as _callout
 
 log = logging.getLogger(__name__)
+
+
+def _project_not_found_response() -> Response:
+    """Return a consistent 404 response for unauthorized/missing project context."""
+    return Response(
+        content=_callout("danger", "Project not found or access denied."),
+        media_type="text/html",
+        status_code=404,
+    )
+
+
+def _html_error_response(message: str, status_code: int) -> Response:
+    """Return a standard HTML callout error response."""
+    return Response(
+        content=_callout("danger", message),
+        media_type="text/html",
+        status_code=status_code,
+    )
+
+
+def _json_error_response(message: str, status_code: int) -> Response:
+    """Return a standard JSON error response."""
+    return Response(
+        content=json.dumps({"error": message}),
+        media_type="application/json",
+        status_code=status_code,
+    )
+
+
+def _service_error_response(error: ServiceError) -> Response:
+    """Render service-layer failures as HTML responses."""
+    status_code = 400 if isinstance(error, SvcValidationError) else 500
+    return Response(
+        content=_callout("danger", error.message),
+        media_type="text/html",
+        status_code=status_code,
+    )
+
+
+def _parse_json_payload(raw_value, invalid_message: str, log_prefix: str):
+    """Parse a JSON string payload, returning `(value, error_response)`."""
+    try:
+        return json.loads(raw_value), None
+    except (json.JSONDecodeError, TypeError) as e:
+        preview = raw_value[:100] if isinstance(raw_value, str) else raw_value
+        log.error(
+            "%s: %s, type: %s, value: %s",
+            log_prefix,
+            e,
+            type(raw_value),
+            preview,
+        )
+        return None, _html_error_response(invalid_message, 400)
+
+
+async def _get_submitted_geojson_data(
+    db: AsyncConnection,
+    project_id: int,
+    data: dict,
+) -> tuple[dict | None, Response | None]:
+    """Load GeoJSON from the request body or fall back to the stored project extract."""
+    if "geojson-data" not in data:
+        log.debug("No geojson-data in request, falling back to database")
+        project_db = await DbProject.one(db, project_id)
+        return project_db.data_extract_geojson, None
+
+    try:
+        geojson_str = data["geojson-data"]
+        geojson_len = len(geojson_str) if geojson_str else 0
+        log.debug("Received geojson-data, length: %s", geojson_len)
+        geojson_data = json.loads(geojson_str)
+        parsed_feature_count = len(geojson_data.get("features", []))
+        log.debug("Successfully parsed GeoJSON with %s features", parsed_feature_count)
+        return geojson_data, None
+    except json.JSONDecodeError as e:
+        log.error(f"Failed to parse GeoJSON from request: {e}")
+        return None, _html_error_response(
+            "Invalid GeoJSON data in request. Please try uploading again.",
+            400,
+        )
+    except (TypeError, KeyError) as e:
+        log.error(f"Error accessing geojson-data from request: {e}")
+        return None, _html_error_response(
+            "Error reading GeoJSON data from request.", 400
+        )
+
+
+def _normalize_geojson_response_body(result_geojson: dict) -> dict:
+    """Build the JSON response body for validated GeoJSON, including area warnings."""
+    response_body: dict = {"geojson": result_geojson}
+    try:
+        geom = result_geojson
+        if geom.get("type") == "Feature":
+            geom = geom.get("geometry", geom)
+        elif geom.get("type") == "FeatureCollection":
+            features = geom.get("features", [])
+            if features:
+                geom = features[0].get("geometry", features[0])
+        area_km2 = geojson_area_km2(geom)
+        response_body["area_km2"] = round(area_km2, 2)
+        if area_km2 > AREA_LIMIT_KM2:
+            response_body["warning"] = (
+                f"Area is {area_km2:,.0f} km², which exceeds the "
+                f"{AREA_LIMIT_KM2:,} km² limit. "
+                "Please select a smaller area."
+            )
+        elif area_km2 > AREA_WARN_KM2:
+            response_body["warning"] = (
+                f"Area is {area_km2:,.0f} km². Large areas "
+                f"(>{AREA_WARN_KM2} km²) may take longer to process. "
+                f"The data extract API is limited to 200 km²."
+            )
+    except Exception as e:
+        log.warning(f"Could not calculate area: {e}")
+    return response_body
+
+
+def _parse_bool_flag(raw_value, default: bool = True) -> bool:
+    """Parse truthy form values from URL-encoded payload."""
+    if raw_value is None:
+        return default
+    if isinstance(raw_value, list):
+        raw_value = raw_value[-1] if raw_value else default
+    if isinstance(raw_value, bool):
+        return raw_value
+    return str(raw_value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_int_form_value(raw_value, default: int) -> int:
+    """Parse an integer form value with a fallback default."""
+    try:
+        return int(raw_value)
+    except (ValueError, TypeError):
+        return default
+
+
+def _parse_split_form_options(data: dict | None) -> dict:
+    """Normalize split form options from the request payload."""
+    payload = data or {}
+    return {
+        "algorithm": payload.get("algorithm", "").strip(),
+        "no_of_buildings": _parse_int_form_value(
+            payload.get("no_of_buildings", 10), 10
+        ),
+        "dimension_meters": _parse_int_form_value(
+            payload.get("dimension_meters", 100), 100
+        ),
+        "include_roads": _parse_bool_flag(payload.get("include_roads"), default=True),
+        "include_rivers": _parse_bool_flag(payload.get("include_rivers"), default=True),
+        "include_railways": _parse_bool_flag(
+            payload.get("include_railways"), default=True
+        ),
+        "include_aeroways": _parse_bool_flag(
+            payload.get("include_aeroways"), default=True
+        ),
+    }
+
+
+def _project_outline_layer(project) -> dict | None:
+    """Build the standard AOI outline map layer."""
+    if not project.outline:
+        return None
+
+    return {
+        "data": {
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "geometry": project.outline, "properties": {}}
+            ],
+        },
+        "name": "Project AOI",
+        "color": "#d63f3f",
+        "weight": 2,
+        "opacity": 0.8,
+        "fillOpacity": 0.1,
+    }
+
+
+def _data_extract_layer(data_extract: dict) -> dict:
+    """Build the standard data-extract map layer."""
+    data_feature_count = len(data_extract.get("features", []))
+    return {
+        "data": data_extract,
+        "name": f"Data Extract ({data_feature_count} features)",
+        "color": "#3388ff",
+        "weight": 2,
+        "opacity": 0.8,
+        "fillOpacity": 0.3,
+    }
+
+
+def _task_boundaries_layer(task_boundaries: dict) -> dict:
+    """Build the standard task-boundaries map layer."""
+    task_count = len(task_boundaries.get("features", []))
+    return {
+        "data": task_boundaries,
+        "name": f"Task Boundaries ({task_count} tasks)",
+        "color": "#ff7800",
+        "weight": 3,
+        "opacity": 1.0,
+        "fillOpacity": 0.1,
+    }
+
+
+def _parse_task_boundaries_json(task_boundaries_json, project_id: int) -> dict | None:
+    """Parse task boundary JSON from string/dict values."""
+    if isinstance(task_boundaries_json, dict):
+        return task_boundaries_json
+    if not isinstance(task_boundaries_json, str):
+        return None
+
+    try:
+        return json.loads(task_boundaries_json)
+    except json.JSONDecodeError:
+        log.warning(f"Failed to parse task boundaries JSON for project {project_id}")
+        return None
+
+
+def _task_preview_state(
+    project, task_boundaries: dict | None
+) -> tuple[bool, Response | None]:
+    """Determine whether preview is no-splitting, incomplete, or ready."""
+    has_features = bool(task_boundaries and task_boundaries.get("features"))
+    if has_features:
+        return False, None
+    if project.task_areas_geojson == {}:
+        return True, None
+    return False, Response(
+        content=_callout(
+            "warning",
+            "No task boundaries found. Please split the project into "
+            'tasks first using the "Split AOI" button above.',
+        ),
+        media_type="text/html",
+        status_code=200,
+    )
+
+
+def _build_preview_layers(
+    project,
+    data_extract: dict,
+    task_boundaries: dict | None,
+    is_no_splitting: bool,
+) -> list[dict]:
+    """Build map layers for the preview-tasks-and-data view."""
+    geojson_layers = []
+    outline_layer = _project_outline_layer(project)
+    if outline_layer:
+        geojson_layers.append(outline_layer)
+    geojson_layers.append(_data_extract_layer(data_extract))
+    if not is_no_splitting and task_boundaries and task_boundaries.get("features"):
+        geojson_layers.append(_task_boundaries_layer(task_boundaries))
+    return geojson_layers
+
+
+def _build_split_preview_response(
+    project_id: int,
+    algorithm: str,
+    tasks_featcol: dict,
+    data_extract: dict | None,
+    project,
+) -> Response:
+    """Render the AOI split preview response with the Accept button."""
+    task_count = len(tasks_featcol.get("features", []))
+    geojson_layers = []
+    outline_layer = _project_outline_layer(project)
+    if outline_layer:
+        geojson_layers.append(outline_layer)
+    if data_extract:
+        geojson_layers.append(_data_extract_layer(data_extract))
+    geojson_layers.append(_task_boundaries_layer(tasks_featcol))
+
+    map_html_content = render_leaflet_map(
+        map_id="leaflet-map-split-preview",
+        geojson_layers=geojson_layers,
+        height="600px",
+        show_controls=True,
+    )
+    tasks_geojson_str = json.dumps(tasks_featcol).replace('"', "&quot;")
+    data_extract_info = ""
+    if data_extract:
+        data_feature_count = len(data_extract.get("features", []))
+        data_extract_info = f" and {data_feature_count} data features"
+
+    split_success_msg = (
+        "✓ AOI split successfully! Generated "
+        f"{task_count} task areas using "
+        f"{algorithm.replace('_', ' ').title()}."
+    )
+    split_preview_msg = (
+        f"Previewing {task_count} task boundaries{data_extract_info}. "
+        "Review the results below. If satisfied, click "
+        '"Accept Task Choices" to save. Otherwise, adjust parameters '
+        'above and click "Split Again" to regenerate.'
+    )
+    return Response(
+        content=f"""
+        {_callout("success", split_success_msg)}
+        <div style="margin-top: 20px;">
+            <div style="margin-bottom: 10px;">
+                {_callout("info", split_preview_msg)}
+            </div>
+            {map_html_content}
+            <form
+                id="accept-split-form"
+                style="margin-top: 20px; display: flex; gap: 10px;
+                justify-content: center;"
+            >
+                <input
+                    type="hidden"
+                    name="tasks_geojson"
+                    value='{tasks_geojson_str}'
+                />
+                <button
+                    id="accept-split-btn"
+                    type="submit"
+                    hx-post="/accept-split-htmx?project_id={project_id}"
+                    hx-target="#split-status"
+                    hx-swap="innerHTML"
+                    hx-include="#accept-split-form"
+                    class="wa-button wa-button--primary"
+                    style="min-width: 200px"
+                >
+                    Accept Task Choices
+                </button>
+            </form>
+        </div>
+        """,
+        media_type="text/html",
+        status_code=200,
+    )
 
 
 def _build_odk_finalize_success_html(result: ODKFinalizeResult) -> str:
@@ -558,7 +890,7 @@ async def collect_new_data_only_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def submit_geojson_data_extract_htmx(  # noqa: PLR0911, PLR0913
+async def submit_geojson_data_extract_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -573,59 +905,18 @@ async def submit_geojson_data_extract_htmx(  # noqa: PLR0911, PLR0913
     """
     project = current_user.get("project")
     if not project or project.id != project_id:
-        return Response(
-            content=_callout("danger", "Project not found or access denied."),
-            media_type="text/html",
-            status_code=404,
-        )
+        return _project_not_found_response()
 
     try:
-        # Get GeoJSON from request body (passed from download/upload endpoints)
-        # or fall back to database if not in request (for backwards compatibility)
-        geojson_data = None
-
         request_keys = list(data.keys()) if data else "None"
         log.debug(f"Submit data extract request received. Keys in data: {request_keys}")
-
-        if "geojson-data" in data:
-            # Get from request body (new flow - not saved to DB yet)
-            try:
-                geojson_str = data["geojson-data"]
-                geojson_len = len(geojson_str) if geojson_str else 0
-                log.debug(f"Received geojson-data, length: {geojson_len}")
-                geojson_data = json.loads(geojson_str)
-                parsed_feature_count = len(geojson_data.get("features", []))
-                log.debug(
-                    f"Successfully parsed GeoJSON with {parsed_feature_count} features"
-                )
-            except json.JSONDecodeError as e:
-                log.error(f"Failed to parse GeoJSON from request: {e}")
-                return Response(
-                    content=_callout(
-                        "danger",
-                        "Invalid GeoJSON data in request. Please try uploading again.",
-                    ),
-                    media_type="text/html",
-                    status_code=400,
-                )
-            except (TypeError, KeyError) as e:
-                log.error(f"Error accessing geojson-data from request: {e}")
-                return Response(
-                    content=_callout(
-                        "danger",
-                        "Error reading GeoJSON data from request.",
-                    ),
-                    media_type="text/html",
-                    status_code=400,
-                )
-        else:
-            # Fall back to database (backwards compatibility)
-            log.debug("No geojson-data in request, falling back to database")
-            project_db = await DbProject.one(db, project_id)
-            geojson_data = project_db.data_extract_geojson
-
-        if not geojson_data:
-            return Response(
+        geojson_data, error_response = await _get_submitted_geojson_data(
+            db,
+            project_id,
+            data or {},
+        )
+        if error_response or not geojson_data:
+            return error_response or Response(
                 content=_callout(
                     "warning",
                     "No GeoJSON data found. Please download OSM data "
@@ -694,7 +985,7 @@ async def submit_geojson_data_extract_htmx(  # noqa: PLR0911, PLR0913
         "current_user": Provide(mapper),
     },
 )
-async def preview_tasks_and_data_htmx(  # noqa: C901, PLR0912
+async def preview_tasks_and_data_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -704,14 +995,9 @@ async def preview_tasks_and_data_htmx(  # noqa: C901, PLR0912
     """Preview task boundaries and data extract together on a Leaflet map via HTMX."""
     project = current_user.get("project")
     if not project or project.id != project_id:
-        return Response(
-            content=_callout("danger", "Project not found or access denied."),
-            media_type="text/html",
-            status_code=404,
-        )
+        return _project_not_found_response()
 
     try:
-        # Get stored GeoJSON data extract
         project = await DbProject.one(db, project_id)
         data_extract = project.data_extract_geojson
 
@@ -726,93 +1012,20 @@ async def preview_tasks_and_data_htmx(  # noqa: C901, PLR0912
                 status_code=404,
             )
 
-        # Get task boundaries
         task_boundaries_json = await project_crud.get_task_geometry(db, project_id)
-        task_boundaries = None
-        is_no_splitting = False
+        task_boundaries = _parse_task_boundaries_json(task_boundaries_json, project_id)
+        is_no_splitting, preview_blocker = _task_preview_state(project, task_boundaries)
+        if preview_blocker:
+            return preview_blocker
 
-        if task_boundaries_json:
-            if isinstance(task_boundaries_json, str):
-                try:
-                    task_boundaries = json.loads(task_boundaries_json)
-                except json.JSONDecodeError:
-                    log.warning(
-                        f"Failed to parse task boundaries JSON for project {project_id}"
-                    )
-            elif isinstance(task_boundaries_json, dict):
-                task_boundaries = task_boundaries_json
-
-        # Check if NO_SPLITTING was selected (empty dict or empty features)
-        if (
-            not task_boundaries
-            or not task_boundaries.get("features")
-            or len(task_boundaries.get("features", [])) == 0
-        ):
-            # Check if task_areas_geojson is explicitly set to {} (NO_SPLITTING)
-            if project.task_areas_geojson == {}:
-                is_no_splitting = True
-            else:
-                # No splitting has been done yet
-                return Response(
-                    content=_callout(
-                        "warning",
-                        "No task boundaries found. Please split the project into "
-                        'tasks first using the "Split AOI" button above.',
-                    ),
-                    media_type="text/html",
-                    status_code=200,  # Return 200 instead of 404 to show message
-                )
-
-        # Prepare layers for map
-        geojson_layers = []
-
-        # Add AOI outline layer (always show)
-        if project.outline:
-            aoi_featcol = {
-                "type": "FeatureCollection",
-                "features": [
-                    {"type": "Feature", "geometry": project.outline, "properties": {}}
-                ],
-            }
-            geojson_layers.append(
-                {
-                    "data": aoi_featcol,
-                    "name": "Project AOI",
-                    "color": "#d63f3f",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.1,
-                }
-            )
-
-        # Add data extract layer
         data_feature_count = len(data_extract.get("features", []))
-        geojson_layers.append(
-            {
-                "data": data_extract,
-                "name": f"Data Extract ({data_feature_count} features)",
-                "color": "#3388ff",
-                "weight": 2,
-                "opacity": 0.8,
-                "fillOpacity": 0.3,
-            }
+        geojson_layers = _build_preview_layers(
+            project,
+            data_extract,
+            task_boundaries,
+            is_no_splitting,
         )
 
-        # Add task boundaries layer (only if splitting was done)
-        if not is_no_splitting and task_boundaries and task_boundaries.get("features"):
-            task_count = len(task_boundaries.get("features", []))
-            geojson_layers.append(
-                {
-                    "data": task_boundaries,
-                    "name": f"Task Boundaries ({task_count} tasks)",
-                    "color": "#ff7800",
-                    "weight": 3,
-                    "opacity": 1.0,
-                    "fillOpacity": 0.1,
-                }
-            )
-
-        # Use reusable map rendering function
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-tasks-and-data",
             geojson_layers=geojson_layers,
@@ -820,7 +1033,6 @@ async def preview_tasks_and_data_htmx(  # noqa: C901, PLR0912
             show_controls=True,
         )
 
-        # Generate preview message
         if is_no_splitting:
             preview_message = (
                 f"Previewing whole AOI (no splitting) with "
@@ -945,7 +1157,7 @@ async def skip_task_split_htmx(
         "current_user": Provide(mapper),
     },
 )
-async def split_aoi_htmx(  # noqa: C901, PLR0911, PLR0913, PLR0915
+async def split_aoi_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -956,80 +1168,41 @@ async def split_aoi_htmx(  # noqa: C901, PLR0911, PLR0913, PLR0915
     """Split AOI into tasks using selected algorithm and return preview map."""
     project = current_user.get("project")
     if not project or project.id != project_id:
-        return Response(
-            content=_callout("danger", "Project not found or access denied."),
-            media_type="text/html",
-            status_code=404,
-        )
+        return _project_not_found_response()
 
     try:
-        # Extract form data
         log.debug(
             f"Split AOI request data keys: {list(data.keys()) if data else 'None'}"
         )
-        algorithm = data.get("algorithm", "").strip() if data else ""
-
-        def parse_bool_flag(raw_value, default: bool = True) -> bool:
-            """Parse truthy form values from URL-encoded payload."""
-            if raw_value is None:
-                return default
-            if isinstance(raw_value, list):
-                raw_value = raw_value[-1] if raw_value else default
-            if isinstance(raw_value, bool):
-                return raw_value
-            return str(raw_value).strip().lower() in {"1", "true", "yes", "on"}
-
-        try:
-            no_of_buildings = int(data.get("no_of_buildings", 10)) if data else 10
-        except (ValueError, TypeError):
-            no_of_buildings = 10
-
-        try:
-            dimension_meters = int(data.get("dimension_meters", 100)) if data else 100
-        except (ValueError, TypeError):
-            dimension_meters = 100
-
-        include_roads = parse_bool_flag(
-            data.get("include_roads") if data else None, default=True
-        )
-        include_rivers = parse_bool_flag(
-            data.get("include_rivers") if data else None, default=True
-        )
-        include_railways = parse_bool_flag(
-            data.get("include_railways") if data else None, default=True
-        )
-        include_aeroways = parse_bool_flag(
-            data.get("include_aeroways") if data else None, default=True
-        )
+        split_options = _parse_split_form_options(data)
+        algorithm = split_options["algorithm"]
 
         log.debug(
             "Split AOI parameters: "
             f"algorithm={algorithm}, "
-            f"no_of_buildings={no_of_buildings}, "
-            f"dimension_meters={dimension_meters}, "
-            f"include_roads={include_roads}, "
-            f"include_rivers={include_rivers}, "
-            f"include_railways={include_railways}, "
-            f"include_aeroways={include_aeroways}"
+            f"no_of_buildings={split_options['no_of_buildings']}, "
+            f"dimension_meters={split_options['dimension_meters']}, "
+            f"include_roads={split_options['include_roads']}, "
+            f"include_rivers={split_options['include_rivers']}, "
+            f"include_railways={split_options['include_railways']}, "
+            f"include_aeroways={split_options['include_aeroways']}"
         )
 
-        if not algorithm or algorithm == "":
-            return Response(
-                content=_callout("danger", "Please select a splitting option."),
-                media_type="text/html",
-                status_code=400,
-            )
+        if not algorithm:
+            return _html_error_response("Please select a splitting option.", 400)
 
         tasks_featcol = await split_aoi(
             db=db,
             project_id=project_id,
-            algorithm=algorithm,
-            no_of_buildings=no_of_buildings,
-            dimension_meters=dimension_meters,
-            include_roads=include_roads,
-            include_rivers=include_rivers,
-            include_railways=include_railways,
-            include_aeroways=include_aeroways,
+            options=SplitAoiOptions(
+                algorithm=algorithm,
+                no_of_buildings=split_options["no_of_buildings"],
+                dimension_meters=split_options["dimension_meters"],
+                include_roads=split_options["include_roads"],
+                include_rivers=split_options["include_rivers"],
+                include_railways=split_options["include_railways"],
+                include_aeroways=split_options["include_aeroways"],
+            ),
         )
 
         if tasks_featcol == {}:
@@ -1043,139 +1216,18 @@ async def split_aoi_htmx(  # noqa: C901, PLR0911, PLR0913, PLR0915
                 headers={"HX-Refresh": "true"},
             )
 
-        task_count = len(tasks_featcol.get("features", []))
-
-        # Store preview in a temporary location (we'll save it when user accepts)
-        # For now, we'll encode it in the response and save it when Accept is clicked
-
-        # Get project outline and data extract for map preview
         project = await DbProject.one(db, project_id)
         data_extract = project.data_extract_geojson
-
-        # Prepare layers for map
-        geojson_layers = []
-
-        # Add AOI outline layer
-        if project.outline:
-            aoi_featcol = {
-                "type": "FeatureCollection",
-                "features": [
-                    {"type": "Feature", "geometry": project.outline, "properties": {}}
-                ],
-            }
-            geojson_layers.append(
-                {
-                    "data": aoi_featcol,
-                    "name": "Project AOI",
-                    "color": "#d63f3f",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.1,
-                }
-            )
-
-        # Add data extract layer if available
-        if data_extract:
-            data_feature_count = len(data_extract.get("features", []))
-            geojson_layers.append(
-                {
-                    "data": data_extract,
-                    "name": f"Data Extract ({data_feature_count} features)",
-                    "color": "#3388ff",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.3,
-                }
-            )
-
-        # Add task boundaries layer
-        geojson_layers.append(
-            {
-                "data": tasks_featcol,
-                "name": f"Task Boundaries ({task_count} tasks)",
-                "color": "#ff7800",
-                "weight": 3,
-                "opacity": 1.0,
-                "fillOpacity": 0.1,
-            }
+        return _build_split_preview_response(
+            project_id,
+            algorithm,
+            tasks_featcol,
+            data_extract,
+            project,
         )
 
-        map_html_content = render_leaflet_map(
-            map_id="leaflet-map-split-preview",
-            geojson_layers=geojson_layers,
-            height="600px",
-            show_controls=True,
-        )
-
-        # Encode the task areas GeoJSON for the Accept button
-        tasks_geojson_str = json.dumps(tasks_featcol).replace('"', "&quot;")
-
-        # Return success message with preview and Accept button
-        data_extract_info = ""
-        if data_extract:
-            data_feature_count = len(data_extract.get("features", []))
-            data_extract_info = f" and {data_feature_count} data features"
-
-        split_success_msg = (
-            "✓ AOI split successfully! Generated "
-            f"{task_count} task areas using "
-            f"{algorithm.replace('_', ' ').title()}."
-        )
-        split_preview_msg = (
-            f"Previewing {task_count} task boundaries{data_extract_info}. "
-            "Review the results below. If satisfied, click "
-            '"Accept Task Choices" to save. Otherwise, adjust parameters '
-            'above and click "Split Again" to regenerate.'
-        )
-        return Response(
-            content=f"""
-            {_callout("success", split_success_msg)}
-            <div style="margin-top: 20px;">
-                <div style="margin-bottom: 10px;">
-                    {_callout("info", split_preview_msg)}
-                </div>
-                {map_html_content}
-                <form
-                    id="accept-split-form"
-                    style="margin-top: 20px; display: flex; gap: 10px;
-                    justify-content: center;"
-                >
-                    <input
-                        type="hidden"
-                        name="tasks_geojson"
-                        value='{tasks_geojson_str}'
-                    />
-                    <button
-                        id="accept-split-btn"
-                        type="submit"
-                        hx-post="/accept-split-htmx?project_id={project_id}"
-                        hx-target="#split-status"
-                        hx-swap="innerHTML"
-                        hx-include="#accept-split-form"
-                        class="wa-button wa-button--primary"
-                        style="min-width: 200px"
-                    >
-                        Accept Task Choices
-                    </button>
-                </form>
-            </div>
-            """,
-            media_type="text/html",
-            status_code=200,
-        )
-
-    except SvcValidationError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=400,
-        )
     except ServiceError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=500,
-        )
+        return _service_error_response(e)
     except Exception as e:
         log.error(f"Error splitting AOI via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1194,7 +1246,7 @@ async def split_aoi_htmx(  # noqa: C901, PLR0911, PLR0913, PLR0915
         "current_user": Provide(mapper),
     },
 )
-async def accept_data_extract_htmx(  # noqa: PLR0911, PLR0913
+async def accept_data_extract_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1205,39 +1257,22 @@ async def accept_data_extract_htmx(  # noqa: PLR0911, PLR0913
     """Accept and save the data extract to the database."""
     project = current_user.get("project")
     if not project or project.id != project_id:
-        return Response(
-            content=_callout("danger", "Project not found or access denied."),
-            media_type="text/html",
-            status_code=404,
-        )
+        return _project_not_found_response()
 
     try:
         geojson_str = data.get("data_extract_geojson", "")
         if not geojson_str:
             data_keys = list(data.keys()) if data else "None"
             log.debug(f"Accept data extract data keys: {data_keys}")
-            return Response(
-                content=_callout("danger", "No data extract provided."),
-                media_type="text/html",
-                status_code=400,
-            )
+            return _html_error_response("No data extract provided.", 400)
 
-        # Parse the GeoJSON
-        try:
-            geojson_data = json.loads(geojson_str)
-        except (json.JSONDecodeError, TypeError) as e:
-            geojson_preview = (
-                geojson_str[:100] if isinstance(geojson_str, str) else geojson_str
-            )
-            log.error(
-                "Error parsing data extract GeoJSON: "
-                f"{e}, type: {type(geojson_str)}, value: {geojson_preview}"
-            )
-            return Response(
-                content=_callout("danger", "Invalid data extract format."),
-                media_type="text/html",
-                status_code=400,
-            )
+        geojson_data, error_response = _parse_json_payload(
+            geojson_str,
+            "Invalid data extract format.",
+            "Error parsing data extract GeoJSON",
+        )
+        if error_response:
+            return error_response
 
         feature_count = await save_data_extract(
             db=db,
@@ -1260,18 +1295,8 @@ async def accept_data_extract_htmx(  # noqa: PLR0911, PLR0913
             headers={"HX-Refresh": "true"},
         )
 
-    except SvcValidationError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=400,
-        )
     except ServiceError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=500,
-        )
+        return _service_error_response(e)
     except Exception as e:
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1290,7 +1315,7 @@ async def accept_data_extract_htmx(  # noqa: PLR0911, PLR0913
         "current_user": Provide(mapper),
     },
 )
-async def accept_split_htmx(  # noqa: PLR0911, PLR0913
+async def accept_split_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -1301,42 +1326,22 @@ async def accept_split_htmx(  # noqa: PLR0911, PLR0913
     """Accept and save the task split results to the database."""
     project = current_user.get("project")
     if not project or project.id != project_id:
-        return Response(
-            content=_callout("danger", "Project not found or access denied."),
-            media_type="text/html",
-            status_code=404,
-        )
+        return _project_not_found_response()
 
     try:
-        # Get task areas GeoJSON from form data (hx-vals sends it as form data)
         tasks_geojson_str = data.get("tasks_geojson", "")
         if not tasks_geojson_str:
             data_keys = list(data.keys()) if data else "None"
             log.debug(f"Accept split data keys: {data_keys}")
-            return Response(
-                content=_callout("danger", "No task areas data provided."),
-                media_type="text/html",
-                status_code=400,
-            )
+            return _html_error_response("No task areas data provided.", 400)
 
-        # Parse the GeoJSON
-        try:
-            tasks_geojson = json.loads(tasks_geojson_str)
-        except (json.JSONDecodeError, TypeError) as e:
-            tasks_preview = (
-                tasks_geojson_str[:100]
-                if isinstance(tasks_geojson_str, str)
-                else tasks_geojson_str
-            )
-            log.error(
-                "Error parsing task areas GeoJSON: "
-                f"{e}, type: {type(tasks_geojson_str)}, value: {tasks_preview}"
-            )
-            return Response(
-                content=_callout("danger", "Invalid task areas data format."),
-                media_type="text/html",
-                status_code=400,
-            )
+        tasks_geojson, error_response = _parse_json_payload(
+            tasks_geojson_str,
+            "Invalid task areas data format.",
+            "Error parsing task areas GeoJSON",
+        )
+        if error_response:
+            return error_response
 
         task_count = await save_task_areas(
             db=db,
@@ -1358,18 +1363,8 @@ async def accept_split_htmx(  # noqa: PLR0911, PLR0913
             headers={"HX-Refresh": "true"},
         )
 
-    except SvcValidationError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=400,
-        )
     except ServiceError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=500,
-        )
+        return _service_error_response(e)
     except Exception as e:
         log.error(f"Error accepting split via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1441,18 +1436,8 @@ async def create_project_odk_htmx(  # noqa: PLR0913
             media_type="text/html",
             status_code=200,
         )
-    except SvcValidationError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=400,
-        )
     except ServiceError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=500,
-        )
+        return _service_error_response(e)
     except Exception as e:
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
@@ -1546,7 +1531,7 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
         "auth_user": Provide(login_required),
     },
 )
-async def validate_geojson(  # noqa: C901
+async def validate_geojson(
     request: HTMXRequest,
     db: AsyncConnection,
     auth_user: AuthUser,
@@ -1571,11 +1556,7 @@ async def validate_geojson(  # noqa: C901
         merge_geometries = data.get("merge_geometries", False)
 
         if not geojson_input:
-            return Response(
-                content=json.dumps({"error": "GeoJSON is required"}),
-                media_type="application/json",
-                status_code=400,
-            )
+            return _json_error_response("GeoJSON is required", 400)
 
         # Normalize and validate AOI using geojson-aoi-parser (PostGIS-backed).
         merged_featcol = parse_aoi(
@@ -1585,17 +1566,9 @@ async def validate_geojson(  # noqa: C901
         )
 
         if not merged_featcol.get("features", []):
-            return Response(
-                content=json.dumps(
-                    {
-                        "error": (
-                            "No polygon geometries found. "
-                            "Project area must be a polygon."
-                        )
-                    }
-                ),
-                media_type="application/json",
-                status_code=422,
+            return _json_error_response(
+                "No polygon geometries found. Project area must be a polygon.",
+                422,
             )
 
         # Return normalized GeoJSON
@@ -1606,57 +1579,17 @@ async def validate_geojson(  # noqa: C901
             else merged_featcol
         )
 
-        # Calculate area and include size feedback
-        response_body: dict = {"geojson": result_geojson}
-        try:
-            geom = result_geojson
-            if geom.get("type") == "Feature":
-                geom = geom.get("geometry", geom)
-            elif geom.get("type") == "FeatureCollection":
-                features = geom.get("features", [])
-                if features:
-                    geom = features[0].get("geometry", features[0])
-            area_km2 = geojson_area_km2(geom)
-            response_body["area_km2"] = round(area_km2, 2)
-            if area_km2 > AREA_LIMIT_KM2:
-                response_body["warning"] = (
-                    f"Area is {area_km2:,.0f} km², which exceeds the "
-                    f"{AREA_LIMIT_KM2:,} km² limit. "
-                    "Please select a smaller area."
-                )
-            elif area_km2 > AREA_WARN_KM2:
-                response_body["warning"] = (
-                    f"Area is {area_km2:,.0f} km². Large areas "
-                    f"(>{AREA_WARN_KM2} km²) may take longer to process. "
-                    f"The data extract API is limited to 200 km²."
-                )
-        except Exception as e:
-            log.warning(f"Could not calculate area: {e}")
-
         return Response(
-            content=json.dumps(response_body),
+            content=json.dumps(_normalize_geojson_response_body(result_geojson)),
             media_type="application/json",
             status_code=200,
         )
 
     except HTTPException as e:
-        # Convert HTTP exceptions to JSON format
-        return Response(
-            content=json.dumps({"error": e.detail}),
-            media_type="application/json",
-            status_code=e.status_code,
-        )
+        return _json_error_response(str(e.detail), e.status_code)
     except ValueError as e:
-        return Response(
-            content=json.dumps({"error": str(e)}),
-            media_type="application/json",
-            status_code=422,
-        )
+        return _json_error_response(str(e), 422)
     except Exception as e:
         log.error(f"Error validating GeoJSON: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
-        return Response(
-            content=json.dumps({"error": error_msg}),
-            media_type="application/json",
-            status_code=500,
-        )
+        return _json_error_response(error_msg, 500)

@@ -78,32 +78,66 @@ def _extract_dataset_property_names(payload: object) -> set[str]:
 
 def _is_duplicate_form_conflict(exc: Exception) -> bool:
     """Check whether an ODK error means the form already exists."""
-    if isinstance(exc, PyODKError):
-        try:
-            if exc.is_central_error(409.3):
-                return True
-        except Exception as err:
-            log.debug("Unable to inspect PyODK conflict details: %s", err)
-
-        if len(exc.args) >= MIN_PYODK_ERROR_ARGS:
-            response = exc.args[1]
-            if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
-                try:
-                    body = response.json()
-                except Exception:
-                    body = {}
-
-                details = body.get("details", {}) if isinstance(body, dict) else {}
-                fields = details.get("fields", []) if isinstance(details, dict) else []
-                if "projectId" in fields and "xmlFormId" in fields:
-                    return True
-
-                message = body.get("message", "") if isinstance(body, dict) else ""
-                if "xmlFormId" in str(message):
-                    return True
+    if _is_pyodk_duplicate_form_conflict(exc):
+        return True
 
     msg = str(exc)
     return "409" in msg and "already exists" in msg and "xmlFormId" in msg
+
+
+def _is_pyodk_duplicate_form_conflict(exc: Exception) -> bool:
+    """Check PyODK-specific conflict metadata for duplicate forms."""
+    if not isinstance(exc, PyODKError):
+        return False
+
+    if _matches_duplicate_form_error_code(exc):
+        return True
+
+    response = _get_pyodk_error_response(exc)
+    if getattr(response, "status_code", None) != status.HTTP_409_CONFLICT:
+        return False
+
+    return _duplicate_form_conflict_from_body(_safe_response_json(response))
+
+
+def _matches_duplicate_form_error_code(exc: PyODKError) -> bool:
+    """Use PyODK's central error inspection when available."""
+    try:
+        return exc.is_central_error(409.3)
+    except Exception as err:
+        log.debug("Unable to inspect PyODK conflict details: %s", err)
+        return False
+
+
+def _get_pyodk_error_response(exc: PyODKError):
+    """Return the response object attached to a PyODKError if present."""
+    if len(exc.args) < MIN_PYODK_ERROR_ARGS:
+        return None
+    return exc.args[1]
+
+
+def _safe_response_json(response) -> dict:
+    """Best-effort JSON decode for PyODK error responses."""
+    if response is None:
+        return {}
+
+    try:
+        body = response.json()
+    except Exception:
+        return {}
+
+    return body if isinstance(body, dict) else {}
+
+
+def _duplicate_form_conflict_from_body(body: dict) -> bool:
+    """Check Central conflict payload details for duplicate form markers."""
+    details = body.get("details", {})
+    if isinstance(details, dict):
+        fields = details.get("fields", [])
+        if isinstance(fields, list) and {"projectId", "xmlFormId"}.issubset(fields):
+            return True
+
+    return "xmlFormId" in str(body.get("message", ""))
 
 
 async def list_odk_projects(
@@ -573,13 +607,205 @@ async def task_geojson_dict_to_entity_values(
     return await gather(*asyncio_tasks)
 
 
-async def create_entity_list(  # noqa: C901, PLR0912, PLR0915
+def _build_entity_merge_rows(
+    entities_list: Optional[list[central_schemas.EntityDict]],
+) -> list[dict[str, str]]:
+    """Flatten EntityDict payloads into pyodk merge rows."""
+    if not entities_list:
+        return []
+
+    merge_rows = []
+    for entity in entities_list:
+        label = entity.get("label")
+        if not label:
+            continue
+
+        data = entity.get("data") or {}
+        merge_rows.append({"label": label, **data})
+
+    return merge_rows
+
+
+def _collect_required_property_keys(
+    properties: list[str],
+    merge_rows: list[dict[str, str]],
+) -> set[str]:
+    """Collect all dataset property keys required by the incoming rows."""
+    required_keys = set(properties)
+    for row in merge_rows:
+        required_keys.update(key for key in row if key != "label")
+    return required_keys
+
+
+def _is_property_conflict(exc: Exception) -> bool:
+    """Return True for duplicate-property conflicts from pyodk requests."""
+    response = getattr(exc, "response", None)
+    if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
+        return True
+
+    msg = str(exc)
+    return (
+        "409 Client Error" in msg
+        or "Status: 409" in msg
+        or '"code":409' in msg
+        or 'code":409' in msg
+    )
+
+
+def _is_entity_version_conflict(exc: PyODKError) -> bool:
+    """Return True for entity update version conflicts."""
+    msg = str(exc)
+    return "Status: 409" in msg and "version" in msg
+
+
+def _get_existing_dataset_property_names(
+    client,
+    project_id: int,
+    dataset_name: str,
+) -> set[str]:
+    """Fetch existing dataset property names, tolerating lookup failures."""
+    try:
+        existing_properties = client.session.get(
+            f"projects/{project_id}/datasets/{dataset_name}/properties"
+        )
+        if existing_properties.status_code < HTTP_ERROR_STATUS_CODE:
+            return _extract_dataset_property_names(existing_properties.json())
+        if existing_properties.status_code != status.HTTP_404_NOT_FOUND:
+            existing_properties.raise_for_status()
+    except Exception as exc:
+        log.warning(
+            "Could not list properties for dataset '%s' in ODK project %s: %s",
+            dataset_name,
+            project_id,
+            exc,
+        )
+
+    return set()
+
+
+def _ensure_dataset_properties(
+    client,
+    project_id: int,
+    dataset_name: str,
+    required_keys: set[str],
+    existing_property_names: set[str],
+) -> None:
+    """Create any missing dataset properties required by the incoming rows."""
+    for key in sorted(required_keys):
+        if key in {"__id", "__system", "label"} or key in existing_property_names:
+            continue
+
+        try:
+            create_property = client.session.post(
+                f"projects/{project_id}/datasets/{dataset_name}/properties",
+                json={"name": key},
+            )
+            if create_property.status_code == status.HTTP_409_CONFLICT:
+                continue
+            if create_property.status_code >= HTTP_ERROR_STATUS_CODE:
+                create_property.raise_for_status()
+        except Exception as exc:
+            if _is_property_conflict(exc):
+                continue
+            raise
+
+
+def _index_entities_by_label(entity_table: dict | list | None) -> dict[str, dict]:
+    """Map existing dataset rows by label."""
+    target_rows = (
+        entity_table.get("value", []) if isinstance(entity_table, dict) else []
+    )
+    return {
+        row.get("label"): row
+        for row in target_rows
+        if isinstance(row, dict) and row.get("label")
+    }
+
+
+def _get_entity_update_data(
+    source_row: dict[str, str],
+    target_row: dict,
+) -> dict[str, str]:
+    """Build the smallest update payload needed to align an existing entity."""
+    update_data = {}
+    for key, value in source_row.items():
+        if key == "label":
+            continue
+
+        existing_value = target_row.get(key)
+        if (existing_value is None and key not in target_row) or str(value) != str(
+            existing_value
+        ):
+            update_data[key] = value
+
+    return update_data
+
+
+def _upsert_entity_rows(
+    client,
+    project_id: int,
+    dataset_name: str,
+    merge_rows: list[dict[str, str]],
+) -> None:
+    """Insert new entities and minimally update existing ones by label."""
+    target_by_label = _index_entities_by_label(
+        client.entities.get_table(entity_list_name=dataset_name, project_id=project_id)
+    )
+
+    to_insert = []
+    for source_row in merge_rows:
+        label = source_row.get("label")
+        if not label:
+            continue
+
+        target_row = target_by_label.get(label)
+        if not target_row:
+            to_insert.append(source_row)
+            continue
+
+        update_data = _get_entity_update_data(source_row, target_row)
+        if not update_data:
+            continue
+
+        try:
+            client.entities.update(
+                uuid=target_row["__id"],
+                entity_list_name=dataset_name,
+                project_id=project_id,
+                label=label,
+                data=update_data,
+                base_version=target_row["__system"]["version"],
+            )
+        except PyODKError as exc:
+            if _is_entity_version_conflict(exc):
+                log.warning(
+                    "Skipping Entity update due to version conflict for "
+                    "label='%s' in dataset '%s' (ODK project %s): %s",
+                    label,
+                    dataset_name,
+                    project_id,
+                    exc,
+                )
+                continue
+            raise
+
+    if to_insert:
+        client.entities.create_many(
+            data=to_insert,
+            entity_list_name=dataset_name,
+            project_id=project_id,
+            create_source="Field-TM",
+            source_size=len(to_insert),
+        )
+
+
+async def create_entity_list(
     odk_creds: Optional[central_schemas.ODKCentral],
     odk_id: int,
     properties: list[str],
     dataset_name: str = "features",
     entities_list: list[central_schemas.EntityDict] = None,
-) -> None:  # noqa: C901, PLR0912, PLR0915
+) -> None:
     """Create a new Entity list (dataset) in ODK and upsert entities.
 
     Notes on implementation:
@@ -590,6 +816,7 @@ async def create_entity_list(  # noqa: C901, PLR0912, PLR0915
     """
     log.info("Creating ODK Entity properties list")
     properties = central_schemas.entity_fields_to_list(properties)
+    merge_rows = _build_entity_merge_rows(entities_list)
 
     if odk_id is None:
         raise HTTPException(
@@ -618,147 +845,23 @@ async def create_entity_list(  # noqa: C901, PLR0912, PLR0915
                 f"for ODK project {odk_id}; will reuse it."
             )
 
-    # Step 2: upsert entities (idempotent) using pyodk merge
-    if not entities_list:
-        return
-
-    # Convert EntityDict format: {"label": str, "data": {...}} -> {"label": str, **data}
-    merge_rows = []
-    for ent in entities_list:
-        label = ent.get("label")
-        data = ent.get("data") or {}
-        if not label:
-            continue
-        merge_rows.append({"label": label, **data})
-
     if not merge_rows:
         return
 
     async with central_deps.pyodk_client(odk_creds) as client:
         pid = int(odk_id)
-
-        # 1) Ensure all required properties exist.
-        required_keys = set(properties)
-        # Also include any keys present in data (minus label)
-        for row in merge_rows:
-            required_keys.update(k for k in row if k != "label")
-
-        existing_property_names: set[str] = set()
-        try:
-            existing_properties = client.session.get(
-                f"projects/{pid}/datasets/{dataset_name}/properties"
-            )
-            if existing_properties.status_code < HTTP_ERROR_STATUS_CODE:
-                existing_property_names = _extract_dataset_property_names(
-                    existing_properties.json()
-                )
-            elif existing_properties.status_code != status.HTTP_404_NOT_FOUND:
-                existing_properties.raise_for_status()
-        except Exception as exc:
-            log.warning(
-                "Could not list properties for dataset '%s' in ODK project %s: %s",
-                dataset_name,
-                pid,
-                exc,
-            )
-
-        for key in sorted(required_keys):
-            if key in {"__id", "__system", "label"}:
-                continue
-            if key in existing_property_names:
-                continue
-
-            try:
-                create_property = client.session.post(
-                    f"projects/{pid}/datasets/{dataset_name}/properties",
-                    json={"name": key},
-                )
-                if create_property.status_code == status.HTTP_409_CONFLICT:
-                    continue
-                if create_property.status_code >= HTTP_ERROR_STATUS_CODE:
-                    create_property.raise_for_status()
-            except Exception as exc:
-                # Treat "already exists" conflicts as OK (idempotent).
-                response = getattr(exc, "response", None)
-                if getattr(response, "status_code", None) == status.HTTP_409_CONFLICT:
-                    continue
-
-                msg = str(exc)
-                if (
-                    "409 Client Error" in msg
-                    or "Status: 409" in msg
-                    or '"code":409' in msg
-                    or 'code":409' in msg
-                ):
-                    continue
-                raise
-
-        # 2) Read existing entities and upsert by label
-        table = client.entities.get_table(entity_list_name=dataset_name, project_id=pid)
-        target_rows = table.get("value", []) if isinstance(table, dict) else []
-        target_by_label = {
-            r.get("label"): r
-            for r in target_rows
-            if isinstance(r, dict) and r.get("label")
-        }
-
-        to_insert = []
-        for src in merge_rows:
-            label = src.get("label")
-            if not label:
-                continue
-            tgt = target_by_label.get(label)
-            if not tgt:
-                to_insert.append(src)
-                continue
-
-            # Compute minimal update payload
-            update_data = {}
-            for k, v in src.items():
-                if k == "label":
-                    continue
-                existing_val = tgt.get(k)
-                # OData responses may omit keys when null; treat that as different.
-                if existing_val is None and k not in tgt or str(v) != str(existing_val):
-                    update_data[k] = v
-
-            if update_data:
-                try:
-                    client.entities.update(
-                        uuid=tgt["__id"],
-                        entity_list_name=dataset_name,
-                        project_id=pid,
-                        label=label,
-                        data=update_data,
-                        base_version=tgt["__system"]["version"],
-                    )
-                except PyODKError as exc:
-                    msg = str(exc)
-                    # Handle concurrent update / version mismatch (409.15) gracefully:
-                    # if the Entity has been updated elsewhere between our table read
-                    # and this update call, Central requires a newer base_version or
-                    # ?force=true. For idempotent regeneration, we treat this as a
-                    # non-fatal warning and skip the update.
-                    if "Status: 409" in msg and "version" in msg:
-                        log.warning(
-                            "Skipping Entity update due to version conflict for "
-                            "label='%s' in dataset '%s' (ODK project %s): %s",
-                            label,
-                            dataset_name,
-                            pid,
-                            msg,
-                        )
-                    else:
-                        raise
-
-        if to_insert:
-            client.entities.create_many(
-                data=to_insert,
-                entity_list_name=dataset_name,
-                project_id=pid,
-                create_source="Field-TM",
-                source_size=len(to_insert),
-            )
+        required_keys = _collect_required_property_keys(properties, merge_rows)
+        existing_property_names = _get_existing_dataset_property_names(
+            client, pid, dataset_name
+        )
+        _ensure_dataset_properties(
+            client,
+            pid,
+            dataset_name,
+            required_keys,
+            existing_property_names,
+        )
+        _upsert_entity_rows(client, pid, dataset_name, merge_rows)
 
 
 async def create_entity(
@@ -857,17 +960,16 @@ async def get_appuser_token(
                     detail=msg,
                 )
 
-            # Legacy behavior used roleId=2 for form-level app-user access.
-            assignment_response = client.session.post(
-                f"projects/{project_odk_id}/forms/{xform_id}/assignments/2/{appuser_sub}"
+            _assign_appuser_role(
+                client,
+                f"projects/{project_odk_id}/assignments/2/{appuser_sub}",
+                "project",
             )
-            assignment_response.raise_for_status()
-            assignment_result = assignment_response.json()
-            if not assignment_result.get("success"):
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="Could not assign form role to app user.",
-                )
+            _assign_appuser_role(
+                client,
+                f"projects/{project_odk_id}/forms/{xform_id}/assignments/2/{appuser_sub}",
+                "form",
+            )
 
         if odk_credentials and getattr(
             odk_credentials, "external_project_instance_url", None
@@ -894,6 +996,20 @@ async def get_appuser_token(
         ) from e
 
 
+def _assign_appuser_role(client, path: str, scope: str) -> None:
+    """Assign an app-user role and validate the ODK response."""
+    assignment_response = client.session.post(path)
+    assignment_response.raise_for_status()
+    assignment_result = assignment_response.json()
+    if assignment_result.get("success"):
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail=f"Could not assign {scope} role to app user.",
+    )
+
+
 def _build_manager_user_email(project_odk_id: int) -> str:
     """Create the default manager email for a project."""
     return f"fmtm-manager-{project_odk_id}@example.org"
@@ -912,11 +1028,130 @@ def _build_manager_user_email_fallback(project_odk_id: int) -> str:
     return f"fmtm-manager-{project_odk_id}-{suffix}@example.org"
 
 
-async def create_project_manager_user(  # noqa: C901, PLR0915
+def _get_project_manager_role_id(client) -> int:
+    """Resolve the ODK Central Project Manager role id."""
+    roles_response = client.session.get("roles")
+    roles_response.raise_for_status()
+
+    roles = roles_response.json() or []
+    project_manager_role = next(
+        (
+            role
+            for role in roles
+            if str(role.get("name", "")).strip().lower() == "project manager"
+        ),
+        None,
+    )
+    if not project_manager_role or "id" not in project_manager_role:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not find 'Project Manager' role in ODK Central.",
+        )
+
+    return int(project_manager_role["id"])
+
+
+def _create_manager_user(client, project_odk_id: int) -> tuple[object, str, str]:
+    """Create a manager user, retrying once with a randomized email on conflict."""
+    for candidate_email in (
+        _build_manager_user_email(project_odk_id),
+        _build_manager_user_email_fallback(project_odk_id),
+    ):
+        candidate_password = _build_manager_user_password()
+        create_response = client.session.post(
+            "users",
+            json={"email": candidate_email, "password": candidate_password},
+        )
+        create_status = getattr(create_response, "status_code", status.HTTP_200_OK)
+
+        if create_status < HTTP_ERROR_STATUS_CODE:
+            created_user = create_response.json() or {}
+            created_user_id = created_user.get("id")
+            if not created_user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="ODK Central returned no user ID after creation.",
+                )
+            return created_user_id, candidate_email, candidate_password
+
+        if create_status == status.HTTP_409_CONFLICT:
+            log.info(
+                "Manager email %s already exists in ODK Central; "
+                "trying fallback address.",
+                candidate_email,
+            )
+            continue
+
+        body = getattr(create_response, "text", "")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"ODK Central returned {create_status} when creating "
+                f"manager user. Body: {body}"
+            ),
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=(
+            "Could not create an ODK Central manager user: "
+            "both primary and fallback email addresses are already taken."
+        ),
+    )
+
+
+def _set_manager_user_display_name(
+    client,
+    manager_user_id: object,
+    display_name: str,
+    project_odk_id: int,
+) -> None:
+    """Set a human-readable display name; failures are non-fatal."""
+    display_name_response = client.session.patch(
+        f"users/{manager_user_id}",
+        json={"displayName": display_name},
+    )
+    if (
+        getattr(display_name_response, "status_code", status.HTTP_200_OK)
+        < HTTP_ERROR_STATUS_CODE
+    ):
+        return
+
+    log.warning(
+        "Could not set display name for manager user %s on ODK project %s.",
+        manager_user_id,
+        project_odk_id,
+    )
+
+
+def _assign_manager_user_to_project(
+    client,
+    project_odk_id: int,
+    role_id: int,
+    manager_user_id: object,
+) -> None:
+    """Assign the Project Manager role to the created Central user."""
+    assignment_response = client.session.post(
+        f"projects/{project_odk_id}/assignments/{role_id}/{manager_user_id}",
+    )
+    assignment_status = getattr(assignment_response, "status_code", status.HTTP_200_OK)
+    if assignment_status == status.HTTP_409_CONFLICT:
+        log.info(
+            "Manager user %s already assigned to ODK project %s.",
+            manager_user_id,
+            project_odk_id,
+        )
+        return
+
+    if assignment_status >= HTTP_ERROR_STATUS_CODE:
+        assignment_response.raise_for_status()
+
+
+async def create_project_manager_user(
     project_odk_id: int,
     project_name: str,
     odk_credentials: Optional[central_schemas.ODKCentral],
-) -> tuple[str, str]:  # noqa: C901, PLR0915
+) -> tuple[str, str]:
     """Create a Central web user scoped to one project as Project Manager.
 
     The user is created with email + password so they can log directly into
@@ -932,122 +1167,24 @@ async def create_project_manager_user(  # noqa: C901, PLR0915
     """
     try:
         async with central_deps.pyodk_client(odk_credentials) as client:
-            # ── 1. Resolve the Project Manager role ID ──────────────────────
-            roles_response = client.session.get("roles")
-            roles_response.raise_for_status()
-            roles = roles_response.json() or []
-
-            project_manager_role = next(
-                (
-                    r
-                    for r in roles
-                    if str(r.get("name", "")).strip().lower() == "project manager"
-                ),
-                None,
-            )
-            if not project_manager_role or "id" not in project_manager_role:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Could not find 'Project Manager' role in ODK Central.",
-                )
-
-            role_id = int(project_manager_role["id"])
+            role_id = _get_project_manager_role_id(client)
             display_name = f"FMTM Manager - {project_name}"
-
-            # ── 2. Create the web user ──────────────────────────────────────
-            # Use a deterministic primary email; fall back to a randomised
-            # variant only if the primary address is already taken (e.g. on
-            # a re-run of finalization).
-            primary_email = _build_manager_user_email(project_odk_id)
-            candidates = [
-                primary_email,
-                _build_manager_user_email_fallback(project_odk_id),
-            ]
-
-            manager_user_id = None
-            manager_email = ""
-            manager_password = ""
-
-            for candidate_email in candidates:
-                candidate_password = _build_manager_user_password()
-                create_response = client.session.post(
-                    "users",
-                    json={
-                        "email": candidate_email,
-                        "password": candidate_password,
-                    },
-                )
-                create_status = getattr(create_response, "status_code", 200)
-
-                if create_status < HTTP_ERROR_STATUS_CODE:
-                    created_user = create_response.json() or {}
-                    created_user_id = created_user.get("id")
-                    if not created_user_id:
-                        raise HTTPException(
-                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="ODK Central returned no user ID after creation.",
-                        )
-                    manager_user_id = created_user_id
-                    manager_email = candidate_email
-                    manager_password = candidate_password
-                    break
-
-                if create_status == status.HTTP_409_CONFLICT:
-                    # Email already registered; try the randomised fallback.
-                    log.info(
-                        "Manager email %s already exists in ODK Central; "
-                        "trying fallback address.",
-                        candidate_email,
-                    )
-                    continue
-
-                # Any other error (4xx / 5xx) is fatal.
-                body = getattr(create_response, "text", "")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=(
-                        f"ODK Central returned {create_status} when creating "
-                        f"manager user. Body: {body}"
-                    ),
-                )
-
-            if not manager_user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=(
-                        "Could not create an ODK Central manager user: "
-                        "both primary and fallback email addresses are already taken."
-                    ),
-                )
-
-            # ── 3. Set a human-readable display name (cosmetic, non-fatal) ──
-            display_name_response = client.session.patch(
-                f"users/{manager_user_id}",
-                json={"displayName": display_name},
+            manager_user_id, manager_email, manager_password = _create_manager_user(
+                client,
+                project_odk_id,
             )
-            if (
-                getattr(display_name_response, "status_code", status.HTTP_200_OK)
-                >= HTTP_ERROR_STATUS_CODE
-            ):
-                log.warning(
-                    "Could not set display name for manager user %s on ODK project %s.",
-                    manager_user_id,
-                    project_odk_id,
-                )
-
-            # ── 4. Assign Project Manager role scoped to this project ───────
-            assignment_response = client.session.post(
-                f"projects/{project_odk_id}/assignments/{role_id}/{manager_user_id}",
+            _set_manager_user_display_name(
+                client,
+                manager_user_id,
+                display_name,
+                project_odk_id,
             )
-            assignment_status = getattr(assignment_response, "status_code", 200)
-            if assignment_status == status.HTTP_409_CONFLICT:
-                log.info(
-                    "Manager user %s already assigned to ODK project %s.",
-                    manager_user_id,
-                    project_odk_id,
-                )
-            elif assignment_status >= HTTP_ERROR_STATUS_CODE:
-                assignment_response.raise_for_status()
+            _assign_manager_user_to_project(
+                client,
+                project_odk_id,
+                role_id,
+                manager_user_id,
+            )
 
             log.info(
                 "Created ODK Central manager user %s for project %s.",

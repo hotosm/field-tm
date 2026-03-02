@@ -56,6 +56,71 @@ def _pyodk_replacement_stub(legacy_method: str, replacement: str):
     )
 
 
+def _env_or_value(value: Optional[str], env_var: str) -> Optional[str]:
+    """Use the explicit value or fall back to an environment variable."""
+    return value if value else os.getenv(env_var, default=None)
+
+
+def _parse_verify_flag(verify) -> bool:
+    """Normalize the secure transport flag to a boolean."""
+    if isinstance(verify, str):
+        return verify.lower() in ("true", "1", "t")
+    return bool(verify)
+
+
+def _load_odk_config_file() -> dict[str, str]:
+    """Load ~/.odkcentral if present."""
+    filespec = os.path.join(os.getenv("HOME", ""), ".odkcentral")
+    if not os.path.exists(filespec):
+        log.warning(f"Authentication settings missing from {filespec}")
+        return {}
+
+    config_values: dict[str, str] = {}
+    with open(filespec) as file:
+        for line in file:
+            if line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", maxsplit=1)
+            if key in {"url", "user", "passwd"}:
+                config_values[key] = value.strip("\n")
+    return config_values
+
+
+def _session_with_request_logging() -> requests.Session:
+    """Create a requests session that logs outgoing URLs."""
+    session = requests.Session()
+    original_request = session.request
+
+    def logging_request(method, url, *args, **kwargs):
+        log.debug(f"ODKCentral request: {method.upper()} {url}")
+        return original_request(method, url, *args, **kwargs)
+
+    session.request = logging_request
+    return session
+
+
+def _write_binary_if_requested(filespec: str, content: bytes, disk: bool) -> None:
+    """Persist downloaded bytes to disk when requested."""
+    if not disk:
+        return
+    mode = "xb" if not os.path.exists(filespec) else "wb"
+    with open(filespec, mode) as f:
+        f.write(content)
+
+
+def _strip_internal_submission_fields(node):
+    """Recursively strip internal ODK submission bookkeeping fields."""
+    if isinstance(node, dict):
+        return {
+            k: _strip_internal_submission_fields(v)
+            for k, v in node.items()
+            if k not in ("__id", "__Submissions-id")
+        }
+    if isinstance(node, list):
+        return [_strip_internal_submission_fields(i) for i in node]
+    return node
+
+
 class OdkCentral:
     def __init__(
         self,
@@ -73,73 +138,30 @@ class OdkCentral:
         Returns:
             (OdkCentral): An instance of this class
         """
-        if not url:
-            url = os.getenv("ODK_CENTRAL_URL", default=None)
-        self.url = url
-        if not user:
-            user = os.getenv("ODK_CENTRAL_USER", default=None)
-        self.user = user
-        if not passwd:
-            passwd = os.getenv("ODK_CENTRAL_PASSWD", default=None)
-        self.passwd = passwd
-        verify = os.getenv("ODK_CENTRAL_SECURE", default=True)
-        if type(verify) == str:
-            self.verify = verify.lower() in ("true", "1", "t")
-        else:
-            self.verify = verify
-        # Set cert bundle path for requests in environment
+        self.url = _env_or_value(url, "ODK_CENTRAL_URL")
+        self.user = _env_or_value(user, "ODK_CENTRAL_USER")
+        self.passwd = _env_or_value(passwd, "ODK_CENTRAL_PASSWD")
+        self.verify = _parse_verify_flag(os.getenv("ODK_CENTRAL_SECURE", default=True))
         if self.verify:
             os.environ["REQUESTS_CA_BUNDLE"] = "/etc/ssl/certs/ca-certificates.crt"
-        # These are settings used by ODK Collect
+
         self.general = {
             "form_update_mode": "match_exactly",
             "autosend": "wifi_and_cellular",
         }
-        # If there is a config file with authentication setting, use that
-        # so we don't have to supply this all the time. This is only used
-        # when odk_client is used, and no parameters are passed in.
+
         if not self.url:
-            # log.debug("Configuring ODKCentral from file .odkcentral")
-            home = os.getenv("HOME")
-            config = ".odkcentral"
-            filespec = home + "/" + config
-            if os.path.exists(filespec):
-                file = open(filespec)
-                for line in file:
-                    # Support embedded comments
-                    if line[0] == "#":
-                        continue
-                    # Read the config file for authentication settings
-                    tmp = line.split("=")
-                    if tmp[0] == "url":
-                        self.url = tmp[1].strip("\n")
-                    if tmp[0] == "user":
-                        self.user = tmp[1].strip("\n")
-                    if tmp[0] == "passwd":
-                        self.passwd = tmp[1].strip("\n")
-            else:
-                log.warning(f"Authentication settings missing from {filespec}")
+            config_values = _load_odk_config_file()
+            self.url = config_values.get("url", self.url)
+            self.user = config_values.get("user", self.user)
+            self.passwd = config_values.get("passwd", self.passwd)
         else:
             log.debug(f"ODKCentral configuration parsed: {self.url}")
-        # Base URL for the REST API
+
         self.version = "v1"
-        # log.debug(f"Using {self.version} API")
         self.base = self.url + "/" + self.version + "/"
-
-        # Use a persistent connect, better for multiple requests
-        self.session = requests.Session()
-
-        # Hook into the session's request method to log the URL that is called
-        original_request = self.session.request
-        def logging_request(method, url, *args, **kwargs):
-            log.debug(f"ODKCentral request: {method.upper()} {url}")
-            return original_request(method, url, *args, **kwargs)
-        self.session.request = logging_request
-
-        # Authentication with session token
+        self.session = _session_with_request_logging()
         self.authenticate()
-
-        # These are just cached data from the queries
         self.projects = dict()
         self.users = list()
 
@@ -520,28 +542,7 @@ class OdkForm(OdkCentral):
             return b""
 
         submission_json = response.json()
-
-        # Save raw JSON if requested
-        if disk:
-            mode = "xb" if not os.path.exists(filespec) else "wb"
-            with open(filespec, mode) as f:
-                f.write(response.content)
-
-        def strip_internal_fields(node):
-            """
-            Recursively strip internal fields ("__id", "__Submissions-id") from a node.
-
-            Args:
-                node (dict or list): The node to strip internal fields from.
-
-            Returns:
-                dict or list: The node with internal fields stripped.
-            """
-            if isinstance(node, dict):
-                return {k: strip_internal_fields(v) for k, v in node.items() if k not in ("__id", "__Submissions-id")}
-            if isinstance(node, list):
-                return [strip_internal_fields(i) for i in node]
-            return node
+        _write_binary_if_requested(filespec, response.content, disk)
 
         # Recursive OData navigation resolver
         def resolve_links(node):
@@ -567,7 +568,9 @@ class OdkForm(OdkCentral):
                         linked_data = resp.json().get("value", resp.json())
 
                         # Strip internal fields and recurse
-                        resolved[field_name] = resolve_links(strip_internal_fields(linked_data))
+                        resolved[field_name] = resolve_links(
+                            _strip_internal_submission_fields(linked_data)
+                        )
                     else:
                         # Regular field: recurse
                         resolved[key] = resolve_links(value)
@@ -667,6 +670,75 @@ class OdkForm(OdkCentral):
 
         return True
 
+    def _read_media_bytes(
+        self,
+        data: Union[str, Path, BytesIO],
+        filename: Optional[str] = None,
+    ) -> tuple[bytes, str]:
+        """Read upload media from memory or disk and return bytes plus filename."""
+        if isinstance(data, BytesIO):
+            if filename is None:
+                msg = "Cannot pass BytesIO object and not include the filename arg"
+                log.error(msg)
+                raise ValueError(msg)
+            return data.getvalue(), filename
+
+        if isinstance(data, str) or isinstance(data, Path):
+            media_file_path = Path(data)
+            if not media_file_path.exists():
+                msg = f"File does not exist on disk: {media_file_path}"
+                log.error(msg)
+                raise ValueError(msg)
+            with open(media_file_path, "rb") as file:
+                return file.read(), str(media_file_path.name)
+
+        msg = f"Unsupported media payload type: {type(data)}"
+        log.error(msg)
+        raise ValueError(msg)
+
+    def _ensure_form_draft(self, projectId: int, form_name: str) -> None:
+        """Convert the form to draft mode when required before attachment upload."""
+        if self.draft and not self.published:
+            return
+
+        log.debug(f"Updating form ({form_name}) to draft")
+        url = f"{self.base}projects/{projectId}/forms/{form_name}/draft?ignoreWarnings=true"
+        result = self.session.post(url, verify=self.verify)
+        if result.status_code == 200:
+            return
+
+        status = result.json()
+        msg = f"Couldn't modify {form_name} to draft: {status['message']}"
+        log.error(msg)
+        raise ValueError(msg)
+
+    def _publish_draft_after_media_upload(self, projectId: int, form_name: str) -> None:
+        """Publish the form draft after a successful media upload when needed."""
+        if not self.published:
+            return
+
+        version = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        publish_url = (
+            f"{self.base}projects/{projectId}/forms/{form_name}/draft/publish"
+            f"?version={version}"
+        )
+        publish_result = self.session.post(publish_url, verify=self.verify)
+        if publish_result.status_code != 200:
+            try:
+                status = publish_result.json()
+                log.error(
+                    f"Couldn't publish {form_name} on Central: {status.get('message')}"
+                )
+            except json.decoder.JSONDecodeError:
+                log.error(
+                    f"Couldn't publish {form_name} on Central: "
+                    "Error decoding JSON response"
+                )
+            return
+
+        self.draft = False
+        self.published = True
+
     def uploadMedia(
         self,
         projectId: int,
@@ -685,23 +757,7 @@ class OdkForm(OdkCentral):
         Returns:
             result (requests.Response): The response object.
         """
-        # BytesIO memory object
-        if isinstance(data, BytesIO):
-            if filename is None:
-                msg = "Cannot pass BytesIO object and not include the filename arg"
-                log.error(msg)
-                raise ValueError(msg)
-            media = data.getvalue()
-        # Filepath
-        elif isinstance(data, str) or isinstance(data, Path):
-            media_file_path = Path(data)
-            if not media_file_path.exists():
-                msg = f"File does not exist on disk: {media_file_path}"
-                log.error(msg)
-                raise ValueError(msg)
-            with open(media_file_path, "rb") as file:
-                media = file.read()
-            filename = str(Path(data).name)
+        media, filename = self._read_media_bytes(data, filename)
 
         # Validate filename present in XForm
         if not self.validateMedia(filename):
@@ -709,17 +765,7 @@ class OdkForm(OdkCentral):
             log.error(msg)
             raise ValueError(msg)
 
-        # Must first convert to draft if already published
-        if not self.draft or self.published:
-            # TODO should this use self.createForm ?
-            log.debug(f"Updating form ({form_name}) to draft")
-            url = f"{self.base}projects/{projectId}/forms/{form_name}/draft?ignoreWarnings=true"
-            result = self.session.post(url, verify=self.verify)
-            if result.status_code != 200:
-                status = result.json()
-                msg = f"Couldn't modify {form_name} to draft: {status['message']}"
-                log.error(msg)
-                raise ValueError(msg)
+        self._ensure_form_draft(projectId, form_name)
 
         # Upload the media
         url = f"{self.base}projects/{projectId}/forms/{form_name}/draft/attachments/{filename}"
@@ -736,28 +782,7 @@ class OdkForm(OdkCentral):
             log.error(msg)
             raise ValueError(msg)
 
-        # Publish draft directly if requested, without using deprecated wrapper.
-        if self.published:
-            version = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
-            publish_url = (
-                f"{self.base}projects/{projectId}/forms/{form_name}/draft/publish"
-                f"?version={version}"
-            )
-            publish_result = self.session.post(publish_url, verify=self.verify)
-            if publish_result.status_code != 200:
-                try:
-                    status = publish_result.json()
-                    log.error(
-                        f"Couldn't publish {form_name} on Central: {status.get('message')}"
-                    )
-                except json.decoder.JSONDecodeError:
-                    log.error(
-                        f"Couldn't publish {form_name} on Central: "
-                        "Error decoding JSON response"
-                    )
-            else:
-                self.draft = False
-                self.published = True
+        self._publish_draft_after_media_upload(projectId, form_name)
 
         # Add to the form var
         self.media[filename] = media

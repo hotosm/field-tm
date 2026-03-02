@@ -173,6 +173,7 @@ async def stub_project(db, stub_project_data):
         db,
         stub_project_data,
     )
+    await db.commit()
     yield stub_project
 
 

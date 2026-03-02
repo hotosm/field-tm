@@ -18,36 +18,31 @@
       <div slot="header" class="ftm-project-card__header">
         <div class="ftm-project-card__header-meta">
           <span class="ftm-project-card__id">
-            #{{ project.id }}{% if project.visibility and
-            project.visibility.value == 'PRIVATE' %}
-            <span class="ftm-private-icon" title="Private Project">🔒</span>{%
-            endif %}
+            #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
+            <span class="ftm-private-icon" title="Private Project">🔒</span>{% endif %}
           </span>
           <div class="ftm-project-card__badges">
-            {% if project.status %} {% set status_value = project.status.value
-            if project.status.value else (project.status if project.status is
-            string else 'DRAFT') %} {% if status_value != 'PUBLISHED' %}
+            {% if project.status %} {% set status_value = project.status.value if
+            project.status.value else (project.status if project.status is string else 'DRAFT') %}
+            {% if status_value != 'PUBLISHED' %}
             <wa-badge
               variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
             >
               {{ status_value }}
             </wa-badge>
             {% endif %} {% endif %} {% if project.field_mapping_app %} {% if
-            project.field_mapping_app.value %} {% set app_name =
-            project.field_mapping_app.value %} {% else %} {% set app_name =
-            project.field_mapping_app %} {% endif %}
+            project.field_mapping_app.value %} {% set app_name = project.field_mapping_app.value %}
+            {% else %} {% set app_name = project.field_mapping_app %} {% endif %}
             <img
               src="/static/images/{{ app_name.lower() }}-logo.svg"
               alt="{{ app_name }}"
               class="ftm-app-logo"
-              onerror="this.style.display='none'"
+              onerror="this.style.display = 'none'"
             />
             {% endif %}
           </div>
         </div>
-        <span class="ftm-project-card__name"
-          >{{ project.project_name or 'Unnamed Project' }}</span
-        >
+        <span class="ftm-project-card__name">{{ project.project_name or 'Unnamed Project' }}</span>
       </div>
       <div class="ftm-project-card__body">
         {% if project.location_str %}
@@ -59,15 +54,12 @@
         </div>
         {% endif %} {% if project.description %}
         <p class="ftm-project-card__description">
-          {{ project.description[:120] }}{% if project.description|length > 120
-          %}...{% endif %}
+          {{ project.description[:120] }}{% if project.description|length > 120 %}...{% endif %}
         </p>
         {% endif %} {% if project.hashtags %}
         <div class="ftm-project-card__tags">
           {% for tag in project.hashtags[:4] %}
-          <wa-badge variant="neutral" style="font-size: 0.8em"
-            >{{ tag }}</wa-badge
-          >
+          <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
           {% endfor %} {% if project.hashtags|length > 4 %}
           <wa-badge variant="neutral" style="font-size: 0.8em"
             >+{{ project.hashtags|length - 4 }}</wa-badge
@@ -76,8 +68,7 @@
         </div>
         {% endif %} {% if project.created_at %}
         <div class="ftm-project-card__footer">
-          Created: {{ project.created_at.strftime('%Y-%m-%d') if
-          project.created_at else 'N/A' }}
+          Created: {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else 'N/A' }}
         </div>
         {% endif %}
       </div>
@@ -85,9 +76,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="ftm-empty-state">
-    No projects found. Create your first project to get started!
-  </p>
+  <p class="ftm-empty-state">No projects found. Create your first project to get started!</p>
   {% endif %}
 </div>
 {% endblock %}

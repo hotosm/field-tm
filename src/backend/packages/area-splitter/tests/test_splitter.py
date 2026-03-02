@@ -165,7 +165,8 @@ def test_split_by_square_with_multigeom_input(db, aoi_multi_json, extract_json):
         )
         assert len(features.get("features", [])) == 76
         for index in [0, 1, 2, 3]:
-            assert Path(f"{Path(outfile).stem}_{index}.geojson)").exists()
+            expected = Path(outfile).with_name(f"{Path(outfile).stem}_{index}.geojson")
+            assert expected.exists()
     finally:
         Path(outfile).unlink()
 

@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %}Create Project - Field Tasking
-Manager{% endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}Create Project - Field Tasking Manager{% endblock %} {%
+block content %}
 <div class="ftm-page ftm-page--narrow">
   <h1 style="margin-bottom: 30px">Create New Project</h1>
 
@@ -64,7 +64,7 @@ Manager{% endblock %} {% block content %}
               src="/static/images/qfield-logo.svg"
               alt="QField"
               class="ftm-app-logo"
-              onerror="this.style.display='none'"
+              onerror="this.style.display = 'none'"
             />
             <span style="font-weight: 500">QField</span>
           </label>
@@ -80,7 +80,7 @@ Manager{% endblock %} {% block content %}
               src="/static/images/odk-logo.svg"
               alt="ODK"
               class="ftm-app-logo"
-              onerror="this.style.display='none'"
+              onerror="this.style.display = 'none'"
             />
             <span style="font-weight: 500">ODK</span>
           </label>
@@ -117,25 +117,16 @@ Manager{% endblock %} {% block content %}
             Clear
           </wa-button>
         </div>
-        <input
-          type="file"
-          id="geojson-file-input"
-          accept=".geojson,.json"
-          style="display: none"
-        />
+        <input type="file" id="geojson-file-input" accept=".geojson,.json" style="display: none" />
         <div id="map" class="ftm-map-container"></div>
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
         <small class="ftm-form-help">
-          Draw a polygon on the map or upload a GeoJSON file to define your
-          project area. Maximum project size is 1,000&nbsp;km². Areas over
-          100&nbsp;km² will show a warning. The OSM data extract API is limited
-          to 200&nbsp;km².
+          Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum
+          project size is 1,000&nbsp;km². Areas over 100&nbsp;km² will show a warning. The OSM data
+          extract API is limited to 200&nbsp;km².
         </small>
-        <div
-          class="ftm-step__actions"
-          style="margin-top: 10px; margin-bottom: 8px"
-        >
+        <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
           <button
             type="button"
             id="aoi-advanced-config-toggle"
@@ -144,10 +135,7 @@ Manager{% endblock %} {% block content %}
             Advanced Config
           </button>
         </div>
-        <div
-          id="aoi-advanced-config-panel"
-          class="ftm-advanced-config ftm-advanced-config--hidden"
-        >
+        <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
           <div class="ftm-advanced-config__content">
             <div class="ftm-checkbox-row">
               <input
@@ -161,11 +149,7 @@ Manager{% endblock %} {% block content %}
             </div>
           </div>
         </div>
-        <textarea
-          name="outline"
-          id="outline-geojson"
-          style="display: none"
-        ></textarea>
+        <textarea name="outline" id="outline-geojson" style="display: none"></textarea>
       </div>
 
       <div class="ftm-form-group">
@@ -177,18 +161,13 @@ Manager{% endblock %} {% block content %}
         ></wa-input>
         <div id="hashtags-container" class="ftm-hashtags-container"></div>
         <small class="ftm-form-help">
-          Type hashtags and press Enter or comma to add them. Click the × on a
-          tag to remove it.
+          Type hashtags and press Enter or comma to add them. Click the × on a tag to remove it.
         </small>
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn">
-          Create Project
-        </wa-button>
-        <span id="submit-indicator" style="display: none; margin-left: 10px"
-          >Creating...</span
-        >
+        <wa-button type="submit" variant="brand" id="submit-btn"> Create Project </wa-button>
+        <span id="submit-indicator" style="display: none; margin-left: 10px">Creating...</span>
         <wa-button href="/htmxprojects" variant="default">Cancel</wa-button>
       </div>
     </form>
@@ -201,12 +180,8 @@ Manager{% endblock %} {% block content %}
   const errorMessageEl = document.getElementById("form-error-message");
   const hashtagInput = document.getElementById("hashtag-input");
   const hashtagsContainer = document.getElementById("hashtags-container");
-  const aoiAdvancedConfigToggle = document.getElementById(
-    "aoi-advanced-config-toggle",
-  );
-  const aoiAdvancedConfigPanel = document.getElementById(
-    "aoi-advanced-config-panel",
-  );
+  const aoiAdvancedConfigToggle = document.getElementById("aoi-advanced-config-toggle");
+  const aoiAdvancedConfigPanel = document.getElementById("aoi-advanced-config-panel");
   const hashtags = new Set();
 
   if (aoiAdvancedConfigToggle && aoiAdvancedConfigPanel) {
@@ -217,8 +192,7 @@ Manager{% endblock %} {% block content %}
 
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;
-    errorMessageEl.textContent =
-      message || "Something went wrong. Please try again.";
+    errorMessageEl.textContent = message || "Something went wrong. Please try again.";
     errorContainer.style.display = "block";
   }
 
@@ -416,8 +390,7 @@ Manager{% endblock %} {% block content %}
 
     if (geojson.features && geojson.features.length > 0) {
       // If single feature, use it directly; otherwise use FeatureCollection
-      const outline =
-        geojson.features.length === 1 ? geojson.features[0] : geojson;
+      const outline = geojson.features.length === 1 ? geojson.features[0] : geojson;
       outlineTextarea.value = JSON.stringify(outline, null, 2);
     } else {
       outlineTextarea.value = "";
@@ -437,9 +410,7 @@ Manager{% endblock %} {% block content %}
 
     try {
       const geojsonData = JSON.parse(outlineValue);
-      const mergeCheckbox = document.getElementById(
-        "merge-geometries-checkbox",
-      );
+      const mergeCheckbox = document.getElementById("merge-geometries-checkbox");
       const mergeGeometries = mergeCheckbox ? mergeCheckbox.checked : false;
 
       const response = await fetch("/validate-geojson", {
@@ -522,110 +493,96 @@ Manager{% endblock %} {% block content %}
   }
 
   // Draw polygon button
-  document
-    .getElementById("draw-polygon-btn")
-    ?.addEventListener("click", function () {
-      if (!map) return;
-      const polygonDrawer = new L.Draw.Polygon(map, {
-        allowIntersection: false,
-        showArea: true,
-      });
-      polygonDrawer.enable();
+  document.getElementById("draw-polygon-btn")?.addEventListener("click", function () {
+    if (!map) return;
+    const polygonDrawer = new L.Draw.Polygon(map, {
+      allowIntersection: false,
+      showArea: true,
     });
+    polygonDrawer.enable();
+  });
 
   // Upload GeoJSON button
-  document
-    .getElementById("upload-geojson-btn")
-    ?.addEventListener("click", function () {
-      document.getElementById("geojson-file-input").click();
-    });
+  document.getElementById("upload-geojson-btn")?.addEventListener("click", function () {
+    document.getElementById("geojson-file-input").click();
+  });
 
   // Handle file upload
-  document
-    .getElementById("geojson-file-input")
-    ?.addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
+  document.getElementById("geojson-file-input")?.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = async function (e) {
-        try {
-          // Parse the file content
-          const geojsonData = JSON.parse(e.target.result);
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      try {
+        // Parse the file content
+        const geojsonData = JSON.parse(e.target.result);
 
-          // Clear any previous errors
-          clearError();
-          const mapError = document.getElementById("map-error");
-          if (mapError) {
-            mapError.innerHTML = "";
-          }
+        // Clear any previous errors
+        clearError();
+        const mapError = document.getElementById("map-error");
+        if (mapError) {
+          mapError.innerHTML = "";
+        }
 
-          // Get merge geometries checkbox value
-          const mergeGeometriesCheckbox = document.getElementById(
-            "merge-geometries-checkbox",
-          );
-          const mergeGeometries = mergeGeometriesCheckbox
-            ? mergeGeometriesCheckbox.checked
-            : false;
+        // Get merge geometries checkbox value
+        const mergeGeometriesCheckbox = document.getElementById("merge-geometries-checkbox");
+        const mergeGeometries = mergeGeometriesCheckbox ? mergeGeometriesCheckbox.checked : false;
 
-          // Send the geojson to API to validate, normalize, and merge into single polygon
-          const response = await fetch("/validate-geojson", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              geojson: geojsonData,
-              merge_geometries: mergeGeometries,
-            }),
-          });
+        // Send the geojson to API to validate, normalize, and merge into single polygon
+        const response = await fetch("/validate-geojson", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            geojson: geojsonData,
+            merge_geometries: mergeGeometries,
+          }),
+        });
 
-          const result = await response.json();
+        const result = await response.json();
 
-          if (!response.ok) {
-            const errorMsg = result.error || "Failed to validate GeoJSON";
-            console.error("Error validating GeoJSON:", errorMsg);
-            if (mapError) {
-              mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-            } else {
-              showError(errorMsg);
-            }
-            return;
-          }
-
-          // Load the normalized, merged GeoJSON onto the map
-          if (result.geojson) {
-            loadGeoJSONOnMap(result.geojson);
-            showAreaInfo(result.area_km2, result.warning);
-          } else {
-            throw new Error("No GeoJSON returned from validation");
-          }
-        } catch (error) {
-          console.error("Error processing GeoJSON:", error);
-          const errorMsg =
-            error.message ||
-            "Invalid GeoJSON file. Please check the file format.";
-          const mapError = document.getElementById("map-error");
+        if (!response.ok) {
+          const errorMsg = result.error || "Failed to validate GeoJSON";
+          console.error("Error validating GeoJSON:", errorMsg);
           if (mapError) {
             mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
           } else {
             showError(errorMsg);
           }
+          return;
         }
-      };
-      reader.readAsText(file);
-    });
+
+        // Load the normalized, merged GeoJSON onto the map
+        if (result.geojson) {
+          loadGeoJSONOnMap(result.geojson);
+          showAreaInfo(result.area_km2, result.warning);
+        } else {
+          throw new Error("No GeoJSON returned from validation");
+        }
+      } catch (error) {
+        console.error("Error processing GeoJSON:", error);
+        const errorMsg = error.message || "Invalid GeoJSON file. Please check the file format.";
+        const mapError = document.getElementById("map-error");
+        if (mapError) {
+          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
+        } else {
+          showError(errorMsg);
+        }
+      }
+    };
+    reader.readAsText(file);
+  });
 
   // Clear map button
-  document
-    .getElementById("clear-map-btn")
-    ?.addEventListener("click", function () {
-      if (drawnLayers) {
-        drawnLayers.clearLayers();
-        updateGeoJSON();
-        showAreaInfo(null);
-      }
-    });
+  document.getElementById("clear-map-btn")?.addEventListener("click", function () {
+    if (drawnLayers) {
+      drawnLayers.clearLayers();
+      updateGeoJSON();
+      showAreaInfo(null);
+    }
+  });
 
   // Listen for duplicate project name error
   document.body.addEventListener("duplicateProjectName", function (event) {
@@ -703,9 +660,7 @@ Manager{% endblock %} {% block content %}
       const responseText = xhr.responseText;
       const parser = new DOMParser();
       const doc = parser.parseFromString(responseText, "text/html");
-      const errorMessage = doc.querySelector(
-        "#form-error-message",
-      )?.textContent;
+      const errorMessage = doc.querySelector("#form-error-message")?.textContent;
 
       if (errorMessage) {
         const projectNameError = document.getElementById("project-name-error");
@@ -738,9 +693,7 @@ Manager{% endblock %} {% block content %}
       ) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(responseText, "text/html");
-        const errorMessage = doc.querySelector(
-          "#form-error-message",
-        )?.textContent;
+        const errorMessage = doc.querySelector("#form-error-message")?.textContent;
 
         if (errorMessage) {
           const mapError = document.getElementById("map-error");
@@ -837,9 +790,7 @@ Manager{% endblock %} {% block content %}
       hashtagsInput.value = hashtagsArray.join(", ");
 
       // Validate outline is present before HTMX submits
-      const outlineValue = document
-        .getElementById("outline-geojson")
-        .value.trim();
+      const outlineValue = document.getElementById("outline-geojson").value.trim();
       if (!outlineValue) {
         e.preventDefault();
         e.stopPropagation();

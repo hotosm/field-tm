@@ -28,6 +28,7 @@ all: backend
 # Test all backend code (including packages)
 [no-cd]
 backend:
+  just stop all
   just build backend
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
@@ -37,11 +38,12 @@ backend:
 # Cleanup orphan backend tests
 [no-cd]
 backend-cleanup:
-    docker compose -f compose.test.yaml down --remove-orphans
+  docker compose -f compose.test.yaml down --remove-orphans
 
 # Test backend API only
 [no-cd]
 api:
+  just stop all
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest tests
@@ -50,6 +52,7 @@ api:
 # Test osm-fieldwork package only
 [no-cd]
 osm-fieldwork:
+  just stop all
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
@@ -57,7 +60,8 @@ osm-fieldwork:
 
 # Test area-splitter package only
 [no-cd]
-splitter:
+area-splitter:
+  just stop all
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
