@@ -18,6 +18,7 @@
 
 """Project detail and QR code HTMX routes."""
 
+import json
 import logging
 
 from litestar import get
@@ -28,6 +29,7 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response, Template
 from psycopg import AsyncConnection
 
+from app.central import central_crud
 from app.db.database import db_conn
 from app.db.models import DbProject
 from app.projects import project_crud
@@ -49,13 +51,21 @@ async def project_details(
     """Render project details page."""
     try:
         project = await DbProject.one(db, project_id)
+        form_templates = []
+        if not project.xlsform_content:
+            form_templates = await central_crud.get_form_list(db)
         return HTMXTemplate(
-            template_name="project_details.html", context={"project": project}
+            template_name="project_details.html",
+            context={
+                "project": project,
+                "form_templates_json": json.dumps(form_templates),
+            },
         )
     except KeyError:
         # Project not found
         return HTMXTemplate(
-            template_name="project_details.html", context={"project": None}
+            template_name="project_details.html",
+            context={"project": None, "form_templates_json": "[]"},
         )
 
 

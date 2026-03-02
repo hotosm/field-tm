@@ -1,268 +1,355 @@
-# Copyright (c) Humanitarian OpenStreetMap Team
-#
-# This file is part of Field-TM.
-#
-#     Field-TM is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     Field-TM is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
-#
-"""Endpoints for Field-TM projects (Litestar)."""
+"""External REST API routes for project creation."""
 
-import json
-import logging
-from typing import Optional
+from __future__ import annotations
 
-from litestar import Response, Router, delete, get, patch
+import base64
+from io import BytesIO
+
+from litestar import Request, Router, delete, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
-from litestar.params import Parameter
-from osm_fieldwork.json_data_models import get_choices
 from psycopg import AsyncConnection
 
-from app.auth.auth_deps import login_required, public_endpoint
-from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import project_manager, super_admin
-from app.central import central_crud
+from app.auth.api_key import api_key_required
+from app.central.central_schemas import ODKCentral
+from app.config import settings
 from app.db.database import db_conn
-from app.db.enums import ProjectStatus
-from app.db.models import (
-    DbProject,
-    DbUser,
-    FieldMappingApp,
+from app.db.enums import FieldMappingApp
+from app.db.models import DbProject, DbTemplateXLSForm
+from app.projects.project_schemas import (
+    CreateProjectRequest,
+    CreateProjectResponse,
+    ProjectUpdate,
 )
-from app.helpers import helper_schemas
-from app.projects import project_crud, project_deps, project_schemas
-from app.qfield.qfield_crud import delete_qfield_project
-
-log = logging.getLogger(__name__)
-
-
-@get(
-    "/all",
-    summary="Return all projects.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(public_endpoint),
-    },
-    return_dto=project_schemas.ProjectOut,
+from app.projects.project_services import (
+    ConflictError,
+    NotFoundError,
+    ServiceError,
+    SplitAoiOptions,
+    ValidationError,
+    create_project_stub,
+    download_osm_data,
+    finalize_odk_project,
+    finalize_qfield_project,
+    process_xlsform,
+    save_data_extract,
+    save_task_areas,
+    split_aoi,
 )
-async def read_projects(
+
+
+def _map_service_error(exc: ServiceError) -> HTTPException:
+    """Convert service-layer exceptions to HTTP errors for API responses."""
+    if isinstance(exc, ValidationError):
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=exc.message,
+        )
+    if isinstance(exc, ConflictError):
+        return HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=exc.message,
+        )
+    if isinstance(exc, NotFoundError):
+        return HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=exc.message,
+        )
+    return HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=exc.message,
+    )
+
+
+def _enum_to_value(value):
+    """Convert enum-like values to plain JSON-serializable primitives."""
+    return value.value if hasattr(value, "value") else value
+
+
+def _build_ftm_url(project_id: int) -> str:
+    """Build the FieldTM project page URL."""
+    domain = settings.FTM_DOMAIN
+    port_suffix = f":{settings.FTM_DEV_PORT}" if settings.FTM_DEV_PORT else ""
+    scheme = "http" if "localhost" in domain else "https"
+    return f"{scheme}://{domain}{port_suffix}/htmxprojects/{project_id}"
+
+
+async def _cleanup_project(db: AsyncConnection, project_id: int | None) -> None:
+    """Delete a partially-created project on workflow failure or cleanup."""
+    if project_id is None:
+        return
+
+    await DbProject.delete(db, project_id)
+    await db.commit()
+
+
+async def _resolve_xlsform_bytes(
     db: AsyncConnection,
-    user_sub: Optional[str] | None = None,
-    skip: Optional[int] = 0,
-    limit: Optional[int] = 100,
-    hashtags: Optional[list[str]] = None,
-) -> list[DbProject]:
-    """Return all projects."""
-    projects = await DbProject.all(db, skip, limit, user_sub, hashtags)
-    return projects or []
+    data: CreateProjectRequest,
+) -> BytesIO:
+    """Load XLSForm bytes from a template or inline base64 payload."""
+    if data.template_form_id is not None:
+        template = await DbTemplateXLSForm.one(db, data.template_form_id)
+        if not template.xls:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Template XLSForm content is empty.",
+            )
+        return BytesIO(template.xls)
+
+    xls_content = base64.b64decode(data.xlsform_base64.encode("utf-8"))
+    return BytesIO(xls_content)
 
 
-@get(
-    "/summaries",
-    summary="Get a paginated summary of projects.",
-    dependencies={
-        "db": Provide(db_conn),
-        "current_user": Provide(public_endpoint),
-    },
-    return_dto=project_schemas.ProjectSummary,
-)
-async def read_project_summaries(  # noqa: PLR0913
+async def _save_requested_data_extract(
     db: AsyncConnection,
-    page: int = Parameter(default=1, ge=1),
-    results_per_page: int = Parameter(default=13, le=100),
-    user_sub: str | None = Parameter(default=None),
-    hashtags: str | None = Parameter(default=None),
-    search: str | None = Parameter(default=None),
-    country: str | None = Parameter(default=None),
-    status: ProjectStatus | None = Parameter(default=None),
-    field_mapping_app: FieldMappingApp | None = Parameter(default=None),
-) -> helper_schemas.PaginatedResponse[DbProject]:
-    """Get a paginated summary of projects.
+    project_id: int,
+    data: CreateProjectRequest,
+) -> None:
+    """Persist either provided GeoJSON, downloaded OSM data, or an empty collection."""
+    if data.geojson is not None:
+        await save_data_extract(db=db, project_id=project_id, geojson_data=data.geojson)
+        await db.commit()
+        return
 
-    NOTE this is a public endpoint with no auth requirements.
-    """
-    return await project_crud.get_paginated_projects(
+    if data.osm_category is not None:
+        geojson = await download_osm_data(
+            db=db,
+            project_id=project_id,
+            osm_category=data.osm_category.name,
+            geom_type=data.geom_type.value,
+            centroid=data.centroid,
+        )
+        await save_data_extract(db=db, project_id=project_id, geojson_data=geojson)
+        await db.commit()
+        return
+
+    await DbProject.update(
         db,
-        page,
-        results_per_page,
-        user_sub,
-        hashtags,
-        search,
-        status,
-        field_mapping_app,
-        country=country,
+        project_id,
+        ProjectUpdate(
+            data_extract_geojson={"type": "FeatureCollection", "features": []}
+        ),
+    )
+    await db.commit()
+
+
+async def _split_project_if_requested(
+    db: AsyncConnection,
+    project_id: int,
+    data: CreateProjectRequest,
+) -> None:
+    """Split the project AOI when an algorithm is supplied."""
+    if data.algorithm is None:
+        return
+
+    tasks_geojson = await split_aoi(
+        db=db,
+        project_id=project_id,
+        options=SplitAoiOptions(
+            algorithm=data.algorithm.value,
+            no_of_buildings=data.no_of_buildings,
+            dimension_meters=data.dimension_meters,
+            include_roads=data.include_roads,
+            include_rivers=data.include_rivers,
+            include_railways=data.include_railways,
+            include_aeroways=data.include_aeroways,
+        ),
+    )
+    await save_task_areas(db=db, project_id=project_id, tasks_geojson=tasks_geojson)
+    await db.commit()
+
+
+def _build_custom_odk_credentials(
+    data: CreateProjectRequest,
+) -> ODKCentral | None:
+    """Build per-request ODK credentials when all custom fields are present."""
+    has_custom_odk = (
+        data.external_project_instance_url
+        and data.external_project_username
+        and data.external_project_password
+    )
+    if not has_custom_odk:
+        return None
+
+    return ODKCentral(
+        external_project_instance_url=data.external_project_instance_url,
+        external_project_username=data.external_project_username,
+        external_project_password=data.external_project_password,
     )
 
 
-@get(
-    "/categories",
-    summary="Get all project categories.",
-    dependencies={
-        "auth_user": Provide(public_endpoint),
-    },
-)
-async def get_categories() -> dict:
-    """Get api for fetching all the categories.
-
-    This endpoint fetches all the categories from osm_fieldwork.
-
-    ## Response
-    - Returns a JSON object containing a list of categories and their respective forms.
-
-    """
-    # Categories are fetched from osm_fieldwork.data_models.get_choices().
-    categories = get_choices()
-    return categories
-
-
-@get(
-    "/{project_id:int}",
-    summary="Get a specific project by ID.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(public_endpoint),
-    },
-    return_dto=project_schemas.ProjectOut,
-)
-async def read_project(
-    project_id: int,
+async def _finalize_project(
     db: AsyncConnection,
-) -> DbProject:
-    """Get a specific project by ID."""
-    try:
-        return await DbProject.one(db, project_id)
-    except KeyError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project ({project_id}) not found.",
-        ) from e
-
-
-@get(
-    "/{project_id:int}/download",
-    summary="Download the project boundary as GeoJSON.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(public_endpoint),
-    },
-)
-async def download_project_boundary(
+    project: DbProject,
     project_id: int,
-    db: AsyncConnection,
-) -> Response:
-    """Downloads the boundary of a project as a GeoJSON file."""
-    try:
-        project = await DbProject.one(db, project_id)
-    except KeyError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project ({project_id}) not found.",
-        ) from e
+    data: CreateProjectRequest,
+) -> tuple[str, str | None, str | None]:
+    """Finalize the project in ODK or QField and return downstream access details."""
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        odk_result = await finalize_odk_project(
+            db=db,
+            project_id=project_id,
+            custom_odk_creds=_build_custom_odk_credentials(data),
+        )
+        return (
+            odk_result.odk_url,
+            odk_result.manager_username,
+            odk_result.manager_password,
+        )
 
-    geojson_bytes = json.dumps(project.outline).encode("utf-8")
-    headers = {
-        "Content-Disposition": f"attachment; filename={project.slug}.geojson",
-        "Content-Type": "application/media",
-    }
-    return Response(
-        content=geojson_bytes,
-        headers=headers,
-        status_code=status.HTTP_200_OK,
+    has_custom_qfield = (
+        data.qfield_cloud_url and data.qfield_cloud_user and data.qfield_cloud_password
     )
+    downstream_url = await finalize_qfield_project(
+        db=db,
+        project_id=project_id,
+        custom_qfield_creds=(data if has_custom_qfield else None),
+    )
+    return downstream_url, None, None
 
 
-@patch(
-    "/{project_id:int}",
-    summary="Partially update an existing project.",
+@post(
+    "/projects",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user_dict": Provide(project_manager),
     },
-    return_dto=project_schemas.ProjectOut,
+    status_code=status.HTTP_201_CREATED,
 )
-async def update_project(
-    data: project_schemas.ProjectUpdate,
-    project_id: int,
-    current_user_dict: ProjectUserDict,
+async def api_create_project(
+    request: Request,
     db: AsyncConnection,
-) -> DbProject:
-    """Partial update an existing project."""
-    # NOTE this does not including updating the ODK project name
-    # If password is None but URL/username are provided,
-    # preserve existing encrypted password
-    project = current_user_dict.get("project")
-    if (
-        (data.external_project_instance_url or data.external_project_username)
-        and not data.external_project_password
-        and project.external_project_password_encrypted
-    ):
-        # Password is None, so set password_encrypted to preserve
-        # existing encrypted password (allows validation to pass)
-        data.password_encrypted = project.external_project_password_encrypted
+    data: CreateProjectRequest,
+) -> CreateProjectResponse:
+    """Create a complete project end-to-end in a single request."""
+    auth_user = await api_key_required(request, db)
+    project_id: int | None = None
 
-    return await DbProject.update(db, project.id, data)
+    try:
+        project = await create_project_stub(
+            db=db,
+            project_name=data.project_name,
+            field_mapping_app=data.field_mapping_app,
+            description=data.description,
+            outline=data.outline,
+            hashtags=data.hashtags or [],
+            user_sub=auth_user.sub,
+        )
+        await db.commit()
+        project_id = project.id
+
+        xlsform_bytes = await _resolve_xlsform_bytes(db, data)
+        await process_xlsform(
+            db=db,
+            project_id=project_id,
+            xlsform_bytes=xlsform_bytes,
+            need_verification_fields=data.need_verification_fields,
+            mandatory_photo_upload=data.mandatory_photo_upload,
+            use_odk_collect=data.use_odk_collect,
+            default_language=data.default_language,
+        )
+        await db.commit()
+
+        await _save_requested_data_extract(db, project_id, data)
+        await _split_project_if_requested(db, project_id, data)
+        downstream_url, manager_username, manager_password = await _finalize_project(
+            db,
+            project,
+            project_id,
+            data,
+        )
+
+        await db.commit()
+
+    except (ValueError, TypeError) as exc:
+        await _cleanup_project(db, project_id)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except HTTPException:
+        await _cleanup_project(db, project_id)
+        raise
+    except ServiceError as exc:
+        await _cleanup_project(db, project_id)
+        raise _map_service_error(exc) from exc
+
+    ftm_url = None if data.cleanup else _build_ftm_url(project_id)
+
+    if data.cleanup:
+        await _cleanup_project(db, project_id)
+
+    return CreateProjectResponse(
+        project_id=project_id,
+        ftm_url=ftm_url,
+        downstream_url=downstream_url,
+        manager_username=manager_username,
+        manager_password=manager_password,
+    )
 
 
 @delete(
-    "/{project_id:int}",
-    summary="Delete a project from ODK Central and the local database.",
+    "/projects/{project_id:int}",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(super_admin),
     },
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_project(
-    project_id: int,
-    db: AsyncConnection,
-    current_user: DbUser,
+async def api_delete_project(
+    request: Request, project_id: int, db: AsyncConnection
 ) -> None:
-    """Delete a project from both ODK Central and the local database."""
-    project = await project_deps.get_project_by_id(db, project_id)
-
-    log.info(
-        f"User {current_user.username} attempting deletion of project {project.id}"
-    )
-
-    # Handle QField projects separately
-    if project.field_mapping_app == FieldMappingApp.QFIELD:
-        log.info(f"Deleting QFieldCloud project for FieldTM project ({project.id})")
-        await delete_qfield_project(db, project.id)
-    else:
-        # Delete ODK Central project
-        log.info(f"Deleting ODK Central project for FieldTM project ({project.id})")
-        # Use None for credentials to fall back to environment variables
-        await central_crud.delete_odk_project(project.external_project_id, None)
-
-    # Delete Field-TM project
-    await DbProject.delete(db, project.id)
-
-    log.info(f"Deletion of project {project.id} successful")
+    """Delete project from Field-TM database."""
+    await api_key_required(request, db)
+    await DbProject.delete(db, project_id)
+    await db.commit()
 
 
-project_router = Router(
-    path="/projects",
-    tags=["projects"],
+@get("/projects", dependencies={"db": Provide(db_conn)})
+async def api_list_projects(db: AsyncConnection) -> list[dict]:
+    """Public endpoint to list projects."""
+    projects = await DbProject.all(db, skip=0, limit=100)
+    return [
+        {
+            "id": project.id,
+            "project_name": project.project_name,
+            "description": project.description,
+            "status": _enum_to_value(project.status),
+            "field_mapping_app": _enum_to_value(project.field_mapping_app),
+        }
+        for project in (projects or [])
+    ]
+
+
+@get("/projects/{project_id:int}", dependencies={"db": Provide(db_conn)})
+async def api_get_project(project_id: int, db: AsyncConnection) -> dict:
+    """Public endpoint to get a single project."""
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project ({project_id}) not found.",
+        ) from exc
+    return {
+        "id": project.id,
+        "project_name": project.project_name,
+        "description": project.description,
+        "status": _enum_to_value(project.status),
+        "field_mapping_app": _enum_to_value(project.field_mapping_app),
+        "outline": project.outline,
+        "hashtags": project.hashtags,
+        "location_str": project.location_str,
+    }
+
+
+api_router = Router(
+    path="/api/v1",
+    tags=["api"],
     route_handlers=[
-        read_projects,
-        read_project_summaries,
-        get_categories,
-        read_project,
-        download_project_boundary,
-        update_project,
-        delete_project,
+        api_create_project,
+        api_delete_project,
+        api_list_projects,
+        api_get_project,
     ],
 )

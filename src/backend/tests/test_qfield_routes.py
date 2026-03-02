@@ -17,19 +17,29 @@
 #
 """Tests for qfield routes."""
 
-# import pytest
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from app.qfield.qfield_routes import qfc_creds_test
+from app.qfield.qfield_schemas import QFieldCloud
 
 
-# async def test_create_qfield_project(client, project, tasks, odk_project):
-#     """Test creating a QField project on QFieldCloud."""
-#     response = await client.post(f"/qfield/projects?project_id={project.id}")
-#     # FIXME returns a 500
-#     assert response.status_code == 200
+async def test_qfield_creds_test():
+    """The surviving QField JSON route should still validate credentials."""
+    with patch(
+        "app.qfield.qfield_routes.qfc_credentials_test", new_callable=AsyncMock
+    ) as mock_test_qfc:
+        await qfc_creds_test.fn(
+            qfc_creds=QFieldCloud(
+                qfield_cloud_url="https://app.qfield.cloud",
+                qfield_cloud_user="demo-user",
+                qfield_cloud_password="Password1234",
+            )
+        )
 
-#     qfield_project = response.json()
-#     assert qfield_project
+    mock_test_qfc.assert_awaited_once()
 
 
-# if __name__ == "__main__":
-#     """Main func if file invoked directly."""
-#     pytest.main()
+if __name__ == "__main__":
+    """Main func if file invoked directly."""
+    pytest.main()

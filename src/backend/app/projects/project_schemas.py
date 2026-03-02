@@ -35,11 +35,14 @@ from pydantic.functional_validators import field_validator, model_validator
 from app.central.central_schemas import ODKCentral
 from app.config import encrypt_value, settings
 from app.db.enums import (
+    DbGeomType,
     FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
+    XLSFormType,
 )
 from app.db.models import DbProject, slugify
+from app.qfield.qfield_schemas import QFieldCloud
 
 
 class SplitFormData(BaseModel):
@@ -48,6 +51,60 @@ class SplitFormData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     project_geojson: UploadFile
     extract_geojson: UploadFile | None = None
+
+
+class CreateProjectRequest(ODKCentral, QFieldCloud):
+    """Single payload to create a complete project end-to-end."""
+
+    project_name: str
+    field_mapping_app: FieldMappingApp
+    description: str
+    outline: dict
+    hashtags: list[str] | None = None
+
+    template_form_id: int | None = None
+    xlsform_base64: str | None = None
+    need_verification_fields: bool = True
+    mandatory_photo_upload: bool = False
+    use_odk_collect: bool = False
+    default_language: str = "english"
+
+    geojson: dict | None = None
+    osm_category: XLSFormType | None = None
+    geom_type: DbGeomType = DbGeomType.POLYGON
+    centroid: bool = False
+
+    algorithm: SplittingAlgorithm | None = None
+    no_of_buildings: int = 10
+    dimension_meters: int = 100
+    include_roads: bool = True
+    include_rivers: bool = True
+    include_railways: bool = True
+    include_aeroways: bool = True
+
+    cleanup: bool = False
+
+    @model_validator(mode="after")
+    def validate_xlsform_source(self):
+        """Require exactly one XLSForm source."""
+        has_template = self.template_form_id is not None
+        has_upload = bool(self.xlsform_base64)
+        if has_template == has_upload:
+            raise ValueError(
+                "Provide exactly one XLSForm source: "
+                "template_form_id or xlsform_base64."
+            )
+        return self
+
+
+class CreateProjectResponse(BaseModel):
+    """Response after full project creation."""
+
+    project_id: int
+    ftm_url: str | None = None
+    downstream_url: str
+    manager_username: str | None = None
+    manager_password: str | None = None
 
 
 # ============================================================================

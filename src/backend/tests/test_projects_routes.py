@@ -18,7 +18,6 @@
 """Tests for project routes."""
 
 import json
-import logging
 import os
 from contextlib import asynccontextmanager
 from io import BytesIO
@@ -29,17 +28,14 @@ import pytest
 
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
-from app.config import settings
 from app.helpers.geometry_utils import check_crs
-
-log = logging.getLogger(__name__)
 
 
 def test_create_project_request_split_defaults():
     """API split defaults should match the onboarding UI default."""
     import base64
 
-    from app.api.api_schemas import CreateProjectRequest
+    from app.projects.project_schemas import CreateProjectRequest
 
     payload = CreateProjectRequest(
         project_name="test",
@@ -688,96 +684,6 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
         == "https://example-odk.trycloudflare.com/v1/key/app-token/projects/2"
     )
     assert captured["qr_micro"] is False
-
-
-async def test_delete_project(client, admin_user, project):
-    """Test deleting a Field-TM project, plus ODK Central project."""
-    response = await client.delete(f"/projects/{project.id}")
-    assert response.status_code == 204
-
-
-async def test_update_project(client, admin_user, project):
-    """Test update project metadata."""
-    updated_project_data = {
-        "project_name": f"Updated Test Project {uuid4()}",
-        "description": "updated description",
-        "hashtags": "#Field-TM anothertag",
-    }
-
-    response = await client.patch(f"/projects/{project.id}", json=updated_project_data)
-
-    if response.status_code != 200:
-        log.error(response.json())
-    assert response.status_code == 200
-
-    response_data = response.json()
-    assert response_data["project_name"] == updated_project_data["project_name"]
-    assert response_data["description"] == updated_project_data["description"]
-
-    assert sorted(response_data["hashtags"]) == sorted(
-        [
-            "#Field-TM",
-            f"#{settings.FTM_DOMAIN}-{response_data['id']}",
-            "#anothertag",
-        ]
-    )
-
-
-async def test_project_summaries(client, project):
-    """Test read project summaries."""
-    response = await client.get("/projects/summaries")
-    assert response.status_code == 200
-    assert "results" in response.json()
-
-    first_project = response.json()["results"][0]
-
-    assert first_project["id"] == project.id
-    assert first_project["project_name"] == project.project_name
-    assert first_project["hashtags"] == project.hashtags
-
-
-async def test_project_by_id(client, project):
-    """Test read project by id."""
-    response = await client.get(f"/projects/{project.id}?project_id={project.id}")
-    assert response.status_code == 200
-
-    data = response.json()
-
-    assert data["id"] == project.id
-    assert data["external_project_id"] == project.external_project_id
-    assert data["created_by_sub"] == project.created_by_sub
-    assert data["project_name"] == project.project_name
-    assert data["description"] == project.description
-    assert data["status"] == project.status
-    assert data["hashtags"] == project.hashtags
-    assert data["location_str"] == project.location_str
-
-
-async def test_read_project(client, project):
-    """Test read project by id."""
-    response = await client.get(f"/projects/{project.id}")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == project.id
-    assert data["external_project_id"] == project.external_project_id
-    assert data["project_name"] == project.project_name
-
-
-async def test_download_project_boundary(client, project):
-    """Test downloading a project boundary as GeoJSON."""
-    response = await client.get(f"/projects/{project.id}/download")
-
-    assert response.status_code == 200
-    assert (
-        response.headers["Content-Disposition"]
-        == f"attachment; filename={project.slug}.geojson"
-    )
-    assert response.headers["Content-Type"] == "application/media"
-
-    content = json.loads(response.content)
-    assert content["type"] == "Polygon"
-    assert "coordinates" in content
-    assert isinstance(content["coordinates"], list)
 
 
 if __name__ == "__main__":
