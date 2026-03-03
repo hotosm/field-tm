@@ -40,7 +40,7 @@ CREATE TABLE public.projects (
     id integer NOT NULL,
     field_mapping_app public.fieldmappingapp DEFAULT 'QField',
     external_project_instance_url character varying,
-    external_project_id integer,
+    external_project_id character varying,
     external_project_username character varying,
     external_project_password_encrypted character varying,
     created_by_sub character varying,

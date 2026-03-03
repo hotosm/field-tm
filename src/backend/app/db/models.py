@@ -442,7 +442,7 @@ class DbProject:
     id: Optional[int] = None
     field_mapping_app: Optional[FieldMappingApp] = None
     external_project_instance_url: Optional[str] = None
-    external_project_id: Optional[int] = None
+    external_project_id: Optional[str | int] = None
     external_project_username: Optional[str] = None
     external_project_password_encrypted: Optional[str] = None
     created_by_sub: Optional[str] = None

@@ -110,6 +110,17 @@ async def test_create_odk_project():
     assert result == {"id": 123, "name": "Field-TM Test Project"}
 
 
+def test_project_update_accepts_qfield_uuid_external_project_id():
+    """QFieldCloud UUID project IDs should validate for project updates."""
+    from app.projects.project_schemas import ProjectUpdate
+
+    qfield_project_id = "becce310-e99e-4a7e-b1db-9e3f00e2c5ba"
+
+    payload = ProjectUpdate(external_project_id=qfield_project_id)
+
+    assert payload.external_project_id == qfield_project_id
+
+
 async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
     """Ensure OSM extract parsing passes GeoJSON object, not JSON string path."""
     from app.projects import project_services

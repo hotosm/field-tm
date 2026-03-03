@@ -302,7 +302,7 @@ class ProjectInBase(StubProjectIn):
 
     # Add missing vars
     external_project_instance_url: Optional[str] = None
-    external_project_id: Optional[int] = None
+    external_project_id: Optional[str | int] = None
     external_project_username: Optional[str] = None
     external_project_password_encrypted: Optional[str] = None
 

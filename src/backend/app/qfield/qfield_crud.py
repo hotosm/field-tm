@@ -17,6 +17,7 @@
 #
 """Logic for interaction with QFieldCloud & data."""
 
+from copy import deepcopy
 import json
 import logging
 import shutil
@@ -127,26 +128,46 @@ def _dominant_geom_type(data_extract: Optional[dict]) -> DbGeomType:
 def clean_tags_for_qgis(
     geojson_data: geojson.FeatureCollection,
 ) -> geojson.FeatureCollection:
-    """Clean tags field in GeoJSON to be compatible with QGIS.
+    """Clean GeoJSON properties to be compatible with QGIS.
 
-    QGIS has issues with JSON string tags like '{"building": "yes"}', so we
-    convert them to a flat ``key=value;…`` format.
+    QGIS cannot write nested JSON/list property values back out to GeoJSON.
+    Flatten ``tags`` to ``key=value;...`` and stringify any other non-scalar
+    property values before the wrapper touches the file.
     """
     if not geojson_data or "features" not in geojson_data:
         return geojson_data
 
-    for feature in geojson_data.get("features", []):
-        properties = feature.get("properties", {})
-        properties["tags"] = _qgis_safe_tags_value(properties.get("tags"))
-        feature["properties"] = properties
+    safe_geojson = deepcopy(geojson_data)
 
-    return geojson_data
+    for feature in safe_geojson.get("features", []):
+        properties = feature.get("properties", {})
+        safe_properties = {
+            key: _qgis_safe_property_value(key, value)
+            for key, value in properties.items()
+        }
+        safe_properties["tags"] = _qgis_safe_tags_value(safe_properties.get("tags"))
+        feature["properties"] = safe_properties
+
+    return safe_geojson
+
+
+def _qgis_safe_property_value(key: str, value):
+    """Normalize non-scalar property values before writing GeoJSON for QGIS."""
+    if key == "tags":
+        return value
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
 
 
 def _qgis_safe_tags_value(tags) -> str:
     """Normalize the ``tags`` property to a QGIS-safe string."""
     if not tags:
         return ""
+    if isinstance(tags, dict):
+        return ";".join(f"{k}={v}" for k, v in tags.items())
+    if isinstance(tags, list):
+        return json.dumps(tags, ensure_ascii=False, separators=(",", ":"))
     if not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
         return str(tags)
 
@@ -279,28 +300,30 @@ async def create_qfield_project(
         await db.commit()
 
         # ── Step 1: Generate QGIS project via wrapper ──────────────────
-        qgis_project_name = project.slug
+        # Use project_name if available; slug can be None for freshly-created
+        # projects that haven't been named yet.
+        qgis_project_title = project.project_name or f"project-{project.id}"
         await _call_qgis_wrapper(
             job_dir=str(job_dir),
-            title=qgis_project_name,
+            title=qgis_project_title,
             language=form_language or "",
             extent=bbox_str,
         )
 
-        # Verify output was created
-        final_project_file = job_dir / "final" / f"{qgis_project_name}.qgz"
-        if not final_project_file.exists():
+        # Locate the generated .qgz — the converter may sanitise the title
+        # when building the filename so we scan rather than predict.
+        final_dir = job_dir / "final"
+        qgz_files = list(final_dir.glob("*.qgz"))
+        if not qgz_files:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    f"QGIS wrapper completed but output file missing: "
-                    f"{final_project_file.name}"
-                ),
+                detail="QGIS wrapper completed but no .qgz file found in output.",
             )
+        final_project_file = qgz_files[0]
         log.info("QGIS project generated: %s", final_project_file)
 
         # ── Step 2: Upload to QFieldCloud ──────────────────────────────
-        qfc_project_name = f"FieldTM-{qgis_project_name}-{getrandbits(32)}"
+        qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
         qfield_url = await _upload_to_qfieldcloud(
             project=project,
             qfc_project_name=qfc_project_name,

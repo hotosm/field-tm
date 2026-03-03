@@ -21,6 +21,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from app.qfield.qfield_crud import clean_tags_for_qgis
 from app.qfield.qfield_routes import qfc_creds_test
 from app.qfield.qfield_schemas import QFieldCloud
 
@@ -39,6 +40,35 @@ async def test_qfield_creds_test():
         )
 
     mock_test_qfc.assert_awaited_once()
+
+
+def test_clean_tags_for_qgis_stringifies_nested_properties():
+    """Nested GeoJSON properties should be flattened before QGIS processing."""
+    input_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "osm_id": 1,
+                    "tags": {"building": "yes", "levels": "2"},
+                    "members": ["a", "b"],
+                    "meta": {"source": "osm"},
+                },
+            }
+        ],
+    }
+
+    cleaned = clean_tags_for_qgis(input_geojson)
+
+    assert cleaned["features"][0]["properties"]["tags"] == "building=yes;levels=2"
+    assert cleaned["features"][0]["properties"]["members"] == '["a","b"]'
+    assert cleaned["features"][0]["properties"]["meta"] == '{"source":"osm"}'
+    assert input_geojson["features"][0]["properties"]["tags"] == {
+        "building": "yes",
+        "levels": "2",
+    }
 
 
 if __name__ == "__main__":
