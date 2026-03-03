@@ -123,21 +123,6 @@ def init_processing(log: logging.Logger) -> None:
         qgis_application.processingRegistry().addProvider(QgsNativeAlgorithms())
         Processing.initialize()
 
-        # Try to add XLSFormConverter if available
-        try:
-            from xlsformconverter.XLSFormConverterPlugin import XLSFormConverterProvider
-            provider = XLSFormConverterProvider(None)
-            success = qgis_application.processingRegistry().addProvider(provider)
-            if success:
-                log.info("XLSFormConverter provider added successfully")
-            else:
-                log.warning("Failed to add XLSFormConverter provider")
-            algorithms = provider.algorithms()
-            log.debug(f"xlsformconverter algorithms available: {algorithms}")
-
-        except ImportError:
-            log.warning("XLSFormConverter plugin not available")
-        
         log.info("QGIS processing initialized")
        
     except Exception as e:
@@ -394,7 +379,7 @@ def xlsform_to_project(
     crs = QgsCoordinateReferenceSystem("EPSG:4326")
     extent_rect = QgsReferencedRectangle(QgsRectangle(*extent_bbox), crs)
 
-    from xlsformconverter.XLSFormConverter import XLSFormConverter
+    from xlsform2qgis.converter import XLSFormConverter
     converter = XLSFormConverter(str(xlsform_path))
 
     if not converter.is_valid():
