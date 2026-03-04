@@ -78,6 +78,69 @@ def dump_and_check_model(db_model: Any) -> dict:
     return model_dump
 
 
+def _add_encrypted_odk_credentials(
+    project_update: Any,
+    model_dump: dict[str, Any],
+) -> None:
+    """Replace plaintext ODK credentials with DB-ready encrypted values."""
+    if not (
+        hasattr(project_update, "external_project_password")
+        and project_update.external_project_password
+    ):
+        return
+
+    from app.central.central_schemas import ODKCentral
+
+    odk_creds = ODKCentral(
+        external_project_instance_url=project_update.external_project_instance_url,
+        external_project_username=project_update.external_project_username,
+        external_project_password=project_update.external_project_password,
+    )
+    model_dump.update(odk_creds.prepare_for_db())
+    model_dump.pop("external_project_password", None)
+
+
+def _normalize_project_jsonb_fields(model_dump: dict[str, Any]) -> None:
+    """Serialize project GeoJSON dicts for JSONB columns."""
+    jsonb_fields = ("data_extract_geojson", "task_areas_geojson")
+    for key in jsonb_fields:
+        if isinstance(model_dump.get(key), dict):
+            model_dump[key] = json.dumps(model_dump[key])
+
+
+def _project_update_placeholders(model_dump: dict[str, Any]) -> list[sql.Composable]:
+    """Build SQL placeholder assignments for project updates."""
+    placeholders: list[sql.Composable] = []
+    for key in model_dump:
+        if key == "task_areas_geojson":
+            placeholders.append(
+                sql.SQL("{column} = {value}::jsonb").format(
+                    column=sql.Identifier(key),
+                    value=sql.Placeholder(key),
+                )
+            )
+            continue
+
+        placeholders.append(
+            sql.SQL("{column} = {value}").format(
+                column=sql.Identifier(key),
+                value=sql.Placeholder(key),
+            )
+        )
+    return placeholders
+
+
+def _ensure_ftm_project_hashtag(model_dump: dict[str, Any], project_id: int) -> None:
+    """Ensure the canonical Field-TM hashtag is preserved on updates."""
+    hashtags = model_dump.get("hashtags")
+    if hashtags is None:
+        return
+
+    ftm_hashtag = f"#{settings.FTM_DOMAIN}-{project_id}"
+    if ftm_hashtag not in hashtags:
+        hashtags.append(ftm_hashtag)
+
+
 @dataclass(slots=True)
 class DbUser:
     """Table users."""
@@ -693,58 +756,10 @@ class DbProject:
     ) -> Self:
         """Update values for project."""
         model_dump = dump_and_check_model(project_update)
-
-        # Handle ODK credentials encryption
-        if (
-            hasattr(project_update, "external_project_password")
-            and project_update.external_project_password
-        ):
-            from app.central.central_schemas import ODKCentral
-
-            odk_creds = ODKCentral(
-                external_project_instance_url=project_update.external_project_instance_url,
-                external_project_username=project_update.external_project_username,
-                external_project_password=project_update.external_project_password,
-            )
-            odk_data = odk_creds.prepare_for_db()
-            # Update model_dump with encrypted password
-            model_dump.update(odk_data)
-            # Remove plaintext password if present
-            model_dump.pop("external_project_password", None)
-
-        # Convert dict/JSONB fields to JSON strings for database
-        for key in list(model_dump.keys()):
-            if (
-                key == "data_extract_geojson"
-                and isinstance(model_dump[key], dict)
-                or key == "task_areas_geojson"
-                and isinstance(model_dump[key], dict)
-            ):
-                # Convert GeoJSON dict to JSON string for JSONB column
-                model_dump[key] = json.dumps(model_dump[key])
-
-        placeholders: list[sql.Composable] = []
-        for key in model_dump:
-            if key == "task_areas_geojson":
-                placeholders.append(
-                    sql.SQL("{column} = {value}::jsonb").format(
-                        column=sql.Identifier(key),
-                        value=sql.Placeholder(key),
-                    )
-                )
-            else:
-                placeholders.append(
-                    sql.SQL("{column} = {value}").format(
-                        column=sql.Identifier(key),
-                        value=sql.Placeholder(key),
-                    )
-                )
-
-        # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
-        if "hashtags" in model_dump:
-            ftm_hashtag = f"#{settings.FTM_DOMAIN}-{project_id}"
-            if ftm_hashtag not in model_dump["hashtags"]:
-                model_dump["hashtags"].append(ftm_hashtag)
+        _add_encrypted_odk_credentials(project_update, model_dump)
+        _normalize_project_jsonb_fields(model_dump)
+        placeholders = _project_update_placeholders(model_dump)
+        _ensure_ftm_project_hashtag(model_dump, project_id)
 
         query = sql.SQL(
             """

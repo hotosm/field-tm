@@ -82,6 +82,9 @@ coverage
 # Bash install script
 envsubst
 
+# Complexipy
+.complexipy_cache
+
 # Scripts
 **/openapi.json
 

@@ -121,6 +121,110 @@ def _strip_internal_submission_fields(node):
     return node
 
 
+def _submission_download_spec(
+    base: str,
+    project_id: int,
+    xform: str,
+    submission_id: int,
+    as_json: bool,
+) -> tuple[str, str]:
+    """Build the download URL and output filename for a submission export."""
+    now = datetime.now()
+    timestamp = f"{now.year}_{now.hour}_{now.minute}"
+
+    if as_json:
+        url = f"{base}projects/{project_id}/forms/{xform}.svc/Submissions"
+        filespec = f"{xform}_{timestamp}.json"
+    else:
+        url = f"{base}projects/{project_id}/forms/{xform}/submissions"
+        filespec = f"{xform}_{timestamp}.csv"
+
+    if submission_id:
+        url += f"('{submission_id}')"
+
+    return url, filespec
+
+
+def _resolve_submission_links(node, session, base: str, project_id: int, xform: str, verify: bool):
+    """Recursively resolve embedded OData navigation links."""
+    if isinstance(node, dict):
+        resolved = {}
+        for key, value in node.items():
+            if key.endswith("@odata.navigationLink"):
+                field_name = key.replace("@odata.navigationLink", "")
+                resolved[field_name] = _fetch_submission_navigation_link(
+                    value,
+                    session,
+                    base,
+                    project_id,
+                    xform,
+                    verify,
+                )
+                continue
+            resolved[key] = _resolve_submission_links(
+                value,
+                session,
+                base,
+                project_id,
+                xform,
+                verify,
+            )
+        return resolved
+
+    if isinstance(node, list):
+        return [
+            _resolve_submission_links(item, session, base, project_id, xform, verify)
+            for item in node
+        ]
+
+    return node
+
+
+def _fetch_submission_navigation_link(link_path, session, base: str, project_id: int, xform: str, verify: bool):
+    """Fetch and resolve a linked OData submission resource."""
+    link_url = f"{base}projects/{project_id}/forms/{xform}.svc/{link_path}"
+    response = session.get(
+        link_url,
+        headers={"Accept": "application/json"},
+        verify=verify,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    linked_data = payload.get("value", payload)
+
+    return _resolve_submission_links(
+        _strip_internal_submission_fields(linked_data),
+        session,
+        base,
+        project_id,
+        xform,
+        verify,
+    )
+
+
+def _resolve_submission_payload(payload, session, base: str, project_id: int, xform: str, verify: bool):
+    """Resolve navigation links for single or multi-submission payloads."""
+    if "value" in payload:
+        payload["value"] = _resolve_submission_links(
+            payload["value"],
+            session,
+            base,
+            project_id,
+            xform,
+            verify,
+        )
+        return payload
+
+    return _resolve_submission_links(
+        payload,
+        session,
+        base,
+        project_id,
+        xform,
+        verify,
+    )
+
+
 class OdkCentral:
     def __init__(
         self,
@@ -518,20 +622,14 @@ class OdkForm(OdkCentral):
         Returns:
             dict: Cleaned submission JSON
         """
-        now = datetime.now()
-        timestamp = f"{now.year}_{now.hour}_{now.minute}"
+        url, filespec = _submission_download_spec(
+            self.base,
+            projectId,
+            xform,
+            submission_id,
+            json,
+        )
 
-        if json:
-            url = self.base + f"projects/{projectId}/forms/{xform}.svc/Submissions"
-            filespec = f"{xform}_{timestamp}.json"
-        else:
-            url = self.base + f"projects/{projectId}/forms/{xform}/submissions"
-            filespec = f"{xform}_{timestamp}.csv"
-
-        if submission_id:
-            url += f"('{submission_id}')"
-
-        # Fetch submission
         response = self.session.get(
             url,
             headers={**self.session.headers, "Content-Type": "application/json"},
@@ -544,50 +642,14 @@ class OdkForm(OdkCentral):
         submission_json = response.json()
         _write_binary_if_requested(filespec, response.content, disk)
 
-        # Recursive OData navigation resolver
-        def resolve_links(node):
-            """
-            Recursively resolve OData navigation links in a node.
-
-            Args:
-                node (dict or list): The node to resolve navigation links from.
-
-            Returns:
-                dict or list: The node with navigation links resolved.
-            """
-            if isinstance(node, dict):
-                resolved = {}
-                for key, value in node.items():
-                    # Handle navigation links
-                    if key.endswith("@odata.navigationLink"):
-                        field_name = key.replace("@odata.navigationLink", "")
-                        link_url = f"{self.base}projects/{projectId}/forms/{xform}.svc/{value}"
-
-                        resp = self.session.get(link_url, headers={"Accept": "application/json"}, verify=self.verify)
-                        resp.raise_for_status()
-                        linked_data = resp.json().get("value", resp.json())
-
-                        # Strip internal fields and recurse
-                        resolved[field_name] = resolve_links(
-                            _strip_internal_submission_fields(linked_data)
-                        )
-                    else:
-                        # Regular field: recurse
-                        resolved[key] = resolve_links(value)
-                return resolved
-
-            if isinstance(node, list):
-                return [resolve_links(i) for i in node]
-
-            return node
-
-        # Resolve for single/multi submission formats
-        if "value" in submission_json:
-            submission_json["value"] = resolve_links(submission_json["value"])
-        else:
-            submission_json = resolve_links(submission_json)
-
-        return submission_json
+        return _resolve_submission_payload(
+            submission_json,
+            self.session,
+            self.base,
+            projectId,
+            xform,
+            self.verify,
+        )
 
 
     def getSubmissionMedia(
