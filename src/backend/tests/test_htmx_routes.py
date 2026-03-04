@@ -9,6 +9,7 @@ from litestar import status_codes as status
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 from app.htmx.project_create_routes import _parse_outline_payload
+from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import _build_odk_finalize_success_html
 from app.projects.project_services import ODKFinalizeResult
 
@@ -231,6 +232,9 @@ async def test_project_listing_renders_cards_and_component_bootstrap(client, pro
     assert response.status_code == status.HTTP_200_OK
     assert project.project_name in response.text
     assert f"/htmxprojects/{project.id}" in response.text
+    assert "Project Status" in response.text
+    assert "Sort By" in response.text
+    assert 'id="projects-search"' in response.text
     assert (
         'rel="stylesheet"\n      href="https://fonts.googleapis.com/css2?family=Archivo'
     ) in response.text
@@ -250,6 +254,65 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     assert (
         "No projects found. Create your first project to get started!" in response.text
     )
+
+
+async def test_project_listing_filters_by_status():
+    """Project listing should pass a valid status filter through to the data layer."""
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_projects:
+        mock_projects.return_value = []
+
+        response = await project_listing.fn(
+            request=Mock(query_params={"status": "COMPLETED"}),
+            db=Mock(),
+        )
+
+    assert response.template_name == "home.html"
+    mock_projects.assert_awaited_once()
+    assert mock_projects.await_args.kwargs["status"] == ProjectStatus.COMPLETED
+
+
+async def test_project_listing_passes_search_and_sort_filters():
+    """Project listing should pass search and sort choices through to the data layer."""
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_projects:
+        mock_projects.return_value = []
+
+        response = await project_listing.fn(
+            request=Mock(
+                query_params={
+                    "status": "COMPLETED",
+                    "sort": "name_asc",
+                    "search": "health",
+                }
+            ),
+            db=Mock(),
+        )
+
+    assert response.template_name == "home.html"
+    mock_projects.assert_awaited_once()
+    assert mock_projects.await_args.kwargs["status"] == ProjectStatus.COMPLETED
+    assert mock_projects.await_args.kwargs["sort_by"] == "name_asc"
+    assert mock_projects.await_args.kwargs["search"] == "health"
+
+
+async def test_project_listing_preserves_search_and_sort_selection():
+    """Project listing should keep selected toolbar values in template context."""
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_projects:
+        mock_projects.return_value = []
+
+        response = await project_listing.fn(
+            request=Mock(query_params={"sort": "name_desc", "search": "roads"}),
+            db=Mock(),
+        )
+
+    assert response.template_name == "home.html"
+    assert response.context["selected_sort"] == "name_desc"
+    assert response.context["search_query"] == "roads"
 
 
 async def test_static_landing_image_served(client):

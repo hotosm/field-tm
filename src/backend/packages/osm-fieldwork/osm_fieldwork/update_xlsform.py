@@ -496,14 +496,38 @@ async def modify_form_for_qfield(
             [qf_survey_df.iloc[:idx], replacement, qf_survey_df.iloc[idx+1:]]
         ).reset_index(drop=True)
 
-    # 2. Remove the 'start-geopoint' field we add as mandatory fields for ODK
+    # 2. Remove ODK/entity-only rows that should not surface in the QField form.
+    #    The converter can otherwise expose these as editable layer fields.
+    if "save_to" in qf_survey_df.columns:
+        qf_survey_df = qf_survey_df[qf_survey_df["save_to"].isna()].reset_index(drop=True)
+
+    names_to_remove = {
+        "feature_exists",
+        "verification",
+        "digitisation_correct",
+        "digitisation_problem",
+        "digitisation_problem_other",
+        "end_note",
+    }
+    qf_survey_df = qf_survey_df[
+        ~qf_survey_df["name"].isin(names_to_remove)
+    ].reset_index(drop=True)
+
+    survey_group_mask = (
+        (qf_survey_df["type"] == "begin group")
+        & (qf_survey_df["name"] == "survey_questions")
+    )
+    if survey_group_mask.any() and "relevant" in qf_survey_df.columns:
+        qf_survey_df.loc[survey_group_mask, "relevant"] = ""
+
+    # 3. Remove the 'start-geopoint' field we add as mandatory fields for ODK
     #    - this breaks XLSFormConverter identifying the correct geom type
     start_geopoint_mask = qf_survey_df["type"] == "start-geopoint"
     if start_geopoint_mask.any():
         qf_survey_df = qf_survey_df[~start_geopoint_mask].reset_index(drop=True)
 
-    # 3. Wrap the final two rows (end_note, image) in a group,
-    #    so they display correctly as final QField tab
+    # 4. Wrap the final two rows (typically the photo repeat) in a group,
+    #    so they display correctly as the final QField tab.
     last_two_rows = qf_survey_df.tail(2)
     begin_row = pd.DataFrame([{"type": "begin group", "name": "final"}])
     end_row = pd.DataFrame([{"type": "end group", "name": None}])
@@ -513,7 +537,7 @@ async def modify_form_for_qfield(
         ignore_index=True,
     )
 
-    # 4. Update survey sheet in updated_form
+    # 5. Update survey sheet in updated_form
     custom_sheets["survey"] = qf_survey_df
 
     return (form_language, await write_xlsform(custom_sheets))

@@ -25,7 +25,15 @@ from litestar.response import Template
 from psycopg import AsyncConnection
 
 from app.db.database import db_conn
+from app.db.enums import ProjectStatus
 from app.db.models import DbProject
+
+PROJECT_SORT_OPTIONS = {
+    "newest",
+    "oldest",
+    "name_asc",
+    "name_desc",
+}
 
 
 @get(
@@ -34,5 +42,34 @@ from app.db.models import DbProject
 )
 async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template:
     """Render public project listing page."""
-    projects = await DbProject.all(db, limit=12) or []
-    return HTMXTemplate(template_name="home.html", context={"projects": projects})
+    status_param = request.query_params.get("status")
+    search_query = (request.query_params.get("search") or "").strip()
+    sort_param = request.query_params.get("sort") or "newest"
+    selected_status = None
+    selected_sort = sort_param if sort_param in PROJECT_SORT_OPTIONS else "newest"
+
+    if status_param:
+        try:
+            selected_status = ProjectStatus(status_param.upper())
+        except ValueError:
+            selected_status = None
+
+    projects = (
+        await DbProject.all(
+            db,
+            limit=12,
+            status=selected_status,
+            search=search_query or None,
+            sort_by=selected_sort,
+        )
+        or []
+    )
+    return HTMXTemplate(
+        template_name="home.html",
+        context={
+            "projects": projects,
+            "selected_status": selected_status.value if selected_status else "",
+            "search_query": search_query,
+            "selected_sort": selected_sort,
+        },
+    )

@@ -508,6 +508,7 @@ class DbProject:
         status: Optional[ProjectStatus] = None,
         field_mapping_app: Optional[FieldMappingApp] = None,
         country: Optional[str] = None,
+        sort_by: Optional[str] = None,
     ) -> Optional[list[Self]]:  # noqa: PLR0913
         """Fetch all projects with optional filters."""
         filters = []
@@ -527,9 +528,33 @@ class DbProject:
 
         if search:
             filters.append(
-                "LOWER(REPLACE(REPLACE(slug, '-', ' '), '_', ' ')) ILIKE %(search)s"
+                """
+                (
+                    project_name ILIKE %(search)s
+                    OR description ILIKE %(search)s
+                    OR location_str ILIKE %(search)s
+                    OR slug ILIKE %(search)s
+                    OR LOWER(REPLACE(REPLACE(slug, '-', ' '), '_', ' '))
+                        ILIKE %(search)s
+                    OR array_to_string(hashtags, ' ') ILIKE %(search)s
+                )
+                """
             )
             params["search"] = f"%{search}%"
+
+        sort_options = {
+            "newest": sql.SQL("created_at DESC NULLS LAST, id DESC"),
+            "oldest": sql.SQL("created_at ASC NULLS LAST, id ASC"),
+            "name_asc": sql.SQL(
+                "LOWER(COALESCE(project_name, slug, '')) ASC, "
+                "created_at DESC NULLS LAST, id DESC"
+            ),
+            "name_desc": sql.SQL(
+                "LOWER(COALESCE(project_name, slug, '')) DESC, "
+                "created_at DESC NULLS LAST, id DESC"
+            ),
+        }
+        selected_sort = sort_options.get(sort_by or "newest", sort_options["newest"])
 
         query = sql.SQL(
             """
@@ -542,7 +567,8 @@ class DbProject:
         if filters:
             query += sql.SQL(" WHERE ")
             query += sql.SQL(" AND ").join(sql.SQL(clause) for clause in filters)
-        query += sql.SQL(" ORDER BY created_at DESC")
+        query += sql.SQL(" ORDER BY ")
+        query += selected_sort
 
         if skip is not None and limit is not None:
             query += sql.SQL(" OFFSET %(offset)s LIMIT %(limit)s;")

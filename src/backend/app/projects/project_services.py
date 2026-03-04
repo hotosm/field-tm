@@ -105,6 +105,15 @@ class ODKFinalizeResult:
 
 
 @dataclass(slots=True)
+class QFieldFinalizeResult:
+    """Details returned after QField finalization."""
+
+    qfield_url: str
+    manager_username: Optional[str]
+    manager_password: Optional[str]
+
+
+@dataclass(slots=True)
 class SplitAoiOptions:
     """Options that control AOI splitting."""
 
@@ -1131,7 +1140,7 @@ async def finalize_qfield_project(
     db: AsyncConnection,
     project_id: int,
     custom_qfield_creds=None,
-) -> str:
+) -> QFieldFinalizeResult:
     """Create project in QField with all data.
 
     Args:
@@ -1140,7 +1149,7 @@ async def finalize_qfield_project(
         custom_qfield_creds: Optional custom QField credentials.
 
     Returns:
-        URL to the QField project.
+        QFieldFinalizeResult with URL and manager credentials.
 
     Raises:
         ValidationError: If prerequisites are missing.
@@ -1159,7 +1168,7 @@ async def finalize_qfield_project(
         )
 
     log.info(f"Creating QField project for Field-TM project {project_id}")
-    qfield_url = await create_qfield_project(db, project, custom_qfield_creds)
+    result = await create_qfield_project(db, project, custom_qfield_creds)
 
     # Update project status to PUBLISHED
     await DbProject.update(
@@ -1169,4 +1178,8 @@ async def finalize_qfield_project(
     )
     await db.commit()
 
-    return qfield_url
+    return QFieldFinalizeResult(
+        qfield_url=result.qfield_url,
+        manager_username=result.manager_username,
+        manager_password=result.manager_password,
+    )

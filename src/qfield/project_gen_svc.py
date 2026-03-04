@@ -328,6 +328,21 @@ def parse_and_validate_extent(extent_str: str) -> list[float]:
         raise ValueError(f"Invalid extent format: {e}")
 
 
+def parse_bool(value: Any, default: bool = True) -> bool:
+    """Parse a JSON-ish boolean with a safe default."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"1", "true", "yes", "on"}:
+            return True
+        if lowered in {"0", "false", "no", "off"}:
+            return False
+    if value is None:
+        return default
+    return bool(value)
+
+
 def set_project_file_permissions(project_path: str | Path) -> None:
     """Set permissive 777 permissions for upstream file access."""
     project_path = Path(project_path)
@@ -343,6 +358,7 @@ def xlsform_to_project(
     extent_bbox: list[float],
     title: str,
     language: str,
+    open_in_edit_mode: bool,
     log: logging.Logger,
 ) -> str:
     """Using a defined XLSForm create a project via xlsformconverter.
@@ -354,6 +370,7 @@ def xlsform_to_project(
         extent_bbox: Project extent as [xmin, ymin, xmax, ymax].
         title: Project title (used for the .qgz filename).
         language: Preferred form language.
+        open_in_edit_mode: Whether the form should open in edit mode.
         log: Logger instance.
 
     Returns:
@@ -394,6 +411,7 @@ def xlsform_to_project(
     converter.set_groups_as_tabs(True)
     converter.set_crs(crs)
     converter.set_extent(extent_rect)
+    _configure_converter_edit_mode(converter, open_in_edit_mode, log)
 
     if features_gpkg_path:
         features_layer = QgsVectorLayer(features_gpkg_path, "features_valid", "ogr")
@@ -409,86 +427,253 @@ def xlsform_to_project(
     return converter.convert(str(final_output_dir))
 
 
+def _configure_converter_edit_mode(
+    converter: Any,
+    open_in_edit_mode: bool,
+    log: logging.Logger,
+) -> None:
+    """Best-effort toggle for the xlsform2qgis edit-mode default."""
+    setter_names = (
+        "set_open_in_edit_mode",
+        "set_start_in_edit_mode",
+        "set_edit_mode",
+    )
+    for setter_name in setter_names:
+        setter = getattr(converter, setter_name, None)
+        if callable(setter):
+            setter(open_in_edit_mode)
+            log.info(
+                "Configured converter %s(%s)",
+                setter_name,
+                open_in_edit_mode,
+            )
+            return
+
+    attribute_names = (
+        "open_in_edit_mode",
+        "start_in_edit_mode",
+        "edit_mode",
+    )
+    for attribute_name in attribute_names:
+        if hasattr(converter, attribute_name):
+            setattr(converter, attribute_name, open_in_edit_mode)
+            log.info(
+                "Configured converter %s=%s",
+                attribute_name,
+                open_in_edit_mode,
+            )
+            return
+
+    log.warning(
+        "Could not configure initial edit mode; xlsform2qgis API exposes no known hook"
+    )
+
+
+def _resolve_over_point_label_placement() -> Any:
+    """Return the OverPoint label placement enum value.
+
+    Uses direct attribute access instead of integer construction to avoid
+    SIP binding bugs where ``Qgis.LabelPlacement(1)`` resolves to a
+    ``LabelPredefinedPointPosition`` member.
+    """
+    from qgis.core import Qgis, QgsPalLayerSettings
+
+    # QGIS 3.26+ scoped enum
+    try:
+        return Qgis.LabelPlacement.OverPoint
+    except AttributeError:
+        pass
+    # Legacy (pre-3.26) enum on QgsPalLayerSettings
+    try:
+        return QgsPalLayerSettings.OverPoint
+    except AttributeError:
+        pass
+    # Last resort: raw integer (OverPoint = 1 in all known versions)
+    return 1
+
+
 def configure_task_layer_style(task_layer: "qgis.core.QgsLayer", log: logging.Logger) -> None:
     """Configure the tasks layer in QGIS."""
-    pass
-    # from qgis.core import (
-    #     QgsFillSymbol,
-    #     QgsPalLayerSettings,
-    #     QgsTextFormat,
-    #     QgsTextBufferSettings,
-    #     QgsVectorLayerSimpleLabeling,
-    # )
-    # from qgis.PyQt.QtGui import QColor, QFont
+    from qgis.core import (
+        QgsPalLayerSettings,
+        QgsTextBufferSettings,
+        QgsTextFormat,
+        QgsVectorLayerSimpleLabeling,
+    )
+    from qgis.PyQt.QtGui import QColor, QFont
 
-    # task_layer = task_layer[0]
-    # log.info("Styling tasks layer")
-    
-    # # Create fill symbol with light blue stroke and grey semi-transparent fill
-    # symbol = QgsFillSymbol.createSimple({
-    #     'color': '128,128,128,77',  # Grey with 0.3 opacity (77/255 ≈ 0.3)
-    #     'outline_color': '173,216,230,255',  # Light blue
-    #     'outline_style': 'solid',
-    #     'outline_width': '0.5',
-    #     'style': 'solid'
-    # })
-    
-    # task_layer.renderer().setSymbol(symbol)
-    
-    # # Configure labels for task_id
-    # label_settings = QgsPalLayerSettings()
-    # label_settings.fieldName = 'task_id'
-    # label_settings.enabled = True
-    
-    # # Text format
-    # text_format = QgsTextFormat()
-    # text_format.setSize(12)
-    # font = QFont()
-    # font.setBold(True)
-    # text_format.setFont(font)
-    # text_format.setColor(QColor(0, 0, 0))  # Black text
-    
-    # # Add text buffer for better visibility
-    # buffer_settings = QgsTextBufferSettings()
-    # buffer_settings.setEnabled(True)
-    # buffer_settings.setSize(1)
-    # buffer_settings.setColor(QColor(255, 255, 255))  # White buffer
-    # text_format.setBuffer(buffer_settings)
-    
-    # label_settings.setFormat(text_format)
-    
-    # # Center placement
-    # label_settings.placement = QgsPalLayerSettings.OverPoint
-    # label_settings.centroidInside = True
-    # label_settings.centroidWhole = True
-    
-    # # Apply labeling
-    # labeling = QgsVectorLayerSimpleLabeling(label_settings)
-    # task_layer.setLabeling(labeling)
-    # task_layer.setLabelsEnabled(True)
-    
-    # task_layer.triggerRepaint()
+    layer = _resolve_vector_layer(task_layer)
+    if not layer:
+        log.warning("No task layer available for styling")
+        return
+
+    log.info("Styling tasks layer")
+    symbol = _build_layer_symbol(
+        layer,
+        fill_rgba=(0, 0, 0, 0),
+        stroke_rgba=(215, 63, 63, 255),
+        stroke_width=1.2,
+    )
+    layer.renderer().setSymbol(symbol)
+
+    label_settings = QgsPalLayerSettings()
+    label_settings.fieldName = 'coalesce("task_id", $id)'
+    label_settings.isExpression = True
+    label_settings.enabled = True
+    label_settings.placement = _resolve_over_point_label_placement()
+    label_settings.centroidInside = True
+    label_settings.centroidWhole = True
+
+    text_format = QgsTextFormat()
+    font = QFont()
+    font.setBold(True)
+    text_format.setFont(font)
+    text_format.setSize(10)
+    text_format.setColor(QColor(64, 66, 72))
+
+    buffer_settings = QgsTextBufferSettings()
+    buffer_settings.setEnabled(True)
+    buffer_settings.setSize(1)
+    buffer_settings.setColor(QColor(255, 255, 255))
+    text_format.setBuffer(buffer_settings)
+    label_settings.setFormat(text_format)
+
+    layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
+    layer.setLabelsEnabled(True)
+    layer.triggerRepaint()
    
 
 def configure_survey_layer_style(survey_layer: "qgis.core.QgsLayer", log: logging.Logger) -> None:
     """Configure the survey layer in QGIS."""
-    pass
-    # from qgis.core import (
-    #     QgsFillSymbol,
-    # )
+    from qgis.core import QgsRuleBasedRenderer
 
-    # survey_layer = survey_layer[0]
-    # log.info("Styling survey/features layer")
-    
-    # # Create fill symbol with purple fill and no stroke
-    # symbol = QgsFillSymbol.createSimple({
-    #     'color': '128,0,128,255',  # Purple
-    #     'outline_style': 'no',  # No stroke
-    #     'style': 'solid'
-    # })
-    
-    # survey_layer.renderer().setSymbol(symbol)
-    # survey_layer.triggerRepaint() 
+    layer = _resolve_vector_layer(survey_layer)
+    if not layer:
+        log.warning("No survey layer available for styling")
+        return
+
+    log.info("Styling survey/features layer")
+
+    root_rule = QgsRuleBasedRenderer.Rule(None)
+    root_rule.appendChild(
+        _build_status_rule(
+            layer,
+            label="Mapped",
+            expression='"status" = \'mapped\'',
+            fill_rgba=(80, 193, 203, 120),
+            stroke_rgba=(80, 193, 203, 255),
+        )
+    )
+    root_rule.appendChild(
+        _build_status_rule(
+            layer,
+            label="Invalid",
+            expression='"status" = \'invalid\'',
+            fill_rgba=(215, 63, 63, 110),
+            stroke_rgba=(215, 63, 63, 255),
+        )
+    )
+
+    default_rule = _build_status_rule(
+        layer,
+        label="Default",
+        expression="",
+        fill_rgba=(130, 128, 133, 90),
+        stroke_rgba=(64, 66, 72, 220),
+    )
+    default_rule.setIsElse(True)
+    root_rule.appendChild(default_rule)
+
+    layer.setRenderer(QgsRuleBasedRenderer(root_rule))
+    layer.triggerRepaint()
+
+
+def _resolve_vector_layer(layer_or_layers):
+    """Return the first vector layer when a list is passed in."""
+    if isinstance(layer_or_layers, list):
+        return layer_or_layers[0] if layer_or_layers else None
+    return layer_or_layers
+
+
+def _build_layer_symbol(
+    layer,
+    *,
+    fill_rgba: tuple[int, int, int, int],
+    stroke_rgba: tuple[int, int, int, int],
+    stroke_width: float,
+):
+    """Build a symbol matching the layer geometry type."""
+    from qgis.core import Qgis, QgsFillSymbol, QgsLineSymbol, QgsMarkerSymbol
+
+    # Qgis.GeometryType (3.30+) replaces deprecated QgsWkbTypes constants
+    try:
+        polygon_type = Qgis.GeometryType.Polygon
+        line_type = Qgis.GeometryType.Line
+    except AttributeError:
+        from qgis.core import QgsWkbTypes
+        polygon_type = QgsWkbTypes.PolygonGeometry
+        line_type = QgsWkbTypes.LineGeometry
+
+    geometry_type = layer.geometryType()
+    if geometry_type == polygon_type:
+        return QgsFillSymbol.createSimple(
+            {
+                "color": _rgba_string(fill_rgba),
+                "outline_color": _rgba_string(stroke_rgba),
+                "outline_width": str(stroke_width),
+                "outline_style": "solid",
+                "style": "solid",
+            }
+        )
+
+    if geometry_type == line_type:
+        return QgsLineSymbol.createSimple(
+            {
+                "line_color": _rgba_string(stroke_rgba),
+                "line_width": str(stroke_width),
+                "line_style": "solid",
+            }
+        )
+
+    return QgsMarkerSymbol.createSimple(
+        {
+            "color": _rgba_string(fill_rgba),
+            "outline_color": _rgba_string(stroke_rgba),
+            "outline_width": str(max(stroke_width / 2, 0.4)),
+            "size": "2.8",
+            "name": "circle",
+        }
+    )
+
+
+def _build_status_rule(
+    layer,
+    *,
+    label: str,
+    expression: str,
+    fill_rgba: tuple[int, int, int, int],
+    stroke_rgba: tuple[int, int, int, int],
+):
+    """Build a rule for survey-layer status styling."""
+    from qgis.core import QgsRuleBasedRenderer
+
+    rule = QgsRuleBasedRenderer.Rule(
+        _build_layer_symbol(
+            layer,
+            fill_rgba=fill_rgba,
+            stroke_rgba=stroke_rgba,
+            stroke_width=0.9,
+        )
+    )
+    rule.setLabel(label)
+    if expression:
+        rule.setFilterExpression(expression)
+    return rule
+
+
+def _rgba_string(rgba: tuple[int, int, int, int]) -> str:
+    """Convert an RGBA tuple to the string format QGIS expects."""
+    return ",".join(str(value) for value in rgba)
 
 
 def configure_project_settings(qgis_project: "qgis.core.QgsProject", log: logging.Logger) -> None:
@@ -515,7 +700,104 @@ def configure_project_settings(qgis_project: "qgis.core.QgsProject", log: loggin
     qgis_project.write()
 
 
-def generate_qgis_project(project_dir: str, title: str, language: str, extent: str, log: logging.Logger) -> Dict[str, Any]:
+def _prepare_features_layer(
+    project_path: Path,
+    log: logging.Logger,
+) -> Optional[str]:
+    """Convert seed feature GeoJSON to a cleaned GeoPackage when available."""
+    log.info("Processing feature geometries")
+    features_geojson_path = project_path / "features.geojson"
+    if not (
+        features_geojson_path.exists()
+        and validate_geometry_file(features_geojson_path, log)
+    ):
+        log.warning(
+            "No valid feature geometries found, creating project without features layer"
+        )
+        return None
+
+    return analyse_and_fix_geometries(str(features_geojson_path), log)
+
+
+def _prepare_tasks_layer(
+    project_path: Path,
+    final_output_dir: Path,
+    log: logging.Logger,
+) -> Optional[str]:
+    """Convert task GeoJSON to a packaged GeoPackage when available."""
+    log.info("Processing task geometries")
+    set_project_file_permissions(project_path)
+    tasks_geojson_path = project_path / "tasks.geojson"
+    if not (tasks_geojson_path.exists() and validate_geometry_file(tasks_geojson_path, log)):
+        log.warning("No valid task geometries found, project will not have a tasks layer")
+        return None
+
+    tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
+    tasks_gpkg_path_final = final_output_dir / "tasks.gpkg"
+    log.debug("Moving %s --> %s", tasks_gpkg_path_input, tasks_gpkg_path_final)
+    shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
+    set_project_file_permissions(project_path)
+    return str(tasks_gpkg_path_final)
+
+
+def _load_generated_project(project_file: str):
+    """Load the generated QGIS project from disk."""
+    from qgis.core import QgsProject
+
+    project = QgsProject.instance()
+    project.clear()
+    if not project.read(project_file):
+        raise RuntimeError(f"Failed to read generated QGIS project: {project_file}")
+    return project
+
+
+def _add_task_layer_to_project(
+    project,
+    tasks_gpkg_path_final: Optional[str],
+    log: logging.Logger,
+) -> None:
+    """Attach the task layer to the generated project."""
+    if not tasks_gpkg_path_final:
+        return
+
+    from qgis.core import QgsVectorLayer
+
+    task_layer = QgsVectorLayer(tasks_gpkg_path_final, "tasks", "ogr")
+    if task_layer.isValid():
+        project.addMapLayer(task_layer)
+        log.info("Tasks layer added to project")
+        return
+
+    log.warning("Tasks GeoPackage is not a valid QGIS layer")
+
+
+def _ensure_survey_layer_on_top(project) -> None:
+    """Move the survey layer to the top of the layer tree when present."""
+    survey_layers = project.mapLayersByName("survey")
+    if not survey_layers:
+        return
+
+    survey_layer = survey_layers[0]
+    layer_root = project.layerTreeRoot()
+    survey_node = layer_root.findLayer(survey_layer.id())
+    if not survey_node:
+        return
+
+    parent = survey_node.parent()
+    current_index = parent.children().index(survey_node)
+    if current_index != 0:
+        parent.insertLayer(0, survey_layer)
+        parent.removeChildNode(survey_node)
+
+
+def generate_qgis_project(
+    project_dir: str,
+    title: str,
+    language: str,
+    extent: str,
+    open_in_edit_mode: bool,
+    log: logging.Logger,
+) -> Dict[str, Any]:
     """
     Generate QGIS project from XLSForm and geometries.
     
@@ -524,78 +806,39 @@ def generate_qgis_project(project_dir: str, title: str, language: str, extent: s
         title: Project title
         language: Project language
         extent: Extent string (xmin,ymin,xmax,ymax)
+        open_in_edit_mode: Whether the project should initially open in edit mode
         log: Logger instance
     
     Returns:
         Result dictionary with status and message
     """
     try:
-        from qgis.core import QgsProject, QgsVectorLayer
-
         # Validate inputs
         project_path = Path(project_dir)
         if not project_path.exists():
             raise FileNotFoundError(f"Project directory not found: {project_dir}")
 
         extent_bbox = parse_and_validate_extent(extent)
-
-        # Process feature geometries (may be empty for collect-new-data workflows)
-        log.info("Processing feature geometries")
-        features_geojson_path = project_path / "features.geojson"
-        features_gpkg_path = None
-        if features_geojson_path.exists() and validate_geometry_file(features_geojson_path, log):
-            features_gpkg_path = analyse_and_fix_geometries(str(features_geojson_path), log)
-        else:
-            log.warning("No valid feature geometries found, creating project without features layer")
+        features_gpkg_path = _prepare_features_layer(project_path, log)
 
         # XLSForm --> QGIS project
         log.info("Converting XLSForm --> project")
         final_output_dir = project_path / "final"
-        project_file = xlsform_to_project(final_output_dir, features_gpkg_path, extent_bbox, title, language, log)
+        project_file = xlsform_to_project(
+            final_output_dir,
+            features_gpkg_path,
+            extent_bbox,
+            title,
+            language,
+            open_in_edit_mode,
+            log,
+        )
+        tasks_gpkg_path_final = _prepare_tasks_layer(project_path, final_output_dir, log)
 
-        # Add task geometries to project dir
-        log.info("Processing task geometries")
-        set_project_file_permissions(project_path)
-        tasks_geojson_path = project_path / "tasks.geojson"
-
-        tasks_gpkg_path_final = None
-        if tasks_geojson_path.exists() and validate_geometry_file(tasks_geojson_path, log):
-            tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
-            tasks_gpkg_path_final = str(final_output_dir / "tasks.gpkg")
-            log.debug(f"Moving {tasks_gpkg_path_input} --> {tasks_gpkg_path_final}")
-            shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
-            set_project_file_permissions(project_path)
-        else:
-            log.warning("No valid task geometries found, project will not have a tasks layer")
-
-        # Open generated project and add task layer
         log.info("Opening generated QGIS project to add task layer")
-        project = QgsProject.instance()
-        project.clear()
-        if not project.read(project_file):
-            raise RuntimeError(f"Failed to read generated QGIS project: {project_file}")
-
-        # Add the task layer if available, then ensure the survey layer is on top
-        if tasks_gpkg_path_final:
-            task_layer = QgsVectorLayer(tasks_gpkg_path_final, 'tasks', 'ogr')
-            if task_layer.isValid():
-                project.addMapLayer(task_layer)
-                log.info("Tasks layer added to project")
-            else:
-                log.warning("Tasks GeoPackage is not a valid QGIS layer")
-
-        # Ensure the survey layer stays on top of the layer tree
-        survey_layers = project.mapLayersByName("survey")
-        if survey_layers:
-            survey_layer = survey_layers[0]
-            layer_root = project.layerTreeRoot()
-            survey_node = layer_root.findLayer(survey_layer.id())
-            if survey_node:
-                parent = survey_node.parent()
-                current_index = parent.children().index(survey_node)
-                if current_index != 0:
-                    parent.insertLayer(0, survey_layer)
-                    parent.removeChildNode(survey_node)
+        project = _load_generated_project(project_file)
+        _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
+        _ensure_survey_layer_on_top(project)
 
         # Finalise the project
         project.write()
@@ -658,6 +901,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
                 title=data["title"],
                 language=data["language"],
                 extent=data["extent"],
+                open_in_edit_mode=parse_bool(data.get("open_in_edit_mode"), True),
                 log=self.log
             )
             

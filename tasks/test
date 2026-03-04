@@ -218,6 +218,22 @@ odk-collect:
 odk-central:
   just test odk-collect
 
+# Start services + create a test QField buildings project for mobile testing with QField
+[no-cd]
+qfield:
+  #!/usr/bin/env sh
+  set -e
+
+  cd {{justfile_directory()}}
+
+  # Start all services (including the local QFieldCloud instance) and wait until
+  # all containers report healthy before proceeding.
+  docker compose up -d --wait
+
+  # Create a test QField buildings project using the service layer inside the container.
+  echo "Creating QField test project..."
+  docker compose exec -T api python3 - < tasks/scripts/create_qfield_test_project.py
+
 # Run load test on backend API (e.g. just test load projects/62/minimal)
 [no-cd]
 load url_path:

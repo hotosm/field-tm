@@ -495,7 +495,8 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
     {% endif %} {% else %}
     <p class="ftm-step__description">
       Generate task areas by splitting the Area of Interest (AOI). Choose an algorithm and
-      parameters, then split. Review the preview, and click "Accept Task Areas" to save.
+      parameters, then split. Review the preview, and click "Accept Task Areas" to save. Or click
+      <strong>Skip</strong> to use the whole AOI as a single task.
     </p>
     <div class="ftm-step__actions" style="margin-top: 0; margin-bottom: 8px">
       <button
@@ -504,6 +505,16 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
         class="wa-button wa-button--default ftm-advanced-toggle"
       >
         Advanced Config
+      </button>
+      <button
+        type="button"
+        hx-post="/skip-task-split-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+        hx-target="#split-status"
+        hx-swap="innerHTML"
+        class="wa-button wa-button--default"
+        style="min-width: 120px"
+      >
+        Skip
       </button>
     </div>
     <form
@@ -577,27 +588,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
         <div>
           <label for="split-algorithm" class="ftm-split-label">Algorithm:</label>
           <select id="split-algorithm" name="algorithm" required class="ftm-split-select">
-            <option
-              value=""
-              disabled
-              {%
-              if
-              not
-              has_task_areas
-              or
-              (has_task_areas
-              and
-              not
-              is_no_splitting)
-              %}selected{%
-              endif
-              %}
-            >
-              Select splitting option...
-            </option>
-            <option value="NO_SPLITTING" {% if is_no_splitting %}selected{% endif %}>
-              No Splitting (Use Whole AOI)
-            </option>
+            <option value="" disabled selected>Select splitting option...</option>
             <option value="DIVIDE_BY_SQUARE">Split by Square</option>
             <option value="AVG_BUILDING_VORONOI">Average Buildings v1 (Voronoi)</option>
             <option value="AVG_BUILDING_SKELETON">Average Buildings v2 (Straight Skeleton)</option>

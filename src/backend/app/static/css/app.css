@@ -52,6 +52,14 @@ body {
   min-height: calc(100vh - 60px);
 }
 
+.ftm-page--projects {
+  background-color: white;
+  min-height: calc(100vh - 60px);
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 /* --- Page header ------------------------------------------ */
 .ftm-page-header {
   display: flex;
@@ -67,11 +75,87 @@ body {
   color: var(--ftm-text);
 }
 
+.ftm-projects-shell {
+  border-bottom: 1px solid var(--ftm-border);
+}
+
+.ftm-projects-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+}
+
+.ftm-projects-filters {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ftm-projects-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.ftm-projects-filter--search {
+  flex: 1 1 10rem;
+  min-width: 10rem;
+}
+
+.ftm-projects-filter--search wa-input {
+  width: 100%;
+}
+
+.ftm-projects-filter__label {
+  font-size: var(--hot-font-size-x-small);
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text-light);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ftm-projects-filter__select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
+  background-color: white;
+  color: var(--ftm-text);
+  font: inherit;
+  white-space: nowrap;
+}
+
+.ftm-projects-toolbar > wa-button {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.ftm-projects-filter__select:focus {
+  outline: 2px solid color-mix(in oklab, var(--ftm-brand) 16%, transparent);
+  outline-offset: 1px;
+  border-color: color-mix(in oklab, var(--ftm-brand) 35%, white);
+}
+
+.ftm-projects-results {
+  margin: 0;
+  padding: 0.5rem 1.5rem 0.75rem;
+  font-size: var(--hot-font-size-small);
+  color: var(--ftm-text-light);
+}
+
 /* --- Card grid (project listing) -------------------------- */
 .ftm-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+  align-items: stretch;
 }
 
 /* --- Project card ----------------------------------------- */
@@ -82,16 +166,24 @@ body {
   height: 100%;
   cursor: pointer;
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px color-mix(in oklab, var(--hot-color-neutral-950) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--hot-color-neutral-300, #b3b1b4) 80%, white);
+  border-radius: 0.75rem;
+  box-shadow:
+    0 0.0625rem 0.125rem color-mix(in oklab, var(--hot-color-neutral-950) 4%, transparent),
+    0 0.375rem 1rem color-mix(in oklab, var(--hot-color-neutral-950) 3%, transparent);
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.ftm-project-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px color-mix(in oklab, var(--hot-color-neutral-950) 12%, transparent);
+.ftm-project-card:hover,
+.ftm-project-card:focus-within {
+  transform: translateY(-0.125rem);
+  border-color: color-mix(in oklab, var(--ftm-brand) 28%, white);
+  box-shadow:
+    0 0.5rem 1.5rem color-mix(in oklab, var(--hot-color-neutral-950) 8%, transparent),
+    0 0 0 0.1875rem color-mix(in oklab, var(--ftm-brand) 10%, transparent);
 }
 
 .ftm-project-card__id {
@@ -103,7 +195,7 @@ body {
 .ftm-project-card__header {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .ftm-project-card__header-meta {
@@ -124,11 +216,11 @@ body {
 }
 
 .ftm-project-card__body {
-  padding: 10px 0;
+  padding: 0.625rem 0;
 }
 
 .ftm-project-card__location {
-  margin: 8px 0;
+  margin: 0.5rem 0;
   font-size: var(--hot-font-size-small);
   color: var(--hot-color-neutral-700);
 }
@@ -164,7 +256,7 @@ body {
 .ftm-empty-state {
   text-align: center;
   color: var(--ftm-text-muted);
-  margin-top: 40px;
+  margin: 2.5rem 1.5rem 0;
 }
 
 /* --- Detail page ------------------------------------------ */
@@ -237,6 +329,32 @@ body {
 
 .ftm-manager-summary-section {
   margin-top: 10px;
+}
+
+@media (max-width: 720px) {
+  .ftm-projects-toolbar,
+  .ftm-card-grid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .ftm-projects-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .ftm-projects-filters {
+    flex-wrap: wrap;
+    flex-basis: 100%;
+  }
+
+  .ftm-projects-results {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .ftm-projects-filter--search {
+    flex-basis: 100%;
+  }
 }
 
 /* --- Flex/layout utilities -------------------------------- */

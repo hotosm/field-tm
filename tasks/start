@@ -32,7 +32,7 @@ all:
   cd {{justfile_directory()}}
   {{docker}} compose up -d
 
-# Production deploy, depending which branch on current
+# Production deploy, based on current checked out branch
 [no-cd]
 prod:
   #!/usr/bin/env sh
@@ -47,12 +47,34 @@ prod:
   just config generate-dotenv "${GIT_BRANCH}"
   just config custom-favicon
 
-  # Deploy
+  # Deploy core FieldTM
   ../envsubst -no-unset -i compose.sub.yaml | \
         {{docker}} compose -f - up --detach \
         --remove-orphans --force-recreate
-  
+
   just _echo-blue "FieldTM started successfully"
+
+# Production deploy with self-hosted ODK Central
+[no-cd]
+prod-with-odk:
+  #!/usr/bin/env sh
+  set -e
+
+  # From deploy dir
+  cd {{justfile_directory()}}/deploy
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
+
+  # Config
+  just config generate-dotenv "${GIT_BRANCH}"
+  just config custom-favicon
+
+  # Deploy core FieldTM + ODK Central addon
+  ../envsubst -no-unset -i compose.sub.yaml | \
+        {{docker}} compose -f - -f compose.odk.yaml up --detach \
+        --remove-orphans --force-recreate
+
+  just _echo-blue "FieldTM + ODK Central started successfully"
 
 # Start backend API only
 [no-cd]

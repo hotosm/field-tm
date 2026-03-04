@@ -49,6 +49,7 @@ from app.htmx.map_helpers import render_leaflet_map
 from app.projects import project_crud, project_schemas
 from app.projects.project_services import (
     ODKFinalizeResult,
+    QFieldFinalizeResult,
     ServiceError,
     SplitAoiOptions,
     download_osm_data,
@@ -432,6 +433,58 @@ def _build_odk_finalize_success_html(result: ODKFinalizeResult) -> str:
       <p style="margin: 8px 0 0 0; color: #666;">
         Save these credentials now. They will only be shown once.
       </p>
+    </div>
+    <div style="margin-top: 12px;">
+      <wa-button type="button" variant="default"
+        onclick="window.location.reload()">
+        Reload Project Page
+      </wa-button>
+    </div>
+    """
+
+
+def _build_qfield_finalize_success_html(result: QFieldFinalizeResult) -> str:
+    """Build success markup returned by HTMX QField finalize."""
+    box_style = (
+        "margin-top: 12px; padding: 16px;"
+        " background-color: #f5f5f5; border-radius: 8px;"
+    )
+    link_style = "color: #d63f3f; text-decoration: none; font-weight: 600;"
+
+    creds_html = ""
+    if result.manager_username and result.manager_password:
+        creds_html = f"""
+      <p style="margin: 0;">
+        <strong>Username:</strong> <code>{result.manager_username}</code>
+      </p>
+      <p style="margin: 6px 0 0 0;">
+        <strong>Password:</strong> <code>{result.manager_password}</code>
+      </p>
+      <p style="margin: 8px 0 0 0; color: #666;">
+        Save these credentials now. They will only be shown once.
+      </p>"""
+    else:
+        creds_html = """
+      <p style="margin: 8px 0 0 0; color: #666;">
+        Manager account could not be created automatically.
+        Log in to QFieldCloud as admin to manage the project.
+      </p>"""
+
+    return f"""
+    <wa-callout variant="success">
+      <span>Project created in QFieldCloud.</span>
+    </wa-callout>
+    <div style="{box_style}">
+      <h4 style="margin: 0 0 10px 0;">
+        Manager Access (QFieldCloud)
+      </h4>
+      <p style="margin: 0 0 8px 0;">
+        <a href="{result.qfield_url}"
+           target="_blank" style="{link_style}">
+          Open project in QFieldCloud
+        </a>
+      </p>
+      {creds_html}
     </div>
     <div style="margin-top: 12px;">
       <wa-button type="button" variant="default"
@@ -1485,22 +1538,14 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
                 qfield_cloud_user=qfield_user,
                 qfield_cloud_password=qfield_password,
             )
-        qfield_url = await finalize_qfield_project(
+        qfield_result = await finalize_qfield_project(
             db=db, project_id=project_id, custom_qfield_creds=custom_qfield_creds
         )
 
-        qfield_success_html = (
-            '<wa-callout variant="success"><span>'
-            "✓ Project successfully created in QField! "
-            f'<a href="{qfield_url}" target="_blank">'
-            "View Project in QField"
-            "</a></span></wa-callout>"
-        )
         return Response(
-            content=qfield_success_html,
+            content=_build_qfield_finalize_success_html(qfield_result),
             media_type="text/html",
             status_code=200,
-            headers={"HX-Refresh": "true"},
         )
     except SvcValidationError as e:
         return Response(

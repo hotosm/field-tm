@@ -202,12 +202,16 @@ async def _finalize_project(
     has_custom_qfield = (
         data.qfield_cloud_url and data.qfield_cloud_user and data.qfield_cloud_password
     )
-    downstream_url = await finalize_qfield_project(
+    qfield_result = await finalize_qfield_project(
         db=db,
         project_id=project_id,
         custom_qfield_creds=(data if has_custom_qfield else None),
     )
-    return downstream_url, None, None
+    return (
+        qfield_result.qfield_url,
+        qfield_result.manager_username,
+        qfield_result.manager_password,
+    )
 
 
 @post(

@@ -124,49 +124,49 @@ async def _serve_icon_file(filename: str, media_type: str) -> Response:
     )
 
 
-@get("/favicon.ico")
+@get("/favicon.ico", include_in_schema=False)
 async def serve_favicon_ico() -> Response:
     """Serve favicon.ico."""
     return await _serve_icon_file("favicon.ico", "image/x-icon")
 
 
-@get("/favicon.png")
+@get("/favicon.png", include_in_schema=False)
 async def serve_favicon_png() -> Response:
     """Serve favicon.png."""
     return await _serve_icon_file("favicon.png", "image/png")
 
 
-@get("/favicon.svg")
+@get("/favicon.svg", include_in_schema=False)
 async def serve_favicon_svg() -> Response:
     """Serve favicon.svg."""
     return await _serve_icon_file("favicon.svg", "image/svg+xml")
 
 
-@get("/apple-touch-icon-180x180.png")
+@get("/apple-touch-icon-180x180.png", include_in_schema=False)
 async def serve_apple_touch_icon() -> Response:
     """Serve apple-touch-icon-180x180.png."""
     return await _serve_icon_file("apple-touch-icon-180x180.png", "image/png")
 
 
-@get("/maskable-icon-512x512.png")
+@get("/maskable-icon-512x512.png", include_in_schema=False)
 async def serve_maskable_icon() -> Response:
     """Serve maskable-icon-512x512.png."""
     return await _serve_icon_file("maskable-icon-512x512.png", "image/png")
 
 
-@get("/pwa-192x192.png")
+@get("/pwa-192x192.png", include_in_schema=False)
 async def serve_pwa_192() -> Response:
     """Serve pwa-192x192.png."""
     return await _serve_icon_file("pwa-192x192.png", "image/png")
 
 
-@get("/pwa-512x512.png")
+@get("/pwa-512x512.png", include_in_schema=False)
 async def serve_pwa_512() -> Response:
     """Serve pwa-512x512.png."""
     return await _serve_icon_file("pwa-512x512.png", "image/png")
 
 
-@get("/pwa-64x64.png")
+@get("/pwa-64x64.png", include_in_schema=False)
 async def serve_pwa_64() -> Response:
     """Serve pwa-64x64.png."""
     return await _serve_icon_file("pwa-64x64.png", "image/png")

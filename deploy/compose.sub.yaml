@@ -15,6 +15,10 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Core FieldTM production compose file.
+# ODK Central and QFieldCloud are managed externally; see compose.odk.yaml
+# and compose.qfield.yaml for optional self-hosted addons.
+
 name: field-tm
 
 volumes:
@@ -22,16 +26,8 @@ volumes:
     name: field-tm-db-data
   ftm_logs:
     name: field-tm-logs
-  ftm_images:
-    name: field-tm-images
-  ftm_tiles:
-    name: field-tm-tiles
   certs:
     name: field-tm-certs
-  central_db_data:
-    name: field-tm-central-db-data
-  central_frontend:
-    name: field-tm-central-frontend
 
 networks:
   ftm-net:
@@ -44,13 +40,9 @@ networks:
 services:
   proxy:
     image: "bunkerity/bunkerweb-all-in-one:1.6.2"
-    depends_on:
-      central-ui:
-        condition: service_completed_successfully
     volumes:
       # - certs:/etc/letsencrypt
       - certs:/data
-      - central_frontend:/var/www/html/${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}:ro
     environment:
       # General
       BUNKERWEB_INSTANCES: proxy
@@ -94,19 +86,14 @@ services:
       AUTO_LETS_ENCRYPT: yes
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
-      # Reverse proxy configs
-      SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN} ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}
+      # Reverse proxy configs — core FieldTM domains only
+      SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}
       ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       # CORS for the backend is configured by FastAPI
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
       # Increase timeout slightly for long project creation requests
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
-      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://central:8383
-      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_REVERSE_PROXY_BUFFERING: no
-      ${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
       - 443:8443
@@ -178,70 +165,6 @@ services:
           cpus: "0.1"
           memory: 100M
 
-  central:
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.2"
-    depends_on:
-      proxy:
-        condition: service_healthy
-      central-db:
-        condition: service_healthy
-      pyxform:
-        condition: service_started
-    environment:
-      - DOMAIN=${FTM_ODK_DOMAIN:-odk.$FTM_DOMAIN}
-      - SSL_TYPE=upstream
-      - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
-      - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
-      - HTTPS_PORT=443
-      - DB_HOST=${CENTRAL_DB_HOST:-central-db}
-      - DB_USER=${CENTRAL_DB_USER}
-      - DB_PASSWORD=${CENTRAL_DB_PASSWORD}
-      - DB_NAME=${CENTRAL_DB_NAME}
-      - DB_SSL=null
-      - EMAIL_FROM=${ODK_CENTRAL_USER}
-      - EMAIL_HOST=${EMAIL_HOST:-mail}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - EMAIL_SECURE=${EMAIL_SECURE:-false}
-      - EMAIL_IGNORE_TLS=${EMAIL_IGNORE_TLS:-true}
-      - EMAIL_USER=${EMAIL_USER:-''}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
-      - OIDC_ENABLED=${OIDC_ENABLED:-false}
-      - OIDC_ISSUER_URL=${OIDC_ISSUER_URL:-https://getodk.org}
-      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID:-xxx}
-      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET:-xxx}
-      - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
-      - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
-      - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
-      - SENTRY_TRACE_RATE=${SENTRY_TRACE_RATE:-100000}
-      - S3_SERVER=http://dummyvalue.com
-      - S3_BUCKET_NAME=dummyvalue
-      - S3_ACCESS_KEY=dummyvalue
-      - S3_SECRET_KEY=dummyvalue
-    networks:
-      - ftm-net
-    restart: "unless-stopped"
-    healthcheck:
-      test: nc -z localhost 8383 || exit 1
-      start_period: 15s
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v4.2.0"
-    networks:
-      - ftm-net
-    restart: "unless-stopped"
-
-  central-ui:
-    # This service simply builds the frontend to a volume
-    # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.4.2"
-    volumes:
-      - central_frontend:/frontend
-    network_mode: none
-    restart: "on-failure:2"
-
   migrations:
     image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
     depends_on:
@@ -275,27 +198,6 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: pg_isready -U ${FTM_DB_USER} -d ${FTM_DB_NAME}
-      start_period: 5s
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  central-db:
-    image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
-    command: -c 'max_connections=64'
-    volumes:
-      - central_db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD}
-      - POSTGRES_DB=${CENTRAL_DB_NAME}
-    ports:
-      - "5434:5432"
-    networks:
-      - ftm-net
-    restart: "unless-stopped"
-    healthcheck:
-      test: pg_isready -U ${CENTRAL_DB_USER} -d ${CENTRAL_DB_NAME}
       start_period: 5s
       interval: 10s
       timeout: 5s
