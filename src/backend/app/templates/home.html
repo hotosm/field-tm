@@ -1,12 +1,81 @@
 {% extends "layout.html" %} {% block content %}
-<div class="ftm-page ftm-page--muted">
-  <!-- Header with Create Project Button -->
-  <div class="ftm-page-header">
-    <h1 class="ftm-page-title">Projects</h1>
-    <wa-button href="/new" variant="brand">Create Project</wa-button>
+<div class="ftm-page ftm-page--projects">
+  <div class="ftm-projects-shell">
+    <div class="ftm-projects-toolbar">
+      <form class="ftm-projects-filters" method="get" action="/htmxprojects">
+        <label class="ftm-projects-filter" for="projects-status-filter">
+          <span class="ftm-projects-filter__label">Project Status</span>
+          <select
+            id="projects-status-filter"
+            name="status"
+            class="ftm-projects-filter__select"
+            onchange="this.form.submit()"
+          >
+            <option value="" {% if not selected_status %}selected{% endif %}>All projects</option>
+            <option value="DRAFT" {% if selected_status="" ="DRAFT" %}selected{% endif %}>
+              Draft
+            </option>
+            <option value="PUBLISHED" {% if selected_status="" ="PUBLISHED" %}selected{% endif %}>
+              Published
+            </option>
+            <option value="COMPLETED" {% if selected_status="" ="COMPLETED" %}selected{% endif %}>
+              Completed
+            </option>
+            <option value="ARCHIVED" {% if selected_status="" ="ARCHIVED" %}selected{% endif %}>
+              Archived
+            </option>
+          </select>
+        </label>
+
+        <label class="ftm-projects-filter" for="projects-sort-filter">
+          <span class="ftm-projects-filter__label">Sort By</span>
+          <select
+            id="projects-sort-filter"
+            name="sort"
+            class="ftm-projects-filter__select"
+            onchange="this.form.submit()"
+          >
+            <option value="newest" {% if selected_sort="" ="newest" %}selected{% endif %}>
+              Newest first
+            </option>
+            <option value="oldest" {% if selected_sort="" ="oldest" %}selected{% endif %}>
+              Oldest first
+            </option>
+            <option value="name_asc" {% if selected_sort="" ="name_asc" %}selected{% endif %}>
+              Name (A-Z)
+            </option>
+            <option value="name_desc" {% if selected_sort="" ="name_desc" %}selected{% endif %}>
+              Name (Z-A)
+            </option>
+          </select>
+        </label>
+
+        <div class="ftm-projects-filter ftm-projects-filter--search">
+          <span class="ftm-projects-filter__label">Search</span>
+          <wa-input
+            id="projects-search"
+            type="search"
+            name="search"
+            size="small"
+            placeholder="Search projects or #hashtags"
+            value="{{ search_query or '' }}"
+            with-clear
+          >
+            <wa-icon name="magnifying-glass" slot="start"></wa-icon>
+          </wa-input>
+        </div>
+      </form>
+
+      <wa-button href="/new" variant="brand">Create Project</wa-button>
+    </div>
+
+    <p class="ftm-projects-results">
+      Showing {{ projects|length }} project{% if projects|length != 1 %}s{% endif %}{% if
+      selected_status %} in {{ selected_status|lower|title }}{% endif %}{% if search_query %}
+      matching "{{ search_query }}"{% endif %}
+    </p>
   </div>
 
-  <!-- Projects Grid -->
   {% if projects %}
   <div class="ftm-card-grid">
     {% for project in projects %}
@@ -79,4 +148,26 @@
   <p class="ftm-empty-state">No projects found. Create your first project to get started!</p>
   {% endif %}
 </div>
+
+<script>
+  (function () {
+    const waInput = document.getElementById("projects-search");
+    if (!waInput) return;
+    const form = waInput.closest("form");
+
+    // Submit on Enter
+    waInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        form.submit();
+      }
+    });
+
+    // Clear and re-submit when the built-in clear button is clicked
+    waInput.addEventListener("wa-clear", function () {
+      waInput.value = "";
+      form.submit();
+    });
+  })();
+</script>
 {% endblock %}

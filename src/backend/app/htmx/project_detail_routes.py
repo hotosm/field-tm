@@ -20,6 +20,7 @@
 
 import json
 import logging
+from contextlib import suppress
 
 from litestar import get
 from litestar.di import Provide
@@ -30,13 +31,129 @@ from litestar.response import Response, Template
 from psycopg import AsyncConnection
 
 from app.central import central_crud
+from app.config import decrypt_value
 from app.db.database import db_conn
+from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
 from app.projects import project_crud
 
 from .htmx_helpers import callout as _callout
 
 log = logging.getLogger(__name__)
+
+
+def _app_name(project: DbProject) -> str:
+    """Return a plain-text app name from the enum-like project field."""
+    if hasattr(project.field_mapping_app, "value"):
+        return project.field_mapping_app.value
+    return str(project.field_mapping_app)
+
+
+def _mapper_credentials_html(project: DbProject) -> str:
+    """Render QField mapper credentials when they are available."""
+    if project.field_mapping_app != FieldMappingApp.QFIELD:
+        return ""
+
+    mapper_username = project.external_project_username
+    mapper_password = None
+    if project.external_project_password_encrypted:
+        with suppress(Exception):
+            mapper_password = decrypt_value(project.external_project_password_encrypted)
+
+    if not (mapper_username and mapper_password):
+        return ""
+
+    return f"""
+            <div class="ftm-qr-panel__mapper-creds" style="
+                margin-top: 16px;
+                padding: 12px 16px;
+                background: #f5f5f5;
+                border-radius: 8px;
+            ">
+                <h4 style="margin: 0 0 8px 0; font-size: 0.95em;">
+                    Mapper Login (QFieldCloud)
+                </h4>
+                <p style="margin: 0; font-size: 0.9em;">
+                    <strong>Username:</strong> <code>{mapper_username}</code>
+                </p>
+                <p style="margin: 4px 0 0 0; font-size: 0.9em;">
+                    <strong>Password:</strong> <code>{mapper_password}</code>
+                </p>
+                <p style="margin: 8px 0 0 0; font-size: 0.8em; color: #666;">
+                    Scan the QR code, then enter these credentials in QField.
+                </p>
+            </div>"""
+
+
+def _qrcode_panel_html(
+    qr_code_data_url: str,
+    qr_download_name: str,
+    app_name: str,
+    mapper_creds_html: str,
+) -> str:
+    """Build the QR code HTML payload."""
+    return f"""
+        <div class="ftm-qr-panel">
+            <h3 class="ftm-qr-panel__title">Scan QR Code</h3>
+            <p class="ftm-qr-panel__description">
+                Use {app_name} to scan this QR code and load the project.
+            </p>
+            <div class="ftm-qr-panel__image-wrap">
+                <img
+                    src="{qr_code_data_url}"
+                    alt="Project QR Code"
+                    class="ftm-qr-panel__image"
+                />
+            </div>
+            <div>
+                <wa-button
+                    onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
+                    variant="default"
+                >
+                    Download QR Code
+                </wa-button>
+            </div>
+            {mapper_creds_html}
+        </div>
+        <script>
+            if (typeof window.downloadQRCode !== "function") {{
+                window.downloadQRCode = function downloadQRCode(dataUrl, filename) {{
+                    const link = document.createElement("a");
+                    link.href = dataUrl;
+                    link.download = filename + ".png";
+                    link.click();
+                }};
+            }}
+        </script>
+        """
+
+
+def _friendly_qr_error(exc: Exception) -> str:
+    """Map low-level QR generation failures to a user-friendly message."""
+    raw = str(exc).lower()
+    if any(
+        kw in raw
+        for kw in (
+            "connection",
+            "connect",
+            "refused",
+            "timeout",
+            "unreachable",
+            "network",
+        )
+    ):
+        return (
+            "Cannot reach the mapping server. Check that ODK Central or "
+            "QFieldCloud is running."
+        )
+    if any(kw in raw for kw in ("500", "server error", "internal")):
+        return "The mapping server returned an error. Check its logs for details."
+    if any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
+        return (
+            "Authentication failed connecting to the mapping server. "
+            "Check the configured credentials."
+        )
+    return "An unexpected error occurred while generating the QR code."
 
 
 @get(
@@ -96,48 +213,14 @@ async def project_qrcode_htmx(
         qr_code_data_url = await project_crud.get_project_qrcode(
             db, project_id, username
         )
-
-        app_name = (
-            project.field_mapping_app.value
-            if hasattr(project.field_mapping_app, "value")
-            else str(project.field_mapping_app)
-        )
-
+        app_name = _app_name(project)
         qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
-        html_content = f"""
-        <div class="ftm-qr-panel">
-            <h3 class="ftm-qr-panel__title">Scan QR Code</h3>
-            <p class="ftm-qr-panel__description">
-                Use {app_name} to scan this QR code and load the project.
-            </p>
-            <div class="ftm-qr-panel__image-wrap">
-                <img
-                    src="{qr_code_data_url}"
-                    alt="Project QR Code"
-                    class="ftm-qr-panel__image"
-                />
-            </div>
-            <div>
-                <wa-button
-                    onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
-                    variant="default"
-                >
-                    Download QR Code
-                </wa-button>
-            </div>
-        </div>
-        <script>
-            if (typeof window.downloadQRCode !== "function") {{
-                window.downloadQRCode = function downloadQRCode(dataUrl, filename) {{
-                    const link = document.createElement("a");
-                    link.href = dataUrl;
-                    link.download = filename + ".png";
-                    link.click();
-                }};
-            }}
-        </script>
-        """
-
+        html_content = _qrcode_panel_html(
+            qr_code_data_url,
+            qr_download_name,
+            app_name,
+            _mapper_credentials_html(project),
+        )
         return Response(
             content=html_content,
             media_type="text/html",
@@ -153,35 +236,8 @@ async def project_qrcode_htmx(
         )
     except Exception as e:
         log.error(f"Error generating QR code via HTMX: {e}", exc_info=True)
-        raw = str(e).lower()
-        if any(
-            kw in raw
-            for kw in (
-                "connection",
-                "connect",
-                "refused",
-                "timeout",
-                "unreachable",
-                "network",
-            )
-        ):
-            friendly = (
-                "Cannot reach the mapping server. Check that ODK Central or "
-                "QFieldCloud is running."
-            )
-        elif any(kw in raw for kw in ("500", "server error", "internal")):
-            friendly = (
-                "The mapping server returned an error. Check its logs for details."
-            )
-        elif any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
-            friendly = (
-                "Authentication failed connecting to the mapping server. "
-                "Check the configured credentials."
-            )
-        else:
-            friendly = "An unexpected error occurred while generating the QR code."
         return Response(
-            content=_callout("warning", friendly),
+            content=_callout("warning", _friendly_qr_error(e)),
             media_type="text/html",
             status_code=200,
         )

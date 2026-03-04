@@ -17,16 +17,19 @@
 #
 """Logic for interaction with QFieldCloud & data."""
 
-from copy import deepcopy
 import json
 import logging
 import shutil
 from asyncio import get_running_loop
+from copy import deepcopy
+from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
 from pathlib import Path
 from random import getrandbits
+from secrets import token_urlsafe
 from typing import Optional
+from urllib.parse import urlparse
 from uuid import uuid4
 
 import geojson
@@ -36,10 +39,14 @@ from litestar.exceptions import HTTPException
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import AsyncConnection
-from qfieldcloud_sdk.sdk import FileTransferType
+from qfieldcloud_sdk.sdk import (
+    FileTransferType,
+    OrganizationMemberRole,
+    ProjectCollaboratorRole,
+)
 from shapely.geometry import shape
 
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db.models import DbProject
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -52,6 +59,17 @@ SHARED_VOLUME_PATH = "/opt/qfield"
 
 # Timeout for QGIS wrapper HTTP calls (project generation can be slow)
 QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
+
+
+@dataclass(slots=True)
+class QFieldProjectResult:
+    """Details returned after QField project creation."""
+
+    qfield_url: str
+    manager_username: Optional[str]
+    manager_password: Optional[str]
+    mapper_username: Optional[str]
+    mapper_password: Optional[str]
 
 
 # ---------------------------------------------------------------------------
@@ -162,23 +180,26 @@ def _qgis_safe_property_value(key: str, value):
 
 def _qgis_safe_tags_value(tags) -> str:
     """Normalize the ``tags`` property to a QGIS-safe string."""
+    result = ""
     if not tags:
-        return ""
+        return result
     if isinstance(tags, dict):
-        return ";".join(f"{k}={v}" for k, v in tags.items())
-    if isinstance(tags, list):
-        return json.dumps(tags, ensure_ascii=False, separators=(",", ":"))
-    if not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
-        return str(tags)
-
-    try:
-        tags_dict = json.loads(tags)
-    except (json.JSONDecodeError, TypeError):
-        return str(tags)
-
-    if not isinstance(tags_dict, dict):
-        return str(tags)
-    return ";".join(f"{k}={v}" for k, v in tags_dict.items())
+        result = ";".join(f"{k}={v}" for k, v in tags.items())
+    elif isinstance(tags, list):
+        result = json.dumps(tags, ensure_ascii=False, separators=(",", ":"))
+    elif not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
+        result = str(tags)
+    else:
+        try:
+            tags_dict = json.loads(tags)
+        except (json.JSONDecodeError, TypeError):
+            result = str(tags)
+        else:
+            if isinstance(tags_dict, dict):
+                result = ";".join(f"{k}={v}" for k, v in tags_dict.items())
+            else:
+                result = str(tags)
+    return result
 
 
 def _build_tasks_geojson(project: DbProject) -> dict:
@@ -224,6 +245,52 @@ def _build_features_geojson(project: DbProject) -> dict:
     return {"type": "FeatureCollection", "features": []}
 
 
+def _strip_feature_properties_for_qfield(features_geojson: dict) -> dict:
+    """Keep seeded geometries, but drop source attributes before QGIS conversion."""
+    if not isinstance(features_geojson, dict):
+        return {"type": "FeatureCollection", "features": []}
+
+    stripped = deepcopy(features_geojson)
+    sanitized_features = []
+    for feature in stripped.get("features", []):
+        if not isinstance(feature, dict):
+            continue
+        sanitized_feature = {
+            "type": feature.get("type", "Feature"),
+            "geometry": feature.get("geometry"),
+            "properties": {},
+        }
+        if "id" in feature:
+            sanitized_feature["id"] = feature["id"]
+        sanitized_features.append(sanitized_feature)
+
+    stripped["features"] = sanitized_features
+    return stripped
+
+
+def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
+    """Keep edit mode only for collect-new-data projects with no seed features."""
+    if not isinstance(data_extract, dict):
+        return True
+    features = data_extract.get("features")
+    return not isinstance(features, list) or len(features) == 0
+
+
+def _can_manage_qfc_users_locally(custom_creds: QFieldCloud | None) -> bool:
+    """Whether user provisioning can use the local qfield-user-mgmt sidecar."""
+    if not custom_creds or not custom_creds.qfield_cloud_url:
+        return True
+
+    host = (urlparse(custom_creds.qfield_cloud_url).hostname or "").lower()
+    return host in {
+        "",
+        "localhost",
+        "127.0.0.1",
+        "qfield-app",
+        "qfield.field.localhost",
+    }
+
+
 # ---------------------------------------------------------------------------
 # Core: create QField project
 # ---------------------------------------------------------------------------
@@ -233,16 +300,17 @@ async def create_qfield_project(
     db: AsyncConnection,
     project: DbProject,
     custom_qfield_creds: QFieldCloud | None = None,
-) -> str:
+) -> QFieldProjectResult:
     """Create QField project in QFieldCloud via the QGIS wrapper service.
 
     Steps:
         1. Prepare local files (XLSForm, features, tasks).
         2. Call the QGIS wrapper HTTP service to generate a ``.qgz`` project.
         3. Create a project on QFieldCloud and upload the generated files.
+        4. Provision manager and mapper service accounts.
 
     Returns:
-        URL to the QFieldCloud project dashboard.
+        QFieldProjectResult with URL and credentials.
 
     Raises:
         HTTPException: On validation or processing errors.
@@ -276,7 +344,9 @@ async def create_qfield_project(
         )
 
     # ── Prepare local data ──────────────────────────────────────────────
+    open_in_edit_mode = _should_open_in_edit_mode(project.data_extract_geojson)
     features_geojson = _build_features_geojson(project)
+    features_geojson = _strip_feature_properties_for_qfield(features_geojson)
     features_geojson = clean_tags_for_qgis(features_geojson)
 
     tasks_geojson = _build_tasks_geojson(project)
@@ -308,6 +378,7 @@ async def create_qfield_project(
             title=qgis_project_title,
             language=form_language or "",
             extent=bbox_str,
+            open_in_edit_mode=open_in_edit_mode,
         )
 
         # Locate the generated .qgz — the converter may sanitise the title
@@ -324,7 +395,7 @@ async def create_qfield_project(
 
         # ── Step 2: Upload to QFieldCloud ──────────────────────────────
         qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
-        qfield_url = await _upload_to_qfieldcloud(
+        result = await _upload_to_qfieldcloud(
             project=project,
             qfc_project_name=qfc_project_name,
             final_project_dir=str(final_project_file.parent),
@@ -332,7 +403,7 @@ async def create_qfield_project(
             db=db,
         )
 
-        return qfield_url
+        return result
 
     finally:
         # Always clean up the temp job directory
@@ -361,6 +432,7 @@ async def _call_qgis_wrapper(
     title: str,
     language: str,
     extent: str,
+    open_in_edit_mode: bool,
 ) -> None:
     """POST to the QGIS wrapper HTTP service and raise on failure."""
     qgis_url = "http://qfield-qgis:8080"
@@ -369,6 +441,7 @@ async def _call_qgis_wrapper(
         "title": title,
         "language": language,
         "extent": extent,
+        "open_in_edit_mode": open_in_edit_mode,
     }
     log.info("Calling QGIS wrapper at %s for project '%s'", qgis_url, title)
 
@@ -377,7 +450,7 @@ async def _call_qgis_wrapper(
         session.post(f"{qgis_url}/", json=payload) as response,
     ):
         body = await response.text()
-        if response.status != 200:
+        if response.status != status.HTTP_200_OK:
             log.error("QGIS wrapper returned %s: %s", response.status, body)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -385,11 +458,11 @@ async def _call_qgis_wrapper(
             )
         try:
             result = json.loads(body)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="QGIS wrapper returned invalid JSON.",
-            )
+            ) from exc
         if result.get("status") != "success":
             msg = result.get("message", "Unknown error")
             log.error("QGIS wrapper reported failure: %s", msg)
@@ -401,6 +474,39 @@ async def _call_qgis_wrapper(
     log.debug("QGIS wrapper call succeeded")
 
 
+async def _create_qfc_user(
+    username: str,
+    password: str,
+) -> bool:
+    """Create a QFieldCloud user via the qfield-user-mgmt sidecar service.
+
+    The sidecar runs inside the qfield-app container (same Django environment)
+    and creates users directly via the ORM.  Returns True on success or if the
+    user already exists, False on failure.
+    """
+    url = "http://qfield-user-mgmt:8001/create-user"
+    payload = {"username": username, "password": password}
+
+    async with ClientSession() as session:
+        try:
+            async with session.post(url, json=payload) as resp:
+                if resp.status in (200, 201):
+                    body = await resp.json()
+                    log.info("QFC user '%s': %s", username, body.get("status", "ok"))
+                    return True
+                body = await resp.text()
+                log.warning(
+                    "qfield-user-mgmt returned %s for '%s': %s",
+                    resp.status,
+                    username,
+                    body,
+                )
+        except Exception as exc:
+            log.warning("qfield-user-mgmt call failed for '%s': %s", username, exc)
+
+    return False
+
+
 async def _upload_to_qfieldcloud(
     *,
     project: DbProject,
@@ -408,10 +514,10 @@ async def _upload_to_qfieldcloud(
     final_project_dir: str,
     custom_qfield_creds: QFieldCloud | None,
     db: AsyncConnection,
-) -> str:
-    """Create a QFieldCloud project and upload files.
+) -> QFieldProjectResult:
+    """Create a QFieldCloud project, upload files, and provision manager/mapper users.
 
-    Returns the project dashboard URL.
+    Returns a QFieldProjectResult with the project URL and credentials.
     """
     loop = get_running_loop()
 
@@ -434,12 +540,11 @@ async def _upload_to_qfieldcloud(
         log.debug("QFieldCloud project created: %s", qfield_project)
 
         api_project_id = qfield_project.get("id")
-        api_project_owner = qfield_project.get("owner")
-        api_project_name = qfield_project.get("name")
+        api_project_owner = qfield_project.get("owner") or qfc_owner
 
         try:
             # Upload files (sync SDK call → run in executor)
-            log.info("Uploading files to QFieldCloud project %s", api_project_name)
+            log.info(f"Uploading files to QFieldCloud project {qfc_project_name}")
             upload_info = await loop.run_in_executor(
                 None,
                 partial(
@@ -470,24 +575,182 @@ async def _upload_to_qfieldcloud(
                 detail=f"Failed to upload files to QFieldCloud: {e}",
             ) from e
 
-    # Build the QFieldCloud project URL
-    qfield_url = _build_qfield_url(
-        api_project_owner, api_project_name, custom_qfield_creds
-    )
+        manager_username = manager_password = None
+        mapper_username = mapper_password = None
+        if _can_manage_qfc_users_locally(custom_qfield_creds):
+            # Create manager user and add to project
+            manager_username, manager_password = await _provision_project_user(
+                loop=loop,
+                client=client,
+                api_project_id=api_project_id,
+                api_project_owner=api_project_owner,
+                username=f"ftm_manager_{project.id}",
+                role=ProjectCollaboratorRole.MANAGER,
+                role_label="manager",
+            )
 
-    # Store QField project details in the DB
-    await DbProject.update(
-        db,
-        project.id,
-        ProjectUpdate(
-            external_project_id=api_project_id,
-            external_project_instance_url=qfield_url,
-        ),
+            # Create mapper service account and add to project
+            mapper_username, mapper_password = await _provision_project_user(
+                loop=loop,
+                client=client,
+                api_project_id=api_project_id,
+                api_project_owner=api_project_owner,
+                username=f"ftm_mapper_{project.id}",
+                role=ProjectCollaboratorRole.EDITOR,
+                role_label="mapper",
+            )
+        else:
+            log.info(
+                "Skipping QField service-account provisioning for remote instance %s",
+                custom_qfield_creds.qfield_cloud_url,
+            )
+
+    # Prefer a canonical URL returned by QFieldCloud, otherwise fall back to
+    # the instance root instead of guessing an internal route.
+    qfield_url = _resolve_qfield_project_url(qfield_project, custom_qfield_creds)
+
+    # Store QField project details and mapper credentials in the DB
+    update_payload = ProjectUpdate(
+        external_project_id=api_project_id,
+        external_project_instance_url=qfield_url,
     )
+    if mapper_username and mapper_password:
+        update_payload.external_project_username = mapper_username
+        update_payload.external_project_password_encrypted = encrypt_value(
+            mapper_password
+        )
+    await DbProject.update(db, project.id, update_payload)
     await db.commit()
     log.info("QFieldCloud project created: %s", qfield_url)
 
-    return qfield_url
+    return QFieldProjectResult(
+        qfield_url=qfield_url,
+        manager_username=manager_username,
+        manager_password=manager_password,
+        mapper_username=mapper_username,
+        mapper_password=mapper_password,
+    )
+
+
+async def _provision_project_user(
+    *,
+    loop,
+    client,
+    api_project_id: str,
+    api_project_owner: str,
+    username: str,
+    role: ProjectCollaboratorRole,
+    role_label: str,
+) -> tuple[Optional[str], Optional[str]]:
+    """Create a QFieldCloud user and add them to the project.
+
+    Returns (username, password) on success, (None, None) if creation failed.
+    """
+    password = token_urlsafe(16)
+    created = await _create_qfc_user(username, password)
+    if not created:
+        log.warning(
+            "Could not create QFC %s user '%s'; skipping collaborator assignment.",
+            role_label,
+            username,
+        )
+        return None, None
+
+    try:
+        if _is_org_owned_project(api_project_owner, getattr(client, "username", None)):
+            await _ensure_org_membership(
+                loop=loop,
+                client=client,
+                organization=api_project_owner,
+                username=username,
+            )
+
+        await loop.run_in_executor(
+            None,
+            partial(
+                client.add_project_collaborator,
+                api_project_id,
+                username,
+                role,
+            ),
+        )
+        log.info(
+            "Added QFC %s '%s' to project %s", role_label, username, api_project_id
+        )
+    except Exception as exc:
+        log.warning(
+            "Could not add '%s' as %s to project %s: %s",
+            username,
+            role_label,
+            api_project_id,
+            exc,
+        )
+        return None, None
+
+    if not await _project_has_collaborator(
+        loop=loop,
+        client=client,
+        api_project_id=api_project_id,
+        username=username,
+    ):
+        log.warning(
+            "QField project %s does not list '%s' as a collaborator after add; "
+            "withholding %s credentials.",
+            api_project_id,
+            username,
+            role_label,
+        )
+        return None, None
+
+    return username, password
+
+
+def _is_org_owned_project(project_owner: str, client_username: str | None) -> bool:
+    """Whether the project owner is an organization rather than the auth user."""
+    return bool(project_owner and client_username and project_owner != client_username)
+
+
+async def _ensure_org_membership(
+    *,
+    loop,
+    client,
+    organization: str,
+    username: str,
+) -> None:
+    """Ensure a user is a member of the owning organization."""
+    members = await loop.run_in_executor(
+        None,
+        partial(client.get_organization_members, organization),
+    )
+    if any(member.get("member") == username for member in members):
+        return
+
+    await loop.run_in_executor(
+        None,
+        partial(
+            client.add_organization_member,
+            organization,
+            username,
+            OrganizationMemberRole.MEMBER,
+            False,
+        ),
+    )
+    log.info("Added QFC user '%s' to organization '%s'", username, organization)
+
+
+async def _project_has_collaborator(
+    *,
+    loop,
+    client,
+    api_project_id: str,
+    username: str,
+) -> bool:
+    """Confirm the project collaborator was persisted by QFieldCloud."""
+    collaborators = await loop.run_in_executor(
+        None,
+        partial(client.get_project_collaborators, api_project_id),
+    )
+    return any(collab.get("collaborator") == username for collab in collaborators)
 
 
 def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
@@ -506,12 +769,8 @@ def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
     return settings.QFIELDCLOUD_USER or "admin"
 
 
-def _build_qfield_url(
-    owner: str,
-    project_name: str,
-    custom_creds: QFieldCloud | None,
-) -> str:
-    """Build the external QFieldCloud project dashboard URL."""
+def _qfield_base_url(custom_creds: QFieldCloud | None) -> str:
+    """Build the external QFieldCloud base UI URL."""
     if custom_creds and custom_creds.qfield_cloud_url:
         # Strip the /api/v1/ suffix and trailing slashes
         base = custom_creds.qfield_cloud_url.rstrip("/")
@@ -526,7 +785,33 @@ def _build_qfield_url(
     else:
         base_url = settings.QFIELDCLOUD_URL or ""
         base = base_url.split("/api/v1")[0].rstrip("/")
-    return f"{base}/a/{owner}/{project_name}"
+        if not base and settings.FTM_DOMAIN:
+            base = (
+                f"http://qfield.{settings.FTM_DOMAIN}:{settings.FTM_DEV_PORT}"
+                if settings.FTM_DEV_PORT
+                else f"http://qfield.{settings.FTM_DOMAIN}"
+            )
+    return base
+
+
+def _resolve_qfield_project_url(
+    qfield_project: dict,
+    custom_creds: QFieldCloud | None,
+) -> str:
+    """Resolve the best user-facing URL for a created QFieldCloud project."""
+    base = _qfield_base_url(custom_creds)
+
+    for key in ("public_url", "url", "absolute_url", "detail_url"):
+        value = qfield_project.get(key)
+        if not isinstance(value, str) or not value.strip():
+            continue
+        candidate = value.strip()
+        if candidate.startswith(("http://", "https://")):
+            return candidate.rstrip("/")
+        if candidate.startswith("/"):
+            return f"{base}{candidate}"
+
+    return base
 
 
 # ---------------------------------------------------------------------------

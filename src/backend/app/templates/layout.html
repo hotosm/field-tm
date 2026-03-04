@@ -99,17 +99,17 @@
     <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/style-core.css"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/style-core.css"
     />
     <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
     <!-- so custom elements are defined as soon as possible after the page loads. -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.7.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/hotosm-ui.js"
     ></script>
 
     <!-- App styles -->
@@ -142,7 +142,7 @@
   </head>
 
   <body>
-    <hot-header id="app-header" title="FieldTM" size="small"></hot-header>
+    <hot-header id="app-header" title="FieldTM" size="medium"></hot-header>
 
     {% block content %}{% endblock %}
 
@@ -154,12 +154,14 @@
         appHeader.tabs = [
           {
             label: "Projects",
+            href: "/htmxprojects",
             clickEvent: () => {
               window.location.href = "/htmxprojects";
             },
           },
           {
             label: "Create Project",
+            href: "/new",
             clickEvent: () => {
               window.location.href = "/new";
             },

@@ -62,6 +62,36 @@ def test_create_project_request_split_defaults():
     assert payload.include_aeroways is True
 
 
+def test_create_project_request_accepts_internal_osm_category_key():
+    """API payloads may provide the internal OSM preset key."""
+    import base64
+
+    from app.db.enums import XLSFormType
+    from app.projects.project_schemas import CreateProjectRequest
+
+    payload = CreateProjectRequest(
+        project_name="test",
+        field_mapping_app="QField",
+        description="test",
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.317, 27.705],
+                    [85.317, 27.704],
+                    [85.318, 27.704],
+                    [85.318, 27.705],
+                    [85.317, 27.705],
+                ]
+            ],
+        },
+        xlsform_base64=base64.b64encode(b"dummy").decode(),
+        osm_category="buildings",
+    )
+
+    assert payload.osm_category == XLSFormType.buildings
+
+
 @pytest.mark.parametrize(
     "crs",
     [
@@ -587,7 +617,15 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
     fake_commit = AsyncMock()
 
     async def fake_create_qfield_project(_db, _project, _custom_qfield_creds=None):
-        return "https://qfield.example.org/projects/1"
+        from app.qfield.qfield_crud import QFieldProjectResult
+
+        return QFieldProjectResult(
+            qfield_url="https://qfield.example.org/projects/1",
+            manager_username=None,
+            manager_password=None,
+            mapper_username=None,
+            mapper_password=None,
+        )
 
     db = Mock()
     db.commit = fake_commit
@@ -604,7 +642,7 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
         project_id=1,
     )
 
-    assert result == "https://qfield.example.org/projects/1"
+    assert result.qfield_url == "https://qfield.example.org/projects/1"
     fake_update.assert_awaited_once()
     assert fake_update.await_args.args[2].status == ProjectStatus.PUBLISHED
     fake_commit.assert_awaited_once()

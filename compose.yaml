@@ -235,6 +235,8 @@ services:
         required: false
       qfield-init:
         condition: service_completed_successfully
+      qfield-user-mgmt:
+        condition: service_healthy
       qfield-qgis:
         condition: service_healthy
     env_file:
@@ -477,6 +479,12 @@ services:
     stop_grace_period: 15m
     labels:
       ofelia.enabled: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "tr '\\000' ' ' </proc/1/cmdline | grep -q 'python manage.py dequeue'"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
     environment:
       <<: *qfield-common-env
     volumes:
@@ -530,7 +538,8 @@ services:
                 username=username,
                 email=email,
                 password=password,
-                is_superuser=False,
+                is_superuser=True,
+                is_staff=True,
                 has_accepted_tos=True,
             )
 
@@ -549,6 +558,26 @@ services:
         else:
             print("Org + user creation skipped, as they already exist.")
         PYCODE
+
+  qfield-user-mgmt:
+    <<: *qfield-common
+    depends_on:
+      qfield-app:
+        condition: service_healthy
+    volumes:
+      - ./src/qfield/user_mgmt_svc.py:/usr/src/app/user_mgmt_svc.py:ro
+    command:
+      - python
+      - /usr/src/app/user_mgmt_svc.py
+    networks:
+      - ftm-net
+    restart: unless-stopped
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8001' || exit 1
+      start_period: 15s
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"

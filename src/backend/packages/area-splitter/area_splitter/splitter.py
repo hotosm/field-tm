@@ -559,7 +559,8 @@ class AreaSplitter:
         """Validate required inputs for SQL-based splitting."""
         if not osm_extract:
             msg = (
-                "To use the Field-TM splitting algo, an OSM data extract must be passed "
+                "To use the Field-TM splitting algo, an OSM data extract "
+                "must be passed "
                 "via param `osm_extract` as a geojson dict or FeatureCollection."
             )
             log.error(msg)

@@ -24,7 +24,7 @@ import re
 from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
-from osm_fieldwork.update_xlsform import append_field_mapping_fields
+from osm_fieldwork.update_xlsform import append_field_mapping_fields, modify_form_for_qfield
 from osm_fieldwork.xlsforms import buildings, healthcare
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
@@ -96,6 +96,22 @@ async def test_healthcare_xlsform():
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
+
+
+async def test_qfield_form_removes_odk_bookkeeping_fields():
+    """QField-specific forms should not include ODK entity bookkeeping rows."""
+    form_bytes = io.BytesIO(convert_to_xlsform(str(buildings)))
+    _, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
+    _, qfield_form = await modify_form_for_qfield(updated_form)
+
+    workbook = load_workbook(filename=BytesIO(qfield_form.getvalue()))
+    survey_sheet = workbook["survey"]
+    name_col = [cell.value for cell in survey_sheet["B"]]
+
+    assert "end_note" not in name_col
+    assert "feature_exists" not in name_col
+    assert "created_by" not in name_col
+    assert "fill" not in name_col
 
 
 async def test_odk_collect_entity_task_selection():

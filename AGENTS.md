@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 MD025 -->
+
 # AGENTS.md
 
 Machine-readable operating guidance for AI coding agents in **field-tm**.
@@ -263,3 +265,5 @@ A change is "done" when all are true:
 4. File-level summary and risk notes are provided.
 
 When uncertain, ask instead of assuming.
+
+<!-- markdownlint-enable MD013 MD025 -->

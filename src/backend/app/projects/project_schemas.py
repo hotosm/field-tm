@@ -84,6 +84,17 @@ class CreateProjectRequest(ODKCentral, QFieldCloud):
 
     cleanup: bool = False
 
+    @field_validator("osm_category", mode="before")
+    @classmethod
+    def normalize_osm_category(cls, value):
+        """Accept internal preset keys as well as enum display values."""
+        if isinstance(value, str):
+            try:
+                return XLSFormType[value.strip().lower()]
+            except KeyError:
+                return value
+        return value
+
     @model_validator(mode="after")
     def validate_xlsform_source(self):
         """Require exactly one XLSForm source."""
