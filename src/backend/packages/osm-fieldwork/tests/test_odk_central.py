@@ -24,10 +24,35 @@ import pytest
 import requests
 import segno
 
-from osm_fieldwork.OdkCentral import OdkCentral
+from osm_fieldwork.OdkCentral import OdkCentral, OdkForm
 from osm_fieldwork.OdkCentralAsync import OdkCentral as OdkCentralAsync
 
 test_data_dir = Path(__file__).parent / "test_data"
+
+
+class _StubResponse:
+    def __init__(self, payload, status_code: int = 200, content: bytes = b"payload"):
+        self._payload = payload
+        self.status_code = status_code
+        self.content = content
+
+    def json(self):
+        return self._payload
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise requests.exceptions.HTTPError(f"status: {self.status_code}")
+
+
+class _StubSession:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.headers = {"Authorization": "Bearer test-token"}
+        self.calls = []
+
+    def get(self, url, **kwargs):
+        self.calls.append((url, kwargs))
+        return self.responses.pop(0)
 
 
 def test_delete_appuser(pyodk_client, appuser_details, project_details):
@@ -211,3 +236,65 @@ async def test_invalid_connection_async():
     ):
         async with OdkCentralAsync("http://central:8383", "thisuser@notexist.org", "Password1234"):
             pass
+
+
+def test_get_submissions_resolves_navigation_links():
+    """Expand linked OData resources and strip internal media fields."""
+    form = OdkForm.__new__(OdkForm)
+    form.base = "https://central.example/v1/"
+    form.verify = True
+    form.session = _StubSession(
+        [
+            _StubResponse(
+                {
+                    "value": [
+                        {
+                            "instanceId": "abc",
+                            "media@odata.navigationLink": "Submissions('abc')/media",
+                        }
+                    ]
+                }
+            ),
+            _StubResponse(
+                {
+                    "value": [
+                        {
+                            "__id": 1,
+                            "__Submissions-id": 2,
+                            "name": "photo.jpg",
+                        }
+                    ]
+                }
+            ),
+        ]
+    )
+
+    result = form.getSubmissions(12, "survey", 123, disk=False, json=True)
+
+    assert result == {
+        "value": [
+            {
+                "instanceId": "abc",
+                "media": [{"name": "photo.jpg"}],
+            }
+        ]
+    }
+    assert form.session.calls == [
+        (
+            "https://central.example/v1/projects/12/forms/survey.svc/Submissions('123')",
+            {
+                "headers": {
+                    "Authorization": "Bearer test-token",
+                    "Content-Type": "application/json",
+                },
+                "verify": True,
+            },
+        ),
+        (
+            "https://central.example/v1/projects/12/forms/survey.svc/Submissions('abc')/media",
+            {
+                "headers": {"Accept": "application/json"},
+                "verify": True,
+            },
+        ),
+    ]

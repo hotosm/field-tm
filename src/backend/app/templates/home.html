@@ -3,30 +3,47 @@
   <div class="ftm-projects-shell">
     <div class="ftm-projects-toolbar">
       <form class="ftm-projects-filters" method="get" action="/htmxprojects">
-        <label class="ftm-projects-filter" for="projects-status-filter">
-          <span class="ftm-projects-filter__label">Project Status</span>
-          <select
-            id="projects-status-filter"
-            name="status"
-            class="ftm-projects-filter__select"
-            onchange="this.form.submit()"
-          >
-            <option value="" {% if not selected_status %}selected{% endif %}>All projects</option>
-            <option value="DRAFT" {% if selected_status="" ="DRAFT" %}selected{% endif %}>
-              Draft
-            </option>
-            <option value="PUBLISHED" {% if selected_status="" ="PUBLISHED" %}selected{% endif %}>
-              Published
-            </option>
-            <option value="COMPLETED" {% if selected_status="" ="COMPLETED" %}selected{% endif %}>
-              Completed
-            </option>
-            <option value="ARCHIVED" {% if selected_status="" ="ARCHIVED" %}selected{% endif %}>
-              Archived
-            </option>
-          </select>
-        </label>
+        <!-- Mobile-only filters toggle -->
+        <button
+          type="button"
+          class="ftm-filters-toggle"
+          onclick="this.closest('.ftm-projects-filters').classList.toggle('ftm-filters--open')"
+        >
+          <wa-icon name="filter"></wa-icon>
+          Filters
+        </button>
 
+        <!-- Status filter: inline on desktop, collapsible on mobile -->
+        {% set status_options = [
+          ('', 'All projects'),
+          ('DRAFT', 'Draft'),
+          ('PUBLISHED', 'Published'),
+          ('COMPLETED', 'Completed'),
+          ('ARCHIVED', 'Archived'),
+        ] %}
+        <div class="ftm-filters-collapsible">
+          <label class="ftm-projects-filter" for="projects-status-filter">
+            <span class="ftm-projects-filter__label">Project Status</span>
+            <select
+              id="projects-status-filter"
+              name="status"
+              class="ftm-projects-filter__select"
+              onchange="this.form.submit()"
+            >
+              {% for val, label in status_options %}
+              {% set is_sel = (val and selected_status == val) or (not val and not selected_status) %}
+              <option value="{{ val }}" {{ 'selected' if is_sel }}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+
+        {% set sort_options = [
+          ('newest', 'Newest first'),
+          ('oldest', 'Oldest first'),
+          ('name_asc', 'Name (A-Z)'),
+          ('name_desc', 'Name (Z-A)'),
+        ] %}
         <label class="ftm-projects-filter" for="projects-sort-filter">
           <span class="ftm-projects-filter__label">Sort By</span>
           <select
@@ -35,18 +52,10 @@
             class="ftm-projects-filter__select"
             onchange="this.form.submit()"
           >
-            <option value="newest" {% if selected_sort="" ="newest" %}selected{% endif %}>
-              Newest first
-            </option>
-            <option value="oldest" {% if selected_sort="" ="oldest" %}selected{% endif %}>
-              Oldest first
-            </option>
-            <option value="name_asc" {% if selected_sort="" ="name_asc" %}selected{% endif %}>
-              Name (A-Z)
-            </option>
-            <option value="name_desc" {% if selected_sort="" ="name_desc" %}selected{% endif %}>
-              Name (Z-A)
-            </option>
+            {% for val, label in sort_options %}
+            {% set is_sel = selected_sort == val %}
+            <option value="{{ val }}" {{ 'selected' if is_sel }}>{{ label }}</option>
+            {% endfor %}
           </select>
         </label>
 
@@ -57,7 +66,7 @@
             type="search"
             name="search"
             size="small"
-            placeholder="Search projects or #hashtags"
+            placeholder="Search projects…"
             value="{{ search_query or '' }}"
             with-clear
           >
@@ -66,7 +75,10 @@
         </div>
       </form>
 
-      <wa-button href="/new" variant="brand">Create Project</wa-button>
+      <wa-button href="/new" variant="brand" class="ftm-create-btn">
+        <span class="ftm-create-btn__full">Create Project</span>
+        <span class="ftm-create-btn__short">+ New</span>
+      </wa-button>
     </div>
 
     <p class="ftm-projects-results">
@@ -167,6 +179,20 @@
     waInput.addEventListener("wa-clear", function () {
       waInput.value = "";
       form.submit();
+    });
+
+    // Close mobile filter dropdown when clicking outside
+    document.addEventListener("click", function (e) {
+      var form = document.querySelector(".ftm-projects-filters");
+      if (!form) return;
+      var toggle = form.querySelector(".ftm-filters-toggle");
+      if (
+        form.classList.contains("ftm-filters--open") &&
+        !e.target.closest(".ftm-filters-collapsible") &&
+        !e.target.closest(".ftm-filters-toggle")
+      ) {
+        form.classList.remove("ftm-filters--open");
+      }
     });
   })();
 </script>

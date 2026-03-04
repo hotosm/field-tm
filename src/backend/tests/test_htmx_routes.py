@@ -1,9 +1,11 @@
 """Tests for HTMX routes."""
 
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
 
 from app.db.enums import ProjectStatus
@@ -254,6 +256,19 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     assert (
         "No projects found. Create your first project to get started!" in response.text
     )
+
+
+def test_project_listing_template_compiles():
+    """Project listing template should compile without Jinja syntax errors."""
+    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+
+    template = env.get_template("home.html")
+
+    assert template.name == "home.html"
 
 
 async def test_project_listing_filters_by_status():
