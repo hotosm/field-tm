@@ -56,7 +56,8 @@
       wa-select:not(:defined),
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
-      hot-header:not(:defined) {
+      hot-header:not(:defined),
+      hotosm-auth:not(:defined) {
         visibility: hidden;
       }
     </style>
@@ -111,6 +112,14 @@
       type="module"
       src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/hotosm-ui.js"
     ></script>
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
+    ></script>
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -143,6 +152,7 @@
 
   <body>
     <hot-header id="app-header" title="FieldTM" size="medium"></hot-header>
+    <hotosm-auth hanko-url="https://dev.login.hotosm.org" show-profile="true"></hotosm-auth>
 
     {% block content %}{% endblock %}
 

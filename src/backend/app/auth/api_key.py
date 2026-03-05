@@ -22,12 +22,12 @@ from __future__ import annotations
 import hashlib
 import secrets
 
+from hotosm_auth_litestar import get_current_user
 from litestar import Request
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection
 
-from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
 from app.db.models import DbApiKey, DbUser
 
@@ -107,9 +107,9 @@ async def login_or_api_key(
     request: Request | None,
     db: AsyncConnection,
     x_api_key: str | None = None,
-) -> AuthUser:
+) -> object:
     """Allow either cookie-based auth or API key auth."""
     raw_api_key = x_api_key or _extract_api_key_from_request(request)
     if raw_api_key:
         return await _authenticate_api_key(db, raw_api_key)
-    return await login_required(request=request)
+    return await get_current_user(request)
