@@ -148,8 +148,11 @@ class Settings(BaseSettings):
         case_sensitive=True, env_file=".env", extra="allow"
     )
 
+    FTM_DOMAIN: str
+    FTM_DEV_PORT: Optional[str] = None
     APP_NAME: str = "Field-TM"
     DEBUG: bool = False
+    HANKO_API_URL: str = "https://dev.login.hotosm.org"
     LOG_LEVEL: str = "INFO"
     PYODK_LOG_LEVEL: str = "CRITICAL"
     ENCRYPTION_KEY: SecretStr
@@ -157,15 +160,7 @@ class Settings(BaseSettings):
     # existing Fernet based database value encryption
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
-    FTM_DOMAIN: str
-    FTM_DEV_PORT: Optional[str] = None
-
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
-
-    @property
-    def cookie_name(self) -> str:
-        """Get the cookie name for the domain."""
-        return self.FTM_DOMAIN.replace(".", "_")
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
@@ -299,10 +294,14 @@ class Settings(BaseSettings):
 def get_settings():
     """Cache settings when accessed throughout app."""
     _settings = Settings()
+    # NOTE hotosm-auth reads these via AuthConfig.from_env() during app startup,
+    # so they must be set here
+    os.environ["HANKO_API_URL"] = _settings.HANKO_API_URL
+    os.environ["COOKIE_SECRET"] = _settings.ENCRYPTION_KEY.get_secret_value()
 
     if _settings.DEBUG:
         # Enable detailed Python async debugger
-        os.environ["PYTHONASYNCIODEBUG"] = "1"
+        # os.environ["PYTHONASYNCIODEBUG"] = "1"
         print(f"Loaded settings: {_settings.model_dump()}")
     return _settings
 

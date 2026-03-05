@@ -31,8 +31,8 @@ from litestar.params import Dependency
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
 
-from app.auth.auth_logic import get_uid
-from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.auth_deps import get_user_sub, get_user_username
+from app.auth.auth_schemas import ProjectUserDict
 from app.db.enums import (
     ProjectRole,
     ProjectStatus,
@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 
 
 async def check_access(
-    user: AuthUser,
+    user: object,
     db: AsyncConnection,
     project_id: Optional[int] = None,
     role: Optional[ProjectRole] = None,
@@ -59,7 +59,7 @@ async def check_access(
         * MAPPER (or None): must have at least MAPPER role for the project.
     - `check_completed=True` blocks access to COMPLETED / ARCHIVED projects.
     """
-    user_sub = await get_uid(user)
+    user_sub = get_user_sub(user)
 
     # Global admin shortcut – no further checks
     async with db.cursor(row_factory=class_row(DbUser)) as cur:
@@ -119,7 +119,7 @@ async def check_access(
 
 
 async def super_admin(
-    auth_user: Annotated[AuthUser, Dependency(skip_validation=True)],
+    auth_user: Annotated[object, Dependency(skip_validation=True)],
     db: AsyncConnection,
 ) -> DbUser:
     """Super admin role, with access to all endpoints.
@@ -134,9 +134,8 @@ async def super_admin(
     if db_user:
         return db_user
 
-    log.error(
-        f"User {auth_user.username} requested an admin endpoint, but is not admin"
-    )
+    username = get_user_username(auth_user)
+    log.error("User %s requested an admin endpoint, but is not admin", username)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="User must be an administrator",
@@ -146,7 +145,7 @@ async def super_admin(
 async def wrap_check_access(
     project: DbProject,
     db: AsyncConnection,
-    user_data: AuthUser,
+    user_data: object,
     role: ProjectRole,
     check_completed: bool = False,
 ) -> ProjectUserDict:
@@ -165,7 +164,7 @@ async def wrap_check_access(
         # for public projects, but also blocking access for svcftm on
         # mapper frontend if the project is private. We must send 401 and
         # not 403 to make managing this easier
-        if user_data.username == "svcftm":
+        if get_user_username(user_data) == "svcftm":
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=msg)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=msg)
@@ -179,7 +178,7 @@ async def wrap_check_access(
 async def project_manager(
     project_id: int,
     db: AsyncConnection,
-    auth_user: AuthUser,
+    auth_user: object,
     check_completed: bool = False,
 ) -> ProjectUserDict:
     """Only allow access to project managers.
@@ -206,7 +205,7 @@ async def project_manager(
 async def mapper(
     project_id: int,
     db: AsyncConnection,
-    auth_user: AuthUser,
+    auth_user: object,
     check_completed: bool = False,
 ) -> ProjectUserDict:
     """Allow permission for mappers.
@@ -237,7 +236,7 @@ async def mapper(
     # If project is public, skip permission check
     if project.visibility == ProjectVisibility.PUBLIC:
         return {
-            "user": await DbUser.one(db, auth_user.sub),
+            "user": await DbUser.one(db, get_user_sub(auth_user)),
             "project": project,
         }
 
