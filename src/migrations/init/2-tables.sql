@@ -10,7 +10,7 @@ CREATE TABLE users (
     registered_at timestamp with time zone DEFAULT now(),
     last_login_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE users OWNER TO fieldtm;
+ALTER TABLE users OWNER TO current_user;
 
 
 CREATE TABLE template_xlsforms (
@@ -18,7 +18,7 @@ CREATE TABLE template_xlsforms (
     title character varying,
     xls bytea
 );
-ALTER TABLE template_xlsforms OWNER TO fieldtm;
+ALTER TABLE template_xlsforms OWNER TO current_user;
 CREATE SEQUENCE template_xlsforms_id_seq
 AS integer
 START WITH 1
@@ -26,7 +26,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE template_xlsforms_id_seq OWNER TO fieldtm;
+ALTER TABLE template_xlsforms_id_seq OWNER TO current_user;
 ALTER SEQUENCE template_xlsforms_id_seq
 OWNED BY template_xlsforms.id;
 -- Autoincrement PK
@@ -59,7 +59,7 @@ CREATE TABLE projects (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE projects OWNER TO fieldtm;
+ALTER TABLE projects OWNER TO current_user;
 CREATE SEQUENCE projects_id_seq
 AS integer
 START WITH 1
@@ -67,7 +67,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE projects_id_seq OWNER TO fieldtm;
+ALTER TABLE projects_id_seq OWNER TO current_user;
 ALTER SEQUENCE projects_id_seq OWNED BY projects.id;
 -- Autoincrement PK
 ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval(
@@ -80,7 +80,7 @@ CREATE TABLE user_roles (
     project_id integer NOT NULL,
     role projectrole NOT NULL DEFAULT 'MAPPER'
 );
-ALTER TABLE user_roles OWNER TO fieldtm;
+ALTER TABLE user_roles OWNER TO current_user;
 
 
 CREATE TABLE api_keys (
@@ -92,7 +92,7 @@ CREATE TABLE api_keys (
     last_used_at timestamp with time zone,
     is_active boolean NOT NULL DEFAULT TRUE
 );
-ALTER TABLE api_keys OWNER TO fieldtm;
+ALTER TABLE api_keys OWNER TO current_user;
 CREATE SEQUENCE api_keys_id_seq
 AS integer
 START WITH 1
@@ -100,7 +100,7 @@ INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE api_keys_id_seq OWNER TO fieldtm;
+ALTER TABLE api_keys_id_seq OWNER TO current_user;
 ALTER SEQUENCE api_keys_id_seq OWNED BY api_keys.id;
 -- Autoincrement PK
 ALTER TABLE ONLY api_keys ALTER COLUMN id SET DEFAULT nextval(
