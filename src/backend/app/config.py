@@ -246,6 +246,22 @@ class Settings(BaseSettings):
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
 
+    @field_validator("QFIELDCLOUD_URL", mode="after")
+    @classmethod
+    def append_qfc_api_path(cls, value: Optional[str]) -> Optional[str]:
+        """Normalise QFieldCloud URL to always end with /api/v1/.
+
+        Users provide the base domain (e.g. https://qfc.example.com) and the
+        API path is appended automatically, consistent with how ODK_CENTRAL_URL
+        is handled (where /v1 is appended by the PyODK library).
+        """
+        if not value:
+            return value
+        value = value.rstrip("/")
+        if not value.endswith("/api/v1"):
+            value = f"{value}/api/v1"
+        return f"{value}/"
+
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
     # NOTE www is required for now
