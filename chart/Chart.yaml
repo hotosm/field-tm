@@ -9,9 +9,3 @@ maintainers:
   name: Sam Woodcock
 home: https://github.com/hotosm/field-tm/tree/main/chart
 icon: https://field.hotosm.org/favicon.png
-dependencies:
-  - name: postgresql
-    version: 15.2.2
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: db.enabled
-    alias: db

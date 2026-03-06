@@ -1,0 +1,121 @@
+# Local dev overrides for single-cluster testing (for example Talos).
+#
+# Usage:
+#   helm upgrade --install field-tm ./chart \
+#     --namespace field-tm \
+#     --create-namespace \
+#     -f chart/values.local.yaml
+#
+# Access from localhost:
+#   kubectl -n field-tm port-forward svc/field-tm 8000:8000
+
+domain: localhost
+
+image:
+  tag: debug
+  pullPolicy: Always
+
+backend:
+  ingress:
+    enabled: false
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  # Override debug-image default CMD (which references /opt/tests) for k8s.
+  command:
+    - uvicorn
+  args:
+    - app.main:api
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+    - --workers
+    - "1"
+    - --log-level
+    - critical
+    - --no-access-log
+
+  # Don't require secret creation for local dev.
+  extraEnvFrom:
+    - secretRef:
+        name: db-ftm-vars
+        optional: true
+    - secretRef:
+        name: api-ftm-vars
+        optional: true
+
+  # Required runtime env vars for local startup when api-ftm-vars is absent.
+  extraEnv:
+    - name: ENCRYPTION_KEY
+      value: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+    - name: OSM_CLIENT_ID
+      value: local-dev
+    - name: OSM_CLIENT_SECRET
+      value: local-dev
+    - name: OSM_SECRET_KEY
+      value: local-dev
+
+db:
+  enabled: true
+  auth:
+    username: fieldtm
+    password: fieldtm
+    database: fieldtm
+  primary:
+    podSecurityContext:
+      fsGroup: 999
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
+    persistence:
+      enabled: false
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+  runAsUser: 1001
+
+initSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+dbCheckSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  seccompProfile:
+    type: RuntimeDefault

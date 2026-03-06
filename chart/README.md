@@ -13,7 +13,7 @@ kubectl create namespace field-tm
 kubectl 
 ```
 
-- **db-ftm-vars** for postgres database
+- **db-ftm-vars** for backend database settings (optional when `db.enabled=true`)
 
   - key: FTM_DB_HOST
   - key: FTM_DB_USER
@@ -22,7 +22,7 @@ kubectl
 
   ```bash
   kubectl create secret generic db-ftm-vars --namespace field-tm \
-    --from-literal=FTM_DB_HOST=fieldtm-db.field-tm.svc.cluster.local \
+    --from-literal=FTM_DB_HOST=your-db-hostname \
     --from-literal=FTM_DB_USER=xxxxxxx \
     --from-literal=FTM_DB_PASSWORD=xxxxxxx \
     --from-literal=FTM_DB_NAME=xxxxxxx
@@ -51,6 +51,10 @@ kubectl
 helm upgrade --install field-tm oci://ghcr.io/hotosm/field-tm --namespace field-tm
 ```
 
+By default the chart expects an external database (`db.enabled=false`).
+Set `db.enabled=true` to run an in-cluster PostGIS database.
+When `db.enabled=false`, provide `FTM_DB_HOST` via your DB secret/env.
+
 Chart values can be overridden using `values.yaml` or the `--set` flag.
 
 ```bash
@@ -59,3 +63,27 @@ helm upgrade --install field-tm . \
   --set image.pullPolicy="Always" \
   --set domain="some.new.domain"
 ```
+
+## Local cluster override (no ingress)
+
+For local dev clusters (for example Talos), use the included override file:
+
+```bash
+helm upgrade --install field-tm ./chart \
+  --namespace field-tm \
+  --create-namespace \
+  -f chart/values.local.yaml
+```
+
+This disables ingress, keeps the service as `ClusterIP`, enables bundled PostGIS
+(`db.enabled=true`), and sets stricter pod/container security contexts for local
+Talos-style `restricted` policies.
+It also includes local fallback env vars so `api-ftm-vars` secret creation is optional.
+Access the app locally with:
+
+```bash
+kubectl -n field-tm port-forward svc/field-tm 8000:8000
+```
+
+`values.local.yaml` also overrides backend command/args so the `debug` image
+can run in Kubernetes without requiring a `/opt/tests` directory.
