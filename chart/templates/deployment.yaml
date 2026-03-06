@@ -71,13 +71,13 @@ spec:
           {{- end }}
           env:
             {{- if .Values.db.enabled }}
-            - name: POSTGRES_HOST
+            - name: FTM_DB_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: POSTGRES_USER
+            - name: FTM_DB_USER
               value: {{ .Values.db.auth.username | quote }}
-            - name: POSTGRES_PASSWORD
+            - name: FTM_DB_PASSWORD
               value: {{ .Values.db.auth.password | quote }}
-            - name: POSTGRES_DB
+            - name: FTM_DB_NAME
               value: {{ .Values.db.auth.database | quote }}
             {{- end }}
             {{- range $key, $val := .Values.env }}
@@ -124,13 +124,13 @@ spec:
               value: "localhost"
               {{- end }}
             {{- if .Values.db.enabled }}
-            - name: POSTGRES_HOST
+            - name: FTM_DB_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: POSTGRES_USER
+            - name: FTM_DB_USER
               value: {{ .Values.db.auth.username | quote }}
-            - name: POSTGRES_PASSWORD
+            - name: FTM_DB_PASSWORD
               value: {{ .Values.db.auth.password | quote }}
-            - name: POSTGRES_DB
+            - name: FTM_DB_NAME
               value: {{ .Values.db.auth.database | quote }}
             {{- end }}
             {{- range $key, $val := .Values.env }}
