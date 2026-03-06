@@ -504,7 +504,7 @@ dependencies = [
     { name = "geojson" },
     { name = "geojson-aoi-parser" },
     { name = "geojson-pydantic" },
-    { name = "litestar" },
+    { name = "litestar", extra = ["jinja"] },
     { name = "markdown" },
     { name = "minio" },
     { name = "osm-fieldwork" },
@@ -571,7 +571,7 @@ requires-dist = [
     { name = "geojson", specifier = "==3.1.0" },
     { name = "geojson-aoi-parser", specifier = ">=0.3.5" },
     { name = "geojson-pydantic", specifier = "==1.1.2" },
-    { name = "litestar", specifier = "==2.19.0" },
+    { name = "litestar", extras = ["jinja"], specifier = "==2.19.0" },
     { name = "markdown", specifier = "==3.8" },
     { name = "minio", specifier = "==7.2.9" },
     { name = "osm-fieldwork", editable = "packages/osm-fieldwork" },
@@ -890,6 +890,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/25/1c/2cf555f8c4236a1db2a4f1492143ab1132c4b5e7f2e7c1e41ee931f57d2b/litestar-2.19.0.tar.gz", hash = "sha256:c2663a7f48a7ed273615260c23fc76dbef2ca0d539ece25318772b737470c531", size = 373938, upload-time = "2025-12-14T13:53:28.425Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/12/9a/fdba1ee34c24811592faba859b377d13457e48c37fbe07d88bd74a36d1f0/litestar-2.19.0-py3-none-any.whl", hash = "sha256:849971d097a6118f81235531fc0f342d797bd29d9aef9c23230559f124d16247", size = 565733, upload-time = "2025-12-14T13:53:26.706Z" },
+]
+
+[package.optional-dependencies]
+jinja = [
+    { name = "jinja2" },
 ]
 
 [[package]]
