@@ -443,6 +443,8 @@ services:
   qfield-app:
     <<: *qfield-common
     depends_on:
+      qfield-db:
+        condition: service_healthy
       s3-init:
         condition: service_completed_successfully
     ports:
