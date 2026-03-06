@@ -21,7 +21,7 @@ jobs:
       context: src
       build_target: ci
       image_tags: |
-        "ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}"
+        "ghcr.io/${{ github.repository }}:ci-${{ github.ref_name }}"
 
   invalidate-cache:
     runs-on: ubuntu-latest

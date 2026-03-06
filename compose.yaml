@@ -199,7 +199,7 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}"
     build:
       context: src
       target: "${TARGET_OVERRIDE:-debug}"
@@ -356,7 +356,7 @@ services:
     restart: "on-failure:2"
 
   migrations:
-    image: "ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}"
+    image: "ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}"
     depends_on:
       fieldtm-db:
         condition: service_healthy

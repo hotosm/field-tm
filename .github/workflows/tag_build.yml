@@ -13,6 +13,6 @@ jobs:
     with:
       context: src
       build_target: prod
-      image_name: ghcr.io/${{ github.repository }}/backend
+      image_name: ghcr.io/${{ github.repository }}
       multi_arch: true
 # Frontend is not built as build variables are required
