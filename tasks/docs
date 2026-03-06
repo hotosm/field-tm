@@ -1,0 +1,93 @@
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list docs
+
+# Generate OpenAPI JSON from Litestar app into docs/openapi/openapi.json
+[no-cd]
+openapi:
+  #!/usr/bin/env sh
+  set -eu
+
+  # First ensure api image is built
+  just build backend
+
+  repo_root="$(git rev-parse --show-toplevel)"
+  cd "$repo_root"
+  mkdir -p docs/openapi
+  [ -f .env ] || touch .env
+
+  ENCRYPTION_KEY="pIxxYIXe4oAVHI36lTveyc97FKK2O_l2VHeiuqU-K_4=" \
+  DEBUG="False" \
+  FTM_DOMAIN="field.localhost" \
+  OSM_CLIENT_ID="x" \
+  OSM_CLIENT_SECRET="y" \
+  OSM_SECRET_KEY="z" \
+  docker compose run --rm --entrypoint python api -c \
+    "import json; from app.main import api; print(json.dumps(api.openapi_schema.to_schema(), separators=(',', ':')))" \
+    > docs/openapi/openapi.json
+  docker compose down
+  echo "Generated docs/openapi/openapi.json"
+
+# Build MkDocs static site in a publishable directory
+[no-cd]
+build output_dir="site":
+  #!/usr/bin/env sh
+  set -eu
+
+  repo_root="$(git rev-parse --show-toplevel)"
+  cd "$repo_root"
+  just docs openapi
+
+  rm -rf "{{ output_dir }}"
+  mkdir -p "{{ output_dir }}"
+
+  docker run --rm \
+    -v "$PWD:/work" \
+    -w /work \
+    --entrypoint=/bin/sh \
+    ghcr.io/hotosm/gh-workflows/mkdocs:main \
+      -c "\
+        git config --global --add safe.directory /work \
+        && mkdocs build --config-file mkdocs.yml --site-dir {{ output_dir }}
+      "
+
+# Run docs website locally in a container
+[no-cd]
+serve:
+  #!/usr/bin/env sh
+  set -eu
+
+  repo_root="$(git rev-parse --show-toplevel)"
+  cd "$repo_root"
+  just docs openapi
+
+  docker run --rm -it \
+    -p "8000:8000" \
+    -v "$PWD:/work" \
+    -w /work \
+    --entrypoint=/bin/sh \
+    ghcr.io/hotosm/gh-workflows/mkdocs:main \
+      -c "\
+        git config --global --add safe.directory /work \
+        && mkdocs serve --config-file mkdocs.yml --dev-addr 0.0.0.0:8000 \
+      "
+
+# Build publishable docs bundle
+[no-cd]
+publish output_dir="site":
+  #!/usr/bin/env sh
+  set -eu
+
+  just docs openapi
+  just docs build "{{ output_dir }}"
+
+  docker run --rm \
+    -v "$PWD:/work" \
+    -w /work \
+    --entrypoint=/bin/sh \
+    ghcr.io/hotosm/gh-workflows/mkdocs:main \
+      -c "\
+        git config --global --add safe.directory /work \
+        && mkdocs gh-deploy --force --clean \
+      "

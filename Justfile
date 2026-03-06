@@ -26,6 +26,7 @@ mod config 'tasks/config'
 mod manage 'tasks/manage'
 mod prep 'tasks/prep'
 mod chart 'tasks/chart'
+mod docs 'tasks/docs'
 
 # List available commands
 [private]
@@ -57,13 +58,6 @@ bump-osm-fieldwork:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
   uv --project packages/osm-fieldwork --directory packages/osm-fieldwork run cz bump --check-consistency
-
-# Run docs website locally
-docs:
-  #!/usr/bin/env sh
-  cd {{justfile_directory()}}/src/backend
-  uv sync --group docs
-  uv run mkdocs serve --config-file ../../mkdocs.yml --dev-addr 0.0.0.0:3000
 
 # Echo to terminal with blue colour
 [no-cd]
