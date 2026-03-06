@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  pytest:
+  docs:
     uses: hotosm/gh-workflows/.github/workflows/just.yml@3.3.2
     with:
       environment: "test"
