@@ -228,7 +228,7 @@ def set_otel_logger(endpoint: str):
 
     logger_provider = LoggerProvider(resource=Resource.create({}))
     set_logger_provider(logger_provider)
-    otlp_log_exporter = OTLPLogExporter()
+    otlp_log_exporter = OTLPLogExporter(endpoint=endpoint)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_log_exporter))
 
     otel_log_handler = FormattedLoggingHandler(logger_provider=logger_provider)
@@ -246,12 +246,8 @@ def set_otel_logger(endpoint: str):
     logging.getLogger().addHandler(otel_log_handler)
 
 
-def instrument_app_otel(app: Litestar):
-    """Add OpenTelemetry LiteStar instrumentation.
-
-    Only used if environment variables configured.
-    """
+def get_otel_plugin():
+    """Return an OpenTelemetry LiteStar plugin instance."""
     from litestar.contrib.opentelemetry import OpenTelemetryConfig, OpenTelemetryPlugin
 
-    open_telemetry_config = OpenTelemetryConfig()
-    app.plugins.append(OpenTelemetryPlugin(open_telemetry_config))
+    return OpenTelemetryPlugin(OpenTelemetryConfig())

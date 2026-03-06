@@ -32,7 +32,8 @@ from app.db.database import close_db_connection_pool, db_conn, get_db_connection
 from app.db.models import DbUser
 from app.monitoring import (
     add_endpoint_profiler,
-    instrument_app_otel,
+    get_otel_plugin,
+    set_otel_logger,
     set_otel_tracer,
     set_sentry_otel_tracer,
 )
@@ -282,6 +283,16 @@ def create_app() -> Litestar:
     from app.qfield.qfield_routes import qfield_router
     from app.users.user_routes import user_router
 
+    plugins = [PydanticPlugin(), HTMXPlugin()]
+
+    if settings.MONITORING == MonitoringTypes.SENTRY:
+        log.info("Adding Sentry OpenTelemetry monitoring config")
+        set_sentry_otel_tracer(settings.monitoring_config.SENTRY_DSN)
+        plugins.append(get_otel_plugin())
+    elif settings.MONITORING == MonitoringTypes.OPENOBSERVE:
+        log.info("Adding OpenObserve OpenTelemetry monitoring config")
+        plugins.append(get_otel_plugin())
+
     app = Litestar(
         route_handlers=[
             root_router,
@@ -293,7 +304,7 @@ def create_app() -> Litestar:
             central_router,
             htmx_router,
         ],
-        plugins=[PydanticPlugin(), HTMXPlugin()],
+        plugins=plugins,
         on_startup=[get_db_connection_pool, server_init, create_local_admin_user],
         on_shutdown=[close_db_connection_pool],
         cors_config=_build_cors_config(),
@@ -315,14 +326,10 @@ def create_app() -> Litestar:
     if settings.DEBUG:
         add_endpoint_profiler(app)
 
-    if settings.MONITORING == MonitoringTypes.SENTRY:
-        log.info("Adding Sentry OpenTelemetry monitoring config")
-        set_sentry_otel_tracer(settings.monitoring_config.SENTRY_DSN)
-        instrument_app_otel(app)
-    elif settings.MONITORING == MonitoringTypes.OPENOBSERVE:
-        log.info("Adding OpenObserve OpenTelemetry monitoring config")
-        set_otel_tracer(app, settings.monitoring_config.otel_exporter_otpl_endpoint)
-        instrument_app_otel(app)
+    if settings.MONITORING == MonitoringTypes.OPENOBSERVE:
+        otel_endpoint = settings.monitoring_config.otel_exporter_otpl_endpoint
+        set_otel_tracer(app, otel_endpoint)
+        set_otel_logger(otel_endpoint)
 
     return app
 

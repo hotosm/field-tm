@@ -25,8 +25,6 @@ import string
 from asyncio import gather
 from contextlib import suppress
 from io import BytesIO, StringIO
-from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import Optional, Union
 from uuid import UUID, uuid4
 
@@ -48,7 +46,6 @@ from app.helpers.geometry_utils import (
     javarosa_to_geojson_geom,
 )
 from app.projects import project_schemas
-from app.s3 import strip_presigned_url_for_local_dev
 
 log = logging.getLogger(__name__)
 
@@ -1205,79 +1202,6 @@ async def create_project_manager_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create ODK Central manager user.",
         ) from e
-
-
-async def upload_form_media(
-    xform_id: str,
-    project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentral,
-    media_attachments: dict[str, BytesIO],
-):
-    """Upload form media attachments to ODK."""
-    attachment_filepaths = []
-
-    # Write all uploaded data to temp files for upload (required by PyODK)
-    # We must use TemporaryDir and preserve the uploaded file names
-    with TemporaryDirectory() as temp_dir:
-        for file_name, file_data in media_attachments.items():
-            temp_path = Path(temp_dir) / file_name
-            with open(temp_path, "wb") as temp_file:
-                temp_file.write(file_data.getvalue())
-            attachment_filepaths.append(temp_path)
-
-        async with central_deps.pyodk_client(odk_credentials) as client:
-            return client.forms.update(
-                project_id=project_odk_id,
-                form_id=xform_id,
-                attachments=attachment_filepaths,
-            )
-
-
-async def get_form_media(
-    xform_id: str,
-    project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentral,
-):
-    """Get a list of form media attachments with their URLs."""
-    async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
-        form_attachment_urls = await async_odk_form.getFormAttachmentUrls(
-            project_odk_id,
-            xform_id,
-        )
-
-    # Remove any entries where the value is None
-    form_attachment_urls = {
-        filename: url
-        for filename, url in form_attachment_urls.items()
-        if url is not None
-    }
-
-    if settings.DEBUG:
-        form_attachment_urls = {
-            filename: strip_presigned_url_for_local_dev(url)
-            for filename, url in form_attachment_urls.items()
-        }
-
-    return form_attachment_urls
-
-
-async def list_form_media(
-    xform_id: str,
-    project_odk_id: int,
-    odk_credentials: central_schemas.ODKCentral,
-) -> list[dict]:
-    """Return a list of form media required for upload.
-
-    Format:
-        [
-            {'name': '1731673738156.jpg', 'exists': False},
-        ]
-    """
-    async with central_deps.get_async_odk_form(odk_credentials) as async_odk_form:
-        return await async_odk_form.listFormAttachments(
-            project_odk_id,
-            xform_id,
-        )
 
 
 async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
