@@ -134,7 +134,7 @@ services:
       retries: 10
 
   api:
-    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH}"
     volumes:
       - ftm_logs:/opt/logs
     depends_on:
@@ -166,7 +166,7 @@ services:
           memory: 100M
 
   migrations:
-    image: "ghcr.io/hotosm/field-tm/backend:${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH}"
     depends_on:
       proxy:
         condition: service_healthy

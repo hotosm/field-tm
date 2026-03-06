@@ -33,10 +33,10 @@ all: backend
 backend:
   # Consider caching
   # cache_to:
-  #   - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+  #   - type=registry,ref=ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}
   #   - type=gha
   # cache_from:
-  #   - type=registry,ref=ghcr.io/hotosm/field-tm/backend:${TAG_OVERRIDE:-debug}
+  #   - type=registry,ref=ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}
   #   - type=gha
   COMPOSE_BAKE=true {{docker}} compose build api
 
