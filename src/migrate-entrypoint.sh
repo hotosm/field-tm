@@ -65,7 +65,7 @@ wait_for_db() {
 create_db_schema_if_missing() {
     table_exists=$(psql -t "$db_url" -c "
         SELECT EXISTS (SELECT 1 FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_name = 'projects');
+        WHERE table_schema = current_schema() AND table_name = 'projects');
     " | tr -d '[:space:]')  # Remove all whitespace and formatting characters
     echo "Debug: return from table_exists query: $table_exists"
 
@@ -89,16 +89,16 @@ create_migrations_table_if_missing() {
     psql "$db_url" <<SQL
     DO \$\$
     BEGIN
-        CREATE TABLE public."_migrations" (
+        CREATE TABLE "_migrations" (
             script_name text,
             date_executed timestamp without time zone,
             CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name)
         );
-        ALTER TABLE IF EXISTS public."_migrations" OWNER TO fieldtm;
+        ALTER TABLE IF EXISTS "_migrations" OWNER TO fieldtm;
         RAISE NOTICE 'Table "_migrations" successfully added to database.';
     EXCEPTION
         WHEN OTHERS THEN
-            RAISE NOTICE 'Table "migrations" already exists. Skipping...';    
+            RAISE NOTICE 'Table "migrations" already exists. Skipping...';
     END\$\$;
 SQL
 }
@@ -106,7 +106,7 @@ SQL
 check_if_missing_migrations() {
     # Get the list of existing migration script names from the migrations table
     existing_scripts=$(psql -t "$db_url" -c "
-        SELECT script_name FROM public.\"_migrations\" ORDER BY date_executed ASC;
+        SELECT script_name FROM \"_migrations\" ORDER BY date_executed ASC;
     ")
     echo "Existing migrations: ${existing_scripts}"
 
@@ -143,7 +143,7 @@ execute_migrations() {
         && psql "$db_url" <<SQL
     DO \$\$
     BEGIN
-        INSERT INTO public."_migrations" (date_executed, script_name)
+        INSERT INTO "_migrations" (date_executed, script_name)
         VALUES (NOW(), '$script_name');
         RAISE NOTICE 'Successfully applied migration: $script_name';
     EXCEPTION

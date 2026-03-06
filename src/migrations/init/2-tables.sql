@@ -1,4 +1,4 @@
-CREATE TABLE public.users (
+CREATE TABLE users (
     sub character varying NOT NULL,
     username character varying,
     is_admin boolean DEFAULT FALSE,
@@ -10,35 +10,35 @@ CREATE TABLE public.users (
     registered_at timestamp with time zone DEFAULT now(),
     last_login_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE public.users OWNER TO fieldtm;
+ALTER TABLE users OWNER TO fieldtm;
 
 
-CREATE TABLE public.template_xlsforms (
+CREATE TABLE template_xlsforms (
     id integer NOT NULL,
     title character varying,
     xls bytea
 );
-ALTER TABLE public.template_xlsforms OWNER TO fieldtm;
-CREATE SEQUENCE public.template_xlsforms_id_seq
+ALTER TABLE template_xlsforms OWNER TO fieldtm;
+CREATE SEQUENCE template_xlsforms_id_seq
 AS integer
 START WITH 1
 INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.template_xlsforms_id_seq OWNER TO fieldtm;
-ALTER SEQUENCE public.template_xlsforms_id_seq
-OWNED BY public.template_xlsforms.id;
+ALTER TABLE template_xlsforms_id_seq OWNER TO fieldtm;
+ALTER SEQUENCE template_xlsforms_id_seq
+OWNED BY template_xlsforms.id;
 -- Autoincrement PK
-ALTER TABLE ONLY public.template_xlsforms
+ALTER TABLE ONLY template_xlsforms
 ALTER COLUMN id SET DEFAULT nextval(
-    'public.template_xlsforms_id_seq'::regclass
+    'template_xlsforms_id_seq'::regclass
 );
 
 
-CREATE TABLE public.projects (
+CREATE TABLE projects (
     id integer NOT NULL,
-    field_mapping_app public.fieldmappingapp DEFAULT 'QField',
+    field_mapping_app fieldmappingapp DEFAULT 'QField',
     external_project_instance_url character varying,
     external_project_id character varying,
     external_project_username character varying,
@@ -48,9 +48,9 @@ CREATE TABLE public.projects (
     description character varying,
     slug character varying,
     location_str character varying,
-    outline public.GEOMETRY (GEOMETRY, 4326),
-    status public.projectstatus NOT NULL DEFAULT 'DRAFT',
-    visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
+    outline GEOMETRY (GEOMETRY, 4326),
+    status projectstatus NOT NULL DEFAULT 'DRAFT',
+    visibility projectvisibility NOT NULL DEFAULT 'PUBLIC',
     xlsform_content bytea,
     data_extract_geojson JSONB,
     task_areas_geojson JSONB,
@@ -59,31 +59,31 @@ CREATE TABLE public.projects (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
-ALTER TABLE public.projects OWNER TO fieldtm;
-CREATE SEQUENCE public.projects_id_seq
+ALTER TABLE projects OWNER TO fieldtm;
+CREATE SEQUENCE projects_id_seq
 AS integer
 START WITH 1
 INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.projects_id_seq OWNER TO fieldtm;
-ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
+ALTER TABLE projects_id_seq OWNER TO fieldtm;
+ALTER SEQUENCE projects_id_seq OWNED BY projects.id;
 -- Autoincrement PK
-ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
-    'public.projects_id_seq'::regclass
+ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval(
+    'projects_id_seq'::regclass
 );
 
 
-CREATE TABLE public.user_roles (
+CREATE TABLE user_roles (
     user_sub character varying NOT NULL,
     project_id integer NOT NULL,
-    role public.projectrole NOT NULL DEFAULT 'MAPPER'
+    role projectrole NOT NULL DEFAULT 'MAPPER'
 );
-ALTER TABLE public.user_roles OWNER TO fieldtm;
+ALTER TABLE user_roles OWNER TO fieldtm;
 
 
-CREATE TABLE public.api_keys (
+CREATE TABLE api_keys (
     id integer NOT NULL,
     user_sub character varying NOT NULL,
     key_hash character varying NOT NULL,
@@ -92,17 +92,17 @@ CREATE TABLE public.api_keys (
     last_used_at timestamp with time zone,
     is_active boolean NOT NULL DEFAULT TRUE
 );
-ALTER TABLE public.api_keys OWNER TO fieldtm;
-CREATE SEQUENCE public.api_keys_id_seq
+ALTER TABLE api_keys OWNER TO fieldtm;
+CREATE SEQUENCE api_keys_id_seq
 AS integer
 START WITH 1
 INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.api_keys_id_seq OWNER TO fieldtm;
-ALTER SEQUENCE public.api_keys_id_seq OWNED BY public.api_keys.id;
+ALTER TABLE api_keys_id_seq OWNER TO fieldtm;
+ALTER SEQUENCE api_keys_id_seq OWNED BY api_keys.id;
 -- Autoincrement PK
-ALTER TABLE ONLY public.api_keys ALTER COLUMN id SET DEFAULT nextval(
-    'public.api_keys_id_seq'::regclass
+ALTER TABLE ONLY api_keys ALTER COLUMN id SET DEFAULT nextval(
+    'api_keys_id_seq'::regclass
 );

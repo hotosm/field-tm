@@ -53,7 +53,7 @@ CREATE TABLE clusteredbuildings AS (
     SELECT * FROM clusteredbuildings
 );
 -- ALTER TABLE clusteredbuildings ADD PRIMARY KEY(osm_id);
-SELECT POPULATE_GEOMETRY_COLUMNS('public.clusteredbuildings'::regclass);
+SELECT POPULATE_GEOMETRY_COLUMNS('clusteredbuildings'::regclass);
 CREATE INDEX clusteredbuildings_idx
 ON clusteredbuildings
 USING gist (geom);

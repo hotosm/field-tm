@@ -1,23 +1,20 @@
-ALTER TABLE ONLY public.users
+ALTER TABLE ONLY users
 ADD CONSTRAINT users_pkey PRIMARY KEY (sub);
 
-ALTER TABLE ONLY public.projects
+ALTER TABLE ONLY projects
 ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.user_invites
-ADD CONSTRAINT user_invites_pkey PRIMARY KEY (token);
-
-ALTER TABLE ONLY public.template_xlsforms
+ALTER TABLE ONLY template_xlsforms
 ADD CONSTRAINT xlsforms_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.template_xlsforms
+ALTER TABLE ONLY template_xlsforms
 ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
 
-ALTER TABLE ONLY public.user_roles
+ALTER TABLE ONLY user_roles
 ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_sub, project_id);
 
-ALTER TABLE ONLY public.api_keys
+ALTER TABLE ONLY api_keys
 ADD CONSTRAINT api_keys_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.api_keys
+ALTER TABLE ONLY api_keys
 ADD CONSTRAINT api_keys_key_hash_key UNIQUE (key_hash);

@@ -132,7 +132,7 @@ END $$;
 -- Make that index column a primary key
 ALTER TABLE polygonsnocount ADD PRIMARY KEY (polyid);
 -- Properly register geometry column (makes QGIS happy)
-SELECT POPULATE_GEOMETRY_COLUMNS('public.polygonsnocount'::regclass);
+SELECT POPULATE_GEOMETRY_COLUMNS('polygonsnocount'::regclass);
 -- Add a spatial index (vastly improves performance for a lot of operations)
 CREATE INDEX polygonsnocount_idx
 ON polygonsnocount

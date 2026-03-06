@@ -1,22 +1,22 @@
-CREATE TYPE public.fieldmappingapp AS ENUM ('QField', 'ODK', 'FieldTM');
-ALTER TYPE public.fieldmappingapp OWNER TO fieldtm;
+CREATE TYPE fieldmappingapp AS ENUM ('QField', 'ODK', 'FieldTM');
+ALTER TYPE fieldmappingapp OWNER TO fieldtm;
 
-CREATE TYPE public.projectstatus AS ENUM (
+CREATE TYPE projectstatus AS ENUM (
     'ARCHIVED',
     'PUBLISHED',
     'DRAFT',
     'COMPLETED'
 );
-ALTER TYPE public.projectstatus OWNER TO fieldtm;
+ALTER TYPE projectstatus OWNER TO fieldtm;
 
-CREATE TYPE public.projectvisibility AS ENUM (
+CREATE TYPE projectvisibility AS ENUM (
     'PUBLIC',
     'PRIVATE'
 );
-ALTER TYPE public.projectvisibility OWNER TO fieldtm;
+ALTER TYPE projectvisibility OWNER TO fieldtm;
 
-CREATE TYPE public.projectrole AS ENUM (
+CREATE TYPE projectrole AS ENUM (
     'MAPPER',
     'PROJECT_MANAGER'
 );
-ALTER TYPE public.projectrole OWNER TO fieldtm;
+ALTER TYPE projectrole OWNER TO fieldtm;
