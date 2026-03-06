@@ -1,16 +1,16 @@
 1. Get the application URL by running these commands:
-{{- if .Values.backend.ingress.enabled }}
-  http{{ if .Values.backend.ingress.tls.enabled }}s{{ end }}://{{ .Values.backend.ingress.host }}
-{{- else if contains "NodePort" .Values.backend.service.type }}
+{{- if .Values.ingress.enabled }}
+  http{{ if .Values.ingress.tls.enabled }}s{{ end }}://{{ .Values.ingress.host }}
+{{- else if contains "NodePort" .Values.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "field-tm.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.backend.service.type }}
+{{- else if contains "LoadBalancer" .Values.service.type }}
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
            You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "field-tm.fullname" . }}'
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "field-tm.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.backend.service.port }}
-{{- else if contains "ClusterIP" .Values.backend.service.type }}
-  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "field-tm.fullname" . }} {{ .Values.backend.service.port }}:{{ .Values.backend.service.port }}
-  echo "Visit http://localhost:{{ .Values.backend.service.port }} to use your application"
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "field-tm.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+  echo "Visit http://localhost:{{ .Values.service.port }} to use your application"
 {{- end }}
