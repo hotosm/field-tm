@@ -61,23 +61,18 @@ generate-dotenv branch="dev":
   cd {{justfile_directory()}}
   just manage _install_envsubst
 
-  # Check if .env already exists and warn, but continue
   if [ -f .env ]; then
-    just _echo-yellow "'.env' file already exists. Skipping dotenv generation to avoid overwriting."
+    just _echo-yellow "'.env' already exists. Skipping generation."
   else
     # Generate a .env file from .env.example, substituting values from environment
     ./envsubst -i .env.example | grep -vE '^\s*#|^\s*$' > .env
   fi
 
-  # Re-export .env to the environment, with cleaned variables
+  # Export all variables from .env into the environment
   if [ -f .env ]; then
-      while IFS= read -r line; do
-          # Remove surrounding quotes (single or double)
-          clean_line=$(echo "$line" | sed -E 's/^([^=]+)=(["'\'']?)(.*)\2$/\1=\3/')
-          var_name=$(echo "$clean_line" | cut -d= -f1)
-          var_value=$(echo "$clean_line" | cut -d= -f2-)
-          export "$var_name=$var_value"
-      done < .env
+    set -a
+    . ./.env
+    set +a
   fi
 
   # Generate compose file (default dev, but can be overridden)
