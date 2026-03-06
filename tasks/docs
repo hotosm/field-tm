@@ -9,17 +9,15 @@ openapi:
   #!/usr/bin/env sh
   set -eu
 
-  # First ensure api image is built
+  # Ensure a .env file is present
+  just config generate-dotenv
+
+  # Ensure api image is built
   just build backend
 
-  repo_root="$(git rev-parse --show-toplevel)"
-  cd "$repo_root"
+  cd {{justfile_directory()}}
   mkdir -p docs/openapi
-  [ -f .env ] || touch .env
 
-  ENCRYPTION_KEY="pIxxYIXe4oAVHI36lTveyc97FKK2O_l2VHeiuqU-K_4=" \
-  DEBUG="False" \
-  FTM_DOMAIN="field.localhost" \
   OSM_CLIENT_ID="x" \
   OSM_CLIENT_SECRET="y" \
   OSM_SECRET_KEY="z" \
@@ -35,8 +33,7 @@ build output_dir="site":
   #!/usr/bin/env sh
   set -eu
 
-  repo_root="$(git rev-parse --show-toplevel)"
-  cd "$repo_root"
+  cd {{justfile_directory()}}
   just docs openapi
 
   rm -rf "{{ output_dir }}"
@@ -58,8 +55,7 @@ serve:
   #!/usr/bin/env sh
   set -eu
 
-  repo_root="$(git rev-parse --show-toplevel)"
-  cd "$repo_root"
+  cd {{justfile_directory()}}
   just docs openapi
 
   docker run --rm -it \
