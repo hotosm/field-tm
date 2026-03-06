@@ -13,19 +13,19 @@ image:
   tag: ""
 
 backend:
-  # Override the DB host when using an external database instead of the bundled PostgreSQL.
-  # When db.enabled is true, the host is automatically derived from the release name.
-  dbHostOverride: ""
-
   # Secrets to load env vars from. The following keys are expected:
-  #   db-ftm-vars: FTM_DB_USER, FTM_DB_PASSWORD, FTM_DB_NAME
   #   api-ftm-vars: ENCRYPTION_KEY, OSM_CLIENT_ID, OSM_CLIENT_SECRET, OSM_SECRET_KEY,
   #                  ODK_CENTRAL_URL, ODK_CENTRAL_PUBLIC_URL, ODK_CENTRAL_USER, ODK_CENTRAL_PASSWD
+  # Optional:
+  #   db-ftm-vars: FTM_DB_HOST, FTM_DB_USER, FTM_DB_PASSWORD, FTM_DB_NAME
+  # Bundled db.enabled=true injects FTM_DB_* directly from db.auth values.
   extraEnvFrom:
     - secretRef:
         name: db-ftm-vars
+        optional: true
     - secretRef:
         name: api-ftm-vars
+  extraEnv: []
 
   service:
     type: ClusterIP
@@ -83,26 +83,29 @@ backend:
   #   mountPath: "/etc/foo"
   #   readOnly: true
 
+  # Optional command/args override for main backend container.
+  command: []
+  args: []
+
 db:
-  # This can be disabled, but an external database must be configured, with Postgis
-  enabled: true
+  # Default is to use an external database; enable for local/in-cluster PostGIS.
+  enabled: false
   image:
-    registry: docker.io
-    repository: bitnami/postgresql
-    tag: 14-debian-12
+    repository: postgis/postgis
+    tag: 18-3.6
+    pullPolicy: IfNotPresent
+  # TODO this is mostly for local dev, so do we need secret based config?
   auth:
-    enablePostgresUser: false
     username: fieldtm
+    password: fieldtm
     database: fieldtm
-    # Must contain keys postgres-password and password
-    existingSecret: db-ftm-vars
-    secretKeys:
-      userPasswordKey: FTM_DB_PASSWORD
-  initdb:
-    scripts:
-      01-enable-postgis.sql: |
-        CREATE EXTENSION IF NOT EXISTS postgis;
+  command:
+    - -c
+    - max_connections=300
   primary:
+    podSecurityContext: {}
+    securityContext: {}
+    dataMountPath: /var/lib/postgresql
     resources:
       limits:
         cpu: 2000m
@@ -110,6 +113,10 @@ db:
       requests:
         cpu: 500m
         memory: 500Mi
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClassName: ""
 
 imagePullSecrets: []
 nameOverride: ""
@@ -130,7 +137,6 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
 
 securityContext:
   # capabilities:
@@ -139,6 +145,9 @@ securityContext:
   # readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1001
+
+initSecurityContext: {}
+dbCheckSecurityContext: {}
 
 nodeSelector: {}
 

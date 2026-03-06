@@ -60,3 +60,17 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Database service name.
+*/}}
+{{- define "field-tm.dbServiceName" -}}
+{{- printf "%s-db" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Database service DNS name inside the cluster.
+*/}}
+{{- define "field-tm.dbServiceHost" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "field-tm.dbServiceName" .) .Release.Namespace -}}
+{{- end }}

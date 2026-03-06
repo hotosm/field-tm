@@ -4,6 +4,7 @@ metadata:
   name: {{ include "field-tm.fullname" . }}
   labels:
     {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
 spec:
   {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -11,6 +12,7 @@ spec:
   selector:
     matchLabels:
       {{- include "field-tm.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,6 +21,7 @@ spec:
       {{- end }}
       labels:
         {{- include "field-tm.labels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -28,21 +31,33 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "field-tm.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         {{- if .Values.db.enabled }}
         - name: db-check
-          image: {{ .Values.db.image.registry }}/{{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}
+          image: "{{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}"
           imagePullPolicy: IfNotPresent
+          {{- with .Values.dbCheckSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: FTM_DB_HOST
-              value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
+              value: {{ include "field-tm.dbServiceHost" . | quote }}
+            - name: FTM_DB_USER
+              value: {{ .Values.db.auth.username | quote }}
+            - name: FTM_DB_PASSWORD
+              value: {{ .Values.db.auth.password | quote }}
+            - name: FTM_DB_NAME
+              value: {{ .Values.db.auth.database | quote }}
           command:
             - /bin/bash
             - -c
             - |
-              until pg_isready -h "$FTM_DB_HOST"; do
+              until pg_isready -h "$FTM_DB_HOST" -U "$FTM_DB_USER" -d "$FTM_DB_NAME"; do
                   echo "waiting for database to be ready";
                   sleep 2;
               done;
@@ -50,18 +65,46 @@ spec:
         - name: migrations
           image: "{{ .Values.image.repository }}/backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.initSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.db.enabled }}
           env:
             - name: FTM_DB_HOST
-              value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
+              value: {{ include "field-tm.dbServiceHost" . | quote }}
+            - name: FTM_DB_USER
+              value: {{ .Values.db.auth.username | quote }}
+            - name: FTM_DB_PASSWORD
+              value: {{ .Values.db.auth.password | quote }}
+            - name: FTM_DB_NAME
+              value: {{ .Values.db.auth.database | quote }}
+            {{- with .Values.backend.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- else if .Values.backend.extraEnv }}
+          env:
+            {{- toYaml .Values.backend.extraEnv | nindent 12 }}
+          {{- end }}
           envFrom:
             {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}
           command: ["/migrate-entrypoint.sh"]
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.image.repository }}/backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.backend.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.backend.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.backend.service.port }}
@@ -75,8 +118,19 @@ spec:
           env:
             - name: FTM_DOMAIN
               value: {{ .Values.domain | quote }}
+            {{- if .Values.db.enabled }}
             - name: FTM_DB_HOST
-              value: {{ if .Values.backend.dbHostOverride }}{{ .Values.backend.dbHostOverride | quote }}{{ else }}{{ printf "%s-db" .Release.Name | quote }}{{ end }}
+              value: {{ include "field-tm.dbServiceHost" . | quote }}
+            - name: FTM_DB_USER
+              value: {{ .Values.db.auth.username | quote }}
+            - name: FTM_DB_PASSWORD
+              value: {{ .Values.db.auth.password | quote }}
+            - name: FTM_DB_NAME
+              value: {{ .Values.db.auth.database | quote }}
+            {{- end }}
+            {{- with .Values.backend.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           envFrom:
             {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}
           volumeMounts:

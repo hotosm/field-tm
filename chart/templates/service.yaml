@@ -13,3 +13,4 @@ spec:
       name: http
   selector:
     {{- include "field-tm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
