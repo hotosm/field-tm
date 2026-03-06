@@ -3,6 +3,6 @@
 -- Start a transaction
 BEGIN;
 -- Delete all records
-DELETE FROM public._migrations;
+DELETE FROM _migrations;
 -- Commit the transaction
 COMMIT;

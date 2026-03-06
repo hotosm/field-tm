@@ -11,7 +11,7 @@ CREATE TABLE dumpedpoints AS (
         (ST_DUMPPOINTS(ST_SEGMENTIZE(cb.geom, 0.00004))).geom AS geom
     FROM clusteredbuildings AS cb
 );
-SELECT POPULATE_GEOMETRY_COLUMNS('public.dumpedpoints'::regclass);
+SELECT POPULATE_GEOMETRY_COLUMNS('dumpedpoints'::regclass);
 CREATE INDEX dumpedpoints_idx
 ON dumpedpoints
 USING gist (geom);

@@ -14,7 +14,7 @@ CREATE TABLE buildings AS (
 
 
 -- Properly register geometry column (makes QGIS happy)
-SELECT POPULATE_GEOMETRY_COLUMNS('public.buildings'::regclass);
+SELECT POPULATE_GEOMETRY_COLUMNS('buildings'::regclass);
 -- Add a spatial index (vastly improves performance for a lot of operations)
 CREATE INDEX buildings_idx
 ON buildings
@@ -40,7 +40,7 @@ CREATE TABLE splitpolygons AS (
     SELECT * FROM polygonsfeaturecount
 );
 ALTER TABLE splitpolygons ADD PRIMARY KEY (polyid);
-SELECT POPULATE_GEOMETRY_COLUMNS('public.splitpolygons'::regclass);
+SELECT POPULATE_GEOMETRY_COLUMNS('splitpolygons'::regclass);
 CREATE INDEX splitpolygons_idx
 ON splitpolygons
 USING gist (geom);
