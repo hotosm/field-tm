@@ -117,7 +117,11 @@ spec:
             {{- toYaml .Values.backend.resources | nindent 12 }}
           env:
             - name: FTM_DOMAIN
-              value: {{ .Values.domain | quote }}
+              {{- if .Values.backend.ingress.enabled }}
+              value: {{ required "backend.ingress.host is required when backend.ingress.enabled=true" .Values.backend.ingress.host | quote }}
+              {{- else }}
+              value: "localhost"
+              {{- end }}
             {{- if .Values.db.enabled }}
             - name: FTM_DB_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}

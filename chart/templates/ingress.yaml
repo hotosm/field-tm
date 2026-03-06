@@ -1,9 +1,7 @@
 {{- if .Values.backend.ingress.enabled -}}
 {{- $fullName := include "field-tm.fullname" . -}}
 {{- $svcPort := .Values.backend.service.port -}}
-{{- if not (hasKey .Values.backend.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.backend.ingress.annotations "kubernetes.io/ingress.class" .Values.backend.ingress.className}}
-{{- end }}
+{{- $host := required "backend.ingress.host is required when backend.ingress.enabled=true" .Values.backend.ingress.host -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -16,18 +14,14 @@ metadata:
   {{- end }}
 spec:
   ingressClassName: {{ .Values.backend.ingress.className }}
-  {{- if .Values.backend.ingress.tls }}
+  {{- if .Values.backend.ingress.tls.enabled }}
   tls:
-    {{- range .Values.backend.ingress.tls }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
+        - {{ $host | quote }}
+      secretName: {{ .Values.backend.ingress.tls.secretName | default (printf "%s-tls" $host) | quote }}
   {{- end }}
   rules:
-    - host: {{ .Values.domain | quote }}
+    - host: {{ $host | quote }}
       http:
         paths:
           - path: /

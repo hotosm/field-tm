@@ -9,8 +9,6 @@
 # Access from localhost:
 #   kubectl -n field-tm port-forward svc/field-tm 8000:8000
 
-domain: localhost
-
 image:
   tag: debug
   pullPolicy: Always

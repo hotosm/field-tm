@@ -1,6 +1,6 @@
 1. Get the application URL by running these commands:
 {{- if .Values.backend.ingress.enabled }}
-  http{{ if $.Values.backend.ingress.tls }}s{{ end }}://{{ .Values.domain }}
+  http{{ if .Values.backend.ingress.tls.enabled }}s{{ end }}://{{ .Values.backend.ingress.host }}
 {{- else if contains "NodePort" .Values.backend.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "field-tm.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
@@ -11,8 +11,6 @@
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "field-tm.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .Values.backend.service.port }}
 {{- else if contains "ClusterIP" .Values.backend.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "field-tm.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "field-tm.fullname" . }} {{ .Values.backend.service.port }}:{{ .Values.backend.service.port }}
+  echo "Visit http://localhost:{{ .Values.backend.service.port }} to use your application"
 {{- end }}

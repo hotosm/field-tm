@@ -4,8 +4,6 @@
 
 replicaCount: 1
 
-domain: field.localhost
-
 image:
   repository: ghcr.io/hotosm/field-tm
   pullPolicy: IfNotPresent
@@ -33,14 +31,18 @@ backend:
 
   ingress:
     enabled: true
-    className: ""
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+    className: nginx
+    # Public hostname for the service. Required when ingress is enabled.
+    # This is also used to set the FTM_DOMAIN environment variable.
+    # When ingress is disabled (e.g. local dev via port-forward), FTM_DOMAIN
+    # automatically defaults to "localhost".
+    host: field.localhost
+    annotations: {}
+    # TLS configuration. Set enabled: true for HTTPS.
+    # secretName defaults to "<host>-tls" if left empty (useful with cert-manager).
+    tls:
+      enabled: false
+      secretName: ""
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
