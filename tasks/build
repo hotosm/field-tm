@@ -45,7 +45,7 @@ backend:
 backend-dev:
   COMPOSE_BAKE=true \
   TARGET_OVERRIDE=prod TAG_OVERRIDE=dev \
-    {{docker}} compose build api
+    {{docker}} compose build --build-arg MONITORING=yes api
 
 # Set 'dc' alias for docker compose
 alias:
