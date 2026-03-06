@@ -63,9 +63,9 @@ wait_for_db() {
 }
 
 create_db_schema_if_missing() {
+    # to_regclass respects search_path and returns NULL if not found (no schema hardcoding)
     table_exists=$(psql -t "$db_url" -c "
-        SELECT EXISTS (SELECT 1 FROM information_schema.tables
-        WHERE table_schema = current_schema() AND table_name = 'projects');
+        SELECT (to_regclass('projects') IS NOT NULL);
     " | tr -d '[:space:]')  # Remove all whitespace and formatting characters
     echo "Debug: return from table_exists query: $table_exists"
 
@@ -86,20 +86,13 @@ create_db_schema_if_missing() {
 
 create_migrations_table_if_missing() {
     echo "Creating _migrations table if not exists."
-    psql "$db_url" <<SQL
-    DO \$\$
-    BEGIN
-        CREATE TABLE "_migrations" (
-            script_name text,
-            date_executed timestamp without time zone,
-            CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name)
-        );
-        ALTER TABLE IF EXISTS "_migrations" OWNER TO fieldtm;
-        RAISE NOTICE 'Table "_migrations" successfully added to database.';
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE NOTICE 'Table "migrations" already exists. Skipping...';
-    END\$\$;
+    psql "$db_url" --set ON_ERROR_STOP=1 <<SQL
+    CREATE TABLE IF NOT EXISTS "_migrations" (
+        script_name text,
+        date_executed timestamp without time zone,
+        CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name)
+    );
+    ALTER TABLE IF EXISTS "_migrations" OWNER TO current_user;
 SQL
 }
 
@@ -140,16 +133,10 @@ execute_migrations() {
         # add an entry in the migrations table to indicate completion
         envsubst < "$script_file" | psql "$db_url" \
             --set ON_ERROR_STOP=1 --echo-all \
-        && psql "$db_url" <<SQL
-    DO \$\$
-    BEGIN
-        INSERT INTO "_migrations" (date_executed, script_name)
-        VALUES (NOW(), '$script_name');
-        RAISE NOTICE 'Successfully applied migration: $script_name';
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE NOTICE 'Failed to add migration to database: $script_name';
-    END\$\$;
+        && psql "$db_url" --set ON_ERROR_STOP=1 <<SQL
+    INSERT INTO "_migrations" (date_executed, script_name)
+    VALUES (NOW(), '$script_name')
+    ON CONFLICT (script_name) DO NOTHING;
 SQL
     done
 }
