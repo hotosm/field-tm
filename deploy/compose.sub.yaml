@@ -180,11 +180,11 @@ services:
     restart: "on-failure:2"
 
   fieldtm-db:
-    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
+    image: "ghcr.io/hotosm/postgis:18-3.6-alpine"
     # Low max_connections for better performance.
     # See https://richyen.com/postgres/2021/09/03/less-is-more-max-connections.html
     # and other sources online. Approx (cores * 4)
-    command: -c 'max_connections=64' -c 'wal_level=logical'
+    command: -c 'max_connections=64'
     volumes:
       - ftm_db_data:/var/lib/postgresql/data/
     environment:

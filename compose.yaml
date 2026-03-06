@@ -371,9 +371,9 @@ services:
 
   fieldtm-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
-    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
+    image: "ghcr.io/hotosm/postgis:18-3.6-alpine"
     volumes:
-      - ftm_db_data:/var/lib/postgresql/data/
+      - ftm_db_data:/var/lib/postgresql/
     environment:
       - POSTGRES_USER=${FTM_DB_USER:-fieldtm}
       - POSTGRES_PASSWORD=${FTM_DB_PASSWORD:-fieldtm}
@@ -385,7 +385,7 @@ services:
     restart: "unless-stopped"
     # We don't need to optimise connections like the prod deploy here.
     # Conversely, we increase connections for test runners.
-    command: -c 'max_connections=300' -c 'wal_level=logical'
+    command: -c 'max_connections=300'
     healthcheck:
       test: pg_isready -U ${FTM_DB_USER:-fieldtm} -d ${FTM_DB_NAME:-fieldtm}
       start_period: 5s
@@ -418,9 +418,9 @@ services:
 
   qfield-db:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
-    image: "ghcr.io/hotosm/postgis:16-3.5-alpine"
+    image: "ghcr.io/hotosm/postgis:18-3.6-alpine"
     volumes:
-      - qfield_db_data:/var/lib/postgresql/data/
+      - qfield_db_data:/var/lib/postgresql/
     environment:
       - POSTGRES_USER=${FTM_DB_USER:-fieldtm}
       - POSTGRES_PASSWORD=${FTM_DB_PASSWORD:-fieldtm}
