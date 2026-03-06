@@ -1,24 +1,24 @@
-{{- if .Values.backend.ingress.enabled -}}
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "field-tm.fullname" . -}}
-{{- $svcPort := .Values.backend.service.port -}}
-{{- $host := required "backend.ingress.host is required when backend.ingress.enabled=true" .Values.backend.ingress.host -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $host := required "ingress.host is required when ingress.enabled=true" .Values.ingress.host -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
     {{- include "field-tm.labels" . | nindent 4 }}
-  {{- with .Values.backend.ingress.annotations }}
+  {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.backend.ingress.className }}
-  {{- if .Values.backend.ingress.tls.enabled }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ $host | quote }}
-      secretName: {{ .Values.backend.ingress.tls.secretName | default (printf "%s-tls" $host) | quote }}
+      secretName: {{ .Values.ingress.tls.secretName | default (printf "%s-tls" $host) | quote }}
   {{- end }}
   rules:
     - host: {{ $host | quote }}

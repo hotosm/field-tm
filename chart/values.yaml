@@ -10,84 +10,76 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-backend:
-  # Secrets to load env vars from. The following keys are expected:
-  #   api-ftm-vars: ENCRYPTION_KEY, OSM_CLIENT_ID, OSM_CLIENT_SECRET, OSM_SECRET_KEY,
-  #                  ODK_CENTRAL_URL, ODK_CENTRAL_PUBLIC_URL, ODK_CENTRAL_USER, ODK_CENTRAL_PASSWD
-  # Optional:
-  #   db-ftm-vars: FTM_DB_HOST, FTM_DB_USER, FTM_DB_PASSWORD, FTM_DB_NAME
-  # Bundled db.enabled=true injects FTM_DB_* directly from db.auth values.
-  extraEnvFrom:
-    - secretRef:
-        name: db-ftm-vars
-        optional: true
-    - secretRef:
-        name: api-ftm-vars
-  extraEnv: []
+# Reference to an existing secret containing environment variables.
+existingSecret:
+  name: ""
 
-  service:
-    type: ClusterIP
-    port: 8000
+# Environment variables to set on the backend container (and migrations init container).
+env: {}
 
-  ingress:
-    enabled: true
-    className: nginx
-    # Public hostname for the service. Required when ingress is enabled.
-    # This is also used to set the FTM_DOMAIN environment variable.
-    # When ingress is disabled (e.g. local dev via port-forward), FTM_DOMAIN
-    # automatically defaults to "localhost".
-    host: field.localhost
-    annotations: {}
-    # TLS configuration. Set enabled: true for HTTPS.
-    # secretName defaults to "<host>-tls" if left empty (useful with cert-manager).
-    tls:
-      enabled: false
-      secretName: ""
+service:
+  type: ClusterIP
+  port: 8000
 
-  resources: {}
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
-
-  livenessProbe:
-    httpGet:
-      path: /__lbheartbeat__
-      port: http
-  readinessProbe:
-    httpGet:
-      path: /__lbheartbeat__
-      port: http
-
-  autoscaling:
+ingress:
+  enabled: false
+  className: nginx
+  # Public hostname for the service. Required when ingress is enabled.
+  # This is also used to set the FTM_DOMAIN environment variable.
+  # When ingress is disabled (e.g. local dev via port-forward), FTM_DOMAIN
+  # automatically defaults to "localhost".
+  host: field.localhost
+  annotations: {}
+  # TLS configuration. Set enabled: true for HTTPS.
+  # secretName defaults to "<host>-tls" if left empty (useful with cert-manager).
+  tls:
     enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
+    secretName: ""
 
-  # Additional volumes on the output Deployment definition.
-  volumes: []
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-  # Additional volumeMounts on the output Deployment definition.
-  volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+livenessProbe:
+  httpGet:
+    path: /__lbheartbeat__
+    port: http
+readinessProbe:
+  httpGet:
+    path: /__lbheartbeat__
+    port: http
 
-  # Optional command/args override for main backend container.
-  command: []
-  args: []
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+# Optional command/args override for main backend container.
+command: []
+args: []
 
 db:
   # Default is to use an external database; enable for local/in-cluster PostGIS.

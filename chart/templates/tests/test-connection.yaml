@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "field-tm.fullname" . }}:{{ .Values.backend.service.port }}']
+      args: ['{{ include "field-tm.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

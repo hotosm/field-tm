@@ -6,7 +6,7 @@ metadata:
     {{- include "field-tm.labels" . | nindent 4 }}
     app.kubernetes.io/component: backend
 spec:
-  {{- if not .Values.backend.autoscaling.enabled }}
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
@@ -45,19 +45,19 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            - name: FTM_DB_HOST
+            - name: POSTGRES_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
+            - name: POSTGRES_USER
               value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
+            - name: POSTGRES_PASSWORD
               value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
+            - name: POSTGRES_DB
               value: {{ .Values.db.auth.database | quote }}
           command:
             - /bin/bash
             - -c
             - |
-              until pg_isready -h "$FTM_DB_HOST" -U "$FTM_DB_USER" -d "$FTM_DB_NAME"; do
+              until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
                   echo "waiting for database to be ready";
                   sleep 2;
               done;
@@ -69,25 +69,26 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.db.enabled }}
           env:
-            - name: FTM_DB_HOST
+            {{- if .Values.db.enabled }}
+            - name: POSTGRES_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
+            - name: POSTGRES_USER
               value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
+            - name: POSTGRES_PASSWORD
               value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
+            - name: POSTGRES_DB
               value: {{ .Values.db.auth.database | quote }}
-            {{- with .Values.backend.extraEnv }}
-            {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- else if .Values.backend.extraEnv }}
-          env:
-            {{- toYaml .Values.backend.extraEnv | nindent 12 }}
-          {{- end }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+          {{- if .Values.existingSecret.name }}
           envFrom:
-            {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}
+            - secretRef:
+                name: {{ .Values.existingSecret.name | quote }}
+          {{- end }}
           command: ["/migrate-entrypoint.sh"]
       containers:
         - name: {{ .Chart.Name }}
@@ -97,51 +98,55 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}/backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.backend.command }}
+          {{- with .Values.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.backend.args }}
+          {{- with .Values.args }}
           args:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.backend.service.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.backend.readinessProbe | nindent 12 }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.backend.resources | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: FTM_DOMAIN
-              {{- if .Values.backend.ingress.enabled }}
-              value: {{ required "backend.ingress.host is required when backend.ingress.enabled=true" .Values.backend.ingress.host | quote }}
+              {{- if .Values.ingress.enabled }}
+              value: {{ required "ingress.host is required when ingress.enabled=true" .Values.ingress.host | quote }}
               {{- else }}
               value: "localhost"
               {{- end }}
             {{- if .Values.db.enabled }}
-            - name: FTM_DB_HOST
+            - name: POSTGRES_HOST
               value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
+            - name: POSTGRES_USER
               value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
+            - name: POSTGRES_PASSWORD
               value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
+            - name: POSTGRES_DB
               value: {{ .Values.db.auth.database | quote }}
             {{- end }}
-            {{- with .Values.backend.extraEnv }}
-            {{- toYaml . | nindent 12 }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
             {{- end }}
+          {{- if .Values.existingSecret.name }}
           envFrom:
-            {{- toYaml .Values.backend.extraEnvFrom | nindent 12 }}
+            - secretRef:
+                name: {{ .Values.existingSecret.name | quote }}
+          {{- end }}
           volumeMounts:
-          {{- with .Values.backend.volumeMounts }}
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.backend.volumes }}
+      {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
