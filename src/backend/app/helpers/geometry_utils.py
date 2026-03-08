@@ -18,17 +18,13 @@
 """GeoJSON and geometry helper functions."""
 
 import logging
+import types
 from typing import Optional, Union
 
 import geojson
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from pyproj import Geod
-from shapely.geometry import (
-    Point,
-    mapping,
-    shape,
-)
 
 log = logging.getLogger(__name__)
 
@@ -49,17 +45,56 @@ def geojson_area_km2(geojson_geom: dict) -> float:
 
     Uses the WGS84 ellipsoid for accurate results regardless of location.
     """
-    geom = shape(geojson_geom)
     geod = Geod(ellps="WGS84")
-    area_m2 = abs(geod.geometry_area_perimeter(geom)[0])
-    return area_m2 / 1_000_000
+    geom_type = geojson_geom.get("type", "")
+    coords = geojson_geom.get("coordinates", [])
+    total_area_m2 = 0.0
+    if geom_type == "Polygon":
+        outer_ring = coords[0] if coords else []
+        lons = [c[0] for c in outer_ring]
+        lats = [c[1] for c in outer_ring]
+        area, _ = geod.polygon_area_perimeter(lons, lats)
+        total_area_m2 = abs(area)
+    elif geom_type == "MultiPolygon":
+        for polygon in coords:
+            outer_ring = polygon[0] if polygon else []
+            lons = [c[0] for c in outer_ring]
+            lats = [c[1] for c in outer_ring]
+            area, _ = geod.polygon_area_perimeter(lons, lats)
+            total_area_m2 += abs(area)
+    return total_area_m2 / 1_000_000
 
 
 async def polygon_to_centroid(
     polygon: geojson.Polygon,
-) -> Point:
-    """Convert GeoJSON to shapely geometry."""
-    return shape(polygon).centroid
+) -> types.SimpleNamespace:
+    """Compute the centroid of a GeoJSON Polygon using the shoelace formula."""
+    coords = polygon.get("coordinates", [[]])[0]
+    n = len(coords)
+    if n < 3:
+        lons = [c[0] for c in coords]
+        lats = [c[1] for c in coords]
+        cx = sum(lons) / n if n else 0.0
+        cy = sum(lats) / n if n else 0.0
+        return types.SimpleNamespace(x=cx, y=cy)
+    area = 0.0
+    cx = 0.0
+    cy = 0.0
+    for i in range(n - 1):
+        xi, yi = coords[i][0], coords[i][1]
+        xi1, yi1 = coords[i + 1][0], coords[i + 1][1]
+        cross = xi * yi1 - xi1 * yi
+        area += cross
+        cx += (xi + xi1) * cross
+        cy += (yi + yi1) * cross
+    area /= 2.0
+    if abs(area) < 1e-10:
+        lons = [c[0] for c in coords]
+        lats = [c[1] for c in coords]
+        return types.SimpleNamespace(x=sum(lons) / n, y=sum(lats) / n)
+    cx /= 6.0 * area
+    cy /= 6.0 * area
+    return types.SimpleNamespace(x=cx, y=cy)
 
 
 def featcol_keep_single_geom_type(
@@ -261,31 +296,35 @@ def multigeom_to_singlegeom(
 ) -> geojson.FeatureCollection:
     """Converts any Multi(xxx) geometry types to individual geometries."""
 
-    def split_multigeom(geom, properties):
+    def split_multigeom(geom: dict, properties: dict) -> list:
         """Split multi-geometries into individual geometries."""
+        geom_type = geom["type"]
+        if geom_type == "GeometryCollection":
+            return [
+                geojson.Feature(geometry=sub_geom, properties=properties)
+                for sub_geom in geom.get("geometries", [])
+            ]
+        single_type = geom_type[5:]  # Strip "Multi" prefix
         return [
-            geojson.Feature(geometry=mapping(single_geom), properties=properties)
-            for single_geom in geom.geoms
+            geojson.Feature(
+                geometry={"type": single_type, "coordinates": part},
+                properties=properties,
+            )
+            for part in geom.get("coordinates", [])
         ]
 
     final_features = []
 
     for feature in featcol.get("features", []):
         properties = feature.get("properties", {})
-        try:
-            geom = shape(feature["geometry"])
-        except ValueError:
-            log.warning(f"Geometry is not valid, so was skipped: {feature['geometry']}")
+        geom = feature.get("geometry")
+        if geom is None:
+            log.warning(f"Feature has no geometry, skipping: {feature}")
             continue
-
-        if geom.geom_type.startswith("Multi"):
+        geom_type = geom.get("type", "")
+        if geom_type.startswith("Multi") or geom_type == "GeometryCollection":
             final_features.extend(split_multigeom(geom, properties))
         else:
-            final_features.append(
-                geojson.Feature(
-                    geometry=mapping(geom),
-                    properties=properties,
-                )
-            )
+            final_features.append(geojson.Feature(geometry=geom, properties=properties))
 
     return geojson.FeatureCollection(final_features)

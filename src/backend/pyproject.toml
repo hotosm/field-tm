@@ -33,7 +33,6 @@ dependencies = [
     "python-multipart==0.0.22",
     "psycopg[c,pool]==3.3.3",
     "geojson==3.1.0",
-    "shapely==2.0.6",
     "pyxform==4.0.0",
     "pyproj==3.7.0",
     "cryptography==43.0.3",

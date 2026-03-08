@@ -27,8 +27,6 @@ import geojson
 from geojson import Feature, FeatureCollection, GeoJSON
 from osm_data_client import get_osm_data
 from psycopg import Connection
-from shapely.geometry import Polygon, box, shape
-from shapely.ops import unary_union
 
 from area_splitter import SplittingAlgorithm, algorithms_path
 from area_splitter.db import (
@@ -288,10 +286,10 @@ class AreaSplitter:
         Returns:
             instance (AreaSplitter): An instance of this class
         """
-        # Parse AOI, merge if multiple geometries
+        # Parse AOI, extract geometry dict
         if aoi_obj:
-            geojson = self.input_to_geojson(aoi_obj)
-            self.aoi = self.geojson_to_shapely_polygon(geojson)
+            geojson_data = self.input_to_geojson(aoi_obj)
+            self.aoi = self._extract_aoi_geometry(geojson_data)
 
         # Init split features
         self.split_features = None
@@ -353,16 +351,16 @@ class AreaSplitter:
         return FeatureCollection(features)
 
     @staticmethod
-    def geojson_to_shapely_polygon(
-        geojson: Union[FeatureCollection, Feature, dict],
-    ) -> Polygon:
-        """Parse GeoJSON and return shapely Polygon.
+    def _extract_aoi_geometry(
+        geojson_data: Union[FeatureCollection, Feature, dict],
+    ) -> dict:
+        """Extract the GeoJSON geometry dict from a FeatureCollection.
 
         The GeoJSON may be of type FeatureCollection, Feature, or Polygon,
-        but should only contain one Polygon geometry in total.
+        but should only contain one geometry in total.
         """
-        features = AreaSplitter.geojson_to_featcol(geojson).get("features", [])
-        log.debug("Converting AOI to Shapely geometry")
+        features = AreaSplitter.geojson_to_featcol(geojson_data).get("features", [])
+        log.debug("Extracting AOI geometry dict")
 
         if len(features) == 0:
             msg = "The input AOI contains no geometries."
@@ -373,7 +371,22 @@ class AreaSplitter:
             log.error(msg)
             raise ValueError(msg)
 
-        return shape(features[0].get("geometry"))
+        return features[0].get("geometry")
+
+    @staticmethod
+    def _polygon_bounds(geom_dict: dict) -> tuple[float, float, float, float]:
+        """Compute (xmin, ymin, xmax, ymax) from a GeoJSON Polygon geometry dict."""
+        geom_type = geom_dict.get("type", "")
+        coords = geom_dict.get("coordinates", [[]])
+        if geom_type == "Polygon":
+            outer_ring = coords[0] if coords else []
+        elif geom_type == "MultiPolygon":
+            outer_ring = [c for poly in coords for c in (poly[0] if poly else [])]
+        else:
+            outer_ring = []
+        lons = [c[0] for c in outer_ring]
+        lats = [c[1] for c in outer_ring]
+        return min(lons), min(lats), max(lons), max(lats)
 
     def meters_to_degrees(
         self, meters: float, reference_lat: float
@@ -427,7 +440,7 @@ class AreaSplitter:
 
     def _square_grid_axes(self, meters: int) -> tuple[list[float], list[float]]:
         """Build the x/y grid axes used for square splitting."""
-        xmin, ymin, xmax, ymax = self.aoi.bounds
+        xmin, ymin, xmax, ymax = self._polygon_bounds(self.aoi)
         reference_lat = (ymin + ymax) / 2
         length_deg, width_deg = self.meters_to_degrees(meters, reference_lat)
         cols = list(self.frange(xmin, xmax + width_deg, width_deg))
@@ -438,7 +451,7 @@ class AreaSplitter:
         self,
         extract_geojson: Optional[Union[dict, FeatureCollection]] = None,
     ) -> list:
-        """Return shapely geometries from the optional extract."""
+        """Return GeoJSON geometry dicts from the optional extract."""
         if not extract_geojson:
             return []
         features = (
@@ -446,45 +459,61 @@ class AreaSplitter:
             if isinstance(extract_geojson, dict)
             else extract_geojson.features
         )
-        return [shape(feature["geometry"]) for feature in features]
-
-    def _square_polygons_for_insert(
-        self,
-        cols: list[float],
-        rows: list[float],
-        extract_geoms: list,
-    ) -> list[tuple[str, str]]:
-        """Generate clipped grid polygons, filtered by extract geometry if present."""
-        polygons = []
-        for x in cols[:-1]:
-            for y in rows[:-1]:
-                grid_polygon = box(
-                    x, y, x + (cols[1] - cols[0]), y + (rows[1] - rows[0])
-                )
-                clipped_polygon = grid_polygon.intersection(self.aoi)
-                if clipped_polygon.is_empty:
-                    continue
-                if extract_geoms and not any(
-                    geom.centroid.within(clipped_polygon) for geom in extract_geoms
-                ):
-                    continue
-                polygons.append((clipped_polygon.wkt, clipped_polygon.wkt))
-        return polygons
+        return [feature["geometry"] for feature in features]
 
     def _insert_square_polygons(
         self,
         cur,
-        polygons: list[tuple[str, str]],
+        cols: list[float],
+        rows: list[float],
+        extract_geoms: list,
         meters: int,
     ) -> None:
-        """Insert generated polygons and merge small neighbors."""
-        insert_query = """
-                INSERT INTO temp_polygons (geom, area)
-                SELECT ST_GeomFromText(%s, 4326),
-                ST_Area(ST_GeomFromText(%s, 4326)::geography)
+        """Insert grid polygons clipped to AOI into temp_polygons, then merge small ones."""
+        # Build GeoJSON box strings in pure Python
+        boxes = []
+        for x in cols[:-1]:
+            for y in rows[:-1]:
+                x2 = x + (cols[1] - cols[0])
+                y2 = y + (rows[1] - rows[0])
+                box_geom = {
+                    "type": "Polygon",
+                    "coordinates": [[[x, y], [x2, y], [x2, y2], [x, y2], [x, y]]],
+                }
+                boxes.append(json.dumps(box_geom))
+
+        extract_geom_strs = [json.dumps(g) for g in extract_geoms]
+        has_extract = bool(extract_geom_strs)
+
+        cur.execute(
             """
-        if polygons:
-            cur.executemany(insert_query, polygons)
+            WITH
+              aoi AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326) AS geom),
+              boxes AS (
+                SELECT ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::text[])), 4326) AS cell
+              ),
+              clipped AS (
+                SELECT ST_Intersection(b.cell, a.geom) AS geom
+                FROM boxes b, aoi a
+                WHERE ST_Intersects(b.cell, a.geom)
+              )
+            INSERT INTO temp_polygons (geom, area)
+            SELECT c.geom, ST_Area(c.geom::geography)
+            FROM clipped c
+            WHERE NOT ST_IsEmpty(c.geom)
+            AND (
+              %s = FALSE
+              OR EXISTS (
+                SELECT 1 FROM unnest(%s::text[]) AS e(geom_json)
+                WHERE ST_Within(
+                  ST_Centroid(ST_SetSRID(ST_GeomFromGeoJSON(e.geom_json), 4326)),
+                  c.geom
+                )
+              )
+            )
+            """,
+            (json.dumps(self.aoi), boxes, has_extract, extract_geom_strs),
+        )
 
         area_threshold = 0.35 * (meters**2)
         cur.execute(
@@ -584,12 +613,12 @@ class AreaSplitter:
     def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
         """Insert the OSM extract into the temporary split tables."""
         for feature in osm_extract["features"]:
-            wkb_element = shape(feature["geometry"]).wkb_hex
+            geom_json = json.dumps(feature["geometry"])
             properties = feature.get("properties", {})
             tags = properties.get("tags", {}) if "tags" in properties else properties
             tags = _json_str_to_dict(tags).get("tags", _json_str_to_dict(tags))
             osm_id = properties.get("osm_id")
-            common_args = dict(osm_id=osm_id, geom=wkb_element, tags=tags)
+            common_args = dict(osm_id=osm_id, geom=geom_json, tags=tags)
 
             if tags.get("building") == "yes":
                 insert_geom(cur, "ways_poly", **common_args)
@@ -663,8 +692,7 @@ class AreaSplitter:
                 );
             """)
             extract_geoms = self._extract_split_geometries(extract_geojson)
-            polygons = self._square_polygons_for_insert(cols, rows, extract_geoms)
-            self._insert_square_polygons(cur, polygons, meters)
+            self._insert_square_polygons(cur, cols, rows, extract_geoms, meters)
             self.split_features = self._fetch_square_split_features(cur)
         return self.split_features
 
@@ -743,41 +771,63 @@ class AreaSplitter:
     def splitByFeature(  # noqa: N802
         self,
         features: FeatureCollection,
+        db: Union[str, Connection],
     ) -> FeatureCollection:
-        """Split the polygon by features in the database.
+        """Split the polygon by features using PostGIS.
 
         Args:
             features(FeatureCollection): FeatureCollection of features
                 to polygonise and return.
+            db (str, psycopg.Connection): The db url or connection object.
 
         Returns:
             data (FeatureCollection): A multipolygon of all the task boundaries.
         """
-        log.debug("Polygonising the FeatureCollection features")
-        geometries = self._feature_split_geometries(features)
-        multi_polygon = unary_union(geometries)
-        clipped_multi_polygon = multi_polygon.intersection(self.aoi)
-        polygon_features = self._polygon_features_from_clipped(clipped_multi_polygon)
-        self.split_features = FeatureCollection(features=polygon_features)
+        log.debug("Polygonising the FeatureCollection features via PostGIS")
+        conn = create_connection(db)
+        geom_dicts = self._feature_split_geometries(features)
+        geom_json_strs = [json.dumps(g) for g in geom_dicts]
 
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                WITH
+                  aoi AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326) AS geom),
+                  input_geoms AS (
+                    SELECT ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::text[])), 4326) AS geom
+                  ),
+                  unioned AS (SELECT ST_Union(geom) AS geom FROM input_geoms),
+                  clipped AS (
+                    SELECT ST_Intersection(u.geom, a.geom) AS geom
+                    FROM unioned u, aoi a
+                  ),
+                  dumped AS (SELECT (ST_Dump(geom)).geom AS geom FROM clipped)
+                SELECT jsonb_build_object(
+                  'type', 'FeatureCollection',
+                  'features', jsonb_agg(jsonb_build_object(
+                    'type', 'Feature',
+                    'geometry', ST_AsGeoJSON(geom)::jsonb,
+                    'properties', '{}'::jsonb
+                  ))
+                ) FROM dumped
+                """,
+                (json.dumps(self.aoi), geom_json_strs),
+            )
+            result = cur.fetchone()[0]
+
+        self.split_features = FeatureCollection(result.get("features", []))
         return self.split_features
 
     def _feature_split_geometries(self, features: FeatureCollection) -> list:
-        """Extract supported geometries for feature-based splitting."""
+        """Extract supported GeoJSON geometry dicts for feature-based splitting."""
         geometries = []
         for feature in features["features"]:
             geom = feature["geometry"]
             if geom["type"] in {"Polygon", "LineString"}:
-                geometries.append(shape(geom))
+                geometries.append(geom)
                 continue
             log.warning(f"Ignoring unsupported geometry type: {geom['type']}")
         return geometries
-
-    def _polygon_features_from_clipped(self, clipped_multi_polygon) -> list[Feature]:
-        """Convert clipped geometry collections into GeoJSON features."""
-        return [
-            Feature(geometry=polygon) for polygon in list(clipped_multi_polygon.geoms)
-        ]
 
     def outputGeojson(  # noqa: N802
         self,
@@ -938,6 +988,7 @@ def split_by_sql(
 
 def split_by_features(
     aoi: Union[str, FeatureCollection],
+    db: Union[str, Connection],
     db_table: Optional[str] = None,
     geojson_input: Optional[Union[str, FeatureCollection]] = None,
     outfile: Optional[str] = None,
@@ -952,6 +1003,9 @@ def split_by_features(
     Args:
         aoi(str, FeatureCollection): Input AOI, either a file path,
             GeoJSON string, or FeatureCollection object.
+        db (str, psycopg.Connection): The db url, format:
+            postgresql://myusername:mypassword@myhost:5432/mydatabase
+            OR an psycopg connection object that is reused.
         geojson_input(str, FeatureCollection): Path to input GeoJSON file,
             a valid FeatureCollection, or GeoJSON string.
         db_table(str): A database table containing features to split by.
@@ -970,6 +1024,7 @@ def split_by_features(
             feat_array,
             lambda index, feat: split_by_features(
                 FeatureCollection(features=[feat]),
+                db,
                 db_table,
                 input_featcol,
                 _outfile_variant(outfile, index),
@@ -977,7 +1032,7 @@ def split_by_features(
         )
 
     splitter = AreaSplitter(aoi_featcol)
-    split_features = _require_split_output(splitter.splitByFeature(input_featcol))
+    split_features = _require_split_output(splitter.splitByFeature(input_featcol, db))
     if outfile:
         splitter.outputGeojson(outfile)
     return split_features
@@ -1075,6 +1130,7 @@ be either the data extract used by the XLSForm, or a postgresql database.
     elif args.source and args.source[3:] != "PG:":
         split_by_features(
             args.boundary,
+            db=args.dburl,
             geojson_input=args.source,
             outfile=args.outfile,
         )
@@ -1082,6 +1138,7 @@ be either the data extract used by the XLSForm, or a postgresql database.
     elif args.source and args.source[3:] == "PG:":
         split_by_features(
             args.boundary,
+            db=args.dburl,
             db_table=args.source[:3],
             outfile=args.outfile,
         )

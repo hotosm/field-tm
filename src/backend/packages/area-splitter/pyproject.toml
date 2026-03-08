@@ -10,7 +10,6 @@ authors = [
 ]
 dependencies = [
     "geojson>=2.5.0",
-    "shapely>=1.8.1",
     "psycopg>=3.1.7",
     "raw-data-api-py>=0.3.0",
 ]
