@@ -154,7 +154,9 @@ async def _get_submitted_geojson_data(
         )
 
 
-def _normalize_geojson_response_body(result_geojson: dict) -> dict:
+async def _normalize_geojson_response_body(
+    db: AsyncConnection, result_geojson: dict
+) -> dict:
     """Build the JSON response body for validated GeoJSON, including area warnings."""
     response_body: dict = {"geojson": result_geojson}
     try:
@@ -165,7 +167,7 @@ def _normalize_geojson_response_body(result_geojson: dict) -> dict:
             features = geom.get("features", [])
             if features:
                 geom = features[0].get("geometry", features[0])
-        area_km2 = geojson_area_km2(geom)
+        area_km2 = await geojson_area_km2(db, geom)
         response_body["area_km2"] = round(area_km2, 2)
         if area_km2 > AREA_LIMIT_KM2:
             response_body["warning"] = (
@@ -1631,7 +1633,9 @@ async def validate_geojson(
         )
 
         return Response(
-            content=json.dumps(_normalize_geojson_response_body(result_geojson)),
+            content=json.dumps(
+                await _normalize_geojson_response_body(db, result_geojson)
+            ),
             media_type="application/json",
             status_code=200,
         )
