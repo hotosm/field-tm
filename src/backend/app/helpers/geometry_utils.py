@@ -17,13 +17,14 @@
 #
 """GeoJSON and geometry helper functions."""
 
+import json
 import logging
 import types
 from typing import Optional
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from pyproj import Geod
+from psycopg import AsyncConnection
 
 log = logging.getLogger(__name__)
 
@@ -41,29 +42,25 @@ AREA_WARN_KM2 = 100
 AREA_LIMIT_KM2 = 1000
 
 
-def geojson_area_km2(geojson_geom: dict) -> float:
-    """Calculate the geodesic area of a GeoJSON geometry in km².
+async def geojson_area_km2(db: AsyncConnection, geojson_geom: dict) -> float:
+    """Calculate the geodesic area of a GeoJSON geometry in km² using PostGIS.
 
-    Uses the WGS84 ellipsoid for accurate results regardless of location.
+    Uses ST_Area with the geography type for WGS84 spheroid accuracy.
     """
-    geod = Geod(ellps="WGS84")
     geom_type = geojson_geom.get("type", "")
-    coords = geojson_geom.get("coordinates", [])
-    total_area_m2 = 0.0
-    if geom_type == "Polygon":
-        outer_ring = coords[0] if coords else []
-        lons = [c[0] for c in outer_ring]
-        lats = [c[1] for c in outer_ring]
-        area, _ = geod.polygon_area_perimeter(lons, lats)
-        total_area_m2 = abs(area)
-    elif geom_type == "MultiPolygon":
-        for polygon in coords:
-            outer_ring = polygon[0] if polygon else []
-            lons = [c[0] for c in outer_ring]
-            lats = [c[1] for c in outer_ring]
-            area, _ = geod.polygon_area_perimeter(lons, lats)
-            total_area_m2 += abs(area)
-    return total_area_m2 / 1_000_000
+    if geom_type not in ("Polygon", "MultiPolygon"):
+        return 0.0
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+               SELECT ST_Area(ST_SetSRID(
+                   ST_GeomFromGeoJSON(%s), 4326
+                )::geography) / 1000000
+            """,
+            (json.dumps(geojson_geom),),
+        )
+        row = await cur.fetchone()
+    return float(row[0]) if row and row[0] is not None else 0.0
 
 
 async def polygon_to_centroid(

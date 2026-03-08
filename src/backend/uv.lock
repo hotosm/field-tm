@@ -463,7 +463,6 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyjwt" },
     { name = "pyodk" },
-    { name = "pyproj" },
     { name = "python-multipart" },
     { name = "pyxform" },
     { name = "qfieldcloud-sdk" },
@@ -521,7 +520,6 @@ requires-dist = [
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
     { name = "pyodk", specifier = ">=1.2.1" },
-    { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.22" },
     { name = "pyxform", specifier = "==4.0.0" },
     { name = "qfieldcloud-sdk", specifier = "==0.10.0" },
@@ -1745,23 +1743,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/4e/c4/ad3dafdba993c0ce8f137359e7faaa395856e3a2fb29ec0cd58dea0ffd1f/pyodk-1.2.1.tar.gz", hash = "sha256:1a535f983ca938da7bc714a453936abd5d811e9c84a4f1c277a1b4b8cb3b8fe4", size = 34309, upload-time = "2025-06-13T19:12:42.815Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/21/76/4f801b125cb48695f39df9302777e603966311c21df75ee379cf2ad72816/pyodk-1.2.1-py3-none-any.whl", hash = "sha256:b83d4d7a64c21d30866038e18a5491ef63cfbe53025c13f0051ce7a853de1e76", size = 43030, upload-time = "2025-06-13T19:12:41.594Z" },
-]
-
-[[package]]
-name = "pyproj"
-version = "3.7.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "certifi" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/47/c2/0572c8e31aebf0270f15f3368adebd10fc473de9f09567a0743a3bc41c8d/pyproj-3.7.0.tar.gz", hash = "sha256:bf658f4aaf815d9d03c8121650b6f0b8067265c36e31bc6660b98ef144d81813", size = 225577, upload-time = "2024-10-01T05:19:22.325Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bf/da/a17c452bea1ff4cd58d6dc573055b9c8fb6af114b7d2c694782aec770865/pyproj-3.7.0-cp313-cp313-macosx_12_0_x86_64.whl", hash = "sha256:94e8b903a9e83448fd2379c49dec3e8cd83c9ed36f54354e68b601cef56d5426", size = 6254898, upload-time = "2024-10-01T05:19:08.861Z" },
-    { url = "https://files.pythonhosted.org/packages/c2/31/ab07b389f2caa527c95ab2ea1940d28879bd2a19e67b2529cb3e94648d26/pyproj-3.7.0-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:64cb5c17d6f6305a8b978a40f95560c87c5b363fcac40632337955664437875a", size = 4628612, upload-time = "2024-10-01T05:21:40.998Z" },
-    { url = "https://files.pythonhosted.org/packages/1d/24/def3ded6529db3e3d8351ad73481730249ab57d8d876d502f86d7958ce06/pyproj-3.7.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2c54e9bdda7ab9c4a5af50f9d6e6ee7704e05fafd504896b96ed1208c7aea098", size = 6315895, upload-time = "2024-10-01T21:38:54.13Z" },
-    { url = "https://files.pythonhosted.org/packages/dd/14/07314f78302105d199fb25e73376d723efe9c2ef3906463aae209913a6d3/pyproj-3.7.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:24fa4e9e0abba875f9524808410cc520067eaf38fd5549ed0ef7c43ac39923c9", size = 9466144, upload-time = "2024-10-01T05:19:15.171Z" },
-    { url = "https://files.pythonhosted.org/packages/00/f2/2a116920db3496e3ff3c94d7d8d15da41374f35cfe1b9e79682eca500a61/pyproj-3.7.0-cp313-cp313-win32.whl", hash = "sha256:b9e8353fc3c79dc14d1f5ac758a1a6e4eee04102c3c0b138670f121f5ac52eb4", size = 5807180, upload-time = "2024-10-01T05:50:07.595Z" },
-    { url = "https://files.pythonhosted.org/packages/f8/33/3c8c6302717096b54aa14ccbb271045ba04629e21cbf348f2f2dc94f69b4/pyproj-3.7.0-cp313-cp313-win_amd64.whl", hash = "sha256:10a8dc6ec61af97c89ff032647d743f8dc023645773da42ef43f7ae1125b3509", size = 6218036, upload-time = "2024-10-01T05:19:20.341Z" },
 ]
 
 [[package]]

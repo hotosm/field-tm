@@ -33,7 +33,6 @@ dependencies = [
     "python-multipart==0.0.22",
     "psycopg[c,pool]==3.3.3",
     "pyxform==4.0.0",
-    "pyproj==3.7.0",
     "cryptography==43.0.3",
     "pyjwt==2.9.0",
     "tldextract==5.3.0",

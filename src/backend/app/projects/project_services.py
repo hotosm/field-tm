@@ -214,10 +214,12 @@ def _build_stub_project_data(
     return project_data
 
 
-def _validate_outline_area_limit(project_data: project_schemas.StubProjectIn) -> None:
+async def _validate_outline_area_limit(
+    db: AsyncConnection, project_data: project_schemas.StubProjectIn
+) -> None:
     """Reject AOIs larger than the configured maximum area."""
     try:
-        area_km2 = geojson_area_km2(project_data.outline.model_dump())
+        area_km2 = await geojson_area_km2(db, project_data.outline.model_dump())
         if area_km2 > AREA_LIMIT_KM2:
             raise ValidationError(
                 f"Project area is too large ({area_km2:,.0f} km²). "
@@ -308,7 +310,7 @@ async def create_project_stub(
         outline,
         hashtags,
     )
-    _validate_outline_area_limit(project_data)
+    await _validate_outline_area_limit(db, project_data)
     await _populate_project_location(db, project_name, project_data)
     project_data.created_by_sub = user_sub
 
