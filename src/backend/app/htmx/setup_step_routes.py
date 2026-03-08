@@ -1559,6 +1559,12 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
             media_type="text/html",
             status_code=500,
         )
+    except HTTPException as e:
+        return Response(
+            content=_callout("danger", str(e.detail)),
+            media_type="text/html",
+            status_code=e.status_code,
+        )
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
         error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"

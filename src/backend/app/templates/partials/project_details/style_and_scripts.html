@@ -655,6 +655,7 @@
   // Step 4: Finalise Project - Unified button with advanced options
   const finaliseProjectBtn = document.getElementById('finalise-project-btn');
   const advancedOptionsToggle = document.getElementById('advanced-options-toggle');
+  const finaliseActions = document.getElementById('finalise-actions');
   const finaliseStatus = document.getElementById('finalise-status');
   const finaliseConfirmDialog = document.getElementById('finalise-confirm-dialog');
   const finaliseConfirmMessage = document.getElementById('finalise-confirm-message');
@@ -917,8 +918,12 @@
           finaliseStatus.innerHTML = result;
 
           if (response.ok) {
-            if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
-            if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
+            if (finaliseActions) {
+              finaliseActions.style.display = 'none';
+            } else {
+              if (finaliseProjectBtn) finaliseProjectBtn.style.display = 'none';
+              if (advancedOptionsToggle) advancedOptionsToggle.style.display = 'none';
+            }
           } else {
             if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
             if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;

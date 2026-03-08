@@ -34,6 +34,8 @@ MIN_LATITUDE = -90
 MAX_LATITUDE = 90
 MIN_LAT_LON_PARTS = 2
 MIN_POLYGON_POINTS = 4
+MIN_CENTROID_POINTS = 3
+POLYGON_AREA_EPSILON = 1e-10
 
 # Project area limits (km²)
 AREA_WARN_KM2 = 100
@@ -71,7 +73,7 @@ async def polygon_to_centroid(
     """Compute the centroid of a GeoJSON Polygon using the shoelace formula."""
     coords = polygon.get("coordinates", [[]])[0]
     n = len(coords)
-    if n < 3:
+    if n < MIN_CENTROID_POINTS:
         lons = [c[0] for c in coords]
         lats = [c[1] for c in coords]
         cx = sum(lons) / n if n else 0.0
@@ -88,7 +90,7 @@ async def polygon_to_centroid(
         cx += (xi + xi1) * cross
         cy += (yi + yi1) * cross
     area /= 2.0
-    if abs(area) < 1e-10:
+    if abs(area) < POLYGON_AREA_EPSILON:
         lons = [c[0] for c in coords]
         lats = [c[1] for c in coords]
         return types.SimpleNamespace(x=sum(lons) / n, y=sum(lats) / n)
