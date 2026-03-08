@@ -65,6 +65,7 @@ db:
       enabled: false
 
 podSecurityContext:
+  fsGroup: 1001
   runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
