@@ -19,6 +19,7 @@
 
 import json
 import logging
+import re
 import shutil
 from asyncio import get_running_loop
 from copy import deepcopy
@@ -44,6 +45,7 @@ from qfieldcloud_sdk.sdk import (
     OrganizationMemberRole,
     ProjectCollaboratorRole,
 )
+
 from app.config import encrypt_value, settings
 from app.db.models import DbProject
 from app.projects.project_schemas import ProjectUpdate
@@ -57,6 +59,7 @@ SHARED_VOLUME_PATH = "/opt/qfield"
 
 # Timeout for QGIS wrapper HTTP calls (project generation can be slow)
 QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
+QFC_NAME_SANITIZE_PATTERN = re.compile(r"[^A-Za-z0-9_.-]+")
 
 
 @dataclass(slots=True)
@@ -160,6 +163,13 @@ def _dominant_geom_type(data_extract: Optional[dict]) -> DbGeomType:
         "line": DbGeomType.LINESTRING,
     }
     return mapping[dominant]
+
+
+def _sanitize_qfc_project_name(name: str) -> str:
+    """Normalize a QFieldCloud project name to API-accepted characters."""
+    cleaned = QFC_NAME_SANITIZE_PATTERN.sub("-", (name or "").strip())
+    cleaned = re.sub(r"-{2,}", "-", cleaned).strip("-.")
+    return cleaned or f"FieldTM-project-{getrandbits(32)}"
 
 
 # ---------------------------------------------------------------------------
@@ -418,7 +428,8 @@ async def create_qfield_project(
         log.info("QGIS project generated: %s", final_project_file)
 
         # ── Step 2: Upload to QFieldCloud ──────────────────────────────
-        qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
+        raw_qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
+        qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
         result = await _upload_to_qfieldcloud(
             project=project,
             qfc_project_name=qfc_project_name,

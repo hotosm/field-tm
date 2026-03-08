@@ -25,6 +25,7 @@ from app.qfield.qfield_crud import (
     _can_manage_qfc_users_locally,
     _is_org_owned_project,
     _resolve_qfield_project_url,
+    _sanitize_qfc_project_name,
     _should_open_in_edit_mode,
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
@@ -147,6 +148,24 @@ def test_existing_features_disable_initial_edit_mode():
     assert (
         _should_open_in_edit_mode({"type": "FeatureCollection", "features": []}) is True
     )
+
+
+def test_sanitize_qfc_project_name_removes_invalid_characters():
+    """QFieldCloud project names must use only letters, numbers, _, -, or ."""
+    raw = "FieldTM-qfield ijdshguijrg-3159991724"
+
+    sanitized = _sanitize_qfc_project_name(raw)
+
+    assert sanitized == "FieldTM-qfield-ijdshguijrg-3159991724"
+
+
+def test_sanitize_qfc_project_name_handles_unicode_and_symbols():
+    """Unicode and symbols should be normalized to API-safe separators."""
+    raw = "  FieldTM-प्रोजेक्ट @ Kathmandu #1  "
+
+    sanitized = _sanitize_qfc_project_name(raw)
+
+    assert sanitized == "FieldTM-Kathmandu-1"
 
 
 def test_strip_feature_properties_for_qfield_removes_seed_attributes():

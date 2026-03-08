@@ -469,7 +469,7 @@ class AreaSplitter:
         extract_geoms: list,
         meters: int,
     ) -> None:
-        """Insert grid polygons clipped to AOI into temp_polygons, then merge small ones."""
+        """Insert AOI-clipped grid polygons, then merge cells below threshold."""
         # Build GeoJSON box strings in pure Python
         boxes = []
         for x in cols[:-1]:
@@ -794,7 +794,8 @@ class AreaSplitter:
                 WITH
                   aoi AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326) AS geom),
                   input_geoms AS (
-                    SELECT ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::text[])), 4326) AS geom
+                    SELECT
+                      ST_SetSRID(ST_GeomFromGeoJSON(unnest(%s::text[])), 4326) AS geom
                   ),
                   unioned AS (SELECT ST_Union(geom) AS geom FROM input_geoms),
                   clipped AS (
