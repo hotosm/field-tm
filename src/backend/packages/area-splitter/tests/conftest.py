@@ -12,11 +12,11 @@
 
 """Configuration and fixtures for PyTest."""
 
+import json
 import logging
 import sys
 from pathlib import Path
 
-import geojson
 import psycopg
 import pytest
 
@@ -44,7 +44,7 @@ def aoi_json():
     """Dummy AOI GeoJSON."""
     path = Path(__file__).parent / "testdata" / "kathmandu.geojson"
     with open(path) as jsonfile:
-        return geojson.load(jsonfile)
+        return json.load(jsonfile)
 
 
 @pytest.fixture(scope="session")
@@ -56,7 +56,7 @@ def aoi_multi_json():
     """
     path = Path(__file__).parent / "testdata" / "kathmandu.geojson"
     with open(path) as jsonfile:
-        parsed_geojson = geojson.load(jsonfile)
+        parsed_geojson = json.load(jsonfile)
     outer_ring = (
         parsed_geojson.get("features")[0].get("geometry").get("coordinates", [[]])[0]
     )
@@ -81,9 +81,11 @@ def aoi_multi_json():
                 "type": "Polygon",
                 "coordinates": [[[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]],
             }
-            squares.append(geojson.Feature(geometry=square_geom))
+            squares.append(
+                {"type": "Feature", "geometry": square_geom, "properties": {}}
+            )
 
-    return geojson.FeatureCollection(features=squares)
+    return {"type": "FeatureCollection", "features": squares}
 
 
 @pytest.fixture(scope="session")
@@ -117,7 +119,7 @@ def extract_json():
     # print(task_id)
     path = Path(__file__).parent / "testdata" / "kathmandu_extract.geojson"
     with open(path) as jsonfile:
-        return geojson.load(jsonfile)
+        return json.load(jsonfile)
 
 
 @pytest.fixture(scope="session")
@@ -125,4 +127,4 @@ def output_json():
     """Processed JSON using Field-TM algo on dummy AOI."""
     path = Path(__file__).parent / "testdata" / "kathmandu_processed.geojson"
     with open(path) as jsonfile:
-        return geojson.load(jsonfile)
+        return json.load(jsonfile)

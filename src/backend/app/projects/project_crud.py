@@ -28,7 +28,6 @@ from textwrap import dedent
 from traceback import format_exc
 from typing import Optional
 
-import geojson
 import segno
 from litestar import Request
 from litestar import status_codes as status
@@ -67,7 +66,7 @@ log = logging.getLogger(__name__)
 
 async def generate_data_extract(
     project_id: int,
-    aoi: geojson.FeatureCollection | geojson.Feature | dict,
+    aoi: dict,
     geom_type: str,
     config_json=None,
     centroid: bool = False,
@@ -77,7 +76,7 @@ async def generate_data_extract(
 
     Args:
         project_id (int): Id (primary key) of the project.
-        aoi (geojson.FeatureCollection | geojson.Feature | dict]):
+        aoi (dict):
             Area of interest for data extraction.
         geom_type (str): Type of geometry to extract.
         config_json (Optional[json], optional):
@@ -224,7 +223,7 @@ async def generate_odk_central_project_content(
     project_odk_form_id: str,
     odk_credentials: central_schemas.ODKCentral,
     xlsform: BytesIO,
-    task_extract_dict: Optional[dict[int, geojson.FeatureCollection]] = None,
+    task_extract_dict: Optional[dict[int, dict]] = None,
     entity_properties: Optional[list[str]] = None,
 ) -> str:  # noqa: PLR0913
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
@@ -627,7 +626,7 @@ async def get_project_features_geojson(
     db: AsyncConnection,
     db_project: DbProject,
     task_id: Optional[int] = None,
-) -> geojson.FeatureCollection:
+) -> dict:
     """Get a geojson of all features for a task."""
     project_id = db_project.id
     data_extract_geojson = _stored_data_extract_geojson(db_project)
@@ -660,7 +659,7 @@ async def _task_filtered_feature_collection(
     project_id: int,
     task_id: int | None,
     use_empty_default: bool = True,
-) -> geojson.FeatureCollection:
+) -> dict:
     """Return either the full extract or the task-specific split subset."""
     if not task_id:
         return data_extract_geojson

@@ -9,7 +9,6 @@ authors = [
     {name = "Sujan Adhikari", email = "adhikarisujan.naxa@gmail.com"},   
 ]
 dependencies = [
-    "geojson>=2.5.0",
     "psycopg>=3.1.7",
     "raw-data-api-py>=0.3.0",
 ]
