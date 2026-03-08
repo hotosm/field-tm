@@ -112,6 +112,26 @@ db:
       size: 10Gi
       storageClassName: ""
 
+qfieldQgis:
+  # Run the qfield-qgis QGIS wrapper as a sidecar container alongside the backend.
+  # When enabled, QFIELDCLOUD_QGIS_URL is automatically set to http://localhost:8080 so
+  # the backend can reach the sidecar over loopback (no separate Service needed).
+  # The shared /opt/qfield volume is backed by a PVC so project files survive restarts.
+  enabled: true
+  image:
+    repository: ghcr.io/hotosm/field-tm/qgis
+    tag: "25.24"
+    pullPolicy: IfNotPresent
+  env:
+    LOG_LEVEL: INFO
+  resources: {}
+  securityContext: {}
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: ""
+    mountPath: /opt/qfield
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
