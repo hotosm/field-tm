@@ -18,7 +18,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
 
-import geojson
 import pytest
 
 from area_splitter.splitter import (
@@ -63,7 +62,7 @@ def test_init_splitter_types(aoi_json):
     # FeatureCollection
     AreaSplitter(aoi_json)
     # GeoJSON String
-    geojson_str = geojson.dumps(aoi_json)
+    geojson_str = json.dumps(aoi_json)
     AreaSplitter(geojson_str)
     # GeoJSON File
     AreaSplitter(f"{TESTDATA_DIR}/kathmandu.geojson")
@@ -101,7 +100,7 @@ def test_split_by_square_with_str(db, aoi_json, extract_json):
     """Test divide by square from geojson str and file."""
     # GeoJSON Dumps
     features = split_by_square(
-        geojson.dumps(aoi_json.get("features")[0]),
+        json.dumps(aoi_json.get("features")[0]),
         db,
         meters=50,
         osm_extract=extract_json,
@@ -144,7 +143,7 @@ def test_split_by_square_with_file_output(db):
         assert len(features.get("features")) == 66
 
         with open(outfile) as jsonfile:
-            output_geojson = geojson.load(jsonfile)
+            output_geojson = json.load(jsonfile)
         assert len(output_geojson.get("features")) == 66
     finally:
         Path(outfile).unlink()
@@ -192,7 +191,7 @@ def test_split_by_sql_ftm_with_extract(db, aoi_json, extract_json):
         num_buildings=5,
         osm_extract=extract_json,
     )
-    assert isinstance(features, geojson.feature.FeatureCollection)
+    assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
     feature_list = features.get("features", [])
     assert len(feature_list) >= 60
     assert all(
@@ -217,7 +216,7 @@ def test_split_by_sql_ftm_no_extract(aoi_json):
 def test_split_by_sql_ftm_multi_geom(extract_json):
     """Test divide by square from geojson file with multiple geometries."""
     with open(f"{TESTDATA_DIR}/kathmandu_split.geojson") as jsonfile:
-        parsed_featcol = geojson.load(jsonfile)
+        parsed_featcol = json.load(jsonfile)
     features = split_by_sql(
         parsed_featcol,
         "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
@@ -225,7 +224,7 @@ def test_split_by_sql_ftm_multi_geom(extract_json):
         osm_extract=extract_json,
     )
 
-    assert isinstance(features, geojson.feature.FeatureCollection)
+    assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
     assert isinstance(features.get("features"), list)
     assert isinstance(features.get("features")[0], dict)
     assert len(features.get("features")) > 22
@@ -238,11 +237,11 @@ def test_split_by_sql_ftm_multi_geom(extract_json):
     ]
     assert len(features.get("features")) == len(polygons)
 
-    polygon_feat = geojson.loads(json.dumps(polygons[0]))
-    assert isinstance(polygon_feat, geojson.Feature)
+    polygon_feat = polygons[0]
+    assert isinstance(polygon_feat, dict) and polygon_feat.get("type") == "Feature"
 
-    polygon = geojson.loads(json.dumps(polygons[0].get("geometry")))
-    assert isinstance(polygon, geojson.geometry.Polygon)
+    polygon = polygons[0].get("geometry")
+    assert isinstance(polygon, dict) and polygon.get("type") == "Polygon"
 
 
 def test_cli_help(capsys):
@@ -279,7 +278,7 @@ def test_split_by_square_cli():
             ]
         )
         with open(outfile) as jsonfile:
-            output_geojson = geojson.load(jsonfile)
+            output_geojson = json.load(jsonfile)
 
         assert len(output_geojson.get("features")) == 19
     finally:
@@ -309,7 +308,7 @@ def test_split_by_features_cli():
             ]
         )
         with open(outfile) as jsonfile:
-            output_geojson = geojson.load(jsonfile)
+            output_geojson = json.load(jsonfile)
 
         assert len(output_geojson.get("features")) == 4
     finally:
@@ -340,7 +339,7 @@ def test_split_by_sql_cli():
             ]
         )
         with open(outfile) as jsonfile:
-            output_geojson = geojson.load(jsonfile)
+            output_geojson = json.load(jsonfile)
 
         assert len(output_geojson.get("features")) > 44
     finally:
@@ -370,7 +369,7 @@ def test_split_by_sql_cli_no_extract():
             ]
         )
         with open(outfile) as geojson_out:
-            output_geojson = geojson.load(geojson_out)
+            output_geojson = json.load(geojson_out)
 
         # NOTE This may change over time as it calls the live API
         # so we set to >= the output from test_split_by_sql_cli

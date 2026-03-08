@@ -19,9 +19,8 @@
 
 import logging
 import types
-from typing import Optional, Union
+from typing import Optional
 
-import geojson
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from pyproj import Geod
@@ -68,7 +67,7 @@ def geojson_area_km2(geojson_geom: dict) -> float:
 
 
 async def polygon_to_centroid(
-    polygon: geojson.Polygon,
+    polygon: dict,
 ) -> types.SimpleNamespace:
     """Compute the centroid of a GeoJSON Polygon using the shoelace formula."""
     coords = polygon.get("coordinates", [[]])[0]
@@ -100,9 +99,9 @@ async def polygon_to_centroid(
 
 
 def featcol_keep_single_geom_type(
-    featcol: geojson.FeatureCollection,
+    featcol: dict,
     geom_type: Optional[str] = None,
-) -> geojson.FeatureCollection:
+) -> dict:
     """Strip out any geometries not matching the dominant geometry type."""
     features = featcol.get("features", [])
 
@@ -116,10 +115,10 @@ def featcol_keep_single_geom_type(
         if feature.get("geometry", {}).get("type", "") == geom_type
     ]
 
-    return geojson.FeatureCollection(features_filtered)
+    return {"type": "FeatureCollection", "features": features_filtered}
 
 
-def get_featcol_dominant_geom_type(featcol: geojson.FeatureCollection) -> str:
+def get_featcol_dominant_geom_type(featcol: dict) -> str:
     """Get the predominant geometry type in a FeatureCollection."""
     geometry_counts = {"Polygon": 0, "Point": 0, "LineString": 0}
 
@@ -132,7 +131,7 @@ def get_featcol_dominant_geom_type(featcol: geojson.FeatureCollection) -> str:
 
 
 async def check_crs(  # noqa: C901
-    input_geojson: Union[dict, geojson.FeatureCollection],
+    input_geojson: dict,
 ):
     """Validate CRS is valid for a geojson."""
     log.debug("validating coordinate reference system")
@@ -294,8 +293,8 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
 
 
 def multigeom_to_singlegeom(
-    featcol: geojson.FeatureCollection,
-) -> geojson.FeatureCollection:
+    featcol: dict,
+) -> dict:
     """Converts any Multi(xxx) geometry types to individual geometries."""
 
     def split_multigeom(geom: dict, properties: dict) -> list:
@@ -303,15 +302,16 @@ def multigeom_to_singlegeom(
         geom_type = geom["type"]
         if geom_type == "GeometryCollection":
             return [
-                geojson.Feature(geometry=sub_geom, properties=properties)
+                {"type": "Feature", "geometry": sub_geom, "properties": properties}
                 for sub_geom in geom.get("geometries", [])
             ]
         single_type = geom_type[5:]  # Strip "Multi" prefix
         return [
-            geojson.Feature(
-                geometry={"type": single_type, "coordinates": part},
-                properties=properties,
-            )
+            {
+                "type": "Feature",
+                "geometry": {"type": single_type, "coordinates": part},
+                "properties": properties,
+            }
             for part in geom.get("coordinates", [])
         ]
 
@@ -327,6 +327,8 @@ def multigeom_to_singlegeom(
         if geom_type.startswith("Multi") or geom_type == "GeometryCollection":
             final_features.extend(split_multigeom(geom, properties))
         else:
-            final_features.append(geojson.Feature(geometry=geom, properties=properties))
+            final_features.append(
+                {"type": "Feature", "geometry": geom, "properties": properties}
+            )
 
-    return geojson.FeatureCollection(final_features)
+    return {"type": "FeatureCollection", "features": final_features}

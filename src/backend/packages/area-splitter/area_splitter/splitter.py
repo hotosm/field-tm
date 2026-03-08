@@ -23,8 +23,6 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
-import geojson
-from geojson import Feature, FeatureCollection, GeoJSON
 from osm_data_client import get_osm_data
 from psycopg import Connection
 
@@ -83,7 +81,7 @@ def _is_linear_split_feature(tags: dict) -> bool:
     return False
 
 
-def _fetch_extract_from_raw_data_api(aoi_geojson: FeatureCollection) -> dict:
+def _fetch_extract_from_raw_data_api(aoi_geojson: dict) -> dict:
     """Fetch an OSM extract from raw-data-api-py and return parsed GeoJSON."""
 
     async def _get_data() -> dict:
@@ -129,9 +127,9 @@ def _outfile_variant(outfile: Optional[str], index: int) -> Optional[str]:
 
 
 def _merge_recursive_split_features(
-    feat_array: list[Feature],
+    feat_array: list[dict],
     split_func,
-) -> FeatureCollection:
+) -> dict:
     """Apply a split function to each AOI feature and merge results."""
     features = []
     for index, feat in enumerate(feat_array):
@@ -139,12 +137,12 @@ def _merge_recursive_split_features(
         feats = featcol.get("features", [])
         if feats:
             features += feats
-    return FeatureCollection(features)
+    return {"type": "FeatureCollection", "features": features}
 
 
 def _require_split_output(
-    split_features: Optional[FeatureCollection],
-) -> FeatureCollection:
+    split_features: Optional[dict],
+) -> dict:
     """Validate that a split operation returned features."""
     if split_features:
         return split_features
@@ -200,9 +198,9 @@ def _resolve_algorithm_params(
 
 
 def _resolve_extract_geojson(
-    aoi_featcol: FeatureCollection,
-    osm_extract: Optional[Union[str, FeatureCollection]],
-) -> FeatureCollection:
+    aoi_featcol: dict,
+    osm_extract: Optional[Union[str, dict]],
+) -> dict:
     """Resolve the OSM extract payload, fetching it if needed."""
     extract_geojson = (
         _fetch_extract_from_raw_data_api(aoi_featcol)
@@ -231,16 +229,16 @@ def _json_str_to_dict(json_item: Union[str, dict]) -> dict:
 
 
 def _parse_aoi_feature_collection(
-    aoi: Union[str, FeatureCollection],
-) -> FeatureCollection:
+    aoi: Union[str, dict],
+) -> dict:
     """Parse the AOI input into a normalized FeatureCollection."""
     parsed_aoi = AreaSplitter.input_to_geojson(aoi)
     return AreaSplitter.geojson_to_featcol(parsed_aoi)
 
 
 def _parse_optional_geojson_input(
-    input_data: Optional[Union[str, FeatureCollection]],
-) -> Optional[GeoJSON]:
+    input_data: Optional[Union[str, dict]],
+) -> Optional[dict]:
     """Parse an optional GeoJSON input."""
     if not input_data:
         return None
@@ -248,9 +246,9 @@ def _parse_optional_geojson_input(
 
 
 def _parse_feature_split_input(
-    geojson_input: Optional[Union[str, FeatureCollection]],
+    geojson_input: Optional[Union[str, dict]],
     db_table: Optional[str] = None,
-) -> FeatureCollection:
+) -> dict:
     """Parse and validate feature-based split input."""
     if db_table:
         raise NotImplementedError("Splitting from db features it not implemented yet.")
@@ -262,7 +260,10 @@ def _parse_feature_split_input(
     input_featcol = AreaSplitter.geojson_to_featcol(
         AreaSplitter.input_to_geojson(geojson_input)
     )
-    if isinstance(input_featcol, FeatureCollection):
+    if (
+        isinstance(input_featcol, dict)
+        and input_featcol.get("type") == "FeatureCollection"
+    ):
         return input_featcol
 
     msg = f"Could not parse geojson data from {geojson_input}"
@@ -275,7 +276,7 @@ class AreaSplitter:
 
     def __init__(
         self,
-        aoi_obj: Optional[Union[str, FeatureCollection, dict]] = None,
+        aoi_obj: Optional[Union[str, dict]] = None,
     ):
         """This class splits a polygon into tasks using a variety of algorithms.
 
@@ -295,10 +296,8 @@ class AreaSplitter:
         self.split_features = None
 
     @staticmethod
-    def input_to_geojson(
-        input_data: Union[str, FeatureCollection, dict], merge: bool = False
-    ) -> GeoJSON:
-        """Parse input data consistently to a GeoJSON obj."""
+    def input_to_geojson(input_data: Union[str, dict], merge: bool = False) -> dict:
+        """Parse input data consistently to a GeoJSON dict."""
         log.info(f"Parsing GeoJSON from type {type(input_data)}")
         if (
             isinstance(input_data, str)
@@ -308,22 +307,20 @@ class AreaSplitter:
             # Impose restriction for path lengths <250 chars
             with open(input_data) as jsonfile:
                 try:
-                    parsed_geojson = geojson.load(jsonfile)
+                    parsed_geojson = json.load(jsonfile)
                 except json.decoder.JSONDecodeError as e:
                     raise OSError(
                         f"File exists, but content is invalid JSON: {input_data}"
                     ) from e
 
-        elif isinstance(input_data, FeatureCollection):
-            parsed_geojson = input_data
         elif isinstance(input_data, dict):
-            parsed_geojson = geojson.loads(geojson.dumps(input_data))
+            parsed_geojson = json.loads(json.dumps(input_data))
         elif isinstance(input_data, str):
             geojson_truncated = (
                 input_data if len(input_data) < 250 else f"{input_data[:250]}..."
             )
             log.debug(f"GeoJSON string passed: {geojson_truncated}")
-            parsed_geojson = geojson.loads(input_data)
+            parsed_geojson = json.loads(input_data)
         else:
             err = (
                 f"The specified AOI is not valid (must be geojson or str): {input_data}"
@@ -335,24 +332,26 @@ class AreaSplitter:
 
     @staticmethod
     def geojson_to_featcol(
-        geojson: Union[FeatureCollection, Feature, dict],
-    ) -> FeatureCollection:
+        geojson_data: dict,
+    ) -> dict:
         """Standardise any geojson type to FeatureCollection."""
-        # Parse and unparse geojson to extract type
-        if isinstance(geojson, FeatureCollection):
+        if (
+            isinstance(geojson_data, dict)
+            and geojson_data.get("type") == "FeatureCollection"
+        ):
             # Handle FeatureCollection nesting
-            features = geojson.get("features", [])
-        elif isinstance(geojson, Feature):
+            features = geojson_data.get("features", [])
+        elif isinstance(geojson_data, dict) and geojson_data.get("type") == "Feature":
             # Must be a list
-            features = [geojson]
+            features = [geojson_data]
         else:
             # A standard geometry type. Has coordinates, no properties
-            features = [Feature(geometry=geojson)]
-        return FeatureCollection(features)
+            features = [{"type": "Feature", "geometry": geojson_data, "properties": {}}]
+        return {"type": "FeatureCollection", "features": features}
 
     @staticmethod
     def _extract_aoi_geometry(
-        geojson_data: Union[FeatureCollection, Feature, dict],
+        geojson_data: dict,
     ) -> dict:
         """Extract the GeoJSON geometry dict from a FeatureCollection.
 
@@ -449,16 +448,12 @@ class AreaSplitter:
 
     def _extract_split_geometries(
         self,
-        extract_geojson: Optional[Union[dict, FeatureCollection]] = None,
+        extract_geojson: Optional[dict] = None,
     ) -> list:
         """Return GeoJSON geometry dicts from the optional extract."""
         if not extract_geojson:
             return []
-        features = (
-            extract_geojson.get("features", extract_geojson)
-            if isinstance(extract_geojson, dict)
-            else extract_geojson.features
-        )
+        features = extract_geojson.get("features", [])
         return [feature["geometry"] for feature in features]
 
     def _insert_square_polygons(
@@ -558,7 +553,7 @@ class AreaSplitter:
         """
         )
 
-    def _fetch_square_split_features(self, cur) -> FeatureCollection:
+    def _fetch_square_split_features(self, cur) -> dict:
         """Fetch the generated square split features from the temp table."""
         cur.execute(
             """
@@ -583,7 +578,7 @@ class AreaSplitter:
         self,
         algorithm: SplittingAlgorithm,
         params: dict,
-        osm_extract: Optional[Union[dict, FeatureCollection]] = None,
+        osm_extract: Optional[dict] = None,
     ) -> None:
         """Validate required inputs for SQL-based splitting."""
         if not osm_extract:
@@ -657,8 +652,8 @@ class AreaSplitter:
         self,
         meters: int,
         db: Union[str, Connection],
-        extract_geojson: Optional[Union[dict, FeatureCollection]] = None,
-    ) -> FeatureCollection:
+        extract_geojson: Optional[dict] = None,
+    ) -> dict:
         """Split the polygon into squares.
 
         Args:
@@ -701,8 +696,8 @@ class AreaSplitter:
         db: Union[str, Connection],
         algorithm: SplittingAlgorithm = SplittingAlgorithm.AVG_BUILDING_SKELETON,
         algorithm_params: Optional[dict] = None,
-        osm_extract: Optional[Union[dict, FeatureCollection]] = None,
-    ) -> FeatureCollection:
+        osm_extract: Optional[dict] = None,
+    ) -> dict:
         """Split the polygon by features in the database using an SQL query.
 
         Args:
@@ -760,7 +755,7 @@ class AreaSplitter:
         else:
             log.info("Query returned no features")
 
-        self.split_features = FeatureCollection(features)
+        self.split_features = {"type": "FeatureCollection", "features": features}
 
         # Drop tables & close (+commit) db connection
         drop_tables(conn)
@@ -770,9 +765,9 @@ class AreaSplitter:
 
     def splitByFeature(  # noqa: N802
         self,
-        features: FeatureCollection,
+        features: dict,
         db: Union[str, Connection],
-    ) -> FeatureCollection:
+    ) -> dict:
         """Split the polygon by features using PostGIS.
 
         Args:
@@ -816,10 +811,13 @@ class AreaSplitter:
             )
             result = cur.fetchone()[0]
 
-        self.split_features = FeatureCollection(result.get("features", []))
+        self.split_features = {
+            "type": "FeatureCollection",
+            "features": result.get("features", []),
+        }
         return self.split_features
 
-    def _feature_split_geometries(self, features: FeatureCollection) -> list:
+    def _feature_split_geometries(self, features: dict) -> list:
         """Extract supported GeoJSON geometry dicts for feature-based splitting."""
         geometries = []
         for feature in features["features"]:
@@ -841,17 +839,17 @@ class AreaSplitter:
             raise RuntimeError(msg)
 
         with open(filename, "w") as jsonfile:
-            geojson.dump(self.split_features, jsonfile)
+            json.dump(self.split_features, jsonfile)
             log.debug(f"Wrote split features to {filename}")
 
 
 def split_by_square(
-    aoi: Union[str, FeatureCollection],
+    aoi: Union[str, dict],
     db: Union[str, Connection],
     meters: int = 100,
-    osm_extract: Union[str, FeatureCollection] = None,
+    osm_extract: Union[str, dict] = None,
     outfile: Optional[str] = None,
-) -> FeatureCollection:
+) -> dict:
     """Split an AOI by square, dividing into an even grid.
 
     Args:
@@ -882,7 +880,7 @@ def split_by_square(
         return _merge_recursive_split_features(
             feat_array,
             lambda index, feat: split_by_square(
-                FeatureCollection(features=[feat]),
+                {"type": "FeatureCollection", "features": [feat]},
                 db,
                 meters,
                 None,
@@ -900,14 +898,14 @@ def split_by_square(
 
 
 def split_by_sql(
-    aoi: Union[str, FeatureCollection],
+    aoi: Union[str, dict],
     db: Union[str, Connection],
     num_buildings: Optional[int] = None,
     outfile: Optional[str] = None,
-    osm_extract: Optional[Union[str, FeatureCollection]] = None,
+    osm_extract: Optional[Union[str, dict]] = None,
     algorithm: Optional[SplittingAlgorithm] = None,
     algorithm_params: Optional[dict] = None,
-) -> FeatureCollection:
+) -> dict:
     """Split an AOI with a field-tm algorithm.
 
     The query will optimise on the following:
@@ -964,7 +962,7 @@ def split_by_sql(
         return _merge_recursive_split_features(
             feat_array,
             lambda index, feat: split_by_sql(
-                FeatureCollection(features=[feat]),
+                {"type": "FeatureCollection", "features": [feat]},
                 db,
                 num_buildings=algorithm_params.get("num_buildings")
                 if "num_buildings" in algorithm_params
@@ -988,12 +986,12 @@ def split_by_sql(
 
 
 def split_by_features(
-    aoi: Union[str, FeatureCollection],
+    aoi: Union[str, dict],
     db: Union[str, Connection],
     db_table: Optional[str] = None,
-    geojson_input: Optional[Union[str, FeatureCollection]] = None,
+    geojson_input: Optional[Union[str, dict]] = None,
     outfile: Optional[str] = None,
-) -> FeatureCollection:
+) -> dict:
     """Split an AOI by geojson features or database features.
 
     Note: either db_table, or geojson_input must be passed.
@@ -1024,7 +1022,7 @@ def split_by_features(
         return _merge_recursive_split_features(
             feat_array,
             lambda index, feat: split_by_features(
-                FeatureCollection(features=[feat]),
+                {"type": "FeatureCollection", "features": [feat]},
                 db,
                 db_table,
                 input_featcol,

@@ -33,7 +33,6 @@ from typing import Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
-import geojson
 from aiohttp import ClientSession, ClientTimeout
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -178,8 +177,8 @@ def _sanitize_qfc_project_name(name: str) -> str:
 
 
 def clean_tags_for_qgis(
-    geojson_data: geojson.FeatureCollection,
-) -> geojson.FeatureCollection:
+    geojson_data: dict,
+) -> dict:
     """Clean GeoJSON properties to be compatible with QGIS.
 
     QGIS cannot write nested JSON/list property values back out to GeoJSON.

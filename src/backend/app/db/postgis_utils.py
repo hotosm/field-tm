@@ -23,7 +23,6 @@ from datetime import datetime, timezone
 from random import getrandbits
 from typing import Optional
 
-import geojson
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection, ProgrammingError, sql
@@ -37,11 +36,11 @@ log = logging.getLogger(__name__)
 
 async def split_geojson_by_task_areas(
     db: AsyncConnection,
-    featcol: geojson.FeatureCollection,
+    featcol: dict,
     project_id: int,
     task_boundaries: Optional[dict] = None,
     geom_type: DbGeomType = DbGeomType.POLYGON,
-) -> Optional[dict[int, geojson.FeatureCollection]]:
+) -> Optional[dict[int, dict]]:
     """Split GeoJSON into tagged task area GeoJSONs.
 
     NOTE batch inserts feature.properties.osm_id as feature.id for each feature.
@@ -50,14 +49,14 @@ async def split_geojson_by_task_areas(
 
     Args:
         db (Connection): Database connection.
-        featcol (geojson.FeatureCollection): Data extract feature collection.
+        featcol (dict): Data extract feature collection.
         project_id (int): The project ID for associated tasks.
         task_boundaries (dict): Task boundaries as GeoJSON
             FeatureCollection.
         geom_type (str): The geometry type of the features.
 
     Returns:
-        dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
+        dict[int, dict]: {task_id: FeatureCollection} mapping.
     """
     try:
         if not task_boundaries or not task_boundaries.get("features"):
@@ -201,10 +200,10 @@ async def _split_task_feature_records(
 def _split_records_to_feature_collections(
     records: list[dict],
     project_id: int,
-) -> Optional[dict[int, geojson.FeatureCollection]]:
+) -> Optional[dict[int, dict]]:
     """Convert raw SQL rows into task-id keyed feature collections."""
     result_dict = {
-        rec["task_id"]: geojson.FeatureCollection(features=rec["features"])
+        rec["task_id"]: {"type": "FeatureCollection", "features": rec["features"]}
         for rec in records
     }
     if not result_dict:
@@ -218,10 +217,10 @@ def _split_records_to_feature_collections(
 
 
 def add_required_geojson_properties(
-    geojson: geojson.FeatureCollection,
-) -> geojson.FeatureCollection:
+    featcol: dict,
+) -> dict:
     """Add required geojson properties if not present."""
-    features = geojson.get("features", [])
+    features = featcol.get("features", [])
     current_date = datetime.now(timezone.utc)
 
     for feature in features:
@@ -256,4 +255,4 @@ def add_required_geojson_properties(
 
         feature["properties"] = properties
 
-    return geojson
+    return featcol

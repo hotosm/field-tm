@@ -28,7 +28,6 @@ from io import BytesIO, StringIO
 from typing import Optional, Union
 from uuid import UUID, uuid4
 
-import geojson
 from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -471,7 +470,7 @@ def flatten_json(data: dict, target: dict):
 
 async def convert_odk_submission_json_to_geojson(
     input_json: Union[BytesIO, list],
-) -> geojson.FeatureCollection:
+) -> dict:
     """Convert ODK submission JSON file to GeoJSON.
 
     Used for loading into QGIS.
@@ -517,34 +516,36 @@ async def convert_odk_submission_json_to_geojson(
                 # Convert geometry
                 geom = await javarosa_to_geojson_geom(geom_data)
 
-                feature = geojson.Feature(
-                    id=data.get(id_field),
-                    geometry=geom,
-                    properties={
+                feature = {
+                    "type": "Feature",
+                    "id": data.get(id_field),
+                    "geometry": geom,
+                    "properties": {
                         "is_additional_geom": True,
                         "id_field": id_field,
                         "geom_field": geom_field,
                     },
-                )
+                }
                 additional_geometries.append(feature)
 
-        feature = geojson.Feature(
-            id=data.get("xlocation"),
-            geometry=geojson_geom,
-            properties=data,
-        )
+        feature = {
+            "type": "Feature",
+            "id": data.get("xlocation"),
+            "geometry": geojson_geom,
+            "properties": data,
+        }
         all_features.append(feature)
         all_features.extend(additional_geometries)
 
-    return geojson.FeatureCollection(features=all_features)
+    return {"type": "FeatureCollection", "features": all_features}
 
 
 async def feature_geojson_to_entity_dict(
-    feature: geojson.Feature,
+    feature: dict,
     additional_features: bool = False,
 ) -> central_schemas.EntityDict:
     """Convert a single GeoJSON to an Entity dict for upload."""
-    if not isinstance(feature, (dict, geojson.Feature)):
+    if not isinstance(feature, dict):
         log.error(f"Feature not in correct format: {feature}")
         raise ValueError(f"Feature not in correct format: {type(feature)}")
 
@@ -567,7 +568,7 @@ async def feature_geojson_to_entity_dict(
         entity_label = f"Additional Feature {uuid4()}"
     else:
         properties["status"] = "unmapped"
-        feature_id = feature.get("id", None)
+        feature_id = feature.get("id")
         entity_label = f"Feature {feature_id}"
 
     return {
@@ -577,7 +578,7 @@ async def feature_geojson_to_entity_dict(
 
 
 async def task_geojson_dict_to_entity_values(
-    task_geojson_dict: Union[dict[int, geojson.Feature], geojson.FeatureCollection],
+    task_geojson_dict: Union[dict[int, dict], dict],
     additional_features: bool = False,
 ) -> list[central_schemas.EntityDict]:
     """Convert a dict of task GeoJSONs into data for ODK Entity upload."""
