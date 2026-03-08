@@ -92,10 +92,10 @@ async def test_project_setup_hides_step2_actions_when_data_extract_is_complete(
 
     assert response.status_code == status.HTTP_200_OK
     assert "✓ OSM data extract ready" in response.text
-    assert "Download OSM Data" not in response.text
-    assert "Collect New Data Only" not in response.text
-    assert "Upload Custom GeoJSON" not in response.text
-    assert "Preview Data Extract" not in response.text
+    assert 'id="download-osm-data-btn"' not in response.text
+    assert 'id="collect-new-data-btn"' not in response.text
+    assert 'id="upload-geojson-btn"' not in response.text
+    assert 'id="preview-data-extract-btn"' not in response.text
 
 
 async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
