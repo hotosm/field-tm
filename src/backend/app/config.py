@@ -245,6 +245,7 @@ class Settings(BaseSettings):
     QFIELDCLOUD_URL: Optional[str] = ""
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
+    QFIELDCLOUD_PROJECT_OWNER: Optional[str] = ""
     QFIELDCLOUD_QGIS_URL: str = "http://qfield-qgis:8080"
 
     @field_validator("QFIELDCLOUD_URL", mode="after")
