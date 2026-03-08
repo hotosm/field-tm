@@ -790,14 +790,18 @@ async def _project_has_collaborator(
 def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
     """Resolve the QFieldCloud project owner.
 
-    Uses the authenticated username from the SDK client.  Falls back to the
-    configured default (typically the HOTOSM org).
+    Prefers the explicit QFIELDCLOUD_PROJECT_OWNER setting (which may be an
+    organisation name rather than the authenticated user).  Falls back to the
+    authenticated username, then the configured login user.
     """
+    # Explicit owner override takes highest priority (e.g. an org like "hotosm")
+    if settings.QFIELDCLOUD_PROJECT_OWNER:
+        return settings.QFIELDCLOUD_PROJECT_OWNER
     # The SDK client stores the logged-in username after authentication
     username = getattr(client, "username", None)
     if username:
         return username
-    # Fallback to configured username
+    # Fallback to configured login username
     if custom_creds and custom_creds.qfield_cloud_user:
         return custom_creds.qfield_cloud_user
     return settings.QFIELDCLOUD_USER or "admin"
