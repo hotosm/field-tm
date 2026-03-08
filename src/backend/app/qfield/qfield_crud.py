@@ -469,7 +469,7 @@ async def _call_qgis_wrapper(
     open_in_edit_mode: bool,
 ) -> None:
     """POST to the QGIS wrapper HTTP service and raise on failure."""
-    qgis_url = "http://qfield-qgis:8080"
+    qgis_url = settings.QFIELDCLOUD_QGIS_URL
     payload = {
         "project_dir": job_dir,
         "title": title,

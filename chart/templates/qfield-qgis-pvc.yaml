@@ -1,0 +1,17 @@
+{{- if and .Values.qfieldQgis.enabled .Values.qfieldQgis.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "field-tm.fullname" . }}-qfield-projects
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.qfieldQgis.persistence.size }}
+  {{- with .Values.qfieldQgis.persistence.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+{{- end }}
