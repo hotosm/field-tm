@@ -17,6 +17,7 @@
 ARG PYTHON_IMG_TAG=3.13
 ARG UV_IMG_TAG=0.10.6
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
+FROM ghcr.io/hotosm/lightningcss:1.31.1 AS lightningcss
 
 
 # Includes all labels and timezone info to extend from
@@ -221,8 +222,16 @@ ENTRYPOINT []
 CMD ["sleep", "infinity"]
 
 
+# Minify CSS as we don't use a bundler
+FROM runtime AS css
+COPY --from=lightningcss /usr/local/bin/lightningcss /usr/local/bin
+RUN lightningcss --minify /opt/app/static/css/app.css -o /opt/app/static/css/app.css
+
+
 # Final stage used during deployment
 FROM runtime AS prod
+# Add minified CSS
+COPY --from=css /opt/app/static/css/app.css /opt/app/static/css/app.css
 # Note: 1 worker (process) per container, behind load balancer
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "1", "--log-level", "critical", "--no-access-log"]
