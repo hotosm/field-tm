@@ -171,13 +171,14 @@ def test_split_by_square_with_multigeom_input(db, aoi_multi_json, extract_json):
         Path(outfile).unlink()
 
 
-def test_split_by_features_geojson(aoi_json):
+def test_split_by_features_geojson(db, aoi_json):
     """Test divide by square from geojson file.
 
     kathmandu_split.json contains 4 polygons inside the kathmandu.json area.
     """
     features = split_by_features(
         aoi_json,
+        db,
         geojson_input=f"{TESTDATA_DIR}/kathmandu_split.geojson",
     )
     assert len(features.get("features")) == 4

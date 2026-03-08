@@ -12,12 +12,12 @@
 
 """DB models for temporary tables in splitBySQL."""
 
+import json
 import logging
 from typing import Union
 
 import psycopg
 from psycopg.types.json import Json
-from shapely.geometry import Polygon
 
 log = logging.getLogger(__name__)
 
@@ -121,13 +121,13 @@ def drop_tables(conn: psycopg.Connection):
         cur.execute("DROP TABLE IF EXISTS ways_line CASCADE;")
 
 
-def aoi_to_postgis(conn: psycopg.Connection, geom: Polygon) -> None:
-    """Export a GeoDataFrame to the project_aoi table in PostGIS.
+def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
+    """Export a GeoJSON geometry dict to the project_aoi table in PostGIS.
 
     Uses a new cursor on existing connection, but not committed directly.
 
     Args:
-        geom (Polygon): The shapely geom to insert.
+        geom (dict): The GeoJSON geometry dict to insert.
         conn (psycopg.Connection): The PostgreSQL connection.
 
     Returns:
@@ -137,14 +137,13 @@ def aoi_to_postgis(conn: psycopg.Connection, geom: Polygon) -> None:
 
     sql_insert = """
         INSERT INTO project_aoi (geom)
-        VALUES (ST_SetSRID(CAST(%s AS GEOMETRY), 4326))
+        VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
         RETURNING id, geom;
     """
 
     try:
         with conn.cursor() as cur:
-            cur.execute(sql_insert, (geom.wkb_hex,))
-            cur.close()
+            cur.execute(sql_insert, (json.dumps(geom),))
     except Exception as e:
         log.error(f"Error during database operations: {e}")
         conn.rollback()  # Rollback in case of error
@@ -165,7 +164,7 @@ def insert_geom(cur: psycopg.Cursor, table_name: str, **kwargs) -> None:
     """
     query = (
         f"INSERT INTO {table_name} (geom, osm_id, tags) "
-        "VALUES (%(geom)s, %(osm_id)s, %(tags)s)"
+        "VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326), %(osm_id)s, %(tags)s)"
     )
     if "tags" in kwargs:
         kwargs["tags"] = Json(kwargs["tags"])

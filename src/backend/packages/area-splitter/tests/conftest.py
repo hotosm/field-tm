@@ -12,7 +12,6 @@
 
 """Configuration and fixtures for PyTest."""
 
-import json
 import logging
 import sys
 from pathlib import Path
@@ -20,8 +19,6 @@ from pathlib import Path
 import geojson
 import psycopg
 import pytest
-from shapely import to_geojson
-from shapely.geometry import box, shape
 
 logging.basicConfig(
     level="DEBUG",
@@ -60,11 +57,14 @@ def aoi_multi_json():
     path = Path(__file__).parent / "testdata" / "kathmandu.geojson"
     with open(path) as jsonfile:
         parsed_geojson = geojson.load(jsonfile)
-    single_polygon = shape(parsed_geojson.get("features")[0].get("geometry"))
-    bbox = single_polygon.bounds
+    outer_ring = (
+        parsed_geojson.get("features")[0].get("geometry").get("coordinates", [[]])[0]
+    )
+    lons = [c[0] for c in outer_ring]
+    lats = [c[1] for c in outer_ring]
+    minx, miny, maxx, maxy = min(lons), min(lats), max(lons), max(lats)
 
     # Divide the bounding box into four equal squares
-    minx, miny, maxx, maxy = bbox
     width = (maxx - minx) / 2
     height = (maxy - miny) / 2
 
@@ -72,16 +72,16 @@ def aoi_multi_json():
     for i in range(2):
         for j in range(2):
             # Calculate coordinates for each square
-            square_minx = minx + i * width
-            square_miny = miny + j * height
-            square_maxx = minx + (i + 1) * width
-            square_maxy = miny + (j + 1) * height
+            x1 = minx + i * width
+            y1 = miny + j * height
+            x2 = minx + (i + 1) * width
+            y2 = miny + (j + 1) * height
 
-            # Create Polygon for each square
-            square_geojson = json.loads(
-                to_geojson(box(square_minx, square_miny, square_maxx, square_maxy))
-            )
-            squares.append(geojson.Feature(geometry=square_geojson))
+            square_geom = {
+                "type": "Polygon",
+                "coordinates": [[[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]],
+            }
+            squares.append(geojson.Feature(geometry=square_geom))
 
     return geojson.FeatureCollection(features=squares)
 

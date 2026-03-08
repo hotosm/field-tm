@@ -44,8 +44,6 @@ from qfieldcloud_sdk.sdk import (
     OrganizationMemberRole,
     ProjectCollaboratorRole,
 )
-from shapely.geometry import shape
-
 from app.config import encrypt_value, settings
 from app.db.models import DbProject
 from app.projects.project_schemas import ProjectUpdate
@@ -77,6 +75,26 @@ class QFieldProjectResult:
 # ---------------------------------------------------------------------------
 
 
+def _flatten_geom_coords(geom: dict) -> list:
+    """Flatten all coordinates in a GeoJSON geometry to a list of [lon, lat] pairs."""
+    geom_type = geom.get("type", "")
+    coords = geom.get("coordinates", [])
+    if geom_type == "Point":
+        return [coords]
+    if geom_type in ("LineString", "MultiPoint"):
+        return list(coords)
+    if geom_type in ("Polygon", "MultiLineString"):
+        return [c for ring in coords for c in ring]
+    if geom_type == "MultiPolygon":
+        return [c for poly in coords for ring in poly for c in ring]
+    if geom_type == "GeometryCollection":
+        result = []
+        for sub_geom in geom.get("geometries", []):
+            result.extend(_flatten_geom_coords(sub_geom))
+        return result
+    return []
+
+
 def _outline_to_bbox_str(outline: dict) -> str:
     """Compute a comma-separated bbox string (xmin,ymin,xmax,ymax) from outline.
 
@@ -88,9 +106,15 @@ def _outline_to_bbox_str(outline: dict) -> str:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Project outline is missing or has no geometry.",
         )
-    geom = shape(geometry)
-    minx, miny, maxx, maxy = geom.bounds
-    return f"{minx},{miny},{maxx},{maxy}"
+    coords = _flatten_geom_coords(geometry)
+    if not coords:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Project outline geometry has no coordinates.",
+        )
+    lons = [c[0] for c in coords]
+    lats = [c[1] for c in coords]
+    return f"{min(lons)},{min(lats)},{max(lons)},{max(lats)}"
 
 
 def _extract_geometry(geojson_obj: dict) -> Optional[dict]:

@@ -71,6 +71,33 @@ async def test_project_setup_shows_step2_advanced_config_options(client, db, pro
     )
 
 
+async def test_project_setup_hides_step2_actions_when_data_extract_is_complete(
+    client, db, project
+):
+    """Completed Step 2 should collapse actions and focus user on Step 3."""
+    await DbProject.update(
+        db,
+        project.id,
+        DbProject(
+            xlsform_content=b"test xlsform",
+            data_extract_geojson={"type": "FeatureCollection", "features": []},
+        ),
+    )
+    await db.commit()
+
+    response = await client.get(
+        f"/htmxprojects/{project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "✓ OSM data extract ready" in response.text
+    assert "Download OSM Data" not in response.text
+    assert "Collect New Data Only" not in response.text
+    assert "Upload Custom GeoJSON" not in response.text
+    assert "Preview Data Extract" not in response.text
+
+
 async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
     client, db, project
 ):

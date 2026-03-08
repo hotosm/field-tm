@@ -29,43 +29,47 @@ all: backend
 [no-cd]
 backend:
   just stop all
+  docker compose -f compose.test.yaml down -v --remove-orphans
   just build backend
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest
-  docker compose -f compose.test.yaml down
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Cleanup orphan backend tests
 [no-cd]
 backend-cleanup:
-  docker compose -f compose.test.yaml down --remove-orphans
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Test backend API only
 [no-cd]
 api:
   just stop all
+  docker compose -f compose.test.yaml down -v --remove-orphans
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest tests
-  docker compose -f compose.test.yaml down
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Test osm-fieldwork package only
 [no-cd]
 osm-fieldwork:
   just stop all
+  docker compose -f compose.test.yaml down -v --remove-orphans
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
-  docker compose -f compose.test.yaml down
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Test area-splitter package only
 [no-cd]
 area-splitter:
   just stop all
+  docker compose -f compose.test.yaml down -v --remove-orphans
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
-  docker compose -f compose.test.yaml down
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Copy prod data into current database (WARNING: deletes local db data)
 [no-cd]
@@ -255,6 +259,7 @@ backend-coverage:
 
   # Start all service and ensure API has finish init process
   # Note that compose startup can still return success for partial service startup
+  docker compose -f compose.test.yaml down -v --remove-orphans
   docker compose -f compose.test.yaml up --detach
   docker compose -f compose.test.yaml run \
     --name backend-coverage-run \
@@ -269,7 +274,7 @@ backend-coverage:
   docker cp backend-coverage-run:/opt/htmlcov/index.html coverage/coverage.html
   docker cp backend-coverage-run:/opt/coverage.svg coverage/coverage.svg
   docker rm backend-coverage-run
-  docker compose -f compose.test.yaml down
+  docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Upload coverage report to gh-pages
 [no-cd]
