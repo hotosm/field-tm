@@ -5,6 +5,7 @@ import json
 import logging
 from pathlib import Path
 
+from hotosm_auth_litestar import setup_auth
 from litestar import Litestar, Request, Response, Router, get
 from litestar import status_codes as status
 from litestar.config.cors import CORSConfig
@@ -26,7 +27,6 @@ from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
 from app.__version__ import __version__
-from app.auth.auth_deps import login_required
 from app.config import MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
@@ -241,7 +241,6 @@ def configure_root_router() -> Router:
     @get(
         "/__heartbeat__",
         dependencies={
-            "current_user": Provide(login_required),
             "db": Provide(db_conn),
         },
         status_code=status.HTTP_200_OK,
@@ -271,8 +270,23 @@ def configure_root_router() -> Router:
     )
 
 
+def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
+    """Inject server-side config values as Jinja2 globals for all templates."""
+    engine.engine.globals["hanko_public_url"] = (
+        settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL
+    )
+    # {% disable_login %} var is available in all templates
+    engine.engine.globals["disable_login"] = settings.DISABLE_LOGIN
+
+
 def create_app() -> Litestar:
     """Configure Litestar app main router."""
+    deps, auth_route_handlers = setup_auth()
+    auth_lib_router = Router(
+        path="/",
+        route_handlers=auth_route_handlers,
+        dependencies=deps,
+    )
     root_router = configure_root_router()
     # Import routers after logger / settings to avoid circular imports
     from app.auth.auth_routes import auth_router
@@ -294,6 +308,7 @@ def create_app() -> Litestar:
 
     app = Litestar(
         route_handlers=[
+            auth_lib_router,
             root_router,
             api_router,
             auth_router,
@@ -316,6 +331,7 @@ def create_app() -> Litestar:
         template_config=TemplateConfig(
             directory=Path(__file__).parent / "templates",
             engine=JinjaTemplateEngine,
+            engine_callback=_configure_template_engine,
         ),
         debug=settings.DEBUG,
     )

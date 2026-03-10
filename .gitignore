@@ -53,6 +53,7 @@ db.sqlite3
 
 # ignore settings
 **/*.env
+deploy/.env
 
 # ignore python environments
 venv
@@ -102,6 +103,8 @@ src/translations/**/*
 favicon.svg
 favicon.png
 
-config
 
-QFieldCloud
+# Agents
+config
+.claude
+.openapi

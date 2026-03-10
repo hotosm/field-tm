@@ -16,6 +16,8 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+docker := env("DOCKER_ALIAS", "docker")
+
 # List available commands
 [private]
 default:
@@ -24,12 +26,26 @@ default:
 # Stop Field-TM
 [no-cd]
 all:
-  docker compose down
+  {{docker}} compose down
+
+# Stop Field-TM & login service
+[no-cd]
+login:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+
+  {{docker}} compose \
+    -f compose.yaml \
+    -f contrib/login/compose.yaml \
+    down --remove-orphans
+  
+  {{docker}} volume rm field-tm_hanko_config
 
 # Stop Field-TM & JOSM
 [no-cd]
 josm:
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/josm/compose.yaml \
     down
@@ -37,7 +53,7 @@ josm:
 # Stop Field-TM & tunnels
 [no-cd]
 tunnel:
-  docker compose \
+  {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
     down

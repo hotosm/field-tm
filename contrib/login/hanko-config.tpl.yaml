@@ -1,0 +1,86 @@
+# Hanko configuration template for local standalone mode.
+# Uses existing Field-TM compose env vars rendered by envsubst.
+
+server:
+  public:
+    address: ":8000"
+    cors:
+      allow_origins:
+        - "${HANKO_ALLOWED_ORIGIN}"
+      allow_credentials: true
+  admin:
+    address: ":8001"
+
+database:
+  database: "${HANKO_DB_NAME}"
+  user: "${HANKO_DB_USER}"
+  password: "${HANKO_DB_PASSWORD}"
+  host: "${HANKO_DB_HOST}"
+  port: 5432
+
+secrets:
+  keys:
+    - "${HANKO_SECRET}"
+
+service:
+  name: "Field-TM"
+
+webauthn:
+  enabled: true
+  relying_party:
+    id: "localhost"
+    display_name: "Field-TM"
+    origins:
+      - "${HANKO_ALLOWED_ORIGIN}"
+
+passkey:
+  enabled: true
+  optional: true
+  acquire_on_registration: never
+  acquire_on_login: never
+
+email:
+  require_verification: false
+
+passcode:
+  enabled: true
+  ttl: 300
+
+password:
+  enabled: true
+  min_length: 8
+  recovery: true
+
+email_delivery:
+  enabled: true
+  smtp:
+    host: "${SMTP_HOST}"
+    port: "${SMTP_PORT}"
+    user: "${SMTP_USER}"
+    password: "${SMTP_PASSWORD}"
+  from_address: "${SMTP_FROM_ADDRESS}"
+  from_name: "Field-TM"
+
+session:
+  lifespan: 24h
+  issuer: "${HANKO_REDIRECT_URL}"
+  audience:
+    - "${HANKO_ALLOWED_ORIGIN}"
+  cookie:
+    name: "hanko"
+    domain: "${HANKO_COOKIE_DOMAIN}"
+    http_only: true
+    same_site: lax
+    secure: false
+
+third_party:
+  redirect_url: "${HANKO_REDIRECT_URL}"
+  error_redirect_url: "${HANKO_REDIRECT_URL}"
+  allowed_redirect_urls:
+    - "${HANKO_ALLOWED_ORIGIN}/**"
+  providers:
+    google:
+      enabled: ${GOOGLE_ENABLED}
+      client_id: "${GOOGLE_CLIENT_ID}"
+      secret: "${GOOGLE_CLIENT_SECRET}"
+      allow_linking: true

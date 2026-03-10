@@ -22,7 +22,6 @@ import json
 import logging
 from io import BytesIO, StringIO
 from pathlib import Path
-from textwrap import dedent
 from uuid import uuid4
 
 import requests
@@ -34,11 +33,8 @@ from litestar.di import Provide
 from litestar.exceptions import HTTPException
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
-from osm_login_python.core import Auth
 
 from app.auth.auth_deps import login_required
-from app.auth.auth_schemas import AuthUser
-from app.auth.providers.osm import init_osm_auth
 from app.central import central_deps
 from app.central.central_crud import (
     convert_geojson_to_odk_csv,
@@ -91,7 +87,7 @@ async def download_template(
 )
 async def convert_geojson_to_odk_csv_wrapper(
     geojson: UploadFile,
-    current_user: AuthUser,
+    current_user: object,
 ) -> Response[bytes]:
     """Convert GeoJSON upload media to ODK CSV upload media."""
     filename = Path(geojson.filename)
@@ -125,7 +121,7 @@ async def create_entities_from_csv(
     csv_file: UploadFile,
     odk_project_id: int,
     entity_name: str,
-    current_user: AuthUser,
+    current_user: object,
     odk_creds: ODKCentral,
 ) -> dict:
     """Upload a CSV file to create new ODK Entities in a project.
@@ -167,7 +163,7 @@ async def create_entities_from_csv(
 )
 async def convert_javarosa_geom_to_geojson(
     javarosa_string: str,
-    current_user: AuthUser,
+    current_user: object,
 ) -> dict:
     """Convert a JavaRosa geometry string to GeoJSON."""
     return await javarosa_to_geojson_geom(javarosa_string)
@@ -179,7 +175,7 @@ async def convert_javarosa_geom_to_geojson(
 )
 async def convert_odk_submission_json_to_geojson_wrapper(
     json_file: UploadFile,
-    current_user: AuthUser,
+    current_user: object,
 ) -> Response[bytes]:
     """Convert the ODK submission output JSON to GeoJSON.
 
@@ -214,7 +210,7 @@ async def convert_odk_submission_json_to_geojson_wrapper(
 )
 async def get_raw_data_api_osm_token(
     request: Request,
-    current_user: AuthUser,
+    current_user: object,
 ) -> Response[None]:
     """Get the OSM OAuth token for a service account for raw-data-api.
 
@@ -239,30 +235,13 @@ async def get_raw_data_api_osm_token(
     )
 
 
-@get(
-    "/view-field-tm-api-token",
-    dependencies={"current_user": Provide(login_required)},
-)
-async def view_user_oauth_token(
-    request: Request,
-    current_user: AuthUser,
-) -> dict[str, str | None]:
-    """Get the Field-TM OSM (OAuth) token for a logged in user.
-
-    The token is encrypted with a secret key and only usable via
-    this Field-TM instance and the osm-login-python module.
-    """
-    cookie_name = settings.cookie_name
-    return {"access_token": request.cookies.get(cookie_name)}
-
-
 @post(
     "/multipolygons-to-polygons",
     dependencies={"current_user": Provide(login_required)},
 )
 async def flatten_multipolygons_to_polygons(
     geojson: UploadFile,
-    current_user: AuthUser,
+    current_user: object,
 ) -> Response[bytes]:
     """If any MultiPolygons are present, replace with multiple Polygons."""
     featcol = parse_aoi(settings.FTM_DB_URL, await geojson.read())
@@ -290,74 +269,78 @@ async def flatten_multipolygons_to_polygons(
     )
 
 
-@post(
-    "/send-test-osm-message",
-    dependencies={
-        "current_user": Provide(login_required),
-        "osm_auth": Provide(init_osm_auth),
-    },
-    status_code=status.HTTP_200_OK,
-)
-async def send_test_osm_message(
-    request: Request,
-    current_user: AuthUser,
-    # NOTE this is duplicated to access the 'deserialize_data' method
-    osm_auth: Auth,
-) -> None:
-    """Sends a test message to currently logged in OSM user."""
-    cookie_name = f"{settings.cookie_name}_osm"
-    log.debug(f"Extracting OSM token from cookie {cookie_name}")
-    serialised_osm_token = request.cookies.get(cookie_name)
-    if not serialised_osm_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You must be logged in to your OpenStreetMap account.",
-        )
+# FIXME we need to extract osm cookie name from hotosm_auth lib before
+# we can use it in this endpoint
+# @post(
+#     "/send-test-osm-message",
+#     dependencies={
+#         "current_user": Provide(login_required),
+#         "osm_auth": Provide(init_osm_auth),
+#     },
+#     status_code=status.HTTP_200_OK,
+# )
+# async def send_test_osm_message(
+#     request: Request,
+#     current_user: object,
+#     # NOTE this is duplicated to access the 'deserialize_data' method
+#     osm_auth: Auth,
+# ) -> None:
+#     """Sends a test message to currently logged in OSM user."""
+#     cookie_name = f"{settings.cookie_name}_osm"
+#     log.debug(f"Extracting OSM token from cookie {cookie_name}")
+#     serialised_osm_token = request.cookies.get(cookie_name)
+#     if not serialised_osm_token:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="You must be logged in to your OpenStreetMap account.",
+#         )
 
-    # NOTE to get this far, the user must be logged in using OSM
-    osm_token = osm_auth.deserialize_data(serialised_osm_token)
-    # NOTE message content must be in markdown format
-    message_content = dedent(
-        """
-        # Heading 1
+#     # NOTE to get this far, the user must be logged in using OSM
+#     osm_token = osm_auth.deserialize_data(serialised_osm_token)
+#     # NOTE message content must be in markdown format
+#     message_content = dedent(
+#         """
+#         # Heading 1
 
-        ## Heading 2
+#         ## Heading 2
 
-        Hello there!
+#         Hello there!
 
-        This is a text message in markdown format.
+#         This is a text message in markdown format.
 
-        > Notes section
-    """
-    )
-    # NOTE post body should contain either recipient or recipient_id
-    post_body = {
-        "recipient_id": 16289154,
-        # "recipient_id": current_user.id,
-        "title": "Test message from Field-TM!",
-        "body": message_content,
-    }
+#         > Notes section
+#     """
+#     )
+#     # NOTE post body should contain either recipient or recipient_id
+#     post_body = {
+#         "recipient_id": 16289154,
+#         # "recipient_id": current_user.id,
+#         "title": "Test message from Field-TM!",
+#         "body": message_content,
+#     }
 
-    email_url = f"{settings.OSM_URL}api/0.6/user/messages"
-    headers = {"Authorization": f"Bearer {osm_token}"}
-    log.debug(f"Sending message to user ({current_user.sub}) via OSM API: {email_url}")
-    response = requests.post(
-        email_url,
-        headers=headers,
-        data=post_body,
-        timeout=REQUEST_TIMEOUT_SECONDS,
-    )
+#     email_url = f"{settings.OSM_URL}api/0.6/user/messages"
+#     headers = {"Authorization": f"Bearer {osm_token}"}
+#     log.debug(
+#         f"Sending message to user ({current_user.sub}) via OSM API: {email_url}"
+#     )
+#     response = requests.post(
+#         email_url,
+#         headers=headers,
+#         data=post_body,
+#         timeout=REQUEST_TIMEOUT_SECONDS,
+#     )
 
-    if response.status_code == status.HTTP_200_OK:
-        log.info("Message sent successfully")
-        return None
+#     if response.status_code == status.HTTP_200_OK:
+#         log.info("Message sent successfully")
+#         return None
 
-    msg = "Sending message via OSM failed"
-    log.error(f"{msg}: {response.text}")
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=msg,
-    )
+#     msg = "Sending message via OSM failed"
+#     log.error(f"{msg}: {response.text}")
+#     raise HTTPException(
+#         status_code=status.HTTP_409_CONFLICT,
+#         detail=msg,
+#     )
 
 
 helper_router = Router(
@@ -370,8 +353,6 @@ helper_router = Router(
         convert_javarosa_geom_to_geojson,
         convert_odk_submission_json_to_geojson_wrapper,
         get_raw_data_api_osm_token,
-        view_user_oauth_token,
         flatten_multipolygons_to_polygons,
-        send_test_osm_message,
     ],
 )
