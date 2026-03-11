@@ -12,7 +12,10 @@ from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 from app.htmx.project_create_routes import _parse_outline_payload
 from app.htmx.project_list_routes import project_listing
-from app.htmx.setup_step_routes import _build_odk_finalize_success_html
+from app.htmx.setup_step_routes import (
+    _build_finalize_error_html,
+    _build_odk_finalize_success_html,
+)
 from app.projects.project_services import ODKFinalizeResult
 
 # We patch where project_crud is used/defined.
@@ -485,3 +488,20 @@ def test_parse_outline_payload_rejects_invalid_json():
     """Reject invalid outline strings with a clear validation error."""
     with pytest.raises(ValueError, match="Project area must be valid JSON"):
         _parse_outline_payload("not-valid-geojson")
+
+
+def test_build_finalize_error_html_prefers_friendly_text_for_plain_errors():
+    """Plain-text errors should remain user-facing and include details toggle."""
+    html = _build_finalize_error_html("Could not connect to ODK Central.")
+
+    assert "Could not connect to ODK Central." in html
+    assert "View technical details" in html
+
+
+def test_build_finalize_error_html_uses_generic_text_for_json_payload():
+    """Structured payloads should show a generic user-facing message."""
+    html = _build_finalize_error_html('{"detail":"{"error":"invalid credentials"}"}')
+
+    assert "Project finalisation failed." in html
+    assert "View technical details" in html
+    assert '"detail"' in html

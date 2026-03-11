@@ -1,0 +1,85 @@
+{% extends "layout.html" %} {% block title %}QFieldCloud Admin — Field Tasking Manager{% endblock %}
+{% block content %}
+<div class="ftm-page ftm-page--wide">
+  <!-- Login panel -->
+  <div id="qfc-login-panel">
+    <wa-card>
+      <div slot="header">
+        <div class="ftm-project-title-wrap">
+          <img
+            src="/static/images/qfield-logo.svg"
+            alt="QField"
+            class="ftm-app-logo ftm-app-logo--header"
+            onerror="this.style.display = 'none'"
+          />
+          <h1 style="margin: 0">QFieldCloud Admin</h1>
+        </div>
+      </div>
+
+      <div style="padding: 20px">
+        <p style="color: var(--ftm-text-muted); margin: 0 0 1.5rem">
+          Enter your QFieldCloud credentials to manage projects and collaborators.
+        </p>
+
+        <form
+          hx-post="/qfc-admin/login"
+          hx-target="#qfc-management"
+          hx-swap="innerHTML"
+          hx-indicator="#qfc-login-spinner"
+        >
+          <div class="ftm-form-group">
+            <label class="ftm-form-label">
+              QFieldCloud URL <span class="ftm-form-required">*</span>
+            </label>
+            <wa-input
+              name="qfc_url"
+              type="url"
+              placeholder="https://qfield.example.com"
+              value="{{ prefill_url }}"
+              required
+            ></wa-input>
+            <span class="ftm-form-help">
+              The base URL of your QFieldCloud instance (without /api/v1).
+            </span>
+          </div>
+
+          <div class="ftm-form-group">
+            <label class="ftm-form-label">
+              Username <span class="ftm-form-required">*</span>
+            </label>
+            <wa-input name="qfc_username" placeholder="admin" required></wa-input>
+          </div>
+
+          <div class="ftm-form-group">
+            <label class="ftm-form-label">
+              Password <span class="ftm-form-required">*</span>
+            </label>
+            <wa-input
+              name="qfc_password"
+              type="password"
+              placeholder="••••••••"
+              required
+            ></wa-input>
+          </div>
+
+          <div class="ftm-form-actions">
+            <wa-button variant="primary" type="submit"> Connect </wa-button>
+            <span
+              id="qfc-login-spinner"
+              class="htmx-indicator"
+              style="color: var(--ftm-text-muted); font-size: var(--hot-font-size-small)"
+            >
+              Connecting…
+            </span>
+          </div>
+        </form>
+      </div>
+    </wa-card>
+  </div>
+
+  <!-- Management area — populated by HTMX after login -->
+  <wa-card>
+    <div id="qfc-management" style="padding: 20px"></div>
+  </wa-card>
+</div>
+{% endblock %}

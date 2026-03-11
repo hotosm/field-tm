@@ -11,6 +11,14 @@ from app.htmx.project_create_routes import (
 )
 from app.htmx.project_detail_routes import project_details, project_qrcode_htmx
 from app.htmx.project_list_routes import project_listing
+from app.htmx.qfc_admin_routes import (
+    add_collaborator,
+    list_collaborators,
+    qfc_admin_login,
+    qfc_admin_page,
+    remove_collaborator,
+    update_collaborator,
+)
 from app.htmx.setup_step_routes import (
     accept_data_extract_htmx,
     accept_split_htmx,
@@ -73,5 +81,11 @@ htmx_router = Router(
         create_project_qfield_htmx,
         project_qrcode_htmx,
         validate_geojson,
+        qfc_admin_page,
+        qfc_admin_login,
+        list_collaborators,
+        add_collaborator,
+        remove_collaborator,
+        update_collaborator,
     ],
 )

@@ -20,6 +20,7 @@
 
 import json
 import logging
+from html import escape
 
 from geojson_aoi import parse_aoi
 from litestar import get, post
@@ -106,6 +107,79 @@ def _service_error_response(error: ServiceError) -> Response:
     )
     return Response(
         content=_callout("danger", error.message),
+        media_type="text/html",
+        status_code=status_code,
+    )
+
+
+def _format_technical_error_details(raw_details: object) -> str:
+    """Normalize error details into a readable plain-text block."""
+    if raw_details is None:
+        return ""
+    if isinstance(raw_details, (dict, list)):
+        return json.dumps(raw_details, indent=2, ensure_ascii=False)
+
+    raw_text = str(raw_details).strip()
+    if not raw_text:
+        return ""
+
+    try:
+        parsed = json.loads(raw_text)
+    except (json.JSONDecodeError, TypeError):
+        return raw_text
+
+    if isinstance(parsed, (dict, list)):
+        return json.dumps(parsed, indent=2, ensure_ascii=False)
+    return raw_text
+
+
+def _is_technical_error_text(error_text: str) -> bool:
+    """Heuristic to detect structured/technical error payloads."""
+    stripped = error_text.strip()
+    if not stripped:
+        return False
+    if stripped.startswith("{") or stripped.startswith("["):
+        return True
+    return any(marker in stripped for marker in ('"detail"', '"error"', "'detail'"))
+
+
+def _build_finalize_error_html(raw_error: object) -> str:
+    """Render user-friendly finalization errors with optional technical details."""
+    technical_details = _format_technical_error_details(raw_error)
+    generic_message = (
+        "Project finalisation failed. Please check your settings and try again. "
+        "If it continues, send the technical details below to your instance "
+        "administrator or support team."
+    )
+
+    if technical_details and not _is_technical_error_text(technical_details):
+        user_message = technical_details
+    else:
+        user_message = generic_message
+
+    base_callout = _callout("danger", escape(user_message))
+    if not technical_details:
+        return base_callout
+
+    return (
+        f"{base_callout}"
+        "<details style='margin-top: 12px;'>"
+        "<summary style='cursor: pointer; font-weight: 600;'>"
+        "View technical details"
+        "</summary>"
+        "<pre style='margin-top: 8px; padding: 12px; border-radius: 8px; "
+        "background: #f6f8fa; border: 1px solid #d0d7de; overflow: auto; "
+        "white-space: pre-wrap;'>"
+        f"{escape(technical_details)}"
+        "</pre>"
+        "</details>"
+    )
+
+
+def _finalize_error_response(raw_error: object, status_code: int) -> Response:
+    """Return HTML response for finalization failures."""
+    return Response(
+        content=_build_finalize_error_html(raw_error),
         media_type="text/html",
         status_code=status_code,
     )
@@ -1497,14 +1571,17 @@ async def create_project_odk_htmx(  # noqa: PLR0913
             status_code=status.HTTP_200_OK,
         )
     except ServiceError as e:
-        return _service_error_response(e)
+        status_code = (
+            status.HTTP_400_BAD_REQUEST
+            if isinstance(e, SvcValidationError)
+            else status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+        return _finalize_error_response(e.message, status_code)
     except Exception as e:
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
-        return Response(
-            content=_callout("danger", f"Error: {error_msg}"),
-            media_type="text/html",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        error_msg = str(e) if hasattr(e, "__str__") else e
+        return _finalize_error_response(
+            error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
@@ -1555,30 +1632,18 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
             status_code=status.HTTP_200_OK,
         )
     except SvcValidationError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
+        return _finalize_error_response(e.message, status.HTTP_400_BAD_REQUEST)
     except ServiceError as e:
-        return Response(
-            content=_callout("danger", e.message),
-            media_type="text/html",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        return _finalize_error_response(
+            e.message, status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     except HTTPException as e:
-        return Response(
-            content=_callout("danger", str(e.detail)),
-            media_type="text/html",
-            status_code=e.status_code,
-        )
+        return _finalize_error_response(e.detail, e.status_code)
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
-        return Response(
-            content=_callout("danger", f"Error: {error_msg}"),
-            media_type="text/html",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        error_msg = str(e) if hasattr(e, "__str__") else e
+        return _finalize_error_response(
+            error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 

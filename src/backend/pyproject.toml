@@ -38,6 +38,7 @@ dependencies = [
     "tldextract==5.3.0",
     "pyodk>=1.2.1",
     # TODO replace with official version, once PR merged
+    # https://github.com/opengisch/QFieldCloud/pull/1506
     "qfieldcloud-sdk",
     "osm-login-python==2.0.0",
     "pg-nearest-city==0.2.1",

@@ -1012,3 +1012,77 @@ body {
 .ftm-link--brand:hover {
   text-decoration: underline;
 }
+
+/* --- QFC Admin ------------------------------------------- */
+.ftm-qfc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--hot-font-size-small);
+}
+
+.ftm-qfc-table th {
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-x-small);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 2px solid var(--ftm-border);
+}
+
+.ftm-qfc-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--ftm-border);
+  vertical-align: middle;
+}
+
+.ftm-qfc-project-row:hover td {
+  background-color: var(--ftm-bg-muted);
+}
+
+.ftm-qfc-collabs-cell:empty {
+  padding: 0;
+  border: none;
+}
+
+.ftm-qfc-table--nested {
+  margin-bottom: 1rem;
+}
+
+.ftm-qfc-table--nested th {
+  border-bottom-width: 1px;
+}
+
+.ftm-qfc-collab-panel {
+  padding: 1rem;
+  background-color: var(--ftm-bg-muted);
+  border-radius: var(--ftm-radius-sm);
+}
+
+.ftm-qfc-collab-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ftm-qfc-add-collab {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ftm-border);
+}
+
+.ftm-qfc-add-collab-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .ftm-qfc-add-collab-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

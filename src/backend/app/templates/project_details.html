@@ -126,13 +126,12 @@
           >
             View Project in ODK Central →
           </a>
-          {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %}
-          <a
-            href="{{ project.external_project_instance_url }}"
-            target="_blank"
-            class="ftm-link--brand"
-          >
-            View Project in QField Cloud →
+          {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %} {% set qfc_base_url =
+          project.external_project_instance_url.split('/api/v1')[0].rstrip('/') if '/api/v1' in
+          (project.external_project_instance_url or '') else (project.external_project_instance_url
+          or '').rstrip('/') %}
+          <a href="/qfc-admin?url={{ qfc_base_url }}" class="ftm-link--brand">
+            Manage Project in QFieldCloud →
           </a>
           {% else %}
           <a
