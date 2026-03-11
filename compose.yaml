@@ -49,6 +49,9 @@ x-qfield-common-env: &qfield-common-env
   SALT_KEY: 0123456789abcdefghijklmnopqrstuvwxyz
   ACCOUNT_EMAIL_VERIFICATION: none
   QFIELDCLOUD_PASSWORD_LOGIN_IS_ENABLED: 1
+  QFIELDCLOUD_ADMIN_URI: admin/
+  CORS_ALLOWED_ORIGINS: "http://qfield.field.localhost,http://qfield.field.localhost:7050"
+  CORS_ALLOW_CREDENTIALS: 1
   # TODO fix injecting S3 vars into STORAGES
   # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-GK3515373e4c851ebaad366558}
   # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-7d37d093435a41f2aab8f13c19ba067d9776c90215f56614adad6ece597dbb34}
@@ -72,29 +75,33 @@ x-qfield-common-env: &qfield-common-env
   POSTGRES_DB: ${FTM_DB_NAME:-fieldtm}
   POSTGRES_HOST: qfield-db
   POSTGRES_PORT: 5432
-  # EMAIL_HOST: ${EMAIL_HOST}
-  # EMAIL_USE_TLS: ${EMAIL_USE_TLS}
-  # EMAIL_USE_SSL: ${EMAIL_USE_SSL}
-  # EMAIL_PORT: ${EMAIL_PORT}
-  # EMAIL_HOST_USER: ${EMAIL_HOST_USER}
-  # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
-  # DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+  POSTGRES_SSLMODE: prefer
+  EMAIL_HOST: mail
+  EMAIL_USE_TLS: "False"
+  EMAIL_USE_SSL: "False"
+  EMAIL_PORT: 1025
+  EMAIL_HOST_USER: ""
+  EMAIL_HOST_PASSWORD: ""
+  DEFAULT_FROM_EMAIL: noreply@field.localhost
   QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
   # NOTE this must have a trailing slash
   QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_URL}
   QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
+  SENTRY_RELEASE: dev
   QFIELDCLOUD_USE_I18N: 0
   QFIELDCLOUD_DEFAULT_LANGUAGE: "en"
   QFIELDCLOUD_DEFAULT_TIME_ZONE: "Europe/London"
   QFIELDCLOUD_DEFAULT_NETWORK: field-tm-local
   QFIELDCLOUD_TRANSFORMATION_GRIDS_VOLUME_NAME: ${COMPOSE_PROJECT_NAME}_qfield_transformation_grids
-  # QFIELDCLOUD_SUBSCRIPTION_MODEL: ${QFIELDCLOUD_SUBSCRIPTION_MODEL}
-  # QFIELDCLOUD_ACCOUNT_ADAPTER: ${QFIELDCLOUD_ACCOUNT_ADAPTER}
+  QFIELDCLOUD_SUBSCRIPTION_MODEL: subscription.Subscription
+  QFIELDCLOUD_ACCOUNT_ADAPTER: qfieldcloud.core.adapters.AccountAdapterSignUpOpen
   # Required for spawned QGIS job containers
   TMP_DIRECTORY: /tmp
 
 x-qfield-common: &qfield-common
-  image: ghcr.io/opengisch/qfieldcloud-app:25.24
+  # This override contains the user creation API from PR:
+  # 
+  image: "ghcr.io/hotosm/field-tm/qfieldcloud-app:26.3"
   volumes:
     - qfield_static:/usr/src/app/staticfiles
   networks:
@@ -151,6 +158,7 @@ services:
       SERVER_NAME: field.localhost odk.field.localhost qfield.field.localhost mail.field.localhost
       field.localhost_REVERSE_PROXY_HOST: http://api:8000
       field.localhost_MAX_CLIENT_SIZE: 1G
+      field.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       # Increase timeout slightly for long project creation requests
       field.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
       # Prevent bunkerweb page handling login errors (handle via Vue router)
@@ -235,8 +243,6 @@ services:
         required: false
       qfield-init:
         condition: service_completed_successfully
-      qfield-user-mgmt:
-        condition: service_healthy
       qfield-qgis:
         condition: service_healthy
     env_file:
@@ -560,26 +566,6 @@ services:
         else:
             print("Org + user creation skipped, as they already exist.")
         PYCODE
-
-  qfield-user-mgmt:
-    <<: *qfield-common
-    depends_on:
-      qfield-app:
-        condition: service_healthy
-    volumes:
-      - ./src/qfield/user_mgmt_svc.py:/usr/src/app/user_mgmt_svc.py:ro
-    command:
-      - python
-      - /usr/src/app/user_mgmt_svc.py
-    networks:
-      - ftm-net
-    restart: unless-stopped
-    healthcheck:
-      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8001' || exit 1
-      start_period: 15s
-      interval: 10s
-      retries: 5
-      timeout: 5s
 
   qfield-qgis:
     image: "ghcr.io/hotosm/field-tm/qgis:25.24"

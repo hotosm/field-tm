@@ -28,7 +28,6 @@ from app.htmx.setup_step_routes import (
 )
 from app.htmx.static_routes import (
     serve_apple_touch_icon,
-    serve_favicon_ico,
     serve_favicon_png,
     serve_favicon_svg,
     serve_maskable_icon,
@@ -43,7 +42,6 @@ htmx_router = Router(
     path="/",
     tags=["htmx"],
     route_handlers=[
-        serve_favicon_ico,
         serve_favicon_png,
         serve_favicon_svg,
         serve_apple_touch_icon,

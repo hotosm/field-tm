@@ -21,6 +21,7 @@
 from pathlib import Path
 
 from litestar import get
+from litestar import status_codes as status
 from litestar.response import Response
 
 
@@ -37,10 +38,10 @@ async def serve_static_css(filename: str) -> Response:
         or "/" in filename
         or "\\" in filename
     ):
-        return Response(content="Forbidden", status_code=403)
+        return Response(content="Forbidden", status_code=status.HTTP_403_FORBIDDEN)
 
     if not file_path.exists():
-        return Response(content="Not Found", status_code=404)
+        return Response(content="Not Found", status_code=status.HTTP_404_NOT_FOUND)
 
     with open(file_path, "rb") as f:
         content = f.read()
@@ -74,13 +75,13 @@ async def serve_static_image(filename: str) -> Response:
     ):
         return Response(
             content="Forbidden",
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
         )
 
     if not file_path.exists():
         return Response(
             content="Not Found",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     with open(file_path, "rb") as f:
@@ -99,21 +100,6 @@ async def _serve_icon_file(filename: str, media_type: str) -> Response:
     icons_dir = Path(__file__).parent.parent / "static" / "icons"
     file_path = icons_dir / filename
 
-    # Handle favicon.ico - try .png if .ico doesn't exist
-    if filename == "favicon.ico" and not file_path.exists():
-        file_path = icons_dir / "favicon.png"
-        if not file_path.exists():
-            return Response(
-                content="Not Found",
-                status_code=404,
-            )
-        media_type = "image/png"
-    elif not file_path.exists():
-        return Response(
-            content="Not Found",
-            status_code=404,
-        )
-
     with open(file_path, "rb") as f:
         content = f.read()
 
@@ -122,12 +108,6 @@ async def _serve_icon_file(filename: str, media_type: str) -> Response:
         media_type=media_type,
         headers={"Cache-Control": "public, max-age=86400"},  # Cache for 1 day
     )
-
-
-@get("/favicon.ico", include_in_schema=False)
-async def serve_favicon_ico() -> Response:
-    """Serve favicon.ico."""
-    return await _serve_icon_file("favicon.ico", "image/x-icon")
 
 
 @get("/favicon.png", include_in_schema=False)

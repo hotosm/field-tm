@@ -389,7 +389,7 @@ async def create_project_htmx(
         return Response(
             content=_project_form_error(e.message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     except Exception as e:
         log.error(
@@ -401,7 +401,7 @@ async def create_project_htmx(
                 "An unexpected error occurred. Please try again."
             ),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 

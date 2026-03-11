@@ -1,0 +1,19 @@
+{{- if .Values.qfieldQgis.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "field-tm.fullname" . }}-qgis
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qgis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "field-tm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: qgis
+{{- end }}

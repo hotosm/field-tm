@@ -113,11 +113,16 @@ db:
       storageClassName: ""
 
 qfieldQgis:
-  # Run the qfield-qgis QGIS wrapper as a sidecar container alongside the backend.
-  # When enabled, QFIELDCLOUD_QGIS_URL is automatically set to http://localhost:8080 so
-  # the backend can reach the sidecar over loopback (no separate Service needed).
-  # The shared /opt/qfield volume is backed by a PVC so project files survive restarts.
+  # Deploy the QGIS project-generation wrapper as a separate Deployment with its
+  # own ClusterIP Service. QFIELDCLOUD_QGIS_URL is automatically pointed at that
+  # Service so the backend can call it. The shared /opt/qfield PVC (ReadWriteMany)
+  # is mounted in both the backend and the QGIS pods so they can exchange files.
+  # Requires a StorageClass that supports ReadWriteMany (e.g. NFS, EFS, Azure Files).
   enabled: true
+  # One replica is sufficient: the threading.Lock in the service queues concurrent
+  # requests rather than dropping them, so jobs always complete in order.
+  # Increase if project generation throughput becomes a bottleneck.
+  replicaCount: 1
   image:
     repository: ghcr.io/hotosm/field-tm/qgis
     tag: "25.24"

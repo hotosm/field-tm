@@ -135,7 +135,7 @@ spec:
             {{- end }}
             {{- if .Values.qfieldQgis.enabled }}
             - name: QFIELDCLOUD_QGIS_URL
-              value: "http://localhost:8080"
+              value: "http://{{ include "field-tm.fullname" . }}-qgis:8080"
             {{- end }}
             {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
@@ -154,39 +154,6 @@ spec:
             - name: qfield-projects
               mountPath: {{ .Values.qfieldQgis.persistence.mountPath }}
           {{- end }}
-        {{- if .Values.qfieldQgis.enabled }}
-        - name: qfield-qgis
-          image: "{{ .Values.qfieldQgis.image.repository }}:{{ .Values.qfieldQgis.image.tag }}"
-          imagePullPolicy: {{ .Values.qfieldQgis.image.pullPolicy }}
-          {{- with .Values.qfieldQgis.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          ports:
-            - name: qgis
-              containerPort: 8080
-              protocol: TCP
-          livenessProbe:
-            tcpSocket:
-              port: qgis
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            tcpSocket:
-              port: qgis
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          env:
-            {{- range $key, $val := .Values.qfieldQgis.env }}
-            - name: {{ $key }}
-              value: {{ $val | quote }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.qfieldQgis.resources | nindent 12 }}
-          volumeMounts:
-            - name: qfield-projects
-              mountPath: {{ .Values.qfieldQgis.persistence.mountPath }}
-        {{- end }}
       {{- if or .Values.volumes .Values.qfieldQgis.enabled }}
       volumes:
         {{- with .Values.volumes }}

@@ -34,6 +34,40 @@ async def test_create_project_htmx(client, stub_project_data):
     assert "/htmxprojects/" in location
 
 
+async def test_create_project_htmx_returns_inline_error_for_missing_description(
+    client, stub_project_data
+):
+    """Validation errors should return 400 with an inline HTML error fragment."""
+    payload = dict(stub_project_data)
+    payload["description"] = ""
+
+    response = await client.post(
+        "/projects/create",
+        data=payload,
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Description is required." in response.text
+
+
+async def test_create_project_htmx_returns_inline_error_for_missing_mapping_app(
+    client, stub_project_data
+):
+    """Missing required app should return 400 with an inline HTML error fragment."""
+    payload = dict(stub_project_data)
+    payload["field_mapping_app"] = ""
+
+    response = await client.post(
+        "/projects/create",
+        data=payload,
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Field Mapping App is required." in response.text
+
+
 async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_project):
     """Draft setup should show a basic-first Step 1 with advanced config."""
     response = await client.get(

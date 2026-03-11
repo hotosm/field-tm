@@ -4,14 +4,21 @@ import sys
 import os
 import logging
 import json
+import threading
 import traceback
 import atexit
 import shutil
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional, Dict, Any
 from pathlib import Path
 
 qgis_application = None
+
+# Serialise QGIS work: the QgsApplication and its processing providers are
+# not thread-safe.  ThreadingHTTPServer accepts connections concurrently, but
+# only one request at a time proceeds past this lock, effectively queuing work
+# rather than dropping or racing it.
+_qgis_lock = threading.Lock()
 
 
 def setup_logging() -> logging.Logger:
@@ -894,16 +901,18 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
                 self._send_error(400, f"Missing required parameters: {missing_params}")
                 return
             
-            # Process request
+            # Process request – serialised via lock so concurrent HTTP requests
+            # queue here rather than racing inside the single-threaded QGIS app.
             self.log.info(f"Processing request for project: {data.get('title')}")
-            result = generate_qgis_project(
-                project_dir=data["project_dir"],
-                title=data["title"],
-                language=data["language"],
-                extent=data["extent"],
-                open_in_edit_mode=parse_bool(data.get("open_in_edit_mode"), True),
-                log=self.log
-            )
+            with _qgis_lock:
+                result = generate_qgis_project(
+                    project_dir=data["project_dir"],
+                    title=data["title"],
+                    language=data["language"],
+                    extent=data["extent"],
+                    open_in_edit_mode=parse_bool(data.get("open_in_edit_mode"), True),
+                    log=self.log
+                )
             
             # Send response
             status_code = 200 if result["status"] == "success" else 500
@@ -966,9 +975,11 @@ def run_server(host: str = "0.0.0.0", port: int = 8080):
         start_qgis_application(enable_processing=True, log=log)
         log.info("QGIS application ready")
 
-        # Create and start server
+        # Create and start server.  ThreadingHTTPServer spawns a thread per
+        # connection so the socket is always ready to accept; _qgis_lock in the
+        # handler serialises the actual QGIS work.
         handler = create_handler_with_logger(log)
-        server = HTTPServer((host, port), handler)
+        server = ThreadingHTTPServer((host, port), handler)
         
         log.info(f"🚀 QGIS API server listening on http://{host}:{port}")
         log.info("Endpoints:")

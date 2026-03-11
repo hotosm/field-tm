@@ -30,7 +30,6 @@ from pathlib import Path
 from random import getrandbits
 from secrets import token_urlsafe
 from typing import Optional
-from urllib.parse import urlparse
 from uuid import uuid4
 
 from aiohttp import ClientSession, ClientTimeout
@@ -39,6 +38,7 @@ from litestar.exceptions import HTTPException
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import AsyncConnection
+from qfieldcloud_sdk.interfaces import QfcRequestException
 from qfieldcloud_sdk.sdk import (
     FileTransferType,
     OrganizationMemberRole,
@@ -309,21 +309,6 @@ def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
     return not isinstance(features, list) or len(features) == 0
 
 
-def _can_manage_qfc_users_locally(custom_creds: QFieldCloud | None) -> bool:
-    """Whether user provisioning can use the local qfield-user-mgmt sidecar."""
-    if not custom_creds or not custom_creds.qfield_cloud_url:
-        return True
-
-    host = (urlparse(custom_creds.qfield_cloud_url).hostname or "").lower()
-    return host in {
-        "",
-        "localhost",
-        "127.0.0.1",
-        "qfield-app",
-        "qfield.field.localhost",
-    }
-
-
 # ---------------------------------------------------------------------------
 # Core: create QField project
 # ---------------------------------------------------------------------------
@@ -508,37 +493,49 @@ async def _call_qgis_wrapper(
     log.debug("QGIS wrapper call succeeded")
 
 
-async def _create_qfc_user(
-    username: str,
-    password: str,
-) -> bool:
-    """Create a QFieldCloud user via the qfield-user-mgmt sidecar service.
+async def _create_qfc_user(username: str, password: str, client) -> bool:
+    """Create a QFieldCloud user via the SDK (POST /api/v1/users/).
 
-    The sidecar runs inside the qfield-app container (same Django environment)
-    and creates users directly via the ORM.  Returns True on success or if the
-    user already exists, False on failure.
+    Returns True when the user is created (201) or already exists (409).
+    Returns False and logs a warning when the endpoint is unavailable (404/405)
+    or the service account lacks staff permission (403).  Both cases are soft
+    failures: caller skips collaborator provisioning but continues.
     """
-    url = "http://qfield-user-mgmt:8001/create-user"
-    payload = {"username": username, "password": password}
-
-    async with ClientSession() as session:
-        try:
-            async with session.post(url, json=payload) as resp:
-                if resp.status in (200, 201):
-                    body = await resp.json()
-                    log.info("QFC user '%s': %s", username, body.get("status", "ok"))
-                    return True
-                body = await resp.text()
-                log.warning(
-                    "qfield-user-mgmt returned %s for '%s': %s",
-                    resp.status,
-                    username,
-                    body,
-                )
-        except Exception as exc:
-            log.warning("qfield-user-mgmt call failed for '%s': %s", username, exc)
-
-    return False
+    loop = get_running_loop()
+    try:
+        await loop.run_in_executor(
+            None,
+            partial(client.create_user, username, password, exist_ok=True),
+        )
+        log.info("QFC user '%s' created or already exists", username)
+        return True
+    except QfcRequestException as exc:
+        status_code = exc.response.status_code
+        if status_code in (
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        ):
+            log.warning(
+                "QFC user creation API not available "
+                "(upgrade QFieldCloud to enable automated account provisioning)"
+            )
+            return False
+        if status_code == status.HTTP_403_FORBIDDEN:
+            log.warning(
+                "QFC service account lacks staff permission for user creation; "
+                "ensure the account has is_staff=True in QFieldCloud"
+            )
+            return False
+        log.warning(
+            "Unexpected QFC user creation response %s for '%s': %s",
+            status_code,
+            username,
+            exc,
+        )
+        return False
+    except Exception as exc:
+        log.warning("QFC user creation call failed for '%s': %s", username, exc)
+        return False
 
 
 async def _upload_to_qfieldcloud(
@@ -609,34 +606,36 @@ async def _upload_to_qfieldcloud(
                 detail=f"Failed to upload files to QFieldCloud: {e}",
             ) from e
 
-        manager_username = manager_password = None
-        mapper_username = mapper_password = None
-        if _can_manage_qfc_users_locally(custom_qfield_creds):
-            # Create manager user and add to project
-            manager_username, manager_password = await _provision_project_user(
-                loop=loop,
-                client=client,
-                api_project_id=api_project_id,
-                api_project_owner=api_project_owner,
-                username=f"ftm_manager_{project.id}",
-                role=ProjectCollaboratorRole.MANAGER,
-                role_label="manager",
-            )
-
-            # Create mapper service account and add to project
-            mapper_username, mapper_password = await _provision_project_user(
-                loop=loop,
-                client=client,
-                api_project_id=api_project_id,
-                api_project_owner=api_project_owner,
-                username=f"ftm_mapper_{project.id}",
-                role=ProjectCollaboratorRole.EDITOR,
-                role_label="mapper",
-            )
-        else:
+        # Provision per-project service accounts via the QFC admin API.
+        # _create_qfc_user returns False (and logs a warning) when the API is
+        # unavailable or the service account lacks staff permission, so these
+        # calls degrade gracefully on older QFieldCloud instances.
+        manager_username, manager_password = await _provision_project_user(
+            loop=loop,
+            client=client,
+            api_project_id=api_project_id,
+            api_project_owner=api_project_owner,
+            username=f"ftm_manager_{project.id}",
+            role=ProjectCollaboratorRole.MANAGER,
+            role_label="manager",
+        )
+        mapper_username, mapper_password = await _provision_project_user(
+            loop=loop,
+            client=client,
+            api_project_id=api_project_id,
+            api_project_owner=api_project_owner,
+            username=f"ftm_mapper_{project.id}",
+            role=ProjectCollaboratorRole.EDITOR,
+            role_label="mapper",
+        )
+        if not manager_username:
             log.info(
-                "Skipping QField service-account provisioning for remote instance %s",
-                custom_qfield_creds.qfield_cloud_url,
+                "QField service-account provisioning skipped for %s",
+                (
+                    custom_qfield_creds.qfield_cloud_url
+                    if custom_qfield_creds
+                    else "default instance"
+                ),
             )
 
     # Prefer a canonical URL returned by QFieldCloud, otherwise fall back to
@@ -681,7 +680,7 @@ async def _provision_project_user(
     Returns (username, password) on success, (None, None) if creation failed.
     """
     password = token_urlsafe(16)
-    created = await _create_qfc_user(username, password)
+    created = await _create_qfc_user(username, password, client)
     if not created:
         log.warning(
             "Could not create QFC %s user '%s'; skipping collaborator assignment.",

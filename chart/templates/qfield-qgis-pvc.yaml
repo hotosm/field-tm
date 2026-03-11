@@ -6,8 +6,12 @@ metadata:
   labels:
     {{- include "field-tm.labels" . | nindent 4 }}
 spec:
+  # ReadWriteMany is required because the backend pod(s) and the separate
+  # qfield-qgis Deployment pods all need concurrent access to the shared
+  # /opt/qfield volume. Ensure your StorageClass supports RWX
+  # (e.g. NFS, CephFS, AWS EFS, Azure Files).
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: {{ .Values.qfieldQgis.persistence.size }}

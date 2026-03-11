@@ -22,7 +22,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from app.qfield.qfield_crud import (
-    _can_manage_qfc_users_locally,
     _is_org_owned_project,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
@@ -104,34 +103,6 @@ def test_resolve_qfield_project_url_falls_back_to_instance_root():
     )
 
     assert url == "http://qfield.field.localhost:7050"
-
-
-def test_remote_qfield_instances_skip_local_user_management_sidecar():
-    """Externally hosted QFieldCloud cannot use the local ORM sidecar."""
-    assert (
-        _can_manage_qfc_users_locally(
-            QFieldCloud(
-                qfield_cloud_url="https://app.qfield.cloud/api/v1/",
-                qfield_cloud_user="demo-user",
-                qfield_cloud_password="Password1234",
-            )
-        )
-        is False
-    )
-
-
-def test_local_qfield_instances_still_use_local_user_management_sidecar():
-    """Locally hosted QFieldCloud should continue using the sidecar."""
-    assert (
-        _can_manage_qfc_users_locally(
-            QFieldCloud(
-                qfield_cloud_url="http://qfield.field.localhost:7050/api/v1/",
-                qfield_cloud_user="svcftm",
-                qfield_cloud_password="password",
-            )
-        )
-        is True
-    )
 
 
 def test_existing_features_disable_initial_edit_mode():

@@ -89,11 +89,10 @@ services:
       # Reverse proxy configs — core FieldTM domains only
       SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}
       ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      ${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       # CORS for the backend is configured by FastAPI
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
-      # Increase timeout slightly for long project creation requests
-      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
     ports:
       - 80:8080
       - 443:8443
