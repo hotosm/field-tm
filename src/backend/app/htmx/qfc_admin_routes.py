@@ -35,13 +35,10 @@ from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Template
-from qfieldcloud_sdk.sdk import (
-    Client,
-    OrganizationMemberRole,
-    ProjectCollaboratorRole,
-)
+from qfieldcloud_sdk.sdk import Client, ProjectCollaboratorRole
 
 from app.config import settings
+from app.qfield.qfield_crud import add_qfc_project_collaborator
 
 from .htmx_helpers import callout as _callout
 
@@ -481,31 +478,14 @@ async def add_collaborator(
 
     try:
         client = _qfc_client(qfc_url, qfc_token)
-
-        # If project is org-owned, ensure user is an org member first
-        if owner:
-            permission_error = await _auto_ensure_org_membership(
-                loop, client, owner, username
-            )
-            if permission_error:
-                return Response(
-                    content=_callout("danger", permission_error),
-                    media_type="text/html",
-                )
-
-        await loop.run_in_executor(
-            None,
-            partial(
-                client.add_project_collaborator,
-                project_id,
-                username,
-                role,
-            ),
-        )
+        # Set username so org-ownership check works correctly
+        client.username = owner
+        await add_qfc_project_collaborator(client, project_id, username, role)
     except Exception as exc:
         log.warning("QFC add collaborator failed: %s", exc)
+        detail = getattr(exc, "detail", None) or _friendly_add_collaborator_error(exc)
         return Response(
-            content=_callout("danger", _friendly_add_collaborator_error(exc)),
+            content=_callout("danger", detail),
             media_type="text/html",
         )
 
@@ -580,9 +560,6 @@ async def update_collaborator(
     return await _reload_collaborators(loop, client, project_id, qfc_url, qfc_token)
 
 
-# ── Internal helpers ────────────────────────────────────────────────────
-
-
 async def _reload_collaborators(
     loop, client: Client, project_id: str, qfc_url: str, qfc_token: str
 ) -> Response:
@@ -609,46 +586,3 @@ async def _reload_collaborators(
     )
 
 
-async def _auto_ensure_org_membership(
-    loop, client: Client, organization: str, username: str
-) -> Optional[str]:
-    """Add the user to the organization if not already a member.
-
-    For generic QFC admin sessions, this must run using the same QFieldCloud
-    account the user logged in with. If that account lacks permission to manage
-    organization members, return a clear error and stop before attempting to
-    add the project collaborator.
-    """
-    try:
-        members = await loop.run_in_executor(
-            None, partial(client.get_organization_members, organization)
-        )
-        if any(m.get("member") == username for m in members):
-            return None
-
-        await loop.run_in_executor(
-            None,
-            partial(
-                client.add_organization_member,
-                organization,
-                username,
-                OrganizationMemberRole.MEMBER,
-                False,
-            ),
-        )
-        log.info(
-            "Auto-added QFC user '%s' to organization '%s'",
-            username,
-            organization,
-        )
-        return None
-    except Exception as exc:
-        log.warning(
-            "Could not auto-add '%s' to org '%s': %s",
-            username,
-            organization,
-            exc,
-        )
-        if "403" in str(exc) or "permission denied" in str(exc).lower():
-            return _org_membership_permission_error(organization)
-        return None

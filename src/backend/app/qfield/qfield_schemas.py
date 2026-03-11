@@ -34,6 +34,13 @@ log = logging.getLogger(__name__)
 # 3. Is used directly as a route parameter (Litestar handles Pydantic models natively)
 
 
+class AddQFCCollaboratorRequest(BaseModel):
+    """Request body to add a collaborator to a QFieldCloud project."""
+
+    username: str
+    role: str = "editor"
+
+
 class QFieldCloud(BaseModel):
     """QField Cloud credentials for API input validation."""
 

@@ -17,14 +17,17 @@
 #
 """Routes to relay requests to QFieldCloud server (Litestar)."""
 
-from litestar import Router, post
+from litestar import Request, Router, post
 from litestar import status_codes as status
 from litestar.di import Provide
+from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
 
+from app.auth.api_key import api_key_required
 from app.auth.auth_deps import public_endpoint
 from app.db.database import db_conn
 from app.qfield import qfield_schemas
-from app.qfield.qfield_crud import qfc_credentials_test
+from app.qfield.qfield_crud import add_qfc_project_collaborator, qfc_credentials_test
+from app.qfield.qfield_deps import qfield_client
 
 
 @post(
@@ -43,10 +46,36 @@ async def qfc_creds_test(
     await qfc_credentials_test(qfc_creds)
 
 
+@post(
+    "/projects/{qfc_project_id:str}/collaborators",
+    summary="Add a collaborator to a QFieldCloud project.",
+    dependencies={
+        "db": Provide(db_conn),
+    },
+    status_code=status.HTTP_201_CREATED,
+)
+async def qfc_add_collaborator(
+    request: Request,
+    db,
+    qfc_project_id: str,
+    data: qfield_schemas.AddQFCCollaboratorRequest,
+) -> None:
+    """Add a user as a collaborator to a QFieldCloud project.
+
+    Uses the server-configured QFieldCloud credentials.
+    Handles org-owned projects automatically.
+    """
+    await api_key_required(request, db)
+    role = ProjectCollaboratorRole(data.role)
+    async with qfield_client() as client:
+        await add_qfc_project_collaborator(client, qfc_project_id, data.username, role)
+
+
 qfield_router = Router(
     path="/qfield",
     tags=["qfield"],
     route_handlers=[
         qfc_creds_test,
+        qfc_add_collaborator,
     ],
 )

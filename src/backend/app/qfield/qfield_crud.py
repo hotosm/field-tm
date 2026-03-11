@@ -852,6 +852,84 @@ def _resolve_qfield_project_url(
 
 
 # ---------------------------------------------------------------------------
+# Collaborator management
+# ---------------------------------------------------------------------------
+
+
+async def add_qfc_project_collaborator(
+    client,
+    qfc_project_id: str,
+    username: str,
+    role: ProjectCollaboratorRole,
+) -> None:
+    """Add a user as a collaborator to a QFieldCloud project.
+
+    Handles org-owned projects by ensuring org membership first.
+    Raises HTTPException on failure.
+    """
+    loop = get_running_loop()
+
+    try:
+        project = await loop.run_in_executor(
+            None, partial(client.get_project, qfc_project_id)
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"QFieldCloud project '{qfc_project_id}' not found.",
+        ) from exc
+
+    owner = project.get("owner", "")
+    client_username = getattr(client, "username", None)
+
+    if _is_org_owned_project(owner, client_username):
+        try:
+            await _ensure_org_membership(
+                loop=loop,
+                client=client,
+                organization=owner,
+                username=username,
+            )
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    f"Project belongs to organization '{owner}'. "
+                    f"Could not add '{username}' to the organization: {exc}"
+                ),
+            ) from exc
+
+    try:
+        await loop.run_in_executor(
+            None,
+            partial(client.add_project_collaborator, qfc_project_id, username, role),
+        )
+    except QfcRequestException as exc:
+        status_code = exc.response.status_code
+        if status_code == status.HTTP_404_NOT_FOUND:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User '{username}' does not exist on QFieldCloud.",
+            ) from exc
+        if status_code == status.HTTP_409_CONFLICT:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User '{username}' is already a collaborator on this project.",
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Failed to add collaborator: {exc}",
+        ) from exc
+
+    log.info(
+        "Added QFC user '%s' to project '%s' with role '%s'",
+        username,
+        qfc_project_id,
+        role,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Credential testing
 # ---------------------------------------------------------------------------
 
