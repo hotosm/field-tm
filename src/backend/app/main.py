@@ -281,7 +281,6 @@ def create_app() -> Litestar:
     from app.htmx.htmx_routes import htmx_router
     from app.projects.project_routes import api_router
     from app.qfield.qfield_routes import qfield_router
-    from app.users.user_routes import user_router
 
     plugins = [PydanticPlugin(), HTMXPlugin()]
 
@@ -298,7 +297,6 @@ def create_app() -> Litestar:
             root_router,
             api_router,
             auth_router,
-            user_router,
             qfield_router,
             helper_router,
             central_router,
