@@ -23,6 +23,7 @@ import logging
 
 from geojson_aoi import parse_aoi
 from litestar import get, post
+from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
@@ -74,7 +75,7 @@ def _project_not_found_response() -> Response:
     return Response(
         content=_callout("danger", "Project not found or access denied."),
         media_type="text/html",
-        status_code=404,
+        status_code=status.HTTP_404_NOT_FOUND,
     )
 
 
@@ -98,7 +99,11 @@ def _json_error_response(message: str, status_code: int) -> Response:
 
 def _service_error_response(error: ServiceError) -> Response:
     """Render service-layer failures as HTML responses."""
-    status_code = 400 if isinstance(error, SvcValidationError) else 500
+    status_code = (
+        status.HTTP_400_BAD_REQUEST
+        if isinstance(error, SvcValidationError)
+        else status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
     return Response(
         content=_callout("danger", error.message),
         media_type="text/html",
@@ -303,7 +308,7 @@ def _task_preview_state(
             'tasks first using the "Split AOI" button above.',
         ),
         media_type="text/html",
-        status_code=200,
+        status_code=status.HTTP_200_OK,
     )
 
 
@@ -398,7 +403,7 @@ def _build_split_preview_response(
         </div>
         """,
         media_type="text/html",
-        status_code=200,
+        status_code=status.HTTP_200_OK,
     )
 
 
@@ -521,7 +526,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -600,20 +605,20 @@ async def download_osm_data_htmx(  # noqa: PLR0913
         return Response(
             content=html,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except SvcValidationError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     except ServiceError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     except Exception as e:
         log.error(f"Error downloading OSM data via HTMX: {e}", exc_info=True)
@@ -621,7 +626,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -647,7 +652,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -662,7 +667,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
                     "Invalid file type. Please upload a .geojson or .json file.",
                 ),
                 media_type="text/html",
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # Parse and validate with geojson-aoi-parser (same as validate-geojson endpoint)
@@ -676,7 +681,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
             return Response(
                 content=_callout("danger", str(e)),
                 media_type="text/html",
-                status_code=422,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
         # Check if we have any features
@@ -687,7 +692,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
                     "No valid geometries found in GeoJSON.",
                 ),
                 media_type="text/html",
-                status_code=422,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
         # Validate CRS (same as validate-geojson)
@@ -756,7 +761,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
             </div>
             """,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except Exception as e:
@@ -765,7 +770,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -790,7 +795,7 @@ async def preview_geojson_htmx(
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -806,7 +811,7 @@ async def preview_geojson_htmx(
                     "or upload a GeoJSON file first.",
                 ),
                 media_type="text/html",
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
 
         feature_count = len(geojson_data.get("features", []))
@@ -870,7 +875,7 @@ async def preview_geojson_htmx(
         return Response(
             content=map_html,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except Exception as e:
@@ -879,7 +884,7 @@ async def preview_geojson_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -904,7 +909,7 @@ async def collect_new_data_only_htmx(
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -924,7 +929,7 @@ async def collect_new_data_only_htmx(
                 "Task splitting is skipped and you can continue.",
             ),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Refresh": "true"},
         )
     except Exception as e:
@@ -933,7 +938,7 @@ async def collect_new_data_only_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -978,7 +983,7 @@ async def submit_geojson_data_extract_htmx(
                     "or upload a GeoJSON file first.",
                 ),
                 media_type="text/html",
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
 
         # Delegate to shared service function (used by both HTMX and API routes)
@@ -1003,7 +1008,7 @@ async def submit_geojson_data_extract_htmx(
                 "</script>"
             ),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Refresh": "true"},
         )
 
@@ -1011,13 +1016,13 @@ async def submit_geojson_data_extract_htmx(
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     except ServiceError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     except Exception as e:
         log.error(
@@ -1028,7 +1033,7 @@ async def submit_geojson_data_extract_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1064,7 +1069,7 @@ async def preview_tasks_and_data_htmx(
                     "or upload a GeoJSON file first.",
                 ),
                 media_type="text/html",
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
 
         task_boundaries_json = await project_crud.get_task_geometry(db, project_id)
@@ -1113,7 +1118,7 @@ async def preview_tasks_and_data_htmx(
             </div>
             """,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except Exception as e:
@@ -1124,7 +1129,7 @@ async def preview_tasks_and_data_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1149,7 +1154,7 @@ async def skip_task_split_htmx(
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -1163,7 +1168,7 @@ async def skip_task_split_htmx(
                     "Project outline not found. Cannot skip task splitting.",
                 ),
                 media_type="text/html",
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # For ODK: Don't create task_boundaries dataset (it will be None/empty)
@@ -1190,7 +1195,7 @@ async def skip_task_split_htmx(
                 "single task. You can proceed to Step 4.",
             ),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Refresh": "true"},
         )
 
@@ -1200,7 +1205,7 @@ async def skip_task_split_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1267,7 +1272,7 @@ async def split_aoi_htmx(
                     "✓ Task splitting is not required for this project setup.",
                 ),
                 media_type="text/html",
-                status_code=200,
+                status_code=status.HTTP_200_OK,
                 headers={"HX-Refresh": "true"},
             )
 
@@ -1289,7 +1294,7 @@ async def split_aoi_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1346,7 +1351,7 @@ async def accept_data_extract_htmx(
         return Response(
             content=_callout("success", accepted_msg),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Refresh": "true"},
         )
 
@@ -1358,7 +1363,7 @@ async def accept_data_extract_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1414,7 +1419,7 @@ async def accept_split_htmx(
         return Response(
             content=success_message,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Refresh": "true"},
         )
 
@@ -1426,7 +1431,7 @@ async def accept_split_htmx(
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1452,7 +1457,7 @@ async def create_project_odk_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -1472,7 +1477,7 @@ async def create_project_odk_htmx(  # noqa: PLR0913
             return Response(
                 content=_callout("warning", custom_creds_msg),
                 media_type="text/html",
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         if all_custom:
@@ -1489,7 +1494,7 @@ async def create_project_odk_htmx(  # noqa: PLR0913
         return Response(
             content=_build_odk_finalize_success_html(odk_result),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
     except ServiceError as e:
         return _service_error_response(e)
@@ -1499,7 +1504,7 @@ async def create_project_odk_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1525,7 +1530,7 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", "Project not found or access denied."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -1547,19 +1552,19 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
         return Response(
             content=_build_qfield_finalize_success_html(qfield_result),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
     except SvcValidationError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     except ServiceError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     except HTTPException as e:
         return Response(
@@ -1573,7 +1578,7 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -1637,7 +1642,7 @@ async def validate_geojson(
                 await _normalize_geojson_response_body(db, result_geojson)
             ),
             media_type="application/json",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except HTTPException as e:

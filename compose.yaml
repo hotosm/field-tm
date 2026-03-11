@@ -100,7 +100,7 @@ x-qfield-common-env: &qfield-common-env
 
 x-qfield-common: &qfield-common
   # This override contains the user creation API from PR:
-  # 
+  #
   image: "ghcr.io/hotosm/field-tm/qfieldcloud-app:26.3"
   volumes:
     - qfield_static:/usr/src/app/staticfiles

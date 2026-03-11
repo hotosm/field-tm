@@ -23,6 +23,7 @@ import logging
 from contextlib import suppress
 
 from litestar import get
+from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
@@ -205,7 +206,7 @@ async def project_qrcode_htmx(
         return Response(
             content=_callout("danger", "Project not found."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     try:
@@ -224,7 +225,7 @@ async def project_qrcode_htmx(
         return Response(
             content=html_content,
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )
 
     except HTTPException as e:
@@ -239,5 +240,5 @@ async def project_qrcode_htmx(
         return Response(
             content=_callout("warning", _friendly_qr_error(e)),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
         )

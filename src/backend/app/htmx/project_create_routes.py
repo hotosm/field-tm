@@ -214,7 +214,7 @@ async def _resolve_uploaded_xlsform_bytes(
             return None, Response(
                 content=_callout("danger", "Failed to load template form."),
                 media_type="text/html",
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
         return BytesIO(template_bytes), None
 
@@ -222,7 +222,7 @@ async def _resolve_uploaded_xlsform_bytes(
         return None, Response(
             content=_callout("danger", "Please select a form or upload a file."),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
 
     return await _validate_xlsform_extension(data.xlsform), None
@@ -305,7 +305,7 @@ async def get_template_xlsform(
     if not xlsx_bytes:
         return Response(
             content="Template XLSForm not found",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     return Response(
@@ -340,7 +340,9 @@ async def create_project_htmx(
             return Response(
                 content=_project_form_error(_OUTLINE_JSON_ERROR),
                 media_type="text/html",
-                status_code=400,
+                # Keep HTMX validation responses as 200 so reverse proxies / WAF
+                # don't replace the body with branded error pages.
+                status_code=status.HTTP_200_OK,
             )
 
         project = await create_project_stub(
@@ -356,7 +358,7 @@ async def create_project_htmx(
 
         return Response(
             content="",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Redirect": f"/htmxprojects/{project.id}"},
         )
     except SvcValidationError as e:
@@ -374,7 +376,7 @@ async def create_project_htmx(
         return Response(
             content=_project_form_error(message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_200_OK,
             headers=headers,
         )
     except ConflictError as e:
@@ -382,14 +384,14 @@ async def create_project_htmx(
         return Response(
             content=_project_form_error(e.message),
             media_type="text/html",
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_200_OK,
             headers={"HX-Trigger": hx_trigger},
         )
     except ServiceError as e:
         return Response(
             content=_project_form_error(e.message),
             media_type="text/html",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_200_OK,
         )
     except Exception as e:
         log.error(
@@ -427,7 +429,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         return Response(
             content=_callout("danger", "Project not found."),
             media_type="text/html",
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # Verify project_id matches the user's project for security
@@ -438,7 +440,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
                 "Project ID mismatch. You do not have access to this project.",
             ),
             media_type="text/html",
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
         )
 
     # Use project.id from current_user (more secure)
@@ -476,7 +478,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
                 "Form validated and uploaded successfully! Reloading page...",
             ),
             media_type="text/html",
-            status_code=200,
+            status_code=status.HTTP_200_OK,
             headers={
                 "HX-Refresh": "true",  # Reload the page to show updated state
             },
@@ -486,13 +488,13 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     except ServiceError as e:
         return Response(
             content=_callout("danger", e.message),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     except Exception as e:
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
@@ -500,5 +502,5 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         return Response(
             content=_callout("danger", f"Error: {error_msg}"),
             media_type="text/html",
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
