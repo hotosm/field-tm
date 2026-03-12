@@ -123,9 +123,11 @@ qfieldQgis:
   # requests rather than dropping them, so jobs always complete in order.
   # Increase if project generation throughput becomes a bottleneck.
   replicaCount: 1
+  # Optional override for the QGIS wrapper image tag.
+  # Leave empty to use qfieldCloud.tag.
   image:
     repository: ghcr.io/hotosm/field-tm/qgis
-    tag: "25.24"
+    tag: ""
     pullPolicy: IfNotPresent
   env:
     LOG_LEVEL: INFO
@@ -174,3 +176,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+qfieldCloud:
+  enabled: false
+  tag: "26.3"

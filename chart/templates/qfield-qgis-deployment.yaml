@@ -32,7 +32,7 @@ spec:
       {{- end }}
       containers:
         - name: qgis
-          image: "{{ .Values.qfieldQgis.image.repository }}:{{ .Values.qfieldQgis.image.tag }}"
+          image: "{{ .Values.qfieldQgis.image.repository }}:{{ default .Values.qfieldCloud.tag .Values.qfieldQgis.image.tag }}"
           imagePullPolicy: {{ .Values.qfieldQgis.image.pullPolicy }}
           {{- with .Values.qfieldQgis.securityContext }}
           securityContext:
