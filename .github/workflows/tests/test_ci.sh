@@ -41,6 +41,11 @@ act push -W .github/workflows/build_odk_imgs.yml \
     -e .github/workflows/tests/push_payload.json \
     --var-file=.env --secret-file=.env
 
+# QField Img Build
+act push -W .github/workflows/build_qfield_imgs.yml \
+    -e .github/workflows/tests/push_payload.json \
+    --var-file=.env --secret-file=.env
+
 # Docs
 act push -W .github/workflows/docs.yml \
     -e .github/workflows/tests/push_payload.json \

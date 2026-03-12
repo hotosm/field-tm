@@ -1,4 +1,5 @@
-FROM ghcr.io/opengisch/qfieldcloud-qgis:25.24
+ARG QFIELDCLOUD_TAG=26.3
+FROM ghcr.io/opengisch/qfieldcloud-qgis:${QFIELDCLOUD_TAG}
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONFAULTHANDLER=1

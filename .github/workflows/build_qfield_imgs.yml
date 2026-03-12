@@ -1,0 +1,24 @@
+name: 🔧 Build QField Images
+
+on:
+  # Push includes PR merge
+  push:
+    branches:
+      - dev
+    paths:
+      # Workflow is triggered only if qfield dir changes
+      - "src/qfield/**"
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  build-qfield-qgis:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
+    with:
+      context: src/qfield
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/qgis:26.3"
+        "ghcr.io/${{ github.repository }}/qgis:latest"
+      extra_build_args: |
+        QFIELDCLOUD_TAG=26.3
+      multi_arch: true

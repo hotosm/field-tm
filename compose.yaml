@@ -83,7 +83,7 @@ x-qfield-common-env: &qfield-common-env
   EMAIL_HOST_USER: ""
   EMAIL_HOST_PASSWORD: ""
   DEFAULT_FROM_EMAIL: noreply@field.localhost
-  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:25.24
+  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:${QFIELDCLOUD_TAG:-26.3}
   # NOTE this must have a trailing slash
   QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_URL}
   QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
@@ -101,7 +101,7 @@ x-qfield-common-env: &qfield-common-env
 x-qfield-common: &qfield-common
   # This override contains the user creation API from PR:
   #
-  image: "ghcr.io/hotosm/field-tm/qfieldcloud-app:26.3"
+  image: "ghcr.io/hotosm/field-tm/qfieldcloud-app:${QFIELDCLOUD_TAG:-26.3}"
   volumes:
     - qfield_static:/usr/src/app/staticfiles
   networks:
@@ -473,7 +473,7 @@ services:
 
   qfield-worker:
     <<: *qfield-common
-    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:25.24
+    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:${QFIELDCLOUD_TAG:-26.3}
     depends_on:
       qfield-app:
         condition: service_healthy
@@ -568,8 +568,11 @@ services:
         PYCODE
 
   qfield-qgis:
-    image: "ghcr.io/hotosm/field-tm/qgis:25.24"
-    build: src/qfield
+    image: "ghcr.io/hotosm/field-tm/qgis:${QFIELDCLOUD_TAG:-26.3}"
+    build:
+      context: src/qfield
+      args:
+        QFIELDCLOUD_TAG: "${QFIELDCLOUD_TAG:-26.3}"
     volumes:
       - qfield_projects:/opt/qfield
       - ./src/qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
