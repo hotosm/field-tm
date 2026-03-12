@@ -1086,3 +1086,41 @@ body {
     align-items: stretch;
   }
 }
+
+/* ============================================================
+   Login page
+   ============================================================ */
+
+.ftm-login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100dvh - 4rem);
+  padding: 2rem 1rem;
+}
+
+.ftm-login-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.ftm-login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.ftm-login-back {
+  font-size: 0.875rem;
+  color: var(--hot-color-neutral-900, #404248);
+  text-decoration: none;
+}
+
+.ftm-login-back:hover {
+  text-decoration: underline;
+}

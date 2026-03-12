@@ -170,14 +170,17 @@ class DummyResponse:
     """Fake HTTP response for error-path testing."""
 
     def __init__(self, payload: dict | list, status_code: int = 200):
+        """Store response payload and status for the test double."""
         self._payload = payload
         self.status_code = status_code
         self.text = json.dumps(payload) if isinstance(payload, (dict, list)) else ""
 
     def json(self):
+        """Return the payload in requests.Response-compatible form."""
         return self._payload
 
     def raise_for_status(self):
+        """Raise a generic error when the fake status is not successful."""
         if self.status_code >= 400:
             raise Exception(f"{self.status_code} error")
 
@@ -186,15 +189,18 @@ class DummySession:
     """Fake HTTP session recording calls."""
 
     def __init__(self):
+        """Initialise call recording for the fake session."""
         self.post_calls = []
         self.patch_calls = []
 
     def get(self, path: str):
+        """Return canned responses for expected GET calls."""
         if path == "roles":
             return DummyResponse([{"id": 7, "name": "Project Manager"}])
         raise AssertionError(f"Unexpected GET path: {path}")
 
     def post(self, path: str, json: dict | None = None):
+        """Record POST calls and return canned responses for known endpoints."""
         self.post_calls.append((path, json))
         if path == "users":
             return DummyResponse({"id": 1234})
@@ -203,6 +209,7 @@ class DummySession:
         raise AssertionError(f"Unexpected POST path: {path}")
 
     def patch(self, path: str, json: dict | None = None):
+        """Record PATCH calls and return canned responses for known endpoints."""
         self.patch_calls.append((path, json))
         if path == "users/1234":
             return DummyResponse({"success": True})
@@ -210,7 +217,10 @@ class DummySession:
 
 
 class DummyClient:
+    """Fake PyODK client exposing the test session double."""
+
     def __init__(self):
+        """Attach a session double matching the client shape used in tests."""
         self.session = DummySession()
 
 

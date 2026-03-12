@@ -1,0 +1,149 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Production self-hosted Hanko authentication overlay.
+# Extends deploy/compose.sub.yaml with the Hanko auth stack.
+#
+# IMPORTANT: This file uses ${FTM_DOMAIN} in bunkerweb env var KEY names,
+# which requires envsubst preprocessing - the same pipeline already used by
+# compose.sub.yaml.  Use `just start prod-login` which handles this.
+#
+# For non-VM deployments see AUTH_PROVIDER=hotosm (centralised HOT login)
+# or AUTH_PROVIDER=custom (bring-your-own Hanko).
+
+name: field-tm
+
+networks:
+  ftm-net:
+    name: field-tm
+
+volumes:
+  hanko_config:
+  hanko_data:
+
+services:
+  # Add login.${FTM_DOMAIN} to the proxy's site list and route it to Hanko.
+  # SERVER_NAME must repeat all prod domains because Docker Compose replaces
+  # (not appends) environment values when merging overlay files.
+  proxy:
+    environment:
+      SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.${FTM_DOMAIN}} login.${FTM_DOMAIN}
+      login.${FTM_DOMAIN}_USE_REVERSE_PROXY: "yes"
+      login.${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://hanko:8000
+      login.${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
+
+  # Inject Hanko URLs for the api container (overrides any value from .env).
+  api:
+    environment:
+      HANKO_API_URL: http://hanko:8000
+      HANKO_PUBLIC_URL: https://login.${FTM_DOMAIN}
+      LOGIN_URL: https://${FTM_DOMAIN}/login
+    depends_on:
+      hanko:
+        condition: service_started
+
+  # --------------------------------------------------------------------------
+  # Hanko auth stack (identical roles to contrib/login/compose.yaml, but with
+  # prod defaults: HTTPS URLs, no exposed host port, real SMTP settings).
+  # --------------------------------------------------------------------------
+
+  hanko-config:
+    image: alpine:3.23
+    command: >
+      sh -c "apk add --no-cache gettext &&
+             envsubst < /tpl/hanko-config.tpl.yaml > /config/hanko-config.yaml &&
+             echo '--- rendered config ---' &&
+             cat /config/hanko-config.yaml"
+    environment:
+      HANKO_DB_HOST: hanko-db
+      HANKO_DB_USER: ${HANKO_DB_USER:-hanko}
+      HANKO_DB_PASSWORD: ${HANKO_DB_PASSWORD:-hanko}
+      HANKO_DB_NAME: ${HANKO_DB_NAME:-hanko}
+      # HANKO_SECRET is required in prod - generate with: openssl rand -base64 32
+      HANKO_SECRET: ${HANKO_SECRET}
+      HANKO_COOKIE_DOMAIN: ${FTM_DOMAIN}
+      HANKO_ALLOWED_ORIGIN: https://${FTM_DOMAIN}
+      HANKO_REDIRECT_URL: https://${FTM_DOMAIN}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM_ADDRESS: ${SMTP_FROM_ADDRESS:-noreply@${FTM_DOMAIN}}
+      GOOGLE_ENABLED: ${GOOGLE_ENABLED:-false}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    volumes:
+      # Path is relative to this file's directory (deploy/), so ../contrib/login/
+      # correctly resolves to the repo-root contrib/login/ directory.
+      - ../contrib/login/hanko-config.tpl.yaml:/tpl/hanko-config.tpl.yaml:ro
+      - hanko_config:/config
+    networks:
+      - ftm-net
+    restart: "on-failure:2"
+
+  hanko-migrate:
+    image: ghcr.io/teamhanko/hanko:v2.1.0
+    command: migrate up --config /config/hanko-config.yaml
+    volumes:
+      - hanko_config:/config:ro
+    depends_on:
+      hanko-config:
+        condition: service_completed_successfully
+      hanko-db:
+        condition: service_healthy
+    networks:
+      - ftm-net
+    restart: "on-failure:2"
+
+  hanko:
+    image: ghcr.io/teamhanko/hanko:v2.1.0
+    command: serve all --config /config/hanko-config.yaml
+    # No host port exposure in prod - access via the proxy only.
+    volumes:
+      - hanko_config:/config:ro
+    depends_on:
+      hanko-migrate:
+        condition: service_completed_successfully
+      hanko-db:
+        condition: service_healthy
+    networks:
+      - ftm-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/hanko", "isready", "--config", "/config/hanko-config.yaml", "public"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hanko-db:
+    image: "ghcr.io/hotosm/postgis:18-3.6-alpine"
+    environment:
+      POSTGRES_USER: ${HANKO_DB_USER:-hanko}
+      POSTGRES_PASSWORD: ${HANKO_DB_PASSWORD:-hanko}
+      POSTGRES_DB: ${HANKO_DB_NAME:-hanko}
+    volumes:
+      - hanko_data:/var/lib/postgresql/data
+    networks:
+      - ftm-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${HANKO_DB_USER:-hanko} -d ${HANKO_DB_NAME:-hanko}"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 5

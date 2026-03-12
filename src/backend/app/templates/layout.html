@@ -112,7 +112,7 @@
       type="module"
       src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
     ></script>
-    {% if not disable_login %}
+    {% if auth_enabled %}
     <link
       rel="modulepreload"
       href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
@@ -154,22 +154,29 @@
 
   <body>
     <hot-header id="app-header" title="FieldTM" size="medium">
-      {% if not disable_login %}
+      {% if auth_enabled %}
       <wa-button slot="auth" variant="brand" id="login-btn">Login</wa-button>
       {% endif %}
     </hot-header>
 
-    {% if not disable_login %}
-    <wa-dialog id="login-dialog" label="Sign in">
-      <hotosm-auth hanko-url="{{ hanko_public_url }}" show-profile="true"></hotosm-auth>
-    </wa-dialog>
+    {% if auth_enabled %}
+    <!-- Hidden session verifier: validates the Hanko session after redirect back
+         from the login page and emits hanko-login. -->
+    <div style="display: none">
+      <hotosm-auth hanko-url="{{ hanko_public_url }}"></hotosm-auth>
+    </div>
     {% endif %} {% block content %}{% endblock %}
 
     <script>
-      {% if not disable_login %}
-      document.getElementById("login-btn").addEventListener("click", () => {
-        document.getElementById("login-dialog").show();
-      });
+      {% if auth_enabled %}
+      const loginButton = document.getElementById("login-btn");
+      if (loginButton) {
+        loginButton.addEventListener("click", () => {
+          const returnTo = encodeURIComponent(window.location.href);
+          const separator = "{{ login_url }}".includes("?") ? "&" : "?";
+          window.location.href = `{{ login_url }}${separator}return_to=${returnTo}`;
+        });
+      }
       {% endif %}
 
       // hot-header tabs must be set as a JS property (not an HTML attribute)

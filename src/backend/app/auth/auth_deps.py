@@ -26,7 +26,7 @@ from litestar import Request
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 
-from app.config import settings
+from app.config import AuthProvider, settings
 
 
 def _pick_attr(obj: object, *names: str) -> Any:
@@ -77,14 +77,14 @@ def get_user_is_admin(user: object) -> bool:
 
 async def login_required(request: Request) -> object:
     """Dependency for endpoints requiring login."""
-    if settings.DEBUG or settings.DISABLE_LOGIN:
+    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
         return SimpleNamespace(sub="osm|1", username="localadmin", is_admin=True)
     return await get_current_user(request)
 
 
 async def public_endpoint(request: Request) -> object:
     """Optional-auth dependency with a service-account fallback."""
-    if settings.DEBUG or settings.DISABLE_LOGIN:
+    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
         return SimpleNamespace(sub="osm|1", username="localadmin", is_admin=True)
     user = await get_current_user_optional(request)
     if user:

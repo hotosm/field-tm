@@ -27,6 +27,12 @@ from psycopg import AsyncConnection
 from app.db.database import db_conn
 
 
+@get(path="/login")
+async def login_page(request: HTMXRequest) -> Template:
+    """Render the embedded login page (used for self-hosted deployments)."""
+    return HTMXTemplate(template_name="login.html")
+
+
 @get(
     path="/",
     dependencies={"db": Provide(db_conn)},

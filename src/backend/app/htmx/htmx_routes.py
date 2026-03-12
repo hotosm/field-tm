@@ -2,7 +2,7 @@
 
 from litestar import Router
 
-from app.htmx.landing_routes import landing, metrics_partial
+from app.htmx.landing_routes import landing, login_page, metrics_partial
 from app.htmx.project_create_routes import (
     create_project_htmx,
     get_template_xlsform,
@@ -58,6 +58,7 @@ htmx_router = Router(
         serve_pwa_512,
         serve_pwa_64,
         landing,
+        login_page,
         project_listing,
         metrics_partial,
         new_project,

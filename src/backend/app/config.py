@@ -32,6 +32,7 @@ from pydantic import (
     ValidationInfo,
     computed_field,
     field_validator,
+    model_validator,
 )
 from pydantic.networks import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -43,6 +44,15 @@ HttpUrlStr = Annotated[
         lambda value: str(TypeAdapter(HttpUrl).validate_python(value) if value else "")
     ),
 ]
+
+
+class AuthProvider(str, Enum):
+    """Authentication provider options."""
+
+    BUNDLED = "bundled"  # self-hosted Hanko via contrib/login (default)
+    DISABLED = "disabled"  # no authentication - public access only
+    HOTOSM = "hotosm"  # centralised HOT login at login.hotosm.org
+    CUSTOM = "custom"  # user-supplied HANKO_API_URL / LOGIN_URL
 
 
 class MonitoringTypes(str, Enum):
@@ -152,14 +162,37 @@ class Settings(BaseSettings):
     FTM_DEV_PORT: Optional[str] = None
     APP_NAME: str = "Field-TM"
     DEBUG: bool = False
-    DISABLE_LOGIN: bool = False
-    HANKO_API_URL: str = "https://dev.login.hotosm.org"
-    # Browser-accessible Hanko URL for the hotosm-auth web component.
-    # Only needed when the backend and browser use different URLs to reach Hanko
-    # (e.g. self-hosted local dev: backend uses http://hanko:8000 internally
-    # while the browser reaches it on http://localhost:8088).
-    # Defaults to HANKO_API_URL when not set.
+    # Auth provider - controls which Hanko instance and login page are used.
+    #   bundled  - self-hosted Hanko via `just start login` (default)
+    #   disabled - no authentication, public access only
+    #   hotosm   - centralised HOT login (auto-configures HANKO_API_URL + LOGIN_URL)
+    #   custom   - bring your own Hanko; set HANKO_API_URL + LOGIN_URL explicitly
+    AUTH_PROVIDER: AuthProvider = AuthProvider.BUNDLED
+    # Only used directly for AUTH_PROVIDER=custom. For bundled/hotosm these are
+    # auto-configured by the model validator below.
+    # contrib/login/compose.yaml injects HANKO_PUBLIC_URL for bundled local dev.
+    HANKO_API_URL: Optional[str] = None
     HANKO_PUBLIC_URL: Optional[str] = None
+    LOGIN_URL: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _apply_auth_provider(self) -> "Settings":
+        """Auto-configure auth fields based on AUTH_PROVIDER."""
+        if self.AUTH_PROVIDER == AuthProvider.DISABLED:
+            object.__setattr__(self, "HANKO_API_URL", None)
+            object.__setattr__(self, "HANKO_PUBLIC_URL", None)
+            object.__setattr__(self, "LOGIN_URL", None)
+        elif self.AUTH_PROVIDER == AuthProvider.HOTOSM:
+            object.__setattr__(self, "HANKO_API_URL", "https://login.hotosm.org")
+            object.__setattr__(self, "LOGIN_URL", "https://login.hotosm.org/app")
+        elif self.AUTH_PROVIDER == AuthProvider.BUNDLED:
+            if not self.HANKO_API_URL:
+                object.__setattr__(self, "HANKO_API_URL", "http://hanko:8000")
+        elif self.AUTH_PROVIDER == AuthProvider.CUSTOM:
+            if not self.HANKO_API_URL:
+                raise ValueError("HANKO_API_URL must be set when AUTH_PROVIDER=custom")
+        return self
+
     LOG_LEVEL: str = "INFO"
     PYODK_LOG_LEVEL: str = "CRITICAL"
     ENCRYPTION_KEY: SecretStr
@@ -320,8 +353,9 @@ def get_settings():
     """Cache settings when accessed throughout app."""
     _settings = Settings()
     # NOTE hotosm-auth reads these via AuthConfig.from_env() during app startup,
-    # so they must be set here
-    os.environ["HANKO_API_URL"] = _settings.HANKO_API_URL
+    # so they must be set here.  Skip when auth is disabled.
+    if _settings.HANKO_API_URL:
+        os.environ["HANKO_API_URL"] = _settings.HANKO_API_URL
     os.environ["COOKIE_SECRET"] = _settings.ENCRYPTION_KEY.get_secret_value()
 
     if _settings.DEBUG:

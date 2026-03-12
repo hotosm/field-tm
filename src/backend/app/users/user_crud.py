@@ -171,8 +171,9 @@ async def get_or_create_user(
 
     #     Hi {username},
 
-    #     Your account has been inactive for a long time. To comply with our policy, your
-    #     account will be deleted in {days_remaining} days if you do not log in.
+    #     Your account has been inactive for a long time. To comply with our
+    #     policy, your account will be deleted in {days_remaining} days if you
+    #     do not log in.
 
     #     Please log in to reset your inactivity period and avoid deletion.
 

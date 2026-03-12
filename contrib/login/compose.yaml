@@ -15,7 +15,7 @@
 #     along with Field-TM.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Self-hosted Hanko authentication service for local development and self-hosting.
+# Self-hosted Hanko authentication - LOCAL DEVELOPMENT ONLY.
 # Use with: docker compose -f compose.yaml -f contrib/login/compose.yaml up -d
 # Or via:   just start login
 #
@@ -24,9 +24,12 @@
 #   - proxy override: adds login.field.localhost routing to Hanko
 #   - api override:   injects HANKO_API_URL + HANKO_PUBLIC_URL automatically
 #
-# No .env changes are needed for local dev — Hanko URLs are wired in here.
-# For production / Kubernetes, configure an external Hanko instance via
-# HANKO_API_URL and HANKO_PUBLIC_URL, or set DISABLE_LOGIN=true to skip auth.
+# No .env changes are needed for local dev - Hanko URLs are wired in here.
+#
+# For VM/production deployments use deploy/compose.login.yaml instead
+# (HTTPS URLs, no exposed debug port, real SMTP, correct domain routing).
+# For centralised HOT login or external Hanko: AUTH_PROVIDER=hotosm / AUTH_PROVIDER=custom.
+# To skip auth entirely: AUTH_PROVIDER=disabled.
 #
 # Email (OTP passcodes) is captured by the local mailpit UI at:
 #   http://mail.field.localhost:${FTM_DEV_PORT:-7050}
@@ -35,8 +38,6 @@ name: field-tm
 
 networks:
   ftm-net:
-    external: true
-    name: field-tm-local
 
 volumes:
   hanko_config:
@@ -64,6 +65,9 @@ services:
     environment:
       HANKO_API_URL: http://hanko:8000
       HANKO_PUBLIC_URL: http://login.field.localhost:${FTM_DEV_PORT:-7050}
+      # For self-hosted, use Field-TM's own /login page (no separate login web app).
+      # The /login page embeds <hotosm-auth> directly against the self-hosted Hanko.
+      LOGIN_URL: http://field.localhost:${FTM_DEV_PORT:-7050}/login
     depends_on:
       hanko:
         condition: service_started
@@ -83,7 +87,7 @@ services:
       HANKO_DB_PASSWORD: ${HANKO_DB_PASSWORD:-hanko}
       HANKO_DB_NAME: ${HANKO_DB_NAME:-hanko}
       HANKO_SECRET: ${HANKO_SECRET:-Dqn09li1XXUdLwUry07XWYnLRpmqkzzsu7AtR6Oum5g=}
-      HANKO_COOKIE_DOMAIN: ${HANKO_COOKIE_DOMAIN:-localhost}
+      HANKO_COOKIE_DOMAIN: ${HANKO_COOKIE_DOMAIN:-field.localhost}
       HANKO_ALLOWED_ORIGIN: ${HANKO_ALLOWED_ORIGIN:-http://field.localhost:7050}
       HANKO_REDIRECT_URL: ${HANKO_REDIRECT_URL:-http://field.localhost:7050}
       # From main compose.yaml mailpit instance

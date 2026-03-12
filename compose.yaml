@@ -230,7 +230,7 @@ services:
       - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
     environment:
       DEBUG: ${DEBUG:-True}
-      DISABLE_LOGIN: ${DISABLE_LOGIN:-false}
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-bundled}
       ODK_CENTRAL_PUBLIC_URL: http://${FTM_ODK_DOMAIN:-odk.field.localhost}:${FTM_DEV_PORT:-7050}
     depends_on:
       proxy:

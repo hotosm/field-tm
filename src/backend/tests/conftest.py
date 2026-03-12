@@ -20,6 +20,7 @@
 import logging
 import os
 from collections.abc import AsyncIterator
+from contextlib import suppress
 from pathlib import Path
 from uuid import uuid4
 
@@ -205,10 +206,8 @@ async def odk_project(odk_creds):
     )
     odk_id = odk_proj["id"]
     yield odk_id
-    try:
+    with suppress(Exception):
         await central_crud.delete_odk_project(odk_id)
-    except Exception:
-        pass
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -241,22 +240,16 @@ async def project_with_xlsform(db, admin_user):
     yield project
 
     # Clean up the ODK Central project (if finalization created one)
-    try:
+    with suppress(Exception):
         refreshed = await DbProject.one(db, project.id)
         if refreshed.external_project_id:
-            try:
+            with suppress(Exception):
                 await central_crud.delete_odk_project(refreshed.external_project_id)
-            except Exception:
-                pass
-    except Exception:
-        pass
 
     # Clean up the FTM project
-    try:
+    with suppress(Exception):
         await DbProject.delete(db, project.id)
         await db.commit()
-    except Exception:
-        pass
 
 
 @pytest_asyncio.fixture(scope="function")

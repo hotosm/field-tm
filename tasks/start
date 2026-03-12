@@ -24,13 +24,13 @@ docker := env("DOCKER_ALIAS", "docker")
 default:
   just --justfile {{justfile()}} --list start
 
-# Start Field-TM (auth disabled via DISABLE_LOGIN=true)
+# Start Field-TM (auth disabled)
 [no-cd]
 all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  DISABLE_LOGIN=true {{docker}} compose up -d
+  AUTH_PROVIDER=disabled {{docker}} compose up -d
 
 # Production deploy, based on current checked out branch
 [no-cd]
@@ -53,6 +53,33 @@ prod:
         --remove-orphans --force-recreate
 
   just _echo-blue "FieldTM started successfully"
+
+# Production deploy with self-hosted Hanko auth (contrib/login)
+[no-cd]
+prod-login:
+  #!/usr/bin/env sh
+  set -e
+
+  # From deploy dir
+  cd {{justfile_directory()}}/deploy
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
+
+  # Config
+  just config generate-dotenv "${GIT_BRANCH}"
+  just config custom-favicon
+
+  # Both compose files use ${FTM_DOMAIN} in bunkerweb env var KEY names, which
+  # requires envsubst preprocessing.  Process to temp files then compose together.
+  tmp_main=$(mktemp)
+  tmp_login=$(mktemp)
+  ../envsubst -no-unset -i compose.sub.yaml > "$tmp_main"
+  ../envsubst -no-unset -i compose.login.yaml > "$tmp_login"
+  {{docker}} compose -f "$tmp_main" -f "$tmp_login" up --detach \
+    --remove-orphans --force-recreate
+  rm -f "$tmp_main" "$tmp_login"
+
+  just _echo-blue "FieldTM + self-hosted Hanko started successfully"
 
 # Production deploy with self-hosted ODK Central
 [no-cd]
