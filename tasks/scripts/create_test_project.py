@@ -77,7 +77,7 @@ async def _get_or_create_api_key(db) -> str:
         row = await cur.fetchone()
 
     if row:
-        # We stored the hash, not the plain key — create a fresh one instead
+        # We stored the hash, not the plain key - create a fresh one instead
         pass
 
     # Generate a new key
@@ -156,7 +156,7 @@ async def main():
         "mandatory_photo_upload": False,
         "use_odk_collect": True,
         "default_language": "english",
-        # Data extract — download OSM buildings
+        # Data extract - download OSM buildings
         "osm_category": "OSM Buildings",
         "geom_type": "POLYGON",
         "centroid": False,

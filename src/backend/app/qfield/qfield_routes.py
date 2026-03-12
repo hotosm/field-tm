@@ -17,6 +17,7 @@
 #
 """Routes to relay requests to QFieldCloud server (Litestar)."""
 
+from psycopg import AsyncConnection
 from litestar import Request, Router, post
 from litestar import status_codes as status
 from litestar.di import Provide
@@ -40,10 +41,10 @@ from app.qfield.qfield_deps import qfield_client
     status_code=status.HTTP_200_OK,
 )
 async def qfc_creds_test(
-    qfc_creds: qfield_schemas.QFieldCloud,
+    data: qfield_schemas.QFieldCloud,
 ) -> None:
     """Test QFieldCloud credentials by attempting to open a session."""
-    await qfc_credentials_test(qfc_creds)
+    await qfc_credentials_test(data)
 
 
 @post(
@@ -56,7 +57,7 @@ async def qfc_creds_test(
 )
 async def qfc_add_collaborator(
     request: Request,
-    db,
+    db: AsyncConnection,
     qfc_project_id: str,
     data: qfield_schemas.AddQFCCollaboratorRequest,
 ) -> None:

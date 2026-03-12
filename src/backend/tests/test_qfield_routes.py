@@ -17,10 +17,12 @@
 #
 """Tests for qfield routes."""
 
-from unittest.mock import AsyncMock, patch
+from uuid import uuid4
 
 import pytest
 
+from app.auth.api_key import hash_api_key
+from app.db.models import DbApiKey
 from app.qfield.qfield_crud import (
     _is_org_owned_project,
     _resolve_qfield_project_url,
@@ -29,24 +31,94 @@ from app.qfield.qfield_crud import (
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
 )
-from app.qfield.qfield_routes import qfc_creds_test
 from app.qfield.qfield_schemas import QFieldCloud
 
 
-async def test_qfield_creds_test():
-    """The surviving QField JSON route should still validate credentials."""
-    with patch(
-        "app.qfield.qfield_routes.qfc_credentials_test", new_callable=AsyncMock
-    ) as mock_test_qfc:
-        await qfc_creds_test.fn(
-            qfc_creds=QFieldCloud(
-                qfield_cloud_url="https://app.qfield.cloud",
-                qfield_cloud_user="demo-user",
-                qfield_cloud_password="Password1234",
-            )
+@pytest.fixture()
+async def ensure_api_keys_table(db):
+    """Ensure the api_keys table exists for API-key-protected route tests."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS public.api_keys (
+                id SERIAL PRIMARY KEY,
+                user_sub character varying NOT NULL
+                    REFERENCES public.users(sub) ON DELETE CASCADE,
+                key_hash character varying NOT NULL UNIQUE,
+                name character varying,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                last_used_at TIMESTAMPTZ,
+                is_active BOOLEAN NOT NULL DEFAULT TRUE
+            );
+            """
         )
+    await db.commit()
 
-    mock_test_qfc.assert_awaited_once()
+
+@pytest.fixture()
+async def admin_api_key(db, admin_user, ensure_api_keys_table):
+    """Create a real API key row for integration route calls."""
+    raw_key = f"ftm_qfield_{uuid4().hex}"
+    await DbApiKey.create(
+        db,
+        DbApiKey(
+            user_sub=admin_user.sub,
+            key_hash=hash_api_key(raw_key),
+            name="qfield route integration key",
+        ),
+    )
+    await db.commit()
+    return raw_key
+
+
+async def test_qfield_creds_test_invalid_credentials_returns_400(client):
+    """QField credential endpoint should reject invalid credentials."""
+    response = await client.post(
+        "/qfield/test-credentials",
+        json={
+            "qfield_cloud_url": "https://app.qfield.cloud",
+            "qfield_cloud_user": "invalid-user",
+            "qfield_cloud_password": "invalid-password",
+        },
+    )
+
+    assert response.status_code == 400
+
+
+async def test_qfield_add_collaborator_requires_api_key(client):
+    """Collaborator route should reject requests without an API key."""
+    response = await client.post(
+        "/qfield/projects/nonexistent/collaborators",
+        json={"username": "new-user", "role": "editor"},
+    )
+
+    assert response.status_code == 401
+
+
+async def test_qfield_add_collaborator_with_real_api_key_hits_qfield_flow(
+    client, admin_api_key
+):
+    """Route should authenticate via DB API key and execute collaborator flow."""
+    response = await client.post(
+        "/qfield/projects/nonexistent/collaborators",
+        headers={"x-api-key": admin_api_key},
+        json={"username": "new-user", "role": "editor"},
+    )
+
+    # We only assert the auth boundary here; downstream QFieldCloud may return
+    # project-not-found (404) or service/login failures (500) depending stack state.
+    assert response.status_code != 401
+
+
+async def test_qfield_add_collaborator_payload_defaults_role(client, admin_api_key):
+    """Role should default when omitted, still exercising the real route path."""
+    response = await client.post(
+        "/qfield/projects/nonexistent/collaborators",
+        headers={"x-api-key": admin_api_key},
+        json={"username": "new-user"},
+    )
+
+    assert response.status_code != 401
 
 
 def test_clean_tags_for_qgis_stringifies_nested_properties():

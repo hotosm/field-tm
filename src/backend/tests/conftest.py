@@ -20,6 +20,7 @@
 import logging
 import os
 from collections.abc import AsyncIterator
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -28,9 +29,9 @@ from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
 from app.auth.auth_schemas import AuthUser
-from app.central import central_schemas
+from app.central import central_crud, central_schemas
 from app.config import encrypt_value, settings
-from app.db.database import get_db_connection_pool
+from app.db.database import close_db_connection_pool, get_db_connection_pool
 from app.db.enums import (
     FieldMappingApp,
 )
@@ -43,6 +44,22 @@ from app.projects.project_schemas import (
     StubProjectIn,
 )
 from app.users.user_crud import get_or_create_user
+
+TEST_DATA_DIR = Path(__file__).parent / "test_data"
+
+# Small Kathmandu polygon used across multiple tests
+_KATHMANDU_OUTLINE = {
+    "type": "Polygon",
+    "coordinates": [
+        [
+            [85.299989110, 27.7140080437],
+            [85.299989110, 27.7108923499],
+            [85.304783157, 27.7108923499],
+            [85.304783157, 27.7140080437],
+            [85.299989110, 27.7140080437],
+        ]
+    ],
+}
 
 log = logging.getLogger(__name__)
 
@@ -75,8 +92,13 @@ async def db():
     # This function also handles reopening closed pools
     pool = await get_db_connection_pool(litestar_api)
 
-    async with pool.connection() as conn:
-        yield conn
+    try:
+        async with pool.connection() as conn:
+            yield conn
+    finally:
+        # Tests can acquire the pool directly without app lifespan management.
+        # Ensure worker tasks are stopped before the event loop is torn down.
+        await close_db_connection_pool(litestar_api)
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -166,6 +188,78 @@ async def stub_project_data():
 
 
 @pytest_asyncio.fixture(scope="function")
+async def odk_creds():
+    """ODK Central credentials from environment variables."""
+    return central_schemas.ODKCentral(
+        external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
+        external_project_username=os.getenv("ODK_CENTRAL_USER"),
+        external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
+    )
+
+
+@pytest_asyncio.fixture(scope="function")
+async def odk_project(odk_creds):
+    """A real ODK Central project. Deleted after the test completes."""
+    odk_proj = await central_crud.create_odk_project(
+        f"ftm-test-{uuid4().hex[:8]}", odk_creds
+    )
+    odk_id = odk_proj["id"]
+    yield odk_id
+    try:
+        await central_crud.delete_odk_project(odk_id)
+    except Exception:
+        pass
+
+
+@pytest_asyncio.fixture(scope="function")
+async def api_key(client):
+    """A real API key for use in external API endpoint tests."""
+    resp = await client.post("/auth/api-keys", json={"name": "test-api-key"})
+    assert resp.status_code == 201, resp.text
+    yield resp.json()["api_key"]
+
+
+@pytest_asyncio.fixture(scope="function")
+async def project_with_xlsform(db, admin_user):
+    """A project pre-loaded with a real XLSForm but no data extract.
+
+    Used for finalization tests that need valid XLSForm content.
+    Teardown deletes the ODK Central project (if created) and the FTM project.
+    """
+    xlsform_bytes = (TEST_DATA_DIR / "buildings.xls").read_bytes()
+    project_metadata = ProjectIn(
+        name=f"test-odk-{uuid4().hex[:8]}",
+        field_mapping_app=FieldMappingApp.ODK,
+        description="test",
+        outline=_KATHMANDU_OUTLINE,
+        created_by_sub=admin_user.sub,
+        xlsform_content=xlsform_bytes,
+    )
+    new_project = await DbProject.create(db, project_metadata)
+    await db.commit()
+    project = await DbProject.one(db, new_project.id)
+    yield project
+
+    # Clean up the ODK Central project (if finalization created one)
+    try:
+        refreshed = await DbProject.one(db, project.id)
+        if refreshed.external_project_id:
+            try:
+                await central_crud.delete_odk_project(refreshed.external_project_id)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    # Clean up the FTM project
+    try:
+        await DbProject.delete(db, project.id)
+        await db.commit()
+    except Exception:
+        pass
+
+
+@pytest_asyncio.fixture(scope="function")
 async def stub_project(db, stub_project_data):
     """A stub project."""
     stub_project_data = StubProjectIn(**stub_project_data)
@@ -212,11 +306,13 @@ async def client() -> AsyncIterator[AsyncClient]:
                 yield ac
     except* Exception as eg:
         # Handle ExceptionGroup from async task cleanup
-        # This can happen when background tasks (e.g., from AsyncNearestCity)
-        # aren't fully cleaned up before the test ends
-        # We'll suppress these as they're typically harmless cleanup issues
+        # This can happen when background tasks (e.g., from AsyncNearestCity or
+        # psycopg connection pool workers) aren't fully cleaned up before the
+        # event loop closes. We suppress these harmless cleanup exceptions.
         cleanup_related = any(
-            "TaskGroup" in str(e) or "unhandled" in str(e).lower()
+            "TaskGroup" in str(e)
+            or "unhandled" in str(e).lower()
+            or "Event loop is closed" in str(e)
             for e in eg.exceptions
         )
         if cleanup_related:

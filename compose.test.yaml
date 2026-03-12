@@ -43,14 +43,7 @@ services:
       service: api
     volumes: !override
       - ftm_logs:/opt/logs
-      - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
-      - ./src/backend/app:/opt/app:ro
-      - ./src/backend/tests:/opt/tests:ro
-      # Workspace packages config
-      - ./src/backend/packages/osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.13/site-packages/osm_fieldwork:ro
-      - ./src/backend/packages/osm-fieldwork/tests:/opt/package_tests/test_osm_fieldwork:ro
-      - ./src/backend/packages/area-splitter/area_splitter:/opt/python/lib/python3.13/site-packages/area_splitter:ro
-      - ./src/backend/packages/area-splitter/tests:/opt/package_tests/test_area_splitter:ro
+      # No mounts needed, as we do a re-built before every test run
     # We don't need proxy
     depends_on: !override
       fieldtm-db:
@@ -66,6 +59,12 @@ services:
   #     file: compose.yaml
   #     service: ui
 
+  # Required for ODK Central user creation (sends welcome email on POST /v1/users)
+  mail:
+    extends:
+      file: compose.yaml
+      service: mail
+
   central:
     extends:
       file: compose.yaml
@@ -74,6 +73,8 @@ services:
     depends_on: !override
       central-db:
         condition: service_healthy
+      mail:
+        condition: service_started
 
   migrations:
     extends:

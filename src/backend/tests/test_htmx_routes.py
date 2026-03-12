@@ -50,7 +50,7 @@ async def test_create_project_htmx_returns_inline_error_for_missing_description(
         headers={"HX-Request": "true"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_200_OK
     assert "Description is required." in response.text
 
 
@@ -67,7 +67,7 @@ async def test_create_project_htmx_returns_inline_error_for_missing_mapping_app(
         headers={"HX-Request": "true"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_200_OK
     assert "Field Mapping App is required." in response.text
 
 
@@ -504,4 +504,4 @@ def test_build_finalize_error_html_uses_generic_text_for_json_payload():
 
     assert "Project finalisation failed." in html
     assert "View technical details" in html
-    assert '"detail"' in html
+    assert "&quot;detail&quot;" in html

@@ -399,7 +399,7 @@ async def create_qfield_project(
             open_in_edit_mode=open_in_edit_mode,
         )
 
-        # Locate the generated .qgz — the converter may sanitise the title
+        # Locate the generated .qgz - the converter may sanitise the title
         # when building the filename so we scan rather than predict.
         final_dir = job_dir / "final"
         qgz_files = list(final_dir.glob("*.qgz"))
@@ -557,7 +557,7 @@ async def _upload_to_qfieldcloud(
         # Determine the owner (the authenticated user, or a configured org)
         qfc_owner = _resolve_qfc_owner(client, custom_qfield_creds)
 
-        # Create project (sync SDK call → run in executor)
+        # Create project (sync SDK call --> run in executor)
         qfield_project = await loop.run_in_executor(
             None,
             partial(
@@ -574,7 +574,7 @@ async def _upload_to_qfieldcloud(
         api_project_owner = qfield_project.get("owner") or qfc_owner
 
         try:
-            # Upload files (sync SDK call → run in executor)
+            # Upload files (sync SDK call --> run in executor)
             log.info(f"Uploading files to QFieldCloud project {qfc_project_name}")
             upload_info = await loop.run_in_executor(
                 None,

@@ -8,6 +8,7 @@
 !backend/tests
 !backend/pyproject.toml
 !backend/uv.lock
+!qfield/project_gen_svc.py
 !app-entrypoint.sh
 !migrate-entrypoint.sh
 !migrations

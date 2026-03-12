@@ -199,8 +199,16 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv <<EOT
         --group docs \
         --group dev
 EOT
+# As we rebuilt before running the tests anyway, just copy all the files in
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
+COPY --chown=appuser:appuser backend/pyproject.toml /opt/pyproject.toml
+COPY --chown=appuser:appuser backend/tests/ /opt/tests/
+# Needed by tests/test_qfield_project_gen_svc.py dynamic module loading
+COPY --chown=appuser:appuser qfield/project_gen_svc.py /opt/src/qfield/project_gen_svc.py
+# We move the package tests for easier pytest discovery
+COPY --chown=appuser:appuser backend/packages/osm-fieldwork/tests/ /opt/package_tests/test_osm_fieldwork/
+COPY --chown=appuser:appuser backend/packages/area-splitter/tests/ /opt/package_tests/test_area_splitter/
 USER appuser
 CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
     "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \

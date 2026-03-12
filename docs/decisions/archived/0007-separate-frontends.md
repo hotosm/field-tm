@@ -5,8 +5,8 @@
 Initially, FieldTM was implemented as a single backend and frontend application,
 serving both managers and mappers through a unified interface.
 
-It became quickly apparent that the needs of our two main user groups—project managers
-and field mappers—are significantly different in terms of both UX and technical
+It became quickly apparent that the needs of our two main user groups-project managers
+and field mappers-are significantly different in terms of both UX and technical
 constraints.
 
 ### Mapper needs

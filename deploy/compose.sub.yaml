@@ -86,7 +86,6 @@ services:
       AUTO_LETS_ENCRYPT: yes
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
-      # Reverse proxy configs — core FieldTM domains only
       SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}
       ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
       ${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"

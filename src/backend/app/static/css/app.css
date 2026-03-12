@@ -1,5 +1,5 @@
 /* ============================================================
-   Field-TM — Shared Application Styles
+   Field-TM - Shared Application Styles
    ============================================================
    Reusable utility classes used across all server-rendered
    templates. Keeps templates thin and style changes centralized.
@@ -46,7 +46,7 @@ body {
   margin: 0 auto;
 }
 
-/* Muted background — used only on list/index pages where cards need to pop */
+/* Muted background - used only on list/index pages where cards need to pop */
 .ftm-page--muted {
   background-color: var(--hot-color-neutral-100, #e8e8e8);
   min-height: calc(100vh - 60px);
@@ -189,7 +189,7 @@ body {
 }
 
 /* --- Project card ----------------------------------------- */
-/* wa-card has no "base" part — style the host element directly.           */
+/* wa-card has no "base" part - style the host element directly.           */
 /* External styles win over shadow-DOM :host styles per CSS Scoping spec.  */
 .ftm-project-card {
   display: block;

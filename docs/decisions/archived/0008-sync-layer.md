@@ -35,7 +35,7 @@ client-side database that integrates smoothly into our stack.
 - Replicache
   - Uses a custom sync engine and local IndexedDB storage. Well-designed for
     reactivity and performance.
-  - Not SQL-based—requires writing a custom sync protocol and a client-side
+  - Not SQL-based-requires writing a custom sync protocol and a client-side
     data model.
 
 - PowerSync

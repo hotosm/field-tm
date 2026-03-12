@@ -133,7 +133,7 @@ async def main():
         "mandatory_photo_upload": False,
         "use_odk_collect": False,
         "default_language": "english",
-        # Data extract — download OSM buildings
+        # Data extract - download OSM buildings
         "osm_category": "buildings",
         "geom_type": "POLYGON",
         "centroid": False,

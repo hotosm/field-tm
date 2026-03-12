@@ -1,43 +1,40 @@
-# Copyright (c) Humanitarian OpenStreetMap Team
-#
-# This file is part of Field-TM.
-#
-#     Field-TM is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     Field-TM is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
-#
-"""Tests for external API v1 routes."""
+"""Integration tests for external API v1 routes."""
+
+from __future__ import annotations
 
 import base64
-from dataclasses import dataclass
-from unittest.mock import AsyncMock, Mock, patch
+import os
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from litestar.exceptions import HTTPException
 
-from app.auth.auth_schemas import AuthUser
-from app.db.enums import FieldMappingApp
-from app.projects.project_routes import (
-    api_create_project,
-    api_get_project,
-    api_list_projects,
-)
-from app.projects.project_schemas import CreateProjectRequest
+from app.auth.api_key import hash_api_key
+from app.db.models import DbApiKey
 
-# Minimal valid XLSForm bytes (placeholder — process_xlsform is mocked)
-_DUMMY_XLS = base64.b64encode(b"dummy-xlsform-content").decode()
-
-# Small Kathmandu polygon shared across tests
+TEST_DATA_DIR = Path(__file__).parent / "test_data"
+_XLSFORM_B64 = base64.b64encode((TEST_DATA_DIR / "buildings.xls").read_bytes()).decode()
+_GEOJSON = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.31735, 27.70495],
+                        [85.31735, 27.70455],
+                        [85.31775, 27.70455],
+                        [85.31775, 27.70495],
+                        [85.31735, 27.70495],
+                    ]
+                ],
+            },
+            "properties": {"osm_id": 1, "building": "yes"},
+        }
+    ],
+}
 _OUTLINE = {
     "type": "Polygon",
     "coordinates": [
@@ -51,198 +48,112 @@ _OUTLINE = {
     ],
 }
 
-# Minimal GeoJSON data extract (skips OSM download)
-_GEOJSON = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [85.317, 27.705]},
-            "properties": {},
-        }
-    ],
-}
 
-
-@dataclass
-class _FakeODKResult:
-    odk_url: str = "https://central.example.org/#/projects/1"
-    manager_username: str = "manager@example.org"
-    manager_password: str = "s3cr3t"
-
-
-def _fake_db():
-    """Build a simple async DB mock for direct route tests."""
-    db = Mock()
-    db.commit = AsyncMock()
-    return db
-
-
-def _build_request(api_key: str | None = None) -> Mock:
-    """Build a minimal request mock with header access."""
-    headers = {}
-    if api_key:
-        headers["x-api-key"] = api_key
-    return Mock(headers=headers)
-
-
-def _build_payload(**overrides) -> CreateProjectRequest:
-    """Create a valid API project payload."""
+def _build_payload(**overrides) -> dict:
     payload = {
         "project_name": f"api-project-{uuid4()}",
         "field_mapping_app": "ODK",
         "description": "Create via external API",
         "outline": _OUTLINE,
         "hashtags": ["#api"],
-        "xlsform_base64": _DUMMY_XLS,
+        "xlsform_base64": _XLSFORM_B64,
         "geojson": _GEOJSON,
     }
     payload.update(overrides)
-    return CreateProjectRequest(**payload)
+    return payload
+
+
+@pytest.fixture()
+async def ensure_api_keys_table(db):
+    """Ensure API key table exists for integration auth flows."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS public.api_keys (
+                id SERIAL PRIMARY KEY,
+                user_sub character varying NOT NULL
+                    REFERENCES public.users(sub) ON DELETE CASCADE,
+                key_hash character varying NOT NULL UNIQUE,
+                name character varying,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                last_used_at TIMESTAMPTZ,
+                is_active BOOLEAN NOT NULL DEFAULT TRUE
+            );
+            """
+        )
+    await db.commit()
+
+
+@pytest.fixture()
+async def api_key(db, admin_user, ensure_api_keys_table):
+    """Create a real API key directly in DB for API route tests."""
+    raw_key = f"ftm_api_{uuid4().hex}"
+    await DbApiKey.create(
+        db,
+        DbApiKey(
+            user_sub=admin_user.sub,
+            key_hash=hash_api_key(raw_key),
+            name="api-routes-integration-key",
+        ),
+    )
+    await db.commit()
+    return raw_key
 
 
 @pytest.mark.asyncio
-async def test_api_v1_create_requires_api_key():
-    """Create handler should reject requests with no API key."""
-    with pytest.raises(HTTPException) as exc_info:
-        await api_create_project.fn(
-            request=_build_request(),
-            db=_fake_db(),
-            data=_build_payload(),
-        )
-
-    assert exc_info.value.status_code == 401
+async def test_api_v1_create_requires_api_key(client):
+    """Create endpoint should reject requests with no API key."""
+    response = await client.post("/api/v1/projects", json=_build_payload())
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_api_v1_create_and_public_read():
-    """Create and read handlers should return project data via the shared API flow."""
-    db = _fake_db()
-    project = Mock(
-        id=123,
-        field_mapping_app=FieldMappingApp.ODK,
-        project_name="api-create",
-        description="Create via external API",
-        status="DRAFT",
-        hashtags=["#api"],
-        outline=_OUTLINE,
-        location_str="Kathmandu, Nepal",
+async def test_api_v1_create_and_public_read(client, api_key):
+    """Create/list/get should work end-to-end with real DB + ODK services."""
+    create_response = await client.post(
+        "/api/v1/projects",
+        headers={"x-api-key": api_key},
+        json=_build_payload(),
     )
+    assert create_response.status_code == 201, create_response.text
+    created = create_response.json()
 
-    with (
-        patch(
-            "app.projects.project_routes.api_key_required",
-            new_callable=AsyncMock,
-            return_value=AuthUser(
-                sub="osm|1",
-                username="localadmin",
-                is_admin=True,
-            ),
-        ),
-        patch(
-            "app.projects.project_routes.create_project_stub",
-            new_callable=AsyncMock,
-            return_value=project,
-        ),
-        patch(
-            "app.projects.project_routes.process_xlsform",
-            new_callable=AsyncMock,
-        ),
-        patch(
-            "app.projects.project_routes.save_data_extract",
-            new_callable=AsyncMock,
-            return_value=1,
-        ),
-        patch(
-            "app.projects.project_routes.finalize_odk_project",
-            new_callable=AsyncMock,
-            return_value=_FakeODKResult(),
-        ),
-        patch(
-            "app.projects.project_routes.DbProject.all",
-            new_callable=AsyncMock,
-            return_value=[project],
-        ),
-        patch(
-            "app.projects.project_routes.DbProject.one",
-            new_callable=AsyncMock,
-            return_value=project,
-        ),
-    ):
-        create_response = await api_create_project.fn(
-            request=_build_request("ftm_test_key"),
-            db=db,
-            data=_build_payload(project_name=project.project_name),
-        )
-        list_response = await api_list_projects.fn(db=db)
-        get_response = await api_get_project.fn(project_id=project.id, db=db)
+    project_id = created["project_id"]
+    assert project_id is not None
+    assert "/#/projects/" in created["downstream_url"]
+    assert created["manager_username"]
+    assert created["manager_password"]
 
-    assert create_response.downstream_url == "https://central.example.org/#/projects/1"
-    assert create_response.manager_username == "manager@example.org"
-    assert create_response.project_id == project.id
-    assert isinstance(list_response, list)
-    assert any(item["id"] == project.id for item in list_response)
-    assert get_response["id"] == project.id
+    list_response = await client.get("/api/v1/projects")
+    assert list_response.status_code == 200
+    listed = list_response.json()
+    assert any(item["id"] == project_id for item in listed)
+
+    get_response = await client.get(f"/api/v1/projects/{project_id}")
+    assert get_response.status_code == 200
+    assert get_response.json()["id"] == project_id
+
+    # Keep test runs hermetic by cleaning up the FTM-side project record.
+    delete_response = await client.delete(
+        f"/api/v1/projects/{project_id}",
+        headers={"x-api-key": api_key},
+    )
+    assert delete_response.status_code == 204
 
 
 @pytest.mark.asyncio
-async def test_api_v1_create_forwards_custom_odk_credentials():
-    """Create endpoint should pass explicit ODK advanced config to service layer."""
-    from app.central.central_schemas import ODKCentral
-
-    db = _fake_db()
-    project = Mock(id=456, field_mapping_app=FieldMappingApp.ODK)
-    payload = _build_payload(
-        project_name=f"api-custom-odk-{uuid4()}",
-        external_project_instance_url="https://example-odk.trycloudflare.com",
-        external_project_username="admin@example.org",
-        external_project_password="test-password",
+async def test_api_v1_create_accepts_custom_odk_credentials(client, api_key):
+    """Create endpoint should support explicit ODK credentials in request payload."""
+    create_response = await client.post(
+        "/api/v1/projects",
+        headers={"x-api-key": api_key},
+        json=_build_payload(
+            external_project_instance_url=os.getenv("ODK_CENTRAL_URL"),
+            external_project_username=os.getenv("ODK_CENTRAL_USER"),
+            external_project_password=os.getenv("ODK_CENTRAL_PASSWD"),
+        ),
     )
-
-    with (
-        patch(
-            "app.projects.project_routes.api_key_required",
-            new_callable=AsyncMock,
-            return_value=AuthUser(
-                sub="osm|1",
-                username="localadmin",
-                is_admin=True,
-            ),
-        ),
-        patch(
-            "app.projects.project_routes.create_project_stub",
-            new_callable=AsyncMock,
-            return_value=project,
-        ),
-        patch(
-            "app.projects.project_routes.process_xlsform",
-            new_callable=AsyncMock,
-        ),
-        patch(
-            "app.projects.project_routes.save_data_extract",
-            new_callable=AsyncMock,
-            return_value=1,
-        ),
-        patch(
-            "app.projects.project_routes.finalize_odk_project",
-            new_callable=AsyncMock,
-            return_value=_FakeODKResult(),
-        ) as mock_finalize,
-    ):
-        create_response = await api_create_project.fn(
-            request=_build_request("ftm_test_key"),
-            db=db,
-            data=payload,
-        )
-
-    assert create_response.project_id == project.id
-    mock_finalize.assert_awaited_once()
-
-    custom_odk = mock_finalize.await_args.kwargs["custom_odk_creds"]
-    assert isinstance(custom_odk, ODKCentral)
-    assert (
-        custom_odk.external_project_instance_url
-        == payload.external_project_instance_url
-    )
-    assert custom_odk.external_project_username == payload.external_project_username
-    assert custom_odk.external_project_password == payload.external_project_password
+    assert create_response.status_code == 201, create_response.text
+    created = create_response.json()
+    assert created["project_id"] is not None
+    assert "/#/projects/" in created["downstream_url"]

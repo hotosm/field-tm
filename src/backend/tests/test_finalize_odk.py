@@ -14,6 +14,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from app.central.central_schemas import ODKCentral
+from app.db.models import DbProject
 from app.projects.project_services import (
     ODKFinalizeResult,
     ServiceError,
@@ -107,38 +108,20 @@ class FakeProject:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_finalize_odk_project_requires_xlsform():
+async def test_finalize_odk_project_requires_xlsform(stub_project, db):
     """Finalize should reject projects without XLSForm."""
-    project = FakeProject(xlsform_content=b"")
-
-    fake_db = AsyncMock()
-
-    with (
-        patch(
-            "app.projects.project_services.DbProject.one",
-            return_value=project,
-        ),
-        pytest.raises(ValidationError, match="XLSForm is required"),
-    ):
-        await finalize_odk_project(fake_db, project_id=1)
+    with pytest.raises(ValidationError, match="XLSForm is required"):
+        await finalize_odk_project(db, project_id=stub_project.id)
 
 
-@pytest.mark.asyncio
-async def test_finalize_odk_project_requires_data_extract():
+async def test_finalize_odk_project_requires_data_extract(stub_project, db):
     """Finalize should reject projects without a data extract."""
-    project = FakeProject(data_extract_geojson=None)
+    # Give the project xlsform bytes so the xlsform check passes.
+    await DbProject.update(db, stub_project.id, DbProject(xlsform_content=b"<xform/>"))
+    await db.commit()
 
-    fake_db = AsyncMock()
-
-    with (
-        patch(
-            "app.projects.project_services.DbProject.one",
-            return_value=project,
-        ),
-        pytest.raises(ValidationError, match="Data extract is required"),
-    ):
-        await finalize_odk_project(fake_db, project_id=1)
+    with pytest.raises(ValidationError, match="Data extract is required"):
+        await finalize_odk_project(db, project_id=stub_project.id)
 
 
 @pytest.mark.asyncio
@@ -245,25 +228,26 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
     assert features_call.kwargs["entities_list"] == []
 
 
-@pytest.mark.asyncio
-async def test_finalize_odk_project_requires_odk_credentials():
+async def test_finalize_odk_project_requires_odk_credentials(stub_project, db):
     """Finalize should reject when no ODK credentials are available."""
-    project = FakeProject()
-
-    fake_db = AsyncMock()
+    # Set xlsform + data_extract so we reach the ODK credentials check.
+    await DbProject.update(
+        db,
+        stub_project.id,
+        DbProject(
+            xlsform_content=b"<xform/>",
+            data_extract_geojson={"type": "FeatureCollection", "features": []},
+        ),
+    )
+    await db.commit()
 
     with (
-        patch(
-            "app.projects.project_services.DbProject.one",
-            return_value=project,
-        ),
         patch("app.projects.project_services.settings") as mock_settings,
+        pytest.raises(ValidationError, match="ODK Central credentials"),
     ):
         mock_settings.ODK_CENTRAL_URL = ""
         mock_settings.ODK_CENTRAL_USER = ""
-
-        with pytest.raises(ValidationError, match="ODK Central credentials"):
-            await finalize_odk_project(fake_db, project_id=1)
+        await finalize_odk_project(db, project_id=stub_project.id)
 
 
 @pytest.mark.asyncio

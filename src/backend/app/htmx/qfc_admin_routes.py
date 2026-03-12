@@ -16,7 +16,7 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""QFieldCloud admin panel — HTMX routes for managing projects & collaborators.
+"""QFieldCloud admin panel - HTMX routes for managing projects & collaborators.
 
 All state is kept client-side: the QFC auth token and API URL are passed
 as hidden form fields with every HTMX request.  The server never stores
@@ -31,6 +31,7 @@ from functools import partial
 from typing import Optional
 
 from litestar import Response, delete, get, patch, post
+from litestar import status_codes as status
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
@@ -148,7 +149,7 @@ async def qfc_admin_page(
 # ── Login & project listing ─────────────────────────────────────────────
 
 
-@post(path="/qfc-admin/login")
+@post(path="/qfc-admin/login", status_code=status.HTTP_200_OK)
 async def qfc_admin_login(
     request: HTMXRequest,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
@@ -454,7 +455,7 @@ def _render_collaborators_panel(
 </div>{"".join(dialogs)}"""
 
 
-@post(path="/qfc-admin/projects/{project_id:str}/collaborators")
+@post(path="/qfc-admin/projects/{project_id:str}/collaborators", status_code=status.HTTP_200_OK)
 async def add_collaborator(
     request: HTMXRequest,
     project_id: str,
