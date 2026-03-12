@@ -17,10 +17,10 @@
 #
 """Routes to relay requests to QFieldCloud server (Litestar)."""
 
-from psycopg import AsyncConnection
 from litestar import Request, Router, post
 from litestar import status_codes as status
 from litestar.di import Provide
+from psycopg import AsyncConnection
 from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
 
 from app.auth.api_key import api_key_required

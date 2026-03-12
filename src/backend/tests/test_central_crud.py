@@ -8,11 +8,8 @@ from unittest.mock import patch
 
 import pytest
 from litestar.exceptions import HTTPException
-from pyodk.errors import PyODKError
-from requests import Response
 
 from app.central import central_crud
-from app.central.central_schemas import ODKCentral
 from app.config import encrypt_value
 from app.db.models import DbProject
 
@@ -313,7 +310,10 @@ async def test_create_project_manager_user_fallback_email_on_conflict():
     assert username != "field-tm-manager-17@example.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[0][0] == "users"
-    assert fake_client.session.post_calls[0][1]["email"] == "field-tm-manager-17@example.org"
+    assert (
+        fake_client.session.post_calls[0][1]["email"]
+        == "field-tm-manager-17@example.org"
+    )
     assert fake_client.session.post_calls[1][0] == "users"
     assert fake_client.session.post_calls[2][0] == "projects/17/assignments/7/999"
     assert fake_client.session.patch_calls[0][0] == "users/999"
