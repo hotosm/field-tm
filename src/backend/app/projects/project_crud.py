@@ -24,12 +24,10 @@ import zlib
 from base64 import b64encode
 from io import BytesIO
 from pathlib import Path
-from textwrap import dedent
 from traceback import format_exc
 from typing import Optional
 
 import segno
-from litestar import Request
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_data_client import (
@@ -39,17 +37,15 @@ from osm_data_client import (
     RawDataResult,
 )
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
-from osm_login_python.core import Auth
 from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 
-from app.auth.providers.osm import get_osm_token, send_osm_message
+# from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.db.models import (
     DbProject,
-    DbUser,
 )
 from app.db.postgis_utils import (
     split_geojson_by_task_areas,
@@ -743,36 +739,40 @@ async def get_paginated_projects(  # noqa: PLR0913
     )
 
 
-async def send_project_manager_message(
-    request: Request,
-    project: DbProject,
-    new_manager: DbUser,
-    osm_auth: Auth,
-):
-    """Send message to the new project manager after assigned."""
-    log.info(f"Sending message to new project manager ({new_manager.username}).")
+# FIXME work out how to use osm token from hotosm_auth pkg
+# async def send_project_manager_message(
+#     request: Request,
+#     project: DbProject,
+#     new_manager: DbUser,
+#     osm_auth: Auth,
+# ):
+#     """Send message to the new project manager after assigned."""
+#     log.info(f"Sending message to new project manager ({new_manager.username}).")
 
-    osm_token = get_osm_token(request, osm_auth)
-    project_url = f"{settings.FTM_DOMAIN}/project/{project.id}"
-    if not project_url.startswith("http"):
-        project_url = f"https://{project_url}"
+#     osm_token = get_osm_token(request, osm_auth)
+#     project_url = f"{settings.FTM_DOMAIN}/project/{project.id}"
+#     if not project_url.startswith("http"):
+#         project_url = f"https://{project_url}"
 
-    message_content = dedent(f"""
-        You have been assigned to the project **{project.project_name}** as a
-        manager. You can now manage the project and its tasks.
+#     message_content = dedent(f"""
+#         You have been assigned to the project **{project.project_name}** as a
+#         manager. You can now manage the project and its tasks.
 
-        [Click here to view the project]({project_url})
+#         [Click here to view the project]({project_url})
 
-        Thank you for being a part of our platform!
-    """)
+#         Thank you for being a part of our platform!
+#     """)
 
-    send_osm_message(
-        osm_token=osm_token,
-        osm_sub=new_manager.sub,
-        title=f"You have been assigned to project {project.project_name} as a manager",
-        body=message_content,
-    )
-    log.info(f"Message sent to new project manager ({new_manager.username}).")
+#     send_osm_message(
+#         osm_token=osm_token,
+#         osm_sub=new_manager.sub,
+#         title=(
+#             f"You have been assigned to project {project.project_name} as a "
+#             "manager"
+#         ),
+#         body=message_content,
+#     )
+#     log.info(f"Message sent to new project manager ({new_manager.username}).")
 
 
 def _project_odk_qr_credentials(project: DbProject) -> central_schemas.ODKCentral:

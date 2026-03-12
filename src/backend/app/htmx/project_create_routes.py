@@ -37,8 +37,8 @@ from osm_fieldwork.xlsforms import xlsforms_path
 from psycopg import AsyncConnection
 from psycopg.rows import dict_row
 
-from app.auth.auth_deps import login_required
-from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.auth_deps import get_user_sub, login_required
+from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import mapper
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
@@ -327,7 +327,7 @@ async def get_template_xlsform(
 async def create_project_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
     """Create a project via HTMX form submission."""
@@ -352,7 +352,7 @@ async def create_project_htmx(
             description=description,
             outline=outline,
             hashtags=hashtags,
-            user_sub=auth_user.sub,
+            user_sub=get_user_sub(auth_user),
         )
         await db.commit()
 
@@ -419,7 +419,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,  # noqa: ARG001
     data: XLSFormUploadData = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
 ) -> Response:

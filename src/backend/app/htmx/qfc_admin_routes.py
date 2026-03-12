@@ -455,7 +455,10 @@ def _render_collaborators_panel(
 </div>{"".join(dialogs)}"""
 
 
-@post(path="/qfc-admin/projects/{project_id:str}/collaborators", status_code=status.HTTP_200_OK)
+@post(
+    path="/qfc-admin/projects/{project_id:str}/collaborators",
+    status_code=status.HTTP_200_OK,
+)
 async def add_collaborator(
     request: HTMXRequest,
     project_id: str,
@@ -585,5 +588,3 @@ async def _reload_collaborators(
         ),
         media_type="text/html",
     )
-
-

@@ -35,7 +35,7 @@ from litestar.response import Response
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required
-from app.auth.auth_schemas import AuthUser, ProjectUserDict
+from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import mapper, project_manager
 from app.central.central_schemas import ODKCentral
 from app.config import settings
@@ -588,7 +588,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
     osm_category: str = Parameter(default="buildings"),
     geom_type: str = Parameter(default="POLYGON"),
@@ -716,7 +716,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
 ) -> Response:
@@ -860,7 +860,7 @@ async def preview_geojson_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
     """Preview GeoJSON data extract in Leaflet map via HTMX."""
@@ -974,7 +974,7 @@ async def collect_new_data_only_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
     """Set setup to collect new data only without preloaded feature extract."""
@@ -1028,7 +1028,7 @@ async def submit_geojson_data_extract_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
@@ -1123,7 +1123,7 @@ async def preview_tasks_and_data_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
     """Preview task boundaries and data extract together on a Leaflet map via HTMX."""
@@ -1219,7 +1219,7 @@ async def skip_task_split_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
     """Skip task splitting and use the whole AOI as a single task."""
@@ -1295,7 +1295,7 @@ async def split_aoi_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
@@ -1384,7 +1384,7 @@ async def accept_data_extract_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
@@ -1453,7 +1453,7 @@ async def accept_split_htmx(
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
@@ -1521,7 +1521,7 @@ async def create_project_odk_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
@@ -1597,7 +1597,7 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
-    auth_user: AuthUser,
+    auth_user: object,
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
@@ -1657,7 +1657,7 @@ async def create_project_qfield_htmx(  # noqa: PLR0913
 async def validate_geojson(
     request: HTMXRequest,
     db: AsyncConnection,
-    auth_user: AuthUser,
+    auth_user: object,
     data: dict = Body(media_type=RequestEncodingType.JSON),
 ) -> Response:
     """Validate and normalize GeoJSON for project area upload.

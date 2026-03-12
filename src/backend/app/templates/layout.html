@@ -56,7 +56,8 @@
       wa-select:not(:defined),
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
-      hot-header:not(:defined) {
+      hot-header:not(:defined),
+      hotosm-auth:not(:defined) {
         visibility: hidden;
       }
     </style>
@@ -99,18 +100,28 @@
     <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/style-core.css"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/style-core.css"
     />
     <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
     <!-- so custom elements are defined as soon as possible after the page loads. -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.8.1/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
     ></script>
+    {% if auth_enabled %}
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
+    ></script>
+    {% endif %}
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -142,11 +153,32 @@
   </head>
 
   <body>
-    <hot-header id="app-header" title="FieldTM" size="medium"></hot-header>
+    <hot-header id="app-header" title="FieldTM" size="medium">
+      {% if auth_enabled %}
+      <wa-button slot="auth" variant="brand" id="login-btn">Login</wa-button>
+      {% endif %}
+    </hot-header>
 
-    {% block content %}{% endblock %}
+    {% if auth_enabled %}
+    <!-- Hidden session verifier: validates the Hanko session after redirect back
+         from the login page and emits hanko-login. -->
+    <div style="display: none">
+      <hotosm-auth hanko-url="{{ hanko_public_url }}"></hotosm-auth>
+    </div>
+    {% endif %} {% block content %}{% endblock %}
 
     <script>
+      {% if auth_enabled %}
+      const loginButton = document.getElementById("login-btn");
+      if (loginButton) {
+        loginButton.addEventListener("click", () => {
+          const returnTo = encodeURIComponent(window.location.href);
+          const separator = "{{ login_url }}".includes("?") ? "&" : "?";
+          window.location.href = `{{ login_url }}${separator}return_to=${returnTo}`;
+        });
+      }
+      {% endif %}
+
       // hot-header tabs must be set as a JS property (not an HTML attribute)
       // because tab objects contain clickEvent functions that can't be serialised.
       const appHeader = document.getElementById("app-header");

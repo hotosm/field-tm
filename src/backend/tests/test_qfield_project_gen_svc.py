@@ -35,8 +35,12 @@ def _load_project_gen_svc_module():
 
 def _install_fake_qgis(monkeypatch, qgis_obj, pal_settings_obj):
     """Install a fake qgis.core module for helper tests."""
-    fake_qgis_core = SimpleNamespace(Qgis=qgis_obj, QgsPalLayerSettings=pal_settings_obj)
-    monkeypatch.setitem(__import__("sys").modules, "qgis", SimpleNamespace(core=fake_qgis_core))
+    fake_qgis_core = SimpleNamespace(
+        Qgis=qgis_obj, QgsPalLayerSettings=pal_settings_obj
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules, "qgis", SimpleNamespace(core=fake_qgis_core)
+    )
     monkeypatch.setitem(__import__("sys").modules, "qgis.core", fake_qgis_core)
 
 
@@ -54,7 +58,10 @@ def test_resolve_over_point_label_placement_prefers_qgis_labelplacement_enum(
         OverPoint = object()
 
     _install_fake_qgis(monkeypatch, MockQgis, MockQgsPalLayerSettings)
-    assert module._resolve_over_point_label_placement() is MockQgis.LabelPlacement.OverPoint
+    assert (
+        module._resolve_over_point_label_placement()
+        is MockQgis.LabelPlacement.OverPoint
+    )
 
 
 def test_resolve_over_point_label_placement_falls_back_to_legacy_shape(monkeypatch):
@@ -88,4 +95,3 @@ def test_resolve_over_point_label_placement_last_resort_value(monkeypatch):
 
     _install_fake_qgis(monkeypatch, MockQgis, MockQgsPalLayerSettings)
     assert module._resolve_over_point_label_placement() == 1
-

@@ -32,10 +32,8 @@ dependencies = [
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.22",
     "psycopg[c,pool]==3.3.3",
+    "cryptography==46.0.5",
     "pyxform==4.0.0",
-    "cryptography==43.0.3",
-    "pyjwt==2.9.0",
-    "tldextract==5.3.0",
     "pyodk>=1.2.1",
     # TODO replace with official version, once PR merged
     # https://github.com/opengisch/QFieldCloud/pull/1506
@@ -44,11 +42,12 @@ dependencies = [
     "pg-nearest-city==0.2.1",
     "raw-data-api-py==0.3.0",
     "geojson-aoi-parser>=0.3.5",
+    "hotosm-auth[litestar] @ git+https://github.com/hotosm/login.git@feat/litestar#subdirectory=auth-libs/python",
     "osm-fieldwork",
     "area-splitter",
 ]
 readme = "../../README.md"
-license = {text = "AGPL-3.0-only"}
+license = "AGPL-3.0-only"
 
 [dependency-groups]
 dev = [

@@ -4,7 +4,9 @@ import html
 import json
 import logging
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
+from hotosm_auth_litestar import setup_auth
 from litestar import Litestar, Request, Response, Router, get
 from litestar import status_codes as status
 from litestar.config.cors import CORSConfig
@@ -26,8 +28,7 @@ from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
 from app.__version__ import __version__
-from app.auth.auth_deps import login_required
-from app.config import MonitoringTypes, settings
+from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
 from app.monitoring import (
@@ -40,6 +41,16 @@ from app.monitoring import (
 from app.projects.project_crud import read_and_insert_xlsforms
 
 log = logging.getLogger(__name__)
+
+
+def build_login_app_url(hanko_url: str) -> str:
+    """Resolve the centralized login app URL from the public Hanko base URL."""
+    parts = urlsplit(hanko_url)
+    path = parts.path.rstrip("/")
+    login_path = path if path.endswith("/app") else f"{path}/app"
+    return urlunsplit(
+        (parts.scheme, parts.netloc, login_path, parts.query, parts.fragment)
+    )
 
 
 async def server_init(server: Litestar) -> None:
@@ -241,7 +252,6 @@ def configure_root_router() -> Router:
     @get(
         "/__heartbeat__",
         dependencies={
-            "current_user": Provide(login_required),
             "db": Provide(db_conn),
         },
         status_code=status.HTTP_200_OK,
@@ -271,8 +281,40 @@ def configure_root_router() -> Router:
     )
 
 
+def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
+    """Inject server-side config values as Jinja2 globals for all templates.
+
+    E.g. auth mode globals are available in all templates.
+    """
+    hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL
+    engine.engine.globals["hanko_public_url"] = hanko_public_url
+
+    # Frontend origin - used for redirect-after-login / redirect-after-logout.
+    if settings.FTM_DEV_PORT:
+        frontend_url = f"http://{settings.FTM_DOMAIN}:{settings.FTM_DEV_PORT}"
+    else:
+        frontend_url = f"https://{settings.FTM_DOMAIN}"
+    engine.engine.globals["frontend_url"] = frontend_url
+
+    # Login page URL. Explicit LOGIN_URL override wins; otherwise derive the
+    # centralized login app from the public Hanko URL.
+    login_url = settings.LOGIN_URL or build_login_app_url(hanko_public_url)
+    engine.engine.globals["login_url"] = login_url
+
+    engine.engine.globals["auth_provider"] = settings.AUTH_PROVIDER.value
+    engine.engine.globals["auth_enabled"] = (
+        settings.AUTH_PROVIDER != AuthProvider.DISABLED
+    )
+
+
 def create_app() -> Litestar:
     """Configure Litestar app main router."""
+    deps, auth_route_handlers = setup_auth()
+    auth_lib_router = Router(
+        path="/",
+        route_handlers=auth_route_handlers,
+        dependencies=deps,
+    )
     root_router = configure_root_router()
     # Import routers after logger / settings to avoid circular imports
     from app.auth.auth_routes import auth_router
@@ -294,6 +336,7 @@ def create_app() -> Litestar:
 
     app = Litestar(
         route_handlers=[
+            auth_lib_router,
             root_router,
             api_router,
             auth_router,
@@ -316,6 +359,7 @@ def create_app() -> Litestar:
         template_config=TemplateConfig(
             directory=Path(__file__).parent / "templates",
             engine=JinjaTemplateEngine,
+            engine_callback=_configure_template_engine,
         ),
         debug=settings.DEBUG,
     )

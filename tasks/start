@@ -24,13 +24,13 @@ docker := env("DOCKER_ALIAS", "docker")
 default:
   just --justfile {{justfile()}} --list start
 
-# Start Field-TM
+# Start Field-TM (auth disabled)
 [no-cd]
 all:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  {{docker}} compose up -d
+  AUTH_PROVIDER=disabled {{docker}} compose up -d
 
 # Production deploy, based on current checked out branch
 [no-cd]
@@ -53,6 +53,33 @@ prod:
         --remove-orphans --force-recreate
 
   just _echo-blue "FieldTM started successfully"
+
+# Production deploy with self-hosted Hanko auth (contrib/login)
+[no-cd]
+prod-login:
+  #!/usr/bin/env sh
+  set -e
+
+  # From deploy dir
+  cd {{justfile_directory()}}/deploy
+  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
+  just _echo-blue "Current branch: ${GIT_BRANCH}"
+
+  # Config
+  just config generate-dotenv "${GIT_BRANCH}"
+  just config custom-favicon
+
+  # Both compose files use ${FTM_DOMAIN} in bunkerweb env var KEY names, which
+  # requires envsubst preprocessing.  Process to temp files then compose together.
+  tmp_main=$(mktemp)
+  tmp_login=$(mktemp)
+  ../envsubst -no-unset -i compose.sub.yaml > "$tmp_main"
+  ../envsubst -no-unset -i compose.login.yaml > "$tmp_login"
+  {{docker}} compose -f "$tmp_main" -f "$tmp_login" up --detach \
+    --remove-orphans --force-recreate
+  rm -f "$tmp_main" "$tmp_login"
+
+  just _echo-blue "FieldTM + self-hosted Hanko started successfully"
 
 # Production deploy with self-hosted ODK Central
 [no-cd]
@@ -99,6 +126,32 @@ backend-no-docker:
 [no-cd]
 without-central:
   {{docker}} compose --profile no-odk up -d
+
+# Start Field-TM with self-hosted Hanko auth (contrib/login)
+[no-cd]
+login:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+
+  {{docker}} compose \
+    -f compose.yaml \
+    -f contrib/login/compose.yaml \
+    up -d
+
+  echo
+  echo "\033[0;33m ############################################### \033[0m"
+  echo
+  echo " Self-hosted Hanko is running."
+  echo
+  echo " HANKO_API_URL and HANKO_PUBLIC_URL are injected automatically."
+  echo " No .env changes needed for local dev."
+  echo
+  echo " Captured emails (OTP passcodes): http://mail.field.localhost:${FTM_DEV_PORT:-7050}"
+  echo " Login UI:                        http://login.field.localhost:${FTM_DEV_PORT:-7050}"
+  echo
+  echo "\033[0;33m ############################################### \033[0m"
+  echo
 
 # Start Field-TM with JOSM
 [no-cd]

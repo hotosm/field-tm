@@ -16,189 +16,115 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""Auth routes, to login, logout, and get user details (Litestar)."""
+"""Auth routes for API key lifecycle management."""
 
-import logging
+from __future__ import annotations
 
-from litestar import Request, Response, Router, get
+from litestar import Router, delete, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
-from osm_login_python.core import Auth
 from psycopg import AsyncConnection
+from pydantic import BaseModel
 
-from app.auth.api_key_routes import (
-    create_api_key_route,
-    list_api_keys_route,
-    revoke_api_key_route,
-)
-from app.auth.auth_deps import login_required
-from app.auth.auth_logic import expire_cookies, refresh_cookies
-from app.auth.auth_schemas import AuthUser, FTMUser
-from app.auth.providers.osm import handle_osm_callback, init_osm_auth
-from app.config import settings
+from app.auth.api_key import generate_api_key, hash_api_key
+from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
-from app.db.models import DbUser
-from app.users.user_crud import get_or_create_user
-
-log = logging.getLogger(__name__)
+from app.db.models import DbApiKey
 
 
-@get(
-    "/login/osm",
-    summary="Get Login URL for OSM Oauth Application.",
-    dependencies={"osm_auth": Provide(init_osm_auth)},
-)
-async def get_osm_management_login_url(
-    osm_auth: Auth,
-) -> dict[str, str]:
-    """Get Login URL for OSM Oauth Application.
+class ApiKeyCreateRequest(BaseModel):
+    """Input payload for creating an API key."""
 
-    The application must be registered on openstreetmap.org.
-    Open the download url returned to get access_token.
-
-    Args:
-        osm_auth: The Auth object from osm-login-python.
-
-    Returns:
-        login_url (string): URL to authorize user in OSM.
-            Includes URL params: client_id, redirect_uri, permission scope.
-    """
-    login_url = osm_auth.login()
-    log.debug(f"OSM Login URL returned: {login_url}")
-    return login_url
+    name: str | None = None
 
 
-@get(
-    "/callback/osm",
-    summary="Performs oauth token exchange with OpenStreetMap.",
-    dependencies={"osm_auth": Provide(init_osm_auth)},
-)
-async def osm_callback(
-    request: Request,
-    osm_auth: Auth,
-) -> Response:
-    """Performs oauth token exchange with OpenStreetMap.
-
-    Provides an access token that can be used for authenticating other endpoints.
-    Also returns a cookie containing the access token for persistence in frontend apps.
-    """
-    try:
-        # This includes the main cookie, refresh cookie, osm token cookie
-        response_plus_cookies = await handle_osm_callback(request, osm_auth)
-        return response_plus_cookies
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e),
-        ) from e
-
-
-@get(
-    "/logout",
-    summary="Reset httpOnly cookie to sign out user.",
-    status_code=status.HTTP_200_OK,
-)
-async def logout() -> Response:
-    """Reset httpOnly cookie to sign out user."""
-    response = Response(
-        status_code=status.HTTP_200_OK,
-        content=b'{"message":"ok"}',
-        media_type="application/json",
-    )
-    # Reset all cookies (logout)
-    ftm_cookie_name = settings.cookie_name
-    refresh_cookie_name = f"{ftm_cookie_name}_refresh"
-    osm_cookie_name = f"{ftm_cookie_name}_osm"
-
-    cookie_names = [
-        ftm_cookie_name,
-        refresh_cookie_name,
-        osm_cookie_name,
-    ]
-
-    response = await expire_cookies(response, cookie_names)
-    return response
-
-
-@get(
-    "/me",
-    summary="Read access token and get user details.",
+@post(
+    "/api-keys",
+    summary="Create a new API key for the current user.",
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
     },
-    return_dto=FTMUser,
+    status_code=status.HTTP_201_CREATED,
 )
-async def my_data(
+async def create_api_key_route(
     db: AsyncConnection,
-    auth_user: AuthUser,
-) -> DbUser:
-    """Read access token and get user details.
+    auth_user: object,
+    data: ApiKeyCreateRequest,
+) -> dict:
+    """Generate a key, store only the hash, and return the raw key once."""
+    raw_key = generate_api_key()
+    db_key = await DbApiKey.create(
+        db,
+        DbApiKey(
+            user_sub=get_user_sub(auth_user),
+            key_hash=hash_api_key(raw_key),
+            name=data.name,
+        ),
+    )
+    await db.commit()
 
-    Args:
-        db (Connection): The db connection.
-        auth_user (AuthUser): User data provided by authentication.
-
-    Returns:
-        DbUser: The user data with project roles.
-    """
-    return await get_or_create_user(db, auth_user)
+    return {
+        "id": db_key.id,
+        "name": db_key.name,
+        "created_at": db_key.created_at,
+        "is_active": db_key.is_active,
+        "api_key": raw_key,
+    }
 
 
 @get(
-    "/refresh",
-    summary="Uses the refresh token to generate a new access token.",
+    "/api-keys",
+    summary="List API keys for the current user.",
     dependencies={
+        "db": Provide(db_conn),
         "auth_user": Provide(login_required),
     },
 )
-async def refresh_management_cookies(
-    request: Request,
-    auth_user: AuthUser,
-) -> Response:
-    """Uses the refresh token to generate a new access token.
+async def list_api_keys_route(db: AsyncConnection, auth_user: object) -> list[dict]:
+    """List API keys (without exposing raw key or stored hash)."""
+    keys = await DbApiKey.all_for_user(db, get_user_sub(auth_user))
+    return [
+        {
+            "id": key.id,
+            "name": key.name,
+            "created_at": key.created_at,
+            "last_used_at": key.last_used_at,
+            "is_active": key.is_active,
+        }
+        for key in keys
+    ]
 
-    This endpoint is specific to the management desktop frontend.
-    Authentication is required.
-    If signed in with login method other than OSM, the user will be logged out and
-    a forbidden status will be returned.
 
-    NOTE this endpoint has no db calls and returns in ~2ms.
-    """
-    # Only allow login via OSM for management frontend
-    # and revoke cookies if service account set via mapper frontend
-    user_sub = auth_user.sub.lower()
-    if "osm" not in user_sub or auth_user.username == "svcftm":
-        response = Response(
-            status_code=status.HTTP_403_FORBIDDEN,
-            content=b"Please log in using OSM for management access.",
+@delete(
+    "/api-keys/{key_id:int}",
+    summary="Revoke (deactivate) an API key for the current user.",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def revoke_api_key_route(
+    key_id: int,
+    db: AsyncConnection,
+    auth_user: object,
+) -> None:
+    """Deactivate a key so it can no longer authenticate requests."""
+    revoked = await DbApiKey.deactivate(db, key_id, get_user_sub(auth_user))
+    if not revoked:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"API key with id={key_id} not found.",
         )
-        cookie_names = [
-            settings.cookie_name,
-            f"{settings.cookie_name}_refresh",
-        ]
-
-        response = await expire_cookies(response, cookie_names)
-        return response
-
-    return await refresh_cookies(
-        request,
-        auth_user,
-        settings.cookie_name,
-        f"{settings.cookie_name}_refresh",
-    )
+    await db.commit()
 
 
 auth_router = Router(
     path="/auth",
     tags=["auth"],
     route_handlers=[
-        get_osm_management_login_url,
-        osm_callback,
-        logout,
-        my_data,
-        refresh_management_cookies,
         create_api_key_route,
         list_api_keys_route,
         revoke_api_key_route,

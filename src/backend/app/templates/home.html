@@ -32,7 +32,7 @@
             >
               {% for val, label in status_options %}
               {% set is_sel = (val and selected_status == val) or (not val and not selected_status) %}
-              <option value="{{ val }}" {{ 'selected' if is_sel }}>{{ label }}</option>
+              <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </label>
