@@ -21,4 +21,6 @@ jobs:
         "ghcr.io/${{ github.repository }}/qgis:latest"
       extra_build_args: |
         QFIELDCLOUD_TAG=26.3
-      multi_arch: true
+      # FIXME once PR merged:
+      # https://github.com/opengisch/QFieldCloud/pull/1507
+      # multi_arch: true
