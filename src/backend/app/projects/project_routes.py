@@ -1,7 +1,5 @@
 """External REST API routes for project creation."""
 
-from __future__ import annotations
-
 import base64
 from io import BytesIO
 
@@ -72,7 +70,7 @@ def _build_ftm_url(project_id: int) -> str:
     domain = settings.FTM_DOMAIN
     port_suffix = f":{settings.FTM_DEV_PORT}" if settings.FTM_DEV_PORT else ""
     scheme = "http" if "localhost" in domain else "https"
-    return f"{scheme}://{domain}{port_suffix}/htmxprojects/{project_id}"
+    return f"{scheme}://{domain}{port_suffix}/projects/{project_id}"
 
 
 async def _cleanup_project(db: AsyncConnection, project_id: int | None) -> None:

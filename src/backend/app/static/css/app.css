@@ -226,6 +226,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-height: 6.5rem;
 }
 
 .ftm-project-card__header-meta {
@@ -235,8 +236,16 @@ body {
 }
 
 .ftm-project-card__name {
+  display: -webkit-box;
   font-weight: var(--hot-font-weight-bold);
   font-size: var(--hot-font-size-large);
+  line-height: 1.25;
+  min-height: calc(1.25em * 3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .ftm-project-card__badges {
@@ -246,11 +255,19 @@ body {
 }
 
 .ftm-project-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   padding: 0.625rem 0;
+  height: 13rem;
+}
+
+.ftm-project-card__content-top {
+  min-height: 2.75rem;
 }
 
 .ftm-project-card__location {
-  margin: 0.5rem 0;
+  margin: 0;
   font-size: var(--hot-font-size-small);
   color: var(--hot-color-neutral-700);
 }
@@ -262,21 +279,36 @@ body {
 }
 
 .ftm-project-card__description {
-  margin: 10px 0 8px 0;
+  margin: 0;
   color: var(--ftm-text-muted);
-  line-height: var(--hot-line-height-normal);
+  line-height: 1.4;
   font-size: var(--hot-font-size-small);
+  min-height: calc(1.4em * 3);
+  max-height: calc(1.4em * 3);
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.ftm-project-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
 }
 
 .ftm-project-card__tags {
-  margin: 10px 0;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--hot-spacing-x-small);
 }
 
 .ftm-project-card__footer {
-  margin-top: 12px;
+  margin-top: 0;
   padding-top: 10px;
   border-top: 1px solid var(--ftm-border);
   font-size: var(--hot-font-size-x-small);
@@ -355,6 +387,12 @@ body {
 .ftm-project-title-wrap h1 {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ftm-project-location-line {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .ftm-manager-summary-section {

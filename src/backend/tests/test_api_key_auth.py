@@ -21,7 +21,7 @@ import pytest
 from litestar.exceptions import HTTPException
 
 from app.auth.api_key import api_key_required, hash_api_key
-from app.db.models import DbApiKey
+from app.db.models import DbApiKey, DbUser
 
 
 @pytest.fixture()
@@ -49,7 +49,7 @@ async def ensure_api_keys_table(db):
 async def test_api_key_routes_create_list_and_revoke(client, db, ensure_api_keys_table):
     """Create, list, and revoke API keys via auth routes."""
     create_resp = await client.post(
-        "/auth/api-keys",
+        "/api/v1/auth/api-keys",
         json={"name": "integration key"},
     )
     assert create_resp.status_code == 201
@@ -63,12 +63,12 @@ async def test_api_key_routes_create_list_and_revoke(client, db, ensure_api_keys
     assert db_key.key_hash != raw_key
     assert db_key.is_active is True
 
-    list_resp = await client.get("/auth/api-keys")
+    list_resp = await client.get("/api/v1/auth/api-keys")
     assert list_resp.status_code == 200
     listed_keys = list_resp.json()
     assert any(key["id"] == body["id"] for key in listed_keys)
 
-    revoke_resp = await client.delete(f"/auth/api-keys/{body['id']}")
+    revoke_resp = await client.delete(f"/api/v1/auth/api-keys/{body['id']}")
     assert revoke_resp.status_code == 204
 
     revoked = await DbApiKey.get_by_hash(db, hash_api_key(raw_key), active_only=False)
@@ -82,7 +82,9 @@ async def test_api_key_required_validates_and_updates_last_used(
 ):
     """api_key_required authenticates valid keys and rejects invalid ones (real DB)."""
     # Create a real API key via the HTTP endpoint
-    create_resp = await client.post("/auth/api-keys", json={"name": "test-valid-key"})
+    create_resp = await client.post(
+        "/api/v1/auth/api-keys", json={"name": "test-valid-key"}
+    )
     assert create_resp.status_code == 201
     raw_key = create_resp.json()["api_key"]
 
@@ -100,3 +102,19 @@ async def test_api_key_required_validates_and_updates_last_used(
     with pytest.raises(HTTPException) as exc_info:
         await api_key_required(request=None, db=db, x_api_key="ftm_invalid_key")
     assert exc_info.value.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_profile_me_returns_and_persists_authenticated_user(client, db):
+    """GET /api/v1/auth/profile/me returns and persists the authenticated user."""
+    resp = await client.get("/api/v1/auth/profile/me")
+    assert resp.status_code == 200
+
+    body = resp.json()
+    assert body["sub"]
+    assert body["username"]
+
+    db_user = await DbUser.one(db, body["sub"])
+    assert db_user.sub == body["sub"]
+    assert db_user.username == body["username"]
+    assert db_user.is_admin is body["is_admin"]

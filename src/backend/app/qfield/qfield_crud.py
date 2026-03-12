@@ -171,6 +171,20 @@ def _sanitize_qfc_project_name(name: str) -> str:
     return cleaned or f"FieldTM-project-{getrandbits(32)}"
 
 
+def _build_qfc_service_account_email(username: str) -> str:
+    """Build a non-empty email for QFieldCloud service-account provisioning."""
+    local_part = re.sub(r"[^A-Za-z0-9._+-]+", "-", (username or "").strip()).strip(".-")
+    if not local_part:
+        local_part = "ftm-qfield-user"
+
+    domain = (settings.FTM_DOMAIN or "field.localhost").strip().lower()
+    domain = re.sub(r"[^a-z0-9.-]+", "-", domain).strip(".-")
+    if not domain or "." not in domain:
+        domain = "noreply.local"
+
+    return f"{local_part}@{domain}"
+
+
 # ---------------------------------------------------------------------------
 # Data preparation helpers
 # ---------------------------------------------------------------------------
@@ -502,10 +516,11 @@ async def _create_qfc_user(username: str, password: str, client) -> bool:
     failures: caller skips collaborator provisioning but continues.
     """
     loop = get_running_loop()
+    email = _build_qfc_service_account_email(username)
     try:
         await loop.run_in_executor(
             None,
-            partial(client.create_user, username, password, exist_ok=True),
+            partial(client.create_user, username, password, email, exist_ok=True),
         )
         log.info("QFC user '%s' created or already exists", username)
         return True

@@ -25,7 +25,7 @@ import psycopg
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
 from app.db.models import DbTemplateXLSForm
-from app.users.user_crud import get_or_create_user
+from app.auth.user_crud import get_or_create_user
 
 # Small AOI in Kathmandu, Nepal - suitable for a quick buildings test
 AOI_OUTLINE = {
@@ -46,7 +46,7 @@ async def _get_or_create_api_key(db) -> str:
     """Return a plain-text API key, creating one if none exist for localadmin."""
     test_user = await get_or_create_user(
         db,
-        AuthUser(sub="osm|1", username="localadmin", is_admin=True),
+        AuthUser(sub="custom|1", username="localadmin", is_admin=True),
     )
     await db.commit()
 

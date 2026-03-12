@@ -27,7 +27,7 @@ async def test_nothing():
 # import pytest
 
 # from app.users import user_schemas
-# from app.users.user_crud import create_user
+# from app.auth.user_crud import create_user
 
 
 # @pytest_asyncio.fixture

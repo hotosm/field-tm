@@ -8,9 +8,10 @@ import pytest
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
 
+from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
-from app.htmx.project_create_routes import _parse_outline_payload
+from app.htmx.project_create_routes import _parse_outline_payload, new_project
 from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     _build_finalize_error_html,
@@ -34,7 +35,7 @@ async def test_create_project_htmx(client, stub_project_data):
     assert response.status_code == status.HTTP_200_OK
     assert "HX-Redirect" in response.headers
     location = response.headers["HX-Redirect"]
-    assert "/htmxprojects/" in location
+    assert "/projects/" in location
 
 
 async def test_create_project_htmx_returns_inline_error_for_missing_description(
@@ -74,7 +75,7 @@ async def test_create_project_htmx_returns_inline_error_for_missing_mapping_app(
 async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_project):
     """Draft setup should show a basic-first Step 1 with advanced config."""
     response = await client.get(
-        f"/htmxprojects/{stub_project.id}",
+        f"/projects/{stub_project.id}",
         headers={"HX-Request": "true"},
     )
 
@@ -95,7 +96,7 @@ async def test_project_setup_shows_step2_advanced_config_options(client, db, pro
     await db.commit()
 
     response = await client.get(
-        f"/htmxprojects/{project.id}",
+        f"/projects/{project.id}",
         headers={"HX-Request": "true"},
     )
 
@@ -123,7 +124,7 @@ async def test_project_setup_hides_step2_actions_when_data_extract_is_complete(
     await db.commit()
 
     response = await client.get(
-        f"/htmxprojects/{project.id}",
+        f"/projects/{project.id}",
         headers={"HX-Request": "true"},
     )
 
@@ -242,7 +243,7 @@ async def test_project_details_shows_odk_media_upload_guidance(client, db, proje
     await db.commit()
 
     response = await client.get(
-        f"/htmxprojects/{project.id}",
+        f"/projects/{project.id}",
         headers={"HX-Request": "true"},
     )
 
@@ -252,6 +253,38 @@ async def test_project_details_shows_odk_media_upload_guidance(client, db, proje
         "If you need to upload additional media files to this project" in response.text
     )
     assert "log into ODK Central and upload them in the form settings." in response.text
+
+
+def test_project_listing_template_renders_project_location():
+    """Project cards should display the location text when available."""
+    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    template = env.get_template("home.html")
+
+    html = template.render(
+        projects=[
+            {
+                "id": 7,
+                "project_name": "Road Mapping",
+                "location_str": "Nairobi, Kenya",
+                "status": None,
+                "visibility": None,
+                "field_mapping_app": None,
+                "description": "",
+                "hashtags": [],
+                "created_at": None,
+            }
+        ],
+        selected_status="",
+        search_query="",
+        selected_sort="newest",
+        create_project_href="/new",
+    )
+
+    assert "Location: Nairobi, Kenya" in html
 
 
 async def test_project_qrcode_htmx(client, project):
@@ -293,11 +326,11 @@ async def test_metrics_partial(client):
 
 async def test_project_listing_renders_cards_and_component_bootstrap(client, project):
     """Project listing should render saved projects and register WA components."""
-    response = await client.get("/htmxprojects", headers={"HX-Request": "true"})
+    response = await client.get("/projects", headers={"HX-Request": "true"})
 
     assert response.status_code == status.HTTP_200_OK
     assert project.project_name in response.text
-    assert f"/htmxprojects/{project.id}" in response.text
+    assert f"/projects/{project.id}" in response.text
     assert "Project Status" in response.text
     assert "Sort By" in response.text
     assert 'id="projects-search"' in response.text
@@ -314,7 +347,7 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     ) as mock_projects:
         mock_projects.return_value = []
 
-        response = await client.get("/htmxprojects", headers={"HX-Request": "true"})
+        response = await client.get("/projects", headers={"HX-Request": "true"})
 
     assert response.status_code == status.HTTP_200_OK
     assert (
@@ -345,6 +378,7 @@ async def test_project_listing_filters_by_status():
         response = await project_listing.fn(
             request=Mock(query_params={"status": "COMPLETED"}),
             db=Mock(),
+            auth_user=Mock(),
         )
 
     assert response.template_name == "home.html"
@@ -368,6 +402,7 @@ async def test_project_listing_passes_search_and_sort_filters():
                 }
             ),
             db=Mock(),
+            auth_user=Mock(),
         )
 
     assert response.template_name == "home.html"
@@ -387,11 +422,60 @@ async def test_project_listing_preserves_search_and_sort_selection():
         response = await project_listing.fn(
             request=Mock(query_params={"sort": "name_desc", "search": "roads"}),
             db=Mock(),
+            auth_user=Mock(),
         )
 
     assert response.template_name == "home.html"
     assert response.context["selected_sort"] == "name_desc"
     assert response.context["search_query"] == "roads"
+
+
+async def test_project_listing_guests_get_login_create_href(monkeypatch):
+    """Guests should be prompted to log in before entering project creation."""
+    monkeypatch.setattr(settings, "DEBUG", False)
+    monkeypatch.setattr(settings, "AUTH_PROVIDER", AuthProvider.BUNDLED)
+
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_projects:
+        mock_projects.return_value = []
+        response = await project_listing.fn(
+            request=Mock(query_params={}),
+            db=Mock(),
+            auth_user=None,
+        )
+
+    assert response.context["create_project_href"] == "/login?return_to=%2Fnew"
+
+
+async def test_new_project_redirects_guests_to_login(monkeypatch):
+    """The new-project page should redirect unauthenticated guests to login."""
+    monkeypatch.setattr(settings, "DEBUG", False)
+    monkeypatch.setattr(settings, "AUTH_PROVIDER", AuthProvider.BUNDLED)
+
+    request = Mock()
+    request.url.path = "/new"
+    request.headers = {}
+
+    response = await new_project.fn(request=request, db=Mock(), auth_user=None)
+
+    assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+    assert response.headers["Location"] == "/login?return_to=%2Fnew"
+
+
+async def test_new_project_htmx_redirects_guests_with_hx_redirect(monkeypatch):
+    """HTMX requests should get 200 + HX-Redirect, not a 307 the browser follows."""
+    monkeypatch.setattr(settings, "DEBUG", False)
+    monkeypatch.setattr(settings, "AUTH_PROVIDER", AuthProvider.BUNDLED)
+
+    request = Mock()
+    request.url.path = "/new"
+    request.headers = {"HX-Request": "true"}
+
+    response = await new_project.fn(request=request, db=Mock(), auth_user=None)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["HX-Redirect"] == "/login?return_to=%2Fnew"
 
 
 async def test_static_landing_image_served(client):

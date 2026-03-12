@@ -158,7 +158,7 @@ def _friendly_qr_error(exc: Exception) -> str:
 
 
 @get(
-    path="/htmxprojects/{project_id:int}",
+    path="/projects/{project_id:int}",
     dependencies={"db": Provide(db_conn)},
 )
 async def project_details(

@@ -824,11 +824,11 @@
             external_project_username: creds.username,
             external_project_password: creds.password
           });
-          response = await fetch(`/central/test-credentials?${params}`, {
+          response = await fetch(`/api/v1/central/test-credentials?${params}`, {
             method: 'POST'
           });
         } else if (isQField) {
-          response = await fetch('/qfield/test-credentials', {
+          response = await fetch('/api/v1/qfield/test-credentials', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

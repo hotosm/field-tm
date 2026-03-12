@@ -73,8 +73,8 @@ async def qfc_add_collaborator(
 
 
 qfield_router = Router(
-    path="/qfield",
-    tags=["qfield"],
+    path="/api/v1/qfield",
+    tags=["api"],
     route_handlers=[
         qfc_creds_test,
         qfc_add_collaborator,

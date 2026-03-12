@@ -494,8 +494,10 @@ extra_head %}
         Enhancing field mapping efficiency and accuracy through seamless coordination.
       </p>
       <div class="landing-hero-actions">
-        <wa-button href="/htmxprojects" variant="brand" size="large">Explore Projects</wa-button>
-        <wa-button href="/new" variant="neutral" size="large">Create Project</wa-button>
+        <wa-button href="/projects" variant="brand" size="large">Explore Projects</wa-button>
+        <wa-button href="{{ create_project_href or '/new' }}" variant="neutral" size="large"
+          >Create Project</wa-button
+        >
       </div>
     </div>
   </section>

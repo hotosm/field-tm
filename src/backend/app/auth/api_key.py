@@ -17,8 +17,6 @@
 #
 """API key authentication dependencies and helpers."""
 
-from __future__ import annotations
-
 import hashlib
 import secrets
 

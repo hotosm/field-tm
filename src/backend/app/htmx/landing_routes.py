@@ -24,22 +24,36 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Template
 from psycopg import AsyncConnection
 
+from app.auth.auth_deps import get_optional_auth_user
 from app.db.database import db_conn
+from app.htmx.project_list_routes import _create_project_href
 
 
 @get(path="/login")
 async def login_page(request: HTMXRequest) -> Template:
     """Render the embedded login page (used for self-hosted deployments)."""
-    return HTMXTemplate(template_name="login.html")
+    return_to = request.query_params.get("return_to") or "/"
+    return HTMXTemplate(
+        template_name="login.html",
+        context={"return_to": return_to},
+    )
 
 
 @get(
     path="/",
-    dependencies={"db": Provide(db_conn)},
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(get_optional_auth_user),
+    },
 )
-async def landing(request: HTMXRequest, db: AsyncConnection) -> Template:
+async def landing(
+    request: HTMXRequest, db: AsyncConnection, auth_user: object | None
+) -> Template:
     """Render public landing page."""
-    return HTMXTemplate(template_name="landing.html")
+    return HTMXTemplate(
+        template_name="landing.html",
+        context={"create_project_href": _create_project_href(auth_user)},
+    )
 
 
 @get(

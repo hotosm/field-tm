@@ -39,17 +39,33 @@ def _pick_attr(obj: object, *names: str) -> Any:
 
 
 def get_user_sub(user: object) -> str:
-    """Normalize hotosm-auth user identifiers to Field-TM `provider|id` form."""
+    """Normalize hotosm-auth user identifiers to Field-TM `provider|id` form.
+
+    The prefix is derived from the configured AUTH_PROVIDER:
+    - HOTOSM  → ``hotosm|<id>``
+    - BUNDLED → ``fieldtm|<id>``
+    - others  → preserve any existing ``provider|id`` form or fall back to ``osm|<id>``
+    """
+    provider_prefixes = {
+        AuthProvider.HOTOSM: "hotosm",
+        AuthProvider.BUNDLED: "fieldtm",
+    }
+    prefix = provider_prefixes.get(settings.AUTH_PROVIDER)
+
     sub = _pick_attr(user, "sub", "user_sub")
     if sub:
         sub_value = str(sub)
         if "|" in sub_value:
+            if prefix:
+                # Re-prefix the raw ID with the correct provider name.
+                raw_id = sub_value.split("|", 1)[1]
+                return f"{prefix}|{raw_id}"
             return sub_value
-        return f"osm|{sub_value}"
+        return f"{prefix or 'osm'}|{sub_value}"
 
     uid = _pick_attr(user, "uid", "id", "user_id")
     if uid is not None:
-        return f"osm|{uid}"
+        return f"{prefix or 'osm'}|{uid}"
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -78,14 +94,25 @@ def get_user_is_admin(user: object) -> bool:
 async def login_required(request: Request) -> object:
     """Dependency for endpoints requiring login."""
     if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return SimpleNamespace(sub="osm|1", username="localadmin", is_admin=True)
+        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
     return await get_current_user(request)
+
+
+async def get_optional_auth_user(request: Request) -> object | None:
+    """Return the authenticated user when present, otherwise None.
+
+    In debug or auth-disabled mode we keep the existing local-admin shortcut so
+    manager workflows remain accessible without a session.
+    """
+    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
+        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
+    return await get_current_user_optional(request)
 
 
 async def public_endpoint(request: Request) -> object:
     """Optional-auth dependency with a service-account fallback."""
     if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return SimpleNamespace(sub="osm|1", username="localadmin", is_admin=True)
+        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
     user = await get_current_user_optional(request)
     if user:
         return user

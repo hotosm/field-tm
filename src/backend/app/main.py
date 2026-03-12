@@ -73,7 +73,7 @@ async def server_init(server: Litestar) -> None:
 async def create_local_admin_user(server: Litestar) -> None:
     """Init admin user on application startup."""
     admin_user = DbUser(
-        sub="osm|1",
+        sub="custom|1",
         username="localadmin",
         is_admin=True,
         name="Admin",
@@ -286,7 +286,7 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
 
     E.g. auth mode globals are available in all templates.
     """
-    hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL
+    hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL or ""
     engine.engine.globals["hanko_public_url"] = hanko_public_url
 
     # Frontend origin - used for redirect-after-login / redirect-after-logout.
@@ -298,7 +298,10 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
 
     # Login page URL. Explicit LOGIN_URL override wins; otherwise derive the
     # centralized login app from the public Hanko URL.
-    login_url = settings.LOGIN_URL or build_login_app_url(hanko_public_url)
+    if settings.AUTH_PROVIDER == AuthProvider.DISABLED:
+        login_url = ""
+    else:
+        login_url = settings.LOGIN_URL or build_login_app_url(hanko_public_url)
     engine.engine.globals["login_url"] = login_url
 
     engine.engine.globals["auth_provider"] = settings.AUTH_PROVIDER.value
@@ -309,12 +312,14 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
 
 def create_app() -> Litestar:
     """Configure Litestar app main router."""
-    deps, auth_route_handlers = setup_auth()
-    auth_lib_router = Router(
-        path="/",
-        route_handlers=auth_route_handlers,
-        dependencies=deps,
-    )
+    auth_lib_router = None
+    if settings.AUTH_PROVIDER != AuthProvider.DISABLED:
+        deps, auth_route_handlers = setup_auth()
+        auth_lib_router = Router(
+            path="/",
+            route_handlers=auth_route_handlers,
+            dependencies=deps,
+        )
     root_router = configure_root_router()
     # Import routers after logger / settings to avoid circular imports
     from app.auth.auth_routes import auth_router
@@ -334,17 +339,20 @@ def create_app() -> Litestar:
         log.info("Adding OpenObserve OpenTelemetry monitoring config")
         plugins.append(get_otel_plugin())
 
+    route_handlers = [
+        root_router,
+        api_router,
+        auth_router,
+        qfield_router,
+        helper_router,
+        central_router,
+        htmx_router,
+    ]
+    if auth_lib_router is not None:
+        route_handlers.insert(0, auth_lib_router)
+
     app = Litestar(
-        route_handlers=[
-            auth_lib_router,
-            root_router,
-            api_router,
-            auth_router,
-            qfield_router,
-            helper_router,
-            central_router,
-            htmx_router,
-        ],
+        route_handlers=route_handlers,
         plugins=plugins,
         on_startup=[get_db_connection_pool, server_init, create_local_admin_user],
         on_shutdown=[close_db_connection_pool],

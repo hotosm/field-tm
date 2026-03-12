@@ -5,6 +5,17 @@
       <p class="ftm-setup-summary__description">
         The project setup flow is complete and shown below for reference.
       </p>
+      {% if project.location_str %}
+      <div
+        class="ftm-step ftm-step--complete"
+        style="margin-bottom: 20px; padding: 15px; background: #f7f9fb"
+      >
+        <div class="ftm-step__header" style="margin-bottom: 0">
+          <h3 class="ftm-step__title" style="font-size: 1.05em">Project Location</h3>
+        </div>
+        <p style="margin: 8px 0 0; color: #444">📍 {{ project.location_str }}</p>
+      </div>
+      {% endif %}
 
       <div class="ftm-section">
         <!-- Step 1: XLSForm -->

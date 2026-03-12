@@ -56,17 +56,6 @@ ENV LANG=en_US.UTF-8 \
 STOPSIGNAL SIGINT
 
 
-# Get supercronic binary for userland scheduling (cron daemon needs root)
-FROM base AS supercronic
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.33/supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=71b0d58cc53f6bd72cf2f293e09e294b79c666d8 \
-    SUPERCRONIC=supercronic-linux-amd64
-RUN curl -fsSLO "$SUPERCRONIC_URL" \
- && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
- && chmod +x "$SUPERCRONIC" \
- && mv "$SUPERCRONIC" /supercronic
-
-
 # Build stage will all dependencies required to build Python wheels
 FROM base AS build
 # NOTE the MONITORING argument is specified during production build on Github workflow
@@ -158,7 +147,6 @@ RUN apt-get update --quiet \
     #    apt-get install -y --quiet --no-install-recommends \
     #    "postgresql-client-17" \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=supercronic /supercronic /usr/local/bin/
 COPY ./*-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime base

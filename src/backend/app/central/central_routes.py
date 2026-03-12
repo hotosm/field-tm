@@ -51,8 +51,8 @@ async def odk_creds_test(
 
 
 central_router = Router(
-    path="/central",
-    tags=["central"],
+    path="/api/v1/central",
+    tags=["api"],
     route_handlers=[
         odk_creds_test,
     ],

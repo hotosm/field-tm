@@ -1,7 +1,13 @@
 """Tests for app bootstrap helpers."""
 
+from app.auth.auth_routes import auth_router
+from app.central.central_routes import central_router
 from app.config import AuthProvider, Settings
-from app.main import build_login_app_url
+from app.helpers.helper_routes import helper_router
+from app.main import _configure_template_engine, build_login_app_url, create_app
+from app.projects.project_routes import api_router
+from app.projects.project_schemas import StubProjectIn
+from app.qfield.qfield_routes import qfield_router
 
 
 def test_build_login_app_url_appends_app_path():
@@ -56,3 +62,68 @@ def test_settings_disabled_provider_keeps_auth_urls_optional():
 
     assert settings.HANKO_API_URL is None
     assert settings.LOGIN_URL is None
+
+
+def test_create_app_skips_auth_setup_when_provider_disabled(monkeypatch):
+    """Disabled auth mode must not call setup_auth()."""
+    from app import main
+
+    monkeypatch.setattr(main.settings, "AUTH_PROVIDER", AuthProvider.DISABLED)
+
+    def _raise_if_called():
+        raise AssertionError("setup_auth must not be called when auth is disabled")
+
+    monkeypatch.setattr(main, "setup_auth", _raise_if_called)
+
+    app = create_app()
+    assert app is not None
+
+
+def test_api_routers_share_versioned_prefix_and_tag():
+    """JSON API routers should live under /api/v1 and share one schema tag."""
+    assert api_router.path == "/api/v1"
+    assert api_router.tags == ["api"]
+
+    assert auth_router.path == "/api/v1/auth"
+    assert auth_router.tags == ["api"]
+
+    assert central_router.path == "/api/v1/central"
+    assert central_router.tags == ["api"]
+
+    assert helper_router.path == "/api/v1/helpers"
+    assert helper_router.tags == ["api"]
+
+    assert qfield_router.path == "/api/v1/qfield"
+    assert qfield_router.tags == ["api"]
+
+
+def test_stub_project_internal_fields_are_persistable():
+    """Server-populated fields must not be excluded from DB model dumps."""
+    assert StubProjectIn.model_fields["location_str"].exclude is not True
+    assert StubProjectIn.model_fields["slug"].exclude is not True
+    assert StubProjectIn.model_fields["created_by_sub"].exclude is not True
+
+
+def test_template_engine_config_handles_disabled_auth_without_hanko_urls(monkeypatch):
+    """Disabled auth must not attempt to derive login URL from missing Hanko URL."""
+    from app import main
+
+    class _FakeInnerEngine:
+        def __init__(self):
+            self.globals = {}
+
+    class _FakeTemplateEngine:
+        def __init__(self):
+            self.engine = _FakeInnerEngine()
+
+    monkeypatch.setattr(main.settings, "AUTH_PROVIDER", AuthProvider.DISABLED)
+    monkeypatch.setattr(main.settings, "HANKO_PUBLIC_URL", None)
+    monkeypatch.setattr(main.settings, "HANKO_API_URL", None)
+    monkeypatch.setattr(main.settings, "LOGIN_URL", None)
+
+    engine = _FakeTemplateEngine()
+    _configure_template_engine(engine)
+
+    assert engine.engine.globals["hanko_public_url"] == ""
+    assert engine.engine.globals["login_url"] == ""
+    assert engine.engine.globals["auth_enabled"] is False

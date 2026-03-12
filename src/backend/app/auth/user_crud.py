@@ -1,7 +1,5 @@
 """User CRUD helpers shared by auth routes and tests."""
 
-from __future__ import annotations
-
 import logging
 
 from litestar import status_codes as status

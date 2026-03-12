@@ -2,7 +2,7 @@
 <div class="ftm-page ftm-page--projects">
   <div class="ftm-projects-shell">
     <div class="ftm-projects-toolbar">
-      <form class="ftm-projects-filters" method="get" action="/htmxprojects">
+      <form class="ftm-projects-filters" method="get" action="/projects">
         <!-- Mobile-only filters toggle -->
         <button
           type="button"
@@ -75,7 +75,7 @@
         </div>
       </form>
 
-      <wa-button href="/new" variant="brand" class="ftm-create-btn">
+      <wa-button href="{{ create_project_href or '/new' }}" variant="brand" class="ftm-create-btn">
         <span class="ftm-create-btn__full">Create Project</span>
         <span class="ftm-create-btn__short">+ New</span>
       </wa-button>
@@ -94,7 +94,7 @@
     <wa-card
       class="ftm-project-card"
       with-header
-      onclick="window.location.href='/htmxprojects/{{ project.id }}'"
+      onclick="window.location.href='/projects/{{ project.id }}'"
     >
       <div slot="header" class="ftm-project-card__header">
         <div class="ftm-project-card__header-meta">
@@ -126,32 +126,36 @@
         <span class="ftm-project-card__name">{{ project.project_name or 'Unnamed Project' }}</span>
       </div>
       <div class="ftm-project-card__body">
-        {% if project.location_str %}
-        <div class="ftm-project-card__location">
-          <span class="ftm-project-card__location-inner">
-            <span style="color: #888">📍</span>
-            <span style="line-height: 1.4">{{ project.location_str }}</span>
-          </span>
-        </div>
-        {% endif %} {% if project.description %}
-        <p class="ftm-project-card__description">
-          {{ project.description[:120] }}{% if project.description|length > 120 %}...{% endif %}
-        </p>
-        {% endif %} {% if project.hashtags %}
-        <div class="ftm-project-card__tags">
-          {% for tag in project.hashtags[:4] %}
-          <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
-          {% endfor %} {% if project.hashtags|length > 4 %}
-          <wa-badge variant="neutral" style="font-size: 0.8em"
-            >+{{ project.hashtags|length - 4 }}</wa-badge
-          >
+        <div class="ftm-project-card__content-top">
+          {% if project.location_str %}
+          <div class="ftm-project-card__location">
+            <span class="ftm-project-card__location-inner">
+              <span style="color: #888">📍</span>
+              <span style="line-height: 1.4">Location: {{ project.location_str }}</span>
+            </span>
+          </div>
           {% endif %}
         </div>
-        {% endif %} {% if project.created_at %}
-        <div class="ftm-project-card__footer">
-          Created: {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else 'N/A' }}
+        <p class="ftm-project-card__description">
+          {{ project.description or '' }}
+        </p>
+        <div class="ftm-project-card__meta">
+          {% if project.hashtags %}
+          <div class="ftm-project-card__tags">
+            {% for tag in project.hashtags[:4] %}
+            <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
+            {% endfor %} {% if project.hashtags|length > 4 %}
+            <wa-badge variant="neutral" style="font-size: 0.8em"
+              >+{{ project.hashtags|length - 4 }}</wa-badge
+            >
+            {% endif %}
+          </div>
+          {% endif %} {% if project.created_at %}
+          <div class="ftm-project-card__footer">
+            Created: {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else 'N/A' }}
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     </wa-card>
     {% endfor %}

@@ -344,8 +344,8 @@ async def flatten_multipolygons_to_polygons(
 
 
 helper_router = Router(
-    path="/helper",
-    tags=["helper"],
+    path="/api/v1/helpers",
+    tags=["api"],
     route_handlers=[
         download_template,
         convert_geojson_to_odk_csv_wrapper,

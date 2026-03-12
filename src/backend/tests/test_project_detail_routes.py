@@ -18,6 +18,7 @@
 """Unit tests for HTMX project detail routes."""
 
 import json
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
@@ -53,6 +54,18 @@ async def test_project_details_includes_form_templates_json(monkeypatch):
     assert response.template_name == "project_details.html"
     assert response.context["project"] is project
     assert response.context["form_templates_json"] == json.dumps(forms)
+
+
+def test_project_details_template_includes_location_display():
+    """Project details template should render a dedicated location line."""
+    template_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "templates"
+        / "project_details.html"
+    )
+    content = template_path.read_text()
+    assert "📍 {{ project.location_str }}" in content
 
 
 if __name__ == "__main__":

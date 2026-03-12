@@ -2,7 +2,7 @@
 %}Field Tasking Manager {% endblock %} {% block content %}
 <div class="ftm-page ftm-page--wide">
   <div style="margin-bottom: 20px">
-    <wa-button href="/htmxprojects" variant="default" style="margin-bottom: 20px">
+    <wa-button href="/projects" variant="default" style="margin-bottom: 20px">
       ← Back to Projects
     </wa-button>
   </div>
@@ -48,6 +48,8 @@
           Project metadata and setup information for managers.
         </p>
       </div>
+      {% endif %} {% if project.location_str %}
+      <p class="ftm-project-location-line">📍 {{ project.location_str }}</p>
       {% endif %}
 
       <!-- Description -->
@@ -150,7 +152,7 @@
     </div>
 
     <div slot="footer" class="ftm-flex-end">
-      <wa-button href="/htmxprojects" variant="default">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="default">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% else %}
@@ -160,7 +162,7 @@
       <p style="color: #666; margin: 20px 0">
         The project you're looking for doesn't exist or you don't have permission to view it.
       </p>
-      <wa-button href="/htmxprojects" variant="primary">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="primary">Back to Projects</wa-button>
     </div>
   </wa-card>
   {% endif %}

@@ -30,6 +30,7 @@ from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
 from app.auth.auth_schemas import AuthUser
+from app.auth.user_crud import get_or_create_user
 from app.central import central_crud, central_schemas
 from app.config import encrypt_value, settings
 from app.db.database import close_db_connection_pool, get_db_connection_pool
@@ -44,7 +45,6 @@ from app.projects.project_schemas import (
     ProjectIn,
     StubProjectIn,
 )
-from app.users.user_crud import get_or_create_user
 
 TEST_DATA_DIR = Path(__file__).parent / "test_data"
 
@@ -108,7 +108,7 @@ async def admin_user(db):
     return await get_or_create_user(
         db,
         AuthUser(
-            sub="osm|1",
+            sub="custom|1",
             username="localadmin",
             is_admin=True,
         ),
@@ -213,7 +213,7 @@ async def odk_project(odk_creds):
 @pytest_asyncio.fixture(scope="function")
 async def api_key(client):
     """A real API key for use in external API endpoint tests."""
-    resp = await client.post("/auth/api-keys", json={"name": "test-api-key"})
+    resp = await client.post("/api/v1/auth/api-keys", json={"name": "test-api-key"})
     assert resp.status_code == 201, resp.text
     yield resp.json()["api_key"]
 

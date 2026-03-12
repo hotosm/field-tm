@@ -24,6 +24,8 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Template
 from psycopg import AsyncConnection
 
+from app.auth.auth_deps import get_optional_auth_user
+from app.config import AuthProvider, settings
 from app.db.database import db_conn
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
@@ -36,11 +38,23 @@ PROJECT_SORT_OPTIONS = {
 }
 
 
+def _create_project_href(auth_user: object | None) -> str:
+    """Return the correct create-project target for the current auth state."""
+    if settings.AUTH_PROVIDER == AuthProvider.DISABLED or auth_user is not None:
+        return "/new"
+    return "/login?return_to=%2Fnew"
+
+
 @get(
-    path="/htmxprojects",
-    dependencies={"db": Provide(db_conn)},
+    path="/projects",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(get_optional_auth_user),
+    },
 )
-async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template:
+async def project_listing(
+    request: HTMXRequest, db: AsyncConnection, auth_user: object | None
+) -> Template:
     """Render public project listing page."""
     status_param = request.query_params.get("status")
     search_query = (request.query_params.get("search") or "").strip()
@@ -71,5 +85,6 @@ async def project_listing(request: HTMXRequest, db: AsyncConnection) -> Template
             "selected_status": selected_status.value if selected_status else "",
             "search_query": search_query,
             "selected_sort": selected_sort,
+            "create_project_href": _create_project_href(auth_user),
         },
     )

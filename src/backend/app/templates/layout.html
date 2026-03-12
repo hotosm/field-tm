@@ -177,6 +177,30 @@
           window.location.href = `{{ login_url }}${separator}return_to=${returnTo}`;
         });
       }
+
+      // Sync the authenticated user into the Field-TM database once per browser
+      // session. hotosm-auth validates the session and emits 'hanko-login' on
+      // every page load when a session is found; sessionStorage prevents us
+      // hitting the endpoint on each navigation after the first sync.
+      const hotosmAuth = document.querySelector("hotosm-auth");
+      if (hotosmAuth) {
+        hotosmAuth.addEventListener("hanko-login", async () => {
+          if (sessionStorage.getItem("ftm_profile_synced")) return;
+          try {
+            const resp = await fetch("/api/v1/auth/profile/me", { credentials: "include" });
+            if (resp.ok) {
+              sessionStorage.setItem("ftm_profile_synced", "1");
+            }
+          } catch (e) {
+            console.warn("Field-TM: failed to sync user profile:", e);
+          }
+        });
+
+        // Clear the flag on logout so the next login triggers a fresh sync.
+        hotosmAuth.addEventListener("hanko-logout", () => {
+          sessionStorage.removeItem("ftm_profile_synced");
+        });
+      }
       {% endif %}
 
       // hot-header tabs must be set as a JS property (not an HTML attribute)
@@ -186,9 +210,9 @@
         appHeader.tabs = [
           {
             label: "Projects",
-            href: "/htmxprojects",
+            href: "/projects",
             clickEvent: () => {
-              window.location.href = "/htmxprojects";
+              window.location.href = "/projects";
             },
           },
           {

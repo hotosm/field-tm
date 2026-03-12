@@ -24,6 +24,8 @@ import pytest
 from app.auth.api_key import hash_api_key
 from app.db.models import DbApiKey
 from app.qfield.qfield_crud import (
+    _build_qfc_service_account_email,
+    _create_qfc_user,
     _is_org_owned_project,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
@@ -74,7 +76,7 @@ async def admin_api_key(db, admin_user, ensure_api_keys_table):
 async def test_qfield_creds_test_invalid_credentials_returns_400(client):
     """QField credential endpoint should reject invalid credentials."""
     response = await client.post(
-        "/qfield/test-credentials",
+        "/api/v1/qfield/test-credentials",
         json={
             "qfield_cloud_url": "https://app.qfield.cloud",
             "qfield_cloud_user": "invalid-user",
@@ -88,7 +90,7 @@ async def test_qfield_creds_test_invalid_credentials_returns_400(client):
 async def test_qfield_add_collaborator_requires_api_key(client):
     """Collaborator route should reject requests without an API key."""
     response = await client.post(
-        "/qfield/projects/nonexistent/collaborators",
+        "/api/v1/qfield/projects/nonexistent/collaborators",
         json={"username": "new-user", "role": "editor"},
     )
 
@@ -100,7 +102,7 @@ async def test_qfield_add_collaborator_with_real_api_key_hits_qfield_flow(
 ):
     """Route should authenticate via DB API key and execute collaborator flow."""
     response = await client.post(
-        "/qfield/projects/nonexistent/collaborators",
+        "/api/v1/qfield/projects/nonexistent/collaborators",
         headers={"x-api-key": admin_api_key},
         json={"username": "new-user", "role": "editor"},
     )
@@ -113,7 +115,7 @@ async def test_qfield_add_collaborator_with_real_api_key_hits_qfield_flow(
 async def test_qfield_add_collaborator_payload_defaults_role(client, admin_api_key):
     """Role should default when omitted, still exercising the real route path."""
     response = await client.post(
-        "/qfield/projects/nonexistent/collaborators",
+        "/api/v1/qfield/projects/nonexistent/collaborators",
         headers={"x-api-key": admin_api_key},
         json={"username": "new-user"},
     )
@@ -209,6 +211,56 @@ def test_sanitize_qfc_project_name_handles_unicode_and_symbols():
     sanitized = _sanitize_qfc_project_name(raw)
 
     assert sanitized == "FieldTM-Kathmandu-1"
+
+
+def test_build_qfc_service_account_email_uses_configured_domain():
+    """Provisioned QField users should always get a non-empty email."""
+    email = _build_qfc_service_account_email("ftm_manager_14")
+
+    assert email == "ftm_manager_14@field.localhost"
+
+
+def test_build_qfc_service_account_email_falls_back_for_invalid_domain(monkeypatch):
+    """Fallback to a safe local domain when FTM_DOMAIN is not email-safe."""
+    monkeypatch.setattr("app.qfield.qfield_crud.settings.FTM_DOMAIN", "localhost")
+
+    email = _build_qfc_service_account_email("ftm mapper 14")
+
+    assert email == "ftm-mapper-14@noreply.local"
+
+
+@pytest.mark.asyncio
+async def test_create_qfc_user_passes_generated_email_to_sdk():
+    """User creation should send a concrete email to QFieldCloud."""
+
+    class FakeClient:
+        def __init__(self):
+            self.calls = []
+
+        def create_user(self, username, password, email="", exist_ok=False):
+            self.calls.append(
+                {
+                    "username": username,
+                    "password": password,
+                    "email": email,
+                    "exist_ok": exist_ok,
+                }
+            )
+            return {"username": username}
+
+    client = FakeClient()
+
+    created = await _create_qfc_user("ftm_mapper_14", "secret", client)
+
+    assert created is True
+    assert client.calls == [
+        {
+            "username": "ftm_mapper_14",
+            "password": "secret",
+            "email": "ftm_mapper_14@field.localhost",
+            "exist_ok": True,
+        }
+    ]
 
 
 def test_strip_feature_properties_for_qfield_removes_seed_attributes():

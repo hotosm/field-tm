@@ -8,7 +8,8 @@ content %}
     <p>Redirecting to the centralized login service.</p>
     <p><a href="{{ login_url }}">Continue to login</a></p>
     <script>
-      const returnTo = encodeURIComponent(window.location.origin);
+      const returnToPath = {{ (return_to or "/")|tojson }};
+      const returnTo = encodeURIComponent(window.location.origin + returnToPath);
       const separator = "{{ login_url }}".includes("?") ? "&" : "?";
       window.location.replace(`{{ login_url }}${separator}return_to=${returnTo}`);
     </script>
