@@ -773,6 +773,72 @@ def _fix_dangling_icc_refs(
     return _DANGLING_ICC_RE.sub(_strip_if_missing, qgs_data), changed
 
 
+def _fix_task_layer_tree(
+    qgs_data: bytes, log: logging.Logger
+) -> tuple[bytes, bool]:
+    """Ensure the tasks layer node appears in the layer-tree-group.
+
+    When QGIS runs headless, addMapLayer(addToLegend=True) registers the layer
+    in <projectlayers> but does not always write the corresponding
+    <layer-tree-layer> node.  The missing node causes QFieldCloud's metadata
+    parser to fail with "Failed to parse metadata from project", and also
+    prevents the tasks layer from appearing in the QField layer panel.
+    """
+    # Only act if a tasks maplayer block is present in projectlayers
+    tasks_block_m = re.search(
+        rb"<maplayer\b[^>]*>(?:(?!</maplayer>).)*?<layername>tasks</layername>"
+        rb"(?:(?!</maplayer>).)*?</maplayer>",
+        qgs_data,
+        re.DOTALL,
+    )
+    if not tasks_block_m:
+        return qgs_data, False
+
+    tasks_block = tasks_block_m.group(0)
+    id_m = re.search(rb"<id>(.*?)</id>", tasks_block)
+    ds_m = re.search(rb"<datasource>(.*?)</datasource>", tasks_block)
+    if not id_m:
+        log.warning("tasks maplayer has no <id>; skipping layer-tree fix")
+        return qgs_data, False
+
+    tasks_id = id_m.group(1).decode("utf-8")
+    datasource = ds_m.group(1).decode("utf-8") if ds_m else "./tasks.gpkg"
+
+    # Already in the tree? Nothing to do.
+    if re.search(
+        rb'<layer-tree-layer\b[^>]*\bid="' + re.escape(tasks_id.encode()) + rb'"',
+        qgs_data,
+    ):
+        return qgs_data, False
+
+    layer_tree_node = (
+        f'\n    <layer-tree-layer patch_size="-1,-1" expanded="1" providerKey="ogr"'
+        f' id="{tasks_id}" checked="Qt::Checked" source="{datasource}"'
+        f' legend_split_behavior="0" name="tasks" legend_exp="">\n'
+        f"      <customproperties>\n"
+        f"        <Option />\n"
+        f"      </customproperties>\n"
+        f"    </layer-tree-layer>"
+    ).encode()
+
+    # Insert after the first </layer-tree-layer> (survey layer), so tasks
+    # appears second in the tree — below survey but above list/basemap layers.
+    ltg_m = re.search(rb"<layer-tree-group\b[^>]*>", qgs_data)
+    if not ltg_m:
+        log.warning("No <layer-tree-group> found; skipping layer-tree fix")
+        return qgs_data, False
+
+    first_end_m = re.search(rb"</layer-tree-layer>", qgs_data[ltg_m.end():])
+    if first_end_m:
+        insert_at = ltg_m.end() + first_end_m.end()
+    else:
+        insert_at = ltg_m.end()
+
+    updated = qgs_data[:insert_at] + layer_tree_node + qgs_data[insert_at:]
+    log.info("Injected tasks <layer-tree-layer> node into project layer tree")
+    return updated, True
+
+
 def _inject_map_canvas(
     qgs_data: bytes, extent_bbox: list, log: logging.Logger
 ) -> tuple[bytes, bool]:
@@ -873,6 +939,7 @@ def sanitize_generated_qgz_metadata(
         qgs_data = archive.read(qgs_entry)
 
     qgs_data, icc_changed = _fix_dangling_icc_refs(qgs_data, bundled, log)
+    qgs_data, tree_fixed = _fix_task_layer_tree(qgs_data, log)
 
     if extent_bbox is not None:
         qgs_data, canvas_injected = _inject_map_canvas(qgs_data, extent_bbox, log)
@@ -884,7 +951,7 @@ def sanitize_generated_qgz_metadata(
                 "extent_bbox was provided; QFieldCloud may fail to parse metadata"
             )
 
-    if not (icc_changed or canvas_injected):
+    if not (icc_changed or tree_fixed or canvas_injected):
         return
 
     temp_archive = project_path.with_suffix(project_path.suffix + ".tmp")
@@ -928,16 +995,16 @@ def _add_task_layer_to_project(
         log.warning("Tasks GeoPackage is not a valid QGIS layer")
         return
 
-    registered = project.addMapLayer(task_layer, addToLegend=True)
+    # addToLegend=False then insertLayer is required in headless QGIS: the
+    # addToLegend=True path silently fails to write a <layer-tree-layer> node
+    # when the project was loaded from a QGZ without a live QgsMapCanvas.
+    registered = project.addMapLayer(task_layer, addToLegend=False)
     if not registered:
         log.warning("Failed to register tasks layer in project")
         return
 
-    # Explicitly mark the layer tree node as visible so it renders on the canvas
     layer_root = project.layerTreeRoot()
-    task_node = layer_root.findLayer(task_layer.id())
-    if task_node:
-        task_node.setItemVisibilityChecked(True)
+    layer_root.insertLayer(1, task_layer)
 
     log.info("Tasks layer added to project")
 
