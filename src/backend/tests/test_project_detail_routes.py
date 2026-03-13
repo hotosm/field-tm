@@ -66,6 +66,9 @@ def test_project_details_template_includes_location_display():
     )
     content = template_path.read_text()
     assert "📍 {{ project.location_str }}" in content
+    assert '<h4 class="ftm-detail-label">Manager</h4>' in content
+    assert "{{ project.manager_username }}" in content
+    assert '<h4 class="ftm-detail-label">Location</h4>' not in content
 
 
 if __name__ == "__main__":

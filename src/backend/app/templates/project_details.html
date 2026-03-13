@@ -67,10 +67,10 @@
           <p class="ftm-detail-value">#{{ project.id }}</p>
         </div>
 
-        {% if project.location_str %}
+        {% if project.manager_username %}
         <div>
-          <h4 class="ftm-detail-label">Location</h4>
-          <p class="ftm-detail-value">{{ project.location_str }}</p>
+          <h4 class="ftm-detail-label">Manager</h4>
+          <p class="ftm-detail-value">{{ project.manager_username }}</p>
         </div>
         {% endif %} {% if project.created_at %}
         <div>

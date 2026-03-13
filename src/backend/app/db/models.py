@@ -528,6 +528,9 @@ class DbProject:
     # GeoJSON task areas/boundaries stored directly in database
     task_areas_geojson: Optional[dict] = None
 
+    # Computed
+    manager_username: Optional[str] = None
+
     @classmethod
     async def one(
         cls,
@@ -540,9 +543,11 @@ class DbProject:
         sql = """
             SELECT
                 p.*,
+                u.username AS manager_username,
                 ST_AsGeoJSON(p.outline)::jsonb AS outline
             FROM
                 projects p
+            LEFT JOIN users u ON u.sub = p.created_by_sub
             WHERE
                 p.id = %(project_id)s;
         """
