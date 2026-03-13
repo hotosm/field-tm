@@ -8,6 +8,8 @@ import threading
 import traceback
 import atexit
 import shutil
+import re
+import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional, Dict, Any
 from pathlib import Path
@@ -747,6 +749,65 @@ def _prepare_tasks_layer(
     return str(tasks_gpkg_path_final)
 
 
+_DANGLING_ICC_RE = re.compile(rb'\s+iccProfileId="attachment:///([^"]+)"')
+
+
+def sanitize_generated_qgz_metadata(project_file: str, log: logging.Logger) -> None:
+    """Remove dangling ICC profile attachment refs from generated .qgz projects.
+
+    QGIS sometimes writes iccProfileId="attachment:///qt_temp-XXXX" into
+    ProjectStyleSettings but never bundles the temp file into the .qgz archive.
+    QFieldCloud's metadata parser rejects projects with such dangling refs,
+    even though QGIS and QField themselves tolerate them. This function strips
+    any iccProfileId attribute whose target is absent from the archive.
+    """
+    project_path = Path(project_file)
+    if project_path.suffix.lower() != ".qgz":
+        return
+
+    with zipfile.ZipFile(project_path, "r") as archive:
+        entry_names = archive.namelist()
+        bundled = set(entry_names)
+        qgs_entries = [name for name in entry_names if name.lower().endswith(".qgs")]
+        if not qgs_entries:
+            log.warning("No .qgs entry found inside %s", project_path)
+            return
+        qgs_entry = qgs_entries[0]
+        qgs_data = archive.read(qgs_entry)
+
+    changed = False
+
+    def _strip_if_missing(m: re.Match) -> bytes:
+        nonlocal changed
+        attachment_name = m.group(1).decode("utf-8")
+        if attachment_name in bundled:
+            return m.group(0)
+        changed = True
+        log.warning(
+            "Removed dangling iccProfileId reference to missing attachment: %s",
+            attachment_name,
+        )
+        return b""
+
+    updated_qgs_data = _DANGLING_ICC_RE.sub(_strip_if_missing, qgs_data)
+
+    if not changed:
+        return
+
+    temp_archive = project_path.with_suffix(project_path.suffix + ".tmp")
+    with zipfile.ZipFile(project_path, "r") as src, zipfile.ZipFile(
+        temp_archive, "w", compression=zipfile.ZIP_DEFLATED
+    ) as dst:
+        for entry_name in entry_names:
+            if entry_name == qgs_entry:
+                dst.writestr(entry_name, updated_qgs_data)
+                continue
+            dst.writestr(entry_name, src.read(entry_name))
+
+    temp_archive.replace(project_path)
+    log.info("Sanitized dangling project metadata attachment refs in %s", project_path)
+
+
 def _load_generated_project(project_file: str):
     """Load the generated QGIS project from disk."""
     from qgis.core import QgsProject
@@ -852,6 +913,7 @@ def generate_qgis_project(
 
         # TODO configure project settings
         configure_project_settings(project, log)
+        sanitize_generated_qgz_metadata(project_file, log)
 
         log.info(f"Final QField project located at: {project_file}")
         return {
