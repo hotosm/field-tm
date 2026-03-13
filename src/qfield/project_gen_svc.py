@@ -520,7 +520,7 @@ def configure_task_layer_style(task_layer: "qgis.core.QgsLayer", log: logging.Lo
     symbol = _build_layer_symbol(
         layer,
         fill_rgba=(0, 0, 0, 0),
-        stroke_rgba=(215, 63, 63, 255),
+        stroke_rgba=(130, 128, 133, 255),  # --hot-color-neutral-500 (#828085)
         stroke_width=1.2,
     )
     layer.renderer().setSymbol(symbol)
@@ -924,12 +924,22 @@ def _add_task_layer_to_project(
     from qgis.core import QgsVectorLayer
 
     task_layer = QgsVectorLayer(tasks_gpkg_path_final, "tasks", "ogr")
-    if task_layer.isValid():
-        project.addMapLayer(task_layer)
-        log.info("Tasks layer added to project")
+    if not task_layer.isValid():
+        log.warning("Tasks GeoPackage is not a valid QGIS layer")
         return
 
-    log.warning("Tasks GeoPackage is not a valid QGIS layer")
+    registered = project.addMapLayer(task_layer, addToLegend=True)
+    if not registered:
+        log.warning("Failed to register tasks layer in project")
+        return
+
+    # Explicitly mark the layer tree node as visible so it renders on the canvas
+    layer_root = project.layerTreeRoot()
+    task_node = layer_root.findLayer(task_layer.id())
+    if task_node:
+        task_node.setItemVisibilityChecked(True)
+
+    log.info("Tasks layer added to project")
 
 
 def _ensure_survey_layer_on_top(project) -> None:
