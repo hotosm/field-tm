@@ -22,7 +22,7 @@ import json
 import logging
 from contextlib import suppress
 
-from litestar import get
+from litestar import delete, get
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
@@ -31,12 +31,22 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response, Template
 from psycopg import AsyncConnection
 
+from app.auth.auth_deps import (
+    get_optional_auth_user,
+    get_user_is_admin,
+    get_user_sub,
+)
 from app.central import central_crud
 from app.config import decrypt_value
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
 from app.projects import project_crud
+from app.projects.project_services import (
+    DownstreamDeleteError,
+    NotFoundError,
+    delete_project_with_downstream,
+)
 
 from .htmx_helpers import callout as _callout
 
@@ -48,6 +58,17 @@ def _app_name(project: DbProject) -> str:
     if hasattr(project.field_mapping_app, "value"):
         return project.field_mapping_app.value
     return str(project.field_mapping_app)
+
+
+def _can_delete_project(auth_user: object | None, project: DbProject) -> bool:
+    """Allow deletion by global admins or the original project creator."""
+    if auth_user is None:
+        return False
+    if get_user_is_admin(auth_user):
+        return True
+    with suppress(Exception):
+        return get_user_sub(auth_user) == project.created_by_sub
+    return False
 
 
 def _mapper_credentials_html(project: DbProject) -> str:
@@ -159,12 +180,16 @@ def _friendly_qr_error(exc: Exception) -> str:
 
 @get(
     path="/projects/{project_id:int}",
-    dependencies={"db": Provide(db_conn)},
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(get_optional_auth_user),
+    },
 )
 async def project_details(
     request: HTMXRequest,
     db: AsyncConnection,
     project_id: int,
+    auth_user: object | None = None,
 ) -> Template:
     """Render project details page."""
     try:
@@ -177,14 +202,71 @@ async def project_details(
             context={
                 "project": project,
                 "form_templates_json": json.dumps(form_templates),
+                "can_delete_project": _can_delete_project(auth_user, project),
             },
         )
     except KeyError:
         # Project not found
         return HTMXTemplate(
             template_name="project_details.html",
-            context={"project": None, "form_templates_json": "[]"},
+            context={
+                "project": None,
+                "form_templates_json": "[]",
+                "can_delete_project": False,
+            },
         )
+
+
+@delete(
+    path="/projects/{project_id:int}",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(get_optional_auth_user),
+    },
+    status_code=status.HTTP_200_OK,
+)
+async def delete_project_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    project_id: int,
+    auth_user: object | None = None,
+) -> Response:
+    """Delete a project after deleting the downstream ODK/QField project."""
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project ({project_id}) not found.",
+        ) from exc
+
+    if not _can_delete_project(auth_user, project):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the project manager can delete this project.",
+        )
+
+    try:
+        await delete_project_with_downstream(db, project_id)
+    except NotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=exc.message,
+        ) from exc
+    except DownstreamDeleteError as exc:
+        return Response(
+            content=_callout("danger", exc.message),
+            media_type="text/html",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+    await db.commit()
+    return Response(
+        content="",
+        media_type="text/html",
+        status_code=status.HTTP_200_OK,
+        headers={"HX-Redirect": "/projects"},
+    )
 
 
 @get(

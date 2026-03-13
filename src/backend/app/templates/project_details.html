@@ -152,6 +152,16 @@
     </div>
 
     <div slot="footer" class="ftm-flex-end">
+      {% if can_delete_project %}
+      <wa-button
+        variant="danger"
+        hx-delete="/projects/{{ project.id }}"
+        hx-confirm="Delete this project in downstream and Field-TM? This cannot be undone."
+        hx-swap="none"
+      >
+        Delete Project
+      </wa-button>
+      {% endif %}
       <wa-button href="/projects" variant="default">Back to Projects</wa-button>
     </div>
   </wa-card>

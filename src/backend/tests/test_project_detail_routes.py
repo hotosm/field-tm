@@ -54,6 +54,27 @@ async def test_project_details_includes_form_templates_json(monkeypatch):
     assert response.template_name == "project_details.html"
     assert response.context["project"] is project
     assert response.context["form_templates_json"] == json.dumps(forms)
+    assert response.context["can_delete_project"] is False
+
+
+async def test_project_details_allows_delete_for_project_creator(monkeypatch):
+    """Project creator should get delete controls in HTMX context."""
+    project = Mock(id=9, xlsform_content=b"sheet", created_by_sub="fieldtm|7")
+
+    async def fake_one(_db, project_id):
+        assert project_id == project.id
+        return project
+
+    monkeypatch.setattr(project_detail_routes.DbProject, "one", fake_one)
+
+    response = await project_detail_routes.project_details.fn(
+        request=Mock(),
+        db=Mock(),
+        project_id=project.id,
+        auth_user=Mock(sub="fieldtm|7", is_admin=False),
+    )
+
+    assert response.context["can_delete_project"] is True
 
 
 def test_project_details_template_includes_location_display():
@@ -69,6 +90,28 @@ def test_project_details_template_includes_location_display():
     assert '<h4 class="ftm-detail-label">Manager</h4>' in content
     assert "{{ project.manager_username }}" in content
     assert '<h4 class="ftm-detail-label">Location</h4>' not in content
+    assert 'hx-delete="/projects/{{ project.id }}"' in content
+
+
+def test_can_delete_project_allows_creator():
+    """Project creator should be allowed to delete from HTMX page."""
+    project = Mock(created_by_sub="fieldtm|123")
+    auth_user = Mock(sub="fieldtm|123", is_admin=False)
+    assert project_detail_routes._can_delete_project(auth_user, project) is True
+
+
+def test_can_delete_project_allows_admin():
+    """Global admins should be allowed to delete any project."""
+    project = Mock(created_by_sub="fieldtm|123")
+    auth_user = Mock(sub="fieldtm|999", is_admin=True)
+    assert project_detail_routes._can_delete_project(auth_user, project) is True
+
+
+def test_can_delete_project_denies_non_manager():
+    """Non-admin users who did not create the project cannot delete it."""
+    project = Mock(created_by_sub="fieldtm|123")
+    auth_user = Mock(sub="fieldtm|999", is_admin=False)
+    assert project_detail_routes._can_delete_project(auth_user, project) is False
 
 
 if __name__ == "__main__":

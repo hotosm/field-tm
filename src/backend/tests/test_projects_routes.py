@@ -21,6 +21,7 @@ import json
 import os
 from contextlib import asynccontextmanager
 from io import BytesIO
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -732,6 +733,100 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
         == "https://example-odk.trycloudflare.com/v1/key/app-token/projects/2"
     )
     assert captured["qr_micro"] is False
+
+
+async def test_delete_project_with_downstream_deletes_ftm_after_remote(monkeypatch):
+    """Service should delete local project after successful downstream deletion."""
+    from app.db.enums import FieldMappingApp
+    from app.projects import project_services
+
+    project = SimpleNamespace(
+        id=19,
+        field_mapping_app=FieldMappingApp.ODK,
+        external_project_id=45,
+    )
+    db = Mock()
+
+    monkeypatch.setattr(
+        project_services.DbProject,
+        "one",
+        AsyncMock(return_value=project),
+    )
+    monkeypatch.setattr(
+        project_services,
+        "_delete_odk_downstream_project",
+        AsyncMock(return_value="already deleted"),
+    )
+    delete_mock = AsyncMock()
+    monkeypatch.setattr(project_services.DbProject, "delete", delete_mock)
+
+    result = await project_services.delete_project_with_downstream(db, 19)
+
+    assert "already deleted" in result.downstream_status
+    delete_mock.assert_awaited_once_with(db, 19)
+
+
+async def test_delete_project_with_downstream_keeps_ftm_on_remote_failure(monkeypatch):
+    """Service should not delete local project if downstream deletion fails."""
+    from app.db.enums import FieldMappingApp
+    from app.projects import project_services
+
+    project = SimpleNamespace(
+        id=20,
+        field_mapping_app=FieldMappingApp.QFIELD,
+        external_project_id="abc-123",
+    )
+    db = Mock()
+
+    monkeypatch.setattr(
+        project_services.DbProject,
+        "one",
+        AsyncMock(return_value=project),
+    )
+    monkeypatch.setattr(
+        project_services,
+        "_delete_qfield_downstream_project",
+        AsyncMock(
+            side_effect=project_services.DownstreamDeleteError("remote deletion failed")
+        ),
+    )
+    delete_mock = AsyncMock()
+    monkeypatch.setattr(project_services.DbProject, "delete", delete_mock)
+
+    with pytest.raises(project_services.DownstreamDeleteError):
+        await project_services.delete_project_with_downstream(db, 20)
+
+    delete_mock.assert_not_awaited()
+
+
+async def test_api_delete_project_returns_422_on_downstream_failure(monkeypatch):
+    """API delete should block local deletion when downstream deletion fails."""
+    from app.projects import project_routes, project_services
+
+    monkeypatch.setattr(
+        project_routes,
+        "api_key_required",
+        AsyncMock(return_value=Mock()),
+    )
+    monkeypatch.setattr(
+        project_routes,
+        "delete_project_with_downstream",
+        AsyncMock(
+            side_effect=project_services.DownstreamDeleteError("cannot delete remote")
+        ),
+    )
+    db = Mock()
+    db.commit = AsyncMock()
+
+    with pytest.raises(Exception) as exc:
+        await project_routes.api_delete_project.fn(
+            request=Mock(),
+            project_id=11,
+            db=db,
+        )
+
+    assert getattr(exc.value, "status_code", None) == 422
+    db.commit.assert_not_awaited()
 
 
 if __name__ == "__main__":

@@ -22,11 +22,13 @@ from app.projects.project_schemas import (
 )
 from app.projects.project_services import (
     ConflictError,
+    DownstreamDeleteError,
     NotFoundError,
     ServiceError,
     SplitAoiOptions,
     ValidationError,
     create_project_stub,
+    delete_project_with_downstream,
     download_osm_data,
     finalize_odk_project,
     finalize_qfield_project,
@@ -52,6 +54,11 @@ def _map_service_error(exc: ServiceError) -> HTTPException:
     if isinstance(exc, NotFoundError):
         return HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=exc.message,
+        )
+    if isinstance(exc, DownstreamDeleteError):
+        return HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=exc.message,
         )
     return HTTPException(
@@ -303,7 +310,10 @@ async def api_delete_project(
 ) -> None:
     """Delete project from Field-TM database."""
     await api_key_required(request, db)
-    await DbProject.delete(db, project_id)
+    try:
+        await delete_project_with_downstream(db, project_id)
+    except ServiceError as exc:
+        raise _map_service_error(exc) from exc
     await db.commit()
 
 

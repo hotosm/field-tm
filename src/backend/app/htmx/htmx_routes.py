@@ -9,7 +9,11 @@ from app.htmx.project_create_routes import (
     new_project,
     upload_xlsform_htmx,
 )
-from app.htmx.project_detail_routes import project_details, project_qrcode_htmx
+from app.htmx.project_detail_routes import (
+    delete_project_htmx,
+    project_details,
+    project_qrcode_htmx,
+)
 from app.htmx.project_list_routes import project_listing
 from app.htmx.qfc_admin_routes import (
     add_collaborator,
@@ -63,6 +67,7 @@ htmx_router = Router(
         metrics_partial,
         new_project,
         project_details,
+        delete_project_htmx,
         create_project_htmx,
         serve_static_css,
         serve_static_image,

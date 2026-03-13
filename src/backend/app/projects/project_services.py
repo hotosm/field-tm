@@ -24,6 +24,7 @@ and REST API routes. They accept typed arguments and raise domain exceptions
 
 import json
 import logging
+from asyncio import get_running_loop
 from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
@@ -37,11 +38,12 @@ from geojson_aoi import parse_aoi
 from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
+from qfieldcloud_sdk.interfaces import QfcRequestException
 
 from app.central import central_crud, central_deps
 from app.central.central_schemas import ODKCentral
 from app.config import settings
-from app.db.enums import ProjectStatus, XLSFormType
+from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
 from app.helpers.geometry_utils import (
@@ -52,8 +54,13 @@ from app.helpers.geometry_utils import (
     polygon_to_centroid,
 )
 from app.projects import project_crud, project_deps, project_schemas
+from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
+
+HTTP_STATUS_OK_MIN = 200
+HTTP_STATUS_OK_MAX_EXCLUSIVE = 300
+HTTP_STATUS_NOT_FOUND = 404
 
 
 # ============================================================================
@@ -95,6 +102,14 @@ class ConflictError(ServiceError):
         super().__init__(message, code="conflict")
 
 
+class DownstreamDeleteError(ServiceError):
+    """Failed to delete downstream project, so local project must be kept."""
+
+    def __init__(self, message: str):
+        """Initialize with message."""
+        super().__init__(message, code="downstream_delete_failed")
+
+
 @dataclass(slots=True)
 class ODKFinalizeResult:
     """Details returned after ODK finalization."""
@@ -124,6 +139,13 @@ class SplitAoiOptions:
     include_rivers: bool = True
     include_railways: bool = True
     include_aeroways: bool = True
+
+
+@dataclass(slots=True)
+class DeleteProjectResult:
+    """Result from deleting project in downstream app + Field-TM."""
+
+    downstream_status: str
 
 
 def _first_outline_feature(outline: Optional[dict]) -> Optional[dict]:
@@ -189,6 +211,95 @@ async def _ensure_project_name_available(
             f"Project with name '{project_name}' already exists. "
             "Please choose a different name."
         )
+
+
+async def _delete_odk_downstream_project(project: DbProject) -> str:
+    """Delete an ODK project, tolerating already-deleted remote state."""
+    if not project.external_project_id:
+        return "No ODK project id configured; skipped downstream deletion."
+
+    try:
+        async with central_deps.pyodk_client(project.get_odk_credentials()) as client:
+            response = client.session.delete(f"projects/{project.external_project_id}")
+    except Exception as exc:
+        raise DownstreamDeleteError(
+            "Failed to connect to ODK Central for project "
+            f"{project.external_project_id}: {exc}"
+        ) from exc
+
+    if HTTP_STATUS_OK_MIN <= response.status_code < HTTP_STATUS_OK_MAX_EXCLUSIVE:
+        return f"Deleted ODK project {project.external_project_id}."
+    if response.status_code == HTTP_STATUS_NOT_FOUND:
+        return (
+            f"ODK project {project.external_project_id} was already deleted; "
+            "proceeding with Field-TM deletion."
+        )
+
+    detail = (response.text or "").strip() or response.reason_phrase
+    raise DownstreamDeleteError(
+        "Failed to delete ODK project "
+        f"{project.external_project_id} (HTTP {response.status_code}): {detail}"
+    )
+
+
+async def _delete_qfield_downstream_project(project: DbProject) -> str:
+    """Delete a QFieldCloud project, tolerating already-deleted remote state."""
+    if not project.external_project_id:
+        return "No QFieldCloud project id configured; skipped downstream deletion."
+
+    loop = get_running_loop()
+    async with qfield_client() as client:
+        try:
+            await loop.run_in_executor(
+                None,
+                partial(client.delete_project, project.external_project_id),
+            )
+            return f"Deleted QFieldCloud project {project.external_project_id}."
+        except QfcRequestException as exc:
+            status_code = exc.response.status_code
+            if status_code == HTTP_STATUS_NOT_FOUND:
+                return (
+                    f"QFieldCloud project {project.external_project_id} was already "
+                    "deleted; proceeding with Field-TM deletion."
+                )
+            raise DownstreamDeleteError(
+                "Failed to delete QFieldCloud project "
+                f"{project.external_project_id} (HTTP {status_code}): {exc}"
+            ) from exc
+        except Exception as exc:
+            raise DownstreamDeleteError(
+                "Failed to delete QFieldCloud project "
+                f"{project.external_project_id}: {exc}"
+            ) from exc
+
+
+async def delete_project_with_downstream(
+    db: AsyncConnection,
+    project_id: int,
+) -> DeleteProjectResult:
+    """Delete downstream project first, then Field-TM project.
+
+    If downstream deletion fails for any reason except "already deleted", the
+    Field-TM project is preserved and a ``DownstreamDeleteError`` is raised.
+    """
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError as exc:
+        raise NotFoundError(f"Project ({project_id}) not found.") from exc
+
+    if project.field_mapping_app == FieldMappingApp.ODK:
+        downstream_status = await _delete_odk_downstream_project(project)
+    elif project.field_mapping_app == FieldMappingApp.QFIELD:
+        downstream_status = await _delete_qfield_downstream_project(project)
+    else:
+        downstream_status = (
+            f"Unsupported field mapping app '{project.field_mapping_app}'; "
+            "skipped downstream deletion."
+        )
+
+    await DbProject.delete(db, project_id)
+    log.info("Deleted FieldTM project %s", project_id)
+    return DeleteProjectResult(downstream_status=downstream_status)
 
 
 def _build_stub_project_data(
