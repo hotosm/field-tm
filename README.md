@@ -145,8 +145,8 @@ various deployment guides.
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
 | ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
-| ✅ | 🖥️ integration with QField | – |
-| ✅ | 🖥️ multiple approaches to task splitting algorithm | – |
+| ✅ | 🖥️ integration with QField | [v2026.1.0][9] |
+| ✅ | 🖥️ multiple approaches to task splitting algorithm | [v2026.1.0][9] |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ integration with OSM mobile apps: EveryDoor, StreetComplete | – |
 | 📅 | 🖥️ integration with ChatMap | – |
@@ -263,3 +263,4 @@ Thanks goes to these wonderful people:
 [6]: https://raw.githubusercontent.com/hotosm/field-tm/main/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
 [8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
+[9]: https://github.com/hotosm/field-tm/releases/tag/2026.1.0 "Renewed"
