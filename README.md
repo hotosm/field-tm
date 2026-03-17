@@ -145,8 +145,8 @@ various deployment guides.
 | ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
 | ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
-| 🔄 | 🖥️ integration with QField | – |
-| 🔄 | 🖥️ multiple approaches to task splitting algorithm | – |
+| ✅ | 🖥️ integration with QField | – |
+| ✅ | 🖥️ multiple approaches to task splitting algorithm | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
 | 📅 | 🖥️ integration with OSM mobile apps: EveryDoor, StreetComplete | – |
 | 📅 | 🖥️ integration with ChatMap | – |
