@@ -15,4 +15,5 @@ jobs:
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}
       multi_arch: true
+      extra_build_args: MONITORING=yes
 # Frontend is not built as build variables are required
