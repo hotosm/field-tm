@@ -123,6 +123,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 # Packages:
 # - procps: pgrep util for heathchecks
+# - gettext: msgfmt util for compiling gettext catalogs
 # - gettext-base: envsubst util for dotenv substitution
 # - postgresql-client: pg_isready util for healthchecks
 # - mime-support: web mimetype support
@@ -132,6 +133,7 @@ RUN apt-get update --quiet \
         "nano" \
         "curl" \
         "procps" \
+        "gettext" \
         "gettext-base" \
         "libpcre2-16-0" \
         "media-types" \
@@ -168,6 +170,8 @@ USER appuser
 FROM runtime-base AS runtime
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
+RUN find /opt/app/locales -path '*/LC_MESSAGES/messages.po' \
+    -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 
 
 # Stage to use during local development
@@ -190,6 +194,8 @@ EOT
 # As we rebuilt before running the tests anyway, just copy all the files in
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
+RUN find /opt/app/locales -path '*/LC_MESSAGES/messages.po' \
+    -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 COPY --chown=appuser:appuser backend/pyproject.toml /opt/pyproject.toml
 COPY --chown=appuser:appuser backend/tests/ /opt/tests/
 # Needed by tests/test_qfield_project_gen_svc.py dynamic module loading

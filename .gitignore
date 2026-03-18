@@ -61,6 +61,7 @@ venv
 # project related
 temp_webmaps/local_only
 temp_webmaps/Naivasha
+src/backend/app/locales/*/LC_MESSAGES/*.mo
 
 # node & pnpm
 **/**/node_modules

@@ -118,6 +118,8 @@ backend-no-docker:
 
   cd {{justfile_directory()}}/src/backend
 
+  uv run --group dev pybabel compile -d app/locales
+
   FTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
   OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
