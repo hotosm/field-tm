@@ -53,6 +53,7 @@ license = "AGPL-3.0-only"
 dev = [
     "pre-commit>=4.3.0",
     "commitizen>=4.9.1",
+    "babel>=2.18.0",
 ]
 test = [
     "pytest==8.3.5",
@@ -138,6 +139,17 @@ ignored_tag_formats = ["osm-fieldwork-$version", "area-splitter-$version"]
 skip = "contrib/*.py,*languages_and_countries.py,*CHANGELOG.md,src/backend/packages/osm-fieldwork/osm_fieldwork/form_components/*,src/backend/packages/osm-fieldwork/osm_fieldwork/update_form.py,src/backend/packages/osm-fieldwork/tests/test_data/*,src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/*,src/backend/app/static/images/*"
 ignore-words-list = "ProjectIn, Indien"
 write-changes = true
+
+
+[[tool.babel.mappings]]
+method = "jinja2"
+pattern = "app/templates/**.html"
+encoding = "utf-8"
+
+[[tool.babel.mappings]]
+method = "python"
+pattern = "app/**.py"
+encoding = "utf-8"
 
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }

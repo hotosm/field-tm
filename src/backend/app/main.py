@@ -31,6 +31,13 @@ from app.__version__ import __version__
 from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
+from app.i18n import (
+    create_locale_cookie_middleware,
+    get_current_locale,
+    gettext_func,
+    ngettext_func,
+    set_locale_before_request,
+)
 from app.monitoring import (
     add_endpoint_profiler,
     get_otel_plugin,
@@ -286,6 +293,11 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
 
     E.g. auth mode globals are available in all templates.
     """
+    # i18n: add gettext support to all templates
+    engine.engine.add_extension("jinja2.ext.i18n")
+    engine.engine.install_gettext_callables(gettext_func, ngettext_func)
+    engine.engine.globals["current_locale"] = get_current_locale
+
     hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL or ""
     engine.engine.globals["hanko_public_url"] = hanko_public_url
 
@@ -369,6 +381,8 @@ def create_app() -> Litestar:
             engine=JinjaTemplateEngine,
             engine_callback=_configure_template_engine,
         ),
+        before_request=set_locale_before_request,
+        middleware=[create_locale_cookie_middleware],
         debug=settings.DEBUG,
     )
 

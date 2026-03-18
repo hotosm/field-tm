@@ -27,6 +27,7 @@ mod manage 'tasks/manage'
 mod prep 'tasks/prep'
 mod chart 'tasks/chart'
 mod docs 'tasks/docs'
+mod i18n 'tasks/i18n'
 
 # List available commands
 [private]

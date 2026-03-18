@@ -1,0 +1,41 @@
+# Copyright (c) Humanitarian OpenStreetMap Team
+#
+# This file is part of Field-TM.
+#
+#     Field-TM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     Field-TM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# Extract translatable strings from templates and Python source into messages.pot
+extract:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/messages.pot --project="Field-TM" .
+
+# Initialize a new locale (e.g. just i18n init fr)
+init LOCALE:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run --group dev pybabel init -i app/locales/messages.pot -d app/locales -l {{LOCALE}}
+
+# Update existing .po files after re-extraction
+update:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run --group dev pybabel update -i app/locales/messages.pot -d app/locales
+
+# Compile .po files into .mo files for runtime use
+compile:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run --group dev pybabel compile -d app/locales
