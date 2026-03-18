@@ -272,11 +272,11 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.2"
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.4"
     build:
       context: src/odkcentral/api
       args:
-        ODK_CENTRAL_TAG: v2025.4.2
+        ODK_CENTRAL_TAG: v2025.4.4
     depends_on:
       proxy:
         condition: service_healthy
@@ -351,11 +351,11 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.4.2"
+    image: "ghcr.io/hotosm/field-tm/odkcentral-ui:v2025.4.4"
     build:
       context: src/odkcentral/ui
       args:
-        ODK_CENTRAL_TAG: v2025.4.2
+        ODK_CENTRAL_TAG: v2025.4.4
     volumes:
       - central_frontend:/frontend
     network_mode: none
