@@ -333,7 +333,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
     </form>
     <div id="geojson-preview-container" style="margin-top: 15px"></div>
     {% else %}
-    <div class="ftm-step__success">✓ OSM data extract ready</div>
+    <div class="ftm-step__success">✓ {{ _("OSM data extract ready") }}</div>
     {% endif %}
   </div>
   {% endif %}

@@ -1,0 +1,36 @@
+{% set box_style = "margin-top: 12px; padding: 16px; background-color: #f5f5f5; border-radius: 8px;"
+%} {% set link_style = "color: #d63f3f; text-decoration: none; font-weight: 600;" %}
+<div>
+  <wa-callout variant="success">
+    <span>{{ _("Project created in QFieldCloud.") }}</span>
+  </wa-callout>
+  <div style="{{ box_style }}">
+    <h4 style="margin: 0 0 10px 0">{{ _("Manager Access (QFieldCloud)") }}</h4>
+    <p style="margin: 0 0 8px 0">
+      <a href="{{ result.qfield_url }}" target="_blank" style="{{ link_style }}">
+        {{ _("Open project in QFieldCloud") }}
+      </a>
+    </p>
+    {% if result.manager_username and result.manager_password %}
+    <p style="margin: 0">
+      <strong>{{ _("Username:") }}</strong> <code>{{ result.manager_username }}</code>
+    </p>
+    <p style="margin: 6px 0 0 0">
+      <strong>{{ _("Password:") }}</strong> <code>{{ result.manager_password }}</code>
+    </p>
+    <p style="margin: 8px 0 0 0; color: #666">
+      {{ _("Save these credentials now. They will only be shown once.") }}
+    </p>
+    {% else %}
+    <p style="margin: 8px 0 0 0; color: #666">
+      {{ _("Manager account could not be created automatically. Log in to QFieldCloud as admin to
+      manage the project.") }}
+    </p>
+    {% endif %}
+  </div>
+  <div style="margin-top: 12px">
+    <wa-button type="button" variant="default" onclick="window.location.reload()">
+      {{ _("Reload Project Page") }}
+    </wa-button>
+  </div>
+</div>

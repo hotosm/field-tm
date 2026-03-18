@@ -1,0 +1,23 @@
+<div>
+  <wa-callout variant="danger">
+    <span>{{ user_message }}</span>
+  </wa-callout>
+  {% if technical_details %}
+  <details style="margin-top: 12px">
+    <summary style="cursor: pointer; font-weight: 600">{{ _("View technical details") }}</summary>
+    <pre
+      style="
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        overflow: auto;
+        white-space: pre-wrap;
+      "
+    >
+{{ technical_details }}</pre
+    >
+  </details>
+  {% endif %}
+</div>

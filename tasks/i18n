@@ -16,17 +16,22 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Extract translatable strings from templates and Python source into messages.pot
-extract:
-  #!/usr/bin/env sh
-  cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/messages.pot --project="Field-TM" .
+# List available commands
+[private]
+default:
+  just --justfile {{justfile()}} --list i18n
 
 # Initialize a new locale (e.g. just i18n init fr)
 init LOCALE:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
   uv run --group dev pybabel init -i app/locales/messages.pot -d app/locales -l {{LOCALE}}
+
+# Extract translatable strings from templates and Python source into messages.pot
+extract:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}/src/backend
+  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/messages.pot --project="Field-TM" .
 
 # Update existing .po files after re-extraction
 update:
@@ -39,3 +44,6 @@ compile:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
   uv run --group dev pybabel compile -d app/locales
+
+# Run all commands to update i18n
+run: extract update compile

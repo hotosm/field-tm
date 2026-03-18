@@ -39,6 +39,7 @@ from litestar.response import Template
 from qfieldcloud_sdk.sdk import Client, ProjectCollaboratorRole
 
 from app.config import settings
+from app.i18n import _
 from app.qfield.qfield_crud import (
     add_qfc_project_collaborator,
     normalise_qfc_url,
@@ -51,11 +52,11 @@ log = logging.getLogger(__name__)
 
 # ── Roles available in the collaborator dropdown ────────────────────────
 COLLABORATOR_ROLES = [
-    ("admin", "Admin"),
-    ("manager", "Manager"),
-    ("editor", "Editor"),
-    ("reporter", "Reporter"),
-    ("reader", "Reader"),
+    ("admin", _("Admin")),
+    ("manager", _("Manager")),
+    ("editor", _("Editor")),
+    ("reporter", _("Reporter")),
+    ("reader", _("Reader")),
 ]
 
 
@@ -102,20 +103,20 @@ def _friendly_add_collaborator_error(exc: Exception) -> str:
     """Map verbose QFC collaborator errors to user-friendly messages."""
     msg = str(exc).lower()
     if "does not exist" in msg:
-        return "This user does not exist. Please create it first."
+        return _("This user does not exist. Please create it first.")
     if "already exists" in msg:
-        return "This user is already a collaborator on this project."
-    return f"Failed to add collaborator: {exc}"
+        return _("This user is already a collaborator on this project.")
+    return _("Failed to add collaborator: %(exc)s") % {"exc": exc}
 
 
 def _org_membership_permission_error(organization: str) -> str:
     """Return a clear error when the user cannot manage org members."""
-    return (
-        f"This project belongs to the {organization} organization. "
-        f"The user must be added to that organization before they can be "
-        f"added as a collaborator. Your QFieldCloud account does not have "
-        f"permission to manage organization members."
-    )
+    return _(
+        "This project belongs to the %(organization)s organization. "
+        "The user must be added to that organization before they can be "
+        "added as a collaborator. Your QFieldCloud account does not have "
+        "permission to manage organization members."
+    ) % {"organization": organization}
 
 
 def _role_badge_variant(role: str) -> str:
@@ -159,7 +160,7 @@ async def qfc_admin_login(
 
     if not all([qfc_url_raw, username, password]):
         return Response(
-            content=_callout("danger", "All fields are required."),
+            content=_callout("danger", _("All fields are required.")),
             media_type="text/html",
         )
 
@@ -174,7 +175,7 @@ async def qfc_admin_login(
         token = result.get("token", client.token)
         if not token:
             return Response(
-                content=_callout("danger", "Login succeeded but no token received."),
+                content=_callout("danger", _("Login succeeded but no token received.")),
                 media_type="text/html",
             )
     except Exception as exc:
@@ -182,7 +183,7 @@ async def qfc_admin_login(
         return Response(
             content=_callout(
                 "danger",
-                "Login failed. Check your URL and credentials.",
+                _("Login failed. Check your URL and credentials."),
             ),
             media_type="text/html",
         )
@@ -213,24 +214,24 @@ def _render_management_area(
     header = f"""
 <div class="ftm-flex-between" style="margin-bottom:1.5rem">
   <div>
-    <h2 class="ftm-section-title" style="margin:0">QFieldCloud Projects</h2>
+    <h2 class="ftm-section-title" style="margin:0">{_("QFieldCloud Projects")}</h2>
     <p
       style="margin:4px 0 0;color:var(--ftm-text-muted);
              font-size:var(--hot-font-size-small)"
     >
-      Connected as <strong>{html.escape(username)}</strong>
-      to <code>{html.escape(base_url)}</code>
+      {_("Connected as")} <strong>{html.escape(username)}</strong>
+      {_("to")} <code>{html.escape(base_url)}</code>
     </p>
   </div>
   <wa-button variant="default" size="small"
     onclick="document.getElementById('qfc-management').innerHTML='';
              document.getElementById('qfc-login-panel').style.display='block';">
-    Log Out
+    {_("Log Out")}
   </wa-button>
 </div>"""
 
     if not projects:
-        table = '<p style="color:var(--ftm-text-muted)">No projects found.</p>'
+        table = f'<p style="color:var(--ftm-text-muted)">{_("No projects found.")}</p>'
     else:
         rows = []
         for p in projects:
@@ -239,9 +240,9 @@ def _render_management_area(
             owner = html.escape(str(p.get("owner", "")))
             desc = html.escape(str(p.get("description", ""))[:80])
             visibility = (
-                '<wa-badge variant="success">Public</wa-badge>'
+                f'<wa-badge variant="success">{_("Public")}</wa-badge>'
                 if p.get("is_public", False)
-                else '<wa-badge variant="neutral">Private</wa-badge>'
+                else f'<wa-badge variant="neutral">{_("Private")}</wa-badge>'
             )
             rows.append(f"""
 <tr class="ftm-qfc-project-row" id="qfc-project-row-{pid}">
@@ -255,7 +256,7 @@ def _render_management_area(
     <form hx-get="/qfc-admin/projects/{pid}/collaborators"
           hx-target="#qfc-collabs-{pid}" hx-swap="innerHTML">
       {hidden}
-      <wa-button variant="default" size="small" type="submit">Manage</wa-button>
+      <wa-button variant="default" size="small" type="submit">{_("Manage")}</wa-button>
     </form>
   </td>
 </tr>
@@ -265,7 +266,7 @@ def _render_management_area(
 <div style="overflow-x:auto">
   <table class="ftm-qfc-table">
     <thead>
-      <tr><th>Project</th><th>Owner</th><th>Visibility</th><th>Description</th><th></th></tr>
+      <tr><th>{_("Project")}</th><th>{_("Owner")}</th><th>{_("Visibility")}</th><th>{_("Description")}</th><th></th></tr>
     </thead>
     <tbody>{"".join(rows)}</tbody>
   </table>
@@ -294,7 +295,7 @@ async def list_collaborators(
     # HTMX sends form data as query params on GET
     if not qfc_url or not qfc_token:
         return Response(
-            content=_callout("danger", "Session expired. Please log in again."),
+            content=_callout("danger", _("Session expired. Please log in again.")),
             media_type="text/html",
         )
 
@@ -311,7 +312,10 @@ async def list_collaborators(
     except Exception as exc:
         log.warning("QFC list collaborators failed: %s", exc)
         return Response(
-            content=_callout("warning", f"Could not load collaborators: {exc}"),
+            content=_callout(
+                "warning",
+                _("Could not load collaborators: %(exc)s") % {"exc": exc},
+            ),
             media_type="text/html",
         )
 
@@ -380,37 +384,37 @@ def _render_collaborators_panel(
       >
         {role_options}
       </select>
-      <wa-button variant="default" size="small" type="submit">Update</wa-button>
+      <wa-button variant="default" size="small" type="submit">{_("Update")}</wa-button>
     </form>
     <wa-button variant="danger" size="small" outline
-      onclick="document.getElementById('{dialog_id}').show()">Remove</wa-button>
+      onclick="document.getElementById('{dialog_id}').show()">{_("Remove")}</wa-button>
   </td>
 </tr>""")
 
             dialogs.append(f"""
-<wa-dialog id="{dialog_id}" label="Remove Collaborator" with-header>
+<wa-dialog id="{dialog_id}" label="{_("Remove Collaborator")}" with-header>
   <p style="margin:0;line-height:1.6">
-    Remove <strong>{uname}</strong> from this project?
+    {_("Remove")} <strong>{uname}</strong> {_("from this project?")}
   </p>
   <div slot="footer" class="ftm-flex-end">
     <wa-button variant="default"
-      onclick="document.getElementById('{dialog_id}').hide()">Cancel</wa-button>
+      onclick="document.getElementById('{dialog_id}').hide()">{_("Cancel")}</wa-button>
     <wa-button variant="danger"
       hx-delete="/qfc-admin/projects/{pid_e}/collaborators/{uname}"
       hx-target="#{target_id}" hx-swap="innerHTML"
-      hx-vals="{hx_vals}">Remove</wa-button>
+      hx-vals="{hx_vals}">{_("Remove")}</wa-button>
   </div>
 </wa-dialog>""")
 
         collab_table = f"""
 <table class="ftm-qfc-table ftm-qfc-table--nested">
-  <thead><tr><th>User</th><th>Role</th><th>Actions</th></tr></thead>
+  <thead><tr><th>{_("User")}</th><th>{_("Role")}</th><th>{_("Actions")}</th></tr></thead>
   <tbody>{"".join(collab_rows)}</tbody>
 </table>"""
     else:
         collab_table = (
             '<p style="color:var(--ftm-text-muted);'
-            'font-size:var(--hot-font-size-small)">No collaborators yet.</p>'
+            f'font-size:var(--hot-font-size-small)">{_("No collaborators yet.")}</p>'
         )
 
     role_options_add = "".join(
@@ -424,7 +428,7 @@ def _render_collaborators_panel(
         class="ftm-qfc-add-collab-form">
     {hidden}
     <input type="hidden" name="project_owner" value="{owner_e}" />
-    <wa-input name="new_username" placeholder="Username" size="small"
+    <wa-input name="new_username" placeholder="{_("Username")}" size="small"
               required style="flex:1;min-width:8rem"></wa-input>
     <select
       name="new_role"
@@ -433,21 +437,23 @@ def _render_collaborators_panel(
     >
       {role_options_add}
     </select>
-    <wa-button variant="primary" size="small" type="submit">Add Collaborator</wa-button>
+    <wa-button variant="primary" size="small" type="submit">
+      {_("Add Collaborator")}
+    </wa-button>
   </form>
 </div>"""
 
     close_btn = f"""
 <div style="text-align:right;margin-bottom:0.5rem">
   <wa-button variant="default" size="small"
-    onclick="document.getElementById('{target_id}').innerHTML=''">Close</wa-button>
+    onclick="document.getElementById('{target_id}').innerHTML=''">{_("Close")}</wa-button>
 </div>"""
 
     return f"""<div class="ftm-qfc-collab-panel">
   {close_btn}
   <h4
     style="margin:0 0 0.75rem;font-family:var(--hot-font-sans-variant-condensed)"
-  >Collaborators</h4>
+  >{_("Collaborators")}</h4>
   {collab_table}
   {add_form}
 </div>{"".join(dialogs)}"""
@@ -471,7 +477,7 @@ async def add_collaborator(
 
     if not username:
         return Response(
-            content=_callout("danger", "Username is required."),
+            content=_callout("danger", _("Username is required.")),
             media_type="text/html",
         )
 
@@ -519,7 +525,10 @@ async def remove_collaborator(
     except Exception as exc:
         log.warning("QFC remove collaborator failed: %s", exc)
         return Response(
-            content=_callout("danger", f"Failed to remove collaborator: {exc}"),
+            content=_callout(
+                "danger",
+                _("Failed to remove collaborator: %(exc)s") % {"exc": exc},
+            ),
             media_type="text/html",
         )
 
@@ -555,7 +564,10 @@ async def update_collaborator(
     except Exception as exc:
         log.warning("QFC update collaborator failed: %s", exc)
         return Response(
-            content=_callout("danger", f"Failed to update collaborator: {exc}"),
+            content=_callout(
+                "danger",
+                _("Failed to update collaborator: %(exc)s") % {"exc": exc},
+            ),
             media_type="text/html",
         )
 
@@ -576,7 +588,10 @@ async def _reload_collaborators(
         owner = project.get("owner", "")
     except Exception as exc:
         return Response(
-            content=_callout("warning", f"Collaborator refresh failed: {exc}"),
+            content=_callout(
+                "warning",
+                _("Collaborator refresh failed: %(exc)s") % {"exc": exc},
+            ),
             media_type="text/html",
         )
 

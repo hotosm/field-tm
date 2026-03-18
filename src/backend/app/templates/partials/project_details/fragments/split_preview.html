@@ -1,0 +1,31 @@
+<div>
+  <wa-callout variant="success">
+    <span>{{ split_success_msg }}</span>
+  </wa-callout>
+  <div style="margin-top: 20px">
+    <div style="margin-bottom: 10px">
+      <wa-callout variant="info">
+        <span>{{ split_preview_msg }}</span>
+      </wa-callout>
+    </div>
+    {{ map_html_content | safe }}
+    <form
+      id="accept-split-form"
+      style="margin-top: 20px; display: flex; gap: 10px; justify-content: center"
+    >
+      <input type="hidden" name="tasks_geojson" value="{{ tasks_geojson_str }}" />
+      <button
+        id="accept-split-btn"
+        type="submit"
+        hx-post="/accept-split-htmx?project_id={{ project_id }}"
+        hx-target="#split-status"
+        hx-swap="innerHTML"
+        hx-include="#accept-split-form"
+        class="wa-button wa-button--primary"
+        style="min-width: 200px"
+      >
+        {{ _("Accept Task Choices") }}
+      </button>
+    </form>
+  </div>
+</div>

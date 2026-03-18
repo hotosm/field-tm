@@ -601,7 +601,7 @@ block content %}
         projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
       } else {
         projectNameError.innerHTML =
-          '<wa-callout variant="danger"><span>A project with this name already exists. Please choose a different name.</span></wa-callout>';
+          '<wa-callout variant="danger"><span>{{ _("A project with this name already exists. Please choose a different name.") }}</span></wa-callout>';
       }
     }
 
@@ -636,7 +636,7 @@ block content %}
         mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
       } else {
         mapError.innerHTML =
-          '<wa-callout variant="danger"><span>You must draw or upload an Area of Interest (AOI) on the map before submitting.</span></wa-callout>';
+          '<wa-callout variant="danger"><span>{{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.") }}</span></wa-callout>';
       }
     }
 
@@ -761,7 +761,7 @@ block content %}
         e.stopPropagation();
         if (descriptionError) {
           descriptionError.innerHTML =
-            '<wa-callout variant="danger"><span>Description is required.</span></wa-callout>';
+            '<wa-callout variant="danger"><span>{{ _("Description is required.") }}</span></wa-callout>';
         }
         if (descriptionInput) {
           setTimeout(() => {

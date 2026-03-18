@@ -1,0 +1,28 @@
+<div>
+  <wa-callout variant="{{ status_variant }}">
+    <span>{{ status_message }}</span>
+  </wa-callout>
+  <div id="geojson-preview-container" style="margin-top: 15px">
+    <div style="margin-bottom: 10px">
+      <wa-callout variant="info">
+        <span>{{ preview_message }}</span>
+      </wa-callout>
+    </div>
+    {{ map_html_content | safe }}
+    <form id="accept-data-extract-form" style="margin-top: 15px; display: flex; gap: 10px">
+      <input type="hidden" name="data_extract_geojson" value="{{ geojson_str }}" />
+      <button
+        id="accept-data-extract-btn"
+        type="submit"
+        hx-post="/accept-data-extract-htmx?project_id={{ project_id }}"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
+        hx-include="#accept-data-extract-form"
+        class="wa-button wa-button--primary"
+        style="flex: 1"
+      >
+        {{ _("Accept Data Extract") }}
+      </button>
+    </form>
+  </div>
+</div>

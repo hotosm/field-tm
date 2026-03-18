@@ -45,6 +45,7 @@ from app.config import AuthProvider, settings
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
 from app.htmx.htmx_schemas import XLSFormUploadData
+from app.i18n import _
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
@@ -201,7 +202,7 @@ async def _validate_xlsform_extension(data) -> BytesIO:
     if file_ext not in [".xls", ".xlsx"]:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Provide a valid .xls or .xlsx file",
+            detail=_("Provide a valid .xls or .xlsx file"),
         )
 
     return BytesIO(await data.read())
@@ -219,7 +220,7 @@ async def _resolve_uploaded_xlsform_bytes(
         )
         if not template_bytes:
             return None, Response(
-                content=_callout("danger", "Failed to load template form."),
+                content=_callout("danger", _("Failed to load template form.")),
                 media_type="text/html",
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -227,7 +228,7 @@ async def _resolve_uploaded_xlsform_bytes(
 
     if not data.xlsform:
         return None, Response(
-            content=_callout("danger", "Please select a form or upload a file."),
+            content=_callout("danger", _("Please select a form or upload a file.")),
             media_type="text/html",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -452,7 +453,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
     project = current_user.get("project")
     if not project:
         return Response(
-            content=_callout("danger", "Project not found."),
+            content=_callout("danger", _("Project not found.")),
             media_type="text/html",
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -462,7 +463,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         return Response(
             content=_callout(
                 "danger",
-                "Project ID mismatch. You do not have access to this project.",
+                _("Project ID mismatch. You do not have access to this project."),
             ),
             media_type="text/html",
             status_code=status.HTTP_403_FORBIDDEN,
@@ -500,7 +501,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         return Response(
             content=_callout(
                 "success",
-                "Form validated and uploaded successfully! Reloading page...",
+                _("Form validated and uploaded successfully! Reloading page..."),
             ),
             media_type="text/html",
             status_code=status.HTTP_200_OK,
@@ -523,9 +524,13 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         )
     except Exception as e:
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else "An unexpected error occurred"
+        error_msg = (
+            str(e) if hasattr(e, "__str__") else _("An unexpected error occurred")
+        )
         return Response(
-            content=_callout("danger", f"Error: {error_msg}"),
+            content=_callout(
+                "danger", (_("Error"), ": {error_msg}".format(error_msg=error_msg))
+            ),
             media_type="text/html",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
