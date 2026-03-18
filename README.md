@@ -21,7 +21,6 @@
 | **CI/CD** | | [![Build CI Img][badge-build-ci]][10] [![Build ODK Images][badge-build-odk]][11] <br> [![Publish Docs][badge-publish-docs]][12] [![pre-commit.ci][badge-pre-commit-ci]][13] |
 | :--- | :--- | :--- |
 | **Tech Stack** | | [![Litestar][badge-litestar]][14] [![HTMX][badge-htmx]][15] [![Postgres][badge-postgres]][16] [![Kubernetes][badge-kubernetes]][17] [![Docker][badge-docker]][18] |
-
 | **Code Style** | | [![Backend Style][badge-ruff]][19] [![Prettier][badge-prettier]][20] [![pre-commit][badge-pre-commit]][21] [![uv][badge-uv]][32] |
 | **Quality** | | [![Coverage][badge-coverage]][22] [![Translation][badge-translation]][23] [![OpenSSF Best Practices][badge-openssf]][24] |
 | **Community** | | [![Slack][badge-slack]][25] [![All Contributors][badge-all-contributors]][26] |
