@@ -39,7 +39,11 @@ from litestar.response import Template
 from qfieldcloud_sdk.sdk import Client, ProjectCollaboratorRole
 
 from app.config import settings
-from app.qfield.qfield_crud import add_qfc_project_collaborator
+from app.qfield.qfield_crud import (
+    add_qfc_project_collaborator,
+    normalise_qfc_url,
+    strip_qfc_api_suffix,
+)
 
 from .htmx_helpers import callout as _callout
 
@@ -65,18 +69,12 @@ def _qfc_client(url: str, token: str) -> Client:
 
 def _strip_api_suffix(url: str) -> str:
     """Strip /api/v1/ suffix from a QFC URL to get the base domain."""
-    url = url.rstrip("/")
-    if url.endswith("/api/v1"):
-        url = url[: -len("/api/v1")]
-    return url
+    return strip_qfc_api_suffix(url)
 
 
 def _normalise_qfc_url(url: str) -> str:
     """Ensure a QFC URL ends with /api/v1/."""
-    url = url.rstrip("/")
-    if not url.endswith("/api/v1"):
-        url = f"{url}/api/v1"
-    return f"{url}/"
+    return normalise_qfc_url(url)
 
 
 def _resolve_login_qfc_url(submitted_url: str) -> str:

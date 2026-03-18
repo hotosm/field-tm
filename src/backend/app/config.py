@@ -22,6 +22,7 @@ import os
 from enum import Enum
 from functools import lru_cache
 from typing import Annotated, Optional, Union
+from urllib.parse import urlsplit
 
 from cryptography.fernet import Fernet
 from pydantic import (
@@ -294,10 +295,12 @@ class Settings(BaseSettings):
         """
         if not value:
             return value
-        value = value.rstrip("/")
-        if not value.endswith("/api/v1"):
-            value = f"{value}/api/v1"
-        return f"{value}/"
+        parsed = urlsplit(value.strip())
+        if parsed.scheme and parsed.netloc:
+            base = f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+        else:
+            base = value.split("/api/v1")[0].rstrip("/")
+        return f"{base}/api/v1/"
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr

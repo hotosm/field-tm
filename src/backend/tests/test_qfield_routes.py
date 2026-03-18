@@ -32,6 +32,7 @@ from app.qfield.qfield_crud import (
     _should_open_in_edit_mode,
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
+    normalise_qfc_url,
 )
 from app.qfield.qfield_schemas import QFieldCloud
 
@@ -177,6 +178,25 @@ def test_resolve_qfield_project_url_falls_back_to_instance_root():
     )
 
     assert url == "http://qfield.field.localhost:7050"
+
+
+def test_normalise_qfc_url_strips_project_path_segments():
+    """QFieldCloud URLs should be reduced to the instance origin before API path."""
+    assert (
+        normalise_qfc_url("https://app.qfield.cloud/a/draperc/")
+        == "https://app.qfield.cloud/api/v1/"
+    )
+
+
+def test_qfield_cloud_schema_normalises_project_url_to_instance_root():
+    """Schema validation should accept a pasted project URL and canonicalize it."""
+    creds = QFieldCloud(
+        qfield_cloud_url="https://app.qfield.cloud/a/draperc/",
+        qfield_cloud_user="svcftm",
+        qfield_cloud_password="password",
+    )
+
+    assert creds.qfield_cloud_url == "https://app.qfield.cloud/api/v1/"
 
 
 def test_existing_features_disable_initial_edit_mode():

@@ -30,6 +30,7 @@ from pathlib import Path
 from random import getrandbits
 from secrets import token_urlsafe
 from typing import Optional
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 from aiohttp import ClientSession, ClientTimeout
@@ -70,6 +71,27 @@ class QFieldProjectResult:
     manager_password: Optional[str]
     mapper_username: Optional[str]
     mapper_password: Optional[str]
+
+
+def strip_qfc_api_suffix(url: str) -> str:
+    """Return the canonical QFieldCloud origin without API path segments."""
+    value = (url or "").strip()
+    if not value:
+        return ""
+
+    parsed = urlsplit(value)
+    if parsed.scheme and parsed.netloc:
+        return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+
+    return value.split("/api/v1")[0].rstrip("/")
+
+
+def normalise_qfc_url(url: str) -> str:
+    """Return the canonical QFieldCloud API root with trailing slash."""
+    base = strip_qfc_api_suffix(url)
+    if not base:
+        return ""
+    return f"{base}/api/v1/"
 
 
 # ---------------------------------------------------------------------------

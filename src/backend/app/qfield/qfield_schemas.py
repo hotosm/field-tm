@@ -57,14 +57,9 @@ class QFieldCloud(BaseModel):
         """
         if not value:
             return None
-        # Remove trailing slash
-        if value.endswith("/"):
-            return value[:-1]
-        # Standardise and append /api/v1
-        if not value.endswith("/api/v1"):
-            value = f"{value}/api/v1"
-        # Add trailing slash back on
-        return f"{value}/"
+        from app.qfield.qfield_crud import normalise_qfc_url
+
+        return normalise_qfc_url(value)
 
     @model_validator(mode="after")
     def all_qfc_vars_together(self) -> Self:

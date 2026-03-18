@@ -5,6 +5,8 @@ from uuid import uuid4
 
 import pytest
 
+from app.htmx.qfc_admin_routes import _resolve_login_qfc_url
+
 
 async def test_qfc_admin_page_renders(client):
     """GET /qfc-admin should render the login form."""
@@ -48,6 +50,14 @@ async def test_qfc_admin_login_bad_credentials(client):
     )
     assert response.status_code == 200
     assert "Login failed" in response.text
+
+
+def test_qfc_admin_login_normalises_project_url_to_instance_root():
+    """Admin login should canonicalize pasted project URLs before SDK login."""
+    assert (
+        _resolve_login_qfc_url("https://app.qfield.cloud/a/draperc/")
+        == "https://app.qfield.cloud/api/v1/"
+    )
 
 
 @pytest.mark.asyncio
