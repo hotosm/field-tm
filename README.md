@@ -18,13 +18,14 @@
 <!-- prettier-ignore-start -->
 <div align="center">
 
-| **CI/CD** | | [![Build CI Img](https://github.com/hotosm/field-tm/actions/workflows/build_ci_img.yml/badge.svg?branch=dev)](https://github.com/hotosm/field-tm/actions/workflows/build_ci_img.yml) [![Build ODK Images](https://github.com/hotosm/field-tm/actions/workflows/build_odk_imgs.yml/badge.svg?branch=dev)](https://github.com/hotosm/field-tm/actions/workflows/build_odk_imgs.yml) <br> [![Publish Docs](https://github.com/hotosm/field-tm/actions/workflows/docs.yml/badge.svg?branch=dev)](https://github.com/hotosm/field-tm/actions/workflows/docs.yml) [![pre-commit.ci](https://results.pre-commit.ci/badge/github/hotosm/field-tm/dev.svg)](https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev) |
+| **CI/CD** | | [![Build CI Img][badge-build-ci]][10] [![Build ODK Images][badge-build-odk]][11] <br> [![Publish Docs][badge-publish-docs]][12] [![pre-commit.ci][badge-pre-commit-ci]][13] |
 | :--- | :--- | :--- |
-| **Tech Stack** | | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Svelte](https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
-| **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev) |
-| **Quality** | | [![Coverage](https://docs.field.hotosm.org/coverage.svg)](https://docs.field.hotosm.org/coverage.html) [![Translation](https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg)](https://hosted.weblate.org/engage/hotosm) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
-| **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/contributors/hotosm/field-tm?logo=github)](#contributors-) |
-| **Other Info** | | [![docs](https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true)](https://docs.field.hotosm.org/) [![dev-roadmap](https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true)](https://github.com/hotosm/field-tm#roadmap) [![timeline](https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true)](https://docs.field.hotosm.org/timeline) [![license-code](https://img.shields.io/github/license/hotosm/field-tm.svg)](https://github.com/hotosm/field-tm/blob/main/LICENSE.md) [![license-translations](https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg)](https://github.com/hotosm/field-tm/blob/main/src/mapper/messages/LICENSE.md) |
+| **Tech Stack** | | [![Litestar][badge-litestar]][14] [![HTMX][badge-htmx]][15] [![Postgres][badge-postgres]][16] [![Kubernetes][badge-kubernetes]][17] [![Docker][badge-docker]][18] |
+
+| **Code Style** | | [![Backend Style][badge-ruff]][19] [![Prettier][badge-prettier]][20] [![pre-commit][badge-pre-commit]][21] [![uv][badge-uv]][32] |
+| **Quality** | | [![Coverage][badge-coverage]][22] [![Translation][badge-translation]][23] [![OpenSSF Best Practices][badge-openssf]][24] |
+| **Community** | | [![Slack][badge-slack]][25] [![All Contributors][badge-all-contributors]][26] |
+| **Other Info** | | [![docs][badge-docs]][27] [![dev-roadmap][badge-roadmap]][28] [![timeline][badge-timeline]][29] [![license-code][badge-license-code]][30] [![license-translations][badge-license-translations]][31] |
 
 </div>
 
@@ -56,11 +57,12 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
    - Data extract: the features you want to map, say building polygons.
    - ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
    - Task areas divided by feature count and linear features (e.g. rivers, roads).
-2. Users assign a task area for themselves, and generate a QR code that is opened
-   in ODK Collect.
+2. Users assign a task area for themselves, then map using ODK Collect, ODK Web
+   Forms, or QField.
 3. User navigates to the feature and fills out the XLSForm survey, then submits.
-4. The submissions are collected by ODK Central, which feeds the data back into
-   Field-TM, for cleaning, conflation with existing data, and pushing back to OSM.
+4. The submissions are collected by ODK Central (or QFieldCloud), which feeds the
+   data back into Field-TM, for cleaning, conflation with existing data, and
+   pushing back to OSM.
 
 ## Usage of ODK
 
@@ -84,13 +86,11 @@ for volunteers to map collaboratively.
 
 To aid future disaster response, we would really welcome contributions for:
 
-- Backend Python development
-- Frontend Typescript development
+- Backend Python development (Litestar + HTMX)
 - Documentation writers
 - UI / UX designers
 - Testers!
 - XLSForm creators
-- Mobile developers
 
 Please take a look at our [Documentation](https://hotosm.github.io/field-tm)
 and [contributor guidance](https://docs.field.hotosm.org/CONTRIBUTING/)
@@ -264,3 +264,49 @@ Thanks goes to these wonderful people:
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
 [8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
 [9]: https://github.com/hotosm/field-tm/releases/tag/2026.1.0 "Renewed"
+[10]: https://github.com/hotosm/field-tm/actions/workflows/build_ci_img.yml "Build CI Img"
+[11]: https://github.com/hotosm/field-tm/actions/workflows/build_odk_imgs.yml "Build ODK Images"
+[12]: https://github.com/hotosm/field-tm/actions/workflows/docs.yml "Publish Docs"
+[13]: https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev "pre-commit.ci"
+[14]: https://litestar.dev "Litestar"
+[15]: https://htmx.org "HTMX"
+[16]: https://www.postgresql.org "PostgreSQL"
+[17]: https://kubernetes.io "Kubernetes"
+[18]: https://www.docker.com "Docker"
+[19]: https://github.com/astral-sh/ruff "Ruff Format"
+[20]: https://prettier.io "Prettier"
+[21]: https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev "pre-commit"
+[22]: https://docs.field.hotosm.org/coverage.html "Coverage Report"
+[23]: https://hosted.weblate.org/engage/hotosm "Weblate"
+[24]: https://www.bestpractices.dev/projects/9218 "OpenSSF Best Practices"
+[25]: https://slack.hotosm.org "HOTOSM Slack"
+[26]: #contributors- "All Contributors"
+[27]: https://docs.field.hotosm.org/ "Documentation"
+[28]: https://github.com/hotosm/field-tm#roadmap "Roadmap"
+[29]: https://docs.field.hotosm.org/timeline "Timeline"
+[30]: https://github.com/hotosm/field-tm/blob/dev/LICENSE.AGPL-3.0.md "Code License"
+[31]: https://github.com/hotosm/field-tm/blob/dev/LICENSE.CC-BY-4.0.md "Translations License"
+[32]: https://github.com/astral-sh/uv "uv"
+[badge-build-ci]: https://github.com/hotosm/field-tm/actions/workflows/build_ci_img.yml/badge.svg?branch=dev
+[badge-build-odk]: https://github.com/hotosm/field-tm/actions/workflows/build_odk_imgs.yml/badge.svg?branch=dev
+[badge-publish-docs]: https://github.com/hotosm/field-tm/actions/workflows/docs.yml/badge.svg?branch=dev
+[badge-pre-commit-ci]: https://results.pre-commit.ci/badge/github/hotosm/field-tm/dev.svg
+[badge-litestar]: https://img.shields.io/badge/Litestar-EDB641?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNzUgMzc1Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEwMS45OSAyNTguMDhjMzQuMzktMS4zNCA3NS4zNi0xMC4wOCAxMTUuNjgtMzUuNzJsLTcuNzcgMjcuNSA0NC45Ny0zNS40MyA0Ny42MyAzMS44MS0xOS44Mi01My43IDQ1LTM1LjQzLTU3LjI1IDIuMjMtMTkuODItNTMuNy0xNS41NiA1NS4wOS01Ny4yNSAyLjI0IDMzLjE0IDIyLjEzYy0yMS44MiAxOS44Mi03Ni41NCA2Mi4xLTE0OS4wMiA2NC45My0xNC42Ni41Ny0zMC4wNC0uNDgtNDYuMDItMy42NSAwIDAgMzYuMDggMTMuNjQgODYuMDYgMTEuNjh6Ii8+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yNTAuNzkgNzguOTdjLTYwLjAxIDAtMTA4LjY1IDQ4LjYtMTA4LjY1IDEwOC41NSAwIDExLjM2IDEuNzUgMjIuMyA0Ljk4IDMyLjU4IDQuNzMtMi4zNSA5LjI0LTQuNzggMTMuNTQtNy4yNi0yLjI3LTguMDUtMy40OC0xNi41NS0zLjQ4LTI1LjMyIDAtNTEuNjUgNDEuOTEtOTMuNTIgOTMuNjEtOTMuNTJzOTMuNiA0MS44NyA5My42IDkzLjUyLTQxLjkxIDkzLjUyLTkzLjYgOTMuNTJjLTI4LjA0IDAtNTMuMTktMTIuMzItNzAuMzUtMzEuODMtNC45OSAxLjk0LTEwLjA0IDMuNzEtMTUuMTUgNS4zIDE5Ljg5IDI1LjMgNTAuNzkgNDEuNTYgODUuNSA0MS41NiA2MCAwIDEwOC42NC00OC42IDEwOC42NC0xMDguNTVzLTQ4LjY0LTEwOC41NS0xMDguNjQtMTA4LjU1eiIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNOTIuMjkgMTczLjAybDUuOTkgMTguNDRoMTkuNGwtMTUuNyAxMS4zOSA2IDE4LjQ0LTE1LjctMTEuMzktMTUuNyAxMS4zOSA2LTE4LjQ0LTE1LjctMTEuMzloMTkuNDF6Ii8+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMjAuMjEgMTEyLjI1bDUuMTggMTUuOTJoMTYuNzVsLTEzLjU1IDkuODMgNS4xOCAxNS45Mi0xMy41NS05Ljg0LTEzLjU1IDkuODQgNS4xNy0xNS45Mi0xMy41NS05LjgzaDE2Ljc1eiIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMzQuNyAyMDkuMTRsMy4wMiA5LjI4aDkuNzdsLTcuOTEgNS43NCAzLjAyIDkuMjktNy45LTUuNzQtNy45IDUuNzQgMy4wMi05LjI5LTcuOTEtNS43NGg5Ljc4eiIvPjwvc3ZnPgo=&logoColor=white
+[badge-htmx]: https://img.shields.io/badge/HTMX-36C?style=for-the-badge&logo=htmx&logoColor=white
+[badge-postgres]: https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white
+[badge-kubernetes]: https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white
+[badge-docker]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
+[badge-ruff]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235
+[badge-prettier]: https://img.shields.io/badge/code_style-prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=1A2B34
+[badge-pre-commit]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+[badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
+[badge-coverage]: https://docs.field.hotosm.org/coverage.svg
+[badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg
+[badge-openssf]: https://www.bestpractices.dev/projects/9218/badge
+[badge-slack]: https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f
+[badge-all-contributors]: https://img.shields.io/github/contributors/hotosm/field-tm?logo=github
+[badge-docs]: https://github.com/hotosm/field-tm/blob/dev/docs/images/docs_badge.svg?raw=true
+[badge-roadmap]: https://github.com/hotosm/field-tm/blob/dev/docs/images/dev_roadmap_badge.svg?raw=true
+[badge-timeline]: https://github.com/hotosm/field-tm/blob/dev/docs/images/timeline_badge.svg?raw=true
+[badge-license-code]: https://img.shields.io/github/license/hotosm/field-tm.svg
+[badge-license-translations]: https://img.shields.io/badge/license:translations-CC%20BY%204.0-orange.svg
