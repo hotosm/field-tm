@@ -154,6 +154,42 @@ collection ecosystem. Instead, it is a higher level tool, aimed at
 
 ---
 
+### Why should I use FieldTM when I already know ODK?
+
+ODK is an excellent tool for collecting field data as an individual.
+
+However, the coordination is primarily done outside of ODK, relying
+on informal organizing and difficult coordination exercises amongst
+teams.
+
+FieldTM simply adds a coordination layer on top of ODK (or other tools),
+that allows for the easier tracking of what has been mapped and what
+has not.
+
+From a practical perspective, FieldTM adds task division to your
+existing workflow, with task status and feature mapped status
+being tracked within ODK Central and ODK Collect.
+
+---
+
+### Should I use QField or ODK Collect?
+
+They both have different pros and cons, and expected use cases.
+
+Use QField if:
+
+- You need mappers to use iOS devices.
+- You expect to use high resolution base imagery, perhaps from OpenAerialMap.
+
+Use ODK if:
+
+- Your user base is more familiar with ODK / Kobo workflows.
+- You users prefer a form-first approach, rather than a map-first.
+  I.e. they are more comfortable with text input rather than
+  navigating around a digital map / GIS workflows.
+
+---
+
 ### What is the relationship between Field-TM and Kobo?
 
 - Kobo is not an Field-TM competitor, it's an ODK competitor.
