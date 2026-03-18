@@ -54,7 +54,7 @@
           >
             {% for val, label in sort_options %}
             {% set is_sel = selected_sort == val %}
-            <option value="{{ val }}" {{ 'selected' if is_sel }}>{{ label }}</option>
+            <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
           </select>
         </label>
