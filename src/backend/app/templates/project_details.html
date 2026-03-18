@@ -3,7 +3,7 @@
 <div class="ftm-page ftm-page--wide">
   <div style="margin-bottom: 20px">
     <wa-button href="/projects" variant="default" style="margin-bottom: 20px">
-      ← Back to Projects
+      {{ _("← Back to Projects") }}
     </wa-button>
   </div>
 
@@ -30,7 +30,7 @@
           onerror="this.style.display = 'none'"
         />
         {% endif %}
-        <h1 style="margin: 0">{{ project.project_name or 'Unnamed Project' }}</h1>
+        <h1 style="margin: 0">{{ project.project_name or _('Unnamed Project') }}</h1>
       </div>
       <wa-badge
         variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
@@ -43,9 +43,9 @@
       {% if status_value == 'PUBLISHED' %} {% include "partials/project_details/setup_steps.html" %}
 
       <div class="ftm-manager-section">
-        <h2 class="ftm-manager-section__title">Project Metadata</h2>
+        <h2 class="ftm-manager-section__title">{{ _("Project Metadata") }}</h2>
         <p class="ftm-manager-section__subtitle">
-          Project metadata and setup information for managers.
+          {{ _("Project metadata and setup information for managers.") }}
         </p>
       </div>
       {% endif %} {% if project.location_str %}
@@ -55,7 +55,7 @@
       <!-- Description -->
       {% if project.description %}
       <div class="ftm-section">
-        <h3 class="ftm-section-title">Description</h3>
+        <h3 class="ftm-section-title">{{ _("Description") }}</h3>
         <p style="color: #333; line-height: 1.6">{{ project.description }}</p>
       </div>
       {% endif %}
@@ -63,25 +63,25 @@
       <!-- Project Details Grid -->
       <div class="ftm-detail-grid">
         <div>
-          <h4 class="ftm-detail-label">Project ID</h4>
+          <h4 class="ftm-detail-label">{{ _("Project ID") }}</h4>
           <p class="ftm-detail-value">#{{ project.id }}</p>
         </div>
 
         {% if project.manager_username %}
         <div>
-          <h4 class="ftm-detail-label">Manager</h4>
+          <h4 class="ftm-detail-label">{{ _("Manager") }}</h4>
           <p class="ftm-detail-value">{{ project.manager_username }}</p>
         </div>
         {% endif %} {% if project.created_at %}
         <div>
-          <h4 class="ftm-detail-label">Created</h4>
+          <h4 class="ftm-detail-label">{{ _("Created") }}</h4>
           <p class="ftm-detail-value">
             {{ project.created_at.strftime('%Y-%m-%d %H:%M') if project.created_at else 'N/A' }}
           </p>
         </div>
         {% endif %} {% if project.updated_at %}
         <div>
-          <h4 class="ftm-detail-label">Last Updated</h4>
+          <h4 class="ftm-detail-label">{{ _("Last Updated") }}</h4>
           <p class="ftm-detail-value">
             {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if project.updated_at else 'N/A' }}
           </p>
@@ -92,7 +92,7 @@
       <!-- Hashtags -->
       {% if project.hashtags %}
       <div class="ftm-section">
-        <h4 class="ftm-detail-label">Hashtags</h4>
+        <h4 class="ftm-detail-label">{{ _("Hashtags") }}</h4>
         <div class="ftm-flex-wrap">
           {% for tag in project.hashtags %}
           <wa-badge variant="neutral">{{ tag }}</wa-badge>
@@ -104,11 +104,11 @@
       <!-- External Project Info -->
       {% if project.external_project_instance_url %}
       <div class="ftm-external-info">
-        <h4 class="ftm-detail-label">External Project</h4>
+        <h4 class="ftm-detail-label">{{ _("External Project") }}</h4>
         <p style="color: #333; font-size: 0.9em">
-          <strong>Instance:</strong> {{ project.external_project_instance_url }}<br />
+          <strong>{{ _("Instance:") }}</strong> {{ project.external_project_instance_url }}<br />
           {% if project.external_project_id %}
-          <strong>Project ID:</strong> {{ project.external_project_id }} {% endif %}
+          <strong>{{ _("Project ID:") }}</strong> {{ project.external_project_id }} {% endif %}
         </p>
         <p style="margin: 0">
           {% if field_mapping_app_upper == 'ODK' and project.external_project_id %} {% if
@@ -118,7 +118,7 @@
             target="_blank"
             class="ftm-link--brand"
           >
-            View Project in ODK Central →
+            {{ _("View Project in ODK Central →") }}
           </a>
           {% else %}
           <a
@@ -126,14 +126,14 @@
             target="_blank"
             class="ftm-link--brand"
           >
-            View Project in ODK Central →
+            {{ _("View Project in ODK Central →") }}
           </a>
           {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %} {% set qfc_base_url =
           project.external_project_instance_url.split('/api/v1')[0].rstrip('/') if '/api/v1' in
           (project.external_project_instance_url or '') else (project.external_project_instance_url
           or '').rstrip('/') %}
           <a href="/qfc-admin?url={{ qfc_base_url }}" class="ftm-link--brand">
-            Manage QFieldCloud Project →
+            {{ _("Manage QFieldCloud Project →") }}
           </a>
           {% else %}
           <a
@@ -141,7 +141,7 @@
             target="_blank"
             class="ftm-link--brand"
           >
-            View Project Externally →
+            {{ _("View Project Externally →") }}
           </a>
           {% endif %}
         </p>
@@ -156,23 +156,24 @@
       <wa-button
         variant="danger"
         hx-delete="/projects/{{ project.id }}"
-        hx-confirm="Delete this project in downstream and Field-TM? This cannot be undone."
+        hx-confirm="{{ _('Delete this project in downstream and Field-TM? This cannot be undone.') }}"
         hx-swap="none"
       >
-        Delete Project
+        {{ _("Delete Project") }}
       </wa-button>
       {% endif %}
-      <wa-button href="/projects" variant="default">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="default">{{ _("Back to Projects") }}</wa-button>
     </div>
   </wa-card>
   {% else %}
   <wa-card>
     <div style="padding: 40px; text-align: center">
-      <h2 class="ftm-section-title">Project Not Found</h2>
+      <h2 class="ftm-section-title">{{ _("Project Not Found") }}</h2>
       <p style="color: #666; margin: 20px 0">
-        The project you're looking for doesn't exist or you don't have permission to view it.
+        {{ _("The project you're looking for doesn't exist or you don't have permission to view
+        it.") }}
       </p>
-      <wa-button href="/projects" variant="primary">Back to Projects</wa-button>
+      <wa-button href="/projects" variant="primary">{{ _("Back to Projects") }}</wa-button>
     </div>
   </wa-card>
   {% endif %}

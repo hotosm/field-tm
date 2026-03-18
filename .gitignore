@@ -96,13 +96,9 @@ field-tm-*.tgz
 # Secrets / keys
 **/**/*.pem
 
-# Paraglide dynamic translation
-src/translations/**/*
-
 # Favicon overrides
 favicon.svg
 favicon.png
-
 
 # Agents
 config

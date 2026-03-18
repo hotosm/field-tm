@@ -10,20 +10,20 @@
           onclick="this.closest('.ftm-projects-filters').classList.toggle('ftm-filters--open')"
         >
           <wa-icon name="filter"></wa-icon>
-          Filters
+          {{ _("Filters") }}
         </button>
 
         <!-- Status filter: inline on desktop, collapsible on mobile -->
         {% set status_options = [
-          ('', 'All projects'),
-          ('DRAFT', 'Draft'),
-          ('PUBLISHED', 'Published'),
-          ('COMPLETED', 'Completed'),
-          ('ARCHIVED', 'Archived'),
+          ('', _('All projects')),
+          ('DRAFT', _('Draft')),
+          ('PUBLISHED', _('Published')),
+          ('COMPLETED', _('Completed')),
+          ('ARCHIVED', _('Archived')),
         ] %}
         <div class="ftm-filters-collapsible">
           <label class="ftm-projects-filter" for="projects-status-filter">
-            <span class="ftm-projects-filter__label">Project Status</span>
+            <span class="ftm-projects-filter__label">{{ _("Project Status") }}</span>
             <select
               id="projects-status-filter"
               name="status"
@@ -39,13 +39,13 @@
         </div>
 
         {% set sort_options = [
-          ('newest', 'Newest first'),
-          ('oldest', 'Oldest first'),
-          ('name_asc', 'Name (A-Z)'),
-          ('name_desc', 'Name (Z-A)'),
+          ('newest', _('Newest first')),
+          ('oldest', _('Oldest first')),
+          ('name_asc', _('Name (A-Z)')),
+          ('name_desc', _('Name (Z-A)')),
         ] %}
         <label class="ftm-projects-filter" for="projects-sort-filter">
-          <span class="ftm-projects-filter__label">Sort By</span>
+          <span class="ftm-projects-filter__label">{{ _("Sort By") }}</span>
           <select
             id="projects-sort-filter"
             name="sort"
@@ -60,13 +60,13 @@
         </label>
 
         <div class="ftm-projects-filter ftm-projects-filter--search">
-          <span class="ftm-projects-filter__label">Search</span>
+          <span class="ftm-projects-filter__label">{{ _("Search") }}</span>
           <wa-input
             id="projects-search"
             type="search"
             name="search"
             size="small"
-            placeholder="Search projects…"
+            placeholder="{{ _("Search projects…") }}"
             value="{{ search_query or '' }}"
             with-clear
           >
@@ -76,8 +76,8 @@
       </form>
 
       <wa-button href="{{ create_project_href or '/new' }}" variant="brand" class="ftm-create-btn">
-        <span class="ftm-create-btn__full">Create Project</span>
-        <span class="ftm-create-btn__short">+ New</span>
+        <span class="ftm-create-btn__full">{{ _("Create Project") }}</span>
+        <span class="ftm-create-btn__short">{{ _("+ New") }}</span>
       </wa-button>
     </div>
 
@@ -100,7 +100,7 @@
         <div class="ftm-project-card__header-meta">
           <span class="ftm-project-card__id">
             #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
-            <span class="ftm-private-icon" title="Private Project">🔒</span>{% endif %}
+            <span class="ftm-private-icon" title="{{ _("Private Project") }}">🔒</span>{% endif %}
           </span>
           <div class="ftm-project-card__badges">
             {% if project.status %} {% set status_value = project.status.value if
@@ -123,7 +123,7 @@
             {% endif %}
           </div>
         </div>
-        <span class="ftm-project-card__name">{{ project.project_name or 'Unnamed Project' }}</span>
+        <span class="ftm-project-card__name">{{ project.project_name or _('Unnamed Project') }}</span>
       </div>
       <div class="ftm-project-card__body">
         <div class="ftm-project-card__content-top">
@@ -131,7 +131,7 @@
           <div class="ftm-project-card__location">
             <span class="ftm-project-card__location-inner">
               <span style="color: #888">📍</span>
-              <span style="line-height: 1.4">Location: {{ project.location_str }}</span>
+              <span style="line-height: 1.4">{{ _("Location:") }} {{ project.location_str }}</span>
             </span>
           </div>
           {% endif %}
@@ -152,7 +152,7 @@
           </div>
           {% endif %} {% if project.created_at %}
           <div class="ftm-project-card__footer">
-            Created: {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else 'N/A' }}
+            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else _('N/A') }}
           </div>
           {% endif %}
         </div>
@@ -161,7 +161,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="ftm-empty-state">No projects found. Create your first project to get started!</p>
+  <p class="ftm-empty-state">{{ _("No projects found. Create your first project to get started!") }}</p>
   {% endif %}
 </div>
 

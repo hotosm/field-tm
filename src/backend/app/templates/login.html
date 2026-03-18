@@ -1,12 +1,12 @@
-{% extends "layout.html" %} {% block title %}Login — Field Tasking Manager{% endblock %} {% block
-content %}
+{% extends "layout.html" %} {% block title %}{{ _("Login") }} — {{ _("Field Tasking Manager") }}{%
+endblock %} {% block content %}
 <main class="ftm-login-page">
   <div class="ftm-login-panel">
-    <h1 class="ftm-login-title">Sign in to Field-TM</h1>
+    <h1 class="ftm-login-title">{{ _("Sign in to Field-TM") }}</h1>
 
     {% if auth_enabled %}
-    <p>Redirecting to the centralized login service.</p>
-    <p><a href="{{ login_url }}">Continue to login</a></p>
+    <p>{{ _("Redirecting to the centralized login service.") }}</p>
+    <p><a href="{{ login_url }}">{{ _("Continue to login") }}</a></p>
     <script>
       const returnToPath = {{ (return_to or "/")|tojson }};
       const returnTo = encodeURIComponent(window.location.origin + returnToPath);
@@ -14,10 +14,10 @@ content %}
       window.location.replace(`{{ login_url }}${separator}return_to=${returnTo}`);
     </script>
     {% else %}
-    <p>Authentication is disabled on this deployment.</p>
+    <p>{{ _("Authentication is disabled on this deployment.") }}</p>
     {% endif %}
 
-    <a href="/" class="ftm-login-back">← Back to home</a>
+    <a href="/" class="ftm-login-back">← {{ _("Back to home") }}</a>
   </div>
 </main>
 {% endblock %}

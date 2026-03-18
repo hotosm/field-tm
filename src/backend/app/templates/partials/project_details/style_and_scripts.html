@@ -6,6 +6,51 @@
       // Shared setup preference for streamlined defaults across steps.
       const setupPreferenceKey = `ftm-project-setup-preference-${projectId}`;
       const hasXlsform = {{ 'true' if has_xlsform else 'false' }};
+      const i18nStrings = {
+        selectSurveyTypePlaceholder: {{ _("Select a survey type...")|tojson }},
+        noSurveyTypesAvailable: {{ _("No survey types available")|tojson }},
+        noSurveyFormsAvailable: {{ _("No survey forms are available. Upload a custom form in Advanced Config.")|tojson }},
+        selectSurveyTypeOrUpload: {{ _("Select a survey type, or upload a custom form in Advanced Config.")|tojson }},
+        surveyTypeSelected: {{ _("Survey type selected.")|tojson }},
+        invalidXlsformFileType: {{ _("Invalid file type. Please upload a .xls or .xlsx file.")|tojson }},
+        selectedFilePrefix: {{ _("Selected file:")|tojson }},
+        customFormSelected: {{ _("Custom form selected.")|tojson }},
+        chooseSurveyTypeFirst: {{ _("Choose a survey type first, or upload a custom form in Advanced Config.")|tojson }},
+        polygons: {{ _("polygons")|tojson }},
+        polylines: {{ _("polylines")|tojson }},
+        points: {{ _("points")|tojson }},
+        features: {{ _("features")|tojson }},
+        customFormDownloadNote: {{ _("You uploaded a custom form, so this OSM download is optional. Use Advanced Config to upload your own GeoJSON or adjust download settings.")|tojson }},
+        recommendedSourceFormat: {{ _("Recommended source: %(title)s (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
+        recommendedSourceUpdatedFormat: {{ _("Recommended source updated (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
+        downloading: {{ _("Downloading...")|tojson }},
+        downloadOsmData: {{ _("Download OSM Data")|tojson }},
+        invalidGeojsonFileType: {{ _("Invalid file type. Please upload a .geojson or .json file.")|tojson }},
+        confirmNoSplitting: {{ _("Confirm No Splitting")|tojson }},
+        splitBySquare: {{ _("Split by Square")|tojson }},
+        splitByBuildings: {{ _("Split by Buildings")|tojson }},
+        splitAoi: {{ _("Split AOI")|tojson }},
+        selectOption: {{ _("Select Option")|tojson }},
+        confirming: {{ _("Confirming...")|tojson }},
+        splitting: {{ _("Splitting...")|tojson }},
+        odkCentral: {{ _("ODK Central")|tojson }},
+        qfield: {{ _("QField")|tojson }},
+        mappingTool: {{ _("the mapping tool")|tojson }},
+        projectTypeNotSet: {{ _("Project type not set. Please set the field mapping app first.")|tojson }},
+        finaliseConfirmFormat: {{ _("Are you sure you want to finalise this project in %(project_type)s? This will create the project, upload forms, and generate all necessary files.")|tojson }},
+        customOdkCredentials: {{ _("Custom ODK Credentials")|tojson }},
+        customQFieldCredentials: {{ _("Custom QField Credentials")|tojson }},
+        pleaseFillAllFields: {{ _("Please fill in all fields.")|tojson }},
+        testing: {{ _("Testing...")|tojson }},
+        testingCredentials: {{ _("Testing credentials...")|tojson }},
+        credentialsValid: {{ _("✓ Credentials are valid!")|tojson }},
+        invalidCredentials: {{ _("Invalid credentials. Please check and try again.")|tojson }},
+        errorTestingCredentialsFormat: {{ _("Error testing credentials: %(message)s")|tojson }},
+        testCredentials: {{ _("Test Credentials")|tojson }},
+        pleaseTestCredentialsFirst: {{ _("Please test credentials first before continuing.")|tojson }},
+        creatingProjectFormat: {{ _("Creating project in %(project_type)s... This may take a moment.")|tojson }},
+        errorPrefix: {{ _("Error:")|tojson }},
+      };
       const OSM_FORM_TITLE_TO_PRESET = {
         'OSM Buildings': { category: 'buildings', geomType: 'POLYGON', centroid: false },
         'OSM Highways': { category: 'highways', geomType: 'POLYLINE', centroid: false },
@@ -91,7 +136,7 @@
 
         const placeholder = document.createElement('option');
         placeholder.value = '';
-        placeholder.textContent = 'Select a survey type...';
+        placeholder.textContent = i18nStrings.selectSurveyTypePlaceholder;
         xlsformSelect.appendChild(placeholder);
 
         forms.forEach((form) => {
@@ -110,9 +155,9 @@
         initialFormTemplates.forEach((form) => formTemplatesById.set(String(form.id), form));
 
         if (initialFormTemplates.length === 0) {
-          xlsformSelect.innerHTML = '<option value="">No survey types available</option>';
+          xlsformSelect.innerHTML = `<option value="">${i18nStrings.noSurveyTypesAvailable}</option>`;
           setStep1Status(
-            'No survey forms are available. Upload a custom form in Advanced Config.',
+            i18nStrings.noSurveyFormsAvailable,
             'warning',
           );
           return;
@@ -121,7 +166,7 @@
         setSurveyTypeOptions(initialFormTemplates);
         xlsformSelect.disabled = false;
         setStep1Status(
-          'Select a survey type, or upload a custom form in Advanced Config.',
+          i18nStrings.selectSurveyTypeOrUpload,
           'info',
         );
       }
@@ -162,7 +207,7 @@
           });
 
           setStep1Ready(true);
-          setStep1Status('Survey type selected.', 'info');
+          setStep1Status(i18nStrings.surveyTypeSelected, 'info');
         });
       }
 
@@ -179,7 +224,7 @@
           const validExtensions = ['.xls', '.xlsx'];
           const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
           if (!validExtensions.includes(fileExtension)) {
-            setStep1Status('Invalid file type. Please upload a .xls or .xlsx file.', 'danger');
+            setStep1Status(i18nStrings.invalidXlsformFileType, 'danger');
             xlsformFileInput.value = '';
             setStep1Ready(false);
             return;
@@ -190,7 +235,7 @@
             xlsformSelect.value = '';
           }
           if (selectedXlsformName) {
-            selectedXlsformName.textContent = `Selected file: ${file.name}`;
+            selectedXlsformName.textContent = `${i18nStrings.selectedFilePrefix} ${file.name}`;
           }
 
           saveSetupPreference({
@@ -203,7 +248,7 @@
           });
 
           setStep1Ready(true);
-          setStep1Status('Custom form selected.', 'info');
+          setStep1Status(i18nStrings.customFormSelected, 'info');
         });
       }
 
@@ -215,7 +260,7 @@
           if (!hasTemplateSelection && !hasUploadedFile) {
             e.preventDefault();
             setStep1Status(
-              'Choose a survey type first, or upload a custom form in Advanced Config.',
+              i18nStrings.chooseSurveyTypeFirst,
               'warning',
             );
             setStep1Ready(false);
@@ -243,10 +288,10 @@
       bindAdvancedToggle(dataAdvancedConfigToggle, dataAdvancedConfigPanel);
 
       function formatGeomType(geomType) {
-        if (geomType === 'POLYGON') return 'polygons';
-        if (geomType === 'POLYLINE') return 'polylines';
-        if (geomType === 'POINT') return 'points';
-        return 'features';
+        if (geomType === 'POLYGON') return i18nStrings.polygons;
+        if (geomType === 'POLYLINE') return i18nStrings.polylines;
+        if (geomType === 'POINT') return i18nStrings.points;
+        return i18nStrings.features;
       }
 
       function toFormTitle(category) {
@@ -289,14 +334,14 @@
         const title = toFormTitle(config.category);
         const geomLabel = formatGeomType(config.geomType);
         if (sourceMode === 'custom') {
-          recommendedDataNoteText.textContent = (
-            'You uploaded a custom form, so this OSM download is optional. '
-            + 'Use Advanced Config to upload your own GeoJSON or adjust download settings.'
-          );
+          recommendedDataNoteText.textContent = i18nStrings.customFormDownloadNote;
         } else if (title) {
-          recommendedDataNoteText.textContent = `Recommended source: ${title} (${geomLabel}). Review the data on the map, then continue.`;
+          recommendedDataNoteText.textContent = i18nStrings.recommendedSourceFormat
+            .replace('%(title)s', title)
+            .replace('%(geom_label)s', geomLabel);
         } else {
-          recommendedDataNoteText.textContent = `Recommended source updated (${geomLabel}). Review the data on the map, then continue.`;
+          recommendedDataNoteText.textContent = i18nStrings.recommendedSourceUpdatedFormat
+            .replace('%(geom_label)s', geomLabel);
         }
       }
 
@@ -327,14 +372,14 @@
 
         downloadOsmDataBtn.addEventListener('htmx:before-request', function() {
           if (downloadLoading) downloadLoading.style.display = 'block';
-          if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+          if (downloadBtnText) downloadBtnText.textContent = i18nStrings.downloading;
           if (downloadSpinner) downloadSpinner.style.display = 'inline-block';
           downloadOsmDataBtn.disabled = true;
         });
 
         downloadOsmDataBtn.addEventListener('htmx:after-request', function() {
           if (downloadLoading) downloadLoading.style.display = 'none';
-          if (downloadBtnText) downloadBtnText.textContent = 'Download OSM Data';
+          if (downloadBtnText) downloadBtnText.textContent = i18nStrings.downloadOsmData;
           if (downloadSpinner) downloadSpinner.style.display = 'none';
           downloadOsmDataBtn.disabled = false;
         });
@@ -385,7 +430,7 @@
           const validExtensions = ['.geojson', '.json'];
           const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
           if (!validExtensions.includes(fileExtension)) {
-            osmDataStatus.innerHTML = '<wa-callout variant="danger"><span>Invalid file type. Please upload a .geojson or .json file.</span></wa-callout>';
+            osmDataStatus.innerHTML = `<wa-callout variant="danger"><span>${i18nStrings.invalidGeojsonFileType}</span></wa-callout>`;
             geojsonFileInput.value = '';
             return;
           }
@@ -551,15 +596,15 @@
       // Update button text based on algorithm and current state
       if (splitBtnText) {
         if (algorithm === 'NO_SPLITTING') {
-          splitBtnText.textContent = 'Confirm No Splitting';
+          splitBtnText.textContent = i18nStrings.confirmNoSplitting;
         } else if (algorithm === 'DIVIDE_BY_SQUARE') {
-          splitBtnText.textContent = 'Split by Square';
+          splitBtnText.textContent = i18nStrings.splitBySquare;
         } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
-          splitBtnText.textContent = 'Split by Buildings';
+          splitBtnText.textContent = i18nStrings.splitByBuildings;
         } else if (algorithm && algorithm !== '') {
-          splitBtnText.textContent = 'Split AOI';
+          splitBtnText.textContent = i18nStrings.splitAoi;
         } else {
-          splitBtnText.textContent = 'Select Option';
+          splitBtnText.textContent = i18nStrings.selectOption;
         }
       }
 
@@ -620,9 +665,9 @@
       const algorithm = splitAlgorithm?.value;
       if (splitBtnText) {
         if (algorithm === 'NO_SPLITTING') {
-          splitBtnText.textContent = 'Confirming...';
+          splitBtnText.textContent = i18nStrings.confirming;
         } else {
-          splitBtnText.textContent = 'Splitting...';
+          splitBtnText.textContent = i18nStrings.splitting;
         }
       }
       if (splitBtnSpinner) splitBtnSpinner.style.display = 'inline-block';
@@ -679,9 +724,9 @@
   let customCreds = null;
 
   function getProjectTypeName() {
-    if (isOdk) return 'ODK Central';
-    if (isQField) return 'QField';
-    return 'the mapping tool';
+    if (isOdk) return i18nStrings.odkCentral;
+    if (isQField) return i18nStrings.qfield;
+    return i18nStrings.mappingTool;
   }
 
   function showFinaliseConfirmDialog() {
@@ -689,7 +734,7 @@
       if (finaliseStatus) {
         finaliseStatus.innerHTML = (
           '<wa-callout variant="danger"><span>'
-          + 'Project type not set. Please set the field mapping app first.'
+          + i18nStrings.projectTypeNotSet
           + '</span></wa-callout>'
         );
       }
@@ -698,9 +743,9 @@
 
     const projectTypeName = getProjectTypeName();
     if (finaliseConfirmMessage) {
-      finaliseConfirmMessage.textContent = (
-        `Are you sure you want to finalise this project in ${projectTypeName}? `
-        + 'This will create the project, upload forms, and generate all necessary files.'
+      finaliseConfirmMessage.textContent = i18nStrings.finaliseConfirmFormat.replace(
+        '%(project_type)s',
+        projectTypeName,
       );
     }
 
@@ -767,18 +812,18 @@
 
       // Check if project type is set
       if (!isOdk && !isQField) {
-        showError('Project type not set. Please set the field mapping app first.', 'warning');
+        showError(i18nStrings.projectTypeNotSet, 'warning');
         credentialsModal.classList.add('ftm-modal-backdrop--visible');
         return;
       }
 
       // Configure modal based on project type
       if (isOdk) {
-        credentialsModalTitle.textContent = 'Custom ODK Credentials';
+        credentialsModalTitle.textContent = i18nStrings.customOdkCredentials;
         if (odkCredentialsFields) odkCredentialsFields.style.display = 'block';
         if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = 'none';
       } else if (isQField) {
-        credentialsModalTitle.textContent = 'Custom QField Credentials';
+        credentialsModalTitle.textContent = i18nStrings.customQFieldCredentials;
         if (odkCredentialsFields) odkCredentialsFields.style.display = 'none';
         if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = 'block';
       }
@@ -807,14 +852,14 @@
       const creds = getCredentials();
 
       if (!creds || !creds.url || !creds.username || !creds.password) {
-        showError('Please fill in all fields.', 'danger');
+        showError(i18nStrings.pleaseFillAllFields, 'danger');
         return;
       }
 
       try {
         testCredsBtn.disabled = true;
-        testCredsBtn.textContent = 'Testing...';
-        showError('Testing credentials...', 'info');
+        testCredsBtn.textContent = i18nStrings.testing;
+        showError(i18nStrings.testingCredentials, 'info');
 
         let response;
 
@@ -840,19 +885,22 @@
         }
 
         if (response.ok) {
-          showError('✓ Credentials are valid!', 'success');
+          showError(i18nStrings.credentialsValid, 'success');
           customCreds = creds;
         } else {
           const error = await response.json();
-          showError(error.detail || 'Invalid credentials. Please check and try again.', 'danger');
+          showError(error.detail || i18nStrings.invalidCredentials, 'danger');
           customCreds = null;
         }
       } catch (error) {
-        showError(`Error testing credentials: ${error.message}`, 'danger');
+        showError(
+          i18nStrings.errorTestingCredentialsFormat.replace('%(message)s', error.message),
+          'danger',
+        );
         customCreds = null;
       } finally {
         testCredsBtn.disabled = false;
-        testCredsBtn.textContent = 'Test Credentials';
+        testCredsBtn.textContent = i18nStrings.testCredentials;
       }
     });
   }
@@ -863,7 +911,7 @@
       e.preventDefault();
 
       if (!customCreds) {
-        showError('Please test credentials first before continuing.', 'warning');
+        showError(i18nStrings.pleaseTestCredentialsFirst, 'warning');
         return;
       }
 
@@ -878,7 +926,7 @@
       async function submitFinaliseProject() {
         const projectTypeName = getProjectTypeName();
         try {
-          finaliseStatus.innerHTML = `<wa-callout variant="info"><span>Creating project in ${projectTypeName}... This may take a moment.</span></wa-callout>`;
+          finaliseStatus.innerHTML = `<wa-callout variant="info"><span>${i18nStrings.creatingProjectFormat.replace('%(project_type)s', projectTypeName)}</span></wa-callout>`;
           if (finaliseProjectBtn) finaliseProjectBtn.disabled = true;
           if (advancedOptionsToggle) advancedOptionsToggle.disabled = true;
           if (finaliseConfirmBtn) finaliseConfirmBtn.disabled = true;
@@ -903,7 +951,7 @@
           } else if (isQField) {
             endpoint = `/create-project-qfield-htmx?project_id=${projectId}`;
           } else {
-            finaliseStatus.innerHTML = '<wa-callout variant="danger"><span>Project type not set. Please set the field mapping app first.</span></wa-callout>';
+            finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>${i18nStrings.projectTypeNotSet}</span></wa-callout>`;
             if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
             if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
             return;
@@ -929,7 +977,7 @@
             if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
           }
         } catch (error) {
-          finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>Error: ${error.message}</span></wa-callout>`;
+          finaliseStatus.innerHTML = `<wa-callout variant="danger"><span>${i18nStrings.errorPrefix} ${error.message}</span></wa-callout>`;
           if (finaliseProjectBtn) finaliseProjectBtn.disabled = false;
           if (advancedOptionsToggle) advancedOptionsToggle.disabled = false;
         } finally {

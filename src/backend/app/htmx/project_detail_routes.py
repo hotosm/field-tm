@@ -41,6 +41,7 @@ from app.config import decrypt_value
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
+from app.i18n import _
 from app.projects import project_crud
 from app.projects.project_services import (
     DownstreamDeleteError,
@@ -93,16 +94,16 @@ def _mapper_credentials_html(project: DbProject) -> str:
                 border-radius: 8px;
             ">
                 <h4 style="margin: 0 0 8px 0; font-size: 0.95em;">
-                    Mapper Login (QFieldCloud)
+                    {_("Mapper Login (QFieldCloud)")}
                 </h4>
                 <p style="margin: 0; font-size: 0.9em;">
-                    <strong>Username:</strong> <code>{mapper_username}</code>
+                    <strong>{_("Username:")}</strong> <code>{mapper_username}</code>
                 </p>
                 <p style="margin: 4px 0 0 0; font-size: 0.9em;">
-                    <strong>Password:</strong> <code>{mapper_password}</code>
+                    <strong>{_("Password:")}</strong> <code>{mapper_password}</code>
                 </p>
                 <p style="margin: 8px 0 0 0; font-size: 0.8em; color: #666;">
-                    Scan the QR code, then enter these credentials in QField.
+                    {_("Scan the QR code, then enter these credentials in QField.")}
                 </p>
             </div>"""
 
@@ -114,16 +115,22 @@ def _qrcode_panel_html(
     mapper_creds_html: str,
 ) -> str:
     """Build the QR code HTML payload."""
+    scan_qr_code = _("Scan QR Code")
+    scan_description = _(
+        "Use %(app_name)s to scan this QR code and load the project."
+    ) % {"app_name": app_name}
+    project_qr_code = _("Project QR Code")
+    download_qr_code = _("Download QR Code")
     return f"""
         <div class="ftm-qr-panel">
-            <h3 class="ftm-qr-panel__title">Scan QR Code</h3>
+            <h3 class="ftm-qr-panel__title">{scan_qr_code}</h3>
             <p class="ftm-qr-panel__description">
-                Use {app_name} to scan this QR code and load the project.
+                {scan_description}
             </p>
             <div class="ftm-qr-panel__image-wrap">
                 <img
                     src="{qr_code_data_url}"
-                    alt="Project QR Code"
+                    alt="{project_qr_code}"
                     class="ftm-qr-panel__image"
                 />
             </div>
@@ -132,7 +139,7 @@ def _qrcode_panel_html(
                     onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
                     variant="default"
                 >
-                    Download QR Code
+                    {download_qr_code}
                 </wa-button>
             </div>
             {mapper_creds_html}
@@ -164,18 +171,18 @@ def _friendly_qr_error(exc: Exception) -> str:
             "network",
         )
     ):
-        return (
-            "Cannot reach the mapping server. Check that ODK Central or "
-            "QFieldCloud is running."
+        return _(
+            "Cannot reach the mapping server. "
+            "Check that ODK Central or QFieldCloud is running."
         )
     if any(kw in raw for kw in ("500", "server error", "internal")):
-        return "The mapping server returned an error. Check its logs for details."
+        return _("The mapping server returned an error. Check its logs for details.")
     if any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
-        return (
+        return _(
             "Authentication failed connecting to the mapping server. "
             "Check the configured credentials."
         )
-    return "An unexpected error occurred while generating the QR code."
+    return _("An unexpected error occurred while generating the QR code.")
 
 
 @get(
@@ -237,13 +244,14 @@ async def delete_project_htmx(
     except KeyError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project ({project_id}) not found.",
+            detail=_("Project (%(project_id)s) not found.")
+            % {"project_id": project_id},
         ) from exc
 
     if not _can_delete_project(auth_user, project):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only the project manager can delete this project.",
+            detail=_("Only the project manager can delete this project."),
         )
 
     try:
@@ -286,7 +294,7 @@ async def project_qrcode_htmx(
         project = await DbProject.one(db, project_id)
     except KeyError:
         return Response(
-            content=_callout("danger", "Project not found."),
+            content=_callout("danger", _("Project not found.")),
             media_type="text/html",
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -313,7 +321,10 @@ async def project_qrcode_htmx(
     except HTTPException as e:
         error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
         return Response(
-            content=_callout("danger", f"Error: {error_msg}"),
+            content=_callout(
+                "danger",
+                _("Error: %(error_msg)s") % {"error_msg": error_msg},
+            ),
             media_type="text/html",
             status_code=e.status_code,
         )

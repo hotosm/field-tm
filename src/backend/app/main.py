@@ -32,6 +32,7 @@ from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
 from app.i18n import (
+    _,
     create_locale_cookie_middleware,
     get_current_locale,
     gettext_func,
@@ -156,7 +157,7 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
     is_htmx = request.headers.get("HX-Request") == "true"
 
     # Determine error message
-    user_msg = "An unexpected error occurred. Please contact an admin."
+    user_msg = _("An unexpected error occurred. Please contact an admin.")
     if isinstance(exc, HTTPException):
         if exc.status_code < HTTP_500_INTERNAL_SERVER_ERROR:
             # Show specific details for client errors (4xx)

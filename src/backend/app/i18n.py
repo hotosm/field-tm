@@ -79,6 +79,11 @@ def gettext_func(message: str) -> str:
     return trans.gettext(message) if trans else message
 
 
+def _(message: str) -> str:
+    """Short gettext alias for Python code and Babel extraction."""
+    return gettext_func(message)
+
+
 def ngettext_func(singular: str, plural: str, n: int) -> str:
     """Translate a singular/plural message using the current request's locale."""
     trans = _current_translations.get()

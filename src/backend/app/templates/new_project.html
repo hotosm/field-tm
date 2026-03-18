@@ -1,7 +1,7 @@
-{% extends "layout.html" %} {% block title %}Create Project — Field Tasking Manager{% endblock %} {%
+{% extends "layout.html" %} {% block title %}{{ _("Create Project — Field Tasking Manager") }}{% endblock %} {%
 block content %}
 <div class="ftm-page ftm-page--narrow">
-  <h1 style="margin-bottom: 30px">Create New Project</h1>
+  <h1 style="margin-bottom: 30px">{{ _("Create New Project") }}</h1>
 
   <wa-card>
     <form
@@ -22,12 +22,12 @@ block content %}
 
       <div class="ftm-form-group">
         <label for="project_name_input" class="ftm-form-label">
-          Project Name <span class="ftm-form-required">*</span>
+          {{ _("Project Name") }} <span class="ftm-form-required">*</span>
         </label>
         <wa-input
           name="project_name"
           id="project_name_input"
-          placeholder="Enter project name"
+          placeholder="{{ _("Enter project name") }}"
           style="width: 100%"
         ></wa-input>
         <div id="project-name-error" style="margin-top: 8px"></div>
@@ -35,12 +35,12 @@ block content %}
 
       <div class="ftm-form-group">
         <label for="description_input" class="ftm-form-label">
-          Description <span class="ftm-form-required">*</span>
+          {{ _("Description") }} <span class="ftm-form-required">*</span>
         </label>
         <wa-textarea
           name="description"
           id="description_input"
-          placeholder="Enter project description"
+          placeholder="{{ _("Enter project description") }}"
           rows="4"
           style="width: 100%"
         ></wa-textarea>
@@ -49,7 +49,7 @@ block content %}
 
       <div class="ftm-form-group">
         <label class="ftm-form-label">
-          Field Mapping App <span class="ftm-form-required">*</span>
+          {{ _("Field Mapping App") }} <span class="ftm-form-required">*</span>
         </label>
         <div id="field-mapping-app-container" class="ftm-radio-group">
           <label class="app-radio-label ftm-radio-card">
@@ -89,7 +89,7 @@ block content %}
 
       <div class="ftm-form-group">
         <label class="ftm-form-label">
-          Project Area <span class="ftm-form-required">*</span>
+          {{ _("Project Area") }} <span class="ftm-form-required">*</span>
         </label>
         <div class="ftm-map-actions">
           <wa-button
@@ -98,7 +98,7 @@ block content %}
             variant="default"
             style="flex: 1; min-width: 120px"
           >
-            Draw Area
+            {{ _("Draw Area") }}
           </wa-button>
           <wa-button
             type="button"
@@ -106,7 +106,7 @@ block content %}
             variant="default"
             style="flex: 1; min-width: 120px"
           >
-            Upload GeoJSON
+            {{ _("Upload GeoJSON") }}
           </wa-button>
           <wa-button
             type="button"
@@ -114,7 +114,7 @@ block content %}
             variant="default"
             style="flex: 1; min-width: 120px"
           >
-            Clear
+            {{ _("Clear") }}
           </wa-button>
         </div>
         <input type="file" id="geojson-file-input" accept=".geojson,.json" style="display: none" />
@@ -122,9 +122,7 @@ block content %}
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
         <small class="ftm-form-help">
-          Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum
-          project size is 1,000&nbsp;km². Areas over 100&nbsp;km² will show a warning. The OSM data
-          extract API is limited to 200&nbsp;km².
+          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data extract API is limited to 200 km².") }}
         </small>
         <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
           <button
@@ -132,7 +130,7 @@ block content %}
             id="aoi-advanced-config-toggle"
             class="wa-button wa-button--default ftm-advanced-toggle"
           >
-            Advanced Config
+            {{ _("Advanced Config") }}
           </button>
         </div>
         <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
@@ -144,7 +142,7 @@ block content %}
                 style="margin: 0; cursor: pointer"
               />
               <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
-                Merge geometries (use convex hull for multipolygons)
+                {{ _("Merge geometries (use convex hull for multipolygons)") }}
               </label>
             </div>
           </div>
@@ -153,22 +151,22 @@ block content %}
       </div>
 
       <div class="ftm-form-group">
-        <label class="ftm-form-label">Hashtags</label>
+        <label class="ftm-form-label">{{ _("Hashtags") }}</label>
         <wa-input
           id="hashtag-input"
-          placeholder="Type hashtags and press Enter or comma"
+          placeholder="{{ _("Type hashtags and press Enter or comma") }}"
           style="width: 100%"
         ></wa-input>
         <div id="hashtags-container" class="ftm-hashtags-container"></div>
         <small class="ftm-form-help">
-          Type hashtags and press Enter or comma to add them. Click the × on a tag to remove it.
+          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove it.") }}
         </small>
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn"> Create Project </wa-button>
-        <span id="submit-indicator" style="display: none; margin-left: 10px">Creating...</span>
-        <wa-button href="/projects" variant="default">Cancel</wa-button>
+        <wa-button type="submit" variant="brand" id="submit-btn"> {{ _("Create Project") }} </wa-button>
+        <span id="submit-indicator" style="display: none; margin-left: 10px">{{ _("Creating...") }}</span>
+        <wa-button href="/projects" variant="default">{{ _("Cancel") }}</wa-button>
       </div>
     </form>
   </wa-card>

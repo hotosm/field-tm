@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block title %}FieldTM | Field Tasking Manager{% endblock %} {% block
+{% extends "layout.html" %} {% block title %}{{ _("FieldTM | Field Tasking Manager") }}{% endblock %} {% block
 extra_head %}
 <style>
   .landing-page {
@@ -488,15 +488,15 @@ extra_head %}
 <main class="landing-page">
   <section class="landing-hero">
     <div class="landing-shell landing-hero-content">
-      <p class="landing-eyebrow">Coordinate field campaigns</p>
-      <h1 class="landing-title">FIELD - TASKING MANAGER</h1>
+      <p class="landing-eyebrow">{{ _("Coordinate field campaigns") }}</p>
+      <h1 class="landing-title">{{ _("FIELD - TASKING MANAGER") }}</h1>
       <p class="landing-subtitle">
-        Enhancing field mapping efficiency and accuracy through seamless coordination.
+        {{ _("Enhancing field mapping efficiency and accuracy through seamless coordination.") }}
       </p>
       <div class="landing-hero-actions">
-        <wa-button href="/projects" variant="brand" size="large">Explore Projects</wa-button>
+        <wa-button href="/projects" variant="brand" size="large">{{ _("Explore Projects") }}</wa-button>
         <wa-button href="{{ create_project_href or '/new' }}" variant="neutral" size="large"
-          >Create Project</wa-button
+          >{{ _("Create Project") }}</wa-button
         >
       </div>
     </div>
@@ -506,7 +506,7 @@ extra_head %}
     <div hx-get="/metrics" hx-trigger="load" hx-swap="innerHTML" aria-live="polite">
       <div class="landing-metrics-grid">
         <wa-card class="landing-metric-card">
-          <div class="landing-loading">Loading metrics...</div>
+          <div class="landing-loading">{{ _("Loading metrics...") }}</div>
         </wa-card>
       </div>
     </div>
@@ -514,113 +514,103 @@ extra_head %}
 
   <section class="landing-shell landing-about">
     <div>
-      <h2 class="landing-section-title">What is it?</h2>
+      <h2 class="landing-section-title">{{ _("What is it?") }}</h2>
       <p>
-        The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by
-        coordinating mapping in the field.
+        {{ _("The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by coordinating mapping in the field.") }}
       </p>
       <p>
-        Field-TM facilitates collaborative mapping by supporting and extending mature tools like ODK
-        and QField. It is a standalone mobile and web workflow that helps teams collect geospatial
-        data efficiently with commonly available Android devices.
+        {{ _("Field-TM facilitates collaborative mapping by supporting and extending mature tools like ODK and QField. It is a standalone mobile and web workflow that helps teams collect geospatial data efficiently with commonly available Android devices.") }}
       </p>
     </div>
     <img
       src="/static/images/landing-pic-1.jpg"
-      alt="A project manager demonstrates FieldTM mapping workflow on a laptop"
+      alt="{{ _("A project manager demonstrates FieldTM mapping workflow on a laptop") }}"
       loading="lazy"
     />
   </section>
 
   <section class="landing-shell landing-features">
-    <h2 class="landing-section-title">Main Features</h2>
+    <h2 class="landing-section-title">{{ _("Main Features") }}</h2>
     <div class="landing-features-grid">
       <article class="landing-feature-card">
-        <h3>Flexible Data Collection</h3>
+        <h3>{{ _("Flexible Data Collection") }}</h3>
         <p>
-          Support diverse survey forms, multiple data formats, and adaptable workflows that fit
-          different operational needs.
+          {{ _("Support diverse survey forms, multiple data formats, and adaptable workflows that fit different operational needs.") }}
         </p>
       </article>
       <article class="landing-feature-card">
-        <h3>Open Source and Customizable</h3>
+        <h3>{{ _("Open Source and Customizable") }}</h3>
         <p>
-          Adapt Field-TM to your own survey logic, data structures, and integration requirements.
+          {{ _("Adapt Field-TM to your own survey logic, data structures, and integration requirements.") }}
         </p>
       </article>
       <article class="landing-feature-card">
-        <h3>Entity-Level Tracking</h3>
+        <h3>{{ _("Entity-Level Tracking") }}</h3>
         <p>
-          Monitor survey progress at task and feature level so managers can make informed decisions
-          quickly.
+          {{ _("Monitor survey progress at task and feature level so managers can make informed decisions quickly.") }}
         </p>
       </article>
     </div>
   </section>
 
   <section class="landing-shell landing-users">
-    <h2 class="landing-section-title">Who is it for?</h2>
+    <h2 class="landing-section-title">{{ _("Who is it for?") }}</h2>
     <div class="landing-users-grid">
       <article class="landing-user-card">
-        <span class="landing-user-role landing-user-role--manager">Project Manager</span>
-        <h3>Create and coordinate field campaigns</h3>
+        <span class="landing-user-role landing-user-role--manager">{{ _("Project Manager") }}</span>
+        <h3>{{ _("Create and coordinate field campaigns") }}</h3>
         <p>
-          Project managers use Field-TM to set up mapping projects, define areas of interest, design
-          survey forms, and split work into manageable tasks.
+          {{ _("Project managers use Field-TM to set up mapping projects, define areas of interest, design survey forms, and split work into manageable tasks.") }}
         </p>
         <ol class="landing-user-steps">
-          <li>Define a project area and upload or choose a survey form</li>
-          <li>Split the area into tasks and generate a data extract</li>
-          <li>Publish the project to ODK Central or QFieldCloud</li>
-          <li>Share a QR code so mappers can start collecting data</li>
+          <li>{{ _("Define a project area and upload or choose a survey form") }}</li>
+          <li>{{ _("Split the area into tasks and generate a data extract") }}</li>
+          <li>{{ _("Publish the project to ODK Central or QFieldCloud") }}</li>
+          <li>{{ _("Share a QR code so mappers can start collecting data") }}</li>
         </ol>
       </article>
       <article class="landing-user-card">
-        <span class="landing-user-role landing-user-role--mapper">Field Mapper</span>
-        <h3>Collect data in the field with your phone</h3>
+        <span class="landing-user-role landing-user-role--mapper">{{ _("Field Mapper") }}</span>
+        <h3>{{ _("Collect data in the field with your phone") }}</h3>
         <p>
-          Mappers do not need to log in to Field-TM. Once a project manager publishes a project,
-          mappers access it directly in their mobile app of choice.
+          {{ _("Mappers do not need to log in to Field-TM. Once a project manager publishes a project, mappers access it directly in their mobile app of choice.") }}
         </p>
         <ol class="landing-user-steps">
-          <li>Scan the QR code shared by your project manager</li>
-          <li>The project loads automatically in ODK Collect or QField</li>
-          <li>Navigate to your assigned task area and collect data</li>
-          <li>Submit your survey, which goes straight to the server</li>
+          <li>{{ _("Scan the QR code shared by your project manager") }}</li>
+          <li>{{ _("The project loads automatically in ODK Collect or QField") }}</li>
+          <li>{{ _("Navigate to your assigned task area and collect data") }}</li>
+          <li>{{ _("Submit your survey, which goes straight to the server") }}</li>
         </ol>
       </article>
     </div>
   </section>
 
   <section class="landing-shell landing-use-cases">
-    <h2 class="landing-section-title">Field-TM Use Cases</h2>
+    <h2 class="landing-section-title">{{ _("Field-TM Use Cases") }}</h2>
     <div class="landing-use-cases-content">
       <img
         class="landing-use-cases-image"
         src="/static/images/landing-pic-2.jpg"
-        alt="Field mapping in progress"
+        alt="{{ _("Field mapping in progress") }}"
         loading="lazy"
       />
       <div>
         <details class="landing-use-case-item" open>
-          <summary>1. Community Mapping</summary>
+          <summary>{{ _("1. Community Mapping") }}</summary>
           <p>
-            Field Tasking Manager empowers communities to map informal settlements, public
-            facilities, and local services for inclusive planning.
+            {{ _("Field Tasking Manager empowers communities to map informal settlements, public facilities, and local services for inclusive planning.") }}
           </p>
         </details>
         <details class="landing-use-case-item" open>
-          <summary>2. Urban Planning and Management</summary>
+          <summary>{{ _("2. Urban Planning and Management") }}</summary>
           <p>
-            Build smarter cities with coordinated surveys of houses, roads, and utilities through
-            clear, manageable mapping tasks.
+            {{ _("Build smarter cities with coordinated surveys of houses, roads, and utilities through clear, manageable mapping tasks.") }}
           </p>
         </details>
         <details class="landing-use-case-item" open>
-          <summary>3. Disaster Response and Recovery</summary>
+          <summary>{{ _("3. Disaster Response and Recovery") }}</summary>
           <p>
-            Rapidly map damaged infrastructure after disasters, coordinate volunteers, and deliver
-            reliable data for relief operations.
+            {{ _("Rapidly map damaged infrastructure after disasters, coordinate volunteers, and deliver reliable data for relief operations.") }}
           </p>
         </details>
       </div>
@@ -628,7 +618,7 @@ extra_head %}
   </section>
 
   <section class="landing-shell landing-resources">
-    <h2 class="landing-section-title">Resources</h2>
+    <h2 class="landing-section-title">{{ _("Resources") }}</h2>
     <div class="landing-resources-grid">
       <a
         class="landing-resource-card"
@@ -636,10 +626,10 @@ extra_head %}
         target="_blank"
         rel="noopener"
       >
-        <p class="landing-resource-type">Data Prep</p>
-        <p class="landing-resource-title">HOT Export Tool</p>
+        <p class="landing-resource-type">{{ _("Data Prep") }}</p>
+        <p class="landing-resource-title">{{ _("HOT Export Tool") }}</p>
         <p class="landing-resource-desc">
-          Download task-ready geospatial data extracts for your project area.
+          {{ _("Download task-ready geospatial data extracts for your project area.") }}
         </p>
       </a>
       <a
@@ -648,10 +638,10 @@ extra_head %}
         target="_blank"
         rel="noopener"
       >
-        <p class="landing-resource-type">Documentation</p>
-        <p class="landing-resource-title">ODK Central Guide</p>
+        <p class="landing-resource-type">{{ _("Documentation") }}</p>
+        <p class="landing-resource-title">{{ _("ODK Central Guide") }}</p>
         <p class="landing-resource-desc">
-          Learn how to manage forms, app users, and field submissions in ODK.
+          {{ _("Learn how to manage forms, app users, and field submissions in ODK.") }}
         </p>
       </a>
       <a
@@ -660,10 +650,10 @@ extra_head %}
         target="_blank"
         rel="noopener"
       >
-        <p class="landing-resource-type">Documentation</p>
-        <p class="landing-resource-title">QField Guide</p>
+        <p class="landing-resource-type">{{ _("Documentation") }}</p>
+        <p class="landing-resource-title">{{ _("QField Guide") }}</p>
         <p class="landing-resource-desc">
-          Set up QFieldCloud projects and mobile workflows for offline mapping.
+          {{ _("Set up QFieldCloud projects and mobile workflows for offline mapping.") }}
         </p>
       </a>
     </div>
@@ -673,8 +663,8 @@ extra_head %}
     <div class="landing-shell">
       <div class="landing-footer-bottom">
         <div class="landing-footer-help">
-          Need assistance?<br />
-          Email:
+          {{ _("Need assistance?") }}<br />
+          {{ _("Email:") }}
           <a href="mailto:tech-data@hotosm.org">tech-data@hotosm.org</a>
         </div>
         <div class="landing-footer-social">

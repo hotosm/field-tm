@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="{{ current_locale() }}" class="hot-theme-light wa-theme-default wa-palette-hotosm">
   <head>
-    <title>{% block title %}Field Tasking Manager{% endblock %}</title>
+    <title>{% block title %}{{ _("Field Tasking Manager") }}{% endblock %}
 
     <meta charset="UTF-8" />
-    <meta name="description" content="Coordinated field mapping for Open Mapping campaigns." />
+    <meta name="description" content="{{ _("Coordinated field mapping for Open Mapping campaigns.") }}" />
     <meta name="author" content="Humanitarian OpenStreetMap Team" />
     <meta name="format-detection" content="telephone=no, email=no, address=no" />
     <meta
@@ -155,7 +155,7 @@
   <body>
     <hot-header id="app-header" title="FieldTM" size="medium">
       {% if auth_enabled %}
-      <wa-button slot="auth" variant="brand" id="login-btn">Login</wa-button>
+      <wa-button slot="auth" variant="brand" id="login-btn">{{ _("Login") }}</wa-button>
       {% endif %}
     </hot-header>
 
@@ -209,21 +209,21 @@
       if (appHeader) {
         appHeader.tabs = [
           {
-            label: "Projects",
+            label: {{ _("Projects")|tojson }},
             href: "/projects",
             clickEvent: () => {
               window.location.href = "/projects";
             },
           },
           {
-            label: "Create Project",
+            label: {{ _("Create Project")|tojson }},
             href: "/new",
             clickEvent: () => {
               window.location.href = "/new";
             },
           },
           {
-            label: "QField Admin",
+            label: {{ _("QField Admin")|tojson }},
             href: "/qfc-admin",
             clickEvent: () => {
               window.location.href = "/qfc-admin";
