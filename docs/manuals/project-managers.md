@@ -106,7 +106,7 @@ All project manager permissions are granted to the organisation manager.
 Project creation access is provided to users who have organisation admin or
 higher level of permission.
 
-Go to [field-tm] <https://field-tm.hotosm.org/>
+Go to [field-tm] <https://field.hotosm.org/>
 
 ### 1. Create the project details
 
@@ -290,9 +290,9 @@ Go to [field-tm] <https://field-tm.hotosm.org/>
 
 #### During Training
 
-1. Share the link of the project for the mapper to reach  
-   to the project easily. The URL be:
-   [https://mapper.field-tm.hotosm.org/project_id](https://mapper.field-tm.hotosm.org/project_id)
+1. Share the link of the project for the mapper to reach
+   to the project easily. The URL will be:
+   `https://field.hotosm.org/project/{project_id}`
 2. **Updating Metadata**  
    If you need mappers to include their email  
    and phone number along with their username, guide them  

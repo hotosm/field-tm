@@ -28,12 +28,6 @@ bash install.sh
 Variables are set in `.env`.
 Some can be updated manually, as required.
 
-##### EXTRA_CORS_ORIGINS
-
-> If extra cors origins are required for testing, the variable
-> `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
-> <http://field.localhost:7050,http://some.other.domain>
-
 ##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided
@@ -55,20 +49,20 @@ stack, and variables should be set accordingly.
 
 #### Other Domains
 
-If you run Field-TM with ODK and Minio (S3) included, then the
+If you run Field-TM with ODK or QField included, then the
 domains will default to:
 
 ```dotenv
-${FTM_DOMAIN} --> Frontend
-api.${FTM_DOMAIN} --> Backend
+${FTM_DOMAIN} --> Field-TM (backend serves everything)
 odk.${FTM_DOMAIN} --> ODK Central
+qfield.${FTM_DOMAIN} --> Garage S3
 ```
 
-These defaults can be overridden with respective environment variables:
+The domain defaults can be overridden with:
 
 ```dotenv
-FTM_API_DOMAIN
 FTM_ODK_DOMAIN
+FTM_QFIELD_DOMAIN
 ```
 
 ### Connecting to a remote database
@@ -81,7 +75,7 @@ FTM_ODK_DOMAIN
 ssh username@server.domain -N -f -L {local_port}:localhost:{remote_port}
 
 # Example
-ssh root@field-tm.hotosm.org -N -f -L 5430:localhost:5433
+ssh root@field.hotosm.org -N -f -L 5430:localhost:5433
 ```
 
 This will map port 5432 on the remote machine to port 5430 on your local machine.
@@ -206,7 +200,7 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
 
 ### Debugging
 
-- Log into the production server, field-tm.hotosm.org and view the container logs:
+- Log into the production server, field.hotosm.org and view the container logs:
 
   ```bash
   docker logs field-tm-main-api-1

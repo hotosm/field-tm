@@ -31,10 +31,9 @@ really appreciate your help!
 Skills with the following would be beneficial:
 
 - Python
-- FastAPI
-- TypeScript / JavaScript
-- React
-- Docker
+- Litestar
+- HTMX / Jinja2 templates
+- Docker / Kubernetes
 - CI/CD workflows
 
 Our latest task board can be found [here][2].

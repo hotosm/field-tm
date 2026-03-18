@@ -1,9 +1,9 @@
 # Backend Deployment for Development
 
-The recommended way to run Field-TM is with Docker.
+The recommended way to run Field-TM is with Docker via the `just` commands.
 
-You can also develop on your local machine outside of Docker,
-see below.
+(if you wish to run without just, inspect the `tasks/` justfiles
+for the underlying command used).
 
 > NOTE: If you haven't yet downloaded the Repository and
 > setup your local environment, please check the docs
@@ -11,29 +11,21 @@ see below.
 
 Now let's get started :thumbsup:
 
-## 1. Start the API with Docker
+## 1. Start Field-TM with Docker
 
-The easiest way to get up and running is by using the
-Field-TM Docker deployment. Docker creates a virtual environment,
-isolated from your computer's environment, installs all necessary
-dependencies, and creates a container for each the database, the api,
-and the frontend. These containers talk to each other via the
-URLs defined in the docker-compose file and your env file.
+The easiest way to get up and running:
 
-1. You will need to
-   [Install Docker](https://docs.docker.com/engine/install/)
-   and ensure that it is running on your local machine.
-2. From the command line: navigate to the top level directory
-   of the Field-TM project.
-3. From the command line run: `docker compose pull`.
-   This will pull the latest container builds from **main** branch.
-4. Make sure you have a `.env` file with all required variables, see
-   [here](../INSTALL.md#2-create-an-env-file).
-5. Once everything is pulled, from the command line run:
-   `docker compose up -d api`
-6. If everything goes well you should now be able to
-   **navigate to the project in your browser:**
-   `http://field.localhost:7050/docs`
+```bash
+# Generate the .env config file
+just config generate-dotenv
+
+# Start all services (auth disabled for local dev)
+just start all
+```
+
+If everything goes well you should now be able to
+**navigate to the project in your browser:**
+`http://field.localhost:7050`
 
 > Note: If that link doesn't work, check the logs with
 > `docker compose logs api`.
@@ -53,27 +45,30 @@ URLs defined in the docker-compose file and your env file.
 To run the local development setup without ODK Central (use external server):
 
 ```bash
-dc --profile no-odk up -d
-
-# Or via Just
 just start without-central
 ```
 
-## 2. Start the API without Docker
+## 2. Start the backend without Docker
 
 - To run Field-TM without Docker, you will need to start the database,
-  then the API.
+  then the backend.
 - First start a Postgres database running on a port on your machine.
   - The database must have the Postgis extension installed.
-- After starting the database, from the command line:
+- Then run:
+
+```bash
+just start backend-no-docker
+```
+
+Or manually:
 
 1. Navigate to the backend directory under `src/backend`.
 2. Install `uv` [via the official docs](https://docs.astral.sh/uv/getting-started/installation/)
 3. Install backend dependencies with `uv`: `uv sync`
-4. Run the Fast API backend with:
+4. Run the Litestar backend with:
    `uv run uvicorn app.main:api --host 0.0.0.0 --port 8000`
 
-The API should now be accessible at: <http://field.localhost:7050/docs>
+The app should now be accessible at: <http://localhost:8000>
 
 ## Backend Tips
 
@@ -98,20 +93,13 @@ The API should now be accessible at: <http://field.localhost:7050/docs>
 To run the backend tests locally, run:
 
 ```bash
-docker compose -f compose.test.yaml run --rm api pytest
-
-# Or via Just
 just test backend
 ```
 
 To assess coverage of tests, run:
 
 ```bash
-docker compose run --rm --entrypoint='sh -c' api \
-  'coverage run -m pytest && coverage report -m'
-
-# Or via Just
-just test coverage
+just test backend-coverage
 ```
 
 To assess performance of endpoints:

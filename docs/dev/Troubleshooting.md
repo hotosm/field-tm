@@ -16,7 +16,7 @@
 
   ```bash
   uv run python
-  import fastapi
+  import litestar
   ```
 
 If you receive errors such as:

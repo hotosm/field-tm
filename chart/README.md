@@ -28,7 +28,7 @@ kubectl
     --from-literal=FTM_DB_NAME=xxxxxxx
   ```
 
-- **api-ftm-vars** for FastAPI
+- **api-ftm-vars** for the Field-TM backend
 
   - key: ENCRYPTION_KEY
   - key: FTM_DOMAIN

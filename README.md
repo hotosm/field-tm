@@ -21,7 +21,7 @@
 | **CI/CD** | | [![Build CI Img][badge-build-ci]][10] [![Build ODK Images][badge-build-odk]][11] <br> [![Publish Docs][badge-publish-docs]][12] [![pre-commit.ci][badge-pre-commit-ci]][13] |
 | :--- | :--- | :--- |
 | **Tech Stack** | | [![Litestar][badge-litestar]][14] [![HTMX][badge-htmx]][15] [![Postgres][badge-postgres]][16] [![Kubernetes][badge-kubernetes]][17] [![Docker][badge-docker]][18] |
-| **Code Style** | | [![Backend Style][badge-ruff]][19] [![Prettier][badge-prettier]][20] [![pre-commit][badge-pre-commit]][21] [![uv][badge-uv]][32] |
+| **Code Style** | | [![Backend Style][badge-ruff]][19] [![Oxfmt][badge-oxfmt]][20] [![pre-commit][badge-pre-commit]][21] [![uv][badge-uv]][32] |
 | **Quality** | | [![Coverage][badge-coverage]][22] [![Translation][badge-translation]][23] [![OpenSSF Best Practices][badge-openssf]][24] |
 | **Community** | | [![Slack][badge-slack]][25] [![All Contributors][badge-all-contributors]][26] |
 | **Other Info** | | [![docs][badge-docs]][27] [![dev-roadmap][badge-roadmap]][28] [![timeline][badge-timeline]][29] [![license-code][badge-license-code]][30] [![license-translations][badge-license-translations]][31] |
@@ -273,7 +273,7 @@ Thanks goes to these wonderful people:
 [17]: https://kubernetes.io "Kubernetes"
 [18]: https://www.docker.com "Docker"
 [19]: https://github.com/astral-sh/ruff "Ruff Format"
-[20]: https://prettier.io "Prettier"
+[20]: https://oxc.rs/docs/guide/usage/formatter.html "Oxfmt"
 [21]: https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev "pre-commit"
 [22]: https://docs.field.hotosm.org/coverage.html "Coverage Report"
 [23]: https://hosted.weblate.org/engage/hotosm "Weblate"
@@ -296,7 +296,7 @@ Thanks goes to these wonderful people:
 [badge-kubernetes]: https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white
 [badge-docker]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
 [badge-ruff]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235
-[badge-prettier]: https://img.shields.io/badge/code_style-prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=1A2B34
+[badge-oxfmt]: https://img.shields.io/badge/code%20style-oxfmt-F7B93E
 [badge-pre-commit]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
 [badge-coverage]: https://docs.field.hotosm.org/coverage.svg

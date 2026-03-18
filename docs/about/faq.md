@@ -346,9 +346,9 @@ into your language.
 
 ### What technologies are used in Field-TM?
 
-Field-TM is built using several technologies, including FastAPI,
-Postgres, React, Svelte, and web components. The codebase is written in
-Python & TypeScript mostly.
+Field-TM is built using Litestar (Python) with HTMX for the web UI,
+backed by PostgreSQL. The codebase is primarily Python with Jinja2
+templates for the frontend.
 
 ---
 
