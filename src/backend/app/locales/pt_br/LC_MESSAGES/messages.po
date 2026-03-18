@@ -1,4 +1,4 @@
-# French translations for Field-TM.
+# Portuguese (Brazil) translations for Field-TM.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the Field-TM project.
 # FIRST AUTHOR sam.woodcock@hotosm.org, 2026.
@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
 "POT-Creation-Date: 2026-03-18 17:44+0000\n"
-"PO-Revision-Date: 2026-03-18 15:17+0000\n"
+"PO-Revision-Date: 2026-03-18 17:42+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
-"Language: fr\n"
-"Language-Team: fr <LL@li.org>\n"
+"Language: pt_BR\n"
+"Language-Team: pt_BR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1741,10 +1741,4 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr ""
-
-#~ msgid ""
-#~ "Manager account could not be created "
-#~ "automatically. Log in to QFieldCloud as"
-#~ " admin to manage the project."
-#~ msgstr ""
 

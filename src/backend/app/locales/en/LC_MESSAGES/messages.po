@@ -1,15 +1,15 @@
 # English translations for Field-TM.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the Field-TM project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+# FIRST AUTHOR sam.woodcock@hotosm.org, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-18 17:03+0000\n"
+"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"POT-Creation-Date: 2026-03-18 17:44+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
