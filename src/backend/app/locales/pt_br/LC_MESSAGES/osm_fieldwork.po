@@ -21,64 +21,62 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "O local digitalizado para esse recurso está correto?"
+msgstr "Digitalização correta"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr "O que há de errado com a digitalização?"
+msgstr "Problema de digitalização"
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr "Você disse “Outro”. Diga-nos o que deu errado com a digitalização!"
+msgstr "Problema de digitalização (outro)"
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
 msgid "end_note"
-msgstr ""
-"Não é possível prosseguir com a aquisição de dados se o edifício não "
-"existir."
+msgstr "Nota final"
 
 #: i18n/osm_fieldwork_strings.py:13
 msgctxt "xlsform_label"
 msgid "existing"
-msgstr "Recurso existente"
+msgstr "Existente"
 
 #: i18n/osm_fieldwork_strings.py:14
 msgctxt "xlsform_label"
 msgid "feature"
-msgstr "Geometria"
+msgstr "Elemento"
 
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr "Esse recurso existe?"
+msgstr "Elemento existente"
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
 msgid "image"
-msgstr "Tire uma foto"
+msgstr "Imagem"
 
 #: i18n/osm_fieldwork_strings.py:17
 msgctxt "xlsform_label"
 msgid "lumped"
-msgstr "Agrupado - um polígono (mais de um edifício digitalizado como um só)"
+msgstr "Agrupado"
 
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr "Você quer mapear um recurso existente ou novo?"
+msgstr "Modo de mapeamento"
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
 msgid "new"
-msgstr "Novo recurso"
+msgstr "Novo"
 
 #: i18n/osm_fieldwork_strings.py:20
 msgctxt "xlsform_label"
 msgid "new_feature"
-msgstr "Por favor, desenhe uma nova geometria"
+msgstr "Novo elemento"
 
 #: i18n/osm_fieldwork_strings.py:21
 msgctxt "xlsform_label"
@@ -88,17 +86,17 @@ msgstr "Não"
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr "Qual é o seu nome de usuário OSM (se desejar ser creditado pelas edições)?"
+msgstr "Nome de usuário OSM"
 
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "other"
-msgstr "OUTROS"
+msgstr "Outro"
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "split"
-msgstr "Split - um edifício (um edifício digitalizado como mais de um polígono)"
+msgstr "Dividir"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
@@ -108,7 +106,7 @@ msgstr "Perguntas da pesquisa"
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "task"
-msgstr "Selecione sua área de tarefa"
+msgstr "Tarefa"
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"

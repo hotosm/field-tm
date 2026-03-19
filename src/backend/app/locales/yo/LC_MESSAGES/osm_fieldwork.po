@@ -22,100 +22,99 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr ""
+msgstr "Dijitaisi tó pe"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr ""
+msgstr "Ìṣòro dijitaisi"
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr ""
+msgstr "Ìṣòro dijitaisi (òmíràn)"
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
 msgid "end_note"
-msgstr ""
+msgstr "Àkíyèsí ìparí"
 
 #: i18n/osm_fieldwork_strings.py:13
 msgctxt "xlsform_label"
 msgid "existing"
-msgstr ""
+msgstr "Tó wà tẹlẹ"
 
 #: i18n/osm_fieldwork_strings.py:14
 msgctxt "xlsform_label"
 msgid "feature"
-msgstr ""
+msgstr "Ẹya"
 
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr ""
+msgstr "Ẹya náà wà"
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
 msgid "image"
-msgstr ""
+msgstr "Àwòrán"
 
 #: i18n/osm_fieldwork_strings.py:17
 msgctxt "xlsform_label"
 msgid "lumped"
-msgstr ""
+msgstr "A ti ṣọ̀kan"
 
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr ""
+msgstr "Ìpo maapu"
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
 msgid "new"
-msgstr ""
+msgstr "Tuntun"
 
 #: i18n/osm_fieldwork_strings.py:20
 msgctxt "xlsform_label"
 msgid "new_feature"
-msgstr ""
+msgstr "Ẹya tuntun"
 
 #: i18n/osm_fieldwork_strings.py:21
 msgctxt "xlsform_label"
 msgid "no"
-msgstr ""
+msgstr "Rárá"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr ""
+msgstr "Orúkọ olumulo OSM"
 
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "other"
-msgstr ""
+msgstr "Òmíràn"
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "split"
-msgstr ""
+msgstr "Pín"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "survey_questions"
-msgstr ""
+msgstr "Àwọn ìbéèrè ìwádìí"
 
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "task"
-msgstr ""
+msgstr "Iṣẹ́"
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "verification"
-msgstr ""
+msgstr "Ìmúdájú"
 
 #: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "yes"
-msgstr ""
-
+msgstr "Bẹ́ẹ̀ni"

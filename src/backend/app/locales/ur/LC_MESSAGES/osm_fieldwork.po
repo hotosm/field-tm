@@ -5,7 +5,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr ""
+msgstr "ڈیجیٹائزیشن درست ہے"
 "Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-03-19 21:38+0000\n"
@@ -22,100 +22,99 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr ""
+msgstr "ڈیجیٹائزیشن میں مسئلہ"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr ""
+msgstr "ڈیجیٹائزیشن میں مسئلہ (دیگر)"
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr ""
+msgstr "اختتامی نوٹ"
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
 msgid "end_note"
-msgstr ""
+msgstr "موجودہ"
 
 #: i18n/osm_fieldwork_strings.py:13
 msgctxt "xlsform_label"
 msgid "existing"
-msgstr ""
+msgstr "خصوصیت"
 
 #: i18n/osm_fieldwork_strings.py:14
 msgctxt "xlsform_label"
 msgid "feature"
-msgstr ""
+msgstr "خصوصیت موجود ہے"
 
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr ""
+msgstr "تصویر"
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
 msgid "image"
-msgstr ""
+msgstr "یکجا"
 
 #: i18n/osm_fieldwork_strings.py:17
 msgctxt "xlsform_label"
 msgid "lumped"
-msgstr ""
+msgstr "نقشہ سازی موڈ"
 
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr ""
+msgstr "نیا"
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
 msgid "new"
-msgstr ""
+msgstr "نئی خصوصیت"
 
 #: i18n/osm_fieldwork_strings.py:20
 msgctxt "xlsform_label"
 msgid "new_feature"
-msgstr ""
+msgstr "نہیں"
 
 #: i18n/osm_fieldwork_strings.py:21
 msgctxt "xlsform_label"
 msgid "no"
-msgstr ""
+msgstr "OSM صارف نام"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr ""
+msgstr "دیگر"
 
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "other"
-msgstr ""
+msgstr "تقسیم کریں"
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "split"
-msgstr ""
+msgstr "سروے کے سوالات"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "survey_questions"
-msgstr ""
+msgstr "کام"
 
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "task"
-msgstr ""
+msgstr "تصدیق"
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "verification"
-msgstr ""
+msgstr "ہاں"
 
 #: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "yes"
-msgstr ""
-
+msgstr "ہاں"
