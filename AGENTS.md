@@ -46,11 +46,7 @@ Older SQL snapshots live in `src/migrations/archived/` and are not the primary t
 Before non-trivial changes:
 
 1. `docs/decisions/README.md`
-2. Relevant MADR in `docs/decisions/`
-
-Most relevant current architecture decision:
-
-- `docs/decisions/0010-litestar.md`
+2. All MADR in `docs/decisions/`
 
 Note: older decisions under `docs/decisions/archived` should be ignored, and are just historical reference.
 
