@@ -1,17 +1,18 @@
-# English translations for Field-TM.
+# Yoruba translations for Field-TM OSM Fieldwork.
 # Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the Field-TM project.
+# This file is distributed under the same license as the Field-TM OSM
+# Fieldwork project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Field-TM VERSION\n"
-"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-03-19 21:38+0000\n"
-"PO-Revision-Date: 2026-03-18 15:17+0000\n"
-"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
+"PO-Revision-Date: 2026-03-19 22:03+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: yo\n"
+"Language-Team: yo <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -21,100 +22,100 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "Digitisation Correct"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr "Digitisation Problem"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr "Digitisation Problem (Other)"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
 msgid "end_note"
-msgstr "End Note"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:13
 msgctxt "xlsform_label"
 msgid "existing"
-msgstr "Existing"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:14
 msgctxt "xlsform_label"
 msgid "feature"
-msgstr "Feature"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr "Feature Exists"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
 msgid "image"
-msgstr "Image"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:17
 msgctxt "xlsform_label"
 msgid "lumped"
-msgstr "Lumped"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr "Mapping Mode"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
 msgid "new"
-msgstr "New"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:20
 msgctxt "xlsform_label"
 msgid "new_feature"
-msgstr "New Feature"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:21
 msgctxt "xlsform_label"
 msgid "no"
-msgstr "No"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr "OSM Username"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "other"
-msgstr "Other"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "split"
-msgstr "Split"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "survey_questions"
-msgstr "Survey Questions"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "task"
-msgstr "Task"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "verification"
-msgstr "Verification"
+msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "yes"
-msgstr "Yes"
+msgstr ""
 
