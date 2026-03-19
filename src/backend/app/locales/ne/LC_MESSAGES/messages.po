@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-18 17:44+0000\n"
-"PO-Revision-Date: 2026-03-18 17:41+0000\n"
-"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"PO-Revision-Date: 2026-03-18 17:03+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ne\n"
 "Language-Team: ne <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -61,8 +61,11 @@ msgstr ""
 #: app/htmx/project_detail_routes.py:100
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
+#, fuzzy
 msgid "Username:"
 msgstr ""
+"तपाईंको OSM प्रयोगकर्ता नाम के हो (यदि तपाईं सम्पादनको श्रेय पाउन "
+"चाहनुहुन्छ भने)?"
 
 #: app/htmx/project_detail_routes.py:103
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
@@ -135,16 +138,18 @@ msgid "Admin"
 msgstr ""
 
 #: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
+#, fuzzy
 msgid "Manager"
-msgstr ""
+msgstr "तस्विर लिनुहोस्"
 
 #: app/htmx/qfc_admin_routes.py:57
 msgid "Editor"
 msgstr ""
 
 #: app/htmx/qfc_admin_routes.py:58
+#, fuzzy
 msgid "Reporter"
-msgstr ""
+msgstr "अन्य"
 
 #: app/htmx/qfc_admin_routes.py:59
 msgid "Reader"
@@ -213,16 +218,18 @@ msgid "Private"
 msgstr ""
 
 #: app/htmx/qfc_admin_routes.py:259
+#, fuzzy
 msgid "Manage"
-msgstr ""
+msgstr "तस्विर लिनुहोस्"
 
 #: app/htmx/qfc_admin_routes.py:269
 msgid "Project"
 msgstr ""
 
 #: app/htmx/qfc_admin_routes.py:269
+#, fuzzy
 msgid "Owner"
-msgstr ""
+msgstr "अन्य"
 
 #: app/htmx/qfc_admin_routes.py:269
 msgid "Visibility"
@@ -230,8 +237,9 @@ msgstr ""
 
 #: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
 #: app/templates/project_details.html:58
+#, fuzzy
 msgid "Description"
-msgstr ""
+msgstr "प्रमाणीकरण"
 
 #: app/htmx/qfc_admin_routes.py:298
 msgid "Session expired. Please log in again."
@@ -286,8 +294,11 @@ msgstr ""
 #: app/templates/partials/project_details/setup_steps.html:626
 #: app/templates/partials/project_details/setup_steps.html:660
 #: app/templates/qfc_admin.html:52
+#, fuzzy
 msgid "Username"
 msgstr ""
+"तपाईंको OSM प्रयोगकर्ता नाम के हो (यदि तपाईं सम्पादनको श्रेय पाउन "
+"चाहनुहुन्छ भने)?"
 
 #: app/htmx/qfc_admin_routes.py:441
 msgid "Add Collaborator"
@@ -600,30 +611,48 @@ msgid "Create Project"
 msgstr ""
 
 #: app/templates/home.html:80
+#, fuzzy
 msgid "+ New"
+msgstr "नयाँ सुविधा"
+
+#: app/templates/home.html:86
+#, python-format
+msgid "Showing %(count)s project"
+msgid_plural "Showing %(count)s projects"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/home.html:87
+#, python-format
+msgid "in %(status)s"
 msgstr ""
 
-#: app/templates/home.html:103
+#: app/templates/home.html:88
+#, python-format
+msgid "matching \"%(query)s\""
+msgstr ""
+
+#: app/templates/home.html:104
 msgid "Private Project"
 msgstr ""
 
-#: app/templates/home.html:126 app/templates/project_details.html:33
+#: app/templates/home.html:127 app/templates/project_details.html:33
 msgid "Unnamed Project"
 msgstr ""
 
-#: app/templates/home.html:134
+#: app/templates/home.html:135
 msgid "Location:"
 msgstr ""
 
-#: app/templates/home.html:155
+#: app/templates/home.html:156
 msgid "Created:"
 msgstr ""
 
-#: app/templates/home.html:155
+#: app/templates/home.html:156
 msgid "N/A"
 msgstr ""
 
-#: app/templates/home.html:164
+#: app/templates/home.html:165
 msgid "No projects found. Create your first project to get started!"
 msgstr ""
 
@@ -676,8 +705,9 @@ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 
 #: app/templates/landing.html:533
+#, fuzzy
 msgid "Main Features"
-msgstr ""
+msgstr "ज्यामिति"
 
 #: app/templates/landing.html:536
 msgid "Flexible Data Collection"
@@ -973,17 +1003,29 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: app/templates/new_project.html:604
-msgid "A project with this name already exists. Please choose a different name."
+#: app/templates/new_project.html:177
+msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/templates/new_project.html:639
+#: app/templates/new_project.html:178
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr ""
+
+#: app/templates/new_project.html:179
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr ""
+
+#: app/templates/new_project.html:180 app/templates/new_project.html:645
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
 msgstr ""
 
-#: app/templates/new_project.html:764
+#: app/templates/new_project.html:610
+msgid "A project with this name already exists. Please choose a different name."
+msgstr ""
+
+#: app/templates/new_project.html:770
 msgid "Description is required."
 msgstr ""
 
@@ -1350,8 +1392,9 @@ msgid "Polyline"
 msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:273
+#, fuzzy
 msgid "Point"
-msgstr ""
+msgstr "विभाजन - एउटा भवन (एउटा भवन एक भन्दा बढी बहुभुजको रूपमा डिजिटाइज गरिएको)"
 
 #: app/templates/partials/project_details/setup_steps.html:286
 msgid "Use centroids"
@@ -1449,13 +1492,15 @@ msgid "Dimension (meters):"
 msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:508
+#, fuzzy
 msgid "Split Again"
-msgstr ""
+msgstr "विभाजन - एउटा भवन (एउटा भवन एक भन्दा बढी बहुभुजको रूपमा डिजिटाइज गरिएको)"
 
 #: app/templates/partials/project_details/setup_steps.html:508
 #: app/templates/partials/project_details/style_and_scripts.html:32
+#, fuzzy
 msgid "Split AOI"
-msgstr ""
+msgstr "विभाजन - एउटा भवन (एउटा भवन एक भन्दा बढी बहुभुजको रूपमा डिजिटाइज गरिएको)"
 
 #: app/templates/partials/project_details/setup_steps.html:544
 msgid "Splitting AOI into tasks... This may take a moment."
@@ -1508,8 +1553,11 @@ msgid "https://qfield.cloud"
 msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:666
+#, fuzzy
 msgid "qfield_username"
 msgstr ""
+"तपाईंको OSM प्रयोगकर्ता नाम के हो (यदि तपाईं सम्पादनको श्रेय पाउन "
+"चाहनुहुन्छ भने)?"
 
 #: app/templates/partials/project_details/setup_steps.html:678
 msgid "qfield_password"
@@ -1573,8 +1621,9 @@ msgid "points"
 msgstr ""
 
 #: app/templates/partials/project_details/style_and_scripts.html:22
+#, fuzzy
 msgid "features"
-msgstr ""
+msgstr "ज्यामिति"
 
 #: app/templates/partials/project_details/style_and_scripts.html:23
 msgid ""
@@ -1656,8 +1705,9 @@ msgid "Please fill in all fields."
 msgstr ""
 
 #: app/templates/partials/project_details/style_and_scripts.html:44
+#, fuzzy
 msgid "Testing..."
-msgstr ""
+msgstr "अवस्थित सुविधा"
 
 #: app/templates/partials/project_details/style_and_scripts.html:45
 msgid "Testing credentials..."

@@ -1,15 +1,15 @@
 # French translations for Field-TM.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the Field-TM project.
-# FIRST AUTHOR sam.woodcock@hotosm.org, 2026.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
-"Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-18 17:44+0000\n"
-"PO-Revision-Date: 2026-03-18 15:17+0000\n"
-"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"PO-Revision-Date: 2026-03-18 17:56+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -603,27 +603,44 @@ msgstr ""
 msgid "+ New"
 msgstr ""
 
-#: app/templates/home.html:103
+#: app/templates/home.html:86
+#, python-format
+msgid "Showing %(count)s project"
+msgid_plural "Showing %(count)s projects"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/home.html:87
+#, python-format
+msgid "in %(status)s"
+msgstr ""
+
+#: app/templates/home.html:88
+#, python-format
+msgid "matching \"%(query)s\""
+msgstr ""
+
+#: app/templates/home.html:104
 msgid "Private Project"
 msgstr ""
 
-#: app/templates/home.html:126 app/templates/project_details.html:33
+#: app/templates/home.html:127 app/templates/project_details.html:33
 msgid "Unnamed Project"
 msgstr ""
 
-#: app/templates/home.html:134
+#: app/templates/home.html:135
 msgid "Location:"
 msgstr ""
 
-#: app/templates/home.html:155
+#: app/templates/home.html:156
 msgid "Created:"
 msgstr ""
 
-#: app/templates/home.html:155
+#: app/templates/home.html:156
 msgid "N/A"
 msgstr ""
 
-#: app/templates/home.html:164
+#: app/templates/home.html:165
 msgid "No projects found. Create your first project to get started!"
 msgstr ""
 
@@ -973,17 +990,29 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: app/templates/new_project.html:604
-msgid "A project with this name already exists. Please choose a different name."
+#: app/templates/new_project.html:177
+msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/templates/new_project.html:639
+#: app/templates/new_project.html:178
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr ""
+
+#: app/templates/new_project.html:179
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr ""
+
+#: app/templates/new_project.html:180 app/templates/new_project.html:645
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
 msgstr ""
 
-#: app/templates/new_project.html:764
+#: app/templates/new_project.html:610
+msgid "A project with this name already exists. Please choose a different name."
+msgstr ""
+
+#: app/templates/new_project.html:770
 msgid "Description is required."
 msgstr ""
 
@@ -1741,10 +1770,4 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr ""
-
-#~ msgid ""
-#~ "Manager account could not be created "
-#~ "automatically. Log in to QFieldCloud as"
-#~ " admin to manage the project."
-#~ msgstr ""
 

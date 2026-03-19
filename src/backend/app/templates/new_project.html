@@ -173,6 +173,12 @@ block content %}
 </div>
 
 <script type="module">
+  const I18N = {
+    somethingWentWrong: {{ _("Something went wrong. Please try again.")|tojson }},
+    invalidGeoJSONFormat: {{ _("Invalid GeoJSON format. Please check your file.")|tojson }},
+    invalidGeoJSONFile: {{ _("Invalid GeoJSON file. Please check the file format.")|tojson }},
+    mustDrawAOI: {{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.")|tojson }},
+  };
   const form = document.getElementById("create-project-form");
   const errorContainer = document.getElementById("form-error");
   const errorMessageEl = document.getElementById("form-error-message");
@@ -190,7 +196,7 @@ block content %}
 
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;
-    errorMessageEl.textContent = message || "Something went wrong. Please try again.";
+    errorMessageEl.textContent = message || I18N.somethingWentWrong;
     errorContainer.style.display = "block";
   }
 
@@ -467,7 +473,7 @@ block content %}
       updateGeoJSON();
     } catch (error) {
       console.error("Error loading GeoJSON:", error);
-      showError("Invalid GeoJSON format. Please check your file.");
+      showError(I18N.invalidGeoJSONFormat);
     }
   }
 
@@ -561,7 +567,7 @@ block content %}
         }
       } catch (error) {
         console.error("Error processing GeoJSON:", error);
-        const errorMsg = error.message || "Invalid GeoJSON file. Please check the file format.";
+        const errorMsg = error.message || I18N.invalidGeoJSONFile;
         const mapError = document.getElementById("map-error");
         if (mapError) {
           mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
@@ -793,8 +799,7 @@ block content %}
         e.preventDefault();
         e.stopPropagation();
         const mapError = document.getElementById("map-error");
-        const errorMsg =
-          "You must draw or upload an Area of Interest (AOI) on the map before submitting.";
+        const errorMsg = I18N.mustDrawAOI;
         if (mapError) {
           mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
         }

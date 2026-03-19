@@ -1,15 +1,14 @@
-"""Translations for XLSForm fields."""
+"""gettext-backed translations for XLSForm field labels."""
 
-import json
-from pathlib import Path
+import gettext
 import re
+from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
-# Load translation JSON files as dictionaries
-def _load_translations(file_name):
-    path = Path(__file__).parent / file_name
-    with path.open(encoding="utf-8") as f:
-        return json.load(f)
+DOMAIN = "osm_fieldwork"
+LOCALE_DIR = Path(__file__).parent / "locales"
+DEFAULT_LANGUAGE_CODE = "en"
 
 INCLUDED_LANGUAGES = {
     "english": "en",
@@ -18,12 +17,44 @@ INCLUDED_LANGUAGES = {
     "italian": "it",
     "swahili": "sw",
     "nepali": "ne",
-    "portuguese": "pt-BR",
+    "portuguese": "pt_br",
     "czech": "cs",
     "japanese": "ja",
 }
 
-translations = {f"{key}({value})": _load_translations(f"{value}.json") for key, value in INCLUDED_LANGUAGES.items()}
+
+def _normalize_language_code(language_code: str) -> str:
+    normalized = language_code.replace("-", "_")
+    if "_" not in normalized:
+        return normalized.lower()
+    language, territory = normalized.split("_", maxsplit=1)
+    return f"{language.lower()}_{territory.upper()}"
+
+
+@lru_cache(maxsize=None)
+def _get_translations(language_code: str) -> gettext.NullTranslations:
+    return gettext.translation(
+        DOMAIN,
+        localedir=str(LOCALE_DIR),
+        languages=[_normalize_language_code(language_code)],
+        fallback=True,
+    )
+
+
+def _translate_label(field_name: str, language_code: str) -> str | None:
+    translation = _get_translations(language_code).pgettext("xlsform_label", field_name)
+    if translation != field_name:
+        return translation
+
+    if language_code == DEFAULT_LANGUAGE_CODE:
+        return None
+
+    fallback_translation = _get_translations(DEFAULT_LANGUAGE_CODE).pgettext(
+        "xlsform_label",
+        field_name,
+    )
+    return fallback_translation if fallback_translation != field_name else None
+
 
 def _invalid_translation_languages(label_cols: list[str]) -> list[str]:
     """Return unsupported language names declared in label columns."""
@@ -51,21 +82,21 @@ def _unwrap_field_name(field_name):
 
 def _add_default_english_label(base: dict, field_name: str) -> dict:
     """Populate the plain `label` column from the English translation table."""
-    label_value = translations.get("english(en)", {}).get(field_name)
+    label_value = _translate_label(field_name, DEFAULT_LANGUAGE_CODE)
     if label_value:
         base["label"] = label_value
     return base
 
 
-def _translation_key_for_column(col: str) -> str | None:
-    """Resolve the translation table key for a label column."""
+def _translation_key_for_column(col: str) -> tuple[str, str] | None:
+    """Resolve the language key and code for a label column."""
     match = re.match(r"label::([^(]+)(?:\(([^)]+)\))?", col)
     if not match:
         return None
 
     lang_key = match.group(1).strip().lower()
     lang_code = match.group(2) or INCLUDED_LANGUAGES.get(lang_key)
-    return f"{lang_key}({lang_code})" if lang_code else lang_key
+    return (lang_key, lang_code) if lang_code else None
 
 
 def _add_requested_label_columns(
@@ -78,11 +109,12 @@ def _add_requested_label_columns(
         if not col.startswith("label::"):
             continue
 
-        trans_key = _translation_key_for_column(col)
-        if not trans_key:
+        translation_spec = _translation_key_for_column(col)
+        if not translation_spec:
             continue
 
-        label_value = translations.get(trans_key, {}).get(field_name)
+        _, lang_code = translation_spec
+        label_value = _translate_label(field_name, lang_code)
         if label_value:
             base[col] = label_value
     return base
@@ -90,10 +122,10 @@ def _add_requested_label_columns(
 
 def _add_all_label_columns(base: dict, field_name: str) -> dict:
     """Populate translated labels for every included language."""
-    for lang_key, lang_dict in translations.items():
-        label_value = lang_dict.get(field_name)
+    for lang_key, lang_code in INCLUDED_LANGUAGES.items():
+        label_value = _translate_label(field_name, lang_code)
         if label_value:
-            base[f"label::{lang_key}"] = label_value
+            base[f"label::{lang_key}({lang_code})"] = label_value
     return base
 
 
@@ -105,7 +137,9 @@ def add_label_translations(base: dict, label_cols: Optional[list[str]] = None) -
     invalid_langs = _invalid_translation_languages(label_cols)
 
     if invalid_langs:
-        raise ValueError(f"Invalid or unsupported translation(s): {', '.join(invalid_langs)}")
+        raise ValueError(
+            f"Invalid or unsupported translation(s): {', '.join(invalid_langs)}"
+        )
 
     if not isinstance(field_name, str):
         return base

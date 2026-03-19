@@ -52,6 +52,7 @@ repos:
     hooks:
       - id: codespell
         types: [text]
+        exclude: ^src/backend/app/locales/.*\.po$
         args: [--toml, src/backend/pyproject.toml]
 
   # # Spelling: Checks for common misspellings in text files.

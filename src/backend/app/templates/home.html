@@ -82,9 +82,10 @@
     </div>
 
     <p class="ftm-projects-results">
-      Showing {{ projects|length }} project{% if projects|length != 1 %}s{% endif %}{% if
-      selected_status %} in {{ selected_status|lower|title }}{% endif %}{% if search_query %}
-      matching "{{ search_query }}"{% endif %}
+      {% set count = projects|length %}
+      {% trans count %}Showing {{ count }} project{% pluralize %}Showing {{ count }} projects{% endtrans %}{% if
+      selected_status %} {{ _("in %(status)s", status=selected_status|lower|title) }}{% endif %}{% if search_query %}
+      {{ _('matching "%(query)s"', query=search_query) }}{% endif %}
     </p>
   </div>
 
