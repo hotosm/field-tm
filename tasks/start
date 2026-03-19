@@ -109,7 +109,7 @@ backend:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  {{docker}} compose up -d api
+  {{docker}} compose up -d backend
 
 # Start backend API without docker
 [no-cd]

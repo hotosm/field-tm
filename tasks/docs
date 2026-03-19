@@ -12,7 +12,7 @@ openapi:
   # Ensure a .env file is present
   just config generate-dotenv
 
-  # Ensure api image is built
+  # Ensure backend image is built
   just build backend
 
   cd {{justfile_directory()}}
@@ -21,7 +21,7 @@ openapi:
   OSM_CLIENT_ID="x" \
   OSM_CLIENT_SECRET="y" \
   OSM_SECRET_KEY="z" \
-  docker compose run --rm --entrypoint python api -c \
+  docker compose run --rm --entrypoint python backend -c \
     "import json; from app.main import api; print(json.dumps(api.openapi_schema.to_schema(), separators=(',', ':')))" \
     > docs/openapi/openapi.json
   docker compose down

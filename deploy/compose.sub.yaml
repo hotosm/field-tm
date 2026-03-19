@@ -87,10 +87,10 @@ services:
       EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
       # USE_LETS_ENCRYPT_STAGING: yes
       SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}
-      ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://backend:8000
       ${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       # CORS for the backend is configured by FastAPI
-      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://api:8000
+      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://backend:8000
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
@@ -104,7 +104,7 @@ services:
     image: "docker.io/4km3/dnsmasq:2.90-r3"
     depends_on:
       # Must start after all containers are created and allocated IP addresses
-      api:
+      backend:
         condition: service_healthy
     command: [
         "-k", # keep in foreground
@@ -131,7 +131,7 @@ services:
       timeout: 5s
       retries: 10
 
-  api:
+  backend:
     image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH}"
     volumes:
       - ftm_logs:/opt/logs

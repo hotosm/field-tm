@@ -1,7 +1,7 @@
 """Create a test QField buildings project via the external JSON API.
 
-Run inside the api container:
-    docker compose exec -T api python3 - < tasks/scripts/create_qfield_test_project.py
+Run inside the backend container:
+    docker compose exec -T backend python3 - < tasks/scripts/create_qfield_test_project.py
 
 The script:
   1. Ensures a local admin user + API key exist (via direct DB access).

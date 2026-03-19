@@ -38,14 +38,14 @@ backend:
   # cache_from:
   #   - type=registry,ref=ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}
   #   - type=gha
-  COMPOSE_BAKE=true {{docker}} compose build api
+  COMPOSE_BAKE=true {{docker}} compose build backend
 
 # Build backend development server container
 [no-cd]
 backend-dev:
   COMPOSE_BAKE=true \
   TARGET_OVERRIDE=prod TAG_OVERRIDE=dev \
-    {{docker}} compose build --build-arg MONITORING=yes api
+    {{docker}} compose build --build-arg MONITORING=yes backend
 
 # Set 'dc' alias for docker compose
 alias:

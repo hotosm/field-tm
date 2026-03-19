@@ -33,7 +33,7 @@ backend:
   just build backend
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
-  docker compose -f compose.test.yaml run --rm api pytest
+  docker compose -f compose.test.yaml run --rm backend pytest
   docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Cleanup orphan backend tests
@@ -41,14 +41,14 @@ backend:
 backend-cleanup:
   docker compose -f compose.test.yaml down -v --remove-orphans
 
-# Test backend API only
+# Test backend routes only
 [no-cd]
-api:
+backend-routes:
   just stop all
   docker compose -f compose.test.yaml down -v --remove-orphans
-  # Start all service and ensure API has finish init process
+  # Start all service and ensure backend has finish init process
   docker compose -f compose.test.yaml up --detach
-  docker compose -f compose.test.yaml run --rm api pytest tests
+  docker compose -f compose.test.yaml run --rm backend pytest tests
   docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Test osm-fieldwork package only
@@ -58,7 +58,7 @@ osm-fieldwork:
   docker compose -f compose.test.yaml down -v --remove-orphans
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
-  docker compose -f compose.test.yaml run --rm api pytest package_tests/test_osm_fieldwork
+  docker compose -f compose.test.yaml run --rm backend pytest package_tests/test_osm_fieldwork
   docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Test area-splitter package only
@@ -68,7 +68,7 @@ area-splitter:
   docker compose -f compose.test.yaml down -v --remove-orphans
   # Start all service and ensure API has finish init process
   docker compose -f compose.test.yaml up --detach
-  docker compose -f compose.test.yaml run --rm api pytest package_tests/test_area_splitter
+  docker compose -f compose.test.yaml run --rm backend pytest package_tests/test_area_splitter
   docker compose -f compose.test.yaml down -v --remove-orphans
 
 # Copy prod data into current database (WARNING: deletes local db data)
@@ -201,21 +201,21 @@ odk-collect:
   # Ensure Central DOMAIN always matches the current public tunnel host.
   just start _restart-central-with-tunnel-domain "${odk_tunnel_url}"
 
-  # Restart API with tunnel URL set. FTM_CENTRAL_DOMAIN is passed so Compose
+  # Restart backend with tunnel URL set. FTM_CENTRAL_DOMAIN is passed so Compose
   # evaluates central's config identically to the running container and skips it.
   FTM_CENTRAL_DOMAIN="${central_domain}" \
   ODK_CENTRAL_PUBLIC_URL="${odk_tunnel_url}" \
   docker compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
-    up -d --wait --force-recreate api
+    up -d --wait --force-recreate backend
 
   # Create a test buildings project using the service layer inside the container.
   # The script is passed via stdin to avoid justfile heredoc indentation issues.
   echo "Creating ODK test project..."
   docker compose exec -T \
     -e ODK_CENTRAL_TUNNEL_URL="${odk_tunnel_url}" \
-    api python3 - < tasks/scripts/create_test_project.py
+    backend python3 - < tasks/scripts/create_test_project.py
 
 # Backward-compatible alias for ODK Central mobile testing workflow
 [no-cd]
@@ -236,7 +236,7 @@ qfield:
 
   # Create a test QField buildings project using the service layer inside the container.
   echo "Creating QField test project..."
-  docker compose exec -T api python3 - < tasks/scripts/create_qfield_test_project.py
+  docker compose exec -T backend python3 - < tasks/scripts/create_qfield_test_project.py
 
 # Run load test on backend API (e.g. just test load projects/62/minimal)
 [no-cd]
@@ -264,7 +264,7 @@ backend-coverage:
   docker compose -f compose.test.yaml run \
     --name backend-coverage-run \
     --entrypoint="sh -c" \
-    api \
+    backend \
     "coverage run -m pytest \
       && coverage report && coverage html \
       && coverage-badge -o coverage.svg"

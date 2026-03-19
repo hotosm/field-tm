@@ -203,10 +203,10 @@ docker compose -f deploy/compose.$GIT_BRANCH.yaml up -d
 - Log into the production server, field.hotosm.org and view the container logs:
 
   ```bash
-  docker logs field-tm-main-api-1
-  docker logs field-tm-main-api-2
-  docker logs field-tm-main-api-3
-  docker logs field-tm-main-api-4
+  docker logs field-tm-main-backend-1
+  docker logs field-tm-main-backend-2
+  docker logs field-tm-main-backend-3
+  docker logs field-tm-main-backend-4
   ```
 
   > Note there are four replica containers running, and any one of them

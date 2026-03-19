@@ -28,7 +28,7 @@ If everything goes well you should now be able to
 `http://field.localhost:7050`
 
 > Note: If that link doesn't work, check the logs with
-> `docker compose logs api`.
+> `docker compose logs backend`.
 > Note: the database host `fieldtm-db` is automatically
 > resolved by docker compose to the database container IP.
 
@@ -117,7 +117,7 @@ To assess performance of endpoints:
   during local development with `compose.yaml`.
 - If you modify the code in the package, the container must be restarted
   to reflect this:
-  `docker compose restart api`
+  `docker compose restart backend`
 
 ### Accessing S3 Files use s3fs
 

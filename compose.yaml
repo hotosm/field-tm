@@ -156,7 +156,7 @@ services:
       USE_BROTLI: yes
       # Reverse proxy configs
       SERVER_NAME: field.localhost odk.field.localhost qfield.field.localhost mail.field.localhost
-      field.localhost_REVERSE_PROXY_HOST: http://api:8000
+      field.localhost_REVERSE_PROXY_HOST: http://backend:8000
       field.localhost_MAX_CLIENT_SIZE: 1G
       field.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       # Increase timeout slightly for long project creation requests
@@ -206,7 +206,7 @@ services:
         ipv4_address: 10.20.30.50
     restart: "unless-stopped"
 
-  api:
+  backend:
     image: "ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}"
     build:
       context: src
@@ -214,7 +214,7 @@ services:
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
     # Uncomment these to debug with a terminal debugger like pdb
-    # Then `docker attach field_tm_api` to debug
+    # Then `docker attach field_tm_backend` to debug
     # stdin_open: true
     # tty: true
     volumes:
