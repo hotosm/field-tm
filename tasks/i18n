@@ -25,28 +25,28 @@ default:
 init LOCALE:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel init -i app/locales/messages.pot -d app/locales -l {{LOCALE}}
+  uv run --group dev pybabel init -D field_tm -i app/locales/field_tm.pot -d app/locales -l {{LOCALE}}
   uv run --group dev pybabel init -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales -l {{LOCALE}}
 
 # Extract translatable strings from templates and Python source into gettext templates
 extract:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/messages.pot --project="Field-TM" .
+  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/field_tm.pot --project="Field-TM" .
   uv run --group dev pybabel extract -k pgettext:1c,2 -o app/locales/osm_fieldwork.pot --project="Field-TM OSM Fieldwork" i18n/osm_fieldwork_strings.py
 
 # Update existing .po files after re-extraction
 update:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel update -i app/locales/messages.pot -d app/locales
+  uv run --group dev pybabel update -D field_tm -i app/locales/field_tm.pot -d app/locales
   uv run --group dev pybabel update -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales
 
 # Compile .po files into .mo files for runtime use
 compile:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel compile -d app/locales
+  uv run --group dev pybabel compile -D field_tm -d app/locales
   uv run --group dev pybabel compile -D osm_fieldwork -d app/locales
 
 # Export compiled osm-fieldwork gettext catalogs into the package locale tree

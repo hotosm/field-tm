@@ -20,7 +20,7 @@ from litestar.types import ASGIApp, Message, Receive, Scope, Send
 log = logging.getLogger(__name__)
 
 LOCALE_DIR = Path(__file__).parent / "locales"
-DOMAIN = "messages"
+DOMAIN = "field_tm"
 SUPPORTED_LOCALES = ["en", "fr", "es", "sw"]
 DEFAULT_LOCALE = "en"
 
