@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"POT-Creation-Date: 2026-03-20 00:12+0000\n"
 "PO-Revision-Date: 2026-03-18 17:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -663,7 +663,8 @@ msgid "Search projects…"
 msgstr "Rechercher des projets…"
 
 #: app/templates/home.html:79 app/templates/landing.html:565
-#: app/templates/layout.html:220 app/templates/new_project.html:167
+#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "Créer un projet"
 
@@ -715,10 +716,6 @@ msgstr "Aucun projet trouvé. Créez votre premier projet pour commencer !"
 #: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
 msgstr "Coordonner les campagnes de terrain"
-
-#: app/templates/landing.html:558
-msgid "FIELD - TASKING MANAGER"
-msgstr "GESTIONNAIRE DE TÂCHES TERRAIN"
 
 #: app/templates/landing.html:560
 msgid ""
@@ -1213,7 +1210,7 @@ msgstr ""
 "Le projet que vous recherchez n'existe pas ou vous n'avez pas la "
 "permission de le consulter."
 
-#: app/templates/qfc_admin.html:15
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
 msgid "QFieldCloud Admin"
 msgstr "Administration QFieldCloud"
 
@@ -1937,4 +1934,3 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Accepter les choix de tâches"
-

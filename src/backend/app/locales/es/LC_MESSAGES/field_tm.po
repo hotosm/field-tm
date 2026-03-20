@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"POT-Creation-Date: 2026-03-20 00:12+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -661,7 +661,8 @@ msgid "Search projects…"
 msgstr "Buscar proyectos…"
 
 #: app/templates/home.html:79 app/templates/landing.html:565
-#: app/templates/layout.html:220 app/templates/new_project.html:167
+#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "Crear proyecto"
 
@@ -713,10 +714,6 @@ msgstr "No se encontraron proyectos. ¡Cree su primer proyecto para comenzar!"
 #: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
 msgstr "Coordinar campañas de campo"
-
-#: app/templates/landing.html:558
-msgid "FIELD - TASKING MANAGER"
-msgstr "GESTOR DE TAREAS DE CAMPO"
 
 #: app/templates/landing.html:560
 msgid ""
@@ -1198,7 +1195,7 @@ msgid ""
 "        it."
 msgstr "El proyecto que busca no existe o no tiene permiso para verlo."
 
-#: app/templates/qfc_admin.html:15
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
 msgid "QFieldCloud Admin"
 msgstr "Administración QFieldCloud"
 
@@ -1919,4 +1916,3 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Aceptar elecciones de tareas"
-

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"POT-Creation-Date: 2026-03-20 00:12+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -647,7 +647,8 @@ msgid "Search projects…"
 msgstr "Hledat projekty…"
 
 #: app/templates/home.html:79 app/templates/landing.html:565
-#: app/templates/layout.html:220 app/templates/new_project.html:167
+#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "Vytvořit projekt"
 
@@ -700,10 +701,6 @@ msgstr "Nebyly nalezeny žádné projekty. Začněte vytvořením svého prvníh
 #: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
 msgstr "Koordinace terénních kampaní"
-
-#: app/templates/landing.html:558
-msgid "FIELD - TASKING MANAGER"
-msgstr "FIELD - TASKING MANAGER"
 
 #: app/templates/landing.html:560
 msgid ""
@@ -1173,7 +1170,7 @@ msgid ""
 "        it."
 msgstr "Projekt, který hledáte, neexistuje nebo nemáte oprávnění jej zobrazit."
 
-#: app/templates/qfc_admin.html:15
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
 msgid "QFieldCloud Admin"
 msgstr "Správa QFieldCloud"
 
@@ -1883,4 +1880,3 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Přijmout volby úkolů"
-

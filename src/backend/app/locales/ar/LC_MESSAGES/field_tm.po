@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"POT-Creation-Date: 2026-03-20 00:12+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ar\n"
@@ -638,7 +638,8 @@ msgid "Search projects…"
 msgstr "ابحث في المشاريع…"
 
 #: app/templates/home.html:79 app/templates/landing.html:565
-#: app/templates/layout.html:220 app/templates/new_project.html:167
+#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "إنشاء مشروع"
 
@@ -694,10 +695,6 @@ msgstr "لم يتم العثور على مشاريع. أنشئ مشروعك ال
 #: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
 msgstr "نسّق الحملات الميدانية"
-
-#: app/templates/landing.html:558
-msgid "FIELD - TASKING MANAGER"
-msgstr "مدير المهام الميدانية"
 
 #: app/templates/landing.html:560
 msgid ""
@@ -1157,7 +1154,7 @@ msgid ""
 "        it."
 msgstr "المشروع الذي تبحث عنه غير موجود أو لا تملك صلاحية عرضه."
 
-#: app/templates/qfc_admin.html:15
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
 msgid "QFieldCloud Admin"
 msgstr "إدارة QFieldCloud"
 
@@ -1851,4 +1848,3 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "قبول خيارات المهام"
-

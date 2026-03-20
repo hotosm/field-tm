@@ -387,6 +387,8 @@ def test_landing_template_renders_locale_selector():
     assert 'data-locale-switch="pt_br"' in rendered
     assert "<wa-dropdown>" in rendered
     assert "landing-footer-social" in rendered
+    assert "Field Tasking Manager" in rendered
+    assert "FIELD TASKING MANAGER" not in rendered
 
 
 def test_project_listing_template_compiles():
