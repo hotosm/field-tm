@@ -253,7 +253,8 @@ extra_head %}
 
   .landing-user-steps {
     margin: 6px 0 0 0;
-    padding: 0 0 0 20px;
+    padding: 0;
+    padding-inline-start: 20px;
     color: var(--landing-muted);
     line-height: 1.7;
   }
@@ -303,7 +304,7 @@ extra_head %}
   .landing-use-case-item summary::after {
     content: "+";
     position: absolute;
-    right: 16px;
+    inset-inline-end: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--landing-brand-red);
@@ -424,7 +425,7 @@ extra_head %}
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-left: 8px;
+    margin-inline-start: 8px;
   }
 
   .landing-footer-locale-label {
@@ -469,7 +470,7 @@ extra_head %}
     color: var(--ftm-text);
     font: inherit;
     font-size: 0.9rem;
-    text-align: left;
+    text-align: start;
     cursor: pointer;
   }
 

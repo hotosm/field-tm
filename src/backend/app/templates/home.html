@@ -22,20 +22,19 @@
           ('ARCHIVED', _('Archived')),
         ] %}
         <div class="ftm-filters-collapsible">
-          <label class="ftm-projects-filter" for="projects-status-filter">
+          <div class="ftm-projects-filter">
             <span class="ftm-projects-filter__label">{{ _("Project Status") }}</span>
-            <select
+            <wa-select
               id="projects-status-filter"
               name="status"
-              class="ftm-projects-filter__select"
-              onchange="this.form.submit()"
+              size="small"
+              value="{{ selected_status or '' }}"
             >
               {% for val, label in status_options %}
-              {% set is_sel = (val and selected_status == val) or (not val and not selected_status) %}
-              <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
+              <wa-option value="{{ val }}">{{ label }}</wa-option>
               {% endfor %}
-            </select>
-          </label>
+            </wa-select>
+          </div>
         </div>
 
         {% set sort_options = [
@@ -44,20 +43,19 @@
           ('name_asc', _('Name (A-Z)')),
           ('name_desc', _('Name (Z-A)')),
         ] %}
-        <label class="ftm-projects-filter" for="projects-sort-filter">
+        <div class="ftm-projects-filter">
           <span class="ftm-projects-filter__label">{{ _("Sort By") }}</span>
-          <select
+          <wa-select
             id="projects-sort-filter"
             name="sort"
-            class="ftm-projects-filter__select"
-            onchange="this.form.submit()"
+            size="small"
+            value="{{ selected_sort or 'newest' }}"
           >
             {% for val, label in sort_options %}
-            {% set is_sel = selected_sort == val %}
-            <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
+            <wa-option value="{{ val }}">{{ label }}</wa-option>
             {% endfor %}
-          </select>
-        </label>
+          </wa-select>
+        </div>
 
         <div class="ftm-projects-filter ftm-projects-filter--search">
           <span class="ftm-projects-filter__label">{{ _("Search") }}</span>
@@ -84,8 +82,8 @@
     <p class="ftm-projects-results">
       {% set count = projects|length %}
       {% trans count %}Showing {{ count }} project{% pluralize %}Showing {{ count }} projects{% endtrans %}{% if
-      selected_status %} {{ _("in %(status)s", status=selected_status|lower|title) }}{% endif %}{% if search_query %}
-      {{ _('matching "%(query)s"', query=search_query) }}{% endif %}
+      selected_status %} {{ _("in %(status)s") % {"status": selected_status|lower|title} }}{% endif %}{% if search_query %}
+      {{ _('matching "%(query)s"') % {"query": search_query} }}{% endif %}
     </p>
   </div>
 
@@ -183,6 +181,14 @@
     // Clear and re-submit when the built-in clear button is clicked
     waInput.addEventListener("wa-clear", function () {
       waInput.value = "";
+      form.submit();
+    });
+
+    // Submit when wa-select filters change (event is "change", not "wa-change")
+    document.getElementById("projects-status-filter").addEventListener("change", function () {
+      form.submit();
+    });
+    document.getElementById("projects-sort-filter").addEventListener("change", function () {
       form.submit();
     });
 

@@ -36,6 +36,7 @@ from app.i18n import (
     SUPPORTED_LOCALES,
     _,
     create_locale_cookie_middleware,
+    get_current_dir,
     get_current_locale,
     gettext_func,
     ngettext_func,
@@ -300,6 +301,7 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
     engine.engine.add_extension("jinja2.ext.i18n")
     engine.engine.install_gettext_callables(gettext_func, ngettext_func)
     engine.engine.globals["current_locale"] = get_current_locale
+    engine.engine.globals["current_dir"] = get_current_dir
     engine.engine.globals["supported_locales"] = SUPPORTED_LOCALES
     engine.engine.globals["locale_labels"] = LOCALE_LABELS
 

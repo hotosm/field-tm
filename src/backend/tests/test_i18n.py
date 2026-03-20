@@ -2,7 +2,14 @@
 
 from types import SimpleNamespace
 
-from app.i18n import DEFAULT_LOCALE, get_preferred_locale, resolve_locale
+from app.i18n import (
+    DEFAULT_LOCALE,
+    RTL_LOCALES,
+    _current_locale,
+    get_current_dir,
+    get_preferred_locale,
+    resolve_locale,
+)
 
 
 def make_request(
@@ -54,3 +61,31 @@ def test_resolve_locale_falls_back_to_english_for_unsupported_browser_locale():
     request = make_request(headers={"Accept-Language": "de-DE,de;q=0.9"})
 
     assert resolve_locale(request) == DEFAULT_LOCALE
+
+
+def test_get_current_dir_returns_rtl_for_arabic():
+    """Arabic locale should produce dir='rtl'."""
+    token = _current_locale.set("ar")
+    try:
+        assert get_current_dir() == "rtl"
+    finally:
+        _current_locale.reset(token)
+
+
+def test_get_current_dir_returns_ltr_for_english():
+    """English locale should produce dir='ltr'."""
+    token = _current_locale.set("en")
+    try:
+        assert get_current_dir() == "ltr"
+    finally:
+        _current_locale.reset(token)
+
+
+def test_rtl_locales_are_subset_of_supported():
+    """All RTL locales must be in the supported locales list."""
+    from app.i18n import SUPPORTED_LOCALES
+
+    for locale in RTL_LOCALES:
+        assert locale in SUPPORTED_LOCALES, (
+            f"{locale} is RTL but not in SUPPORTED_LOCALES"
+        )

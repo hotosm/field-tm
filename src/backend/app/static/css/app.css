@@ -56,8 +56,7 @@ body {
   background-color: white;
   min-height: calc(100vh - 60px);
   padding-top: 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding-inline: 0;
 }
 
 /* --- Page header ------------------------------------------ */
@@ -103,7 +102,7 @@ body {
   gap: 0.375rem;
   flex: 0 0 auto;
   min-width: 0;
-  width: 7.5rem;
+  width: 11.25rem;
 }
 
 .ftm-projects-filter--search {
@@ -144,14 +143,8 @@ body {
 
 .ftm-projects-toolbar > .ftm-create-btn {
   flex: 0 0 auto;
-  margin-left: 1rem;
+  margin-inline-start: 1rem;
   white-space: nowrap;
-}
-
-.ftm-projects-filter__select:focus {
-  outline: 2px solid color-mix(in oklab, var(--ftm-brand) 16%, transparent);
-  outline-offset: 1px;
-  border-color: color-mix(in oklab, var(--ftm-brand) 35%, white);
 }
 
 .ftm-projects-results {
@@ -450,7 +443,7 @@ body {
     display: none;
     position: absolute;
     top: calc(100% + 0.25rem);
-    left: 0;
+    inset-inline-start: 0;
     z-index: 20;
     background: white;
     border: 1px solid var(--ftm-border);
@@ -490,7 +483,7 @@ body {
   }
 
   .ftm-projects-toolbar > .ftm-create-btn {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 }
 
@@ -636,12 +629,12 @@ body {
 
 .ftm-step--pending {
   background-color: var(--ftm-bg-muted);
-  border-left: 4px solid var(--ftm-brand);
+  border-inline-start: 4px solid var(--ftm-brand);
 }
 
 .ftm-step--complete {
   background-color: var(--ftm-bg-success);
-  border-left: 4px solid var(--ftm-color-success);
+  border-inline-start: 4px solid var(--ftm-color-success);
 }
 
 .ftm-step__header {
@@ -660,7 +653,7 @@ body {
 
 .ftm-step__check {
   color: var(--ftm-color-success);
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 
 .ftm-step__description {
@@ -1037,7 +1030,7 @@ body {
 /* --- Private badge ---------------------------------------- */
 .ftm-private-icon {
   color: var(--ftm-brand);
-  margin-left: 4px;
+  margin-inline-start: 4px;
 }
 
 /* --- Link styles ----------------------------------------- */
@@ -1059,7 +1052,7 @@ body {
 }
 
 .ftm-qfc-table th {
-  text-align: left;
+  text-align: start;
   padding: 0.625rem 0.75rem;
   font-weight: var(--hot-font-weight-semibold);
   color: var(--ftm-text-muted);

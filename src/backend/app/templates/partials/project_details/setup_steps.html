@@ -202,7 +202,11 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
         style="min-width: 200px; position: relative"
       >
         <span id="download-btn-text">{{ _("Download OSM Data") }}</span>
-        <span id="download-spinner" class="htmx-indicator" style="display: none; margin-left: 8px">
+        <span
+          id="download-spinner"
+          class="htmx-indicator"
+          style="display: none; margin-inline-start: 8px"
+        >
           <svg
             class="ftm-spinner"
             viewBox="0 0 24 24"
@@ -420,7 +424,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
                 type="checkbox"
                 id="split-include-roads-checkbox"
                 checked
-                style="margin-right: 8px; cursor: pointer"
+                style="margin-inline-end: 8px; cursor: pointer"
               />
               {{ _("Include roads") }}
             </label>
@@ -429,7 +433,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
                 type="checkbox"
                 id="split-include-rivers-checkbox"
                 checked
-                style="margin-right: 8px; cursor: pointer"
+                style="margin-inline-end: 8px; cursor: pointer"
               />
               {{ _("Include rivers") }}
             </label>
@@ -438,7 +442,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
                 type="checkbox"
                 id="split-include-railways-checkbox"
                 checked
-                style="margin-right: 8px; cursor: pointer"
+                style="margin-inline-end: 8px; cursor: pointer"
               />
               {{ _("Include railways") }}
             </label>
@@ -447,7 +451,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
                 type="checkbox"
                 id="split-include-aeroways-checkbox"
                 checked
-                style="margin-right: 8px; cursor: pointer"
+                style="margin-inline-end: 8px; cursor: pointer"
               />
               {{ _("Include aeroways") }}
             </label>
@@ -511,7 +515,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
             <span
               id="split-btn-spinner"
               class="htmx-indicator"
-              style="display: none; margin-left: 8px"
+              style="display: none; margin-inline-start: 8px"
             >
               <svg
                 class="ftm-spinner"

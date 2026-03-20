@@ -52,6 +52,8 @@ SUPPORTED_LOCALES = [
     "yo",
     "zh",
 ]
+RTL_LOCALES = frozenset({"ar", "ur"})
+
 LOCALE_LABELS = {
     "en": "English",
     "am": "አማርኛ",
@@ -265,3 +267,8 @@ def create_locale_cookie_middleware(app: ASGIApp) -> ASGIApp:
 def get_current_locale() -> str:
     """Return the current request's resolved locale (for use as a Jinja global)."""
     return _current_locale.get()
+
+
+def get_current_dir() -> str:
+    """Return 'rtl' for right-to-left locales, 'ltr' otherwise."""
+    return "rtl" if _current_locale.get() in RTL_LOCALES else "ltr"
