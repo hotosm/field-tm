@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-20 00:12+0000\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sw\n"
@@ -1138,7 +1138,7 @@ msgstr "Mradi wa nje"
 
 #: app/templates/project_details.html:109
 msgid "Instance:"
-msgstr "Instance:"
+msgstr "Instansi:"
 
 #: app/templates/project_details.html:111
 msgid "Project ID:"
@@ -1895,3 +1895,4 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Kubali machaguo ya kazi"
+

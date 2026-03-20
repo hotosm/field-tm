@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-20 00:12+0000\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: it\n"
@@ -70,7 +70,7 @@ msgstr "Nome utente:"
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
-msgstr "Password:"
+msgstr "Parola d'accesso:"
 
 #: app/htmx/project_detail_routes.py:106
 msgid "Scan the QR code, then enter these credentials in QField."
@@ -959,7 +959,7 @@ msgstr "Hai bisogno di assistenza?"
 
 #: app/templates/landing.html:733
 msgid "Email:"
-msgstr "Email:"
+msgstr "E-mail:"
 
 #: app/templates/landing.html:749
 #, fuzzy
@@ -1219,7 +1219,7 @@ msgstr "admin"
 #: app/templates/partials/project_details/setup_steps.html:672
 #: app/templates/qfc_admin.html:59
 msgid "Password"
-msgstr "Password"
+msgstr "Parola d'accesso"
 
 #: app/templates/qfc_admin.html:70
 msgid "Connect"
@@ -1909,3 +1909,4 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Accetta scelte task"
+

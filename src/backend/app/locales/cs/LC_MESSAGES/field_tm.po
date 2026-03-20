@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-20 00:12+0000\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -1125,7 +1125,7 @@ msgstr "Externí projekt"
 
 #: app/templates/project_details.html:109
 msgid "Instance:"
-msgstr "Instance:"
+msgstr "Instance serveru:"
 
 #: app/templates/project_details.html:111
 msgid "Project ID:"
@@ -1458,7 +1458,7 @@ msgstr "Typ geometrie:"
 
 #: app/templates/partials/project_details/setup_steps.html:271
 msgid "Polygon"
-msgstr "Polygon"
+msgstr "Mnohoúhelník"
 
 #: app/templates/partials/project_details/setup_steps.html:272
 msgid "Polyline"
@@ -1880,3 +1880,4 @@ msgstr ""
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
 msgstr "Přijmout volby úkolů"
+

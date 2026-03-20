@@ -1,18 +1,17 @@
-# Fula translations for Field-TM OSM Fieldwork.
+# English translations for Field-TM.
 # Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the Field-TM OSM
-# Fieldwork project.
+# This file is distributed under the same license as the Field-TM project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-20 00:12+0000\n"
-"PO-Revision-Date: 2026-03-19 22:03+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ff\n"
-"Language-Team: ff <LL@li.org>\n"
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
+"PO-Revision-Date: 2026-03-18 15:17+0000\n"
+"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"Language: vi\n"
+"Language-Team: vi <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -22,100 +21,100 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "Ndee nokkuure moƴƴi ɗiijitaaka ngal sifa ndee?"
+msgstr "Is the digitized location for this feature correct?"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr "Caɗeele dijitalseende"
+msgstr "Digitisation Problem"
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr "Caɗeele dijitalseende (goɗɗe)"
+msgstr "Digitisation Problem (Other)"
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
 msgid "end_note"
-msgstr "Nottol gasiiɗo"
+msgstr "End Note"
 
 #: i18n/osm_fieldwork_strings.py:13
 msgctxt "xlsform_label"
 msgid "existing"
-msgstr "Woodi"
+msgstr "Existing"
 
 #: i18n/osm_fieldwork_strings.py:14
 msgctxt "xlsform_label"
 msgid "feature"
-msgstr "Cifol"
+msgstr "Feature"
 
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr "Cifol ngol woodi"
+msgstr "Feature Exists"
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
 msgid "image"
-msgstr "Natal"
+msgstr "Image"
 
 #: i18n/osm_fieldwork_strings.py:17
 msgctxt "xlsform_label"
 msgid "lumped"
-msgstr "Mooftaama"
+msgstr "Lumped"
 
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr "Mbaydi kartooji"
+msgstr "Mapping Mode"
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
 msgid "new"
-msgstr "Kesum"
+msgstr "New"
 
 #: i18n/osm_fieldwork_strings.py:20
 msgctxt "xlsform_label"
 msgid "new_feature"
-msgstr "Cifol kesol"
+msgstr "New Feature"
 
 #: i18n/osm_fieldwork_strings.py:21
 msgctxt "xlsform_label"
 msgid "no"
-msgstr "Alaa"
+msgstr "No"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr "Innde kuutoro OSM"
+msgstr "OSM Username"
 
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "other"
-msgstr "Goɗɗum"
+msgstr "Other"
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "split"
-msgstr "Sendu"
+msgstr "Split"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "survey_questions"
-msgstr "Naamne njiilaw"
+msgstr "Survey Questions"
 
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "task"
-msgstr "Kuugal"
+msgstr "Task"
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "verification"
-msgstr "Ƴeewtere"
+msgstr "Verification"
 
 #: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "yes"
-msgstr "Eey"
+msgstr "Yes"
 

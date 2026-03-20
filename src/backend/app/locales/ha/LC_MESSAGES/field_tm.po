@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-20 00:12+0000\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ha\n"
@@ -93,9 +93,11 @@ msgstr "Sauke lambar QR"
 
 #: app/htmx/project_detail_routes.py:175
 msgid ""
-"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is "
-"running."
-msgstr "Ba a iya isa sabar taswira ba. Duba ko ODK Central ko QFieldCloud suna aiki."
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
+msgstr ""
+"Ba a iya isa sabar taswira ba. Duba ko ODK Central ko QFieldCloud suna "
+"aiki."
 
 #: app/htmx/project_detail_routes.py:179
 msgid "The mapping server returned an error. Check its logs for details."
@@ -103,11 +105,11 @@ msgstr "Sabar taswira ta dawo da kuskure. Duba rubuce-rubucenta don bayani."
 
 #: app/htmx/project_detail_routes.py:182
 msgid ""
-"Authentication failed connecting to the mapping server. Check the configured"
-" credentials."
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
 msgstr ""
-"Tabbatarwa ta kasa yayin haɗawa da sabar taswira. Duba bayanan shaidar da "
-"aka saita."
+"Tabbatarwa ta kasa yayin haɗawa da sabar taswira. Duba bayanan shaidar da"
+" aka saita."
 
 #: app/htmx/project_detail_routes.py:185
 msgid "An unexpected error occurred while generating the QR code."
@@ -168,13 +170,14 @@ msgstr "An kasa ƙara mai haɗin gwiwa: %(exc)s"
 #: app/htmx/qfc_admin_routes.py:115
 #, python-format
 msgid ""
-"This project belongs to the %(organization)s organization. The user must be "
-"added to that organization before they can be added as a collaborator. Your "
-"QFieldCloud account does not have permission to manage organization members."
+"This project belongs to the %(organization)s organization. The user must "
+"be added to that organization before they can be added as a collaborator."
+" Your QFieldCloud account does not have permission to manage organization"
+" members."
 msgstr ""
-"Wannan aikin na ƙungiyar %(organization)s ne. Dole ne a fara ƙara mai amfani"
-" a cikin ƙungiyar kafin a ƙara shi a matsayin mai haɗin gwiwa. Asusunka na "
-"QFieldCloud ba shi da izinin kula da mambobin ƙungiya."
+"Wannan aikin na ƙungiyar %(organization)s ne. Dole ne a fara ƙara mai "
+"amfani a cikin ƙungiyar kafin a ƙara shi a matsayin mai haɗin gwiwa. "
+"Asusunka na QFieldCloud ba shi da izinin kula da mambobin ƙungiya."
 
 #: app/htmx/qfc_admin_routes.py:163
 msgid "All fields are required."
@@ -330,13 +333,13 @@ msgstr "Ba a samu aikin ba ko an hana shiga."
 
 #: app/htmx/setup_step_routes.py:155
 msgid ""
-"Project finalisation failed. Please check your settings and try again. If it"
-" continues, send the technical details below to your instance administrator "
-"or support team."
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
 msgstr ""
 "Kammala aikin ya kasa. Da fatan a duba saituna kuma a sake gwadawa. Idan "
-"matsalar ta ci gaba, a aika da bayanan fasaha da ke ƙasa zuwa ga mai gudanar"
-" da instans ko ƙungiyar tallafi."
+"matsalar ta ci gaba, a aika da bayanan fasaha da ke ƙasa zuwa ga mai "
+"gudanar da instans ko ƙungiyar tallafi."
 
 #: app/htmx/setup_step_routes.py:221
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -349,21 +352,21 @@ msgstr "Kuskure wajen karanta bayanan GeoJSON daga buƙatar."
 #: app/htmx/setup_step_routes.py:248
 #, python-format
 msgid ""
-"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. Please"
-" select a smaller area."
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please select a smaller area."
 msgstr ""
-"Yankin ya kai %(area_km2)s km², wanda ya wuce iyakar %(area_limit)s km². Da "
-"fatan a zaɓi ƙaramin yanki."
+"Yankin ya kai %(area_km2)s km², wanda ya wuce iyakar %(area_limit)s km². "
+"Da fatan a zaɓi ƙaramin yanki."
 
 #: app/htmx/setup_step_routes.py:256
 #, python-format
 msgid ""
-"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take longer "
-"to process. The data extract API is limited to 200 km²."
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process. The data extract API is limited to 200 km²."
 msgstr ""
-"Yankin ya kai %(area_km2)s km². Manyan yankuna (>%(area_warn)s km²) na iya "
-"ɗaukar lokaci fiye da haka wajen sarrafawa. API na cire bayanai yana da "
-"iyaka zuwa 200 km²."
+"Yankin ya kai %(area_km2)s km². Manyan yankuna (>%(area_warn)s km²) na "
+"iya ɗaukar lokaci fiye da haka wajen sarrafawa. API na cire bayanai yana "
+"da iyaka zuwa 200 km²."
 
 #: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
 msgid "Project AOI"
@@ -381,11 +384,11 @@ msgstr "Iyakokin aiki (%(task_count)s ayyuka)"
 
 #: app/htmx/setup_step_routes.py:384
 msgid ""
-"No task boundaries found. Please split the project into tasks first using "
-"the \"Split AOI\" button above."
+"No task boundaries found. Please split the project into tasks first using"
+" the \"Split AOI\" button above."
 msgstr ""
-"Ba a samu iyakokin aiki ba. Da fatan a fara raba aikin zuwa ayyuka ta amfani"
-" da maɓallin \"Split AOI\" da ke sama."
+"Ba a samu iyakokin aiki ba. Da fatan a fara raba aikin zuwa ayyuka ta "
+"amfani da maɓallin \"Split AOI\" da ke sama."
 
 #: app/htmx/setup_step_routes.py:440
 #, python-format
@@ -399,14 +402,15 @@ msgstr ""
 #: app/htmx/setup_step_routes.py:447
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review the "
-"results below. If satisfied, click \"Accept Task Choices\" to save. "
-"Otherwise, adjust parameters above and click \"Split Again\" to regenerate."
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
+"the results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to "
+"regenerate."
 msgstr ""
-"Ana duba iyakokin aiki %(task_count)s%(data_extract_info)s. Duba sakamakon "
-"da ke ƙasa. Idan ka gamsu, danna \"Accept Task Choices\" don ajiye. In ba "
-"haka ba, gyara sigogin da ke sama sannan danna \"Split Again\" don sake "
-"samarwa."
+"Ana duba iyakokin aiki %(task_count)s%(data_extract_info)s. Duba "
+"sakamakon da ke ƙasa. Idan ka gamsu, danna \"Accept Task Choices\" don "
+"ajiye. In ba haka ba, gyara sigogin da ke sama sannan danna \"Split "
+"Again\" don sake samarwa."
 
 #: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
 msgid "Data Extract"
@@ -421,12 +425,12 @@ msgstr "An sauke bayanan OSM cikin nasara! An samu siffofi %(feature_count)s."
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try downloading"
-" again with different parameters."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
 msgstr ""
-"Ana duba siffofi %(feature_count)s a kan taswira. Duba bayanan da ke ƙasa. "
-"Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka ba, sake "
-"gwada saukewa da wasu sigogi dabam."
+"Ana duba siffofi %(feature_count)s a kan taswira. Duba bayanan da ke "
+"ƙasa. Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka "
+"ba, sake gwada saukewa da wasu sigogi dabam."
 
 #: app/htmx/setup_step_routes.py:622
 #: app/templates/partials/project_details/style_and_scripts.html:28
@@ -446,20 +450,20 @@ msgstr "✓ An ɗora GeoJSON cikin nasara! An samu siffofi %(feature_count)s."
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try uploading a"
-" different file."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
 msgstr ""
-"Ana duba siffofi %(feature_count)s a kan taswira. Duba bayanan da ke ƙasa. "
-"Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka ba, gwada"
-" ɗora wani fayil dabam."
+"Ana duba siffofi %(feature_count)s a kan taswira. Duba bayanan da ke "
+"ƙasa. Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka "
+"ba, gwada ɗora wani fayil dabam."
 
 #: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr ""
-"Ba a samu bayanan GeoJSON ba. Da fatan a fara sauke bayanan OSM ko a ɗora "
-"fayil GeoJSON."
+"Ba a samu bayanan GeoJSON ba. Da fatan a fara sauke bayanan OSM ko a ɗora"
+" fayil GeoJSON."
 
 #: app/htmx/setup_step_routes.py:778
 #, python-format
@@ -480,24 +484,24 @@ msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
 msgstr ""
-"✓ An zaɓi yanayin tattara sabbin bayanai. An tsallake rabon aiki kuma za ka "
-"iya ci gaba."
+"✓ An zaɓi yanayin tattara sabbin bayanai. An tsallake rabon aiki kuma za "
+"ka iya ci gaba."
 
 #: app/htmx/setup_step_routes.py:935
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
 "XLSForm) and then Step 4 (split tasks)."
 msgstr ""
-"✓ An ajiye cire bayanai cikin nasara! Yanzu za ka iya ci gaba zuwa Mataki na"
-" 3 (ɗora XLSForm) sannan Mataki na 4 (raba ayyuka)."
+"✓ An ajiye cire bayanai cikin nasara! Yanzu za ka iya ci gaba zuwa Mataki"
+" na 3 (ɗora XLSForm) sannan Mataki na 4 (raba ayyuka)."
 
 #: app/htmx/setup_step_routes.py:1005
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr ""
-"Ba a samu cire bayanai ba. Da fatan a fara sauke bayanan OSM ko a ɗora fayil"
-" GeoJSON."
+"Ba a samu cire bayanai ba. Da fatan a fara sauke bayanan OSM ko a ɗora "
+"fayil GeoJSON."
 
 #: app/htmx/setup_step_routes.py:1036
 #, python-format
@@ -512,8 +516,8 @@ msgstr ""
 #: app/htmx/setup_step_routes.py:1043
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries and %(data_feature_count)s data "
-"features together."
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
+" features together."
 msgstr ""
 "Ana duba iyakokin aiki %(task_count)s da siffofin bayanai "
 "%(data_feature_count)s tare."
@@ -524,11 +528,11 @@ msgstr "Ba a samu iyakar aikin ba. Ba za a iya tsallake rabon aiki ba."
 
 #: app/htmx/setup_step_routes.py:1129
 msgid ""
-"✓ Task splitting skipped. The whole AOI will be used as a single task. You "
-"can proceed to Step 4."
+"✓ Task splitting skipped. The whole AOI will be used as a single task. "
+"You can proceed to Step 4."
 msgstr ""
-"✓ An tsallake rabon aiki. Za a yi amfani da dukan AOI a matsayin aiki guda "
-"ɗaya. Za ka iya ci gaba zuwa Mataki na 4."
+"✓ An tsallake rabon aiki. Za a yi amfani da dukan AOI a matsayin aiki "
+"guda ɗaya. Za ka iya ci gaba zuwa Mataki na 4."
 
 #: app/htmx/setup_step_routes.py:1190
 msgid "Please select a splitting option."
@@ -570,11 +574,11 @@ msgstr "✓ An ajiye rababbun ayyuka cikin nasara"
 
 #: app/htmx/setup_step_routes.py:1414
 msgid ""
-"Provide ODK URL, username, and password (all 3), or leave them all blank to "
-"use server defaults."
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
 msgstr ""
-"Bayar da ODK URL, sunan mai amfani, da kalmar sirri (duk uku), ko kuma a bar"
-" su a fanko don amfani da tsoffin saitunan sabar."
+"Bayar da ODK URL, sunan mai amfani, da kalmar sirri (duk uku), ko kuma a "
+"bar su a fanko don amfani da tsoffin saitunan sabar."
 
 #: app/htmx/setup_step_routes.py:1536
 msgid "GeoJSON is required"
@@ -715,29 +719,29 @@ msgstr "Menene wannan?"
 
 #: app/templates/landing.html:585
 msgid ""
-"The Field Tasking Manager (Field-TM) helps teams add local knowledge to map "
-"features by coordinating mapping in the field."
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
+"map features by coordinating mapping in the field."
 msgstr ""
-"Field Tasking Manager (Field-TM) yana taimaka wa ƙungiyoyi su ƙara ilimin "
-"gari zuwa siffofin taswira ta hanyar daidaita aikin taswira a fili."
+"Field Tasking Manager (Field-TM) yana taimaka wa ƙungiyoyi su ƙara ilimin"
+" gari zuwa siffofin taswira ta hanyar daidaita aikin taswira a fili."
 
 #: app/templates/landing.html:588
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
-"mature tools like ODK and QField. It is a standalone mobile and web workflow"
-" that helps teams collect geospatial data efficiently with commonly "
-"available Android devices."
+"mature tools like ODK and QField. It is a standalone mobile and web "
+"workflow that helps teams collect geospatial data efficiently with "
+"commonly available Android devices."
 msgstr ""
 "Field-TM yana sauƙaƙa aikin taswira na haɗin gwiwa ta hanyar tallafa da "
-"faɗaɗa kayan aiki masu ƙarfi kamar ODK da QField. Tsarin aiki ne na wayar "
-"hannu da yanar gizo wanda ke taimaka wa ƙungiyoyi tattara bayanan sarari "
-"cikin inganci ta amfani da na'urorin Android da ake yawan samu."
+"faɗaɗa kayan aiki masu ƙarfi kamar ODK da QField. Tsarin aiki ne na wayar"
+" hannu da yanar gizo wanda ke taimaka wa ƙungiyoyi tattara bayanan sarari"
+" cikin inganci ta amfani da na'urorin Android da ake yawan samu."
 
 #: app/templates/landing.html:593
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
-"Mai kula da aiki yana nuna tsarin aikin taswira na FieldTM a kan kwamfutar "
-"tafi-da-gidanka"
+"Mai kula da aiki yana nuna tsarin aikin taswira na FieldTM a kan "
+"kwamfutar tafi-da-gidanka"
 
 #: app/templates/landing.html:599
 msgid "Main Features"
@@ -749,11 +753,12 @@ msgstr "Tattara bayanai mai sassauci"
 
 #: app/templates/landing.html:604
 msgid ""
-"Support diverse survey forms, multiple data formats, and adaptable workflows"
-" that fit different operational needs."
+"Support diverse survey forms, multiple data formats, and adaptable "
+"workflows that fit different operational needs."
 msgstr ""
-"Yana tallafa wa fom ɗin bincike iri-iri, tsarin bayanai da yawa, da tsarin "
-"aiki masu daidaituwa da suka dace da bukatun gudanarwa daban-daban."
+"Yana tallafa wa fom ɗin bincike iri-iri, tsarin bayanai da yawa, da "
+"tsarin aiki masu daidaituwa da suka dace da bukatun gudanarwa daban-"
+"daban."
 
 #: app/templates/landing.html:608
 msgid "Open Source and Customizable"
@@ -761,9 +766,11 @@ msgstr "Buɗaɗɗen tushe kuma ana iya daidaitawa"
 
 #: app/templates/landing.html:610
 msgid ""
-"Adapt Field-TM to your own survey logic, data structures, and integration "
-"requirements."
-msgstr "Daidaita Field-TM da tsarin bincikeka, tsarin bayanai, da bukatun haɗakawa."
+"Adapt Field-TM to your own survey logic, data structures, and integration"
+" requirements."
+msgstr ""
+"Daidaita Field-TM da tsarin bincikeka, tsarin bayanai, da bukatun "
+"haɗakawa."
 
 #: app/templates/landing.html:614
 msgid "Entity-Level Tracking"
@@ -774,8 +781,8 @@ msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed decisions quickly."
 msgstr ""
-"Sa ido kan ci gaban bincike a matakin aiki da siffa don masu kula su yanke "
-"shawara cikin sauri da sani."
+"Sa ido kan ci gaban bincike a matakin aiki da siffa don masu kula su "
+"yanke shawara cikin sauri da sani."
 
 #: app/templates/landing.html:623
 msgid "Who is it for?"
@@ -791,12 +798,12 @@ msgstr "Ƙirƙira kuma daidaita kamfen na fili"
 
 #: app/templates/landing.html:629
 msgid ""
-"Project managers use Field-TM to set up mapping projects, define areas of "
-"interest, design survey forms, and split work into manageable tasks."
+"Project managers use Field-TM to set up mapping projects, define areas of"
+" interest, design survey forms, and split work into manageable tasks."
 msgstr ""
-"Masu kula da aiki suna amfani da Field-TM don kafa ayyukan taswira, tantance"
-" yankunan sha'awa, ƙirƙirar fom ɗin bincike, da raba aiki zuwa ayyuka masu "
-"sauƙin kulawa."
+"Masu kula da aiki suna amfani da Field-TM don kafa ayyukan taswira, "
+"tantance yankunan sha'awa, ƙirƙirar fom ɗin bincike, da raba aiki zuwa "
+"ayyuka masu sauƙin kulawa."
 
 #: app/templates/landing.html:632
 msgid "Define a project area and upload or choose a survey form"
@@ -824,12 +831,13 @@ msgstr "Tattara bayanai a fili da wayarka"
 
 #: app/templates/landing.html:642
 msgid ""
-"Mappers do not need to log in to Field-TM. Once a project manager publishes "
-"a project, mappers access it directly in their mobile app of choice."
+"Mappers do not need to log in to Field-TM. Once a project manager "
+"publishes a project, mappers access it directly in their mobile app of "
+"choice."
 msgstr ""
 "Masu taswira ba sa buƙatar shiga Field-TM. Da zarar mai kula da aiki ya "
-"wallafa aiki, masu taswira za su iya shiga kai tsaye ta manhajar wayar da "
-"suka zaɓa."
+"wallafa aiki, masu taswira za su iya shiga kai tsaye ta manhajar wayar da"
+" suka zaɓa."
 
 #: app/templates/landing.html:645
 msgid "Scan the QR code shared by your project manager"
@@ -876,8 +884,9 @@ msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities through clear, manageable mapping tasks."
 msgstr ""
-"Gina birane masu basira ta hanyar bincike mai daidaituwa na gidaje, hanyoyi,"
-" da kayayyakin more rayuwa ta ayyukan taswira masu bayyani da sauƙin kulawa."
+"Gina birane masu basira ta hanyar bincike mai daidaituwa na gidaje, "
+"hanyoyi, da kayayyakin more rayuwa ta ayyukan taswira masu bayyani da "
+"sauƙin kulawa."
 
 #: app/templates/landing.html:677
 msgid "3. Disaster Response and Recovery"
@@ -885,8 +894,8 @@ msgstr "3. Amsa bala'i da farfaɗowa"
 
 #: app/templates/landing.html:679
 msgid ""
-"Rapidly map damaged infrastructure after disasters, coordinate volunteers, "
-"and deliver reliable data for relief operations."
+"Rapidly map damaged infrastructure after disasters, coordinate "
+"volunteers, and deliver reliable data for relief operations."
 msgstr ""
 "Yi taswira da gaggawa ga lalatattun kayayyakin more rayuwa bayan bala'i, "
 "daidaita masu sa kai, kuma samar da amintattun bayanai don ayyukan agaji."
@@ -918,8 +927,8 @@ msgstr "Jagorar ODK Central"
 #: app/templates/landing.html:710
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
-"Koyi yadda ake kula da fom, masu amfani da manhaja, da ƙaddamarwar fili a "
-"ODK."
+"Koyi yadda ake kula da fom, masu amfani da manhaja, da ƙaddamarwar fili a"
+" ODK."
 
 #: app/templates/landing.html:720
 msgid "QField Guide"
@@ -1017,13 +1026,14 @@ msgstr "Goge"
 
 #: app/templates/new_project.html:125
 msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project "
-"area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
 "warning. The OSM data extract API is limited to 200 km²."
 msgstr ""
-"Zana polygon a taswira ko ka ɗora fayil GeoJSON don tantance yankin aikinka."
-" Matsakaicin girman aiki shi ne 1,000 km². Yankuna sama da 100 km² za su "
-"nuna gargaɗi. API na cire bayanan OSM yana da iyaka zuwa 200 km²."
+"Zana polygon a taswira ko ka ɗora fayil GeoJSON don tantance yankin "
+"aikinka. Matsakaicin girman aiki shi ne 1,000 km². Yankuna sama da 100 "
+"km² za su nuna gargaɗi. API na cire bayanan OSM yana da iyaka zuwa 200 "
+"km²."
 
 #: app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:101
@@ -1047,11 +1057,11 @@ msgstr "Rubuta hashtag sannan danna Enter ko comma"
 
 #: app/templates/new_project.html:162
 msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag to "
-"remove it."
+"Type hashtags and press Enter or comma to add them. Click the × on a tag "
+"to remove it."
 msgstr ""
-"Rubuta hashtag sannan danna Enter ko comma don ƙara su. Danna × a kan alama "
-"don cire ta."
+"Rubuta hashtag sannan danna Enter ko comma don ƙara su. Danna × a kan "
+"alama don cire ta."
 
 #: app/templates/new_project.html:168
 msgid "Creating..."
@@ -1119,7 +1129,8 @@ msgstr "Instans:"
 msgid "Project ID:"
 msgstr "ID na aiki:"
 
-#: app/templates/project_details.html:121 app/templates/project_details.html:129
+#: app/templates/project_details.html:121
+#: app/templates/project_details.html:129
 msgid "View Project in ODK Central →"
 msgstr "Duba aiki a ODK Central →"
 
@@ -1139,7 +1150,8 @@ msgstr "A share wannan aiki a downstream da Field-TM? Ba za a iya janye wannan b
 msgid "Delete Project"
 msgstr "Share aiki"
 
-#: app/templates/project_details.html:165 app/templates/project_details.html:176
+#: app/templates/project_details.html:165
+#: app/templates/project_details.html:176
 msgid "Back to Projects"
 msgstr "Koma zuwa ayyuka"
 
@@ -1149,8 +1161,8 @@ msgstr "Ba a samu aikin ba"
 
 #: app/templates/project_details.html:173
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission to"
-" view\n"
+"The project you're looking for doesn't exist or you don't have permission"
+" to view\n"
 "        it."
 msgstr "Aikin da kake nema bai wanzu ba ko kuma ba ka da izinin dubawa."
 
@@ -1159,10 +1171,12 @@ msgid "QFieldCloud Admin"
 msgstr "Gudanar da QFieldCloud"
 
 #: app/templates/qfc_admin.html:21
-msgid "This page is for managing the users in your QField project, after creation."
+msgid ""
+"This page is for managing the users in your QField project, after "
+"creation."
 msgstr ""
-"Wannan shafi na kula da masu amfani a aikin QField ɗinka ne bayan an ƙirƙira"
-" shi."
+"Wannan shafi na kula da masu amfani a aikin QField ɗinka ne bayan an "
+"ƙirƙira shi."
 
 #: app/templates/qfc_admin.html:25
 msgid "Enter your QFieldCloud credentials to manage collaborators."
@@ -1257,12 +1271,14 @@ msgstr "Mataki na 4: Kammala aiki"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
-"If you need to upload additional media files to this project, such as images"
-" and\n"
-"          videos, log into ODK Central and upload them in the form settings."
+"If you need to upload additional media files to this project, such as "
+"images and\n"
+"          videos, log into ODK Central and upload them in the form "
+"settings."
 msgstr ""
-"Idan kana buƙatar ɗora ƙarin fayilolin media zuwa wannan aiki, kamar hotuna "
-"da bidiyo, shiga ODK Central sannan ka ɗora su a cikin saitunan fom."
+"Idan kana buƙatar ɗora ƙarin fayilolin media zuwa wannan aiki, kamar "
+"hotuna da bidiyo, shiga ODK Central sannan ka ɗora su a cikin saitunan "
+"fom."
 
 #: app/templates/partials/project_details/setup_steps.html:14
 msgid "Ready for Mapping"
@@ -1440,11 +1456,11 @@ msgstr "Nau'in geometry:"
 
 #: app/templates/partials/project_details/setup_steps.html:271
 msgid "Polygon"
-msgstr "Polygon"
+msgstr "Poligon"
 
 #: app/templates/partials/project_details/setup_steps.html:272
 msgid "Polyline"
-msgstr "Polyline"
+msgstr "Polilayi"
 
 #: app/templates/partials/project_details/setup_steps.html:273
 msgid "Point"
@@ -1478,13 +1494,13 @@ msgstr "✓ Rabon aiki ba shi da amfani idan babu bayanan da suke akwai"
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task "
-"Areas\" to save. Or\n"
+"      parameters, then split. Review the preview, and click \"Accept Task"
+" Areas\" to save. Or\n"
 "      click"
 msgstr ""
-"Samar da yankunan aiki ta hanyar raba Area of Interest (AOI). Zaɓi algorithm"
-" da sigogi, sannan ka raba. Duba abin da aka nuna, sannan ka danna \"Accept "
-"Task Areas\" don ajiye. Ko kuma ka danna"
+"Samar da yankunan aiki ta hanyar raba Area of Interest (AOI). Zaɓi "
+"algorithm da sigogi, sannan ka raba. Duba abin da aka nuna, sannan ka "
+"danna \"Accept Task Areas\" don ajiye. Ko kuma ka danna"
 
 #: app/templates/partials/project_details/setup_steps.html:368
 #: app/templates/partials/project_details/setup_steps.html:387
@@ -1567,11 +1583,11 @@ msgstr "A shirye"
 
 #: app/templates/partials/project_details/setup_steps.html:563
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping "
-"tool."
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
 msgstr ""
-"An cika duk abubuwan da ake buƙata! Ƙirƙiri aikin a kayan aikin taswira da "
-"ka zaɓa."
+"An cika duk abubuwan da ake buƙata! Ƙirƙiri aikin a kayan aikin taswira "
+"da ka zaɓa."
 
 #: app/templates/partials/project_details/setup_steps.html:568
 msgid "Finalise Project"
@@ -1660,7 +1676,9 @@ msgstr "An zaɓi fom na musamman."
 
 #: app/templates/partials/project_details/style_and_scripts.html:18
 msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr "Da farko ka zaɓi nau'in bincike, ko ka ɗora fom na musamman a Babban tsari."
+msgstr ""
+"Da farko ka zaɓi nau'in bincike, ko ka ɗora fom na musamman a Babban "
+"tsari."
 
 #: app/templates/partials/project_details/style_and_scripts.html:19
 msgid "polygons"
@@ -1680,17 +1698,17 @@ msgstr "siffofi"
 
 #: app/templates/partials/project_details/style_and_scripts.html:23
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use Advanced "
-"Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Use "
+"Advanced Config to upload your own GeoJSON or adjust download settings."
 msgstr ""
-"Ka ɗora fom na musamman, don haka wannan saukar OSM na zaɓi ne. Yi amfani da"
-" Babban tsari don ɗora GeoJSON naka ko daidaita saitunan sauke."
+"Ka ɗora fom na musamman, don haka wannan saukar OSM na zaɓi ne. Yi amfani"
+" da Babban tsari don ɗora GeoJSON naka ko daidaita saitunan sauke."
 
 #: app/templates/partials/project_details/style_and_scripts.html:24
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
+"map, then continue."
 msgstr ""
 "Asalin da aka ba da shawara: %(title)s (%(geom_label)s). Duba bayanan a "
 "taswira, sannan ka ci gaba."
@@ -1843,8 +1861,8 @@ msgstr "Buɗe aiki a QFieldCloud"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
 msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud as"
-" admin to\n"
+"Manager account could not be created automatically. Log in to QFieldCloud"
+" as admin to\n"
 "      manage the project."
 msgstr ""
 "Ba a iya ƙirƙirar asusun mai kula ta atomatik ba. Shiga QFieldCloud a "

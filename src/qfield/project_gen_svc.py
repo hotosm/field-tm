@@ -822,7 +822,7 @@ def _fix_task_layer_tree(
     ).encode()
 
     # Insert after the first </layer-tree-layer> (survey layer), so tasks
-    # appears second in the tree — below survey but above list/basemap layers.
+    # appears second in the tree - below survey but above list/basemap layers.
     ltg_m = re.search(rb"<layer-tree-group\b[^>]*>", qgs_data)
     if not ltg_m:
         log.warning("No <layer-tree-group> found; skipping layer-tree fix")
@@ -912,12 +912,12 @@ def sanitize_generated_qgz_metadata(
 
     Applies two corrections that xlsform2qgis projects consistently need:
 
-    1. Removes dangling iccProfileId attachment refs — QGIS sometimes writes
+    1. Removes dangling iccProfileId attachment refs - QGIS sometimes writes
        iccProfileId="attachment:///qt_temp-XXXX" into ProjectStyleSettings but
        never bundles the temp file.  QFieldCloud rejects such refs even though
        QGIS/QField tolerate them.
 
-    2. Injects <mapcanvas name="theMapCanvas"> if absent — QFieldCloud's
+    2. Injects <mapcanvas name="theMapCanvas"> if absent - QFieldCloud's
        process_projectfile worker looks for this element to extract the project
        extent and background colour.  xlsform2qgis runs headless (no
        QgsMapCanvas), so the element is never written.  extent_bbox must be

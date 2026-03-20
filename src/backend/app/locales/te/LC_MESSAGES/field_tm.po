@@ -1,0 +1,1906 @@
+# English translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR sam.woodcock@hotosm.org, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"POT-Creation-Date: 2026-03-20 04:19+0000\n"
+"PO-Revision-Date: 2026-03-18 15:17+0000\n"
+"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"Language: te\n"
+"Language-Team: te <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:162
+msgid "An unexpected error occurred. Please contact an admin."
+msgstr "అనూహ్యమైన లోపం ఏర్పడింది. దయచేసి నిర్వాహకుడిని సంప్రదించండి."
+
+#: app/htmx/project_create_routes.py:205
+msgid "Provide a valid .xls or .xlsx file"
+msgstr "చెల్లుబాటు అయ్యే .xls లేదా .xlsx ఫైల్‌ను ఇవ్వండి"
+
+#: app/htmx/project_create_routes.py:223
+msgid "Failed to load template form."
+msgstr "టెంప్లేట్ ఫారమ్‌ను లోడ్ చేయలేకపోయాము."
+
+#: app/htmx/project_create_routes.py:231
+msgid "Please select a form or upload a file."
+msgstr "దయచేసి ఒక ఫారమ్ ఎంచుకోండి లేదా ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:297
+msgid "Project not found."
+msgstr "ప్రాజెక్ట్ కనబడలేదు."
+
+#: app/htmx/project_create_routes.py:466
+msgid "Project ID mismatch. You do not have access to this project."
+msgstr "ప్రాజెక్ట్ ఐడి సరిపోలడం లేదు. ఈ ప్రాజెక్ట్‌కి మీకు ప్రాప్తి లేదు."
+
+#: app/htmx/project_create_routes.py:504
+msgid "Form validated and uploaded successfully! Reloading page..."
+msgstr ""
+"ఫారమ్ విజయవంతంగా ధృవీకరించబడి అప్‌లోడ్ చేయబడింది! పేజీ మళ్లీ లోడ్ "
+"అవుతోంది..."
+
+#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+msgid "An unexpected error occurred"
+msgstr "అనూహ్యమైన లోపం ఏర్పడింది"
+
+#: app/htmx/project_create_routes.py:532
+msgid "Error"
+msgstr "లోపం"
+
+#: app/htmx/project_detail_routes.py:97
+msgid "Mapper Login (QFieldCloud)"
+msgstr "మ్యాపర్ లాగిన్ (QFieldCloud)"
+
+#: app/htmx/project_detail_routes.py:100
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
+msgid "Username:"
+msgstr "వినియోగదారు పేరు:"
+
+#: app/htmx/project_detail_routes.py:103
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
+msgid "Password:"
+msgstr "పాస్‌వర్డ్:"
+
+#: app/htmx/project_detail_routes.py:106
+msgid "Scan the QR code, then enter these credentials in QField."
+msgstr "QR కోడ్‌ను స్కాన్ చేసి, ఈ గుర్తింపు వివరాలను QField లో నమోదు చేయండి."
+
+#: app/htmx/project_detail_routes.py:118
+msgid "Scan QR Code"
+msgstr "QR కోడ్‌ను స్కాన్ చేయండి"
+
+#: app/htmx/project_detail_routes.py:120
+#, python-format
+msgid "Use %(app_name)s to scan this QR code and load the project."
+msgstr ""
+"ఈ QR కోడ్‌ను స్కాన్ చేసి ప్రాజెక్ట్‌ను లోడ్ చేయడానికి %(app_name)s ను "
+"ఉపయోగించండి."
+
+#: app/htmx/project_detail_routes.py:122
+msgid "Project QR Code"
+msgstr "ప్రాజెక్ట్ QR కోడ్"
+
+#: app/htmx/project_detail_routes.py:123
+msgid "Download QR Code"
+msgstr "QR కోడ్‌ను డౌన్‌లోడ్ చేయండి"
+
+#: app/htmx/project_detail_routes.py:175
+msgid ""
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
+msgstr ""
+"మ్యాపింగ్ సర్వర్‌ను చేరుకోలేకపోయాము. ODK Central లేదా QFieldCloud "
+"నడుస్తున్నదో లేదో చూడండి."
+
+#: app/htmx/project_detail_routes.py:179
+msgid "The mapping server returned an error. Check its logs for details."
+msgstr "మ్యాపింగ్ సర్వర్ లోపాన్ని తిరిగి పంపింది. వివరాల కోసం లాగ్‌లను చూడండి."
+
+#: app/htmx/project_detail_routes.py:182
+msgid ""
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
+msgstr ""
+"మ్యాపింగ్ సర్వర్‌కు కనెక్ట్ అవుతున్నప్పుడు ప్రమాణీకరణ విఫలమైంది. సెటప్ "
+"చేసిన గుర్తింపు వివరాలను చూడండి."
+
+#: app/htmx/project_detail_routes.py:185
+msgid "An unexpected error occurred while generating the QR code."
+msgstr "QR కోడ్‌ను రూపొందిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
+
+#: app/htmx/project_detail_routes.py:247
+#, python-format
+msgid "Project (%(project_id)s) not found."
+msgstr "ప్రాజెక్ట్ (%(project_id)s) కనబడలేదు."
+
+#: app/htmx/project_detail_routes.py:254
+msgid "Only the project manager can delete this project."
+msgstr "ఈ ప్రాజెక్ట్‌ను ప్రాజెక్ట్ మేనేజర్ మాత్రమే తొలగించగలరు."
+
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
+#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
+#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
+#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
+#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
+#: app/htmx/setup_step_routes.py:1375
+#, python-format
+msgid "Error: %(error_msg)s"
+msgstr "లోపం: %(error_msg)s"
+
+#: app/htmx/qfc_admin_routes.py:55
+msgid "Admin"
+msgstr "నిర్వాహకుడు"
+
+#: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
+msgid "Manager"
+msgstr "మేనేజర్"
+
+#: app/htmx/qfc_admin_routes.py:57
+msgid "Editor"
+msgstr "సంపాదకుడు"
+
+#: app/htmx/qfc_admin_routes.py:58
+msgid "Reporter"
+msgstr "రిపోర్టర్"
+
+#: app/htmx/qfc_admin_routes.py:59
+msgid "Reader"
+msgstr "చదివేవాడు"
+
+#: app/htmx/qfc_admin_routes.py:106
+msgid "This user does not exist. Please create it first."
+msgstr "ఈ వినియోగదారు లేరు. దయచేసి ముందుగా సృష్టించండి."
+
+#: app/htmx/qfc_admin_routes.py:108
+msgid "This user is already a collaborator on this project."
+msgstr "ఈ వినియోగదారు ఇప్పటికే ఈ ప్రాజెక్ట్‌లో సహకారిగా ఉన్నారు."
+
+#: app/htmx/qfc_admin_routes.py:109
+#, python-format
+msgid "Failed to add collaborator: %(exc)s"
+msgstr "సహకారిని చేర్చడం విఫలమైంది: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:115
+#, python-format
+msgid ""
+"This project belongs to the %(organization)s organization. The user must "
+"be added to that organization before they can be added as a collaborator."
+" Your QFieldCloud account does not have permission to manage organization"
+" members."
+msgstr ""
+"ఈ ప్రాజెక్ట్ %(organization)s సంస్థకు చెందినది. వినియోగదారిని సహకారిగా "
+"చేర్చే ముందు ఆ సంస్థకు చేర్చాలి. మీ QFieldCloud ఖాతాకు సంస్థ సభ్యులను "
+"నిర్వహించడానికి అనుమతి లేదు."
+
+#: app/htmx/qfc_admin_routes.py:163
+msgid "All fields are required."
+msgstr "అన్ని ఫీల్డ్‌లు అవసరం."
+
+#: app/htmx/qfc_admin_routes.py:178
+msgid "Login succeeded but no token received."
+msgstr "లాగిన్ విజయవంతమైంది కానీ టోకెన్ అందలేదు."
+
+#: app/htmx/qfc_admin_routes.py:186
+msgid "Login failed. Check your URL and credentials."
+msgstr "లాగిన్ విఫలమైంది. మీ URL మరియు గుర్తింపు వివరాలను చూడండి."
+
+#: app/htmx/qfc_admin_routes.py:217
+msgid "QFieldCloud Projects"
+msgstr "QFieldCloud ప్రాజెక్టులు"
+
+#: app/htmx/qfc_admin_routes.py:222
+msgid "Connected as"
+msgstr "ఇలాగా కనెక్ట్ అయ్యారు"
+
+#: app/htmx/qfc_admin_routes.py:223
+msgid "to"
+msgstr "కు"
+
+#: app/htmx/qfc_admin_routes.py:229
+msgid "Log Out"
+msgstr "లాగ్ అవుట్"
+
+#: app/htmx/qfc_admin_routes.py:234
+msgid "No projects found."
+msgstr "ఏ ప్రాజెక్ట్ కూడా కనబడలేదు."
+
+#: app/htmx/qfc_admin_routes.py:243
+msgid "Public"
+msgstr "పబ్లిక్"
+
+#: app/htmx/qfc_admin_routes.py:245
+msgid "Private"
+msgstr "ప్రైవేట్"
+
+#: app/htmx/qfc_admin_routes.py:259
+msgid "Manage"
+msgstr "నిర్వహించు"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Project"
+msgstr "ప్రాజెక్ట్"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Owner"
+msgstr "యజమాని"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Visibility"
+msgstr "కనిపింపు"
+
+#: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
+#: app/templates/project_details.html:58
+msgid "Description"
+msgstr "వివరణ"
+
+#: app/htmx/qfc_admin_routes.py:298
+msgid "Session expired. Please log in again."
+msgstr "సెషన్ గడువు ముగిసింది. దయచేసి మళ్లీ లాగిన్ అవ్వండి."
+
+#: app/htmx/qfc_admin_routes.py:317
+#, python-format
+msgid "Could not load collaborators: %(exc)s"
+msgstr "సహకారులను లోడ్ చేయలేకపోయాము: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:387
+msgid "Update"
+msgstr "అప్‌డేట్ చేయండి"
+
+#: app/htmx/qfc_admin_routes.py:390 app/htmx/qfc_admin_routes.py:397
+#: app/htmx/qfc_admin_routes.py:405
+msgid "Remove"
+msgstr "తొలగించు"
+
+#: app/htmx/qfc_admin_routes.py:395
+msgid "Remove Collaborator"
+msgstr "సహకారిని తొలగించు"
+
+#: app/htmx/qfc_admin_routes.py:397
+msgid "from this project?"
+msgstr "ఈ ప్రాజెక్ట్ నుండి?"
+
+#: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
+#: app/templates/partials/project_details/setup_steps.html:592
+#: app/templates/partials/project_details/setup_steps.html:687
+msgid "Cancel"
+msgstr "రద్దు చేయి"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "User"
+msgstr "వినియోగదారు"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Role"
+msgstr "పాత్ర"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Actions"
+msgstr "చర్యలు"
+
+#: app/htmx/qfc_admin_routes.py:417
+msgid "No collaborators yet."
+msgstr "ఇంకా సహకారులు లేరు."
+
+#: app/htmx/qfc_admin_routes.py:431
+#: app/templates/partials/project_details/setup_steps.html:620
+#: app/templates/partials/project_details/setup_steps.html:626
+#: app/templates/partials/project_details/setup_steps.html:660
+#: app/templates/qfc_admin.html:52
+msgid "Username"
+msgstr "వినియోగదారు పేరు"
+
+#: app/htmx/qfc_admin_routes.py:441
+msgid "Add Collaborator"
+msgstr "సహకారిని చేర్చు"
+
+#: app/htmx/qfc_admin_routes.py:449
+msgid "Close"
+msgstr "మూసివేయి"
+
+#: app/htmx/qfc_admin_routes.py:456
+msgid "Collaborators"
+msgstr "సహకారులు"
+
+#: app/htmx/qfc_admin_routes.py:480
+msgid "Username is required."
+msgstr "వినియోగదారు పేరు అవసరం."
+
+#: app/htmx/qfc_admin_routes.py:530
+#, python-format
+msgid "Failed to remove collaborator: %(exc)s"
+msgstr "సహకారిని తొలగించడం విఫలమైంది: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:569
+#, python-format
+msgid "Failed to update collaborator: %(exc)s"
+msgstr "సహకారిని అప్‌డేట్ చేయడం విఫలమైంది: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:593
+#, python-format
+msgid "Collaborator refresh failed: %(exc)s"
+msgstr "సహకారి రిఫ్రెష్ విఫలమైంది: %(exc)s"
+
+#: app/htmx/setup_step_routes.py:82
+msgid "Project not found or access denied."
+msgstr "ప్రాజెక్ట్ కనబడలేదు లేదా ప్రాప్తి నిరాకరించబడింది."
+
+#: app/htmx/setup_step_routes.py:155
+msgid ""
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
+msgstr ""
+"ప్రాజెక్ట్ ఫైనలైజ్ చేయడం విఫలమైంది. దయచేసి మీ సెట్టింగ్‌లను చూసి మళ్లీ "
+"ప్రయత్నించండి. ఇది కొనసాగితే, క్రింద ఉన్న సాంకేతిక వివరాలను మీ instance "
+"నిర్వాహకుడికి లేదా మద్దతు బృందానికి పంపండి."
+
+#: app/htmx/setup_step_routes.py:221
+msgid "Invalid GeoJSON data in request. Please try uploading again."
+msgstr "రిక్వెస్ట్‌లో చెల్లని GeoJSON డేటా ఉంది. దయచేసి మళ్లీ అప్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:227
+msgid "Error reading GeoJSON data from request."
+msgstr "రిక్వెస్ట్ నుండి GeoJSON డేటాను చదవడంలో లోపం ఏర్పడింది."
+
+#: app/htmx/setup_step_routes.py:248
+#, python-format
+msgid ""
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please select a smaller area."
+msgstr ""
+"విస్తీర్ణం %(area_km2)s కి.మీ² ఉంది, ఇది %(area_limit)s కి.మీ² పరిమితిని "
+"మించిపోయింది. దయచేసి చిన్న ప్రాంతాన్ని ఎంచుకోండి."
+
+#: app/htmx/setup_step_routes.py:256
+#, python-format
+msgid ""
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process. The data extract API is limited to 200 km²."
+msgstr ""
+"విస్తీర్ణం %(area_km2)s కి.మీ². పెద్ద ప్రాంతాలు (>%(area_warn)s కి.మీ²) "
+"ప్రాసెస్ కావడానికి ఎక్కువ సమయం పట్టవచ్చు. డేటా ఎక్స్‌ట్రాక్ట్ API 200 "
+"కి.మీ² కు పరిమితం."
+
+#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+msgid "Project AOI"
+msgstr "ప్రాజెక్ట్ AOI"
+
+#: app/htmx/setup_step_routes.py:334
+#, python-format
+msgid "Data Extract (%(data_feature_count)s features)"
+msgstr "డేటా ఎక్స్‌ట్రాక్ట్ (%(data_feature_count)s లక్షణాలు)"
+
+#: app/htmx/setup_step_routes.py:348
+#, python-format
+msgid "Task Boundaries (%(task_count)s tasks)"
+msgstr "పని సరిహద్దులు (%(task_count)s పనులు)"
+
+#: app/htmx/setup_step_routes.py:384
+msgid ""
+"No task boundaries found. Please split the project into tasks first using"
+" the \"Split AOI\" button above."
+msgstr ""
+"పని సరిహద్దులు కనబడలేదు. దయచేసి ముందుగా పై ఉన్న \"Split AOI\" బటన్ "
+"ఉపయోగించి ప్రాజెక్ట్‌ను పనులుగా విభజించండి."
+
+#: app/htmx/setup_step_routes.py:440
+#, python-format
+msgid ""
+"✓ AOI split successfully! Generated %(task_count)s task areas using "
+"%(algorithm)s."
+msgstr ""
+"✓ AOI విజయవంతంగా విభజించబడింది! %(algorithm)s ఉపయోగించి %(task_count)s "
+"పని ప్రాంతాలు రూపొందించబడ్డాయి."
+
+#: app/htmx/setup_step_routes.py:447
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
+"the results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to "
+"regenerate."
+msgstr ""
+"%(task_count)s పని సరిహద్దులు%(data_extract_info)s ప్రివ్యూ చూపబడుతోంది. "
+"క్రింద ఉన్న ఫలితాలను చూడండి. సంతృప్తిగా ఉంటే సేవ్ చేయడానికి \"Accept Task"
+" Choices\" నొక్కండి. లేకపోతే పై పరామితులను సర్దుబాటు చేసి మళ్లీ "
+"సృష్టించడానికి \"Split Again\" నొక్కండి."
+
+#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+msgid "Data Extract"
+msgstr "డేటా ఎక్స్‌ట్రాక్ట్"
+
+#: app/htmx/setup_step_routes.py:547
+#, python-format
+msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+msgstr ""
+"OSM డేటా విజయవంతంగా డౌన్‌లోడ్ అయింది! %(feature_count)s లక్షణాలు "
+"కనబడ్డాయి."
+
+#: app/htmx/setup_step_routes.py:550
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
+msgstr ""
+"%(feature_count)s లక్షణాలు మ్యాప్‌లో ప్రివ్యూ చూపబడుతున్నాయి. క్రింది "
+"డేటాను పరిశీలించండి. సంతృప్తిగా ఉంటే సేవ్ చేయడానికి \"Accept Data "
+"Extract\" క్లిక్ చేయండి. లేకపోతే వేరే పరామితులతో మళ్లీ డౌన్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:622
+#: app/templates/partials/project_details/style_and_scripts.html:28
+msgid "Invalid file type. Please upload a .geojson or .json file."
+msgstr "చెల్లని ఫైల్ రకం. దయచేసి .geojson లేదా .json ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:647
+msgid "No valid geometries found in GeoJSON."
+msgstr "GeoJSON లో చెల్లుబాటు అయ్యే జ్యామితులు కనబడలేదు."
+
+#: app/htmx/setup_step_routes.py:679
+#, python-format
+msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+msgstr ""
+"✓ GeoJSON విజయవంతంగా అప్‌లోడ్ చేయబడింది! %(feature_count)s లక్షణాలు "
+"కనబడ్డాయి."
+
+#: app/htmx/setup_step_routes.py:682
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
+msgstr ""
+"%(feature_count)s లక్షణాలు మ్యాప్‌లో ప్రివ్యూ చూపబడుతున్నాయి. క్రింది "
+"డేటాను పరిశీలించండి. సంతృప్తిగా ఉంటే సేవ్ చేయడానికి \"Accept Data "
+"Extract\" క్లిక్ చేయండి. లేకపోతే వేరే ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+msgid ""
+"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"GeoJSON డేటా కనబడలేదు. దయచేసి ముందుగా OSM డేటాను డౌన్‌లోడ్ చేయండి లేదా "
+"GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:778
+#, python-format
+msgid "Data Extract (%(feature_count)s features)"
+msgstr "డేటా ఎక్స్‌ట్రాక్ట్ (%(feature_count)s లక్షణాలు)"
+
+#: app/htmx/setup_step_routes.py:797
+#, python-format
+msgid ""
+"Previewing %(feature_count)s data features on map. Review the data, then "
+"continue to the next step."
+msgstr ""
+"%(feature_count)s డేటా లక్షణాలు మ్యాప్‌లో ప్రివ్యూ చూపబడుతున్నాయి. డేటాను"
+" పరిశీలించి తదుపరి దశకు కొనసాగండి."
+
+#: app/htmx/setup_step_routes.py:857
+msgid ""
+"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
+"continue."
+msgstr ""
+"✓ కొత్త డేటా సేకరణ మోడ్ ఎంచుకోబడింది. పని విభజన దాటవేయబడుతుంది; మీరు "
+"కొనసాగవచ్చు."
+
+#: app/htmx/setup_step_routes.py:935
+msgid ""
+"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
+"XLSForm) and then Step 4 (split tasks)."
+msgstr ""
+"✓ డేటా ఎక్స్‌ట్రాక్ట్ విజయవంతంగా సేవ్ చేయబడింది! ఇప్పుడు మీరు దశ 3 "
+"(XLSForm అప్‌లోడ్) మరియు తర్వాత దశ 4 (పనులను విభజించు) కి వెళ్లవచ్చు."
+
+#: app/htmx/setup_step_routes.py:1005
+msgid ""
+"No data extract found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"డేటా ఎక్స్‌ట్రాక్ట్ కనబడలేదు. దయచేసి ముందుగా OSM డేటాను డౌన్‌లోడ్ చేయండి "
+"లేదా GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/htmx/setup_step_routes.py:1036
+#, python-format
+msgid ""
+"Previewing whole AOI (no splitting) with %(data_feature_count)s data "
+"features. The entire AOI will be used as a single task."
+msgstr ""
+"%(data_feature_count)s డేటా లక్షణాలతో మొత్తం AOI (విభజన లేదు) ప్రివ్యూ "
+"చూపబడుతోంది. మొత్తం AOI ఒకే పనిగా ఉపయోగించబడుతుంది."
+
+#: app/htmx/setup_step_routes.py:1043
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
+" features together."
+msgstr ""
+"%(task_count)s పని సరిహద్దులు మరియు %(data_feature_count)s డేటా లక్షణాలు "
+"కలిపి ప్రివ్యూ చూపబడుతున్నాయి."
+
+#: app/htmx/setup_step_routes.py:1102
+msgid "Project outline not found. Cannot skip task splitting."
+msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ కనబడలేదు. పని విభజనను దాటవేయలేం."
+
+#: app/htmx/setup_step_routes.py:1129
+msgid ""
+"✓ Task splitting skipped. The whole AOI will be used as a single task. "
+"You can proceed to Step 4."
+msgstr ""
+"✓ పని విభజన దాటవేయబడింది. మొత్తం AOI ఒకే పనిగా ఉపయోగించబడుతుంది. మీరు దశ "
+"4 కు వెళ్లవచ్చు."
+
+#: app/htmx/setup_step_routes.py:1190
+msgid "Please select a splitting option."
+msgstr "దయచేసి ఒక విభజన ఎంపికను ఎంచుకోండి."
+
+#: app/htmx/setup_step_routes.py:1210
+msgid "✓ Task splitting is not required for this project setup."
+msgstr "✓ ఈ ప్రాజెక్ట్ సెటప్‌కు పని విభజన అవసరం లేదు."
+
+#: app/htmx/setup_step_routes.py:1267
+msgid "No data extract provided."
+msgstr "డేటా ఎక్స్‌ట్రాక్ట్ ఇవ్వలేదు."
+
+#: app/htmx/setup_step_routes.py:1271
+msgid "Invalid data extract format."
+msgstr "చెల్లని డేటా ఎక్స్‌ట్రాక్ట్ ఫార్మాట్."
+
+#: app/htmx/setup_step_routes.py:1288
+#, python-format
+msgid ""
+"✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
+"complete."
+msgstr ""
+"✓ డేటా ఎక్స్‌ట్రాక్ట్ అంగీకరించబడింది! %(feature_count)s లక్షణాలు సేవ్ "
+"చేయబడ్డాయి. దశ 2 ఇప్పుడు పూర్తైంది."
+
+#: app/htmx/setup_step_routes.py:1338
+msgid "No task areas data provided."
+msgstr "పని ప్రాంతాల డేటా ఇవ్వలేదు."
+
+#: app/htmx/setup_step_routes.py:1342
+msgid "Invalid task areas data format."
+msgstr "చెల్లని పని ప్రాంతాల డేటా ఫార్మాట్."
+
+#: app/htmx/setup_step_routes.py:1359
+#: app/templates/partials/project_details/setup_steps.html:362
+msgid "✓ Split tasks saved successfully"
+msgstr "✓ విభజించిన పనులు విజయవంతంగా సేవ్ అయ్యాయి"
+
+#: app/htmx/setup_step_routes.py:1414
+msgid ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
+msgstr ""
+"ODK URL, వినియోగదారు పేరు, పాస్‌వర్డ్ (మూడింటినీ) ఇవ్వండి, లేదా సర్వర్ "
+"డిఫాల్ట్‌లను ఉపయోగించడానికి అన్నింటినీ ఖాళీగా వదిలేయండి."
+
+#: app/htmx/setup_step_routes.py:1536
+msgid "GeoJSON is required"
+msgstr "GeoJSON అవసరం"
+
+#: app/htmx/setup_step_routes.py:1547
+msgid "No polygon geometries found. Project area must be a polygon."
+msgstr "పాలిగాన్ జ్యామితులు కనబడలేదు. ప్రాజెక్ట్ ప్రాంతం ఒక పాలిగాన్ అయి ఉండాలి."
+
+#: app/templates/home.html:13
+msgid "Filters"
+msgstr "ఫిల్టర్లు"
+
+#: app/templates/home.html:18
+msgid "All projects"
+msgstr "అన్ని ప్రాజెక్టులు"
+
+#: app/templates/home.html:19
+msgid "Draft"
+msgstr "ముసాయిదా"
+
+#: app/templates/home.html:20
+msgid "Published"
+msgstr "ప్రచురించబడింది"
+
+#: app/templates/home.html:21
+msgid "Completed"
+msgstr "పూర్తైంది"
+
+#: app/templates/home.html:22
+msgid "Archived"
+msgstr "ఆర్కైవ్ చేయబడింది"
+
+#: app/templates/home.html:26
+msgid "Project Status"
+msgstr "ప్రాజెక్ట్ స్థితి"
+
+#: app/templates/home.html:42
+msgid "Newest first"
+msgstr "కొత్తది ముందుగా"
+
+#: app/templates/home.html:43
+msgid "Oldest first"
+msgstr "పాతది ముందుగా"
+
+#: app/templates/home.html:44
+msgid "Name (A-Z)"
+msgstr "పేరు (A-Z)"
+
+#: app/templates/home.html:45
+msgid "Name (Z-A)"
+msgstr "పేరు (Z-A)"
+
+#: app/templates/home.html:48
+msgid "Sort By"
+msgstr "ఇలా క్రమపరచు"
+
+#: app/templates/home.html:63
+msgid "Search"
+msgstr "శోధించు"
+
+#: app/templates/home.html:69
+msgid "Search projects…"
+msgstr "ప్రాజెక్టులను శోధించండి…"
+
+#: app/templates/home.html:79 app/templates/landing.html:565
+#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
+msgid "Create Project"
+msgstr "ప్రాజెక్ట్ సృష్టించు"
+
+#: app/templates/home.html:80
+msgid "+ New"
+msgstr "+ కొత్తది"
+
+#: app/templates/home.html:86
+#, python-format
+msgid "Showing %(count)s project"
+msgid_plural "Showing %(count)s projects"
+msgstr[0] "Showing %(count)s project"
+msgstr[1] "Showing %(count)s projects"
+
+#: app/templates/home.html:87
+#, python-format
+msgid "in %(status)s"
+msgstr "%(status)s లో"
+
+#: app/templates/home.html:88
+#, python-format
+msgid "matching \"%(query)s\""
+msgstr "\"%(query)s\" కు సరిపడే"
+
+#: app/templates/home.html:104
+msgid "Private Project"
+msgstr "ప్రైవేట్ ప్రాజెక్ట్"
+
+#: app/templates/home.html:127 app/templates/project_details.html:33
+msgid "Unnamed Project"
+msgstr "పేరులేని ప్రాజెక్ట్"
+
+#: app/templates/home.html:135
+msgid "Location:"
+msgstr "స్థానం:"
+
+#: app/templates/home.html:156
+msgid "Created:"
+msgstr "సృష్టించబడింది:"
+
+#: app/templates/home.html:156
+msgid "N/A"
+msgstr "వర్తించదు"
+
+#: app/templates/home.html:165
+msgid "No projects found. Create your first project to get started!"
+msgstr ""
+"ఏ ప్రాజెక్ట్ కనబడలేదు. ప్రారంభించడానికి మీ మొదటి ప్రాజెక్ట్‌ను "
+"సృష్టించండి!"
+
+#: app/templates/landing.html:557
+msgid "Coordinate field campaigns"
+msgstr "ఫీల్డ్ కార్యక్రమాలను సమన్వయం చేయండి"
+
+#: app/templates/landing.html:560
+msgid ""
+"Enhancing field mapping efficiency and accuracy through seamless "
+"coordination."
+msgstr ""
+"అంతరాయం లేకుండా సమన్వయం ద్వారా ఫీల్డ్ మ్యాపింగ్ సామర్థ్యాన్ని మరియు "
+"ఖచ్చితత్వాన్ని పెంచడం."
+
+#: app/templates/landing.html:563
+msgid "Explore Projects"
+msgstr "ప్రాజెక్టులను పరిశీలించండి"
+
+#: app/templates/landing.html:575
+msgid "Loading metrics..."
+msgstr "మెట్రిక్‌లు లోడ్ అవుతున్నాయి..."
+
+#: app/templates/landing.html:583
+msgid "What is it?"
+msgstr "ఇది ఏమిటి?"
+
+#: app/templates/landing.html:585
+msgid ""
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
+"map features by coordinating mapping in the field."
+msgstr ""
+"Field Tasking Manager (Field-TM) ఫీల్డ్‌లో మ్యాపింగ్‌ను సమన్వయం చేయడం "
+"ద్వారా బృందాలు స్థానిక జ్ఞానాన్ని మ్యాప్ లక్షణాలకు జోడించడానికి "
+"సహాయపడుతుంది."
+
+#: app/templates/landing.html:588
+msgid ""
+"Field-TM facilitates collaborative mapping by supporting and extending "
+"mature tools like ODK and QField. It is a standalone mobile and web "
+"workflow that helps teams collect geospatial data efficiently with "
+"commonly available Android devices."
+msgstr ""
+"ODK మరియు QField వంటి అభివృద్ధి చెందిన సాధనాలను మద్దతు ఇవ్వడం మరియు "
+"విస్తరించడం ద్వారా Field-TM సహకార మ్యాపింగ్‌ను సులభం చేస్తుంది. ఇది "
+"సాధారణంగా అందుబాటులో ఉన్న Android పరికరాలతో బృందాలు భౌగోళిక డేటాను "
+"సమర్థవంతంగా సేకరించడంలో సహాయపడే స్వతంత్ర మొబైల్ మరియు వెబ్ వర్క్‌ఫ్లో."
+
+#: app/templates/landing.html:593
+msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+msgstr ""
+"ఒక ప్రాజెక్ట్ మేనేజర్ ల్యాప్‌టాప్‌పై FieldTM మ్యాపింగ్ వర్క్‌ఫ్లోని "
+"చూపిస్తున్నారు"
+
+#: app/templates/landing.html:599
+msgid "Main Features"
+msgstr "ప్రధాన లక్షణాలు"
+
+#: app/templates/landing.html:602
+msgid "Flexible Data Collection"
+msgstr "అనుకూల డేటా సేకరణ"
+
+#: app/templates/landing.html:604
+msgid ""
+"Support diverse survey forms, multiple data formats, and adaptable "
+"workflows that fit different operational needs."
+msgstr ""
+"విభిన్న సర్వే ఫారమ్‌లు, అనేక డేటా ఫార్మాట్‌లు మరియు వేర్వేరు ఆపరేషనల్ "
+"అవసరాలకు సరిపోయే అనుకూల వర్క్‌ఫ్లోలకు మద్దతు ఇస్తుంది."
+
+#: app/templates/landing.html:608
+msgid "Open Source and Customizable"
+msgstr "ఓపెన్ సోర్స్ మరియు అనుకూలీకరించదగినది"
+
+#: app/templates/landing.html:610
+msgid ""
+"Adapt Field-TM to your own survey logic, data structures, and integration"
+" requirements."
+msgstr ""
+"మీ సర్వే తర్కం, డేటా నిర్మాణాలు మరియు సమీకరణ అవసరాలకు Field-TM ను "
+"సరిపోల్చుకోండి."
+
+#: app/templates/landing.html:614
+msgid "Entity-Level Tracking"
+msgstr "ఎంటిటీ-స్థాయి ట్రాకింగ్"
+
+#: app/templates/landing.html:616
+msgid ""
+"Monitor survey progress at task and feature level so managers can make "
+"informed decisions quickly."
+msgstr ""
+"మేనేజర్లు త్వరగా సమాచారం ఆధారిత నిర్ణయాలు తీసుకునేలా పని మరియు లక్షణ "
+"స్థాయిలో సర్వే పురోగతిని పర్యవేక్షించండి."
+
+#: app/templates/landing.html:623
+msgid "Who is it for?"
+msgstr "ఇది ఎవరికి?"
+
+#: app/templates/landing.html:626
+msgid "Project Manager"
+msgstr "ప్రాజెక్ట్ మేనేజర్"
+
+#: app/templates/landing.html:627
+msgid "Create and coordinate field campaigns"
+msgstr "ఫీల్డ్ కార్యక్రమాలను సృష్టించండి మరియు సమన్వయం చేయండి"
+
+#: app/templates/landing.html:629
+msgid ""
+"Project managers use Field-TM to set up mapping projects, define areas of"
+" interest, design survey forms, and split work into manageable tasks."
+msgstr ""
+"ప్రాజెక్ట్ మేనేజర్లు Field-TM ను ఉపయోగించి మ్యాపింగ్ ప్రాజెక్టులను "
+"ఏర్పాటు చేస్తారు, ఆసక్తి ప్రాంతాలను నిర్వచిస్తారు, సర్వే ఫారమ్‌లను "
+"రూపకల్పన చేస్తారు, మరియు పనిని నిర్వహించదగిన భాగాలుగా విభజిస్తారు."
+
+#: app/templates/landing.html:632
+msgid "Define a project area and upload or choose a survey form"
+msgstr ""
+"ప్రాజెక్ట్ ప్రాంతాన్ని నిర్వచించి సర్వే ఫారమ్‌ను అప్‌లోడ్ చేయండి లేదా "
+"ఎంచుకోండి"
+
+#: app/templates/landing.html:633
+msgid "Split the area into tasks and generate a data extract"
+msgstr "ప్రాంతాన్ని పనులుగా విభజించి డేటా ఎక్స్‌ట్రాక్ట్ రూపొందించండి"
+
+#: app/templates/landing.html:634
+msgid "Publish the project to ODK Central or QFieldCloud"
+msgstr "ప్రాజెక్ట్‌ను ODK Central లేదా QFieldCloud లో ప్రచురించండి"
+
+#: app/templates/landing.html:635
+msgid "Share a QR code so mappers can start collecting data"
+msgstr "మ్యాపర్లు డేటా సేకరించడం ప్రారంభించేందుకు QR కోడ్‌ను పంచుకోండి"
+
+#: app/templates/landing.html:639
+msgid "Field Mapper"
+msgstr "ఫీల్డ్ మ్యాపర్"
+
+#: app/templates/landing.html:640
+msgid "Collect data in the field with your phone"
+msgstr "మీ ఫోన్‌తో ఫీల్డ్‌లో డేటా సేకరించండి"
+
+#: app/templates/landing.html:642
+msgid ""
+"Mappers do not need to log in to Field-TM. Once a project manager "
+"publishes a project, mappers access it directly in their mobile app of "
+"choice."
+msgstr ""
+"మ్యాపర్లు Field-TM లో లాగిన్ కావాల్సిన అవసరం లేదు. ప్రాజెక్ట్ మేనేజర్ ఒక "
+"ప్రాజెక్ట్‌ను ప్రచురించిన తర్వాత, వారు తమకు ఇష్టమైన మొబైల్ యాప్‌లో నేరుగా"
+" దానిని యాక్సెస్ చేస్తారు."
+
+#: app/templates/landing.html:645
+msgid "Scan the QR code shared by your project manager"
+msgstr "మీ ప్రాజెక్ట్ మేనేజర్ పంచుకున్న QR కోడ్‌ను స్కాన్ చేయండి"
+
+#: app/templates/landing.html:646
+msgid "The project loads automatically in ODK Collect or QField"
+msgstr "ప్రాజెక్ట్ ODK Collect లేదా QField లో స్వయంచాలకంగా లోడ్ అవుతుంది"
+
+#: app/templates/landing.html:647
+msgid "Navigate to your assigned task area and collect data"
+msgstr "మీకు కేటాయించిన పని ప్రాంతానికి వెళ్లి డేటా సేకరించండి"
+
+#: app/templates/landing.html:648
+msgid "Submit your survey, which goes straight to the server"
+msgstr "మీ సర్వేను సమర్పించండి, అది నేరుగా సర్వర్‌కి వెళుతుంది"
+
+#: app/templates/landing.html:655
+msgid "Field-TM Use Cases"
+msgstr "Field-TM వినియోగ సందర్భాలు"
+
+#: app/templates/landing.html:660
+msgid "Field mapping in progress"
+msgstr "ఫీల్డ్ మ్యాపింగ్ ప్రగతిలో ఉంది"
+
+#: app/templates/landing.html:665
+msgid "1. Community Mapping"
+msgstr "1. సముదాయ మ్యాపింగ్"
+
+#: app/templates/landing.html:667
+msgid ""
+"Field Tasking Manager empowers communities to map informal settlements, "
+"public facilities, and local services for inclusive planning."
+msgstr ""
+"Field Tasking Manager సమగ్ర ప్రణాళిక కోసం అనధికార నివాసాలు, ప్రజా "
+"సదుపాయాలు మరియు స్థానిక సేవలను మ్యాప్ చేయడానికి సముదాయాలకు "
+"శక్తినిస్తుంది."
+
+#: app/templates/landing.html:671
+msgid "2. Urban Planning and Management"
+msgstr "2. పట్టణ ప్రణాళిక మరియు నిర్వహణ"
+
+#: app/templates/landing.html:673
+msgid ""
+"Build smarter cities with coordinated surveys of houses, roads, and "
+"utilities through clear, manageable mapping tasks."
+msgstr ""
+"స్పష్టమైన, నిర్వహించదగిన మ్యాపింగ్ పనుల ద్వారా ఇళ్లు, రహదారులు మరియు "
+"యుటిలిటీలపై సమన్వయ సర్వేలతో మరింత స్మార్ట్ నగరాలను నిర్మించండి."
+
+#: app/templates/landing.html:677
+msgid "3. Disaster Response and Recovery"
+msgstr "3. విపత్తు ప్రతిస్పందన మరియు పునరుద్ధరణ"
+
+#: app/templates/landing.html:679
+msgid ""
+"Rapidly map damaged infrastructure after disasters, coordinate "
+"volunteers, and deliver reliable data for relief operations."
+msgstr ""
+"విపత్తుల తరువాత దెబ్బతిన్న మౌలిక వసతులను వేగంగా మ్యాప్ చేయండి, స్వచ్ఛంద "
+"కార్యకర్తలను సమన్వయం చేయండి, మరియు సహాయక చర్యలకు నమ్మదగిన డేటాను "
+"అందించండి."
+
+#: app/templates/landing.html:687
+msgid "Resources"
+msgstr "వనరులు"
+
+#: app/templates/landing.html:695
+msgid "Data Prep"
+msgstr "డేటా సిద్ధం"
+
+#: app/templates/landing.html:696
+msgid "HOT Export Tool"
+msgstr "HOT ఎగుమతి సాధనం"
+
+#: app/templates/landing.html:698
+msgid "Download task-ready geospatial data extracts for your project area."
+msgstr ""
+"మీ ప్రాజెక్ట్ ప్రాంతానికి పని-సిద్ధమైన భౌగోళిక డేటా ఎక్స్‌ట్రాక్ట్‌లను "
+"డౌన్‌లోడ్ చేయండి."
+
+#: app/templates/landing.html:707 app/templates/landing.html:719
+msgid "Documentation"
+msgstr "పత్రాలు"
+
+#: app/templates/landing.html:708
+msgid "ODK Central Guide"
+msgstr "ODK Central మార్గదర్శిని"
+
+#: app/templates/landing.html:710
+msgid "Learn how to manage forms, app users, and field submissions in ODK."
+msgstr ""
+"ODK లో ఫారమ్‌లు, యాప్ వినియోగదారులు మరియు ఫీల్డ్ సమర్పణలను ఎలా "
+"నిర్వహించాలో తెలుసుకోండి."
+
+#: app/templates/landing.html:720
+msgid "QField Guide"
+msgstr "QField మార్గదర్శిని"
+
+#: app/templates/landing.html:722
+msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+msgstr ""
+"ఆఫ్‌లైన్ మ్యాపింగ్ కోసం QFieldCloud ప్రాజెక్టులు మరియు మొబైల్ "
+"వర్క్‌ఫ్లోలను ఏర్పాటు చేయండి."
+
+#: app/templates/landing.html:732
+msgid "Need assistance?"
+msgstr "సహాయం కావాలా?"
+
+#: app/templates/landing.html:733
+msgid "Email:"
+msgstr "ఇమెయిల్:"
+
+#: app/templates/landing.html:749
+msgid "Language"
+msgstr "భాష"
+
+#: app/templates/layout.html:7
+msgid "Coordinated field mapping for Open Mapping campaigns."
+msgstr "Open Mapping కార్యక్రమాల కోసం సమన్వయ ఫీల్డ్ మ్యాపింగ్."
+
+#: app/templates/layout.html:159 app/templates/login.html:1
+msgid "Login"
+msgstr "లాగిన్"
+
+#: app/templates/layout.html:213
+msgid "Projects"
+msgstr "ప్రాజెక్టులు"
+
+#: app/templates/layout.html:227
+msgid "QField Admin"
+msgstr "QField నిర్వాహకుడు"
+
+#: app/templates/login.html:5
+msgid "Sign in to Field-TM"
+msgstr "Field-TM లో సైన్ ఇన్ చేయండి"
+
+#: app/templates/login.html:8
+msgid "Redirecting to the centralized login service."
+msgstr "కేంద్రీకృత లాగిన్ సేవకు మళ్లిస్తోంది."
+
+#: app/templates/login.html:9
+msgid "Continue to login"
+msgstr "లాగిన్‌కు కొనసాగండి"
+
+#: app/templates/login.html:17
+msgid "Authentication is disabled on this deployment."
+msgstr "ఈ అమరికలో ప్రమాణీకరణ నిలిపివేయబడింది."
+
+#: app/templates/login.html:20
+msgid "Back to home"
+msgstr "హోమ్‌కు తిరిగి వెళ్ళు"
+
+#: app/templates/new_project.html:4
+msgid "Create New Project"
+msgstr "కొత్త ప్రాజెక్ట్ సృష్టించు"
+
+#: app/templates/new_project.html:25
+msgid "Project Name"
+msgstr "ప్రాజెక్ట్ పేరు"
+
+#: app/templates/new_project.html:30
+msgid "Enter project name"
+msgstr "ప్రాజెక్ట్ పేరును నమోదు చేయండి"
+
+#: app/templates/new_project.html:43
+msgid "Enter project description"
+msgstr "ప్రాజెక్ట్ వివరణను నమోదు చేయండి"
+
+#: app/templates/new_project.html:52
+msgid "Field Mapping App"
+msgstr "ఫీల్డ్ మ్యాపింగ్ యాప్"
+
+#: app/templates/new_project.html:92
+msgid "Project Area"
+msgstr "ప్రాజెక్ట్ ప్రాంతం"
+
+#: app/templates/new_project.html:101
+msgid "Draw Area"
+msgstr "ప్రాంతాన్ని గీయండి"
+
+#: app/templates/new_project.html:109
+msgid "Upload GeoJSON"
+msgstr "GeoJSON అప్‌లోడ్ చేయండి"
+
+#: app/templates/new_project.html:117
+msgid "Clear"
+msgstr "తొలగించు"
+
+#: app/templates/new_project.html:125
+msgid ""
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"warning. The OSM data extract API is limited to 200 km²."
+msgstr ""
+"మీ ప్రాజెక్ట్ ప్రాంతాన్ని నిర్వచించడానికి మ్యాప్‌పై ఒక బహుభుజాన్ని గీయండి"
+" లేదా GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి. గరిష్ట ప్రాజెక్ట్ పరిమాణం 1,000 "
+"కి.మీ². 100 కి.మీ² కంటే పెద్ద ప్రాంతాలు హెచ్చరికను చూపిస్తాయి. OSM డేటా "
+"ఎక్స్‌ట్రాక్ట్ API 200 కి.మీ² వరకు పరిమితం."
+
+#: app/templates/new_project.html:133
+#: app/templates/partials/project_details/setup_steps.html:101
+#: app/templates/partials/project_details/setup_steps.html:236
+#: app/templates/partials/project_details/setup_steps.html:377
+#: app/templates/partials/project_details/setup_steps.html:576
+msgid "Advanced Config"
+msgstr "అధునాతన కాన్ఫిగ్"
+
+#: app/templates/new_project.html:145
+msgid "Merge geometries (use convex hull for multipolygons)"
+msgstr "జ్యామితులను విలీనం చేయండి (బహుభుజాల కోసం convex hull ఉపయోగించండి)"
+
+#: app/templates/new_project.html:154 app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "హ్యాష్‌ట్యాగ్‌లు"
+
+#: app/templates/new_project.html:157
+msgid "Type hashtags and press Enter or comma"
+msgstr "హ్యాష్‌ట్యాగ్‌లను టైప్ చేసి Enter లేదా comma నొక్కండి"
+
+#: app/templates/new_project.html:162
+msgid ""
+"Type hashtags and press Enter or comma to add them. Click the × on a tag "
+"to remove it."
+msgstr ""
+"హ్యాష్‌ట్యాగ్‌లను జోడించడానికి టైప్ చేసి Enter లేదా comma నొక్కండి. ఒక "
+"ట్యాగ్‌ను తొలగించడానికి × నొక్కండి."
+
+#: app/templates/new_project.html:168
+msgid "Creating..."
+msgstr "సృష్టిస్తోంది..."
+
+#: app/templates/new_project.html:177
+msgid "Something went wrong. Please try again."
+msgstr "ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి."
+
+#: app/templates/new_project.html:178
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr "చెల్లని GeoJSON ఫార్మాట్. దయచేసి మీ ఫైల్‌ను పరిశీలించండి."
+
+#: app/templates/new_project.html:179
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr "చెల్లని GeoJSON ఫైల్. దయచేసి ఫైల్ ఫార్మాట్‌ను పరిశీలించండి."
+
+#: app/templates/new_project.html:180 app/templates/new_project.html:645
+msgid ""
+"You must draw or upload an Area of Interest (AOI) on the map before "
+"submitting."
+msgstr ""
+"సమర్పించే ముందు మ్యాప్‌పై ఆసక్తి ప్రాంతం (AOI) గీయాలి లేదా అప్‌లోడ్ "
+"చేయాలి."
+
+#: app/templates/new_project.html:610
+msgid "A project with this name already exists. Please choose a different name."
+msgstr "ఈ పేరుతో ఒక ప్రాజెక్ట్ ఇప్పటికే ఉంది. దయచేసి వేరే పేరును ఎంచుకోండి."
+
+#: app/templates/new_project.html:770
+msgid "Description is required."
+msgstr "వివరణ అవసరం."
+
+#: app/templates/project_details.html:6
+msgid "← Back to Projects"
+msgstr "← ప్రాజెక్టులకు తిరిగి వెళ్ళు"
+
+#: app/templates/project_details.html:46
+msgid "Project Metadata"
+msgstr "ప్రాజెక్ట్ మెటాడేటా"
+
+#: app/templates/project_details.html:48
+msgid "Project metadata and setup information for managers."
+msgstr "మేనేజర్ల కోసం ప్రాజెక్ట్ మెటాడేటా మరియు సెటప్ సమాచారం."
+
+#: app/templates/project_details.html:66
+msgid "Project ID"
+msgstr "ప్రాజెక్ట్ గుర్తింపు"
+
+#: app/templates/project_details.html:77
+msgid "Created"
+msgstr "సృష్టించబడింది"
+
+#: app/templates/project_details.html:84
+msgid "Last Updated"
+msgstr "చివరిసారిగా నవీకరించబడింది"
+
+#: app/templates/project_details.html:107
+msgid "External Project"
+msgstr "బాహ్య ప్రాజెక్ట్"
+
+#: app/templates/project_details.html:109
+msgid "Instance:"
+msgstr "ఇన్‌స్టాన్స్:"
+
+#: app/templates/project_details.html:111
+msgid "Project ID:"
+msgstr "ప్రాజెక్ట్ గుర్తింపు:"
+
+#: app/templates/project_details.html:121
+#: app/templates/project_details.html:129
+msgid "View Project in ODK Central →"
+msgstr "ODK Central లో ప్రాజెక్ట్‌ను చూడండి →"
+
+#: app/templates/project_details.html:136
+msgid "Manage QFieldCloud Project →"
+msgstr "QFieldCloud ప్రాజెక్ట్‌ను నిర్వహించండి →"
+
+#: app/templates/project_details.html:144
+msgid "View Project Externally →"
+msgstr "ప్రాజెక్ట్‌ను బాహ్యంగా చూడండి →"
+
+#: app/templates/project_details.html:159
+msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+msgstr ""
+"ఈ ప్రాజెక్ట్‌ను downstream మరియు Field-TM లో తొలగించాలా? ఇది తిరిగి "
+"చేయలేరు."
+
+#: app/templates/project_details.html:162
+msgid "Delete Project"
+msgstr "ప్రాజెక్ట్ తొలగించు"
+
+#: app/templates/project_details.html:165
+#: app/templates/project_details.html:176
+msgid "Back to Projects"
+msgstr "ప్రాజెక్టులకు తిరిగి వెళ్ళు"
+
+#: app/templates/project_details.html:171
+msgid "Project Not Found"
+msgstr "ప్రాజెక్ట్ కనబడలేదు"
+
+#: app/templates/project_details.html:173
+msgid ""
+"The project you're looking for doesn't exist or you don't have permission"
+" to view\n"
+"        it."
+msgstr "మీరు వెతుకుతున్న ప్రాజెక్ట్ లేదు లేదా దాన్ని చూడటానికి మీకు అనుమతి లేదు."
+
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
+msgid "QFieldCloud Admin"
+msgstr "QFieldCloud నిర్వాహకుడు"
+
+#: app/templates/qfc_admin.html:21
+msgid ""
+"This page is for managing the users in your QField project, after "
+"creation."
+msgstr ""
+"ఈ పేజీ మీ QField ప్రాజెక్ట్‌లోని వినియోగదారులను సృష్టించిన తరువాత "
+"నిర్వహించడానికి ఉపయోగపడుతుంది."
+
+#: app/templates/qfc_admin.html:25
+msgid "Enter your QFieldCloud credentials to manage collaborators."
+msgstr "సహకారులను నిర్వహించడానికి మీ QFieldCloud గుర్తింపు వివరాలను నమోదు చేయండి."
+
+#: app/templates/qfc_admin.html:36
+msgid "QFieldCloud URL"
+msgstr "QFieldCloud URL"
+
+#: app/templates/qfc_admin.html:46
+msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+msgstr "మీ QFieldCloud instance యొక్క ప్రాథమిక URL (/api/v1 లేకుండా)."
+
+#: app/templates/qfc_admin.html:54
+msgid "admin"
+msgstr "నిర్వాహకుడు"
+
+#: app/templates/partials/project_details/setup_steps.html:632
+#: app/templates/partials/project_details/setup_steps.html:638
+#: app/templates/partials/project_details/setup_steps.html:672
+#: app/templates/qfc_admin.html:59
+msgid "Password"
+msgstr "పాస్‌వర్డ్"
+
+#: app/templates/qfc_admin.html:70
+msgid "Connect"
+msgstr "కనెక్ట్ చేయండి"
+
+#: app/templates/qfc_admin.html:76
+msgid "Connecting…"
+msgstr "కనెక్ట్ అవుతోంది…"
+
+#: app/templates/partials/metrics.html:5
+msgid "Features Surveyed (Approximate)"
+msgstr "సర్వే చేసిన లక్షణాలు (సుమారు)"
+
+#: app/templates/partials/metrics.html:12
+msgid "Projects Created"
+msgstr "సృష్టించిన ప్రాజెక్టులు"
+
+#: app/templates/partials/metrics.html:19
+msgid "Countries Covered"
+msgstr "కవర్ చేసిన దేశాలు"
+
+#: app/templates/partials/metrics.html:26
+msgid "Users Registered"
+msgstr "నమోదైన వినియోగదారులు"
+
+#: app/templates/partials/metrics.html:33
+msgid "Supported Mapping Apps"
+msgstr "మద్దతు ఉన్న మ్యాపింగ్ యాప్‌లు"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:3
+msgid "Manager Setup Summary"
+msgstr "మేనేజర్ సెటప్ సారాంశం"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:6
+msgid "The project setup flow is complete and shown below for reference."
+msgstr "ప్రాజెక్ట్ సెటప్ ప్రక్రియ పూర్తయింది మరియు సూచన కోసం కింద చూపబడుతోంది."
+
+#: app/templates/partials/project_details/manager_setup_summary.html:14
+msgid "Project Location"
+msgstr "ప్రాజెక్ట్ స్థానం"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:25
+msgid "Step 1: Upload XLSForm"
+msgstr "దశ 1: XLSForm అప్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:28
+#: app/templates/partials/project_details/manager_setup_summary.html:39
+#: app/templates/partials/project_details/manager_setup_summary.html:50
+#: app/templates/partials/project_details/manager_setup_summary.html:61
+#: app/templates/partials/project_details/setup_steps.html:46
+#: app/templates/partials/project_details/setup_steps.html:184
+#: app/templates/partials/project_details/setup_steps.html:354
+msgid "Complete"
+msgstr "పూర్తి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:36
+#: app/templates/partials/project_details/setup_steps.html:179
+msgid "Step 2: Get Data"
+msgstr "దశ 2: డేటాను పొందండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:47
+msgid "Step 3: Split into Tasks"
+msgstr "దశ 3: పనులుగా విభజించండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:58
+#: app/templates/partials/project_details/setup_steps.html:559
+msgid "Step 4: Finalise Project"
+msgstr "దశ 4: ప్రాజెక్ట్‌ను పూర్తిచేయండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:69
+msgid ""
+"If you need to upload additional media files to this project, such as "
+"images and\n"
+"          videos, log into ODK Central and upload them in the form "
+"settings."
+msgstr ""
+"ఈ ప్రాజెక్ట్‌కు చిత్రాలు, వీడియోలు వంటి అదనపు మీడియా ఫైళ్లను అప్‌లోడ్ "
+"చేయాల్సి ఉంటే, ODK Central లో లాగిన్ అయి ఫారమ్ సెట్టింగ్‌లలో అప్‌లోడ్ "
+"చేయండి."
+
+#: app/templates/partials/project_details/setup_steps.html:14
+msgid "Ready for Mapping"
+msgstr "మ్యాపింగ్‌కు సిద్ధం"
+
+#: app/templates/partials/project_details/setup_steps.html:25
+msgid "Loading QR code..."
+msgstr "QR కోడ్ లోడ్ అవుతోంది..."
+
+#: app/templates/partials/project_details/setup_steps.html:32
+msgid "Project Setup"
+msgstr "ప్రాజెక్ట్ సెటప్"
+
+#: app/templates/partials/project_details/setup_steps.html:41
+msgid "Step 1: Select Survey Form"
+msgstr "దశ 1: సర్వే ఫారమ్ ఎంచుకోండి"
+
+#: app/templates/partials/project_details/setup_steps.html:51
+msgid "Choose a survey type and continue with recommended defaults."
+msgstr "ఒక సర్వే రకాన్ని ఎంచుకుని సిఫార్సు చేసిన డిఫాల్ట్‌లతో కొనసాగండి."
+
+#: app/templates/partials/project_details/setup_steps.html:62
+msgid "Choose Survey Type:"
+msgstr "సర్వే రకాన్ని ఎంచుకోండి:"
+
+#: app/templates/partials/project_details/setup_steps.html:64
+msgid "Loading survey types..."
+msgstr "సర్వే రకాలు లోడ్ అవుతున్నాయి..."
+
+#: app/templates/partials/project_details/setup_steps.html:75
+msgid ""
+"Recommended defaults are active for ODK projects, including ODK Collect\n"
+"          compatibility."
+msgstr ""
+"ODK Collect అనుకూలతతో సహా ODK ప్రాజెక్ట్‌లకు సిఫార్సు చేసిన డిఫాల్ట్‌లు "
+"సక్రియంగా ఉన్నాయి."
+
+#: app/templates/partials/project_details/setup_steps.html:82
+#, python-format
+msgid "Recommended defaults are active for %(app_name)s projects."
+msgstr "%(app_name)s ప్రాజెక్ట్‌లకు సిఫార్సు చేసిన డిఫాల్ట్‌లు సక్రియంగా ఉన్నాయి."
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Recommended defaults are active for this project."
+msgstr "ఈ ప్రాజెక్ట్‌కు సిఫార్సు చేసిన డిఫాల్ట్‌లు సక్రియంగా ఉన్నాయి."
+
+#: app/templates/partials/project_details/setup_steps.html:108
+msgid "Upload a custom XLSForm or adjust form-processing options."
+msgstr ""
+"కస్టమ్ XLSForm ను అప్‌లోడ్ చేయండి లేదా ఫారమ్-ప్రాసెసింగ్ ఎంపికలను "
+"సర్దుబాటు చేయండి."
+
+#: app/templates/partials/project_details/setup_steps.html:118
+msgid "Upload Custom Form"
+msgstr "కస్టమ్ ఫారమ్ అప్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:130
+msgid "Make photo upload mandatory"
+msgstr "ఫోటో అప్‌లోడ్‌ను తప్పనిసరి చేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:134
+msgid "Default Language:"
+msgstr "డిఫాల్ట్ భాష:"
+
+#: app/templates/partials/project_details/setup_steps.html:136
+msgid "English"
+msgstr "ఇంగ్లీష్"
+
+#: app/templates/partials/project_details/setup_steps.html:137
+msgid "Spanish"
+msgstr "స్పానిష్"
+
+#: app/templates/partials/project_details/setup_steps.html:138
+msgid "French"
+msgstr "ఫ్రెంచ్"
+
+#: app/templates/partials/project_details/setup_steps.html:139
+msgid "Portuguese"
+msgstr "పోర్చుగీస్"
+
+#: app/templates/partials/project_details/setup_steps.html:140
+msgid "Swahili"
+msgstr "స్వాహిలి"
+
+#: app/templates/partials/project_details/setup_steps.html:141
+msgid "Hindi"
+msgstr "హిందీ"
+
+#: app/templates/partials/project_details/setup_steps.html:163
+msgid "Continue"
+msgstr "కొనసాగించు"
+
+#: app/templates/partials/project_details/setup_steps.html:167
+msgid "✓ Survey form uploaded successfully"
+msgstr "✓ సర్వే ఫారమ్ విజయవంతంగా అప్‌లోడ్ చేయబడింది"
+
+#: app/templates/partials/project_details/setup_steps.html:189
+msgid "Download the recommended OSM data for your survey form."
+msgstr "మీ సర్వే ఫారమ్ కోసం సిఫార్సు చేసిన OSM డేటాను డౌన్‌లోడ్ చేయండి."
+
+#: app/templates/partials/project_details/setup_steps.html:191
+msgid "Review the data on the map, then continue."
+msgstr "మ్యాప్‌లోని డేటాను పరిశీలించి తర్వాత కొనసాగండి."
+
+#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/style_and_scripts.html:27
+msgid "Download OSM Data"
+msgstr "OSM డేటాను డౌన్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:226
+msgid "Collect New Data Only"
+msgstr "కొత్త డేటాను మాత్రమే సేకరించండి"
+
+#: app/templates/partials/project_details/setup_steps.html:243
+msgid "Use custom data inputs or override the default OSM download options."
+msgstr ""
+"కస్టమ్ డేటా ఇన్‌పుట్‌లను ఉపయోగించండి లేదా డిఫాల్ట్ OSM డౌన్‌లోడ్ ఎంపికలను"
+" మార్చండి."
+
+#: app/templates/partials/project_details/setup_steps.html:249
+msgid "OSM Category:"
+msgstr "OSM వర్గం:"
+
+#: app/templates/partials/project_details/setup_steps.html:252
+msgid "OSM Buildings"
+msgstr "OSM భవనాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:253
+msgid "OSM Highways"
+msgstr "OSM రహదారులు"
+
+#: app/templates/partials/project_details/setup_steps.html:254
+msgid "OSM Healthcare"
+msgstr "OSM ఆరోగ్య సేవలు"
+
+#: app/templates/partials/project_details/setup_steps.html:255
+msgid "OSM Toilets"
+msgstr "OSM మరుగుదొడ్లు"
+
+#: app/templates/partials/project_details/setup_steps.html:256
+msgid "OSM Religious"
+msgstr "OSM మత సంబంధిత"
+
+#: app/templates/partials/project_details/setup_steps.html:257
+msgid "OSM Landuse"
+msgstr "OSM భూ వినియోగం"
+
+#: app/templates/partials/project_details/setup_steps.html:258
+msgid "OSM Waterways"
+msgstr "OSM జలమార్గాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:259
+msgid "OSM Water Points"
+msgstr "OSM నీటి కేంద్రాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:260
+msgid "OSM Waste Disposal"
+msgstr "OSM వ్యర్థాల నిర్వాహణ"
+
+#: app/templates/partials/project_details/setup_steps.html:261
+msgid "OSM Education"
+msgstr "OSM విద్య"
+
+#: app/templates/partials/project_details/setup_steps.html:262
+msgid "OSM Cemeteries"
+msgstr "OSM సమాధి స్థలాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:263
+msgid "OSM Amenities"
+msgstr "OSM సౌకర్యాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Geometry Type:"
+msgstr "జ్యామితి రకం:"
+
+#: app/templates/partials/project_details/setup_steps.html:271
+msgid "Polygon"
+msgstr "బహుభుజం"
+
+#: app/templates/partials/project_details/setup_steps.html:272
+msgid "Polyline"
+msgstr "పాలీలైన్"
+
+#: app/templates/partials/project_details/setup_steps.html:273
+msgid "Point"
+msgstr "బిందువు"
+
+#: app/templates/partials/project_details/setup_steps.html:286
+msgid "Use centroids"
+msgstr "కేంద్ర బిందువులను ఉపయోగించండి"
+
+#: app/templates/partials/project_details/setup_steps.html:298
+msgid "Upload Custom GeoJSON"
+msgstr "కస్టమ్ GeoJSON అప్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:317
+msgid "Generating OSM data extract... This may take a moment."
+msgstr "OSM డేటా ఎక్స్‌ట్రాక్ట్ రూపొందుతోంది... దీనికి కొంత సమయం పట్టవచ్చు."
+
+#: app/templates/partials/project_details/setup_steps.html:336
+msgid "OSM data extract ready"
+msgstr "OSM డేటా ఎక్స్‌ట్రాక్ట్ సిద్ధంగా ఉంది"
+
+#: app/templates/partials/project_details/setup_steps.html:349
+msgid "Step 3: Split into Tasks (Optional)"
+msgstr "దశ 3: పనులుగా విభజించండి (ఐచ్చికం)"
+
+#: app/templates/partials/project_details/setup_steps.html:359
+msgid "✓ Task splitting is not relevant without existing data"
+msgstr "✓ ఇప్పటికే ఉన్న డేటా లేకుండా పని విభజన అవసరం లేదు"
+
+#: app/templates/partials/project_details/setup_steps.html:365
+msgid ""
+"Generate task areas by splitting the Area of Interest (AOI). Choose an "
+"algorithm and\n"
+"      parameters, then split. Review the preview, and click \"Accept Task"
+" Areas\" to save. Or\n"
+"      click"
+msgstr ""
+"ఆసక్తి ప్రాంతాన్ని (AOI) విభజించి పని ప్రాంతాలను సృష్టించండి. ఒక "
+"ఆల్గారిథమ్ మరియు పరామితులను ఎంచుకుని విభజించండి. ప్రివ్యూను చూసి సేవ్ "
+"చేయడానికి \"Accept Task Areas\" క్లిక్ చేయండి. లేదా"
+
+#: app/templates/partials/project_details/setup_steps.html:368
+#: app/templates/partials/project_details/setup_steps.html:387
+msgid "Skip"
+msgstr "దాటవేయి"
+
+#: app/templates/partials/project_details/setup_steps.html:369
+msgid "to use the whole AOI as a single task."
+msgstr "మొత్తం AOI ని ఒకే పనిగా ఉపయోగించడానికి."
+
+#: app/templates/partials/project_details/setup_steps.html:401
+msgid "Choose which linear features influence building-based task splitting."
+msgstr "భవనాల ఆధారిత పని విభజనపై ప్రభావం చూపే రేఖీయ లక్షణాలను ఎంచుకోండి."
+
+#: app/templates/partials/project_details/setup_steps.html:425
+msgid "Include roads"
+msgstr "రహదారులను చేర్చండి"
+
+#: app/templates/partials/project_details/setup_steps.html:434
+msgid "Include rivers"
+msgstr "నదులను చేర్చండి"
+
+#: app/templates/partials/project_details/setup_steps.html:443
+msgid "Include railways"
+msgstr "రైలుమార్గాలను చేర్చండి"
+
+#: app/templates/partials/project_details/setup_steps.html:452
+msgid "Include aeroways"
+msgstr "విమాన మార్గాలను చేర్చండి"
+
+#: app/templates/partials/project_details/setup_steps.html:459
+msgid "Algorithm:"
+msgstr "ఆల్గారిథమ్:"
+
+#: app/templates/partials/project_details/setup_steps.html:461
+msgid "Select splitting option..."
+msgstr "విభజన ఎంపికను ఎంచుకోండి..."
+
+#: app/templates/partials/project_details/setup_steps.html:462
+#: app/templates/partials/project_details/style_and_scripts.html:30
+msgid "Split by Square"
+msgstr "చదరంగా విభజించు"
+
+#: app/templates/partials/project_details/setup_steps.html:463
+msgid "Average Buildings v1 (Voronoi)"
+msgstr "సగటు భవనాలు v1 (Voronoi)"
+
+#: app/templates/partials/project_details/setup_steps.html:465
+msgid "Average Buildings v2 (Straight Skeleton)"
+msgstr "సగటు భవనాలు v2 (Straight Skeleton)"
+
+#: app/templates/partials/project_details/setup_steps.html:468
+msgid "Split by Specific Number of Tasks (Coming Soon)"
+msgstr "నిర్దిష్ట పనుల సంఖ్య ప్రకారం విభజించు (త్వరలో)"
+
+#: app/templates/partials/project_details/setup_steps.html:476
+msgid "Avg. Buildings per Task:"
+msgstr "ఒక పనికి సగటు భవనాలు:"
+
+#: app/templates/partials/project_details/setup_steps.html:489
+msgid "Dimension (meters):"
+msgstr "కొలత (మీటర్లు):"
+
+#: app/templates/partials/project_details/setup_steps.html:508
+msgid "Split Again"
+msgstr "మళ్లీ విభజించు"
+
+#: app/templates/partials/project_details/setup_steps.html:508
+#: app/templates/partials/project_details/style_and_scripts.html:32
+msgid "Split AOI"
+msgstr "AOI ని విభజించు"
+
+#: app/templates/partials/project_details/setup_steps.html:544
+msgid "Splitting AOI into tasks... This may take a moment."
+msgstr "AOI ను పనులుగా విభజిస్తోంది... దీనికి కొంత సమయం పట్టవచ్చు."
+
+#: app/templates/partials/project_details/setup_steps.html:560
+msgid "Ready"
+msgstr "సిద్ధం"
+
+#: app/templates/partials/project_details/setup_steps.html:563
+msgid ""
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
+msgstr ""
+"అన్ని ముందస్తు అవసరాలు పూర్తయ్యాయి! మీరు ఎంచుకున్న మ్యాపింగ్ సాధనంలో "
+"ప్రాజెక్ట్‌ను సృష్టించండి."
+
+#: app/templates/partials/project_details/setup_steps.html:568
+msgid "Finalise Project"
+msgstr "ప్రాజెక్ట్‌ను పూర్తిచేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:585
+msgid "Confirm Project Finalisation"
+msgstr "ప్రాజెక్ట్ పూర్తి చేయడాన్ని నిర్ధారించండి"
+
+#: app/templates/partials/project_details/setup_steps.html:589
+msgid "Are you sure you want to finalise this project?"
+msgstr "ఈ ప్రాజెక్ట్‌ను పూర్తిచేయాలనుకుంటున్నారా?"
+
+#: app/templates/partials/project_details/setup_steps.html:594
+msgid "Confirm & Finalise"
+msgstr "నిర్ధారించి పూర్తిచేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html:602
+msgid "Custom Credentials"
+msgstr "కస్టమ్ గుర్తింపు వివరాలు"
+
+#: app/templates/partials/project_details/setup_steps.html:608
+msgid "ODK Central URL"
+msgstr "ODK Central URL"
+
+#: app/templates/partials/project_details/setup_steps.html:614
+msgid "https://your-odk-central.com"
+msgstr "https://your-odk-central.com"
+
+#: app/templates/partials/project_details/setup_steps.html:648
+msgid "QField Cloud URL"
+msgstr "QField Cloud URL"
+
+#: app/templates/partials/project_details/setup_steps.html:654
+msgid "https://qfield.cloud"
+msgstr "https://qfield.cloud"
+
+#: app/templates/partials/project_details/setup_steps.html:666
+msgid "qfield_username"
+msgstr "qfield_username"
+
+#: app/templates/partials/project_details/setup_steps.html:678
+msgid "qfield_password"
+msgstr "qfield_password"
+
+#: app/templates/partials/project_details/setup_steps.html:690
+#: app/templates/partials/project_details/style_and_scripts.html:49
+msgid "Test Credentials"
+msgstr "గుర్తింపు వివరాలను పరీక్షించండి"
+
+#: app/templates/partials/project_details/setup_steps.html:693
+msgid "Save & Continue"
+msgstr "సేవ్ చేసి కొనసాగండి"
+
+#: app/templates/partials/project_details/style_and_scripts.html:10
+msgid "Select a survey type..."
+msgstr "ఒక సర్వే రకాన్ని ఎంచుకోండి..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:11
+msgid "No survey types available"
+msgstr "ఏ సర్వే రకాలూ లేవు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:12
+msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgstr "ఏ సర్వే ఫారమ్‌లు లేవు. Advanced Config లో కస్టమ్ ఫారమ్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:13
+msgid "Select a survey type, or upload a custom form in Advanced Config."
+msgstr ""
+"ఒక సర్వే రకాన్ని ఎంచుకోండి, లేదా Advanced Config లో కస్టమ్ ఫారమ్‌ను "
+"అప్‌లోడ్ చేయండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:14
+msgid "Survey type selected."
+msgstr "సర్వే రకం ఎంచుకోబడింది."
+
+#: app/templates/partials/project_details/style_and_scripts.html:15
+msgid "Invalid file type. Please upload a .xls or .xlsx file."
+msgstr "చెల్లని ఫైల్ రకం. దయచేసి .xls లేదా .xlsx ఫైల్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:16
+msgid "Selected file:"
+msgstr "ఎంచుకున్న ఫైల్:"
+
+#: app/templates/partials/project_details/style_and_scripts.html:17
+msgid "Custom form selected."
+msgstr "కస్టమ్ ఫారమ్ ఎంచుకోబడింది."
+
+#: app/templates/partials/project_details/style_and_scripts.html:18
+msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+msgstr ""
+"ముందుగా ఒక సర్వే రకాన్ని ఎంచుకోండి, లేదా Advanced Config లో కస్టమ్ "
+"ఫారమ్‌ను అప్‌లోడ్ చేయండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:19
+msgid "polygons"
+msgstr "బహుభుజాలు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:20
+msgid "polylines"
+msgstr "పాలీలైన్లు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:21
+msgid "points"
+msgstr "బిందువులు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:22
+msgid "features"
+msgstr "లక్షణాలు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:23
+msgid ""
+"You uploaded a custom form, so this OSM download is optional. Use "
+"Advanced Config to upload your own GeoJSON or adjust download settings."
+msgstr ""
+"మీరు కస్టమ్ ఫారమ్‌ను అప్‌లోడ్ చేశారు, కాబట్టి ఈ OSM డౌన్‌లోడ్ ఐచ్చికం. మీ"
+" స్వంత GeoJSON ను అప్‌లోడ్ చేయడానికి లేదా డౌన్‌లోడ్ సెట్టింగ్‌లను "
+"సర్దుబాటు చేయడానికి Advanced Config ను ఉపయోగించండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:24
+#, python-format
+msgid ""
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
+"map, then continue."
+msgstr ""
+"సిఫార్సు చేసిన మూలం: %(title)s (%(geom_label)s). మ్యాప్‌లోని డేటాను చూసి "
+"తర్వాత కొనసాగండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:25
+#, python-format
+msgid ""
+"Recommended source updated (%(geom_label)s). Review the data on the map, "
+"then continue."
+msgstr ""
+"సిఫార్సు చేసిన మూలం నవీకరించబడింది (%(geom_label)s). మ్యాప్‌లోని డేటాను "
+"చూసి తర్వాత కొనసాగండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:26
+msgid "Downloading..."
+msgstr "డౌన్‌లోడ్ అవుతోంది..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:29
+msgid "Confirm No Splitting"
+msgstr "విభజన లేదని నిర్ధారించండి"
+
+#: app/templates/partials/project_details/style_and_scripts.html:31
+msgid "Split by Buildings"
+msgstr "భవనాల ప్రకారం విభజించు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:33
+msgid "Select Option"
+msgstr "ఎంపికను ఎంచుకోండి"
+
+#: app/templates/partials/project_details/style_and_scripts.html:34
+msgid "Confirming..."
+msgstr "నిర్ధారిస్తోంది..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:35
+msgid "Splitting..."
+msgstr "విభజిస్తోంది..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:36
+msgid "ODK Central"
+msgstr "ODK Central"
+
+#: app/templates/partials/project_details/style_and_scripts.html:37
+msgid "QField"
+msgstr "QField"
+
+#: app/templates/partials/project_details/style_and_scripts.html:38
+msgid "the mapping tool"
+msgstr "మ్యాపింగ్ సాధనం"
+
+#: app/templates/partials/project_details/style_and_scripts.html:39
+msgid "Project type not set. Please set the field mapping app first."
+msgstr ""
+"ప్రాజెక్ట్ రకం సెట్ చేయబడలేదు. ముందుగా ఫీల్డ్ మ్యాపింగ్ యాప్‌ను సెట్ "
+"చేయండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:40
+#, python-format
+msgid ""
+"Are you sure you want to finalise this project in %(project_type)s? This "
+"will create the project, upload forms, and generate all necessary files."
+msgstr ""
+"%(project_type)s లో ఈ ప్రాజెక్ట్‌ను పూర్తిచేయాలనుకుంటున్నారా? ఇది "
+"ప్రాజెక్ట్‌ను సృష్టించి, ఫారమ్‌లను అప్‌లోడ్ చేసి, అవసరమైన అన్ని ఫైళ్లను "
+"రూపొందిస్తుంది."
+
+#: app/templates/partials/project_details/style_and_scripts.html:41
+msgid "Custom ODK Credentials"
+msgstr "కస్టమ్ ODK గుర్తింపు వివరాలు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:42
+msgid "Custom QField Credentials"
+msgstr "కస్టమ్ QField గుర్తింపు వివరాలు"
+
+#: app/templates/partials/project_details/style_and_scripts.html:43
+msgid "Please fill in all fields."
+msgstr "దయచేసి అన్ని ఫీల్డ్‌లను పూరించండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:44
+msgid "Testing..."
+msgstr "పరీక్షిస్తోంది..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:45
+msgid "Testing credentials..."
+msgstr "గుర్తింపు వివరాలను పరీక్షిస్తోంది..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:46
+msgid "✓ Credentials are valid!"
+msgstr "✓ గుర్తింపు వివరాలు చెల్లుబాటు అవుతున్నాయి!"
+
+#: app/templates/partials/project_details/style_and_scripts.html:47
+msgid "Invalid credentials. Please check and try again."
+msgstr "చెల్లని గుర్తింపు వివరాలు. దయచేసి చూసి మళ్లీ ప్రయత్నించండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:48
+#, python-format
+msgid "Error testing credentials: %(message)s"
+msgstr "గుర్తింపు వివరాలను పరీక్షించడంలో లోపం: %(message)s"
+
+#: app/templates/partials/project_details/style_and_scripts.html:50
+msgid "Please test credentials first before continuing."
+msgstr "కొనసాగించే ముందు దయచేసి ముందుగా గుర్తింపు వివరాలను పరీక్షించండి."
+
+#: app/templates/partials/project_details/style_and_scripts.html:51
+#, python-format
+msgid "Creating project in %(project_type)s... This may take a moment."
+msgstr "%(project_type)s లో ప్రాజెక్ట్ రూపొందుతోంది... దీనికి కొంత సమయం పట్టవచ్చు."
+
+#: app/templates/partials/project_details/style_and_scripts.html:52
+msgid "Error:"
+msgstr "లోపం:"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+msgid "Accept Data Extract"
+msgstr "డేటా ఎక్స్‌ట్రాక్ట్‌ను అంగీకరించండి"
+
+#: app/templates/partials/project_details/fragments/finalize_error.html:7
+msgid "View technical details"
+msgstr "సాంకేతిక వివరాలను చూడండి"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
+msgid "Project created in ODK Central."
+msgstr "ప్రాజెక్ట్ ODK Central లో సృష్టించబడింది."
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
+msgid "Manager Access (ODK Central UI)"
+msgstr "మేనేజర్ ప్రాప్యత (ODK Central UI)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
+msgid "Open project in ODK Central"
+msgstr "ODK Central లో ప్రాజెక్ట్‌ను తెరవండి"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
+msgid "Save these credentials now. They will only be shown once."
+msgstr "ఈ గుర్తింపు వివరాలను ఇప్పుడు సేవ్ చేయండి. ఇవి ఒక్కసారే చూపబడతాయి."
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
+msgid "Reload Project Page"
+msgstr "ప్రాజెక్ట్ పేజీని మళ్లీ లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
+msgid "Project created in QFieldCloud."
+msgstr "ప్రాజెక్ట్ QFieldCloud లో సృష్టించబడింది."
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
+msgid "Manager Access (QFieldCloud)"
+msgstr "మేనేజర్ ప్రాప్యత (QFieldCloud)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
+msgid "Open project in QFieldCloud"
+msgstr "QFieldCloud లో ప్రాజెక్ట్‌ను తెరవండి"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
+msgid ""
+"Manager account could not be created automatically. Log in to QFieldCloud"
+" as admin to\n"
+"      manage the project."
+msgstr ""
+"మేనేజర్ ఖాతా స్వయంచాలకంగా సృష్టించబడలేదు. ప్రాజెక్ట్‌ను నిర్వహించడానికి "
+"QFieldCloud లో admin గా లాగిన్ అవ్వండి."
+
+#: app/templates/partials/project_details/fragments/split_preview.html:27
+msgid "Accept Task Choices"
+msgstr "పని ఎంపికలను అంగీకరించండి"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to manage the project."
+#~ msgstr ""
+
