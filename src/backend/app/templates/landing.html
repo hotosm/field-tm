@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block title %}{{ _("FieldTM | Field Tasking Manager") }}{% endblock %} {% block
+{% extends "layout.html" %} {% block title %}FieldTM | Field Tasking Manager{% endblock %} {% block
 extra_head %}
 <style>
   .landing-page {
@@ -409,6 +409,7 @@ extra_head %}
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .landing-footer-social a {
@@ -417,6 +418,71 @@ extra_head %}
     border: 1px solid rgba(255, 255, 255, 0.36);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
+  }
+
+  .landing-footer-locale {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+  }
+
+  .landing-footer-locale-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .landing-footer-locale wa-button::part(base) {
+    border-radius: 999px;
+    border-color: rgba(255, 255, 255, 0.36);
+    background: transparent;
+    color: white;
+    min-height: 2rem;
+    padding-inline: 0.75rem;
+  }
+
+  .landing-footer-locale wa-button::part(label) {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .landing-footer-locale-menu {
+    min-width: 10rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  }
+
+  .landing-footer-locale-option {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ftm-text);
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .landing-footer-locale-option:hover,
+  .landing-footer-locale-option:focus-visible {
+    background: var(--ftm-bg-muted);
+    outline: none;
+  }
+
+  .landing-footer-locale-option--active {
+    background: color-mix(in oklab, var(--ftm-brand) 12%, white);
+    color: var(--ftm-text);
+    font-weight: var(--hot-font-weight-semibold);
   }
 
   @keyframes landing-fade-up {
@@ -679,9 +745,38 @@ extra_head %}
           <a href="https://www.instagram.com/_hotosm/" target="_blank" rel="noopener">Instagram</a>
           <a href="https://www.youtube.com/user/hotosm" target="_blank" rel="noopener">YouTube</a>
           <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
+          <div class="landing-footer-locale">
+            <span class="landing-footer-locale-label">{{ _("Language") }}</span>
+            <wa-dropdown>
+              <wa-button slot="trigger" variant="text">
+                {{ locale_labels.get(current_locale(), current_locale().upper()) }}
+              </wa-button>
+              <div class="landing-footer-locale-menu">
+              {% for locale_code in supported_locales %}
+              <button
+                type="button"
+                class="landing-footer-locale-option{% if current_locale() == locale_code %} landing-footer-locale-option--active{% endif %}"
+                data-locale-switch="{{ locale_code }}"
+              >
+                {{ locale_labels.get(locale_code, locale_code.upper()) }}
+              </button>
+              {% endfor %}
+              </div>
+            </wa-dropdown>
+          </div>
         </div>
       </div>
     </div>
   </footer>
 </main>
+<script>
+  document.querySelectorAll("[data-locale-switch]").forEach((item) => {
+    item.addEventListener("click", () => {
+      const nextLocale = item.dataset.localeSwitch;
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set("lang", nextLocale);
+      window.location.assign(nextUrl.toString());
+    });
+  });
+</script>
 {% endblock %}

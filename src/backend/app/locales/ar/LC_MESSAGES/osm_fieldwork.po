@@ -5,11 +5,11 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr "الرقمنة صحيحة"
-"Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
-"PO-Revision-Date: 2026-03-19 22:03+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ar\n"
 "Language-Team: ar <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgstr "الرقمنة صحيحة"
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "مشكلة في الرقمنة"
+msgstr "هل الموقع المرقمن لهذا العنصر صحيح؟"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
@@ -119,3 +119,4 @@ msgstr "نعم"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "نعم"
+

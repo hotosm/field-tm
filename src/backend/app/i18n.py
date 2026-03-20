@@ -21,8 +21,55 @@ log = logging.getLogger(__name__)
 
 LOCALE_DIR = Path(__file__).parent / "locales"
 DOMAIN = "field_tm"
-SUPPORTED_LOCALES = ["en", "fr", "es", "sw"]
 DEFAULT_LOCALE = "en"
+SUPPORTED_LOCALES = [
+    "en",
+    "ar",
+    "bn",
+    "cs",
+    "es",
+    "ff",
+    "fr",
+    "ha",
+    "hi",
+    "ig",
+    "it",
+    "ja",
+    "kab",
+    "ne",
+    "om",
+    "pt",
+    "pt_br",
+    "ru",
+    "sw",
+    "ur",
+    "yo",
+    "zh",
+]
+LOCALE_LABELS = {
+    "en": "English",
+    "ar": "العربية",
+    "bn": "বাংলা",
+    "cs": "Čeština",
+    "es": "Español",
+    "ff": "Fulfulde",
+    "fr": "Français",
+    "ha": "Hausa",
+    "hi": "हिन्दी",
+    "ig": "Igbo",
+    "it": "Italiano",
+    "ja": "日本語",
+    "kab": "Taqbaylit",
+    "ne": "नेपाली",
+    "om": "Afaan Oromoo",
+    "pt": "Português",
+    "pt_br": "Português (Brasil)",
+    "ru": "Русский",
+    "sw": "Kiswahili",
+    "ur": "اردو",
+    "yo": "Yorùbá",
+    "zh": "中文",
+}
 
 _translations_cache: dict[str, gettext.GNUTranslations | gettext.NullTranslations] = {}
 _current_translations: ContextVar[
@@ -36,10 +83,11 @@ def get_translations(
 ) -> gettext.GNUTranslations | gettext.NullTranslations:
     """Return cached translations for a locale, falling back to NullTranslations."""
     if locale not in _translations_cache:
+        normalized_locale = locale.replace("-", "_")
+        mo_path = LOCALE_DIR / normalized_locale / "LC_MESSAGES" / f"{DOMAIN}.mo"
         try:
-            _translations_cache[locale] = gettext.translation(
-                DOMAIN, localedir=str(LOCALE_DIR), languages=[locale]
-            )
+            with mo_path.open("rb") as mo_file:
+                _translations_cache[locale] = gettext.GNUTranslations(mo_file)
         except FileNotFoundError:
             log.debug(
                 "No .mo file found for locale '%s', using NullTranslations", locale

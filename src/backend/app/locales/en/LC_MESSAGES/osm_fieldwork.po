@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: en\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "Digitisation Correct"
+msgstr "Is the digitized location for this feature correct?"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"

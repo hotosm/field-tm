@@ -5,11 +5,11 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr "डिजिटाइज़ेशन सही है"
-"Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
-"PO-Revision-Date: 2026-03-19 22:03+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: hi\n"
 "Language-Team: hi <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr "डिजिटाइज़ेशन सही है"
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "डिजिटाइज़ेशन में समस्या"
+msgstr "क्या इस विशेषता का डिजिटाइज़ किया गया स्थान सही है?"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
@@ -118,3 +118,4 @@ msgstr "हाँ"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "हाँ"
+

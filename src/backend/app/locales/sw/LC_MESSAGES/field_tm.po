@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sw\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:160
+#: app/main.py:162
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Hitilafu isiyotarajiwa imetokea. Tafadhali wasiliana na msimamizi."
 
@@ -93,8 +93,8 @@ msgstr "Pakua msimbo wa QR"
 
 #: app/htmx/project_detail_routes.py:175
 msgid ""
-"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is "
-"running."
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
 msgstr ""
 "Haiwezekani kufikia seva ya uchoraji ramani. Hakikisha ODK Central au "
 "QFieldCloud inaendeshwa."
@@ -107,11 +107,11 @@ msgstr ""
 
 #: app/htmx/project_detail_routes.py:182
 msgid ""
-"Authentication failed connecting to the mapping server. Check the configured"
-" credentials."
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
 msgstr ""
-"Uthibitishaji umeshindikana wakati wa kuunganisha kwenye seva ya uchoraji "
-"ramani. Angalia taarifa za uthibitishaji zilizowekwa."
+"Uthibitishaji umeshindikana wakati wa kuunganisha kwenye seva ya uchoraji"
+" ramani. Angalia taarifa za uthibitishaji zilizowekwa."
 
 #: app/htmx/project_detail_routes.py:185
 msgid "An unexpected error occurred while generating the QR code."
@@ -172,13 +172,14 @@ msgstr "Imeshindikana kuongeza mshiriki: %(exc)s"
 #: app/htmx/qfc_admin_routes.py:115
 #, python-format
 msgid ""
-"This project belongs to the %(organization)s organization. The user must be "
-"added to that organization before they can be added as a collaborator. Your "
-"QFieldCloud account does not have permission to manage organization members."
+"This project belongs to the %(organization)s organization. The user must "
+"be added to that organization before they can be added as a collaborator."
+" Your QFieldCloud account does not have permission to manage organization"
+" members."
 msgstr ""
-"Mradi huu ni wa shirika la %(organization)s. Mtumiaji lazima aongezwe kwenye"
-" shirika hilo kabla ya kuongezwa kama mshiriki. Akaunti yako ya QFieldCloud "
-"haina ruhusa ya kusimamia wanachama wa shirika."
+"Mradi huu ni wa shirika la %(organization)s. Mtumiaji lazima aongezwe "
+"kwenye shirika hilo kabla ya kuongezwa kama mshiriki. Akaunti yako ya "
+"QFieldCloud haina ruhusa ya kusimamia wanachama wa shirika."
 
 #: app/htmx/qfc_admin_routes.py:163
 msgid "All fields are required."
@@ -334,13 +335,13 @@ msgstr "Mradi haujapatikana au ruhusa imekataliwa."
 
 #: app/htmx/setup_step_routes.py:155
 msgid ""
-"Project finalisation failed. Please check your settings and try again. If it"
-" continues, send the technical details below to your instance administrator "
-"or support team."
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
 msgstr ""
-"Ukamilishaji wa mradi umeshindikana. Tafadhali angalia mipangilio yako na "
-"ujaribu tena. Iwapo tatizo litaendelea, tuma maelezo ya kiufundi hapa chini "
-"kwa msimamizi wa mfumo wako au timu ya msaada."
+"Ukamilishaji wa mradi umeshindikana. Tafadhali angalia mipangilio yako na"
+" ujaribu tena. Iwapo tatizo litaendelea, tuma maelezo ya kiufundi hapa "
+"chini kwa msimamizi wa mfumo wako au timu ya msaada."
 
 #: app/htmx/setup_step_routes.py:221
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -353,8 +354,8 @@ msgstr "Hitilafu wakati wa kusoma data ya GeoJSON kutoka kwenye ombi."
 #: app/htmx/setup_step_routes.py:248
 #, python-format
 msgid ""
-"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. Please"
-" select a smaller area."
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please select a smaller area."
 msgstr ""
 "Eneo ni %(area_km2)s km², ambalo limezidi kikomo cha %(area_limit)s km². "
 "Tafadhali chagua eneo dogo zaidi."
@@ -362,12 +363,12 @@ msgstr ""
 #: app/htmx/setup_step_routes.py:256
 #, python-format
 msgid ""
-"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take longer "
-"to process. The data extract API is limited to 200 km²."
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process. The data extract API is limited to 200 km²."
 msgstr ""
 "Eneo ni %(area_km2)s km². Maeneo makubwa (>%(area_warn)s km²) yanaweza "
-"kuchukua muda mrefu kuchakatwa. API ya uchotaji data imewekewa kikomo cha "
-"200 km²."
+"kuchukua muda mrefu kuchakatwa. API ya uchotaji data imewekewa kikomo cha"
+" 200 km²."
 
 #: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
 msgid "Project AOI"
@@ -385,8 +386,8 @@ msgstr "Mipaka ya kazi (%(task_count)s kazi)"
 
 #: app/htmx/setup_step_routes.py:384
 msgid ""
-"No task boundaries found. Please split the project into tasks first using "
-"the \"Split AOI\" button above."
+"No task boundaries found. Please split the project into tasks first using"
+" the \"Split AOI\" button above."
 msgstr ""
 "Hakuna mipaka ya kazi iliyopatikana. Tafadhali gawanya mradi katika kazi "
 "kwanza kwa kutumia kitufe cha \"Gawanya AOI\" hapo juu."
@@ -397,20 +398,21 @@ msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
 msgstr ""
-"✓ AOI imegawanywa kwa mafanikio! Maeneo ya kazi %(task_count)s yamezalishwa "
-"kwa kutumia %(algorithm)s."
+"✓ AOI imegawanywa kwa mafanikio! Maeneo ya kazi %(task_count)s "
+"yamezalishwa kwa kutumia %(algorithm)s."
 
 #: app/htmx/setup_step_routes.py:447
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review the "
-"results below. If satisfied, click \"Accept Task Choices\" to save. "
-"Otherwise, adjust parameters above and click \"Split Again\" to regenerate."
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
+"the results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to "
+"regenerate."
 msgstr ""
-"Inaonyesha hakikisho la mipaka ya kazi %(task_count)s%(data_extract_info)s. "
-"Kagua matokeo hapa chini. Ukiridhika, bofya \"Kubali machaguo ya kazi\" "
-"kuhifadhi. Vinginevyo, rekebisha vigezo hapo juu na ubofye \"Gawanya tena\" "
-"ili kuzalisha upya."
+"Inaonyesha hakikisho la mipaka ya kazi "
+"%(task_count)s%(data_extract_info)s. Kagua matokeo hapa chini. "
+"Ukiridhika, bofya \"Kubali machaguo ya kazi\" kuhifadhi. Vinginevyo, "
+"rekebisha vigezo hapo juu na ubofye \"Gawanya tena\" ili kuzalisha upya."
 
 #: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
 msgid "Data Extract"
@@ -427,8 +429,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try downloading"
-" again with different parameters."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
 msgstr ""
 "Inaonyesha hakikisho la vipengele %(feature_count)s kwenye ramani. Kagua "
 "data hapa chini. Ukiridhika, bofya \"Kubali dondoo la data\" kuhifadhi. "
@@ -446,14 +448,16 @@ msgstr "Hakuna jiometri halali zilizopatikana kwenye GeoJSON."
 #: app/htmx/setup_step_routes.py:679
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
-msgstr "✓ GeoJSON imepakiwa kwa mafanikio! Vipengele %(feature_count)s vimepatikana."
+msgstr ""
+"✓ GeoJSON imepakiwa kwa mafanikio! Vipengele %(feature_count)s "
+"vimepatikana."
 
 #: app/htmx/setup_step_routes.py:682
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try uploading a"
-" different file."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
 msgstr ""
 "Inaonyesha hakikisho la vipengele %(feature_count)s kwenye ramani. Kagua "
 "data hapa chini. Ukiridhika, bofya \"Kubali dondoo la data\" kuhifadhi. "
@@ -464,8 +468,8 @@ msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr ""
-"Hakuna data ya GeoJSON iliyopatikana. Tafadhali pakua data ya OSM au pakia "
-"faili la GeoJSON kwanza."
+"Hakuna data ya GeoJSON iliyopatikana. Tafadhali pakua data ya OSM au "
+"pakia faili la GeoJSON kwanza."
 
 #: app/htmx/setup_step_routes.py:778
 #, python-format
@@ -478,8 +482,8 @@ msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
 "continue to the next step."
 msgstr ""
-"Inaonyesha hakikisho la vipengele vya data %(feature_count)s kwenye ramani. "
-"Kagua data, kisha endelea kwenye hatua inayofuata."
+"Inaonyesha hakikisho la vipengele vya data %(feature_count)s kwenye "
+"ramani. Kagua data, kisha endelea kwenye hatua inayofuata."
 
 #: app/htmx/setup_step_routes.py:857
 msgid ""
@@ -502,8 +506,8 @@ msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr ""
-"Hakuna dondoo la data lililopatikana. Tafadhali pakua data ya OSM au pakia "
-"faili la GeoJSON kwanza."
+"Hakuna dondoo la data lililopatikana. Tafadhali pakua data ya OSM au "
+"pakia faili la GeoJSON kwanza."
 
 #: app/htmx/setup_step_routes.py:1036
 #, python-format
@@ -511,17 +515,17 @@ msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
 "features. The entire AOI will be used as a single task."
 msgstr ""
-"Inaonyesha hakikisho la AOI yote (bila kugawanya) lenye vipengele vya data "
-"%(data_feature_count)s. AOI yote itatumika kama kazi moja."
+"Inaonyesha hakikisho la AOI yote (bila kugawanya) lenye vipengele vya "
+"data %(data_feature_count)s. AOI yote itatumika kama kazi moja."
 
 #: app/htmx/setup_step_routes.py:1043
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries and %(data_feature_count)s data "
-"features together."
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
+" features together."
 msgstr ""
-"Inaonyesha hakikisho la mipaka ya kazi %(task_count)s na vipengele vya data "
-"%(data_feature_count)s pamoja."
+"Inaonyesha hakikisho la mipaka ya kazi %(task_count)s na vipengele vya "
+"data %(data_feature_count)s pamoja."
 
 #: app/htmx/setup_step_routes.py:1102
 msgid "Project outline not found. Cannot skip task splitting."
@@ -529,8 +533,8 @@ msgstr "Muhtasari wa mradi haukupatikana. Haiwezekani kuruka mgawanyo wa kazi."
 
 #: app/htmx/setup_step_routes.py:1129
 msgid ""
-"✓ Task splitting skipped. The whole AOI will be used as a single task. You "
-"can proceed to Step 4."
+"✓ Task splitting skipped. The whole AOI will be used as a single task. "
+"You can proceed to Step 4."
 msgstr ""
 "✓ Mgawanyo wa kazi umerukwa. AOI yote itatumika kama kazi moja. Unaweza "
 "kuendelea hadi Hatua ya 4."
@@ -557,8 +561,8 @@ msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
 "complete."
 msgstr ""
-"✓ Dondoo la data limekubaliwa! Vipengele %(feature_count)s vimehifadhiwa. "
-"Hatua ya 2 sasa imekamilika."
+"✓ Dondoo la data limekubaliwa! Vipengele %(feature_count)s vimehifadhiwa."
+" Hatua ya 2 sasa imekamilika."
 
 #: app/htmx/setup_step_routes.py:1338
 msgid "No task areas data provided."
@@ -575,11 +579,11 @@ msgstr "✓ Kazi zilizogawanywa zimehifadhiwa kwa mafanikio"
 
 #: app/htmx/setup_step_routes.py:1414
 msgid ""
-"Provide ODK URL, username, and password (all 3), or leave them all blank to "
-"use server defaults."
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
 msgstr ""
-"Toa URL ya ODK, jina la mtumiaji, na nywila (zote 3), au ziache zote wazi "
-"ili kutumia chaguo-msingi za seva."
+"Toa URL ya ODK, jina la mtumiaji, na nywila (zote 3), au ziache zote wazi"
+" ili kutumia chaguo-msingi za seva."
 
 #: app/htmx/setup_step_routes.py:1536
 msgid "GeoJSON is required"
@@ -647,8 +651,8 @@ msgstr "Tafuta"
 msgid "Search projects…"
 msgstr "Tafuta miradi…"
 
-#: app/templates/home.html:79 app/templates/landing.html:499
-#: app/templates/layout.html:219 app/templates/new_project.html:167
+#: app/templates/home.html:79 app/templates/landing.html:565
+#: app/templates/layout.html:220 app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "Unda mradi"
 
@@ -697,97 +701,95 @@ msgstr "Haitumiki"
 msgid "No projects found. Create your first project to get started!"
 msgstr "Hakuna miradi iliyopatikana. Unda mradi wako wa kwanza ili uanze!"
 
-#: app/templates/landing.html:1
-msgid "FieldTM | Field Tasking Manager"
-msgstr "FieldTM | Field Tasking Manager"
-
-#: app/templates/landing.html:491
+#: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
 msgstr "Ratibu kampeni za uwanjani"
 
-#: app/templates/landing.html:492
+#: app/templates/landing.html:558
 msgid "FIELD - TASKING MANAGER"
 msgstr "FIELD - TASKING MANAGER"
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:560
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
 msgstr ""
-"Kuongeza ufanisi na usahihi wa uchoraji ramani wa uwanjani kupitia uratibu "
-"usio na vikwazo."
+"Kuongeza ufanisi na usahihi wa uchoraji ramani wa uwanjani kupitia "
+"uratibu usio na vikwazo."
 
-#: app/templates/landing.html:497
+#: app/templates/landing.html:563
 msgid "Explore Projects"
 msgstr "Chunguza miradi"
 
-#: app/templates/landing.html:509
+#: app/templates/landing.html:575
 msgid "Loading metrics..."
 msgstr "Vipimo vinapakiwa..."
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:583
 msgid "What is it?"
 msgstr "Ni nini hiki?"
 
-#: app/templates/landing.html:519
+#: app/templates/landing.html:585
 msgid ""
-"The Field Tasking Manager (Field-TM) helps teams add local knowledge to map "
-"features by coordinating mapping in the field."
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
+"map features by coordinating mapping in the field."
 msgstr ""
-"Field Tasking Manager (Field-TM) husaidia timu kuongeza maarifa ya kienyeji "
-"kwenye vipengele vya ramani kwa kuratibu uchoraji ramani uwanjani."
+"Field Tasking Manager (Field-TM) husaidia timu kuongeza maarifa ya "
+"kienyeji kwenye vipengele vya ramani kwa kuratibu uchoraji ramani "
+"uwanjani."
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:588
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
-"mature tools like ODK and QField. It is a standalone mobile and web workflow"
-" that helps teams collect geospatial data efficiently with commonly "
-"available Android devices."
+"mature tools like ODK and QField. It is a standalone mobile and web "
+"workflow that helps teams collect geospatial data efficiently with "
+"commonly available Android devices."
 msgstr ""
 "Field-TM huwezesha uchoraji ramani wa ushirikiano kwa kuunga mkono na "
-"kupanua zana zilizokomaa kama ODK na QField. Ni mtiririko wa kazi wa simu na"
-" wavuti wa kujitegemea unaosaidia timu kukusanya data ya kijiografia kwa "
-"ufanisi kwa kutumia vifaa vya Android vinavyopatikana kwa kawaida."
+"kupanua zana zilizokomaa kama ODK na QField. Ni mtiririko wa kazi wa simu"
+" na wavuti wa kujitegemea unaosaidia timu kukusanya data ya kijiografia "
+"kwa ufanisi kwa kutumia vifaa vya Android vinavyopatikana kwa kawaida."
 
-#: app/templates/landing.html:527
+#: app/templates/landing.html:593
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Msimamizi wa mradi anaonyesha mtiririko wa kazi wa uchoraji ramani wa "
 "FieldTM kwenye kompyuta mpakato"
 
-#: app/templates/landing.html:533
+#: app/templates/landing.html:599
 msgid "Main Features"
 msgstr "Vipengele vikuu"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:602
 msgid "Flexible Data Collection"
 msgstr "Ukusanyaji data wenye kubadilika"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:604
 msgid ""
-"Support diverse survey forms, multiple data formats, and adaptable workflows"
-" that fit different operational needs."
+"Support diverse survey forms, multiple data formats, and adaptable "
+"workflows that fit different operational needs."
 msgstr ""
 "Inasaidia aina mbalimbali za fomu za utafiti, miundo mingi ya data, na "
-"mtiririko wa kazi unaobadilika kulingana na mahitaji tofauti ya uendeshaji."
+"mtiririko wa kazi unaobadilika kulingana na mahitaji tofauti ya "
+"uendeshaji."
 
-#: app/templates/landing.html:542
+#: app/templates/landing.html:608
 msgid "Open Source and Customizable"
 msgstr "Chanzo huria na kinachoweza kubinafsishwa"
 
-#: app/templates/landing.html:544
+#: app/templates/landing.html:610
 msgid ""
-"Adapt Field-TM to your own survey logic, data structures, and integration "
-"requirements."
+"Adapt Field-TM to your own survey logic, data structures, and integration"
+" requirements."
 msgstr ""
-"Badilisha Field-TM ilingane na mantiki yako ya utafiti, miundo ya data, na "
-"mahitaji ya uunganishaji."
+"Badilisha Field-TM ilingane na mantiki yako ya utafiti, miundo ya data, "
+"na mahitaji ya uunganishaji."
 
-#: app/templates/landing.html:548
+#: app/templates/landing.html:614
 msgid "Entity-Level Tracking"
 msgstr "Ufuatiliaji wa kiwango cha kipengele"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:616
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed decisions quickly."
@@ -795,188 +797,190 @@ msgstr ""
 "Fuatilia maendeleo ya utafiti katika kiwango cha kazi na kipengele ili "
 "mameneja waweze kufanya maamuzi sahihi haraka."
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:623
 msgid "Who is it for?"
 msgstr "Ni kwa ajili ya nani?"
 
-#: app/templates/landing.html:560
+#: app/templates/landing.html:626
 msgid "Project Manager"
 msgstr "Meneja wa mradi"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:627
 msgid "Create and coordinate field campaigns"
 msgstr "Unda na uratibu kampeni za uwanjani"
 
-#: app/templates/landing.html:563
+#: app/templates/landing.html:629
 msgid ""
-"Project managers use Field-TM to set up mapping projects, define areas of "
-"interest, design survey forms, and split work into manageable tasks."
+"Project managers use Field-TM to set up mapping projects, define areas of"
+" interest, design survey forms, and split work into manageable tasks."
 msgstr ""
 "Mameneja wa miradi hutumia Field-TM kuweka miradi ya uchoraji ramani, "
-"kufafanua maeneo ya maslahi, kubuni fomu za utafiti, na kugawa kazi katika "
-"majukumu yanayoweza kusimamiwa."
+"kufafanua maeneo ya maslahi, kubuni fomu za utafiti, na kugawa kazi "
+"katika majukumu yanayoweza kusimamiwa."
 
-#: app/templates/landing.html:566
+#: app/templates/landing.html:632
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Fafanua eneo la mradi na upakie au uchague fomu ya utafiti"
 
-#: app/templates/landing.html:567
+#: app/templates/landing.html:633
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Gawanya eneo katika kazi na uzalishe dondoo la data"
 
-#: app/templates/landing.html:568
+#: app/templates/landing.html:634
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Chapisha mradi kwenye ODK Central au QFieldCloud"
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:635
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Shiriki msimbo wa QR ili wachoraji ramani waanze kukusanya data"
 
-#: app/templates/landing.html:573
+#: app/templates/landing.html:639
 msgid "Field Mapper"
 msgstr "Mchoraji ramani wa uwanjani"
 
-#: app/templates/landing.html:574
+#: app/templates/landing.html:640
 msgid "Collect data in the field with your phone"
 msgstr "Kusanya data uwanjani kwa kutumia simu yako"
 
-#: app/templates/landing.html:576
+#: app/templates/landing.html:642
 msgid ""
-"Mappers do not need to log in to Field-TM. Once a project manager publishes "
-"a project, mappers access it directly in their mobile app of choice."
+"Mappers do not need to log in to Field-TM. Once a project manager "
+"publishes a project, mappers access it directly in their mobile app of "
+"choice."
 msgstr ""
-"Wachoraji ramani hawahitaji kuingia kwenye Field-TM. Mara meneja wa mradi "
-"anapochapisha mradi, wachoraji ramani huufikia moja kwa moja kwenye programu"
-" yao ya simu wanayoichagua."
+"Wachoraji ramani hawahitaji kuingia kwenye Field-TM. Mara meneja wa mradi"
+" anapochapisha mradi, wachoraji ramani huufikia moja kwa moja kwenye "
+"programu yao ya simu wanayoichagua."
 
-#: app/templates/landing.html:579
+#: app/templates/landing.html:645
 msgid "Scan the QR code shared by your project manager"
 msgstr "Changanua msimbo wa QR ulioshirikiwa na meneja wako wa mradi"
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:646
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Mradi unapakia kiotomatiki kwenye ODK Collect au QField"
 
-#: app/templates/landing.html:581
+#: app/templates/landing.html:647
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Nenda kwenye eneo lako la kazi ulilopewa na ukusanye data"
 
-#: app/templates/landing.html:582
+#: app/templates/landing.html:648
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Wasilisha utafiti wako, ambao huenda moja kwa moja kwenye seva"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:655
 msgid "Field-TM Use Cases"
 msgstr "Matumizi ya Field-TM"
 
-#: app/templates/landing.html:594
+#: app/templates/landing.html:660
 msgid "Field mapping in progress"
 msgstr "Uchoraji ramani wa uwanjani unaendelea"
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:665
 msgid "1. Community Mapping"
 msgstr "1. Uchoraji ramani wa jamii"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:667
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public facilities, and local services for inclusive planning."
 msgstr ""
-"Field Tasking Manager huwezesha jamii kuchora ramani ya makazi yasiyo rasmi,"
-" huduma za umma, na huduma za eneo kwa ajili ya mipango shirikishi."
+"Field Tasking Manager huwezesha jamii kuchora ramani ya makazi yasiyo "
+"rasmi, huduma za umma, na huduma za eneo kwa ajili ya mipango shirikishi."
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:671
 msgid "2. Urban Planning and Management"
 msgstr "2. Mipango na usimamizi wa miji"
 
-#: app/templates/landing.html:607
+#: app/templates/landing.html:673
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities through clear, manageable mapping tasks."
 msgstr ""
-"Jenga miji yenye akili zaidi kwa tafiti zilizoratibiwa za nyumba, barabara, "
-"na huduma kupitia kazi za uchoraji ramani zilizo wazi na zinazoweza "
-"kusimamiwa."
+"Jenga miji yenye akili zaidi kwa tafiti zilizoratibiwa za nyumba, "
+"barabara, na huduma kupitia kazi za uchoraji ramani zilizo wazi na "
+"zinazoweza kusimamiwa."
 
-#: app/templates/landing.html:611
+#: app/templates/landing.html:677
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Mwitikio na urejeshaji baada ya maafa"
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:679
 msgid ""
-"Rapidly map damaged infrastructure after disasters, coordinate volunteers, "
-"and deliver reliable data for relief operations."
+"Rapidly map damaged infrastructure after disasters, coordinate "
+"volunteers, and deliver reliable data for relief operations."
 msgstr ""
-"Chora ramani kwa haraka ya miundombinu iliyoharibika baada ya maafa, ratibu "
-"wajitolea, na toa data ya kuaminika kwa shughuli za msaada."
+"Chora ramani kwa haraka ya miundombinu iliyoharibika baada ya maafa, "
+"ratibu wajitolea, na toa data ya kuaminika kwa shughuli za msaada."
 
-#: app/templates/landing.html:621
+#: app/templates/landing.html:687
 msgid "Resources"
 msgstr "Rasilimali"
 
-#: app/templates/landing.html:629
+#: app/templates/landing.html:695
 msgid "Data Prep"
 msgstr "Maandalizi ya data"
 
-#: app/templates/landing.html:630
+#: app/templates/landing.html:696
 msgid "HOT Export Tool"
 msgstr "HOT Export Tool"
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:698
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
-"Pakua dondoo za data za kijiografia zilizo tayari kwa kazi kwa eneo lako la "
-"mradi."
+"Pakua dondoo za data za kijiografia zilizo tayari kwa kazi kwa eneo lako "
+"la mradi."
 
-#: app/templates/landing.html:641 app/templates/landing.html:653
+#: app/templates/landing.html:707 app/templates/landing.html:719
 msgid "Documentation"
 msgstr "Nyaraka"
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:708
 msgid "ODK Central Guide"
 msgstr "Mwongozo wa ODK Central"
 
-#: app/templates/landing.html:644
+#: app/templates/landing.html:710
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
-"Jifunze jinsi ya kusimamia fomu, watumiaji wa programu, na uwasilishaji wa "
-"uwanjani katika ODK."
+"Jifunze jinsi ya kusimamia fomu, watumiaji wa programu, na uwasilishaji "
+"wa uwanjani katika ODK."
 
-#: app/templates/landing.html:654
+#: app/templates/landing.html:720
 msgid "QField Guide"
 msgstr "Mwongozo wa QField"
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:722
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Sanidi miradi ya QFieldCloud na mtiririko wa kazi wa simu kwa uchoraji "
 "ramani bila mtandao."
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:732
 msgid "Need assistance?"
 msgstr "Unahitaji msaada?"
 
-#: app/templates/landing.html:667
+#: app/templates/landing.html:733
 msgid "Email:"
 msgstr "Barua pepe:"
 
-#: app/templates/layout.html:4 app/templates/login.html:1
-msgid "Field Tasking Manager"
-msgstr "Field Tasking Manager"
+#: app/templates/landing.html:749
+#, fuzzy
+msgid "Language"
+msgstr "Simamia"
 
 #: app/templates/layout.html:7
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Uchoraji ramani wa uwanjani ulioratibiwa kwa kampeni za Open Mapping."
 
-#: app/templates/layout.html:158 app/templates/login.html:1
+#: app/templates/layout.html:159 app/templates/login.html:1
 msgid "Login"
 msgstr "Ingia"
 
-#: app/templates/layout.html:212
+#: app/templates/layout.html:213
 msgid "Projects"
 msgstr "Miradi"
 
-#: app/templates/layout.html:226
+#: app/templates/layout.html:227
 msgid "QField Admin"
 msgstr "Usimamizi wa QField"
 
@@ -999,10 +1003,6 @@ msgstr "Uthibitishaji umezimwa kwenye usambazaji huu."
 #: app/templates/login.html:20
 msgid "Back to home"
 msgstr "Rudi nyumbani"
-
-#: app/templates/new_project.html:1
-msgid "Create Project — Field Tasking Manager"
-msgstr "Unda mradi — Field Tasking Manager"
 
 #: app/templates/new_project.html:4
 msgid "Create New Project"
@@ -1042,13 +1042,14 @@ msgstr "Futa"
 
 #: app/templates/new_project.html:125
 msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project "
-"area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
 "warning. The OSM data extract API is limited to 200 km²."
 msgstr ""
 "Chora poligoni kwenye ramani au pakia faili la GeoJSON kufafanua eneo la "
-"mradi wako. Ukubwa wa juu wa mradi ni 1,000 km². Maeneo yanayozidi 100 km² "
-"yataonyesha onyo. API ya uchotaji data ya OSM imewekewa kikomo cha 200 km²."
+"mradi wako. Ukubwa wa juu wa mradi ni 1,000 km². Maeneo yanayozidi 100 "
+"km² yataonyesha onyo. API ya uchotaji data ya OSM imewekewa kikomo cha "
+"200 km²."
 
 #: app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:101
@@ -1072,8 +1073,8 @@ msgstr "Andika hashtags na ubonyeze Enter au koma"
 
 #: app/templates/new_project.html:162
 msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag to "
-"remove it."
+"Type hashtags and press Enter or comma to add them. Click the × on a tag "
+"to remove it."
 msgstr ""
 "Andika hashtags na ubonyeze Enter au koma ili kuziongeza. Bofya × kwenye "
 "lebo ili kuiondoa."
@@ -1146,7 +1147,8 @@ msgstr "Instance:"
 msgid "Project ID:"
 msgstr "Kitambulisho cha mradi:"
 
-#: app/templates/project_details.html:121 app/templates/project_details.html:129
+#: app/templates/project_details.html:121
+#: app/templates/project_details.html:129
 msgid "View Project in ODK Central →"
 msgstr "Tazama mradi kwenye ODK Central →"
 
@@ -1168,7 +1170,8 @@ msgstr ""
 msgid "Delete Project"
 msgstr "Futa mradi"
 
-#: app/templates/project_details.html:165 app/templates/project_details.html:176
+#: app/templates/project_details.html:165
+#: app/templates/project_details.html:176
 msgid "Back to Projects"
 msgstr "Rudi kwenye miradi"
 
@@ -1178,24 +1181,22 @@ msgstr "Mradi haujapatikana"
 
 #: app/templates/project_details.html:173
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission to"
-" view\n"
+"The project you're looking for doesn't exist or you don't have permission"
+" to view\n"
 "        it."
 msgstr "Mradi unaoutafuta haupo au huna ruhusa ya kuuona."
-
-#: app/templates/qfc_admin.html:1
-msgid "QFieldCloud Admin — Field Tasking Manager"
-msgstr "Usimamizi wa QFieldCloud — Field Tasking Manager"
 
 #: app/templates/qfc_admin.html:15
 msgid "QFieldCloud Admin"
 msgstr "Usimamizi wa QFieldCloud"
 
 #: app/templates/qfc_admin.html:21
-msgid "This page is for managing the users in your QField project, after creation."
+msgid ""
+"This page is for managing the users in your QField project, after "
+"creation."
 msgstr ""
-"Ukurasa huu ni wa kusimamia watumiaji katika mradi wako wa QField baada ya "
-"kuundwa."
+"Ukurasa huu ni wa kusimamia watumiaji katika mradi wako wa QField baada "
+"ya kuundwa."
 
 #: app/templates/qfc_admin.html:25
 msgid "Enter your QFieldCloud credentials to manage collaborators."
@@ -1292,12 +1293,14 @@ msgstr "Hatua ya 4: Kamilisha mradi"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
-"If you need to upload additional media files to this project, such as images"
-" and\n"
-"          videos, log into ODK Central and upload them in the form settings."
+"If you need to upload additional media files to this project, such as "
+"images and\n"
+"          videos, log into ODK Central and upload them in the form "
+"settings."
 msgstr ""
-"Ikiwa unahitaji kupakia faili za ziada za media kwenye mradi huu, kama picha"
-" na video, ingia kwenye ODK Central na uzipakie kwenye mipangilio ya fomu."
+"Ikiwa unahitaji kupakia faili za ziada za media kwenye mradi huu, kama "
+"picha na video, ingia kwenye ODK Central na uzipakie kwenye mipangilio ya"
+" fomu."
 
 #: app/templates/partials/project_details/setup_steps.html:14
 msgid "Ready for Mapping"
@@ -1332,8 +1335,8 @@ msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
 msgstr ""
-"Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya ODK, ikiwa ni "
-"pamoja na uoanifu wa ODK Collect."
+"Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya ODK, ikiwa ni"
+" pamoja na uoanifu wa ODK Collect."
 
 #: app/templates/partials/project_details/setup_steps.html:82
 #, python-format
@@ -1509,13 +1512,13 @@ msgstr "✓ Ugawaji wa kazi hauhitajiki bila data iliyopo"
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task "
-"Areas\" to save. Or\n"
+"      parameters, then split. Review the preview, and click \"Accept Task"
+" Areas\" to save. Or\n"
 "      click"
 msgstr ""
-"Zalisha maeneo ya kazi kwa kugawanya Area of Interest (AOI). Chagua algoriti"
-" na vigezo, kisha gawanya. Kagua hakikisho na ubofye \"Kubali maeneo ya "
-"kazi\" ili kuhifadhi. Au bofya"
+"Zalisha maeneo ya kazi kwa kugawanya Area of Interest (AOI). Chagua "
+"algoriti na vigezo, kisha gawanya. Kagua hakikisho na ubofye \"Kubali "
+"maeneo ya kazi\" ili kuhifadhi. Au bofya"
 
 #: app/templates/partials/project_details/setup_steps.html:368
 #: app/templates/partials/project_details/setup_steps.html:387
@@ -1600,11 +1603,11 @@ msgstr "Tayari"
 
 #: app/templates/partials/project_details/setup_steps.html:563
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping "
-"tool."
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
 msgstr ""
-"Masharti yote ya awali yamekamilika! Unda mradi katika zana yako uliyochagua"
-" ya uchoraji ramani."
+"Masharti yote ya awali yamekamilika! Unda mradi katika zana yako "
+"uliyochagua ya uchoraji ramani."
 
 #: app/templates/partials/project_details/setup_steps.html:568
 msgid "Finalise Project"
@@ -1670,12 +1673,14 @@ msgstr "Hakuna aina za utafiti zinazopatikana"
 #: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "No survey forms are available. Upload a custom form in Advanced Config."
 msgstr ""
-"Hakuna fomu za utafiti zinazopatikana. Pakia fomu maalum katika usanidi wa "
-"hali ya juu."
+"Hakuna fomu za utafiti zinazopatikana. Pakia fomu maalum katika usanidi "
+"wa hali ya juu."
 
 #: app/templates/partials/project_details/style_and_scripts.html:13
 msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "Chagua aina ya utafiti, au pakia fomu maalum katika usanidi wa hali ya juu."
+msgstr ""
+"Chagua aina ya utafiti, au pakia fomu maalum katika usanidi wa hali ya "
+"juu."
 
 #: app/templates/partials/project_details/style_and_scripts.html:14
 msgid "Survey type selected."
@@ -1696,8 +1701,8 @@ msgstr "Fomu maalum imechaguliwa."
 #: app/templates/partials/project_details/style_and_scripts.html:18
 msgid "Choose a survey type first, or upload a custom form in Advanced Config."
 msgstr ""
-"Chagua aina ya utafiti kwanza, au pakia fomu maalum katika usanidi wa hali "
-"ya juu."
+"Chagua aina ya utafiti kwanza, au pakia fomu maalum katika usanidi wa "
+"hali ya juu."
 
 #: app/templates/partials/project_details/style_and_scripts.html:19
 msgid "polygons"
@@ -1717,8 +1722,8 @@ msgstr "vipengele"
 
 #: app/templates/partials/project_details/style_and_scripts.html:23
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use Advanced "
-"Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Use "
+"Advanced Config to upload your own GeoJSON or adjust download settings."
 msgstr ""
 "Umepakia fomu maalum, kwa hiyo upakuaji huu wa OSM ni wa hiari. Tumia "
 "usanidi wa hali ya juu kupakia GeoJSON yako au kurekebisha mipangilio ya "
@@ -1727,8 +1732,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:24
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
+"map, then continue."
 msgstr ""
 "Chanzo kinachopendekezwa: %(title)s (%(geom_label)s). Kagua data kwenye "
 "ramani, kisha endelea."
@@ -1739,8 +1744,8 @@ msgid ""
 "Recommended source updated (%(geom_label)s). Review the data on the map, "
 "then continue."
 msgstr ""
-"Chanzo kilichopendekezwa kimesasishwa (%(geom_label)s). Kagua data kwenye "
-"ramani, kisha endelea."
+"Chanzo kilichopendekezwa kimesasishwa (%(geom_label)s). Kagua data kwenye"
+" ramani, kisha endelea."
 
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Downloading..."
@@ -1781,8 +1786,8 @@ msgstr "zana ya uchoraji ramani"
 #: app/templates/partials/project_details/style_and_scripts.html:39
 msgid "Project type not set. Please set the field mapping app first."
 msgstr ""
-"Aina ya mradi haijawekwa. Tafadhali weka kwanza programu ya uchoraji ramani "
-"wa uwanjani."
+"Aina ya mradi haijawekwa. Tafadhali weka kwanza programu ya uchoraji "
+"ramani wa uwanjani."
 
 #: app/templates/partials/project_details/style_and_scripts.html:40
 #, python-format
@@ -1883,12 +1888,12 @@ msgstr "Fungua mradi katika QFieldCloud"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
 msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud as"
-" admin to\n"
+"Manager account could not be created automatically. Log in to QFieldCloud"
+" as admin to\n"
 "      manage the project."
 msgstr ""
-"Akaunti ya meneja haikuweza kuundwa kiotomatiki. Ingia kwenye QFieldCloud "
-"kama msimamizi ili kusimamia mradi."
+"Akaunti ya meneja haikuweza kuundwa kiotomatiki. Ingia kwenye QFieldCloud"
+" kama msimamizi ili kusimamia mradi."
 
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"

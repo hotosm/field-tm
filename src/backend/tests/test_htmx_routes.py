@@ -355,6 +355,40 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     )
 
 
+def test_landing_template_renders_locale_selector():
+    """Landing template should render the locale selector in the existing footer."""
+    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    env.add_extension("jinja2.ext.i18n")
+    env.install_gettext_callables(
+        lambda message: message, lambda s, p, n: s if n == 1 else p
+    )
+    env.globals["current_locale"] = lambda: "en"
+    env.globals["supported_locales"] = ["en", "fr", "es", "sw", "ar", "pt", "pt_br"]
+    env.globals["locale_labels"] = {
+        "en": "English",
+        "fr": "Français",
+        "es": "Español",
+        "sw": "Kiswahili",
+        "ar": "العربية",
+        "pt": "Português",
+        "pt_br": "Português (Brasil)",
+    }
+    env.globals["auth_enabled"] = False
+
+    template = env.get_template("landing.html")
+    rendered = template.render(create_project_href="/new")
+
+    assert 'data-locale-switch="en"' in rendered
+    assert 'data-locale-switch="pt"' in rendered
+    assert 'data-locale-switch="pt_br"' in rendered
+    assert "<wa-dropdown>" in rendered
+    assert "landing-footer-social" in rendered
+
+
 def test_project_listing_template_compiles():
     """Project listing template should compile without Jinja syntax errors."""
     templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"

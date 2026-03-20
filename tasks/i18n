@@ -77,7 +77,7 @@ export-osm-fieldwork *ARGS='':
       locale_name = relative.parts[0]
       if "_" in locale_name:
           language, territory = locale_name.split("_", maxsplit=1)
-          locale_name = f"{language.lower()}_{territory.upper()}"
+          locale_name = f"{language.lower()}_{territory.lower()}"
           relative = Path(locale_name, *relative.parts[1:])
       return output_dir / relative
 

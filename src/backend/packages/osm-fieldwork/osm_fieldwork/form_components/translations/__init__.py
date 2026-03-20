@@ -28,17 +28,18 @@ def _normalize_language_code(language_code: str) -> str:
     if "_" not in normalized:
         return normalized.lower()
     language, territory = normalized.split("_", maxsplit=1)
-    return f"{language.lower()}_{territory.upper()}"
+    return f"{language.lower()}_{territory.lower()}"
 
 
 @lru_cache(maxsize=None)
 def _get_translations(language_code: str) -> gettext.NullTranslations:
-    return gettext.translation(
-        DOMAIN,
-        localedir=str(LOCALE_DIR),
-        languages=[_normalize_language_code(language_code)],
-        fallback=True,
-    )
+    normalized_code = _normalize_language_code(language_code)
+    mo_path = LOCALE_DIR / normalized_code / "LC_MESSAGES" / f"{DOMAIN}.mo"
+    try:
+        with mo_path.open("rb") as mo_file:
+            return gettext.GNUTranslations(mo_file)
+    except FileNotFoundError:
+        return gettext.NullTranslations()
 
 
 def _translate_label(field_name: str, language_code: str) -> str | None:

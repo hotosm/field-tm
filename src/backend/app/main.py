@@ -32,6 +32,8 @@ from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
 from app.i18n import (
+    LOCALE_LABELS,
+    SUPPORTED_LOCALES,
     _,
     create_locale_cookie_middleware,
     get_current_locale,
@@ -298,6 +300,8 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
     engine.engine.add_extension("jinja2.ext.i18n")
     engine.engine.install_gettext_callables(gettext_func, ngettext_func)
     engine.engine.globals["current_locale"] = get_current_locale
+    engine.engine.globals["supported_locales"] = SUPPORTED_LOCALES
+    engine.engine.globals["locale_labels"] = LOCALE_LABELS
 
     hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL or ""
     engine.engine.globals["hanko_public_url"] = hanko_public_url

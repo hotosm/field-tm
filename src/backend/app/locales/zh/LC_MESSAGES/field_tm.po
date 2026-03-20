@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -18,107 +18,107 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:160
+#: app/main.py:162
 msgid "An unexpected error occurred. Please contact an admin."
-msgstr ""
+msgstr "发生意外错误。请联系管理员。"
 
 #: app/htmx/project_create_routes.py:205
 msgid "Provide a valid .xls or .xlsx file"
-msgstr ""
+msgstr "请提供有效的 .xls 或 .xlsx 文件"
 
 #: app/htmx/project_create_routes.py:223
 msgid "Failed to load template form."
-msgstr ""
+msgstr "加载模板表单失败。"
 
 #: app/htmx/project_create_routes.py:231
 msgid "Please select a form or upload a file."
-msgstr ""
+msgstr "请选择表单或上传文件。"
 
 #: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:297
 msgid "Project not found."
-msgstr ""
+msgstr "未找到项目。"
 
 #: app/htmx/project_create_routes.py:466
 msgid "Project ID mismatch. You do not have access to this project."
-msgstr ""
+msgstr "项目 ID 不匹配。您无权访问此项目。"
 
 #: app/htmx/project_create_routes.py:504
 msgid "Form validated and uploaded successfully! Reloading page..."
-msgstr ""
+msgstr "表单验证并上传成功！正在重新加载页面……"
 
 #: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
 msgid "An unexpected error occurred"
-msgstr ""
+msgstr "发生意外错误"
 
 #: app/htmx/project_create_routes.py:532
 msgid "Error"
-msgstr ""
+msgstr "错误"
 
 #: app/htmx/project_detail_routes.py:97
 msgid "Mapper Login (QFieldCloud)"
-msgstr ""
+msgstr "制图员登录（QFieldCloud）"
 
 #: app/htmx/project_detail_routes.py:100
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
-msgstr ""
+msgstr "用户名："
 
 #: app/htmx/project_detail_routes.py:103
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
-msgstr ""
+msgstr "密码："
 
 #: app/htmx/project_detail_routes.py:106
 msgid "Scan the QR code, then enter these credentials in QField."
-msgstr ""
+msgstr "扫描二维码，然后在 QField 中输入这些凭据。"
 
 #: app/htmx/project_detail_routes.py:118
 msgid "Scan QR Code"
-msgstr ""
+msgstr "扫描二维码"
 
 #: app/htmx/project_detail_routes.py:120
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
-msgstr ""
+msgstr "使用 %(app_name)s 扫描此二维码并加载项目。"
 
 #: app/htmx/project_detail_routes.py:122
 msgid "Project QR Code"
-msgstr ""
+msgstr "项目二维码"
 
 #: app/htmx/project_detail_routes.py:123
 msgid "Download QR Code"
-msgstr ""
+msgstr "下载二维码"
 
 #: app/htmx/project_detail_routes.py:175
 msgid ""
-"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
-" running."
-msgstr ""
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is "
+"running."
+msgstr "无法连接到制图服务器。请检查 ODK Central 或 QFieldCloud 是否正在运行。"
 
 #: app/htmx/project_detail_routes.py:179
 msgid "The mapping server returned an error. Check its logs for details."
-msgstr ""
+msgstr "制图服务器返回错误。请查看其日志了解详情。"
 
 #: app/htmx/project_detail_routes.py:182
 msgid ""
-"Authentication failed connecting to the mapping server. Check the "
-"configured credentials."
-msgstr ""
+"Authentication failed connecting to the mapping server. Check the configured"
+" credentials."
+msgstr "连接制图服务器时身份验证失败。请检查已配置的凭据。"
 
 #: app/htmx/project_detail_routes.py:185
 msgid "An unexpected error occurred while generating the QR code."
-msgstr ""
+msgstr "生成二维码时发生意外错误。"
 
 #: app/htmx/project_detail_routes.py:247
 #, python-format
 msgid "Project (%(project_id)s) not found."
-msgstr ""
+msgstr "未找到项目（%(project_id)s）。"
 
 #: app/htmx/project_detail_routes.py:254
 msgid "Only the project manager can delete this project."
-msgstr ""
+msgstr "只有项目经理可以删除此项目。"
 
 #: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
 #: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
@@ -128,158 +128,159 @@ msgstr ""
 #: app/htmx/setup_step_routes.py:1375
 #, python-format
 msgid "Error: %(error_msg)s"
-msgstr ""
+msgstr "错误：%(error_msg)s"
 
 #: app/htmx/qfc_admin_routes.py:55
 msgid "Admin"
-msgstr ""
+msgstr "管理员"
 
 #: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
 msgid "Manager"
-msgstr ""
+msgstr "经理"
 
 #: app/htmx/qfc_admin_routes.py:57
 msgid "Editor"
-msgstr ""
+msgstr "编辑者"
 
 #: app/htmx/qfc_admin_routes.py:58
 msgid "Reporter"
-msgstr ""
+msgstr "报告员"
 
 #: app/htmx/qfc_admin_routes.py:59
 msgid "Reader"
-msgstr ""
+msgstr "查看者"
 
 #: app/htmx/qfc_admin_routes.py:106
 msgid "This user does not exist. Please create it first."
-msgstr ""
+msgstr "该用户不存在。请先创建。"
 
 #: app/htmx/qfc_admin_routes.py:108
 msgid "This user is already a collaborator on this project."
-msgstr ""
+msgstr "该用户已是此项目的协作者。"
 
 #: app/htmx/qfc_admin_routes.py:109
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
-msgstr ""
+msgstr "添加协作者失败：%(exc)s"
 
 #: app/htmx/qfc_admin_routes.py:115
 #, python-format
 msgid ""
-"This project belongs to the %(organization)s organization. The user must "
-"be added to that organization before they can be added as a collaborator."
-" Your QFieldCloud account does not have permission to manage organization"
-" members."
+"This project belongs to the %(organization)s organization. The user must be "
+"added to that organization before they can be added as a collaborator. Your "
+"QFieldCloud account does not have permission to manage organization members."
 msgstr ""
+"此项目属于 %(organization)s 组织。必须先将用户添加到该组织，才能将其添加为协作者。您的 QFieldCloud "
+"账户没有管理组织成员的权限。"
 
 #: app/htmx/qfc_admin_routes.py:163
 msgid "All fields are required."
-msgstr ""
+msgstr "所有字段均为必填。"
 
 #: app/htmx/qfc_admin_routes.py:178
 msgid "Login succeeded but no token received."
-msgstr ""
+msgstr "登录成功，但未收到令牌。"
 
 #: app/htmx/qfc_admin_routes.py:186
 msgid "Login failed. Check your URL and credentials."
-msgstr ""
+msgstr "登录失败。请检查 URL 和凭据。"
 
 #: app/htmx/qfc_admin_routes.py:217
 msgid "QFieldCloud Projects"
-msgstr ""
+msgstr "QFieldCloud 项目"
 
 #: app/htmx/qfc_admin_routes.py:222
 msgid "Connected as"
-msgstr ""
+msgstr "已连接身份"
 
 #: app/htmx/qfc_admin_routes.py:223
 msgid "to"
-msgstr ""
+msgstr "到"
 
 #: app/htmx/qfc_admin_routes.py:229
 msgid "Log Out"
-msgstr ""
+msgstr "退出登录"
 
 #: app/htmx/qfc_admin_routes.py:234
 msgid "No projects found."
-msgstr ""
+msgstr "未找到项目。"
 
 #: app/htmx/qfc_admin_routes.py:243
 msgid "Public"
-msgstr ""
+msgstr "公开"
 
 #: app/htmx/qfc_admin_routes.py:245
 msgid "Private"
-msgstr ""
+msgstr "私有"
 
 #: app/htmx/qfc_admin_routes.py:259
 msgid "Manage"
-msgstr ""
+msgstr "管理"
 
 #: app/htmx/qfc_admin_routes.py:269
 msgid "Project"
-msgstr ""
+msgstr "项目"
 
 #: app/htmx/qfc_admin_routes.py:269
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: app/htmx/qfc_admin_routes.py:269
 msgid "Visibility"
-msgstr ""
+msgstr "可见性"
 
 #: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
 #: app/templates/project_details.html:58
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: app/htmx/qfc_admin_routes.py:298
 msgid "Session expired. Please log in again."
-msgstr ""
+msgstr "会话已过期。请重新登录。"
 
 #: app/htmx/qfc_admin_routes.py:317
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
-msgstr ""
+msgstr "无法加载协作者：%(exc)s"
 
 #: app/htmx/qfc_admin_routes.py:387
 msgid "Update"
-msgstr ""
+msgstr "更新"
 
 #: app/htmx/qfc_admin_routes.py:390 app/htmx/qfc_admin_routes.py:397
 #: app/htmx/qfc_admin_routes.py:405
 msgid "Remove"
-msgstr ""
+msgstr "移除"
 
 #: app/htmx/qfc_admin_routes.py:395
 msgid "Remove Collaborator"
-msgstr ""
+msgstr "移除协作者"
 
 #: app/htmx/qfc_admin_routes.py:397
 msgid "from this project?"
-msgstr ""
+msgstr "从此项目中移除？"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
 #: app/templates/partials/project_details/setup_steps.html:592
 #: app/templates/partials/project_details/setup_steps.html:687
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: app/htmx/qfc_admin_routes.py:411
 msgid "User"
-msgstr ""
+msgstr "用户"
 
 #: app/htmx/qfc_admin_routes.py:411
 msgid "Role"
-msgstr ""
+msgstr "角色"
 
 #: app/htmx/qfc_admin_routes.py:411
 msgid "Actions"
-msgstr ""
+msgstr "操作"
 
 #: app/htmx/qfc_admin_routes.py:417
 msgid "No collaborators yet."
-msgstr ""
+msgstr "尚无协作者。"
 
 #: app/htmx/qfc_admin_routes.py:431
 #: app/templates/partials/project_details/setup_steps.html:620
@@ -287,677 +288,679 @@ msgstr ""
 #: app/templates/partials/project_details/setup_steps.html:660
 #: app/templates/qfc_admin.html:52
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: app/htmx/qfc_admin_routes.py:441
 msgid "Add Collaborator"
-msgstr ""
+msgstr "添加协作者"
 
 #: app/htmx/qfc_admin_routes.py:449
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: app/htmx/qfc_admin_routes.py:456
 msgid "Collaborators"
-msgstr ""
+msgstr "协作者"
 
 #: app/htmx/qfc_admin_routes.py:480
 msgid "Username is required."
-msgstr ""
+msgstr "用户名为必填项。"
 
 #: app/htmx/qfc_admin_routes.py:530
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
-msgstr ""
+msgstr "移除协作者失败：%(exc)s"
 
 #: app/htmx/qfc_admin_routes.py:569
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
-msgstr ""
+msgstr "更新协作者失败：%(exc)s"
 
 #: app/htmx/qfc_admin_routes.py:593
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
-msgstr ""
+msgstr "刷新协作者列表失败：%(exc)s"
 
 #: app/htmx/setup_step_routes.py:82
 msgid "Project not found or access denied."
-msgstr ""
+msgstr "未找到项目或访问被拒绝。"
 
 #: app/htmx/setup_step_routes.py:155
 msgid ""
-"Project finalisation failed. Please check your settings and try again. If"
-" it continues, send the technical details below to your instance "
-"administrator or support team."
-msgstr ""
+"Project finalisation failed. Please check your settings and try again. If it"
+" continues, send the technical details below to your instance administrator "
+"or support team."
+msgstr "项目完成失败。请检查设置后重试。如果问题持续，请将以下技术详情发送给实例管理员或支持团队。"
 
 #: app/htmx/setup_step_routes.py:221
 msgid "Invalid GeoJSON data in request. Please try uploading again."
-msgstr ""
+msgstr "请求中的 GeoJSON 数据无效。请重新上传。"
 
 #: app/htmx/setup_step_routes.py:227
 msgid "Error reading GeoJSON data from request."
-msgstr ""
+msgstr "读取请求中的 GeoJSON 数据时出错。"
 
 #: app/htmx/setup_step_routes.py:248
 #, python-format
 msgid ""
-"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
-"Please select a smaller area."
-msgstr ""
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. Please"
+" select a smaller area."
+msgstr "区域面积为 %(area_km2)s 平方公里，超过 %(area_limit)s 平方公里限制。请选择更小的区域。"
 
 #: app/htmx/setup_step_routes.py:256
 #, python-format
 msgid ""
-"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
-"longer to process. The data extract API is limited to 200 km²."
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take longer "
+"to process. The data extract API is limited to 200 km²."
 msgstr ""
+"区域面积为 %(area_km2)s 平方公里。较大区域（>%(area_warn)s 平方公里）可能需要更长处理时间。数据提取 API 限制为 200"
+" 平方公里。"
 
 #: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
 msgid "Project AOI"
-msgstr ""
+msgstr "项目 AOI"
 
 #: app/htmx/setup_step_routes.py:334
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
-msgstr ""
+msgstr "数据提取（%(data_feature_count)s 个要素）"
 
 #: app/htmx/setup_step_routes.py:348
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
-msgstr ""
+msgstr "任务边界（%(task_count)s 个任务）"
 
 #: app/htmx/setup_step_routes.py:384
 msgid ""
-"No task boundaries found. Please split the project into tasks first using"
-" the \"Split AOI\" button above."
-msgstr ""
+"No task boundaries found. Please split the project into tasks first using "
+"the \"Split AOI\" button above."
+msgstr "未找到任务边界。请先使用上方的“Split AOI”按钮将项目拆分为任务。"
 
 #: app/htmx/setup_step_routes.py:440
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
-msgstr ""
+msgstr "✓ AOI 拆分成功！已使用 %(algorithm)s 生成 %(task_count)s 个任务区域。"
 
 #: app/htmx/setup_step_routes.py:447
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
-"the results below. If satisfied, click \"Accept Task Choices\" to save. "
-"Otherwise, adjust parameters above and click \"Split Again\" to "
-"regenerate."
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review the "
+"results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to regenerate."
 msgstr ""
+"正在预览 %(task_count)s 个任务边界%(data_extract_info)s。请查看下方结果。如满意，点击“Accept Task "
+"Choices”保存。否则，请调整上方参数并点击“Split Again”重新生成。"
 
 #: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
 msgid "Data Extract"
-msgstr ""
+msgstr "数据提取"
 
 #: app/htmx/setup_step_routes.py:547
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
-msgstr ""
+msgstr "OSM 数据下载成功！找到 %(feature_count)s 个要素。"
 
 #: app/htmx/setup_step_routes.py:550
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"downloading again with different parameters."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try downloading"
+" again with different parameters."
 msgstr ""
+"正在地图上预览 %(feature_count)s 个要素。请查看下方数据。如满意，点击“Accept Data "
+"Extract”保存。否则，请尝试使用不同参数重新下载。"
 
 #: app/htmx/setup_step_routes.py:622
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
-msgstr ""
+msgstr "文件类型无效。请上传 .geojson 或 .json 文件。"
 
 #: app/htmx/setup_step_routes.py:647
 msgid "No valid geometries found in GeoJSON."
-msgstr ""
+msgstr "在 GeoJSON 中未找到有效几何。"
 
 #: app/htmx/setup_step_routes.py:679
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
-msgstr ""
+msgstr "✓ GeoJSON 上传成功！找到 %(feature_count)s 个要素。"
 
 #: app/htmx/setup_step_routes.py:682
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"uploading a different file."
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try uploading a"
+" different file."
 msgstr ""
+"正在地图上预览 %(feature_count)s 个要素。请查看下方数据。如满意，点击“Accept Data "
+"Extract”保存。否则，请尝试上传其他文件。"
 
 #: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
-msgstr ""
+msgstr "未找到 GeoJSON 数据。请先下载 OSM 数据或上传 GeoJSON 文件。"
 
 #: app/htmx/setup_step_routes.py:778
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
-msgstr ""
+msgstr "数据提取（%(feature_count)s 个要素）"
 
 #: app/htmx/setup_step_routes.py:797
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
 "continue to the next step."
-msgstr ""
+msgstr "正在地图上预览 %(feature_count)s 个数据要素。请查看数据，然后继续下一步。"
 
 #: app/htmx/setup_step_routes.py:857
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
-msgstr ""
+msgstr "✓ 已选择仅采集新数据模式。任务拆分已跳过，您可以继续。"
 
 #: app/htmx/setup_step_routes.py:935
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
 "XLSForm) and then Step 4 (split tasks)."
-msgstr ""
+msgstr "✓ 数据提取保存成功！现在可以进入步骤 3（上传 XLSForm），然后步骤 4（拆分任务）。"
 
 #: app/htmx/setup_step_routes.py:1005
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
-msgstr ""
+msgstr "未找到数据提取。请先下载 OSM 数据或上传 GeoJSON 文件。"
 
 #: app/htmx/setup_step_routes.py:1036
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
 "features. The entire AOI will be used as a single task."
-msgstr ""
+msgstr "正在预览整个 AOI（不拆分），包含 %(data_feature_count)s 个数据要素。整个 AOI 将作为单个任务使用。"
 
 #: app/htmx/setup_step_routes.py:1043
 #, python-format
 msgid ""
-"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
-" features together."
-msgstr ""
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data "
+"features together."
+msgstr "正在同时预览 %(task_count)s 个任务边界和 %(data_feature_count)s 个数据要素。"
 
 #: app/htmx/setup_step_routes.py:1102
 msgid "Project outline not found. Cannot skip task splitting."
-msgstr ""
+msgstr "未找到项目轮廓。无法跳过任务拆分。"
 
 #: app/htmx/setup_step_routes.py:1129
 msgid ""
-"✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
-msgstr ""
+"✓ Task splitting skipped. The whole AOI will be used as a single task. You "
+"can proceed to Step 4."
+msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 4。"
 
 #: app/htmx/setup_step_routes.py:1190
 msgid "Please select a splitting option."
-msgstr ""
+msgstr "请选择拆分选项。"
 
 #: app/htmx/setup_step_routes.py:1210
 msgid "✓ Task splitting is not required for this project setup."
-msgstr ""
+msgstr "✓ 此项目设置无需任务拆分。"
 
 #: app/htmx/setup_step_routes.py:1267
 msgid "No data extract provided."
-msgstr ""
+msgstr "未提供数据提取。"
 
 #: app/htmx/setup_step_routes.py:1271
 msgid "Invalid data extract format."
-msgstr ""
+msgstr "数据提取格式无效。"
 
 #: app/htmx/setup_step_routes.py:1288
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
 "complete."
-msgstr ""
+msgstr "✓ 已接受数据提取！已保存 %(feature_count)s 个要素。步骤 2 现已完成。"
 
 #: app/htmx/setup_step_routes.py:1338
 msgid "No task areas data provided."
-msgstr ""
+msgstr "未提供任务区域数据。"
 
 #: app/htmx/setup_step_routes.py:1342
 msgid "Invalid task areas data format."
-msgstr ""
+msgstr "任务区域数据格式无效。"
 
 #: app/htmx/setup_step_routes.py:1359
 #: app/templates/partials/project_details/setup_steps.html:362
 msgid "✓ Split tasks saved successfully"
-msgstr ""
+msgstr "✓ 拆分任务保存成功"
 
 #: app/htmx/setup_step_routes.py:1414
 msgid ""
-"Provide ODK URL, username, and password (all 3), or leave them all blank "
-"to use server defaults."
-msgstr ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank to "
+"use server defaults."
+msgstr "请提供 ODK URL、用户名和密码（共 3 项），或将其全部留空以使用服务器默认值。"
 
 #: app/htmx/setup_step_routes.py:1536
 msgid "GeoJSON is required"
-msgstr ""
+msgstr "必须提供 GeoJSON"
 
 #: app/htmx/setup_step_routes.py:1547
 msgid "No polygon geometries found. Project area must be a polygon."
-msgstr ""
+msgstr "未找到多边形几何。项目区域必须是多边形。"
 
 #: app/templates/home.html:13
 msgid "Filters"
-msgstr ""
+msgstr "筛选"
 
 #: app/templates/home.html:18
 msgid "All projects"
-msgstr ""
+msgstr "所有项目"
 
 #: app/templates/home.html:19
 msgid "Draft"
-msgstr ""
+msgstr "草稿"
 
 #: app/templates/home.html:20
 msgid "Published"
-msgstr ""
+msgstr "已发布"
 
 #: app/templates/home.html:21
 msgid "Completed"
-msgstr ""
+msgstr "已完成"
 
 #: app/templates/home.html:22
 msgid "Archived"
-msgstr ""
+msgstr "已归档"
 
 #: app/templates/home.html:26
 msgid "Project Status"
-msgstr ""
+msgstr "项目状态"
 
 #: app/templates/home.html:42
 msgid "Newest first"
-msgstr ""
+msgstr "最新优先"
 
 #: app/templates/home.html:43
 msgid "Oldest first"
-msgstr ""
+msgstr "最早优先"
 
 #: app/templates/home.html:44
 msgid "Name (A-Z)"
-msgstr ""
+msgstr "名称（A-Z）"
 
 #: app/templates/home.html:45
 msgid "Name (Z-A)"
-msgstr ""
+msgstr "名称（Z-A）"
 
 #: app/templates/home.html:48
 msgid "Sort By"
-msgstr ""
+msgstr "排序方式"
 
 #: app/templates/home.html:63
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: app/templates/home.html:69
 msgid "Search projects…"
-msgstr ""
+msgstr "搜索项目…"
 
-#: app/templates/home.html:79 app/templates/landing.html:499
-#: app/templates/layout.html:219 app/templates/new_project.html:167
+#: app/templates/home.html:79 app/templates/landing.html:565
+#: app/templates/layout.html:220 app/templates/new_project.html:167
 msgid "Create Project"
-msgstr ""
+msgstr "创建项目"
 
 #: app/templates/home.html:80
 msgid "+ New"
-msgstr ""
+msgstr "+ 新建"
 
 #: app/templates/home.html:86
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] ""
+msgstr[0] "显示 %(count)s 个项目"
 
 #: app/templates/home.html:87
 #, python-format
 msgid "in %(status)s"
-msgstr ""
+msgstr "状态为 %(status)s"
 
 #: app/templates/home.html:88
 #, python-format
 msgid "matching \"%(query)s\""
-msgstr ""
+msgstr "匹配“%(query)s”"
 
 #: app/templates/home.html:104
 msgid "Private Project"
-msgstr ""
+msgstr "私有项目"
 
 #: app/templates/home.html:127 app/templates/project_details.html:33
 msgid "Unnamed Project"
-msgstr ""
+msgstr "未命名项目"
 
 #: app/templates/home.html:135
 msgid "Location:"
-msgstr ""
+msgstr "位置："
 
 #: app/templates/home.html:156
 msgid "Created:"
-msgstr ""
+msgstr "创建时间："
 
 #: app/templates/home.html:156
 msgid "N/A"
-msgstr ""
+msgstr "不适用"
 
 #: app/templates/home.html:165
 msgid "No projects found. Create your first project to get started!"
-msgstr ""
+msgstr "未找到项目。创建您的第一个项目以开始使用！"
 
-#: app/templates/landing.html:1
-msgid "FieldTM | Field Tasking Manager"
-msgstr ""
-
-#: app/templates/landing.html:491
+#: app/templates/landing.html:557
 msgid "Coordinate field campaigns"
-msgstr ""
+msgstr "协调外业活动"
 
-#: app/templates/landing.html:492
+#: app/templates/landing.html:558
 msgid "FIELD - TASKING MANAGER"
-msgstr ""
+msgstr "外业任务管理器"
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:560
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
-msgstr ""
+msgstr "通过无缝协同提升外业制图的效率和准确性。"
 
-#: app/templates/landing.html:497
+#: app/templates/landing.html:563
 msgid "Explore Projects"
-msgstr ""
+msgstr "浏览项目"
 
-#: app/templates/landing.html:509
+#: app/templates/landing.html:575
 msgid "Loading metrics..."
-msgstr ""
+msgstr "正在加载指标……"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:583
 msgid "What is it?"
-msgstr ""
+msgstr "这是什么？"
 
-#: app/templates/landing.html:519
+#: app/templates/landing.html:585
 msgid ""
-"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
-"map features by coordinating mapping in the field."
-msgstr ""
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to map "
+"features by coordinating mapping in the field."
+msgstr "Field Tasking Manager（Field-TM）通过协调外业制图，帮助团队将本地知识补充到地图要素中。"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:588
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
-"mature tools like ODK and QField. It is a standalone mobile and web "
-"workflow that helps teams collect geospatial data efficiently with "
-"commonly available Android devices."
+"mature tools like ODK and QField. It is a standalone mobile and web workflow"
+" that helps teams collect geospatial data efficiently with commonly "
+"available Android devices."
 msgstr ""
+"Field-TM 通过支持并扩展 ODK 和 QField 等成熟工具来促进协作制图。它是一套独立的移动端和网页端工作流，帮助团队使用常见的 "
+"Android 设备高效采集地理空间数据。"
 
-#: app/templates/landing.html:527
+#: app/templates/landing.html:593
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
-msgstr ""
+msgstr "项目经理正在笔记本电脑上演示 FieldTM 制图工作流"
 
-#: app/templates/landing.html:533
+#: app/templates/landing.html:599
 msgid "Main Features"
-msgstr ""
+msgstr "主要功能"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:602
 msgid "Flexible Data Collection"
-msgstr ""
+msgstr "灵活的数据采集"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:604
 msgid ""
-"Support diverse survey forms, multiple data formats, and adaptable "
-"workflows that fit different operational needs."
-msgstr ""
+"Support diverse survey forms, multiple data formats, and adaptable workflows"
+" that fit different operational needs."
+msgstr "支持多样化调查表、多种数据格式，以及适应不同业务需求的可调整工作流。"
 
-#: app/templates/landing.html:542
+#: app/templates/landing.html:608
 msgid "Open Source and Customizable"
-msgstr ""
+msgstr "开源且可定制"
 
-#: app/templates/landing.html:544
+#: app/templates/landing.html:610
 msgid ""
-"Adapt Field-TM to your own survey logic, data structures, and integration"
-" requirements."
-msgstr ""
+"Adapt Field-TM to your own survey logic, data structures, and integration "
+"requirements."
+msgstr "可根据您的调查逻辑、数据结构和集成需求定制 Field-TM。"
 
-#: app/templates/landing.html:548
+#: app/templates/landing.html:614
 msgid "Entity-Level Tracking"
-msgstr ""
+msgstr "实体级跟踪"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:616
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed decisions quickly."
-msgstr ""
+msgstr "在任务和要素级别监控调查进度，帮助管理者快速做出有依据的决策。"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:623
 msgid "Who is it for?"
-msgstr ""
+msgstr "适合谁使用？"
 
-#: app/templates/landing.html:560
+#: app/templates/landing.html:626
 msgid "Project Manager"
-msgstr ""
+msgstr "项目经理"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:627
 msgid "Create and coordinate field campaigns"
-msgstr ""
+msgstr "创建并协调外业活动"
 
-#: app/templates/landing.html:563
+#: app/templates/landing.html:629
 msgid ""
-"Project managers use Field-TM to set up mapping projects, define areas of"
-" interest, design survey forms, and split work into manageable tasks."
-msgstr ""
+"Project managers use Field-TM to set up mapping projects, define areas of "
+"interest, design survey forms, and split work into manageable tasks."
+msgstr "项目经理使用 Field-TM 设置制图项目、定义关注区域、设计调查表单，并将工作拆分为可管理的任务。"
 
-#: app/templates/landing.html:566
+#: app/templates/landing.html:632
 msgid "Define a project area and upload or choose a survey form"
-msgstr ""
+msgstr "定义项目区域并上传或选择调查表单"
 
-#: app/templates/landing.html:567
+#: app/templates/landing.html:633
 msgid "Split the area into tasks and generate a data extract"
-msgstr ""
+msgstr "将区域拆分为任务并生成数据提取"
 
-#: app/templates/landing.html:568
+#: app/templates/landing.html:634
 msgid "Publish the project to ODK Central or QFieldCloud"
-msgstr ""
+msgstr "将项目发布到 ODK Central 或 QFieldCloud"
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:635
 msgid "Share a QR code so mappers can start collecting data"
-msgstr ""
+msgstr "分享二维码，让制图员开始采集数据"
 
-#: app/templates/landing.html:573
+#: app/templates/landing.html:639
 msgid "Field Mapper"
-msgstr ""
+msgstr "外业制图员"
 
-#: app/templates/landing.html:574
+#: app/templates/landing.html:640
 msgid "Collect data in the field with your phone"
-msgstr ""
+msgstr "使用手机在外业中采集数据"
 
-#: app/templates/landing.html:576
+#: app/templates/landing.html:642
 msgid ""
-"Mappers do not need to log in to Field-TM. Once a project manager "
-"publishes a project, mappers access it directly in their mobile app of "
-"choice."
-msgstr ""
+"Mappers do not need to log in to Field-TM. Once a project manager publishes "
+"a project, mappers access it directly in their mobile app of choice."
+msgstr "制图员无需登录 Field-TM。项目经理发布项目后，制图员可直接在所选移动应用中访问。"
 
-#: app/templates/landing.html:579
+#: app/templates/landing.html:645
 msgid "Scan the QR code shared by your project manager"
-msgstr ""
+msgstr "扫描项目经理分享的二维码"
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:646
 msgid "The project loads automatically in ODK Collect or QField"
-msgstr ""
+msgstr "项目会自动加载到 ODK Collect 或 QField 中"
 
-#: app/templates/landing.html:581
+#: app/templates/landing.html:647
 msgid "Navigate to your assigned task area and collect data"
-msgstr ""
+msgstr "前往分配给您的任务区域并采集数据"
 
-#: app/templates/landing.html:582
+#: app/templates/landing.html:648
 msgid "Submit your survey, which goes straight to the server"
-msgstr ""
+msgstr "提交调查结果，数据会直接发送到服务器"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:655
 msgid "Field-TM Use Cases"
-msgstr ""
+msgstr "Field-TM 使用场景"
 
-#: app/templates/landing.html:594
+#: app/templates/landing.html:660
 msgid "Field mapping in progress"
-msgstr ""
+msgstr "外业制图进行中"
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:665
 msgid "1. Community Mapping"
-msgstr ""
+msgstr "1. 社区制图"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:667
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public facilities, and local services for inclusive planning."
-msgstr ""
+msgstr "Field Tasking Manager 帮助社区绘制非正规住区、公共设施和本地服务地图，以支持包容性规划。"
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:671
 msgid "2. Urban Planning and Management"
-msgstr ""
+msgstr "2. 城市规划与管理"
 
-#: app/templates/landing.html:607
+#: app/templates/landing.html:673
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities through clear, manageable mapping tasks."
-msgstr ""
+msgstr "通过清晰且可管理的制图任务，协调调查房屋、道路和公用设施，建设更智慧的城市。"
 
-#: app/templates/landing.html:611
+#: app/templates/landing.html:677
 msgid "3. Disaster Response and Recovery"
-msgstr ""
+msgstr "3. 灾害响应与恢复"
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:679
 msgid ""
-"Rapidly map damaged infrastructure after disasters, coordinate "
-"volunteers, and deliver reliable data for relief operations."
-msgstr ""
+"Rapidly map damaged infrastructure after disasters, coordinate volunteers, "
+"and deliver reliable data for relief operations."
+msgstr "在灾害后快速绘制受损基础设施地图，协调志愿者，并为救援行动提供可靠数据。"
 
-#: app/templates/landing.html:621
+#: app/templates/landing.html:687
 msgid "Resources"
-msgstr ""
+msgstr "资源"
 
-#: app/templates/landing.html:629
+#: app/templates/landing.html:695
 msgid "Data Prep"
-msgstr ""
+msgstr "数据准备"
 
-#: app/templates/landing.html:630
+#: app/templates/landing.html:696
 msgid "HOT Export Tool"
-msgstr ""
+msgstr "HOT 导出工具"
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:698
 msgid "Download task-ready geospatial data extracts for your project area."
-msgstr ""
+msgstr "为您的项目区域下载适合任务使用的地理空间数据提取。"
 
-#: app/templates/landing.html:641 app/templates/landing.html:653
+#: app/templates/landing.html:707 app/templates/landing.html:719
 msgid "Documentation"
-msgstr ""
+msgstr "文档"
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:708
 msgid "ODK Central Guide"
-msgstr ""
+msgstr "ODK Central 指南"
 
-#: app/templates/landing.html:644
+#: app/templates/landing.html:710
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
-msgstr ""
+msgstr "了解如何在 ODK 中管理表单、应用用户和外业提交。"
 
-#: app/templates/landing.html:654
+#: app/templates/landing.html:720
 msgid "QField Guide"
-msgstr ""
+msgstr "QField 指南"
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:722
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
-msgstr ""
+msgstr "为离线制图设置 QFieldCloud 项目和移动工作流。"
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:732
 msgid "Need assistance?"
-msgstr ""
+msgstr "需要帮助？"
 
-#: app/templates/landing.html:667
+#: app/templates/landing.html:733
 msgid "Email:"
-msgstr ""
+msgstr "电子邮件："
 
-#: app/templates/layout.html:4 app/templates/login.html:1
-msgid "Field Tasking Manager"
+#: app/templates/landing.html:749
+msgid "Language"
 msgstr ""
 
 #: app/templates/layout.html:7
 msgid "Coordinated field mapping for Open Mapping campaigns."
-msgstr ""
+msgstr "为开放制图活动提供协调一致的外业制图。"
 
-#: app/templates/layout.html:158 app/templates/login.html:1
+#: app/templates/layout.html:159 app/templates/login.html:1
 msgid "Login"
-msgstr ""
+msgstr "登录"
 
-#: app/templates/layout.html:212
+#: app/templates/layout.html:213
 msgid "Projects"
-msgstr ""
+msgstr "项目"
 
-#: app/templates/layout.html:226
+#: app/templates/layout.html:227
 msgid "QField Admin"
-msgstr ""
+msgstr "QField 管理"
 
 #: app/templates/login.html:5
 msgid "Sign in to Field-TM"
-msgstr ""
+msgstr "登录 Field-TM"
 
 #: app/templates/login.html:8
 msgid "Redirecting to the centralized login service."
-msgstr ""
+msgstr "正在重定向到集中式登录服务。"
 
 #: app/templates/login.html:9
 msgid "Continue to login"
-msgstr ""
+msgstr "继续登录"
 
 #: app/templates/login.html:17
 msgid "Authentication is disabled on this deployment."
-msgstr ""
+msgstr "此部署已禁用身份验证。"
 
 #: app/templates/login.html:20
 msgid "Back to home"
-msgstr ""
-
-#: app/templates/new_project.html:1
-msgid "Create Project — Field Tasking Manager"
-msgstr ""
+msgstr "返回首页"
 
 #: app/templates/new_project.html:4
 msgid "Create New Project"
-msgstr ""
+msgstr "创建新项目"
 
 #: app/templates/new_project.html:25
 msgid "Project Name"
-msgstr ""
+msgstr "项目名称"
 
 #: app/templates/new_project.html:30
 msgid "Enter project name"
-msgstr ""
+msgstr "输入项目名称"
 
 #: app/templates/new_project.html:43
 msgid "Enter project description"
-msgstr ""
+msgstr "输入项目描述"
 
 #: app/templates/new_project.html:52
 msgid "Field Mapping App"
-msgstr ""
+msgstr "外业制图应用"
 
 #: app/templates/new_project.html:92
 msgid "Project Area"
-msgstr ""
+msgstr "项目区域"
 
 #: app/templates/new_project.html:101
 msgid "Draw Area"
-msgstr ""
+msgstr "绘制区域"
 
 #: app/templates/new_project.html:109
 msgid "Upload GeoJSON"
-msgstr ""
+msgstr "上传 GeoJSON"
 
 #: app/templates/new_project.html:117
 msgid "Clear"
-msgstr ""
+msgstr "清除"
 
 #: app/templates/new_project.html:125
 msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"Draw a polygon on the map or upload a GeoJSON file to define your project "
+"area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
 "warning. The OSM data extract API is limited to 200 km²."
 msgstr ""
+"请在地图上绘制多边形或上传 GeoJSON 文件以定义项目区域。项目最大面积为 1,000 平方公里。超过 100 平方公里的区域将显示警告。OSM "
+"数据提取 API 限制为 200 平方公里。"
 
 #: app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:101
@@ -965,55 +968,55 @@ msgstr ""
 #: app/templates/partials/project_details/setup_steps.html:377
 #: app/templates/partials/project_details/setup_steps.html:576
 msgid "Advanced Config"
-msgstr ""
+msgstr "高级配置"
 
 #: app/templates/new_project.html:145
 msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr ""
+msgstr "合并几何（多重多边形使用凸包）"
 
 #: app/templates/new_project.html:154 app/templates/project_details.html:95
 msgid "Hashtags"
-msgstr ""
+msgstr "标签"
 
 #: app/templates/new_project.html:157
 msgid "Type hashtags and press Enter or comma"
-msgstr ""
+msgstr "输入标签并按 Enter 或逗号"
 
 #: app/templates/new_project.html:162
 msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag "
-"to remove it."
-msgstr ""
+"Type hashtags and press Enter or comma to add them. Click the × on a tag to "
+"remove it."
+msgstr "输入标签并按 Enter 或逗号以添加。点击标签上的 × 可移除。"
 
 #: app/templates/new_project.html:168
 msgid "Creating..."
-msgstr ""
+msgstr "正在创建……"
 
 #: app/templates/new_project.html:177
 msgid "Something went wrong. Please try again."
-msgstr ""
+msgstr "出现问题。请重试。"
 
 #: app/templates/new_project.html:178
 msgid "Invalid GeoJSON format. Please check your file."
-msgstr ""
+msgstr "GeoJSON 格式无效。请检查文件。"
 
 #: app/templates/new_project.html:179
 msgid "Invalid GeoJSON file. Please check the file format."
-msgstr ""
+msgstr "GeoJSON 文件无效。请检查文件格式。"
 
 #: app/templates/new_project.html:180 app/templates/new_project.html:645
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
-msgstr ""
+msgstr "提交前，必须在地图上绘制或上传关注区域（AOI）。"
 
 #: app/templates/new_project.html:610
 msgid "A project with this name already exists. Please choose a different name."
-msgstr ""
+msgstr "已存在同名项目。请选择其他名称。"
 
 #: app/templates/new_project.html:770
 msgid "Description is required."
-msgstr ""
+msgstr "描述为必填项。"
 
 #: app/templates/project_details.html:6
 msgid "← Back to Projects"
@@ -1051,8 +1054,7 @@ msgstr ""
 msgid "Project ID:"
 msgstr ""
 
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
+#: app/templates/project_details.html:121 app/templates/project_details.html:129
 msgid "View Project in ODK Central →"
 msgstr ""
 
@@ -1072,8 +1074,7 @@ msgstr ""
 msgid "Delete Project"
 msgstr ""
 
-#: app/templates/project_details.html:165
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:165 app/templates/project_details.html:176
 msgid "Back to Projects"
 msgstr ""
 
@@ -1083,13 +1084,9 @@ msgstr ""
 
 #: app/templates/project_details.html:173
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
+"The project you're looking for doesn't exist or you don't have permission to"
+" view\n"
 "        it."
-msgstr ""
-
-#: app/templates/qfc_admin.html:1
-msgid "QFieldCloud Admin — Field Tasking Manager"
 msgstr ""
 
 #: app/templates/qfc_admin.html:15
@@ -1097,9 +1094,7 @@ msgid "QFieldCloud Admin"
 msgstr ""
 
 #: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
+msgid "This page is for managing the users in your QField project, after creation."
 msgstr ""
 
 #: app/templates/qfc_admin.html:25
@@ -1195,10 +1190,9 @@ msgstr ""
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
+"If you need to upload additional media files to this project, such as images"
+" and\n"
+"          videos, log into ODK Central and upload them in the form settings."
 msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:14
@@ -1409,8 +1403,8 @@ msgstr ""
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
+"      parameters, then split. Review the preview, and click \"Accept Task "
+"Areas\" to save. Or\n"
 "      click"
 msgstr ""
 
@@ -1495,8 +1489,8 @@ msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:563
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
+"All prerequisites are complete! Create the project in your chosen mapping "
+"tool."
 msgstr ""
 
 #: app/templates/partials/project_details/setup_steps.html:568
@@ -1606,15 +1600,15 @@ msgstr ""
 
 #: app/templates/partials/project_details/style_and_scripts.html:23
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Use Advanced "
+"Config to upload your own GeoJSON or adjust download settings."
 msgstr ""
 
 #: app/templates/partials/project_details/style_and_scripts.html:24
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the map, "
+"then continue."
 msgstr ""
 
 #: app/templates/partials/project_details/style_and_scripts.html:25
@@ -1761,8 +1755,8 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
 msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
+"Manager account could not be created automatically. Log in to QFieldCloud as"
+" admin to\n"
 "      manage the project."
 msgstr ""
 

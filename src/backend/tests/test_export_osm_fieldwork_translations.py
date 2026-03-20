@@ -28,7 +28,7 @@ PO_TO_LOCALE_LANG = {
     "it": "it",
     "ja": "ja",
     "ne": "ne",
-    "pt_br": "pt_BR",
+    "pt_br": "pt_br",
     "sw": "sw",
 }
 
@@ -70,6 +70,13 @@ def load_xlsform_translations(po_path: Path) -> dict[str, str]:
     return dict(sorted(data.items()))
 
 
+def load_mo_translations(locale_lang: str) -> gettext.GNUTranslations:
+    """Load a compiled gettext catalog using the exact locale directory name."""
+    mo_path = OUTPUT_DIR / locale_lang / "LC_MESSAGES" / "osm_fieldwork.mo"
+    with mo_path.open("rb") as mo_file:
+        return gettext.GNUTranslations(mo_file)
+
+
 def test_committed_osm_fieldwork_mo_matches_compiled_catalogs() -> None:
     """Packaged osm-fieldwork .mo artifacts should match backend catalogs."""
     result = run_export_command("--check")
@@ -87,16 +94,10 @@ def test_export_translations_writes_expected_mo_files() -> None:
     } >= set(PO_TO_LOCALE_LANG.values())
 
     for po_lang, locale_lang in PO_TO_LOCALE_LANG.items():
-        output_dir = OUTPUT_DIR
         expected = load_xlsform_translations(
             LOCALE_DIR / po_lang / "LC_MESSAGES" / "osm_fieldwork.po"
         )
-        translations = gettext.translation(
-            "osm_fieldwork",
-            localedir=str(output_dir),
-            languages=[locale_lang],
-            fallback=False,
-        )
+        translations = load_mo_translations(locale_lang)
         actual = {
             key: translations.pgettext("xlsform_label", key) for key in sorted(expected)
         }

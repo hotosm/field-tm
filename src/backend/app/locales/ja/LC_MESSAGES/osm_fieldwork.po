@@ -4,11 +4,11 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr "その他のデジタイズの問題"
-"Project-Id-Version: Field-TM VERSION\n"
-"Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
-"PO-Revision-Date: 2026-03-18 17:03+0000\n"
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr "その他のデジタイズの問題"
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "デジタイジングした地物の位置は正しいですか？"
+msgstr "この要素のデジタイズされた位置は正しいですか？"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
@@ -117,3 +117,4 @@ msgstr "検証"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "はい"
+

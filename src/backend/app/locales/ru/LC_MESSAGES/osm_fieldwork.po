@@ -5,11 +5,11 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr "Оцифровка выполнена правильно"
-"Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
-"PO-Revision-Date: 2026-03-19 22:03+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgstr "Оцифровка выполнена правильно"
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "Проблема с оцифровкой"
+msgstr "Правильно ли оцифровано расположение этого объекта?"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
@@ -119,3 +119,4 @@ msgstr "Да"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Да"
+

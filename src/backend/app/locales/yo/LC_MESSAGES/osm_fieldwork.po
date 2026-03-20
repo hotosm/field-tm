@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 21:38+0000\n"
+"POT-Creation-Date: 2026-03-19 23:57+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: yo\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:9
 msgctxt "xlsform_label"
 msgid "digitisation_correct"
-msgstr "Dijitaisi tó pe"
+msgstr "Ṣé ipò tí a ti dijitaali fún àbùdá yìí tọ́?"
 
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
@@ -118,3 +118,4 @@ msgstr "Ìmúdájú"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Bẹ́ẹ̀ni"
+
