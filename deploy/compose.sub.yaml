@@ -154,7 +154,7 @@ services:
     environment:
       QFIELDCLOUD_QGIS_URL: http://qfield-qgis:8080
     env_file:
-      - .env
+      - ../.env
     networks:
       - ftm-net
     restart: "unless-stopped"
@@ -180,7 +180,7 @@ services:
       fieldtm-db:
         condition: service_healthy
     env_file:
-      - .env
+      - ../.env
     networks:
       - ftm-net
     entrypoint: ["/migrate-entrypoint.sh"]
