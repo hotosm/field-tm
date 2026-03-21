@@ -615,7 +615,7 @@ class AreaSplitter:
             osm_id = properties.get("osm_id")
             common_args = dict(osm_id=osm_id, geom=geom_json, tags=tags)
 
-            if tags.get("building") == "yes":
+            if tags.get("building"):
                 insert_geom(cur, "ways_poly", **common_args)
             elif _is_linear_split_feature(tags):
                 insert_geom(cur, "ways_line", **common_args)
