@@ -62,6 +62,10 @@ spec:
             - name: FTM_DB_NAME
               value: {{ .Values.db.auth.database | quote }}
             {{- end }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- range $key, $val := .Values.qfieldQgis.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
