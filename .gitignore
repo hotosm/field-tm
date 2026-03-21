@@ -97,10 +97,6 @@ field-tm-*.tgz
 # Secrets / keys
 **/**/*.pem
 
-# Favicon overrides
-favicon.svg
-favicon.png
-
 # Agents
 config
 .claude

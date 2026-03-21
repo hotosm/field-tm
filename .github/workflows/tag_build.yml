@@ -9,7 +9,7 @@ on:
 
 jobs:
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.6.0
     with:
       context: src
       build_target: prod
