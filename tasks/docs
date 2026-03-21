@@ -21,7 +21,7 @@ openapi:
   OSM_CLIENT_ID="x" \
   OSM_CLIENT_SECRET="y" \
   OSM_SECRET_KEY="z" \
-  docker compose run --rm --entrypoint python backend -c \
+  docker compose run --rm --no-deps --entrypoint python backend -c \
     "import json; from app.main import api; print(json.dumps(api.openapi_schema.to_schema(), separators=(',', ':')))" \
     > docs/openapi/openapi.json
   docker compose down
