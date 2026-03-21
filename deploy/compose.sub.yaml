@@ -18,6 +18,10 @@
 # Core FieldTM production compose file.
 # ODK Central and QFieldCloud are managed externally; see compose.odk.yaml
 # and compose.qfield.yaml for optional self-hosted addons.
+#
+# NOTE: This file uses ${FTM_DOMAIN} in bunkerweb env var KEY names,
+# which requires envsubst preprocessing before passing to docker compose.
+# Use `just start prod` which handles this automatically.
 
 name: field-tm
 
@@ -39,9 +43,8 @@ networks:
 
 services:
   proxy:
-    image: "bunkerity/bunkerweb-all-in-one:1.6.2"
+    image: "bunkerity/bunkerweb-all-in-one:1.6.8"
     volumes:
-      # - certs:/etc/letsencrypt
       - certs:/data
     environment:
       # General
@@ -89,8 +92,12 @@ services:
       SERVER_NAME: ${FTM_DOMAIN} ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}
       ${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://backend:8000
       ${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
-      # CORS for the backend is configured by FastAPI
+      # Increase timeout slightly for long project creation requests
+      ${FTM_DOMAIN}_REVERSE_PROXY_READ_TIMEOUT: 90s
+      ${FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
+      # API subdomain (CORS is configured by the backend)
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_HOST: http://backend:8000
+      ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       ${FTM_API_DOMAIN:-api.$FTM_DOMAIN}_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
@@ -142,6 +149,10 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
+      qfield-qgis:
+        condition: service_healthy
+    environment:
+      QFIELDCLOUD_QGIS_URL: http://qfield-qgis:8080
     env_file:
       - .env
     networks:
@@ -166,8 +177,6 @@ services:
   migrations:
     image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH}"
     depends_on:
-      proxy:
-        condition: service_healthy
       fieldtm-db:
         condition: service_healthy
     env_file:
@@ -200,3 +209,24 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  # QGIS project generation wrapper service.
+  # Generates QField-compatible .qgs project files from the FTM database.
+  # This is NOT the full QFieldCloud stack - just the lightweight QGIS wrapper.
+  qfield-qgis:
+    image: "ghcr.io/hotosm/field-tm/qgis:${QFIELDCLOUD_TAG:-26.3}"
+    depends_on:
+      fieldtm-db:
+        condition: service_healthy
+    environment:
+      LOG_LEVEL: ${QGIS_LOG_LEVEL:-INFO}
+      FTM_DB_URL: "postgresql://${FTM_DB_USER}:${FTM_DB_PASSWORD}@fieldtm-db/${FTM_DB_NAME}"
+    networks:
+      - ftm-net
+    restart: "unless-stopped"
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      start_period: 10s
+      interval: 5s
+      retries: 5
+      timeout: 5s
