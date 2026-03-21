@@ -300,7 +300,7 @@ Thanks goes to these wonderful people:
 [badge-pre-commit]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
 [badge-coverage]: https://docs.field.hotosm.org/coverage.svg
-[badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg
+[badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm/svg-badge.svg
 [badge-openssf]: https://www.bestpractices.dev/projects/9218/badge
 [badge-slack]: https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f
 [badge-all-contributors]: https://img.shields.io/github/contributors/hotosm/field-tm?logo=github
