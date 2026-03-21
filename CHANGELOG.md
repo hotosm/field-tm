@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026.1.2 (2026-03-21)
+
+### Fix
+
+- **area-splitter**: fixes to geom insert prior to splitting
+- **backend**: fix #3034 static urls in sentry
+- odk download forms auto, default to POINT geoms for new
+- area-splitter
+- **backend**: parsing of data extract returned
+- productionize the qfield-qgis wrapper to use temp db entries
+- re-run i18n builds
+- also remove redundant osm_fieldwork english.po file
+- remove redundant english translation file + update badge
+
 ## 2026.1.1 (2026-03-20)
 
 ### Feat
