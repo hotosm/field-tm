@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026.1.1 (2026-03-20)
+
+### Feat
+
+- add rtl for arabic translation, minor bugfixes, use wa-selects
+- finalise translations
+- add Hausa translation
+- continue translations, ensure main page title is always english
+- continue translation efforts, add locale switcher to footer
+- finalise nepali translations
+- continue translations for fr, es, pt_br, cz, ja, etc
+- add machine translations for French, Spanish, Portuguese (BR), Swahili,
+- use .po translations for field-tm + osm-fieldwork, for single weblate project
+- init new languages for i18n
+- **i18n**: final stage, separate out setup_step_routes into partials with valid i18n
+- **i18n**: part2 - add _xx replacement syntax to all frontend strings
+- put structure in place to i18n on frontend strings (pybabel)
+
+### Fix
+
+- update latest .po files, omit machine .mo files, compile during build
+- template fixes after i18n introduction
+- **backend**: better handle qfield urls in different forms
+
+### Refactor
+
+- rename api compose service --> backend
+- rename messages.po --> field_tm.po for clarity, rebuild osm-fieldwork .mo files
+
 ## 2026.1.0 (2026-03-17)
 
 ### Feat
