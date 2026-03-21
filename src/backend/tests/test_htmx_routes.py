@@ -16,6 +16,8 @@ from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     _build_finalize_error_html,
     _build_odk_finalize_success_html,
+    accept_data_extract_htmx,
+    accept_split_htmx,
 )
 from app.projects.project_services import ODKFinalizeResult
 
@@ -227,6 +229,84 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     assert "Accept Data Extract" in response.content
     assert captured["payload"] == uploaded_bytes
     assert captured["merge"] is False
+
+
+async def test_accept_data_extract_htmx_decodes_html_escaped_geojson(monkeypatch):
+    """Accept-data route should tolerate HTML-escaped JSON form values."""
+    saved: dict = {}
+    project = Mock(id=42)
+    escaped_geojson = (
+        '{&quot;type&quot;: "FeatureCollection", '
+        '&quot;features&quot;: [{&quot;type&quot;: "Feature", '
+        "&quot;geometry&quot;: null, &quot;properties&quot;: {}}]}"
+    )
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": None, "properties": {}}],
+    }
+
+    async def fake_save_data_extract(*, db, project_id, geojson_data):
+        saved["db"] = db
+        saved["project_id"] = project_id
+        saved["geojson_data"] = geojson_data
+        return len(geojson_data["features"])
+
+    monkeypatch.setattr(
+        "app.htmx.setup_step_routes.save_data_extract", fake_save_data_extract
+    )
+
+    response = await accept_data_extract_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        data={"data_extract_geojson": escaped_geojson},
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("HX-Refresh") == "true"
+    assert saved["project_id"] == project.id
+    assert saved["geojson_data"] == feature_collection
+
+
+async def test_accept_split_htmx_decodes_html_escaped_geojson(monkeypatch):
+    """Accept-split route should tolerate HTML-escaped JSON form values."""
+    saved: dict = {}
+    project = Mock(id=42)
+    escaped_geojson = (
+        '{&quot;type&quot;: "FeatureCollection", '
+        '&quot;features&quot;: [{&quot;type&quot;: "Feature", '
+        "&quot;geometry&quot;: null, &quot;properties&quot;: {}}]}"
+    )
+    tasks_geojson = {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": None, "properties": {}}],
+    }
+
+    async def fake_save_task_areas(*, db, project_id, tasks_geojson):
+        saved["db"] = db
+        saved["project_id"] = project_id
+        saved["tasks_geojson"] = tasks_geojson
+        return len(tasks_geojson["features"])
+
+    monkeypatch.setattr(
+        "app.htmx.setup_step_routes.save_task_areas", fake_save_task_areas
+    )
+
+    response = await accept_split_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        data={"tasks_geojson": escaped_geojson},
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("HX-Refresh") == "true"
+    assert saved["project_id"] == project.id
+    assert saved["tasks_geojson"] == tasks_geojson
 
 
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
