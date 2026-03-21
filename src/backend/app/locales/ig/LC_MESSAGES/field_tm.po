@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-20 04:19+0000\n"
+"POT-Creation-Date: 2026-03-21 05:32+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ig\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:162
+#: app/main.py:163
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Njehie a na-atụghị anya ya mere. Biko kpọtụrụ onye nchịkwa."
 
@@ -265,8 +265,8 @@ msgid "from this project?"
 msgstr "na ọrụ a?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:592
-#: app/templates/partials/project_details/setup_steps.html:687
+#: app/templates/partials/project_details/setup_steps.html:596
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Cancel"
 msgstr "Kagbuo"
 
@@ -287,9 +287,9 @@ msgid "No collaborators yet."
 msgstr "Enweghị ndị mmekọ ugbu a."
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:620
-#: app/templates/partials/project_details/setup_steps.html:626
-#: app/templates/partials/project_details/setup_steps.html:660
+#: app/templates/partials/project_details/setup_steps.html:624
+#: app/templates/partials/project_details/setup_steps.html:630
+#: app/templates/partials/project_details/setup_steps.html:664
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Aha njirimara"
@@ -564,7 +564,7 @@ msgid "Invalid task areas data format."
 msgstr "Ụdị data mpaghara ọrụ ezighi ezi."
 
 #: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:362
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ A chekwara ọrụ ndị e kewara nke ọma"
 
@@ -612,108 +612,108 @@ msgstr "E debere n’akpa nchekwa"
 msgid "Project Status"
 msgstr "Ọkwa ọrụ"
 
-#: app/templates/home.html:42
+#: app/templates/home.html:41
 msgid "Newest first"
 msgstr "Nke kachasị ọhụrụ mbụ"
 
-#: app/templates/home.html:43
+#: app/templates/home.html:42
 msgid "Oldest first"
 msgstr "Nke kacha ochie mbụ"
 
-#: app/templates/home.html:44
+#: app/templates/home.html:43
 msgid "Name (A-Z)"
 msgstr "Aha (A-Z)"
 
-#: app/templates/home.html:45
+#: app/templates/home.html:44
 msgid "Name (Z-A)"
 msgstr "Aha (Z-A)"
 
-#: app/templates/home.html:48
+#: app/templates/home.html:47
 msgid "Sort By"
 msgstr "Hazie dịka"
 
-#: app/templates/home.html:63
+#: app/templates/home.html:61
 msgid "Search"
 msgstr "Chọọ"
 
-#: app/templates/home.html:69
+#: app/templates/home.html:67
 msgid "Search projects…"
 msgstr "Chọọ ọrụ…"
 
-#: app/templates/home.html:79 app/templates/landing.html:565
-#: app/templates/layout.html:220 app/templates/new_project.html:1
+#: app/templates/home.html:77 app/templates/landing.html:566
+#: app/templates/layout.html:222 app/templates/new_project.html:1
 #: app/templates/new_project.html:167
 msgid "Create Project"
 msgstr "Mepụta ọrụ"
 
-#: app/templates/home.html:80
+#: app/templates/home.html:78
 msgid "+ New"
 msgstr "+ Ọhụrụ"
 
-#: app/templates/home.html:86
+#: app/templates/home.html:84
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
 msgstr[0] "Na-egosi ọrụ %(count)s"
 msgstr[1] "Na-egosi ọrụ %(count)s"
 
-#: app/templates/home.html:87
+#: app/templates/home.html:85
 #, python-format
 msgid "in %(status)s"
 msgstr "n'ime %(status)s"
 
-#: app/templates/home.html:88
+#: app/templates/home.html:86
 #, python-format
 msgid "matching \"%(query)s\""
 msgstr "na-adaba na \"%(query)s\""
 
-#: app/templates/home.html:104
+#: app/templates/home.html:102
 msgid "Private Project"
 msgstr "Ọrụ nzuzo"
 
-#: app/templates/home.html:127 app/templates/project_details.html:33
+#: app/templates/home.html:125 app/templates/project_details.html:33
 msgid "Unnamed Project"
 msgstr "Ọrụ enweghị aha"
 
-#: app/templates/home.html:135
+#: app/templates/home.html:133
 msgid "Location:"
 msgstr "Ebe:"
 
-#: app/templates/home.html:156
+#: app/templates/home.html:154
 msgid "Created:"
 msgstr "E kere:"
 
-#: app/templates/home.html:156
+#: app/templates/home.html:154
 msgid "N/A"
 msgstr "Adịghị mkpa"
 
-#: app/templates/home.html:165
+#: app/templates/home.html:163
 msgid "No projects found. Create your first project to get started!"
 msgstr "Achọtaghị ọrụ ọ bụla. Mepụta ọrụ mbụ gị ka ịmalite!"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:558
 msgid "Coordinate field campaigns"
 msgstr "Hazie mkpọsa ubi"
 
-#: app/templates/landing.html:560
+#: app/templates/landing.html:561
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
 msgstr "Ịkwalite arụmọrụ na izi ezi nke ime maapụ ubi site n'ịhazi nke ọma."
 
-#: app/templates/landing.html:563
+#: app/templates/landing.html:564
 msgid "Explore Projects"
 msgstr "Lelee ọrụ"
 
-#: app/templates/landing.html:575
+#: app/templates/landing.html:576
 msgid "Loading metrics..."
 msgstr "Na-ebubata metrik..."
 
-#: app/templates/landing.html:583
+#: app/templates/landing.html:584
 msgid "What is it?"
 msgstr "Kedu ihe ọ bụ?"
 
-#: app/templates/landing.html:585
+#: app/templates/landing.html:586
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features by coordinating mapping in the field."
@@ -721,7 +721,7 @@ msgstr ""
 "Field Tasking Manager (Field-TM) na-enyere ndị otu aka itinye ihe ọmụma "
 "mpaghara na njirimara maapụ site n'ịhazi ime maapụ n'ubi."
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:589
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools like ODK and QField. It is a standalone mobile and web "
@@ -733,19 +733,19 @@ msgstr ""
 "ya nke na-enyere ndị otu aka ịnakọta data geospatial nke ọma site na "
 "ngwaọrụ Android a na-ahụkarị."
 
-#: app/templates/landing.html:593
+#: app/templates/landing.html:594
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr "Onye njikwa ọrụ na-egosi usoro ọrụ maapụ FieldTM na laptọọpụ"
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:600
 msgid "Main Features"
 msgstr "Njirimara bụ isi"
 
-#: app/templates/landing.html:602
+#: app/templates/landing.html:603
 msgid "Flexible Data Collection"
 msgstr "Nchịkọta data na-agbanwe agbanwe"
 
-#: app/templates/landing.html:604
+#: app/templates/landing.html:605
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that fit different operational needs."
@@ -753,11 +753,11 @@ msgstr ""
 "Na-akwado ụdị fọm nyocha dị iche iche, ụdị data ọtụtụ, na usoro ọrụ "
 "enwere ike imegharị iji kwekọọ na mkpa arụmọrụ dị iche iche."
 
-#: app/templates/landing.html:608
+#: app/templates/landing.html:609
 msgid "Open Source and Customizable"
 msgstr "Isi mmalite mepere emepe ma enwere ike imegharị"
 
-#: app/templates/landing.html:610
+#: app/templates/landing.html:611
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 " requirements."
@@ -765,11 +765,11 @@ msgstr ""
 "Mee ka Field-TM kwekọọ na ọgụgụ isi nyocha gị, nhazi data, na ihe ndị a "
 "chọrọ maka njikọta."
 
-#: app/templates/landing.html:614
+#: app/templates/landing.html:615
 msgid "Entity-Level Tracking"
 msgstr "Nyocha n'ọkwa ihe"
 
-#: app/templates/landing.html:616
+#: app/templates/landing.html:617
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed decisions quickly."
@@ -777,19 +777,19 @@ msgstr ""
 "Lelee ọganihu nyocha n'ọkwa ọrụ na njirimara ka ndị njikwa nwee ike ime "
 "mkpebi mara mma ngwa ngwa."
 
-#: app/templates/landing.html:623
+#: app/templates/landing.html:624
 msgid "Who is it for?"
 msgstr "Ònye ka ọ bụ maka ya?"
 
-#: app/templates/landing.html:626
+#: app/templates/landing.html:627
 msgid "Project Manager"
 msgstr "Onye njikwa ọrụ"
 
-#: app/templates/landing.html:627
+#: app/templates/landing.html:628
 msgid "Create and coordinate field campaigns"
 msgstr "Mepụta ma hazie mkpọsa ubi"
 
-#: app/templates/landing.html:629
+#: app/templates/landing.html:630
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest, design survey forms, and split work into manageable tasks."
@@ -797,31 +797,31 @@ msgstr ""
 "Ndị njikwa ọrụ na-eji Field-TM hazie ọrụ maapụ, kọwaa mpaghara mmasị, "
 "mepụta fọm nyocha, ma kewaa ọrụ n'ime ọrụ a pụrụ ijikwa."
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:633
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Kọwaa mpaghara ọrụ ma bulite ma ọ bụ họrọ fọm nyocha"
 
-#: app/templates/landing.html:633
+#: app/templates/landing.html:634
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Kewaa mpaghara ahụ n'ime ọrụ ma mepụta mgbakwunye data"
 
-#: app/templates/landing.html:634
+#: app/templates/landing.html:635
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Bipụta ọrụ ahụ na ODK Central ma ọ bụ QFieldCloud"
 
-#: app/templates/landing.html:635
+#: app/templates/landing.html:636
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Kesaa koodu QR ka ndị na-ese maapụ nwee ike ịmalite ịnakọta data"
 
-#: app/templates/landing.html:639
+#: app/templates/landing.html:640
 msgid "Field Mapper"
 msgstr "Onye na-ese maapụ ubi"
 
-#: app/templates/landing.html:640
+#: app/templates/landing.html:641
 msgid "Collect data in the field with your phone"
 msgstr "Jiri ekwentị gị nakọta data n'ubi"
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:643
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a project, mappers access it directly in their mobile app of "
@@ -831,35 +831,35 @@ msgstr ""
 "bipụtara ọrụ, ndị na-ese maapụ na-enweta ya ozugbo na ngwa ekwentị ha "
 "họọrọ."
 
-#: app/templates/landing.html:645
+#: app/templates/landing.html:646
 msgid "Scan the QR code shared by your project manager"
 msgstr "Skanụọ koodu QR onye njikwa ọrụ gị kesara"
 
-#: app/templates/landing.html:646
+#: app/templates/landing.html:647
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Ọrụ ahụ na-ebubata onwe ya na ODK Collect ma ọ bụ QField"
 
-#: app/templates/landing.html:647
+#: app/templates/landing.html:648
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Gaa na mpaghara ọrụ e kenyere gị ma nakọta data"
 
-#: app/templates/landing.html:648
+#: app/templates/landing.html:649
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Zipu nyocha gị, nke ga-aga ozugbo na sava"
 
-#: app/templates/landing.html:655
+#: app/templates/landing.html:656
 msgid "Field-TM Use Cases"
 msgstr "Ojiji Field-TM"
 
-#: app/templates/landing.html:660
+#: app/templates/landing.html:661
 msgid "Field mapping in progress"
 msgstr "Ime maapụ ubi na-aga n'ihu"
 
-#: app/templates/landing.html:665
+#: app/templates/landing.html:666
 msgid "1. Community Mapping"
 msgstr "1. Ime maapụ obodo"
 
-#: app/templates/landing.html:667
+#: app/templates/landing.html:668
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public facilities, and local services for inclusive planning."
@@ -868,11 +868,11 @@ msgstr ""
 "nke nkịtị, akụrụngwa ọha, na ọrụ mpaghara maka atụmatụ na-agụnye mmadụ "
 "niile."
 
-#: app/templates/landing.html:671
+#: app/templates/landing.html:672
 msgid "2. Urban Planning and Management"
 msgstr "2. Atụmatụ obodo na njikwa"
 
-#: app/templates/landing.html:673
+#: app/templates/landing.html:674
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities through clear, manageable mapping tasks."
@@ -880,11 +880,11 @@ msgstr ""
 "Wulite obodo mara ihe karịa site na nyocha ahaziri nke ụlọ, ụzọ, na "
 "akụrụngwa site na ọrụ maapụ doro anya ma a pụrụ ijikwa."
 
-#: app/templates/landing.html:677
+#: app/templates/landing.html:678
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Nzaghachi ọdachi na mgbake"
 
-#: app/templates/landing.html:679
+#: app/templates/landing.html:680
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and deliver reliable data for relief operations."
@@ -892,55 +892,55 @@ msgstr ""
 "Mee ngwa ngwa maapụ akụrụngwa mebiri emebi mgbe ọdachi gasịrị, hazie ndị "
 "ọrụ afọ ofufo, ma nye data a pụrụ ịdabere na ya maka ọrụ enyemaka."
 
-#: app/templates/landing.html:687
+#: app/templates/landing.html:688
 msgid "Resources"
 msgstr "Akụrụngwa"
 
-#: app/templates/landing.html:695
+#: app/templates/landing.html:696
 msgid "Data Prep"
 msgstr "Nkwadebe data"
 
-#: app/templates/landing.html:696
+#: app/templates/landing.html:697
 msgid "HOT Export Tool"
 msgstr "Ngwa mbupụ HOT"
 
-#: app/templates/landing.html:698
+#: app/templates/landing.html:699
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Budata mgbakwunye data geospatial dị njikere maka ọrụ maka mpaghara ọrụ "
 "gị."
 
-#: app/templates/landing.html:707 app/templates/landing.html:719
+#: app/templates/landing.html:708 app/templates/landing.html:720
 msgid "Documentation"
 msgstr "Akwụkwọ nduzi"
 
-#: app/templates/landing.html:708
+#: app/templates/landing.html:709
 msgid "ODK Central Guide"
 msgstr "Nduzi ODK Central"
 
-#: app/templates/landing.html:710
+#: app/templates/landing.html:711
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr "Mụta otu esi ejikwa fọm, ndị ọrụ ngwa, na ntinye ubi na ODK."
 
-#: app/templates/landing.html:720
+#: app/templates/landing.html:721
 msgid "QField Guide"
 msgstr "Nduzi QField"
 
-#: app/templates/landing.html:722
+#: app/templates/landing.html:723
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Hazie ọrụ QFieldCloud na usoro ọrụ ekwentị maka ime maapụ na-enweghị "
 "njikọ."
 
-#: app/templates/landing.html:732
+#: app/templates/landing.html:733
 msgid "Need assistance?"
 msgstr "Ị chọrọ enyemaka?"
 
-#: app/templates/landing.html:733
+#: app/templates/landing.html:734
 msgid "Email:"
 msgstr "Ozi-e:"
 
-#: app/templates/landing.html:749
+#: app/templates/landing.html:750
 msgid "Language"
 msgstr "Asụsụ"
 
@@ -948,15 +948,15 @@ msgstr "Asụsụ"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Ime maapụ ubi a haziri nke ọma maka mkpọsa Open Mapping."
 
-#: app/templates/layout.html:159 app/templates/login.html:1
+#: app/templates/layout.html:161 app/templates/login.html:1
 msgid "Login"
 msgstr "Banye"
 
-#: app/templates/layout.html:213
+#: app/templates/layout.html:215
 msgid "Projects"
 msgstr "Ọrụ"
 
-#: app/templates/layout.html:227
+#: app/templates/layout.html:229
 msgid "QField Admin"
 msgstr "Onye nchịkwa QField"
 
@@ -1028,9 +1028,9 @@ msgstr ""
 
 #: app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:236
-#: app/templates/partials/project_details/setup_steps.html:377
-#: app/templates/partials/project_details/setup_steps.html:576
+#: app/templates/partials/project_details/setup_steps.html:240
+#: app/templates/partials/project_details/setup_steps.html:381
+#: app/templates/partials/project_details/setup_steps.html:580
 msgid "Advanced Config"
 msgstr "Nhazi dị elu"
 
@@ -1183,9 +1183,9 @@ msgstr "Isi URL nke instans QFieldCloud gị (na-enweghị /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:632
-#: app/templates/partials/project_details/setup_steps.html:638
-#: app/templates/partials/project_details/setup_steps.html:672
+#: app/templates/partials/project_details/setup_steps.html:636
+#: app/templates/partials/project_details/setup_steps.html:642
+#: app/templates/partials/project_details/setup_steps.html:676
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Okwuntughe"
@@ -1240,7 +1240,7 @@ msgstr "Nzọụkwụ 1: Bulite XLSForm"
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
 #: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:354
+#: app/templates/partials/project_details/setup_steps.html:358
 msgid "Complete"
 msgstr "Zuru ezu"
 
@@ -1254,7 +1254,7 @@ msgid "Step 3: Split into Tasks"
 msgstr "Nzọụkwụ 3: Kewaa n'ime ọrụ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:559
+#: app/templates/partials/project_details/setup_steps.html:563
 msgid "Step 4: Finalise Project"
 msgstr "Nzọụkwụ 4: Mechaa ọrụ"
 
@@ -1372,107 +1372,107 @@ msgstr "Nyochaa data dị na maapụ, wee gaa n'ihu."
 msgid "Download OSM Data"
 msgstr "Budata data OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:226
+#: app/templates/partials/project_details/setup_steps.html:230
 msgid "Collect New Data Only"
 msgstr "Naanị nakọta data ọhụrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:243
+#: app/templates/partials/project_details/setup_steps.html:247
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "Jiri ntinye data omenala ma ọ bụ gbanwee nhọrọ nbudata OSM ndabara."
 
-#: app/templates/partials/project_details/setup_steps.html:249
+#: app/templates/partials/project_details/setup_steps.html:253
 msgid "OSM Category:"
 msgstr "Udi OSM:"
 
-#: app/templates/partials/project_details/setup_steps.html:252
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "OSM Buildings"
 msgstr "Ụlọ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:257
 msgid "OSM Highways"
 msgstr "Ụzọ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:254
+#: app/templates/partials/project_details/setup_steps.html:258
 msgid "OSM Healthcare"
 msgstr "Ahụike OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:255
+#: app/templates/partials/project_details/setup_steps.html:259
 msgid "OSM Toilets"
 msgstr "Ụlọ ịsa ahụ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:260
 msgid "OSM Religious"
 msgstr "Okpukpe OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:261
 msgid "OSM Landuse"
 msgstr "Ojiji ala OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:262
 msgid "OSM Waterways"
 msgstr "Ụzọ mmiri OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:263
 msgid "OSM Water Points"
 msgstr "Ebe mmiri OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:264
 msgid "OSM Waste Disposal"
 msgstr "Ntụfu ahịhịa OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:265
 msgid "OSM Education"
 msgstr "Mmụta OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:266
 msgid "OSM Cemeteries"
 msgstr "Ebe a na-eli ozu OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:267
 msgid "OSM Amenities"
 msgstr "Akụrụngwa OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:268
+#: app/templates/partials/project_details/setup_steps.html:272
 msgid "Geometry Type:"
 msgstr "Ụdị geometry:"
 
-#: app/templates/partials/project_details/setup_steps.html:271
+#: app/templates/partials/project_details/setup_steps.html:275
 msgid "Polygon"
 msgstr "Poligon"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:276
 msgid "Polyline"
 msgstr "Polilaini"
 
-#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:277
 msgid "Point"
 msgstr "Point"
 
-#: app/templates/partials/project_details/setup_steps.html:286
+#: app/templates/partials/project_details/setup_steps.html:290
 msgid "Use centroids"
 msgstr "Jiri centroid"
 
-#: app/templates/partials/project_details/setup_steps.html:298
+#: app/templates/partials/project_details/setup_steps.html:302
 msgid "Upload Custom GeoJSON"
 msgstr "Bulite GeoJSON omenala"
 
-#: app/templates/partials/project_details/setup_steps.html:317
+#: app/templates/partials/project_details/setup_steps.html:321
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Na-emepụta mgbakwunye data OSM... Nke a nwere ike iwe obere oge."
 
-#: app/templates/partials/project_details/setup_steps.html:336
+#: app/templates/partials/project_details/setup_steps.html:340
 msgid "OSM data extract ready"
 msgstr "Mgbakwunye data OSM dị njikere"
 
-#: app/templates/partials/project_details/setup_steps.html:349
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "Step 3: Split into Tasks (Optional)"
 msgstr "Nzọụkwụ 3: Kewaa n'ime ọrụ (nhọrọ)"
 
-#: app/templates/partials/project_details/setup_steps.html:359
+#: app/templates/partials/project_details/setup_steps.html:363
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ Nkewa ọrụ adịghị mkpa ma ọ bụrụ na enweghị data dị ugbu a"
 
-#: app/templates/partials/project_details/setup_steps.html:365
+#: app/templates/partials/project_details/setup_steps.html:369
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1484,141 +1484,141 @@ msgstr ""
 "na paramita, wee kewaa. Nyochaa ihe e gosiri, ma pịa \"Accept Task "
 "Areas\" iji chekwaa. Ma ọ bụ pịa"
 
-#: app/templates/partials/project_details/setup_steps.html:368
-#: app/templates/partials/project_details/setup_steps.html:387
+#: app/templates/partials/project_details/setup_steps.html:372
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Skip"
 msgstr "Gafee"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:373
 msgid "to use the whole AOI as a single task."
 msgstr "iji jiri AOI dum dị ka otu ọrụ."
 
-#: app/templates/partials/project_details/setup_steps.html:401
+#: app/templates/partials/project_details/setup_steps.html:405
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "Họrọ njirimara ahịrị ndị ga-emetụta nkewa ọrụ dabere na ụlọ."
 
-#: app/templates/partials/project_details/setup_steps.html:425
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "Include roads"
 msgstr "Tinye ụzọ"
 
-#: app/templates/partials/project_details/setup_steps.html:434
+#: app/templates/partials/project_details/setup_steps.html:438
 msgid "Include rivers"
 msgstr "Tinye osimiri"
 
-#: app/templates/partials/project_details/setup_steps.html:443
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Include railways"
 msgstr "Tinye ụzọ ígwè"
 
-#: app/templates/partials/project_details/setup_steps.html:452
+#: app/templates/partials/project_details/setup_steps.html:456
 msgid "Include aeroways"
 msgstr "Tinye ụzọ ikuku"
 
-#: app/templates/partials/project_details/setup_steps.html:459
+#: app/templates/partials/project_details/setup_steps.html:463
 msgid "Algorithm:"
 msgstr "Algorithm:"
 
-#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:465
 msgid "Select splitting option..."
 msgstr "Họrọ nhọrọ nkewa..."
 
-#: app/templates/partials/project_details/setup_steps.html:462
+#: app/templates/partials/project_details/setup_steps.html:466
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "Kewaa site na square"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:467
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "Ọnụ ọgụgụ ụlọ nkezi v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:469
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "Ọnụ ọgụgụ ụlọ nkezi v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:468
+#: app/templates/partials/project_details/setup_steps.html:472
 msgid "Split by Specific Number of Tasks (Coming Soon)"
 msgstr "Kewaa site na ọnụ ọgụgụ ọrụ akọwapụtara (na-abịa n’oge adịghị anya)"
 
-#: app/templates/partials/project_details/setup_steps.html:476
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Avg. Buildings per Task:"
 msgstr "Ọnụ ọgụgụ ụlọ nkezi kwa ọrụ:"
 
-#: app/templates/partials/project_details/setup_steps.html:489
+#: app/templates/partials/project_details/setup_steps.html:493
 msgid "Dimension (meters):"
 msgstr "Nha (mita):"
 
-#: app/templates/partials/project_details/setup_steps.html:508
+#: app/templates/partials/project_details/setup_steps.html:512
 msgid "Split Again"
 msgstr "Kewaa ọzọ"
 
-#: app/templates/partials/project_details/setup_steps.html:508
+#: app/templates/partials/project_details/setup_steps.html:512
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "Kewaa AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:544
+#: app/templates/partials/project_details/setup_steps.html:548
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "Na-ekewa AOI n'ime ọrụ... Nke a nwere ike iwe obere oge."
 
-#: app/templates/partials/project_details/setup_steps.html:560
+#: app/templates/partials/project_details/setup_steps.html:564
 msgid "Ready"
 msgstr "Njikere"
 
-#: app/templates/partials/project_details/setup_steps.html:563
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "Ihe niile achọrọ emezuola! Mepụta ọrụ ahụ na ngwaọrụ maapụ ị họrọ."
 
-#: app/templates/partials/project_details/setup_steps.html:568
+#: app/templates/partials/project_details/setup_steps.html:572
 msgid "Finalise Project"
 msgstr "Mechaa ọrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:585
+#: app/templates/partials/project_details/setup_steps.html:589
 msgid "Confirm Project Finalisation"
 msgstr "Kwenye mmechi ọrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:593
 msgid "Are you sure you want to finalise this project?"
 msgstr "Ị ji n'aka na ịchọrọ imechi ọrụ a?"
 
-#: app/templates/partials/project_details/setup_steps.html:594
+#: app/templates/partials/project_details/setup_steps.html:598
 msgid "Confirm & Finalise"
 msgstr "Kwenye ma mechaa"
 
-#: app/templates/partials/project_details/setup_steps.html:602
+#: app/templates/partials/project_details/setup_steps.html:606
 msgid "Custom Credentials"
 msgstr "Njirimara omenala"
 
-#: app/templates/partials/project_details/setup_steps.html:608
+#: app/templates/partials/project_details/setup_steps.html:612
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps.html:614
+#: app/templates/partials/project_details/setup_steps.html:618
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:648
+#: app/templates/partials/project_details/setup_steps.html:652
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:654
+#: app/templates/partials/project_details/setup_steps.html:658
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:666
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:678
+#: app/templates/partials/project_details/setup_steps.html:682
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:690
+#: app/templates/partials/project_details/setup_steps.html:694
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "Nwale njirimara"
 
-#: app/templates/partials/project_details/setup_steps.html:693
+#: app/templates/partials/project_details/setup_steps.html:697
 msgid "Save & Continue"
 msgstr "Chekwaa ma gaa n'ihu"
 
