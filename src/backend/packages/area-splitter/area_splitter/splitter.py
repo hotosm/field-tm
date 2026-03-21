@@ -608,16 +608,23 @@ class AreaSplitter:
     def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
         """Insert the OSM extract into the temporary split tables."""
         for feature in osm_extract["features"]:
-            geom_json = json.dumps(feature["geometry"])
+            geometry = feature.get("geometry", {})
+            geom_type = geometry.get("type", "")
+            geom_json = json.dumps(geometry)
             properties = feature.get("properties", {})
             tags = properties.get("tags", {}) if "tags" in properties else properties
             tags = _json_str_to_dict(tags).get("tags", _json_str_to_dict(tags))
             osm_id = properties.get("osm_id")
             common_args = dict(osm_id=osm_id, geom=geom_json, tags=tags)
 
-            if tags.get("building"):
+            # Point buildings in ways_poly break voronoi's
+            # ST_DUMPPOINTS/ST_VORONOIPOLYGONS pipeline
+            if tags.get("building") and geom_type in ("Polygon", "MultiPolygon"):
                 insert_geom(cur, "ways_poly", **common_args)
-            elif _is_linear_split_feature(tags):
+            elif _is_linear_split_feature(tags) and geom_type in (
+                "LineString",
+                "MultiLineString",
+            ):
                 insert_geom(cur, "ways_line", **common_args)
 
     def _run_split_sql_files(
