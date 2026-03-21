@@ -1179,8 +1179,22 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
 
             db_url = os.environ.get("FTM_DB_URL")
             if not db_url:
-                self._send_error(500, "FTM_DB_URL environment variable not set")
-                return
+                db_host = os.environ.get("FTM_DB_HOST")
+                db_user = os.environ.get("FTM_DB_USER")
+                db_password = os.environ.get("FTM_DB_PASSWORD")
+                db_name = os.environ.get("FTM_DB_NAME")
+                if all((db_host, db_user, db_password, db_name)):
+                    db_url = (
+                        f"postgresql://{db_user}:{db_password}"
+                        f"@{db_host}/{db_name}"
+                    )
+                else:
+                    self._send_error(
+                        500,
+                        "Database not configured: set FTM_DB_URL or "
+                        "FTM_DB_HOST/FTM_DB_USER/FTM_DB_PASSWORD/FTM_DB_NAME",
+                    )
+                    return
 
             # Dispatch QGIS work to the main thread (Qt thread affinity)
             # and block until the result is ready.

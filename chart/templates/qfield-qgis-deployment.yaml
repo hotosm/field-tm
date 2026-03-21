@@ -53,8 +53,14 @@ spec:
             periodSeconds: 10
           env:
             {{- if .Values.db.enabled }}
-            - name: FTM_DB_URL
-              value: "postgresql://{{ .Values.db.auth.username }}:{{ .Values.db.auth.password }}@{{ include "field-tm.dbServiceHost" . }}/{{ .Values.db.auth.database }}"
+            - name: FTM_DB_HOST
+              value: {{ include "field-tm.dbServiceHost" . | quote }}
+            - name: FTM_DB_USER
+              value: {{ .Values.db.auth.username | quote }}
+            - name: FTM_DB_PASSWORD
+              value: {{ .Values.db.auth.password | quote }}
+            - name: FTM_DB_NAME
+              value: {{ .Values.db.auth.database | quote }}
             {{- end }}
             {{- range $key, $val := .Values.qfieldQgis.env }}
             - name: {{ $key }}
