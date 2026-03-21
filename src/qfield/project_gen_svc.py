@@ -4,23 +4,29 @@ import sys
 import os
 import logging
 import json
+import queue
 import threading
 import traceback
 import atexit
 import shutil
 import re
 import zipfile
+import base64
+import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional, Dict, Any
 from pathlib import Path
 
+import psycopg
+
 qgis_application = None
 
-# Serialise QGIS work: the QgsApplication and its processing providers are
-# not thread-safe.  ThreadingHTTPServer accepts connections concurrently, but
-# only one request at a time proceeds past this lock, effectively queuing work
-# rather than dropping or racing it.
-_qgis_lock = threading.Lock()
+# QGIS work must run on the main thread (the thread that called
+# QgsApplication.initQgis()) because Qt objects have thread affinity.
+# ThreadingHTTPServer handles each HTTP request in a worker thread so health
+# checks stay responsive, but POST handlers dispatch QGIS work to the main
+# thread via this queue and wait for the result.
+_work_queue: queue.Queue = queue.Queue()
 
 
 def setup_logging() -> logging.Logger:
@@ -1028,33 +1034,68 @@ def _ensure_survey_layer_on_top(project) -> None:
         parent.removeChildNode(survey_node)
 
 
+def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.Logger) -> None:
+    """Read input files from the qgis_jobs table and write to local temp dir."""
+    with psycopg.connect(db_url) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT xlsform, features, tasks FROM qgis_jobs WHERE job_id = %s",
+            (job_id,),
+        )
+        row = cur.fetchone()
+    if not row:
+        raise RuntimeError(f"Job {job_id} not found in database")
+
+    xlsform_bytes, features, tasks = row
+    (project_path / "xlsform.xlsx").write_bytes(xlsform_bytes)
+    with open(project_path / "features.geojson", "w") as f:
+        json.dump(features, f)
+    with open(project_path / "tasks.geojson", "w") as f:
+        json.dump(tasks, f)
+    log.debug("Read job inputs from DB and wrote to %s", project_path)
+
+
+def _write_job_outputs(db_url: str, job_id: str, final_dir: Path, log: logging.Logger) -> int:
+    """Read output files from final/ dir and write as base64 dict to DB."""
+    output_files = {}
+    for file_path in final_dir.iterdir():
+        if file_path.is_file():
+            output_files[file_path.name] = base64.b64encode(
+                file_path.read_bytes()
+            ).decode("ascii")
+            log.debug("Collected output file: %s (%d bytes)", file_path.name, file_path.stat().st_size)
+
+    with psycopg.connect(db_url) as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE qgis_jobs SET output_files = %s WHERE job_id = %s",
+            (json.dumps(output_files), job_id),
+        )
+        conn.commit()
+
+    log.info("Wrote %d output files to DB for job %s", len(output_files), job_id)
+    return len(output_files)
+
+
 def generate_qgis_project(
-    project_dir: str,
+    db_url: str,
+    job_id: str,
     title: str,
     language: str,
     extent: str,
     open_in_edit_mode: bool,
     log: logging.Logger,
 ) -> Dict[str, Any]:
-    """
-    Generate QGIS project from XLSForm and geometries.
-    
-    Args:
-        project_dir: Project directory path
-        title: Project title
-        language: Project language
-        extent: Extent string (xmin,ymin,xmax,ymax)
-        open_in_edit_mode: Whether the project should initially open in edit mode
-        log: Logger instance
-    
+    """Generate QGIS project using input files from the database.
+
+    Reads inputs from the ``qgis_jobs`` table, processes them locally,
+    and writes the output files back to the same row.
+
     Returns:
-        Result dictionary with status and message
+        Result dictionary with status and message.
     """
+    tmp_dir = tempfile.mkdtemp(prefix="qgis_job_")
+    project_path = Path(tmp_dir)
     try:
-        # Validate inputs
-        project_path = Path(project_dir)
-        if not project_path.exists():
-            raise FileNotFoundError(f"Project directory not found: {project_dir}")
+        _read_job_inputs(db_url, job_id, project_path, log)
 
         extent_bbox = parse_and_validate_extent(extent)
         features_gpkg_path = _prepare_features_layer(project_path, log)
@@ -1081,25 +1122,25 @@ def generate_qgis_project(
         # Finalise the project
         project.write()
 
-        # TODO configure project settings
         configure_project_settings(project, log)
         sanitize_generated_qgz_metadata(project_file, log, extent_bbox=extent_bbox)
 
-        log.info(f"Final QField project located at: {project_file}")
+        num_files = _write_job_outputs(db_url, job_id, final_output_dir, log)
+        log.info("Project generation complete, wrote %d output files to DB", num_files)
         return {
             "status": "success",
             "message": "QGIS project generated successfully",
-            # "output": result['OUTPUT']
-            "output": str(final_output_dir),
         }
 
     except Exception as e:
         log.error(f"Project generation failed: {e}")
         return {
-            "status": "error", 
+            "status": "error",
             "message": str(e),
-            "traceback": traceback.format_exc()
+            "traceback": traceback.format_exc(),
         }
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 class QGISRequestHandler(BaseHTTPRequestHandler):
@@ -1110,46 +1151,61 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
         super().__init__(*args, **kwargs)
     
     def do_POST(self):
-        """Handle POST requests."""
+        """Handle POST requests.
+
+        Expects a JSON body with a job_id referencing the ``qgis_jobs``
+        table, plus processing parameters (title, language, extent).
+        Input files are read from and output files written to the database.
+        """
         try:
-            # Read and parse request
             content_length = int(self.headers.get("Content-Length", 0))
             if content_length == 0:
                 self._send_error(400, "Empty request body")
                 return
-            
+
             body = self.rfile.read(content_length).decode("utf-8")
-            
+
             try:
                 data = json.loads(body)
             except json.JSONDecodeError as e:
                 self._send_error(400, f"Invalid JSON: {e}")
                 return
-            
-            # Validate required parameters
-            required_params = ["project_dir", "title", "language", "extent"]
+
+            required_params = ["job_id", "title", "language", "extent"]
             missing_params = [p for p in required_params if p not in data]
             if missing_params:
                 self._send_error(400, f"Missing required parameters: {missing_params}")
                 return
-            
-            # Process request – serialised via lock so concurrent HTTP requests
-            # queue here rather than racing inside the single-threaded QGIS app.
+
+            db_url = os.environ.get("FTM_DB_URL")
+            if not db_url:
+                self._send_error(500, "FTM_DB_URL environment variable not set")
+                return
+
+            # Dispatch QGIS work to the main thread (Qt thread affinity)
+            # and block until the result is ready.
             self.log.info(f"Processing request for project: {data.get('title')}")
-            with _qgis_lock:
-                result = generate_qgis_project(
-                    project_dir=data["project_dir"],
-                    title=data["title"],
-                    language=data["language"],
-                    extent=data["extent"],
-                    open_in_edit_mode=parse_bool(data.get("open_in_edit_mode"), True),
-                    log=self.log
-                )
-            
-            # Send response
+            result_event = threading.Event()
+            work_item = {
+                "args": {
+                    "db_url": db_url,
+                    "job_id": data["job_id"],
+                    "title": data["title"],
+                    "language": data["language"],
+                    "extent": data["extent"],
+                    "open_in_edit_mode": parse_bool(data.get("open_in_edit_mode"), True),
+                    "log": self.log,
+                },
+                "result": None,
+                "done": result_event,
+            }
+            _work_queue.put(work_item)
+            result_event.wait()
+            result = work_item["result"]
+
             status_code = 200 if result["status"] == "success" else 500
             self._send_json_response(status_code, result)
-            
+
         except Exception as e:
             self.log.error(f"Request handling error: {e}")
             self._send_error(500, f"Internal server error: {e}")
@@ -1191,39 +1247,65 @@ def create_handler_with_logger(logger):
     return handler
 
 
-def run_server(host: str = "0.0.0.0", port: int = 8080):
+def _process_work_queue(log: logging.Logger) -> None:
+    """Process QGIS work items on the main thread (Qt thread affinity).
+
+    Blocks on the queue with a short timeout so the main thread can still
+    handle KeyboardInterrupt.  Called in a loop from ``run_server``.
     """
-    Run the QGIS HTTP server.
-    
-    Args:
-        host: Server host
-        port: Server port
+    try:
+        item = _work_queue.get(timeout=0.5)
+    except queue.Empty:
+        return
+
+    try:
+        item["result"] = generate_qgis_project(**item["args"])
+    except Exception as exc:
+        item["result"] = {
+            "status": "error",
+            "message": str(exc),
+            "traceback": traceback.format_exc(),
+        }
+    finally:
+        item["done"].set()
+
+
+def run_server(host: str = "0.0.0.0", port: int = 8080):
+    """Run the QGIS HTTP server.
+
+    QGIS is initialised on the main thread.  The HTTP server runs in a
+    daemon thread (ThreadingHTTPServer keeps health-check GETs responsive
+    while a POST job is processing).  QGIS work dispatched by POST handlers
+    is executed on the main thread via ``_work_queue``.
     """
     log = setup_logging()
-    
+
     try:
-        # Initialize QGIS
+        # Initialize QGIS on the main thread
         log.info("Initializing QGIS application...")
         start_qgis_application(enable_processing=True, log=log)
         log.info("QGIS application ready")
 
-        # Create and start server.  ThreadingHTTPServer spawns a thread per
-        # connection so the socket is always ready to accept; _qgis_lock in the
-        # handler serialises the actual QGIS work.
         handler = create_handler_with_logger(log)
         server = ThreadingHTTPServer((host, port), handler)
-        
-        log.info(f"🚀 QGIS API server listening on http://{host}:{port}")
+
+        # Run the HTTP server in a daemon thread so the main thread can
+        # process the QGIS work queue.
+        server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+        server_thread.start()
+
+        log.info(f"QGIS API server listening on http://{host}:{port}")
         log.info("Endpoints:")
         log.info("  POST / - Process QGIS project")
         log.info("  GET /health - Health check")
-        
-        server.serve_forever()
-        
+
+        # Main-thread loop: process QGIS work items dispatched by handlers
+        while True:
+            _process_work_queue(log)
+
     except KeyboardInterrupt:
         log.info("Shutting down server...")
-        if 'server' in locals():
-            server.shutdown()
+        server.shutdown()
     except Exception as e:
         log.error(f"Server startup failed: {e}")
         sys.exit(1)

@@ -36,8 +36,9 @@ or support our plugin requirements. We still need our wrapper to generate the
 Sidecar deployment coupled QGIS scaling to backend scaling and created a
 multi-process pod. Running the wrapper as its own Deployment avoids both.
 
-The backend calls the wrapper via `QFIELDCLOUD_QGIS_URL`, and both services
-mount the same RWX PVC (`/opt/qfield`) for file exchange.
+The backend calls the wrapper via `QFIELDCLOUD_QGIS_URL`. Input and output
+files are exchanged via the shared PostgreSQL database (see
+[0006-db-shared-state-qgis-jobs](0006-db-shared-state-qgis-jobs.md)).
 
 ### Concurrency within each QGIS replica
 
@@ -57,12 +58,11 @@ from replica count (`qfieldQgis.replicaCount`, default `2`).
 - Bad, we maintain a custom Docker container with the XLSFormConverter
   plugin installed.
 - Bad, we maintain custom wrapper code/images.
-- Bad, current design depends on RWX shared storage.
 
 ## Future Work
 
-- Move QGIS generation to per-request Kubernetes Jobs and object storage to
-  remove persistent QGIS pods and RWX dependency.
+- Move QGIS generation to per-request Kubernetes Jobs to remove persistent QGIS
+  pods.
 - Contribute upstream support for Kubernetes-backed workers in QFieldCloud.
 - Continue upstream collaboration on user-creation API support and adopt it in
   Field-TM when available in released QFieldCloud versions.

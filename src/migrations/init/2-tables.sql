@@ -83,6 +83,18 @@ CREATE TABLE user_roles (
 ALTER TABLE user_roles OWNER TO current_user;
 
 
+-- Temporary job state for QGIS project generation (shared between containers)
+CREATE TABLE qgis_jobs (
+    job_id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    xlsform BYTEA,
+    features JSONB,
+    tasks JSONB,
+    output_files JSONB
+);
+ALTER TABLE qgis_jobs OWNER TO current_user;
+
+
 CREATE TABLE api_keys (
     id integer NOT NULL,
     user_sub character varying NOT NULL,

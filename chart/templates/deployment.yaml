@@ -146,28 +146,13 @@ spec:
             - secretRef:
                 name: {{ .Values.existingSecret.name | quote }}
           {{- end }}
-          volumeMounts:
           {{- with .Values.volumeMounts }}
+          volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.qfieldQgis.enabled }}
-            - name: qfield-projects
-              mountPath: {{ .Values.qfieldQgis.persistence.mountPath }}
-          {{- end }}
-      {{- if or .Values.volumes .Values.qfieldQgis.enabled }}
+      {{- with .Values.volumes }}
       volumes:
-        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
-        {{- if .Values.qfieldQgis.enabled }}
-        - name: qfield-projects
-          {{- if .Values.qfieldQgis.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "field-tm.fullname" . }}-qfield-projects
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

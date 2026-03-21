@@ -115,9 +115,7 @@ db:
 qfieldQgis:
   # Deploy the QGIS project-generation wrapper as a separate Deployment with its
   # own ClusterIP Service. QFIELDCLOUD_QGIS_URL is automatically pointed at that
-  # Service so the backend can call it. The shared /opt/qfield PVC (ReadWriteMany)
-  # is mounted in both the backend and the QGIS pods so they can exchange files.
-  # Requires a StorageClass that supports ReadWriteMany (e.g. NFS, EFS, Azure Files).
+  # Service so the backend can call it.
   enabled: true
   # One replica is sufficient: the threading.Lock in the service queues concurrent
   # requests rather than dropping them, so jobs always complete in order.
@@ -133,11 +131,6 @@ qfieldQgis:
     LOG_LEVEL: INFO
   resources: {}
   securityContext: {}
-  persistence:
-    enabled: true
-    size: 5Gi
-    storageClassName: ""
-    mountPath: /opt/qfield
 
 imagePullSecrets: []
 nameOverride: ""

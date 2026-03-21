@@ -156,12 +156,11 @@ COPY --from=build /opt/python /opt/python
 WORKDIR /opt
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "field-tm account" -d /home/appuser -s /bin/false appuser \
-    && mkdir -p /opt/logs /opt/qfield /opt/migrations /opt/app \
+    && mkdir -p /opt/logs /opt/migrations /opt/app \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh
 # Add volumes for persistence
 VOLUME /opt/logs
-VOLUME /opt/qfield
 # Change to non-root user
 USER appuser
 
