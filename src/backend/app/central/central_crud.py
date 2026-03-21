@@ -305,7 +305,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
 async def append_fields_to_user_xlsform(
     xlsform: BytesIO,
     form_name: str = "buildings",
-    new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
+    new_geom_type: Optional[DbGeomType] = DbGeomType.POINT,
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
     default_language: str = "english",
@@ -328,7 +328,7 @@ async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
     default_language: str = "english",
     form_name: str = "buildings",
-    new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
+    new_geom_type: Optional[DbGeomType] = DbGeomType.POINT,
     need_verification_fields: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
