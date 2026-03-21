@@ -1,8 +1,10 @@
 """Tests for app bootstrap helpers."""
 
+import os
+
 from app.auth.auth_routes import auth_router
 from app.central.central_routes import central_router
-from app.config import AuthProvider, Settings
+from app.config import AuthProvider, OtelSettings, Settings
 from app.helpers.helper_routes import helper_router
 from app.main import _configure_template_engine, build_login_app_url, create_app
 from app.projects.project_routes import api_router
@@ -64,6 +66,22 @@ def test_settings_disabled_provider_keeps_auth_urls_optional():
     assert settings.LOGIN_URL is None
 
 
+def test_otel_settings_exclude_static_urls(monkeypatch):
+    """OpenTelemetry URL exclusions should include static asset child routes."""
+    monkeypatch.delenv("OTEL_PYTHON_EXCLUDED_URLS", raising=False)
+
+    otel_settings = OtelSettings(
+        FTM_DOMAIN="localhost",
+        LOG_LEVEL="INFO",
+        ODK_CENTRAL_URL="",
+    )
+
+    excluded_urls = otel_settings.otel_python_excluded_urls
+
+    assert "^/static/.*" in excluded_urls
+    assert os.environ["OTEL_PYTHON_EXCLUDED_URLS"] == excluded_urls
+
+
 def test_create_app_skips_auth_setup_when_provider_disabled(monkeypatch):
     """Disabled auth mode must not call setup_auth()."""
     from app import main
@@ -111,6 +129,12 @@ def test_template_engine_config_handles_disabled_auth_without_hanko_urls(monkeyp
     class _FakeInnerEngine:
         def __init__(self):
             self.globals = {}
+
+        def add_extension(self, _extension):
+            return None
+
+        def install_gettext_callables(self, *_args):
+            return None
 
     class _FakeTemplateEngine:
         def __init__(self):

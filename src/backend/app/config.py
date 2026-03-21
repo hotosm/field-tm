@@ -102,7 +102,7 @@ class OtelSettings(BaseSettings):
     @property
     def otel_python_excluded_urls(self) -> Optional[str]:
         """Set excluded URLs for Python instrumentation."""
-        endpoints = "__lbheartbeat__,docs,openapi.json"
+        endpoints = "__lbheartbeat__,docs,openapi.json,^/static/.*"
         os.environ["OTEL_PYTHON_EXCLUDED_URLS"] = endpoints
         # Add extra endpoints ignored by for requests
         # NOTE we add ODK Central session auth endpoint here
