@@ -8,38 +8,59 @@ USING gist (geom);
 -- Merge least feature polygons with neighbouring polygons
 DO $$
 DECLARE
-    num_buildings INTEGER := %(num_buildings)s;
+    num_buildings INTEGER := current_setting('area_splitter.num_buildings');
+    num_enumerators INTEGER := current_setting('area_splitter.num_enumerators');
     min_area NUMERIC; -- Set the minimum area threshold
     mean_area NUMERIC;
     stddev_area NUMERIC; -- Set the standard deviation
     min_buildings INTEGER; -- Set the minimum number of buildings threshold
     small_polygon RECORD; -- set small_polygon and nearest_neighbor as record 
     nearest_neighbor RECORD; -- in order to use them in the loop
+    merges_remaining INTEGER = NULL;
 BEGIN
-    min_buildings := num_buildings * 0.5;
-
-    -- Find the mean and standard deviation of the area
-    SELECT 
-        AVG(ST_Area(geom)),
-        STDDEV_POP(ST_Area(geom))
-    INTO mean_area, stddev_area
-    FROM taskpolygons;
-
-    -- Set the threshold as mean - standard deviation
-    min_area := mean_area - stddev_area;
 
     DROP TABLE IF EXISTS leastfeaturepolygons;
-    CREATE TABLE leastfeaturepolygons AS
-    SELECT taskid, geom
-    FROM taskpolygons
-    WHERE ST_Area(geom) < min_area OR (
-        SELECT COUNT(b.id) FROM buildings b 
-        WHERE ST_Contains(taskpolygons.geom, b.geom)
-    ) < min_buildings; -- find least feature polygons based on the area and feature
+    IF num_enumerators > 0 THEN
+      merges_remaining = (SELECT COUNT(*) FROM taskpolygons) - num_enumerators;
+      IF merges_remaining < 0 THEN
+        merges_remaining = 0; -- Skip merging
+      END IF;
+      CREATE TABLE leastfeaturepolygons AS
+        SELECT taskid, geom,
+        (SELECT COUNT(b.id) FROM buildings b
+          WHERE ST_Intersects(taskpolygons.geom, b.geom)) numbuildings
+        FROM taskpolygons ORDER BY numbuildings ASC LIMIT merges_remaining;
+    ELSE
+      -- Find the mean and standard deviation of the area
+      SELECT
+          AVG(ST_Area(geom)),
+          STDDEV_POP(ST_Area(geom))
+      INTO mean_area, stddev_area
+      FROM taskpolygons;
+
+      -- Set the threshold as mean - standard deviation
+      min_area := min_area - stddev_area;
+      min_buildings := num_buildings * 0.5;
+
+      CREATE TABLE leastfeaturepolygons AS
+      SELECT taskid, geom
+      FROM taskpolygons
+      WHERE ST_Area(geom) < min_area OR
+        (
+          SELECT COUNT(b.id) FROM buildings b
+          WHERE ST_Contains(taskpolygons.geom, b.geom)
+        ) < min_buildings; -- find least feature polygons based on the area and feature
+
+    END IF;
 
     FOR small_polygon IN 
         SELECT * FROM leastfeaturepolygons
     LOOP
+        -- If the required # of polygons are merged, we are done.
+        IF merges_remaining = 0 THEN
+          EXIT;
+        END IF;
+
         -- Find the nearest neighbor to merge the small polygon with
         FOR nearest_neighbor IN
         SELECT taskid, geom, ST_LENGTH2D(ST_Intersection(small_polygon.geom, geom)) as shared_bound
@@ -56,11 +77,16 @@ BEGIN
             WHERE taskid = nearest_neighbor.taskid;
 
             DELETE FROM taskpolygons WHERE taskid = small_polygon.taskid;
+
+            IF merges_remaining IS NOT NULL THEN -- Fixed number of mappers
+              merges_remaining = merges_remaining - 1;
+            END IF;
+
             -- Exit the neighboring polygon loop after one successful merge
             EXIT;
         END LOOP;
     END LOOP;
 END $$;
 
-DROP TABLE IF EXISTS leastfeaturepolygons;
+-- DROP TABLE IF EXISTS leastfeaturepolygons;
 -- VACUUM ANALYZE taskpolygons;
