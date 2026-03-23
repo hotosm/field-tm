@@ -468,8 +468,10 @@
   // Step 3: Split AOI - Handle algorithm selection and parameter visibility
   const splitAlgorithm = document.getElementById('split-algorithm');
   const paramBuildings = document.getElementById('param-buildings');
+  const paramTasks = document.getElementById('param-tasks');
   const paramDimension = document.getElementById('param-dimension');
   const noOfBuildingsInput = document.getElementById('no-of-buildings');
+  const noOfTasksInput = document.getElementById('no-of-tasks');
   const dimensionMetersInput = document.getElementById('dimension-meters');
   const splitAdvancedConfigToggle = document.getElementById('split-advanced-config-toggle');
   const splitAdvancedConfigPanel = document.getElementById('split-advanced-config-panel');
@@ -506,53 +508,35 @@
     });
   syncSplitLinearFeatureOptions();
 
-  if (splitAlgorithm) {
-    // Function to update parameter visibility
-    function updateParameterVisibility() {
-      const algorithm = splitAlgorithm.value;
-      if (algorithm === 'DIVIDE_BY_SQUARE') {
-        if (paramBuildings) paramBuildings.style.display = 'none';
-        if (paramDimension) paramDimension.style.display = 'block';
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.removeAttribute('required');
-          noOfBuildingsInput.disabled = true; // Disable so it's not sent
-        }
-        if (dimensionMetersInput) {
-          dimensionMetersInput.setAttribute('required', 'required');
-          dimensionMetersInput.disabled = false;
-        }
-      } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
-        if (paramBuildings) paramBuildings.style.display = 'block';
-        if (paramDimension) paramDimension.style.display = 'none';
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.setAttribute('required', 'required');
-          noOfBuildingsInput.disabled = false;
-        }
-        if (dimensionMetersInput) {
-          dimensionMetersInput.removeAttribute('required');
-          dimensionMetersInput.disabled = true; // Disable so it's not sent
-        }
-      } else {
-        // NO_SPLITTING, TOTAL_TASKS, or other options
-        if (paramBuildings) paramBuildings.style.display = 'none';
-        if (paramDimension) paramDimension.style.display = 'none';
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.removeAttribute('required');
-          noOfBuildingsInput.disabled = true; // Disable so it's not sent
-        }
-        if (dimensionMetersInput) {
-          dimensionMetersInput.removeAttribute('required');
-          dimensionMetersInput.disabled = true; // Disable so it's not sent
-        }
+  // Map each algorithm to which input group is active: buildings, tasks, or dimension
+  const splitParamGroups = {
+    buildings: { container: paramBuildings, input: noOfBuildingsInput },
+    tasks: { container: paramTasks, input: noOfTasksInput },
+    dimension: { container: paramDimension, input: dimensionMetersInput },
+  };
+  const algorithmActiveParam = {
+    'DIVIDE_BY_SQUARE': 'dimension',
+    'AVG_BUILDING_VORONOI': 'buildings',
+    'AVG_BUILDING_SKELETON': 'buildings',
+    'TOTAL_TASKS': 'tasks',
+  };
+
+  function updateSplitParamVisibility() {
+    if (!splitAlgorithm) return;
+    const active = algorithmActiveParam[splitAlgorithm.value] || null;
+    for (const [key, { container, input }] of Object.entries(splitParamGroups)) {
+      const isActive = key === active;
+      if (container) container.style.display = isActive ? 'block' : 'none';
+      if (input) {
+        input.disabled = !isActive;
+        if (isActive) input.setAttribute('required', 'required');
+        else input.removeAttribute('required');
       }
     }
-
-    // Initialize visibility on page load
-    updateParameterVisibility();
-
-    // Update on change
-    splitAlgorithm.addEventListener('change', updateParameterVisibility);
   }
+
+  // Initial param visibility (updateAlgorithmUI also calls this on change)
+  updateSplitParamVisibility();
 
   // Scroll to map after successful split
   document.body.addEventListener('htmx:afterSwap', function(event) {
@@ -584,28 +568,20 @@
       const splitBtn = splitAoiForm.querySelector('button[type="submit"]');
       const splitBtnText = document.getElementById('split-btn-text');
 
-      // Show/hide parameter container based on algorithm
       if (paramContainer) {
-        if (algorithm === 'NO_SPLITTING' || !algorithm) {
-          paramContainer.style.display = 'none';
-        } else {
-          paramContainer.style.display = 'block';
-        }
+        paramContainer.style.display = (algorithm && algorithm !== 'NO_SPLITTING') ? 'block' : 'none';
       }
 
-      // Update button text based on algorithm and current state
       if (splitBtnText) {
-        if (algorithm === 'NO_SPLITTING') {
-          splitBtnText.textContent = i18nStrings.confirmNoSplitting;
-        } else if (algorithm === 'DIVIDE_BY_SQUARE') {
-          splitBtnText.textContent = i18nStrings.splitBySquare;
-        } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
-          splitBtnText.textContent = i18nStrings.splitByBuildings;
-        } else if (algorithm && algorithm !== '') {
-          splitBtnText.textContent = i18nStrings.splitAoi;
-        } else {
-          splitBtnText.textContent = i18nStrings.selectOption;
-        }
+        const btnLabels = {
+          'NO_SPLITTING': i18nStrings.confirmNoSplitting,
+          'DIVIDE_BY_SQUARE': i18nStrings.splitBySquare,
+          'AVG_BUILDING_VORONOI': i18nStrings.splitByBuildings,
+          'AVG_BUILDING_SKELETON': i18nStrings.splitByBuildings,
+          'TOTAL_TASKS': i18nStrings.splitAoi,
+        };
+        splitBtnText.textContent = btnLabels[algorithm]
+          || (algorithm ? i18nStrings.splitAoi : i18nStrings.selectOption);
       }
 
       // Disable/enable button based on selection
@@ -613,35 +589,13 @@
         splitBtn.disabled = !algorithm || algorithm === '';
       }
 
-      // Disable the parameter that's not needed so it's not sent in form data
-      if (algorithm === 'DIVIDE_BY_SQUARE') {
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.disabled = true;
-        }
-        if (dimensionMetersInput) {
-          dimensionMetersInput.disabled = false;
-        }
-      } else if (algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON') {
-        if (dimensionMetersInput) {
-          dimensionMetersInput.disabled = true;
-        }
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.disabled = false;
-        }
-      } else if (algorithm === 'NO_SPLITTING' || !algorithm) {
-        if (noOfBuildingsInput) {
-          noOfBuildingsInput.disabled = true;
-        }
-        if (dimensionMetersInput) {
-          dimensionMetersInput.disabled = true;
-        }
-      }
+      // Param visibility is handled by updateSplitParamVisibility
+      updateSplitParamVisibility();
     }
 
     // Update UI on algorithm change
     if (splitAlgorithm) {
       splitAlgorithm.addEventListener('change', updateAlgorithmUI);
-      // Initialize UI on page load
       updateAlgorithmUI();
     }
 

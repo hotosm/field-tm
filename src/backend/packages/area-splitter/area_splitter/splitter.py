@@ -767,12 +767,11 @@ class AreaSplitter:
 
         # Make the input parameters accessible to other sql files.
         cur.execute(
-            f"SET area_splitter.num_buildings = "
-            f"{params.get('num_buildings', 0)}"
+            f"SET area_splitter.num_buildings = {int(params.get('num_buildings', 0))}"
         )
         cur.execute(
             f"SET area_splitter.num_enumerators = "
-            f"{params.get('num_enumerators', 0)}"
+            f"{int(params.get('num_enumerators', 0))}"
         )
 
         # Close current cursor
@@ -1163,7 +1162,6 @@ be either the data extract used by the XLSForm, or a postgresql database.
             args.boundary,
             db=args.dburl,
             num_buildings=args.number,
-            num_enumerators=0,
             outfile=args.outfile,
             osm_extract=args.extract,
         )
@@ -1171,7 +1169,6 @@ be either the data extract used by the XLSForm, or a postgresql database.
         split_by_sql(
             args.boundary,
             db=args.dburl,
-            num_buildings=0,
             num_enumerators=args.tasks,
             outfile=args.outfile,
             osm_extract=args.extract,

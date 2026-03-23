@@ -11,11 +11,13 @@ from litestar import status_codes as status
 from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
+from app.htmx.map_helpers import render_leaflet_map
 from app.htmx.project_create_routes import _parse_outline_payload, new_project
 from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     _build_finalize_error_html,
     _build_odk_finalize_success_html,
+    _task_boundaries_layer,
     accept_data_extract_htmx,
     accept_split_htmx,
 )
@@ -307,6 +309,64 @@ async def test_accept_split_htmx_decodes_html_escaped_geojson(monkeypatch):
     assert response.headers.get("HX-Refresh") == "true"
     assert saved["project_id"] == project.id
     assert saved["tasks_geojson"] == tasks_geojson
+
+
+def test_task_boundaries_layer_uses_translated_popup_labels():
+    """Task boundary popups should show translated labels without layer name."""
+    layer = _task_boundaries_layer(
+        {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": None,
+                    "properties": {"task_id": 3, "building_count": 14},
+                }
+            ],
+        }
+    )
+
+    assert layer["popup_options"]["showLayerName"] is False
+    assert layer["popup_options"]["propertyLabels"] == {
+        "task_id": "Task ID",
+        "building_count": "Building Count",
+    }
+    assert layer["popup_options"]["propertyOrder"] == ["task_id", "building_count"]
+
+
+def test_render_leaflet_map_serializes_popup_options():
+    """Leaflet helper should pass popup configuration through to the frontend."""
+    html = render_leaflet_map(
+        map_id="leaflet-map-test",
+        geojson_layers=[
+            {
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": None,
+                            "properties": {"task_id": 3, "building_count": 14},
+                        }
+                    ],
+                },
+                "name": "Task Boundaries (1 tasks)",
+                "popup_options": {
+                    "showLayerName": False,
+                    "propertyLabels": {
+                        "task_id": "Task ID",
+                        "building_count": "Building Count",
+                    },
+                    "propertyOrder": ["task_id", "building_count"],
+                },
+            }
+        ],
+    )
+
+    assert '"showLayerName": false' in html
+    assert '"task_id": "Task ID"' in html
+    assert '"building_count": "Building Count"' in html
+    assert '"propertyOrder": ["task_id", "building_count"]' in html
 
 
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):

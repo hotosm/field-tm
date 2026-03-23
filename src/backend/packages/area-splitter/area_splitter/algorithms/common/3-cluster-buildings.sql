@@ -19,7 +19,7 @@ BEGIN
     DROP TABLE IF EXISTS partition_tasks;
     create table partition_tasks as
         select polyid, numfeatures,
-        greatest(1,round(numfeatures/features_per_cluster))::int tasks
+        greatest(1,ceil(numfeatures/features_per_cluster))::int tasks
         from splitpolygons WHERE numfeatures > 0;
 
     -- Now adjust the tasks assigned to match the total tasks exactly with the

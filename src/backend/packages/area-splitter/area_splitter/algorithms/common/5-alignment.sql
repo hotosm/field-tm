@@ -39,7 +39,7 @@ BEGIN
       FROM taskpolygons;
 
       -- Set the threshold as mean - standard deviation
-      min_area := min_area - stddev_area;
+      min_area := mean_area - stddev_area;
       min_buildings := num_buildings * 0.5;
 
       CREATE TABLE leastfeaturepolygons AS
@@ -88,5 +88,5 @@ BEGIN
     END LOOP;
 END $$;
 
--- DROP TABLE IF EXISTS leastfeaturepolygons;
+DROP TABLE IF EXISTS leastfeaturepolygons;
 -- VACUUM ANALYZE taskpolygons;

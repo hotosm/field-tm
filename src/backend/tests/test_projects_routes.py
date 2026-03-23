@@ -57,6 +57,7 @@ def test_create_project_request_split_defaults():
     )
 
     assert payload.no_of_buildings == 10
+    assert payload.no_of_tasks == 10
     assert payload.include_roads is True
     assert payload.include_rivers is True
     assert payload.include_railways is True
@@ -425,6 +426,92 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     assert callable(captured.get("func"))
     algorithm_params = captured["func"].keywords["algorithm_params"]
     assert algorithm_params["num_buildings"] == 50
+    assert algorithm_params["include_roads"] == "TRUE"
+    assert algorithm_params["include_rivers"] == "TRUE"
+    assert algorithm_params["include_railways"] == "TRUE"
+    assert algorithm_params["include_aeroways"] == "TRUE"
+    assert result["type"] == "FeatureCollection"
+    assert len(result["features"]) == 1
+
+
+async def test_split_aoi_total_tasks_passes_num_enumerators(monkeypatch):
+    """TOTAL_TASKS should pass num_enumerators into area-splitter."""
+    from app.projects import project_services
+
+    project = Mock(
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.30, 27.71],
+                    [85.30, 27.70],
+                    [85.31, 27.70],
+                    [85.31, 27.71],
+                    [85.30, 27.71],
+                ]
+            ],
+        },
+        data_extract_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [85.30, 27.71],
+                                [85.30, 27.70],
+                                [85.31, 27.70],
+                                [85.31, 27.71],
+                                [85.30, 27.71],
+                            ]
+                        ],
+                    },
+                    "properties": {"osm_id": 1},
+                }
+            ],
+        },
+    )
+
+    async def fake_project_one(_db, _project_id):
+        return project
+
+    captured: dict = {}
+
+    async def fake_run_sync(func, *args):
+        captured["func"] = func
+        captured["args"] = args
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": project.outline,
+                    "properties": {"task_id": 1},
+                }
+            ],
+        }
+
+    async def fake_check_crs(_featcol):
+        return None
+
+    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(project_services.to_thread, "run_sync", fake_run_sync)
+    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+
+    result = await project_services.split_aoi(
+        db=Mock(),
+        project_id=1,
+        options=project_services.SplitAoiOptions(
+            algorithm="TOTAL_TASKS",
+            no_of_tasks=6,
+        ),
+    )
+
+    assert callable(captured.get("func"))
+    algorithm_params = captured["func"].keywords["algorithm_params"]
+    assert algorithm_params["num_enumerators"] == 6
     assert algorithm_params["include_roads"] == "TRUE"
     assert algorithm_params["include_rivers"] == "TRUE"
     assert algorithm_params["include_railways"] == "TRUE"
