@@ -18,7 +18,7 @@
 
 [project]
 name = "field-tm"
-version = "2026.1.2"
+version = "2026.1.3"
 description = "Field Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
@@ -124,7 +124,7 @@ asyncio_default_fixture_loop_scope="function"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2026.1.2"
+version = "2026.1.3"
 version_provider = "uv"
 version_files = [
     "pyproject.toml:version",

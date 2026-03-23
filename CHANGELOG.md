@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026.1.3 (2026-03-23)
+
+### Feat
+
+- add a 'number of enumerators / buildings' task splitting workflow (#3042)
+
+### Fix
+
+- fixes to project creation workflow usability
+
+### Refactor
+
+- update translations & small fix to test cases
+
 ## 2026.1.2 (2026-03-21)
 
 ### Fix
