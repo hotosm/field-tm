@@ -296,6 +296,7 @@ def _parse_split_form_options(data: dict | None) -> dict:
         "no_of_buildings": _parse_int_form_value(
             payload.get("no_of_buildings", 10), 10
         ),
+        "no_of_tasks": _parse_int_form_value(payload.get("no_of_tasks", 10), 10),
         "dimension_meters": _parse_int_form_value(
             payload.get("dimension_meters", 100), 100
         ),
@@ -355,6 +356,14 @@ def _task_boundaries_layer(task_boundaries: dict) -> dict:
         "weight": 3,
         "opacity": 1.0,
         "fillOpacity": 0.1,
+        "popup_options": {
+            "showLayerName": False,
+            "propertyLabels": {
+                "task_id": _("Task ID"),
+                "building_count": _("Building Count"),
+            },
+            "propertyOrder": ["task_id", "building_count"],
+        },
     }
 
 
@@ -1183,6 +1192,7 @@ async def split_aoi_htmx(
             "Split AOI parameters: "
             f"algorithm={algorithm}, "
             f"no_of_buildings={split_options['no_of_buildings']}, "
+            f"no_of_tasks={split_options['no_of_tasks']}, "
             f"dimension_meters={split_options['dimension_meters']}, "
             f"include_roads={split_options['include_roads']}, "
             f"include_rivers={split_options['include_rivers']}, "
@@ -1199,6 +1209,7 @@ async def split_aoi_htmx(
             options=SplitAoiOptions(
                 algorithm=algorithm,
                 no_of_buildings=split_options["no_of_buildings"],
+                no_of_tasks=split_options["no_of_tasks"],
                 dimension_meters=split_options["dimension_meters"],
                 include_roads=split_options["include_roads"],
                 include_rivers=split_options["include_rivers"],

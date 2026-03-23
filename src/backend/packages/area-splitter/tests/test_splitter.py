@@ -20,6 +20,7 @@ from time import sleep
 
 import pytest
 
+from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import (
     AreaSplitter,
     _is_linear_split_feature,
@@ -198,6 +199,42 @@ def test_split_by_sql_ftm_with_extract(db, aoi_json, extract_json):
         feature.get("geometry", {}).get("type") in {"Polygon", "MultiPolygon"}
         for feature in feature_list
     )
+
+
+def test_split_by_sql_total_tasks_passes_num_enumerators(
+    monkeypatch, aoi_json, extract_json
+):
+    """Target-task splitting should pass num_enumerators to the SQL runner."""
+    captured = {}
+
+    def fake_split_by_sql(self, db, algorithm, algorithm_params, osm_extract):
+        captured["db"] = db
+        captured["algorithm"] = algorithm
+        captured["algorithm_params"] = algorithm_params
+        captured["osm_extract"] = osm_extract
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": aoi_json["features"][0]["geometry"],
+                }
+            ],
+        }
+
+    monkeypatch.setattr(AreaSplitter, "splitBySQL", fake_split_by_sql)
+
+    features = split_by_sql(
+        aoi_json,
+        "postgresql://unused",
+        num_enumerators=6,
+        osm_extract=extract_json,
+        algorithm=SplittingAlgorithm.TOTAL_TASKS,
+    )
+
+    assert captured["algorithm"] == SplittingAlgorithm.TOTAL_TASKS
+    assert captured["algorithm_params"]["num_enumerators"] == 6
+    assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
 
 
 def test_split_by_sql_ftm_no_extract(aoi_json):

@@ -55,7 +55,7 @@ DROP TABLE polygonsnocount;
 --         SELECT *
 --         FROM splitpolygons AS p
 --         -- TODO: feature count should not be hard-coded
---         WHERE p.numfeatures < %(num_buildings)s
+--         WHERE p.numfeatures < buildings_per_tasks
 --     ),
 
 --     -- Find the neighbors of the low-feature-count polygons
