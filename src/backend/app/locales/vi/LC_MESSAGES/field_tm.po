@@ -1892,3 +1892,74 @@ msgstr "Chấp nhận lựa chọn nhiệm vụ"
 #~ " admin to manage the project."
 #~ msgstr ""
 
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Or use your own form instead:"
+msgstr "Hoặc thay vào đó hãy dùng biểu mẫu của riêng bạn:"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "Chọn loại khảo sát và tiếp tục với các cài đặt mặc định được khuyến nghị."
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Upload Custom XLSForm"
+msgstr "Tải lên biểu mẫu tùy chỉnh"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 2: Select Survey Form"
+msgstr "Bước 2: Chọn biểu mẫu khảo sát"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 2: Upload XLSForm"
+msgstr "Bước 2: Tải lên XLSForm"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 3: Get Data"
+msgstr "Bước 3: Lấy dữ liệu"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 4: Split into Tasks"
+msgstr "Bước 4: Chia thành nhiệm vụ"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 5: Finalise Project"
+msgstr "Bước 5: Hoàn tất dự án"
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
+msgstr "✓ Đã bỏ qua việc chia nhiệm vụ. Toàn bộ AOI sẽ được sử dụng như một nhiệm vụ duy nhất. Bạn có thể chuyển sang Bước 5."
+

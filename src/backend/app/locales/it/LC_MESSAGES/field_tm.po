@@ -1910,3 +1910,74 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Accetta scelte task"
 
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Or use your own form instead:"
+msgstr "Oppure usa invece il tuo modulo:"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "Scegli un tipo di indagine e continua con i valori predefiniti consigliati."
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Upload Custom XLSForm"
+msgstr "Carica modulo personalizzato"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 2: Select Survey Form"
+msgstr "Passaggio 2: Seleziona modulo di indagine"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 2: Upload XLSForm"
+msgstr "Passaggio 2: Carica XLSForm"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 3: Get Data"
+msgstr "Passaggio 3: Ottieni dati"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 4: Split into Tasks"
+msgstr "Passaggio 4: Suddividi in task"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 5: Finalise Project"
+msgstr "Passaggio 5: Finalizza progetto"
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
+msgstr "✓ Suddivisione dei task saltata. L'intera AOI sarà usata come un singolo task. Puoi procedere al Passaggio 5."
+

@@ -98,7 +98,7 @@
         });
       }
 
-      // Step 1: XLSForm Selection
+      // Step 2: XLSForm Selection
       const uploadXlsformBtn = document.getElementById('upload-xlsform-btn');
       const formAdvancedConfigToggle = document.getElementById('form-advanced-config-toggle');
       const formAdvancedConfigPanel = document.getElementById('form-advanced-config-panel');
@@ -113,6 +113,50 @@
       const formTemplatesById = new Map();
 
       bindAdvancedToggle(formAdvancedConfigToggle, formAdvancedConfigPanel);
+
+      // Form option checkboxes
+      const includePhotoCheckbox = document.getElementById('include-photo-upload-checkbox');
+      const mandatoryPhotoCheckbox = document.getElementById('mandatory-photo-checkbox');
+      const mandatoryPhotoLabel = document.getElementById('mandatory-photo-label');
+      const includePhotoHidden = document.getElementById('include-photo-upload-hidden');
+      const verificationFieldsCheckbox = document.getElementById('verification-fields-checkbox');
+      const needVerificationHidden = document.getElementById('need-verification-fields-hidden');
+      const customFormDisclaimer = document.getElementById('custom-form-disclaimer');
+
+      if (includePhotoCheckbox && mandatoryPhotoCheckbox && mandatoryPhotoLabel) {
+        includePhotoCheckbox.addEventListener('change', function() {
+          const enabled = includePhotoCheckbox.checked;
+          mandatoryPhotoCheckbox.disabled = !enabled;
+          mandatoryPhotoLabel.style.opacity = enabled ? '1' : '0.4';
+          if (!enabled) {
+            mandatoryPhotoCheckbox.checked = false;
+          }
+          if (includePhotoHidden) {
+            includePhotoHidden.value = enabled ? 'true' : 'false';
+          }
+        });
+      }
+
+      if (verificationFieldsCheckbox && needVerificationHidden) {
+        verificationFieldsCheckbox.addEventListener('change', function() {
+          needVerificationHidden.value = verificationFieldsCheckbox.checked ? 'true' : 'false';
+        });
+      }
+
+      // Auto-select XLSForm default language based on user's current locale
+      const defaultLanguageSelect = document.getElementById('default-language-select');
+      if (defaultLanguageSelect) {
+        const localeToLanguage = {
+          'en': 'english', 'es': 'spanish', 'fr': 'french',
+          'pt': 'portuguese', 'pt_br': 'portuguese',
+          'sw': 'swahili', 'hi': 'hindi',
+        };
+        const htmlLang = document.documentElement.lang || '';
+        const matched = localeToLanguage[htmlLang] || localeToLanguage[htmlLang.split(/[-_]/)[0]];
+        if (matched && defaultLanguageSelect.querySelector(`option[value="${matched}"]`)) {
+          defaultLanguageSelect.value = matched;
+        }
+      }
 
       function setStep1Status(message, variant = 'info') {
         if (!xlsformStatus) return;
@@ -194,6 +238,9 @@
           if (selectedXlsformName) {
             selectedXlsformName.textContent = '';
           }
+          if (customFormDisclaimer) {
+            customFormDisclaimer.style.display = 'none';
+          }
 
           const selectedForm = formTemplatesById.get(String(formId));
           const preset = presetForFormTitle(selectedForm?.title);
@@ -237,6 +284,9 @@
           if (selectedXlsformName) {
             selectedXlsformName.textContent = `${i18nStrings.selectedFilePrefix} ${file.name}`;
           }
+          if (customFormDisclaimer) {
+            customFormDisclaimer.style.display = 'block';
+          }
 
           saveSetupPreference({
             mode: 'custom',
@@ -269,7 +319,7 @@
         });
       }
 
-      // Step 2: OSM Data
+      // Step 3: OSM Data
       const downloadOsmDataBtn = document.getElementById('download-osm-data-btn');
       const collectNewDataBtn = document.getElementById('collect-new-data-btn');
       const uploadGeojsonBtn = document.getElementById('upload-geojson-btn');
@@ -444,7 +494,7 @@
         });
       }
 
-  // Step 2: Data extract preview (collapsed by default when Step 2 is complete)
+  // Step 3: Data extract preview (collapsed by default when Step 3 is complete)
   const previewDataExtractBtn = document.getElementById('preview-data-extract-btn');
   const hideDataExtractPreviewBtn = document.getElementById('hide-data-extract-preview-btn');
   const geojsonPreviewWrapper = document.getElementById('geojson-preview-wrapper');
@@ -465,7 +515,7 @@
     });
   }
 
-  // Step 3: Split AOI - Handle algorithm selection and parameter visibility
+  // Step 4: Split AOI - Handle algorithm selection and parameter visibility
   const splitAlgorithm = document.getElementById('split-algorithm');
   const paramBuildings = document.getElementById('param-buildings');
   const paramDimension = document.getElementById('param-dimension');
@@ -687,7 +737,7 @@
       if (event.detail.xhr.status === 200) {
         const responseText = event.detail.xhr.responseText;
         // If page refresh is triggered, the UI will update automatically
-        if (responseText.includes('HX-Refresh') || responseText.includes('proceed to Step 4')) {
+        if (responseText.includes('HX-Refresh') || responseText.includes('proceed to Step 5')) {
           // Page will refresh, no need to update button text
         } else {
           // Update button text based on current algorithm selection
@@ -697,7 +747,7 @@
     });
   }
 
-  // Step 4: Finalise Project - Unified button with advanced options
+  // Step 5: Finalise Project - Unified button with advanced options
   const finaliseProjectBtn = document.getElementById('finalise-project-btn');
   const advancedOptionsToggle = document.getElementById('advanced-options-toggle');
   const finaliseActions = document.getElementById('finalise-actions');
@@ -1009,6 +1059,6 @@
       }
 
       // NOTE: We intentionally do not auto-load Leaflet previews on page load.
-      // This keeps Step 2 "completed" state collapsed (no reserved space for the map).
+      // This keeps Step 3 "completed" state collapsed (no reserved space for the map).
     })();
 </script>

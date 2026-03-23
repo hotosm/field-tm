@@ -439,6 +439,7 @@ async def process_xlsform(
     project_id: int,
     xlsform_bytes: BytesIO,
     need_verification_fields: bool = True,
+    include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     default_language: str = "english",
@@ -450,6 +451,7 @@ async def process_xlsform(
         project_id: The project ID.
         xlsform_bytes: BytesIO of the XLSForm file.
         need_verification_fields: Whether to add verification fields.
+        include_photo_upload: Whether to include photo upload question.
         mandatory_photo_upload: Whether photo upload is mandatory.
         use_odk_collect: Whether to use ODK Collect.
         default_language: Default language for the form.
@@ -465,6 +467,7 @@ async def process_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
         need_verification_fields=need_verification_fields,
+        include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
@@ -474,6 +477,7 @@ async def process_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
         need_verification_fields=need_verification_fields,
+        include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,

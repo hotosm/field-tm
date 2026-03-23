@@ -325,6 +325,8 @@ block content %}
   let map;
   let drawnLayers;
   let drawControl;
+  let activeDrawHandler = null;
+  let undoControl = null;
 
   function initMap() {
     // Wait for Leaflet to be available
@@ -346,7 +348,7 @@ block content %}
     drawnLayers = new L.FeatureGroup();
     map.addLayer(drawnLayers);
 
-    // Initialize draw control
+    // Initialize draw control (no edit/delete toolbar - we use our own Clear + Undo)
     drawControl = new L.Control.Draw({
       draw: {
         polygon: {
@@ -359,30 +361,119 @@ block content %}
         circlemarker: false,
         polyline: false,
       },
-      edit: {
-        featureGroup: drawnLayers,
-        remove: true,
-      },
+      edit: false,
     });
 
     map.addControl(drawControl);
 
+    // ── Custom Undo Vertex control (visible only while drawing) ──
+    const UndoControl = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = "Undo last vertex";
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          if (activeDrawHandler && activeDrawHandler.deleteLastVertex) {
+            activeDrawHandler.deleteLastVertex();
+          }
+        });
+        container.style.display = "none";
+        this._container = container;
+        return container;
+      },
+      show: function () { if (this._container) this._container.style.display = ""; },
+      hide: function () { if (this._container) this._container.style.display = "none"; },
+    });
+    undoControl = new UndoControl();
+    map.addControl(undoControl);
+
+    // ── Custom Locate control (geolocation) ──
+    const LocateControl = L.Control.extend({
+      options: { position: "bottomleft" },
+      onAdd: function (map) {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = "My location";
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        this._btn = btn;
+        this._map = map;
+        this._marker = null;
+        this._circle = null;
+        const self = this;
+
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          btn.classList.add("ftm-map-ctrl-btn--loading");
+          map.locate({ setView: true, maxZoom: 16 });
+        });
+
+        map.on("locationfound", function (e) {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+          // Remove previous markers
+          if (self._marker) map.removeLayer(self._marker);
+          if (self._circle) map.removeLayer(self._circle);
+          self._circle = L.circle(e.latlng, {
+            radius: e.accuracy / 2,
+            color: "#4a90d9",
+            fillColor: "#4a90d9",
+            fillOpacity: 0.15,
+            weight: 1,
+          }).addTo(map);
+          self._marker = L.circleMarker(e.latlng, {
+            radius: 7,
+            color: "#fff",
+            fillColor: "#4a90d9",
+            fillOpacity: 1,
+            weight: 2,
+          }).addTo(map);
+        });
+
+        map.on("locationerror", function () {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+        });
+
+        return container;
+      },
+    });
+    map.addControl(new LocateControl());
+
     // Handle draw events
+    map.on("draw:drawstart", function (e) {
+      // Capture the active handler from toolbar if not set by our button
+      if (!activeDrawHandler && drawControl._toolbars && drawControl._toolbars.draw) {
+        const mode = drawControl._toolbars.draw._activeMode;
+        if (mode && mode.handler) {
+          activeDrawHandler = mode.handler;
+        }
+      }
+      if (undoControl) undoControl.show();
+    });
+
     map.on(L.Draw.Event.CREATED, function (e) {
       const layer = e.layer;
       drawnLayers.clearLayers();
       drawnLayers.addLayer(layer);
       updateGeoJSON();
       validateAndShowAreaInfo();
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
     });
 
-    map.on(L.Draw.Event.EDITED, function (e) {
-      updateGeoJSON();
-      validateAndShowAreaInfo();
-    });
-
-    map.on(L.Draw.Event.DELETED, function (e) {
-      updateGeoJSON();
+    // Also hide undo if drawing is cancelled (e.g. pressing Escape)
+    map.on("draw:drawstop", function () {
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
     });
   }
 
@@ -499,11 +590,11 @@ block content %}
   // Draw polygon button
   document.getElementById("draw-polygon-btn")?.addEventListener("click", function () {
     if (!map) return;
-    const polygonDrawer = new L.Draw.Polygon(map, {
+    activeDrawHandler = new L.Draw.Polygon(map, {
       allowIntersection: false,
       showArea: true,
     });
-    polygonDrawer.enable();
+    activeDrawHandler.enable();
   });
 
   // Upload GeoJSON button

@@ -295,6 +295,7 @@ async def _process_all_form_tabs(
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
+    include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     label_cols: list[str] = [],
@@ -343,8 +344,8 @@ async def _process_all_form_tabs(
     xform_id = _configure_form_settings(custom_sheets, form_name, default_language)
 
     # Select appropriate form components based on target platform
-    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df, label_cols)
-    
+    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df if include_photo_upload else None, label_cols)
+
     # Process survey sheet
     custom_sheets["survey"] = _process_survey_sheet(
         custom_sheets.get("survey"),
@@ -390,6 +391,7 @@ async def append_field_mapping_fields(
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
     need_verification_fields: bool = True,
+    include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     default_language: str = "english",
     use_odk_collect: bool = False,
@@ -429,6 +431,7 @@ async def append_field_mapping_fields(
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
         need_verification_fields=need_verification_fields,
+        include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,

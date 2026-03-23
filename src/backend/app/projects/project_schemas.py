@@ -65,6 +65,7 @@ class CreateProjectRequest(ODKCentral, QFieldCloud):
     template_form_id: int | None = None
     xlsform_base64: str | None = None
     need_verification_fields: bool = True
+    include_photo_upload: bool = True
     mandatory_photo_upload: bool = False
     use_odk_collect: bool = False
     default_language: str = "english"

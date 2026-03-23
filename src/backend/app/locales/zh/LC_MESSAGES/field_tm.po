@@ -1769,3 +1769,74 @@ msgstr "无法自动创建管理账户。请以管理员身份登录 QFieldCloud
 msgid "Accept Task Choices"
 msgstr "接受任务选择"
 
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Or use your own form instead:"
+msgstr "或改用您自己的表单："
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "选择调查类型，并使用推荐默认值继续。"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Upload Custom XLSForm"
+msgstr "上传自定义表单"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 2: Select Survey Form"
+msgstr "步骤 2：选择调查表单"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 2: Upload XLSForm"
+msgstr "步骤 2：上传 XLSForm"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 3: Get Data"
+msgstr "步骤 3：获取数据"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 4: Split into Tasks"
+msgstr "步骤 4：拆分任务"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 5: Finalise Project"
+msgstr "步骤 5：完成项目"
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
+msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 5。"
+

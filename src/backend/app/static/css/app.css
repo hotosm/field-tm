@@ -577,7 +577,9 @@ body {
 
 .ftm-map-container {
   width: 100%;
-  height: 400px;
+  height: 50vh;
+  min-height: 280px;
+  max-height: 600px;
   border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius-sm);
   margin-top: 10px;
@@ -588,6 +590,36 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* Custom Leaflet map controls (undo vertex, locate) */
+.ftm-map-ctrl-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  color: #333;
+  cursor: pointer;
+}
+
+.ftm-map-ctrl-btn:hover {
+  background-color: #f4f4f4;
+}
+
+.ftm-map-ctrl-btn--loading {
+  animation: ftm-pulse 1s ease-in-out infinite;
+}
+
+@keyframes ftm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .ftm-checkbox-row {

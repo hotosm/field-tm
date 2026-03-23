@@ -86,6 +86,9 @@ async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_pro
     assert "Use Selected Survey Type" not in response.text
     assert "Continue" in response.text
     assert "Advanced Config" in response.text
+    assert response.text.index("Default Language:") < response.text.index(
+        "Form Options:"
+    )
 
 
 async def test_project_setup_shows_step2_advanced_config_options(client, db, project):

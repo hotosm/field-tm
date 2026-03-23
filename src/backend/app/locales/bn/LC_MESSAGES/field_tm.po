@@ -1882,3 +1882,74 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "কাজের পছন্দ গ্রহণ করুন"
 
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Or use your own form instead:"
+msgstr "অথবা পরিবর্তে আপনার নিজস্ব ফর্ম ব্যবহার করুন:"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "একটি জরিপের ধরন বেছে নিন এবং প্রস্তাবিত ডিফল্ট দিয়ে চালিয়ে যান।"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Upload Custom XLSForm"
+msgstr "কাস্টম ফর্ম আপলোড করুন"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 2: Select Survey Form"
+msgstr "ধাপ ২: জরিপ ফর্ম নির্বাচন করুন"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 2: Upload XLSForm"
+msgstr "ধাপ ২: XLSForm আপলোড করুন"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 3: Get Data"
+msgstr "ধাপ ৩: ডেটা নিন"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 4: Split into Tasks"
+msgstr "ধাপ ৪: কাজে ভাগ করুন"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 5: Finalise Project"
+msgstr "ধাপ ৫: প্রকল্প চূড়ান্ত করুন"
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
+msgstr "✓ কাজ বিভাজন বাদ দেওয়া হয়েছে। পুরো AOI একটি কাজ হিসেবে ব্যবহৃত হবে। আপনি ধাপ ৫-এ যেতে পারেন।"
+

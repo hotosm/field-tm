@@ -31,14 +31,14 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
 <div class="ftm-published-divider">
   <h2 class="ftm-setup-header">{{ _("Project Setup") }}</h2>
 
-  <!-- Step 1: Select XLSForm (always show, with completion indicator) -->
+  <!-- Step 2: Select XLSForm (always show, with completion indicator) -->
   <div
-    id="step-1-container"
+    id="step-2-container"
     class="ftm-step {% if has_xlsform %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
     <div class="ftm-step__header">
       <h3 class="ftm-step__title">
-        {{ _("Step 1: Select Survey Form") }} {% if has_xlsform %}
+        {{ _("Step 2: Select Survey Form") }} {% if has_xlsform %}
         <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
@@ -48,7 +48,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
     </div>
     {% if not has_xlsform %}
     <p class="ftm-step__description">
-      {{ _("Choose a survey type and continue with recommended defaults.") }}
+      {{ _("Choose a preset survey type, or upload your own custom XLSForm.") }}
     </p>
     <form
       id="upload-xlsform-form"
@@ -65,7 +65,59 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
         </select>
       </div>
 
-      <input type="hidden" name="need_verification_fields" value="true" />
+      <!-- Upload Custom Form (prominent option) -->
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          background: #f0f7ff;
+          border: 1px dashed #4a90d9;
+          border-radius: 8px;
+        "
+      >
+        <span style="font-size: 0.95em; color: #333; white-space: nowrap"
+          >{{ _("Or use your own form instead:") }}</span
+        >
+        <button
+          type="button"
+          id="upload-xlsform-btn"
+          class="wa-button wa-button--default"
+          style="min-width: 200px"
+        >
+          {{ _("Upload Custom XLSForm") }}
+        </button>
+        <small
+          id="selected-xlsform-name"
+          class="ftm-form-help"
+          style="color: #2a6ab0; font-weight: 500"
+        ></small>
+      </div>
+      <div
+        id="custom-form-disclaimer"
+        class="ftm-config-note ftm-config-note--muted"
+        style="display: none; margin-top: -4px"
+      >
+        <span style="font-size: 0.88em"
+          >{{ _("Note: Field-TM will automatically inject additional fields into your form for task
+          division and feature selection. Your form should only contain the survey questions you
+          want to ask (do not include select_one_from_file fields for tasks/features).") }}</span
+        >
+      </div>
+
+      <input
+        type="hidden"
+        id="need-verification-fields-hidden"
+        name="need_verification_fields"
+        value="true"
+      />
+      <input
+        type="hidden"
+        id="include-photo-upload-hidden"
+        name="include_photo_upload"
+        value="true"
+      />
       {% if field_mapping_app_value %} {% set app_name = field_mapping_app_value %} {% set is_odk =
       field_mapping_app_upper == 'ODK' %}
       <input type="hidden" name="use_odk_collect" value="{{ 'true' if is_odk else 'false' }}" />
@@ -104,35 +156,9 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
 
       <div id="form-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
         <div class="ftm-advanced-config__content">
-          <p class="ftm-step__description" style="margin-bottom: 10px">
-            {{ _("Upload a custom XLSForm or adjust form-processing options.") }}
-          </p>
-
-          <div class="ftm-step__actions" style="margin-bottom: 12px">
-            <button
-              type="button"
-              id="upload-xlsform-btn"
-              class="wa-button wa-button--default"
-              style="min-width: 220px"
-            >
-              {{ _("Upload Custom Form") }}
-            </button>
-            <small id="selected-xlsform-name" class="ftm-form-help"></small>
-          </div>
-
-          <label class="ftm-checkbox-label" style="display: flex; align-items: center; gap: 8px">
-            <input
-              type="checkbox"
-              name="mandatory_photo_upload"
-              value="true"
-              style="margin: 0; cursor: pointer"
-            />
-            <span style="font-size: 0.95em">{{ _("Make photo upload mandatory") }}</span>
-          </label>
-
-          <div style="margin-top: 10px">
+          <div style="margin-top: 4px">
             <label class="ftm-split-label">{{ _("Default Language:") }}</label>
-            <select name="default_language" class="ftm-split-select">
+            <select id="default-language-select" name="default_language" class="ftm-split-select">
               <option value="english">{{ _("English") }}</option>
               <option value="spanish">{{ _("Spanish") }}</option>
               <option value="french">{{ _("French") }}</option>
@@ -140,6 +166,69 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
               <option value="swahili">{{ _("Swahili") }}</option>
               <option value="hindi">{{ _("Hindi") }}</option>
             </select>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              margin-top: 12px;
+              padding: 10px 14px;
+              border: 1px solid #e0e0e0;
+              border-radius: 8px;
+              background: #fafafa;
+            "
+          >
+            <span class="ftm-split-label" style="margin-bottom: 2px">{{ _("Form Options:") }}</span>
+
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+              <label
+                class="ftm-checkbox-label"
+                style="display: flex; align-items: center; gap: 8px"
+              >
+                <input
+                  type="checkbox"
+                  id="include-photo-upload-checkbox"
+                  checked
+                  style="margin: 0; cursor: pointer"
+                />
+                <span style="font-size: 0.95em">{{ _("Include photo upload question") }}</span>
+              </label>
+              <label
+                class="ftm-checkbox-label"
+                id="mandatory-photo-label"
+                style="display: flex; align-items: center; gap: 8px"
+              >
+                <input
+                  type="checkbox"
+                  name="mandatory_photo_upload"
+                  id="mandatory-photo-checkbox"
+                  value="true"
+                  style="margin: 0; cursor: pointer"
+                />
+                <span style="font-size: 0.95em; color: #666">{{ _("Make photo mandatory") }}</span>
+              </label>
+            </div>
+
+            <small style="color: #888; font-size: 0.85em; margin-top: -4px"
+              >{{ _("Asks the user to take a photo at their location.") }}</small
+            >
+
+            <label class="ftm-checkbox-label" style="display: flex; align-items: center; gap: 8px">
+              <input
+                type="checkbox"
+                id="verification-fields-checkbox"
+                checked
+                style="margin: 0; cursor: pointer"
+              />
+              <span style="font-size: 0.95em"
+                >{{ _("Include digitisation verification question") }}</span
+              >
+            </label>
+            <small style="color: #888; font-size: 0.85em; margin-top: -4px"
+              >{{ _("Asks the mapper to verify if existing features are correctly digitised.")
+              }}</small
+            >
           </div>
         </div>
       </div>
@@ -168,15 +257,15 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
     {% endif %}
   </div>
 
-  <!-- Step 2: Download/Upload OSM Data (always show if Step 1 is complete) -->
+  <!-- Step 3: Download/Upload OSM Data (always show if Step 2 is complete) -->
   {% if has_xlsform %}
   <div
-    id="step-2-container"
+    id="step-3-container"
     class="ftm-step {% if has_data_extract %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
     <div class="ftm-step__header">
       <h3 class="ftm-step__title">
-        {{ _("Step 2: Get Data") }} {% if has_data_extract %}
+        {{ _("Step 3: Get Data") }} {% if has_data_extract %}
         <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
@@ -342,15 +431,15 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
   </div>
   {% endif %}
 
-  <!-- Step 3: Split AOI (only show if Step 2 is complete, including empty data extract) -->
+  <!-- Step 4: Split AOI (only show if Step 3 is complete, including empty data extract) -->
   {% if has_data_extract or (project.data_extract_geojson is not none and is_empty_data_extract) %}
   <div
-    id="step-3-container"
+    id="step-4-container"
     class="ftm-step {% if has_task_areas %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
   >
     <div class="ftm-step__header">
       <h3 class="ftm-step__title">
-        {{ _("Step 3: Split into Tasks (Optional)") }} {% if has_task_areas %}
+        {{ _("Step 4: Split into Tasks (Optional)") }} {% if has_task_areas %}
         <span class="ftm-step__check">✓</span>
         {% endif %}
       </h3>
@@ -556,11 +645,11 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
   </div>
   {% endif %}
 
-  <!-- Step 4: Finalise Project (only show if Steps 1, 2, and 3 are complete) -->
+  <!-- Step 5: Finalise Project (only show if Steps 2, 3, and 4 are complete) -->
   {% if has_xlsform and has_data_extract and has_task_areas %}
-  <div id="step-4-container" class="ftm-step ftm-step--complete">
+  <div id="step-5-container" class="ftm-step ftm-step--complete">
     <div class="ftm-step__header">
-      <h3 class="ftm-step__title">{{ _("Step 4: Finalise Project") }}</h3>
+      <h3 class="ftm-step__title">{{ _("Step 5: Finalise Project") }}</h3>
       <wa-badge variant="success">{{ _("Ready") }}</wa-badge>
     </div>
     <p class="ftm-step__description">

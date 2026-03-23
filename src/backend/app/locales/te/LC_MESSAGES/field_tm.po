@@ -1904,3 +1904,74 @@ msgstr "పని ఎంపికలను అంగీకరించండి"
 #~ " admin to manage the project."
 #~ msgstr ""
 
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Or use your own form instead:"
+msgstr "లేదా బదులుగా మీ స్వంత ఫారమ్‌ను ఉపయోగించండి:"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "ఒక సర్వే రకాన్ని ఎంచుకుని సిఫార్సు చేసిన డిఫాల్ట్‌లతో కొనసాగండి."
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Upload Custom XLSForm"
+msgstr "కస్టమ్ ఫారమ్ అప్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 2: Select Survey Form"
+msgstr "దశ 2: సర్వే ఫారమ్ ఎంచుకోండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 2: Upload XLSForm"
+msgstr "దశ 2: XLSForm అప్‌లోడ్ చేయండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 3: Get Data"
+msgstr "దశ 3: డేటాను పొందండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+msgid "Step 4: Split into Tasks"
+msgstr "దశ 4: పనులుగా విభజించండి"
+
+#: app/templates/partials/project_details/manager_setup_summary.html
+#: app/templates/partials/project_details/setup_steps.html
+msgid "Step 5: Finalise Project"
+msgstr "దశ 5: ప్రాజెక్ట్‌ను పూర్తిచేయండి"
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py
+msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
+msgstr "✓ పని విభజన దాటవేయబడింది. మొత్తం AOI ఒకే పనిగా ఉపయోగించబడుతుంది. మీరు దశ 5 కు వెళ్లవచ్చు."
+

@@ -894,7 +894,7 @@ async def submit_geojson_data_extract_htmx(
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
-    """Save GeoJSON data extract to database (Step 2).
+    """Save GeoJSON data extract to database (Step 3).
 
     Entity list creation is deferred to the final project creation step.
     This endpoint only saves the geometry data to the database.
@@ -936,8 +936,8 @@ async def submit_geojson_data_extract_htmx(
         )
 
         saved_message = _(
-            "✓ Data extract successfully saved! You can now proceed to Step 3 "
-            "(upload XLSForm) and then Step 4 (split tasks)."
+            "✓ Data extract successfully saved! You can now proceed to Step 4 "
+            "(split tasks)."
         )
         return Response(
             content=(
@@ -1131,7 +1131,7 @@ async def skip_task_split_htmx(
                 "success",
                 _(
                     "✓ Task splitting skipped. The whole AOI will be used as "
-                    "a single task. You can proceed to Step 4."
+                    "a single task. You can proceed to Step 5."
                 ),
             ),
             media_type="text/html",

@@ -30,6 +30,7 @@ class XLSFormUploadData(BaseModel):
 
     xlsform: Optional[UploadFile] = None
     need_verification_fields: Optional[str] = "true"
+    include_photo_upload: Optional[str] = "true"
     mandatory_photo_upload: Optional[str] = "false"
     use_odk_collect: Optional[str] = "false"
     default_language: Optional[str] = "english"
