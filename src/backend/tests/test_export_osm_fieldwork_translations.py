@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import pytest
 from babel.messages import pofile
 
 LOCALE_DIR = Path(__file__).resolve().parents[1] / "app" / "locales"
@@ -19,7 +20,19 @@ OUTPUT_DIR = (
     / "translations"
     / "locales"
 )
-REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _find_repo_root() -> Path | None:
+    """Walk up from this file to find the repo root (contains Justfile)."""
+    path = Path(__file__).resolve().parent
+    while path != path.parent:
+        if (path / "Justfile").exists():
+            return path
+        path = path.parent
+    return None
+
+
+REPO_ROOT = _find_repo_root()
 PO_TO_LOCALE_LANG = {
     "cs": "cs",
     "en": "en",
@@ -31,6 +44,11 @@ PO_TO_LOCALE_LANG = {
     "pt_br": "pt_br",
     "sw": "sw",
 }
+
+
+_requires_repo = pytest.mark.skipif(
+    REPO_ROOT is None, reason="Repo root not found (running outside source tree)"
+)
 
 
 def run_export_command(*args: str) -> subprocess.CompletedProcess[str]:
@@ -77,12 +95,14 @@ def load_mo_translations(locale_lang: str) -> gettext.GNUTranslations:
         return gettext.GNUTranslations(mo_file)
 
 
+@_requires_repo
 def test_committed_osm_fieldwork_mo_matches_compiled_catalogs() -> None:
     """Packaged osm-fieldwork .mo artifacts should match backend catalogs."""
     result = run_export_command("--check")
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+@_requires_repo
 def test_export_translations_writes_expected_mo_files() -> None:
     """Exporter should copy compiled gettext catalogs that osm-fieldwork consumes."""
     result = run_export_command()

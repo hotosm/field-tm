@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: id\n"
@@ -42,15 +42,15 @@ msgstr "Proyek tidak ditemukan."
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "ID proyek tidak cocok. Anda tidak memiliki akses ke proyek ini."
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Formulir berhasil divalidasi dan diunggah! Memuat ulang halaman..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Terjadi kesalahan yang tidak terduga"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "Kesalahan"
 
@@ -124,12 +124,12 @@ msgstr "Proyek (%(project_id)s) tidak ditemukan."
 msgid "Only the project manager can delete this project."
 msgstr "Hanya manajer proyek yang dapat menghapus proyek ini."
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Kesalahan: %(error_msg)s"
@@ -268,8 +268,8 @@ msgid "from this project?"
 msgstr "dari proyek ini?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "Batal"
 
@@ -290,9 +290,9 @@ msgid "No collaborators yet."
 msgstr "Belum ada kolaborator."
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Nama pengguna"
@@ -328,11 +328,11 @@ msgstr "Gagal memperbarui kolaborator: %(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "Penyegaran kolaborator gagal: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "Proyek tidak ditemukan atau akses ditolak."
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -342,15 +342,15 @@ msgstr ""
 "Jika masih berlanjut, kirimkan rincian teknis di bawah ini kepada "
 "administrator instans atau tim dukungan Anda."
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "Data GeoJSON dalam permintaan tidak valid. Silakan coba unggah lagi."
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "Kesalahan saat membaca data GeoJSON dari permintaan."
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -359,7 +359,7 @@ msgstr ""
 "Luas area adalah %(area_km2)s km², melebihi batas %(area_limit)s km². "
 "Silakan pilih area yang lebih kecil."
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -369,21 +369,29 @@ msgstr ""
 "mungkin membutuhkan waktu lebih lama untuk diproses. API ekstrak data "
 "dibatasi hingga 200 km²."
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "AOI Proyek"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "Ekstrak Data (%(data_feature_count)s fitur)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "Batas Tugas (%(task_count)s tugas)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "ID Tugas"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "Jumlah Bangunan"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -391,7 +399,7 @@ msgstr ""
 "Tidak ditemukan batas tugas. Silakan bagi proyek menjadi tugas terlebih "
 "dahulu menggunakan tombol \"Split AOI\" di atas."
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -400,7 +408,7 @@ msgstr ""
 "✓ AOI berhasil dibagi! Menghasilkan %(task_count)s area tugas menggunakan"
 " %(algorithm)s."
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -413,16 +421,16 @@ msgstr ""
 "menyimpan. Jika tidak, sesuaikan parameter di atas dan klik \"Split "
 "Again\" untuk membuat ulang."
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "Ekstrak Data"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "Data OSM berhasil diunduh! Ditemukan %(feature_count)s fitur."
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -433,21 +441,21 @@ msgstr ""
 "bawah. Jika sesuai, klik \"Accept Data Extract\" untuk menyimpan. Jika "
 "tidak, coba unduh lagi dengan parameter berbeda."
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Jenis file tidak valid. Silakan unggah file .geojson atau .json."
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "Tidak ditemukan geometri yang valid di GeoJSON."
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON berhasil diunggah! Ditemukan %(feature_count)s fitur."
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -458,7 +466,7 @@ msgstr ""
 "bawah. Jika sesuai, klik \"Accept Data Extract\" untuk menyimpan. Jika "
 "tidak, coba unggah file lain."
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -466,12 +474,12 @@ msgstr ""
 "Tidak ditemukan data GeoJSON. Silakan unduh data OSM atau unggah file "
 "GeoJSON terlebih dahulu."
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "Ekstrak Data (%(feature_count)s fitur)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -480,7 +488,7 @@ msgstr ""
 "Menampilkan pratinjau %(feature_count)s fitur data di peta. Tinjau data, "
 "lalu lanjutkan ke langkah berikutnya."
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -488,15 +496,13 @@ msgstr ""
 "✓ Mode kumpulkan data baru dipilih. Pembagian tugas dilewati dan Anda "
 "dapat melanjutkan."
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
 msgstr ""
-"✓ Ekstrak data berhasil disimpan! Sekarang Anda dapat melanjutkan ke "
-"Langkah 3 (unggah XLSForm) lalu Langkah 4 (bagi tugas)."
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -504,7 +510,7 @@ msgstr ""
 "Tidak ditemukan ekstrak data. Silakan unduh data OSM atau unggah file "
 "GeoJSON terlebih dahulu."
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -514,7 +520,7 @@ msgstr ""
 "%(data_feature_count)s fitur data. Seluruh AOI akan digunakan sebagai "
 "satu tugas."
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -523,35 +529,35 @@ msgstr ""
 "Menampilkan pratinjau %(task_count)s batas tugas dan "
 "%(data_feature_count)s fitur data bersama-sama."
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Batas proyek tidak ditemukan. Tidak dapat melewati pembagian tugas."
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
+"You can proceed to Step 5."
 msgstr ""
 "✓ Pembagian tugas dilewati. Seluruh AOI akan digunakan sebagai satu "
-"tugas. Anda dapat melanjutkan ke Langkah 4."
+"tugas. Anda dapat melanjutkan ke Langkah 5."
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "Silakan pilih opsi pembagian."
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Pembagian tugas tidak diperlukan untuk pengaturan proyek ini."
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "Tidak ada ekstrak data yang diberikan."
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "Format ekstrak data tidak valid."
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
@@ -560,20 +566,20 @@ msgstr ""
 "✓ Ekstrak data diterima! %(feature_count)s fitur disimpan. Langkah 2 "
 "sekarang selesai."
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "Tidak ada data area tugas yang diberikan."
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "Format data area tugas tidak valid."
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Tugas yang dibagi berhasil disimpan"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -581,11 +587,11 @@ msgstr ""
 "Berikan URL ODK, nama pengguna, dan kata sandi (ketiganya), atau biarkan "
 "kosong untuk menggunakan bawaan server."
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON diperlukan"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "Tidak ditemukan geometri poligon. Area proyek harus berupa poligon."
 
@@ -1037,10 +1043,10 @@ msgstr ""
 " km²."
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "Konfigurasi Lanjutan"
 
@@ -1080,7 +1086,7 @@ msgstr "Format GeoJSON tidak valid. Periksa file Anda."
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "File GeoJSON tidak valid. Periksa format file."
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
@@ -1088,11 +1094,11 @@ msgstr ""
 "Anda harus menggambar atau mengunggah Area of Interest (AOI) di peta "
 "sebelum mengirimkan."
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Proyek dengan nama ini sudah ada. Silakan pilih nama lain."
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "Deskripsi wajib diisi."
 
@@ -1201,9 +1207,9 @@ msgstr "URL dasar instans QFieldCloud Anda (tanpa /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Kata sandi"
@@ -1251,32 +1257,32 @@ msgid "Project Location"
 msgstr "Lokasi Proyek"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "Langkah 1: Unggah XLSForm"
+msgid "Step 2: Upload XLSForm"
+msgstr "Langkah 2: Unggah XLSForm"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "Selesai"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "Langkah 2: Ambil Data"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "Langkah 3: Ambil Data"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "Langkah 3: Bagi Menjadi Tugas"
+msgid "Step 4: Split into Tasks"
+msgstr "Langkah 4: Bagi Menjadi Tugas"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "Langkah 4: Finalisasi Proyek"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "Langkah 5: Finalisasi Proyek"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1302,11 +1308,11 @@ msgid "Project Setup"
 msgstr "Penyiapan Proyek"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "Langkah 1: Pilih Formulir Survei"
+msgid "Step 2: Select Survey Form"
+msgstr "Langkah 2: Pilih Formulir Survei"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "Pilih jenis survei dan lanjutkan dengan setelan bawaan yang disarankan."
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1317,7 +1323,25 @@ msgstr "Pilih Jenis Survei:"
 msgid "Loading survey types..."
 msgstr "Memuat jenis survei..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "Atau gunakan formulir Anda sendiri sebagai gantinya:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "Unggah Formulir Kustom"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
@@ -1325,177 +1349,190 @@ msgstr ""
 "Setelan bawaan yang disarankan aktif untuk proyek ODK, termasuk "
 "kompatibilitas ODK Collect."
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "Setelan bawaan yang disarankan aktif untuk proyek %(app_name)s."
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "Setelan bawaan yang disarankan aktif untuk proyek ini."
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "Unggah XLSForm khusus atau sesuaikan opsi pemrosesan formulir."
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "Unggah Formulir Kustom"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "Jadikan unggahan foto wajib"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "Bahasa Bawaan:"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "Inggris"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "Prancis"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "Portugis"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "Swahili"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "Hindi"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "Lanjutkan"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ Formulir survei berhasil diunggah"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "Unduh data OSM yang direkomendasikan untuk formulir survei Anda."
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "Tinjau data di peta, lalu lanjutkan."
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "Unduh Data OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "Kumpulkan Data Baru Saja"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "Gunakan masukan data khusus atau timpa opsi unduhan OSM bawaan."
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "Kategori OSM:"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "Bangunan OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "Jalan OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "Kesehatan OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "Toilet OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "Religi OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "Tata Guna Lahan OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "Jalur Air OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "Titik Air OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "Pembuangan Sampah OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "Pendidikan OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "Pemakaman OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "Fasilitas OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "Jenis Geometri:"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "Poligon"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "Polilin"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "Titik"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "Gunakan centroid"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "Unggah GeoJSON Kustom"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Membuat ekstrak data OSM... Ini mungkin memerlukan beberapa saat."
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "Ekstrak data OSM siap"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "Langkah 3: Bagi Menjadi Tugas (Opsional)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ Pembagian tugas tidak relevan tanpa data yang sudah ada"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1507,143 +1544,148 @@ msgstr ""
 "dan parameter, lalu bagi. Tinjau pratinjau, lalu klik \"Accept Task "
 "Areas\" untuk menyimpan. Atau klik"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "Lewati"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "untuk menggunakan seluruh AOI sebagai satu tugas."
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr ""
 "Pilih fitur linear mana yang memengaruhi pembagian tugas berbasis "
 "bangunan."
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "Sertakan jalan"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "Sertakan sungai"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "Sertakan rel kereta"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "Sertakan jalur udara"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "Algoritma:"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "Pilih opsi pembagian..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "Bagi Berdasarkan Kotak"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "Rata-rata Bangunan v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "Rata-rata Bangunan v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "Bagi Berdasarkan Jumlah Tugas Tertentu (Segera Hadir)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "Rata-rata Bangunan per Tugas:"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "Dimensi (meter):"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "Bagi Lagi"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "Bagi AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "Membagi AOI menjadi tugas... Ini mungkin memerlukan beberapa saat."
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "Siap"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "Semua prasyarat telah lengkap! Buat proyek di alat pemetaan pilihan Anda."
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "Finalisasi Proyek"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "Konfirmasi Finalisasi Proyek"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "Apakah Anda yakin ingin memfinalisasi proyek ini?"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "Konfirmasi & Finalisasi"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "Kredensial Kustom"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "Uji Kredensial"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "Simpan & Lanjutkan"
 
@@ -1891,74 +1933,60 @@ msgstr "Terima Pilihan Tugas"
 #~ " admin to manage the project."
 #~ msgstr ""
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ Ekstrak data berhasil disimpan! "
+#~ "Sekarang Anda dapat melanjutkan ke "
+#~ "Langkah 3 (unggah XLSForm) lalu Langkah"
+#~ " 4 (bagi tugas)."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ Pembagian tugas dilewati. Seluruh AOI"
+#~ " akan digunakan sebagai satu tugas. "
+#~ "Anda dapat melanjutkan ke Langkah 4."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "Langkah 1: Unggah XLSForm"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "Langkah 2: Ambil Data"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "Langkah 3: Bagi Menjadi Tugas"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "Langkah 4: Finalisasi Proyek"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "Langkah 1: Pilih Formulir Survei"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "Atau gunakan formulir Anda sendiri sebagai gantinya:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "Pilih jenis survei dan lanjutkan dengan setelan bawaan yang disarankan."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Pilih jenis survei dan lanjutkan dengan setelan bawaan yang disarankan."
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "Unggah XLSForm khusus atau sesuaikan opsi pemrosesan formulir."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "Unggah Formulir Kustom"
+#~ msgid "Upload Custom Form"
+#~ msgstr "Unggah Formulir Kustom"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "Jadikan unggahan foto wajib"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "Langkah 2: Pilih Formulir Survei"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "Langkah 2: Unggah XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "Langkah 3: Ambil Data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "Langkah 4: Bagi Menjadi Tugas"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "Langkah 5: Finalisasi Proyek"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ Pembagian tugas dilewati. Seluruh AOI akan digunakan sebagai satu tugas. Anda dapat melanjutkan ke Langkah 5."
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sw\n"
@@ -42,15 +42,15 @@ msgstr "Mradi haujapatikana."
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "Kitambulisho cha mradi hakilingani. Huna ruhusa ya kufikia mradi huu."
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Fomu imethibitishwa na kupakiwa kwa mafanikio! Ukurasa unapakiwa upya..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Hitilafu isiyotarajiwa imetokea"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "Hitilafu"
 
@@ -126,12 +126,12 @@ msgstr "Mradi (%(project_id)s) haujapatikana."
 msgid "Only the project manager can delete this project."
 msgstr "Ni msimamizi wa mradi pekee anayeweza kufuta mradi huu."
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Hitilafu: %(error_msg)s"
@@ -269,8 +269,8 @@ msgid "from this project?"
 msgstr "kutoka kwenye mradi huu?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "Ghairi"
 
@@ -291,9 +291,9 @@ msgid "No collaborators yet."
 msgstr "Bado hakuna washiriki."
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Jina la mtumiaji"
@@ -329,11 +329,11 @@ msgstr "Imeshindikana kusasisha mshiriki: %(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "Usasishaji wa washiriki umeshindikana: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "Mradi haujapatikana au ruhusa imekataliwa."
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -343,15 +343,15 @@ msgstr ""
 " ujaribu tena. Iwapo tatizo litaendelea, tuma maelezo ya kiufundi hapa "
 "chini kwa msimamizi wa mfumo wako au timu ya msaada."
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "Data ya GeoJSON si halali kwenye ombi. Tafadhali jaribu kupakia tena."
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "Hitilafu wakati wa kusoma data ya GeoJSON kutoka kwenye ombi."
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -360,7 +360,7 @@ msgstr ""
 "Eneo ni %(area_km2)s km², ambalo limezidi kikomo cha %(area_limit)s km². "
 "Tafadhali chagua eneo dogo zaidi."
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -370,21 +370,29 @@ msgstr ""
 "kuchukua muda mrefu kuchakatwa. API ya uchotaji data imewekewa kikomo cha"
 " 200 km²."
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "AOI ya mradi"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "Dondoo la data (%(data_feature_count)s vipengele)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "Mipaka ya kazi (%(task_count)s kazi)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "Kitambulisho cha jukumu"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "Idadi ya majengo"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -392,7 +400,7 @@ msgstr ""
 "Hakuna mipaka ya kazi iliyopatikana. Tafadhali gawanya mradi katika kazi "
 "kwanza kwa kutumia kitufe cha \"Gawanya AOI\" hapo juu."
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -401,7 +409,7 @@ msgstr ""
 "✓ AOI imegawanywa kwa mafanikio! Maeneo ya kazi %(task_count)s "
 "yamezalishwa kwa kutumia %(algorithm)s."
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -414,18 +422,18 @@ msgstr ""
 "Ukiridhika, bofya \"Kubali machaguo ya kazi\" kuhifadhi. Vinginevyo, "
 "rekebisha vigezo hapo juu na ubofye \"Gawanya tena\" ili kuzalisha upya."
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "Dondoo la data"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr ""
 "Data ya OSM imepakuliwa kwa mafanikio! Vipengele %(feature_count)s "
 "vimepatikana."
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -436,23 +444,23 @@ msgstr ""
 "data hapa chini. Ukiridhika, bofya \"Kubali dondoo la data\" kuhifadhi. "
 "Vinginevyo, jaribu kupakua tena kwa vigezo tofauti."
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Aina ya faili si sahihi. Tafadhali pakia faili la .geojson au .json."
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "Hakuna jiometri halali zilizopatikana kwenye GeoJSON."
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr ""
 "✓ GeoJSON imepakiwa kwa mafanikio! Vipengele %(feature_count)s "
 "vimepatikana."
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -463,7 +471,7 @@ msgstr ""
 "data hapa chini. Ukiridhika, bofya \"Kubali dondoo la data\" kuhifadhi. "
 "Vinginevyo, jaribu kupakia faili tofauti."
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -471,12 +479,12 @@ msgstr ""
 "Hakuna data ya GeoJSON iliyopatikana. Tafadhali pakua data ya OSM au "
 "pakia faili la GeoJSON kwanza."
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "Dondoo la data (%(feature_count)s vipengele)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -485,7 +493,7 @@ msgstr ""
 "Inaonyesha hakikisho la vipengele vya data %(feature_count)s kwenye "
 "ramani. Kagua data, kisha endelea kwenye hatua inayofuata."
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -493,15 +501,13 @@ msgstr ""
 "✓ Hali ya kukusanya data mpya imechaguliwa. Mgawanyo wa kazi umerukwa na "
 "unaweza kuendelea."
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
 msgstr ""
-"✓ Dondoo la data limehifadhiwa kwa mafanikio! Sasa unaweza kuendelea na "
-"Hatua ya 3 (pakia XLSForm) kisha Hatua ya 4 (gawanya kazi)."
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -509,7 +515,7 @@ msgstr ""
 "Hakuna dondoo la data lililopatikana. Tafadhali pakua data ya OSM au "
 "pakia faili la GeoJSON kwanza."
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -518,7 +524,7 @@ msgstr ""
 "Inaonyesha hakikisho la AOI yote (bila kugawanya) lenye vipengele vya "
 "data %(data_feature_count)s. AOI yote itatumika kama kazi moja."
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -527,35 +533,35 @@ msgstr ""
 "Inaonyesha hakikisho la mipaka ya kazi %(task_count)s na vipengele vya "
 "data %(data_feature_count)s pamoja."
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Muhtasari wa mradi haukupatikana. Haiwezekani kuruka mgawanyo wa kazi."
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
+"You can proceed to Step 5."
 msgstr ""
 "✓ Mgawanyo wa kazi umerukwa. AOI yote itatumika kama kazi moja. Unaweza "
-"kuendelea hadi Hatua ya 4."
+"kuendelea hadi Hatua ya 5."
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "Tafadhali chagua chaguo la mgawanyo."
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Mgawanyo wa kazi hauhitajiki kwa mpangilio huu wa mradi."
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "Hakuna dondoo la data lililotolewa."
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "Muundo wa dondoo la data si sahihi."
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
@@ -564,20 +570,20 @@ msgstr ""
 "✓ Dondoo la data limekubaliwa! Vipengele %(feature_count)s vimehifadhiwa."
 " Hatua ya 2 sasa imekamilika."
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "Hakuna data ya maeneo ya kazi iliyotolewa."
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "Muundo wa data ya maeneo ya kazi si sahihi."
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Kazi zilizogawanywa zimehifadhiwa kwa mafanikio"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -585,11 +591,11 @@ msgstr ""
 "Toa URL ya ODK, jina la mtumiaji, na nywila (zote 3), au ziache zote wazi"
 " ili kutumia chaguo-msingi za seva."
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON inahitajika"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr ""
 "Hakuna jiometri za poligoni zilizopatikana. Eneo la mradi lazima liwe "
@@ -1049,10 +1055,10 @@ msgstr ""
 "200 km²."
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "Usanidi wa hali ya juu"
 
@@ -1092,7 +1098,7 @@ msgstr "Muundo wa GeoJSON si sahihi. Tafadhali angalia faili lako."
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "Faili la GeoJSON si sahihi. Tafadhali angalia muundo wa faili."
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
@@ -1100,11 +1106,11 @@ msgstr ""
 "Lazima uchore au upakie Area of Interest (AOI) kwenye ramani kabla ya "
 "kuwasilisha."
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Mradi wenye jina hili tayari upo. Tafadhali chagua jina tofauti."
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "Maelezo yanahitajika."
 
@@ -1211,9 +1217,9 @@ msgstr "URL ya msingi ya instance yako ya QFieldCloud (bila /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Nywila"
@@ -1261,32 +1267,32 @@ msgid "Project Location"
 msgstr "Mahali pa mradi"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "Hatua ya 1: Pakia XLSForm"
+msgid "Step 2: Upload XLSForm"
+msgstr "Hatua ya 2: Pakia XLSForm"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "Imekamilika"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "Hatua ya 2: Pata data"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "Hatua ya 3: Pata data"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "Hatua ya 3: Gawanya katika kazi"
+msgid "Step 4: Split into Tasks"
+msgstr "Hatua ya 4: Gawanya katika kazi"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "Hatua ya 4: Kamilisha mradi"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "Hatua ya 5: Kamilisha mradi"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1312,11 +1318,11 @@ msgid "Project Setup"
 msgstr "Usanidi wa mradi"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "Hatua ya 1: Chagua fomu ya utafiti"
+msgid "Step 2: Select Survey Form"
+msgstr "Hatua ya 2: Chagua fomu ya utafiti"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "Chagua aina ya utafiti na uendelee kwa chaguo-msingi yanayopendekezwa."
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1327,7 +1333,25 @@ msgstr "Chagua aina ya utafiti:"
 msgid "Loading survey types..."
 msgstr "Aina za utafiti zinapakiwa..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "Au tumia fomu yako mwenyewe badala yake:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "Pakia fomu maalum"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
@@ -1335,177 +1359,190 @@ msgstr ""
 "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya ODK, ikiwa ni"
 " pamoja na uoanifu wa ODK Collect."
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya %(app_name)s."
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa mradi huu."
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "Pakia XLSForm maalum au rekebisha chaguo za uchakataji wa fomu."
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "Pakia fomu maalum"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "Fanya upakiaji wa picha kuwa wa lazima"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "Lugha ya msingi:"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "Kiingereza"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "Kihispania"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "Kifaransa"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "Kireno"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "Kiswahili"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "Kihindi"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "Endelea"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ Fomu ya utafiti imepakiwa kwa mafanikio"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "Pakua data ya OSM inayopendekezwa kwa fomu yako ya utafiti."
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "Kagua data kwenye ramani, kisha endelea."
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "Pakua data ya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "Kusanya data mpya pekee"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "Tumia data maalum au ubadilishe chaguo-msingi za upakuaji wa OSM."
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "Kategoria ya OSM:"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "Majengo ya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "Barabara za OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "Huduma za afya za OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "Vyoo vya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "Kidini cha OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "Matumizi ya ardhi ya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "Njia za maji za OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "Vyanzo vya maji vya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "Utupaji taka wa OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "Elimu ya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "Makaburi ya OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "Huduma za OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "Aina ya jiometri:"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "Poligoni"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "Polilaini"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "Nukta"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "Tumia centrodi"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "Pakia GeoJSON maalum"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Inazalisha dondoo la data ya OSM... Hii inaweza kuchukua muda kidogo."
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "Dondoo la data ya OSM liko tayari"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "Hatua ya 3: Gawanya katika kazi (hiari)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ Ugawaji wa kazi hauhitajiki bila data iliyopo"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1517,88 +1554,93 @@ msgstr ""
 "algoriti na vigezo, kisha gawanya. Kagua hakikisho na ubofye \"Kubali "
 "maeneo ya kazi\" ili kuhifadhi. Au bofya"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "Ruka"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "ili kutumia AOI yote kama kazi moja."
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr ""
 "Chagua vipengele vya mistari vinavyoathiri ugawaji wa kazi unaotegemea "
 "majengo."
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "Jumuisha barabara"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "Jumuisha mito"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "Jumuisha reli"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "Jumuisha njia za ndege"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "Algoriti:"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "Chagua chaguo la ugawaji..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "Gawanya kwa mraba"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "Wastani wa majengo v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "Wastani wa majengo v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "Gawanya kwa idadi maalum ya kazi (inakuja hivi karibuni)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "Wastani wa majengo kwa kazi:"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "Kipimo (mita):"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "Gawanya tena"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "Gawanya AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "Inagawanya AOI katika kazi... Hii inaweza kuchukua muda kidogo."
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "Tayari"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
@@ -1606,56 +1648,56 @@ msgstr ""
 "Masharti yote ya awali yamekamilika! Unda mradi katika zana yako "
 "uliyochagua ya uchoraji ramani."
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "Kamilisha mradi"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "Thibitisha ukamilishaji wa mradi"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "Una uhakika unataka kukamilisha mradi huu?"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "Thibitisha na ukamilishe"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "Taarifa maalum za uthibitishaji"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "URL ya ODK Central"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "URL ya QField Cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "Jaribu taarifa za uthibitishaji"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "Hifadhi na uendelee"
 
@@ -1896,74 +1938,60 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Kubali machaguo ya kazi"
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ Dondoo la data limehifadhiwa kwa "
+#~ "mafanikio! Sasa unaweza kuendelea na "
+#~ "Hatua ya 3 (pakia XLSForm) kisha "
+#~ "Hatua ya 4 (gawanya kazi)."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ Mgawanyo wa kazi umerukwa. AOI "
+#~ "yote itatumika kama kazi moja. Unaweza"
+#~ " kuendelea hadi Hatua ya 4."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "Hatua ya 1: Pakia XLSForm"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "Hatua ya 2: Pata data"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "Hatua ya 3: Gawanya katika kazi"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "Hatua ya 4: Kamilisha mradi"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "Hatua ya 1: Chagua fomu ya utafiti"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "Au tumia fomu yako mwenyewe badala yake:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "Chagua aina ya utafiti na uendelee kwa chaguo-msingi yanayopendekezwa."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Chagua aina ya utafiti na uendelee kwa chaguo-msingi yanayopendekezwa."
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "Pakia XLSForm maalum au rekebisha chaguo za uchakataji wa fomu."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "Pakia fomu maalum"
+#~ msgid "Upload Custom Form"
+#~ msgstr "Pakia fomu maalum"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "Fanya upakiaji wa picha kuwa wa lazima"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "Hatua ya 2: Chagua fomu ya utafiti"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "Hatua ya 2: Pakia XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "Hatua ya 3: Pata data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "Hatua ya 4: Gawanya katika kazi"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "Hatua ya 5: Kamilisha mradi"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ Mgawanyo wa kazi umerukwa. AOI yote itatumika kama kazi moja. Unaweza kuendelea hadi Hatua ya 5."
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

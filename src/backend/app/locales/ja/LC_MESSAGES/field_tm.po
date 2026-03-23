@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -42,15 +42,15 @@ msgstr "プロジェクトが見つかりません。"
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "プロジェクト ID が一致しません。このプロジェクトにアクセスする権限がありません。"
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "フォームの検証とアップロードに成功しました。ページを再読み込みしています..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "予期しないエラーが発生しました"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "エラー"
 
@@ -120,12 +120,12 @@ msgstr "プロジェクト (%(project_id)s) が見つかりません。"
 msgid "Only the project manager can delete this project."
 msgstr "このプロジェクトを削除できるのはプロジェクト管理者のみです。"
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "エラー: %(error_msg)s"
@@ -263,8 +263,8 @@ msgid "from this project?"
 msgstr "をこのプロジェクトから削除しますか？"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -285,9 +285,9 @@ msgid "No collaborators yet."
 msgstr "まだ共同作業者はいません。"
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "ユーザー名"
@@ -323,33 +323,33 @@ msgstr "共同作業者の更新に失敗しました: %(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "共同作業者の再読み込みに失敗しました: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "プロジェクトが見つからないか、アクセスが拒否されました。"
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
 "administrator or support team."
 msgstr "プロジェクトの最終確定に失敗しました。設定を確認して再試行してください。問題が続く場合は、以下の技術的な詳細をインスタンス管理者またはサポートチームに送ってください。"
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "リクエスト内の GeoJSON データが無効です。もう一度アップロードしてください。"
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "リクエストから GeoJSON データを読み取る際にエラーが発生しました。"
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
 "Please select a smaller area."
 msgstr "面積は %(area_km2)s km² で、上限 %(area_limit)s km² を超えています。より小さい範囲を選択してください。"
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -358,34 +358,42 @@ msgstr ""
 "面積は %(area_km2)s km² です。広い範囲 (>%(area_warn)s km²) は処理に時間がかかる場合があります。データ抽出"
 " API は 200 km² に制限されています。"
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "プロジェクト AOI"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "データ抽出 (%(data_feature_count)s 件の要素)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "タスク境界 (%(task_count)s 件のタスク)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "タスクID"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "建物数"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
 msgstr "タスク境界が見つかりません。まず上の「AOI を分割」ボタンを使ってプロジェクトをタスクに分割してください。"
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
 msgstr "✓ AOI の分割に成功しました。%(algorithm)s を使って %(task_count)s 個のタスク領域を生成しました。"
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -396,16 +404,16 @@ msgstr ""
 "%(task_count)s 個のタスク境界%(data_extract_info)s "
 "をプレビューしています。以下の結果を確認してください。問題なければ「タスク選択を承認」をクリックして保存してください。そうでない場合は上のパラメータを調整し、「再分割」をクリックして再生成してください。"
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "データ抽出"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "OSM データのダウンロードに成功しました。%(feature_count)s 件の要素が見つかりました。"
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -415,21 +423,21 @@ msgstr ""
 "地図上で %(feature_count)s "
 "件の要素をプレビューしています。以下のデータを確認してください。問題なければ「データ抽出を承認」をクリックして保存してください。そうでない場合は、別のパラメータで再度ダウンロードしてください。"
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "無効なファイル形式です。.geojson または .json ファイルをアップロードしてください。"
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "GeoJSON に有効なジオメトリが見つかりません。"
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON のアップロードに成功しました。%(feature_count)s 件の要素が見つかりました。"
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -439,43 +447,43 @@ msgstr ""
 "地図上で %(feature_count)s "
 "件の要素をプレビューしています。以下のデータを確認してください。問題なければ「データ抽出を承認」をクリックして保存してください。そうでない場合は、別のファイルをアップロードしてください。"
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "GeoJSON データが見つかりません。先に OSM データをダウンロードするか GeoJSON ファイルをアップロードしてください。"
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "データ抽出 (%(feature_count)s 件の要素)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
 "continue to the next step."
 msgstr "地図上で %(feature_count)s 件のデータ要素をプレビューしています。データを確認してから次のステップに進んでください。"
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
 msgstr "✓ 新規データ収集モードが選択されました。タスク分割はスキップされ、そのまま続行できます。"
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
-msgstr "✓ データ抽出の保存に成功しました。次にステップ 3 (XLSForm のアップロード)、その後ステップ 4 (タスク分割) に進めます。"
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "データ抽出が見つかりません。先に OSM データをダウンロードするか GeoJSON ファイルをアップロードしてください。"
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -484,70 +492,70 @@ msgstr ""
 "%(data_feature_count)s 件のデータ要素を含む AOI 全体 (分割なし) をプレビューしています。AOI 全体が 1 "
 "つのタスクとして使用されます。"
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
 " features together."
 msgstr "%(task_count)s 個のタスク境界と %(data_feature_count)s 件のデータ要素をあわせてプレビューしています。"
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "プロジェクトの外形が見つかりません。タスク分割をスキップできません。"
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
-msgstr "✓ タスク分割をスキップしました。AOI 全体が 1 つのタスクとして使用されます。ステップ 4 に進めます。"
+"You can proceed to Step 5."
+msgstr "✓ タスク分割をスキップしました。AOI 全体が 1 つのタスクとして使用されます。ステップ 5 に進めます。"
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "分割オプションを選択してください。"
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ このプロジェクト設定ではタスク分割は不要です。"
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "データ抽出が指定されていません。"
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "無効なデータ抽出形式です。"
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
 "complete."
 msgstr "✓ データ抽出を承認しました。%(feature_count)s 件の要素を保存しました。ステップ 2 は完了です。"
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "タスク領域データが指定されていません。"
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "無効なタスク領域データ形式です。"
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ 分割タスクを正常に保存しました"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
 msgstr "ODK の URL、ユーザー名、パスワード (3 つすべて) を指定するか、サーバー既定値を使うためにすべて空欄のままにしてください。"
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON は必須です"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "ポリゴンのジオメトリが見つかりません。プロジェクト領域はポリゴンである必要があります。"
 
@@ -975,10 +983,10 @@ msgstr ""
 " km² です。100 km² を超える領域では警告が表示されます。OSM データ抽出 API は 200 km² に制限されています。"
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "詳細設定"
 
@@ -1016,17 +1024,17 @@ msgstr "無効な GeoJSON 形式です。ファイルを確認してください
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "無効な GeoJSON ファイルです。ファイル形式を確認してください。"
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
 msgstr "送信前に地図上で関心領域 (AOI) を描画するかアップロードする必要があります。"
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "この名前のプロジェクトはすでに存在します。別の名前を選択してください。"
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "説明は必須です。"
 
@@ -1129,9 +1137,9 @@ msgstr "QFieldCloud インスタンスのベース URL (/api/v1 を除く)。"
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "パスワード"
@@ -1177,32 +1185,32 @@ msgid "Project Location"
 msgstr "プロジェクト場所"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "ステップ 1: XLSForm をアップロード"
+msgid "Step 2: Upload XLSForm"
+msgstr "ステップ 2: XLSForm をアップロード"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "完了"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "ステップ 2: データ取得"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "ステップ 3: データ取得"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "ステップ 3: タスクに分割"
+msgid "Step 4: Split into Tasks"
+msgstr "ステップ 4: タスクに分割"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "ステップ 4: プロジェクトを確定"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "ステップ 5: プロジェクトを確定"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1227,11 +1235,11 @@ msgid "Project Setup"
 msgstr "プロジェクト設定"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "ステップ 1: 調査フォームを選択"
+msgid "Step 2: Select Survey Form"
+msgstr "ステップ 2: 調査フォームを選択"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "調査タイプを選択し、推奨デフォルト設定で続行します。"
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1242,183 +1250,214 @@ msgstr "調査タイプを選択:"
 msgid "Loading survey types..."
 msgstr "調査タイプを読み込み中..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "または代わりに独自のフォームを使用:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "カスタムフォームをアップロード"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
 msgstr "ODK Collect との互換性を含む、ODK プロジェクト向けの推奨デフォルト設定が有効です。"
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "%(app_name)s プロジェクト向けの推奨デフォルト設定が有効です。"
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "このプロジェクト向けの推奨デフォルト設定が有効です。"
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "カスタム XLSForm をアップロードするか、フォーム処理オプションを調整してください。"
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "カスタムフォームをアップロード"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "写真アップロードを必須にする"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "既定の言語:"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "英語"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "フランス語"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "ポルトガル語"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "スワヒリ語"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "ヒンディー語"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "続行"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ 調査フォームのアップロードに成功しました"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "調査フォームに推奨される OSM データをダウンロードします。"
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "地図上のデータを確認してから続行してください。"
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "OSM データをダウンロード"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "新規データのみ収集"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "カスタムデータ入力を使用するか、既定の OSM ダウンロード設定を上書きします。"
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "OSM カテゴリ:"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "OSM 建物"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "OSM 道路"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "OSM 医療"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "OSM トイレ"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "OSM 宗教施設"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "OSM 土地利用"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "OSM 水路"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "OSM 給水地点"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "OSM 廃棄物処理"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "OSM 教育"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "OSM 墓地"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "OSM 施設"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "ジオメトリタイプ:"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "ポリゴン"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "ポリライン"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "ポイント"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "重心を使用"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "カスタム GeoJSON をアップロード"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM データ抽出を生成しています... 少し時間がかかる場合があります。"
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "OSM データ抽出の準備ができました"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "ステップ 3: タスクに分割 (任意)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ 既存データがない場合、タスク分割は不要です"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1429,141 +1468,146 @@ msgstr ""
 "関心領域 (AOI) "
 "を分割してタスク領域を生成します。アルゴリズムとパラメータを選択して分割してください。プレビューを確認し、「タスク領域を承認」をクリックして保存します。または"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "スキップ"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "をクリックして、AOI 全体を 1 つのタスクとして使用します。"
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "建物ベースのタスク分割に影響する線要素を選択してください。"
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "道路を含める"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "河川を含める"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "鉄道を含める"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "航空路を含める"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "アルゴリズム:"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "分割オプションを選択..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "正方形で分割"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "平均建物数 v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "平均建物数 v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "指定したタスク数で分割 (近日対応)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "タスクあたり平均建物数:"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "寸法 (メートル):"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "再分割"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "AOI を分割"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "AOI をタスクへ分割中... 少し時間がかかる場合があります。"
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "準備完了"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "すべての前提条件が整いました。選択したマッピングツールでプロジェクトを作成してください。"
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "プロジェクトを確定"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "プロジェクト確定を確認"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "このプロジェクトを確定してよろしいですか？"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "確認して確定"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "カスタム認証情報"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "ODK Central URL"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "QField Cloud URL"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "認証情報をテスト"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "保存して続行"
 
@@ -1789,74 +1833,53 @@ msgstr "管理者アカウントを自動作成できませんでした。QField
 msgid "Accept Task Choices"
 msgstr "タスク選択を承認"
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr "✓ データ抽出の保存に成功しました。次にステップ 3 (XLSForm のアップロード)、その後ステップ 4 (タスク分割) に進めます。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr "✓ タスク分割をスキップしました。AOI 全体が 1 つのタスクとして使用されます。ステップ 4 に進めます。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "ステップ 1: XLSForm をアップロード"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "ステップ 2: データ取得"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "ステップ 3: タスクに分割"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "ステップ 4: プロジェクトを確定"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "ステップ 1: 調査フォームを選択"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "または代わりに独自のフォームを使用:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "調査タイプを選択し、推奨デフォルト設定で続行します。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "調査タイプを選択し、推奨デフォルト設定で続行します。"
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "カスタム XLSForm をアップロードするか、フォーム処理オプションを調整してください。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "カスタムフォームをアップロード"
+#~ msgid "Upload Custom Form"
+#~ msgstr "カスタムフォームをアップロード"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "写真アップロードを必須にする"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "ステップ 2: 調査フォームを選択"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "ステップ 2: XLSForm をアップロード"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "ステップ 3: データ取得"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "ステップ 4: タスクに分割"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "ステップ 5: プロジェクトを確定"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ タスク分割をスキップしました。AOI 全体が 1 つのタスクとして使用されます。ステップ 5 に進めます。"
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

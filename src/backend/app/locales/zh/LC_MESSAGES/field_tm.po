@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -42,15 +42,15 @@ msgstr "未找到项目。"
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "项目 ID 不匹配。您无权访问此项目。"
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "表单验证并上传成功！正在重新加载页面……"
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "发生意外错误"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "错误"
 
@@ -120,12 +120,12 @@ msgstr "未找到项目（%(project_id)s）。"
 msgid "Only the project manager can delete this project."
 msgstr "只有项目经理可以删除此项目。"
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "错误：%(error_msg)s"
@@ -262,8 +262,8 @@ msgid "from this project?"
 msgstr "从此项目中移除？"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "取消"
 
@@ -284,9 +284,9 @@ msgid "No collaborators yet."
 msgstr "尚无协作者。"
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "用户名"
@@ -322,33 +322,33 @@ msgstr "更新协作者失败：%(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "刷新协作者列表失败：%(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "未找到项目或访问被拒绝。"
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
 "administrator or support team."
 msgstr "项目完成失败。请检查设置后重试。如果问题持续，请将以下技术详情发送给实例管理员或支持团队。"
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "请求中的 GeoJSON 数据无效。请重新上传。"
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "读取请求中的 GeoJSON 数据时出错。"
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
 "Please select a smaller area."
 msgstr "区域面积为 %(area_km2)s 平方公里，超过 %(area_limit)s 平方公里限制。请选择更小的区域。"
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -357,34 +357,42 @@ msgstr ""
 "区域面积为 %(area_km2)s 平方公里。较大区域（>%(area_warn)s 平方公里）可能需要更长处理时间。数据提取 API 限制为 "
 "200 平方公里。"
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "项目 AOI"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "数据提取（%(data_feature_count)s 个要素）"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "任务边界（%(task_count)s 个任务）"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "任务编号"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "建筑物数量"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
 msgstr "未找到任务边界。请先使用上方的“Split AOI”按钮将项目拆分为任务。"
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
 msgstr "✓ AOI 拆分成功！已使用 %(algorithm)s 生成 %(task_count)s 个任务区域。"
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -395,16 +403,16 @@ msgstr ""
 "正在预览 %(task_count)s 个任务边界%(data_extract_info)s。请查看下方结果。如满意，点击“Accept Task"
 " Choices”保存。否则，请调整上方参数并点击“Split Again”重新生成。"
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "数据提取"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "OSM 数据下载成功！找到 %(feature_count)s 个要素。"
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -414,21 +422,21 @@ msgstr ""
 "正在地图上预览 %(feature_count)s 个要素。请查看下方数据。如满意，点击“Accept Data "
 "Extract”保存。否则，请尝试使用不同参数重新下载。"
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "文件类型无效。请上传 .geojson 或 .json 文件。"
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "在 GeoJSON 中未找到有效几何。"
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON 上传成功！找到 %(feature_count)s 个要素。"
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -438,113 +446,113 @@ msgstr ""
 "正在地图上预览 %(feature_count)s 个要素。请查看下方数据。如满意，点击“Accept Data "
 "Extract”保存。否则，请尝试上传其他文件。"
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "未找到 GeoJSON 数据。请先下载 OSM 数据或上传 GeoJSON 文件。"
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "数据提取（%(feature_count)s 个要素）"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
 "continue to the next step."
 msgstr "正在地图上预览 %(feature_count)s 个数据要素。请查看数据，然后继续下一步。"
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
 msgstr "✓ 已选择仅采集新数据模式。任务拆分已跳过，您可以继续。"
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
-msgstr "✓ 数据提取保存成功！现在可以进入步骤 3（上传 XLSForm），然后步骤 4（拆分任务）。"
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "未找到数据提取。请先下载 OSM 数据或上传 GeoJSON 文件。"
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
 "features. The entire AOI will be used as a single task."
 msgstr "正在预览整个 AOI（不拆分），包含 %(data_feature_count)s 个数据要素。整个 AOI 将作为单个任务使用。"
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
 " features together."
 msgstr "正在同时预览 %(task_count)s 个任务边界和 %(data_feature_count)s 个数据要素。"
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "未找到项目轮廓。无法跳过任务拆分。"
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
-msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 4。"
+"You can proceed to Step 5."
+msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 5。"
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "请选择拆分选项。"
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ 此项目设置无需任务拆分。"
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "未提供数据提取。"
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "数据提取格式无效。"
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
 "complete."
 msgstr "✓ 已接受数据提取！已保存 %(feature_count)s 个要素。步骤 2 现已完成。"
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "未提供任务区域数据。"
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "任务区域数据格式无效。"
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ 拆分任务保存成功"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
 msgstr "请提供 ODK URL、用户名和密码（共 3 项），或将其全部留空以使用服务器默认值。"
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "必须提供 GeoJSON"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "未找到多边形几何。项目区域必须是多边形。"
 
@@ -963,10 +971,10 @@ msgstr ""
 "平方公里的区域将显示警告。OSM 数据提取 API 限制为 200 平方公里。"
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "高级配置"
 
@@ -1004,17 +1012,17 @@ msgstr "GeoJSON 格式无效。请检查文件。"
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "GeoJSON 文件无效。请检查文件格式。"
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
 msgstr "提交前，必须在地图上绘制或上传关注区域（AOI）。"
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "已存在同名项目。请选择其他名称。"
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "描述为必填项。"
 
@@ -1117,9 +1125,9 @@ msgstr "您的 QFieldCloud 实例基础 URL（不含 /api/v1）。"
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "密码"
@@ -1165,32 +1173,32 @@ msgid "Project Location"
 msgstr "项目位置"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "步骤 1：上传 XLSForm"
+msgid "Step 2: Upload XLSForm"
+msgstr "步骤 2：上传 XLSForm"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "完成"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "步骤 2：获取数据"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "步骤 3：获取数据"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "步骤 3：拆分任务"
+msgid "Step 4: Split into Tasks"
+msgstr "步骤 4：拆分任务"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "步骤 4：完成项目"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "步骤 5：完成项目"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1213,11 +1221,11 @@ msgid "Project Setup"
 msgstr "项目设置"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "步骤 1：选择调查表单"
+msgid "Step 2: Select Survey Form"
+msgstr "步骤 2：选择调查表单"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "选择调查类型，并使用推荐默认值继续。"
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1228,183 +1236,214 @@ msgstr "选择调查类型："
 msgid "Loading survey types..."
 msgstr "正在加载调查类型……"
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "或改用您自己的表单："
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "上传自定义表单"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
 msgstr "ODK 项目已启用推荐默认设置，包括与 ODK Collect 的兼容性。"
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "%(app_name)s 项目已启用推荐默认设置。"
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "此项目已启用推荐默认设置。"
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "上传自定义 XLSForm 或调整表单处理选项。"
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "上传自定义表单"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "将照片上传设为必填"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "默认语言："
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "英语"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "法语"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "斯瓦希里语"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "印地语"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "继续"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ 调查表单上传成功"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "为您的调查表单下载推荐的 OSM 数据。"
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "在地图上查看数据，然后继续。"
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "下载 OSM 数据"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "仅采集新数据"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "使用自定义数据输入，或覆盖默认的 OSM 下载选项。"
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "OSM 类别："
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "OSM 建筑物"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "OSM 道路"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "OSM 医疗设施"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "OSM 厕所"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "OSM 宗教场所"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "OSM 土地利用"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "OSM 水道"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "OSM 取水点"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "OSM 废弃物处理"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "OSM 教育设施"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "OSM 墓地"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "OSM 生活设施"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "几何类型："
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "多边形"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "折线"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "点"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "使用质心"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "上传自定义 GeoJSON"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "正在生成 OSM 数据提取……这可能需要一点时间。"
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "OSM 数据提取已准备就绪"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "步骤 3：拆分任务（可选）"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ 没有现有数据时，无需进行任务拆分"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1413,141 +1452,146 @@ msgid ""
 "      click"
 msgstr "通过拆分关注区域（AOI）来生成任务区域。选择算法和参数后进行拆分。查看预览，如满意请点击“Accept Task Areas”保存。或者点击"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "跳过"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "以将整个 AOI 作为单个任务使用。"
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "选择哪些线状要素会影响基于建筑物的任务拆分。"
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "包含道路"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "包含河流"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "包含铁路"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "包含航空线路"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "算法："
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "选择拆分选项……"
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "按方格拆分"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "平均建筑数 v1（Voronoi）"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "平均建筑数 v2（Straight Skeleton）"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "按指定任务数量拆分（即将推出）"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "每个任务平均建筑数："
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "尺寸（米）："
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "重新拆分"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "拆分 AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "正在将 AOI 拆分为任务……这可能需要一点时间。"
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "准备就绪"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "所有前置步骤均已完成！请在您选择的制图工具中创建项目。"
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "完成项目"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "确认完成项目"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "您确定要完成此项目吗？"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "确认并完成"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "自定义凭据"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "ODK Central URL"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "QField Cloud URL"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "测试凭据"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "保存并继续"
 
@@ -1769,74 +1813,53 @@ msgstr "无法自动创建管理账户。请以管理员身份登录 QFieldCloud
 msgid "Accept Task Choices"
 msgstr "接受任务选择"
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr "✓ 数据提取保存成功！现在可以进入步骤 3（上传 XLSForm），然后步骤 4（拆分任务）。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 4。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "步骤 1：上传 XLSForm"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "步骤 2：获取数据"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "步骤 3：拆分任务"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "步骤 4：完成项目"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "步骤 1：选择调查表单"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "或改用您自己的表单："
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "选择调查类型，并使用推荐默认值继续。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "选择调查类型，并使用推荐默认值继续。"
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "上传自定义 XLSForm 或调整表单处理选项。"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "上传自定义表单"
+#~ msgid "Upload Custom Form"
+#~ msgstr "上传自定义表单"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "将照片上传设为必填"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "步骤 2：选择调查表单"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "步骤 2：上传 XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "步骤 3：获取数据"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "步骤 4：拆分任务"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "步骤 5：完成项目"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ 已跳过任务拆分。整个 AOI 将作为单个任务使用。您可以进入步骤 5。"
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

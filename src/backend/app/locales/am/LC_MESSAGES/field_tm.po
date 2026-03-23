@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: am\n"
@@ -42,15 +42,15 @@ msgstr "ፕሮጀክቱ አልተገኘም።"
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "የፕሮጀክት መለያ አይዛመድም። ይህን ፕሮጀክት ለመድረስ ፍቃድ የለዎትም።"
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "ቅጹ ተረጋግጦ በተሳካ ሁኔታ ተስቅሏል! ገጹ እንደገና በመጫን ላይ..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "ያልተጠበቀ ስህተት ተከስቷል"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "ስህተት"
 
@@ -120,12 +120,12 @@ msgstr "ፕሮጀክት (%(project_id)s) አልተገኘም።"
 msgid "Only the project manager can delete this project."
 msgstr "ይህን ፕሮጀክት ሊሰርዘው የሚችለው የፕሮጀክት አስተዳዳሪ ብቻ ነው።"
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "ስህተት: %(error_msg)s"
@@ -262,8 +262,8 @@ msgid "from this project?"
 msgstr "ከዚህ ፕሮጀክት?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "ሰርዝ"
 
@@ -284,9 +284,9 @@ msgid "No collaborators yet."
 msgstr "እስካሁን ተባባሪዎች የሉም።"
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "የተጠቃሚ ስም"
@@ -322,11 +322,11 @@ msgstr "ተባባሪ ማዘመን አልተሳካም: %(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "የተባባሪ ማደስ አልተሳካም: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "ፕሮጀክቱ አልተገኘም ወይም መዳረሻ ተከልክሏል።"
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -335,15 +335,15 @@ msgstr ""
 "የፕሮጀክት ማጠናቀቅ አልተሳካም። እባክዎ ቅንብሮችዎን ያረጋግጡ እና እንደገና ይሞክሩ። ችግሩ ከቀጠለ ከታች ያሉትን "
 "ቴክኒክ ዝርዝሮች ለኢንስታንስ አስተዳዳሪዎ ወይም ለድጋፍ ቡድን ይላኩ።"
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "በጥያቄው ውስጥ ያለው GeoJSON ውሂብ ልክ አይደለም። እባክዎ እንደገና ይስቀሉ።"
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "GeoJSON ውሂብን ከጥያቄው ማንበብ ላይ ስህተት ተከስቷል።"
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -352,7 +352,7 @@ msgstr ""
 "አካባቢው %(area_km2)s ኪሜ² ነው፣ ይህም %(area_limit)s ኪሜ² ገደብን ይበልጣል። እባክዎ ከዚህ "
 "ያነሰ አካባቢ ይምረጡ።"
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -361,21 +361,29 @@ msgstr ""
 "አካባቢው %(area_km2)s ኪሜ² ነው። ትልቅ አካባቢዎች (>%(area_warn)s ኪሜ²) ለማቀናበር ረዘም ያለ "
 "ጊዜ ሊወስዱ ይችላሉ። የዳታ ማውጫ API እስከ 200 ኪሜ² ድረስ ብቻ ነው።"
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "የፕሮጀክት AOI"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "የውሂብ ማውጫ (%(data_feature_count)s ባህሪዎች)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "የተግባር ድንበሮች (%(task_count)s ተግባሮች)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "የተግባር መለያ"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "የህንፃ ብዛት"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -383,7 +391,7 @@ msgstr ""
 "ምንም የተግባር ድንበር አልተገኘም። እባክዎ መጀመሪያ ከላይ ያለውን \"Split AOI\" አዝራር በመጠቀም "
 "ፕሮጀክቱን ወደ ተግባሮች ይከፋፍሉ።"
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -392,7 +400,7 @@ msgstr ""
 "✓ AOI በተሳካ ሁኔታ ተከፍሏል! %(algorithm)s በመጠቀም %(task_count)s የተግባር አካባቢዎች "
 "ተፈጥረዋል።"
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -404,16 +412,16 @@ msgstr ""
 "ውጤቶቹን ይመልከቱ። ከተስማሙ ለማስቀመጥ \"Accept Task Choices\" ይጫኑ። አለበለዚያ ከላይ ያሉ "
 "መለኪያዎችን ያስተካክሉ እና እንደገና ለመፍጠር \"Split Again\" ይጫኑ።"
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "የውሂብ ማውጫ"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "የOSM ውሂብ በተሳካ ሁኔታ ወርዷል! %(feature_count)s ባህሪዎች ተገኝተዋል።"
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -424,21 +432,21 @@ msgstr ""
 " ከተስማሙ ለማስቀመጥ \"Accept Data Extract\" ይጫኑ። አለበለዚያ በተለያዩ መለኪያዎች እንደገና "
 "ለማውረድ ይሞክሩ።"
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "የፋይል አይነቱ ልክ አይደለም። እባክዎ .geojson ወይም .json ፋይል ይስቀሉ።"
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "በGeoJSON ውስጥ ምንም ትክክለኛ ጂኦሜትሪ አልተገኘም።"
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON በተሳካ ሁኔታ ተስቅሏል! %(feature_count)s ባህሪዎች ተገኝተዋል።"
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -448,18 +456,18 @@ msgstr ""
 "%(feature_count)s ባህሪዎች በካርታ ላይ ቅድመ እይታ በማሳየት ላይ ናቸው። ከታች ያለውን ውሂብ ይመልከቱ።"
 " ከተስማሙ ለማስቀመጥ \"Accept Data Extract\" ይጫኑ። አለበለዚያ ሌላ ፋይል ለመስቀል ይሞክሩ።"
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "ምንም GeoJSON ውሂብ አልተገኘም። እባክዎ መጀመሪያ የOSM ውሂብ ያውርዱ ወይም GeoJSON ፋይል ይስቀሉ።"
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "የውሂብ ማውጫ (%(feature_count)s ባህሪዎች)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -468,27 +476,25 @@ msgstr ""
 "%(feature_count)s የውሂብ ባህሪዎች በካርታ ላይ ቅድመ እይታ በማሳየት ላይ ናቸው። ውሂቡን ይመልከቱ ከዚያ"
 " ወደሚቀጥለው ደረጃ ይቀጥሉ።"
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
 msgstr "✓ አዲስ-ውሂብ-ሰብስብ ሁኔታ ተመርጧል። የተግባር መከፋፈል ይተወዋል እና መቀጠል ይችላሉ።"
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
 msgstr ""
-"✓ የውሂብ ማውጫ በተሳካ ሁኔታ ተቀምጧል! አሁን ወደ ደረጃ 3 (XLSForm ስቀል) እና ከዚያ ወደ ደረጃ 4 "
-"(ተግባሮችን ከፋፍል) መሄድ ይችላሉ።"
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "ምንም የውሂብ ማውጫ አልተገኘም። እባክዎ መጀመሪያ የOSM ውሂብ ያውርዱ ወይም GeoJSON ፋይል ይስቀሉ።"
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -497,7 +503,7 @@ msgstr ""
 "ሙሉ AOI በ%(data_feature_count)s የውሂብ ባህሪዎች ጋር (ያለ መከፋፈል) ቅድመ እይታ በማሳየት ላይ "
 "ነው። ሙሉ AOI እንደ አንድ ተግባር ይጠቀማል።"
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -506,53 +512,53 @@ msgstr ""
 "%(task_count)s የተግባር ድንበሮችን እና %(data_feature_count)s የውሂብ ባህሪዎችን አብረው "
 "ቅድመ እይታ በማሳየት ላይ ናቸው።"
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "የፕሮጀክት ውጫዊ መስመር አልተገኘም። የተግባር መከፋፈልን መዝለል አይቻልም።"
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
-msgstr "✓ የተግባር መከፋፈል ተዘለለ። ሙሉ AOI እንደ አንድ ተግባር ይጠቀማል። ወደ ደረጃ 4 መቀጠል ይችላሉ።"
+"You can proceed to Step 5."
+msgstr "✓ የተግባር መከፋፈል ተዘለለ። ሙሉ AOI እንደ አንድ ተግባር ይጠቀማል። ወደ ደረጃ 5 መቀጠል ይችላሉ።"
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "እባክዎ የመከፋፈል አማራጭ ይምረጡ።"
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ ለዚህ የፕሮጀክት ቅንብር የተግባር መከፋፈል አያስፈልግም።"
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "ምንም የውሂብ ማውጫ አልተሰጠም።"
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "የውሂብ ማውጫ ቅርጸት ልክ አይደለም።"
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
 "complete."
 msgstr "✓ የውሂብ ማውጫ ተቀባይነት አግኝቷል! %(feature_count)s ባህሪዎች ተቀምጠዋል። ደረጃ 2 አሁን ተጠናቋል።"
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "ምንም የተግባር አካባቢዎች ውሂብ አልተሰጠም።"
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "የተግባር አካባቢዎች ውሂብ ቅርጸት ልክ አይደለም።"
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ የተከፈሉ ተግባሮች በተሳካ ሁኔታ ተቀምጠዋል"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -560,11 +566,11 @@ msgstr ""
 "ODK URL፣ የተጠቃሚ ስም እና የይለፍ ቃል (ሶስቱንም) ያቅርቡ፣ ወይም የአገልጋዩን ነባሪዎች ለመጠቀም ሁሉንም "
 "ባዶ ይተዉ።"
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON ያስፈልጋል"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "ምንም ፖሊጎን ጂኦሜትሪ አልተገኘም። የፕሮጀክት አካባቢ ፖሊጎን መሆን አለበት።"
 
@@ -1002,10 +1008,10 @@ msgstr ""
 "እስከ 200 ኪሜ² ድረስ ብቻ ነው።"
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "የላቀ ቅንብር"
 
@@ -1043,17 +1049,17 @@ msgstr "የGeoJSON ቅርጸት ልክ አይደለም። እባክዎ ፋይል
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "የGeoJSON ፋይል ልክ አይደለም። እባክዎ የፋይሉን ቅርጸት ያረጋግጡ።"
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
 msgstr "ከማስገባትዎ በፊት በካርታው ላይ የፍላጎት አካባቢ (AOI) መሳል ወይም መስቀል አለብዎት።"
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "በዚህ ስም ያለ ፕሮጀክት አስቀድሞ አለ። እባክዎ ሌላ ስም ይምረጡ።"
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "መግለጫ ያስፈልጋል።"
 
@@ -1156,9 +1162,9 @@ msgstr "የQFieldCloud ኢንስታንስዎ መሰረታዊ URL (/api/v1 ሳይ
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "የይለፍ ቃል"
@@ -1204,32 +1210,32 @@ msgid "Project Location"
 msgstr "የፕሮጀክት ቦታ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "ደረጃ 1፡ XLSForm ስቀል"
+msgid "Step 2: Upload XLSForm"
+msgstr "ደረጃ 2፡ XLSForm ስቀል"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "ተጠናቋል"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "ደረጃ 2፡ ውሂብ አግኝ"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "ደረጃ 3፡ ውሂብ አግኝ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "ደረጃ 3፡ ወደ ተግባሮች ከፋፍል"
+msgid "Step 4: Split into Tasks"
+msgstr "ደረጃ 4፡ ወደ ተግባሮች ከፋፍል"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "ደረጃ 4፡ ፕሮጀክት ጨርስ"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "ደረጃ 5፡ ፕሮጀክት ጨርስ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1254,11 +1260,11 @@ msgid "Project Setup"
 msgstr "የፕሮጀክት ቅንብር"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "ደረጃ 1፡ የጥናት ቅጽ ምረጥ"
+msgid "Step 2: Select Survey Form"
+msgstr "ደረጃ 2፡ የጥናት ቅጽ ምረጥ"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "የጥናት አይነት ይምረጡ እና በተመከሩ ነባሪዎች ይቀጥሉ።"
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1269,183 +1275,214 @@ msgstr "የጥናት አይነት ምረጥ፡"
 msgid "Loading survey types..."
 msgstr "የጥናት አይነቶች በመጫን ላይ..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "ወይም በምትኩ የራስዎን ቅጽ ይጠቀሙ:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "ብጁ ቅጽ ስቀል"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
 msgstr "ODK Collect ተኳኋኝነትን ጨምሮ ለODK ፕሮጀክቶች የተመከሩ ነባሪዎች ንቁ ናቸው።"
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "ለ%(app_name)s ፕሮጀክቶች የተመከሩ ነባሪዎች ንቁ ናቸው።"
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "ለዚህ ፕሮጀክት የተመከሩ ነባሪዎች ንቁ ናቸው።"
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "ብጁ XLSForm ይስቀሉ ወይም የቅጽ-አቀናባሪ አማራጮችን ያስተካክሉ።"
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "ብጁ ቅጽ ስቀል"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "የፎቶ መስቀል ግዴታ አድርግ"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "ነባሪ ቋንቋ፡"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "እንግሊዝኛ"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "ስፓኒሽ"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "ፈረንሳይኛ"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "ፖርቱጋልኛ"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "ስዋሂሊ"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "ሂንዲ"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "ቀጥል"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ የጥናት ቅጹ በተሳካ ሁኔታ ተስቅሏል"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "ለጥናት ቅጽዎ የተመከረውን የOSM ውሂብ ያውርዱ።"
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "ውሂቡን በካርታ ላይ ይመልከቱ ከዚያ ይቀጥሉ።"
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "የOSM ውሂብ አውርድ"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "አዲስ ውሂብ ብቻ ሰብስብ"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "ብጁ የውሂብ ግቤቶችን ይጠቀሙ ወይም ነባሪውን የOSM ማውረድ አማራጮች ይተኩ።"
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "የOSM ምድብ፡"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "የOSM ሕንጻዎች"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "የOSM መንገዶች"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "የOSM ጤና አገልግሎት"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "የOSM መጸዳጃ ቤቶች"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "የOSM ሃይማኖታዊ ቦታዎች"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "የOSM የመሬት አጠቃቀም"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "የOSM የውሃ መስመሮች"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "የOSM የውሃ ነጥቦች"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "የOSM ቆሻሻ ማስወገጃ"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "የOSM ትምህርት"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "የOSM መቃብር ቦታዎች"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "የOSM አገልግሎቶች"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "የጂኦሜትሪ አይነት፡"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "ፖሊጎን"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "ፖሊላይን"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "ነጥብ"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "ማእከላዊ ነጥቦችን ተጠቀም"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "ብጁ GeoJSON ስቀል"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "የOSM ውሂብ ማውጫ በመፍጠር ላይ... ይህ ትንሽ ጊዜ ሊወስድ ይችላል።"
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "የOSM ውሂብ ማውጫ ዝግጁ ነው"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "ደረጃ 3፡ ወደ ተግባሮች ከፋፍል (አማራጭ)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ ያለ ነባር ውሂብ የተግባር መከፋፈል ተገቢ አይደለም"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1456,141 +1493,146 @@ msgstr ""
 "የፍላጎት አካባቢን (AOI) በመከፋፈል የተግባር አካባቢዎችን ይፍጠሩ። አልጎርይዝም እና መለኪያዎች ይምረጡ፣ ከዚያ "
 "ይከፋፍሉ። ቅድመ እይታውን ይመልከቱ እና ለማስቀመጥ \"Accept Task Areas\" ይጫኑ። ወይም"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "ዝለል"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "ሙሉ AOIን እንደ አንድ ተግባር ለመጠቀም።"
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "በሕንጻ-መሰረት የተግባር መከፋፈል ላይ ተጽእኖ የሚያደርጉ መስመራዊ ባህሪዎችን ይምረጡ።"
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "መንገዶችን አካትት"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "ወንዞችን አካትት"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "የባቡር መስመሮችን አካትት"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "የአየር መስመሮችን አካትት"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "አልጎርይዝም፡"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "የመከፋፈል አማራጭ ምረጥ..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "በካሬ ከፋፍል"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "አማካይ ሕንጻዎች v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "አማካይ ሕንጻዎች v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "በተወሰነ የተግባር ብዛት ከፋፍል (በቅርብ ጊዜ)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "በአንድ ተግባር አማካይ ሕንጻዎች፡"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "ልኬት (ሜትር)፡"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "እንደገና ከፋፍል"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "AOI ከፋፍል"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "AOIን ወደ ተግባሮች በመከፋፈል ላይ... ይህ ትንሽ ጊዜ ሊወስድ ይችላል።"
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "ዝግጁ"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "ሁሉም ቅድመ ሁኔታዎች ተጠናቀዋል! በመረጡት የካርታ መሳሪያ ውስጥ ፕሮጀክቱን ይፍጠሩ።"
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "ፕሮጀክት ጨርስ"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "የፕሮጀክት ማጠናቀቅን አረጋግጥ"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "ይህን ፕሮጀክት ማጠናቀቅ እንደሚፈልጉ እርግጠኛ ነዎት?"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "አረጋግጥ እና ጨርስ"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "ብጁ ማረጋገጫዎች"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "የODK Central URL"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "የQField Cloud URL"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "ማረጋገጫዎችን ሞክር"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "አስቀምጥ እና ቀጥል"
 
@@ -1824,74 +1866,56 @@ msgstr "የተግባር ምርጫዎችን ተቀበል"
 #~ " admin to manage the project."
 #~ msgstr ""
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ የውሂብ ማውጫ በተሳካ ሁኔታ ተቀምጧል! አሁን "
+#~ "ወደ ደረጃ 3 (XLSForm ስቀል) እና ከዚያ "
+#~ "ወደ ደረጃ 4 (ተግባሮችን ከፋፍል) መሄድ ይችላሉ።"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr "✓ የተግባር መከፋፈል ተዘለለ። ሙሉ AOI እንደ አንድ ተግባር ይጠቀማል። ወደ ደረጃ 4 መቀጠል ይችላሉ።"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "ደረጃ 1፡ XLSForm ስቀል"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "ደረጃ 2፡ ውሂብ አግኝ"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "ደረጃ 3፡ ወደ ተግባሮች ከፋፍል"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "ደረጃ 4፡ ፕሮጀክት ጨርስ"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "ደረጃ 1፡ የጥናት ቅጽ ምረጥ"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "ወይም በምትኩ የራስዎን ቅጽ ይጠቀሙ:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "የጥናት አይነት ይምረጡ እና በተመከሩ ነባሪዎች ይቀጥሉ።"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "የጥናት አይነት ይምረጡ እና በተመከሩ ነባሪዎች ይቀጥሉ።"
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "ብጁ XLSForm ይስቀሉ ወይም የቅጽ-አቀናባሪ አማራጮችን ያስተካክሉ።"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "ብጁ ቅጽ ስቀል"
+#~ msgid "Upload Custom Form"
+#~ msgstr "ብጁ ቅጽ ስቀል"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "የፎቶ መስቀል ግዴታ አድርግ"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "ደረጃ 2፡ የጥናት ቅጽ ምረጥ"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "ደረጃ 2፡ XLSForm ስቀል"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "ደረጃ 3፡ ውሂብ አግኝ"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "ደረጃ 4፡ ወደ ተግባሮች ከፋፍል"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "ደረጃ 5፡ ፕሮጀክት ጨርስ"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ የተግባር መከፋፈል ተዘለለ። ሙሉ AOI እንደ አንድ ተግባር ይጠቀማል። ወደ ደረጃ 5 መቀጠል ይችላሉ።"
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

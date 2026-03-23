@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: yo\n"
@@ -42,17 +42,17 @@ msgstr "A kò rí iṣẹ́ náà."
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "ID iṣẹ́ kò bá mu. O kò ní ààyè sí iṣẹ́ yìí."
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr ""
 "A ti jẹ́rìí fọ́ọ̀mù náà, a sì ti gbé e sókè ní àṣeyọrí! A ń tún ojú-ìwé "
 "náà ṣí..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "Aṣiṣe"
 
@@ -126,12 +126,12 @@ msgstr "A kò rí iṣẹ́ (%(project_id)s)."
 msgid "Only the project manager can delete this project."
 msgstr "Alákóso iṣẹ́ nìkan ló lè pa iṣẹ́ yìí rẹ́."
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Aṣiṣe: %(error_msg)s"
@@ -269,8 +269,8 @@ msgid "from this project?"
 msgstr "kúrò nínú iṣẹ́ yìí?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "Fagilé"
 
@@ -291,9 +291,9 @@ msgid "No collaborators yet."
 msgstr "Kò tíì sí alábàáṣiṣẹ́pọ̀ kankan."
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Orúkọ olumulo"
@@ -329,11 +329,11 @@ msgstr "Àtúnṣe alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "Ìtúnṣe àtòjọ alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "A kò rí iṣẹ́ náà tàbí a kọ ọ́ láàyè."
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -343,15 +343,15 @@ msgstr ""
 " bá a lọ, fi àwọn àlàyé imọ̀ẹ̀rọ tó wà ní isalẹ ranṣẹ́ sí alabojuto "
 "àpẹẹrẹ rẹ tàbí ẹgbẹ́ atilẹyin."
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "Data GeoJSON nínú ìbéèrè kò tọ́. Jọwọ tún gbé e sókè."
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "Aṣiṣe ṣẹlẹ nígbà tí a ń ka data GeoJSON láti inú ìbéèrè."
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -360,7 +360,7 @@ msgstr ""
 "Agbègbè náà jẹ́ %(area_km2)s km², èyí tó ju ààlà %(area_limit)s km² lọ. "
 "Jọwọ yan agbègbè tó kere síi."
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -369,21 +369,29 @@ msgstr ""
 "Agbègbè náà jẹ́ %(area_km2)s km². Àwọn agbègbè ńlá (>%(area_warn)s km²) "
 "lè gba àkókò púpọ̀ síi láti ṣiṣẹ́. API ìyọkúrò data ní ààlà 200 km²."
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "AOI iṣẹ́"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "Ìyọkúrò data (%(data_feature_count)s àwọn ẹ̀yà)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "Ààlà iṣẹ́ (%(task_count)s iṣẹ́)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "ID Iṣẹ-ṣiṣe"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "Iye Awọn Ile"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -391,7 +399,7 @@ msgstr ""
 "A kò rí ààlà iṣẹ́ kankan. Jọwọ kọ́kọ́ pín iṣẹ́ náà sí àwọn iṣẹ́ kéékèèké "
 "pẹ̀lú bọtìnì \"Split AOI\" tó wà lókè."
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -400,7 +408,7 @@ msgstr ""
 "✓ A pín AOI ní àṣeyọrí! A ṣẹ̀dá agbègbè iṣẹ́ %(task_count)s pẹ̀lú "
 "%(algorithm)s."
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -413,16 +421,16 @@ msgstr ""
 "láti fipamọ́. Bí kò bá rí bẹ́ẹ̀, ṣàtúnṣe àwọn ìwọn tó wà lókè kí o sì tẹ "
 "\"Split Again\" láti tún ṣẹ̀dá a."
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "Ìyọkúrò data"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "A gba data OSM wọlé ní àṣeyọrí! A rí %(feature_count)s àwọn ẹ̀yà."
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -433,21 +441,21 @@ msgstr ""
 "isalẹ. Tí ó bá yọ ọ lójú, tẹ \"Accept Data Extract\" láti fipamọ́. Bí kò "
 "bá rí bẹ́ẹ̀, gbìyànjú láti tún ṣe igbasilẹ pẹ̀lú àwọn ìwọn mìíràn."
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Irú fáìlì kò tọ́. Jọwọ gbe fáìlì .geojson tàbí .json sókè."
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "A kò rí àwọn geometry tó wulo nínú GeoJSON."
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ A gbe GeoJSON sókè ní àṣeyọrí! A rí %(feature_count)s àwọn ẹ̀yà."
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -458,7 +466,7 @@ msgstr ""
 "isalẹ. Tí ó bá yọ ọ lójú, tẹ \"Accept Data Extract\" láti fipamọ́. Bí kò "
 "bá rí bẹ́ẹ̀, gbìyànjú láti gbe fáìlì míì sókè."
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -466,12 +474,12 @@ msgstr ""
 "A kò rí data GeoJSON kankan. Jọwọ gba data OSM wọlé tàbí gbe fáìlì "
 "GeoJSON sókè kọ́kọ́."
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "Ìyọkúrò data (%(feature_count)s àwọn ẹ̀yà)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -480,7 +488,7 @@ msgstr ""
 "A ń fi %(feature_count)s àwọn ẹ̀yà data hàn lórí maapu. Ṣàyẹ̀wò data náà,"
 " lẹ́yìn náà tẹ̀síwájú sí ìgbésẹ̀ tó kàn."
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -488,15 +496,13 @@ msgstr ""
 "✓ A ti yan ipo kíkó data tuntun nìkan. A foju kọ́ pínpín iṣẹ́, o sì lè "
 "tẹ̀síwájú."
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
 msgstr ""
-"✓ A ti fipamọ́ ìyọkúrò data ní àṣeyọrí! O lè lọ sí Ìgbésẹ̀ 3 (gbe XLSForm"
-" sókè), lẹ́yìn náà sí Ìgbésẹ̀ 4 (pín iṣẹ́)."
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -504,7 +510,7 @@ msgstr ""
 "A kò rí ìyọkúrò data kankan. Jọwọ gba data OSM wọlé tàbí gbe fáìlì "
 "GeoJSON sókè kọ́kọ́."
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -513,7 +519,7 @@ msgstr ""
 "A ń fi gbogbo AOI hàn (láìpín) pẹ̀lú %(data_feature_count)s àwọn ẹ̀yà "
 "data. Gbogbo AOI náà ni a máa lò gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -522,35 +528,35 @@ msgstr ""
 "A ń fi ààlà iṣẹ́ %(task_count)s àti %(data_feature_count)s àwọn ẹ̀yà data"
 " hàn pọ̀."
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "A kò rí àgbékalẹ̀ iṣẹ́ náà. Kò ṣee ṣe láti foju kọ́ pínpín iṣẹ́."
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
+"You can proceed to Step 5."
 msgstr ""
 "✓ A foju kọ́ pínpín iṣẹ́. Gbogbo AOI ni a máa lò gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
-" O lè lọ sí Ìgbésẹ̀ 4."
+" O lè lọ sí Ìgbésẹ̀ 5."
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "Jọwọ yan ọ̀nà pínpín kan."
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Kò sí dandan fún pínpín iṣẹ́ nínú ètò iṣẹ́ yìí."
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "A kò pèsè ìyọkúrò data kankan."
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "Ọ̀nà ìṣètò ìyọkúrò data kò tọ́."
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
@@ -559,20 +565,20 @@ msgstr ""
 "✓ A ti gba ìyọkúrò data! A fipamọ́ %(feature_count)s àwọn ẹ̀yà. Ìgbésẹ̀ 2"
 " ti parí báyìí."
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "A kò pèsè data agbègbè iṣẹ́ kankan."
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "Ọ̀nà ìṣètò data agbègbè iṣẹ́ kò tọ́."
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ A ti fipamọ́ àwọn iṣẹ́ tí a pín ní àṣeyọrí"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -580,11 +586,11 @@ msgstr ""
 "Pese ODK URL, orúkọ olumulo, àti ọ̀rọ̀ aṣínà (gbogbo mẹ́ta), tàbí fi "
 "gbogbo wọn sílẹ̀ ní àfojúdi láti lò àwọn ètò àìyẹsẹ̀ olupin."
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON jẹ́ dandan"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "A kò rí polygon geometries kankan. Agbègbè iṣẹ́ gbọ́dọ̀ jẹ́ polygon."
 
@@ -1035,10 +1041,10 @@ msgstr ""
 "km² lọ yóò fi ìkìlọ̀ hàn. API ìyọkúrò data OSM ní ààlà 200 km²."
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "Ètò tó jinlẹ̀"
 
@@ -1078,7 +1084,7 @@ msgstr "Ọ̀nà ìṣètò GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò fáìlì
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "Fáìlì GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò ọ̀nà ìṣètò fáìlì náà."
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
@@ -1086,11 +1092,11 @@ msgstr ""
 "O gbọ́dọ̀ ya tàbí gbe Area of Interest (AOI) sókè lórí maapu kí o tó fi "
 "ránṣẹ́."
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Iṣẹ́ kan pẹ̀lú orúkọ yìí ti wà tẹ́lẹ̀. Jọwọ yan orúkọ mìíràn."
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "Àpèjúwe jẹ́ dandan."
 
@@ -1195,9 +1201,9 @@ msgstr "URL ìpilẹ̀ àpẹẹrẹ QFieldCloud rẹ (láìsí /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Ọ̀rọ̀ aṣínà"
@@ -1243,32 +1249,32 @@ msgid "Project Location"
 msgstr "Ibi iṣẹ́"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "Ìgbésẹ̀ 1: Gbe XLSForm sókè"
+msgid "Step 2: Upload XLSForm"
+msgstr "Ìgbésẹ̀ 2: Gbe XLSForm sókè"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "Parí"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "Ìgbésẹ̀ 2: Gba data"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "Ìgbésẹ̀ 3: Gba data"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "Ìgbésẹ̀ 3: Pín sí iṣẹ́"
+msgid "Step 4: Split into Tasks"
+msgstr "Ìgbésẹ̀ 4: Pín sí iṣẹ́"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "Ìgbésẹ̀ 4: Parí iṣẹ́"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "Ìgbésẹ̀ 5: Parí iṣẹ́"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1293,11 +1299,11 @@ msgid "Project Setup"
 msgstr "Ìṣètò iṣẹ́"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "Ìgbésẹ̀ 1: Yan fọ́ọ̀mù ìwádìí"
+msgid "Step 2: Select Survey Form"
+msgstr "Ìgbésẹ̀ 2: Yan fọ́ọ̀mù ìwádìí"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "Yan irú ìwádìí kan kí o sì tẹ̀síwájú pẹ̀lú àwọn àìyẹsẹ̀ tí a ṣeduro."
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1308,7 +1314,25 @@ msgstr "Yan irú ìwádìí:"
 msgid "Loading survey types..."
 msgstr "A ń gbé irú ìwádìí wọlé..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "Tabi lo fọọmu tirẹ dipo:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "Gbe fọ́ọ̀mù àdáni sókè"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
@@ -1316,177 +1340,190 @@ msgstr ""
 "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún àwọn iṣẹ́ ODK, pẹ̀lú ibámu ODK "
 "Collect."
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún àwọn iṣẹ́ %(app_name)s."
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún iṣẹ́ yìí."
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr "Gbe XLSForm àdáni sókè tàbí ṣàtúnṣe àwọn aṣayan ìṣiṣẹ́ fọ́ọ̀mù."
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "Gbe fọ́ọ̀mù àdáni sókè"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "Jẹ́ kí fífi àwòrán sókè jẹ́ dandan"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "Èdè àìyẹsẹ̀:"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "Gẹ̀ẹ́sì"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "Sípáníìṣì"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "Faransé"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "Pọ́túgì"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "Swahili"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "Hindi"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "Tẹ̀síwájú"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ A gbe fọ́ọ̀mù ìwádìí sókè ní àṣeyọrí"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "Gba data OSM tí a ṣeduro wọlé fún fọ́ọ̀mù ìwádìí rẹ."
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "Ṣàyẹ̀wò data lórí maapu, lẹ́yìn náà tẹ̀síwájú."
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "Gba data OSM wọlé"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "Kó data tuntun nìkan jọ"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr "Lo àwọn ìwọlé data àdáni tàbí yí àwọn aṣayan ìgbasilẹ OSM àìyẹsẹ̀ padà."
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "Ẹ̀ka OSM:"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "Ilé OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "Ọ̀nà OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "Ìtọju ìlera OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "Ilé ìgbónsẹ̀ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "Ibùdó ẹ̀sìn OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "Lílò ilẹ̀ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "Ọ̀nà omi OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "Ibùdó omi OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "Ìtójú ìdọ̀tí OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "Ẹ̀kọ́ OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "Sàré OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "Àwọn ohun ìní OSM"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "Irú geometry:"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "Poligoni"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "Polilaini"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "Àmì"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "Lo centroid"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "Gbe GeoJSON àdáni sókè"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "A ń ṣe ìyọkúrò data OSM... Èyí lè gba àkókò díẹ̀."
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "Ìyọkúrò data OSM ti ṣetan"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "Ìgbésẹ̀ 3: Pín sí iṣẹ́ (àṣàyàn)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ Pínpín iṣẹ́ kò ṣe pàtàkì bí kò bá sí data tó ti wà tẹ́lẹ̀"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1498,86 +1535,91 @@ msgstr ""
 "algorithm àti àwọn ìwọn, lẹ́yìn náà pín un. Ṣàyẹ̀wò ohun tí a fi hàn, kí "
 "o sì tẹ \"Accept Task Areas\" láti fipamọ́. Tàbí tẹ"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "Foju kọ́"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "láti lo gbogbo AOI gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "Yan àwọn ẹ̀yà oníla tí yóò ní ipa lórí pínpín iṣẹ́ tó dá lórí ilé."
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "Fi ọ̀nà kún un"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "Fi odò kún un"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "Fi ojú irin kún un"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "Fi ọ̀nà ojú òfurufú kún un"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "Algorithm:"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "Yan aṣayan pínpín..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "Pín nípasẹ̀ onígun mẹ́rin"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "Apapọ ilé v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "Apapọ ilé v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "Pín gẹ́gẹ́ bí iye iṣẹ́ kan pàtó (yóò dé láìpẹ́)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "Apapọ ilé fún iṣẹ́ kọọkan:"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "Ìwọn (mítà):"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "Tun pín"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "Pín AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "A ń pín AOI sí iṣẹ́... Èyí lè gba àkókò díẹ̀."
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "Ṣetan"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
@@ -1585,56 +1627,56 @@ msgstr ""
 "Gbogbo ohun tí ó yẹ kó ti pé! Dá iṣẹ́ náà sílẹ̀ nínú irinṣẹ́ maapu tí o "
 "yàn."
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "Parí iṣẹ́"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "Jẹ́rìí ìparí iṣẹ́"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "Ṣé o dá ọ lójú pé o fẹ́ parí iṣẹ́ yìí?"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "Jẹ́rìí kí o sì parí"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "Ìdánimọ̀ àdáni"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "Ṣàyẹ̀wò àwọn ìdánimọ̀"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "Fipamọ́ kí o sì tẹ̀síwájú"
 
@@ -1867,74 +1909,61 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Gba àwọn yíyàn iṣẹ́"
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ A ti fipamọ́ ìyọkúrò data ní "
+#~ "àṣeyọrí! O lè lọ sí Ìgbésẹ̀ 3 "
+#~ "(gbe XLSForm sókè), lẹ́yìn náà sí "
+#~ "Ìgbésẹ̀ 4 (pín iṣẹ́)."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ A foju kọ́ pínpín iṣẹ́. Gbogbo"
+#~ " AOI ni a máa lò gẹ́gẹ́ bí "
+#~ "iṣẹ́ kan ṣoṣo. O lè lọ sí "
+#~ "Ìgbésẹ̀ 4."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "Ìgbésẹ̀ 1: Gbe XLSForm sókè"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "Ìgbésẹ̀ 2: Gba data"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "Ìgbésẹ̀ 3: Pín sí iṣẹ́"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "Ìgbésẹ̀ 4: Parí iṣẹ́"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "Ìgbésẹ̀ 1: Yan fọ́ọ̀mù ìwádìí"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "Tabi lo fọọmu tirẹ dipo:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "Yan irú ìwádìí kan kí o sì tẹ̀síwájú pẹ̀lú àwọn àìyẹsẹ̀ tí a ṣeduro."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Yan irú ìwádìí kan kí o sì tẹ̀síwájú pẹ̀lú àwọn àìyẹsẹ̀ tí a ṣeduro."
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "Gbe XLSForm àdáni sókè tàbí ṣàtúnṣe àwọn aṣayan ìṣiṣẹ́ fọ́ọ̀mù."
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "Gbe fọ́ọ̀mù àdáni sókè"
+#~ msgid "Upload Custom Form"
+#~ msgstr "Gbe fọ́ọ̀mù àdáni sókè"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "Jẹ́ kí fífi àwòrán sókè jẹ́ dandan"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "Ìgbésẹ̀ 2: Yan fọ́ọ̀mù ìwádìí"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "Ìgbésẹ̀ 2: Gbe XLSForm sókè"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "Ìgbésẹ̀ 3: Gba data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "Ìgbésẹ̀ 4: Pín sí iṣẹ́"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "Ìgbésẹ̀ 5: Parí iṣẹ́"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ A foju kọ́ pínpín iṣẹ́. Gbogbo AOI ni a máa lò gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo. O lè lọ sí Ìgbésẹ̀ 5."
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 

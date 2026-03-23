@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-21 05:32+0000\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: bn\n"
@@ -44,15 +44,15 @@ msgstr "প্রকল্প পাওয়া যায়নি।"
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "প্রকল্প আইডি মিলছে না। এই প্রকল্পে আপনার প্রবেশাধিকার নেই।"
 
-#: app/htmx/project_create_routes.py:504
+#: app/htmx/project_create_routes.py:508
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "ফর্ম সফলভাবে যাচাই এবং আপলোড করা হয়েছে! পৃষ্ঠা পুনরায় লোড হচ্ছে..."
 
-#: app/htmx/project_create_routes.py:528 app/htmx/setup_step_routes.py:76
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে"
 
-#: app/htmx/project_create_routes.py:532
+#: app/htmx/project_create_routes.py:536
 msgid "Error"
 msgstr "ত্রুটি"
 
@@ -126,12 +126,12 @@ msgstr "প্রকল্প (%(project_id)s) পাওয়া যায়�
 msgid "Only the project manager can delete this project."
 msgstr "শুধুমাত্র প্রকল্প ব্যবস্থাপক এই প্রকল্প মুছে দিতে পারেন।"
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:585
-#: app/htmx/setup_step_routes.py:705 app/htmx/setup_step_routes.py:816
-#: app/htmx/setup_step_routes.py:870 app/htmx/setup_step_routes.py:969
-#: app/htmx/setup_step_routes.py:1067 app/htmx/setup_step_routes.py:1143
-#: app/htmx/setup_step_routes.py:1234 app/htmx/setup_step_routes.py:1305
-#: app/htmx/setup_step_routes.py:1375
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "ত্রুটি: %(error_msg)s"
@@ -269,8 +269,8 @@ msgid "from this project?"
 msgstr "এই প্রকল্প থেকে?"
 
 #: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:596
-#: app/templates/partials/project_details/setup_steps.html:691
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
 msgid "Cancel"
 msgstr "বাতিল"
 
@@ -291,9 +291,9 @@ msgid "No collaborators yet."
 msgstr "এখনও কোনো সহযোগী নেই।"
 
 #: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:624
-#: app/templates/partials/project_details/setup_steps.html:630
-#: app/templates/partials/project_details/setup_steps.html:664
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "ব্যবহারকারীর নাম"
@@ -329,11 +329,11 @@ msgstr "সহযোগী আপডেট করতে ব্যর্থ: %(ex
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "সহযোগী তালিকা রিফ্রেশ ব্যর্থ: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:82
+#: app/htmx/setup_step_routes.py:83
 msgid "Project not found or access denied."
 msgstr "প্রকল্প পাওয়া যায়নি অথবা প্রবেশাধিকার প্রত্যাখ্যাত।"
 
-#: app/htmx/setup_step_routes.py:155
+#: app/htmx/setup_step_routes.py:156
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -343,15 +343,15 @@ msgstr ""
 "আবার চেষ্টা করুন। সমস্যা চলতে থাকলে নিচের প্রযুক্তিগত বিবরণ আপনার সিস্টেম"
 " প্রশাসক বা সহায়তা দলকে পাঠান।"
 
-#: app/htmx/setup_step_routes.py:221
+#: app/htmx/setup_step_routes.py:225
 msgid "Invalid GeoJSON data in request. Please try uploading again."
 msgstr "অনুরোধে অবৈধ GeoJSON ডেটা রয়েছে। অনুগ্রহ করে আবার আপলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:227
+#: app/htmx/setup_step_routes.py:231
 msgid "Error reading GeoJSON data from request."
 msgstr "অনুরোধ থেকে GeoJSON ডেটা পড়তে গিয়ে ত্রুটি হয়েছে।"
 
-#: app/htmx/setup_step_routes.py:248
+#: app/htmx/setup_step_routes.py:252
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -360,7 +360,7 @@ msgstr ""
 "এলাকাটি %(area_km2)s বর্গকিমি, যা %(area_limit)s বর্গকিমি সীমা অতিক্রম "
 "করেছে। অনুগ্রহ করে একটি ছোট এলাকা নির্বাচন করুন।"
 
-#: app/htmx/setup_step_routes.py:256
+#: app/htmx/setup_step_routes.py:260
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -370,21 +370,29 @@ msgstr ""
 "প্রক্রিয়াকরণে বেশি সময় লাগতে পারে। ডেটা এক্সট্র্যাক্ট API 200 "
 "বর্গকিমিতে সীমাবদ্ধ।"
 
-#: app/htmx/setup_step_routes.py:321 app/htmx/setup_step_routes.py:766
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
 msgid "Project AOI"
 msgstr "প্রকল্প AOI"
 
-#: app/htmx/setup_step_routes.py:334
+#: app/htmx/setup_step_routes.py:339
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "ডেটা এক্সট্র্যাক্ট (%(data_feature_count)s বৈশিষ্ট্য)"
 
-#: app/htmx/setup_step_routes.py:348
+#: app/htmx/setup_step_routes.py:353
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "কাজের সীমানা (%(task_count)s কাজ)"
 
-#: app/htmx/setup_step_routes.py:384
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "টাস্ক আইডি"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "ভবনের সংখ্যা"
+
+#: app/htmx/setup_step_routes.py:397
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -392,7 +400,7 @@ msgstr ""
 "কোনো কাজের সীমানা পাওয়া যায়নি। আগে উপরের \"Split AOI\" বোতাম ব্যবহার "
 "করে প্রকল্পকে কাজগুলোতে ভাগ করুন।"
 
-#: app/htmx/setup_step_routes.py:440
+#: app/htmx/setup_step_routes.py:453
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -401,7 +409,7 @@ msgstr ""
 "✓ AOI সফলভাবে ভাগ করা হয়েছে! %(algorithm)s ব্যবহার করে %(task_count)s "
 "কাজের এলাকা তৈরি হয়েছে।"
 
-#: app/htmx/setup_step_routes.py:447
+#: app/htmx/setup_step_routes.py:460
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -414,16 +422,16 @@ msgstr ""
 "Choices\" ক্লিক করুন। নইলে উপরের মানগুলো সামঞ্জস্য করে \"Split Again\" "
 "ক্লিক করুন।"
 
-#: app/htmx/setup_step_routes.py:534 app/htmx/setup_step_routes.py:667
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
 msgid "Data Extract"
 msgstr "ডেটা এক্সট্র্যাক্ট"
 
-#: app/htmx/setup_step_routes.py:547
+#: app/htmx/setup_step_routes.py:560
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "OSM ডেটা সফলভাবে ডাউনলোড হয়েছে! %(feature_count)s বৈশিষ্ট্য পাওয়া গেছে।"
 
-#: app/htmx/setup_step_routes.py:550
+#: app/htmx/setup_step_routes.py:563
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -434,21 +442,21 @@ msgstr ""
 " পর্যালোচনা করুন। সন্তুষ্ট হলে সংরক্ষণ করতে \"Accept Data Extract\" ক্লিক"
 " করুন। নইলে ভিন্ন প্যারামিটার দিয়ে আবার ডাউনলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:622
+#: app/htmx/setup_step_routes.py:635
 #: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "ফাইলের ধরন অবৈধ। অনুগ্রহ করে .geojson বা .json ফাইল আপলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:647
+#: app/htmx/setup_step_routes.py:660
 msgid "No valid geometries found in GeoJSON."
 msgstr "GeoJSON-এ কোনো বৈধ জ্যামিতি পাওয়া যায়নি।"
 
-#: app/htmx/setup_step_routes.py:679
+#: app/htmx/setup_step_routes.py:692
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON সফলভাবে আপলোড হয়েছে! %(feature_count)s বৈশিষ্ট্য পাওয়া গেছে।"
 
-#: app/htmx/setup_step_routes.py:682
+#: app/htmx/setup_step_routes.py:695
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -459,7 +467,7 @@ msgstr ""
 " পর্যালোচনা করুন। সন্তুষ্ট হলে সংরক্ষণ করতে \"Accept Data Extract\" ক্লিক"
 " করুন। নইলে অন্য ফাইল আপলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:742 app/htmx/setup_step_routes.py:915
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -467,12 +475,12 @@ msgstr ""
 "কোনো GeoJSON ডেটা পাওয়া যায়নি। আগে OSM ডেটা ডাউনলোড করুন অথবা একটি "
 "GeoJSON ফাইল আপলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:778
+#: app/htmx/setup_step_routes.py:791
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "ডেটা এক্সট্র্যাক্ট (%(feature_count)s বৈশিষ্ট্য)"
 
-#: app/htmx/setup_step_routes.py:797
+#: app/htmx/setup_step_routes.py:810
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -481,7 +489,7 @@ msgstr ""
 "মানচিত্রে %(feature_count)s ডেটা বৈশিষ্ট্যের পূর্বরূপ দেখানো হচ্ছে। ডেটা "
 "পর্যালোচনা করুন, তারপর পরবর্তী ধাপে যান।"
 
-#: app/htmx/setup_step_routes.py:857
+#: app/htmx/setup_step_routes.py:870
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -489,15 +497,13 @@ msgstr ""
 "✓ নতুন ডেটা সংগ্রহ মোড নির্বাচন করা হয়েছে। কাজ ভাগ করা এড়িয়ে যাওয়া "
 "হয়েছে এবং আপনি এগোতে পারেন।"
 
-#: app/htmx/setup_step_routes.py:935
+#: app/htmx/setup_step_routes.py:948
 msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 3 (upload "
-"XLSForm) and then Step 4 (split tasks)."
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
 msgstr ""
-"✓ ডেটা এক্সট্র্যাক্ট সফলভাবে সংরক্ষিত হয়েছে! এখন আপনি ধাপ ৩ (XLSForm "
-"আপলোড) এবং তারপর ধাপ ৪ (কাজ ভাগ) এ যেতে পারেন।"
 
-#: app/htmx/setup_step_routes.py:1005
+#: app/htmx/setup_step_routes.py:1018
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -505,7 +511,7 @@ msgstr ""
 "কোনো ডেটা এক্সট্র্যাক্ট পাওয়া যায়নি। আগে OSM ডেটা ডাউনলোড করুন অথবা "
 "GeoJSON ফাইল আপলোড করুন।"
 
-#: app/htmx/setup_step_routes.py:1036
+#: app/htmx/setup_step_routes.py:1049
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -514,7 +520,7 @@ msgstr ""
 "পুরো AOI (বিভাজন ছাড়া) %(data_feature_count)s ডেটা বৈশিষ্ট্যসহ দেখানো "
 "হচ্ছে। সম্পূর্ণ AOI একটি কাজ হিসেবে ব্যবহৃত হবে।"
 
-#: app/htmx/setup_step_routes.py:1043
+#: app/htmx/setup_step_routes.py:1056
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -523,35 +529,35 @@ msgstr ""
 "%(task_count)s কাজের সীমানা এবং %(data_feature_count)s ডেটা বৈশিষ্ট্য "
 "একসঙ্গে দেখানো হচ্ছে।"
 
-#: app/htmx/setup_step_routes.py:1102
+#: app/htmx/setup_step_routes.py:1115
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "প্রকল্পের সীমানা পাওয়া যায়নি। কাজ বিভাজন বাদ দেওয়া যাবে না।"
 
-#: app/htmx/setup_step_routes.py:1129
+#: app/htmx/setup_step_routes.py:1142
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
-"You can proceed to Step 4."
+"You can proceed to Step 5."
 msgstr ""
 "✓ কাজ বিভাজন বাদ দেওয়া হয়েছে। পুরো AOI একটি কাজ হিসেবে ব্যবহৃত হবে। "
-"আপনি ধাপ ৪-এ যেতে পারেন।"
+"আপনি ধাপ ৫-এ যেতে পারেন।"
 
-#: app/htmx/setup_step_routes.py:1190
+#: app/htmx/setup_step_routes.py:1204
 msgid "Please select a splitting option."
 msgstr "অনুগ্রহ করে একটি বিভাজন বিকল্প নির্বাচন করুন।"
 
-#: app/htmx/setup_step_routes.py:1210
+#: app/htmx/setup_step_routes.py:1225
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ এই প্রকল্প সেটআপের জন্য কাজ বিভাজন প্রয়োজন নেই।"
 
-#: app/htmx/setup_step_routes.py:1267
+#: app/htmx/setup_step_routes.py:1282
 msgid "No data extract provided."
 msgstr "কোনো ডেটা এক্সট্র্যাক্ট দেওয়া হয়নি।"
 
-#: app/htmx/setup_step_routes.py:1271
+#: app/htmx/setup_step_routes.py:1286
 msgid "Invalid data extract format."
 msgstr "ডেটা এক্সট্র্যাক্টের ফরম্যাট অবৈধ।"
 
-#: app/htmx/setup_step_routes.py:1288
+#: app/htmx/setup_step_routes.py:1303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
@@ -560,20 +566,20 @@ msgstr ""
 "✓ ডেটা এক্সট্র্যাক্ট গ্রহণ করা হয়েছে! %(feature_count)s বৈশিষ্ট্য "
 "সংরক্ষিত হয়েছে। ধাপ ২ এখন সম্পূর্ণ।"
 
-#: app/htmx/setup_step_routes.py:1338
+#: app/htmx/setup_step_routes.py:1353
 msgid "No task areas data provided."
 msgstr "কোনো কাজের এলাকা সংক্রান্ত ডেটা দেওয়া হয়নি।"
 
-#: app/htmx/setup_step_routes.py:1342
+#: app/htmx/setup_step_routes.py:1357
 msgid "Invalid task areas data format."
 msgstr "কাজের এলাকা ডেটার ফরম্যাট অবৈধ।"
 
-#: app/htmx/setup_step_routes.py:1359
-#: app/templates/partials/project_details/setup_steps.html:366
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ বিভক্ত কাজগুলো সফলভাবে সংরক্ষিত হয়েছে"
 
-#: app/htmx/setup_step_routes.py:1414
+#: app/htmx/setup_step_routes.py:1429
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -581,11 +587,11 @@ msgstr ""
 "ODK URL, ব্যবহারকারীর নাম ও পাসওয়ার্ড (সব ৩টি) দিন, অথবা সার্ভারের "
 "ডিফল্ট ব্যবহার করতে সবগুলো ফাঁকা রাখুন।"
 
-#: app/htmx/setup_step_routes.py:1536
+#: app/htmx/setup_step_routes.py:1551
 msgid "GeoJSON is required"
 msgstr "GeoJSON আবশ্যক"
 
-#: app/htmx/setup_step_routes.py:1547
+#: app/htmx/setup_step_routes.py:1562
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "কোনো পলিগন জ্যামিতি পাওয়া যায়নি। প্রকল্পের এলাকা অবশ্যই পলিগন হতে হবে।"
 
@@ -1038,10 +1044,10 @@ msgstr ""
 "API ২০০ বর্গকিমিতে সীমিত।"
 
 #: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:101
-#: app/templates/partials/project_details/setup_steps.html:240
-#: app/templates/partials/project_details/setup_steps.html:381
-#: app/templates/partials/project_details/setup_steps.html:580
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
 msgid "Advanced Config"
 msgstr "উন্নত কনফিগারেশন"
 
@@ -1081,7 +1087,7 @@ msgstr "GeoJSON ফরম্যাট সঠিক নয়। অনুগ্�
 msgid "Invalid GeoJSON file. Please check the file format."
 msgstr "GeoJSON ফাইল সঠিক নয়। অনুগ্রহ করে ফাইল ফরম্যাট পরীক্ষা করুন।"
 
-#: app/templates/new_project.html:180 app/templates/new_project.html:645
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
 msgid ""
 "You must draw or upload an Area of Interest (AOI) on the map before "
 "submitting."
@@ -1089,11 +1095,11 @@ msgstr ""
 "জমা দেওয়ার আগে মানচিত্রে একটি Area of Interest (AOI) আঁকতে বা আপলোড করতে"
 " হবে।"
 
-#: app/templates/new_project.html:610
+#: app/templates/new_project.html:701
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "এই নামে একটি প্রকল্প ইতোমধ্যে রয়েছে। অনুগ্রহ করে অন্য নাম নির্বাচন করুন।"
 
-#: app/templates/new_project.html:770
+#: app/templates/new_project.html:861
 msgid "Description is required."
 msgstr "বিবরণ আবশ্যক।"
 
@@ -1200,9 +1206,9 @@ msgstr "আপনার QFieldCloud ইনস্ট্যান্সের ব�
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:636
-#: app/templates/partials/project_details/setup_steps.html:642
-#: app/templates/partials/project_details/setup_steps.html:676
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "পাসওয়ার্ড"
@@ -1250,32 +1256,32 @@ msgid "Project Location"
 msgstr "প্রকল্পের অবস্থান"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 1: Upload XLSForm"
-msgstr "ধাপ ১: XLSForm আপলোড করুন"
+msgid "Step 2: Upload XLSForm"
+msgstr "ধাপ ২: XLSForm আপলোড করুন"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
 #: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:184
-#: app/templates/partials/project_details/setup_steps.html:358
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "সম্পূর্ণ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:179
-msgid "Step 2: Get Data"
-msgstr "ধাপ ২: ডেটা নিন"
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "ধাপ ৩: ডেটা নিন"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 3: Split into Tasks"
-msgstr "ধাপ ৩: কাজে ভাগ করুন"
+msgid "Step 4: Split into Tasks"
+msgstr "ধাপ ৪: কাজে ভাগ করুন"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:563
-msgid "Step 4: Finalise Project"
-msgstr "ধাপ ৪: প্রকল্প চূড়ান্ত করুন"
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "ধাপ ৫: প্রকল্প চূড়ান্ত করুন"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1300,11 +1306,11 @@ msgid "Project Setup"
 msgstr "প্রকল্প সেটআপ"
 
 #: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 1: Select Survey Form"
-msgstr "ধাপ ১: জরিপ ফর্ম নির্বাচন করুন"
+msgid "Step 2: Select Survey Form"
+msgstr "ধাপ ২: জরিপ ফর্ম নির্বাচন করুন"
 
 #: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a survey type and continue with recommended defaults."
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
 msgstr "একটি জরিপের ধরন বেছে নিন এবং প্রস্তাবিত ডিফল্ট দিয়ে চালিয়ে যান।"
 
 #: app/templates/partials/project_details/setup_steps.html:62
@@ -1315,7 +1321,25 @@ msgstr "জরিপের ধরন নির্বাচন করুন:"
 msgid "Loading survey types..."
 msgstr "জরিপের ধরন লোড হচ্ছে..."
 
-#: app/templates/partials/project_details/setup_steps.html:75
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "অথবা পরিবর্তে আপনার নিজস্ব ফর্ম ব্যবহার করুন:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "কাস্টম ফর্ম আপলোড করুন"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
 msgid ""
 "Recommended defaults are active for ODK projects, including ODK Collect\n"
 "          compatibility."
@@ -1323,181 +1347,192 @@ msgstr ""
 "ODK প্রকল্পের জন্য প্রস্তাবিত ডিফল্ট সক্রিয় রয়েছে, যার মধ্যে ODK "
 "Collect সামঞ্জস্যও রয়েছে।"
 
-#: app/templates/partials/project_details/setup_steps.html:82
+#: app/templates/partials/project_details/setup_steps.html:134
 #, python-format
 msgid "Recommended defaults are active for %(app_name)s projects."
 msgstr "%(app_name)s প্রকল্পগুলোর জন্য প্রস্তাবিত ডিফল্ট সক্রিয় রয়েছে।"
 
-#: app/templates/partials/project_details/setup_steps.html:89
+#: app/templates/partials/project_details/setup_steps.html:141
 msgid "Recommended defaults are active for this project."
 msgstr "এই প্রকল্পের জন্য প্রস্তাবিত ডিফল্ট সক্রিয় রয়েছে।"
 
-#: app/templates/partials/project_details/setup_steps.html:108
-msgid "Upload a custom XLSForm or adjust form-processing options."
-msgstr ""
-"একটি কাস্টম XLSForm আপলোড করুন বা ফর্ম-প্রক্রিয়াকরণ বিকল্পসমূহ সামঞ্জস্য"
-" করুন।"
-
-#: app/templates/partials/project_details/setup_steps.html:118
-msgid "Upload Custom Form"
-msgstr "কাস্টম ফর্ম আপলোড করুন"
-
-#: app/templates/partials/project_details/setup_steps.html:130
-msgid "Make photo upload mandatory"
-msgstr "ছবি আপলোড বাধ্যতামূলক করুন"
-
-#: app/templates/partials/project_details/setup_steps.html:134
+#: app/templates/partials/project_details/setup_steps.html:160
 msgid "Default Language:"
 msgstr "ডিফল্ট ভাষা:"
 
-#: app/templates/partials/project_details/setup_steps.html:136
+#: app/templates/partials/project_details/setup_steps.html:162
 msgid "English"
 msgstr "ইংরেজি"
 
-#: app/templates/partials/project_details/setup_steps.html:137
+#: app/templates/partials/project_details/setup_steps.html:163
 msgid "Spanish"
 msgstr "স্প্যানিশ"
 
-#: app/templates/partials/project_details/setup_steps.html:138
+#: app/templates/partials/project_details/setup_steps.html:164
 msgid "French"
 msgstr "ফরাসি"
 
-#: app/templates/partials/project_details/setup_steps.html:139
+#: app/templates/partials/project_details/setup_steps.html:165
 msgid "Portuguese"
 msgstr "পর্তুগিজ"
 
-#: app/templates/partials/project_details/setup_steps.html:140
+#: app/templates/partials/project_details/setup_steps.html:166
 msgid "Swahili"
 msgstr "সোয়াহিলি"
 
-#: app/templates/partials/project_details/setup_steps.html:141
+#: app/templates/partials/project_details/setup_steps.html:167
 msgid "Hindi"
 msgstr "হিন্দি"
 
-#: app/templates/partials/project_details/setup_steps.html:163
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
 msgid "Continue"
 msgstr "চালিয়ে যান"
 
-#: app/templates/partials/project_details/setup_steps.html:167
+#: app/templates/partials/project_details/setup_steps.html:256
 msgid "✓ Survey form uploaded successfully"
 msgstr "✓ জরিপ ফর্ম সফলভাবে আপলোড হয়েছে"
 
-#: app/templates/partials/project_details/setup_steps.html:189
+#: app/templates/partials/project_details/setup_steps.html:278
 msgid "Download the recommended OSM data for your survey form."
 msgstr "আপনার জরিপ ফর্মের জন্য প্রস্তাবিত OSM ডেটা ডাউনলোড করুন।"
 
-#: app/templates/partials/project_details/setup_steps.html:191
+#: app/templates/partials/project_details/setup_steps.html:280
 msgid "Review the data on the map, then continue."
 msgstr "মানচিত্রে ডেটা পর্যালোচনা করুন, তারপর এগিয়ে যান।"
 
-#: app/templates/partials/project_details/setup_steps.html:204
+#: app/templates/partials/project_details/setup_steps.html:293
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Download OSM Data"
 msgstr "OSM ডেটা ডাউনলোড করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:230
+#: app/templates/partials/project_details/setup_steps.html:319
 msgid "Collect New Data Only"
 msgstr "শুধু নতুন ডেটা সংগ্রহ করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:247
+#: app/templates/partials/project_details/setup_steps.html:336
 msgid "Use custom data inputs or override the default OSM download options."
 msgstr ""
 "কাস্টম ডেটা ইনপুট ব্যবহার করুন অথবা ডিফল্ট OSM ডাউনলোড বিকল্প ওভাররাইড "
 "করুন।"
 
-#: app/templates/partials/project_details/setup_steps.html:253
+#: app/templates/partials/project_details/setup_steps.html:342
 msgid "OSM Category:"
 msgstr "OSM শ্রেণি:"
 
-#: app/templates/partials/project_details/setup_steps.html:256
+#: app/templates/partials/project_details/setup_steps.html:345
 msgid "OSM Buildings"
 msgstr "OSM ভবন"
 
-#: app/templates/partials/project_details/setup_steps.html:257
+#: app/templates/partials/project_details/setup_steps.html:346
 msgid "OSM Highways"
 msgstr "OSM সড়ক"
 
-#: app/templates/partials/project_details/setup_steps.html:258
+#: app/templates/partials/project_details/setup_steps.html:347
 msgid "OSM Healthcare"
 msgstr "OSM স্বাস্থ্যসেবা"
 
-#: app/templates/partials/project_details/setup_steps.html:259
+#: app/templates/partials/project_details/setup_steps.html:348
 msgid "OSM Toilets"
 msgstr "OSM টয়লেট"
 
-#: app/templates/partials/project_details/setup_steps.html:260
+#: app/templates/partials/project_details/setup_steps.html:349
 msgid "OSM Religious"
 msgstr "OSM ধর্মীয় স্থান"
 
-#: app/templates/partials/project_details/setup_steps.html:261
+#: app/templates/partials/project_details/setup_steps.html:350
 msgid "OSM Landuse"
 msgstr "OSM ভূমি ব্যবহার"
 
-#: app/templates/partials/project_details/setup_steps.html:262
+#: app/templates/partials/project_details/setup_steps.html:351
 msgid "OSM Waterways"
 msgstr "OSM জলপথ"
 
-#: app/templates/partials/project_details/setup_steps.html:263
+#: app/templates/partials/project_details/setup_steps.html:352
 msgid "OSM Water Points"
 msgstr "OSM পানির পয়েন্ট"
 
-#: app/templates/partials/project_details/setup_steps.html:264
+#: app/templates/partials/project_details/setup_steps.html:353
 msgid "OSM Waste Disposal"
 msgstr "OSM বর্জ্য নিষ্পত্তি"
 
-#: app/templates/partials/project_details/setup_steps.html:265
+#: app/templates/partials/project_details/setup_steps.html:354
 msgid "OSM Education"
 msgstr "OSM শিক্ষা"
 
-#: app/templates/partials/project_details/setup_steps.html:266
+#: app/templates/partials/project_details/setup_steps.html:355
 msgid "OSM Cemeteries"
 msgstr "OSM কবরস্থান"
 
-#: app/templates/partials/project_details/setup_steps.html:267
+#: app/templates/partials/project_details/setup_steps.html:356
 msgid "OSM Amenities"
 msgstr "OSM সুবিধাসমূহ"
 
-#: app/templates/partials/project_details/setup_steps.html:272
+#: app/templates/partials/project_details/setup_steps.html:361
 msgid "Geometry Type:"
 msgstr "জ্যামিতির ধরন:"
 
-#: app/templates/partials/project_details/setup_steps.html:275
+#: app/templates/partials/project_details/setup_steps.html:364
 msgid "Polygon"
 msgstr "পলিগন"
 
-#: app/templates/partials/project_details/setup_steps.html:276
+#: app/templates/partials/project_details/setup_steps.html:365
 msgid "Polyline"
 msgstr "পলিলাইন"
 
-#: app/templates/partials/project_details/setup_steps.html:277
+#: app/templates/partials/project_details/setup_steps.html:366
 msgid "Point"
 msgstr "বিন্দু"
 
-#: app/templates/partials/project_details/setup_steps.html:290
+#: app/templates/partials/project_details/setup_steps.html:379
 msgid "Use centroids"
 msgstr "সেন্ট্রয়েড ব্যবহার করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:302
+#: app/templates/partials/project_details/setup_steps.html:391
 msgid "Upload Custom GeoJSON"
 msgstr "কাস্টম GeoJSON আপলোড করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:321
+#: app/templates/partials/project_details/setup_steps.html:410
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM ডেটা এক্সট্র্যাক্ট তৈরি হচ্ছে... কিছু সময় লাগতে পারে।"
 
-#: app/templates/partials/project_details/setup_steps.html:340
+#: app/templates/partials/project_details/setup_steps.html:429
 msgid "OSM data extract ready"
 msgstr "OSM ডেটা এক্সট্র্যাক্ট প্রস্তুত"
 
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "Step 3: Split into Tasks (Optional)"
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
 msgstr "ধাপ ৩: কাজে ভাগ করুন (ঐচ্ছিক)"
 
-#: app/templates/partials/project_details/setup_steps.html:363
+#: app/templates/partials/project_details/setup_steps.html:452
 msgid "✓ Task splitting is not relevant without existing data"
 msgstr "✓ বিদ্যমান ডেটা ছাড়া কাজ ভাগ করা প্রাসঙ্গিক নয়"
 
-#: app/templates/partials/project_details/setup_steps.html:369
+#: app/templates/partials/project_details/setup_steps.html:458
 msgid ""
 "Generate task areas by splitting the Area of Interest (AOI). Choose an "
 "algorithm and\n"
@@ -1509,141 +1544,146 @@ msgstr ""
 "প্যারামিটার বেছে নিন, তারপর ভাগ করুন। পূর্বরূপ পর্যালোচনা করুন, এবং "
 "সংরক্ষণ করতে \"Accept Task Areas\" ক্লিক করুন। অথবা ক্লিক করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:372
-#: app/templates/partials/project_details/setup_steps.html:391
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
 msgid "Skip"
 msgstr "এড়িয়ে যান"
 
-#: app/templates/partials/project_details/setup_steps.html:373
+#: app/templates/partials/project_details/setup_steps.html:462
 msgid "to use the whole AOI as a single task."
 msgstr "AOI-এর পুরোটা একটি কাজ হিসেবে ব্যবহার করতে।"
 
-#: app/templates/partials/project_details/setup_steps.html:405
+#: app/templates/partials/project_details/setup_steps.html:494
 msgid "Choose which linear features influence building-based task splitting."
 msgstr "ভবনভিত্তিক কাজ ভাগে কোন রৈখিক বৈশিষ্ট্য প্রভাব ফেলবে তা নির্বাচন করুন।"
 
-#: app/templates/partials/project_details/setup_steps.html:429
+#: app/templates/partials/project_details/setup_steps.html:518
 msgid "Include roads"
 msgstr "রাস্তা অন্তর্ভুক্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:438
+#: app/templates/partials/project_details/setup_steps.html:527
 msgid "Include rivers"
 msgstr "নদী অন্তর্ভুক্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:447
+#: app/templates/partials/project_details/setup_steps.html:536
 msgid "Include railways"
 msgstr "রেলপথ অন্তর্ভুক্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:456
+#: app/templates/partials/project_details/setup_steps.html:545
 msgid "Include aeroways"
 msgstr "বিমানপথ অন্তর্ভুক্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:463
+#: app/templates/partials/project_details/setup_steps.html:552
 msgid "Algorithm:"
 msgstr "অ্যালগরিদম:"
 
-#: app/templates/partials/project_details/setup_steps.html:465
+#: app/templates/partials/project_details/setup_steps.html:554
 msgid "Select splitting option..."
 msgstr "ভাগের বিকল্প নির্বাচন করুন..."
 
-#: app/templates/partials/project_details/setup_steps.html:466
+#: app/templates/partials/project_details/setup_steps.html:555
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split by Square"
 msgstr "বর্গাকারভাবে ভাগ করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:467
+#: app/templates/partials/project_details/setup_steps.html:556
 msgid "Average Buildings v1 (Voronoi)"
 msgstr "গড় ভবন v1 (Voronoi)"
 
-#: app/templates/partials/project_details/setup_steps.html:469
+#: app/templates/partials/project_details/setup_steps.html:558
 msgid "Average Buildings v2 (Straight Skeleton)"
 msgstr "গড় ভবন v2 (Straight Skeleton)"
 
-#: app/templates/partials/project_details/setup_steps.html:472
-msgid "Split by Specific Number of Tasks (Coming Soon)"
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
 msgstr "নির্দিষ্ট সংখ্যক কাজে ভাগ করুন (শীঘ্রই আসছে)"
 
-#: app/templates/partials/project_details/setup_steps.html:480
+#: app/templates/partials/project_details/setup_steps.html:567
 msgid "Avg. Buildings per Task:"
 msgstr "প্রতি কাজে গড় ভবন:"
 
-#: app/templates/partials/project_details/setup_steps.html:493
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
 msgid "Dimension (meters):"
 msgstr "মাত্রা (মিটার):"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 msgid "Split Again"
 msgstr "আবার ভাগ করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:512
+#: app/templates/partials/project_details/setup_steps.html:610
 #: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Split AOI"
 msgstr "AOI ভাগ করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:548
+#: app/templates/partials/project_details/setup_steps.html:646
 msgid "Splitting AOI into tasks... This may take a moment."
 msgstr "AOI-কে কাজে ভাগ করা হচ্ছে... কিছু সময় লাগতে পারে।"
 
-#: app/templates/partials/project_details/setup_steps.html:564
+#: app/templates/partials/project_details/setup_steps.html:662
 msgid "Ready"
 msgstr "প্রস্তুত"
 
-#: app/templates/partials/project_details/setup_steps.html:567
+#: app/templates/partials/project_details/setup_steps.html:665
 msgid ""
 "All prerequisites are complete! Create the project in your chosen mapping"
 " tool."
 msgstr "সব পূর্বশর্ত পূরণ হয়েছে! আপনার নির্বাচিত ম্যাপিং টুলে প্রকল্প তৈরি করুন।"
 
-#: app/templates/partials/project_details/setup_steps.html:572
+#: app/templates/partials/project_details/setup_steps.html:670
 msgid "Finalise Project"
 msgstr "প্রকল্প চূড়ান্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:589
+#: app/templates/partials/project_details/setup_steps.html:687
 msgid "Confirm Project Finalisation"
 msgstr "প্রকল্প চূড়ান্তকরণ নিশ্চিত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:593
+#: app/templates/partials/project_details/setup_steps.html:691
 msgid "Are you sure you want to finalise this project?"
 msgstr "আপনি কি নিশ্চিত যে এই প্রকল্পটি চূড়ান্ত করতে চান?"
 
-#: app/templates/partials/project_details/setup_steps.html:598
+#: app/templates/partials/project_details/setup_steps.html:696
 msgid "Confirm & Finalise"
 msgstr "নিশ্চিত করুন ও চূড়ান্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:606
+#: app/templates/partials/project_details/setup_steps.html:704
 msgid "Custom Credentials"
 msgstr "কাস্টম তথ্য"
 
-#: app/templates/partials/project_details/setup_steps.html:612
+#: app/templates/partials/project_details/setup_steps.html:710
 msgid "ODK Central URL"
 msgstr "ODK Central URL"
 
-#: app/templates/partials/project_details/setup_steps.html:618
+#: app/templates/partials/project_details/setup_steps.html:716
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps.html:652
+#: app/templates/partials/project_details/setup_steps.html:750
 msgid "QField Cloud URL"
 msgstr "QField Cloud URL"
 
-#: app/templates/partials/project_details/setup_steps.html:658
+#: app/templates/partials/project_details/setup_steps.html:756
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps.html:670
+#: app/templates/partials/project_details/setup_steps.html:768
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps.html:682
+#: app/templates/partials/project_details/setup_steps.html:780
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:792
 #: app/templates/partials/project_details/style_and_scripts.html:49
 msgid "Test Credentials"
 msgstr "তথ্য পরীক্ষা করুন"
 
-#: app/templates/partials/project_details/setup_steps.html:697
+#: app/templates/partials/project_details/setup_steps.html:795
 msgid "Save & Continue"
 msgstr "সংরক্ষণ করুন ও এগিয়ে যান"
 
@@ -1882,74 +1922,62 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "কাজের পছন্দ গ্রহণ করুন"
 
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ ডেটা এক্সট্র্যাক্ট সফলভাবে সংরক্ষিত "
+#~ "হয়েছে! এখন আপনি ধাপ ৩ (XLSForm "
+#~ "আপলোড) এবং তারপর ধাপ ৪ (কাজ ভাগ)"
+#~ " এ যেতে পারেন।"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Form Options:"
-msgstr ""
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ কাজ বিভাজন বাদ দেওয়া হয়েছে। "
+#~ "পুরো AOI একটি কাজ হিসেবে ব্যবহৃত "
+#~ "হবে। আপনি ধাপ ৪-এ যেতে পারেন।"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include photo upload question"
-msgstr ""
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "ধাপ ১: XLSForm আপলোড করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Make photo mandatory"
-msgstr ""
+#~ msgid "Step 2: Get Data"
+#~ msgstr "ধাপ ২: ডেটা নিন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the user to take a photo at their location."
-msgstr ""
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "ধাপ ৩: কাজে ভাগ করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Include digitisation verification question"
-msgstr ""
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "ধাপ ৪: প্রকল্প চূড়ান্ত করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "ধাপ ১: জরিপ ফর্ম নির্বাচন করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Or use your own form instead:"
-msgstr "অথবা পরিবর্তে আপনার নিজস্ব ফর্ম ব্যবহার করুন:"
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr "একটি জরিপের ধরন বেছে নিন এবং প্রস্তাবিত ডিফল্ট দিয়ে চালিয়ে যান।"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "একটি জরিপের ধরন বেছে নিন এবং প্রস্তাবিত ডিফল্ট দিয়ে চালিয়ে যান।"
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr ""
+#~ "একটি কাস্টম XLSForm আপলোড করুন বা "
+#~ "ফর্ম-প্রক্রিয়াকরণ বিকল্পসমূহ সামঞ্জস্য করুন।"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Upload Custom XLSForm"
-msgstr "কাস্টম ফর্ম আপলোড করুন"
+#~ msgid "Upload Custom Form"
+#~ msgstr "কাস্টম ফর্ম আপলোড করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Note: Field-TM will automatically inject additional fields into your form for task division and feature selection. Your form should only contain the survey questions you want to ask (do not include select_one_from_file fields for tasks/features)."
-msgstr ""
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "ছবি আপলোড বাধ্যতামূলক করুন"
 
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 2: Select Survey Form"
-msgstr "ধাপ ২: জরিপ ফর্ম নির্বাচন করুন"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 2: Upload XLSForm"
-msgstr "ধাপ ২: XLSForm আপলোড করুন"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 3: Get Data"
-msgstr "ধাপ ৩: ডেটা নিন"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-msgid "Step 4: Split into Tasks"
-msgstr "ধাপ ৪: কাজে ভাগ করুন"
-
-#: app/templates/partials/project_details/manager_setup_summary.html
-#: app/templates/partials/project_details/setup_steps.html
-msgid "Step 5: Finalise Project"
-msgstr "ধাপ ৫: প্রকল্প চূড়ান্ত করুন"
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Data extract successfully saved! You can now proceed to Step 4 (split tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py
-msgid "✓ Task splitting skipped. The whole AOI will be used as a single task. You can proceed to Step 5."
-msgstr "✓ কাজ বিভাজন বাদ দেওয়া হয়েছে। পুরো AOI একটি কাজ হিসেবে ব্যবহৃত হবে। আপনি ধাপ ৫-এ যেতে পারেন।"
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""
 
