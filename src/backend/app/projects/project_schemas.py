@@ -76,6 +76,7 @@ class CreateProjectRequest(ODKCentral, QFieldCloud):
 
     algorithm: SplittingAlgorithm | None = None
     no_of_buildings: int = 10
+    no_of_tasks: int = 10
     dimension_meters: int = 100
     include_roads: bool = True
     include_rivers: bool = True

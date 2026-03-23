@@ -59,6 +59,7 @@ def render_leaflet_map(
             "weight": layer.get("weight", 2),
             "opacity": layer.get("opacity", 0.8),
             "fillOpacity": layer.get("fillOpacity", 0.3),
+            "popupOptions": layer.get("popup_options", {}),
         }
         escaped_layers.append(layer_config)
 
@@ -166,20 +167,43 @@ def render_leaflet_map(
                                 onEachFeature:
                                   function(f, layer) {{
                                     if (f.properties) {{
-                                        var ks = Object.keys(
+                                        var popupOptions =
+                                            cfg.popupOptions || {{}};
+                                        var propertyLabels =
+                                            popupOptions.propertyLabels || {{}};
+                                        var propertyOrder =
+                                            popupOptions.propertyOrder || [];
+                                        var showLayerName =
+                                            popupOptions.showLayerName !== false;
+                                        var orderedKeys = propertyOrder.filter(
+                                            function(k) {{
+                                                return Object.prototype
+                                                    .hasOwnProperty.call(
+                                                        f.properties, k);
+                                            }}
+                                        );
+                                        var extraKeys = Object.keys(
                                             f.properties
+                                        ).filter(function(k) {{
+                                            return !propertyOrder.includes(k);
+                                        }});
+                                        var ks = orderedKeys.concat(
+                                            extraKeys
                                         ).slice(0, 5);
                                         var ps = ks.map(
                                             function(k) {{
                                             return '<b>'
-                                                + k
+                                                + (propertyLabels[k] || k)
                                                 + ':</b> '
                                                 + f.properties[k];
                                         }}).join('<br>');
-                                        var h = '<b>'
-                                            + cfg.name
-                                            + '</b><br>'
-                                            + (ps || 'None');
+                                        var h = ps || 'None';
+                                        if (showLayerName) {{
+                                            h = '<b>'
+                                                + cfg.name
+                                                + '</b><br>'
+                                                + h;
+                                        }}
                                         layer.bindPopup(h);
                                     }}
                                 }}

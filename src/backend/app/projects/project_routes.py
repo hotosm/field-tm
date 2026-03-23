@@ -155,6 +155,7 @@ async def _split_project_if_requested(
         options=SplitAoiOptions(
             algorithm=data.algorithm.value,
             no_of_buildings=data.no_of_buildings,
+            no_of_tasks=data.no_of_tasks,
             dimension_meters=data.dimension_meters,
             include_roads=data.include_roads,
             include_rivers=data.include_rivers,

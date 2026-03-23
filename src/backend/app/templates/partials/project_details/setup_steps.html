@@ -468,9 +468,7 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
             <option value="AVG_BUILDING_SKELETON">
               {{ _("Average Buildings v2 (Straight Skeleton)") }}
             </option>
-            <option value="TOTAL_TASKS" disabled>
-              {{ _("Split by Specific Number of Tasks (Coming Soon)") }}
-            </option>
+            <option value="TOTAL_TASKS">{{ _("Split by Specific Number of Tasks") }}</option>
           </select>
         </div>
         <div id="algorithm-param-container">
@@ -483,6 +481,17 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
               type="number"
               id="no-of-buildings"
               name="no_of_buildings"
+              value="10"
+              min="1"
+              class="ftm-split-input"
+            />
+          </div>
+          <div id="param-tasks" style="display: none">
+            <label for="no-of-tasks" class="ftm-split-label">{{ _("Number of Tasks:") }}</label>
+            <input
+              type="number"
+              id="no-of-tasks"
+              name="no_of_tasks"
               value="10"
               min="1"
               class="ftm-split-input"
