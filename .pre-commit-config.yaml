@@ -155,6 +155,8 @@ repos:
             MD033,
             --disable,
             MD059,
+            --disable,
+            MD046,
             --ignore,
             CHANGELOG.md,
             --ignore,

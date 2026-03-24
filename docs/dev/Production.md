@@ -40,31 +40,26 @@ just prep machine
 Run this as a non-root user. It installs and configures the container runtime
 (runc, containerd, nerdctl) in rootless mode.
 
-## 3. Generate `.env`
+## 3. Configure `.env`
 
 ```bash
-just config generate-dotenv
+just config setup
 ```
 
-This creates `.env` from `.env.example` if it does not already exist.
+This runs an interactive wizard that:
 
-## 4. Configure `.env`
+1. Generates `.env` from `.env.example`
+2. Asks for your domain and Let's Encrypt email
+3. Lets you choose an auth provider
+4. Auto-generates secure secrets and database passwords
+5. Pauses so you can review and edit `.env` before continuing
 
-The production behavior is controlled by `.env`. Start with the generated file,
-then review the sections below.
+For advanced or automated setups you can instead run
+`just config generate-dotenv` and edit `.env` by hand.
 
-### Required base settings
+### Base settings
 
-Set these for every production deployment:
-
-- `FTM_DOMAIN`: Public domain for your Field-TM instance
-  (for example, `fieldtm.example.com`)
-- `CERT_EMAIL`: Email for Let's Encrypt certificate registration
-- `FTM_DB_PASSWORD`: PostgreSQL password (change from default)
-- `ENCRYPTION_KEY`: App encryption key. Generate with
-  `openssl rand -base64 32`
-
-Also review:
+The `setup` wizard configures these automatically, but you may want to review:
 
 - `DEBUG` (default: `False`): Must be `False` in production
 - `LOG_LEVEL` (default: `INFO`): Application log level

@@ -108,8 +108,7 @@ just start dev
 
 # Production install
 just prep machine
-just config generate-dotenv
-# edit .env with your domain, certs, auth, etc.
+just config setup
 just start prod
 ```
 

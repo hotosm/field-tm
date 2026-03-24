@@ -31,13 +31,17 @@ Short version:
 git clone https://github.com/hotosm/field-tm.git
 cd field-tm
 just prep machine
-just config generate-dotenv
-# edit .env with your domain, certs, auth, etc.
+just config setup
 just start prod
 ```
 
-`just start prod` will prompt you to select a release version, check out that
-tag, and deploy. Run `just prep machine` as a non-root user.
+`just config setup` walks you through domain, certificates, and auth, then
+generates secure secrets automatically. `just start prod` will prompt you to
+select a release version, check out that tag, and deploy.
+
+!!! important
+
+        Run `just prep machine` as a non-root user.
 
 ## Requirements
 
