@@ -120,7 +120,7 @@ _containerd_rootless:
 
   # uidmap is needed for 'newuidmap' and 'newgidmap' binaries
   # dbus-user-session is needed for userspace systemd
-  sudo apt-get install --no-install-recommends -y uidmap dbus-user-session
+  sudo apt-get install --no-install-recommends -y uidmap dbus-user-session iptables
   systemctl --user start dbus
 
   # AppArmor required for Ubuntu 24.04 onwards
