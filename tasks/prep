@@ -103,7 +103,7 @@ _nerdctl_containerd:
   just prep _curl
 
   just _echo-blue "Installing high level container runtime: containerd + nerdctl CLI"
-  VERSION=2.1.3
+  VERSION=2.2.1
   ARCH=$(just prep _get_arch)
   URL="https://github.com/containerd/nerdctl/releases/download/v${VERSION}/nerdctl-full-${VERSION}-linux-${ARCH}.tar.gz"
 
