@@ -5,6 +5,6 @@
 
 ```bash
 just build backend
-just start all
+just start dev
 just test backend
 ```

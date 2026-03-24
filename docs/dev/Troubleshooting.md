@@ -1,38 +1,80 @@
-# Troubleshooting 🆘
+# Troubleshooting
 
-## Running Field-TM standalone
+## Local development issues
 
-- Although it's easiest to use Docker, sometimes it may no be feasible, or
-  not preferred.
-- We use a tool called `uv` to manage dependencies.
-- Be careful when running Field-TM you are not accidentally pulling in your
-  system packages.
+### Containers won't start
 
-### Tips
-
-- Troubleshoot the packages `uv` sees with:
-  `uv pip list`
-- Check a package can be imported in the uv-based Python environment:
-
-  ```bash
-  uv run python
-  import litestar
-  ```
-
-If you receive errors such as:
+Check logs for the failing service:
 
 ```bash
+docker compose logs backend
+docker compose logs central
+```
+
+If services fail immediately, regenerate your `.env`:
+
+```bash
+rm .env
+just config generate-dotenv
+just start dev
+```
+
+### Backend can't connect to the database
+
+The database host `fieldtm-db` is resolved automatically by docker compose.
+If the backend reports connection errors:
+
+- Check the database container is healthy: `docker compose ps fieldtm-db`
+- Check database logs: `docker compose logs fieldtm-db`
+- If the database was recently recreated, migrations may need to run again.
+  Restart the stack: `just stop all && just start dev`
+
+### Environment variable errors
+
+If you see errors like:
+
+```text
 pydantic.error_wrappers.ValidationError: 3 validation errors for Settings
 OSM_URL
   field required (type=value_error.missing)
-OSM_SCOPE
-  field required (type=value_error.missing)
 ```
 
-Then you need to set the env variables on your system.
+Your environment variables are not loaded. Either:
 
-Alternatively, run via `just`:
+- Regenerate `.env`: `just config generate-dotenv`
+- Or run via just, which loads `.env` automatically:
+  `just start backend-no-docker`
+
+### Package import errors (running without Docker)
+
+We use `uv` to manage dependencies. Make sure you're running inside the
+uv-managed environment:
 
 ```bash
-just start backend-no-docker
+# Check what packages uv sees
+cd src/backend && uv pip list
+
+# Verify a package can be imported
+uv run python -c "import litestar"
 ```
+
+If you get import errors, sync dependencies first:
+
+```bash
+cd src/backend && uv sync
+```
+
+### OSM fieldwork changes not reflected
+
+The `osm-fieldwork` package is mounted inside the backend container during
+local development. After modifying code in `src/backend/packages/osm-fieldwork`,
+restart the backend:
+
+```bash
+docker compose restart backend
+```
+
+## Production issues
+
+For production deployment troubleshooting, see the
+[Production Deployment](./Production.md#help-field-tm-is-broken) guide.

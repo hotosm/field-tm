@@ -32,16 +32,57 @@ dev:
   cd {{justfile_directory()}}
   AUTH_PROVIDER=disabled {{docker}} compose up -d
 
-# Production deploy, based on current checked out branch
+# Prompt the user to select a release tag, checkout, and export GIT_BRANCH.
+# Exits if the working tree is dirty or no tags are found.
+[no-cd]
+_select-version:
+  #!/usr/bin/env bash
+  set -e
+
+  cd {{justfile_directory()}}
+
+  # Guard: refuse to deploy with uncommitted changes
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    just _echo-red "You have unstaged / uncommitted changes. Stash them first before deploy."
+    exit 1
+  fi
+
+  # Collect Field-TM release tags (CalVer 20xx.*)
+  mapfile -t tags < <(git tag -l '20*' --sort=-v:refname)
+  if [ ${#tags[@]} -eq 0 ]; then
+    just _echo-red "No Field-TM release tags found."
+    exit 1
+  fi
+
+  echo ""
+  just _echo-blue "Select Field-TM version:"
+  echo ""
+  PS3="Enter number: "
+  select chosen in "${tags[@]}"; do
+    if [ -n "$chosen" ]; then
+      break
+    fi
+    echo "Invalid selection, try again."
+  done
+
+  echo ""
+  just _echo-blue "Checking out ${chosen}..."
+  git checkout "${chosen}"
+
+  # Persist the chosen tag for the calling recipe
+  echo "${chosen}" > /tmp/.ftm_deploy_tag
+
+# Production deploy
 [no-cd]
 prod:
   #!/usr/bin/env sh
   set -e
 
+  just start _select-version
+  export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
+
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
@@ -52,7 +93,7 @@ prod:
         {{docker}} compose -f - up --detach \
         --remove-orphans --force-recreate
 
-  just _echo-blue "FieldTM started successfully"
+  just _echo-blue "FieldTM ${GIT_BRANCH} started successfully"
 
 # Production deploy with self-hosted Hanko auth (contrib/login)
 [no-cd]
@@ -60,10 +101,11 @@ prod-login:
   #!/usr/bin/env sh
   set -e
 
+  just start _select-version
+  export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
+
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
@@ -79,7 +121,7 @@ prod-login:
     --remove-orphans --force-recreate
   rm -f "$tmp_main" "$tmp_login"
 
-  just _echo-blue "FieldTM + self-hosted Hanko started successfully"
+  just _echo-blue "FieldTM ${GIT_BRANCH} + self-hosted Hanko started successfully"
 
 # Production deploy with self-hosted ODK Central
 [no-cd]
@@ -87,10 +129,11 @@ prod-with-odk:
   #!/usr/bin/env sh
   set -e
 
+  just start _select-version
+  export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
+
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
@@ -101,7 +144,7 @@ prod-with-odk:
         {{docker}} compose -f - -f compose.odk.yaml up --detach \
         --remove-orphans --force-recreate
 
-  just _echo-blue "FieldTM + ODK Central started successfully"
+  just _echo-blue "FieldTM ${GIT_BRANCH} + ODK Central started successfully"
 
 # Start backend API only
 [no-cd]

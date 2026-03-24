@@ -2,263 +2,182 @@
 
 # AGENTS.md
 
-Machine-readable operating guidance for AI coding agents in **field-tm**.
-
-Project: **field-tm**  
-Accountability: human maintainers are responsible for all merged changes.
+Guidance for AI coding agents in **Field-TM**.
+Human developers are accountable for all merged changes.
 
 ---
 
-# 1) Current Architecture (Authoritative)
+## Project
 
-Field-TM manager workflows currently run through a single LiteStar backend:
+Field-TM coordinates field mapping campaigns for humanitarian OpenStreetMap
+work. Mappers use ODK Collect or QField on mobile; managers create and monitor
+projects via a web UI. The backend handles task splitting, ODK/QFieldCloud
+integration, data conflation, and submission tracking.
 
-- LiteStar app under `src/backend/app/`
-- HTMX + server-rendered templates for manager UI
-- JSON API routes alongside HTMX routes, with shared backend logic
-- Minimal JavaScript only when server-rendering is not enough
-
-Current backend structure to prefer:
-
-- Route layers in `src/backend/app/api/` and `src/backend/app/htmx/`
-- Shared business logic in `*_crud.py`, `*_services.py`, helpers, and package code
-- Templates and static assets in `src/backend/app/templates/` and `src/backend/app/static/`
-
-Active code and support paths:
-
-- `src/backend/app/`
-- `src/backend/tests/`
-- `src/backend/packages/osm-fieldwork/`
-- `src/backend/packages/area-splitter/`
-- `src/migrations/init/`
-
-Supporting local service/container code also exists in:
-
-- `src/odkcentral/`
-- `src/qfield/`
-
-Older SQL snapshots live in `src/migrations/archived/` and are not the primary target for schema updates.
+**Stack:** Python 3.12 / LiteStar / HTMX / PostgreSQL 18 + PostGIS 3.6 /
+Docker Compose (dev + prod) / Helm (k8s) / uv / Ruff / pre-commit
 
 ---
 
-# 2) Required Reading Order
+## Structure
 
-Before non-trivial changes:
-
-1. `docs/decisions/README.md`
-2. All MADR in `docs/decisions/`
-
-Note: older decisions under `docs/decisions/archived` should be ignored, and are just historical reference.
-
----
-
-# 3) Agent Workflow Contract
-
-Use this execution loop:
-
-1. Discover
-   - Inspect current code paths first.
-   - Prefer existing patterns over inventing new ones.
-2. Plan
-   - Keep edits minimal and task-scoped.
-   - Identify tests to update/add before coding.
-3. Implement
-   - Keep handlers thin.
-   - Put business logic in service/crud layers or package modules.
-   - Reuse shared logic across HTMX and API flows.
-4. Verify
-   - Run targeted tests first, then broader checks.
-   - Report what you could and could not verify.
-5. Summarize
-   - List changed files and behavioral impact.
-   - List risks and follow-up actions if any.
-
-For large work, deliver in safe incremental commits/patches rather than one monolith.
-
----
-
-# 4) Commands (Use These)
-
-Install backend deps:
-
-```bash
-cd src/backend && uv sync
-```
-
-Run backend app tests:
-
-```bash
-cd src/backend && uv run pytest -v tests
-```
-
-Run package tests:
-
-```bash
-cd src/backend && uv run pytest -v packages/osm-fieldwork/tests packages/area-splitter/tests
-```
-
-Run all backend tests from the backend workspace:
-
-```bash
-cd src/backend && uv run pytest -v
-```
-
-Run lint/format hooks:
-
-```bash
-just lint
-```
-
-Start full docker stack:
-
-```bash
-just start all
-```
-
-Run backend-only docker test stack:
-
-```bash
-just test backend
-```
-
-Run backend without docker:
-
-```bash
-just start backend-no-docker
+```text
+src/backend/app/          # LiteStar application
+src/backend/app/api/      # JSON API routes
+src/backend/app/htmx/     # HTMX routes (server-rendered UI)
+src/backend/app/templates/ # Jinja2 templates
+src/backend/app/static/   # Static assets (JS, CSS, images)
+src/backend/tests/        # Backend tests
+src/backend/packages/     # osm-fieldwork, area-splitter
+src/migrations/init/      # Current schema SQL
+src/odkcentral/           # ODK Central container config
+src/qfield/              # QField container config
+docs/decisions/          # MADRs (read before non-trivial changes)
+tasks/                   # Just submodule recipes
+deploy/                  # Production compose files
+chart/                   # Helm chart
 ```
 
 ---
 
-# 5) Coding Standards
+## Commands
 
-- Prefer explicit, simple, readable code.
-- Avoid unnecessary abstractions.
-- Keep functions focused and small.
-- If there is a well-maintained existing library implementation, use that instead.
-- Add comments only where intent is non-obvious.
-- Reuse existing DTO/schema/service/crud patterns.
-- Keep route handlers thin and move stateful logic into shared backend modules.
-
-HTMX principles:
-
-- Server owns state and rendering decisions.
-- Use partial template responses intentionally.
-- Avoid client-state duplication.
-- Do not add JavaScript where HTMX or server-rendering already covers the flow.
+```bash
+just test backend-routes                   # app tests
+just test backend                          # all tests (inc. packages)
+just lint                                  # pre-commit hooks
+just start dev                             # full docker stack
+just start backend-no-docker               # backend only (no docker)
+just test backend                          # docker test stack
+```
 
 ---
 
-# 6) Testing Standards
+## Decisions Already Made
 
-All new behavior must be tested.
+Read `docs/decisions/` before proposing alternatives to these:
 
-- Cover success and failure paths.
-- Favor route/integration behavior tests for HTTP flows.
-- Add unit tests for isolated service logic as needed.
-- Add backend route tests under `src/backend/tests/`.
-- Add package tests under the relevant package directory (`src/backend/packages/*/tests/`).
-- Do not weaken/delete tests to "make CI pass".
-
-If environment constraints block test execution, state the exact blocker.
+- **No SPA.** Manager UI is server-rendered LiteStar + HTMX. A React frontend
+  existed previously and was removed. Do not reintroduce client-side routing or
+  SPA patterns.
+- **No separate frontend build.** Templates and static files are served by the
+  backend. No webpack/vite/node build step.
+- **No incremental migrations.** Schema lives in `src/migrations/init/` as
+  base SQL. Do not add Alembic-style migration files unless maintainers ask.
+- **Rootless containers in prod.** Production uses nerdctl/containerd in
+  rootless mode, not Docker daemon. The `just prep machine` flow sets this up.
+- **CalVer releases.** Tags are `YYYY.MINOR.PATCH` (e.g. `2026.1.3`), no `v`
+  prefix. Conventional Commits for messages.
 
 ---
 
-# 7) Security and Safety Boundaries
+## Where AI Help Is Welcome
+
+- Backend route handlers, services, CRUD logic
+- Tests (route/integration tests, unit tests for services)
+- HTMX templates and partials
+- osm-fieldwork / area-splitter package code
+- Documentation and docstrings
+- Just task recipes
+- Boilerplate, scaffolding, refactoring within existing patterns
+
+---
+
+## Where AI Must Not Act Unsupervised
+
+Get explicit approval before changing:
+
+- Auth/permission model or middleware
+- Database schema
+- Deployment config (`deploy/`, `chart/`, `.github/workflows/`)
+- Dependencies (new or upgraded)
+- Encryption, token handling, or credential flows
+- CI pipeline configuration
+
+---
+
+## Security Boundaries
 
 Never:
 
-- Commit `.env` or credentials
-- Hardcode secrets/tokens
-- Bypass auth/permission checks
-- Introduce unparameterized SQL
+- Commit `.env`, credentials, or secrets
+- Hardcode secrets or tokens
+- Bypass auth or permission checks
+- Use unparameterized SQL or string-interpolated queries
+- Use `eval()`, `exec()`, or dynamic code execution
+- Introduce XSS vectors (unescaped user input in templates)
+- Disable CSRF, CORS, or other security middleware
 
-Ask first before:
-
-- New dependencies
-- Auth model changes
-- DB schema changes not aligned with current migration strategy
-- Deployment/infrastructure changes
-- CI workflow changes
+These are non-negotiable regardless of task scope.
 
 ---
 
-# 8) Database and Migration Policy
+## Coding Standards
 
-Current schema evolution is expected to be reflected in the base SQL init files under:
-
-- `src/migrations/init/`
-
-Do not add incremental migration files unless explicitly requested by maintainers.
-Do not treat `src/migrations/archived/` as the primary place for new schema edits.
-
----
-
-# 9) Repo Change Boundaries
-
-Default edit scope:
-
-- `src/backend/**`
-- `src/migrations/init/**`
-- `docs/**`
-- `tasks/**` / `Justfile` (only when needed for task alignment)
-
-Usually avoid unless the task explicitly requires it:
-
-- `src/odkcentral/**`
-- `src/qfield/**`
-
-Do not modify these unless explicitly requested:
-
-- `.env`
-- `chart/`
-- `deploy/`
-- `.github/workflows/`
-
-Also avoid editing generated or local-environment artifacts unless the task is specifically about them:
-
-- `**/__pycache__/`
-- `**/.pytest_cache/`
-- `**/.ruff_cache/`
-- `src/backend/.venv/`
-- `src/backend/dist/`
+- Explicit, simple, readable. No unnecessary abstractions.
+- Thin route handlers; business logic in `*_services.py` / `*_crud.py`.
+- Reuse existing patterns (DTOs, schemas, services) rather than inventing new ones.
+- Comments only where intent is non-obvious.
+- HTMX: server owns state, use partial responses, no client-side state
+  duplication, no JS where HTMX suffices.
 
 ---
 
-# 10) Dependency and Versioning Policy
+## Testing Standards
 
-- Use Conventional Commits.
-- Keep dependency diffs minimal and justified.
-- Respect Renovate flow (`renovate.json`).
-- Avoid opportunistic upgrades unrelated to the task.
+All new behavior must be tested (success + failure paths).
 
-Always include a Git trailer with model information:
+- Route/integration tests for HTTP flows under `src/backend/tests/`.
+- Unit tests for isolated service logic as needed.
+- Package tests under `src/backend/packages/*/tests/`.
+- Do not weaken or delete tests to make CI pass.
+- If environment constraints block test execution, state the exact blocker.
+
+---
+
+## Anti-Patterns
+
+- Reintroducing SPA patterns or client-side routing
+- Adding JS where HTMX/server-rendering covers the flow
+- Large refactors without staged validation
+- Mixing old and new architectural styles in one feature
+- Duplicating logic between HTMX handlers and API handlers
+- Opportunistic dependency upgrades unrelated to the task
+
+---
+
+## Workflow
+
+1. **Discover** - read current code first; prefer existing patterns.
+2. **Plan** - minimal, task-scoped edits; identify tests before coding.
+3. **Implement** - thin handlers, shared logic, incremental commits.
+4. **Verify** - targeted tests first, then broader checks.
+5. **Summarize** - changed files, behavioral impact, risks.
+
+## Edit Scope
+
+Default: `src/backend/**`, `src/migrations/init/**`, `docs/**`, `tasks/**`,
+`Justfile`
+
+Avoid unless task requires: `src/odkcentral/`, `src/qfield/`
+
+Do not touch without explicit request: `.env`, `chart/`, `deploy/`,
+`.github/workflows/`, `**/__pycache__/`, `**/.venv/`
+
+## Commits
+
+Use Conventional Commits. Include a Git trailer:
 
 ```text
 Assisted-by: <Tool Name>
 ```
 
----
+## Done Criteria
 
-# 11) Anti-Patterns
-
-- Reintroducing SPA patterns for manager workflows
-- Adding JS where HTMX/server-rendering is sufficient
-- Large refactors without staged validation
-- Mixing old and new architectural styles in one feature
-- Duplicating business logic between HTMX handlers and JSON API handlers
-
-Consistency and maintainability are higher priority than novelty.
-
----
-
-# 12) Done Criteria
-
-A change is "done" when all are true:
-
-1. Behavior implemented and documented in code/tests.
-2. Relevant tests pass (or blockers are explicitly reported).
-3. Lint/format checks run for changed scope.
-4. File-level summary and risk notes are provided.
+1. Behavior implemented and tested.
+2. Tests pass (or blockers reported).
+3. Lint/format clean for changed scope `prek run --all-files`.
+4. File summary and risk notes provided.
 
 When uncertain, ask instead of assuming.
 
