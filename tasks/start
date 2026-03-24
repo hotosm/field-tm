@@ -16,8 +16,8 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Allow usage of nerdctl instead of docker
-docker := env("DOCKER_ALIAS", "docker")
+# Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
+docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
 
 # List available commands
 [private]
@@ -69,13 +69,9 @@ prod:
   #!/usr/bin/env bash
   set -e
 
-  # Ensure PATH includes common binary locations (rootless docker, snap, etc.)
-  export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
-
-  if ! command -v {{docker}} >/dev/null 2>&1; then
-    just _echo-red "'{{docker}}' not found. If using nerdctl, set DOCKER_ALIAS=nerdctl in .env"
-    exit 1
-  fi
+  # Source exported env vars from .bashrc (e.g. CONTAINERD_SNAPSHOTTER)
+  # Aliases are ignored in non-interactive scripts; nerdctl is resolved by just.
+  eval "$(grep '^export ' ~/.bashrc 2>/dev/null)" || true
 
   just start _select-version
   export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
@@ -115,13 +111,8 @@ prod-with-odk:
   #!/usr/bin/env bash
   set -e
 
-  # Ensure PATH includes common binary locations (rootless docker, snap, etc.)
-  export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
-
-  if ! command -v {{docker}} >/dev/null 2>&1; then
-    just _echo-red "'{{docker}}' not found. If using nerdctl, set DOCKER_ALIAS=nerdctl in .env"
-    exit 1
-  fi
+  # Source exported env vars from .bashrc (e.g. CONTAINERD_SNAPSHOTTER)
+  eval "$(grep '^export ' ~/.bashrc 2>/dev/null)" || true
 
   just start _select-version
   export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)

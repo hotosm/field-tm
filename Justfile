@@ -18,6 +18,9 @@
 
 set dotenv-load
 
+# Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
+docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
+
 mod start 'tasks/start'
 mod stop 'tasks/stop'
 mod build 'tasks/build'
@@ -40,7 +43,7 @@ help:
 
 # Delete local database, S3, and ODK Central data
 clean:
-  docker compose down -v
+  {{docker}} compose down -v
 
 # Run pre-commit hooks
 lint:
