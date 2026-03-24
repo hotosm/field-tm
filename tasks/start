@@ -47,25 +47,16 @@ _select-version:
     exit 1
   fi
 
-  # Collect Field-TM release tags (CalVer 20xx.*)
-  mapfile -t tags < <(git tag -l '20*' --sort=-v:refname)
+  # Collect Field-TM release tags (CalVer 20xx.*), most recent 8
+  mapfile -t tags < <(git tag -l '20*' --sort=-v:refname | head -n 8)
   if [ ${#tags[@]} -eq 0 ]; then
     just _echo-red "No Field-TM release tags found."
     exit 1
   fi
 
   echo ""
-  just _echo-blue "Select Field-TM version:"
-  echo ""
-  PS3="Enter number: "
-  select chosen in "${tags[@]}"; do
-    if [ -n "$chosen" ]; then
-      break
-    fi
-    echo "Invalid selection, try again."
-  done
+  chosen=$(just _select-menu "Select Field-TM version:" "${tags[@]}")
 
-  echo ""
   just _echo-blue "Checking out ${chosen}..."
   git checkout "${chosen}"
 
