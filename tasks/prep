@@ -121,6 +121,15 @@ _containerd_rootless:
   # uidmap is needed for 'newuidmap' and 'newgidmap' binaries
   # dbus-user-session is needed for userspace systemd
   sudo apt-get install --no-install-recommends -y uidmap dbus-user-session iptables
+  # Ensure iptables alternative is configured (may not be set on minimal installs)
+  if ! command -v iptables &> /dev/null; then
+    sudo update-alternatives --set iptables /usr/sbin/iptables-nft
+    sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-nft
+  fi
+  # Rootless containerd may not have /usr/sbin in PATH, so ensure iptables is reachable
+  if [ ! -e /usr/local/bin/iptables ]; then
+    sudo ln -s "$(update-alternatives --query iptables | grep Value | awk '{print $2}')" /usr/local/bin/iptables
+  fi
   systemctl --user start dbus
 
   # AppArmor required for Ubuntu 24.04 onwards
