@@ -14,14 +14,15 @@ your own cloud server.
   is a good guide for basic server setup including creation of a
   user.
 
-### Run the install script
+### Prepare the machine and deploy with Just
 
 ```bash
-curl -L https://get.field.hotosm.org -o install.sh
-bash install.sh
-
-# Then follow the prompts
+just prep machine
+just config generate-dotenv
+just start prod
 ```
+
+`install.sh` is no longer maintained and should not be used.
 
 #### Additional Environment Variables
 

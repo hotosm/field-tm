@@ -11,8 +11,6 @@ It is recommended to run Field-TM on a Linux-based machine.
 Before you can install and use this application, you will need to have
 the following software installed and configured on your system:
 
-> If running Debian/Ubuntu, the install script below does this for you.
-
 [Git][3] to clone the Field-TM repository.
 
 [Docker][4]
@@ -25,20 +23,17 @@ for easy orchestration of the Field-TM services.
 >
 > i.e. `docker compose` commands, not `docker-compose` (the old tool).
 
-## Easy Install
+## Quick Start
 
-On a Linux-based machine with `bash` installed, run the script:
-
-> Note: it is best to run this script as a user other than root.
->
-> However, if you run as root, a user svcftm will be created for you.
+The `install.sh` script is no longer maintained. Use the `just` commands instead:
 
 ```bash
-curl -L https://get.field.hotosm.org -o install.sh
-bash install.sh
-
-# Then follow the prompts
+just prep machine
+just config generate-dotenv
+just start prod
 ```
+
+> Note: run `just prep machine` as a non-root user.
 
 ## Manual Install
 
