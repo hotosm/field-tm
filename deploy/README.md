@@ -30,5 +30,7 @@ Alternative production entry points:
 
 ```sh
 just start prod-with-odk
-just start prod-login
 ```
+
+> `just start prod` automatically includes the self-hosted Hanko login overlay
+> when `AUTH_PROVIDER=bundled` is set in `.env`.

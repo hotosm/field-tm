@@ -83,7 +83,7 @@ The `setup` wizard configures these automatically, but you may want to review:
 - `custom`: Your own Hanko instance
   Deploy with `just start prod`
 - `bundled`: Self-hosted Hanko via the login overlay
-  Deploy with `just start prod-login`
+  Deploy with `just start prod` (login overlay is included automatically)
 
 If you use `AUTH_PROVIDER=hotosm`, set:
 
@@ -211,11 +211,10 @@ just start prod-with-odk
 
 ### Field-TM with self-hosted Hanko login
 
-```bash
-just start prod-login
-```
+Set `AUTH_PROVIDER=bundled` in `.env` (or select it during `just config setup`),
+then run `just start prod` — the login overlay is included automatically.
 
-All three commands will:
+All commands will:
 
 1. Check for uncommitted changes (and refuse to proceed if dirty)
 2. Present a numbered list of available release versions

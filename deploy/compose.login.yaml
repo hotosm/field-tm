@@ -20,7 +20,8 @@
 #
 # IMPORTANT: This file uses ${FTM_DOMAIN} in bunkerweb env var KEY names,
 # which requires envsubst preprocessing - the same pipeline already used by
-# compose.sub.yaml.  Use `just start prod-login` which handles this.
+# compose.sub.yaml.  `just start prod` handles this automatically when
+# AUTH_PROVIDER=bundled is set in .env.
 #
 # For non-VM deployments see AUTH_PROVIDER=hotosm (centralised HOT login)
 # or AUTH_PROVIDER=custom (bring-your-own Hanko).

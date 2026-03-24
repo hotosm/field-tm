@@ -151,7 +151,7 @@ setup:
   echo ""
   just _echo-blue "Setup complete. Config written to .env"
   echo ""
-  just _echo-yellow "Modify .env as needed, then run: just start prod       (or just start prod-login)"
+  just _echo-yellow "Modify .env as needed, then run: just start prod"
   echo ""
 
 # For custom branding, place favicon.svg in the repo root, then run this
