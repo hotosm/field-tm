@@ -26,7 +26,7 @@ default:
 
 # Start Field-TM (auth disabled)
 [no-cd]
-all:
+dev:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
