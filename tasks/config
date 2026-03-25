@@ -59,7 +59,7 @@ generate-dotenv branch="dev":
   # By default we deploy from 'dev' branch, but can be overridden
 
   cd {{justfile_directory()}}
-  just manage _install_envsubst
+  just prep envsubst
 
   if [ -f .env ]; then
     just _echo-yellow "'.env' already exists. Skipping generation."

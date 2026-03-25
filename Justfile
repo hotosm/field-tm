@@ -27,8 +27,6 @@ mod build 'tasks/build'
 mod test 'tasks/test'
 mod config 'tasks/config'
 mod manage 'tasks/manage'
-mod prep 'tasks/prep'
-mod chart 'tasks/chart'
 mod docs 'tasks/docs'
 mod i18n 'tasks/i18n'
 
@@ -40,6 +38,18 @@ default:
 # List available commands
 help:
   just --justfile {{justfile()}} --list
+
+# Prep module from https://github.com/hotosm/justfiles
+prep *args:
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/prep.just \
+      -o {{justfile_directory()}}/tasks/prep.just;
+    @just --justfile {{justfile_directory()}}/tasks/prep.just {{args}}
+
+# Chart module from https://github.com/hotosm/justfiles
+chart *args:
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/chart.just \
+      -o {{justfile_directory()}}/tasks/chart.just;
+    @just --justfile {{justfile_directory()}}/tasks/chart.just --set chart_name "field-tm" {{args}}
 
 # Delete local database, S3, and ODK Central data
 clean:
