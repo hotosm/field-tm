@@ -15,7 +15,6 @@
 
     <!-- Resource hints to reduce first-paint theme/font flash -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="preconnect" href="https://unpkg.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -51,12 +50,15 @@
       wa-card:not(:defined),
       wa-badge:not(:defined),
       wa-callout:not(:defined),
+      wa-dropdown:not(:defined),
+      wa-icon:not(:defined),
       wa-input:not(:defined),
       wa-textarea:not(:defined),
       wa-select:not(:defined),
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
       hot-header:not(:defined),
+      hotosm-tool-menu:not(:defined),
       hotosm-auth:not(:defined) {
         visibility: hidden;
       }
@@ -91,13 +93,25 @@
       import "@awesome.me/webawesome/dist/components/callout/callout.js";
       import "@awesome.me/webawesome/dist/components/card/card.js";
       import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+      import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+      import "@awesome.me/webawesome/dist/components/icon/icon.js";
       import "@awesome.me/webawesome/dist/components/input/input.js";
       import "@awesome.me/webawesome/dist/components/select/select.js";
       import "@awesome.me/webawesome/dist/components/tag/tag.js";
       import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
     </script>
 
-    <!-- HOT UI theme + components -->
+    <!-- hotosm-auth (always loaded first — must precede hotosm-tool-menu) -->
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
+    ></script>
+
+    <!-- HOT UI theme + components (registers hotosm-tool-menu / export tool) -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/style-core.css"
@@ -112,16 +126,6 @@
       type="module"
       src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
     ></script>
-    {% if auth_enabled %}
-    <link
-      rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
-    />
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth/dist/hanko-auth.esm.js"
-    ></script>
-    {% endif %}
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -132,22 +136,22 @@
       name="htmx-config"
       content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}'
     />
-    <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
 
     <!-- Maps - Leaflet -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
     {% block extra_head %}{% endblock %}
   </head>
@@ -155,45 +159,31 @@
   <body>
     <hot-header id="app-header" title="FieldTM" size="medium">
       {% if auth_enabled %}
-      <wa-button slot="auth" variant="brand" id="login-btn">{{ _("Login") }}</wa-button>
+      <hotosm-auth
+        slot="auth"
+        hanko-url="{{ hanko_public_url }}"
+        base-path="{{ hanko_public_url }}"
+        redirect-after-login="{{ frontend_url }}"
+        redirect-after-logout="{{ frontend_url }}"
+        mapping-check-url="/api/v1/auth/profile/me"
+        app-id="field-tm"
+        button-variant="filled"
+        lang="{{ current_locale() }}"
+      ></hotosm-auth>
       {% endif %}
+      <hotosm-tool-menu slot="auth" lang="{{ current_locale() }}"></hotosm-tool-menu>
     </hot-header>
 
-    {% if auth_enabled %}
-    <!-- Hidden session verifier: validates the Hanko session after redirect back
-         from the login page and emits hanko-login. -->
-    <div style="display: none">
-      <hotosm-auth hanko-url="{{ hanko_public_url }}"></hotosm-auth>
-    </div>
-    {% endif %} {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 
     <script>
       {% if auth_enabled %}
-      const loginButton = document.getElementById("login-btn");
-      if (loginButton) {
-        loginButton.addEventListener("click", () => {
-          const returnTo = encodeURIComponent(window.location.href);
-          const separator = "{{ login_url }}".includes("?") ? "&" : "?";
-          window.location.href = `{{ login_url }}${separator}return_to=${returnTo}`;
-        });
-      }
-
-      // Sync the authenticated user into the Field-TM database once per browser
-      // session. hotosm-auth validates the session and emits 'hanko-login' on
-      // every page load when a session is found; sessionStorage prevents us
-      // hitting the endpoint on each navigation after the first sync.
+      // hotosm-auth calls mapping-check-url on every session detection. The
+      // sessionStorage guard prevents redundant syncs on subsequent navigations.
       const hotosmAuth = document.querySelector("hotosm-auth");
       if (hotosmAuth) {
-        hotosmAuth.addEventListener("hanko-login", async () => {
-          if (sessionStorage.getItem("ftm_profile_synced")) return;
-          try {
-            const resp = await fetch("/api/v1/auth/profile/me", { credentials: "include" });
-            if (resp.ok) {
-              sessionStorage.setItem("ftm_profile_synced", "1");
-            }
-          } catch (e) {
-            console.warn("Field-TM: failed to sync user profile:", e);
-          }
+        hotosmAuth.addEventListener("hanko-login", () => {
+          sessionStorage.setItem("ftm_profile_synced", "1");
         });
 
         // Clear the flag on logout so the next login triggers a fresh sync.

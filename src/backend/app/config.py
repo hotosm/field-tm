@@ -18,11 +18,14 @@
 """Config file for Pydantic and LiteStar, using environment variables."""
 
 import base64
+import logging
 import os
 from enum import Enum
 from functools import lru_cache
 from typing import Annotated, Optional, Union
 from urllib.parse import urlsplit
+
+log = logging.getLogger(__name__)
 
 from cryptography.fernet import Fernet
 from pydantic import (
@@ -361,10 +364,20 @@ def get_settings():
         os.environ["HANKO_API_URL"] = _settings.HANKO_API_URL
     os.environ["COOKIE_SECRET"] = _settings.ENCRYPTION_KEY.get_secret_value()
 
+    # hotosm-auth reads OSM_LOGIN_REDIRECT_URI from env to register the OSM OAuth
+    # callback route via setup_auth().  Derive it from FTM_DOMAIN so it matches
+    # the actual server address without requiring a separate env var.
+    if _settings.AUTH_PROVIDER != AuthProvider.DISABLED:
+        if _settings.FTM_DEV_PORT:
+            _osm_callback = f"http://{_settings.FTM_DOMAIN}:{_settings.FTM_DEV_PORT}/api/auth/osm/callback"
+        else:
+            _osm_callback = f"https://{_settings.FTM_DOMAIN}/api/auth/osm/callback"
+        os.environ["OSM_LOGIN_REDIRECT_URI"] = _osm_callback
+
     if _settings.DEBUG:
         # Enable detailed Python async debugger
         # os.environ["PYTHONASYNCIODEBUG"] = "1"
-        print(f"Loaded settings: {_settings.model_dump()}")
+        log.debug("Loaded settings: %s", _settings.model_dump())
     return _settings
 
 
