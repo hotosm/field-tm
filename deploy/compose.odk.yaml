@@ -46,8 +46,6 @@ services:
   central:
     image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.4"
     depends_on:
-      proxy:
-        condition: service_healthy
       central-db:
         condition: service_healthy
       pyxform:
