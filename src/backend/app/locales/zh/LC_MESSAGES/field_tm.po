@@ -1787,8 +1787,8 @@ msgstr "请立即保存这些凭据。它们只会显示一次。"
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "重新加载项目页面"
+msgid "View FieldTM Project"
+msgstr "查看 FieldTM 项目"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1862,4 +1862,3 @@ msgstr "接受任务选择"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

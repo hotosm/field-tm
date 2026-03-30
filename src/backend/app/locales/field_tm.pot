@@ -1771,7 +1771,7 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
+msgid "View FieldTM Project"
 msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5

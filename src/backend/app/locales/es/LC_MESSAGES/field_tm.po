@@ -1929,8 +1929,8 @@ msgstr "Guarde estas credenciales ahora. Solo se mostrarán una vez."
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "Recargar página del proyecto"
+msgid "View FieldTM Project"
+msgstr "Ver proyecto de FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -2020,4 +2020,3 @@ msgstr "Aceptar elecciones de tareas"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

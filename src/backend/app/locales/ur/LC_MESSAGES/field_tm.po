@@ -1884,8 +1884,8 @@ msgstr "یہ معلومات ابھی محفوظ کریں۔ یہ صرف ایک ب
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "منصوبے کا صفحہ دوبارہ لوڈ کریں"
+msgid "View FieldTM Project"
+msgstr "FieldTM منصوبہ دیکھیں"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1973,4 +1973,3 @@ msgstr "کام کے اختیارات قبول کریں"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

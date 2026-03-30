@@ -1886,8 +1886,8 @@ msgstr "Ajiye waɗannan bayanan shaida yanzu. Za a nuna su sau ɗaya kacal."
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "Sake loda shafin aiki"
+msgid "View FieldTM Project"
+msgstr "Duba aikin FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1974,4 +1974,3 @@ msgstr "Karɓi zaɓin ayyuka"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

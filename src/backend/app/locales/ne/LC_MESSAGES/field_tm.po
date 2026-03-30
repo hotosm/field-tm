@@ -1906,8 +1906,8 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "परियोजना पृष्ठ पुनःलोड गर्नुहोस्"
+msgid "View FieldTM Project"
+msgstr "FieldTM परियोजना हेर्नुहोस्"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1995,4 +1995,3 @@ msgstr "कार्य विकल्पहरू स्वीकार गर
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

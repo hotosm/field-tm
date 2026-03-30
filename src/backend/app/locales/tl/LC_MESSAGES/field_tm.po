@@ -1941,8 +1941,8 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "I-reload ang Pahina ng Proyekto"
+msgid "View FieldTM Project"
+msgstr "Tingnan ang proyekto ng FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -2039,4 +2039,3 @@ msgstr "Tanggapin ang mga Piniling Gawain"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

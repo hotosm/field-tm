@@ -1899,8 +1899,8 @@ msgstr "Simpan kredensial ini sekarang. Ini hanya akan ditampilkan sekali."
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "Muat Ulang Halaman Proyek"
+msgid "View FieldTM Project"
+msgstr "Lihat proyek FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1989,4 +1989,3 @@ msgstr "Terima Pilihan Tugas"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-
