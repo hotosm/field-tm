@@ -99,69 +99,24 @@ def add_endpoint_profiler(app: Litestar) -> None:
     app.middleware.append(profiler_middleware)
 
 
-from urllib.parse import urlparse
-
-# Endpoints that should not create tracing or error noise
-IGNORED_PATHS = {
-    "/robots.txt",
-}
-
-
-def traces_sampler(sampling_context: dict) -> float:
-    """Determine if an incoming request should be traced.
-    Returns 0.0 to ignore, 1.0 to trace.
-    """
-    scope = sampling_context.get("asgi_scope")
-
-    if scope:
-        path = scope.get("path", "")
-        if path in IGNORED_PATHS:
-            return 0.0
-
-    return 1.0
-
-
-def before_send(event: dict, hint: dict) -> dict | None:
-    """Filter out specific error events before they are sent to Sentry."""
-    request = event.get("request", {})
-    url = request.get("url")
-
-    if url:
-        path = urlparse(url).path
-        if path in IGNORED_PATHS:
-            return None
-
-    return event
-
-
-def set_sentry_otel_tracer(dsn: str) -> None:
-    """Initialize Sentry with OpenTelemetry integration."""
-    if not dsn:
-        return
-
-    try:
-        from opentelemetry import trace
-        from opentelemetry.propagate import set_global_textmap
-        from opentelemetry.sdk.trace import TracerProvider
-        from sentry_sdk import init
-        from sentry_sdk.integrations.opentelemetry import (
-            SentryPropagator,
-            SentrySpanProcessor,
-        )
-    except ImportError:
-        # Silently fail if packages are missing (e.g. in local dev environment)
-        return
+def set_sentry_otel_tracer(dsn: str):
+    """Add OpenTelemetry tracing only if environment variables configured."""
+    from opentelemetry import trace
+    from opentelemetry.propagate import set_global_textmap
+    from opentelemetry.sdk.trace import TracerProvider
+    from sentry_sdk import init
+    from sentry_sdk.integrations.opentelemetry import (
+        SentryPropagator,
+        SentrySpanProcessor,
+    )
 
     init(
         dsn=dsn,
         enable_tracing=True,
+        traces_sample_rate=1.0,
         instrumenter="otel",
-        traces_sampler=traces_sampler,
-        before_send=before_send,
-        propagate_traces=True,
     )
 
-    # OpenTelemetry Tracing Setup
     provider = TracerProvider()
     provider.add_span_processor(SentrySpanProcessor())
     trace.set_tracer_provider(provider)
