@@ -1016,6 +1016,18 @@ body {
   margin-top: 10px;
 }
 
+/* --- hot-header tab color guard --------------------------- */
+/* hotosm-auth can introduce global CSS that overrides HOT design tokens.
+   Locking the neutral tokens on hot-header ensures tab text and active
+   border colors always use the correct values from style-core.css,
+   regardless of load order or external component interference.          */
+hot-header {
+  --hot-color-neutral-300: #b3b0b3; /* tab hover border */
+  --hot-color-neutral-600: #716f73; /* tab default text */
+  --hot-color-neutral-800: #515057; /* tab hover/active text + border */
+  --hot-color-neutral-900: #404248; /* tab active+hover text */
+}
+
 /* --- App logo -------------------------------------------- */
 .ftm-app-logo {
   width: 24px;

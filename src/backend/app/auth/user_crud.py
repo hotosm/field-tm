@@ -39,6 +39,10 @@ async def get_or_create_user(
                 )
                 ON CONFLICT (sub)
                 DO UPDATE SET
+                    -- Refresh mutable fields on every login so that accounts
+                    -- created before email/username were available get updated.
+                    username = COALESCE(EXCLUDED.username, users.username),
+                    email_address = COALESCE(EXCLUDED.email_address, users.email_address),
                     profile_img = EXCLUDED.profile_img,
                     last_login_at = NOW()
                 RETURNING sub, username, email_address, profile_img, is_admin

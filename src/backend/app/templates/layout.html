@@ -15,6 +15,7 @@
 
     <!-- Resource hints to reduce first-paint theme/font flash -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -50,16 +51,14 @@
       wa-card:not(:defined),
       wa-badge:not(:defined),
       wa-callout:not(:defined),
-      wa-dropdown:not(:defined),
-      wa-icon:not(:defined),
       wa-input:not(:defined),
       wa-textarea:not(:defined),
       wa-select:not(:defined),
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
       hot-header:not(:defined),
-      hotosm-tool-menu:not(:defined),
-      hotosm-auth:not(:defined) {
+      hotosm-auth:not(:defined),
+      hotosm-tool-menu:not(:defined) {
         visibility: hidden;
       }
     </style>
@@ -93,25 +92,13 @@
       import "@awesome.me/webawesome/dist/components/callout/callout.js";
       import "@awesome.me/webawesome/dist/components/card/card.js";
       import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-      import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
-      import "@awesome.me/webawesome/dist/components/icon/icon.js";
       import "@awesome.me/webawesome/dist/components/input/input.js";
       import "@awesome.me/webawesome/dist/components/select/select.js";
       import "@awesome.me/webawesome/dist/components/tag/tag.js";
       import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
     </script>
 
-    <!-- hotosm-auth (always loaded first — must precede hotosm-tool-menu) -->
-    <link
-      rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
-    />
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
-    ></script>
-
-    <!-- HOT UI theme + components (registers hotosm-tool-menu / export tool) -->
+    <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/style-core.css"
@@ -126,6 +113,16 @@
       type="module"
       src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
     ></script>
+    {% if auth_enabled %}
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/hanko-auth@0.5.2/dist/hanko-auth.esm.js"
+    ></script>
+    {% endif %}
 
     <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
@@ -136,22 +133,22 @@
       name="htmx-config"
       content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}'
     />
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.3/dist/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
 
     <!-- Maps - Leaflet -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <script
-      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
     {% block extra_head %}{% endblock %}
   </head>
@@ -165,30 +162,102 @@
         base-path="{{ hanko_public_url }}"
         redirect-after-login="{{ frontend_url }}"
         redirect-after-logout="{{ frontend_url }}"
-        mapping-check-url="/api/v1/auth/profile/me"
         app-id="field-tm"
         button-variant="filled"
         lang="{{ current_locale() }}"
+        mapping-check-url="/api/v1/auth/profile/me"
       ></hotosm-auth>
-      {% endif %}
       <hotosm-tool-menu slot="auth" lang="{{ current_locale() }}"></hotosm-tool-menu>
+      {% endif %}
     </hot-header>
 
     {% block content %}{% endblock %}
 
     <script>
       {% if auth_enabled %}
-      // hotosm-auth calls mapping-check-url on every session detection. The
-      // sessionStorage guard prevents redundant syncs on subsequent navigations.
+      // hotosm-auth emits 'hanko-login' on every page load when a session exists.
+      // We call /profile/me once per session: it syncs the user into the FTM
+      // database and returns the OSM username, which we set as display-name so
+      // hotosm-auth shows the username instead of the raw Hanko UUID.
       const hotosmAuth = document.querySelector("hotosm-auth");
       if (hotosmAuth) {
-        hotosmAuth.addEventListener("hanko-login", () => {
-          sessionStorage.setItem("ftm_profile_synced", "1");
+        // Helper: push a display name into hotosm-auth via both attribute and
+        // direct Lit property so the component re-renders immediately.
+        function _setDisplayName(name) {
+          hotosmAuth.setAttribute("display-name", name);
+          // Also set the Lit reactive property directly so the component
+          // re-renders even if attributeChangedCallback is delayed.
+          if ("displayNameAttr" in hotosmAuth) {
+            hotosmAuth.displayNameAttr = name;
+          }
+        }
+
+        // Helper: overwrite the profile-email text inside hotosm-auth's Shadow DOM.
+        // The component renders `this.user.email || this.user.id` there; SSO users
+        // (OSM OAuth) have no email in Hanko so it falls back to the UUID.
+        // We replace the text directly via shadowRoot (open mode → accessible).
+        // The equality check prevents an infinite observer loop: after we set
+        // textContent the observer fires again, but finds current === email → no-op.
+        function _patchProfileEmail(email) {
+          const root = hotosmAuth.shadowRoot;
+          if (!root) return;
+          const el = root.querySelector(".profile-email");
+          if (!el || el.textContent.trim() === email) return;
+          el.textContent = email;
+        }
+
+        // Set up a MutationObserver on the shadow root so we re-patch whenever
+        // Lit re-renders (opening/closing the dropdown changes `isOpen`, which
+        // triggers a full re-render that resets profile-email back to the UUID).
+        // Must be called after the shadow root exists (inside event handlers).
+        let _emailObserverReady = false;
+        function _setupEmailObserver() {
+          if (_emailObserverReady) return;
+          const root = hotosmAuth.shadowRoot;
+          if (!root) return;
+          _emailObserverReady = true;
+          new MutationObserver(() => {
+            const email = sessionStorage.getItem("ftm_display_name_v2");
+            if (email) _patchProfileEmail(email);
+          }).observe(root, { subtree: true, childList: true, characterData: true });
+        }
+
+        // Apply a cached name immediately (before hanko-login fires) so there
+        // is no flash of UUID on navigations after the first profile fetch.
+        // Note: shadowRoot is not yet available here (ESM not loaded), so only
+        // _setDisplayName runs now; _patchProfileEmail runs inside the event handler.
+        const _cached = sessionStorage.getItem("ftm_display_name_v2");
+        if (_cached) _setDisplayName(_cached);
+
+        hotosmAuth.addEventListener("hanko-login", async () => {
+          // shadowRoot is guaranteed to exist inside event handlers.
+          _setupEmailObserver();
+          const cachedName = sessionStorage.getItem("ftm_display_name_v2");
+          if (cachedName) {
+            _setDisplayName(cachedName);
+            _patchProfileEmail(cachedName);
+            return;
+          }
+          try {
+            const resp = await fetch("/api/v1/auth/profile/me", { credentials: "include" });
+            if (resp.ok) {
+              const profile = await resp.json();
+              // DbUser serializes email as `email_address`; prefer it so the
+              // dropdown shows the full email rather than the email-prefix username.
+              const name = profile.email_address || profile.username || profile.name;
+              if (name) {
+                sessionStorage.setItem("ftm_display_name_v2", name);
+                _setDisplayName(name);
+                _patchProfileEmail(name);
+              }
+            }
+          } catch (e) {
+            console.warn("Field-TM: failed to sync user profile:", e);
+          }
         });
 
-        // Clear the flag on logout so the next login triggers a fresh sync.
         hotosmAuth.addEventListener("hanko-logout", () => {
-          sessionStorage.removeItem("ftm_profile_synced");
+          sessionStorage.removeItem("ftm_display_name_v2");
         });
       }
       {% endif %}

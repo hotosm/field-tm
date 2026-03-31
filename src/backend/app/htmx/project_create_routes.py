@@ -23,7 +23,6 @@ import json
 import logging
 from io import BytesIO
 from pathlib import Path
-from urllib.parse import quote
 
 from litestar import get, post
 from litestar import status_codes as status
@@ -38,10 +37,9 @@ from osm_fieldwork.xlsforms import xlsforms_path
 from psycopg import AsyncConnection
 from psycopg.rows import dict_row
 
-from app.auth.auth_deps import get_optional_auth_user, get_user_sub, login_required
+from app.auth.auth_deps import get_user_sub, login_required
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import mapper
-from app.config import AuthProvider, settings
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
 from app.htmx.htmx_schemas import XLSFormUploadData
@@ -189,11 +187,6 @@ def _to_bool_form_value(value: object, default: bool = False) -> bool:
     return bool(value)
 
 
-def _login_prompt_path(return_to: str) -> str:
-    """Build the local login page path with a post-login return target."""
-    return f"/login?return_to={quote(return_to, safe='')}"
-
-
 async def _validate_xlsform_extension(data) -> BytesIO:
     """Validate an uploaded XLSForm has .xls or .xlsx extension and return bytes."""
     filename = Path(data.filename or "")
@@ -240,26 +233,12 @@ async def _resolve_uploaded_xlsform_bytes(
     path="/new",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(get_optional_auth_user),
     },
 )
 async def new_project(
-    request: HTMXRequest, db: AsyncConnection, auth_user: object | None
-) -> Template | Response:
+    request: HTMXRequest, db: AsyncConnection
+) -> Template:
     """Render the new project creation form."""
-    if settings.AUTH_PROVIDER != AuthProvider.DISABLED and auth_user is None:
-        login_path = _login_prompt_path(str(request.url.path))
-        if request.headers.get("HX-Request") == "true":
-            return Response(
-                content="",
-                status_code=status.HTTP_200_OK,
-                headers={"HX-Redirect": login_path},
-            )
-        return Response(
-            content="",
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": login_path},
-        )
     return HTMXTemplate(template_name="new_project.html")
 
 

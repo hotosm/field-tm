@@ -18,14 +18,11 @@
 """Config file for Pydantic and LiteStar, using environment variables."""
 
 import base64
-import logging
 import os
 from enum import Enum
 from functools import lru_cache
 from typing import Annotated, Optional, Union
 from urllib.parse import urlsplit
-
-log = logging.getLogger(__name__)
 
 from cryptography.fernet import Fernet
 from pydantic import (
@@ -377,7 +374,7 @@ def get_settings():
     if _settings.DEBUG:
         # Enable detailed Python async debugger
         # os.environ["PYTHONASYNCIODEBUG"] = "1"
-        log.debug("Loaded settings: %s", _settings.model_dump())
+        print(f"Loaded settings: {_settings.model_dump()}")
     return _settings
 
 
