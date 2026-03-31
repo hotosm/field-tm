@@ -28,6 +28,7 @@ from litestar.types import ASGIApp, Receive, Scope, Send
 
 log = logging.getLogger(__name__)
 
+
 def add_endpoint_profiler(app: Litestar) -> None:
     """Add a simple per-request profiler middleware when DEBUG is enabled.
 
@@ -97,6 +98,7 @@ def add_endpoint_profiler(app: Litestar) -> None:
     # Register middleware with the Litestar app
     app.middleware.append(profiler_middleware)
 
+
 from urllib.parse import urlparse
 
 # Endpoints that should not create tracing or error noise
@@ -104,13 +106,13 @@ IGNORED_PATHS = {
     "/robots.txt",
 }
 
+
 def traces_sampler(sampling_context: dict) -> float:
-    """
-    Determine if an incoming request should be traced.
+    """Determine if an incoming request should be traced.
     Returns 0.0 to ignore, 1.0 to trace.
     """
     scope = sampling_context.get("asgi_scope")
-    
+
     if scope:
         path = scope.get("path", "")
         if path in IGNORED_PATHS:
@@ -118,10 +120,9 @@ def traces_sampler(sampling_context: dict) -> float:
 
     return 1.0
 
+
 def before_send(event: dict, hint: dict) -> dict | None:
-    """
-    Filter out specific error events before they are sent to Sentry.
-    """
+    """Filter out specific error events before they are sent to Sentry."""
     request = event.get("request", {})
     url = request.get("url")
 
@@ -132,10 +133,9 @@ def before_send(event: dict, hint: dict) -> dict | None:
 
     return event
 
+
 def set_sentry_otel_tracer(dsn: str) -> None:
-    """
-    Initialize Sentry with OpenTelemetry integration.
-    """
+    """Initialize Sentry with OpenTelemetry integration."""
     if not dsn:
         return
 
@@ -296,4 +296,3 @@ def get_otel_plugin():
     from litestar.contrib.opentelemetry import OpenTelemetryConfig, OpenTelemetryPlugin
 
     return OpenTelemetryPlugin(OpenTelemetryConfig())
-
