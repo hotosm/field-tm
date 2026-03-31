@@ -1,0 +1,137 @@
+name: Deploy to https://field.testlogin.hotosm.org
+
+on:
+  push:
+    branches:
+      - login_hanko
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: hotosm/field-tm
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src
+          target: prod
+          push: true
+          tags: ghcr.io/${{ env.IMAGE_NAME }}:login_hanko
+          build-args: |
+            MONITORING=yes
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: testlogin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Add host to known_hosts
+        run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
+        run: |
+          ssh $EC2_USER@$EC2_HOST << 'ENDSSH'
+            set -e
+
+            # Ensure Traefik is running
+            if ! docker ps | grep -q traefik; then
+              echo "ERROR: Traefik not running. Run setup-test-server.sh first."
+              exit 1
+            fi
+
+            # Ensure hotosm-test network exists
+            docker network inspect hotosm-test >/dev/null 2>&1 || \
+              docker network create hotosm-test
+
+            APP_DIR="/opt/field-tm"
+
+            # Initial setup if directory does not exist
+            if [ ! -d "$APP_DIR" ]; then
+              sudo mkdir -p $APP_DIR
+              sudo chown $USER:$USER $APP_DIR
+              git clone -b login_hanko https://github.com/hotosm/field-tm.git $APP_DIR
+              echo "Cloned repository"
+            fi
+
+            cd $APP_DIR
+
+            # Pull latest changes
+            git fetch origin login_hanko
+            git reset --hard origin/login_hanko
+
+            # Create .env with config
+            cat > deploy/.env << EOF
+          FTM_DOMAIN=field.testlogin.hotosm.org
+          FTM_ODK_DOMAIN=odk.field.testlogin.hotosm.org
+          GIT_BRANCH=login_hanko
+          FTM_DB_USER=fieldtm
+          FTM_DB_PASSWORD=fieldtm
+          FTM_DB_NAME=fieldtm
+          CENTRAL_DB_USER=odk
+          CENTRAL_DB_PASSWORD=odk
+          CENTRAL_DB_NAME=odk
+          COOKIE_SECRET=${COOKIE_SECRET}
+          AUTH_PROVIDER=hanko
+          HANKO_API_URL=https://dev.login.hotosm.org
+          HANKO_PUBLIC_URL=https://dev.login.hotosm.org
+          LOGIN_URL=https://dev.login.hotosm.org/app
+          JWT_ISSUER=https://dev.login.hotosm.org
+          EOF
+            echo "Created .env"
+
+            # Login to GHCR
+            echo "${GH_TOKEN}" | docker login ghcr.io -u ${GH_ACTOR} --password-stdin
+
+            cd deploy
+
+            # Stop app containers
+            docker compose -f compose.testlogin.yaml stop api migrations || true
+
+            # Pull new images
+            docker compose -f compose.testlogin.yaml pull
+
+            # Remove old app containers
+            docker compose -f compose.testlogin.yaml rm -f api migrations || true
+
+            # Ensure db is running
+            docker compose -f compose.testlogin.yaml up -d --no-recreate fieldtm-db central-db
+
+            # Wait for db
+            sleep 5
+
+            # Start fresh app containers
+            docker compose -f compose.testlogin.yaml up -d
+
+            # Cleanup old images
+            docker image prune -af
+
+            echo "Deployment complete: https://field.testlogin.hotosm.org"
+          ENDSSH

@@ -1,0 +1,130 @@
+# Testlogin deployment overlay for Field-TM
+# Uses Traefik (already running on testlogin server) instead of BunkerWeb
+#
+# Usage:
+#   docker compose -f deploy/compose.testlogin.yaml up -d
+
+name: field-tm
+
+networks:
+  ftm-net:
+    name: field-tm
+  hotosm-test:
+    external: true
+
+volumes:
+  ftm_db_data:
+    name: field-tm-db-data
+  ftm_logs:
+    name: field-tm-logs
+  central_db_data:
+    name: field-tm-central-db
+  central_frontend:
+    name: field-tm-central-frontend
+
+services:
+  # API served directly via Traefik (no BunkerWeb)
+  api:
+    image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH:-login_hanko}"
+    volumes:
+      - ftm_logs:/opt/logs
+    depends_on:
+      fieldtm-db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      - FTM_DOMAIN=${FTM_DOMAIN}
+      - HANKO_API_URL=${HANKO_API_URL:-https://dev.login.hotosm.org}
+      - HANKO_PUBLIC_URL=${HANKO_PUBLIC_URL:-https://dev.login.hotosm.org}
+      - LOGIN_URL=${LOGIN_URL:-https://dev.login.hotosm.org/app}
+      - JWT_ISSUER=${JWT_ISSUER:-https://dev.login.hotosm.org}
+    networks:
+      - ftm-net
+      - hotosm-test
+    restart: "unless-stopped"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.field-tm-api.rule=Host(`${FTM_DOMAIN}`)"
+      - "traefik.http.routers.field-tm-api.entrypoints=websecure"
+      - "traefik.http.routers.field-tm-api.tls=true"
+      - "traefik.http.routers.field-tm-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.field-tm-api.loadbalancer.server.port=8000"
+      - "traefik.docker.network=hotosm-test"
+
+  migrations:
+    image: "ghcr.io/hotosm/field-tm:${GIT_BRANCH:-login_hanko}"
+    depends_on:
+      fieldtm-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - ftm-net
+    entrypoint: ["/migrate-entrypoint.sh"]
+    restart: "on-failure:2"
+
+  fieldtm-db:
+    image: "ghcr.io/hotosm/postgis:18-3.6-alpine"
+    command: -c 'max_connections=64'
+    volumes:
+      - ftm_db_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${FTM_DB_USER:-fieldtm}
+      - POSTGRES_PASSWORD=${FTM_DB_PASSWORD:-fieldtm}
+      - POSTGRES_DB=${FTM_DB_NAME:-fieldtm}
+    networks:
+      - ftm-net
+    restart: "unless-stopped"
+    healthcheck:
+      test: pg_isready -U ${FTM_DB_USER:-fieldtm} -d ${FTM_DB_NAME:-fieldtm}
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ODK Central services (optional, for full Field-TM functionality)
+  central:
+    image: "ghcr.io/hotosm/field-tm/odkcentral:v2025.4.4"
+    depends_on:
+      central-db:
+        condition: service_healthy
+    environment:
+      - DOMAIN=${FTM_ODK_DOMAIN:-odk.${FTM_DOMAIN}}
+      - HTTPS_PORT=443
+      - SYSADMIN_EMAIL=${CENTRAL_ADMIN_EMAIL:-admin@hotosm.org}
+      - DB_HOST=central-db
+      - DB_USER=${CENTRAL_DB_USER:-odk}
+      - DB_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - DB_NAME=${CENTRAL_DB_NAME:-odk}
+      - DB_SSL=null
+    networks:
+      - ftm-net
+    restart: "unless-stopped"
+
+  central-db:
+    image: "ghcr.io/hotosm/postgis:14-3.5-alpine"
+    environment:
+      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
+      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
+    volumes:
+      - central_db_data:/var/lib/postgresql/data
+    networks:
+      - ftm-net
+    restart: "unless-stopped"
+    command: -c 'max_connections=64'
+    healthcheck:
+      test: pg_isready -U ${CENTRAL_DB_USER:-odk} -d ${CENTRAL_DB_NAME:-odk}
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 3
