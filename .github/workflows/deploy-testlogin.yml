@@ -1,4 +1,4 @@
-name: Deploy to https://field.testlogin.hotosm.org
+name: Deploy to https://fieldtm.testlogin.hotosm.org
 
 on:
   push:
@@ -89,8 +89,8 @@ jobs:
 
             # Create .env with config
             cat > deploy/.env << EOF
-          FTM_DOMAIN=field.testlogin.hotosm.org
-          FTM_ODK_DOMAIN=odk.field.testlogin.hotosm.org
+          FTM_DOMAIN=fieldtm.testlogin.hotosm.org
+          FTM_ODK_DOMAIN=odk.fieldtm.testlogin.hotosm.org
           GIT_BRANCH=login_hanko
           FTM_DB_HOST=fieldtm-db
           FTM_DB_USER=fieldtm
@@ -140,5 +140,5 @@ jobs:
             # Cleanup old images
             docker image prune -af
 
-            echo "Deployment complete: https://field.testlogin.hotosm.org"
+            echo "Deployment complete: https://fieldtm.testlogin.hotosm.org"
           ENDSSH
