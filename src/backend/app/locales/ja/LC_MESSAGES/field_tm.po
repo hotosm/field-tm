@@ -1807,8 +1807,8 @@ msgstr "これらの認証情報は今保存してください。表示される
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "プロジェクトページを再読み込み"
+msgid "View FieldTM Project"
+msgstr "FieldTMプロジェクトを表示"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1882,4 +1882,3 @@ msgstr "タスク選択を承認"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

@@ -130,13 +130,13 @@ prod-with-odk:
 
   just _echo-blue "FieldTM ${GIT_BRANCH} + ODK Central started successfully"
 
-# Start backend API only
+# Start backend API only (includes proxy for browser access)
 [no-cd]
 backend:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  {{docker}} compose up -d backend
+  {{docker}} compose up -d backend proxy
 
 # Start backend API without docker
 [no-cd]

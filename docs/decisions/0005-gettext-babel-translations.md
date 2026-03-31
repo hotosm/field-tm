@@ -36,6 +36,18 @@ catalog management tool for extraction, update, and compilation.
 We will keep `field-tm` and `osm-fieldwork` as separate gettext domains rather
 than forcing both projects into a single shared catalog.
 
+We will also keep different gettext patterns for the two domains:
+
+- `field_tm` uses standard bilingual gettext, where English source text lives
+  in `msgid`.
+- `osm_fieldwork` uses monolingual gettext, where stable field keys live in
+  `msgid` and the human-readable English labels live in `msgstr`.
+
+This is intentional. `field_tm` follows the normal UI translation workflow,
+while `osm_fieldwork` needs stable translation keys that match XLSForm field
+identifiers at runtime. Because of that, Weblate must be configured
+differently for each component.
+
 The main reasons are:
 
 - Gettext is the standard format supported broadly across Python web stacks and

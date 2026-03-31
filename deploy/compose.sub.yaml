@@ -143,8 +143,6 @@ services:
     volumes:
       - ftm_logs:/opt/logs
     depends_on:
-      proxy:
-        condition: service_healthy
       fieldtm-db:
         condition: service_healthy
       migrations:

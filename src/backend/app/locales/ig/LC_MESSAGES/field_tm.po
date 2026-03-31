@@ -1864,8 +1864,8 @@ msgstr "Chekwaa njirimara ndị a ugbu a. A ga-egosi ha naanị otu ugboro."
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "Bulite ibe ọrụ ọzọ"
+msgid "View FieldTM Project"
+msgstr "Lelee ọrụ FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1948,4 +1948,3 @@ msgstr "Nabata nhọrọ ọrụ"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

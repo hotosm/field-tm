@@ -1863,8 +1863,8 @@ msgstr "احفظ بيانات الاعتماد هذه الآن. لن تُعرض 
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "إعادة تحميل صفحة المشروع"
+msgid "View FieldTM Project"
+msgstr "عرض مشروع FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1947,4 +1947,3 @@ msgstr "قبول خيارات المهام"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

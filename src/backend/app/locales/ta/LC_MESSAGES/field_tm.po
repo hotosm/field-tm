@@ -1928,8 +1928,8 @@ msgstr "இந்த சான்றுகளை இப்போது சேம
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "திட்டப் பக்கத்தை மீண்டும் ஏற்று"
+msgid "View FieldTM Project"
+msgstr "FieldTM திட்டத்தைப் பார்க்கவும்"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -2022,4 +2022,3 @@ msgstr "பணி தேர்வுகளை ஏற்கவும்"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

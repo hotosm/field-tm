@@ -1894,8 +1894,8 @@ msgstr "এই তথ্যগুলো এখন সংরক্ষণ কর�
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "প্রকল্প পৃষ্ঠা পুনরায় লোড করুন"
+msgid "View FieldTM Project"
+msgstr "FieldTM প্রকল্প দেখুন"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1980,4 +1980,3 @@ msgstr "কাজের পছন্দ গ্রহণ করুন"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-

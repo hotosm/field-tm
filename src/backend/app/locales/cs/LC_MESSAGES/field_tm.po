@@ -1895,8 +1895,8 @@ msgstr "Uložte si tyto přihlašovací údaje nyní. Budou zobrazeny pouze jedn
 
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "Reload Project Page"
-msgstr "Znovu načíst stránku projektu"
+msgid "View FieldTM Project"
+msgstr "Zobrazit projekt FieldTM"
 
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
 msgid "Project created in QFieldCloud."
@@ -1979,4 +1979,3 @@ msgstr "Přijmout volby úkolů"
 #~ "(do not include select_one_from_file fields"
 #~ " for tasks/features)."
 #~ msgstr ""
-
