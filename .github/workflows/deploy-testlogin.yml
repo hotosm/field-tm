@@ -101,11 +101,16 @@ jobs:
           CENTRAL_DB_PASSWORD=odk
           CENTRAL_DB_NAME=odk
           COOKIE_SECRET=${COOKIE_SECRET}
-          AUTH_PROVIDER=hanko
+          ENCRYPTION_KEY=pIxxYIXe4oAVHI36lTveyc97FKK2O_l2VHeiuqU-K_4=
+          AUTH_PROVIDER=hotosm
           HANKO_API_URL=https://dev.login.hotosm.org
           HANKO_PUBLIC_URL=https://dev.login.hotosm.org
           LOGIN_URL=https://dev.login.hotosm.org/app
           JWT_ISSUER=https://dev.login.hotosm.org
+          OSM_CLIENT_ID=placeholder
+          OSM_CLIENT_SECRET=placeholder
+          OSM_SECRET_KEY=placeholder
+          OSM_URL=https://www.openstreetmap.org
           EOF
             echo "Created .env"
 
