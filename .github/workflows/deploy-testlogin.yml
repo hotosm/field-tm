@@ -92,9 +92,11 @@ jobs:
           FTM_DOMAIN=field.testlogin.hotosm.org
           FTM_ODK_DOMAIN=odk.field.testlogin.hotosm.org
           GIT_BRANCH=login_hanko
+          FTM_DB_HOST=fieldtm-db
           FTM_DB_USER=fieldtm
           FTM_DB_PASSWORD=fieldtm
           FTM_DB_NAME=fieldtm
+          CENTRAL_DB_HOST=central-db
           CENTRAL_DB_USER=odk
           CENTRAL_DB_PASSWORD=odk
           CENTRAL_DB_NAME=odk
