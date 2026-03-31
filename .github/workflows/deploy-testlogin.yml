@@ -58,7 +58,7 @@ jobs:
           GH_ACTOR: ${{ github.actor }}
           COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
         run: |
-          ssh $EC2_USER@$EC2_HOST << 'ENDSSH'
+          ssh $EC2_USER@$EC2_HOST << ENDSSH
             set -e
 
             # Ensure Traefik is running
@@ -74,14 +74,14 @@ jobs:
             APP_DIR="/opt/field-tm"
 
             # Initial setup if directory does not exist
-            if [ ! -d "$APP_DIR" ]; then
-              sudo mkdir -p $APP_DIR
-              sudo chown $USER:$USER $APP_DIR
-              git clone -b login_hanko https://github.com/hotosm/field-tm.git $APP_DIR
+            if [ ! -d "\$APP_DIR" ]; then
+              sudo mkdir -p \$APP_DIR
+              sudo chown \$USER:\$USER \$APP_DIR
+              git clone -b login_hanko https://github.com/hotosm/field-tm.git \$APP_DIR
               echo "Cloned repository"
             fi
 
-            cd $APP_DIR
+            cd \$APP_DIR
 
             # Pull latest changes
             git fetch origin login_hanko
