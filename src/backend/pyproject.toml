@@ -154,7 +154,7 @@ encoding = "utf-8"
 [tool.uv.sources]
 osm-fieldwork = { workspace = true }
 area-splitter = { workspace = true }
-qfieldcloud-sdk = { git = "https://github.com/hotosm/qfieldcloud-sdk-python", rev = "feat/temp-cgi-plus-user-api" }
+qfieldcloud-sdk = { git = "https://github.com/hotosm/qfieldcloud-sdk-python", rev = "f75370fcfa11e05858585c31e2c3b7105f28efc2" }
 
 [tool.uv.workspace]
 members = ["packages/*"]

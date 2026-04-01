@@ -569,7 +569,7 @@ requires-dist = [
     { name = "pyodk", specifier = ">=1.2.1" },
     { name = "python-multipart", specifier = "==0.0.22" },
     { name = "pyxform", specifier = "==4.0.0" },
-    { name = "qfieldcloud-sdk", git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=feat%2Ftemp-cgi-plus-user-api" },
+    { name = "qfieldcloud-sdk", git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=f75370fcfa11e05858585c31e2c3b7105f28efc2" },
     { name = "raw-data-api-py", specifier = "==0.3.0" },
     { name = "uvicorn", specifier = "==0.41.0" },
 ]
@@ -1969,7 +1969,7 @@ wheels = [
 [[package]]
 name = "qfieldcloud-sdk"
 version = "0.0.1"
-source = { git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=feat%2Ftemp-cgi-plus-user-api#07b9dc3d5231eb03bcdbe98aca8ef27a5d38d65d" }
+source = { git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=f75370fcfa11e05858585c31e2c3b7105f28efc2#f75370fcfa11e05858585c31e2c3b7105f28efc2" }
 dependencies = [
     { name = "certifi" },
     { name = "charset-normalizer" },
