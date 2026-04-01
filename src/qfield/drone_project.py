@@ -172,8 +172,9 @@ def _maybe_add_dem_layer(
             return None
 
         project.addMapLayer(dem_layer, addToLegend=False)
-        root.addLayer(dem_layer)
-        log.info("DEM raster layer added to project")
+        dem_node = root.addLayer(dem_layer)
+        dem_node.setItemVisibilityChecked(False)
+        log.info("DEM raster layer added to project (hidden by default)")
         return dem_path
     except (URLError, OSError) as exc:
         log.warning("Failed to download DEM, skipping: %s", exc)
