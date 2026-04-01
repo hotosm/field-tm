@@ -25,8 +25,9 @@ RUN apt-get update --quiet \
     apt-get install -y --quiet --no-install-recommends "libpq5" \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -u 1001 -m -s /bin/false qgis \
-    && mkdir -p /tmp/qgis_jobs && chown qgis:qgis /tmp/qgis_jobs
+    && mkdir -p /tmp/qgis_jobs /usr/src/app/packager \
+    && chown qgis:qgis /tmp/qgis_jobs
 COPY --from=build /usr/local/lib /usr/local/lib
-COPY project_gen_svc.py /usr/src/app/
+COPY *.py /usr/src/app/packager/
 USER qgis
-CMD ["python3", "/usr/src/app/project_gen_svc.py"]
+CMD ["python3", "/usr/src/app/packager/server.py"]

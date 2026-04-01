@@ -282,6 +282,9 @@ class Settings(BaseSettings):
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
     QFIELDCLOUD_PROJECT_OWNER: Optional[str] = ""
+    # FIXME the name QFIELDCLOUD_QGIS_URL probably isn't appropriate here
+    # as it's not technically a QFieldCloud variable
+    # This should match DroneTM var
     QFIELDCLOUD_QGIS_URL: str = "http://qfield-qgis:8080"
 
     @field_validator("QFIELDCLOUD_URL", mode="after")

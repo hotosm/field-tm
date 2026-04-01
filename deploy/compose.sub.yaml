@@ -212,7 +212,7 @@ services:
   # Generates QField-compatible .qgs project files from the FTM database.
   # This is NOT the full QFieldCloud stack - just the lightweight QGIS wrapper.
   qfield-qgis:
-    image: "ghcr.io/hotosm/field-tm/qgis:${QFIELDCLOUD_TAG:-26.3}"
+    image: "ghcr.io/hotosm/qfield-project-packager:${QFIELDCLOUD_TAG:-26.3}"
     depends_on:
       fieldtm-db:
         condition: service_healthy

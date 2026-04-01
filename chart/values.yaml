@@ -124,7 +124,7 @@ qfieldQgis:
   # Optional override for the QGIS wrapper image tag.
   # Leave empty to use qfieldCloud.tag.
   image:
-    repository: ghcr.io/hotosm/field-tm/qgis
+    repository: ghcr.io/hotosm/qfield-project-packager
     tag: ""
     pullPolicy: IfNotPresent
   env:
