@@ -26,13 +26,13 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "uvicorn==0.41.0",
-    "litestar[jinja]==2.21.0",
+    "litestar[jinja]==2.21.1",
     "pydantic==2.9.2",
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.22",
     "psycopg[c,pool]==3.3.3",
-    "cryptography==46.0.5",
+    "cryptography==46.0.6",
     "pyxform==4.0.0",
     "pyodk>=1.2.1",
     # TODO replace with official version, once PR merged
@@ -60,12 +60,12 @@ test = [
     "pytest-asyncio==0.24.0",
     "httpx==0.28.1",
     "pyinstrument==5.0.3",
-    "coverage==7.6.7",
+    "coverage==7.13.5",
     "coverage-badge==1.1.2",
     "asgi-lifespan==2.1.0",
 ]
 debug = [
-    "debugpy==1.8.17",
+    "debugpy==1.8.20",
 ]
 docs = [
     "mkdocs==1.6.1",
