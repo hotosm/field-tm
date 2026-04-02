@@ -50,8 +50,6 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 <!-- TODO: Splash image link [6] gives 404; ![field-tm-splash][6] -->
 
-
-
 ## How Field-TM Works
 
 1. Project is created in an area with three things:
@@ -263,7 +261,6 @@ Thanks goes to these wonderful people:
 [2]: https://github.com/hotosm/field-tm/releases/tag/2024.5.0 "Mapper Frontend"
 [3]: https://github.com/hotosm/field-tm/releases/tag/2025.1.0 "New Geoms"
 [4]: https://github.com/hotosm/field-tm/releases/tag/2025.2.0 "Web Forms"
-[6]: https://raw.githubusercontent.com/hotosm/field-tm/main/src/mapper/static/screenshot-mapper.jpeg "Mapper Page Screenshot"
 [7]: https://github.com/hotosm/field-tm/releases/tag/2025.3.0 "Offline Mode"
 [8]: https://github.com/hotosm/field-tm/discussions/2878 "Removed offline support"
 [9]: https://github.com/hotosm/field-tm/releases/tag/2026.1.0 "Renewed"
@@ -279,7 +276,6 @@ Thanks goes to these wonderful people:
 [19]: https://github.com/astral-sh/ruff "Ruff Format"
 [20]: https://oxc.rs/docs/guide/usage/formatter.html "Oxfmt"
 [21]: https://results.pre-commit.ci/latest/github/hotosm/field-tm/dev "pre-commit"
-[22]: https://docs.field.hotosm.org/coverage.html "Coverage Report"
 [23]: https://hosted.weblate.org/engage/hotosm "Weblate"
 [24]: https://www.bestpractices.dev/projects/9218 "OpenSSF Best Practices"
 [25]: https://slack.hotosm.org "HOTOSM Slack"
@@ -303,7 +299,6 @@ Thanks goes to these wonderful people:
 [badge-oxfmt]: https://img.shields.io/badge/code%20style-oxfmt-F7B93E
 [badge-pre-commit]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
-[badge-coverage]: https://docs.field.hotosm.org/coverage.svg
 [badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm/svg-badge.svg
 [badge-openssf]: https://www.bestpractices.dev/projects/9218/badge
 [badge-slack]: https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f
