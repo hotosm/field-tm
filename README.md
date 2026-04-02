@@ -22,7 +22,7 @@
 | :--- | :--- | :--- |
 | **Tech Stack** | | [![Litestar][badge-litestar]][14] [![HTMX][badge-htmx]][15] [![Postgres][badge-postgres]][16] [![Kubernetes][badge-kubernetes]][17] [![Docker][badge-docker]][18] |
 | **Code Style** | | [![Backend Style][badge-ruff]][19] [![Oxfmt][badge-oxfmt]][20] [![pre-commit][badge-pre-commit]][21] [![uv][badge-uv]][32] |
-| **Quality** | | [![Coverage][badge-coverage]][22] [![Translation][badge-translation]][23] [![OpenSSF Best Practices][badge-openssf]][24] |
+| **Quality** | | <!-- Coverage badge removed: coverage docs no longer published [![Coverage][badge-coverage]][22] --> [![Translation][badge-translation]][23] [![OpenSSF Best Practices][badge-openssf]][24] |
 | **Community** | | [![Slack][badge-slack]][25] [![All Contributors][badge-all-contributors]][26] |
 | **Other Info** | | [![docs][badge-docs]][27] [![dev-roadmap][badge-roadmap]][28] [![timeline][badge-timeline]][29] [![license-code][badge-license-code]][30] [![license-translations][badge-license-translations]][31] |
 
@@ -43,12 +43,14 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 > [!NOTE]
 > More details can be found here:
-> [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-field-tm),
+> [overview](https://field.hotosm.org/),
 > [timeline](https://docs.field.hotosm.org/timeline),
 > [docs](https://docs.field.hotosm.org) page, and the
 > [FAQ](https://docs.field.hotosm.org/about/faq).
 
-![field-tm-splash][6]
+<!-- TODO: Splash image link [6] gives 404; ![field-tm-splash][6] -->
+
+
 
 ## How Field-TM Works
 
