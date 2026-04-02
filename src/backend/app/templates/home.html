@@ -14,13 +14,8 @@
         </button>
 
         <!-- Status filter: inline on desktop, collapsible on mobile -->
-        {% set status_options = [
-          ('', _('All projects')),
-          ('DRAFT', _('Draft')),
-          ('PUBLISHED', _('Published')),
-          ('COMPLETED', _('Completed')),
-          ('ARCHIVED', _('Archived')),
-        ] %}
+        {% set status_options = [ ('', _('All projects')), ('DRAFT', _('Draft')), ('PUBLISHED',
+        _('Published')), ('COMPLETED', _('Completed')), ('ARCHIVED', _('Archived')), ] %}
         <div class="ftm-filters-collapsible">
           <div class="ftm-projects-filter">
             <span class="ftm-projects-filter__label">{{ _("Project Status") }}</span>
@@ -37,12 +32,8 @@
           </div>
         </div>
 
-        {% set sort_options = [
-          ('newest', _('Newest first')),
-          ('oldest', _('Oldest first')),
-          ('name_asc', _('Name (A-Z)')),
-          ('name_desc', _('Name (Z-A)')),
-        ] %}
+        {% set sort_options = [ ('newest', _('Newest first')), ('oldest', _('Oldest first')),
+        ('name_asc', _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %}
         <div class="ftm-projects-filter">
           <span class="ftm-projects-filter__label">{{ _("Sort By") }}</span>
           <wa-select
@@ -64,7 +55,7 @@
             type="search"
             name="search"
             size="small"
-            placeholder="{{ _("Search projects…") }}"
+            placeholder='{{ _("Search projects…") }}'
             value="{{ search_query or '' }}"
             with-clear
           >
@@ -80,10 +71,10 @@
     </div>
 
     <p class="ftm-projects-results">
-      {% set count = projects|length %}
-      {% trans count %}Showing {{ count }} project{% pluralize %}Showing {{ count }} projects{% endtrans %}{% if
-      selected_status %} {{ _("in %(status)s") % {"status": selected_status|lower|title} }}{% endif %}{% if search_query %}
-      {{ _('matching "%(query)s"') % {"query": search_query} }}{% endif %}
+      {% set count = projects|length %} {% trans count %}Showing {{ count }} project{% pluralize
+      %}Showing {{ count }} projects{% endtrans %}{% if selected_status %} {{ _("in %(status)s") %
+      {"status": selected_status|lower|title} }}{% endif %}{% if search_query %} {{ _('matching
+      "%(query)s"') % {"query": search_query} }}{% endif %}
     </p>
   </div>
 
@@ -99,7 +90,7 @@
         <div class="ftm-project-card__header-meta">
           <span class="ftm-project-card__id">
             #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
-            <span class="ftm-private-icon" title="{{ _("Private Project") }}">🔒</span>{% endif %}
+            <span class="ftm-private-icon" title='{{ _("Private Project") }}'>🔒</span>{% endif %}
           </span>
           <div class="ftm-project-card__badges">
             {% if project.status %} {% set status_value = project.status.value if
@@ -122,7 +113,9 @@
             {% endif %}
           </div>
         </div>
-        <span class="ftm-project-card__name">{{ project.project_name or _('Unnamed Project') }}</span>
+        <span class="ftm-project-card__name"
+          >{{ project.project_name or _('Unnamed Project') }}</span
+        >
       </div>
       <div class="ftm-project-card__body">
         <div class="ftm-project-card__content-top">
@@ -135,9 +128,7 @@
           </div>
           {% endif %}
         </div>
-        <p class="ftm-project-card__description">
-          {{ project.description or '' }}
-        </p>
+        <p class="ftm-project-card__description">{{ project.description or '' }}</p>
         <div class="ftm-project-card__meta">
           {% if project.hashtags %}
           <div class="ftm-project-card__tags">
@@ -151,7 +142,8 @@
           </div>
           {% endif %} {% if project.created_at %}
           <div class="ftm-project-card__footer">
-            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else _('N/A') }}
+            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at
+            else _('N/A') }}
           </div>
           {% endif %}
         </div>
@@ -160,7 +152,9 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="ftm-empty-state">{{ _("No projects found. Create your first project to get started!") }}</p>
+  <p class="ftm-empty-state">
+    {{ _("No projects found. Create your first project to get started!") }}
+  </p>
   {% endif %}
 </div>
 

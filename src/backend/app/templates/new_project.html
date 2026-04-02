@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{% endblock %} {%
-block content %}
+{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{%
+endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
   <h1 style="margin-bottom: 30px">{{ _("Create New Project") }}</h1>
 
@@ -122,7 +122,9 @@ block content %}
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
         <small class="ftm-form-help">
-          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data extract API is limited to 200 km².") }}
+          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area.
+          Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data
+          extract API is limited to 200 km².") }}
         </small>
         <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
           <button
@@ -154,18 +156,23 @@ block content %}
         <label class="ftm-form-label">{{ _("Hashtags") }}</label>
         <wa-input
           id="hashtag-input"
-          placeholder="{{ _("Type hashtags and press Enter or comma") }}"
+          placeholder='{{ _("Type hashtags and press Enter or comma") }}'
           style="width: 100%"
         ></wa-input>
         <div id="hashtags-container" class="ftm-hashtags-container"></div>
         <small class="ftm-form-help">
-          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove it.") }}
+          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove
+          it.") }}
         </small>
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn"> {{ _("Create Project") }} </wa-button>
-        <span id="submit-indicator" style="display: none; margin-inline-start: 10px">{{ _("Creating...") }}</span>
+        <wa-button type="submit" variant="brand" id="submit-btn">
+          {{ _("Create Project") }}
+        </wa-button>
+        <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
+          >{{ _("Creating...") }}</span
+        >
         <wa-button href="/projects" variant="default">{{ _("Cancel") }}</wa-button>
       </div>
     </form>

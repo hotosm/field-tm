@@ -238,6 +238,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/allisonsibrian"><img src="https://avatars.githubusercontent.com/u/114789954?v=4?s=100" width="100px;" alt="allison"/><br /><sub><b>allison</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=allisonsibrian" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://amitdkhan-pg.blogspot.com"><img src="https://avatars.githubusercontent.com/u/64206751?v=4?s=100" width="100px;" alt="Amit Khanekar"/><br /><sub><b>Amit Khanekar</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=amitdkhan-pg" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://chainbytes.com"><img src="https://avatars.githubusercontent.com/u/694055?v=4?s=100" width="100px;" alt="Eric Grill"/><br /><sub><b>Eric Grill</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=EricGrill" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sjorza"><img src="https://avatars.githubusercontent.com/u/129431198?v=4?s=100" width="100px;" alt="Sjorza"/><br /><sub><b>Sjorza</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Sjorza" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
