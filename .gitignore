@@ -59,6 +59,7 @@ deploy/.env
 venv
 
 # project related
+xlsforms/
 temp_webmaps/local_only
 temp_webmaps/Naivasha
 src/backend/app/locales/*/LC_MESSAGES/*.mo

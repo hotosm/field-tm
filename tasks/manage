@@ -21,6 +21,14 @@
 default:
   just --justfile {{justfile()}} --list manage
 
+# Export bundled raw XLSForm templates to disk
+[no-cd]
+export-raw-xlsforms:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}/src/backend
+  uv run python scripts/export_raw_xlsforms.py
+
 # Rename docker volume
 [no-cd]
 rename-volume oldname newname:
