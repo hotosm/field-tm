@@ -119,14 +119,11 @@ jobs:
 
             cd deploy
 
-            # Stop app containers
-            docker compose -f compose.testlogin.yaml stop api migrations || true
-
             # Pull new images
             docker compose -f compose.testlogin.yaml pull
 
-            # Remove old app containers
-            docker compose -f compose.testlogin.yaml rm -f api migrations || true
+            # Bring down app containers cleanly (avoids name conflicts on recreate)
+            docker compose -f compose.testlogin.yaml down --remove-orphans || true
 
             # Ensure db is running
             docker compose -f compose.testlogin.yaml up -d --no-recreate fieldtm-db central-db
