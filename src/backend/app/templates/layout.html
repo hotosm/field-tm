@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="{{ current_locale() }}" class="hot-theme-light wa-theme-default wa-palette-hotosm">
+<html
+  lang="{{ current_locale() }}"
+  dir="{{ current_dir() }}"
+  class="hot-theme-light wa-theme-default wa-palette-hotosm"
+>
   <head>
-    <title>{% block title %}{{ _("Field Tasking Manager") }}{% endblock %}</title>
+    <title>{% block title %}Field Tasking Manager{% endblock %}</title>
 
     <meta charset="UTF-8" />
-    <meta name="description" content="{{ _("Coordinated field mapping for Open Mapping campaigns.") }}" />
+    <meta
+      name="description"
+      content='{{ _("Coordinated field mapping for Open Mapping campaigns.") }}'
+    />
     <meta name="author" content="Humanitarian OpenStreetMap Team" />
     <meta name="format-detection" content="telephone=no, email=no, address=no" />
     <meta
@@ -53,6 +60,7 @@
       wa-callout:not(:defined),
       wa-input:not(:defined),
       wa-textarea:not(:defined),
+      wa-option:not(:defined),
       wa-select:not(:defined),
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
@@ -91,8 +99,10 @@
       import "@awesome.me/webawesome/dist/components/button/button.js";
       import "@awesome.me/webawesome/dist/components/callout/callout.js";
       import "@awesome.me/webawesome/dist/components/card/card.js";
+      import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
       import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
       import "@awesome.me/webawesome/dist/components/input/input.js";
+      import "@awesome.me/webawesome/dist/components/option/option.js";
       import "@awesome.me/webawesome/dist/components/select/select.js";
       import "@awesome.me/webawesome/dist/components/tag/tag.js";
       import "@awesome.me/webawesome/dist/components/textarea/textarea.js";

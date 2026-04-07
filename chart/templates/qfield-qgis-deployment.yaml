@@ -12,10 +12,8 @@ spec:
     matchLabels:
       {{- include "field-tm.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: qgis
-  # Recreate avoids two pods briefly writing to the same PVC directory during a
-  # rolling update, which could corrupt an in-progress project generation.
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -54,23 +52,31 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            {{- if .Values.db.enabled }}
+            - name: FTM_DB_HOST
+              value: {{ include "field-tm.dbServiceHost" . | quote }}
+            - name: FTM_DB_USER
+              value: {{ .Values.db.auth.username | quote }}
+            - name: FTM_DB_PASSWORD
+              value: {{ .Values.db.auth.password | quote }}
+            - name: FTM_DB_NAME
+              value: {{ .Values.db.auth.database | quote }}
+            {{- end }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
             {{- range $key, $val := .Values.qfieldQgis.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
             {{- end }}
+          {{- if .Values.existingSecret.name }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.existingSecret.name | quote }}
+          {{- end }}
           resources:
             {{- toYaml .Values.qfieldQgis.resources | nindent 12 }}
-          volumeMounts:
-            - name: qfield-projects
-              mountPath: {{ .Values.qfieldQgis.persistence.mountPath }}
-      volumes:
-        - name: qfield-projects
-          {{- if .Values.qfieldQgis.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "field-tm.fullname" . }}-qfield-projects
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

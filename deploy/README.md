@@ -1,19 +1,36 @@
 # Deployment Config
 
-- Docker compose based deployments.
-- In production, HOT uses the Kubernetes Helm charts.
+This directory contains the production-oriented compose files.
 
-## Compose Files
+Use the `just start prod*` commands from the repo root instead of calling
+`docker compose` against these files directly. The production commands handle
+the required `envsubst` preprocessing for `${FTM_DOMAIN}`-based environment
+keys.
 
-- `compose.sub.yaml`: core FieldTM (API, database, proxy). ODK and QFieldCloud
-  are expected to be managed externally - provide their URLs via `.env`.
-- `compose.odk.yaml`: optional ODK Central addon overlay. Overlay on top of
-  `compose.sub.yaml` when you want to self-host ODK Central:
+## Compose files
 
-  ```sh
-  envsubst -no-unset -i compose.sub.yaml | \
-    docker compose -f - -f compose.odk.yaml up --detach
-  ```
+- `compose.sub.yaml`: core Field-TM stack. This includes the backend, database,
+  BunkerWeb proxy, and QGIS wrapper. ODK Central and QFieldCloud are expected
+  to be external unless you add an overlay.
+- `compose.odk.yaml`: optional self-hosted ODK Central overlay.
+- `compose.login.yaml`: optional self-hosted Hanko login overlay.
+- `compose.qfield.yaml`: reserved for QFieldCloud-related overlays.
 
-- `compose.qfield.yaml`: optional QFieldCloud addon overlay (not yet populated;
-  QFieldCloud self-hosting is managed separately).
+## Recommended commands
+
+From the repo root:
+
+```sh
+just prep machine
+just config setup
+just start prod
+```
+
+Alternative production entry points:
+
+```sh
+just start prod-with-odk
+```
+
+> `just start prod` automatically includes the self-hosted Hanko login overlay
+> when `AUTH_PROVIDER=bundled` is set in `.env`.

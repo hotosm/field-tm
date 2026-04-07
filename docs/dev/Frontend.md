@@ -15,7 +15,7 @@ The web UI is server-rendered by LiteStar + HTMX from backend templates.
 Run the full stack:
 
 ```bash
-just start all
+just start dev
 ```
 
 Or run backend only:

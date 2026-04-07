@@ -18,14 +18,15 @@
 
 set dotenv-load
 
+# Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
+docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
+
 mod start 'tasks/start'
 mod stop 'tasks/stop'
 mod build 'tasks/build'
 mod test 'tasks/test'
 mod config 'tasks/config'
 mod manage 'tasks/manage'
-mod prep 'tasks/prep'
-mod chart 'tasks/chart'
 mod docs 'tasks/docs'
 mod i18n 'tasks/i18n'
 
@@ -38,9 +39,21 @@ default:
 help:
   just --justfile {{justfile()}} --list
 
+# Prep module from https://github.com/hotosm/justfiles
+prep *args:
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/prep.just \
+      -o {{justfile_directory()}}/tasks/prep.just;
+    @just --justfile {{justfile_directory()}}/tasks/prep.just {{args}}
+
+# Chart module from https://github.com/hotosm/justfiles
+chart *args:
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/chart.just \
+      -o {{justfile_directory()}}/tasks/chart.just;
+    @just --justfile {{justfile_directory()}}/tasks/chart.just --set chart_name "field-tm" {{args}}
+
 # Delete local database, S3, and ODK Central data
 clean:
-  docker compose down -v
+  {{docker}} compose down -v
 
 # Run pre-commit hooks
 lint:
@@ -59,6 +72,57 @@ bump-osm-fieldwork:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
   uv --project packages/osm-fieldwork --directory packages/osm-fieldwork run cz bump --check-consistency
+
+# Arrow-key selection menu. Draws on stderr, prints chosen item to stdout.
+# Usage: chosen=$(just _select-menu "Pick one:" item1 item2 item3)
+[no-cd]
+_select-menu prompt +items:
+  #!/usr/bin/env bash
+  set -e
+
+  IFS=' ' read -ra opts <<< "{{ items }}"
+  count=${#opts[@]}
+  selected=0
+
+  # Print prompt
+  printf "\033[0;34m%s\033[0m\n" "{{ prompt }}" >&2
+
+  # Hide cursor, restore on exit
+  tput civis >&2 2>/dev/null
+  trap 'tput cnorm >&2 2>/dev/null' EXIT
+
+  draw_menu() {
+    for i in "${!opts[@]}"; do
+      tput el >&2 2>/dev/null
+      if [ "$i" -eq "$selected" ]; then
+        printf "  \033[7m > %s \033[0m\n" "${opts[$i]}" >&2
+      else
+        printf "    %s\n" "${opts[$i]}" >&2
+      fi
+    done
+  }
+
+  draw_menu
+  while true; do
+    read -rsn1 key
+    case "$key" in
+      $'\x1b')
+        read -rsn2 rest
+        case "$rest" in
+          '[A') ((selected > 0)) && ((selected--)) || true ;;
+          '[B') ((selected < count - 1)) && ((selected++)) || true ;;
+        esac
+        ;;
+      '')  # enter
+        break
+        ;;
+    esac
+    printf "\033[%dA" "$count" >&2
+    draw_menu
+  done
+
+  printf "\n" >&2
+  echo "${opts[$selected]}"
 
 # Echo to terminal with blue colour
 [no-cd]

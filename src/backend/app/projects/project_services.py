@@ -134,6 +134,7 @@ class SplitAoiOptions:
 
     algorithm: str
     no_of_buildings: int = 10
+    no_of_tasks: int = 10
     dimension_meters: int = 100
     include_roads: bool = True
     include_rivers: bool = True
@@ -439,6 +440,7 @@ async def process_xlsform(
     project_id: int,
     xlsform_bytes: BytesIO,
     need_verification_fields: bool = True,
+    include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     default_language: str = "english",
@@ -450,6 +452,7 @@ async def process_xlsform(
         project_id: The project ID.
         xlsform_bytes: BytesIO of the XLSForm file.
         need_verification_fields: Whether to add verification fields.
+        include_photo_upload: Whether to include photo upload question.
         mandatory_photo_upload: Whether photo upload is mandatory.
         use_odk_collect: Whether to use ODK Collect.
         default_language: Default language for the form.
@@ -465,6 +468,7 @@ async def process_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
         need_verification_fields=need_verification_fields,
+        include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
@@ -474,6 +478,7 @@ async def process_xlsform(
         xlsform=xlsform_bytes,
         form_name=form_name,
         need_verification_fields=need_verification_fields,
+        include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
@@ -728,7 +733,7 @@ async def _split_with_building_algorithm(
     aoi_featcol: dict,
     parsed_extract: dict,
     algorithm_enum: SplittingAlgorithm,
-    no_of_buildings: int,
+    algorithm_params: dict,
     include_roads: bool,
     include_rivers: bool,
     include_railways: bool,
@@ -737,7 +742,7 @@ async def _split_with_building_algorithm(
     """Run one of the SQL-backed building-based split algorithms."""
     _validate_split_extract(parsed_extract)
     algorithm_params = {
-        "num_buildings": no_of_buildings,
+        **algorithm_params,
         "include_roads": "TRUE" if include_roads else "FALSE",
         "include_rivers": "TRUE" if include_rivers else "FALSE",
         "include_railways": "TRUE" if include_railways else "FALSE",
@@ -848,7 +853,7 @@ async def split_aoi(
             aoi_featcol,
             parsed_extract,
             algorithm_enum,
-            options.no_of_buildings,
+            {"num_buildings": options.no_of_buildings},
             options.include_roads,
             options.include_rivers,
             options.include_railways,
@@ -861,8 +866,15 @@ async def split_aoi(
             options.dimension_meters,
         )
     elif algorithm_enum == SplittingAlgorithm.TOTAL_TASKS:
-        raise ValidationError(
-            "Split by Specific Number of Tasks is not yet implemented."
+        features = await _split_with_building_algorithm(
+            aoi_featcol,
+            parsed_extract,
+            algorithm_enum,
+            {"num_enumerators": options.no_of_tasks},
+            options.include_roads,
+            options.include_rivers,
+            options.include_railways,
+            options.include_aeroways,
         )
     else:
         raise ValidationError(f"Algorithm {algorithm} not yet implemented.")

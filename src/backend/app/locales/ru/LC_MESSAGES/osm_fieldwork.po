@@ -1,0 +1,122 @@
+# Russian translations for Field-TM OSM Fieldwork.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM OSM
+# Fieldwork project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: i18n/osm_fieldwork_strings.py:9
+msgctxt "xlsform_label"
+msgid "digitisation_correct"
+msgstr "Правильно ли оцифровано расположение этого объекта?"
+
+#: i18n/osm_fieldwork_strings.py:10
+msgctxt "xlsform_label"
+msgid "digitisation_problem"
+msgstr "Проблема с оцифровкой (другое)"
+
+#: i18n/osm_fieldwork_strings.py:11
+msgctxt "xlsform_label"
+msgid "digitisation_problem_other"
+msgstr "Заключительная заметка"
+
+#: i18n/osm_fieldwork_strings.py:12
+msgctxt "xlsform_label"
+msgid "end_note"
+msgstr "Существующий"
+
+#: i18n/osm_fieldwork_strings.py:13
+msgctxt "xlsform_label"
+msgid "existing"
+msgstr "Объект"
+
+#: i18n/osm_fieldwork_strings.py:14
+msgctxt "xlsform_label"
+msgid "feature"
+msgstr "Объект существует"
+
+#: i18n/osm_fieldwork_strings.py:15
+msgctxt "xlsform_label"
+msgid "feature_exists"
+msgstr "Изображение"
+
+#: i18n/osm_fieldwork_strings.py:16
+msgctxt "xlsform_label"
+msgid "image"
+msgstr "Объединено"
+
+#: i18n/osm_fieldwork_strings.py:17
+msgctxt "xlsform_label"
+msgid "lumped"
+msgstr "Режим картирования"
+
+#: i18n/osm_fieldwork_strings.py:18
+msgctxt "xlsform_label"
+msgid "mapping_mode"
+msgstr "Новый"
+
+#: i18n/osm_fieldwork_strings.py:19
+msgctxt "xlsform_label"
+msgid "new"
+msgstr "Новый объект"
+
+#: i18n/osm_fieldwork_strings.py:20
+msgctxt "xlsform_label"
+msgid "new_feature"
+msgstr "Нет"
+
+#: i18n/osm_fieldwork_strings.py:21
+msgctxt "xlsform_label"
+msgid "no"
+msgstr "Имя пользователя OSM"
+
+#: i18n/osm_fieldwork_strings.py:22
+msgctxt "xlsform_label"
+msgid "osm_username"
+msgstr "Другое"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
+msgid "other"
+msgstr "Разделить"
+
+#: i18n/osm_fieldwork_strings.py:24
+msgctxt "xlsform_label"
+msgid "split"
+msgstr "Вопросы опроса"
+
+#: i18n/osm_fieldwork_strings.py:25
+msgctxt "xlsform_label"
+msgid "survey_questions"
+msgstr "Задача"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
+msgid "task"
+msgstr "Проверка"
+
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr "Да"
+
+#: i18n/osm_fieldwork_strings.py:28
+msgctxt "xlsform_label"
+msgid "yes"
+msgstr "Да"
+

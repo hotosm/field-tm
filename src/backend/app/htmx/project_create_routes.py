@@ -454,6 +454,9 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
     need_verification_fields_bool = _to_bool_form_value(
         data.need_verification_fields, default=True
     )
+    include_photo_upload_bool = _to_bool_form_value(
+        data.include_photo_upload, default=True
+    )
     mandatory_photo_upload_bool = _to_bool_form_value(
         data.mandatory_photo_upload, default=False
     )
@@ -471,6 +474,7 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
             project_id=project_id,
             xlsform_bytes=xlsform_bytes,
             need_verification_fields=need_verification_fields_bool,
+            include_photo_upload=include_photo_upload_bool,
             mandatory_photo_upload=mandatory_photo_upload_bool,
             use_odk_collect=use_odk_collect_bool,
             default_language=default_language,

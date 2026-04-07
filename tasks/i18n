@@ -25,25 +25,92 @@ default:
 init LOCALE:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel init -i app/locales/messages.pot -d app/locales -l {{LOCALE}}
+  uv run --group dev pybabel init -D field_tm -i app/locales/field_tm.pot -d app/locales -l {{LOCALE}}
+  uv run --group dev pybabel init -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales -l {{LOCALE}}
 
-# Extract translatable strings from templates and Python source into messages.pot
+# Extract translatable strings from templates and Python source into gettext templates
 extract:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/messages.pot --project="Field-TM" .
+  uv run --group dev pybabel extract -F pyproject.toml -o app/locales/field_tm.pot --project="Field-TM" .
+  uv run --group dev pybabel extract -k pgettext:1c,2 -o app/locales/osm_fieldwork.pot --project="Field-TM OSM Fieldwork" i18n/osm_fieldwork_strings.py
 
 # Update existing .po files after re-extraction
 update:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel update -i app/locales/messages.pot -d app/locales
+  uv run --group dev pybabel update -D field_tm -i app/locales/field_tm.pot -d app/locales
+  uv run --group dev pybabel update -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales
 
 # Compile .po files into .mo files for runtime use
 compile:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel compile -d app/locales
+  uv run --group dev pybabel compile -D field_tm -d app/locales
+  uv run --group dev pybabel compile -D osm_fieldwork -d app/locales
+
+# Export compiled osm-fieldwork gettext catalogs into the package locale tree
+export-osm-fieldwork *ARGS='':
+  #!/usr/bin/env -S uv run --project {{justfile_directory()}}/src/backend --group dev python
+  import argparse
+  import shutil
+  from pathlib import Path
+
+  backend_dir = "{{justfile_directory()}}/src/backend"
+  locale_dir = Path(backend_dir) / "app" / "locales"
+  output_dir = (
+      Path(backend_dir)
+      / "packages"
+      / "osm-fieldwork"
+      / "osm_fieldwork"
+      / "form_components"
+      / "translations"
+      / "locales"
+  )
+  domain = "osm_fieldwork"
+
+  def source_paths() -> list[Path]:
+      return sorted(locale_dir.glob(f"*/LC_MESSAGES/{domain}.mo"))
+
+  def target_path(source_path: Path) -> Path:
+      relative = source_path.relative_to(locale_dir)
+      locale_name = relative.parts[0]
+      if "_" in locale_name:
+          language, territory = locale_name.split("_", maxsplit=1)
+          locale_name = f"{language.lower()}_{territory.lower()}"
+          relative = Path(locale_name, *relative.parts[1:])
+      return output_dir / relative
+
+  def export_translations() -> list[Path]:
+      written_paths = []
+      for source_path in source_paths():
+          output_path = target_path(source_path)
+          output_path.parent.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(source_path, output_path)
+          written_paths.append(output_path)
+      return written_paths
+
+  def check_translations() -> list[Path]:
+      mismatches = []
+      for source_path in source_paths():
+          output_path = target_path(source_path)
+          if not output_path.exists() or output_path.read_bytes() != source_path.read_bytes():
+              mismatches.append(output_path)
+      return mismatches
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--check", action="store_true")
+  args = parser.parse_args("""{{ARGS}}""".split())
+
+  if args.check:
+      mismatches = check_translations()
+      if mismatches:
+          for path in mismatches:
+              print(path)
+          raise SystemExit(1)
+      raise SystemExit(0)
+
+  export_translations()
 
 # Run all commands to update i18n
-run: extract update compile
+run: extract update compile export-osm-fieldwork

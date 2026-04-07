@@ -13,7 +13,7 @@ class SplittingAlgorithm(StrEnum):
     DIVIDE_BY_SQUARE = "DIVIDE_BY_SQUARE"
     AVG_BUILDING_VORONOI = "AVG_BUILDING_VORONOI"
     AVG_BUILDING_SKELETON = "AVG_BUILDING_SKELETON"
-    TOTAL_TASKS = "TOTAL_TASKS"  # Not implemented yet
+    TOTAL_TASKS = "TOTAL_TASKS"
 
     @property
     def sql_path(self) -> Path | None:
@@ -21,12 +21,14 @@ class SplittingAlgorithm(StrEnum):
         if self in (
             SplittingAlgorithm.AVG_BUILDING_VORONOI,
             SplittingAlgorithm.AVG_BUILDING_SKELETON,
+            SplittingAlgorithm.TOTAL_TASKS,
         ):
             sql_file = {
                 SplittingAlgorithm.AVG_BUILDING_VORONOI: "avg_building_voronoi.sql",
                 SplittingAlgorithm.AVG_BUILDING_SKELETON: (
                     "avg_building_straight_skeleton.sql"
                 ),
+                SplittingAlgorithm.TOTAL_TASKS: "avg_building_straight_skeleton.sql",
             }[self]
             return algorithms_path / sql_file
         return None
@@ -52,5 +54,5 @@ class SplittingAlgorithm(StrEnum):
             SplittingAlgorithm.DIVIDE_BY_SQUARE: [],
             SplittingAlgorithm.AVG_BUILDING_VORONOI: ["num_buildings"],
             SplittingAlgorithm.AVG_BUILDING_SKELETON: ["num_buildings"],
-            SplittingAlgorithm.TOTAL_TASKS: [],  # Not implemented yet
+            SplittingAlgorithm.TOTAL_TASKS: ["num_enumerators"],
         }[self]

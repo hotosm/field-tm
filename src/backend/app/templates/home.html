@@ -14,50 +14,39 @@
         </button>
 
         <!-- Status filter: inline on desktop, collapsible on mobile -->
-        {% set status_options = [
-          ('', _('All projects')),
-          ('DRAFT', _('Draft')),
-          ('PUBLISHED', _('Published')),
-          ('COMPLETED', _('Completed')),
-          ('ARCHIVED', _('Archived')),
-        ] %}
+        {% set status_options = [ ('', _('All projects')), ('DRAFT', _('Draft')), ('PUBLISHED',
+        _('Published')), ('COMPLETED', _('Completed')), ('ARCHIVED', _('Archived')), ] %}
         <div class="ftm-filters-collapsible">
-          <label class="ftm-projects-filter" for="projects-status-filter">
+          <div class="ftm-projects-filter">
             <span class="ftm-projects-filter__label">{{ _("Project Status") }}</span>
-            <select
+            <wa-select
               id="projects-status-filter"
               name="status"
-              class="ftm-projects-filter__select"
-              onchange="this.form.submit()"
+              size="small"
+              value="{{ selected_status or '' }}"
             >
               {% for val, label in status_options %}
-              {% set is_sel = (val and selected_status == val) or (not val and not selected_status) %}
-              <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
+              <wa-option value="{{ val }}">{{ label }}</wa-option>
               {% endfor %}
-            </select>
-          </label>
+            </wa-select>
+          </div>
         </div>
 
-        {% set sort_options = [
-          ('newest', _('Newest first')),
-          ('oldest', _('Oldest first')),
-          ('name_asc', _('Name (A-Z)')),
-          ('name_desc', _('Name (Z-A)')),
-        ] %}
-        <label class="ftm-projects-filter" for="projects-sort-filter">
+        {% set sort_options = [ ('newest', _('Newest first')), ('oldest', _('Oldest first')),
+        ('name_asc', _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %}
+        <div class="ftm-projects-filter">
           <span class="ftm-projects-filter__label">{{ _("Sort By") }}</span>
-          <select
+          <wa-select
             id="projects-sort-filter"
             name="sort"
-            class="ftm-projects-filter__select"
-            onchange="this.form.submit()"
+            size="small"
+            value="{{ selected_sort or 'newest' }}"
           >
             {% for val, label in sort_options %}
-            {% set is_sel = selected_sort == val %}
-            <option value="{{ val }}" {% if is_sel %}selected{% endif %}>{{ label }}</option>
+            <wa-option value="{{ val }}">{{ label }}</wa-option>
             {% endfor %}
-          </select>
-        </label>
+          </wa-select>
+        </div>
 
         <div class="ftm-projects-filter ftm-projects-filter--search">
           <span class="ftm-projects-filter__label">{{ _("Search") }}</span>
@@ -66,7 +55,7 @@
             type="search"
             name="search"
             size="small"
-            placeholder="{{ _("Search projects…") }}"
+            placeholder='{{ _("Search projects…") }}'
             value="{{ search_query or '' }}"
             with-clear
           >
@@ -82,9 +71,10 @@
     </div>
 
     <p class="ftm-projects-results">
-      Showing {{ projects|length }} project{% if projects|length != 1 %}s{% endif %}{% if
-      selected_status %} in {{ selected_status|lower|title }}{% endif %}{% if search_query %}
-      matching "{{ search_query }}"{% endif %}
+      {% set count = projects|length %} {% trans count %}Showing {{ count }} project{% pluralize
+      %}Showing {{ count }} projects{% endtrans %}{% if selected_status %} {{ _("in %(status)s") %
+      {"status": selected_status|lower|title} }}{% endif %}{% if search_query %} {{ _('matching
+      "%(query)s"') % {"query": search_query} }}{% endif %}
     </p>
   </div>
 
@@ -100,7 +90,7 @@
         <div class="ftm-project-card__header-meta">
           <span class="ftm-project-card__id">
             #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
-            <span class="ftm-private-icon" title="{{ _("Private Project") }}">🔒</span>{% endif %}
+            <span class="ftm-private-icon" title='{{ _("Private Project") }}'>🔒</span>{% endif %}
           </span>
           <div class="ftm-project-card__badges">
             {% if project.status %} {% set status_value = project.status.value if
@@ -123,7 +113,9 @@
             {% endif %}
           </div>
         </div>
-        <span class="ftm-project-card__name">{{ project.project_name or _('Unnamed Project') }}</span>
+        <span class="ftm-project-card__name"
+          >{{ project.project_name or _('Unnamed Project') }}</span
+        >
       </div>
       <div class="ftm-project-card__body">
         <div class="ftm-project-card__content-top">
@@ -136,9 +128,7 @@
           </div>
           {% endif %}
         </div>
-        <p class="ftm-project-card__description">
-          {{ project.description or '' }}
-        </p>
+        <p class="ftm-project-card__description">{{ project.description or '' }}</p>
         <div class="ftm-project-card__meta">
           {% if project.hashtags %}
           <div class="ftm-project-card__tags">
@@ -152,7 +142,8 @@
           </div>
           {% endif %} {% if project.created_at %}
           <div class="ftm-project-card__footer">
-            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at else _('N/A') }}
+            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at
+            else _('N/A') }}
           </div>
           {% endif %}
         </div>
@@ -161,7 +152,9 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="ftm-empty-state">{{ _("No projects found. Create your first project to get started!") }}</p>
+  <p class="ftm-empty-state">
+    {{ _("No projects found. Create your first project to get started!") }}
+  </p>
   {% endif %}
 </div>
 
@@ -182,6 +175,14 @@
     // Clear and re-submit when the built-in clear button is clicked
     waInput.addEventListener("wa-clear", function () {
       waInput.value = "";
+      form.submit();
+    });
+
+    // Submit when wa-select filters change (event is "change", not "wa-change")
+    document.getElementById("projects-status-filter").addEventListener("change", function () {
+      form.submit();
+    });
+    document.getElementById("projects-sort-filter").addEventListener("change", function () {
       form.submit();
     });
 

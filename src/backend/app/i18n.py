@@ -20,9 +20,70 @@ from litestar.types import ASGIApp, Message, Receive, Scope, Send
 log = logging.getLogger(__name__)
 
 LOCALE_DIR = Path(__file__).parent / "locales"
-DOMAIN = "messages"
-SUPPORTED_LOCALES = ["en", "fr", "es", "sw"]
+DOMAIN = "field_tm"
 DEFAULT_LOCALE = "en"
+SUPPORTED_LOCALES = [
+    "en",
+    "am",
+    "ar",
+    "bn",
+    "cs",
+    "es",
+    "fr",
+    "ha",
+    "hi",
+    "id",
+    "ig",
+    "it",
+    "ja",
+    "ne",
+    "om",
+    "pt",
+    "pt_br",
+    "ru",
+    "sw",
+    "ta",
+    "te",
+    "th",
+    "tl",
+    "tr",
+    "ur",
+    "vi",
+    "yo",
+    "zh",
+]
+RTL_LOCALES = frozenset({"ar", "ur"})
+
+LOCALE_LABELS = {
+    "en": "English",
+    "am": "አማርኛ",
+    "ar": "العربية",
+    "bn": "বাংলা",
+    "cs": "Čeština",
+    "es": "Español",
+    "fr": "Français",
+    "ha": "Hausa",
+    "hi": "हिन्दी",
+    "id": "Bahasa Indonesia",
+    "ig": "Igbo",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ne": "नेपाली",
+    "om": "Afaan Oromoo",
+    "pt": "Português",
+    "pt_br": "Português (Brasil)",
+    "ru": "Русский",
+    "sw": "Kiswahili",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "th": "ไทย",
+    "tl": "Filipino / Tagalog",
+    "tr": "Türkçe",
+    "ur": "اردو",
+    "vi": "Tiếng Việt",
+    "yo": "Yorùbá",
+    "zh": "中文",
+}
 
 _translations_cache: dict[str, gettext.GNUTranslations | gettext.NullTranslations] = {}
 _current_translations: ContextVar[
@@ -31,15 +92,72 @@ _current_translations: ContextVar[
 _current_locale: ContextVar[str] = ContextVar("_current_locale", default=DEFAULT_LOCALE)
 
 
+def normalize_locale_code(locale: str) -> str:
+    """Normalize locale codes for internal matching."""
+    return locale.strip().lower().replace("-", "_")
+
+
+def match_supported_locale(locale: str) -> str | None:
+    """Match an input locale to the closest supported locale."""
+    normalized_locale = normalize_locale_code(locale)
+    if normalized_locale in SUPPORTED_LOCALES:
+        return normalized_locale
+
+    base_language = normalized_locale.split("_", 1)[0]
+    if base_language in SUPPORTED_LOCALES:
+        return base_language
+
+    return None
+
+
+def _parse_quality(params: list[str]) -> float:
+    """Extract the q= quality value from Accept-Language parameters."""
+    for param in params:
+        key, separator, value = param.partition("=")
+        if key.strip().lower() != "q" or separator != "=":
+            continue
+        try:
+            return float(value)
+        except ValueError:
+            return 0.0
+    return 1.0
+
+
+def get_preferred_locale(accept_language: str) -> str | None:
+    """Resolve the best supported locale from an Accept-Language header."""
+    preferred_locales: list[tuple[float, int, str]] = []
+
+    for index, part in enumerate(accept_language.split(",")):
+        language_range = part.strip()
+        if not language_range:
+            continue
+
+        locale, *params = (value.strip() for value in language_range.split(";"))
+        if not locale or locale == "*":
+            continue
+
+        preferred_locales.append((_parse_quality(params), index, locale))
+
+    for _quality, _index, locale in sorted(
+        preferred_locales, key=lambda item: (-item[0], item[1])
+    ):
+        matched_locale = match_supported_locale(locale)
+        if matched_locale:
+            return matched_locale
+
+    return None
+
+
 def get_translations(
     locale: str,
 ) -> gettext.GNUTranslations | gettext.NullTranslations:
     """Return cached translations for a locale, falling back to NullTranslations."""
     if locale not in _translations_cache:
+        normalized_locale = locale.replace("-", "_")
+        mo_path = LOCALE_DIR / normalized_locale / "LC_MESSAGES" / f"{DOMAIN}.mo"
         try:
-            _translations_cache[locale] = gettext.translation(
-                DOMAIN, localedir=str(LOCALE_DIR), languages=[locale]
-            )
+            with mo_path.open("rb") as mo_file:
+                _translations_cache[locale] = gettext.GNUTranslations(mo_file)
         except FileNotFoundError:
             log.debug(
                 "No .mo file found for locale '%s', using NullTranslations", locale
@@ -54,18 +172,19 @@ def resolve_locale(request: Request) -> str:
     Priority: ?lang= query param > ftm_locale cookie > Accept-Language header > default.
     """
     lang = request.query_params.get("lang")
-    if lang and lang in SUPPORTED_LOCALES:
-        return lang
+    matched_query_locale = match_supported_locale(lang) if lang else None
+    if matched_query_locale:
+        return matched_query_locale
 
     cookie_lang = request.cookies.get("ftm_locale")
-    if cookie_lang and cookie_lang in SUPPORTED_LOCALES:
-        return cookie_lang
+    matched_cookie_locale = match_supported_locale(cookie_lang) if cookie_lang else None
+    if matched_cookie_locale:
+        return matched_cookie_locale
 
     accept = request.headers.get("Accept-Language", "")
-    for part in accept.split(","):
-        code = part.split(";")[0].strip().split("-")[0].lower()
-        if code in SUPPORTED_LOCALES:
-            return code
+    preferred_locale = get_preferred_locale(accept)
+    if preferred_locale:
+        return preferred_locale
 
     return DEFAULT_LOCALE
 
@@ -148,3 +267,8 @@ def create_locale_cookie_middleware(app: ASGIApp) -> ASGIApp:
 def get_current_locale() -> str:
     """Return the current request's resolved locale (for use as a Jinja global)."""
     return _current_locale.get()
+
+
+def get_current_dir() -> str:
+    """Return 'rtl' for right-to-left locales, 'ltr' otherwise."""
+    return "rtl" if _current_locale.get() in RTL_LOCALES else "ltr"

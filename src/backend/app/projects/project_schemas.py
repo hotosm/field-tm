@@ -65,6 +65,7 @@ class CreateProjectRequest(ODKCentral, QFieldCloud):
     template_form_id: int | None = None
     xlsform_base64: str | None = None
     need_verification_fields: bool = True
+    include_photo_upload: bool = True
     mandatory_photo_upload: bool = False
     use_odk_collect: bool = False
     default_language: str = "english"
@@ -76,6 +77,7 @@ class CreateProjectRequest(ODKCentral, QFieldCloud):
 
     algorithm: SplittingAlgorithm | None = None
     no_of_buildings: int = 10
+    no_of_tasks: int = 10
     dimension_meters: int = 100
     include_roads: bool = True
     include_rivers: bool = True

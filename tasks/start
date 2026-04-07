@@ -16,8 +16,8 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Allow usage of nerdctl instead of docker
-docker := env("DOCKER_ALIAS", "docker")
+# Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
+docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
 
 # List available commands
 [private]
@@ -26,90 +26,117 @@ default:
 
 # Start Field-TM (auth disabled)
 [no-cd]
-all:
+dev:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
   AUTH_PROVIDER=disabled {{docker}} compose up -d
 
-# Production deploy, based on current checked out branch
+# Prompt the user to select a release tag, checkout, and export GIT_BRANCH.
+# Exits if the working tree is dirty or no tags are found.
+[no-cd]
+_select-version:
+  #!/usr/bin/env bash
+  set -e
+
+  cd {{justfile_directory()}}
+
+  # Guard: refuse to deploy with uncommitted changes
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    just _echo-red "You have unstaged / uncommitted changes. Stash them first before deploy."
+    exit 1
+  fi
+
+  # Collect Field-TM release tags (CalVer 20xx.*), most recent 8
+  mapfile -t tags < <(git tag -l '20*' --sort=-v:refname | head -n 8)
+  if [ ${#tags[@]} -eq 0 ]; then
+    just _echo-red "No Field-TM release tags found."
+    exit 1
+  fi
+
+  echo ""
+  chosen=$(just _select-menu "Select Field-TM version:" "${tags[@]}")
+
+  just _echo-blue "Checking out ${chosen}..."
+  git checkout "${chosen}"
+
+  # Persist the chosen tag for the calling recipe
+  echo "${chosen}" > /tmp/.ftm_deploy_tag
+
+# Production deploy (auto-detects AUTH_PROVIDER from .env)
 [no-cd]
 prod:
-  #!/usr/bin/env sh
+  #!/usr/bin/env bash
   set -e
+
+  # Source exported env vars from .bashrc (e.g. CONTAINERD_SNAPSHOTTER)
+  # Aliases are ignored in non-interactive scripts; nerdctl is resolved by just.
+  eval "$(grep '^export ' ~/.bashrc 2>/dev/null)" || true
+
+  just start _select-version
+  export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
 
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
-  just config custom-favicon
 
-  # Deploy core FieldTM
-  ../envsubst -no-unset -i compose.sub.yaml | \
-        {{docker}} compose -f - up --detach \
-        --remove-orphans --force-recreate
+  # Read AUTH_PROVIDER from .env
+  auth_provider=$(grep -E '^AUTH_PROVIDER=' ../.env | cut -d= -f2 | tr -d '"' || echo "")
 
-  just _echo-blue "FieldTM started successfully"
-
-# Production deploy with self-hosted Hanko auth (contrib/login)
-[no-cd]
-prod-login:
-  #!/usr/bin/env sh
-  set -e
-
-  # From deploy dir
-  cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
-
-  # Config
-  just config generate-dotenv "${GIT_BRANCH}"
-  just config custom-favicon
-
-  # Both compose files use ${FTM_DOMAIN} in bunkerweb env var KEY names, which
-  # requires envsubst preprocessing.  Process to temp files then compose together.
-  tmp_main=$(mktemp)
-  tmp_login=$(mktemp)
-  ../envsubst -no-unset -i compose.sub.yaml > "$tmp_main"
-  ../envsubst -no-unset -i compose.login.yaml > "$tmp_login"
-  {{docker}} compose -f "$tmp_main" -f "$tmp_login" up --detach \
-    --remove-orphans --force-recreate
-  rm -f "$tmp_main" "$tmp_login"
-
-  just _echo-blue "FieldTM + self-hosted Hanko started successfully"
+  if [ "$auth_provider" = "bundled" ]; then
+    just _echo-blue "AUTH_PROVIDER=bundled detected, deploying with self-hosted Hanko..."
+    # Both compose files use ${FTM_DOMAIN} in bunkerweb env var KEY names, which
+    # requires envsubst preprocessing.  Process to temp files then compose together.
+    tmp_main=$(mktemp)
+    tmp_login=$(mktemp)
+    ../envsubst -no-unset -i compose.sub.yaml > "$tmp_main"
+    ../envsubst -no-unset -i compose.login.yaml > "$tmp_login"
+    {{docker}} compose -f "$tmp_main" -f "$tmp_login" up --detach \
+      --remove-orphans --force-recreate
+    rm -f "$tmp_main" "$tmp_login"
+    just _echo-blue "FieldTM ${GIT_BRANCH} + self-hosted Hanko started successfully"
+  else
+    just _echo-blue "AUTH_PROVIDER=${auth_provider} detected, deploying without bundled login..."
+    ../envsubst -no-unset -i compose.sub.yaml | \
+          {{docker}} compose -f - up --detach \
+          --remove-orphans --force-recreate
+    just _echo-blue "FieldTM ${GIT_BRANCH} started successfully"
+  fi
 
 # Production deploy with self-hosted ODK Central
 [no-cd]
 prod-with-odk:
-  #!/usr/bin/env sh
+  #!/usr/bin/env bash
   set -e
+
+  # Source exported env vars from .bashrc (e.g. CONTAINERD_SNAPSHOTTER)
+  eval "$(grep '^export ' ~/.bashrc 2>/dev/null)" || true
+
+  just start _select-version
+  export GIT_BRANCH=$(cat /tmp/.ftm_deploy_tag)
 
   # From deploy dir
   cd {{justfile_directory()}}/deploy
-  export GIT_BRANCH=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
-  just _echo-blue "Current branch: ${GIT_BRANCH}"
 
   # Config
   just config generate-dotenv "${GIT_BRANCH}"
-  just config custom-favicon
 
   # Deploy core FieldTM + ODK Central addon
   ../envsubst -no-unset -i compose.sub.yaml | \
         {{docker}} compose -f - -f compose.odk.yaml up --detach \
         --remove-orphans --force-recreate
 
-  just _echo-blue "FieldTM + ODK Central started successfully"
+  just _echo-blue "FieldTM ${GIT_BRANCH} + ODK Central started successfully"
 
-# Start backend API only
+# Start backend API only (includes proxy for browser access)
 [no-cd]
 backend:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
-  {{docker}} compose up -d api
+  {{docker}} compose up -d backend proxy
 
 # Start backend API without docker
 [no-cd]

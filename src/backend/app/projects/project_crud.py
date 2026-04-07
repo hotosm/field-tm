@@ -835,7 +835,7 @@ def _odk_qrcode_data_url(
                 f"{odk_base_url}/v1/key/{appuser_token}/projects"
                 f"/{project.external_project_id}"
             ),
-            "form_update_mode": "manual",
+            "form_update_mode": "match_exactly",
             "basemap_source": "osm",
             "autosend": "wifi_and_cellular",
             "metadata_username": username,

@@ -13,12 +13,12 @@ on:
 
 jobs:
   build-qfield-qgis:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.3.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@3.6.0
     with:
       context: src/qfield
       image_tags: |
-        "ghcr.io/${{ github.repository }}/qgis:26.3"
-        "ghcr.io/${{ github.repository }}/qgis:latest"
+        "ghcr.io/hotosm/qfield-project-packager:26.3"
+        "ghcr.io/hotosm/qfield-project-packager:latest"
       extra_build_args: |
         QFIELDCLOUD_TAG=26.3
       # FIXME once PR merged:

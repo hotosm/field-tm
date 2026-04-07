@@ -102,7 +102,7 @@ class OtelSettings(BaseSettings):
     @property
     def otel_python_excluded_urls(self) -> Optional[str]:
         """Set excluded URLs for Python instrumentation."""
-        endpoints = "__lbheartbeat__,docs,openapi.json"
+        endpoints = "__lbheartbeat__,docs,openapi.json,robots.txt,^/static/.*"
         os.environ["OTEL_PYTHON_EXCLUDED_URLS"] = endpoints
         # Add extra endpoints ignored by for requests
         # NOTE we add ODK Central session auth endpoint here
@@ -282,6 +282,9 @@ class Settings(BaseSettings):
     QFIELDCLOUD_USER: Optional[str] = ""
     QFIELDCLOUD_PASSWORD: Optional[SecretStr] = ""
     QFIELDCLOUD_PROJECT_OWNER: Optional[str] = ""
+    # FIXME the name QFIELDCLOUD_QGIS_URL probably isn't appropriate here
+    # as it's not technically a QFieldCloud variable
+    # This should match DroneTM var
     QFIELDCLOUD_QGIS_URL: str = "http://qfield-qgis:8080"
 
     @field_validator("QFIELDCLOUD_URL", mode="after")

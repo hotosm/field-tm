@@ -1,0 +1,120 @@
+# English translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: 2026-03-18 15:17+0000\n"
+"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"Language: ta\n"
+"Language-Team: ta <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: i18n/osm_fieldwork_strings.py:9
+msgctxt "xlsform_label"
+msgid "digitisation_correct"
+msgstr "இந்த அம்சத்திற்கான டிஜிட்டல் இடம் சரியானதா"
+
+#: i18n/osm_fieldwork_strings.py:10
+msgctxt "xlsform_label"
+msgid "digitisation_problem"
+msgstr "டிஜிட்டல் பதிவு பிரச்சினை"
+
+#: i18n/osm_fieldwork_strings.py:11
+msgctxt "xlsform_label"
+msgid "digitisation_problem_other"
+msgstr "மற்ற டிஜிட்டல் பதிவு பிரச்சினை"
+
+#: i18n/osm_fieldwork_strings.py:12
+msgctxt "xlsform_label"
+msgid "end_note"
+msgstr "முடிவு குறிப்பு"
+
+#: i18n/osm_fieldwork_strings.py:13
+msgctxt "xlsform_label"
+msgid "existing"
+msgstr "ஏற்கனவே உள்ளது"
+
+#: i18n/osm_fieldwork_strings.py:14
+msgctxt "xlsform_label"
+msgid "feature"
+msgstr "அம்சம்"
+
+#: i18n/osm_fieldwork_strings.py:15
+msgctxt "xlsform_label"
+msgid "feature_exists"
+msgstr "அம்சம் உள்ளது"
+
+#: i18n/osm_fieldwork_strings.py:16
+msgctxt "xlsform_label"
+msgid "image"
+msgstr "படம்"
+
+#: i18n/osm_fieldwork_strings.py:17
+msgctxt "xlsform_label"
+msgid "lumped"
+msgstr "ஒன்றாக இணைக்கப்பட்டது"
+
+#: i18n/osm_fieldwork_strings.py:18
+msgctxt "xlsform_label"
+msgid "mapping_mode"
+msgstr "வரைபட முறை"
+
+#: i18n/osm_fieldwork_strings.py:19
+msgctxt "xlsform_label"
+msgid "new"
+msgstr "புதியது"
+
+#: i18n/osm_fieldwork_strings.py:20
+msgctxt "xlsform_label"
+msgid "new_feature"
+msgstr "புதிய அம்சம்"
+
+#: i18n/osm_fieldwork_strings.py:21
+msgctxt "xlsform_label"
+msgid "no"
+msgstr "இல்லை"
+
+#: i18n/osm_fieldwork_strings.py:22
+msgctxt "xlsform_label"
+msgid "osm_username"
+msgstr "OSM பயனர் பெயர்"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
+msgid "other"
+msgstr "மற்றவை"
+
+#: i18n/osm_fieldwork_strings.py:24
+msgctxt "xlsform_label"
+msgid "split"
+msgstr "பிரிக்கப்பட்டது"
+
+#: i18n/osm_fieldwork_strings.py:25
+msgctxt "xlsform_label"
+msgid "survey_questions"
+msgstr "கணக்கெடுப்பு கேள்விகள்"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
+msgid "task"
+msgstr "பணி"
+
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr "சரிபார்ப்பு"
+
+#: i18n/osm_fieldwork_strings.py:28
+msgctxt "xlsform_label"
+msgid "yes"
+msgstr "ஆம்"
+

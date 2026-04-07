@@ -1,0 +1,120 @@
+# Japanese translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: i18n/osm_fieldwork_strings.py:9
+msgctxt "xlsform_label"
+msgid "digitisation_correct"
+msgstr "この要素のデジタイズされた位置は正しいですか？"
+
+#: i18n/osm_fieldwork_strings.py:10
+msgctxt "xlsform_label"
+msgid "digitisation_problem"
+msgstr "そのデジタイジングにはどんな問題がありますか？"
+
+#: i18n/osm_fieldwork_strings.py:11
+msgctxt "xlsform_label"
+msgid "digitisation_problem_other"
+msgstr "その他のデジタイズの問題"
+
+#: i18n/osm_fieldwork_strings.py:12
+msgctxt "xlsform_label"
+msgid "end_note"
+msgstr "建物が存在しないと、データ取得は不可能です"
+
+#: i18n/osm_fieldwork_strings.py:13
+msgctxt "xlsform_label"
+msgid "existing"
+msgstr "既存の地物"
+
+#: i18n/osm_fieldwork_strings.py:14
+msgctxt "xlsform_label"
+msgid "feature"
+msgstr "ジオメトリ"
+
+#: i18n/osm_fieldwork_strings.py:15
+msgctxt "xlsform_label"
+msgid "feature_exists"
+msgstr "この地物は実在しますか？"
+
+#: i18n/osm_fieldwork_strings.py:16
+msgctxt "xlsform_label"
+msgid "image"
+msgstr "写真撮影"
+
+#: i18n/osm_fieldwork_strings.py:17
+msgctxt "xlsform_label"
+msgid "lumped"
+msgstr "一括化（複数の建物を1つのポリゴンとしてデジタイズ）"
+
+#: i18n/osm_fieldwork_strings.py:18
+msgctxt "xlsform_label"
+msgid "mapping_mode"
+msgstr "既存の地物をマッピングしますか、それとも新しい地物を作成しますか？"
+
+#: i18n/osm_fieldwork_strings.py:19
+msgctxt "xlsform_label"
+msgid "new"
+msgstr "新しい地物"
+
+#: i18n/osm_fieldwork_strings.py:20
+msgctxt "xlsform_label"
+msgid "new_feature"
+msgstr "新しいジオメトリを描いてください"
+
+#: i18n/osm_fieldwork_strings.py:21
+msgctxt "xlsform_label"
+msgid "no"
+msgstr "いいえ"
+
+#: i18n/osm_fieldwork_strings.py:22
+msgctxt "xlsform_label"
+msgid "osm_username"
+msgstr "あなたのOSMユーザー名は何ですか（編集の功績を認めてほしい場合）？"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
+msgid "other"
+msgstr "その他"
+
+#: i18n/osm_fieldwork_strings.py:24
+msgctxt "xlsform_label"
+msgid "split"
+msgstr "分割（1つの建物を複数のポリゴンに分離）"
+
+#: i18n/osm_fieldwork_strings.py:25
+msgctxt "xlsform_label"
+msgid "survey_questions"
+msgstr "調査項目"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
+msgid "task"
+msgstr "タスクエリアを選択してください"
+
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr "検証"
+
+#: i18n/osm_fieldwork_strings.py:28
+msgctxt "xlsform_label"
+msgid "yes"
+msgstr "はい"
+

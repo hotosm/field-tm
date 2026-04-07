@@ -1,0 +1,120 @@
+# French translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: 2026-03-18 17:56+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: i18n/osm_fieldwork_strings.py:9
+msgctxt "xlsform_label"
+msgid "digitisation_correct"
+msgstr "L'emplacement numérisé de cette caractéristique est-il correct ?"
+
+#: i18n/osm_fieldwork_strings.py:10
+msgctxt "xlsform_label"
+msgid "digitisation_problem"
+msgstr "Problème de numérisation"
+
+#: i18n/osm_fieldwork_strings.py:11
+msgctxt "xlsform_label"
+msgid "digitisation_problem_other"
+msgstr "Problème de numérisation (autre)"
+
+#: i18n/osm_fieldwork_strings.py:12
+msgctxt "xlsform_label"
+msgid "end_note"
+msgstr "Note de fin"
+
+#: i18n/osm_fieldwork_strings.py:13
+msgctxt "xlsform_label"
+msgid "existing"
+msgstr "Existant"
+
+#: i18n/osm_fieldwork_strings.py:14
+msgctxt "xlsform_label"
+msgid "feature"
+msgstr "Élément"
+
+#: i18n/osm_fieldwork_strings.py:15
+msgctxt "xlsform_label"
+msgid "feature_exists"
+msgstr "Élément existant"
+
+#: i18n/osm_fieldwork_strings.py:16
+msgctxt "xlsform_label"
+msgid "image"
+msgstr "Image"
+
+#: i18n/osm_fieldwork_strings.py:17
+msgctxt "xlsform_label"
+msgid "lumped"
+msgstr "Regroupé"
+
+#: i18n/osm_fieldwork_strings.py:18
+msgctxt "xlsform_label"
+msgid "mapping_mode"
+msgstr "Mode de cartographie"
+
+#: i18n/osm_fieldwork_strings.py:19
+msgctxt "xlsform_label"
+msgid "new"
+msgstr "Nouveau"
+
+#: i18n/osm_fieldwork_strings.py:20
+msgctxt "xlsform_label"
+msgid "new_feature"
+msgstr "Nouvel élément"
+
+#: i18n/osm_fieldwork_strings.py:21
+msgctxt "xlsform_label"
+msgid "no"
+msgstr "Non"
+
+#: i18n/osm_fieldwork_strings.py:22
+msgctxt "xlsform_label"
+msgid "osm_username"
+msgstr "Nom d'utilisateur OSM"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
+msgid "other"
+msgstr "Autre"
+
+#: i18n/osm_fieldwork_strings.py:24
+msgctxt "xlsform_label"
+msgid "split"
+msgstr "Diviser"
+
+#: i18n/osm_fieldwork_strings.py:25
+msgctxt "xlsform_label"
+msgid "survey_questions"
+msgstr "Questions d'enquête"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
+msgid "task"
+msgstr "Tâche"
+
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr "Vérification"
+
+#: i18n/osm_fieldwork_strings.py:28
+msgctxt "xlsform_label"
+msgid "yes"
+msgstr "Oui"
+

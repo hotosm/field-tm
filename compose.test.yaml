@@ -37,10 +37,10 @@ services:
   #     service: proxy
 
   # Remove qfield dependencies
-  api:
+  backend:
     extends:
       file: compose.yaml
-      service: api
+      service: backend
     volumes: !override
       - ftm_logs:/opt/logs
       # No mounts needed, as we do a re-built before every test run

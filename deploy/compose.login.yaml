@@ -20,7 +20,8 @@
 #
 # IMPORTANT: This file uses ${FTM_DOMAIN} in bunkerweb env var KEY names,
 # which requires envsubst preprocessing - the same pipeline already used by
-# compose.sub.yaml.  Use `just start prod-login` which handles this.
+# compose.sub.yaml.  `just start prod` handles this automatically when
+# AUTH_PROVIDER=bundled is set in .env.
 #
 # For non-VM deployments see AUTH_PROVIDER=hotosm (centralised HOT login)
 # or AUTH_PROVIDER=custom (bring-your-own Hanko).
@@ -46,8 +47,8 @@ services:
       login.${FTM_DOMAIN}_REVERSE_PROXY_HOST: http://hanko:8000
       login.${FTM_DOMAIN}_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
 
-  # Inject Hanko URLs for the api container (overrides any value from .env).
-  api:
+  # Inject Hanko URLs for the backend container (overrides any value from .env).
+  backend:
     environment:
       HANKO_API_URL: http://hanko:8000
       HANKO_PUBLIC_URL: https://login.${FTM_DOMAIN}

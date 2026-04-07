@@ -56,8 +56,7 @@ body {
   background-color: white;
   min-height: calc(100vh - 60px);
   padding-top: 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding-inline: 0;
 }
 
 /* --- Page header ------------------------------------------ */
@@ -103,7 +102,7 @@ body {
   gap: 0.375rem;
   flex: 0 0 auto;
   min-width: 0;
-  width: 7.5rem;
+  width: 11.25rem;
 }
 
 .ftm-projects-filter--search {
@@ -144,14 +143,8 @@ body {
 
 .ftm-projects-toolbar > .ftm-create-btn {
   flex: 0 0 auto;
-  margin-left: 1rem;
+  margin-inline-start: 1rem;
   white-space: nowrap;
-}
-
-.ftm-projects-filter__select:focus {
-  outline: 2px solid color-mix(in oklab, var(--ftm-brand) 16%, transparent);
-  outline-offset: 1px;
-  border-color: color-mix(in oklab, var(--ftm-brand) 35%, white);
 }
 
 .ftm-projects-results {
@@ -450,7 +443,7 @@ body {
     display: none;
     position: absolute;
     top: calc(100% + 0.25rem);
-    left: 0;
+    inset-inline-start: 0;
     z-index: 20;
     background: white;
     border: 1px solid var(--ftm-border);
@@ -490,7 +483,7 @@ body {
   }
 
   .ftm-projects-toolbar > .ftm-create-btn {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 }
 
@@ -584,7 +577,9 @@ body {
 
 .ftm-map-container {
   width: 100%;
-  height: 400px;
+  height: 50vh;
+  min-height: 280px;
+  max-height: 600px;
   border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius-sm);
   margin-top: 10px;
@@ -595,6 +590,36 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* Custom Leaflet map controls (undo vertex, locate) */
+.ftm-map-ctrl-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  color: #333;
+  cursor: pointer;
+}
+
+.ftm-map-ctrl-btn:hover {
+  background-color: #f4f4f4;
+}
+
+.ftm-map-ctrl-btn--loading {
+  animation: ftm-pulse 1s ease-in-out infinite;
+}
+
+@keyframes ftm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .ftm-checkbox-row {
@@ -636,12 +661,12 @@ body {
 
 .ftm-step--pending {
   background-color: var(--ftm-bg-muted);
-  border-left: 4px solid var(--ftm-brand);
+  border-inline-start: 4px solid var(--ftm-brand);
 }
 
 .ftm-step--complete {
   background-color: var(--ftm-bg-success);
-  border-left: 4px solid var(--ftm-color-success);
+  border-inline-start: 4px solid var(--ftm-color-success);
 }
 
 .ftm-step__header {
@@ -660,7 +685,7 @@ body {
 
 .ftm-step__check {
   color: var(--ftm-color-success);
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 
 .ftm-step__description {
@@ -1049,7 +1074,7 @@ hot-header {
 /* --- Private badge ---------------------------------------- */
 .ftm-private-icon {
   color: var(--ftm-brand);
-  margin-left: 4px;
+  margin-inline-start: 4px;
 }
 
 /* --- Link styles ----------------------------------------- */
@@ -1071,7 +1096,7 @@ hot-header {
 }
 
 .ftm-qfc-table th {
-  text-align: left;
+  text-align: start;
   padding: 0.625rem 0.75rem;
   font-weight: var(--hot-font-weight-semibold);
   color: var(--ftm-text-muted);

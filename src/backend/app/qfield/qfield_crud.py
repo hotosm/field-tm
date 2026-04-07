@@ -17,10 +17,12 @@
 #
 """Logic for interaction with QFieldCloud & data."""
 
+import base64
 import json
 import logging
 import re
 import shutil
+import tempfile
 from asyncio import get_running_loop
 from copy import deepcopy
 from dataclasses import dataclass
@@ -53,9 +55,6 @@ from app.qfield.qfield_deps import qfield_client
 from app.qfield.qfield_schemas import QFieldCloud
 
 log = logging.getLogger(__name__)
-
-# Shared Docker volume mounted in both backend and qfield-qgis containers
-SHARED_VOLUME_PATH = "/opt/qfield"
 
 # Timeout for QGIS wrapper HTTP calls (project generation can be slow)
 QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
@@ -406,93 +405,135 @@ async def create_qfield_project(
     tasks_geojson = _build_tasks_geojson(project)
     tasks_geojson = clean_tags_for_qgis(tasks_geojson)
 
-    # ── Write files to shared volume ────────────────────────────────────
-    qgis_job_id = str(uuid4())
-    job_dir = Path(SHARED_VOLUME_PATH) / qgis_job_id
-    job_dir.mkdir(parents=True, exist_ok=True)
+    # Persist the QField-modified XLSForm back to DB
+    log.debug("Saving QField XLSForm to DB for project %s", project.id)
+    await DbProject.update(
+        db,
+        project.id,
+        ProjectUpdate(xlsform_content=xlsform_bytes),
+    )
+    await db.commit()
+
+    # ── Step 1: Write job inputs to DB and call QGIS wrapper ─────────
+    qgis_project_title = project.project_name or f"project-{project.id}"
+    job_id = uuid4()
+    await _insert_qgis_job(db, job_id, xlsform_bytes, features_geojson, tasks_geojson)
+    await db.commit()
 
     try:
-        _write_job_files(job_dir, xlsform_bytes, features_geojson, tasks_geojson)
-
-        # Persist the QField-modified XLSForm back to DB
-        log.debug("Saving QField XLSForm to DB for project %s", project.id)
-        await DbProject.update(
-            db,
-            project.id,
-            ProjectUpdate(xlsform_content=xlsform_bytes),
-        )
-        await db.commit()
-
-        # ── Step 1: Generate QGIS project via wrapper ──────────────────
-        # Use project_name if available; slug can be None for freshly-created
-        # projects that haven't been named yet.
-        qgis_project_title = project.project_name or f"project-{project.id}"
         await _call_qgis_wrapper(
-            job_dir=str(job_dir),
+            job_id=str(job_id),
             title=qgis_project_title,
             language=form_language or "",
             extent=bbox_str,
             open_in_edit_mode=open_in_edit_mode,
         )
 
-        # Locate the generated .qgz - the converter may sanitise the title
-        # when building the filename so we scan rather than predict.
-        final_dir = job_dir / "final"
-        qgz_files = list(final_dir.glob("*.qgz"))
-        if not qgz_files:
+        # ── Step 2: Read outputs from DB, upload to QFieldCloud ──────
+        output_files = await _read_qgis_job_outputs(db, job_id)
+        if not output_files:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="QGIS wrapper completed but no .qgz file found in output.",
+                detail="QGIS wrapper completed but wrote no output files.",
             )
-        final_project_file = qgz_files[0]
-        log.info("QGIS project generated: %s", final_project_file)
 
-        # ── Step 2: Upload to QFieldCloud ──────────────────────────────
-        raw_qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
-        qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
-        result = await _upload_to_qfieldcloud(
-            project=project,
-            qfc_project_name=qfc_project_name,
-            final_project_dir=str(final_project_file.parent),
-            custom_qfield_creds=custom_qfield_creds,
-            db=db,
-        )
+        tmp_dir = tempfile.mkdtemp(prefix="qfield_upload_")
+        try:
+            for filename, b64_content in output_files.items():
+                (Path(tmp_dir) / filename).write_bytes(base64.b64decode(b64_content))
 
-        return result
+            qgz_files = list(Path(tmp_dir).glob("*.qgz"))
+            if not qgz_files:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="QGIS wrapper completed but no .qgz file in output.",
+                )
+            log.info("QGIS project generated: %s", qgz_files[0].name)
 
+            raw_qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
+            qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
+            result = await _upload_to_qfieldcloud(
+                project=project,
+                qfc_project_name=qfc_project_name,
+                final_project_dir=tmp_dir,
+                custom_qfield_creds=custom_qfield_creds,
+                db=db,
+            )
+            return result
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
     finally:
-        # Always clean up the temp job directory
-        shutil.rmtree(job_dir, ignore_errors=True)
+        await _delete_qgis_job(db, job_id)
+        await db.commit()
 
 
-def _write_job_files(
-    job_dir: Path,
-    xlsform_bytes: bytes,
-    features_geojson: dict,
-    tasks_geojson: dict,
+async def _insert_qgis_job(
+    db: AsyncConnection,
+    job_id,
+    xlsform: bytes,
+    features: dict,
+    tasks: dict,
 ) -> None:
-    """Write the input files the QGIS wrapper expects."""
-    (job_dir / "xlsform.xlsx").write_bytes(xlsform_bytes)
+    """Insert a new QGIS job with input files into the database."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            INSERT INTO qgis_jobs (job_id, xlsform, features, tasks)
+            VALUES (%(job_id)s, %(xlsform)s, %(features)s, %(tasks)s)
+            """,
+            {
+                "job_id": job_id,
+                "xlsform": xlsform,
+                "features": json.dumps(features),
+                "tasks": json.dumps(tasks),
+            },
+        )
+    log.debug("Inserted QGIS job %s", job_id)
 
-    with open(job_dir / "features.geojson", "w") as f:
-        json.dump(features_geojson, f)
 
-    with open(job_dir / "tasks.geojson", "w") as f:
-        json.dump(tasks_geojson, f)
+async def _read_qgis_job_outputs(
+    db: AsyncConnection,
+    job_id,
+) -> dict | None:
+    """Read the output_files dict written by the QGIS wrapper."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            "SELECT output_files FROM qgis_jobs WHERE job_id = %(job_id)s",
+            {"job_id": job_id},
+        )
+        row = await cur.fetchone()
+    if not row or not row[0]:
+        return None
+    return row[0]
+
+
+async def _delete_qgis_job(db: AsyncConnection, job_id) -> None:
+    """Delete a completed or failed QGIS job."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            "DELETE FROM qgis_jobs WHERE job_id = %(job_id)s",
+            {"job_id": job_id},
+        )
+    log.debug("Deleted QGIS job %s", job_id)
 
 
 async def _call_qgis_wrapper(
     *,
-    job_dir: str,
+    job_id: str,
     title: str,
     language: str,
     extent: str,
     open_in_edit_mode: bool,
 ) -> None:
-    """POST to the QGIS wrapper HTTP service and raise on failure."""
+    """POST to the QGIS wrapper to trigger project generation.
+
+    The wrapper reads input files from and writes output files to the
+    ``qgis_jobs`` table in the shared database.  Only the job_id and
+    processing parameters are sent via HTTP.
+    """
     qgis_url = settings.QFIELDCLOUD_QGIS_URL
     payload = {
-        "project_dir": job_dir,
+        "job_id": job_id,
         "title": title,
         "language": language,
         "extent": extent,
@@ -526,7 +567,7 @@ async def _call_qgis_wrapper(
                 detail=f"QGIS project generation failed: {msg}",
             )
 
-    log.debug("QGIS wrapper call succeeded")
+    log.debug("QGIS wrapper call succeeded for job %s", job_id)
 
 
 async def _create_qfc_user(username: str, password: str, client) -> bool:

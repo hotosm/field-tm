@@ -1,0 +1,121 @@
+# Chinese translations for Field-TM OSM Fieldwork.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM OSM
+# Fieldwork project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: i18n/osm_fieldwork_strings.py:9
+msgctxt "xlsform_label"
+msgid "digitisation_correct"
+msgstr "该要素的数字化位置是否正确？"
+
+#: i18n/osm_fieldwork_strings.py:10
+msgctxt "xlsform_label"
+msgid "digitisation_problem"
+msgstr "数字化问题（其他）"
+
+#: i18n/osm_fieldwork_strings.py:11
+msgctxt "xlsform_label"
+msgid "digitisation_problem_other"
+msgstr "结束说明"
+
+#: i18n/osm_fieldwork_strings.py:12
+msgctxt "xlsform_label"
+msgid "end_note"
+msgstr "现有"
+
+#: i18n/osm_fieldwork_strings.py:13
+msgctxt "xlsform_label"
+msgid "existing"
+msgstr "要素"
+
+#: i18n/osm_fieldwork_strings.py:14
+msgctxt "xlsform_label"
+msgid "feature"
+msgstr "要素存在"
+
+#: i18n/osm_fieldwork_strings.py:15
+msgctxt "xlsform_label"
+msgid "feature_exists"
+msgstr "图像"
+
+#: i18n/osm_fieldwork_strings.py:16
+msgctxt "xlsform_label"
+msgid "image"
+msgstr "合并"
+
+#: i18n/osm_fieldwork_strings.py:17
+msgctxt "xlsform_label"
+msgid "lumped"
+msgstr "测绘模式"
+
+#: i18n/osm_fieldwork_strings.py:18
+msgctxt "xlsform_label"
+msgid "mapping_mode"
+msgstr "新建"
+
+#: i18n/osm_fieldwork_strings.py:19
+msgctxt "xlsform_label"
+msgid "new"
+msgstr "新要素"
+
+#: i18n/osm_fieldwork_strings.py:20
+msgctxt "xlsform_label"
+msgid "new_feature"
+msgstr "否"
+
+#: i18n/osm_fieldwork_strings.py:21
+msgctxt "xlsform_label"
+msgid "no"
+msgstr "OSM 用户名"
+
+#: i18n/osm_fieldwork_strings.py:22
+msgctxt "xlsform_label"
+msgid "osm_username"
+msgstr "其他"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
+msgid "other"
+msgstr "拆分"
+
+#: i18n/osm_fieldwork_strings.py:24
+msgctxt "xlsform_label"
+msgid "split"
+msgstr "调查问题"
+
+#: i18n/osm_fieldwork_strings.py:25
+msgctxt "xlsform_label"
+msgid "survey_questions"
+msgstr "任务"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
+msgid "task"
+msgstr "核验"
+
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr "是"
+
+#: i18n/osm_fieldwork_strings.py:28
+msgctxt "xlsform_label"
+msgid "yes"
+msgstr "是"
+

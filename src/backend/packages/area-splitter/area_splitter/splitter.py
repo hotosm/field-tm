@@ -163,20 +163,32 @@ def _validate_algorithm_selection(algorithm: SplittingAlgorithm) -> None:
 def _resolve_algorithm_params(
     algorithm: SplittingAlgorithm,
     num_buildings: Optional[int],
+    num_enumerators: Optional[int],
     algorithm_params: Optional[dict],
 ) -> dict:
     """Normalize and validate algorithm parameters."""
     params = dict(algorithm_params or {})
     if not params:
-        if not num_buildings:
+        if num_buildings and num_enumerators:
             err = (
-                f"Algorithm {algorithm.value} requires the following parameters: "
-                f"{', '.join(algorithm.required_params)}. "
-                f"Either provide algorithm_params dict or num_buildings (deprecated)."
+                "Exactly one of num_buildings or num_enumerators may be provided "
+                "when algorithm_params is omitted."
             )
             log.error(err)
             raise ValueError(err)
-        params["num_buildings"] = num_buildings
+        if num_buildings:
+            params["num_buildings"] = num_buildings
+        elif num_enumerators:
+            params["num_enumerators"] = num_enumerators
+        else:
+            err = (
+                f"Algorithm {algorithm.value} requires the following parameters: "
+                f"{', '.join(algorithm.required_params)}. "
+                "Either provide algorithm_params dict or a compatible legacy "
+                "parameter."
+            )
+            log.error(err)
+            raise ValueError(err)
 
     missing_params = [
         param for param in algorithm.required_params if param not in params
@@ -608,16 +620,23 @@ class AreaSplitter:
     def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
         """Insert the OSM extract into the temporary split tables."""
         for feature in osm_extract["features"]:
-            geom_json = json.dumps(feature["geometry"])
+            geometry = feature.get("geometry", {})
+            geom_type = geometry.get("type", "")
+            geom_json = json.dumps(geometry)
             properties = feature.get("properties", {})
             tags = properties.get("tags", {}) if "tags" in properties else properties
             tags = _json_str_to_dict(tags).get("tags", _json_str_to_dict(tags))
             osm_id = properties.get("osm_id")
             common_args = dict(osm_id=osm_id, geom=geom_json, tags=tags)
 
-            if tags.get("building") == "yes":
+            # Point buildings in ways_poly break voronoi's
+            # ST_DUMPPOINTS/ST_VORONOIPOLYGONS pipeline
+            if tags.get("building") and geom_type in ("Polygon", "MultiPolygon"):
                 insert_geom(cur, "ways_poly", **common_args)
-            elif _is_linear_split_feature(tags):
+            elif _is_linear_split_feature(tags) and geom_type in (
+                "LineString",
+                "MultiLineString",
+            ):
                 insert_geom(cur, "ways_line", **common_args)
 
     def _run_split_sql_files(
@@ -708,7 +727,8 @@ class AreaSplitter:
                 database connections to be spawned.
             algorithm (SplittingAlgorithm): The algorithm to use.
             algorithm_params (dict): Dictionary of parameters for the algorithm.
-                For building-based algorithms, should include 'num_buildings'.
+                For building-based algorithms, should include 'num_buildings'
+                or 'num_enumerators', depending on the selected algorithm.
             osm_extract (dict, FeatureCollection): an OSM extract geojson,
                 containing building polygons, or linestrings.
 
@@ -744,6 +764,16 @@ class AreaSplitter:
             CROSS JOIN (SELECT geom FROM project_aoi LIMIT 1) p
             WHERE ST_Intersects(p.geom, w.geom)
         """)
+
+        # Make the input parameters accessible to other sql files.
+        cur.execute(
+            f"SET area_splitter.num_buildings = {int(params.get('num_buildings', 0))}"
+        )
+        cur.execute(
+            f"SET area_splitter.num_enumerators = "
+            f"{int(params.get('num_enumerators', 0))}"
+        )
+
         # Close current cursor
         cur.close()
 
@@ -901,6 +931,7 @@ def split_by_sql(
     aoi: Union[str, dict],
     db: Union[str, Connection],
     num_buildings: Optional[int] = None,
+    num_enumerators: Optional[int] = None,
     outfile: Optional[str] = None,
     osm_extract: Optional[Union[str, dict]] = None,
     algorithm: Optional[SplittingAlgorithm] = None,
@@ -911,9 +942,10 @@ def split_by_sql(
     The query will optimise on the following:
     - Attempt to divide the aoi into tasks that contain approximately the
         number of buildings from `num_buildings` (or algorithm_params).
+    - Or divide the AOI into a target number of tasks using
+        `num_enumerators`.
     - Split the task areas on major features such as roads an rivers, to
       avoid traversal of these features across task areas.
-
     Also has handling for multiple geometries within FeatureCollection object.
 
     Args:
@@ -928,6 +960,9 @@ def split_by_sql(
             splitting algorithm with (approx buildings per generated feature).
             Deprecated: Use algorithm_params instead. If algorithm_params is provided,
             this parameter is ignored.
+        num_enumerators(int, optional): The target number of task areas to
+            generate. Deprecated: Use algorithm_params instead. If
+            algorithm_params is provided, this parameter is ignored.
         outfile(str): Output to a GeoJSON file on disk.
         osm_extract (str, FeatureCollection): an OSM extract geojson,
             containing building polygons, or linestrings.
@@ -936,13 +971,13 @@ def split_by_sql(
             what you are doing.
         algorithm (SplittingAlgorithm, optional): The algorithm to use.
             Must be a building-based algorithm
-            (AVG_BUILDING_VORONOI or AVG_BUILDING_SKELETON).
+            (AVG_BUILDING_VORONOI, AVG_BUILDING_SKELETON, or TOTAL_TASKS).
             Defaults to AVG_BUILDING_SKELETON.
         algorithm_params (dict, optional): Dictionary of parameters for the algorithm.
             Should include all parameters required by the algorithm
             (see algorithm.required_params).
-            If not provided, will be constructed from num_buildings for backward
-            compatibility.
+            If not provided, it will be constructed from num_buildings or
+            num_enumerators for backward compatibility.
 
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
@@ -952,6 +987,7 @@ def split_by_sql(
     algorithm_params = _resolve_algorithm_params(
         algorithm,
         num_buildings,
+        num_enumerators,
         algorithm_params,
     )
     aoi_featcol = _parse_aoi_feature_collection(aoi)
@@ -966,6 +1002,9 @@ def split_by_sql(
                 db,
                 num_buildings=algorithm_params.get("num_buildings")
                 if "num_buildings" in algorithm_params
+                else None,
+                num_enumerators=algorithm_params.get("num_enumerators")
+                if "num_enumerators" in algorithm_params
                 else None,
                 outfile=_outfile_variant(outfile, index),
                 osm_extract=osm_extract,
@@ -1074,6 +1113,7 @@ be either the data extract used by the XLSForm, or a postgresql database.
     parser.add_argument(
         "-number", "--number", nargs="?", const=5, help="Number of buildings in a task"
     )
+    parser.add_argument("-tasks", "--tasks", nargs="?", const=5, help="Number of tasks")
     parser.add_argument("-b", "--boundary", required=True, help="Polygon AOI")
     parser.add_argument("-s", "--source", help="Source data, Geojson or PG:[dbname]")
     parser.add_argument(
@@ -1122,6 +1162,14 @@ be either the data extract used by the XLSForm, or a postgresql database.
             args.boundary,
             db=args.dburl,
             num_buildings=args.number,
+            outfile=args.outfile,
+            osm_extract=args.extract,
+        )
+    elif args.tasks:
+        split_by_sql(
+            args.boundary,
+            db=args.dburl,
+            num_enumerators=args.tasks,
             outfile=args.outfile,
             osm_extract=args.extract,
         )

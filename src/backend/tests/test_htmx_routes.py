@@ -11,11 +11,15 @@ from litestar import status_codes as status
 from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
+from app.htmx.map_helpers import render_leaflet_map
 from app.htmx.project_create_routes import _parse_outline_payload, new_project
 from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     _build_finalize_error_html,
     _build_odk_finalize_success_html,
+    _task_boundaries_layer,
+    accept_data_extract_htmx,
+    accept_split_htmx,
 )
 from app.projects.project_services import ODKFinalizeResult
 
@@ -84,6 +88,9 @@ async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_pro
     assert "Use Selected Survey Type" not in response.text
     assert "Continue" in response.text
     assert "Advanced Config" in response.text
+    assert response.text.index("Default Language:") < response.text.index(
+        "Form Options:"
+    )
 
 
 async def test_project_setup_shows_step2_advanced_config_options(client, db, project):
@@ -229,6 +236,142 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     assert captured["merge"] is False
 
 
+async def test_accept_data_extract_htmx_decodes_html_escaped_geojson(monkeypatch):
+    """Accept-data route should tolerate HTML-escaped JSON form values."""
+    saved: dict = {}
+    project = Mock(id=42)
+    escaped_geojson = (
+        '{&quot;type&quot;: "FeatureCollection", '
+        '&quot;features&quot;: [{&quot;type&quot;: "Feature", '
+        "&quot;geometry&quot;: null, &quot;properties&quot;: {}}]}"
+    )
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": None, "properties": {}}],
+    }
+
+    async def fake_save_data_extract(*, db, project_id, geojson_data):
+        saved["db"] = db
+        saved["project_id"] = project_id
+        saved["geojson_data"] = geojson_data
+        return len(geojson_data["features"])
+
+    monkeypatch.setattr(
+        "app.htmx.setup_step_routes.save_data_extract", fake_save_data_extract
+    )
+
+    response = await accept_data_extract_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        data={"data_extract_geojson": escaped_geojson},
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("HX-Refresh") == "true"
+    assert saved["project_id"] == project.id
+    assert saved["geojson_data"] == feature_collection
+
+
+async def test_accept_split_htmx_decodes_html_escaped_geojson(monkeypatch):
+    """Accept-split route should tolerate HTML-escaped JSON form values."""
+    saved: dict = {}
+    project = Mock(id=42)
+    escaped_geojson = (
+        '{&quot;type&quot;: "FeatureCollection", '
+        '&quot;features&quot;: [{&quot;type&quot;: "Feature", '
+        "&quot;geometry&quot;: null, &quot;properties&quot;: {}}]}"
+    )
+    tasks_geojson = {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": None, "properties": {}}],
+    }
+
+    async def fake_save_task_areas(*, db, project_id, tasks_geojson):
+        saved["db"] = db
+        saved["project_id"] = project_id
+        saved["tasks_geojson"] = tasks_geojson
+        return len(tasks_geojson["features"])
+
+    monkeypatch.setattr(
+        "app.htmx.setup_step_routes.save_task_areas", fake_save_task_areas
+    )
+
+    response = await accept_split_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        data={"tasks_geojson": escaped_geojson},
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers.get("HX-Refresh") == "true"
+    assert saved["project_id"] == project.id
+    assert saved["tasks_geojson"] == tasks_geojson
+
+
+def test_task_boundaries_layer_uses_translated_popup_labels():
+    """Task boundary popups should show translated labels without layer name."""
+    layer = _task_boundaries_layer(
+        {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": None,
+                    "properties": {"task_id": 3, "building_count": 14},
+                }
+            ],
+        }
+    )
+
+    assert layer["popup_options"]["showLayerName"] is False
+    assert layer["popup_options"]["propertyLabels"] == {
+        "task_id": "Task ID",
+        "building_count": "Building Count",
+    }
+    assert layer["popup_options"]["propertyOrder"] == ["task_id", "building_count"]
+
+
+def test_render_leaflet_map_serializes_popup_options():
+    """Leaflet helper should pass popup configuration through to the frontend."""
+    html = render_leaflet_map(
+        map_id="leaflet-map-test",
+        geojson_layers=[
+            {
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": None,
+                            "properties": {"task_id": 3, "building_count": 14},
+                        }
+                    ],
+                },
+                "name": "Task Boundaries (1 tasks)",
+                "popup_options": {
+                    "showLayerName": False,
+                    "propertyLabels": {
+                        "task_id": "Task ID",
+                        "building_count": "Building Count",
+                    },
+                    "propertyOrder": ["task_id", "building_count"],
+                },
+            }
+        ],
+    )
+
+    assert '"showLayerName": false' in html
+    assert '"task_id": "Task ID"' in html
+    assert '"building_count": "Building Count"' in html
+    assert '"propertyOrder": ["task_id", "building_count"]' in html
+
+
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
     """Published ODK projects should show guidance for form media uploads."""
     await DbProject.update(
@@ -353,6 +496,42 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     assert (
         "No projects found. Create your first project to get started!" in response.text
     )
+
+
+def test_landing_template_renders_locale_selector():
+    """Landing template should render the locale selector in the existing footer."""
+    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    env.add_extension("jinja2.ext.i18n")
+    env.install_gettext_callables(
+        lambda message: message, lambda s, p, n: s if n == 1 else p
+    )
+    env.globals["current_locale"] = lambda: "en"
+    env.globals["supported_locales"] = ["en", "fr", "es", "sw", "ar", "pt", "pt_br"]
+    env.globals["locale_labels"] = {
+        "en": "English",
+        "fr": "Français",
+        "es": "Español",
+        "sw": "Kiswahili",
+        "ar": "العربية",
+        "pt": "Português",
+        "pt_br": "Português (Brasil)",
+    }
+    env.globals["auth_enabled"] = False
+
+    template = env.get_template("landing.html")
+    rendered = template.render(create_project_href="/new")
+
+    assert 'data-locale-switch="en"' in rendered
+    assert 'data-locale-switch="pt"' in rendered
+    assert 'data-locale-switch="pt_br"' in rendered
+    assert "<wa-dropdown>" in rendered
+    assert "landing-footer-social" in rendered
+    assert "Field Tasking Manager" in rendered
+    assert "FIELD TASKING MANAGER" not in rendered
 
 
 def test_project_listing_template_compiles():

@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %}{{ _("Create Project — Field Tasking Manager") }}{% endblock %} {%
-block content %}
+{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{%
+endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
   <h1 style="margin-bottom: 30px">{{ _("Create New Project") }}</h1>
 
@@ -122,7 +122,9 @@ block content %}
         <div id="map-error" style="margin-top: 8px"></div>
         <div id="area-info" style="margin-top: 8px"></div>
         <small class="ftm-form-help">
-          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data extract API is limited to 200 km².") }}
+          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area.
+          Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data
+          extract API is limited to 200 km².") }}
         </small>
         <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
           <button
@@ -154,18 +156,23 @@ block content %}
         <label class="ftm-form-label">{{ _("Hashtags") }}</label>
         <wa-input
           id="hashtag-input"
-          placeholder="{{ _("Type hashtags and press Enter or comma") }}"
+          placeholder='{{ _("Type hashtags and press Enter or comma") }}'
           style="width: 100%"
         ></wa-input>
         <div id="hashtags-container" class="ftm-hashtags-container"></div>
         <small class="ftm-form-help">
-          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove it.") }}
+          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove
+          it.") }}
         </small>
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn"> {{ _("Create Project") }} </wa-button>
-        <span id="submit-indicator" style="display: none; margin-left: 10px">{{ _("Creating...") }}</span>
+        <wa-button type="submit" variant="brand" id="submit-btn">
+          {{ _("Create Project") }}
+        </wa-button>
+        <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
+          >{{ _("Creating...") }}</span
+        >
         <wa-button href="/projects" variant="default">{{ _("Cancel") }}</wa-button>
       </div>
     </form>
@@ -173,6 +180,12 @@ block content %}
 </div>
 
 <script type="module">
+  const I18N = {
+    somethingWentWrong: {{ _("Something went wrong. Please try again.")|tojson }},
+    invalidGeoJSONFormat: {{ _("Invalid GeoJSON format. Please check your file.")|tojson }},
+    invalidGeoJSONFile: {{ _("Invalid GeoJSON file. Please check the file format.")|tojson }},
+    mustDrawAOI: {{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.")|tojson }},
+  };
   const form = document.getElementById("create-project-form");
   const errorContainer = document.getElementById("form-error");
   const errorMessageEl = document.getElementById("form-error-message");
@@ -190,7 +203,7 @@ block content %}
 
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;
-    errorMessageEl.textContent = message || "Something went wrong. Please try again.";
+    errorMessageEl.textContent = message || I18N.somethingWentWrong;
     errorContainer.style.display = "block";
   }
 
@@ -319,6 +332,8 @@ block content %}
   let map;
   let drawnLayers;
   let drawControl;
+  let activeDrawHandler = null;
+  let undoControl = null;
 
   function initMap() {
     // Wait for Leaflet to be available
@@ -340,7 +355,7 @@ block content %}
     drawnLayers = new L.FeatureGroup();
     map.addLayer(drawnLayers);
 
-    // Initialize draw control
+    // Initialize draw control (no edit/delete toolbar - we use our own Clear + Undo)
     drawControl = new L.Control.Draw({
       draw: {
         polygon: {
@@ -353,30 +368,119 @@ block content %}
         circlemarker: false,
         polyline: false,
       },
-      edit: {
-        featureGroup: drawnLayers,
-        remove: true,
-      },
+      edit: false,
     });
 
     map.addControl(drawControl);
 
+    // ── Custom Undo Vertex control (visible only while drawing) ──
+    const UndoControl = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = "Undo last vertex";
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          if (activeDrawHandler && activeDrawHandler.deleteLastVertex) {
+            activeDrawHandler.deleteLastVertex();
+          }
+        });
+        container.style.display = "none";
+        this._container = container;
+        return container;
+      },
+      show: function () { if (this._container) this._container.style.display = ""; },
+      hide: function () { if (this._container) this._container.style.display = "none"; },
+    });
+    undoControl = new UndoControl();
+    map.addControl(undoControl);
+
+    // ── Custom Locate control (geolocation) ──
+    const LocateControl = L.Control.extend({
+      options: { position: "bottomleft" },
+      onAdd: function (map) {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = "My location";
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        this._btn = btn;
+        this._map = map;
+        this._marker = null;
+        this._circle = null;
+        const self = this;
+
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          btn.classList.add("ftm-map-ctrl-btn--loading");
+          map.locate({ setView: true, maxZoom: 16 });
+        });
+
+        map.on("locationfound", function (e) {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+          // Remove previous markers
+          if (self._marker) map.removeLayer(self._marker);
+          if (self._circle) map.removeLayer(self._circle);
+          self._circle = L.circle(e.latlng, {
+            radius: e.accuracy / 2,
+            color: "#4a90d9",
+            fillColor: "#4a90d9",
+            fillOpacity: 0.15,
+            weight: 1,
+          }).addTo(map);
+          self._marker = L.circleMarker(e.latlng, {
+            radius: 7,
+            color: "#fff",
+            fillColor: "#4a90d9",
+            fillOpacity: 1,
+            weight: 2,
+          }).addTo(map);
+        });
+
+        map.on("locationerror", function () {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+        });
+
+        return container;
+      },
+    });
+    map.addControl(new LocateControl());
+
     // Handle draw events
+    map.on("draw:drawstart", function (e) {
+      // Capture the active handler from toolbar if not set by our button
+      if (!activeDrawHandler && drawControl._toolbars && drawControl._toolbars.draw) {
+        const mode = drawControl._toolbars.draw._activeMode;
+        if (mode && mode.handler) {
+          activeDrawHandler = mode.handler;
+        }
+      }
+      if (undoControl) undoControl.show();
+    });
+
     map.on(L.Draw.Event.CREATED, function (e) {
       const layer = e.layer;
       drawnLayers.clearLayers();
       drawnLayers.addLayer(layer);
       updateGeoJSON();
       validateAndShowAreaInfo();
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
     });
 
-    map.on(L.Draw.Event.EDITED, function (e) {
-      updateGeoJSON();
-      validateAndShowAreaInfo();
-    });
-
-    map.on(L.Draw.Event.DELETED, function (e) {
-      updateGeoJSON();
+    // Also hide undo if drawing is cancelled (e.g. pressing Escape)
+    map.on("draw:drawstop", function () {
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
     });
   }
 
@@ -467,7 +571,7 @@ block content %}
       updateGeoJSON();
     } catch (error) {
       console.error("Error loading GeoJSON:", error);
-      showError("Invalid GeoJSON format. Please check your file.");
+      showError(I18N.invalidGeoJSONFormat);
     }
   }
 
@@ -493,11 +597,11 @@ block content %}
   // Draw polygon button
   document.getElementById("draw-polygon-btn")?.addEventListener("click", function () {
     if (!map) return;
-    const polygonDrawer = new L.Draw.Polygon(map, {
+    activeDrawHandler = new L.Draw.Polygon(map, {
       allowIntersection: false,
       showArea: true,
     });
-    polygonDrawer.enable();
+    activeDrawHandler.enable();
   });
 
   // Upload GeoJSON button
@@ -561,7 +665,7 @@ block content %}
         }
       } catch (error) {
         console.error("Error processing GeoJSON:", error);
-        const errorMsg = error.message || "Invalid GeoJSON file. Please check the file format.";
+        const errorMsg = error.message || I18N.invalidGeoJSONFile;
         const mapError = document.getElementById("map-error");
         if (mapError) {
           mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
@@ -793,8 +897,7 @@ block content %}
         e.preventDefault();
         e.stopPropagation();
         const mapError = document.getElementById("map-error");
-        const errorMsg =
-          "You must draw or upload an Area of Interest (AOI) on the map before submitting.";
+        const errorMsg = I18N.mustDrawAOI;
         if (mapError) {
           mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
         }

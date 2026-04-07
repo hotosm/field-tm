@@ -5,9 +5,9 @@ The recommended way to run Field-TM is with Docker via the `just` commands.
 (if you wish to run without just, inspect the `tasks/` justfiles
 for the underlying command used).
 
-> NOTE: If you haven't yet downloaded the Repository and
-> setup your local environment, please check the docs
-> [here](../INSTALL.md#setup-your-local-environment).
+> NOTE: If you haven't yet downloaded the repository and
+> set up your local environment, see the
+> [Contributor Setup](./Setup.md) guide.
 
 Now let's get started :thumbsup:
 
@@ -20,7 +20,7 @@ The easiest way to get up and running:
 just config generate-dotenv
 
 # Start all services (auth disabled for local dev)
-just start all
+just start dev
 ```
 
 If everything goes well you should now be able to
@@ -28,7 +28,7 @@ If everything goes well you should now be able to
 `http://field.localhost:7050`
 
 > Note: If that link doesn't work, check the logs with
-> `docker compose logs api`.
+> `docker compose logs backend`.
 > Note: the database host `fieldtm-db` is automatically
 > resolved by docker compose to the database container IP.
 
@@ -117,7 +117,7 @@ To assess performance of endpoints:
   during local development with `compose.yaml`.
 - If you modify the code in the package, the container must be restarted
   to reflect this:
-  `docker compose restart api`
+  `docker compose restart backend`
 
 ### Accessing S3 Files use s3fs
 
@@ -132,13 +132,7 @@ echo ACCESS_KEY_ID:SECRET_ACCESS_KEY > ${HOME}/.passwd-s3fs
 chmod 600 ${HOME}/.passwd-s3fs
 ```
 
-#### Mount local S3 using Just
-
-```bash
-just mount-s3
-```
-
-#### Mount S3 manually
+#### Mount S3
 
 Install s3fs:
 

@@ -62,6 +62,12 @@ Generic field mapping:
 - **ArcGIS Field Maps**: proprietary / paid, similar applications to Fulcrum,
   but not necessarily designed for text/question based surveys.
 
+- **Avenza Maps**: proprietary / paid, primarily for conducting fieldwork
+  based on entirely offline PDF maps. Supports basic data collection, such as
+  adding points, photos, and notes directly onto maps. However, its
+  functionality is largely centered around annotation rather than structured
+  data collection.
+
 Field survey-based data collection:
 
 - **KoboCollect**: fork of ODK, same mobile app essentially, but different back

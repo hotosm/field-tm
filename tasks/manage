@@ -21,24 +21,13 @@
 default:
   just --justfile {{justfile()}} --list manage
 
-# Install envsubst
+# Export bundled raw XLSForm templates to disk
 [no-cd]
-[no-exit-message]
-_install_envsubst:
-  #!/usr/bin/env bash
-  just prep _curl
+export-raw-xlsforms:
+  #!/usr/bin/env sh
 
-  echo
-  # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
-  # Use local version, as envsubst may be installed on system already
-  if [ -f ./envsubst ]; then
-      echo "envsubst already exists. Continuing."
-  else
-      echo "Downloading a8m/envsubst"
-      echo
-      curl -L "https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-$(uname -s)-$(uname -m)" -o envsubst
-      chmod +x envsubst
-  fi
+  cd {{justfile_directory()}}/src/backend
+  uv run python scripts/export_raw_xlsforms.py
 
 # Rename docker volume
 [no-cd]
@@ -64,7 +53,7 @@ upgrade-dev-db:
 
   cd {{justfile_directory()}}
 
-  just manage _install_envsubst
+  just prep envsubst
 
   ./envsubst -i contrib/pg-upgrade/compose.yaml | \
     docker compose -f - up --abort-on-container-failure
@@ -82,7 +71,7 @@ upgrade-db:
     GIT_BRANCH="development"
   fi
 
-  just manage _install_envsubst
+  just prep envsubst
 
   export VOLUME_NAME=field-tm-db-data-${GIT_BRANCH}
 

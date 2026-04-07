@@ -16,8 +16,8 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Allow usage of nerdctl instead of docker
-docker := env("DOCKER_ALIAS", "docker")
+# Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
+docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
 
 # List available commands
 [private]
@@ -59,7 +59,7 @@ generate-dotenv branch="dev":
   # By default we deploy from 'dev' branch, but can be overridden
 
   cd {{justfile_directory()}}
-  just manage _install_envsubst
+  just prep envsubst
 
   if [ -f .env ]; then
     just _echo-yellow "'.env' already exists. Skipping generation."
@@ -82,6 +82,77 @@ generate-dotenv branch="dev":
   echo ""
   # NOTE we run through envsubst twice for nested vars
   ./envsubst -i deploy/compose.sub.yaml | ./envsubst
+
+# Interactive setup for production / self-hosted deployments
+[no-cd]
+setup:
+  #!/usr/bin/env sh
+  set -e
+
+  cd {{justfile_directory()}}
+
+  echo ""
+  just _echo-blue "Field-TM Production Setup"
+  just _echo-blue "========================="
+  echo ""
+  echo "This will generate a .env file and configure it for your domain."
+  echo "Secrets and database passwords are auto-generated."
+  echo ""
+
+  # Remove existing .env so generate-dotenv creates a fresh one
+  rm -f .env
+  just config generate-dotenv > /dev/null 2>&1
+
+  # --- Domain ---
+  printf "Enter your domain (e.g. fieldtm.example.org): "
+  read ftm_domain
+  if [ -z "$ftm_domain" ]; then
+    just _echo-red "Domain is required. Aborting."
+    exit 1
+  fi
+  just config update-dotenv FTM_DOMAIN "$ftm_domain"
+  just config update-dotenv HANKO_COOKIE_DOMAIN "$ftm_domain"
+  just config update-dotenv HANKO_ALLOWED_ORIGIN "https://$ftm_domain"
+  just config update-dotenv HANKO_REDIRECT_URL "https://$ftm_domain"
+
+  # --- Cert email ---
+  printf "Email for Let's Encrypt certificates: "
+  read cert_email
+  if [ -z "$cert_email" ]; then
+    just _echo-red "Certificate email is required. Aborting."
+    exit 1
+  fi
+  just config update-dotenv CERT_EMAIL "$cert_email"
+
+  # --- Auth provider ---
+  echo ""
+  echo "Auth provider options:"
+  echo "  1) bundled  - self-hosted Hanko (default, recommended)"
+  echo "  2) hotosm   - centralised HOT login at login.hotosm.org"
+  echo "  3) disabled - no authentication, public access"
+  echo "  4) custom   - bring your own Hanko instance"
+  printf "Select auth provider [1]: "
+  read auth_choice
+  case "$auth_choice" in
+    2) just config update-dotenv AUTH_PROVIDER hotosm ;;
+    3) just config update-dotenv AUTH_PROVIDER disabled ;;
+    4) just config update-dotenv AUTH_PROVIDER custom ;;
+    *) just config update-dotenv AUTH_PROVIDER bundled ;;
+  esac
+
+  # --- Auto-generate secrets & passwords ---
+  just config update-dotenv ENCRYPTION_KEY "$(openssl rand -base64 32)"
+  just config update-dotenv HANKO_SECRET "$(openssl rand -base64 32)"
+  just config update-dotenv FTM_DB_PASSWORD "$(openssl rand -base64 24)"
+  just config update-dotenv ODK_CENTRAL_PASSWD "$(openssl rand -base64 24)"
+  just config update-dotenv QFIELDCLOUD_PASSWORD "$(openssl rand -base64 24)"
+  just config update-dotenv QFIELDCLOUD_ADMIN_PASSWORD "$(openssl rand -base64 24)"
+
+  echo ""
+  just _echo-blue "Setup complete. Config written to .env"
+  echo ""
+  just _echo-yellow "Modify .env as needed, then run: just start prod"
+  echo ""
 
 # For custom branding, place favicon.svg in the repo root, then run this
 [no-cd]

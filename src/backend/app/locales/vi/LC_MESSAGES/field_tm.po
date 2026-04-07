@@ -1,0 +1,1997 @@
+# English translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR sam.woodcock@hotosm.org, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: tech@hotosm.org\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: 2026-03-18 15:17+0000\n"
+"Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
+"Language: vi\n"
+"Language-Team: vi <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:163
+msgid "An unexpected error occurred. Please contact an admin."
+msgstr "Đã xảy ra lỗi không mong muốn. Vui lòng liên hệ quản trị viên."
+
+#: app/htmx/project_create_routes.py:205
+msgid "Provide a valid .xls or .xlsx file"
+msgstr "Cung cấp tệp .xls hoặc .xlsx hợp lệ"
+
+#: app/htmx/project_create_routes.py:223
+msgid "Failed to load template form."
+msgstr "Không tải được biểu mẫu mẫu."
+
+#: app/htmx/project_create_routes.py:231
+msgid "Please select a form or upload a file."
+msgstr "Vui lòng chọn biểu mẫu hoặc tải lên tệp."
+
+#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:297
+msgid "Project not found."
+msgstr "Không tìm thấy dự án."
+
+#: app/htmx/project_create_routes.py:466
+msgid "Project ID mismatch. You do not have access to this project."
+msgstr "ID dự án không khớp. Bạn không có quyền truy cập dự án này."
+
+#: app/htmx/project_create_routes.py:508
+msgid "Form validated and uploaded successfully! Reloading page..."
+msgstr "Biểu mẫu đã được xác thực và tải lên thành công! Đang tải lại trang..."
+
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
+msgid "An unexpected error occurred"
+msgstr "Đã xảy ra lỗi không mong muốn"
+
+#: app/htmx/project_create_routes.py:536
+msgid "Error"
+msgstr "Lỗi"
+
+#: app/htmx/project_detail_routes.py:97
+msgid "Mapper Login (QFieldCloud)"
+msgstr "Đăng nhập người lập bản đồ (QFieldCloud)"
+
+#: app/htmx/project_detail_routes.py:100
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
+msgid "Username:"
+msgstr "Tên người dùng:"
+
+#: app/htmx/project_detail_routes.py:103
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
+msgid "Password:"
+msgstr "Mật khẩu:"
+
+#: app/htmx/project_detail_routes.py:106
+msgid "Scan the QR code, then enter these credentials in QField."
+msgstr "Quét mã QR, sau đó nhập các thông tin này vào QField."
+
+#: app/htmx/project_detail_routes.py:118
+msgid "Scan QR Code"
+msgstr "Quét mã QR"
+
+#: app/htmx/project_detail_routes.py:120
+#, python-format
+msgid "Use %(app_name)s to scan this QR code and load the project."
+msgstr "Dùng %(app_name)s để quét mã QR này và tải dự án."
+
+#: app/htmx/project_detail_routes.py:122
+msgid "Project QR Code"
+msgstr "Mã QR của dự án"
+
+#: app/htmx/project_detail_routes.py:123
+msgid "Download QR Code"
+msgstr "Tải mã QR"
+
+#: app/htmx/project_detail_routes.py:175
+msgid ""
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
+msgstr ""
+"Không thể kết nối tới máy chủ lập bản đồ. Hãy kiểm tra xem ODK Central "
+"hoặc QFieldCloud có đang chạy không."
+
+#: app/htmx/project_detail_routes.py:179
+msgid "The mapping server returned an error. Check its logs for details."
+msgstr "Máy chủ lập bản đồ trả về lỗi. Xem nhật ký để biết chi tiết."
+
+#: app/htmx/project_detail_routes.py:182
+msgid ""
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
+msgstr ""
+"Xác thực thất bại khi kết nối tới máy chủ lập bản đồ. Hãy kiểm tra thông "
+"tin xác thực đã cấu hình."
+
+#: app/htmx/project_detail_routes.py:185
+msgid "An unexpected error occurred while generating the QR code."
+msgstr "Đã xảy ra lỗi không mong muốn khi tạo mã QR."
+
+#: app/htmx/project_detail_routes.py:247
+#, python-format
+msgid "Project (%(project_id)s) not found."
+msgstr "Không tìm thấy dự án (%(project_id)s)."
+
+#: app/htmx/project_detail_routes.py:254
+msgid "Only the project manager can delete this project."
+msgstr "Chỉ quản lý dự án mới có thể xóa dự án này."
+
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
+#, python-format
+msgid "Error: %(error_msg)s"
+msgstr "Lỗi: %(error_msg)s"
+
+#: app/htmx/qfc_admin_routes.py:55
+msgid "Admin"
+msgstr "Quản trị viên"
+
+#: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
+msgid "Manager"
+msgstr "Quản lý"
+
+#: app/htmx/qfc_admin_routes.py:57
+msgid "Editor"
+msgstr "Biên tập viên"
+
+#: app/htmx/qfc_admin_routes.py:58
+msgid "Reporter"
+msgstr "Người báo cáo"
+
+#: app/htmx/qfc_admin_routes.py:59
+msgid "Reader"
+msgstr "Người đọc"
+
+#: app/htmx/qfc_admin_routes.py:106
+msgid "This user does not exist. Please create it first."
+msgstr "Người dùng này không tồn tại. Vui lòng tạo trước."
+
+#: app/htmx/qfc_admin_routes.py:108
+msgid "This user is already a collaborator on this project."
+msgstr "Người dùng này đã là cộng tác viên của dự án."
+
+#: app/htmx/qfc_admin_routes.py:109
+#, python-format
+msgid "Failed to add collaborator: %(exc)s"
+msgstr "Không thể thêm cộng tác viên: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:115
+#, python-format
+msgid ""
+"This project belongs to the %(organization)s organization. The user must "
+"be added to that organization before they can be added as a collaborator."
+" Your QFieldCloud account does not have permission to manage organization"
+" members."
+msgstr ""
+"Dự án này thuộc tổ chức %(organization)s. Người dùng phải được thêm vào "
+"tổ chức đó trước khi có thể được thêm làm cộng tác viên. Tài khoản "
+"QFieldCloud của bạn không có quyền quản lý thành viên tổ chức."
+
+#: app/htmx/qfc_admin_routes.py:163
+msgid "All fields are required."
+msgstr "Tất cả các trường đều bắt buộc."
+
+#: app/htmx/qfc_admin_routes.py:178
+msgid "Login succeeded but no token received."
+msgstr "Đăng nhập thành công nhưng không nhận được token."
+
+#: app/htmx/qfc_admin_routes.py:186
+msgid "Login failed. Check your URL and credentials."
+msgstr "Đăng nhập thất bại. Hãy kiểm tra URL và thông tin xác thực của bạn."
+
+#: app/htmx/qfc_admin_routes.py:217
+msgid "QFieldCloud Projects"
+msgstr "Dự án QFieldCloud"
+
+#: app/htmx/qfc_admin_routes.py:222
+msgid "Connected as"
+msgstr "Đang kết nối với tư cách"
+
+#: app/htmx/qfc_admin_routes.py:223
+msgid "to"
+msgstr "tới"
+
+#: app/htmx/qfc_admin_routes.py:229
+msgid "Log Out"
+msgstr "Đăng xuất"
+
+#: app/htmx/qfc_admin_routes.py:234
+msgid "No projects found."
+msgstr "Không tìm thấy dự án."
+
+#: app/htmx/qfc_admin_routes.py:243
+msgid "Public"
+msgstr "Công khai"
+
+#: app/htmx/qfc_admin_routes.py:245
+msgid "Private"
+msgstr "Riêng tư"
+
+#: app/htmx/qfc_admin_routes.py:259
+msgid "Manage"
+msgstr "Quản lý"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Project"
+msgstr "Dự án"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Owner"
+msgstr "Chủ sở hữu"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Visibility"
+msgstr "Hiển thị"
+
+#: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
+#: app/templates/project_details.html:58
+msgid "Description"
+msgstr "Mô tả"
+
+#: app/htmx/qfc_admin_routes.py:298
+msgid "Session expired. Please log in again."
+msgstr "Phiên đã hết hạn. Vui lòng đăng nhập lại."
+
+#: app/htmx/qfc_admin_routes.py:317
+#, python-format
+msgid "Could not load collaborators: %(exc)s"
+msgstr "Không thể tải cộng tác viên: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:387
+msgid "Update"
+msgstr "Cập nhật"
+
+#: app/htmx/qfc_admin_routes.py:390 app/htmx/qfc_admin_routes.py:397
+#: app/htmx/qfc_admin_routes.py:405
+msgid "Remove"
+msgstr "Xóa"
+
+#: app/htmx/qfc_admin_routes.py:395
+msgid "Remove Collaborator"
+msgstr "Xóa cộng tác viên"
+
+#: app/htmx/qfc_admin_routes.py:397
+msgid "from this project?"
+msgstr "khỏi dự án này?"
+
+#: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
+msgid "Cancel"
+msgstr "Hủy"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "User"
+msgstr "Người dùng"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Role"
+msgstr "Vai trò"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Actions"
+msgstr "Hành động"
+
+#: app/htmx/qfc_admin_routes.py:417
+msgid "No collaborators yet."
+msgstr "Chưa có cộng tác viên nào."
+
+#: app/htmx/qfc_admin_routes.py:431
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
+#: app/templates/qfc_admin.html:52
+msgid "Username"
+msgstr "Tên người dùng"
+
+#: app/htmx/qfc_admin_routes.py:441
+msgid "Add Collaborator"
+msgstr "Thêm cộng tác viên"
+
+#: app/htmx/qfc_admin_routes.py:449
+msgid "Close"
+msgstr "Đóng"
+
+#: app/htmx/qfc_admin_routes.py:456
+msgid "Collaborators"
+msgstr "Cộng tác viên"
+
+#: app/htmx/qfc_admin_routes.py:480
+msgid "Username is required."
+msgstr "Tên người dùng là bắt buộc."
+
+#: app/htmx/qfc_admin_routes.py:530
+#, python-format
+msgid "Failed to remove collaborator: %(exc)s"
+msgstr "Không thể xóa cộng tác viên: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:569
+#, python-format
+msgid "Failed to update collaborator: %(exc)s"
+msgstr "Không thể cập nhật cộng tác viên: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:593
+#, python-format
+msgid "Collaborator refresh failed: %(exc)s"
+msgstr "Làm mới cộng tác viên thất bại: %(exc)s"
+
+#: app/htmx/setup_step_routes.py:83
+msgid "Project not found or access denied."
+msgstr "Không tìm thấy dự án hoặc bị từ chối truy cập."
+
+#: app/htmx/setup_step_routes.py:156
+msgid ""
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
+msgstr ""
+"Hoàn tất dự án thất bại. Vui lòng kiểm tra cài đặt và thử lại. Nếu vẫn "
+"tiếp diễn, hãy gửi chi tiết kỹ thuật bên dưới cho quản trị viên hệ thống "
+"hoặc nhóm hỗ trợ."
+
+#: app/htmx/setup_step_routes.py:225
+msgid "Invalid GeoJSON data in request. Please try uploading again."
+msgstr "Dữ liệu GeoJSON trong yêu cầu không hợp lệ. Vui lòng thử tải lên lại."
+
+#: app/htmx/setup_step_routes.py:231
+msgid "Error reading GeoJSON data from request."
+msgstr "Lỗi khi đọc dữ liệu GeoJSON từ yêu cầu."
+
+#: app/htmx/setup_step_routes.py:252
+#, python-format
+msgid ""
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please select a smaller area."
+msgstr ""
+"Diện tích là %(area_km2)s km², vượt quá giới hạn %(area_limit)s km². Vui "
+"lòng chọn khu vực nhỏ hơn."
+
+#: app/htmx/setup_step_routes.py:260
+#, python-format
+msgid ""
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process. The data extract API is limited to 200 km²."
+msgstr ""
+"Diện tích là %(area_km2)s km². Các khu vực lớn (>% (area_warn)s km²) có "
+"thể mất nhiều thời gian xử lý hơn. API trích xuất dữ liệu bị giới hạn ở "
+"200 km²."
+
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
+msgid "Project AOI"
+msgstr "AOI của dự án"
+
+#: app/htmx/setup_step_routes.py:339
+#, python-format
+msgid "Data Extract (%(data_feature_count)s features)"
+msgstr "Trích xuất dữ liệu (%(data_feature_count)s đối tượng)"
+
+#: app/htmx/setup_step_routes.py:353
+#, python-format
+msgid "Task Boundaries (%(task_count)s tasks)"
+msgstr "Ranh giới nhiệm vụ (%(task_count)s nhiệm vụ)"
+
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "ID nhiệm vụ"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "Số lượng tòa nhà"
+
+#: app/htmx/setup_step_routes.py:397
+msgid ""
+"No task boundaries found. Please split the project into tasks first using"
+" the \"Split AOI\" button above."
+msgstr ""
+"Không tìm thấy ranh giới nhiệm vụ. Vui lòng chia dự án thành các nhiệm vụ"
+" trước bằng nút \"Split AOI\" ở trên."
+
+#: app/htmx/setup_step_routes.py:453
+#, python-format
+msgid ""
+"✓ AOI split successfully! Generated %(task_count)s task areas using "
+"%(algorithm)s."
+msgstr ""
+"✓ AOI đã được chia thành công! Đã tạo %(task_count)s khu vực nhiệm vụ "
+"bằng %(algorithm)s."
+
+#: app/htmx/setup_step_routes.py:460
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
+"the results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to "
+"regenerate."
+msgstr ""
+"Đang xem trước %(task_count)s ranh giới nhiệm vụ%(data_extract_info)s. "
+"Xem lại kết quả bên dưới. Nếu hài lòng, nhấp \"Accept Task Choices\" để "
+"lưu. Nếu không, điều chỉnh các tham số ở trên và nhấp \"Split Again\" để "
+"tạo lại."
+
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
+msgid "Data Extract"
+msgstr "Trích xuất dữ liệu"
+
+#: app/htmx/setup_step_routes.py:560
+#, python-format
+msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+msgstr "Đã tải dữ liệu OSM thành công! Tìm thấy %(feature_count)s đối tượng."
+
+#: app/htmx/setup_step_routes.py:563
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
+msgstr ""
+"Đang xem trước %(feature_count)s đối tượng trên bản đồ. Xem lại dữ liệu "
+"bên dưới. Nếu hài lòng, nhấp \"Accept Data Extract\" để lưu. Nếu không, "
+"hãy thử tải lại với các tham số khác."
+
+#: app/htmx/setup_step_routes.py:635
+#: app/templates/partials/project_details/style_and_scripts.html:28
+msgid "Invalid file type. Please upload a .geojson or .json file."
+msgstr "Loại tệp không hợp lệ. Vui lòng tải lên tệp .geojson hoặc .json."
+
+#: app/htmx/setup_step_routes.py:660
+msgid "No valid geometries found in GeoJSON."
+msgstr "Không tìm thấy hình học hợp lệ trong GeoJSON."
+
+#: app/htmx/setup_step_routes.py:692
+#, python-format
+msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+msgstr "✓ Đã tải GeoJSON lên thành công! Tìm thấy %(feature_count)s đối tượng."
+
+#: app/htmx/setup_step_routes.py:695
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
+msgstr ""
+"Đang xem trước %(feature_count)s đối tượng trên bản đồ. Xem lại dữ liệu "
+"bên dưới. Nếu hài lòng, nhấp \"Accept Data Extract\" để lưu. Nếu không, "
+"hãy thử tải lên tệp khác."
+
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
+msgid ""
+"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"Không tìm thấy dữ liệu GeoJSON. Vui lòng tải dữ liệu OSM hoặc tải lên tệp"
+" GeoJSON trước."
+
+#: app/htmx/setup_step_routes.py:791
+#, python-format
+msgid "Data Extract (%(feature_count)s features)"
+msgstr "Trích xuất dữ liệu (%(feature_count)s đối tượng)"
+
+#: app/htmx/setup_step_routes.py:810
+#, python-format
+msgid ""
+"Previewing %(feature_count)s data features on map. Review the data, then "
+"continue to the next step."
+msgstr ""
+"Đang xem trước %(feature_count)s đối tượng dữ liệu trên bản đồ. Xem lại "
+"dữ liệu, sau đó tiếp tục sang bước tiếp theo."
+
+#: app/htmx/setup_step_routes.py:870
+msgid ""
+"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
+"continue."
+msgstr ""
+"✓ Đã chọn chế độ chỉ thu thập dữ liệu mới. Việc chia nhiệm vụ sẽ được bỏ "
+"qua và bạn có thể tiếp tục."
+
+#: app/htmx/setup_step_routes.py:948
+msgid ""
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py:1018
+msgid ""
+"No data extract found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"Không tìm thấy trích xuất dữ liệu. Vui lòng tải dữ liệu OSM hoặc tải lên "
+"tệp GeoJSON trước."
+
+#: app/htmx/setup_step_routes.py:1049
+#, python-format
+msgid ""
+"Previewing whole AOI (no splitting) with %(data_feature_count)s data "
+"features. The entire AOI will be used as a single task."
+msgstr ""
+"Đang xem trước toàn bộ AOI (không chia) với %(data_feature_count)s đối "
+"tượng dữ liệu. Toàn bộ AOI sẽ được dùng như một nhiệm vụ duy nhất."
+
+#: app/htmx/setup_step_routes.py:1056
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
+" features together."
+msgstr ""
+"Đang xem trước %(task_count)s ranh giới nhiệm vụ và "
+"%(data_feature_count)s đối tượng dữ liệu cùng nhau."
+
+#: app/htmx/setup_step_routes.py:1115
+msgid "Project outline not found. Cannot skip task splitting."
+msgstr "Không tìm thấy ranh giới dự án. Không thể bỏ qua việc chia nhiệm vụ."
+
+#: app/htmx/setup_step_routes.py:1142
+msgid ""
+"✓ Task splitting skipped. The whole AOI will be used as a single task. "
+"You can proceed to Step 5."
+msgstr ""
+"✓ Đã bỏ qua việc chia nhiệm vụ. Toàn bộ AOI sẽ được sử dụng như một nhiệm"
+" vụ duy nhất. Bạn có thể chuyển sang Bước 5."
+
+#: app/htmx/setup_step_routes.py:1204
+msgid "Please select a splitting option."
+msgstr "Vui lòng chọn một tùy chọn chia tách."
+
+#: app/htmx/setup_step_routes.py:1225
+msgid "✓ Task splitting is not required for this project setup."
+msgstr "✓ Không cần chia nhiệm vụ cho cấu hình dự án này."
+
+#: app/htmx/setup_step_routes.py:1282
+msgid "No data extract provided."
+msgstr "Không có trích xuất dữ liệu nào được cung cấp."
+
+#: app/htmx/setup_step_routes.py:1286
+msgid "Invalid data extract format."
+msgstr "Định dạng trích xuất dữ liệu không hợp lệ."
+
+#: app/htmx/setup_step_routes.py:1303
+#, python-format
+msgid ""
+"✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
+"complete."
+msgstr ""
+"✓ Trích xuất dữ liệu đã được chấp nhận! Đã lưu %(feature_count)s đối "
+"tượng. Bước 2 hiện đã hoàn tất."
+
+#: app/htmx/setup_step_routes.py:1353
+msgid "No task areas data provided."
+msgstr "Không có dữ liệu khu vực nhiệm vụ nào được cung cấp."
+
+#: app/htmx/setup_step_routes.py:1357
+msgid "Invalid task areas data format."
+msgstr "Định dạng dữ liệu khu vực nhiệm vụ không hợp lệ."
+
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
+msgid "✓ Split tasks saved successfully"
+msgstr "✓ Đã lưu thành công các nhiệm vụ đã chia"
+
+#: app/htmx/setup_step_routes.py:1429
+msgid ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
+msgstr ""
+"Cung cấp URL ODK, tên người dùng và mật khẩu (cả 3), hoặc để trống tất cả"
+" để dùng mặc định của máy chủ."
+
+#: app/htmx/setup_step_routes.py:1551
+msgid "GeoJSON is required"
+msgstr "Yêu cầu GeoJSON"
+
+#: app/htmx/setup_step_routes.py:1562
+msgid "No polygon geometries found. Project area must be a polygon."
+msgstr "Không tìm thấy hình học đa giác. Khu vực dự án phải là đa giác."
+
+#: app/templates/home.html:13
+msgid "Filters"
+msgstr "Bộ lọc"
+
+#: app/templates/home.html:18
+msgid "All projects"
+msgstr "Tất cả dự án"
+
+#: app/templates/home.html:19
+msgid "Draft"
+msgstr "Bản nháp"
+
+#: app/templates/home.html:20
+msgid "Published"
+msgstr "Đã xuất bản"
+
+#: app/templates/home.html:21
+msgid "Completed"
+msgstr "Hoàn thành"
+
+#: app/templates/home.html:22
+msgid "Archived"
+msgstr "Đã lưu trữ"
+
+#: app/templates/home.html:26
+msgid "Project Status"
+msgstr "Trạng thái dự án"
+
+#: app/templates/home.html:41
+msgid "Newest first"
+msgstr "Mới nhất trước"
+
+#: app/templates/home.html:42
+msgid "Oldest first"
+msgstr "Cũ nhất trước"
+
+#: app/templates/home.html:43
+msgid "Name (A-Z)"
+msgstr "Tên (A-Z)"
+
+#: app/templates/home.html:44
+msgid "Name (Z-A)"
+msgstr "Tên (Z-A)"
+
+#: app/templates/home.html:47
+msgid "Sort By"
+msgstr "Sắp xếp theo"
+
+#: app/templates/home.html:61
+msgid "Search"
+msgstr "Tìm kiếm"
+
+#: app/templates/home.html:67
+msgid "Search projects…"
+msgstr "Tìm dự án…"
+
+#: app/templates/home.html:77 app/templates/landing.html:566
+#: app/templates/layout.html:222 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
+msgid "Create Project"
+msgstr "Tạo dự án"
+
+#: app/templates/home.html:78
+msgid "+ New"
+msgstr "+ Mới"
+
+#: app/templates/home.html:84
+#, python-format
+msgid "Showing %(count)s project"
+msgid_plural "Showing %(count)s projects"
+msgstr[0] "Hiển thị %(count)s dự án"
+msgstr[1] "Hiển thị %(count)s dự án"
+
+#: app/templates/home.html:85
+#, python-format
+msgid "in %(status)s"
+msgstr "trong %(status)s"
+
+#: app/templates/home.html:86
+#, python-format
+msgid "matching \"%(query)s\""
+msgstr "khớp với \"%(query)s\""
+
+#: app/templates/home.html:102
+msgid "Private Project"
+msgstr "Dự án riêng tư"
+
+#: app/templates/home.html:125 app/templates/project_details.html:33
+msgid "Unnamed Project"
+msgstr "Dự án chưa có tên"
+
+#: app/templates/home.html:133
+msgid "Location:"
+msgstr "Vị trí:"
+
+#: app/templates/home.html:154
+msgid "Created:"
+msgstr "Đã tạo:"
+
+#: app/templates/home.html:154
+msgid "N/A"
+msgstr "Không áp dụng"
+
+#: app/templates/home.html:163
+msgid "No projects found. Create your first project to get started!"
+msgstr "Không tìm thấy dự án nào. Hãy tạo dự án đầu tiên để bắt đầu!"
+
+#: app/templates/landing.html:558
+msgid "Coordinate field campaigns"
+msgstr "Điều phối các chiến dịch hiện trường"
+
+#: app/templates/landing.html:561
+msgid ""
+"Enhancing field mapping efficiency and accuracy through seamless "
+"coordination."
+msgstr ""
+"Nâng cao hiệu quả và độ chính xác của lập bản đồ hiện trường thông qua "
+"điều phối liền mạch."
+
+#: app/templates/landing.html:564
+msgid "Explore Projects"
+msgstr "Khám phá dự án"
+
+#: app/templates/landing.html:576
+msgid "Loading metrics..."
+msgstr "Đang tải số liệu..."
+
+#: app/templates/landing.html:584
+msgid "What is it?"
+msgstr "Đây là gì?"
+
+#: app/templates/landing.html:586
+msgid ""
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
+"map features by coordinating mapping in the field."
+msgstr ""
+"Field Tasking Manager (Field-TM) giúp các nhóm bổ sung kiến thức địa "
+"phương vào các đối tượng bản đồ bằng cách điều phối lập bản đồ ngoài hiện"
+" trường."
+
+#: app/templates/landing.html:589
+msgid ""
+"Field-TM facilitates collaborative mapping by supporting and extending "
+"mature tools like ODK and QField. It is a standalone mobile and web "
+"workflow that helps teams collect geospatial data efficiently with "
+"commonly available Android devices."
+msgstr ""
+"Field-TM tạo điều kiện cho việc lập bản đồ cộng tác bằng cách hỗ trợ và "
+"mở rộng các công cụ trưởng thành như ODK và QField. Đây là một quy trình "
+"làm việc độc lập trên di động và web, giúp các nhóm thu thập dữ liệu địa "
+"không gian hiệu quả bằng các thiết bị Android phổ biến."
+
+#: app/templates/landing.html:594
+msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+msgstr ""
+"Một quản lý dự án đang trình bày quy trình lập bản đồ FieldTM trên máy "
+"tính xách tay"
+
+#: app/templates/landing.html:600
+msgid "Main Features"
+msgstr "Tính năng chính"
+
+#: app/templates/landing.html:603
+msgid "Flexible Data Collection"
+msgstr "Thu thập dữ liệu linh hoạt"
+
+#: app/templates/landing.html:605
+msgid ""
+"Support diverse survey forms, multiple data formats, and adaptable "
+"workflows that fit different operational needs."
+msgstr ""
+"Hỗ trợ nhiều biểu mẫu khảo sát, nhiều định dạng dữ liệu và quy trình làm "
+"việc linh hoạt phù hợp với các nhu cầu vận hành khác nhau."
+
+#: app/templates/landing.html:609
+msgid "Open Source and Customizable"
+msgstr "Mã nguồn mở và có thể tùy chỉnh"
+
+#: app/templates/landing.html:611
+msgid ""
+"Adapt Field-TM to your own survey logic, data structures, and integration"
+" requirements."
+msgstr ""
+"Điều chỉnh Field-TM theo logic khảo sát, cấu trúc dữ liệu và yêu cầu tích"
+" hợp của riêng bạn."
+
+#: app/templates/landing.html:615
+msgid "Entity-Level Tracking"
+msgstr "Theo dõi ở cấp thực thể"
+
+#: app/templates/landing.html:617
+msgid ""
+"Monitor survey progress at task and feature level so managers can make "
+"informed decisions quickly."
+msgstr ""
+"Theo dõi tiến độ khảo sát ở cấp nhiệm vụ và đối tượng để các nhà quản lý "
+"có thể nhanh chóng đưa ra quyết định chính xác."
+
+#: app/templates/landing.html:624
+msgid "Who is it for?"
+msgstr "Dành cho ai?"
+
+#: app/templates/landing.html:627
+msgid "Project Manager"
+msgstr "Quản lý dự án"
+
+#: app/templates/landing.html:628
+msgid "Create and coordinate field campaigns"
+msgstr "Tạo và điều phối các chiến dịch hiện trường"
+
+#: app/templates/landing.html:630
+msgid ""
+"Project managers use Field-TM to set up mapping projects, define areas of"
+" interest, design survey forms, and split work into manageable tasks."
+msgstr ""
+"Các quản lý dự án sử dụng Field-TM để thiết lập dự án lập bản đồ, xác "
+"định khu vực quan tâm, thiết kế biểu mẫu khảo sát và chia công việc thành"
+" các nhiệm vụ dễ quản lý."
+
+#: app/templates/landing.html:633
+msgid "Define a project area and upload or choose a survey form"
+msgstr "Xác định khu vực dự án và tải lên hoặc chọn biểu mẫu khảo sát"
+
+#: app/templates/landing.html:634
+msgid "Split the area into tasks and generate a data extract"
+msgstr "Chia khu vực thành các nhiệm vụ và tạo bản trích xuất dữ liệu"
+
+#: app/templates/landing.html:635
+msgid "Publish the project to ODK Central or QFieldCloud"
+msgstr "Xuất bản dự án lên ODK Central hoặc QFieldCloud"
+
+#: app/templates/landing.html:636
+msgid "Share a QR code so mappers can start collecting data"
+msgstr "Chia sẻ mã QR để người lập bản đồ có thể bắt đầu thu thập dữ liệu"
+
+#: app/templates/landing.html:640
+msgid "Field Mapper"
+msgstr "Người lập bản đồ hiện trường"
+
+#: app/templates/landing.html:641
+msgid "Collect data in the field with your phone"
+msgstr "Thu thập dữ liệu ngoài hiện trường bằng điện thoại của bạn"
+
+#: app/templates/landing.html:643
+msgid ""
+"Mappers do not need to log in to Field-TM. Once a project manager "
+"publishes a project, mappers access it directly in their mobile app of "
+"choice."
+msgstr ""
+"Người lập bản đồ không cần đăng nhập vào Field-TM. Khi quản lý dự án xuất"
+" bản một dự án, họ có thể truy cập trực tiếp từ ứng dụng di động mình "
+"chọn."
+
+#: app/templates/landing.html:646
+msgid "Scan the QR code shared by your project manager"
+msgstr "Quét mã QR do quản lý dự án của bạn chia sẻ"
+
+#: app/templates/landing.html:647
+msgid "The project loads automatically in ODK Collect or QField"
+msgstr "Dự án sẽ tự động tải trong ODK Collect hoặc QField"
+
+#: app/templates/landing.html:648
+msgid "Navigate to your assigned task area and collect data"
+msgstr "Đi tới khu vực nhiệm vụ được giao và thu thập dữ liệu"
+
+#: app/templates/landing.html:649
+msgid "Submit your survey, which goes straight to the server"
+msgstr "Gửi khảo sát của bạn, dữ liệu sẽ đi thẳng đến máy chủ"
+
+#: app/templates/landing.html:656
+msgid "Field-TM Use Cases"
+msgstr "Các trường hợp sử dụng Field-TM"
+
+#: app/templates/landing.html:661
+msgid "Field mapping in progress"
+msgstr "Lập bản đồ hiện trường đang diễn ra"
+
+#: app/templates/landing.html:666
+msgid "1. Community Mapping"
+msgstr "1. Lập bản đồ cộng đồng"
+
+#: app/templates/landing.html:668
+msgid ""
+"Field Tasking Manager empowers communities to map informal settlements, "
+"public facilities, and local services for inclusive planning."
+msgstr ""
+"Field Tasking Manager trao quyền cho cộng đồng để lập bản đồ các khu dân "
+"cư không chính thức, cơ sở công cộng và dịch vụ địa phương nhằm phục vụ "
+"quy hoạch bao trùm."
+
+#: app/templates/landing.html:672
+msgid "2. Urban Planning and Management"
+msgstr "2. Quy hoạch và quản lý đô thị"
+
+#: app/templates/landing.html:674
+msgid ""
+"Build smarter cities with coordinated surveys of houses, roads, and "
+"utilities through clear, manageable mapping tasks."
+msgstr ""
+"Xây dựng các thành phố thông minh hơn với các khảo sát phối hợp về nhà ở,"
+" đường sá và hạ tầng tiện ích thông qua các nhiệm vụ lập bản đồ rõ ràng, "
+"dễ quản lý."
+
+#: app/templates/landing.html:678
+msgid "3. Disaster Response and Recovery"
+msgstr "3. Ứng phó và phục hồi sau thảm họa"
+
+#: app/templates/landing.html:680
+msgid ""
+"Rapidly map damaged infrastructure after disasters, coordinate "
+"volunteers, and deliver reliable data for relief operations."
+msgstr ""
+"Nhanh chóng lập bản đồ hạ tầng bị hư hại sau thiên tai, điều phối tình "
+"nguyện viên và cung cấp dữ liệu đáng tin cậy cho hoạt động cứu trợ."
+
+#: app/templates/landing.html:688
+msgid "Resources"
+msgstr "Tài nguyên"
+
+#: app/templates/landing.html:696
+msgid "Data Prep"
+msgstr "Chuẩn bị dữ liệu"
+
+#: app/templates/landing.html:697
+msgid "HOT Export Tool"
+msgstr "Công cụ xuất HOT"
+
+#: app/templates/landing.html:699
+msgid "Download task-ready geospatial data extracts for your project area."
+msgstr ""
+"Tải xuống các bản trích xuất dữ liệu địa không gian sẵn sàng cho nhiệm vụ"
+" của khu vực dự án."
+
+#: app/templates/landing.html:708 app/templates/landing.html:720
+msgid "Documentation"
+msgstr "Tài liệu"
+
+#: app/templates/landing.html:709
+msgid "ODK Central Guide"
+msgstr "Hướng dẫn ODK Central"
+
+#: app/templates/landing.html:711
+msgid "Learn how to manage forms, app users, and field submissions in ODK."
+msgstr ""
+"Tìm hiểu cách quản lý biểu mẫu, người dùng ứng dụng và bài nộp ngoài hiện"
+" trường trong ODK."
+
+#: app/templates/landing.html:721
+msgid "QField Guide"
+msgstr "Hướng dẫn QField"
+
+#: app/templates/landing.html:723
+msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+msgstr ""
+"Thiết lập các dự án QFieldCloud và quy trình làm việc trên di động cho "
+"lập bản đồ ngoại tuyến."
+
+#: app/templates/landing.html:733
+msgid "Need assistance?"
+msgstr "Cần hỗ trợ?"
+
+#: app/templates/landing.html:734
+msgid "Email:"
+msgstr "Thư điện tử:"
+
+#: app/templates/landing.html:750
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+#: app/templates/layout.html:7
+msgid "Coordinated field mapping for Open Mapping campaigns."
+msgstr "Lập bản đồ hiện trường phối hợp cho các chiến dịch Open Mapping."
+
+#: app/templates/layout.html:161 app/templates/login.html:1
+msgid "Login"
+msgstr "Đăng nhập"
+
+#: app/templates/layout.html:215
+msgid "Projects"
+msgstr "Dự án"
+
+#: app/templates/layout.html:229
+msgid "QField Admin"
+msgstr "Quản trị QField"
+
+#: app/templates/login.html:5
+msgid "Sign in to Field-TM"
+msgstr "Đăng nhập vào Field-TM"
+
+#: app/templates/login.html:8
+msgid "Redirecting to the centralized login service."
+msgstr "Đang chuyển hướng đến dịch vụ đăng nhập tập trung."
+
+#: app/templates/login.html:9
+msgid "Continue to login"
+msgstr "Tiếp tục đăng nhập"
+
+#: app/templates/login.html:17
+msgid "Authentication is disabled on this deployment."
+msgstr "Xác thực đã bị tắt trên bản triển khai này."
+
+#: app/templates/login.html:20
+msgid "Back to home"
+msgstr "Quay lại trang chủ"
+
+#: app/templates/new_project.html:4
+msgid "Create New Project"
+msgstr "Tạo dự án mới"
+
+#: app/templates/new_project.html:25
+msgid "Project Name"
+msgstr "Tên dự án"
+
+#: app/templates/new_project.html:30
+msgid "Enter project name"
+msgstr "Nhập tên dự án"
+
+#: app/templates/new_project.html:43
+msgid "Enter project description"
+msgstr "Nhập mô tả dự án"
+
+#: app/templates/new_project.html:52
+msgid "Field Mapping App"
+msgstr "Ứng dụng lập bản đồ hiện trường"
+
+#: app/templates/new_project.html:92
+msgid "Project Area"
+msgstr "Khu vực dự án"
+
+#: app/templates/new_project.html:101
+msgid "Draw Area"
+msgstr "Vẽ khu vực"
+
+#: app/templates/new_project.html:109
+msgid "Upload GeoJSON"
+msgstr "Tải lên GeoJSON"
+
+#: app/templates/new_project.html:117
+msgid "Clear"
+msgstr "Xóa"
+
+#: app/templates/new_project.html:125
+msgid ""
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"warning. The OSM data extract API is limited to 200 km²."
+msgstr ""
+"Vẽ một đa giác trên bản đồ hoặc tải lên tệp GeoJSON để xác định khu vực "
+"dự án. Kích thước dự án tối đa là 1.000 km². Các khu vực trên 100 km² sẽ "
+"hiển thị cảnh báo. API trích xuất dữ liệu OSM bị giới hạn ở 200 km²."
+
+#: app/templates/new_project.html:133
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
+msgid "Advanced Config"
+msgstr "Cấu hình nâng cao"
+
+#: app/templates/new_project.html:145
+msgid "Merge geometries (use convex hull for multipolygons)"
+msgstr "Hợp nhất hình học (dùng convex hull cho đa đa giác)"
+
+#: app/templates/new_project.html:154 app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "Hashtag"
+
+#: app/templates/new_project.html:157
+msgid "Type hashtags and press Enter or comma"
+msgstr "Nhập hashtag và nhấn Enter hoặc dấu phẩy"
+
+#: app/templates/new_project.html:162
+msgid ""
+"Type hashtags and press Enter or comma to add them. Click the × on a tag "
+"to remove it."
+msgstr ""
+"Nhập hashtag và nhấn Enter hoặc dấu phẩy để thêm. Nhấp vào × trên thẻ để "
+"xóa."
+
+#: app/templates/new_project.html:168
+msgid "Creating..."
+msgstr "Đang tạo..."
+
+#: app/templates/new_project.html:177
+msgid "Something went wrong. Please try again."
+msgstr "Đã xảy ra sự cố. Vui lòng thử lại."
+
+#: app/templates/new_project.html:178
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr "Định dạng GeoJSON không hợp lệ. Vui lòng kiểm tra tệp của bạn."
+
+#: app/templates/new_project.html:179
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr "Tệp GeoJSON không hợp lệ. Vui lòng kiểm tra định dạng tệp."
+
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
+msgid ""
+"You must draw or upload an Area of Interest (AOI) on the map before "
+"submitting."
+msgstr "Bạn phải vẽ hoặc tải lên Area of Interest (AOI) trên bản đồ trước khi gửi."
+
+#: app/templates/new_project.html:701
+msgid "A project with this name already exists. Please choose a different name."
+msgstr "Đã có một dự án với tên này. Vui lòng chọn tên khác."
+
+#: app/templates/new_project.html:861
+msgid "Description is required."
+msgstr "Mô tả là bắt buộc."
+
+#: app/templates/project_details.html:6
+msgid "← Back to Projects"
+msgstr "← Quay lại dự án"
+
+#: app/templates/project_details.html:46
+msgid "Project Metadata"
+msgstr "Siêu dữ liệu dự án"
+
+#: app/templates/project_details.html:48
+msgid "Project metadata and setup information for managers."
+msgstr "Siêu dữ liệu dự án và thông tin thiết lập dành cho quản lý."
+
+#: app/templates/project_details.html:66
+msgid "Project ID"
+msgstr "ID dự án"
+
+#: app/templates/project_details.html:77
+msgid "Created"
+msgstr "Đã tạo"
+
+#: app/templates/project_details.html:84
+msgid "Last Updated"
+msgstr "Cập nhật lần cuối"
+
+#: app/templates/project_details.html:107
+msgid "External Project"
+msgstr "Dự án bên ngoài"
+
+#: app/templates/project_details.html:109
+msgid "Instance:"
+msgstr "Phiên bản:"
+
+#: app/templates/project_details.html:111
+msgid "Project ID:"
+msgstr "ID dự án:"
+
+#: app/templates/project_details.html:121
+#: app/templates/project_details.html:129
+msgid "View Project in ODK Central →"
+msgstr "Xem dự án trong ODK Central →"
+
+#: app/templates/project_details.html:136
+msgid "Manage QFieldCloud Project →"
+msgstr "Quản lý dự án QFieldCloud →"
+
+#: app/templates/project_details.html:144
+msgid "View Project Externally →"
+msgstr "Xem dự án bên ngoài →"
+
+#: app/templates/project_details.html:159
+msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+msgstr ""
+"Xóa dự án này ở hệ thống hạ nguồn và Field-TM? Không thể hoàn tác thao "
+"tác này."
+
+#: app/templates/project_details.html:162
+msgid "Delete Project"
+msgstr "Xóa dự án"
+
+#: app/templates/project_details.html:165
+#: app/templates/project_details.html:176
+msgid "Back to Projects"
+msgstr "Quay lại dự án"
+
+#: app/templates/project_details.html:171
+msgid "Project Not Found"
+msgstr "Không tìm thấy dự án"
+
+#: app/templates/project_details.html:173
+msgid ""
+"The project you're looking for doesn't exist or you don't have permission"
+" to view\n"
+"        it."
+msgstr "Dự án bạn đang tìm không tồn tại hoặc bạn không có quyền xem."
+
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
+msgid "QFieldCloud Admin"
+msgstr "Quản trị QFieldCloud"
+
+#: app/templates/qfc_admin.html:21
+msgid ""
+"This page is for managing the users in your QField project, after "
+"creation."
+msgstr ""
+"Trang này dùng để quản lý người dùng trong dự án QField của bạn sau khi "
+"tạo."
+
+#: app/templates/qfc_admin.html:25
+msgid "Enter your QFieldCloud credentials to manage collaborators."
+msgstr "Nhập thông tin QFieldCloud của bạn để quản lý cộng tác viên."
+
+#: app/templates/qfc_admin.html:36
+msgid "QFieldCloud URL"
+msgstr "URL QFieldCloud"
+
+#: app/templates/qfc_admin.html:46
+msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+msgstr "URL gốc của phiên bản QFieldCloud của bạn (không có /api/v1)."
+
+#: app/templates/qfc_admin.html:54
+msgid "admin"
+msgstr "admin"
+
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
+#: app/templates/qfc_admin.html:59
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: app/templates/qfc_admin.html:70
+msgid "Connect"
+msgstr "Kết nối"
+
+#: app/templates/qfc_admin.html:76
+msgid "Connecting…"
+msgstr "Đang kết nối…"
+
+#: app/templates/partials/metrics.html:5
+msgid "Features Surveyed (Approximate)"
+msgstr "Đối tượng đã khảo sát (ước tính)"
+
+#: app/templates/partials/metrics.html:12
+msgid "Projects Created"
+msgstr "Dự án đã tạo"
+
+#: app/templates/partials/metrics.html:19
+msgid "Countries Covered"
+msgstr "Các quốc gia được bao phủ"
+
+#: app/templates/partials/metrics.html:26
+msgid "Users Registered"
+msgstr "Người dùng đã đăng ký"
+
+#: app/templates/partials/metrics.html:33
+msgid "Supported Mapping Apps"
+msgstr "Ứng dụng lập bản đồ được hỗ trợ"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:3
+msgid "Manager Setup Summary"
+msgstr "Tóm tắt thiết lập quản lý"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:6
+msgid "The project setup flow is complete and shown below for reference."
+msgstr ""
+"Quy trình thiết lập dự án đã hoàn tất và được hiển thị bên dưới để tham "
+"khảo."
+
+#: app/templates/partials/project_details/manager_setup_summary.html:14
+msgid "Project Location"
+msgstr "Vị trí dự án"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:25
+msgid "Step 2: Upload XLSForm"
+msgstr "Bước 2: Tải lên XLSForm"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:28
+#: app/templates/partials/project_details/manager_setup_summary.html:39
+#: app/templates/partials/project_details/manager_setup_summary.html:50
+#: app/templates/partials/project_details/manager_setup_summary.html:61
+#: app/templates/partials/project_details/setup_steps.html:46
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
+msgid "Complete"
+msgstr "Hoàn tất"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:36
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "Bước 3: Lấy dữ liệu"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:47
+msgid "Step 4: Split into Tasks"
+msgstr "Bước 4: Chia thành nhiệm vụ"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:58
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "Bước 5: Hoàn tất dự án"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:69
+msgid ""
+"If you need to upload additional media files to this project, such as "
+"images and\n"
+"          videos, log into ODK Central and upload them in the form "
+"settings."
+msgstr ""
+"Nếu bạn cần tải lên thêm các tệp phương tiện như hình ảnh và video cho dự"
+" án này, hãy đăng nhập vào ODK Central và tải chúng lên trong phần cài "
+"đặt biểu mẫu."
+
+#: app/templates/partials/project_details/setup_steps.html:14
+msgid "Ready for Mapping"
+msgstr "Sẵn sàng lập bản đồ"
+
+#: app/templates/partials/project_details/setup_steps.html:25
+msgid "Loading QR code..."
+msgstr "Đang tải mã QR..."
+
+#: app/templates/partials/project_details/setup_steps.html:32
+msgid "Project Setup"
+msgstr "Thiết lập dự án"
+
+#: app/templates/partials/project_details/setup_steps.html:41
+msgid "Step 2: Select Survey Form"
+msgstr "Bước 2: Chọn biểu mẫu khảo sát"
+
+#: app/templates/partials/project_details/setup_steps.html:51
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "Chọn loại khảo sát và tiếp tục với các cài đặt mặc định được khuyến nghị."
+
+#: app/templates/partials/project_details/setup_steps.html:62
+msgid "Choose Survey Type:"
+msgstr "Chọn loại khảo sát:"
+
+#: app/templates/partials/project_details/setup_steps.html:64
+msgid "Loading survey types..."
+msgstr "Đang tải loại khảo sát..."
+
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "Hoặc thay vào đó hãy dùng biểu mẫu của riêng bạn:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "Tải lên biểu mẫu tùy chỉnh"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
+msgid ""
+"Recommended defaults are active for ODK projects, including ODK Collect\n"
+"          compatibility."
+msgstr ""
+"Các cài đặt mặc định được khuyến nghị đang áp dụng cho dự án ODK, bao gồm"
+" khả năng tương thích với ODK Collect."
+
+#: app/templates/partials/project_details/setup_steps.html:134
+#, python-format
+msgid "Recommended defaults are active for %(app_name)s projects."
+msgstr "Các cài đặt mặc định được khuyến nghị đang áp dụng cho dự án %(app_name)s."
+
+#: app/templates/partials/project_details/setup_steps.html:141
+msgid "Recommended defaults are active for this project."
+msgstr "Các cài đặt mặc định được khuyến nghị đang áp dụng cho dự án này."
+
+#: app/templates/partials/project_details/setup_steps.html:160
+msgid "Default Language:"
+msgstr "Ngôn ngữ mặc định:"
+
+#: app/templates/partials/project_details/setup_steps.html:162
+msgid "English"
+msgstr "Tiếng Anh"
+
+#: app/templates/partials/project_details/setup_steps.html:163
+msgid "Spanish"
+msgstr "Tiếng Tây Ban Nha"
+
+#: app/templates/partials/project_details/setup_steps.html:164
+msgid "French"
+msgstr "Tiếng Pháp"
+
+#: app/templates/partials/project_details/setup_steps.html:165
+msgid "Portuguese"
+msgstr "Tiếng Bồ Đào Nha"
+
+#: app/templates/partials/project_details/setup_steps.html:166
+msgid "Swahili"
+msgstr "Tiếng Swahili"
+
+#: app/templates/partials/project_details/setup_steps.html:167
+msgid "Hindi"
+msgstr "Tiếng Hindi"
+
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
+msgid "Continue"
+msgstr "Tiếp tục"
+
+#: app/templates/partials/project_details/setup_steps.html:256
+msgid "✓ Survey form uploaded successfully"
+msgstr "✓ Đã tải biểu mẫu khảo sát lên thành công"
+
+#: app/templates/partials/project_details/setup_steps.html:278
+msgid "Download the recommended OSM data for your survey form."
+msgstr "Tải dữ liệu OSM được khuyến nghị cho biểu mẫu khảo sát của bạn."
+
+#: app/templates/partials/project_details/setup_steps.html:280
+msgid "Review the data on the map, then continue."
+msgstr "Xem lại dữ liệu trên bản đồ, sau đó tiếp tục."
+
+#: app/templates/partials/project_details/setup_steps.html:293
+#: app/templates/partials/project_details/style_and_scripts.html:27
+msgid "Download OSM Data"
+msgstr "Tải dữ liệu OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:319
+msgid "Collect New Data Only"
+msgstr "Chỉ thu thập dữ liệu mới"
+
+#: app/templates/partials/project_details/setup_steps.html:336
+msgid "Use custom data inputs or override the default OSM download options."
+msgstr ""
+"Sử dụng đầu vào dữ liệu tùy chỉnh hoặc ghi đè các tùy chọn tải OSM mặc "
+"định."
+
+#: app/templates/partials/project_details/setup_steps.html:342
+msgid "OSM Category:"
+msgstr "Danh mục OSM:"
+
+#: app/templates/partials/project_details/setup_steps.html:345
+msgid "OSM Buildings"
+msgstr "Công trình OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:346
+msgid "OSM Highways"
+msgstr "Đường OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:347
+msgid "OSM Healthcare"
+msgstr "Y tế OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:348
+msgid "OSM Toilets"
+msgstr "Nhà vệ sinh OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:349
+msgid "OSM Religious"
+msgstr "Tôn giáo OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:350
+msgid "OSM Landuse"
+msgstr "Sử dụng đất OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:351
+msgid "OSM Waterways"
+msgstr "Đường thủy OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:352
+msgid "OSM Water Points"
+msgstr "Điểm nước OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:353
+msgid "OSM Waste Disposal"
+msgstr "Xử lý chất thải OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:354
+msgid "OSM Education"
+msgstr "Giáo dục OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:355
+msgid "OSM Cemeteries"
+msgstr "Nghĩa trang OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:356
+msgid "OSM Amenities"
+msgstr "Tiện ích OSM"
+
+#: app/templates/partials/project_details/setup_steps.html:361
+msgid "Geometry Type:"
+msgstr "Loại hình học:"
+
+#: app/templates/partials/project_details/setup_steps.html:364
+msgid "Polygon"
+msgstr "Đa giác"
+
+#: app/templates/partials/project_details/setup_steps.html:365
+msgid "Polyline"
+msgstr "Đường gấp khúc"
+
+#: app/templates/partials/project_details/setup_steps.html:366
+msgid "Point"
+msgstr "Điểm"
+
+#: app/templates/partials/project_details/setup_steps.html:379
+msgid "Use centroids"
+msgstr "Dùng trọng tâm"
+
+#: app/templates/partials/project_details/setup_steps.html:391
+msgid "Upload Custom GeoJSON"
+msgstr "Tải GeoJSON tùy chỉnh"
+
+#: app/templates/partials/project_details/setup_steps.html:410
+msgid "Generating OSM data extract... This may take a moment."
+msgstr "Đang tạo bản trích xuất dữ liệu OSM... Việc này có thể mất một lúc."
+
+#: app/templates/partials/project_details/setup_steps.html:429
+msgid "OSM data extract ready"
+msgstr "Bản trích xuất dữ liệu OSM đã sẵn sàng"
+
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
+msgstr "Bước 3: Chia thành nhiệm vụ (Tùy chọn)"
+
+#: app/templates/partials/project_details/setup_steps.html:452
+msgid "✓ Task splitting is not relevant without existing data"
+msgstr "✓ Không cần chia nhiệm vụ nếu không có dữ liệu hiện có"
+
+#: app/templates/partials/project_details/setup_steps.html:458
+msgid ""
+"Generate task areas by splitting the Area of Interest (AOI). Choose an "
+"algorithm and\n"
+"      parameters, then split. Review the preview, and click \"Accept Task"
+" Areas\" to save. Or\n"
+"      click"
+msgstr ""
+"Tạo các khu vực nhiệm vụ bằng cách chia Area of Interest (AOI). Chọn "
+"thuật toán và tham số, sau đó chia. Xem trước kết quả và nhấp \"Accept "
+"Task Areas\" để lưu. Hoặc nhấp"
+
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
+msgid "Skip"
+msgstr "Bỏ qua"
+
+#: app/templates/partials/project_details/setup_steps.html:462
+msgid "to use the whole AOI as a single task."
+msgstr "để dùng toàn bộ AOI như một nhiệm vụ duy nhất."
+
+#: app/templates/partials/project_details/setup_steps.html:494
+msgid "Choose which linear features influence building-based task splitting."
+msgstr ""
+"Chọn các đối tượng tuyến ảnh hưởng đến việc chia nhiệm vụ dựa trên công "
+"trình."
+
+#: app/templates/partials/project_details/setup_steps.html:518
+msgid "Include roads"
+msgstr "Bao gồm đường"
+
+#: app/templates/partials/project_details/setup_steps.html:527
+msgid "Include rivers"
+msgstr "Bao gồm sông"
+
+#: app/templates/partials/project_details/setup_steps.html:536
+msgid "Include railways"
+msgstr "Bao gồm đường sắt"
+
+#: app/templates/partials/project_details/setup_steps.html:545
+msgid "Include aeroways"
+msgstr "Bao gồm đường hàng không"
+
+#: app/templates/partials/project_details/setup_steps.html:552
+msgid "Algorithm:"
+msgstr "Thuật toán:"
+
+#: app/templates/partials/project_details/setup_steps.html:554
+msgid "Select splitting option..."
+msgstr "Chọn tùy chọn chia tách..."
+
+#: app/templates/partials/project_details/setup_steps.html:555
+#: app/templates/partials/project_details/style_and_scripts.html:30
+msgid "Split by Square"
+msgstr "Chia theo ô vuông"
+
+#: app/templates/partials/project_details/setup_steps.html:556
+msgid "Average Buildings v1 (Voronoi)"
+msgstr "Trung bình công trình v1 (Voronoi)"
+
+#: app/templates/partials/project_details/setup_steps.html:558
+msgid "Average Buildings v2 (Straight Skeleton)"
+msgstr "Trung bình công trình v2 (Straight Skeleton)"
+
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
+msgstr "Chia theo số lượng nhiệm vụ cụ thể (Sắp có)"
+
+#: app/templates/partials/project_details/setup_steps.html:567
+msgid "Avg. Buildings per Task:"
+msgstr "Số công trình trung bình mỗi nhiệm vụ:"
+
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
+msgid "Dimension (meters):"
+msgstr "Kích thước (mét):"
+
+#: app/templates/partials/project_details/setup_steps.html:610
+msgid "Split Again"
+msgstr "Chia lại"
+
+#: app/templates/partials/project_details/setup_steps.html:610
+#: app/templates/partials/project_details/style_and_scripts.html:32
+msgid "Split AOI"
+msgstr "Chia AOI"
+
+#: app/templates/partials/project_details/setup_steps.html:646
+msgid "Splitting AOI into tasks... This may take a moment."
+msgstr "Đang chia AOI thành các nhiệm vụ... Việc này có thể mất một lúc."
+
+#: app/templates/partials/project_details/setup_steps.html:662
+msgid "Ready"
+msgstr "Sẵn sàng"
+
+#: app/templates/partials/project_details/setup_steps.html:665
+msgid ""
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
+msgstr ""
+"Tất cả các điều kiện tiên quyết đã hoàn tất! Hãy tạo dự án trong công cụ "
+"lập bản đồ bạn chọn."
+
+#: app/templates/partials/project_details/setup_steps.html:670
+msgid "Finalise Project"
+msgstr "Hoàn tất dự án"
+
+#: app/templates/partials/project_details/setup_steps.html:687
+msgid "Confirm Project Finalisation"
+msgstr "Xác nhận hoàn tất dự án"
+
+#: app/templates/partials/project_details/setup_steps.html:691
+msgid "Are you sure you want to finalise this project?"
+msgstr "Bạn có chắc muốn hoàn tất dự án này không?"
+
+#: app/templates/partials/project_details/setup_steps.html:696
+msgid "Confirm & Finalise"
+msgstr "Xác nhận và hoàn tất"
+
+#: app/templates/partials/project_details/setup_steps.html:704
+msgid "Custom Credentials"
+msgstr "Thông tin xác thực tùy chỉnh"
+
+#: app/templates/partials/project_details/setup_steps.html:710
+msgid "ODK Central URL"
+msgstr "URL ODK Central"
+
+#: app/templates/partials/project_details/setup_steps.html:716
+msgid "https://your-odk-central.com"
+msgstr "https://your-odk-central.com"
+
+#: app/templates/partials/project_details/setup_steps.html:750
+msgid "QField Cloud URL"
+msgstr "URL QField Cloud"
+
+#: app/templates/partials/project_details/setup_steps.html:756
+msgid "https://qfield.cloud"
+msgstr "https://qfield.cloud"
+
+#: app/templates/partials/project_details/setup_steps.html:768
+msgid "qfield_username"
+msgstr "qfield_username"
+
+#: app/templates/partials/project_details/setup_steps.html:780
+msgid "qfield_password"
+msgstr "qfield_password"
+
+#: app/templates/partials/project_details/setup_steps.html:792
+#: app/templates/partials/project_details/style_and_scripts.html:49
+msgid "Test Credentials"
+msgstr "Kiểm tra thông tin xác thực"
+
+#: app/templates/partials/project_details/setup_steps.html:795
+msgid "Save & Continue"
+msgstr "Lưu và tiếp tục"
+
+#: app/templates/partials/project_details/style_and_scripts.html:10
+msgid "Select a survey type..."
+msgstr "Chọn một loại khảo sát..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:11
+msgid "No survey types available"
+msgstr "Không có loại khảo sát nào khả dụng"
+
+#: app/templates/partials/project_details/style_and_scripts.html:12
+msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgstr ""
+"Không có biểu mẫu khảo sát nào khả dụng. Tải lên biểu mẫu tùy chỉnh trong"
+" Cấu hình nâng cao."
+
+#: app/templates/partials/project_details/style_and_scripts.html:13
+msgid "Select a survey type, or upload a custom form in Advanced Config."
+msgstr ""
+"Chọn một loại khảo sát hoặc tải lên biểu mẫu tùy chỉnh trong Cấu hình "
+"nâng cao."
+
+#: app/templates/partials/project_details/style_and_scripts.html:14
+msgid "Survey type selected."
+msgstr "Đã chọn loại khảo sát."
+
+#: app/templates/partials/project_details/style_and_scripts.html:15
+msgid "Invalid file type. Please upload a .xls or .xlsx file."
+msgstr "Loại tệp không hợp lệ. Vui lòng tải lên tệp .xls hoặc .xlsx."
+
+#: app/templates/partials/project_details/style_and_scripts.html:16
+msgid "Selected file:"
+msgstr "Tệp đã chọn:"
+
+#: app/templates/partials/project_details/style_and_scripts.html:17
+msgid "Custom form selected."
+msgstr "Đã chọn biểu mẫu tùy chỉnh."
+
+#: app/templates/partials/project_details/style_and_scripts.html:18
+msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+msgstr ""
+"Hãy chọn loại khảo sát trước hoặc tải lên biểu mẫu tùy chỉnh trong Cấu "
+"hình nâng cao."
+
+#: app/templates/partials/project_details/style_and_scripts.html:19
+msgid "polygons"
+msgstr "đa giác"
+
+#: app/templates/partials/project_details/style_and_scripts.html:20
+msgid "polylines"
+msgstr "đường gấp khúc"
+
+#: app/templates/partials/project_details/style_and_scripts.html:21
+msgid "points"
+msgstr "điểm"
+
+#: app/templates/partials/project_details/style_and_scripts.html:22
+msgid "features"
+msgstr "đối tượng"
+
+#: app/templates/partials/project_details/style_and_scripts.html:23
+msgid ""
+"You uploaded a custom form, so this OSM download is optional. Use "
+"Advanced Config to upload your own GeoJSON or adjust download settings."
+msgstr ""
+"Bạn đã tải lên biểu mẫu tùy chỉnh, vì vậy việc tải OSM này là tùy chọn. "
+"Hãy dùng Cấu hình nâng cao để tải lên GeoJSON của riêng bạn hoặc điều "
+"chỉnh cài đặt tải xuống."
+
+#: app/templates/partials/project_details/style_and_scripts.html:24
+#, python-format
+msgid ""
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
+"map, then continue."
+msgstr ""
+"Nguồn được khuyến nghị: %(title)s (%(geom_label)s). Xem lại dữ liệu trên "
+"bản đồ, sau đó tiếp tục."
+
+#: app/templates/partials/project_details/style_and_scripts.html:25
+#, python-format
+msgid ""
+"Recommended source updated (%(geom_label)s). Review the data on the map, "
+"then continue."
+msgstr ""
+"Nguồn được khuyến nghị đã được cập nhật (%(geom_label)s). Xem lại dữ liệu"
+" trên bản đồ, sau đó tiếp tục."
+
+#: app/templates/partials/project_details/style_and_scripts.html:26
+msgid "Downloading..."
+msgstr "Đang tải xuống..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:29
+msgid "Confirm No Splitting"
+msgstr "Xác nhận không chia"
+
+#: app/templates/partials/project_details/style_and_scripts.html:31
+msgid "Split by Buildings"
+msgstr "Chia theo công trình"
+
+#: app/templates/partials/project_details/style_and_scripts.html:33
+msgid "Select Option"
+msgstr "Chọn tùy chọn"
+
+#: app/templates/partials/project_details/style_and_scripts.html:34
+msgid "Confirming..."
+msgstr "Đang xác nhận..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:35
+msgid "Splitting..."
+msgstr "Đang chia..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:36
+msgid "ODK Central"
+msgstr "ODK Central"
+
+#: app/templates/partials/project_details/style_and_scripts.html:37
+msgid "QField"
+msgstr "QField"
+
+#: app/templates/partials/project_details/style_and_scripts.html:38
+msgid "the mapping tool"
+msgstr "công cụ lập bản đồ"
+
+#: app/templates/partials/project_details/style_and_scripts.html:39
+msgid "Project type not set. Please set the field mapping app first."
+msgstr "Chưa đặt loại dự án. Vui lòng đặt ứng dụng lập bản đồ hiện trường trước."
+
+#: app/templates/partials/project_details/style_and_scripts.html:40
+#, python-format
+msgid ""
+"Are you sure you want to finalise this project in %(project_type)s? This "
+"will create the project, upload forms, and generate all necessary files."
+msgstr ""
+"Bạn có chắc muốn hoàn tất dự án này trong %(project_type)s không? Thao "
+"tác này sẽ tạo dự án, tải biểu mẫu lên và tạo tất cả các tệp cần thiết."
+
+#: app/templates/partials/project_details/style_and_scripts.html:41
+msgid "Custom ODK Credentials"
+msgstr "Thông tin xác thực ODK tùy chỉnh"
+
+#: app/templates/partials/project_details/style_and_scripts.html:42
+msgid "Custom QField Credentials"
+msgstr "Thông tin xác thực QField tùy chỉnh"
+
+#: app/templates/partials/project_details/style_and_scripts.html:43
+msgid "Please fill in all fields."
+msgstr "Vui lòng điền tất cả các trường."
+
+#: app/templates/partials/project_details/style_and_scripts.html:44
+msgid "Testing..."
+msgstr "Đang kiểm tra..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:45
+msgid "Testing credentials..."
+msgstr "Đang kiểm tra thông tin xác thực..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:46
+msgid "✓ Credentials are valid!"
+msgstr "✓ Thông tin xác thực hợp lệ!"
+
+#: app/templates/partials/project_details/style_and_scripts.html:47
+msgid "Invalid credentials. Please check and try again."
+msgstr "Thông tin xác thực không hợp lệ. Vui lòng kiểm tra và thử lại."
+
+#: app/templates/partials/project_details/style_and_scripts.html:48
+#, python-format
+msgid "Error testing credentials: %(message)s"
+msgstr "Lỗi khi kiểm tra thông tin xác thực: %(message)s"
+
+#: app/templates/partials/project_details/style_and_scripts.html:50
+msgid "Please test credentials first before continuing."
+msgstr "Vui lòng kiểm tra thông tin xác thực trước khi tiếp tục."
+
+#: app/templates/partials/project_details/style_and_scripts.html:51
+#, python-format
+msgid "Creating project in %(project_type)s... This may take a moment."
+msgstr "Đang tạo dự án trong %(project_type)s... Việc này có thể mất một lúc."
+
+#: app/templates/partials/project_details/style_and_scripts.html:52
+msgid "Error:"
+msgstr "Lỗi:"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+msgid "Accept Data Extract"
+msgstr "Chấp nhận trích xuất dữ liệu"
+
+#: app/templates/partials/project_details/fragments/finalize_error.html:7
+msgid "View technical details"
+msgstr "Xem chi tiết kỹ thuật"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
+msgid "Project created in ODK Central."
+msgstr "Dự án đã được tạo trong ODK Central."
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
+msgid "Manager Access (ODK Central UI)"
+msgstr "Quyền truy cập quản lý (Giao diện ODK Central)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
+msgid "Open project in ODK Central"
+msgstr "Mở dự án trong ODK Central"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
+msgid "Save these credentials now. They will only be shown once."
+msgstr ""
+"Hãy lưu các thông tin xác thực này ngay bây giờ. Chúng sẽ chỉ được hiển "
+"thị một lần."
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
+msgid "View FieldTM Project"
+msgstr "Xem dự án FieldTM"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
+msgid "Project created in QFieldCloud."
+msgstr "Dự án đã được tạo trong QFieldCloud."
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
+msgid "Manager Access (QFieldCloud)"
+msgstr "Quyền truy cập quản lý (QFieldCloud)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
+msgid "Open project in QFieldCloud"
+msgstr "Mở dự án trong QFieldCloud"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
+msgid ""
+"Manager account could not be created automatically. Log in to QFieldCloud"
+" as admin to\n"
+"      manage the project."
+msgstr ""
+"Không thể tạo tài khoản quản lý tự động. Hãy đăng nhập QFieldCloud với tư"
+" cách admin để quản lý dự án."
+
+#: app/templates/partials/project_details/fragments/split_preview.html:27
+msgid "Accept Task Choices"
+msgstr "Chấp nhận lựa chọn nhiệm vụ"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to manage the project."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ Đã lưu trích xuất dữ liệu "
+#~ "thành công! Bây giờ bạn có thể "
+#~ "chuyển sang Bước 3 (tải lên "
+#~ "XLSForm) và sau đó là Bước 4 "
+#~ "(chia nhiệm vụ)."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ Đã bỏ qua việc chia nhiệm "
+#~ "vụ. Toàn bộ AOI sẽ được sử "
+#~ "dụng như một nhiệm vụ duy nhất."
+#~ " Bạn có thể chuyển sang Bước 4."
+
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "Bước 1: Tải lên XLSForm"
+
+#~ msgid "Step 2: Get Data"
+#~ msgstr "Bước 2: Lấy dữ liệu"
+
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "Bước 3: Chia thành nhiệm vụ"
+
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "Bước 4: Hoàn tất dự án"
+
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "Bước 1: Chọn biểu mẫu khảo sát"
+
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr ""
+#~ "Chọn loại khảo sát và tiếp tục "
+#~ "với các cài đặt mặc định được "
+#~ "khuyến nghị."
+
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "Tải lên XLSForm tùy chỉnh hoặc điều chỉnh các tùy chọn xử lý biểu mẫu."
+
+#~ msgid "Upload Custom Form"
+#~ msgstr "Tải lên biểu mẫu tùy chỉnh"
+
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "Bắt buộc tải ảnh lên"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""

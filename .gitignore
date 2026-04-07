@@ -59,6 +59,7 @@ deploy/.env
 venv
 
 # project related
+xlsforms/
 temp_webmaps/local_only
 temp_webmaps/Naivasha
 src/backend/app/locales/*/LC_MESSAGES/*.mo
@@ -96,10 +97,6 @@ field-tm-*.tgz
 
 # Secrets / keys
 **/**/*.pem
-
-# Favicon overrides
-favicon.svg
-favicon.png
 
 # Agents
 config

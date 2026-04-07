@@ -18,6 +18,7 @@
 
 """HTMX routes for project setup steps (data extract, task splitting, finalize)."""
 
+import html
 import json
 import logging
 
@@ -183,7 +184,10 @@ def _finalize_error_response(raw_error: object, status_code: int) -> Response:
 def _parse_json_payload(raw_value, invalid_message: str, log_prefix: str):
     """Parse a JSON string payload, returning `(value, error_response)`."""
     try:
-        return json.loads(raw_value), None
+        normalized_value = (
+            html.unescape(raw_value) if isinstance(raw_value, str) else raw_value
+        )
+        return json.loads(normalized_value), None
     except (json.JSONDecodeError, TypeError) as e:
         preview = raw_value[:100] if isinstance(raw_value, str) else raw_value
         log.error(
@@ -292,6 +296,7 @@ def _parse_split_form_options(data: dict | None) -> dict:
         "no_of_buildings": _parse_int_form_value(
             payload.get("no_of_buildings", 10), 10
         ),
+        "no_of_tasks": _parse_int_form_value(payload.get("no_of_tasks", 10), 10),
         "dimension_meters": _parse_int_form_value(
             payload.get("dimension_meters", 100), 100
         ),
@@ -351,6 +356,14 @@ def _task_boundaries_layer(task_boundaries: dict) -> dict:
         "weight": 3,
         "opacity": 1.0,
         "fillOpacity": 0.1,
+        "popup_options": {
+            "showLayerName": False,
+            "propertyLabels": {
+                "task_id": _("Task ID"),
+                "building_count": _("Building Count"),
+            },
+            "propertyOrder": ["task_id", "building_count"],
+        },
     }
 
 
@@ -430,7 +443,7 @@ def _build_split_preview_response(
         height="600px",
         show_controls=True,
     )
-    tasks_geojson_str = json.dumps(tasks_featcol).replace('"', "&quot;")
+    tasks_geojson_str = json.dumps(tasks_featcol)
     data_extract_info = ""
     if data_extract:
         data_feature_count = len(data_extract.get("features", []))
@@ -520,7 +533,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913
         feature_count = len(featcol_single_geom_type.get("features", []))
 
         # Encode GeoJSON for the Accept button (don't save yet)
-        geojson_str = json.dumps(featcol_single_geom_type).replace('"', "&quot;")
+        geojson_str = json.dumps(featcol_single_geom_type)
 
         # Automatically show preview after successful download
         project = await DbProject.one(db, project_id)
@@ -656,7 +669,7 @@ async def upload_geojson_htmx(  # noqa: PLR0913
         feature_count = len(featcol.get("features", []))
 
         # Encode GeoJSON for the Accept button (don't save yet)
-        geojson_str = json.dumps(featcol).replace('"', "&quot;")
+        geojson_str = json.dumps(featcol)
 
         # Use reusable map rendering function
         map_html_content = render_leaflet_map(
@@ -890,7 +903,7 @@ async def submit_geojson_data_extract_htmx(
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
-    """Save GeoJSON data extract to database (Step 2).
+    """Save GeoJSON data extract to database (Step 3).
 
     Entity list creation is deferred to the final project creation step.
     This endpoint only saves the geometry data to the database.
@@ -932,8 +945,8 @@ async def submit_geojson_data_extract_htmx(
         )
 
         saved_message = _(
-            "✓ Data extract successfully saved! You can now proceed to Step 3 "
-            "(upload XLSForm) and then Step 4 (split tasks)."
+            "✓ Data extract successfully saved! You can now proceed to Step 4 "
+            "(split tasks)."
         )
         return Response(
             content=(
@@ -1127,7 +1140,7 @@ async def skip_task_split_htmx(
                 "success",
                 _(
                     "✓ Task splitting skipped. The whole AOI will be used as "
-                    "a single task. You can proceed to Step 4."
+                    "a single task. You can proceed to Step 5."
                 ),
             ),
             media_type="text/html",
@@ -1179,6 +1192,7 @@ async def split_aoi_htmx(
             "Split AOI parameters: "
             f"algorithm={algorithm}, "
             f"no_of_buildings={split_options['no_of_buildings']}, "
+            f"no_of_tasks={split_options['no_of_tasks']}, "
             f"dimension_meters={split_options['dimension_meters']}, "
             f"include_roads={split_options['include_roads']}, "
             f"include_rivers={split_options['include_rivers']}, "
@@ -1195,6 +1209,7 @@ async def split_aoi_htmx(
             options=SplitAoiOptions(
                 algorithm=algorithm,
                 no_of_buildings=split_options["no_of_buildings"],
+                no_of_tasks=split_options["no_of_tasks"],
                 dimension_meters=split_options["dimension_meters"],
                 include_roads=split_options["include_roads"],
                 include_rivers=split_options["include_rivers"],

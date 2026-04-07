@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.15.6"
+    rev: "v0.15.8"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.10
+    rev: 0.11.2
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -52,6 +52,7 @@ repos:
     hooks:
       - id: codespell
         types: [text]
+        exclude: ^src/backend/app/(locales/.*\.po|i18n\.py)$
         args: [--toml, src/backend/pyproject.toml]
 
   # # Spelling: Checks for common misspellings in text files.
@@ -109,7 +110,7 @@ repos:
 
   # Lint & Autoformat: SQL
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 4.0.4
+    rev: 4.1.0
     hooks:
       - id: sqlfluff-lint
         files: ^src/migrations/.*\.sql$
@@ -154,6 +155,8 @@ repos:
             MD033,
             --disable,
             MD059,
+            --disable,
+            MD046,
             --ignore,
             CHANGELOG.md,
             --ignore,

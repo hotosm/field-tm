@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% block title %}{{ _("FieldTM | Field Tasking Manager") }}{% endblock %} {% block
+{% extends "layout.html" %} {% block title %}FieldTM | Field Tasking Manager{% endblock %} {% block
 extra_head %}
 <style>
   .landing-page {
@@ -253,7 +253,8 @@ extra_head %}
 
   .landing-user-steps {
     margin: 6px 0 0 0;
-    padding: 0 0 0 20px;
+    padding: 0;
+    padding-inline-start: 20px;
     color: var(--landing-muted);
     line-height: 1.7;
   }
@@ -303,7 +304,7 @@ extra_head %}
   .landing-use-case-item summary::after {
     content: "+";
     position: absolute;
-    right: 16px;
+    inset-inline-end: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--landing-brand-red);
@@ -409,6 +410,7 @@ extra_head %}
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .landing-footer-social a {
@@ -417,6 +419,71 @@ extra_head %}
     border: 1px solid rgba(255, 255, 255, 0.36);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
+  }
+
+  .landing-footer-locale {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-inline-start: 8px;
+  }
+
+  .landing-footer-locale-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .landing-footer-locale wa-button::part(base) {
+    border-radius: 999px;
+    border-color: rgba(255, 255, 255, 0.36);
+    background: transparent;
+    color: white;
+    min-height: 2rem;
+    padding-inline: 0.75rem;
+  }
+
+  .landing-footer-locale wa-button::part(label) {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .landing-footer-locale-menu {
+    min-width: 10rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  }
+
+  .landing-footer-locale-option {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ftm-text);
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .landing-footer-locale-option:hover,
+  .landing-footer-locale-option:focus-visible {
+    background: var(--ftm-bg-muted);
+    outline: none;
+  }
+
+  .landing-footer-locale-option--active {
+    background: color-mix(in oklab, var(--ftm-brand) 12%, white);
+    color: var(--ftm-text);
+    font-weight: var(--hot-font-weight-semibold);
   }
 
   @keyframes landing-fade-up {
@@ -489,12 +556,14 @@ extra_head %}
   <section class="landing-hero">
     <div class="landing-shell landing-hero-content">
       <p class="landing-eyebrow">{{ _("Coordinate field campaigns") }}</p>
-      <h1 class="landing-title">{{ _("FIELD - TASKING MANAGER") }}</h1>
+      <h1 class="landing-title">Field Tasking Manager</h1>
       <p class="landing-subtitle">
         {{ _("Enhancing field mapping efficiency and accuracy through seamless coordination.") }}
       </p>
       <div class="landing-hero-actions">
-        <wa-button href="/projects" variant="brand" size="large">{{ _("Explore Projects") }}</wa-button>
+        <wa-button href="/projects" variant="brand" size="large"
+          >{{ _("Explore Projects") }}</wa-button
+        >
         <wa-button href="{{ create_project_href or '/new' }}" variant="neutral" size="large"
           >{{ _("Create Project") }}</wa-button
         >
@@ -516,10 +585,13 @@ extra_head %}
     <div>
       <h2 class="landing-section-title">{{ _("What is it?") }}</h2>
       <p>
-        {{ _("The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features by coordinating mapping in the field.") }}
+        {{ _("The Field Tasking Manager (Field-TM) helps teams add local knowledge to map features
+        by coordinating mapping in the field.") }}
       </p>
       <p>
-        {{ _("Field-TM facilitates collaborative mapping by supporting and extending mature tools like ODK and QField. It is a standalone mobile and web workflow that helps teams collect geospatial data efficiently with commonly available Android devices.") }}
+        {{ _("Field-TM facilitates collaborative mapping by supporting and extending mature tools
+        like ODK and QField. It is a standalone mobile and web workflow that helps teams collect
+        geospatial data efficiently with commonly available Android devices.") }}
       </p>
     </div>
     <img
@@ -535,19 +607,22 @@ extra_head %}
       <article class="landing-feature-card">
         <h3>{{ _("Flexible Data Collection") }}</h3>
         <p>
-          {{ _("Support diverse survey forms, multiple data formats, and adaptable workflows that fit different operational needs.") }}
+          {{ _("Support diverse survey forms, multiple data formats, and adaptable workflows that
+          fit different operational needs.") }}
         </p>
       </article>
       <article class="landing-feature-card">
         <h3>{{ _("Open Source and Customizable") }}</h3>
         <p>
-          {{ _("Adapt Field-TM to your own survey logic, data structures, and integration requirements.") }}
+          {{ _("Adapt Field-TM to your own survey logic, data structures, and integration
+          requirements.") }}
         </p>
       </article>
       <article class="landing-feature-card">
         <h3>{{ _("Entity-Level Tracking") }}</h3>
         <p>
-          {{ _("Monitor survey progress at task and feature level so managers can make informed decisions quickly.") }}
+          {{ _("Monitor survey progress at task and feature level so managers can make informed
+          decisions quickly.") }}
         </p>
       </article>
     </div>
@@ -560,7 +635,8 @@ extra_head %}
         <span class="landing-user-role landing-user-role--manager">{{ _("Project Manager") }}</span>
         <h3>{{ _("Create and coordinate field campaigns") }}</h3>
         <p>
-          {{ _("Project managers use Field-TM to set up mapping projects, define areas of interest, design survey forms, and split work into manageable tasks.") }}
+          {{ _("Project managers use Field-TM to set up mapping projects, define areas of interest,
+          design survey forms, and split work into manageable tasks.") }}
         </p>
         <ol class="landing-user-steps">
           <li>{{ _("Define a project area and upload or choose a survey form") }}</li>
@@ -573,7 +649,8 @@ extra_head %}
         <span class="landing-user-role landing-user-role--mapper">{{ _("Field Mapper") }}</span>
         <h3>{{ _("Collect data in the field with your phone") }}</h3>
         <p>
-          {{ _("Mappers do not need to log in to Field-TM. Once a project manager publishes a project, mappers access it directly in their mobile app of choice.") }}
+          {{ _("Mappers do not need to log in to Field-TM. Once a project manager publishes a
+          project, mappers access it directly in their mobile app of choice.") }}
         </p>
         <ol class="landing-user-steps">
           <li>{{ _("Scan the QR code shared by your project manager") }}</li>
@@ -591,26 +668,29 @@ extra_head %}
       <img
         class="landing-use-cases-image"
         src="/static/images/landing-pic-2.jpg"
-        alt="{{ _("Field mapping in progress") }}"
+        alt='{{ _("Field mapping in progress") }}'
         loading="lazy"
       />
       <div>
         <details class="landing-use-case-item" open>
           <summary>{{ _("1. Community Mapping") }}</summary>
           <p>
-            {{ _("Field Tasking Manager empowers communities to map informal settlements, public facilities, and local services for inclusive planning.") }}
+            {{ _("Field Tasking Manager empowers communities to map informal settlements, public
+            facilities, and local services for inclusive planning.") }}
           </p>
         </details>
         <details class="landing-use-case-item" open>
           <summary>{{ _("2. Urban Planning and Management") }}</summary>
           <p>
-            {{ _("Build smarter cities with coordinated surveys of houses, roads, and utilities through clear, manageable mapping tasks.") }}
+            {{ _("Build smarter cities with coordinated surveys of houses, roads, and utilities
+            through clear, manageable mapping tasks.") }}
           </p>
         </details>
         <details class="landing-use-case-item" open>
           <summary>{{ _("3. Disaster Response and Recovery") }}</summary>
           <p>
-            {{ _("Rapidly map damaged infrastructure after disasters, coordinate volunteers, and deliver reliable data for relief operations.") }}
+            {{ _("Rapidly map damaged infrastructure after disasters, coordinate volunteers, and
+            deliver reliable data for relief operations.") }}
           </p>
         </details>
       </div>
@@ -679,9 +759,38 @@ extra_head %}
           <a href="https://www.instagram.com/_hotosm/" target="_blank" rel="noopener">Instagram</a>
           <a href="https://www.youtube.com/user/hotosm" target="_blank" rel="noopener">YouTube</a>
           <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
+          <div class="landing-footer-locale">
+            <span class="landing-footer-locale-label">{{ _("Language") }}</span>
+            <wa-dropdown>
+              <wa-button slot="trigger" variant="text">
+                {{ locale_labels.get(current_locale(), current_locale().upper()) }}
+              </wa-button>
+              <div class="landing-footer-locale-menu">
+                {% for locale_code in supported_locales %}
+                <button
+                  type="button"
+                  class="landing-footer-locale-option{% if current_locale() == locale_code %} landing-footer-locale-option--active{% endif %}"
+                  data-locale-switch="{{ locale_code }}"
+                >
+                  {{ locale_labels.get(locale_code, locale_code.upper()) }}
+                </button>
+                {% endfor %}
+              </div>
+            </wa-dropdown>
+          </div>
         </div>
       </div>
     </div>
   </footer>
 </main>
+<script>
+  document.querySelectorAll("[data-locale-switch]").forEach((item) => {
+    item.addEventListener("click", () => {
+      const nextLocale = item.dataset.localeSwitch;
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set("lang", nextLocale);
+      window.location.assign(nextUrl.toString());
+    });
+  });
+</script>
 {% endblock %}

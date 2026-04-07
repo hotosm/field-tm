@@ -91,32 +91,33 @@ To aid future disaster response, we would really welcome contributions for:
 - Testers!
 - XLSForm creators
 
-Please take a look at our [Documentation](https://hotosm.github.io/field-tm)
-and [contributor guidance](https://docs.field.hotosm.org/CONTRIBUTING/)
+Please take a look at our [documentation](https://hotosm.github.io/field-tm)
+and [contributor guidance](https://hotosm.github.io/field-tm/CONTRIBUTING)
 for more details!
 
 Reach out to us if any questions!
 
 ## Install
 
-To install for a quick test, or on a production instance,
-use the convenience script:
+Use one of these supported paths:
 
 ```sh
-# Deprecated approach (for now):
-# curl --proto '=https' --tlsv1.2 -sSf https://get.field.hotosm.org | bash
-
-# Development
+# Local development
 just config generate-dotenv
-just start all
+just start dev
 
-# Production
+# Production install
 just prep machine
+just config setup
 just start prod
 ```
 
-Alternatively see the [docs](https://docs.field.hotosm.org) for
-various deployment guides.
+`just start prod` presents an interactive version selector and checks
+out the chosen release tag automatically.
+
+See [INSTALL.md](INSTALL.md) for requirements, or the full
+[Production Deployment](https://docs.field.hotosm.org/dev/Production/)
+guide for details.
 
 ## Roadmap
 
@@ -237,6 +238,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/allisonsibrian"><img src="https://avatars.githubusercontent.com/u/114789954?v=4?s=100" width="100px;" alt="allison"/><br /><sub><b>allison</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=allisonsibrian" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://amitdkhan-pg.blogspot.com"><img src="https://avatars.githubusercontent.com/u/64206751?v=4?s=100" width="100px;" alt="Amit Khanekar"/><br /><sub><b>Amit Khanekar</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=amitdkhan-pg" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://chainbytes.com"><img src="https://avatars.githubusercontent.com/u/694055?v=4?s=100" width="100px;" alt="Eric Grill"/><br /><sub><b>Eric Grill</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=EricGrill" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sjorza"><img src="https://avatars.githubusercontent.com/u/129431198?v=4?s=100" width="100px;" alt="Sjorza"/><br /><sub><b>Sjorza</b></sub></a><br /><a href="https://github.com/hotosm/field-tm/commits?author=Sjorza" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
@@ -300,7 +302,7 @@ Thanks goes to these wonderful people:
 [badge-pre-commit]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [badge-uv]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json
 [badge-coverage]: https://docs.field.hotosm.org/coverage.svg
-[badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm-mapper-ui/svg-badge.svg
+[badge-translation]: https://hosted.weblate.org/widget/hotosm/field-tm/svg-badge.svg
 [badge-openssf]: https://www.bestpractices.dev/projects/9218/badge
 [badge-slack]: https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f
 [badge-all-contributors]: https://img.shields.io/github/contributors/hotosm/field-tm?logo=github

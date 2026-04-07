@@ -1,0 +1,1975 @@
+# Urdu translations for Field-TM.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Field-TM project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field-TM VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"PO-Revision-Date: 2026-03-19 22:03+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ur\n"
+"Language-Team: ur <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:163
+msgid "An unexpected error occurred. Please contact an admin."
+msgstr "ایک غیر متوقع خرابی پیش آئی۔ براہ کرم منتظم سے رابطہ کریں۔"
+
+#: app/htmx/project_create_routes.py:205
+msgid "Provide a valid .xls or .xlsx file"
+msgstr "ایک درست .xls یا .xlsx فائل فراہم کریں"
+
+#: app/htmx/project_create_routes.py:223
+msgid "Failed to load template form."
+msgstr "ٹیمپلیٹ فارم لوڈ نہیں ہو سکا۔"
+
+#: app/htmx/project_create_routes.py:231
+msgid "Please select a form or upload a file."
+msgstr "براہ کرم ایک فارم منتخب کریں یا فائل اپ لوڈ کریں۔"
+
+#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:297
+msgid "Project not found."
+msgstr "منصوبہ نہیں ملا۔"
+
+#: app/htmx/project_create_routes.py:466
+msgid "Project ID mismatch. You do not have access to this project."
+msgstr "منصوبے کی ID مماثل نہیں۔ آپ کو اس منصوبے تک رسائی حاصل نہیں۔"
+
+#: app/htmx/project_create_routes.py:508
+msgid "Form validated and uploaded successfully! Reloading page..."
+msgstr "فارم کامیابی سے جانچا اور اپ لوڈ کیا گیا! صفحہ دوبارہ لوڈ ہو رہا ہے..."
+
+#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
+msgid "An unexpected error occurred"
+msgstr "ایک غیر متوقع خرابی پیش آئی"
+
+#: app/htmx/project_create_routes.py:536
+msgid "Error"
+msgstr "خرابی"
+
+#: app/htmx/project_detail_routes.py:97
+msgid "Mapper Login (QFieldCloud)"
+msgstr "نقشہ ساز لاگ اِن (QFieldCloud)"
+
+#: app/htmx/project_detail_routes.py:100
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
+msgid "Username:"
+msgstr "صارف نام:"
+
+#: app/htmx/project_detail_routes.py:103
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
+msgid "Password:"
+msgstr "پاس ورڈ:"
+
+#: app/htmx/project_detail_routes.py:106
+msgid "Scan the QR code, then enter these credentials in QField."
+msgstr "QR کوڈ اسکین کریں، پھر یہ معلومات QField میں درج کریں۔"
+
+#: app/htmx/project_detail_routes.py:118
+msgid "Scan QR Code"
+msgstr "QR کوڈ اسکین کریں"
+
+#: app/htmx/project_detail_routes.py:120
+#, python-format
+msgid "Use %(app_name)s to scan this QR code and load the project."
+msgstr ""
+"اس QR کوڈ کو اسکین کرنے اور منصوبہ لوڈ کرنے کے لیے %(app_name)s استعمال "
+"کریں۔"
+
+#: app/htmx/project_detail_routes.py:122
+msgid "Project QR Code"
+msgstr "منصوبے کا QR کوڈ"
+
+#: app/htmx/project_detail_routes.py:123
+msgid "Download QR Code"
+msgstr "QR کوڈ ڈاؤن لوڈ کریں"
+
+#: app/htmx/project_detail_routes.py:175
+msgid ""
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
+msgstr ""
+"میپنگ سرور تک رسائی ممکن نہیں۔ چیک کریں کہ ODK Central یا QFieldCloud چل "
+"رہا ہے۔"
+
+#: app/htmx/project_detail_routes.py:179
+msgid "The mapping server returned an error. Check its logs for details."
+msgstr "میپنگ سرور نے خرابی واپس کی۔ تفصیلات کے لیے اس کے لاگز دیکھیں۔"
+
+#: app/htmx/project_detail_routes.py:182
+msgid ""
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
+msgstr "میپنگ سرور سے جڑتے وقت توثیق ناکام ہو گئی۔ ترتیب دی گئی معلومات چیک کریں۔"
+
+#: app/htmx/project_detail_routes.py:185
+msgid "An unexpected error occurred while generating the QR code."
+msgstr "QR کوڈ بناتے وقت ایک غیر متوقع خرابی پیش آئی۔"
+
+#: app/htmx/project_detail_routes.py:247
+#, python-format
+msgid "Project (%(project_id)s) not found."
+msgstr "منصوبہ (%(project_id)s) نہیں ملا۔"
+
+#: app/htmx/project_detail_routes.py:254
+msgid "Only the project manager can delete this project."
+msgstr "صرف منصوبہ منتظم ہی اس منصوبے کو حذف کر سکتا ہے۔"
+
+#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
+#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
+#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
+#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
+#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
+#: app/htmx/setup_step_routes.py:1390
+#, python-format
+msgid "Error: %(error_msg)s"
+msgstr "خرابی: %(error_msg)s"
+
+#: app/htmx/qfc_admin_routes.py:55
+msgid "Admin"
+msgstr "منتظم"
+
+#: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
+msgid "Manager"
+msgstr "منیجر"
+
+#: app/htmx/qfc_admin_routes.py:57
+msgid "Editor"
+msgstr "مدیر"
+
+#: app/htmx/qfc_admin_routes.py:58
+msgid "Reporter"
+msgstr "رپورٹر"
+
+#: app/htmx/qfc_admin_routes.py:59
+msgid "Reader"
+msgstr "قاری"
+
+#: app/htmx/qfc_admin_routes.py:106
+msgid "This user does not exist. Please create it first."
+msgstr "یہ صارف موجود نہیں۔ براہ کرم پہلے اسے بنائیں۔"
+
+#: app/htmx/qfc_admin_routes.py:108
+msgid "This user is already a collaborator on this project."
+msgstr "یہ صارف پہلے ہی اس منصوبے میں معاون ہے۔"
+
+#: app/htmx/qfc_admin_routes.py:109
+#, python-format
+msgid "Failed to add collaborator: %(exc)s"
+msgstr "معاون شامل کرنے میں ناکامی: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:115
+#, python-format
+msgid ""
+"This project belongs to the %(organization)s organization. The user must "
+"be added to that organization before they can be added as a collaborator."
+" Your QFieldCloud account does not have permission to manage organization"
+" members."
+msgstr ""
+"یہ منصوبہ %(organization)s تنظیم سے تعلق رکھتا ہے۔ صارف کو معاون بنانے سے"
+" پہلے اسے اس تنظیم میں شامل کرنا ضروری ہے۔ آپ کے QFieldCloud اکاؤنٹ کو "
+"تنظیم کے اراکین کا انتظام کرنے کی اجازت نہیں۔"
+
+#: app/htmx/qfc_admin_routes.py:163
+msgid "All fields are required."
+msgstr "تمام خانے ضروری ہیں۔"
+
+#: app/htmx/qfc_admin_routes.py:178
+msgid "Login succeeded but no token received."
+msgstr "لاگ اِن کامیاب ہوا لیکن کوئی ٹوکن موصول نہیں ہوا۔"
+
+#: app/htmx/qfc_admin_routes.py:186
+msgid "Login failed. Check your URL and credentials."
+msgstr "لاگ اِن ناکام ہوا۔ اپنا URL اور معلومات چیک کریں۔"
+
+#: app/htmx/qfc_admin_routes.py:217
+msgid "QFieldCloud Projects"
+msgstr "QFieldCloud منصوبے"
+
+#: app/htmx/qfc_admin_routes.py:222
+msgid "Connected as"
+msgstr "بطور منسلک"
+
+#: app/htmx/qfc_admin_routes.py:223
+msgid "to"
+msgstr "سے"
+
+#: app/htmx/qfc_admin_routes.py:229
+msgid "Log Out"
+msgstr "لاگ آؤٹ"
+
+#: app/htmx/qfc_admin_routes.py:234
+msgid "No projects found."
+msgstr "کوئی منصوبہ نہیں ملا۔"
+
+#: app/htmx/qfc_admin_routes.py:243
+msgid "Public"
+msgstr "عوامی"
+
+#: app/htmx/qfc_admin_routes.py:245
+msgid "Private"
+msgstr "نجی"
+
+#: app/htmx/qfc_admin_routes.py:259
+msgid "Manage"
+msgstr "انتظام کریں"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Project"
+msgstr "منصوبہ"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Owner"
+msgstr "مالک"
+
+#: app/htmx/qfc_admin_routes.py:269
+msgid "Visibility"
+msgstr "مرئیت"
+
+#: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
+#: app/templates/project_details.html:58
+msgid "Description"
+msgstr "تفصیل"
+
+#: app/htmx/qfc_admin_routes.py:298
+msgid "Session expired. Please log in again."
+msgstr "سیشن ختم ہو گیا۔ براہ کرم دوبارہ لاگ اِن کریں۔"
+
+#: app/htmx/qfc_admin_routes.py:317
+#, python-format
+msgid "Could not load collaborators: %(exc)s"
+msgstr "معاونین لوڈ نہیں ہو سکے: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:387
+msgid "Update"
+msgstr "اپ ڈیٹ"
+
+#: app/htmx/qfc_admin_routes.py:390 app/htmx/qfc_admin_routes.py:397
+#: app/htmx/qfc_admin_routes.py:405
+msgid "Remove"
+msgstr "ہٹائیں"
+
+#: app/htmx/qfc_admin_routes.py:395
+msgid "Remove Collaborator"
+msgstr "معاون ہٹائیں"
+
+#: app/htmx/qfc_admin_routes.py:397
+msgid "from this project?"
+msgstr "اس منصوبے سے؟"
+
+#: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
+#: app/templates/partials/project_details/setup_steps.html:694
+#: app/templates/partials/project_details/setup_steps.html:789
+msgid "Cancel"
+msgstr "منسوخ کریں"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "User"
+msgstr "صارف"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Role"
+msgstr "کردار"
+
+#: app/htmx/qfc_admin_routes.py:411
+msgid "Actions"
+msgstr "اعمال"
+
+#: app/htmx/qfc_admin_routes.py:417
+msgid "No collaborators yet."
+msgstr "ابھی تک کوئی معاون نہیں۔"
+
+#: app/htmx/qfc_admin_routes.py:431
+#: app/templates/partials/project_details/setup_steps.html:722
+#: app/templates/partials/project_details/setup_steps.html:728
+#: app/templates/partials/project_details/setup_steps.html:762
+#: app/templates/qfc_admin.html:52
+msgid "Username"
+msgstr "صارف نام"
+
+#: app/htmx/qfc_admin_routes.py:441
+msgid "Add Collaborator"
+msgstr "معاون شامل کریں"
+
+#: app/htmx/qfc_admin_routes.py:449
+msgid "Close"
+msgstr "بند کریں"
+
+#: app/htmx/qfc_admin_routes.py:456
+msgid "Collaborators"
+msgstr "معاونین"
+
+#: app/htmx/qfc_admin_routes.py:480
+msgid "Username is required."
+msgstr "صارف نام ضروری ہے۔"
+
+#: app/htmx/qfc_admin_routes.py:530
+#, python-format
+msgid "Failed to remove collaborator: %(exc)s"
+msgstr "معاون ہٹانے میں ناکامی: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:569
+#, python-format
+msgid "Failed to update collaborator: %(exc)s"
+msgstr "معاون کو اپ ڈیٹ کرنے میں ناکامی: %(exc)s"
+
+#: app/htmx/qfc_admin_routes.py:593
+#, python-format
+msgid "Collaborator refresh failed: %(exc)s"
+msgstr "معاونین کی فہرست تازہ کرنے میں ناکامی: %(exc)s"
+
+#: app/htmx/setup_step_routes.py:83
+msgid "Project not found or access denied."
+msgstr "منصوبہ نہیں ملا یا رسائی مسترد ہے۔"
+
+#: app/htmx/setup_step_routes.py:156
+msgid ""
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
+msgstr ""
+"منصوبے کو حتمی بنانے میں ناکامی۔ براہ کرم اپنی ترتیبات چیک کریں اور "
+"دوبارہ کوشش کریں۔ اگر مسئلہ برقرار رہے تو نیچے دی گئی تکنیکی تفصیل اپنے "
+"انسٹینس منتظم یا معاونت ٹیم کو بھیجیں۔"
+
+#: app/htmx/setup_step_routes.py:225
+msgid "Invalid GeoJSON data in request. Please try uploading again."
+msgstr "درخواست میں GeoJSON ڈیٹا درست نہیں۔ براہ کرم دوبارہ اپ لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:231
+msgid "Error reading GeoJSON data from request."
+msgstr "درخواست سے GeoJSON ڈیٹا پڑھنے میں خرابی۔"
+
+#: app/htmx/setup_step_routes.py:252
+#, python-format
+msgid ""
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please select a smaller area."
+msgstr ""
+"رقبہ %(area_km2)s مربع کلومیٹر ہے، جو %(area_limit)s مربع کلومیٹر کی حد "
+"سے زیادہ ہے۔ براہ کرم چھوٹا علاقہ منتخب کریں۔"
+
+#: app/htmx/setup_step_routes.py:260
+#, python-format
+msgid ""
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process. The data extract API is limited to 200 km²."
+msgstr ""
+"رقبہ %(area_km2)s مربع کلومیٹر ہے۔ بڑے علاقے (>%(area_warn)s مربع "
+"کلومیٹر) کو پراسیس کرنے میں زیادہ وقت لگ سکتا ہے۔ ڈیٹا ایکسٹریکٹ API کی "
+"حد 200 مربع کلومیٹر ہے۔"
+
+#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
+msgid "Project AOI"
+msgstr "منصوبے کا AOI"
+
+#: app/htmx/setup_step_routes.py:339
+#, python-format
+msgid "Data Extract (%(data_feature_count)s features)"
+msgstr "ڈیٹا ایکسٹریکٹ (%(data_feature_count)s خصوصیات)"
+
+#: app/htmx/setup_step_routes.py:353
+#, python-format
+msgid "Task Boundaries (%(task_count)s tasks)"
+msgstr "کام کی حدیں (%(task_count)s کام)"
+
+#: app/htmx/setup_step_routes.py:362
+msgid "Task ID"
+msgstr "ٹاسک آئی ڈی"
+
+#: app/htmx/setup_step_routes.py:363
+msgid "Building Count"
+msgstr "عمارتوں کی تعداد"
+
+#: app/htmx/setup_step_routes.py:397
+msgid ""
+"No task boundaries found. Please split the project into tasks first using"
+" the \"Split AOI\" button above."
+msgstr ""
+"کوئی کامی حد نہیں ملی۔ براہ کرم پہلے اوپر موجود \"Split AOI\" بٹن سے "
+"منصوبے کو کاموں میں تقسیم کریں۔"
+
+#: app/htmx/setup_step_routes.py:453
+#, python-format
+msgid ""
+"✓ AOI split successfully! Generated %(task_count)s task areas using "
+"%(algorithm)s."
+msgstr ""
+"✓ AOI کامیابی سے تقسیم ہو گیا! %(algorithm)s کی مدد سے %(task_count)s "
+"کامی علاقے بنائے گئے۔"
+
+#: app/htmx/setup_step_routes.py:460
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
+"the results below. If satisfied, click \"Accept Task Choices\" to save. "
+"Otherwise, adjust parameters above and click \"Split Again\" to "
+"regenerate."
+msgstr ""
+"%(task_count)s کامی حدیں%(data_extract_info)s دکھائی جا رہی ہیں۔ نیچے "
+"نتائج کا جائزہ لیں۔ اگر مطمئن ہوں تو محفوظ کرنے کے لیے \"Accept Task "
+"Choices\" پر کلک کریں۔ ورنہ اوپر کے پیرامیٹرز بدلیں اور دوبارہ بنانے کے "
+"لیے \"Split Again\" پر کلک کریں۔"
+
+#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
+msgid "Data Extract"
+msgstr "ڈیٹا ایکسٹریکٹ"
+
+#: app/htmx/setup_step_routes.py:560
+#, python-format
+msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+msgstr "OSM ڈیٹا کامیابی سے ڈاؤن لوڈ ہو گیا! %(feature_count)s خصوصیات ملیں۔"
+
+#: app/htmx/setup_step_routes.py:563
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
+msgstr ""
+"نقشے پر %(feature_count)s خصوصیات دکھائی جا رہی ہیں۔ نیچے ڈیٹا کا جائزہ "
+"لیں۔ اگر مطمئن ہوں تو محفوظ کرنے کے لیے \"Accept Data Extract\" پر کلک "
+"کریں۔ ورنہ مختلف پیرامیٹرز کے ساتھ دوبارہ ڈاؤن لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:635
+#: app/templates/partials/project_details/style_and_scripts.html:28
+msgid "Invalid file type. Please upload a .geojson or .json file."
+msgstr "فائل کی قسم درست نہیں۔ براہ کرم .geojson یا .json فائل اپ لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:660
+msgid "No valid geometries found in GeoJSON."
+msgstr "GeoJSON میں کوئی درست جیومیٹری نہیں ملی۔"
+
+#: app/htmx/setup_step_routes.py:692
+#, python-format
+msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+msgstr "✓ GeoJSON کامیابی سے اپ لوڈ ہو گیا! %(feature_count)s خصوصیات ملیں۔"
+
+#: app/htmx/setup_step_routes.py:695
+#, python-format
+msgid ""
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
+msgstr ""
+"نقشے پر %(feature_count)s خصوصیات دکھائی جا رہی ہیں۔ نیچے ڈیٹا کا جائزہ "
+"لیں۔ اگر مطمئن ہوں تو محفوظ کرنے کے لیے \"Accept Data Extract\" پر کلک "
+"کریں۔ ورنہ کوئی دوسری فائل اپ لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
+msgid ""
+"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"کوئی GeoJSON ڈیٹا نہیں ملا۔ براہ کرم پہلے OSM ڈیٹا ڈاؤن لوڈ کریں یا "
+"GeoJSON فائل اپ لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:791
+#, python-format
+msgid "Data Extract (%(feature_count)s features)"
+msgstr "ڈیٹا ایکسٹریکٹ (%(feature_count)s خصوصیات)"
+
+#: app/htmx/setup_step_routes.py:810
+#, python-format
+msgid ""
+"Previewing %(feature_count)s data features on map. Review the data, then "
+"continue to the next step."
+msgstr ""
+"نقشے پر %(feature_count)s ڈیٹا خصوصیات دکھائی جا رہی ہیں۔ ڈیٹا کا جائزہ "
+"لیں، پھر اگلے مرحلے پر جائیں۔"
+
+#: app/htmx/setup_step_routes.py:870
+msgid ""
+"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
+"continue."
+msgstr ""
+"✓ صرف نیا ڈیٹا جمع کرنے کا موڈ منتخب کیا گیا ہے۔ کاموں کی تقسیم چھوڑ دی "
+"گئی ہے اور آپ آگے بڑھ سکتے ہیں۔"
+
+#: app/htmx/setup_step_routes.py:948
+msgid ""
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
+
+#: app/htmx/setup_step_routes.py:1018
+msgid ""
+"No data extract found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"کوئی ڈیٹا ایکسٹریکٹ نہیں ملا۔ براہ کرم پہلے OSM ڈیٹا ڈاؤن لوڈ کریں یا "
+"GeoJSON فائل اپ لوڈ کریں۔"
+
+#: app/htmx/setup_step_routes.py:1049
+#, python-format
+msgid ""
+"Previewing whole AOI (no splitting) with %(data_feature_count)s data "
+"features. The entire AOI will be used as a single task."
+msgstr ""
+"%(data_feature_count)s ڈیٹا خصوصیات کے ساتھ پورا AOI (بغیر تقسیم) دکھایا "
+"جا رہا ہے۔ پورا AOI ایک ہی کام کے طور پر استعمال ہوگا۔"
+
+#: app/htmx/setup_step_routes.py:1056
+#, python-format
+msgid ""
+"Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
+" features together."
+msgstr ""
+"%(task_count)s کامی حدیں اور %(data_feature_count)s ڈیٹا خصوصیات ایک ساتھ"
+" دکھائی جا رہی ہیں۔"
+
+#: app/htmx/setup_step_routes.py:1115
+msgid "Project outline not found. Cannot skip task splitting."
+msgstr "منصوبے کی حد نہیں ملی۔ کاموں کی تقسیم کو چھوڑا نہیں جا سکتا۔"
+
+#: app/htmx/setup_step_routes.py:1142
+msgid ""
+"✓ Task splitting skipped. The whole AOI will be used as a single task. "
+"You can proceed to Step 5."
+msgstr ""
+"✓ کاموں کی تقسیم چھوڑ دی گئی۔ پورا AOI ایک ہی کام کے طور پر استعمال ہوگا۔"
+" آپ مرحلہ 5 کی طرف بڑھ سکتے ہیں۔"
+
+#: app/htmx/setup_step_routes.py:1204
+msgid "Please select a splitting option."
+msgstr "براہ کرم تقسیم کا ایک اختیار منتخب کریں۔"
+
+#: app/htmx/setup_step_routes.py:1225
+msgid "✓ Task splitting is not required for this project setup."
+msgstr "✓ اس منصوبے کی ترتیب کے لیے کاموں کی تقسیم ضروری نہیں۔"
+
+#: app/htmx/setup_step_routes.py:1282
+msgid "No data extract provided."
+msgstr "کوئی ڈیٹا ایکسٹریکٹ فراہم نہیں کیا گیا۔"
+
+#: app/htmx/setup_step_routes.py:1286
+msgid "Invalid data extract format."
+msgstr "ڈیٹا ایکسٹریکٹ کا فارمیٹ درست نہیں۔"
+
+#: app/htmx/setup_step_routes.py:1303
+#, python-format
+msgid ""
+"✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
+"complete."
+msgstr ""
+"✓ ڈیٹا ایکسٹریکٹ قبول کر لیا گیا! %(feature_count)s خصوصیات محفوظ ہو "
+"گئیں۔ مرحلہ 2 اب مکمل ہے۔"
+
+#: app/htmx/setup_step_routes.py:1353
+msgid "No task areas data provided."
+msgstr "کوئی کامی علاقہ ڈیٹا فراہم نہیں کیا گیا۔"
+
+#: app/htmx/setup_step_routes.py:1357
+msgid "Invalid task areas data format."
+msgstr "کامی علاقوں کے ڈیٹا کا فارمیٹ درست نہیں۔"
+
+#: app/htmx/setup_step_routes.py:1374
+#: app/templates/partials/project_details/setup_steps.html:455
+msgid "✓ Split tasks saved successfully"
+msgstr "✓ تقسیم شدہ کام کامیابی سے محفوظ ہو گئے"
+
+#: app/htmx/setup_step_routes.py:1429
+msgid ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
+msgstr ""
+"ODK URL، صارف نام، اور پاس ورڈ (تینوں) فراہم کریں، یا سرور کی طے شدہ "
+"ترتیبات استعمال کرنے کے لیے سب خالی چھوڑ دیں۔"
+
+#: app/htmx/setup_step_routes.py:1551
+msgid "GeoJSON is required"
+msgstr "GeoJSON ضروری ہے"
+
+#: app/htmx/setup_step_routes.py:1562
+msgid "No polygon geometries found. Project area must be a polygon."
+msgstr "کوئی پولیگون جیومیٹری نہیں ملی۔ منصوبے کا علاقہ پولیگون ہونا چاہیے۔"
+
+#: app/templates/home.html:13
+msgid "Filters"
+msgstr "فلٹرز"
+
+#: app/templates/home.html:18
+msgid "All projects"
+msgstr "تمام منصوبے"
+
+#: app/templates/home.html:19
+msgid "Draft"
+msgstr "مسودہ"
+
+#: app/templates/home.html:20
+msgid "Published"
+msgstr "شائع شدہ"
+
+#: app/templates/home.html:21
+msgid "Completed"
+msgstr "مکمل"
+
+#: app/templates/home.html:22
+msgid "Archived"
+msgstr "محفوظ شدہ"
+
+#: app/templates/home.html:26
+msgid "Project Status"
+msgstr "منصوبے کی حالت"
+
+#: app/templates/home.html:41
+msgid "Newest first"
+msgstr "نئے پہلے"
+
+#: app/templates/home.html:42
+msgid "Oldest first"
+msgstr "پرانے پہلے"
+
+#: app/templates/home.html:43
+msgid "Name (A-Z)"
+msgstr "نام (A-Z)"
+
+#: app/templates/home.html:44
+msgid "Name (Z-A)"
+msgstr "نام (Z-A)"
+
+#: app/templates/home.html:47
+msgid "Sort By"
+msgstr "اس کے مطابق ترتیب دیں"
+
+#: app/templates/home.html:61
+msgid "Search"
+msgstr "تلاش"
+
+#: app/templates/home.html:67
+msgid "Search projects…"
+msgstr "منصوبے تلاش کریں…"
+
+#: app/templates/home.html:77 app/templates/landing.html:566
+#: app/templates/layout.html:222 app/templates/new_project.html:1
+#: app/templates/new_project.html:167
+msgid "Create Project"
+msgstr "منصوبہ بنائیں"
+
+#: app/templates/home.html:78
+msgid "+ New"
+msgstr "+ نیا"
+
+#: app/templates/home.html:84
+#, python-format
+msgid "Showing %(count)s project"
+msgid_plural "Showing %(count)s projects"
+msgstr[0] "%(count)s منصوبہ دکھایا جا رہا ہے"
+msgstr[1] "%(count)s منصوبے دکھائے جا رہے ہیں"
+
+#: app/templates/home.html:85
+#, python-format
+msgid "in %(status)s"
+msgstr "%(status)s میں"
+
+#: app/templates/home.html:86
+#, python-format
+msgid "matching \"%(query)s\""
+msgstr "\"%(query)s\" سے مطابقت رکھتا ہے"
+
+#: app/templates/home.html:102
+msgid "Private Project"
+msgstr "نجی منصوبہ"
+
+#: app/templates/home.html:125 app/templates/project_details.html:33
+msgid "Unnamed Project"
+msgstr "بے نام منصوبہ"
+
+#: app/templates/home.html:133
+msgid "Location:"
+msgstr "مقام:"
+
+#: app/templates/home.html:154
+msgid "Created:"
+msgstr "تخلیق:"
+
+#: app/templates/home.html:154
+msgid "N/A"
+msgstr "دستیاب نہیں"
+
+#: app/templates/home.html:163
+msgid "No projects found. Create your first project to get started!"
+msgstr "کوئی منصوبہ نہیں ملا۔ شروع کرنے کے لیے اپنا پہلا منصوبہ بنائیں!"
+
+#: app/templates/landing.html:558
+msgid "Coordinate field campaigns"
+msgstr "میدانی مہمات کو مربوط کریں"
+
+#: app/templates/landing.html:561
+msgid ""
+"Enhancing field mapping efficiency and accuracy through seamless "
+"coordination."
+msgstr ""
+"بغیر رکاوٹ ہم آہنگی کے ذریعے میدانی نقشہ سازی کی کارکردگی اور درستگی بہتر"
+" بنانا۔"
+
+#: app/templates/landing.html:564
+msgid "Explore Projects"
+msgstr "منصوبے دیکھیں"
+
+#: app/templates/landing.html:576
+msgid "Loading metrics..."
+msgstr "اشاریے لوڈ ہو رہے ہیں..."
+
+#: app/templates/landing.html:584
+msgid "What is it?"
+msgstr "یہ کیا ہے؟"
+
+#: app/templates/landing.html:586
+msgid ""
+"The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
+"map features by coordinating mapping in the field."
+msgstr ""
+"Field Tasking Manager (Field-TM) میدانی نقشہ سازی کو مربوط کر کے ٹیموں کو"
+" نقشے کی خصوصیات میں مقامی معلومات شامل کرنے میں مدد دیتا ہے۔"
+
+#: app/templates/landing.html:589
+msgid ""
+"Field-TM facilitates collaborative mapping by supporting and extending "
+"mature tools like ODK and QField. It is a standalone mobile and web "
+"workflow that helps teams collect geospatial data efficiently with "
+"commonly available Android devices."
+msgstr ""
+"Field-TM، ODK اور QField جیسے پختہ ٹولز کی مدد اور توسیع کے ذریعے اشتراکی"
+" نقشہ سازی کو آسان بناتا ہے۔ یہ ایک خودمختار موبائل اور ویب ورک فلو ہے جو"
+" ٹیموں کو عام دستیاب Android آلات کے ساتھ مؤثر انداز میں جغرافیائی ڈیٹا "
+"جمع کرنے میں مدد دیتا ہے۔"
+
+#: app/templates/landing.html:594
+msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+msgstr "ایک منصوبہ منیجر لیپ ٹاپ پر FieldTM نقشہ سازی ورک فلو دکھا رہا ہے"
+
+#: app/templates/landing.html:600
+msgid "Main Features"
+msgstr "اہم خصوصیات"
+
+#: app/templates/landing.html:603
+msgid "Flexible Data Collection"
+msgstr "لچکدار ڈیٹا جمع آوری"
+
+#: app/templates/landing.html:605
+msgid ""
+"Support diverse survey forms, multiple data formats, and adaptable "
+"workflows that fit different operational needs."
+msgstr ""
+"متنوع سروے فارم، متعدد ڈیٹا فارمیٹس، اور مختلف عملی ضروریات کے مطابق "
+"ڈھلنے والے ورک فلو کی حمایت کرتا ہے۔"
+
+#: app/templates/landing.html:609
+msgid "Open Source and Customizable"
+msgstr "اوپن سورس اور حسبِ ضرورت"
+
+#: app/templates/landing.html:611
+msgid ""
+"Adapt Field-TM to your own survey logic, data structures, and integration"
+" requirements."
+msgstr ""
+"Field-TM کو اپنی سروے منطق، ڈیٹا ساخت، اور انضمامی ضروریات کے مطابق "
+"ڈھالیں۔"
+
+#: app/templates/landing.html:615
+msgid "Entity-Level Tracking"
+msgstr "اکائی سطح کی نگرانی"
+
+#: app/templates/landing.html:617
+msgid ""
+"Monitor survey progress at task and feature level so managers can make "
+"informed decisions quickly."
+msgstr ""
+"کام اور خصوصیت کی سطح پر سروے کی پیش رفت دیکھیں تاکہ منیجر جلد باخبر "
+"فیصلے کر سکیں۔"
+
+#: app/templates/landing.html:624
+msgid "Who is it for?"
+msgstr "یہ کس کے لیے ہے؟"
+
+#: app/templates/landing.html:627
+msgid "Project Manager"
+msgstr "منصوبہ منیجر"
+
+#: app/templates/landing.html:628
+msgid "Create and coordinate field campaigns"
+msgstr "میدانی مہمات بنائیں اور مربوط کریں"
+
+#: app/templates/landing.html:630
+msgid ""
+"Project managers use Field-TM to set up mapping projects, define areas of"
+" interest, design survey forms, and split work into manageable tasks."
+msgstr ""
+"منصوبہ منیجر Field-TM استعمال کرتے ہیں تاکہ نقشہ سازی منصوبے قائم کریں، "
+"دلچسپی کے علاقے متعین کریں، سروے فارم بنائیں، اور کام کو قابلِ انتظام "
+"حصوں میں تقسیم کریں۔"
+
+#: app/templates/landing.html:633
+msgid "Define a project area and upload or choose a survey form"
+msgstr "منصوبے کا علاقہ متعین کریں اور سروے فارم اپ لوڈ کریں یا منتخب کریں"
+
+#: app/templates/landing.html:634
+msgid "Split the area into tasks and generate a data extract"
+msgstr "علاقے کو کاموں میں تقسیم کریں اور ڈیٹا ایکسٹریکٹ بنائیں"
+
+#: app/templates/landing.html:635
+msgid "Publish the project to ODK Central or QFieldCloud"
+msgstr "منصوبہ ODK Central یا QFieldCloud پر شائع کریں"
+
+#: app/templates/landing.html:636
+msgid "Share a QR code so mappers can start collecting data"
+msgstr "QR کوڈ شیئر کریں تاکہ نقشہ ساز ڈیٹا جمع کرنا شروع کر سکیں"
+
+#: app/templates/landing.html:640
+msgid "Field Mapper"
+msgstr "فیلڈ نقشہ ساز"
+
+#: app/templates/landing.html:641
+msgid "Collect data in the field with your phone"
+msgstr "اپنے فون سے میدان میں ڈیٹا جمع کریں"
+
+#: app/templates/landing.html:643
+msgid ""
+"Mappers do not need to log in to Field-TM. Once a project manager "
+"publishes a project, mappers access it directly in their mobile app of "
+"choice."
+msgstr ""
+"نقشہ سازوں کو Field-TM میں لاگ اِن کرنے کی ضرورت نہیں۔ جب منصوبہ منیجر "
+"کوئی منصوبہ شائع کر دیتا ہے، تو نقشہ ساز اپنی پسند کی موبائل ایپ میں براہ"
+" راست اس تک رسائی حاصل کرتے ہیں۔"
+
+#: app/templates/landing.html:646
+msgid "Scan the QR code shared by your project manager"
+msgstr "اپنے منصوبہ منیجر کے شیئر کردہ QR کوڈ کو اسکین کریں"
+
+#: app/templates/landing.html:647
+msgid "The project loads automatically in ODK Collect or QField"
+msgstr "منصوبہ خودکار طور پر ODK Collect یا QField میں لوڈ ہو جاتا ہے"
+
+#: app/templates/landing.html:648
+msgid "Navigate to your assigned task area and collect data"
+msgstr "اپنے مقرر کردہ کام کے علاقے میں جائیں اور ڈیٹا جمع کریں"
+
+#: app/templates/landing.html:649
+msgid "Submit your survey, which goes straight to the server"
+msgstr "اپنا سروے جمع کریں، جو سیدھا سرور تک جائے گا"
+
+#: app/templates/landing.html:656
+msgid "Field-TM Use Cases"
+msgstr "Field-TM کے استعمال کی مثالیں"
+
+#: app/templates/landing.html:661
+msgid "Field mapping in progress"
+msgstr "میدانی نقشہ سازی جاری ہے"
+
+#: app/templates/landing.html:666
+msgid "1. Community Mapping"
+msgstr "1. کمیونٹی نقشہ سازی"
+
+#: app/templates/landing.html:668
+msgid ""
+"Field Tasking Manager empowers communities to map informal settlements, "
+"public facilities, and local services for inclusive planning."
+msgstr ""
+"Field Tasking Manager کمیونٹیز کو غیر رسمی آبادیوں، عوامی سہولیات، اور "
+"مقامی خدمات کی نقشہ سازی کے قابل بناتا ہے تاکہ جامع منصوبہ بندی ممکن ہو۔"
+
+#: app/templates/landing.html:672
+msgid "2. Urban Planning and Management"
+msgstr "2. شہری منصوبہ بندی اور انتظام"
+
+#: app/templates/landing.html:674
+msgid ""
+"Build smarter cities with coordinated surveys of houses, roads, and "
+"utilities through clear, manageable mapping tasks."
+msgstr ""
+"واضح اور قابلِ انتظام نقشہ سازی کاموں کے ذریعے گھروں، سڑکوں، اور سہولیات "
+"کے مربوط سروے سے زیادہ ذہین شہر بنائیں۔"
+
+#: app/templates/landing.html:678
+msgid "3. Disaster Response and Recovery"
+msgstr "3. آفات سے نمٹنا اور بحالی"
+
+#: app/templates/landing.html:680
+msgid ""
+"Rapidly map damaged infrastructure after disasters, coordinate "
+"volunteers, and deliver reliable data for relief operations."
+msgstr ""
+"آفات کے بعد متاثرہ بنیادی ڈھانچے کی تیزی سے نقشہ سازی کریں، رضاکاروں کو "
+"مربوط کریں، اور امدادی کارروائیوں کے لیے قابلِ اعتماد ڈیٹا فراہم کریں۔"
+
+#: app/templates/landing.html:688
+msgid "Resources"
+msgstr "وسائل"
+
+#: app/templates/landing.html:696
+msgid "Data Prep"
+msgstr "ڈیٹا تیاری"
+
+#: app/templates/landing.html:697
+msgid "HOT Export Tool"
+msgstr "HOT Export Tool"
+
+#: app/templates/landing.html:699
+msgid "Download task-ready geospatial data extracts for your project area."
+msgstr ""
+"اپنے منصوبے کے علاقے کے لیے کام کے قابل جغرافیائی ڈیٹا ایکسٹریکٹس ڈاؤن "
+"لوڈ کریں۔"
+
+#: app/templates/landing.html:708 app/templates/landing.html:720
+msgid "Documentation"
+msgstr "دستاویزات"
+
+#: app/templates/landing.html:709
+msgid "ODK Central Guide"
+msgstr "ODK Central رہنما"
+
+#: app/templates/landing.html:711
+msgid "Learn how to manage forms, app users, and field submissions in ODK."
+msgstr ""
+"سیکھیں کہ ODK میں فارم، ایپ صارفین، اور میدانی جمع آوریوں کا انتظام کیسے "
+"کرنا ہے۔"
+
+#: app/templates/landing.html:721
+msgid "QField Guide"
+msgstr "QField رہنما"
+
+#: app/templates/landing.html:723
+msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+msgstr "آف لائن نقشہ سازی کے لیے QFieldCloud منصوبے اور موبائل ورک فلو ترتیب دیں۔"
+
+#: app/templates/landing.html:733
+msgid "Need assistance?"
+msgstr "مدد چاہیے؟"
+
+#: app/templates/landing.html:734
+msgid "Email:"
+msgstr "ای میل:"
+
+#: app/templates/landing.html:750
+msgid "Language"
+msgstr "زبان"
+
+#: app/templates/layout.html:7
+msgid "Coordinated field mapping for Open Mapping campaigns."
+msgstr "اوپن میپنگ مہمات کے لیے مربوط میدانی نقشہ سازی۔"
+
+#: app/templates/layout.html:161 app/templates/login.html:1
+msgid "Login"
+msgstr "لاگ اِن"
+
+#: app/templates/layout.html:215
+msgid "Projects"
+msgstr "منصوبے"
+
+#: app/templates/layout.html:229
+msgid "QField Admin"
+msgstr "QField انتظام"
+
+#: app/templates/login.html:5
+msgid "Sign in to Field-TM"
+msgstr "Field-TM میں سائن اِن کریں"
+
+#: app/templates/login.html:8
+msgid "Redirecting to the centralized login service."
+msgstr "مرکزی لاگ اِن سروس کی طرف بھیجا جا رہا ہے۔"
+
+#: app/templates/login.html:9
+msgid "Continue to login"
+msgstr "لاگ اِن جاری رکھیں"
+
+#: app/templates/login.html:17
+msgid "Authentication is disabled on this deployment."
+msgstr "اس تعیناتی میں توثیق بند ہے۔"
+
+#: app/templates/login.html:20
+msgid "Back to home"
+msgstr "ہوم پر واپس جائیں"
+
+#: app/templates/new_project.html:4
+msgid "Create New Project"
+msgstr "نیا منصوبہ بنائیں"
+
+#: app/templates/new_project.html:25
+msgid "Project Name"
+msgstr "منصوبے کا نام"
+
+#: app/templates/new_project.html:30
+msgid "Enter project name"
+msgstr "منصوبے کا نام درج کریں"
+
+#: app/templates/new_project.html:43
+msgid "Enter project description"
+msgstr "منصوبے کی تفصیل درج کریں"
+
+#: app/templates/new_project.html:52
+msgid "Field Mapping App"
+msgstr "فیلڈ میپنگ ایپ"
+
+#: app/templates/new_project.html:92
+msgid "Project Area"
+msgstr "منصوبے کا علاقہ"
+
+#: app/templates/new_project.html:101
+msgid "Draw Area"
+msgstr "علاقہ بنائیں"
+
+#: app/templates/new_project.html:109
+msgid "Upload GeoJSON"
+msgstr "GeoJSON اپ لوڈ کریں"
+
+#: app/templates/new_project.html:117
+msgid "Clear"
+msgstr "صاف کریں"
+
+#: app/templates/new_project.html:125
+msgid ""
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
+"warning. The OSM data extract API is limited to 200 km²."
+msgstr ""
+"اپنے منصوبے کے علاقے کی تعریف کے لیے نقشے پر پولیگون بنائیں یا GeoJSON "
+"فائل اپ لوڈ کریں۔ منصوبے کا زیادہ سے زیادہ حجم 1,000 مربع کلومیٹر ہے۔ 100"
+" مربع کلومیٹر سے بڑے علاقے پر تنبیہ دکھائی جائے گی۔ OSM ڈیٹا ایکسٹریکٹ "
+"API کی حد 200 مربع کلومیٹر ہے۔"
+
+#: app/templates/new_project.html:133
+#: app/templates/partials/project_details/setup_steps.html:153
+#: app/templates/partials/project_details/setup_steps.html:329
+#: app/templates/partials/project_details/setup_steps.html:470
+#: app/templates/partials/project_details/setup_steps.html:678
+msgid "Advanced Config"
+msgstr "اعلیٰ ترتیب"
+
+#: app/templates/new_project.html:145
+msgid "Merge geometries (use convex hull for multipolygons)"
+msgstr "جیومیٹریاں ضم کریں (ملٹی پولیگون کے لیے convex hull استعمال کریں)"
+
+#: app/templates/new_project.html:154 app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "ہیش ٹیگز"
+
+#: app/templates/new_project.html:157
+msgid "Type hashtags and press Enter or comma"
+msgstr "ہیش ٹیگز لکھیں اور Enter یا کوما دبائیں"
+
+#: app/templates/new_project.html:162
+msgid ""
+"Type hashtags and press Enter or comma to add them. Click the × on a tag "
+"to remove it."
+msgstr ""
+"ہیش ٹیگز شامل کرنے کے لیے لکھیں اور Enter یا کوما دبائیں۔ ہٹانے کے لیے "
+"ٹیگ پر × دبائیں۔"
+
+#: app/templates/new_project.html:168
+msgid "Creating..."
+msgstr "بنایا جا رہا ہے..."
+
+#: app/templates/new_project.html:177
+msgid "Something went wrong. Please try again."
+msgstr "کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔"
+
+#: app/templates/new_project.html:178
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr "GeoJSON فارمیٹ درست نہیں۔ براہ کرم اپنی فائل چیک کریں۔"
+
+#: app/templates/new_project.html:179
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr "GeoJSON فائل درست نہیں۔ براہ کرم فائل فارمیٹ چیک کریں۔"
+
+#: app/templates/new_project.html:180 app/templates/new_project.html:736
+msgid ""
+"You must draw or upload an Area of Interest (AOI) on the map before "
+"submitting."
+msgstr ""
+"جمع کرانے سے پہلے آپ کو نقشے پر Area of Interest (AOI) بنانا یا اپ لوڈ "
+"کرنا ہوگا۔"
+
+#: app/templates/new_project.html:701
+msgid "A project with this name already exists. Please choose a different name."
+msgstr "اس نام کا منصوبہ پہلے سے موجود ہے۔ براہ کرم دوسرا نام منتخب کریں۔"
+
+#: app/templates/new_project.html:861
+msgid "Description is required."
+msgstr "تفصیل ضروری ہے۔"
+
+#: app/templates/project_details.html:6
+msgid "← Back to Projects"
+msgstr "← منصوبوں پر واپس جائیں"
+
+#: app/templates/project_details.html:46
+msgid "Project Metadata"
+msgstr "منصوبے کا میٹاڈیٹا"
+
+#: app/templates/project_details.html:48
+msgid "Project metadata and setup information for managers."
+msgstr "منیجرز کے لیے منصوبے کا میٹاڈیٹا اور سیٹ اپ معلومات۔"
+
+#: app/templates/project_details.html:66
+msgid "Project ID"
+msgstr "منصوبے کی آئی ڈی"
+
+#: app/templates/project_details.html:77
+msgid "Created"
+msgstr "تخلیق شدہ"
+
+#: app/templates/project_details.html:84
+msgid "Last Updated"
+msgstr "آخری اپ ڈیٹ"
+
+#: app/templates/project_details.html:107
+msgid "External Project"
+msgstr "بیرونی منصوبہ"
+
+#: app/templates/project_details.html:109
+msgid "Instance:"
+msgstr "انسٹینس:"
+
+#: app/templates/project_details.html:111
+msgid "Project ID:"
+msgstr "منصوبے کی آئی ڈی:"
+
+#: app/templates/project_details.html:121
+#: app/templates/project_details.html:129
+msgid "View Project in ODK Central →"
+msgstr "منصوبہ ODK Central میں دیکھیں →"
+
+#: app/templates/project_details.html:136
+msgid "Manage QFieldCloud Project →"
+msgstr "QFieldCloud منصوبے کا انتظام کریں →"
+
+#: app/templates/project_details.html:144
+msgid "View Project Externally →"
+msgstr "منصوبہ بیرونی طور پر دیکھیں →"
+
+#: app/templates/project_details.html:159
+msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+msgstr ""
+"کیا اس منصوبے کو downstream اور Field-TM میں حذف کرنا ہے؟ یہ واپس نہیں "
+"کیا جا سکتا۔"
+
+#: app/templates/project_details.html:162
+msgid "Delete Project"
+msgstr "منصوبہ حذف کریں"
+
+#: app/templates/project_details.html:165
+#: app/templates/project_details.html:176
+msgid "Back to Projects"
+msgstr "منصوبوں پر واپس جائیں"
+
+#: app/templates/project_details.html:171
+msgid "Project Not Found"
+msgstr "منصوبہ نہیں ملا"
+
+#: app/templates/project_details.html:173
+msgid ""
+"The project you're looking for doesn't exist or you don't have permission"
+" to view\n"
+"        it."
+msgstr ""
+"جس منصوبے کو آپ تلاش کر رہے ہیں وہ موجود نہیں یا آپ کو اسے دیکھنے کی "
+"اجازت نہیں۔"
+
+#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
+msgid "QFieldCloud Admin"
+msgstr "QFieldCloud انتظام"
+
+#: app/templates/qfc_admin.html:21
+msgid ""
+"This page is for managing the users in your QField project, after "
+"creation."
+msgstr "یہ صفحہ آپ کے QField منصوبے کے بننے کے بعد صارفین کے انتظام کے لیے ہے۔"
+
+#: app/templates/qfc_admin.html:25
+msgid "Enter your QFieldCloud credentials to manage collaborators."
+msgstr "معاونین کا انتظام کرنے کے لیے اپنی QFieldCloud معلومات درج کریں۔"
+
+#: app/templates/qfc_admin.html:36
+msgid "QFieldCloud URL"
+msgstr "QFieldCloud URL"
+
+#: app/templates/qfc_admin.html:46
+msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+msgstr "آپ کے QFieldCloud انسٹینس کا بنیادی URL (/api/v1 کے بغیر)۔"
+
+#: app/templates/qfc_admin.html:54
+msgid "admin"
+msgstr "admin"
+
+#: app/templates/partials/project_details/setup_steps.html:734
+#: app/templates/partials/project_details/setup_steps.html:740
+#: app/templates/partials/project_details/setup_steps.html:774
+#: app/templates/qfc_admin.html:59
+msgid "Password"
+msgstr "پاس ورڈ"
+
+#: app/templates/qfc_admin.html:70
+msgid "Connect"
+msgstr "منسلک کریں"
+
+#: app/templates/qfc_admin.html:76
+msgid "Connecting…"
+msgstr "منسلک ہو رہا ہے…"
+
+#: app/templates/partials/metrics.html:5
+msgid "Features Surveyed (Approximate)"
+msgstr "سروے کی گئی خصوصیات (تقریباً)"
+
+#: app/templates/partials/metrics.html:12
+msgid "Projects Created"
+msgstr "بنائے گئے منصوبے"
+
+#: app/templates/partials/metrics.html:19
+msgid "Countries Covered"
+msgstr "شامل ممالک"
+
+#: app/templates/partials/metrics.html:26
+msgid "Users Registered"
+msgstr "رجسٹرڈ صارفین"
+
+#: app/templates/partials/metrics.html:33
+msgid "Supported Mapping Apps"
+msgstr "حمایت یافتہ نقشہ سازی ایپس"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:3
+msgid "Manager Setup Summary"
+msgstr "منیجر سیٹ اپ خلاصہ"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:6
+msgid "The project setup flow is complete and shown below for reference."
+msgstr "منصوبے کا سیٹ اپ عمل مکمل ہو چکا ہے اور حوالہ کے لیے نیچے دکھایا گیا ہے۔"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:14
+msgid "Project Location"
+msgstr "منصوبے کا مقام"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:25
+msgid "Step 2: Upload XLSForm"
+msgstr "مرحلہ 2: XLSForm اپ لوڈ کریں"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:28
+#: app/templates/partials/project_details/manager_setup_summary.html:39
+#: app/templates/partials/project_details/manager_setup_summary.html:50
+#: app/templates/partials/project_details/manager_setup_summary.html:61
+#: app/templates/partials/project_details/setup_steps.html:46
+#: app/templates/partials/project_details/setup_steps.html:273
+#: app/templates/partials/project_details/setup_steps.html:447
+msgid "Complete"
+msgstr "مکمل"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:36
+#: app/templates/partials/project_details/setup_steps.html:268
+msgid "Step 3: Get Data"
+msgstr "مرحلہ 3: ڈیٹا حاصل کریں"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:47
+msgid "Step 4: Split into Tasks"
+msgstr "مرحلہ 4: کاموں میں تقسیم کریں"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:58
+#: app/templates/partials/project_details/setup_steps.html:661
+msgid "Step 5: Finalise Project"
+msgstr "مرحلہ 5: منصوبہ حتمی بنائیں"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:69
+msgid ""
+"If you need to upload additional media files to this project, such as "
+"images and\n"
+"          videos, log into ODK Central and upload them in the form "
+"settings."
+msgstr ""
+"اگر آپ کو اس منصوبے میں اضافی میڈیا فائلیں، جیسے تصاویر اور ویڈیوز، اپ "
+"لوڈ کرنی ہیں تو ODK Central میں لاگ اِن کریں اور انہیں فارم سیٹنگز میں اپ"
+" لوڈ کریں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:14
+msgid "Ready for Mapping"
+msgstr "نقشہ سازی کے لیے تیار"
+
+#: app/templates/partials/project_details/setup_steps.html:25
+msgid "Loading QR code..."
+msgstr "QR کوڈ لوڈ ہو رہا ہے..."
+
+#: app/templates/partials/project_details/setup_steps.html:32
+msgid "Project Setup"
+msgstr "منصوبہ سیٹ اپ"
+
+#: app/templates/partials/project_details/setup_steps.html:41
+msgid "Step 2: Select Survey Form"
+msgstr "مرحلہ 2: سروے فارم منتخب کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:51
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr "ایک سروے قسم منتخب کریں اور تجویز کردہ طے شدہ ترتیبات کے ساتھ جاری رکھیں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:62
+msgid "Choose Survey Type:"
+msgstr "سروے کی قسم منتخب کریں:"
+
+#: app/templates/partials/project_details/setup_steps.html:64
+msgid "Loading survey types..."
+msgstr "سروے اقسام لوڈ ہو رہی ہیں..."
+
+#: app/templates/partials/project_details/setup_steps.html:81
+msgid "Or use your own form instead:"
+msgstr "یا اس کے بجائے اپنا فارم استعمال کریں:"
+
+#: app/templates/partials/project_details/setup_steps.html:89
+msgid "Upload Custom XLSForm"
+msgstr "کسٹم فارم اپ لوڈ کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:103
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"          division and feature selection. Your form should only contain "
+"the survey questions you\n"
+"          want to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:127
+msgid ""
+"Recommended defaults are active for ODK projects, including ODK Collect\n"
+"          compatibility."
+msgstr ""
+"ODK منصوبوں کے لیے تجویز کردہ طے شدہ ترتیبات فعال ہیں، جن میں ODK Collect"
+" مطابقت بھی شامل ہے۔"
+
+#: app/templates/partials/project_details/setup_steps.html:134
+#, python-format
+msgid "Recommended defaults are active for %(app_name)s projects."
+msgstr "%(app_name)s منصوبوں کے لیے تجویز کردہ طے شدہ ترتیبات فعال ہیں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:141
+msgid "Recommended defaults are active for this project."
+msgstr "اس منصوبے کے لیے تجویز کردہ طے شدہ ترتیبات فعال ہیں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:160
+msgid "Default Language:"
+msgstr "طے شدہ زبان:"
+
+#: app/templates/partials/project_details/setup_steps.html:162
+msgid "English"
+msgstr "انگریزی"
+
+#: app/templates/partials/project_details/setup_steps.html:163
+msgid "Spanish"
+msgstr "ہسپانوی"
+
+#: app/templates/partials/project_details/setup_steps.html:164
+msgid "French"
+msgstr "فرانسیسی"
+
+#: app/templates/partials/project_details/setup_steps.html:165
+msgid "Portuguese"
+msgstr "پرتگالی"
+
+#: app/templates/partials/project_details/setup_steps.html:166
+msgid "Swahili"
+msgstr "سواحلی"
+
+#: app/templates/partials/project_details/setup_steps.html:167
+msgid "Hindi"
+msgstr "ہندی"
+
+#: app/templates/partials/project_details/setup_steps.html:182
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:195
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:209
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:214
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:225
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:229
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:252
+msgid "Continue"
+msgstr "جاری رکھیں"
+
+#: app/templates/partials/project_details/setup_steps.html:256
+msgid "✓ Survey form uploaded successfully"
+msgstr "✓ سروے فارم کامیابی سے اپ لوڈ ہو گیا"
+
+#: app/templates/partials/project_details/setup_steps.html:278
+msgid "Download the recommended OSM data for your survey form."
+msgstr "اپنے سروے فارم کے لیے تجویز کردہ OSM ڈیٹا ڈاؤن لوڈ کریں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:280
+msgid "Review the data on the map, then continue."
+msgstr "نقشے پر ڈیٹا کا جائزہ لیں، پھر جاری رکھیں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:293
+#: app/templates/partials/project_details/style_and_scripts.html:27
+msgid "Download OSM Data"
+msgstr "OSM ڈیٹا ڈاؤن لوڈ کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:319
+msgid "Collect New Data Only"
+msgstr "صرف نیا ڈیٹا جمع کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:336
+msgid "Use custom data inputs or override the default OSM download options."
+msgstr "کسٹم ڈیٹا ان پٹس استعمال کریں یا طے شدہ OSM ڈاؤن لوڈ اختیارات تبدیل کریں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:342
+msgid "OSM Category:"
+msgstr "OSM زمرہ:"
+
+#: app/templates/partials/project_details/setup_steps.html:345
+msgid "OSM Buildings"
+msgstr "OSM عمارتیں"
+
+#: app/templates/partials/project_details/setup_steps.html:346
+msgid "OSM Highways"
+msgstr "OSM سڑکیں"
+
+#: app/templates/partials/project_details/setup_steps.html:347
+msgid "OSM Healthcare"
+msgstr "OSM صحت کی سہولیات"
+
+#: app/templates/partials/project_details/setup_steps.html:348
+msgid "OSM Toilets"
+msgstr "OSM بیت الخلا"
+
+#: app/templates/partials/project_details/setup_steps.html:349
+msgid "OSM Religious"
+msgstr "OSM مذہبی مقامات"
+
+#: app/templates/partials/project_details/setup_steps.html:350
+msgid "OSM Landuse"
+msgstr "OSM زمین کا استعمال"
+
+#: app/templates/partials/project_details/setup_steps.html:351
+msgid "OSM Waterways"
+msgstr "OSM آبی راستے"
+
+#: app/templates/partials/project_details/setup_steps.html:352
+msgid "OSM Water Points"
+msgstr "OSM پانی کے مقامات"
+
+#: app/templates/partials/project_details/setup_steps.html:353
+msgid "OSM Waste Disposal"
+msgstr "OSM فضلہ تلفی"
+
+#: app/templates/partials/project_details/setup_steps.html:354
+msgid "OSM Education"
+msgstr "OSM تعلیم"
+
+#: app/templates/partials/project_details/setup_steps.html:355
+msgid "OSM Cemeteries"
+msgstr "OSM قبرستان"
+
+#: app/templates/partials/project_details/setup_steps.html:356
+msgid "OSM Amenities"
+msgstr "OSM سہولیات"
+
+#: app/templates/partials/project_details/setup_steps.html:361
+msgid "Geometry Type:"
+msgstr "جیومیٹری کی قسم:"
+
+#: app/templates/partials/project_details/setup_steps.html:364
+msgid "Polygon"
+msgstr "پولیگون"
+
+#: app/templates/partials/project_details/setup_steps.html:365
+msgid "Polyline"
+msgstr "پولی لائن"
+
+#: app/templates/partials/project_details/setup_steps.html:366
+msgid "Point"
+msgstr "نقطہ"
+
+#: app/templates/partials/project_details/setup_steps.html:379
+msgid "Use centroids"
+msgstr "سینٹروئیڈ استعمال کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:391
+msgid "Upload Custom GeoJSON"
+msgstr "کسٹم GeoJSON اپ لوڈ کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:410
+msgid "Generating OSM data extract... This may take a moment."
+msgstr "OSM ڈیٹا ایکسٹریکٹ تیار کیا جا رہا ہے... اس میں کچھ وقت لگ سکتا ہے۔"
+
+#: app/templates/partials/project_details/setup_steps.html:429
+msgid "OSM data extract ready"
+msgstr "OSM ڈیٹا ایکسٹریکٹ تیار ہے"
+
+#: app/templates/partials/project_details/setup_steps.html:442
+#, fuzzy
+msgid "Step 4: Split into Tasks (Optional)"
+msgstr "مرحلہ 3: کاموں میں تقسیم کریں (اختیاری)"
+
+#: app/templates/partials/project_details/setup_steps.html:452
+msgid "✓ Task splitting is not relevant without existing data"
+msgstr "✓ موجودہ ڈیٹا کے بغیر کاموں کی تقسیم متعلقہ نہیں"
+
+#: app/templates/partials/project_details/setup_steps.html:458
+msgid ""
+"Generate task areas by splitting the Area of Interest (AOI). Choose an "
+"algorithm and\n"
+"      parameters, then split. Review the preview, and click \"Accept Task"
+" Areas\" to save. Or\n"
+"      click"
+msgstr ""
+"Area of Interest (AOI) کو تقسیم کر کے کام کے علاقے بنائیں۔ ایک الگورتھم "
+"اور پیرامیٹرز منتخب کریں، پھر تقسیم کریں۔ پیش منظر کا جائزہ لیں، اور "
+"محفوظ کرنے کے لیے \"Accept Task Areas\" پر کلک کریں۔ یا کلک کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:461
+#: app/templates/partials/project_details/setup_steps.html:480
+msgid "Skip"
+msgstr "چھوڑیں"
+
+#: app/templates/partials/project_details/setup_steps.html:462
+msgid "to use the whole AOI as a single task."
+msgstr "تاکہ پورا AOI ایک ہی کام کے طور پر استعمال ہو۔"
+
+#: app/templates/partials/project_details/setup_steps.html:494
+msgid "Choose which linear features influence building-based task splitting."
+msgstr ""
+"منتخب کریں کہ کون سی خطی خصوصیات عمارتوں پر مبنی کاموں کی تقسیم کو متاثر "
+"کریں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:518
+msgid "Include roads"
+msgstr "سڑکیں شامل کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:527
+msgid "Include rivers"
+msgstr "دریا شامل کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:536
+msgid "Include railways"
+msgstr "ریلوے شامل کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:545
+msgid "Include aeroways"
+msgstr "ہوائی راستے شامل کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:552
+msgid "Algorithm:"
+msgstr "الگورتھم:"
+
+#: app/templates/partials/project_details/setup_steps.html:554
+msgid "Select splitting option..."
+msgstr "تقسیم کا اختیار منتخب کریں..."
+
+#: app/templates/partials/project_details/setup_steps.html:555
+#: app/templates/partials/project_details/style_and_scripts.html:30
+msgid "Split by Square"
+msgstr "چوکور کے مطابق تقسیم کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:556
+msgid "Average Buildings v1 (Voronoi)"
+msgstr "اوسط عمارتیں v1 (Voronoi)"
+
+#: app/templates/partials/project_details/setup_steps.html:558
+msgid "Average Buildings v2 (Straight Skeleton)"
+msgstr "اوسط عمارتیں v2 (Straight Skeleton)"
+
+#: app/templates/partials/project_details/setup_steps.html:560
+#, fuzzy
+msgid "Split by Specific Number of Tasks"
+msgstr "مخصوص تعداد کے کاموں کے مطابق تقسیم کریں (جلد آ رہا ہے)"
+
+#: app/templates/partials/project_details/setup_steps.html:567
+msgid "Avg. Buildings per Task:"
+msgstr "فی کام اوسط عمارتیں:"
+
+#: app/templates/partials/project_details/setup_steps.html:579
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps.html:591
+msgid "Dimension (meters):"
+msgstr "سائز (میٹر):"
+
+#: app/templates/partials/project_details/setup_steps.html:610
+msgid "Split Again"
+msgstr "دوبارہ تقسیم کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:610
+#: app/templates/partials/project_details/style_and_scripts.html:32
+msgid "Split AOI"
+msgstr "AOI تقسیم کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:646
+msgid "Splitting AOI into tasks... This may take a moment."
+msgstr "AOI کو کاموں میں تقسیم کیا جا رہا ہے... اس میں کچھ وقت لگ سکتا ہے۔"
+
+#: app/templates/partials/project_details/setup_steps.html:662
+msgid "Ready"
+msgstr "تیار"
+
+#: app/templates/partials/project_details/setup_steps.html:665
+msgid ""
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
+msgstr "تمام ابتدائی تقاضے مکمل ہیں! اپنے منتخب نقشہ سازی ٹول میں منصوبہ بنائیں۔"
+
+#: app/templates/partials/project_details/setup_steps.html:670
+msgid "Finalise Project"
+msgstr "منصوبہ حتمی بنائیں"
+
+#: app/templates/partials/project_details/setup_steps.html:687
+msgid "Confirm Project Finalisation"
+msgstr "منصوبے کی حتمی تکمیل کی تصدیق کریں"
+
+#: app/templates/partials/project_details/setup_steps.html:691
+msgid "Are you sure you want to finalise this project?"
+msgstr "کیا آپ واقعی اس منصوبے کو حتمی بنانا چاہتے ہیں؟"
+
+#: app/templates/partials/project_details/setup_steps.html:696
+msgid "Confirm & Finalise"
+msgstr "تصدیق کریں اور حتمی بنائیں"
+
+#: app/templates/partials/project_details/setup_steps.html:704
+msgid "Custom Credentials"
+msgstr "کسٹم معلومات"
+
+#: app/templates/partials/project_details/setup_steps.html:710
+msgid "ODK Central URL"
+msgstr "ODK Central URL"
+
+#: app/templates/partials/project_details/setup_steps.html:716
+msgid "https://your-odk-central.com"
+msgstr "https://your-odk-central.com"
+
+#: app/templates/partials/project_details/setup_steps.html:750
+msgid "QField Cloud URL"
+msgstr "QField Cloud URL"
+
+#: app/templates/partials/project_details/setup_steps.html:756
+msgid "https://qfield.cloud"
+msgstr "https://qfield.cloud"
+
+#: app/templates/partials/project_details/setup_steps.html:768
+msgid "qfield_username"
+msgstr "qfield_username"
+
+#: app/templates/partials/project_details/setup_steps.html:780
+msgid "qfield_password"
+msgstr "qfield_password"
+
+#: app/templates/partials/project_details/setup_steps.html:792
+#: app/templates/partials/project_details/style_and_scripts.html:49
+msgid "Test Credentials"
+msgstr "معلومات آزمائیں"
+
+#: app/templates/partials/project_details/setup_steps.html:795
+msgid "Save & Continue"
+msgstr "محفوظ کریں اور جاری رکھیں"
+
+#: app/templates/partials/project_details/style_and_scripts.html:10
+msgid "Select a survey type..."
+msgstr "ایک سروے قسم منتخب کریں..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:11
+msgid "No survey types available"
+msgstr "کوئی سروے قسم دستیاب نہیں"
+
+#: app/templates/partials/project_details/style_and_scripts.html:12
+msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgstr "کوئی سروے فارم دستیاب نہیں۔ Advanced Config میں ایک کسٹم فارم اپ لوڈ کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:13
+msgid "Select a survey type, or upload a custom form in Advanced Config."
+msgstr "ایک سروے قسم منتخب کریں، یا Advanced Config میں کسٹم فارم اپ لوڈ کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:14
+msgid "Survey type selected."
+msgstr "سروے قسم منتخب کر لی گئی۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:15
+msgid "Invalid file type. Please upload a .xls or .xlsx file."
+msgstr "فائل کی قسم درست نہیں۔ براہ کرم .xls یا .xlsx فائل اپ لوڈ کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:16
+msgid "Selected file:"
+msgstr "منتخب فائل:"
+
+#: app/templates/partials/project_details/style_and_scripts.html:17
+msgid "Custom form selected."
+msgstr "کسٹم فارم منتخب کر لیا گیا۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:18
+msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+msgstr ""
+"پہلے ایک سروے قسم منتخب کریں، یا Advanced Config میں کسٹم فارم اپ لوڈ "
+"کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:19
+msgid "polygons"
+msgstr "پولیگونز"
+
+#: app/templates/partials/project_details/style_and_scripts.html:20
+msgid "polylines"
+msgstr "پولی لائنز"
+
+#: app/templates/partials/project_details/style_and_scripts.html:21
+msgid "points"
+msgstr "نقاط"
+
+#: app/templates/partials/project_details/style_and_scripts.html:22
+msgid "features"
+msgstr "خصوصیات"
+
+#: app/templates/partials/project_details/style_and_scripts.html:23
+msgid ""
+"You uploaded a custom form, so this OSM download is optional. Use "
+"Advanced Config to upload your own GeoJSON or adjust download settings."
+msgstr ""
+"آپ نے ایک کسٹم فارم اپ لوڈ کیا ہے، لہٰذا یہ OSM ڈاؤن لوڈ اختیاری ہے۔ اپنا"
+" GeoJSON اپ لوڈ کرنے یا ڈاؤن لوڈ ترتیبات بدلنے کے لیے Advanced Config "
+"استعمال کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:24
+#, python-format
+msgid ""
+"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
+"map, then continue."
+msgstr ""
+"تجویز کردہ ماخذ: %(title)s (%(geom_label)s)۔ نقشے پر ڈیٹا کا جائزہ لیں، "
+"پھر جاری رکھیں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:25
+#, python-format
+msgid ""
+"Recommended source updated (%(geom_label)s). Review the data on the map, "
+"then continue."
+msgstr ""
+"تجویز کردہ ماخذ اپ ڈیٹ ہو گیا (%(geom_label)s)۔ نقشے پر ڈیٹا کا جائزہ "
+"لیں، پھر جاری رکھیں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:26
+msgid "Downloading..."
+msgstr "ڈاؤن لوڈ ہو رہا ہے..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:29
+msgid "Confirm No Splitting"
+msgstr "بغیر تقسیم کی تصدیق کریں"
+
+#: app/templates/partials/project_details/style_and_scripts.html:31
+msgid "Split by Buildings"
+msgstr "عمارتوں کے مطابق تقسیم کریں"
+
+#: app/templates/partials/project_details/style_and_scripts.html:33
+msgid "Select Option"
+msgstr "اختیار منتخب کریں"
+
+#: app/templates/partials/project_details/style_and_scripts.html:34
+msgid "Confirming..."
+msgstr "تصدیق ہو رہی ہے..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:35
+msgid "Splitting..."
+msgstr "تقسیم ہو رہی ہے..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:36
+msgid "ODK Central"
+msgstr "ODK Central"
+
+#: app/templates/partials/project_details/style_and_scripts.html:37
+msgid "QField"
+msgstr "QField"
+
+#: app/templates/partials/project_details/style_and_scripts.html:38
+msgid "the mapping tool"
+msgstr "نقشہ سازی کا ٹول"
+
+#: app/templates/partials/project_details/style_and_scripts.html:39
+msgid "Project type not set. Please set the field mapping app first."
+msgstr "منصوبے کی قسم متعین نہیں۔ براہ کرم پہلے فیلڈ میپنگ ایپ متعین کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:40
+#, python-format
+msgid ""
+"Are you sure you want to finalise this project in %(project_type)s? This "
+"will create the project, upload forms, and generate all necessary files."
+msgstr ""
+"کیا آپ واقعی %(project_type)s میں اس منصوبے کو حتمی بنانا چاہتے ہیں؟ اس "
+"سے منصوبہ بنے گا، فارم اپ لوڈ ہوں گے، اور تمام ضروری فائلیں تیار ہوں گی۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:41
+msgid "Custom ODK Credentials"
+msgstr "کسٹم ODK معلومات"
+
+#: app/templates/partials/project_details/style_and_scripts.html:42
+msgid "Custom QField Credentials"
+msgstr "کسٹم QField معلومات"
+
+#: app/templates/partials/project_details/style_and_scripts.html:43
+msgid "Please fill in all fields."
+msgstr "براہ کرم تمام خانے بھریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:44
+msgid "Testing..."
+msgstr "آزمایا جا رہا ہے..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:45
+msgid "Testing credentials..."
+msgstr "معلومات آزمائی جا رہی ہیں..."
+
+#: app/templates/partials/project_details/style_and_scripts.html:46
+msgid "✓ Credentials are valid!"
+msgstr "✓ معلومات درست ہیں!"
+
+#: app/templates/partials/project_details/style_and_scripts.html:47
+msgid "Invalid credentials. Please check and try again."
+msgstr "معلومات درست نہیں۔ براہ کرم چیک کریں اور دوبارہ کوشش کریں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:48
+#, python-format
+msgid "Error testing credentials: %(message)s"
+msgstr "معلومات آزماتے وقت خرابی: %(message)s"
+
+#: app/templates/partials/project_details/style_and_scripts.html:50
+msgid "Please test credentials first before continuing."
+msgstr "جاری رکھنے سے پہلے براہ کرم پہلے معلومات آزمائیں۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:51
+#, python-format
+msgid "Creating project in %(project_type)s... This may take a moment."
+msgstr "%(project_type)s میں منصوبہ بنایا جا رہا ہے... اس میں کچھ وقت لگ سکتا ہے۔"
+
+#: app/templates/partials/project_details/style_and_scripts.html:52
+msgid "Error:"
+msgstr "خرابی:"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+msgid "Accept Data Extract"
+msgstr "ڈیٹا ایکسٹریکٹ قبول کریں"
+
+#: app/templates/partials/project_details/fragments/finalize_error.html:7
+msgid "View technical details"
+msgstr "تکنیکی تفصیل دیکھیں"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
+msgid "Project created in ODK Central."
+msgstr "منصوبہ ODK Central میں بنایا گیا۔"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
+msgid "Manager Access (ODK Central UI)"
+msgstr "منیجر رسائی (ODK Central UI)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
+msgid "Open project in ODK Central"
+msgstr "منصوبہ ODK Central میں کھولیں"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
+msgid "Save these credentials now. They will only be shown once."
+msgstr "یہ معلومات ابھی محفوظ کریں۔ یہ صرف ایک بار دکھائی جائیں گی۔"
+
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
+msgid "View FieldTM Project"
+msgstr "FieldTM منصوبہ دیکھیں"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
+msgid "Project created in QFieldCloud."
+msgstr "منصوبہ QFieldCloud میں بنایا گیا۔"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
+msgid "Manager Access (QFieldCloud)"
+msgstr "منیجر رسائی (QFieldCloud)"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
+msgid "Open project in QFieldCloud"
+msgstr "منصوبہ QFieldCloud میں کھولیں"
+
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
+msgid ""
+"Manager account could not be created automatically. Log in to QFieldCloud"
+" as admin to\n"
+"      manage the project."
+msgstr ""
+"منیجر اکاؤنٹ خودکار طور پر نہیں بنایا جا سکا۔ منصوبے کا انتظام کرنے کے "
+"لیے admin کے طور پر QFieldCloud میں لاگ اِن کریں۔"
+
+#: app/templates/partials/project_details/fragments/split_preview.html:27
+msgid "Accept Task Choices"
+msgstr "کام کے اختیارات قبول کریں"
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 3 "
+#~ "(upload XLSForm) and then Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ ڈیٹا ایکسٹریکٹ کامیابی سے محفوظ "
+#~ "ہو گیا! اب آپ مرحلہ 3 (XLSForm "
+#~ "اپ لوڈ کریں) اور پھر مرحلہ 4 "
+#~ "(کام تقسیم کریں) کی طرف بڑھ سکتے"
+#~ " ہیں۔"
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 4."
+#~ msgstr ""
+#~ "✓ کاموں کی تقسیم چھوڑ دی گئی۔ "
+#~ "پورا AOI ایک ہی کام کے طور "
+#~ "پر استعمال ہوگا۔ آپ مرحلہ 4 کی "
+#~ "طرف بڑھ سکتے ہیں۔"
+
+#~ msgid "Step 1: Upload XLSForm"
+#~ msgstr "مرحلہ 1: XLSForm اپ لوڈ کریں"
+
+#~ msgid "Step 2: Get Data"
+#~ msgstr "مرحلہ 2: ڈیٹا حاصل کریں"
+
+#~ msgid "Step 3: Split into Tasks"
+#~ msgstr "مرحلہ 3: کاموں میں تقسیم کریں"
+
+#~ msgid "Step 4: Finalise Project"
+#~ msgstr "مرحلہ 4: منصوبہ حتمی بنائیں"
+
+#~ msgid "Step 1: Select Survey Form"
+#~ msgstr "مرحلہ 1: سروے فارم منتخب کریں"
+
+#~ msgid "Choose a survey type and continue with recommended defaults."
+#~ msgstr ""
+#~ "ایک سروے قسم منتخب کریں اور تجویز"
+#~ " کردہ طے شدہ ترتیبات کے ساتھ "
+#~ "جاری رکھیں۔"
+
+#~ msgid "Upload a custom XLSForm or adjust form-processing options."
+#~ msgstr "ایک کسٹم XLSForm اپ لوڈ کریں یا فارم پراسیسنگ کے اختیارات بدلیں۔"
+
+#~ msgid "Upload Custom Form"
+#~ msgstr "کسٹم فارم اپ لوڈ کریں"
+
+#~ msgid "Make photo upload mandatory"
+#~ msgstr "تصویر اپ لوڈ لازمی کریں"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you want to ask "
+#~ "(do not include select_one_from_file fields"
+#~ " for tasks/features)."
+#~ msgstr ""

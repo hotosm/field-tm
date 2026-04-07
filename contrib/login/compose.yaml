@@ -22,7 +22,7 @@
 # This file extends the base compose.yaml with:
 #   - hanko-db, hanko-config, hanko-migrate, hanko  (the Hanko auth stack)
 #   - proxy override: adds login.field.localhost routing to Hanko
-#   - api override:   injects HANKO_API_URL + HANKO_PUBLIC_URL automatically
+#   - backend override: injects HANKO_API_URL + HANKO_PUBLIC_URL automatically
 #
 # No .env changes are needed for local dev - Hanko URLs are wired in here.
 #
@@ -60,8 +60,8 @@ services:
   # Inject Hanko URLs into the API so developers don't have to set them in .env.
   # HANKO_API_URL   – backend → Hanko (internal Docker network)
   # HANKO_PUBLIC_URL – browser → Hanko (via the proxy on the host port)
-  # Compose merges environment maps, so all other api env vars are preserved.
-  api:
+  # Compose merges environment maps, so all other backend env vars are preserved.
+  backend:
     environment:
       HANKO_API_URL: http://hanko:8000
       HANKO_PUBLIC_URL: http://login.field.localhost:${FTM_DEV_PORT:-7050}
