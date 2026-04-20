@@ -344,6 +344,16 @@ def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
     return not isinstance(features, list) or len(features) == 0
 
 
+def get_missing_basemap_attach_config() -> list[str]:
+    """Return required config keys missing for basemap attach workflow."""
+    missing: list[str] = []
+    if not (settings.QFIELDCLOUD_QGIS_URL or "").strip():
+        missing.append("QFIELDCLOUD_QGIS_URL")
+    if not (settings.QFIELDCLOUD_URL or "").strip():
+        missing.append("QFIELDCLOUD_URL")
+    return missing
+
+
 # ---------------------------------------------------------------------------
 # Core: create QField project
 # ---------------------------------------------------------------------------
@@ -353,6 +363,7 @@ async def create_qfield_project(
     db: AsyncConnection,
     project: DbProject,
     custom_qfield_creds: QFieldCloud | None = None,
+    default_language: str | None = None,
 ) -> QFieldProjectResult:
     """Create QField project in QFieldCloud via the QGIS wrapper service.
 
@@ -388,6 +399,7 @@ async def create_qfield_project(
     form_language, final_form = await modify_form_for_qfield(
         BytesIO(project.xlsform_content),
         geom_layer_type=geom_type,
+        default_language=default_language,
     )
     xlsform_bytes = final_form.getvalue()
     if not xlsform_bytes:
@@ -467,25 +479,116 @@ async def create_qfield_project(
         await db.commit()
 
 
+async def attach_basemap_to_qfield_project(
+    db: AsyncConnection,
+    project: DbProject,
+    basemap_url: str,
+) -> None:
+    """Attach an MBTiles basemap to an existing QField project via QGIS wrapper."""
+    if not project.external_project_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="QField project ID is missing; cannot attach basemap.",
+        )
+
+    job_id = uuid4()
+
+    try:
+        await _insert_qgis_job(
+            db,
+            job_id,
+            b"",
+            {},
+            {},
+            operation="basemap",
+            project_id=str(project.external_project_id),
+            basemap_url=basemap_url,
+        )
+        await db.commit()
+
+        await _call_qgis_wrapper(
+            job_id=str(job_id),
+            title=project.project_name or f"project-{project.id}",
+            language="",
+            extent="0,0,0,0",
+            open_in_edit_mode=False,
+            endpoint="/basemap",
+        )
+
+        output_files = await _read_qgis_job_outputs(db, job_id)
+        if not output_files:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Basemap attach completed but produced no project files.",
+            )
+
+        upload_dir = tempfile.mkdtemp(prefix="qfield_basemap_upload_")
+        try:
+            for filename, b64_content in output_files.items():
+                (Path(upload_dir) / filename).write_bytes(base64.b64decode(b64_content))
+
+            loop = get_running_loop()
+            async with qfield_client() as client:
+                await loop.run_in_executor(
+                    None,
+                    partial(
+                        client.upload_files,
+                        project_id=project.external_project_id,
+                        upload_type=FileTransferType.PROJECT,
+                        project_path=upload_dir,
+                        filter_glob="*",
+                        throw_on_error=True,
+                        force=True,
+                    ),
+                )
+        finally:
+            shutil.rmtree(upload_dir, ignore_errors=True)
+    finally:
+        await _delete_qgis_job(db, job_id)
+        await db.commit()
+
+
 async def _insert_qgis_job(
     db: AsyncConnection,
     job_id,
     xlsform: bytes,
     features: dict,
     tasks: dict,
+    operation: str = "field",
+    project_id: Optional[str] = None,
+    basemap_url: Optional[str] = None,
 ) -> None:
     """Insert a new QGIS job with input files into the database."""
     async with db.cursor() as cur:
         await cur.execute(
             """
-            INSERT INTO qgis_jobs (job_id, xlsform, features, tasks)
-            VALUES (%(job_id)s, %(xlsform)s, %(features)s, %(tasks)s)
+            INSERT INTO qgis_jobs (
+                job_id,
+                xlsform,
+                features,
+                tasks,
+                operation,
+                project_id,
+                basemap_url
+            )
+            VALUES (
+                %(job_id)s,
+                %(xlsform)s,
+                %(features)s,
+                %(tasks)s,
+                %(operation)s,
+                %(project_id)s,
+                %(basemap_url)s
+            )
             """,
             {
                 "job_id": job_id,
                 "xlsform": xlsform,
                 "features": json.dumps(features),
                 "tasks": json.dumps(tasks),
+                "operation": operation,
+                "project_id": project_id,
+                "basemap_url": basemap_url,
             },
         )
     log.debug("Inserted QGIS job %s", job_id)
@@ -524,6 +627,7 @@ async def _call_qgis_wrapper(
     language: str,
     extent: str,
     open_in_edit_mode: bool,
+    endpoint: str = "/",
 ) -> None:
     """POST to the QGIS wrapper to trigger project generation.
 
@@ -543,7 +647,7 @@ async def _call_qgis_wrapper(
 
     async with (
         ClientSession(timeout=QGIS_REQUEST_TIMEOUT) as session,
-        session.post(f"{qgis_url}/", json=payload) as response,
+        session.post(f"{qgis_url}{endpoint}", json=payload) as response,
     ):
         body = await response.text()
         if response.status != status.HTTP_200_OK:

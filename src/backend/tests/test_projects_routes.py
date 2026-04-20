@@ -704,7 +704,12 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
     fake_update = AsyncMock(return_value=project)
     fake_commit = AsyncMock()
 
-    async def fake_create_qfield_project(_db, _project, _custom_qfield_creds=None):
+    async def fake_create_qfield_project(
+        _db,
+        _project,
+        _custom_qfield_creds=None,
+        default_language=None,
+    ):
         from app.qfield.qfield_crud import QFieldProjectResult
 
         return QFieldProjectResult(

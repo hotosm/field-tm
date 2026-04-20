@@ -22,9 +22,15 @@ from pathlib import Path
 import re
 
 from openpyxl import Workbook, load_workbook, worksheet
+import pandas as pd
 from pyxform.xls2xform import convert as xform_convert
 
-from osm_fieldwork.update_xlsform import append_field_mapping_fields, modify_form_for_qfield
+from osm_fieldwork.update_xlsform import (
+    _configure_form_settings,
+    _resolve_qfield_form_language,
+    append_field_mapping_fields,
+    modify_form_for_qfield,
+)
 from osm_fieldwork.xlsforms import buildings, healthcare
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
@@ -194,6 +200,91 @@ async def test_status_values_are_text():
     fill_calc = survey_sheet.cell(row=fill_idx + 1, column=calc_col_idx).value
     assert "'unmapped'" in fill_calc, f"Fill calculation should reference 'unmapped', got: {fill_calc}"
     assert "'invalid'" in fill_calc, f"Fill calculation should reference 'invalid', got: {fill_calc}"
+
+
+def _minimal_qfield_test_form(
+    survey_columns: list[str],
+    settings_default_language: str | None = None,
+) -> BytesIO:
+    """Build a minimal XLSForm workbook for QField language resolution tests."""
+    survey_data = {
+        "type": ["select_one_from_file features.csv", "text", "note"],
+        "name": ["feature", "name", "notes"],
+    }
+    for col in survey_columns:
+        survey_data[col] = ["Feature", "Name", "Notes"]
+
+    survey_df = pd.DataFrame(survey_data)
+    settings_df = pd.DataFrame([{"form_id": "demo-form"}])
+    if settings_default_language is not None:
+        settings_df["default_language"] = settings_default_language
+
+    xls_bytes = BytesIO()
+    with pd.ExcelWriter(xls_bytes, engine="openpyxl") as writer:
+        survey_df.to_excel(writer, sheet_name="survey", index=False)
+        settings_df.to_excel(writer, sheet_name="settings", index=False)
+    xls_bytes.seek(0)
+    return xls_bytes
+
+
+async def test_modify_form_for_qfield_prefers_explicit_language_over_settings_and_survey():
+    """Explicit user-selected language must win over settings and survey order."""
+    xlsform = _minimal_qfield_test_form(
+        survey_columns=["label::english(en)", "label::french(fr)"],
+        settings_default_language="french(fr)",
+    )
+
+    resolved_language, _ = await modify_form_for_qfield(
+        xlsform,
+        default_language="english",
+    )
+
+    assert resolved_language == "english(en)"
+
+
+async def test_modify_form_for_qfield_uses_settings_default_language_when_explicit_missing():
+    """Settings default_language should be used when no explicit language is provided."""
+    xlsform = _minimal_qfield_test_form(
+        survey_columns=["label::english(en)", "label::french(fr)"],
+        settings_default_language="french",
+    )
+
+    resolved_language, _ = await modify_form_for_qfield(xlsform)
+
+    assert resolved_language == "french(fr)"
+
+
+async def test_modify_form_for_qfield_falls_back_to_first_survey_language_when_settings_invalid():
+    """When settings language is invalid, fall back to first survey translation column."""
+    xlsform = _minimal_qfield_test_form(
+        survey_columns=["label::english(en)", "label::french(fr)"],
+        settings_default_language="klingon",
+    )
+
+    resolved_language, _ = await modify_form_for_qfield(xlsform)
+
+    assert resolved_language == "english(en)"
+
+
+def test_configure_form_settings_keeps_default_language_as_scalar_string():
+    """Settings default_language should remain a scalar string, not a tuple."""
+    custom_sheets = {
+        "survey": pd.DataFrame(
+            {
+                "type": ["text"],
+                "name": ["name"],
+                "label::english(en)": ["Name"],
+            }
+        ),
+        "settings": pd.DataFrame([{"form_id": "demo-form", "default_language": "english"}]),
+    }
+
+    xform_id = _configure_form_settings(custom_sheets, "Demo Form", None)
+
+    assert xform_id == "demo-form"
+    default_language_value = custom_sheets["settings"]["default_language"].iloc[0]
+    assert isinstance(default_language_value, str)
+    assert default_language_value == "english(en)"
 
 
 def check_survey_sheet(workbook: Workbook) -> None:

@@ -309,7 +309,7 @@ async def append_fields_to_user_xlsform(
     need_verification_fields: bool = True,
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
-    default_language: str = "english",
+    default_language: str | None = None,
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:  # noqa: PLR0913
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -328,7 +328,7 @@ async def append_fields_to_user_xlsform(
 
 async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
-    default_language: str = "english",
+    default_language: str | None = None,
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POINT,
     need_verification_fields: bool = True,

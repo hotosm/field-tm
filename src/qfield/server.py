@@ -21,6 +21,7 @@ from utils import parse_bool, parse_and_validate_extent
 # checks stay responsive, but POST handlers dispatch QGIS work to the main
 # thread via this queue and wait for the result.
 _work_queue: queue.Queue = queue.Queue()
+QGIS_DISPATCH_TIMEOUT_SECONDS = 180
 
 
 class QGISRequestHandler(BaseHTTPRequestHandler):
@@ -36,6 +37,8 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self._handle_field()
         elif self.path == "/drone":
             self._handle_drone()
+        elif self.path == "/basemap":
+            self._handle_basemap()
         else:
             self._send_error(404, f"Unknown endpoint: {self.path}")
 
@@ -143,6 +146,40 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self.log.error(f"Request handling error: {e}")
             self._send_error(500, f"Internal server error: {e}")
 
+    def _handle_basemap(self):
+        """Handle /basemap POST — attach MBTiles to existing QField project."""
+        try:
+            data = self._read_json_body()
+            if data is None:
+                return
+
+            required_params = ["job_id"]
+            missing_params = [p for p in required_params if p not in data]
+            if missing_params:
+                self._send_error(400, f"Missing required parameters: {missing_params}")
+                return
+
+            db_url = self._resolve_db_url()
+            if db_url is None:
+                return
+
+            self.log.info("Processing /basemap request for job: %s", data.get("job_id"))
+            result = self._dispatch_to_main_thread(
+                "basemap",
+                {
+                    "db_url": db_url,
+                    "job_id": data["job_id"],
+                    "log": self.log,
+                },
+            )
+
+            status_code = 200 if result["status"] == "success" else 500
+            self._send_json_response(status_code, result)
+
+        except Exception as e:
+            self.log.error(f"Request handling error: {e}")
+            self._send_error(500, f"Internal server error: {e}")
+
     def do_GET(self):
         """Handle GET requests (health check)."""
         if self.path == "/health":
@@ -203,7 +240,15 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             "done": result_event,
         }
         _work_queue.put(work_item)
-        result_event.wait()
+        completed = result_event.wait(timeout=QGIS_DISPATCH_TIMEOUT_SECONDS)
+        if not completed:
+            return {
+                "status": "error",
+                "message": (
+                    "QGIS processing timed out while waiting for main-thread dispatch "
+                    f"(>{QGIS_DISPATCH_TIMEOUT_SECONDS}s)."
+                ),
+            }
         return work_item["result"]
 
     def _send_json_response(self, status_code: int, data: Dict[str, Any]):
@@ -250,6 +295,9 @@ def _process_work_queue(log: logging.Logger) -> None:
         if endpoint == "drone":
             from drone_project import generate_drone_project
             item["result"] = generate_drone_project(**item["args"])
+        elif endpoint == "basemap":
+            from field_project import attach_basemap_to_qgis_project
+            item["result"] = attach_basemap_to_qgis_project(**item["args"])
         else:
             from field_project import generate_qgis_project
             item["result"] = generate_qgis_project(**item["args"])
@@ -292,6 +340,7 @@ def run_server(host: str = "0.0.0.0", port: int = 8080):
         log.info("Endpoints:")
         log.info("  POST /field - Generate field mapping project")
         log.info("  POST /drone - Generate drone mapping project")
+        log.info("  POST /basemap - Attach basemap to existing project")
         log.info("  GET /health - Health check")
 
         # Main-thread loop: process QGIS work items dispatched by handlers

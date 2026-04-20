@@ -1,7 +1,9 @@
 """Tests for HTMX routes."""
 
 import json
+from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -12,7 +14,11 @@ from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 from app.htmx.map_helpers import render_leaflet_map
-from app.htmx.project_create_routes import _parse_outline_payload, new_project
+from app.htmx.project_create_routes import (
+    _parse_outline_payload,
+    new_project,
+    upload_xlsform_htmx,
+)
 from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_step_routes import (
     _build_finalize_error_html,
@@ -230,8 +236,13 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert "GeoJSON uploaded successfully! Found 1 features." in response.content
-    assert "Accept Data Extract" in response.content
+    assert response.template_name.endswith("data_extract_preview.html")
+    assert response.context["status_variant"] == "success"
+    assert (
+        "GeoJSON uploaded successfully! Found 1 features."
+        in response.context["status_message"]
+    )
+    assert "Accept Data Extract" in response.context["preview_message"]
     assert captured["payload"] == uploaded_bytes
     assert captured["merge"] is False
 
@@ -398,38 +409,6 @@ async def test_project_details_shows_odk_media_upload_guidance(client, db, proje
     assert "log into ODK Central and upload them in the form settings." in response.text
 
 
-def test_project_listing_template_renders_project_location():
-    """Project cards should display the location text when available."""
-    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
-    env = Environment(
-        loader=FileSystemLoader(str(templates_dir)),
-        autoescape=select_autoescape(["html", "xml"]),
-    )
-    template = env.get_template("home.html")
-
-    html = template.render(
-        projects=[
-            {
-                "id": 7,
-                "project_name": "Road Mapping",
-                "location_str": "Nairobi, Kenya",
-                "status": None,
-                "visibility": None,
-                "field_mapping_app": None,
-                "description": "",
-                "hashtags": [],
-                "created_at": None,
-            }
-        ],
-        selected_status="",
-        search_query="",
-        selected_sort="newest",
-        create_project_href="/new",
-    )
-
-    assert "Location: Nairobi, Kenya" in html
-
-
 async def test_project_qrcode_htmx(client, project):
     """Test QR code generation via HTMX."""
     # Mock get_project_qrcode to avoid calling ODK/QField
@@ -467,13 +446,23 @@ async def test_metrics_partial(client):
     assert "Features Surveyed" in response.text
 
 
-async def test_project_listing_renders_cards_and_component_bootstrap(client, project):
-    """Project listing should render saved projects and register WA components."""
+async def test_project_listing_renders_cards_and_component_bootstrap(
+    client, db, project
+):
+    """Project listing renders saved projects, location, and WA components."""
+    await DbProject.update(
+        db,
+        project.id,
+        DbProject(location_str="Nairobi, Kenya"),
+    )
+    await db.commit()
+
     response = await client.get("/projects", headers={"HX-Request": "true"})
 
     assert response.status_code == status.HTTP_200_OK
     assert project.project_name in response.text
     assert f"/projects/{project.id}" in response.text
+    assert "Location: Nairobi, Kenya" in response.text
     assert "Project Status" in response.text
     assert "Sort By" in response.text
     assert 'id="projects-search"' in response.text
@@ -521,6 +510,7 @@ def test_landing_template_renders_locale_selector():
         "pt_br": "Português (Brasil)",
     }
     env.globals["auth_enabled"] = False
+    env.globals["current_dir"] = lambda: "ltr"
 
     template = env.get_template("landing.html")
     rendered = template.render(create_project_href="/new")
@@ -532,19 +522,6 @@ def test_landing_template_renders_locale_selector():
     assert "landing-footer-social" in rendered
     assert "Field Tasking Manager" in rendered
     assert "FIELD TASKING MANAGER" not in rendered
-
-
-def test_project_listing_template_compiles():
-    """Project listing template should compile without Jinja syntax errors."""
-    templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
-    env = Environment(
-        loader=FileSystemLoader(str(templates_dir)),
-        autoescape=select_autoescape(["html", "xml"]),
-    )
-
-    template = env.get_template("home.html")
-
-    assert template.name == "home.html"
 
 
 async def test_project_listing_filters_by_status():
@@ -671,34 +648,120 @@ async def test_static_image_rejects_unsupported_extension(client):
 
 
 def test_build_odk_finalize_success_html_includes_manager_credentials():
-    """Test ODK finalize response includes manager credentials."""
+    """ODK finalize helper should return template context with manager credentials."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
         manager_username="field-tm-manager@example.org",
         manager_password="StrongPass123!",
     )
 
-    html = _build_odk_finalize_success_html(result)
+    response_template = _build_odk_finalize_success_html(result)
 
-    assert "Manager Access (ODK Central UI)" in html
-    assert "field-tm-manager@example.org" in html
-    assert "StrongPass123!" in html
-    assert "Save these credentials now." in html
+    assert response_template.template_name.endswith("finalize_success_odk.html")
+    assert response_template.context["result"].manager_username == (
+        "field-tm-manager@example.org"
+    )
+    assert response_template.context["result"].manager_password == "StrongPass123!"
 
 
 def test_build_odk_finalize_success_html_does_not_render_qr_markup():
-    """Finalize response should not include mapper QR code markup."""
+    """ODK finalize helper should use ODK success fragment, not QField QR fragment."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
         manager_username="field-tm-manager@example.org",
         manager_password="StrongPass123!",
     )
 
-    html = _build_odk_finalize_success_html(result)
-    html_normalized = " ".join(html.split())
+    response_template = _build_odk_finalize_success_html(result)
 
-    assert "ODK Collect App User Access" not in html_normalized
-    assert "Project QR Code" not in html_normalized
+    assert response_template.template_name.endswith("finalize_success_odk.html")
+    assert not response_template.template_name.endswith("finalize_success_qfield.html")
+
+
+async def test_upload_xlsform_htmx_passes_none_default_language_when_not_explicit(
+    monkeypatch,
+):
+    """HTMX upload should pass None when language was auto-selected but not explicit."""
+    captured: dict = {}
+
+    async def fake_resolve_uploaded_xlsform_bytes(data, db):
+        return BytesIO(b"fake-xls"), None
+
+    async def fake_process_xlsform(**kwargs):
+        captured.update(kwargs)
+
+    monkeypatch.setattr(
+        "app.htmx.project_create_routes._resolve_uploaded_xlsform_bytes",
+        fake_resolve_uploaded_xlsform_bytes,
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create_routes.process_xlsform",
+        fake_process_xlsform,
+    )
+
+    response = await upload_xlsform_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": SimpleNamespace(id=42)},
+        auth_user=Mock(),
+        data=SimpleNamespace(
+            xlsform=None,
+            template_form_id="1",
+            need_verification_fields="true",
+            include_photo_upload="true",
+            mandatory_photo_upload="false",
+            use_odk_collect="false",
+            default_language_explicit="false",
+            default_language="french",
+        ),
+        project_id=42,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert captured["default_language"] is None
+
+
+async def test_upload_xlsform_htmx_passes_selected_default_language_when_explicit(
+    monkeypatch,
+):
+    """HTMX upload should forward selected language when user explicitly changed it."""
+    captured: dict = {}
+
+    async def fake_resolve_uploaded_xlsform_bytes(data, db):
+        return BytesIO(b"fake-xls"), None
+
+    async def fake_process_xlsform(**kwargs):
+        captured.update(kwargs)
+
+    monkeypatch.setattr(
+        "app.htmx.project_create_routes._resolve_uploaded_xlsform_bytes",
+        fake_resolve_uploaded_xlsform_bytes,
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create_routes.process_xlsform",
+        fake_process_xlsform,
+    )
+
+    response = await upload_xlsform_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": SimpleNamespace(id=42)},
+        auth_user=Mock(),
+        data=SimpleNamespace(
+            xlsform=None,
+            template_form_id="1",
+            need_verification_fields="true",
+            include_photo_upload="true",
+            mandatory_photo_upload="false",
+            use_odk_collect="false",
+            default_language_explicit="true",
+            default_language="french",
+        ),
+        project_id=42,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert captured["default_language"] == "french"
 
 
 def test_parse_outline_payload_accepts_feature_json_string():
@@ -754,17 +817,25 @@ def test_parse_outline_payload_rejects_invalid_json():
 
 
 def test_build_finalize_error_html_prefers_friendly_text_for_plain_errors():
-    """Plain-text errors should remain user-facing and include details toggle."""
-    html = _build_finalize_error_html("Could not connect to ODK Central.")
+    """Plain-text errors should remain user-facing and include raw details."""
+    response_template = _build_finalize_error_html("Could not connect to ODK Central.")
 
-    assert "Could not connect to ODK Central." in html
-    assert "View technical details" in html
+    assert response_template.template_name.endswith("finalize_error.html")
+    assert (
+        response_template.context["user_message"] == "Could not connect to ODK Central."
+    )
+    assert (
+        response_template.context["technical_details"]
+        == "Could not connect to ODK Central."
+    )
 
 
 def test_build_finalize_error_html_uses_generic_text_for_json_payload():
     """Structured payloads should show a generic user-facing message."""
-    html = _build_finalize_error_html('{"detail":"{"error":"invalid credentials"}"}')
+    response_template = _build_finalize_error_html(
+        '{"detail":"{"error":"invalid credentials"}"}'
+    )
 
-    assert "Project finalisation failed." in html
-    assert "View technical details" in html
-    assert "&quot;detail&quot;" in html
+    assert response_template.template_name.endswith("finalize_error.html")
+    assert "Project finalisation failed." in response_template.context["user_message"]
+    assert '"detail"' in response_template.context["technical_details"]

@@ -482,7 +482,10 @@ async def upload_xlsform_htmx(  # noqa: PLR0911, PLR0913
         data.mandatory_photo_upload, default=False
     )
     use_odk_collect_bool = _to_bool_form_value(data.use_odk_collect, default=False)
-    default_language = data.default_language or "english"
+    default_language_explicit = _to_bool_form_value(
+        data.default_language_explicit, default=False
+    )
+    default_language = data.default_language if default_language_explicit else None
 
     try:
         xlsform_bytes, error_response = await _resolve_uploaded_xlsform_bytes(data, db)

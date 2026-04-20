@@ -572,7 +572,7 @@ services:
       fieldtm-db:
         condition: service_healthy
     volumes:
-      - ./src/qfield/project_gen_svc.py:/usr/src/app/project_gen_svc.py:ro
+      - ./src/qfield:/usr/src/app/packager:ro
     environment:
       LOG_LEVEL: DEBUG
       FTM_DB_URL: "postgresql://${FTM_DB_USER:-fieldtm}:${FTM_DB_PASSWORD:-fieldtm}@fieldtm-db/${FTM_DB_NAME:-fieldtm}"

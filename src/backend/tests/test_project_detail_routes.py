@@ -18,11 +18,11 @@
 """Unit tests for HTMX project detail routes."""
 
 import json
-from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 
+from app.db.models import DbProject
 from app.htmx import project_detail_routes
 
 
@@ -77,20 +77,26 @@ async def test_project_details_allows_delete_for_project_creator(monkeypatch):
     assert response.context["can_delete_project"] is True
 
 
-def test_project_details_template_includes_location_display():
-    """Project details template should render a dedicated location line."""
-    template_path = (
-        Path(__file__).resolve().parents[1]
-        / "app"
-        / "templates"
-        / "project_details.html"
+async def test_project_details_renders_location_and_manager_metadata(
+    client, db, project
+):
+    """Project details route renders location without a legacy label."""
+    await DbProject.update(
+        db,
+        project.id,
+        DbProject(location_str="Nairobi, Kenya"),
     )
-    content = template_path.read_text()
-    assert "📍 {{ project.location_str }}" in content
-    assert '<h4 class="ftm-detail-label">Manager</h4>' in content
-    assert "{{ project.manager_username }}" in content
-    assert '<h4 class="ftm-detail-label">Location</h4>' not in content
-    assert 'hx-delete="/projects/{{ project.id }}"' in content
+    await db.commit()
+
+    response = await client.get(
+        f"/projects/{project.id}",
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == 200
+    assert "📍 Nairobi, Kenya" in response.text
+    assert "Location</h4>" not in response.text
+    assert f'hx-delete="/projects/{project.id}"' in response.text
 
 
 def test_can_delete_project_allows_creator():

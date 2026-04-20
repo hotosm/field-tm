@@ -1,4 +1,4 @@
-"""QGZ metadata fixes (ICC, canvas, layer tree)."""
+"""QGIS project metadata fixes (ICC, canvas, layer tree)."""
 
 import logging
 import re
@@ -161,41 +161,13 @@ def _inject_map_canvas(
     return qgs_data, False
 
 
-def sanitize_generated_qgz_metadata(
-    project_file: str,
+def _apply_qgs_metadata_fixes(
+    qgs_data: bytes,
+    bundled: set[str],
     log: logging.Logger,
     extent_bbox: Optional[list] = None,
-) -> None:
-    """Fix generated .qgz projects for QFieldCloud compatibility.
-
-    Applies two corrections that xlsform2qgis projects consistently need:
-
-    1. Removes dangling iccProfileId attachment refs - QGIS sometimes writes
-       iccProfileId="attachment:///qt_temp-XXXX" into ProjectStyleSettings but
-       never bundles the temp file.  QFieldCloud rejects such refs even though
-       QGIS/QField tolerate them.
-
-    2. Injects <mapcanvas name="theMapCanvas"> if absent - QFieldCloud's
-       process_projectfile worker looks for this element to extract the project
-       extent and background colour.  xlsform2qgis runs headless (no
-       QgsMapCanvas), so the element is never written.  extent_bbox must be
-       supplied ([xmin, ymin, xmax, ymax] in the project CRS) for this fix to
-       apply; if omitted the missing canvas is only logged as a warning.
-    """
-    project_path = Path(project_file)
-    if project_path.suffix.lower() != ".qgz":
-        return
-
-    with zipfile.ZipFile(project_path, "r") as archive:
-        entry_names = archive.namelist()
-        bundled = set(entry_names)
-        qgs_entries = [name for name in entry_names if name.lower().endswith(".qgs")]
-        if not qgs_entries:
-            log.warning("No .qgs entry found inside %s", project_path)
-            return
-        qgs_entry = qgs_entries[0]
-        qgs_data = archive.read(qgs_entry)
-
+) -> tuple[bytes, bool]:
+    """Apply all in-memory metadata fixes to a qgs payload."""
     qgs_data, icc_changed = _fix_dangling_icc_refs(qgs_data, bundled, log)
     qgs_data, tree_fixed = _fix_task_layer_tree(qgs_data, log)
 
@@ -209,7 +181,25 @@ def sanitize_generated_qgz_metadata(
                 "extent_bbox was provided; QFieldCloud may fail to parse metadata"
             )
 
-    if not (icc_changed or tree_fixed or canvas_injected):
+    return qgs_data, icc_changed or tree_fixed or canvas_injected
+
+
+def _sanitize_qgz_project(
+    project_path: Path, log: logging.Logger, extent_bbox: Optional[list] = None
+) -> None:
+    """Patch metadata inside a qgz archive when fixes are needed."""
+    with zipfile.ZipFile(project_path, "r") as archive:
+        entry_names = archive.namelist()
+        bundled = set(entry_names)
+        qgs_entries = [name for name in entry_names if name.lower().endswith(".qgs")]
+        if not qgs_entries:
+            log.warning("No .qgs entry found inside %s", project_path)
+            return
+        qgs_entry = qgs_entries[0]
+        qgs_data = archive.read(qgs_entry)
+
+    qgs_data, changed = _apply_qgs_metadata_fixes(qgs_data, bundled, log, extent_bbox)
+    if not changed:
         return
 
     temp_archive = project_path.with_suffix(project_path.suffix + ".tmp")
@@ -224,3 +214,58 @@ def sanitize_generated_qgz_metadata(
 
     temp_archive.replace(project_path)
     log.info("Patched project metadata in %s", project_path)
+
+
+def _sanitize_qgs_project(
+    project_path: Path, log: logging.Logger, extent_bbox: Optional[list] = None
+) -> None:
+    """Patch metadata in a plain qgs project when fixes are needed."""
+    qgs_data = project_path.read_bytes()
+    qgs_data, changed = _apply_qgs_metadata_fixes(qgs_data, set(), log, extent_bbox)
+    if not changed:
+        return
+
+    project_path.write_bytes(qgs_data)
+    log.info("Patched project metadata in %s", project_path)
+
+
+def sanitize_generated_qgis_metadata(
+    project_file: str,
+    log: logging.Logger,
+    extent_bbox: Optional[list] = None,
+) -> None:
+    """Fix generated QGIS projects for QFieldCloud compatibility.
+
+    Applies compatibility corrections that generated projects can need:
+
+    1. Removes dangling iccProfileId attachment refs - QGIS sometimes writes
+       iccProfileId="attachment:///qt_temp-XXXX" into ProjectStyleSettings but
+       never bundles the temp file. QFieldCloud rejects such refs even though
+       QGIS/QField tolerate them.
+
+    2. Ensures the tasks layer is represented in <layer-tree-group> when a
+       ``<layername>tasks</layername>`` maplayer exists.
+
+    3. Injects <mapcanvas name="theMapCanvas"> if absent - QFieldCloud's
+       process_projectfile worker looks for this element to extract the project
+       extent and background colour.
+
+       * For ``.qgz`` projects, this usually needs ``extent_bbox`` to synthesize
+         a canvas extent when absent.
+       * For ``.qgs`` projects, QGIS typically writes mapcanvas already, but if
+         missing and ``extent_bbox`` is provided this helper can still inject it.
+    """
+    project_path = Path(project_file)
+    suffix = project_path.suffix.lower()
+
+    if suffix == ".qgz":
+        _sanitize_qgz_project(project_path, log, extent_bbox)
+        return
+
+    if suffix == ".qgs":
+        _sanitize_qgs_project(project_path, log, extent_bbox)
+        return
+
+    log.debug(
+        "Skipping metadata sanitize for unsupported project type: %s", project_path
+    )

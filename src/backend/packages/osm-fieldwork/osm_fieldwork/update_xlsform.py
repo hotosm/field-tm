@@ -60,6 +60,108 @@ pandas_monkeypatch()
 FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
+DEFAULT_LANGUAGE_NAME = "english"
+DEFAULT_LANGUAGE_TOKEN = (
+    f"{DEFAULT_LANGUAGE_NAME}({INCLUDED_LANGUAGES[DEFAULT_LANGUAGE_NAME]})"
+)
+
+
+def _normalize_language_token(value: object) -> Optional[str]:
+    """Normalize language values to the canonical ``name(code)`` format."""
+    if isinstance(value, (list, tuple)):
+        value = value[0] if value else None
+
+    if not isinstance(value, str):
+        return None
+
+    candidate = value.strip().lower()
+    if not candidate:
+        return None
+
+    if "::" in candidate:
+        candidate = candidate.split("::", maxsplit=1)[1].strip()
+
+    if "(" in candidate and ")" in candidate:
+        lang_name = candidate.split("(", maxsplit=1)[0].strip()
+        lang_code = candidate.split("(", maxsplit=1)[1].split(")", maxsplit=1)[0].strip()
+
+        if lang_name in INCLUDED_LANGUAGES:
+            return f"{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
+
+        normalized_by_code = next(
+            (name for name, code in INCLUDED_LANGUAGES.items() if code == lang_code),
+            None,
+        )
+        if normalized_by_code:
+            return f"{normalized_by_code}({lang_code})"
+        return None
+
+    if candidate in INCLUDED_LANGUAGES:
+        return f"{candidate}({INCLUDED_LANGUAGES[candidate]})"
+
+    normalized_by_code = next(
+        (name for name, code in INCLUDED_LANGUAGES.items() if code == candidate),
+        None,
+    )
+    if normalized_by_code:
+        return f"{normalized_by_code}({candidate})"
+
+    return None
+
+
+def _extract_language_from_survey_column(column_name: str) -> Optional[str]:
+    """Extract normalized language token from a survey translation column."""
+    match = re.match(
+        r"^(?:label|hint|required_message)::\s*([^(]+)(?:\(([^)]+)\))?$",
+        str(column_name).strip().lower(),
+    )
+    if not match:
+        return None
+
+    lang_name = match.group(1).strip()
+    lang_code = (match.group(2) or "").strip()
+
+    if lang_name in INCLUDED_LANGUAGES:
+        return f"{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
+
+    normalized_by_code = next(
+        (name for name, code in INCLUDED_LANGUAGES.items() if code == (lang_code or lang_name)),
+        None,
+    )
+    if normalized_by_code:
+        return f"{normalized_by_code}({INCLUDED_LANGUAGES[normalized_by_code]})"
+
+    return None
+
+
+def _resolve_qfield_form_language(
+    custom_sheets: dict,
+    explicit_default_language: str | None = None,
+) -> Optional[str]:
+    """Resolve QField form language with explicit > settings > survey precedence."""
+    explicit_language = _normalize_language_token(explicit_default_language)
+    if explicit_language:
+        return explicit_language
+
+    settings_sheet = custom_sheets.get("settings")
+    if settings_sheet is not None and not settings_sheet.empty and "default_language" in settings_sheet:
+        settings_value = settings_sheet["default_language"].iloc[0]
+        settings_language = _normalize_language_token(settings_value)
+        if settings_language:
+            return settings_language
+        if settings_value not in (None, ""):
+            log.warning("Ignoring unsupported settings.default_language value: %s", settings_value)
+
+    survey_sheet = custom_sheets.get("survey")
+    if survey_sheet is None:
+        return None
+
+    for col_name in survey_sheet.columns.tolist():
+        language = _extract_language_from_survey_column(col_name)
+        if language:
+            return language
+
+    return None
 
 def _standardized_language_column(
     col: str,
@@ -299,7 +401,7 @@ async def _process_all_form_tabs(
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     label_cols: list[str] = [],
-    default_language: str = "english",
+    default_language: str | None = None,
 ) -> tuple[str, pd.DataFrame]:
     if "label" in label_cols:
         add_label = False
@@ -393,7 +495,7 @@ async def append_field_mapping_fields(
     need_verification_fields: bool = True,
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
-    default_language: str = "english",
+    default_language: str | None = None,
     use_odk_collect: bool = False,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
@@ -424,7 +526,13 @@ async def append_field_mapping_fields(
         log.error(msg)
         raise ValueError(msg)
     
-    custom_sheets, label_cols = standardize_xlsform_sheets(custom_sheets, default_language)  # Also get the label columns
+    resolved_default_language = _normalize_language_token(default_language) or DEFAULT_LANGUAGE_TOKEN
+    resolved_default_language_name = resolved_default_language.split("(", maxsplit=1)[0]
+
+    custom_sheets, label_cols = standardize_xlsform_sheets(
+        custom_sheets,
+        resolved_default_language_name,
+    )  # Also get the label columns
     xformid, updated_form = await _process_all_form_tabs(
         custom_sheets=custom_sheets,
         form_name=form_name,
@@ -435,7 +543,7 @@ async def append_field_mapping_fields(
         mandatory_photo_upload=mandatory_photo_upload,
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,
-        default_language=default_language
+        default_language=resolved_default_language,
     )
     return (xformid, await write_xlsform(updated_form))
 
@@ -443,6 +551,7 @@ async def append_field_mapping_fields(
 async def modify_form_for_qfield(
     custom_form: BytesIO,
     geom_layer_type: DbGeomType = DbGeomType.POINT,
+    default_language: str | None = None,
 ) -> tuple[Optional[str], BytesIO]:
     """Append mandatory fields to the XLSForm for use in QField.
 
@@ -465,18 +574,11 @@ async def modify_form_for_qfield(
         log.error(msg)
         raise ValueError(msg)
 
-    # Get first available language in format 'english(en)'
-    form_languages = []
-    all_columns = custom_sheets["survey"].columns.tolist()
-    for col_name in all_columns:
-        if "::" in col_name:
-            form_languages.append(col_name)
-    form_language = form_languages[0].split("::")[1] if form_languages else None
-    if (total_languages := len(form_languages)) > 1:
-        log.warning(
-            f"Found {total_languages} form translations, but only the first will "
-            f"be used {form_language}"
-        )
+    # Resolve language with precedence: explicit > settings.default_language > survey columns
+    form_language = _resolve_qfield_form_language(
+        custom_sheets,
+        explicit_default_language=default_language,
+    )
 
     # 1. Replace the "select_one_from_file features.csv"
     #    row with a geometry field
@@ -624,7 +726,11 @@ def _validate_required_sheet(
         raise ValueError(msg)
 
 
-def _configure_form_settings(custom_sheets: dict, form_name: str, default_language: str) -> str:
+def _configure_form_settings(
+    custom_sheets: dict,
+    form_name: str,
+    default_language: str | None,
+) -> str:
     """Configure form settings and extract/set form ID.
     
     Args:
@@ -635,6 +741,9 @@ def _configure_form_settings(custom_sheets: dict, form_name: str, default_langua
         str: The form ID (xform_id)
     """
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    normalized_default_language = (
+        _normalize_language_token(default_language) or DEFAULT_LANGUAGE_TOKEN
+    )
     # Check if settings sheet exists and create if needed
     if "settings" not in custom_sheets or custom_sheets["settings"].empty:
         xform_id = str(uuid4())
@@ -643,7 +752,7 @@ def _configure_form_settings(custom_sheets: dict, form_name: str, default_langua
             "version": current_datetime,
             "form_title": form_name,
             "allow_choice_duplicates": "yes",
-            "default_language": f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
+            "default_language": normalized_default_language,
         }])
         
         log.debug(f"Created default settings with form_id: {xform_id}")
@@ -664,14 +773,20 @@ def _configure_form_settings(custom_sheets: dict, form_name: str, default_langua
     settings["form_title"] = form_name
     
     if "default_language" not in settings:
-        settings["default_language"] = f"{default_language}({INCLUDED_LANGUAGES.get(default_language, 'en')})",
+        settings["default_language"] = normalized_default_language
     else:
         default_language_value = settings["default_language"].iloc[0]
+        normalized_settings_language = _normalize_language_token(default_language_value)
 
-        if "(" not in default_language_value:
-            code = INCLUDED_LANGUAGES.get(default_language_value)
-            if code:
-                settings["default_language"] = f"{default_language_value}({code})"
+        if normalized_settings_language:
+            settings["default_language"] = normalized_settings_language
+        elif default_language_value in (None, ""):
+            settings["default_language"] = normalized_default_language
+        else:
+            log.warning(
+                "Ignoring unsupported settings.default_language value: %s",
+                default_language_value,
+            )
     
     return xform_id
 

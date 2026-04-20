@@ -443,7 +443,7 @@ async def process_xlsform(
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
-    default_language: str = "english",
+    default_language: str | None = None,
 ) -> None:  # noqa: PLR0913
     """Validate, process, and store an XLSForm for a project.
 
@@ -1265,6 +1265,7 @@ async def finalize_qfield_project(
     db: AsyncConnection,
     project_id: int,
     custom_qfield_creds=None,
+    default_language: str | None = None,
 ) -> QFieldFinalizeResult:
     """Create project in QField with all data.
 
@@ -1272,6 +1273,7 @@ async def finalize_qfield_project(
         db: Database connection.
         project_id: The project ID.
         custom_qfield_creds: Optional custom QField credentials.
+        default_language: Optional form language override for project generation.
 
     Returns:
         QFieldFinalizeResult with URL and manager credentials.
@@ -1293,7 +1295,12 @@ async def finalize_qfield_project(
         )
 
     log.info(f"Creating QField project for Field-TM project {project_id}")
-    result = await create_qfield_project(db, project, custom_qfield_creds)
+    result = await create_qfield_project(
+        db,
+        project,
+        custom_qfield_creds,
+        default_language=default_language,
+    )
 
     # Update project status to PUBLISHED
     await DbProject.update(

@@ -159,9 +159,10 @@ def get_translations(
             with mo_path.open("rb") as mo_file:
                 _translations_cache[locale] = gettext.GNUTranslations(mo_file)
         except FileNotFoundError:
-            log.debug(
-                "No .mo file found for locale '%s', using NullTranslations", locale
-            )
+            if locale != DEFAULT_LOCALE:
+                log.debug(
+                    "No .mo file found for locale '%s', using NullTranslations", locale
+                )
             _translations_cache[locale] = gettext.NullTranslations()
     return _translations_cache[locale]
 

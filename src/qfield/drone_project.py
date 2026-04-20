@@ -12,6 +12,7 @@ from urllib.request import urlopen
 from urllib.error import URLError
 
 from basemaps import create_osm_basemap
+from sanitize import sanitize_generated_qgis_metadata
 from styling import configure_task_layer_style
 
 
@@ -72,6 +73,7 @@ def generate_drone_project(
 
         qgs_path = tmp / f"{project_name}.qgs"
         project.write(str(qgs_path))
+        sanitize_generated_qgis_metadata(str(qgs_path), log, extent_bbox=extent_bbox)
         log.info("QGIS project written: %s", qgs_path)
 
         zip_bytes = _bundle_zip(

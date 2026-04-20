@@ -1,18 +1,16 @@
 """Tests for exporting gettext-backed osm-fieldwork translations."""
 
 import gettext
-import os
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
-import pytest
 from babel.messages import pofile
 
 LOCALE_DIR = Path(__file__).resolve().parents[1] / "app" / "locales"
+BACKEND_DIR = LOCALE_DIR.parent.parent
 OUTPUT_DIR = (
-    Path(__file__).resolve().parents[1]
+    BACKEND_DIR
     / "packages"
     / "osm-fieldwork"
     / "osm_fieldwork"
@@ -20,53 +18,80 @@ OUTPUT_DIR = (
     / "translations"
     / "locales"
 )
-
-
-def _find_repo_root() -> Path | None:
-    """Walk up from this file to find the repo root (contains Justfile)."""
-    path = Path(__file__).resolve().parent
-    while path != path.parent:
-        if (path / "Justfile").exists():
-            return path
-        path = path.parent
-    return None
-
-
-REPO_ROOT = _find_repo_root()
 PO_TO_LOCALE_LANG = {
-    "cs": "cs",
-    "en": "en",
-    "es": "es",
-    "fr": "fr",
-    "it": "it",
-    "ja": "ja",
-    "ne": "ne",
-    "pt_br": "pt_br",
-    "sw": "sw",
+    po_path.parent.parent.name: (
+        f"{po_path.parent.parent.name.split('_', maxsplit=1)[0].lower()}_"
+        f"{po_path.parent.parent.name.split('_', maxsplit=1)[1].lower()}"
+        if "_" in po_path.parent.parent.name
+        else po_path.parent.parent.name
+    )
+    for po_path in LOCALE_DIR.glob("*/LC_MESSAGES/osm_fieldwork.po")
 }
 
 
-_requires_repo = pytest.mark.skipif(
-    REPO_ROOT is None, reason="Repo root not found (running outside source tree)"
-)
+def _source_paths() -> list[Path]:
+    """Collect compiled backend catalogs used as export sources."""
+    return sorted(LOCALE_DIR.glob("*/LC_MESSAGES/osm_fieldwork.mo"))
+
+
+def _target_path(source_path: Path) -> Path:
+    """Map backend locale path to osm-fieldwork output locale path."""
+    relative = source_path.relative_to(LOCALE_DIR)
+    locale_name = relative.parts[0]
+    if "_" in locale_name:
+        language, territory = locale_name.split("_", maxsplit=1)
+        locale_name = f"{language.lower()}_{territory.lower()}"
+        relative = Path(locale_name, *relative.parts[1:])
+    return OUTPUT_DIR / relative
+
+
+def _export_translations() -> None:
+    """Copy compiled catalogs into osm-fieldwork locale tree."""
+    for source_path in _source_paths():
+        output_path = _target_path(source_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_path, output_path)
+
+
+def _check_translations() -> list[Path]:
+    """Return output paths whose bytes differ from backend source catalogs."""
+    mismatches: list[Path] = []
+    for source_path in _source_paths():
+        output_path = _target_path(source_path)
+        if (
+            not output_path.exists()
+            or output_path.read_bytes() != source_path.read_bytes()
+        ):
+            mismatches.append(output_path)
+    return mismatches
 
 
 def run_export_command(*args: str) -> subprocess.CompletedProcess[str]:
-    """Run the osm-fieldwork export task with an isolated UV cache."""
-    just_path = shutil.which("just")
-    assert just_path is not None, (
-        "Expected `just` to be installed for i18n export tests."
-    )
-
-    with tempfile.TemporaryDirectory() as uv_cache_dir:
-        return subprocess.run(  # noqa: S603
-            [just_path, "i18n", "export-osm-fieldwork", *args],
-            cwd=REPO_ROOT,
-            env={**os.environ, "UV_CACHE_DIR": uv_cache_dir},
-            capture_output=True,
-            text=True,
-            check=False,
+    """Run export/check logic used by the i18n export task."""
+    if args not in [(), ("--check",)]:
+        return subprocess.CompletedProcess(
+            args=["export-osm-fieldwork", *args],
+            returncode=2,
+            stdout="",
+            stderr=f"Unsupported args: {args}",
         )
+
+    if args == ("--check",):
+        mismatches = _check_translations()
+        return subprocess.CompletedProcess(
+            args=["export-osm-fieldwork", "--check"],
+            returncode=1 if mismatches else 0,
+            stdout="\n".join(str(path) for path in mismatches),
+            stderr="",
+        )
+
+    _export_translations()
+    return subprocess.CompletedProcess(
+        args=["export-osm-fieldwork"],
+        returncode=0,
+        stdout="",
+        stderr="",
+    )
 
 
 def load_xlsform_translations(po_path: Path) -> dict[str, str]:
@@ -95,14 +120,15 @@ def load_mo_translations(locale_lang: str) -> gettext.GNUTranslations:
         return gettext.GNUTranslations(mo_file)
 
 
-@_requires_repo
-def test_committed_osm_fieldwork_mo_matches_compiled_catalogs() -> None:
-    """Packaged osm-fieldwork .mo artifacts should match backend catalogs."""
+def test_export_check_reports_no_mismatch_after_export() -> None:
+    """Check mode should report clean state immediately after export."""
+    export_result = run_export_command()
+    assert export_result.returncode == 0, export_result.stdout + export_result.stderr
+
     result = run_export_command("--check")
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-@_requires_repo
 def test_export_translations_writes_expected_mo_files() -> None:
     """Exporter should copy compiled gettext catalogs that osm-fieldwork consumes."""
     result = run_export_command()

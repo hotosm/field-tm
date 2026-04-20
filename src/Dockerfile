@@ -198,7 +198,7 @@ RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
 COPY --chown=appuser:appuser backend/pyproject.toml /opt/pyproject.toml
 COPY --chown=appuser:appuser backend/tests/ /opt/tests/
 # Needed by tests/test_qfield_project_gen_svc.py dynamic module loading
-COPY --chown=appuser:appuser qfield/project_gen_svc.py /opt/src/qfield/project_gen_svc.py
+COPY --chown=appuser:appuser qfield/ /opt/src/qfield/
 # We move the package tests for easier pytest discovery
 COPY --chown=appuser:appuser backend/packages/osm-fieldwork/tests/ /opt/package_tests/test_osm_fieldwork/
 COPY --chown=appuser:appuser backend/packages/area-splitter/tests/ /opt/package_tests/test_area_splitter/

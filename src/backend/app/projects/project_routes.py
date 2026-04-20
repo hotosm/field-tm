@@ -212,6 +212,7 @@ async def _finalize_project(
         db=db,
         project_id=project_id,
         custom_qfield_creds=(data if has_custom_qfield else None),
+        default_language=data.default_language,
     )
     return (
         qfield_result.qfield_url,

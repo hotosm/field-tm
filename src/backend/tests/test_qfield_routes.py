@@ -17,12 +17,17 @@
 #
 """Tests for qfield routes."""
 
+import base64
+from contextlib import asynccontextmanager
+from io import BytesIO
+from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
 
 from app.auth.api_key import hash_api_key
 from app.db.models import DbApiKey
+from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
     _build_qfc_service_account_email,
     _create_qfc_user,
@@ -98,29 +103,25 @@ async def test_qfield_add_collaborator_requires_api_key(client):
     assert response.status_code == 401
 
 
-async def test_qfield_add_collaborator_with_real_api_key_hits_qfield_flow(
-    client, admin_api_key
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"username": "new-user", "role": "editor"},
+        {"username": "new-user"},
+    ],
+)
+async def test_qfield_add_collaborator_with_real_api_key_rejects_only_auth_failures(
+    client, admin_api_key, payload
 ):
-    """Route should authenticate via DB API key and execute collaborator flow."""
+    """Valid API keys should pass auth across collaborator payload variants."""
     response = await client.post(
         "/api/v1/qfield/projects/nonexistent/collaborators",
         headers={"x-api-key": admin_api_key},
-        json={"username": "new-user", "role": "editor"},
+        json=payload,
     )
 
     # We only assert the auth boundary here; downstream QFieldCloud may return
     # project-not-found (404) or service/login failures (500) depending stack state.
-    assert response.status_code != 401
-
-
-async def test_qfield_add_collaborator_payload_defaults_role(client, admin_api_key):
-    """Role should default when omitted, still exercising the real route path."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        headers={"x-api-key": admin_api_key},
-        json={"username": "new-user"},
-    )
-
     assert response.status_code != 401
 
 
@@ -311,6 +312,163 @@ def test_org_owned_project_detection_only_triggers_for_different_owner():
     """Only org-owned projects need organization membership before sharing."""
     assert _is_org_owned_project("HOTOSM", "svcftm") is True
     assert _is_org_owned_project("svcftm", "svcftm") is False
+
+
+@pytest.mark.asyncio
+async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
+    monkeypatch,
+):
+    """Basemap attach should enqueue qgis job using basemap_url transport."""
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    inserted_calls = []
+    deleted_calls = []
+
+    async def fake_insert_qgis_job(
+        db,
+        job_id,
+        xlsform,
+        features,
+        tasks,
+        operation="field",
+        project_id=None,
+        basemap_url=None,
+    ):
+        inserted_calls.append(
+            {
+                "db": db,
+                "job_id": job_id,
+                "xlsform": xlsform,
+                "features": features,
+                "tasks": tasks,
+                "operation": operation,
+                "project_id": project_id,
+                "basemap_url": basemap_url,
+            }
+        )
+
+    async def fake_call_qgis_wrapper(**kwargs):
+        assert kwargs["endpoint"] == "/basemap"
+
+    async def fake_read_qgis_job_outputs(db, job_id):
+        return {
+            "project.qgz": base64.b64encode(b"qgz-bytes").decode("ascii"),
+        }
+
+    async def fake_delete_qgis_job(db, job_id):
+        deleted_calls.append(job_id)
+
+    @asynccontextmanager
+    async def fake_qfield_client():
+        class FakeClient:
+            def upload_files(self, **kwargs):
+                return None
+
+        yield FakeClient()
+
+    monkeypatch.setattr(qfield_crud, "_insert_qgis_job", fake_insert_qgis_job)
+    monkeypatch.setattr(qfield_crud, "_call_qgis_wrapper", fake_call_qgis_wrapper)
+    monkeypatch.setattr(
+        qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
+    )
+    monkeypatch.setattr(qfield_crud, "_delete_qgis_job", fake_delete_qgis_job)
+    monkeypatch.setattr(qfield_crud, "qfield_client", fake_qfield_client)
+
+    project = SimpleNamespace(id=7, external_project_id="qfc-123", project_name="demo")
+
+    await qfield_crud.attach_basemap_to_qfield_project(
+        DummyDb(),
+        project,
+        "https://tiles.example.com/basemap.mbtiles",
+    )
+
+    assert len(inserted_calls) == 1
+    inserted = inserted_calls[0]
+    assert inserted["operation"] == "basemap"
+    assert inserted["project_id"] == "qfc-123"
+    assert inserted["basemap_url"] == "https://tiles.example.com/basemap.mbtiles"
+    assert deleted_calls
+
+
+@pytest.mark.asyncio
+async def test_create_qfield_project_passes_resolved_language_to_qgis_wrapper(
+    monkeypatch,
+):
+    """create_qfield_project should pass resolved form language to QGIS wrapper."""
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    captured: dict = {}
+
+    async def fake_modify_form_for_qfield(*args, **kwargs):
+        return "french(fr)", BytesIO(b"updated-xlsform")
+
+    async def fake_db_update(*args, **kwargs):
+        return None
+
+    async def fake_insert_qgis_job(*args, **kwargs):
+        return None
+
+    async def fake_call_qgis_wrapper(**kwargs):
+        captured["language"] = kwargs["language"]
+
+    async def fake_read_qgis_job_outputs(*args, **kwargs):
+        return {
+            "project.qgz": base64.b64encode(b"qgz-bytes").decode("ascii"),
+        }
+
+    async def fake_delete_qgis_job(*args, **kwargs):
+        return None
+
+    async def fake_upload_to_qfieldcloud(**kwargs):
+        return qfield_crud.QFieldProjectResult(
+            qfield_url="https://app.qfield.cloud/project/demo",
+            manager_username=None,
+            manager_password=None,
+            mapper_username=None,
+            mapper_password=None,
+        )
+
+    monkeypatch.setattr(
+        qfield_crud, "modify_form_for_qfield", fake_modify_form_for_qfield
+    )
+    monkeypatch.setattr(qfield_crud.DbProject, "update", fake_db_update)
+    monkeypatch.setattr(qfield_crud, "_insert_qgis_job", fake_insert_qgis_job)
+    monkeypatch.setattr(qfield_crud, "_call_qgis_wrapper", fake_call_qgis_wrapper)
+    monkeypatch.setattr(
+        qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
+    )
+    monkeypatch.setattr(qfield_crud, "_delete_qgis_job", fake_delete_qgis_job)
+    monkeypatch.setattr(
+        qfield_crud, "_upload_to_qfieldcloud", fake_upload_to_qfieldcloud
+    )
+
+    project = SimpleNamespace(
+        id=11,
+        project_name="demo",
+        outline={
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [85.3, 27.7]},
+            "properties": {},
+        },
+        xlsform_content=b"original-xlsform",
+        data_extract_geojson={"type": "FeatureCollection", "features": []},
+        task_areas_geojson={},
+        external_project_id=None,
+    )
+
+    await qfield_crud.create_qfield_project(
+        DummyDb(),
+        project,
+        default_language="english",
+    )
+
+    assert captured["language"] == "french(fr)"
 
 
 if __name__ == "__main__":

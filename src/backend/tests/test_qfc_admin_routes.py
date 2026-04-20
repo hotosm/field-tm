@@ -52,8 +52,26 @@ async def test_qfc_admin_login_bad_credentials(client):
     assert "Login failed" in response.text
 
 
-def test_qfc_admin_login_normalises_project_url_to_instance_root():
-    """Admin login should canonicalize pasted project URLs before SDK login."""
+def test_resolve_login_qfc_url_uses_configured_url_for_local_submitted_url(monkeypatch):
+    """Local/dev submitted URLs should resolve to configured QFC instance URL."""
+    monkeypatch.setattr(
+        "app.htmx.qfc_admin_routes.settings.QFIELDCLOUD_URL",
+        "https://configured.qfield.example.com",
+    )
+
+    assert (
+        _resolve_login_qfc_url("http://localhost:8000")
+        == "https://configured.qfield.example.com/api/v1/"
+    )
+
+
+def test_resolve_login_qfc_url_keeps_non_local_submitted_url(monkeypatch):
+    """Non-local submitted URLs should be preserved even if config is set."""
+    monkeypatch.setattr(
+        "app.htmx.qfc_admin_routes.settings.QFIELDCLOUD_URL",
+        "https://configured.qfield.example.com",
+    )
+
     assert (
         _resolve_login_qfc_url("https://app.qfield.cloud/a/draperc/")
         == "https://app.qfield.cloud/api/v1/"
