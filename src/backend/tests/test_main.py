@@ -2,6 +2,7 @@
 
 import os
 
+from app import main
 from app.auth.auth_routes import auth_router
 from app.central.central_routes import central_router
 from app.config import AuthProvider, OtelSettings, Settings
@@ -84,8 +85,6 @@ def test_otel_settings_exclude_static_urls(monkeypatch):
 
 def test_create_app_skips_auth_setup_when_provider_disabled(monkeypatch):
     """Disabled auth mode must not call setup_auth()."""
-    from app import main
-
     monkeypatch.setattr(main.settings, "AUTH_PROVIDER", AuthProvider.DISABLED)
 
     def _raise_if_called():
@@ -124,7 +123,6 @@ def test_stub_project_internal_fields_are_persistable():
 
 def test_template_engine_config_handles_disabled_auth_without_hanko_urls(monkeypatch):
     """Disabled auth must not attempt to derive login URL from missing Hanko URL."""
-    from app import main
 
     class _FakeInnerEngine:
         def __init__(self):

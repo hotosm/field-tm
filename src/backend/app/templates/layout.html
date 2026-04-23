@@ -110,17 +110,17 @@
     <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/style-core.css"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.2/dist/style-core.css"
     />
     <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
     <!-- so custom elements are defined as soon as possible after the page loads. -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.2/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.2/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
@@ -168,6 +168,12 @@
       <wa-button slot="auth" variant="brand" id="login-btn">{{ _("Login") }}</wa-button>
       {% endif %}
     </hot-header>
+
+    <hot-tracking
+      style="position: &quot;fixed&quot;; bottom: &quot;0%&quot;"
+      site-id="28"
+      domain="field.hotosm.org"
+    ></hot-tracking>
 
     {% if auth_enabled %}
     <!-- Hidden session verifier: validates the Hanko session after redirect back

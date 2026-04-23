@@ -24,6 +24,7 @@ and REST API routes. They accept typed arguments and raise domain exceptions
 
 import json
 import logging
+from asyncio import TimeoutError as AsyncTimeoutError
 from asyncio import get_running_loop
 from dataclasses import dataclass
 from functools import partial
@@ -35,6 +36,8 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql, split_by_square
 from geojson_aoi import parse_aoi
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -54,6 +57,7 @@ from app.helpers.geometry_utils import (
     polygon_to_centroid,
 )
 from app.projects import project_crud, project_deps, project_schemas
+from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
@@ -561,9 +565,8 @@ def _validate_downloaded_geojson(geojson_data: dict) -> dict:
         raise ServiceError("Downloaded GeoJSON has invalid feature structure.")
     if len(features) == 0:
         raise ValidationError(
-            "No matching OSM features were found for this area and selection. "
-            "Try different extract options, upload custom GeoJSON, "
-            "or choose Collect New Data Only."
+            "No data found in OSM. Please continue with the Collect New "
+            "Data Only option."
         )
     return geojson_data
 
@@ -612,14 +615,31 @@ async def download_osm_data(
     )
 
     # Generate data extract
-    result = await project_crud.generate_data_extract(
-        project.id,
-        aoi_featcol,
-        geom_type_lower,
-        config_data,
-        centroid,
-        True,
-    )
+    try:
+        result = await project_crud.generate_data_extract(
+            project.id,
+            aoi_featcol,
+            geom_type_lower,
+            config_data,
+            centroid,
+            True,
+        )
+    except HTTPException as exc:
+        if (
+            exc.status_code == status.HTTP_400_BAD_REQUEST
+            and "Failed to generate data extract from the raw data API."
+            in str(exc.detail)
+        ):
+            raise ServiceError(
+                "OSM data extraction timed out or failed upstream. "
+                "Please reduce the AOI size or choose Collect New Data Only."
+            ) from exc
+        raise
+    except AsyncTimeoutError as exc:
+        raise ServiceError(
+            "OSM data extraction timed out. "
+            "Please reduce the AOI size or choose Collect New Data Only."
+        ) from exc
 
     # Download GeoJSON from URL
     download_url = result.data.get("download_url")
@@ -1282,8 +1302,6 @@ async def finalize_qfield_project(
         ValidationError: If prerequisites are missing.
         ServiceError: If QField project creation fails.
     """
-    from app.qfield.qfield_crud import create_qfield_project
-
     project = await DbProject.one(db, project_id)
 
     if not project.xlsform_content:

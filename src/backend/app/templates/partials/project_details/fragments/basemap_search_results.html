@@ -1,0 +1,61 @@
+{% if items %}
+<div class="ftm-step__description" style="margin-bottom: 8px">
+  {{ _("Select one imagery item to start MBTiles generation.") }}
+</div>
+<div style="display: grid; gap: 10px">
+  {% for item in items %}
+  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px">
+    <div style="display: flex; justify-content: space-between; gap: 16px; align-items: start">
+      <div>
+        <div style="font-weight: 600">{{ item.id }}</div>
+        <div style="font-size: 0.9em; color: #555">
+          {% if item.datetime %}{{ item.datetime }}{% endif %} {% if item.platform %} · {{
+          item.platform }}{% endif %} {% if item.cloud_cover is not none %} · {{ _("Cloud") }}: {{
+          item.cloud_cover }}%{% endif %} {% if item.minzoom is not none or item.maxzoom is not none
+          %} · {{ _("Zoom") }}: {% if item.minzoom is not none and item.maxzoom is not none %} {{
+          item.minzoom }}-{{ item.maxzoom }} {% elif item.minzoom is not none %} ≥{{ item.minzoom }}
+          {% else %} ≤{{ item.maxzoom }} {% endif %} {% endif %}
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+        <button
+          class="wa-button wa-button--default"
+          onclick="window.open('{{ metadata_url_template | replace('{stac_item_id}', item.id) }}', '_blank', 'noopener')"
+          type="button"
+        >
+          {{ _("View Metadata") }}
+        </button>
+        <form
+          hx-post="/projects/{{ project.id }}/basemap/generate/{{ item.id }}"
+          hx-target="#basemap-workspace"
+          hx-swap="innerHTML"
+        >
+          <input
+            type="hidden"
+            name="mbtiles_size_bytes"
+            value="{{ item.mbtiles_size_bytes or '' }}"
+          />
+          <input
+            type="hidden"
+            name="mbtiles_minzoom"
+            value="{{ item.minzoom if item.minzoom is not none else '' }}"
+          />
+          <input
+            type="hidden"
+            name="mbtiles_maxzoom"
+            value="{{ item.maxzoom if item.maxzoom is not none else '' }}"
+          />
+          <button class="wa-button wa-button--default" type="submit">
+            {{ _("Use this image") }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<wa-callout variant="warning">
+  <span>{{ _("No imagery items were found for this AOI.") }}</span>
+</wa-callout>
+{% endif %}

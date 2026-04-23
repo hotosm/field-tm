@@ -1,0 +1,60 @@
+<wa-callout variant="success">
+  <span>
+    {% if is_qfield and project.basemap_attach_status == "ready" %} {{ _("Basemap attached to QField
+    project.") }} {% else %} {{ _("Basemap is ready.") }} {% endif %}{% if basemap_size_display or
+    basemap_zoom_display %} ({% if basemap_size_display %} {{ _("Total size") }}: {{
+    basemap_size_display }} {% endif %}{% if basemap_zoom_display %}{% if basemap_size_display %} ·
+    {% endif %}{{ _("Available Zoom") }}: {{ basemap_zoom_display }}{% endif %}){% endif %}
+  </span>
+</wa-callout>
+
+<div class="ftm-step__actions" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap">
+  {% if project.basemap_url %}
+  <button
+    class="wa-button wa-button--default"
+    onclick="window.open('{{ project.basemap_url }}', '_blank', 'noopener')"
+    type="button"
+  >
+    {{ _("Download MBTiles") }}
+  </button>
+  {% endif %} {% if is_qfield and basemap_metadata_url and project.basemap_attach_status != "ready"
+  %}
+  <button
+    class="wa-button wa-button--default"
+    onclick="window.open('{{ basemap_metadata_url }}', '_blank', 'noopener')"
+    type="button"
+  >
+    {{ _("View Metadata") }}
+  </button>
+  {% endif %} {% if is_qfield and project.basemap_attach_status != "ready" %} {% if
+  project.basemap_attach_status == "in_progress" %}
+  <button
+    class="wa-button wa-button--brand"
+    hx-post="/projects/{{ project.id }}/basemap/attach"
+    hx-target="#basemap-status"
+    hx-swap="innerHTML"
+    hx-disabled-elt="this"
+    disabled="disabled"
+    onclick="this.disabled = true"
+  >
+    {{ _("Attach to QField Project") }}
+  </button>
+  {% else %}
+  <button
+    class="wa-button wa-button--brand"
+    hx-post="/projects/{{ project.id }}/basemap/attach"
+    hx-target="#basemap-status"
+    hx-swap="innerHTML"
+    hx-disabled-elt="this"
+    onclick="this.disabled = true"
+  >
+    {{ _("Attach to QField Project") }}
+  </button>
+  {% endif %} {% endif %}
+</div>
+
+{% if is_odk %}
+<p style="margin-top: 10px; font-size: 0.92em; color: #555">
+  {{ _("Use the ODK offline maps documentation to configure this MBTiles file in Collect.") }}
+</p>
+{% endif %}

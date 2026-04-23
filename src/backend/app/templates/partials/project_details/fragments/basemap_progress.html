@@ -1,0 +1,121 @@
+<div class="ftm-basemap-progress">
+  {% if progress_scope == 'attach' %} {% if project.basemap_attach_status == 'failed' %}
+  <wa-callout variant="danger">
+    <span>
+      {{ project.basemap_attach_error or _("Basemap attach failed. Use retry to start again.") }}
+    </span>
+  </wa-callout>
+
+  <div
+    class="ftm-step__actions"
+    style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap"
+  >
+    <button
+      class="wa-button wa-button--brand"
+      hx-post="/projects/{{ project.id }}/basemap/attach"
+      hx-target="#basemap-status"
+      hx-swap="innerHTML"
+    >
+      {{ _("Retry Attach") }}
+    </button>
+  </div>
+  {% else %}
+  <wa-callout variant="brand">
+    <span>
+      {{ _("Basemap attach is in progress. Use the button below to check the latest status.") }}
+    </span>
+  </wa-callout>
+
+  <div
+    class="ftm-step__actions"
+    style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap"
+  >
+    <button
+      class="wa-button wa-button--default"
+      hx-get="/projects/{{ project.id }}/basemap/attach-status"
+      hx-target="#basemap-status"
+      hx-swap="innerHTML"
+      hx-disabled-elt="this"
+      hx-on::before-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Checking...') }}'; this.querySelector('.js-basemap-spinner').style.display='inline-flex'"
+      hx-on::after-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Check Status') }}'; this.querySelector('.js-basemap-spinner').style.display='none'"
+      style="position: relative"
+    >
+      <span class="js-basemap-check-text">{{ _("Check Status") }}</span>
+      <span class="js-basemap-spinner" style="display: none; margin-inline-start: 8px">
+        <svg
+          class="ftm-spinner"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 12a9 9 0 11-6.219-8.56" />
+        </svg>
+      </span>
+    </button>
+  </div>
+  {% endif %} {% else %}
+  <wa-callout variant="brand">
+    <span>
+      {{ _("Basemap generation is in progress. Use the button below to check the latest status.") }}
+      {% if project.basemap_stac_item_id %} ({{ _("STAC item") }}: {{ project.basemap_stac_item_id
+      }}) {% endif %} {% if basemap_zoom_display %} · {{ _("Zoom") }}: {{ basemap_zoom_display }} {%
+      endif %}
+    </span>
+  </wa-callout>
+
+  <div
+    class="ftm-step__actions"
+    style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap"
+  >
+    <button
+      class="wa-button wa-button--default"
+      hx-get="/projects/{{ project.id }}/basemap/status"
+      {%
+      if
+      basemap_size_bytes
+      is
+      not
+      none
+      or
+      basemap_minzoom
+      is
+      not
+      none
+      or
+      basemap_maxzoom
+      is
+      not
+      none
+      %}
+      hx-vals='{
+          "mbtiles_size_bytes":"{{ basemap_size_bytes if basemap_size_bytes is not none else "" }}",
+          "mbtiles_minzoom":"{{ basemap_minzoom if basemap_minzoom is not none else "" }}",
+          "mbtiles_maxzoom":"{{ basemap_maxzoom if basemap_maxzoom is not none else "" }}"
+        }'
+      {%
+      endif
+      %}
+      hx-target="closest .ftm-basemap-progress"
+      hx-swap="outerHTML"
+      hx-disabled-elt="this"
+      hx-on::before-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Checking...') }}'; this.querySelector('.js-basemap-spinner').style.display='inline-flex'"
+      hx-on::after-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Check Status') }}'; this.querySelector('.js-basemap-spinner').style.display='none'"
+      style="position: relative"
+    >
+      <span class="js-basemap-check-text">{{ _("Check Status") }}</span>
+      <span class="js-basemap-spinner" style="display: none; margin-inline-start: 8px">
+        <svg
+          class="ftm-spinner"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 12a9 9 0 11-6.219-8.56" />
+        </svg>
+      </span>
+    </button>
+  </div>
+  {% endif %}
+</div>

@@ -217,23 +217,59 @@ def _add_task_layer_to_project(
     log.info("Tasks layer added to project")
 
 
-def _ensure_survey_layer_on_top(project) -> None:
-    """Move the survey layer to the top of the layer tree when present."""
-    survey_layers = project.mapLayersByName("survey")
-    if not survey_layers:
+def _layer_order_priority(layer) -> int:
+    """Return canonical ordering priority for known layer names."""
+    layer_name = (layer.name() or "").strip().lower()
+    if layer_name == "survey":
+        return 0
+    if layer_name in {"tasks", "dtm-tasks"}:
+        return 1
+    if layer_name == "basemap":
+        return 90
+    if layer_name == "openstreetmap":
+        return 100
+    return 10
+
+
+def _normalize_root_layer_order(project, log: logging.Logger) -> None:
+    """Normalize known layer positions in the root layer tree."""
+    root = project.layerTreeRoot()
+
+    ordered_layers = []
+    for index, node in enumerate(root.children()):
+        layer = getattr(node, "layer", lambda: None)()
+        if layer is None:
+            continue
+        ordered_layers.append((index, layer))
+
+    if not ordered_layers:
         return
 
-    survey_layer = survey_layers[0]
-    layer_root = project.layerTreeRoot()
-    survey_node = layer_root.findLayer(survey_layer.id())
-    if not survey_node:
-        return
+    desired_layers = [
+        layer
+        for _, layer in sorted(
+            ordered_layers,
+            key=lambda item: (_layer_order_priority(item[1]), item[0]),
+        )
+    ]
 
-    parent = survey_node.parent()
-    current_index = parent.children().index(survey_node)
-    if current_index != 0:
-        parent.insertLayer(0, survey_layer)
-        parent.removeChildNode(survey_node)
+    changed = False
+    for target_index, layer in enumerate(desired_layers):
+        node = root.findLayer(layer.id())
+        if node is None:
+            continue
+        current_children = list(root.children())
+        if node not in current_children:
+            continue
+        current_index = current_children.index(node)
+        if current_index == target_index:
+            continue
+        root.insertLayer(target_index, layer)
+        root.removeChildNode(node)
+        changed = True
+
+    if changed:
+        log.info("Normalized field project layer order in root tree")
 
 
 def configure_project_settings(qgis_project, log: logging.Logger) -> None:
@@ -248,7 +284,7 @@ def configure_project_settings(qgis_project, log: logging.Logger) -> None:
     else:
         log.warning("Tasks layer not found in project")
 
-    # Configure features layer (survey layer with purple fill, no stroke)
+    # Configure features layer (survey layer with blue stroke, no fill)
     survey_layers = qgis_project.mapLayersByName("survey")
     if survey_layers:
         configure_survey_layer_style(survey_layers, log)
@@ -301,15 +337,35 @@ def _read_basemap_job_inputs(db_url: str, job_id: str) -> tuple[str, str]:
     return str(project_id), str(basemap_url).strip()
 
 
-def _write_job_outputs(db_url: str, job_id: str, final_dir: Path, log: logging.Logger) -> int:
+def _write_job_outputs(
+    db_url: str,
+    job_id: str,
+    final_dir: Path,
+    log: logging.Logger,
+    excluded_suffixes: tuple[str, ...] = (),
+) -> int:
     """Read output files from final/ dir and write as base64 dict to DB."""
+    excluded = {suffix.lower() for suffix in excluded_suffixes}
     output_files = {}
     for file_path in final_dir.iterdir():
-        if file_path.is_file():
-            output_files[file_path.name] = base64.b64encode(
-                file_path.read_bytes()
-            ).decode("ascii")
-            log.debug("Collected output file: %s (%d bytes)", file_path.name, file_path.stat().st_size)
+        if not file_path.is_file():
+            continue
+
+        if file_path.suffix.lower() in excluded:
+            log.info(
+                "Skipping output file %s from DB transport (suffix excluded)",
+                file_path.name,
+            )
+            continue
+
+        output_files[file_path.name] = base64.b64encode(
+            file_path.read_bytes()
+        ).decode("ascii")
+        log.debug(
+            "Collected output file: %s (%d bytes)",
+            file_path.name,
+            file_path.stat().st_size,
+        )
 
     with psycopg.connect(db_url) as conn, conn.cursor() as cur:
         cur.execute(
@@ -320,6 +376,7 @@ def _write_job_outputs(db_url: str, job_id: str, final_dir: Path, log: logging.L
 
     log.info("Wrote %d output files to DB for job %s", len(output_files), job_id)
     return len(output_files)
+
 
 
 def generate_qgis_project(
@@ -364,7 +421,7 @@ def generate_qgis_project(
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
-        _ensure_survey_layer_on_top(project)
+        _normalize_root_layer_order(project, log)
 
         # Finalise the project
         project.write()
@@ -390,9 +447,9 @@ def generate_qgis_project(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-def _qfc_api_root() -> str:
-    """Resolve QFieldCloud API URL from environment."""
-    base = (os.environ.get("QFIELDCLOUD_URL") or "").strip().rstrip("/")
+def _qfc_api_root(qfield_cloud_url: Optional[str] = None) -> str:
+    """Resolve QFieldCloud API URL from payload or environment."""
+    base = (qfield_cloud_url or os.environ.get("QFIELDCLOUD_URL") or "").strip().rstrip("/")
     if not base:
         raise RuntimeError("QFIELDCLOUD_URL is required for basemap attachment")
     if base.endswith("/api/v1"):
@@ -400,18 +457,24 @@ def _qfc_api_root() -> str:
     return f"{base}/api/v1"
 
 
-def _qfc_token() -> str:
+def _qfc_token(
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
+) -> str:
     """Authenticate against QFieldCloud and return API token."""
-    user = (os.environ.get("QFIELDCLOUD_USER") or "").strip()
-    password = (os.environ.get("QFIELDCLOUD_PASSWORD") or "").strip()
+    user = (qfield_cloud_user or os.environ.get("QFIELDCLOUD_USER") or "").strip()
+    password = (
+        qfield_cloud_password or os.environ.get("QFIELDCLOUD_PASSWORD") or ""
+    ).strip()
     if not user or not password:
         raise RuntimeError(
             "QFIELDCLOUD_USER and QFIELDCLOUD_PASSWORD are required for basemap attachment"
         )
 
-    api_root = _qfc_api_root()
+    api_root = _qfc_api_root(qfield_cloud_url)
     response = requests.post(
-        f"{api_root}/auth/login",
+        f"{api_root}/auth/login/",
         data={"username": user, "password": password},
         timeout=30,
     )
@@ -438,10 +501,21 @@ def _safe_remote_project_path(remote_name: str) -> Path:
     return Path(*parts)
 
 
-def _download_qfc_project_files(project_id: str, destination: Path, log: logging.Logger) -> None:
+def _download_qfc_project_files(
+    project_id: str,
+    destination: Path,
+    log: logging.Logger,
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
+) -> None:
     """Download all project files from QFieldCloud into destination directory."""
-    api_root = _qfc_api_root()
-    token = _qfc_token()
+    api_root = _qfc_api_root(qfield_cloud_url)
+    token = _qfc_token(
+        qfield_cloud_url=qfield_cloud_url,
+        qfield_cloud_user=qfield_cloud_user,
+        qfield_cloud_password=qfield_cloud_password,
+    )
     headers = {"Authorization": f"token {token}"}
 
     files_response = requests.get(
@@ -498,7 +572,7 @@ def _attach_mbtiles_layer_to_project(
     mbtiles_path: Path,
     log: logging.Logger,
 ) -> None:
-    """Attach MBTiles raster layer at the bottom of project layer tree."""
+    """Attach MBTiles raster layer and normalize project layer ordering."""
     from qgis.core import QgsProject, QgsRasterLayer
 
     project = QgsProject.instance()
@@ -517,6 +591,7 @@ def _attach_mbtiles_layer_to_project(
     project.addMapLayer(basemap_layer, addToLegend=False)
     root = project.layerTreeRoot()
     root.addLayer(basemap_layer)
+    _normalize_root_layer_order(project, log)
 
     if not project.write(str(project_file)):
         raise RuntimeError("Failed to save QGIS project after basemap attach")
@@ -526,6 +601,9 @@ def attach_basemap_to_qgis_project(
     db_url: str,
     job_id: str,
     log: logging.Logger,
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Attach MBTiles basemap to an existing QField project and write outputs."""
     tmp_dir = tempfile.mkdtemp(prefix="qgis_basemap_job_")
@@ -536,7 +614,14 @@ def attach_basemap_to_qgis_project(
 
     try:
         project_id, basemap_url = _read_basemap_job_inputs(db_url, job_id)
-        _download_qfc_project_files(project_id, working_dir, log)
+        _download_qfc_project_files(
+            project_id,
+            working_dir,
+            log,
+            qfield_cloud_url=qfield_cloud_url,
+            qfield_cloud_user=qfield_cloud_user,
+            qfield_cloud_password=qfield_cloud_password,
+        )
 
         qgz_files = sorted(working_dir.glob("**/*.qgz"))
         if not qgz_files:
@@ -563,10 +648,19 @@ def attach_basemap_to_qgis_project(
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
 
-        num_files = _write_job_outputs(db_url, job_id, final_dir, log)
+        num_files = _write_job_outputs(
+            db_url,
+            job_id,
+            final_dir,
+            log,
+            excluded_suffixes=(".mbtiles",),
+        )
         return {
             "status": "success",
-            "message": f"Basemap attached successfully ({num_files} files).",
+            "message": (
+                "Basemap attached successfully "
+                f"({num_files} DB-transferred files; MBTiles kept for direct upload)."
+            ),
         }
     except Exception as exc:
         log.error("Basemap attach failed: %s", exc)

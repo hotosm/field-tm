@@ -28,8 +28,35 @@ from qfieldcloud_sdk.sdk import Client
 
 from app.config import settings
 from app.qfield.qfield_schemas import QFieldCloud
+from app.qfield.qfield_utils import normalise_qfc_url, resolve_backend_qfc_url
 
 log = logging.getLogger(__name__)
+
+
+def _resolve_qfield_creds(creds: Optional[QFieldCloud]) -> QFieldCloud:
+    """Resolve and normalize QField credentials for backend SDK calls."""
+    if creds:
+        normalized_url = normalise_qfc_url(str(creds.qfield_cloud_url or ""))
+        backend_url = resolve_backend_qfc_url(normalized_url)
+        if backend_url == creds.qfield_cloud_url:
+            return creds
+
+        return QFieldCloud(
+            qfield_cloud_url=backend_url,
+            qfield_cloud_user=creds.qfield_cloud_user,
+            qfield_cloud_password=creds.qfield_cloud_password,
+        )
+
+    base_url = resolve_backend_qfc_url(str(settings.QFIELDCLOUD_URL or ""))
+    return QFieldCloud(
+        qfield_cloud_url=base_url,
+        qfield_cloud_user=str(settings.QFIELDCLOUD_USER or ""),
+        qfield_cloud_password=(
+            settings.QFIELDCLOUD_PASSWORD.get_secret_value()
+            if settings.QFIELDCLOUD_PASSWORD
+            else ""
+        ),
+    )
 
 
 @asynccontextmanager
@@ -41,18 +68,10 @@ async def qfield_client(creds: Optional[QFieldCloud] = None):
 
     The yielded client has a ``username`` attribute set for downstream use.
     """
-    if creds:
-        qfc_url = creds.qfield_cloud_url
-        qfc_user = creds.qfield_cloud_user
-        qfc_password = creds.qfield_cloud_password
-    else:
-        qfc_url = settings.QFIELDCLOUD_URL
-        qfc_user = settings.QFIELDCLOUD_USER
-        qfc_password = (
-            settings.QFIELDCLOUD_PASSWORD.get_secret_value()
-            if settings.QFIELDCLOUD_PASSWORD
-            else ""
-        )
+    resolved_creds = _resolve_qfield_creds(creds)
+    qfc_url = resolved_creds.qfield_cloud_url
+    qfc_user = resolved_creds.qfield_cloud_user
+    qfc_password = resolved_creds.qfield_cloud_password
 
     if not all([qfc_url, qfc_user, qfc_password]):
         raise ValueError(

@@ -145,6 +145,7 @@
 
       // Auto-select XLSForm default language based on user's current locale
       const defaultLanguageSelect = document.getElementById('default-language-select');
+      const defaultLanguageExplicitHidden = document.getElementById('default-language-explicit-hidden');
       if (defaultLanguageSelect) {
         const localeToLanguage = {
           'en': 'english', 'es': 'spanish', 'fr': 'french',
@@ -156,6 +157,12 @@
         if (matched && defaultLanguageSelect.querySelector(`option[value="${matched}"]`)) {
           defaultLanguageSelect.value = matched;
         }
+
+        defaultLanguageSelect.addEventListener('change', function() {
+          if (defaultLanguageExplicitHidden) {
+            defaultLanguageExplicitHidden.value = 'true';
+          }
+        });
       }
 
       function setStep1Status(message, variant = 'info') {

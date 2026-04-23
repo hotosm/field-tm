@@ -28,9 +28,13 @@ from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
 from app.__version__ import __version__
+from app.auth.auth_routes import auth_router
+from app.central.central_routes import central_router
 from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
+from app.helpers.helper_routes import helper_router
+from app.htmx.htmx_routes import htmx_router
 from app.i18n import (
     LOCALE_LABELS,
     SUPPORTED_LOCALES,
@@ -50,6 +54,8 @@ from app.monitoring import (
     set_sentry_otel_tracer,
 )
 from app.projects.project_crud import read_and_insert_xlsforms
+from app.projects.project_routes import api_router
+from app.qfield.qfield_routes import qfield_router
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +142,7 @@ def _custom_validation_exception_handler(
             {
                 "type": "validation_error",
                 "loc": ["body"],
-                "msg": str(exc.detail) if exc.detail else "Validation failed",
+                "msg": str(exc.detail) if exc.detail else _("Validation failed"),
                 "input": None,
                 "ctx": {},
             }
@@ -278,7 +284,7 @@ def configure_root_router() -> Router:
             log.warning("Server failed __heartbeat__ database connection check")
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Could not connect to database",
+                detail=_("Could not connect to database"),
             )
 
     return Router(
@@ -340,13 +346,6 @@ def create_app() -> Litestar:
             dependencies=deps,
         )
     root_router = configure_root_router()
-    # Import routers after logger / settings to avoid circular imports
-    from app.auth.auth_routes import auth_router
-    from app.central.central_routes import central_router
-    from app.helpers.helper_routes import helper_router
-    from app.htmx.htmx_routes import htmx_router
-    from app.projects.project_routes import api_router
-    from app.qfield.qfield_routes import qfield_router
 
     plugins = [PydanticPlugin(), HTMXPlugin()]
 

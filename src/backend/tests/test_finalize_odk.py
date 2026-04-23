@@ -19,6 +19,7 @@ from app.projects.project_services import (
     ODKFinalizeResult,
     ServiceError,
     ValidationError,
+    _build_feature_dataset_payload,
     finalize_odk_project,
 )
 
@@ -785,8 +786,6 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
 @pytest.mark.asyncio
 async def test_build_feature_dataset_payload_allows_empty_data_extract_features():
     """Collect-new-data mode should generate an empty features dataset payload."""
-    from app.projects.project_services import _build_feature_dataset_payload
-
     project = FakeProject(
         data_extract_geojson={"type": "FeatureCollection", "features": []}
     )

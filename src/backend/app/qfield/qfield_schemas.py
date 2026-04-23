@@ -24,6 +24,7 @@ from pydantic import BaseModel
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr
+from app.qfield.qfield_utils import normalise_qfc_url
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +58,6 @@ class QFieldCloud(BaseModel):
         """
         if not value:
             return None
-        from app.qfield.qfield_crud import normalise_qfc_url
 
         return normalise_qfc_url(value)
 

@@ -44,6 +44,7 @@ from app.helpers.geometry_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
 )
+from app.i18n import _
 from app.projects import project_schemas
 
 log = logging.getLogger(__name__)
@@ -147,7 +148,7 @@ async def list_odk_projects(
         log.exception(f"Error listing ODK projects: {e}", stack_info=True)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error listing projects on ODK Central: {e}",
+            detail=_("Error listing projects on ODK Central: %(error)s") % {"error": e},
         ) from e
 
 
@@ -178,7 +179,7 @@ async def create_odk_project(
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating project on ODK Central: {e}",
+            detail=_("Error creating project on ODK Central: %(error)s") % {"error": e},
         ) from e
 
 
@@ -239,7 +240,10 @@ async def create_odk_xform(
         log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"message": f"Failed to upload form to ODK Central: {e}"},
+            detail={
+                "message": _("Failed to upload form to ODK Central: %(error)s")
+                % {"error": e}
+            },
         ) from e
 
 
@@ -252,7 +256,7 @@ async def list_submissions(
     if not form_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="form_id is required to list submissions with pyodk.",
+            detail=_("form_id is required to list submissions with pyodk."),
         )
 
     async with central_deps.pyodk_client(odk_central) as client:
@@ -295,7 +299,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         return BytesIO(xform_convert(input_data).xform.encode("utf-8"))
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
-        msg = f"XLSForm is invalid: {str(e)}"
+        msg = _("XLSForm is invalid: %(error)s") % {"error": e}
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=msg,
@@ -422,7 +426,7 @@ async def convert_geojson_to_odk_csv(
     if not parsed_geojson:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Conversion GeoJSON --> CSV failed",
+            detail=_("Conversion GeoJSON --> CSV failed"),
         )
 
     csv_buffer = StringIO()
@@ -493,7 +497,7 @@ async def convert_odk_submission_json_to_geojson(
     if not submission_json:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Project contains no submissions yet",
+            detail=_("Project contains no submissions yet"),
         )
 
     all_features = []
@@ -555,7 +559,7 @@ async def feature_geojson_to_entity_dict(
 
     geometry = feature.get("geometry", {})
     if not geometry:
-        msg = "'geometry' data field is mandatory"
+        msg = _("'geometry' data field is mandatory")
         log.debug(msg)
         raise ValueError(msg)
 
@@ -823,7 +827,7 @@ async def create_entity_list(
     if odk_id is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="ODK project_id is missing; cannot create/merge entity lists.",
+            detail=_("ODK project_id is missing; cannot create/merge entity lists."),
         )
 
     async with central_deps.get_odk_dataset(odk_creds) as odk_central:
@@ -956,7 +960,7 @@ async def get_appuser_token(
             appuser_sub = app_user.get("id")
 
             if not appuser_token or not appuser_sub:
-                msg = "Could not generate token for app user."
+                msg = _("Could not generate token for app user.")
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=msg,
@@ -988,13 +992,13 @@ async def get_appuser_token(
         log.exception(f"PyODK error while creating app user token: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while creating the app user token.",
+            detail=_("An error occurred while creating the app user token."),
         ) from e
     except Exception as e:
         log.exception(f"An error occurred: {str(e)}", stack_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while creating the app user token.",
+            detail=_("An error occurred while creating the app user token."),
         ) from e
 
 
@@ -1008,7 +1012,7 @@ def _assign_appuser_role(client, path: str, scope: str) -> None:
 
     raise HTTPException(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail=f"Could not assign {scope} role to app user.",
+        detail=_("Could not assign %(scope)s role to app user.") % {"scope": scope},
     )
 
 
@@ -1047,7 +1051,7 @@ def _get_project_manager_role_id(client) -> int:
     if not project_manager_role or "id" not in project_manager_role:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Could not find 'Project Manager' role in ODK Central.",
+            detail=_("Could not find 'Project Manager' role in ODK Central."),
         )
 
     return int(project_manager_role["id"])
@@ -1072,7 +1076,7 @@ def _create_manager_user(client, project_odk_id: int) -> tuple[object, str, str]
             if not created_user_id:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="ODK Central returned no user ID after creation.",
+                    detail=_("ODK Central returned no user ID after creation."),
                 )
             return created_user_id, candidate_email, candidate_password
 
@@ -1205,7 +1209,7 @@ async def create_project_manager_user(
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create ODK Central manager user.",
+            detail=_("Failed to create ODK Central manager user."),
         ) from e
 
 
@@ -1225,5 +1229,5 @@ async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
         log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unexpected error while testing ODK Central credentials.",
+            detail=_("Unexpected error while testing ODK Central credentials."),
         ) from e

@@ -169,6 +169,9 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
                 {
                     "db_url": db_url,
                     "job_id": data["job_id"],
+                    "qfield_cloud_url": data.get("qfield_cloud_url"),
+                    "qfield_cloud_user": data.get("qfield_cloud_user"),
+                    "qfield_cloud_password": data.get("qfield_cloud_password"),
                     "log": self.log,
                 },
             )

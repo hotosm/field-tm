@@ -34,4 +34,5 @@ class XLSFormUploadData(BaseModel):
     mandatory_photo_upload: Optional[str] = "false"
     use_odk_collect: Optional[str] = "false"
     default_language: Optional[str] = "english"
+    default_language_explicit: Optional[str] = "false"
     template_form_id: Optional[str] = None

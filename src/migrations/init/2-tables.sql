@@ -56,6 +56,14 @@ CREATE TABLE projects (
     task_areas_geojson JSONB,
     hashtags character varying [],
     custom_tms_url character varying,
+    basemap_stac_item_id character varying,
+    basemap_url character varying,
+    basemap_status character varying,
+    basemap_minzoom integer,
+    basemap_maxzoom integer,
+    basemap_attach_status character varying DEFAULT 'idle',
+    basemap_attach_error text,
+    basemap_attach_updated_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
@@ -90,7 +98,10 @@ CREATE TABLE qgis_jobs (
     xlsform BYTEA,
     features JSONB,
     tasks JSONB,
-    output_files JSONB
+    output_files JSONB,
+    operation character varying NOT NULL DEFAULT 'field',
+    project_id character varying,
+    basemap_url character varying
 );
 ALTER TABLE qgis_jobs OWNER TO current_user;
 

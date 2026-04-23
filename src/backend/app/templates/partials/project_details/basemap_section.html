@@ -1,0 +1,47 @@
+<div class="ftm-manager-section" style="margin-top: 24px">
+  <h2 class="ftm-manager-section__title">{{ _("Offline Basemap") }}</h2>
+  <p class="ftm-manager-section__subtitle">
+    {{ _("Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles basemap.") }}
+  </p>
+</div>
+
+{% set field_mapping_app_value = ( project.field_mapping_app.value if project.field_mapping_app and
+(project.field_mapping_app is not string) and project.field_mapping_app.value else
+(project.field_mapping_app if project.field_mapping_app else none) ) %} {% set
+field_mapping_app_normalized = field_mapping_app_value.upper() if field_mapping_app_value else none
+%} {% set is_qfield = field_mapping_app_normalized == 'QFIELD' %} {% set is_odk =
+field_mapping_app_normalized == 'ODK' %} {% set basemap_metadata_url = (
+'https://api.imagery.hotosm.org/browser/external/api.imagery.hotosm.org/stac/collections/openaerialmap/items/'
+~ project.basemap_stac_item_id if project.basemap_stac_item_id else none ) %}
+
+<div class="ftm-step ftm-step--pending">
+  <div class="ftm-step__actions">
+    <button
+      class="wa-button wa-button--brand"
+      hx-post="/projects/{{ project.id }}/basemap/search"
+      hx-target="#basemap-workspace"
+      hx-swap="innerHTML"
+      style="min-width: 220px"
+    >
+      {{ _("Search OAM Imagery") }}
+    </button>
+  </div>
+
+  <div id="basemap-workspace" style="margin-top: 12px">
+    {% if project.basemap_status == 'generating' or (project.basemap_status == 'failed' and
+    project.basemap_stac_item_id) %} {% include
+    "partials/project_details/fragments/basemap_progress.html" %} {% elif project.basemap_status ==
+    'ready' %} {% include "partials/project_details/fragments/basemap_ready.html" %} {% elif
+    project.basemap_status == 'failed' %}
+    <wa-callout variant="danger">
+      <span>{{ _("Basemap generation previously failed. Please search again and retry.") }}</span>
+    </wa-callout>
+    {% else %}
+    <wa-callout variant="neutral">
+      <span>{{ _("No basemap selected yet.") }}</span>
+    </wa-callout>
+    {% endif %}
+  </div>
+</div>
+
+<div id="basemap-status" class="ftm-step__status" style="margin-top: 12px"></div>

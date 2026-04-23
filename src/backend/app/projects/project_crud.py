@@ -54,7 +54,8 @@ from app.helpers.geometry_utils import (
     get_featcol_dominant_geom_type,
     javarosa_to_geojson_geom,
 )
-from app.helpers.helper_schemas import PaginationInfo
+from app.helpers.helper_schemas import PaginatedResponse, PaginationInfo
+from app.i18n import _
 from app.projects import project_deps
 
 log = logging.getLogger(__name__)
@@ -131,8 +132,10 @@ async def generate_data_extract(
                 error_dict = ast.literal_eval(error_str)
                 msg = error_dict["detail"][0]["msg"]
             except Exception:
-                msg = """Selected area is too large.
-                Please select an area smaller than 200 km²."""
+                msg = _(
+                    "Selected area is too large. "
+                    "Please select an area smaller than 200 km²."
+                )
 
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -141,7 +144,7 @@ async def generate_data_extract(
 
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to generate data extract from the raw data API.",
+            detail=_("Failed to generate data extract from the raw data API."),
         ) from e
 
 
@@ -731,8 +734,6 @@ async def get_paginated_projects(  # noqa: PLR0913
         len(projects) if projects else 0,
     )
 
-    from app.helpers.helper_schemas import PaginatedResponse
-
     return PaginatedResponse[DbProject](
         results=paginated_projects,
         pagination=pagination,
@@ -854,7 +855,7 @@ def _qfield_qrcode_data_url(project: DbProject) -> str:
     if not project.external_project_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="QField project ID not found.",
+            detail=_("QField project ID not found."),
         )
 
     qfield_url = f"qfield://cloud?project={project.external_project_id}"
@@ -887,14 +888,14 @@ async def get_project_qrcode(
     if not project.project_name:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Project name not found.",
+            detail=_("Project name not found."),
         )
 
     if project.field_mapping_app == FieldMappingApp.ODK:
         if not project.external_project_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="ODK project ID not found.",
+                detail=_("ODK project ID not found."),
             )
 
         odk_central = _project_odk_qr_credentials(project)
@@ -903,7 +904,7 @@ async def get_project_qrcode(
         if not appuser_token:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Appuser token not found.",
+                detail=_("Appuser token not found."),
             )
 
         qr_code_data_url = _odk_qrcode_data_url(
@@ -920,7 +921,7 @@ async def get_project_qrcode(
     if not qr_code_data_url:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate QR code.",
+            detail=_("Failed to generate QR code."),
         )
 
     return qr_code_data_url

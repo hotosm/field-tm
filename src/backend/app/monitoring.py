@@ -131,9 +131,7 @@ def set_otel_tracer(app: Litestar, endpoint: str):
     # from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import (
-        BatchSpanProcessor,
-    )
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
     log.info(f"Adding OpenTelemetry tracing for url: {endpoint}")
 

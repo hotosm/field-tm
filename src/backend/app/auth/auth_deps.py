@@ -27,6 +27,7 @@ from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 
 from app.config import AuthProvider, settings
+from app.i18n import _
 
 
 def _pick_attr(obj: object, *names: str) -> Any:
@@ -69,7 +70,7 @@ def get_user_sub(user: object) -> str:
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authenticated user is missing a valid identifier.",
+        detail=_("Authenticated user is missing a valid identifier."),
     )
 
 

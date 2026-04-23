@@ -38,13 +38,9 @@ from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Template
 from qfieldcloud_sdk.sdk import Client, ProjectCollaboratorRole
 
-from app.config import settings
 from app.i18n import _
-from app.qfield.qfield_crud import (
-    add_qfc_project_collaborator,
-    normalise_qfc_url,
-    strip_qfc_api_suffix,
-)
+from app.qfield.qfield_crud import add_qfc_project_collaborator
+from app.qfield.qfield_utils import resolve_backend_qfc_url, strip_qfc_api_suffix
 
 from .htmx_helpers import callout as _callout
 
@@ -73,22 +69,9 @@ def _strip_api_suffix(url: str) -> str:
     return strip_qfc_api_suffix(url)
 
 
-def _normalise_qfc_url(url: str) -> str:
-    """Ensure a QFC URL ends with /api/v1/."""
-    return normalise_qfc_url(url)
-
-
 def _resolve_login_qfc_url(submitted_url: str) -> str:
-    """Use the configured QFC URL when the submitted URL looks local."""
-    qfc_url = _normalise_qfc_url(submitted_url)
-    configured_url = str(settings.QFIELDCLOUD_URL or "").strip()
-    if not configured_url:
-        return qfc_url
-
-    if "localhost" in qfc_url or "field-tm.dev.test" in qfc_url:
-        return _normalise_qfc_url(configured_url)
-
-    return qfc_url
+    """Use shared backend URL resolution policy for login API calls."""
+    return resolve_backend_qfc_url(submitted_url)
 
 
 def _hidden_fields_html(qfc_url: str, qfc_token: str) -> str:

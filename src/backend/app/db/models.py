@@ -26,7 +26,7 @@ import logging
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from re import sub
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Self
+from typing import Any, Mapping, Optional, Self
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -34,6 +34,7 @@ from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel
 
+from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import (
     FieldMappingApp,
@@ -42,9 +43,7 @@ from app.db.enums import (
     ProjectVisibility,
     XLSFormType,
 )
-
-if TYPE_CHECKING:
-    from app.central.central_schemas import ODKCentral
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +71,8 @@ def dump_and_check_model(db_model: Any) -> dict:
     if not model_dump:
         log.error("Attempted create or update with no data.")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No data provided."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_("No data provided."),
         )
 
     return model_dump
@@ -88,8 +88,6 @@ def _add_encrypted_odk_credentials(
         and project_update.external_project_password
     ):
         return
-
-    from app.central.central_schemas import ODKCentral
 
     odk_creds = ODKCentral(
         external_project_instance_url=project_update.external_project_instance_url,
@@ -519,6 +517,14 @@ class DbProject:
     xlsform_content: Optional[bytes] = None
     hashtags: Optional[list[str]] = None
     custom_tms_url: Optional[str] = None
+    basemap_stac_item_id: Optional[str] = None
+    basemap_url: Optional[str] = None
+    basemap_status: Optional[str] = None
+    basemap_minzoom: Optional[int] = None
+    basemap_maxzoom: Optional[int] = None
+    basemap_attach_status: Optional[str] = None
+    basemap_attach_error: Optional[str] = None
+    basemap_attach_updated_at: Optional[AwareDatetime] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)
@@ -667,8 +673,6 @@ class DbProject:
             hasattr(project_in, "external_project_password")
             and project_in.external_project_password
         ):
-            from app.central.central_schemas import ODKCentral
-
             odk_creds = ODKCentral(
                 external_project_instance_url=project_in.external_project_instance_url,
                 external_project_username=project_in.external_project_username,
@@ -796,8 +800,6 @@ class DbProject:
 
         Returns None if no credentials are set.
         """
-        from app.central.central_schemas import ODKCentral
-
         has_complete_creds = all(
             [
                 self.external_project_instance_url,

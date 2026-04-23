@@ -2,6 +2,13 @@
 
 from litestar import Router
 
+from app.htmx.basemap_routes import (
+    basemap_attach_htmx,
+    basemap_attach_status_htmx,
+    basemap_generate_htmx,
+    basemap_search_htmx,
+    basemap_status_htmx,
+)
 from app.htmx.landing_routes import landing, login_page, metrics_partial
 from app.htmx.project_create_routes import (
     create_project_htmx,
@@ -40,6 +47,7 @@ from app.htmx.setup_step_routes import (
 )
 from app.htmx.static_routes import (
     serve_apple_touch_icon,
+    serve_favicon_ico,
     serve_favicon_png,
     serve_favicon_svg,
     serve_maskable_icon,
@@ -56,6 +64,7 @@ htmx_router = Router(
     route_handlers=[
         serve_favicon_png,
         serve_favicon_svg,
+        serve_favicon_ico,
         serve_apple_touch_icon,
         serve_maskable_icon,
         serve_pwa_192,
@@ -93,5 +102,10 @@ htmx_router = Router(
         add_collaborator,
         remove_collaborator,
         update_collaborator,
+        basemap_search_htmx,
+        basemap_generate_htmx,
+        basemap_status_htmx,
+        basemap_attach_htmx,
+        basemap_attach_status_htmx,
     ],
 )

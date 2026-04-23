@@ -51,7 +51,7 @@ x-qfield-common-env: &qfield-common-env
   QFIELDCLOUD_ADMIN_URI: admin/
   CORS_ALLOWED_ORIGINS: "http://qfield.field.localhost,http://qfield.field.localhost:7050"
   CORS_ALLOW_CREDENTIALS: 1
-  # TODO fix injecting S3 vars into STORAGES
+  # TODO fix injecting S3 vars into STORAGES (Garage is our local S3-compatible provider)
   # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-GK3515373e4c851ebaad366558}
   # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-7d37d093435a41f2aab8f13c19ba067d9776c90215f56614adad6ece597dbb34}
   # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
@@ -83,8 +83,8 @@ x-qfield-common-env: &qfield-common-env
   EMAIL_HOST_PASSWORD: ""
   DEFAULT_FROM_EMAIL: noreply@field.localhost
   QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:${QFIELDCLOUD_TAG:-26.3}
-  # NOTE this must have a trailing slash
-  QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_URL}
+  # NOTE this must point to the QFieldCloud API root and end with trailing slash
+  QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_WORKER_QFIELDCLOUD_URL:-http://qfield-app:8000/api/v1/}
   QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
   SENTRY_RELEASE: dev
   QFIELDCLOUD_USE_I18N: 0

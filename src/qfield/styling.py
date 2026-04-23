@@ -27,6 +27,39 @@ def _resolve_over_point_label_placement() -> Any:
     return 1
 
 
+def _resolve_identifiable_map_layer_flag() -> Any:
+    """Return the map-layer identifiable flag enum value when available."""
+    from qgis.core import Qgis
+
+    map_layer_flag = getattr(Qgis, "MapLayerFlag", None)
+    if map_layer_flag is None:
+        return None
+
+    for attr_name in ("Identifiable", "IdentifiableLayer"):
+        flag_value = getattr(map_layer_flag, attr_name, None)
+        if flag_value is not None:
+            return flag_value
+
+    return None
+
+
+def _set_layer_not_identifiable(layer, log: logging.Logger) -> None:
+    """Disable identify interaction for the given layer when supported."""
+    if hasattr(layer, "flags") and hasattr(layer, "setFlags"):
+        identifiable_flag = _resolve_identifiable_map_layer_flag()
+        if identifiable_flag is None:
+            log.warning("Could not resolve QGIS identifiable layer flag")
+            return
+        layer.setFlags(layer.flags() & ~identifiable_flag)
+        return
+
+    if hasattr(layer, "setIdentifiable"):
+        layer.setIdentifiable(False)
+        return
+
+    log.warning("Layer does not expose an identifiable toggle API")
+
+
 def configure_task_layer_style(
     task_layer,
     log: logging.Logger,
@@ -50,7 +83,7 @@ def configure_task_layer_style(
     symbol = _build_layer_symbol(
         layer,
         fill_rgba=(0, 0, 0, 0),
-        stroke_rgba=(130, 128, 133, 255),  # --hot-color-neutral-500 (#828085)
+        stroke_rgba=(66, 133, 244, 255),
         stroke_width=1.2,
     )
     layer.renderer().setSymbol(symbol)
@@ -79,51 +112,25 @@ def configure_task_layer_style(
 
     layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
     layer.setLabelsEnabled(True)
+    _set_layer_not_identifiable(layer, log)
     layer.triggerRepaint()
 
 
 def configure_survey_layer_style(survey_layer, log: logging.Logger) -> None:
     """Configure the survey layer in QGIS."""
-    from qgis.core import QgsRuleBasedRenderer
-
     layer = _resolve_vector_layer(survey_layer)
     if not layer:
         log.warning("No survey layer available for styling")
         return
 
     log.info("Styling survey/features layer")
-
-    root_rule = QgsRuleBasedRenderer.Rule(None)
-    root_rule.appendChild(
-        _build_status_rule(
-            layer,
-            label="Mapped",
-            expression='"status" = \'mapped\'',
-            fill_rgba=(80, 193, 203, 120),
-            stroke_rgba=(80, 193, 203, 255),
-        )
-    )
-    root_rule.appendChild(
-        _build_status_rule(
-            layer,
-            label="Invalid",
-            expression='"status" = \'invalid\'',
-            fill_rgba=(215, 63, 63, 110),
-            stroke_rgba=(215, 63, 63, 255),
-        )
-    )
-
-    default_rule = _build_status_rule(
+    symbol = _build_layer_symbol(
         layer,
-        label="Default",
-        expression="",
-        fill_rgba=(130, 128, 133, 90),
-        stroke_rgba=(64, 66, 72, 220),
+        fill_rgba=(0, 0, 0, 0),
+        stroke_rgba=(64, 66, 72, 255),
+        stroke_width=1.2,
     )
-    default_rule.setIsElse(True)
-    root_rule.appendChild(default_rule)
-
-    layer.setRenderer(QgsRuleBasedRenderer(root_rule))
+    layer.renderer().setSymbol(symbol)
     layer.triggerRepaint()
 
 
@@ -183,31 +190,6 @@ def _build_layer_symbol(
             "name": "circle",
         }
     )
-
-
-def _build_status_rule(
-    layer,
-    *,
-    label: str,
-    expression: str,
-    fill_rgba: tuple[int, int, int, int],
-    stroke_rgba: tuple[int, int, int, int],
-):
-    """Build a rule for survey-layer status styling."""
-    from qgis.core import QgsRuleBasedRenderer
-
-    rule = QgsRuleBasedRenderer.Rule(
-        _build_layer_symbol(
-            layer,
-            fill_rgba=fill_rgba,
-            stroke_rgba=stroke_rgba,
-            stroke_width=0.9,
-        )
-    )
-    rule.setLabel(label)
-    if expression:
-        rule.setFilterExpression(expression)
-    return rule
 
 
 def _rgba_string(rgba: tuple[int, int, int, int]) -> str:

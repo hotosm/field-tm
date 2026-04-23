@@ -35,6 +35,7 @@ from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentral
 from app.config import settings
+from app.i18n import _
 
 
 def _resolve_backend_odk_url(url: str) -> str:
@@ -195,7 +196,7 @@ async def validate_xlsform_extension(xlsform: UploadFile):
     if file_ext not in allowed_extensions:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Provide a valid .xls or .xlsx file",
+            detail=_("Provide a valid .xls or .xlsx file"),
         )
     return BytesIO(await xlsform.read())
 

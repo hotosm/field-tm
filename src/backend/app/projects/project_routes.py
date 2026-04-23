@@ -15,6 +15,7 @@ from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject, DbTemplateXLSForm
+from app.i18n import _
 from app.projects.project_schemas import (
     CreateProjectRequest,
     CreateProjectResponse,
@@ -99,7 +100,7 @@ async def _resolve_xlsform_bytes(
         if not template.xls:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Template XLSForm content is empty.",
+                detail=_("Template XLSForm content is empty."),
             )
         return BytesIO(template.xls)
 
@@ -343,7 +344,8 @@ async def api_get_project(project_id: int, db: AsyncConnection) -> dict:
     except KeyError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Project ({project_id}) not found.",
+            detail=_("Project (%(project_id)s) not found.")
+            % {"project_id": project_id},
         ) from exc
     return {
         "id": project.id,

@@ -1,5 +1,8 @@
 """Tests for QField project generator compatibility helpers."""
 
+# ruff: noqa: N802
+
+import logging
 import xml.etree.ElementTree as ET
 import zipfile
 from importlib.util import module_from_spec, spec_from_file_location
@@ -375,7 +378,10 @@ def test_download_mbtiles_file_allows_large_stream_without_local_cap(
     )
 
     assert destination.exists()
-    assert destination.stat().st_size == 4 * 1024 * 1024
+    assert destination.stat().st_size == (4 * 1024 * 1024)
+
+
+def test_read_basemap_job_inputs_returns_trimmed_values(monkeypatch):
     """Reader should return project_id and trimmed basemap_url from qgis_jobs."""
     field_project = _load_field_project_module()
 
@@ -463,3 +469,341 @@ def test_read_basemap_job_inputs_rejects_missing_basemap_url(monkeypatch):
 
     with pytest.raises(RuntimeError, match="Missing basemap_url"):
         field_project._read_basemap_job_inputs("db-url", "job-id")
+
+
+def _make_fake_layer(layer_name: str, layer_id: str):
+    """Create a minimal fake layer object for layer-order tests."""
+
+    class FakeLayer:
+        def __init__(self, name, layer_id_value):
+            self._name = name
+            self._id = layer_id_value
+
+        def name(self):
+            return self._name
+
+        def id(self):
+            return self._id
+
+    return FakeLayer(layer_name, layer_id)
+
+
+def _make_fake_root(layer_specs: list[tuple[str, str]]):
+    """Create a minimal fake root tree supporting reorder operations."""
+
+    class FakeNode:
+        def __init__(self, layer):
+            self._layer = layer
+
+        def layer(self):
+            return self._layer
+
+    class FakeRoot:
+        def __init__(self, specs):
+            self._children = [
+                FakeNode(_make_fake_layer(name, layer_id)) for name, layer_id in specs
+            ]
+
+        # noqa: N802 - mimic PyQGIS API
+        def children(self):
+            return list(self._children)
+
+        # noqa: N802 - mimic PyQGIS API
+        def findLayer(self, layer_id):
+            for node in self._children:
+                if node.layer().id() == layer_id:
+                    return node
+            return None
+
+        # noqa: N802 - mimic PyQGIS API
+        def insertLayer(self, index, layer):
+            self._children.insert(index, FakeNode(layer))
+
+        # noqa: N802 - mimic PyQGIS API
+        def removeChildNode(self, node):
+            self._children.remove(node)
+
+    return FakeRoot(layer_specs)
+
+
+def _layer_names_from_root(fake_root):
+    return [node.layer().name() for node in fake_root.children()]
+
+
+def test_normalize_root_layer_order_in_field_project_places_basemap_above_osm():
+    """Canonical field ordering keeps vectors above basemap and OSM at bottom."""
+    field_project = _load_field_project_module()
+    fake_root = _make_fake_root(
+        [
+            ("OpenStreetMap", "osm"),
+            ("survey", "survey"),
+            ("basemap", "basemap"),
+            ("tasks", "tasks"),
+            ("notes", "notes"),
+        ]
+    )
+
+    fake_project = SimpleNamespace(layerTreeRoot=lambda: fake_root)
+    field_project._normalize_root_layer_order(
+        fake_project, field_project.logging.getLogger(__name__)
+    )
+
+    assert _layer_names_from_root(fake_root) == [
+        "survey",
+        "tasks",
+        "notes",
+        "basemap",
+        "OpenStreetMap",
+    ]
+
+
+def test_normalize_root_layer_order_in_drone_project_places_vectors_above_rasters():
+    """Drone ordering keeps task vectors above rasters and OSM at bottom."""
+    repo_root = _find_repo_root(Path(__file__).resolve())
+    drone_path = _find_existing_file(
+        repo_root,
+        "src/qfield/drone_project.py",
+        "qfield/drone_project.py",
+    )
+
+    drone_spec = spec_from_file_location("qfield_drone_project_test", drone_path)
+    assert drone_spec is not None and drone_spec.loader is not None
+    drone_module = module_from_spec(drone_spec)
+
+    sys_modules = __import__("sys").modules
+    sys_modules.setdefault(
+        "basemaps", SimpleNamespace(create_osm_basemap=lambda *_args, **_kwargs: None)
+    )
+    sys_modules.setdefault(
+        "sanitize",
+        SimpleNamespace(sanitize_generated_qgis_metadata=lambda *args, **kwargs: None),
+    )
+    sys_modules.setdefault(
+        "styling",
+        SimpleNamespace(configure_task_layer_style=lambda *args, **kwargs: None),
+    )
+
+    drone_spec.loader.exec_module(drone_module)
+
+    fake_root = _make_fake_root(
+        [
+            ("OpenStreetMap", "osm"),
+            ("dem", "dem"),
+            ("dtm-tasks", "dtm-tasks"),
+            ("basemap", "basemap"),
+        ]
+    )
+    fake_project = SimpleNamespace(layerTreeRoot=lambda: fake_root)
+
+    drone_module._normalize_root_layer_order(
+        fake_project, drone_module.logging.getLogger(__name__)
+    )
+
+    assert _layer_names_from_root(fake_root) == [
+        "dtm-tasks",
+        "basemap",
+        "dem",
+        "OpenStreetMap",
+    ]
+
+
+class _FakeSymbol:
+    def __init__(self, props):
+        self._props = props
+
+    def symbolLayer(self, _index):
+        return self
+
+    def properties(self):
+        return self._props
+
+
+class _FakeRenderer:
+    def __init__(self):
+        self.symbol = None
+
+    def setSymbol(self, symbol):
+        self.symbol = symbol
+
+
+class _FakeLayerForStyling:
+    def __init__(self):
+        self._renderer = _FakeRenderer()
+        self._flags = 0b1111
+        self.labeling = None
+        self.labels_enabled = False
+
+    def renderer(self):
+        return self._renderer
+
+    def setLabeling(self, labeling):
+        self.labeling = labeling
+
+    def setLabelsEnabled(self, enabled):
+        self.labels_enabled = enabled
+
+    def triggerRepaint(self):
+        return None
+
+    def flags(self):
+        return self._flags
+
+    def setFlags(self, flags):
+        self._flags = flags
+
+    def geometryType(self):
+        return "polygon"
+
+
+class _FakeQgsFillSymbol:
+    @staticmethod
+    def createSimple(props):
+        return _FakeSymbol(props)
+
+
+class _FakeQgsLineSymbol:
+    @staticmethod
+    def createSimple(props):
+        return _FakeSymbol(props)
+
+
+class _FakeQgsMarkerSymbol:
+    @staticmethod
+    def createSimple(props):
+        return _FakeSymbol(props)
+
+
+class _FakePalLayerSettings:
+    def __init__(self):
+        self.fieldName = ""
+        self.isExpression = False
+        self.enabled = False
+        self.placement = None
+        self.centroidInside = False
+        self.centroidWhole = False
+        self._format = None
+
+    def setFormat(self, fmt):
+        self._format = fmt
+
+
+class _FakeTextBufferSettings:
+    def __init__(self):
+        self.enabled = False
+        self.size = 0
+        self.color = None
+
+    def setEnabled(self, enabled):
+        self.enabled = enabled
+
+    def setSize(self, size):
+        self.size = size
+
+    def setColor(self, color):
+        self.color = color
+
+
+class _FakeTextFormat:
+    def __init__(self):
+        self.font = None
+        self.size = 0
+        self.color = None
+        self.buffer = None
+
+    def setFont(self, font):
+        self.font = font
+
+    def setSize(self, size):
+        self.size = size
+
+    def setColor(self, color):
+        self.color = color
+
+    def setBuffer(self, buffer):
+        self.buffer = buffer
+
+
+class _FakeVectorLayerSimpleLabeling:
+    def __init__(self, settings):
+        self.settings = settings
+
+
+class _FakeQColor:
+    def __init__(self, r, g, b, a=255):
+        self.rgba = (r, g, b, a)
+
+
+class _FakeQFont:
+    def __init__(self):
+        self.bold = False
+
+    def setBold(self, bold):
+        self.bold = bold
+
+
+def _load_styling_module_with_fakes(monkeypatch):
+    repo_root = _find_repo_root(Path(__file__).resolve())
+    styling_path = _find_existing_file(
+        repo_root,
+        "src/qfield/styling.py",
+        "qfield/styling.py",
+    )
+
+    spec = spec_from_file_location("qfield_styling_test_runtime", styling_path)
+    assert spec is not None and spec.loader is not None
+    module = module_from_spec(spec)
+
+    fake_core = SimpleNamespace(
+        Qgis=SimpleNamespace(
+            GeometryType=SimpleNamespace(Polygon="polygon", Line="line"),
+            LabelPlacement=SimpleNamespace(OverPoint="over-point"),
+            MapLayerFlag=SimpleNamespace(Identifiable=0b0010),
+        ),
+        QgsFillSymbol=_FakeQgsFillSymbol,
+        QgsLineSymbol=_FakeQgsLineSymbol,
+        QgsMarkerSymbol=_FakeQgsMarkerSymbol,
+        QgsPalLayerSettings=_FakePalLayerSettings,
+        QgsTextBufferSettings=_FakeTextBufferSettings,
+        QgsTextFormat=_FakeTextFormat,
+        QgsVectorLayerSimpleLabeling=_FakeVectorLayerSimpleLabeling,
+    )
+    fake_qt_gui = SimpleNamespace(QColor=_FakeQColor, QFont=_FakeQFont)
+
+    monkeypatch.setitem(
+        __import__("sys").modules, "qgis", SimpleNamespace(core=fake_core)
+    )
+    monkeypatch.setitem(__import__("sys").modules, "qgis.core", fake_core)
+    monkeypatch.setitem(
+        __import__("sys").modules, "qgis.PyQt", SimpleNamespace(QtGui=fake_qt_gui)
+    )
+    monkeypatch.setitem(__import__("sys").modules, "qgis.PyQt.QtGui", fake_qt_gui)
+
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_configure_task_layer_style_sets_blue_stroke_and_non_identifiable(
+    monkeypatch,
+):
+    """Task style uses transparent fill, blue stroke, and disables identify."""
+    styling = _load_styling_module_with_fakes(monkeypatch)
+    layer = _FakeLayerForStyling()
+
+    styling.configure_task_layer_style(layer, logging.getLogger(__name__))
+
+    symbol_props = layer.renderer().symbol.symbolLayer(0).properties()
+    assert symbol_props["color"] == "0,0,0,0"
+    assert symbol_props["outline_color"] == "66,133,244,255"
+    assert layer.flags() == 0b1101
+
+
+def test_configure_survey_layer_style_sets_transparent_fill_grey_stroke(monkeypatch):
+    """Survey style uses transparent fill with grey stroke."""
+    styling = _load_styling_module_with_fakes(monkeypatch)
+    layer = _FakeLayerForStyling()
+
+    styling.configure_survey_layer_style(layer, logging.getLogger(__name__))
+
+    symbol_props = layer.renderer().symbol.symbolLayer(0).properties()
+    assert symbol_props["color"] == "0,0,0,0"
+    assert symbol_props["outline_color"] == "64,66,72,255"

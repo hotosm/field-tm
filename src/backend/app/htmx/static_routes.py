@@ -122,6 +122,16 @@ async def serve_favicon_svg() -> Response:
     return await _serve_icon_file("favicon.svg", "image/svg+xml")
 
 
+@get("/favicon.ico", include_in_schema=False)
+async def serve_favicon_ico() -> Response:
+    """Redirect favicon.ico requests to favicon.svg."""
+    return Response(
+        content=b"",
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={"Location": "/favicon.svg"},
+    )
+
+
 @get("/apple-touch-icon-180x180.png", include_in_schema=False)
 async def serve_apple_touch_icon() -> Response:
     """Serve apple-touch-icon-180x180.png."""

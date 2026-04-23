@@ -17,26 +17,30 @@
 #
 """Tests for project routes."""
 
+import base64
 import json
 import os
+import zlib
 from contextlib import asynccontextmanager
 from io import BytesIO
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
+from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.helpers.geometry_utils import check_crs
+from app.projects import project_crud, project_routes, project_services
+from app.projects.project_schemas import CreateProjectRequest, ProjectUpdate
+from app.qfield.qfield_crud import QFieldProjectResult
 
 
 def test_create_project_request_split_defaults():
     """API split defaults should match the onboarding UI default."""
-    import base64
-
-    from app.projects.project_schemas import CreateProjectRequest
-
     payload = CreateProjectRequest(
         project_name="test",
         field_mapping_app="ODK",
@@ -66,11 +70,6 @@ def test_create_project_request_split_defaults():
 
 def test_create_project_request_accepts_internal_osm_category_key():
     """API payloads may provide the internal OSM preset key."""
-    import base64
-
-    from app.db.enums import XLSFormType
-    from app.projects.project_schemas import CreateProjectRequest
-
     payload = CreateProjectRequest(
         project_name="test",
         field_mapping_app="QField",
@@ -144,8 +143,6 @@ async def test_create_odk_project():
 
 def test_project_update_accepts_qfield_uuid_external_project_id():
     """QFieldCloud UUID project IDs should validate for project updates."""
-    from app.projects.project_schemas import ProjectUpdate
-
     qfield_project_id = "becce310-e99e-4a7e-b1db-9e3f00e2c5ba"
 
     payload = ProjectUpdate(external_project_id=qfield_project_id)
@@ -155,8 +152,6 @@ def test_project_update_accepts_qfield_uuid_external_project_id():
 
 async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
     """Ensure OSM extract parsing passes GeoJSON object, not JSON string path."""
-    from app.projects import project_services
-
     downloaded_geojson = {
         "type": "FeatureCollection",
         "features": [
@@ -266,8 +261,6 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
 
 async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch):
     """Null features from extract API should return a validation error."""
-    from app.projects import project_services
-
     downloaded_geojson = {"type": "FeatureCollection", "features": None}
 
     async def fake_get_project_by_id(_db, _project_id):
@@ -330,13 +323,69 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
 
     with pytest.raises(
         project_services.ValidationError,
-        match="No matching OSM features were found",
+        match=(
+            "No data found in OSM. Please continue with the Collect New "
+            "Data Only option."
+        ),
     ):
         await project_services.download_osm_data(
             db=Mock(),
             project_id=1,
             osm_category="highways",
             geom_type="POLYLINE",
+            centroid=False,
+        )
+
+
+async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
+    """Raw-data extraction failures should return actionable guidance."""
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return Mock(
+            id=1,
+            outline={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.30, 27.71],
+                        [85.30, 27.70],
+                        [85.31, 27.70],
+                        [85.31, 27.71],
+                        [85.30, 27.71],
+                    ]
+                ],
+            },
+        )
+
+    async def fake_generate_data_extract(*_args, **_kwargs):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to generate data extract from the raw data API.",
+        )
+
+    monkeypatch.setattr(
+        project_services.project_deps,
+        "get_project_by_id",
+        fake_get_project_by_id,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_data_extract",
+        fake_generate_data_extract,
+    )
+
+    with pytest.raises(
+        project_services.ServiceError,
+        match=(
+            "OSM data extraction timed out or failed upstream. "
+            "Please reduce the AOI size or choose Collect New Data Only."
+        ),
+    ):
+        await project_services.download_osm_data(
+            db=Mock(),
+            project_id=1,
+            osm_category="buildings",
+            geom_type="POLYGON",
             centroid=False,
         )
 
@@ -349,8 +398,6 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     monkeypatch, algorithm
 ):
     """Ensure split_aoi does not pass kwargs to anyio.to_thread.run_sync."""
-    from app.projects import project_services
-
     project = Mock(
         outline={
             "type": "Polygon",
@@ -436,8 +483,6 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
 
 async def test_split_aoi_total_tasks_passes_num_enumerators(monkeypatch):
     """TOTAL_TASKS should pass num_enumerators into area-splitter."""
-    from app.projects import project_services
-
     project = Mock(
         outline={
             "type": "Polygon",
@@ -524,8 +569,6 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
     monkeypatch,
 ):
     """Finalize should create fallback task from DbProject.outline geometry."""
-    from app.projects import project_services
-
     project = Mock(
         id=1,
         project_name="Test Project",
@@ -689,9 +732,6 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
 
 async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeypatch):
     """Finalize should allow an explicitly empty FeatureCollection for QField."""
-    from app.db.enums import ProjectStatus
-    from app.projects import project_services
-
     project = Mock(
         id=1,
         xlsform_content=b"xlsform-bytes",
@@ -710,8 +750,6 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
         _custom_qfield_creds=None,
         default_language=None,
     ):
-        from app.qfield.qfield_crud import QFieldProjectResult
-
         return QFieldProjectResult(
             qfield_url="https://qfield.example.org/projects/1",
             manager_username=None,
@@ -726,7 +764,8 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
     monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
     monkeypatch.setattr(project_services.DbProject, "update", fake_update)
     monkeypatch.setattr(
-        "app.qfield.qfield_crud.create_qfield_project",
+        project_services,
+        "create_qfield_project",
         fake_create_qfield_project,
     )
 
@@ -743,12 +782,6 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
 
 async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
     """QR payload should use project external URL, not internal docker URL."""
-    import base64
-    import zlib
-
-    from app.db.enums import FieldMappingApp
-    from app.projects import project_crud
-
     project = Mock(
         id=2,
         project_name="ODK Tunnel Project",
@@ -829,9 +862,6 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
 
 async def test_delete_project_with_downstream_deletes_ftm_after_remote(monkeypatch):
     """Service should delete local project after successful downstream deletion."""
-    from app.db.enums import FieldMappingApp
-    from app.projects import project_services
-
     project = SimpleNamespace(
         id=19,
         field_mapping_app=FieldMappingApp.ODK,
@@ -860,9 +890,6 @@ async def test_delete_project_with_downstream_deletes_ftm_after_remote(monkeypat
 
 async def test_delete_project_with_downstream_keeps_ftm_on_remote_failure(monkeypatch):
     """Service should not delete local project if downstream deletion fails."""
-    from app.db.enums import FieldMappingApp
-    from app.projects import project_services
-
     project = SimpleNamespace(
         id=20,
         field_mapping_app=FieldMappingApp.QFIELD,
@@ -893,8 +920,6 @@ async def test_delete_project_with_downstream_keeps_ftm_on_remote_failure(monkey
 
 async def test_api_delete_project_returns_422_on_downstream_failure(monkeypatch):
     """API delete should block local deletion when downstream deletion fails."""
-    from app.projects import project_routes, project_services
-
     monkeypatch.setattr(
         project_routes,
         "api_key_required",

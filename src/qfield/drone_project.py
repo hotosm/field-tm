@@ -69,6 +69,7 @@ def generate_drone_project(
         )
         dem_path = _maybe_add_dem_layer(project, root, tmp, dem_url, log)
         _add_osm_basemap(project, root, log)
+        _normalize_root_layer_order(project, log)
         _set_flight_variables(project, flight_params)
 
         qgs_path = tmp / f"{project_name}.qgs"
@@ -189,6 +190,61 @@ def _add_osm_basemap(project: Any, root: Any, log: logging.Logger) -> None:
     if osm_layer:
         project.addMapLayer(osm_layer, addToLegend=False)
         root.addLayer(osm_layer)
+
+
+def _layer_order_priority(layer: Any) -> int:
+    """Return semantic ordering priority for known drone layer names."""
+    layer_name = (layer.name() or "").strip().lower()
+    if layer_name in {"tasks", "dtm-tasks", "survey"}:
+        return 1
+    if layer_name == "basemap":
+        return 90
+    if layer_name == "openstreetmap":
+        return 100
+    if layer_name == "dem":
+        return 95
+    return 10
+
+
+def _normalize_root_layer_order(project: Any, log: logging.Logger) -> None:
+    """Normalize known layer positions in the drone project root tree."""
+    root = project.layerTreeRoot()
+
+    ordered_layers = []
+    for index, node in enumerate(root.children()):
+        layer = getattr(node, "layer", lambda: None)()
+        if layer is None:
+            continue
+        ordered_layers.append((index, layer))
+
+    if not ordered_layers:
+        return
+
+    desired_layers = [
+        layer
+        for _, layer in sorted(
+            ordered_layers,
+            key=lambda item: (_layer_order_priority(item[1]), item[0]),
+        )
+    ]
+
+    changed = False
+    for target_index, layer in enumerate(desired_layers):
+        node = root.findLayer(layer.id())
+        if node is None:
+            continue
+        current_children = list(root.children())
+        if node not in current_children:
+            continue
+        current_index = current_children.index(node)
+        if current_index == target_index:
+            continue
+        root.insertLayer(target_index, layer)
+        root.removeChildNode(node)
+        changed = True
+
+    if changed:
+        log.info("Normalized drone project layer order in root tree")
 
 
 def _set_flight_variables(project: Any, flight_params: Dict[str, Any]) -> None:

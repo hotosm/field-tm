@@ -32,14 +32,15 @@ from app.qfield.qfield_crud import (
     _build_qfc_service_account_email,
     _create_qfc_user,
     _is_org_owned_project,
+    _resolve_backend_qfc_url,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
     _should_open_in_edit_mode,
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
-    normalise_qfc_url,
 )
 from app.qfield.qfield_schemas import QFieldCloud
+from app.qfield.qfield_utils import normalise_qfc_url
 
 
 @pytest.fixture()
@@ -179,6 +180,44 @@ def test_resolve_qfield_project_url_falls_back_to_instance_root():
     )
 
     assert url == "http://qfield.field.localhost:7050"
+
+
+def test_resolve_backend_qfc_url_prefers_internal_url_for_local_public_hostname(
+    monkeypatch,
+):
+    """Backend QField clients should use the internal URL for local proxy hosts."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000",
+    )
+
+    resolved = _resolve_backend_qfc_url("http://qfield.field.localhost:7050")
+
+    assert resolved == "http://qfield-app:8000/api/v1/"
+
+
+def test_resolve_backend_qfc_url_prefers_internal_for_dev_test_hostname(monkeypatch):
+    """Backend QField clients should rewrite local test domains to internal host."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000/api/v1/",
+    )
+
+    resolved = _resolve_backend_qfc_url("https://qfield.field-tm.dev.test")
+
+    assert resolved == "http://qfield-app:8000/api/v1/"
+
+
+def test_resolve_backend_qfc_url_keeps_remote_custom_url(monkeypatch):
+    """A real remote custom QField URL should remain unchanged."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000/api/v1/",
+    )
+
+    resolved = _resolve_backend_qfc_url("https://app.qfield.cloud")
+
+    assert resolved == "https://app.qfield.cloud/api/v1/"
 
 
 def test_normalise_qfc_url_strips_project_path_segments():
@@ -361,8 +400,14 @@ async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
     async def fake_delete_qgis_job(db, job_id):
         deleted_calls.append(job_id)
 
+    downloaded_basemaps = []
+
+    async def fake_download_file_for_qfield_upload(url, destination):
+        downloaded_basemaps.append((url, destination.name))
+        destination.write_bytes(b"mbtiles-bytes")
+
     @asynccontextmanager
-    async def fake_qfield_client():
+    async def fake_qfield_client(_creds=None):
         class FakeClient:
             def upload_files(self, **kwargs):
                 return None
@@ -374,10 +419,22 @@ async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
     monkeypatch.setattr(
         qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
     )
+    monkeypatch.setattr(
+        qfield_crud,
+        "_download_file_for_qfield_upload",
+        fake_download_file_for_qfield_upload,
+    )
     monkeypatch.setattr(qfield_crud, "_delete_qgis_job", fake_delete_qgis_job)
     monkeypatch.setattr(qfield_crud, "qfield_client", fake_qfield_client)
 
-    project = SimpleNamespace(id=7, external_project_id="qfc-123", project_name="demo")
+    project = SimpleNamespace(
+        id=7,
+        external_project_id="qfc-123",
+        project_name="demo",
+        external_project_instance_url=None,
+        external_project_username=None,
+        external_project_password_encrypted=None,
+    )
 
     await qfield_crud.attach_basemap_to_qfield_project(
         DummyDb(),
@@ -391,6 +448,9 @@ async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
     assert inserted["project_id"] == "qfc-123"
     assert inserted["basemap_url"] == "https://tiles.example.com/basemap.mbtiles"
     assert deleted_calls
+    assert downloaded_basemaps == [
+        ("https://tiles.example.com/basemap.mbtiles", "basemap.mbtiles")
+    ]
 
 
 @pytest.mark.asyncio

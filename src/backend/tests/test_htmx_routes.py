@@ -13,6 +13,7 @@ from litestar import status_codes as status
 from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
+from app.htmx import setup_step_routes
 from app.htmx.map_helpers import render_leaflet_map
 from app.htmx.project_create_routes import (
     _parse_outline_payload,
@@ -26,8 +27,11 @@ from app.htmx.setup_step_routes import (
     _task_boundaries_layer,
     accept_data_extract_htmx,
     accept_split_htmx,
+    download_osm_data_htmx,
+    upload_geojson_htmx,
 )
 from app.projects.project_services import ODKFinalizeResult
+from app.projects.project_services import ValidationError as SvcValidationError
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`
@@ -171,11 +175,39 @@ async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
     assert updated_project.task_areas_geojson == {}
 
 
+async def test_download_osm_data_htmx_returns_requested_no_data_message(monkeypatch):
+    """No-feature validation errors should surface the requested OSM no-data copy."""
+    project = Mock(id=42)
+
+    async def fake_download_osm_data(**_kwargs):
+        raise SvcValidationError(
+            "No data found in OSM. Please continue with the Collect New "
+            "Data Only option."
+        )
+
+    monkeypatch.setattr(
+        setup_step_routes,
+        "download_osm_data",
+        fake_download_osm_data,
+    )
+
+    response = await download_osm_data_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert (
+        "No data found in OSM. Please continue with the Collect New Data Only option."
+        in str(response.content)
+    )
+
+
 async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypatch):
     """Upload should accept OSM-style GeoJSON properties including UTF-8 tags."""
-    from app.htmx import setup_step_routes
-    from app.htmx.setup_step_routes import upload_geojson_htmx
-
     uploaded_geojson = {
         "type": "FeatureCollection",
         "features": [
