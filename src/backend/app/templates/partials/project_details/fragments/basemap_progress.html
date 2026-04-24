@@ -1,8 +1,12 @@
 <div class="ftm-basemap-progress">
-  {% if progress_scope == 'attach' %} {% if project.basemap_attach_status == 'failed' %}
-  <wa-callout variant="danger">
+  {% set show_initial_processing = is_initially_processing if is_initially_processing is defined
+  else ((progress_scope == 'attach' and project.basemap_attach_status == 'in_progress') or
+  (progress_scope != 'attach' and project.basemap_status == 'generating')) %} {% if progress_scope
+  == 'attach' %} {% if project.basemap_attach_status == 'failed' %}
+  <wa-callout variant="warning">
     <span>
-      {{ project.basemap_attach_error or _("Basemap attach failed. Use retry to start again.") }}
+      {{ project.basemap_attach_error or _("Basemap attach failed for now. Your project is ready to
+      use. Please retry attach.") }}
     </span>
   </wa-callout>
 
@@ -40,8 +44,13 @@
       hx-on::after-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Check Status') }}'; this.querySelector('.js-basemap-spinner').style.display='none'"
       style="position: relative"
     >
-      <span class="js-basemap-check-text">{{ _("Check Status") }}</span>
-      <span class="js-basemap-spinner" style="display: none; margin-inline-start: 8px">
+      <span class="js-basemap-check-text"
+        >{{ _("Checking...") if show_initial_processing else _("Check Status") }}</span
+      >
+      <span
+        class="js-basemap-spinner"
+        style="display: {{ 'inline-flex' if show_initial_processing else 'none' }}; margin-inline-start: 8px"
+      >
         <svg
           class="ftm-spinner"
           viewBox="0 0 24 24"
@@ -103,8 +112,13 @@
       hx-on::after-request="this.querySelector('.js-basemap-check-text').textContent='{{ _('Check Status') }}'; this.querySelector('.js-basemap-spinner').style.display='none'"
       style="position: relative"
     >
-      <span class="js-basemap-check-text">{{ _("Check Status") }}</span>
-      <span class="js-basemap-spinner" style="display: none; margin-inline-start: 8px">
+      <span class="js-basemap-check-text"
+        >{{ _("Checking...") if show_initial_processing else _("Check Status") }}</span
+      >
+      <span
+        class="js-basemap-spinner"
+        style="display: {{ 'inline-flex' if show_initial_processing else 'none' }}; margin-inline-start: 8px"
+      >
         <svg
           class="ftm-spinner"
           viewBox="0 0 24 24"

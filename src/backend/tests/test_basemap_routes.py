@@ -61,12 +61,15 @@ def test_basemap_ready_fragment_hides_metadata_and_attach_for_odk_projects():
 
 def test_basemap_progress_fragment_uses_manual_status_check_only():
     """Progress fragment should not auto-poll and must expose a manual check button."""
-    project = Mock(id=55, basemap_stac_item_id="item-manual")
+    project = Mock(
+        id=55, basemap_stac_item_id="item-manual", basemap_status="generating"
+    )
     html = _render_template(
         "partials/project_details/fragments/basemap_progress.html",
         {
             "project": project,
             "progress_scope": None,
+            "is_initially_processing": True,
             "basemap_size_bytes": 1048576,
             "basemap_minzoom": 10,
             "basemap_maxzoom": 16,
@@ -82,6 +85,79 @@ def test_basemap_progress_fragment_uses_manual_status_check_only():
     assert 'hx-trigger="load delay:3s"' not in html
     assert html.count('hx-get="/projects/55/basemap/status"') == 1
     assert 'hx-disabled-elt="this"' in html
+    compact_html = " ".join(html.split())
+    assert 'class="js-basemap-check-text"' in compact_html
+    assert "Checking..." in compact_html
+    assert 'js-basemap-spinner" style="display: inline-flex;' in compact_html
+
+
+def test_basemap_attach_progress_fragment_shows_initial_processing_state():
+    """Attach progress should render active processing markers on first load."""
+    project = Mock(id=56, basemap_attach_status="in_progress")
+    html = _render_template(
+        "partials/project_details/fragments/basemap_progress.html",
+        {
+            "project": project,
+            "progress_scope": "attach",
+            "is_initially_processing": True,
+        },
+    )
+
+    assert (
+        "Basemap attach is in progress. "
+        "Use the button below to check the latest status." in html
+    )
+    assert 'hx-trigger="load delay:3s"' not in html
+    assert html.count('hx-get="/projects/56/basemap/attach-status"') == 1
+    compact_html = " ".join(html.split())
+    assert 'class="js-basemap-check-text"' in compact_html
+    assert "Checking..." in compact_html
+    assert 'js-basemap-spinner" style="display: inline-flex;' in compact_html
+
+
+def test_basemap_attach_progress_fragment_shows_warning_and_retry_on_failed_attach():
+    """Failed attach should be non-blocking with warning semantics and retry action."""
+    project = Mock(
+        id=57,
+        basemap_attach_status="failed",
+        basemap_attach_error=(
+            "Basemap attach failed for now. "
+            "Your project is ready to use. Please retry attach."
+        ),
+    )
+    html = _render_template(
+        "partials/project_details/fragments/basemap_progress.html",
+        {
+            "project": project,
+            "progress_scope": "attach",
+            "is_initially_processing": False,
+        },
+    )
+
+    assert 'variant="warning"' in html
+    assert "Your project is ready to use" in html
+    assert "Retry Attach" in html
+    assert 'hx-post="/projects/57/basemap/attach"' in html
+
+
+def test_attach_error_text_classifies_transient_network_failures():
+    """Transient network failures should return retry-oriented non-blocking copy."""
+    message = basemap_routes._attach_error_text(
+        RuntimeError("Temporary failure in name resolution from remote host")
+    )
+
+    assert "temporary network issue" in message
+    assert "Your project is ready to use" in message
+
+
+def test_attach_error_text_keeps_generic_fallback_for_unknown_failures():
+    """Unknown failures should keep a safe generic attach failure message."""
+    message = basemap_routes._attach_error_text(RuntimeError("wrapper failure"))
+
+    assert (
+        message == "Basemap attach failed for now. Your project is ready to use. "
+        "Please retry attach."
+    )
 
 
 async def test_basemap_search_requires_project_context():
@@ -149,6 +225,34 @@ def test_basemap_ready_fragment_shows_action_triad_when_not_attached():
     assert "Download MBTiles" in html
     assert "View Metadata" in html
     assert "Attach to QField Project" in html
+    compact_html = " ".join(html.split())
+    assert "Basemap is ready. Not yet attached to QField project." in compact_html
+
+
+def test_basemap_ready_fragment_shows_attach_in_progress_message_when_disabled():
+    """Ready fragment should explain disabled attach button while attach is running."""
+    project = Mock(
+        id=44,
+        basemap_url="https://tiles/ready.mbtiles",
+        basemap_attach_status="in_progress",
+    )
+    html = _render_template(
+        "partials/project_details/fragments/basemap_ready.html",
+        {
+            "project": project,
+            "is_qfield": True,
+            "is_odk": False,
+            "basemap_metadata_url": "https://api.imagery.hotosm.org/browser/external/"
+            "api.imagery.hotosm.org/stac/collections/openaerialmap/items/item-44",
+            "basemap_size_display": "2.0 MB",
+            "basemap_zoom_display": "9-17",
+        },
+    )
+
+    compact_html = " ".join(html.split())
+    assert "Basemap is ready. Attaching to QField project in progress." in compact_html
+    assert "Attach to QField Project" in html
+    assert 'disabled="disabled"' in html
 
 
 def test_basemap_ready_fragment_shows_download_only_when_attached():
@@ -242,6 +346,45 @@ async def test_basemap_search_success(monkeypatch):
     )
     update_mock.assert_awaited_once()
     db.commit.assert_awaited_once()
+
+
+async def test_basemap_search_returns_sanitized_error_when_search_fails(monkeypatch):
+    """Search failures should return a safe inline fragment, not raise NameError."""
+    project = Mock(
+        id=12,
+        status=ProjectStatus.PUBLISHED,
+        outline={
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.0, 27.0],
+                    [85.0, 28.0],
+                    [86.0, 28.0],
+                    [86.0, 27.0],
+                    [85.0, 27.0],
+                ]
+            ],
+        },
+        field_mapping_app=FieldMappingApp.QFIELD,
+    )
+
+    monkeypatch.setattr(
+        basemap_routes,
+        "search_oam_imagery",
+        AsyncMock(side_effect=RuntimeError("imagery backend unavailable")),
+    )
+
+    response = await basemap_routes.basemap_search_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=12,
+    )
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert "Failed to search imagery right now" in str(response.content)
+    assert "imagery backend unavailable" not in str(response.content)
 
 
 async def test_basemap_generate_returns_ready_fragment(monkeypatch):
@@ -585,8 +728,13 @@ async def test_basemap_status_progress_preserves_size_context(monkeypatch):
 
 
 async def test_basemap_status_marks_failed_on_exception(monkeypatch):
-    """Status polling should mark the basemap as failed after an exception."""
-    project = Mock(id=18, basemap_stac_item_id="item", basemap_url=None)
+    """Status polling should return a clean error for non-generating failures."""
+    project = Mock(
+        id=18,
+        basemap_stac_item_id="item",
+        basemap_url=None,
+        basemap_status="ready",
+    )
     db = Mock()
     db.commit = AsyncMock()
     update_mock = AsyncMock()
@@ -608,7 +756,48 @@ async def test_basemap_status_marks_failed_on_exception(monkeypatch):
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert "upstream failed" not in str(response.content)
-    assert update_mock.await_count == 1
+    update_mock.assert_not_awaited()
+    db.commit.assert_not_awaited()
+
+
+async def test_basemap_status_preserves_generating_state_on_status_refresh_failure(
+    monkeypatch,
+):
+    """Status refresh failures should keep generating UI/state for in-progress items."""
+    project = Mock(
+        id=181,
+        basemap_stac_item_id="item",
+        basemap_url=None,
+        basemap_status="generating",
+        field_mapping_app=FieldMappingApp.QFIELD,
+        basemap_minzoom=12,
+        basemap_maxzoom=15,
+    )
+    db = Mock()
+    db.commit = AsyncMock()
+    update_mock = AsyncMock()
+
+    monkeypatch.setattr(
+        basemap_routes,
+        "check_tilepack_status",
+        AsyncMock(side_effect=RuntimeError("bad upstream payload")),
+    )
+    monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
+
+    response = await basemap_routes.basemap_status_htmx.fn(
+        request=Mock(query_params={"mbtiles_size_bytes": "1048576"}),
+        db=db,
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=181,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template_name.endswith("basemap_progress.html")
+    assert response.context["is_initially_processing"] is True
+    assert response.context["basemap_size_bytes"] == 1048576
+    update_mock.assert_not_awaited()
+    db.commit.assert_not_awaited()
 
 
 async def test_basemap_attach_requires_published_project():
@@ -882,6 +1071,8 @@ async def test_run_basemap_attach_background_marks_ready(monkeypatch):
         return _ConnCtx()
 
     monkeypatch.setattr(basemap_routes.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=project)
     )
@@ -895,6 +1086,50 @@ async def test_run_basemap_attach_background_marks_ready(monkeypatch):
     )
 
     attach_mock.assert_awaited_once_with(db, project, "https://tiles/ready.mbtiles")
+    assert update_mock.await_count == 1
+    project_update = update_mock.await_args.args[2]
+    assert project_update.basemap_attach_status == "ready"
+    assert project_update.basemap_attach_error is None
+    db.commit.assert_awaited_once()
+
+
+async def test_run_basemap_attach_background_retries_once_for_transient_failure(
+    monkeypatch,
+):
+    """Background attach should retry once for transient failures then succeed."""
+    project = Mock(id=32)
+    db = Mock()
+    db.commit = AsyncMock()
+
+    class _ConnCtx:
+        async def __aenter__(self):
+            return db
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+    async def _connect(_):
+        return _ConnCtx()
+
+    attach_mock = AsyncMock(
+        side_effect=[RuntimeError("Connection reset by peer"), None]
+    )
+
+    monkeypatch.setattr(basemap_routes.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
+    monkeypatch.setattr(
+        basemap_routes.DbProject, "one", AsyncMock(return_value=project)
+    )
+    monkeypatch.setattr(basemap_routes, "attach_basemap_to_qfield_project", attach_mock)
+    update_mock = AsyncMock()
+    monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
+
+    await basemap_routes._run_basemap_attach_background(
+        32, "https://tiles/ready.mbtiles"
+    )
+
+    assert attach_mock.await_count == 2
     assert update_mock.await_count == 1
     project_update = update_mock.await_args.args[2]
     assert project_update.basemap_attach_status == "ready"
@@ -919,13 +1154,16 @@ async def test_run_basemap_attach_background_marks_failed_with_error(monkeypatch
         return _ConnCtx()
 
     monkeypatch.setattr(basemap_routes.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_routes, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=project)
     )
+    attach_mock = AsyncMock(side_effect=RuntimeError("wrapper failure"))
     monkeypatch.setattr(
         basemap_routes,
         "attach_basemap_to_qfield_project",
-        AsyncMock(side_effect=RuntimeError("wrapper failure")),
+        attach_mock,
     )
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
@@ -934,11 +1172,12 @@ async def test_run_basemap_attach_background_marks_failed_with_error(monkeypatch
         31, "https://tiles/ready.mbtiles"
     )
 
+    attach_mock.assert_awaited_once_with(db, project, "https://tiles/ready.mbtiles")
     assert update_mock.await_count == 1
     project_update = update_mock.await_args.args[2]
     assert project_update.basemap_attach_status == "failed"
-    assert (
-        project_update.basemap_attach_error
-        == "Basemap attach failed. Please try again."
+    assert project_update.basemap_attach_error == (
+        "Basemap attach failed for now. Your project is ready to use. "
+        "Please retry attach."
     )
     db.commit.assert_awaited_once()

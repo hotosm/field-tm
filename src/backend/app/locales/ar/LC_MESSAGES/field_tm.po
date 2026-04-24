@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:12+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ar\n"
@@ -122,7 +122,7 @@ msgstr "فشل في إنشاء مستخدم مدير ODK المركزي."
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "حدث خطأ غير متوقع أثناء إنشاء رمز QR."
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:367
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "يرجى تقديم ملف .xls أو .xlsx صالح"
 
@@ -140,7 +140,7 @@ msgstr "فشل %(action)s مع HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "فشل %(action)s بسبب خطأ في الاتصال المنبع."
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "قامت واجهة برمجة تطبيقات Tilepack بإرجاع HTTP %(status_code)s."
@@ -177,47 +177,56 @@ msgstr "ملف Geojson الخاص بك غير صالح."
 msgid "Project not found or access denied."
 msgstr "لم يتم العثور على المشروع أو تم رفض الوصول."
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr "تم إرفاق الخريطة الأساسية بمشروع QField بنجاح."
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr "لم يبدأ إرفاق الخريطة الأساسية بعد."
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+#, fuzzy
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr "فشل إرفاق الخريطة الأساسية. يرجى المحاولة مرة أخرى."
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "تعذر البحث عن الصور الآن. يرجى المحاولة مرة أخرى بعد قليل."
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr "تعذر بدء إنشاء الخريطة الأساسية الآن. يرجى المحاولة مرة أخرى بعد قليل."
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr "تعذر تحديث حالة الخريطة الأساسية الآن. يرجى المحاولة مرة أخرى بعد قليل."
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr "يتوفر إرفاق الخريطة الأساسية بعد النشر."
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr "إرفاق الخريطة الأساسية متاح فقط لمشاريع QField."
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "الخريطة الأساسية ليست جاهزة بعد. يرجى الانتظار حتى يكتمل الإنشاء."
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr "لا يتوفر رابط تنزيل للخريطة الأساسية المُنشأة بعد."
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -226,39 +235,56 @@ msgstr ""
 "إرفاق الخريطة الأساسية في QField غير مُعد في هذا النشر. العنصر المفقود هو"
 " %(config)s."
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr "تتوفر أدوات الخريطة الأساسية بعد النشر."
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr "أعمال الخرائط الميدانية جارية"
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:77
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"يجب أن تكون منطقة المشروع JSON صالحًا (GeoJSON Polygon أو MultiPolygon أو"
+" Feature أو FeatureCollection)."
+
+#: app/htmx/project_create_routes.py:385
 msgid "Failed to load template form."
 msgstr "فشل تحميل نموذج القالب."
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:393
 msgid "Please select a form or upload a file."
 msgstr "يرجى اختيار نموذج أو رفع ملف."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:695 app/htmx/project_create_routes.py:817
+msgid "An unexpected error occurred. Please try again."
+msgstr "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+
+#: app/htmx/project_create_routes.py:758
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr "تعذر تحميل نموذج OSM Buildings الافتراضي لإنشاء مشروع بسيط."
+
+#: app/htmx/project_create_routes.py:844 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "لم يتم العثور على المشروع."
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:854
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "معرّف المشروع غير مطابق. لا تملك صلاحية الوصول إلى هذا المشروع."
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:899
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "تم التحقق من النموذج ورفعه بنجاح! جارٍ إعادة تحميل الصفحة..."
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:923 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "حدث خطأ غير متوقع"
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:927
 msgid "Error"
 msgstr "خطأ"
 
@@ -441,7 +467,7 @@ msgstr "المالك"
 msgid "Visibility"
 msgstr "الظهور"
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr "الوصف"
@@ -472,7 +498,7 @@ msgstr "إزالة المتعاون"
 msgid "from this project?"
 msgstr "من هذا المشروع؟"
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -824,6 +850,28 @@ msgstr "فشل تحميل نموذج القالب."
 msgid "Template XLSForm content is empty."
 msgstr "محتوى قالب XLSForm فارغ."
 
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"تم إنشاء هذا المشروع بسير عمل مبسط في FieldTM وهو مخصص لجمع بيانات "
+"المباني لتحسين OpenStreetMap."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "منطقة بدون اسم"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "المنطقة {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
+
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
 msgstr "مخطط المشروع مفقود أو ليس له أي شكل هندسي."
@@ -893,7 +941,9 @@ msgstr "لم يتم العثور على المشروع (%(project_id)s)."
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
-msgstr "ينتمي المشروع إلى منظمة \"%(owner)s\". تعذر إضافة \"%(username)s\" إلى المؤسسة: %(error)s"
+msgstr ""
+"ينتمي المشروع إلى منظمة \"%(owner)s\". تعذر إضافة \"%(username)s\" إلى "
+"المؤسسة: %(error)s"
 
 #: app/qfield/qfield_crud.py:1186
 #, python-format
@@ -967,7 +1017,10 @@ msgstr "ابحث في المشاريع…"
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr "إنشاء مشروع"
 
@@ -979,12 +1032,12 @@ msgstr "+ جديد"
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] "عرض مشروع واحد"
-msgstr[1] "عرض مشروعين"
-msgstr[2] "عرض %(count)s مشاريع"
-msgstr[3] "عرض %(count)s مشروعًا"
-msgstr[4] "عرض %(count)s مشروع"
-msgstr[5] "عرض %(count)s مشروع"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: app/templates/home.html:75
 #, python-format
@@ -1321,996 +1374,75 @@ msgstr "العودة إلى الرئيسية"
 msgid "Create New Project"
 msgstr "إنشاء مشروع جديد"
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr "إذا كنت تجمع بيانات OSM Buildings، فاستخدم سير العمل البسيط مع AOI فقط."
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr "اسم المشروع"
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr "أدخل اسم المشروع"
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr "أدخل وصف المشروع"
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr "تطبيق الخرائط الميدانية"
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "منطقة المشروع"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "ارسم المنطقة"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "رفع GeoJSON"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "مسح"
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-"ارسم مضلعًا على الخريطة أو ارفع ملف GeoJSON لتحديد منطقة المشروع. الحد "
-"الأقصى لحجم المشروع هو 1,000 كم². ستظهر رسالة تحذير للمناطق التي تتجاوز "
-"100 كم². كما أن واجهة استخراج بيانات OSM محدودة بـ 200 كم²."
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr "إعدادات متقدمة"
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "ادمج الأشكال الهندسية (استخدم الغلاف المحدب للمتعددات)"
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr "الوسوم"
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr "اكتب وسومًا واضغط Enter أو فاصلة"
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
 "          it."
 msgstr "اكتب الوسوم واضغط Enter أو فاصلة لإضافتها. انقر × على الوسم لإزالته."
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr "جارٍ الإنشاء..."
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr "حدث خطأ ما. يرجى المحاولة مرة أخرى."
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "تنسيق GeoJSON غير صالح. يرجى التحقق من الملف."
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "ملف GeoJSON غير صالح. يرجى التحقق من تنسيق الملف."
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr "يجب عليك رسم أو رفع منطقة الاهتمام (AOI) على الخريطة قبل الإرسال."
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "يوجد مشروع بهذا الاسم بالفعل. يرجى اختيار اسم مختلف."
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr "الوصف مطلوب."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← العودة إلى المشاريع"
-
-#: app/templates/project_details.html:46
-msgid "Project Metadata"
-msgstr "بيانات المشروع الوصفية"
-
-#: app/templates/project_details.html:48
-msgid "Project metadata and setup information for managers."
-msgstr "بيانات المشروع الوصفية ومعلومات الإعداد للمديرين."
-
-#: app/templates/project_details.html:66
-msgid "Project ID"
-msgstr "معرّف المشروع"
-
-#: app/templates/project_details.html:77
-msgid "Created"
-msgstr "أُنشئ"
-
-#: app/templates/project_details.html:84
-msgid "Last Updated"
-msgstr "آخر تحديث"
-
-#: app/templates/project_details.html:107
-msgid "External Project"
-msgstr "مشروع خارجي"
-
-#: app/templates/project_details.html:109
-msgid "Instance:"
-msgstr "النسخة:"
-
-#: app/templates/project_details.html:111
-msgid "Project ID:"
-msgstr "معرّف المشروع:"
-
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
-msgid "View Project in ODK Central →"
-msgstr "عرض المشروع في ODK Central →"
-
-#: app/templates/project_details.html:136
-msgid "Manage QFieldCloud Project →"
-msgstr "إدارة مشروع QFieldCloud →"
-
-#: app/templates/project_details.html:144
-msgid "View Project Externally →"
-msgstr "عرض المشروع خارجيًا →"
-
-#: app/templates/project_details.html:160
-msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#: app/templates/new_project_simple.html:8
+msgid ""
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
 msgstr ""
-"حذف هذا المشروع في النظام اللاحق وفي Field-TM؟ لا يمكن التراجع عن هذا "
-"الإجراء."
-
-#: app/templates/project_details.html:163
-msgid "Delete Project"
-msgstr "حذف المشروع"
-
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr "العودة إلى المشاريع"
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr "لم يتم العثور على المشروع"
-
-#: app/templates/project_details.html:174
-msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "المشروع الذي تبحث عنه غير موجود أو لا تملك صلاحية عرضه."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "إدارة QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
-msgstr "هذه الصفحة مخصصة لإدارة المستخدمين في مشروع QField الخاص بك بعد إنشائه."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "أدخل بيانات اعتماد QFieldCloud لإدارة المتعاونين."
-
-#: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "رابط QFieldCloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "الرابط الأساسي لنسخة QFieldCloud الخاصة بك (من دون ‎/api/v1)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "كلمة المرور"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "اتصال"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "جارٍ الاتصال…"
-
-#: app/templates/partials/metrics.html:5
-msgid "Features Surveyed (Approximate)"
-msgstr "المعالم التي تم مسحها (تقريبيًا)"
-
-#: app/templates/partials/metrics.html:12
-msgid "Projects Created"
-msgstr "المشاريع المُنشأة"
-
-#: app/templates/partials/metrics.html:19
-msgid "Countries Covered"
-msgstr "الدول المشمولة"
-
-#: app/templates/partials/metrics.html:26
-msgid "Users Registered"
-msgstr "المستخدمون المسجلون"
-
-#: app/templates/partials/metrics.html:33
-msgid "Supported Mapping Apps"
-msgstr "تطبيقات الخرائط المدعومة"
-
-#: app/templates/partials/project_details/basemap_section.html:2
-msgid "Offline Basemap"
-msgstr "خريطة أساسية دون اتصال"
-
-#: app/templates/partials/project_details/basemap_section.html:4
-msgid ""
-"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
-"basemap."
-msgstr ""
-"ابحث في صور HOT OpenAerialMap لهذه المنطقة وأنشئ خريطة أساسية بصيغة "
-"MBTiles."
-
-#: app/templates/partials/project_details/basemap_section.html:26
-msgid "Search OAM Imagery"
-msgstr "ابحث في صور OAM"
-
-#: app/templates/partials/project_details/basemap_section.html:37
-msgid "Basemap generation previously failed. Please search again and retry."
-msgstr "فشل إنشاء الخريطة الأساسية سابقًا. يرجى البحث مرة أخرى ثم إعادة المحاولة."
-
-#: app/templates/partials/project_details/basemap_section.html:41
-msgid "No basemap selected yet."
-msgstr "لم يتم اختيار خريطة أساسية بعد."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:3
-msgid "Manager Setup Summary"
-msgstr "ملخص إعداد المدير"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:6
-msgid "The project setup flow is complete and shown below for reference."
-msgstr "اكتمل مسار إعداد المشروع وهو معروض أدناه للرجوع إليه."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "موقع المشروع"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "الخطوة 2: رفع XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
-msgid "Complete"
-msgstr "مكتمل"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
-msgid "Step 3: Get Data"
-msgstr "الخطوة 3: جلب البيانات"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "الخطوة 4: التقسيم إلى مهام"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
-msgid "Step 5: Finalise Project"
-msgstr "الخطوة 5: إنهاء المشروع"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:69
-msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
-msgstr ""
-"إذا كنت بحاجة إلى رفع ملفات وسائط إضافية إلى هذا المشروع، مثل الصور "
-"ومقاطع الفيديو، فسجّل الدخول إلى ODK Central وارفعها من إعدادات النموذج."
-
-#: app/templates/partials/project_details/setup_steps.html:14
-msgid "Ready for Mapping"
-msgstr "جاهز لرسم الخرائط"
-
-#: app/templates/partials/project_details/setup_steps.html:25
-msgid "Loading QR code..."
-msgstr "جارٍ تحميل رمز QR..."
-
-#: app/templates/partials/project_details/setup_steps.html:32
-msgid "Project Setup"
-msgstr "إعداد المشروع"
-
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "الخطوة 2: اختيار نموذج الاستبيان"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "اختر نوع الاستبيان وتابع باستخدام الإعدادات الافتراضية الموصى بها."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "اختر نوع الاستبيان:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "جارٍ تحميل أنواع الاستبيان..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "أو استخدم النموذج الخاص بك بدلاً من ذلك:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "رفع نموذج مخصص"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-"ملاحظة: سيضيف Field-TM تلقائيًا حقولًا إضافية إلى النموذج لتقسيم المهام "
-"واختيار المعالم. يجب أن يحتوي النموذج فقط على أسئلة الاستبيان التي تريد "
-"طرحها (لا تُضمّن حقول select_one_from_file الخاصة بالمهام أو المعالم)."
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"الإعدادات الافتراضية الموصى بها مفعّلة لمشاريع ODK، بما في ذلك التوافق مع"
-" ODK Collect."
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "الإعدادات الافتراضية الموصى بها مفعّلة لمشاريع %(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr "الإعدادات الافتراضية الموصى بها مفعّلة لهذا المشروع."
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr "اللغة الافتراضية:"
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr "الإنجليزية"
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr "الإسبانية"
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr "الفرنسية"
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr "البرتغالية"
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr "السواحيلية"
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr "الهندية"
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr "خيارات النموذج:"
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr "تضمين سؤال رفع صورة"
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr "اجعل الصورة إلزامية"
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr "يطلب من المستخدم التقاط صورة في موقعه."
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr "تضمين سؤال التحقق من الرقمنة"
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr "يطلب من الرسام التحقق مما إذا كانت المعالم الحالية مرقمنة بشكل صحيح."
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr "متابعة"
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ تم رفع نموذج الاستبيان بنجاح"
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr "نزّل بيانات OSM الموصى بها لنموذج الاستبيان الخاص بك."
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr "راجع البيانات على الخريطة ثم تابع."
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "تنزيل بيانات OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr "جمع بيانات جديدة فقط"
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr "استخدم بيانات مخصصة أو تجاوز خيارات تنزيل OSM الافتراضية."
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr "فئة OSM:"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr "مباني OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr "طرق OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr "رعاية صحية OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr "دورات مياه OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr "معالم دينية OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr "استخدامات الأراضي OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr "مجاري مائية OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr "نقاط مياه OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr "التخلص من النفايات OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr "تعليم OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr "مقابر OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr "مرافق OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr "نوع الشكل الهندسي:"
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr "مضلع"
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr "خط متعدد"
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr "نقطة"
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr "استخدم مراكز الأشكال"
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr "رفع GeoJSON مخصص"
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "جارٍ إنشاء استخراج بيانات OSM... قد يستغرق ذلك بعض الوقت."
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr "استخراج بيانات OSM جاهز"
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "الخطوة 3: التقسيم إلى مهام (اختياري)"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ تقسيم المهام غير مناسب في غياب بيانات موجودة"
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"أنشئ مناطق المهام من خلال تقسيم منطقة الاهتمام (AOI). اختر خوارزمية "
-"ومعلمات ثم قم بالتقسيم. راجع المعاينة وانقر على \"قبول مناطق المهام\" "
-"للحفظ. أو انقر"
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr "تخطي"
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr "لاستخدام AOI بالكامل كمهمة واحدة."
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "اختر المعالم الخطية التي تؤثر في تقسيم المهام المعتمد على المباني."
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr "تضمين الطرق"
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr "تضمين الأنهار"
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr "تضمين السكك الحديدية"
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr "تضمين المسارات الجوية"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr "الخوارزمية:"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr "اختر خيار التقسيم..."
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "التقسيم حسب المربع"
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "متوسط المباني v1 (فورونوي)"
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "متوسط المباني v2 (الهيكل المستقيم)"
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr "التقسيم حسب عدد محدد من المهام (قريبًا)"
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr "متوسط المباني لكل مهمة:"
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr "عدد المهام:"
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr "البعد (بالمتر):"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr "إعادة التقسيم"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr "تقسيم AOI"
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "جارٍ تقسيم AOI إلى مهام... قد يستغرق ذلك بعض الوقت."
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr "جاهز"
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr "اكتملت جميع المتطلبات المسبقة! أنشئ المشروع في أداة الخرائط التي اخترتها."
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr "إنهاء المشروع"
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr "تأكيد إنهاء المشروع"
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr "هل أنت متأكد أنك تريد إنهاء هذا المشروع؟"
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr "تأكيد وإنهاء"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr "بيانات اعتماد مخصصة"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr "رابط ODK Central"
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr "رابط QField Cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "اختبار بيانات الاعتماد"
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr "حفظ ومتابعة"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "Select a survey type..."
-msgstr "اختر نوع الاستبيان..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "No survey types available"
-msgstr "لا توجد أنواع استبيان متاحة"
-
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
-msgstr "لا توجد نماذج استبيان متاحة. ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
-
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "اختر نوع استبيان، أو ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
-
-#: app/templates/partials/project_details/style_and_scripts.html:14
-msgid "Survey type selected."
-msgstr "تم اختيار نوع الاستبيان."
-
-#: app/templates/partials/project_details/style_and_scripts.html:15
-msgid "Invalid file type. Please upload a .xls or .xlsx file."
-msgstr "نوع الملف غير صالح. يرجى رفع ملف .xls أو .xlsx."
-
-#: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Selected file:"
-msgstr "الملف المحدد:"
-
-#: app/templates/partials/project_details/style_and_scripts.html:17
-msgid "Custom form selected."
-msgstr "تم اختيار نموذج مخصص."
-
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr "اختر نوع استبيان أولاً، أو ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
-
-#: app/templates/partials/project_details/style_and_scripts.html:19
-msgid "polygons"
-msgstr "مضلعات"
-
-#: app/templates/partials/project_details/style_and_scripts.html:20
-msgid "polylines"
-msgstr "خطوط متعددة"
-
-#: app/templates/partials/project_details/style_and_scripts.html:21
-msgid "points"
-msgstr "نقاط"
-
-#: app/templates/partials/project_details/style_and_scripts.html:22
-msgid "features"
-msgstr "معالم"
-
-#: app/templates/partials/project_details/style_and_scripts.html:23
-msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
-msgstr ""
-"لقد رفعت نموذجًا مخصصًا، لذا فإن تنزيل OSM هذا اختياري. استخدم الإعدادات "
-"المتقدمة لرفع GeoJSON الخاص بك أو ضبط إعدادات التنزيل."
-
-#: app/templates/partials/project_details/style_and_scripts.html:24
-#, python-format
-msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
-msgstr ""
-"المصدر الموصى به: %(title)s (%(geom_label)s). راجع البيانات على الخريطة "
-"ثم تابع."
-
-#: app/templates/partials/project_details/style_and_scripts.html:25
-#, python-format
-msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
-msgstr ""
-"تم تحديث المصدر الموصى به (%(geom_label)s). راجع البيانات على الخريطة ثم "
-"تابع."
-
-#: app/templates/partials/project_details/style_and_scripts.html:26
-msgid "Downloading..."
-msgstr "جارٍ التنزيل..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Confirm No Splitting"
-msgstr "تأكيد عدم التقسيم"
-
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
-msgstr "التقسيم حسب المباني"
-
-#: app/templates/partials/project_details/style_and_scripts.html:33
-msgid "Select Option"
-msgstr "اختر خيارًا"
-
-#: app/templates/partials/project_details/style_and_scripts.html:34
-msgid "Confirming..."
-msgstr "جارٍ التأكيد..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Splitting..."
-msgstr "جارٍ التقسيم..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
-msgid "ODK Central"
-msgstr "ODK Central"
-
-#: app/templates/partials/project_details/style_and_scripts.html:37
-msgid "QField"
-msgstr "QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:38
-msgid "the mapping tool"
-msgstr "أداة الخرائط"
-
-#: app/templates/partials/project_details/style_and_scripts.html:39
-msgid "Project type not set. Please set the field mapping app first."
-msgstr "لم يتم تعيين نوع المشروع. يرجى تعيين تطبيق الخرائط الميدانية أولاً."
-
-#: app/templates/partials/project_details/style_and_scripts.html:40
-#, python-format
-msgid ""
-"Are you sure you want to finalise this project in %(project_type)s? This "
-"will create the project, upload forms, and generate all necessary files."
-msgstr ""
-"هل أنت متأكد أنك تريد إنهاء هذا المشروع في %(project_type)s؟ سيؤدي ذلك "
-"إلى إنشاء المشروع ورفع النماذج وتوليد جميع الملفات اللازمة."
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
-msgid "Custom ODK Credentials"
-msgstr "بيانات اعتماد ODK مخصصة"
-
-#: app/templates/partials/project_details/style_and_scripts.html:42
-msgid "Custom QField Credentials"
-msgstr "بيانات اعتماد QField مخصصة"
-
-#: app/templates/partials/project_details/style_and_scripts.html:43
-msgid "Please fill in all fields."
-msgstr "يرجى ملء جميع الحقول."
-
-#: app/templates/partials/project_details/style_and_scripts.html:44
-msgid "Testing..."
-msgstr "جارٍ الاختبار..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:45
-msgid "Testing credentials..."
-msgstr "جارٍ اختبار بيانات الاعتماد..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:46
-msgid "✓ Credentials are valid!"
-msgstr "✓ بيانات الاعتماد صالحة!"
-
-#: app/templates/partials/project_details/style_and_scripts.html:47
-msgid "Invalid credentials. Please check and try again."
-msgstr "بيانات الاعتماد غير صالحة. يرجى التحقق والمحاولة مرة أخرى."
-
-#: app/templates/partials/project_details/style_and_scripts.html:48
-#, python-format
-msgid "Error testing credentials: %(message)s"
-msgstr "خطأ أثناء اختبار بيانات الاعتماد: %(message)s"
-
-#: app/templates/partials/project_details/style_and_scripts.html:50
-msgid "Please test credentials first before continuing."
-msgstr "يرجى اختبار بيانات الاعتماد أولاً قبل المتابعة."
-
-#: app/templates/partials/project_details/style_and_scripts.html:51
-#, python-format
-msgid "Creating project in %(project_type)s... This may take a moment."
-msgstr "جارٍ إنشاء المشروع في %(project_type)s... قد يستغرق ذلك بعض الوقت."
-
-#: app/templates/partials/project_details/style_and_scripts.html:52
-msgid "Error:"
-msgstr "خطأ:"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
-msgstr "فشل إرفاق الخريطة الأساسية. استخدم إعادة المحاولة للبدء من جديد."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
-msgid "Retry Attach"
-msgstr "إعادة محاولة الإرفاق"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
-msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr "إرفاق الخريطة الأساسية جارٍ. استخدم الزر أدناه للتحقق من أحدث حالة."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
-msgid "Checking..."
-msgstr "جارٍ التحقق..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
-msgid "Check Status"
-msgstr "حالة المشروع"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
-msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
-msgstr "إنشاء الخريطة الأساسية جارٍ. يتم تحديث الحالة تلقائيًا كل بضع ثوانٍ."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
-msgid "STAC item"
-msgstr "عنصر STAC"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
-msgid "Zoom"
-msgstr "التكبير"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
-msgid "Select one imagery item to start MBTiles generation."
-msgstr "اختر عنصر صورة واحدًا لبدء إنشاء MBTiles."
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
-msgid "Cloud"
-msgstr "إغلاق"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
-msgstr "عرض البيانات الوصفية"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
-msgid "Use this image"
-msgstr "استخدم هذه الصورة"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
-msgid "No imagery items were found for this AOI."
-msgstr "لم يتم العثور على أي عناصر صور لهذه المنطقة."
-
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
-msgid "Accept Data Extract"
-msgstr "قبول استخراج البيانات"
-
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
-msgid "View technical details"
-msgstr "عرض التفاصيل التقنية"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
-msgid "Project created in ODK Central."
-msgstr "تم إنشاء المشروع في ODK Central."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
-msgid "Manager Access (ODK Central UI)"
-msgstr "وصول المدير (واجهة ODK Central)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
-msgid "Open project in ODK Central"
-msgstr "افتح المشروع في ODK Central"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
-msgid "Save these credentials now. They will only be shown once."
-msgstr "احفظ بيانات الاعتماد هذه الآن. لن تُعرض إلا مرة واحدة."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "View FieldTM Project"
-msgstr "عرض مشروع FieldTM"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
-msgid "Project created in QFieldCloud."
-msgstr "تم إنشاء المشروع في QFieldCloud."
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "وصول المدير (QFieldCloud)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
-msgid "Open project in QFieldCloud"
-msgstr "افتح المشروع في QFieldCloud"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
-msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
-msgstr ""
-"تعذر إنشاء حساب المدير تلقائيًا. سجّل الدخول إلى QFieldCloud كمسؤول "
-"لإدارة المشروع."
-
-#: app/templates/partials/project_details/fragments/split_preview.html:27
-msgid "Accept Task Choices"
-msgstr "قبول خيارات المهام"
+"هذا المسار البسيط يحتاج فقط إلى منطقة مشروعك. سننشئ تلقائيًا عنوان "
+"المشروع ووصفه ووسومه لـ OSM Buildings."
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr "العودة إلى النموذج القياسي"
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr "جارٍ إنشاء المشروع وإعداد الخريطة..."
 
 #~ msgid "Failed to add collaborator: %(error)s"
 #~ msgstr "فشل إضافة المتعاون: %(exc)s"
@@ -2328,14 +1460,1921 @@ msgstr "قبول خيارات المهام"
 #~ msgstr "مستوى التكبير المتاح"
 
 #~ msgid "Download MBTiles"
-#~ msgstr "تنزيل رمز QR"
+#~ msgstr "تنزيل MBTiles"
 
 #~ msgid "Attach to QField Project"
-#~ msgstr "إدارة مشروع QFieldCloud →"
+#~ msgstr "إرفاق بمشروع QField"
 
 #~ msgid ""
 #~ "Use the ODK offline maps documentation"
 #~ " to configure this MBTiles file in"
 #~ " Collect."
-#~ msgstr "استخدم وثائق خرائط ODK دون اتصال لتهيئة ملف MBTiles هذا في Collect."
+#~ msgstr "استخدم وثائق خرائط ODK غير المتصلة لتكوين ملف MBTiles هذا في Collect."
+
+#~ msgid "Validation failed"
+#~ msgstr "فشل التحقق من الصحة"
+
+#~ msgid "An unexpected error occurred. Please contact an admin."
+#~ msgstr "حدث خطأ غير متوقع. يرجى التواصل مع المسؤول."
+
+#~ msgid "Could not connect to database"
+#~ msgstr "لا يمكن الاتصال بقاعدة البيانات"
+
+#~ msgid "Authenticated user is missing a valid identifier."
+#~ msgstr "المستخدم الذي تمت مصادقته يفتقد معرفًا صالحًا."
+
+#~ msgid "User must be an administrator"
+#~ msgstr "يجب أن يكون المستخدم مسؤولاً"
+
+#~ msgid "User does not have permission to access the project."
+#~ msgstr "ليس لدى المستخدم إذن للوصول إلى المشروع."
+
+#~ msgid "Project is locked since it is in %(state)s state."
+#~ msgstr "تم قفل المشروع لأنه في حالة %(state)s."
+
+#~ msgid "User (%(user_sub)s) could not be inserted in db"
+#~ msgstr "لا يمكن إدراج المستخدم (%(user_sub)s) في قاعدة البيانات"
+
+#~ msgid "Error listing projects on ODK Central: %(error)s"
+#~ msgstr "افتح المشروع في ODK Central"
+
+#~ msgid "Error creating project on ODK Central: %(error)s"
+#~ msgstr "افتح المشروع في ODK Central"
+
+#~ msgid "Failed to upload form to ODK Central: %(error)s"
+#~ msgstr "فشل تحميل النموذج إلى ODK Central: %(error)s"
+
+#~ msgid "form_id is required to list submissions with pyodk."
+#~ msgstr "مطلوب form_id لسرد التقديمات مع pyodk."
+
+#~ msgid "XLSForm is invalid: %(error)s"
+#~ msgstr "XLSForm غير صالح: %(error)s"
+
+#~ msgid "Conversion GeoJSON --> CSV failed"
+#~ msgstr "فشل تحويل GeoJSON --> CSV"
+
+#~ msgid "Project contains no submissions yet"
+#~ msgstr "لا يحتوي المشروع على أي طلبات حتى الآن"
+
+#~ msgid "'geometry' data field is mandatory"
+#~ msgstr "حقل البيانات \"الهندسة\" إلزامي"
+
+#~ msgid "ODK project_id is missing; cannot create/merge entity lists."
+#~ msgstr "ODK project_id مفقود؛ لا يمكن إنشاء/دمج قوائم الكيانات."
+
+#~ msgid "Could not generate token for app user."
+#~ msgstr "تعذر إنشاء رمز مميز لمستخدم التطبيق."
+
+#~ msgid "An error occurred while creating the app user token."
+#~ msgstr "حدث خطأ غير متوقع أثناء إنشاء رمز QR."
+
+#~ msgid "Could not assign %(scope)s role to app user."
+#~ msgstr "تعذر تعيين دور %(scope)s لمستخدم التطبيق."
+
+#~ msgid "Could not find 'Project Manager' role in ODK Central."
+#~ msgstr "افتح المشروع في ODK Central"
+
+#~ msgid "ODK Central returned no user ID after creation."
+#~ msgstr "لم يُرجع ODK Central أي معرف مستخدم بعد الإنشاء."
+
+#~ msgid "Failed to create ODK Central manager user."
+#~ msgstr "فشل في إنشاء مستخدم مدير ODK المركزي."
+
+#~ msgid "Unexpected error while testing ODK Central credentials."
+#~ msgstr "حدث خطأ غير متوقع أثناء إنشاء رمز QR."
+
+#~ msgid "Provide a valid .xls or .xlsx file"
+#~ msgstr "يرجى تقديم ملف .xls أو .xlsx صالح"
+
+#~ msgid "No data provided."
+#~ msgstr "لم يتم توفير استخراج بيانات."
+
+#~ msgid "%(action)s failed with HTTP %(status_code)s."
+#~ msgstr "فشل %(action)s مع HTTP %(status_code)s."
+
+#~ msgid "%(action)s failed due to upstream connection error."
+#~ msgstr "فشل %(action)s بسبب خطأ في الاتصال المنبع."
+
+#~ msgid "Tilepack API returned HTTP %(status_code)s."
+#~ msgstr "قامت واجهة برمجة تطبيقات Tilepack بإرجاع HTTP %(status_code)s."
+
+#~ msgid "Failed to convert YAML form to XLSForm."
+#~ msgstr "فشل تحويل نموذج YAML إلى XLSForm."
+
+#~ msgid "Provide a valid .json or .geojson file"
+#~ msgstr "يرجى تقديم ملف .xls أو .xlsx صالح"
+
+#~ msgid "Provide a valid .csv"
+#~ msgstr "يرجى تقديم ملف .xls أو .xlsx صالح"
+
+#~ msgid "Provide a valid .json file"
+#~ msgstr "يرجى تقديم ملف .xls أو .xlsx صالح"
+
+#~ msgid "Could not login to raw-data-api"
+#~ msgstr "تعذر تسجيل الدخول إلى Raw-data-api"
+
+#~ msgid "No geometries present"
+#~ msgstr "لا توجد أشكال هندسية موجودة"
+
+#~ msgid "Your geojson file is invalid."
+#~ msgstr "ملف Geojson الخاص بك غير صالح."
+
+#~ msgid "Project not found or access denied."
+#~ msgstr "لم يتم العثور على المشروع أو تم رفض الوصول."
+
+#~ msgid "Basemap attached to QField project successfully."
+#~ msgstr "تم إرفاق الخريطة الأساسية بمشروع QField بنجاح."
+
+#~ msgid "Basemap attach has not started yet."
+#~ msgstr "لم يبدأ إرفاق الخريطة الأساسية بعد."
+
+#~ msgid "Basemap attach failed. Please try again."
+#~ msgstr "فشل إرفاق الخريطة الأساسية. يرجى المحاولة مرة أخرى."
+
+#~ msgid "Failed to search imagery right now. Please try again shortly."
+#~ msgstr "تعذر البحث عن الصور الآن. يرجى المحاولة مرة أخرى بعد قليل."
+
+#~ msgid "Failed to start basemap generation right now. Please try again shortly."
+#~ msgstr "تعذر بدء إنشاء الخريطة الأساسية الآن. يرجى المحاولة مرة أخرى بعد قليل."
+
+#~ msgid "Failed to refresh basemap status right now. Please try again shortly."
+#~ msgstr "تعذر تحديث حالة الخريطة الأساسية الآن. يرجى المحاولة مرة أخرى بعد قليل."
+
+#~ msgid "Basemap attach is available after publication."
+#~ msgstr "يتوفر إرفاق الخريطة الأساسية بعد النشر."
+
+#~ msgid "Basemap attach is only available for QField projects."
+#~ msgstr "إرفاق الخريطة الأساسية متاح فقط لمشاريع QField."
+
+#~ msgid "Basemap is not ready yet. Please wait for generation to complete."
+#~ msgstr "الخريطة الأساسية ليست جاهزة بعد. يرجى الانتظار حتى يكتمل الإنشاء."
+
+#~ msgid "No generated basemap download URL is available yet."
+#~ msgstr "لا يتوفر رابط تنزيل للخريطة الأساسية المُنشأة بعد."
+
+#~ msgid ""
+#~ "QField basemap attach is not configured"
+#~ " on this deployment. Missing %(config)s."
+#~ msgstr ""
+#~ "إرفاق الخريطة الأساسية في QField غير "
+#~ "مُعد في هذا النشر. العنصر المفقود "
+#~ "هو %(config)s."
+
+#~ msgid "Basemap tools are available after publication."
+#~ msgstr "تتوفر أدوات الخريطة الأساسية بعد النشر."
+
+#~ msgid "No basemap generation in progress."
+#~ msgstr "أعمال الخرائط الميدانية جارية"
+
+#~ msgid "Failed to load template form."
+#~ msgstr "فشل تحميل نموذج القالب."
+
+#~ msgid "Please select a form or upload a file."
+#~ msgstr "يرجى اختيار نموذج أو رفع ملف."
+
+#~ msgid "Project not found."
+#~ msgstr "لم يتم العثور على المشروع."
+
+#~ msgid "Project ID mismatch. You do not have access to this project."
+#~ msgstr "معرّف المشروع غير مطابق. لا تملك صلاحية الوصول إلى هذا المشروع."
+
+#~ msgid "Form validated and uploaded successfully! Reloading page..."
+#~ msgstr "تم التحقق من النموذج ورفعه بنجاح! جارٍ إعادة تحميل الصفحة..."
+
+#~ msgid "An unexpected error occurred"
+#~ msgstr "حدث خطأ غير متوقع"
+
+#~ msgid "Error"
+#~ msgstr "خطأ"
+
+#~ msgid "Mapper Login (QFieldCloud)"
+#~ msgstr "تسجيل دخول الرسّام (QFieldCloud)"
+
+#~ msgid "Username:"
+#~ msgstr "اسم المستخدم:"
+
+#~ msgid "Password:"
+#~ msgstr "كلمة المرور:"
+
+#~ msgid "Scan the QR code, then enter these credentials in QField."
+#~ msgstr "امسح رمز QR ثم أدخل بيانات الاعتماد هذه في QField."
+
+#~ msgid "Scan QR Code"
+#~ msgstr "امسح رمز QR"
+
+#~ msgid "Use %(app_name)s to scan this QR code and load the project."
+#~ msgstr "استخدم %(app_name)s لمسح رمز QR هذا وتحميل المشروع."
+
+#~ msgid "Project QR Code"
+#~ msgstr "رمز QR للمشروع"
+
+#~ msgid "Download QR Code"
+#~ msgstr "تنزيل رمز QR"
+
+#~ msgid ""
+#~ "Cannot reach the mapping server. Check"
+#~ " that ODK Central or QFieldCloud is"
+#~ " running."
+#~ msgstr ""
+#~ "تعذر الوصول إلى خادم الخرائط. تحقق "
+#~ "من أن ODK Central أو QFieldCloud "
+#~ "يعمل."
+
+#~ msgid "The mapping server returned an error. Check its logs for details."
+#~ msgstr "أعاد خادم الخرائط خطأً. تحقق من السجلات لمزيد من التفاصيل."
+
+#~ msgid ""
+#~ "Authentication failed connecting to the "
+#~ "mapping server. Check the configured "
+#~ "credentials."
+#~ msgstr ""
+#~ "فشلت المصادقة أثناء الاتصال بخادم "
+#~ "الخرائط. تحقق من بيانات الاعتماد "
+#~ "المهيأة."
+
+#~ msgid "An unexpected error occurred while generating the QR code."
+#~ msgstr "حدث خطأ غير متوقع أثناء إنشاء رمز QR."
+
+#~ msgid "Project (%(project_id)s) not found."
+#~ msgstr "لم يتم العثور على المشروع (%(project_id)s)."
+
+#~ msgid "Only the project manager can delete this project."
+#~ msgstr "لا يمكن حذف هذا المشروع إلا من قبل مدير المشروع."
+
+#~ msgid "Error: %(error_msg)s"
+#~ msgstr "خطأ: %(error_msg)s"
+
+#~ msgid "Admin"
+#~ msgstr "مسؤول"
+
+#~ msgid "Manager"
+#~ msgstr "مدير"
+
+#~ msgid "Editor"
+#~ msgstr "محرر"
+
+#~ msgid "Reporter"
+#~ msgstr "مبلّغ"
+
+#~ msgid "Reader"
+#~ msgstr "قارئ"
+
+#~ msgid "This user does not exist. Please create it first."
+#~ msgstr "هذا المستخدم غير موجود. يرجى إنشاؤه أولاً."
+
+#~ msgid "This user is already a collaborator on this project."
+#~ msgstr "هذا المستخدم متعاون بالفعل في هذا المشروع."
+
+#~ msgid "Failed to add collaborator: %(exc)s"
+#~ msgstr "فشل إضافة المتعاون: %(exc)s"
+
+#~ msgid ""
+#~ "This project belongs to the "
+#~ "%(organization)s organization. The user must"
+#~ " be added to that organization before"
+#~ " they can be added as a "
+#~ "collaborator. Your QFieldCloud account does"
+#~ " not have permission to manage "
+#~ "organization members."
+#~ msgstr ""
+#~ "ينتمي هذا المشروع إلى منظمة "
+#~ "%(organization)s. يجب إضافة المستخدم إلى "
+#~ "تلك المنظمة قبل إضافته كمتعاون. لا "
+#~ "يملك حسابك في QFieldCloud صلاحية إدارة"
+#~ " أعضاء المنظمة."
+
+#~ msgid "All fields are required."
+#~ msgstr "جميع الحقول مطلوبة."
+
+#~ msgid "Login succeeded but no token received."
+#~ msgstr "نجح تسجيل الدخول لكن لم يتم استلام رمز."
+
+#~ msgid "Login failed. Check your URL and credentials."
+#~ msgstr "فشل تسجيل الدخول. تحقق من الرابط وبيانات الاعتماد."
+
+#~ msgid "QFieldCloud Projects"
+#~ msgstr "مشاريع QFieldCloud"
+
+#~ msgid "Connected as"
+#~ msgstr "متصل باسم"
+
+#~ msgid "to"
+#~ msgstr "إلى"
+
+#~ msgid "Log Out"
+#~ msgstr "تسجيل الخروج"
+
+#~ msgid "No projects found."
+#~ msgstr "لم يتم العثور على مشاريع."
+
+#~ msgid "Public"
+#~ msgstr "عام"
+
+#~ msgid "Private"
+#~ msgstr "خاص"
+
+#~ msgid "Manage"
+#~ msgstr "إدارة"
+
+#~ msgid "Project"
+#~ msgstr "مشروع"
+
+#~ msgid "Owner"
+#~ msgstr "المالك"
+
+#~ msgid "Visibility"
+#~ msgstr "الظهور"
+
+#~ msgid "Description"
+#~ msgstr "الوصف"
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "انتهت الجلسة. يرجى تسجيل الدخول مجددًا."
+
+#~ msgid "Could not load collaborators: %(exc)s"
+#~ msgstr "تعذر تحميل المتعاونين: %(exc)s"
+
+#~ msgid "Update"
+#~ msgstr "تحديث"
+
+#~ msgid "Remove"
+#~ msgstr "إزالة"
+
+#~ msgid "Remove Collaborator"
+#~ msgstr "إزالة المتعاون"
+
+#~ msgid "from this project?"
+#~ msgstr "من هذا المشروع؟"
+
+#~ msgid "Cancel"
+#~ msgstr "إلغاء"
+
+#~ msgid "User"
+#~ msgstr "المستخدم"
+
+#~ msgid "Role"
+#~ msgstr "الدور"
+
+#~ msgid "Actions"
+#~ msgstr "الإجراءات"
+
+#~ msgid "No collaborators yet."
+#~ msgstr "لا يوجد متعاونون بعد."
+
+#~ msgid "Username"
+#~ msgstr "اسم المستخدم"
+
+#~ msgid "Add Collaborator"
+#~ msgstr "إضافة متعاون"
+
+#~ msgid "Close"
+#~ msgstr "إغلاق"
+
+#~ msgid "Collaborators"
+#~ msgstr "المتعاونون"
+
+#~ msgid "Username is required."
+#~ msgstr "اسم المستخدم مطلوب."
+
+#~ msgid "Failed to remove collaborator: %(exc)s"
+#~ msgstr "فشلت إزالة المتعاون: %(exc)s"
+
+#~ msgid "Failed to update collaborator: %(exc)s"
+#~ msgstr "فشل تحديث المتعاون: %(exc)s"
+
+#~ msgid "Collaborator refresh failed: %(exc)s"
+#~ msgstr "فشل تحديث قائمة المتعاونين: %(exc)s"
+
+#~ msgid ""
+#~ "Project finalisation failed. Please check "
+#~ "your settings and try again. If it"
+#~ " continues, send the technical details "
+#~ "below to your instance administrator or"
+#~ " support team."
+#~ msgstr ""
+#~ "فشل إتمام المشروع. يرجى التحقق من "
+#~ "الإعدادات والمحاولة مرة أخرى. إذا استمرت"
+#~ " المشكلة، فأرسل التفاصيل التقنية أدناه "
+#~ "إلى مسؤول النظام أو فريق الدعم."
+
+#~ msgid "Invalid GeoJSON data in request. Please try uploading again."
+#~ msgstr "بيانات GeoJSON غير صالحة في الطلب. يرجى إعادة الرفع."
+
+#~ msgid "Error reading GeoJSON data from request."
+#~ msgstr "حدث خطأ أثناء قراءة بيانات GeoJSON من الطلب."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km², which exceeds"
+#~ " the %(area_limit)s km² limit. Please "
+#~ "select a smaller area."
+#~ msgstr ""
+#~ "المساحة هي %(area_km2)s كم²، وهي تتجاوز"
+#~ " الحد %(area_limit)s كم². يرجى اختيار "
+#~ "مساحة أصغر."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km². Large areas"
+#~ " (>%(area_warn)s km²) may take longer "
+#~ "to process. The data extract API "
+#~ "is limited to 200 km²."
+#~ msgstr ""
+#~ "المساحة هي %(area_km2)s كم². قد تستغرق"
+#~ " المساحات الكبيرة (>% (area_warn)s كم²) "
+#~ "وقتًا أطول للمعالجة. واجهة استخراج "
+#~ "البيانات محدودة بـ 200 كم²."
+
+#~ msgid "Project AOI"
+#~ msgstr "منطقة اهتمام المشروع"
+
+#~ msgid "Data Extract (%(data_feature_count)s features)"
+#~ msgstr "استخراج البيانات (%(data_feature_count)s معالم)"
+
+#~ msgid "Task Boundaries (%(task_count)s tasks)"
+#~ msgstr "حدود المهام (%(task_count)s مهام)"
+
+#~ msgid "Task ID"
+#~ msgstr "معرّف المهمة"
+
+#~ msgid "Building Count"
+#~ msgstr "عدد المباني"
+
+#~ msgid ""
+#~ "No task boundaries found. Please split"
+#~ " the project into tasks first using"
+#~ " the \"Split AOI\" button above."
+#~ msgstr ""
+#~ "لم يتم العثور على حدود للمهام. "
+#~ "يرجى تقسيم المشروع إلى مهام أولاً "
+#~ "باستخدام زر \"تقسيم AOI\" أعلاه."
+
+#~ msgid ""
+#~ "✓ AOI split successfully! Generated "
+#~ "%(task_count)s task areas using %(algorithm)s."
+#~ msgstr ""
+#~ "✓ تم تقسيم AOI بنجاح! تم إنشاء "
+#~ "%(task_count)s مناطق مهام باستخدام "
+#~ "%(algorithm)s."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task "
+#~ "boundaries%(data_extract_info)s. Review the results"
+#~ " below. If satisfied, click \"Accept "
+#~ "Task Choices\" to save. Otherwise, "
+#~ "adjust parameters above and click "
+#~ "\"Split Again\" to regenerate."
+#~ msgstr ""
+#~ "معاينة %(task_count)s حدود "
+#~ "مهام%(data_extract_info)s. راجع النتائج أدناه. "
+#~ "إذا كانت مناسبة، انقر \"قبول خيارات "
+#~ "المهام\" للحفظ. وإلا عدّل المعلمات أعلاه"
+#~ " وانقر \"إعادة التقسيم\" لإعادة التوليد."
+
+#~ msgid "Data Extract"
+#~ msgstr "استخراج البيانات"
+
+#~ msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+#~ msgstr "تم تنزيل بيانات OSM بنجاح! تم العثور على %(feature_count)s معالم."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try downloading again "
+#~ "with different parameters."
+#~ msgstr ""
+#~ "معاينة %(feature_count)s معالم على الخريطة."
+#~ " راجع البيانات أدناه. إذا كانت "
+#~ "مناسبة، انقر \"قبول استخراج البيانات\" "
+#~ "للحفظ. وإلا فحاول التنزيل مرة أخرى "
+#~ "بمعلمات مختلفة."
+
+#~ msgid "Invalid file type. Please upload a .geojson or .json file."
+#~ msgstr "نوع الملف غير صالح. يرجى رفع ملف .geojson أو .json."
+
+#~ msgid "No valid geometries found in GeoJSON."
+#~ msgstr "لم يتم العثور على أشكال هندسية صالحة في GeoJSON."
+
+#~ msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+#~ msgstr "✓ تم رفع GeoJSON بنجاح! تم العثور على %(feature_count)s معالم."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try uploading a "
+#~ "different file."
+#~ msgstr ""
+#~ "معاينة %(feature_count)s معالم على الخريطة."
+#~ " راجع البيانات أدناه. إذا كانت "
+#~ "مناسبة، انقر \"قبول استخراج البيانات\" "
+#~ "للحفظ. وإلا فحاول رفع ملف مختلف."
+
+#~ msgid ""
+#~ "No GeoJSON data found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "لم يتم العثور على بيانات GeoJSON. "
+#~ "يرجى تنزيل بيانات OSM أو رفع ملف"
+#~ " GeoJSON أولاً."
+
+#~ msgid "Data Extract (%(feature_count)s features)"
+#~ msgstr "استخراج البيانات (%(feature_count)s معالم)"
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s data features on"
+#~ " map. Review the data, then continue"
+#~ " to the next step."
+#~ msgstr ""
+#~ "معاينة %(feature_count)s من معالم البيانات "
+#~ "على الخريطة. راجع البيانات ثم تابع "
+#~ "إلى الخطوة التالية."
+
+#~ msgid ""
+#~ "✓ Collect-new-data mode selected. "
+#~ "Task splitting is skipped and you "
+#~ "can continue."
+#~ msgstr ""
+#~ "✓ تم اختيار وضع جمع البيانات "
+#~ "الجديدة. تم تخطي تقسيم المهام ويمكنك "
+#~ "المتابعة."
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ تم حفظ استخراج البيانات بنجاح! "
+#~ "يمكنك الآن المتابعة إلى الخطوة 4 "
+#~ "(تقسيم المهام)."
+
+#~ msgid ""
+#~ "No data extract found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "لم يتم العثور على استخراج بيانات. "
+#~ "يرجى تنزيل بيانات OSM أو رفع ملف"
+#~ " GeoJSON أولاً."
+
+#~ msgid ""
+#~ "Previewing whole AOI (no splitting) with"
+#~ " %(data_feature_count)s data features. The "
+#~ "entire AOI will be used as a "
+#~ "single task."
+#~ msgstr ""
+#~ "معاينة AOI بالكامل (دون تقسيم) مع "
+#~ "%(data_feature_count)s معالم بيانات. سيتم "
+#~ "استخدام AOI بالكامل كمهمة واحدة."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task boundaries and"
+#~ " %(data_feature_count)s data features together."
+#~ msgstr ""
+#~ "معاينة %(task_count)s حدود مهام "
+#~ "و%(data_feature_count)s معالم بيانات معًا."
+
+#~ msgid "Project outline not found. Cannot skip task splitting."
+#~ msgstr "لم يتم العثور على حدود المشروع. لا يمكن تخطي تقسيم المهام."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 5."
+#~ msgstr ""
+#~ "✓ تم تخطي تقسيم المهام. سيتم "
+#~ "استخدام AOI بالكامل كمهمة واحدة. يمكنك"
+#~ " المتابعة إلى الخطوة 5."
+
+#~ msgid "Please select a splitting option."
+#~ msgstr "يرجى اختيار خيار للتقسيم."
+
+#~ msgid "✓ Task splitting is not required for this project setup."
+#~ msgstr "✓ تقسيم المهام غير مطلوب لهذا الإعداد."
+
+#~ msgid "No data extract provided."
+#~ msgstr "لم يتم توفير استخراج بيانات."
+
+#~ msgid "Invalid data extract format."
+#~ msgstr "تنسيق استخراج البيانات غير صالح."
+
+#~ msgid ""
+#~ "✓ Data extract accepted! Saved "
+#~ "%(feature_count)s features. Step 2 is "
+#~ "now complete."
+#~ msgstr ""
+#~ "✓ تم قبول استخراج البيانات! تم حفظ"
+#~ " %(feature_count)s معالم. الخطوة 2 اكتملت"
+#~ " الآن."
+
+#~ msgid "No task areas data provided."
+#~ msgstr "لم يتم توفير بيانات مناطق المهام."
+
+#~ msgid "Invalid task areas data format."
+#~ msgstr "تنسيق بيانات مناطق المهام غير صالح."
+
+#~ msgid "✓ Split tasks saved successfully"
+#~ msgstr "✓ تم حفظ المهام المقسمة بنجاح"
+
+#~ msgid ""
+#~ "Provide ODK URL, username, and password"
+#~ " (all 3), or leave them all "
+#~ "blank to use server defaults."
+#~ msgstr ""
+#~ "قدّم رابط ODK واسم المستخدم وكلمة "
+#~ "المرور (الثلاثة معًا)، أو اتركها كلها"
+#~ " فارغة لاستخدام الإعدادات الافتراضية "
+#~ "للخادم."
+
+#~ msgid "GeoJSON is required"
+#~ msgstr "ملف GeoJSON مطلوب"
+
+#~ msgid "No polygon geometries found. Project area must be a polygon."
+#~ msgstr "لم يتم العثور على أشكال مضلعة. يجب أن تكون منطقة المشروع مضلعًا."
+
+#~ msgid "Selected area is too large. Please select an area smaller than 200 km²."
+#~ msgstr "المنطقة المحددة كبيرة جدًا. يرجى تحديد منطقة أصغر من 200 km²."
+
+#~ msgid "Failed to generate data extract from the raw data API."
+#~ msgstr "فشل في إنشاء مستخلص البيانات من واجهة برمجة تطبيقات البيانات الأولية."
+
+#~ msgid "QField project ID not found."
+#~ msgstr "لم يتم العثور على المشروع."
+
+#~ msgid "Project name not found."
+#~ msgstr "لم يتم العثور على المشروع."
+
+#~ msgid "ODK project ID not found."
+#~ msgstr "لم يتم العثور على المشروع."
+
+#~ msgid "Appuser token not found."
+#~ msgstr "لم يتم العثور على المشروع."
+
+#~ msgid "Failed to generate QR code."
+#~ msgstr "فشل تحميل نموذج القالب."
+
+#~ msgid "Template XLSForm content is empty."
+#~ msgstr "محتوى قالب XLSForm فارغ."
+
+#~ msgid "Project outline is missing or has no geometry."
+#~ msgstr "مخطط المشروع مفقود أو ليس له أي شكل هندسي."
+
+#~ msgid "Project outline geometry has no coordinates."
+#~ msgstr "هندسة المخطط التفصيلي للمشروع ليس لها إحداثيات."
+
+#~ msgid "Project outline is required for QField project creation."
+#~ msgstr "مخطط المشروع مطلوب لإنشاء مشروع QField."
+
+#~ msgid "XLSForm is required for QField project creation."
+#~ msgstr "مطلوب XLSForm لإنشاء مشروع QField."
+
+#~ msgid "Failed to modify XLSForm for QField."
+#~ msgstr "فشل تعديل XLSForm لـ QField."
+
+#~ msgid "QGIS wrapper completed but wrote no output files."
+#~ msgstr "اكتمل غلاف QGIS ولكنه لم يكتب أي ملفات إخراج."
+
+#~ msgid "QGIS wrapper completed but no .qgz file in output."
+#~ msgstr "اكتمل غلاف QGIS ولكن لا يوجد ملف .qgz في الإخراج."
+
+#~ msgid "QField project ID is missing; cannot attach basemap."
+#~ msgstr "معرف مشروع QField مفقود؛ لا يمكن إرفاق خريطة الأساس."
+
+#~ msgid "Basemap attach completed but produced no project files."
+#~ msgstr "تم إرفاق الخريطة الأساسية بمشروع QField."
+
+#~ msgid "QGIS project generation failed: %(error)s"
+#~ msgstr "فشل إنشاء مشروع QGIS: %(error)s"
+
+#~ msgid "QGIS wrapper returned invalid JSON."
+#~ msgstr "قام مجمّع QGIS بإرجاع JSON غير صالح."
+
+#~ msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+#~ msgstr "فشل تنزيل خريطة الأساس MBTiles للتحميل (HTTP %(status)s)."
+
+#~ msgid "Downloaded basemap MBTiles is empty."
+#~ msgstr "تنزيل رمز QR"
+
+#~ msgid "Failed to upload files to QFieldCloud: %(error)s"
+#~ msgstr "فشل تحميل الملفات إلى QFieldCloud: %(error)s"
+
+#~ msgid "QFieldCloud project '%(project_id)s' not found."
+#~ msgstr "لم يتم العثور على المشروع (%(project_id)s)."
+
+#~ msgid ""
+#~ "Project belongs to organization '%(owner)s'."
+#~ " Could not add '%(username)s' to the"
+#~ " organization: %(error)s"
+#~ msgstr ""
+#~ "ينتمي المشروع إلى منظمة \"%(owner)s\". "
+#~ "تعذر إضافة \"%(username)s\" إلى المؤسسة: "
+#~ "%(error)s"
+
+#~ msgid "User '%(username)s' does not exist on QFieldCloud."
+#~ msgstr "المستخدم \"%(username)s\" غير موجود على QFieldCloud."
+
+#~ msgid "User '%(username)s' is already a collaborator on this project."
+#~ msgstr "هذا المستخدم متعاون بالفعل في هذا المشروع."
+
+#~ msgid "QFieldCloud credentials are invalid."
+#~ msgstr "✓ بيانات الاعتماد صالحة!"
+
+#~ msgid "Filters"
+#~ msgstr "عوامل التصفية"
+
+#~ msgid "All projects"
+#~ msgstr "جميع المشاريع"
+
+#~ msgid "Draft"
+#~ msgstr "مسودة"
+
+#~ msgid "Published"
+#~ msgstr "منشور"
+
+#~ msgid "Completed"
+#~ msgstr "مكتمل"
+
+#~ msgid "Archived"
+#~ msgstr "مؤرشف"
+
+#~ msgid "Project Status"
+#~ msgstr "حالة المشروع"
+
+#~ msgid "Newest first"
+#~ msgstr "الأحدث أولاً"
+
+#~ msgid "Oldest first"
+#~ msgstr "الأقدم أولاً"
+
+#~ msgid "Name (A-Z)"
+#~ msgstr "الاسم (أ-ي)"
+
+#~ msgid "Name (Z-A)"
+#~ msgstr "الاسم (ي-أ)"
+
+#~ msgid "Sort By"
+#~ msgstr "ترتيب حسب"
+
+#~ msgid "Search"
+#~ msgstr "بحث"
+
+#~ msgid "Search projects…"
+#~ msgstr "ابحث في المشاريع…"
+
+#~ msgid "Create Project"
+#~ msgstr "إنشاء مشروع"
+
+#~ msgid "+ New"
+#~ msgstr "+ جديد"
+
+#~ msgid "Showing %(count)s project"
+#~ msgid_plural "Showing %(count)s projects"
+#~ msgstr[0] "عرض مشروع واحد"
+#~ msgstr[1] "عرض مشروعين"
+#~ msgstr[2] "عرض %(count)s مشاريع"
+#~ msgstr[3] "عرض %(count)s مشروعًا"
+#~ msgstr[4] "عرض %(count)s مشروع"
+#~ msgstr[5] "عرض %(count)s مشروع"
+
+#~ msgid "in %(status)s"
+#~ msgstr "ضمن %(status)s"
+
+#~ msgid ""
+#~ "matching\n"
+#~ "      \"%(query)s\""
+#~ msgstr "المطابقة لـ \"%(query)s\""
+
+#~ msgid "Private Project"
+#~ msgstr "مشروع خاص"
+
+#~ msgid "Unnamed Project"
+#~ msgstr "مشروع بلا اسم"
+
+#~ msgid "Location:"
+#~ msgstr "الموقع:"
+
+#~ msgid "Created:"
+#~ msgstr "أُنشئ:"
+
+#~ msgid "N/A"
+#~ msgstr "غير متاح"
+
+#~ msgid "No projects found. Create your first project to get started!"
+#~ msgstr "لم يتم العثور على مشاريع. أنشئ مشروعك الأول للبدء!"
+
+#~ msgid "Coordinate field campaigns"
+#~ msgstr "نسّق الحملات الميدانية"
+
+#~ msgid ""
+#~ "Enhancing field mapping efficiency and "
+#~ "accuracy through seamless coordination."
+#~ msgstr "تعزيز كفاءة ودقة الخرائط الميدانية من خلال تنسيق سلس."
+
+#~ msgid "Explore Projects"
+#~ msgstr "استكشف المشاريع"
+
+#~ msgid "Loading metrics..."
+#~ msgstr "جارٍ تحميل المؤشرات..."
+
+#~ msgid "What is it?"
+#~ msgstr "ما هذا؟"
+
+#~ msgid ""
+#~ "The Field Tasking Manager (Field-TM) "
+#~ "helps teams add local knowledge to "
+#~ "map features\n"
+#~ "        by coordinating mapping in the field."
+#~ msgstr ""
+#~ "يساعد Field Tasking Manager (Field-TM)"
+#~ " الفرق على إضافة المعرفة المحلية إلى"
+#~ " المعالم الجغرافية من خلال تنسيق "
+#~ "أعمال الخرائط في الميدان."
+
+#~ msgid ""
+#~ "Field-TM facilitates collaborative mapping "
+#~ "by supporting and extending mature tools"
+#~ "\n"
+#~ "        like ODK and QField. It is"
+#~ " a standalone mobile and web workflow"
+#~ " that helps teams collect\n"
+#~ "        geospatial data efficiently with "
+#~ "commonly available Android devices."
+#~ msgstr ""
+#~ "يسهّل Field-TM رسم الخرائط التعاوني "
+#~ "من خلال دعم وتوسيع أدوات ناضجة مثل"
+#~ " ODK وQField. وهو سير عمل مستقل "
+#~ "على الويب والهواتف يساعد الفرق على "
+#~ "جمع البيانات الجغرافية المكانية بكفاءة "
+#~ "باستخدام أجهزة Android المتاحة عادة."
+
+#~ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+#~ msgstr "مدير مشروع يعرض سير عمل الخرائط في FieldTM على حاسوب محمول"
+
+#~ msgid "Main Features"
+#~ msgstr "الميزات الرئيسية"
+
+#~ msgid "Flexible Data Collection"
+#~ msgstr "جمع بيانات مرن"
+
+#~ msgid ""
+#~ "Support diverse survey forms, multiple "
+#~ "data formats, and adaptable workflows "
+#~ "that\n"
+#~ "          fit different operational needs."
+#~ msgstr ""
+#~ "يدعم نماذج استبيان متنوعة، وتنسيقات "
+#~ "بيانات متعددة، وسير عمل قابل للتكيف "
+#~ "يلائم احتياجات تشغيلية مختلفة."
+
+#~ msgid "Open Source and Customizable"
+#~ msgstr "مفتوح المصدر وقابل للتخصيص"
+
+#~ msgid ""
+#~ "Adapt Field-TM to your own survey"
+#~ " logic, data structures, and integration"
+#~ "\n"
+#~ "          requirements."
+#~ msgstr ""
+#~ "خصّص Field-TM ليلائم منطق الاستبيانات"
+#~ " لديك، وبنى البيانات، ومتطلبات التكامل."
+
+#~ msgid "Entity-Level Tracking"
+#~ msgstr "تتبع على مستوى الكيان"
+
+#~ msgid ""
+#~ "Monitor survey progress at task and "
+#~ "feature level so managers can make "
+#~ "informed\n"
+#~ "          decisions quickly."
+#~ msgstr ""
+#~ "راقب تقدم الاستبيان على مستوى المهام "
+#~ "والمعالم كي يتمكن المدراء من اتخاذ "
+#~ "قرارات مدروسة بسرعة."
+
+#~ msgid "Who is it for?"
+#~ msgstr "لمن هو؟"
+
+#~ msgid "Project Manager"
+#~ msgstr "مدير المشروع"
+
+#~ msgid "Create and coordinate field campaigns"
+#~ msgstr "أنشئ ونسّق الحملات الميدانية"
+
+#~ msgid ""
+#~ "Project managers use Field-TM to "
+#~ "set up mapping projects, define areas"
+#~ " of interest,\n"
+#~ "          design survey forms, and split work into manageable tasks."
+#~ msgstr ""
+#~ "يستخدم مديرو المشاريع Field-TM لإعداد"
+#~ " مشاريع الخرائط، وتحديد مناطق الاهتمام، "
+#~ "وتصميم نماذج الاستبيان، وتقسيم العمل إلى"
+#~ " مهام يمكن إدارتها."
+
+#~ msgid "Define a project area and upload or choose a survey form"
+#~ msgstr "حدّد منطقة المشروع ثم ارفع أو اختر نموذج استبيان"
+
+#~ msgid "Split the area into tasks and generate a data extract"
+#~ msgstr "قسّم المنطقة إلى مهام وأنشئ استخراجًا للبيانات"
+
+#~ msgid "Publish the project to ODK Central or QFieldCloud"
+#~ msgstr "انشر المشروع على ODK Central أو QFieldCloud"
+
+#~ msgid "Share a QR code so mappers can start collecting data"
+#~ msgstr "شارك رمز QR ليتمكن الرسامون من بدء جمع البيانات"
+
+#~ msgid "Field Mapper"
+#~ msgstr "الرسام الميداني"
+
+#~ msgid "Collect data in the field with your phone"
+#~ msgstr "اجمع البيانات في الميدان باستخدام هاتفك"
+
+#~ msgid ""
+#~ "Mappers do not need to log in "
+#~ "to Field-TM. Once a project "
+#~ "manager publishes a\n"
+#~ "          project, mappers access it "
+#~ "directly in their mobile app of "
+#~ "choice."
+#~ msgstr ""
+#~ "لا يحتاج الرسامون إلى تسجيل الدخول "
+#~ "إلى Field-TM. بمجرد أن ينشر مدير"
+#~ " المشروع مشروعًا، يمكنهم الوصول إليه "
+#~ "مباشرة من تطبيق الهاتف الذي يختارونه."
+
+#~ msgid "Scan the QR code shared by your project manager"
+#~ msgstr "امسح رمز QR الذي شاركه مدير مشروعك"
+
+#~ msgid "The project loads automatically in ODK Collect or QField"
+#~ msgstr "يُحمّل المشروع تلقائيًا في ODK Collect أو QField"
+
+#~ msgid "Navigate to your assigned task area and collect data"
+#~ msgstr "انتقل إلى منطقة المهمة المخصصة لك واجمع البيانات"
+
+#~ msgid "Submit your survey, which goes straight to the server"
+#~ msgstr "أرسل الاستبيان الخاص بك ليصل مباشرة إلى الخادم"
+
+#~ msgid "Field-TM Use Cases"
+#~ msgstr "حالات استخدام Field-TM"
+
+#~ msgid "Field mapping in progress"
+#~ msgstr "أعمال الخرائط الميدانية جارية"
+
+#~ msgid "1. Community Mapping"
+#~ msgstr "1. الخرائط المجتمعية"
+
+#~ msgid ""
+#~ "Field Tasking Manager empowers communities "
+#~ "to map informal settlements, public\n"
+#~ "            facilities, and local services for inclusive planning."
+#~ msgstr ""
+#~ "يمكّن مدير المهام الميدانية المجتمعات من"
+#~ " رسم خرائط المستوطنات غير الرسمية، "
+#~ "والمرافق العامة، والخدمات المحلية من أجل"
+#~ " تخطيط شامل."
+
+#~ msgid "2. Urban Planning and Management"
+#~ msgstr "2. التخطيط والإدارة الحضرية"
+
+#~ msgid ""
+#~ "Build smarter cities with coordinated "
+#~ "surveys of houses, roads, and utilities"
+#~ "\n"
+#~ "            through clear, manageable mapping tasks."
+#~ msgstr ""
+#~ "ابنِ مدنًا أكثر ذكاءً من خلال "
+#~ "استبيانات منسقة للمنازل والطرق والمرافق "
+#~ "عبر مهام خرائط واضحة وقابلة للإدارة."
+
+#~ msgid "3. Disaster Response and Recovery"
+#~ msgstr "3. الاستجابة للكوارث والتعافي"
+
+#~ msgid ""
+#~ "Rapidly map damaged infrastructure after "
+#~ "disasters, coordinate volunteers, and\n"
+#~ "            deliver reliable data for relief operations."
+#~ msgstr ""
+#~ "ارسم بسرعة خرائط البنية التحتية المتضررة"
+#~ " بعد الكوارث، ونسّق المتطوعين، ووفّر "
+#~ "بيانات موثوقة لعمليات الإغاثة."
+
+#~ msgid "Resources"
+#~ msgstr "الموارد"
+
+#~ msgid "Data Prep"
+#~ msgstr "إعداد البيانات"
+
+#~ msgid "HOT Export Tool"
+#~ msgstr "أداة HOT للتصدير"
+
+#~ msgid "Download task-ready geospatial data extracts for your project area."
+#~ msgstr "نزّل مقتطفات بيانات جغرافية مكانية جاهزة للمهام لمنطقة مشروعك."
+
+#~ msgid "Documentation"
+#~ msgstr "التوثيق"
+
+#~ msgid "ODK Central Guide"
+#~ msgstr "دليل ODK Central"
+
+#~ msgid "Learn how to manage forms, app users, and field submissions in ODK."
+#~ msgstr ""
+#~ "تعرّف على كيفية إدارة النماذج، ومستخدمي"
+#~ " التطبيق، والإرسالات الميدانية في ODK."
+
+#~ msgid "QField Guide"
+#~ msgstr "دليل QField"
+
+#~ msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+#~ msgstr ""
+#~ "أعد إعداد مشاريع QFieldCloud وسير العمل"
+#~ " على الهاتف لرسم الخرائط دون اتصال."
+
+#~ msgid "Need assistance?"
+#~ msgstr "هل تحتاج إلى مساعدة؟"
+
+#~ msgid "Email:"
+#~ msgstr "البريد الإلكتروني:"
+
+#~ msgid "Language"
+#~ msgstr "إدارة"
+
+#~ msgid "Coordinated field mapping for Open Mapping campaigns."
+#~ msgstr "خرائط ميدانية منسقة لحملات Open Mapping."
+
+#~ msgid "Login"
+#~ msgstr "تسجيل الدخول"
+
+#~ msgid "Projects"
+#~ msgstr "المشاريع"
+
+#~ msgid "QField Admin"
+#~ msgstr "إدارة QField"
+
+#~ msgid "Sign in to Field-TM"
+#~ msgstr "سجّل الدخول إلى Field-TM"
+
+#~ msgid "Redirecting to the centralized login service."
+#~ msgstr "جارٍ إعادة التوجيه إلى خدمة الدخول المركزية."
+
+#~ msgid "Continue to login"
+#~ msgstr "المتابعة إلى تسجيل الدخول"
+
+#~ msgid "Authentication is disabled on this deployment."
+#~ msgstr "تم تعطيل المصادقة في هذا النشر."
+
+#~ msgid "Back to home"
+#~ msgstr "العودة إلى الرئيسية"
+
+#~ msgid "Create New Project"
+#~ msgstr "إنشاء مشروع جديد"
+
+#~ msgid "Project Name"
+#~ msgstr "اسم المشروع"
+
+#~ msgid "Enter project name"
+#~ msgstr "أدخل اسم المشروع"
+
+#~ msgid "Enter project description"
+#~ msgstr "أدخل وصف المشروع"
+
+#~ msgid "Field Mapping App"
+#~ msgstr "تطبيق الخرائط الميدانية"
+
+#~ msgid "Project Area"
+#~ msgstr "منطقة المشروع"
+
+#~ msgid "Draw Area"
+#~ msgstr "ارسم المنطقة"
+
+#~ msgid "Upload GeoJSON"
+#~ msgstr "رفع GeoJSON"
+
+#~ msgid "Clear"
+#~ msgstr "مسح"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area.\n"
+#~ "          Maximum project size is 1,000"
+#~ " km². Areas over 100 km² will "
+#~ "show a warning. The OSM data\n"
+#~ "          extract API is limited to 200 km²."
+#~ msgstr ""
+#~ "ارسم مضلعًا على الخريطة أو ارفع "
+#~ "ملف GeoJSON لتحديد منطقة المشروع. الحد"
+#~ " الأقصى لحجم المشروع هو 1,000 كم²."
+#~ " ستظهر رسالة تحذير للمناطق التي "
+#~ "تتجاوز 100 كم². كما أن واجهة "
+#~ "استخراج بيانات OSM محدودة بـ 200 "
+#~ "كم²."
+
+#~ msgid "Advanced Config"
+#~ msgstr "إعدادات متقدمة"
+
+#~ msgid "Merge geometries (use convex hull for multipolygons)"
+#~ msgstr "ادمج الأشكال الهندسية (استخدم الغلاف المحدب للمتعددات)"
+
+#~ msgid "Hashtags"
+#~ msgstr "الوسوم"
+
+#~ msgid "Type hashtags and press Enter or comma"
+#~ msgstr "اكتب وسومًا واضغط Enter أو فاصلة"
+
+#~ msgid ""
+#~ "Type hashtags and press Enter or "
+#~ "comma to add them. Click the × "
+#~ "on a tag to remove\n"
+#~ "          it."
+#~ msgstr "اكتب الوسوم واضغط Enter أو فاصلة لإضافتها. انقر × على الوسم لإزالته."
+
+#~ msgid "Creating..."
+#~ msgstr "جارٍ الإنشاء..."
+
+#~ msgid "Something went wrong. Please try again."
+#~ msgstr "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+
+#~ msgid "Invalid GeoJSON format. Please check your file."
+#~ msgstr "تنسيق GeoJSON غير صالح. يرجى التحقق من الملف."
+
+#~ msgid "Invalid GeoJSON file. Please check the file format."
+#~ msgstr "ملف GeoJSON غير صالح. يرجى التحقق من تنسيق الملف."
+
+#~ msgid ""
+#~ "You must draw or upload an Area"
+#~ " of Interest (AOI) on the map "
+#~ "before submitting."
+#~ msgstr "يجب عليك رسم أو رفع منطقة الاهتمام (AOI) على الخريطة قبل الإرسال."
+
+#~ msgid ""
+#~ "A project with this name already "
+#~ "exists. Please choose a different name."
+#~ msgstr "يوجد مشروع بهذا الاسم بالفعل. يرجى اختيار اسم مختلف."
+
+#~ msgid "Description is required."
+#~ msgstr "الوصف مطلوب."
+
+#~ msgid "← Back to Projects"
+#~ msgstr "← العودة إلى المشاريع"
+
+#~ msgid "Project Metadata"
+#~ msgstr "بيانات المشروع الوصفية"
+
+#~ msgid "Project metadata and setup information for managers."
+#~ msgstr "بيانات المشروع الوصفية ومعلومات الإعداد للمديرين."
+
+#~ msgid "Project ID"
+#~ msgstr "معرّف المشروع"
+
+#~ msgid "Created"
+#~ msgstr "أُنشئ"
+
+#~ msgid "Last Updated"
+#~ msgstr "آخر تحديث"
+
+#~ msgid "External Project"
+#~ msgstr "مشروع خارجي"
+
+#~ msgid "Instance:"
+#~ msgstr "النسخة:"
+
+#~ msgid "Project ID:"
+#~ msgstr "معرّف المشروع:"
+
+#~ msgid "View Project in ODK Central →"
+#~ msgstr "عرض المشروع في ODK Central →"
+
+#~ msgid "Manage QFieldCloud Project →"
+#~ msgstr "إدارة مشروع QFieldCloud →"
+
+#~ msgid "View Project Externally →"
+#~ msgstr "عرض المشروع خارجيًا →"
+
+#~ msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#~ msgstr ""
+#~ "حذف هذا المشروع في النظام اللاحق "
+#~ "وفي Field-TM؟ لا يمكن التراجع عن"
+#~ " هذا الإجراء."
+
+#~ msgid "Delete Project"
+#~ msgstr "حذف المشروع"
+
+#~ msgid "Back to Projects"
+#~ msgstr "العودة إلى المشاريع"
+
+#~ msgid "Project Not Found"
+#~ msgstr "لم يتم العثور على المشروع"
+
+#~ msgid ""
+#~ "The project you're looking for doesn't"
+#~ " exist or you don't have permission"
+#~ " to view\n"
+#~ "        it."
+#~ msgstr "المشروع الذي تبحث عنه غير موجود أو لا تملك صلاحية عرضه."
+
+#~ msgid "QFieldCloud Admin"
+#~ msgstr "إدارة QFieldCloud"
+
+#~ msgid ""
+#~ "This page is for managing the "
+#~ "users in your QField project, after "
+#~ "creation."
+#~ msgstr "هذه الصفحة مخصصة لإدارة المستخدمين في مشروع QField الخاص بك بعد إنشائه."
+
+#~ msgid "Enter your QFieldCloud credentials to manage collaborators."
+#~ msgstr "أدخل بيانات اعتماد QFieldCloud لإدارة المتعاونين."
+
+#~ msgid "QFieldCloud URL"
+#~ msgstr "رابط QFieldCloud"
+
+#~ msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+#~ msgstr "الرابط الأساسي لنسخة QFieldCloud الخاصة بك (من دون ‎/api/v1)."
+
+#~ msgid "admin"
+#~ msgstr "admin"
+
+#~ msgid "Password"
+#~ msgstr "كلمة المرور"
+
+#~ msgid "Connect"
+#~ msgstr "اتصال"
+
+#~ msgid "Connecting…"
+#~ msgstr "جارٍ الاتصال…"
+
+#~ msgid "Features Surveyed (Approximate)"
+#~ msgstr "المعالم التي تم مسحها (تقريبيًا)"
+
+#~ msgid "Projects Created"
+#~ msgstr "المشاريع المُنشأة"
+
+#~ msgid "Countries Covered"
+#~ msgstr "الدول المشمولة"
+
+#~ msgid "Users Registered"
+#~ msgstr "المستخدمون المسجلون"
+
+#~ msgid "Supported Mapping Apps"
+#~ msgstr "تطبيقات الخرائط المدعومة"
+
+#~ msgid "Offline Basemap"
+#~ msgstr "خريطة أساسية دون اتصال"
+
+#~ msgid ""
+#~ "Search HOT OpenAerialMap imagery for "
+#~ "this AOI and generate an MBTiles "
+#~ "basemap."
+#~ msgstr ""
+#~ "ابحث في صور HOT OpenAerialMap لهذه "
+#~ "المنطقة وأنشئ خريطة أساسية بصيغة "
+#~ "MBTiles."
+
+#~ msgid "Search OAM Imagery"
+#~ msgstr "ابحث في صور OAM"
+
+#~ msgid "Basemap generation previously failed. Please search again and retry."
+#~ msgstr ""
+#~ "فشل إنشاء الخريطة الأساسية سابقًا. يرجى"
+#~ " البحث مرة أخرى ثم إعادة المحاولة."
+
+#~ msgid "No basemap selected yet."
+#~ msgstr "لم يتم اختيار خريطة أساسية بعد."
+
+#~ msgid "Manager Setup Summary"
+#~ msgstr "ملخص إعداد المدير"
+
+#~ msgid "The project setup flow is complete and shown below for reference."
+#~ msgstr "اكتمل مسار إعداد المشروع وهو معروض أدناه للرجوع إليه."
+
+#~ msgid "Project Location"
+#~ msgstr "موقع المشروع"
+
+#~ msgid "Step 2: Upload XLSForm"
+#~ msgstr "الخطوة 2: رفع XLSForm"
+
+#~ msgid "Complete"
+#~ msgstr "مكتمل"
+
+#~ msgid "Step 3: Get Data"
+#~ msgstr "الخطوة 3: جلب البيانات"
+
+#~ msgid "Step 4: Split into Tasks"
+#~ msgstr "الخطوة 4: التقسيم إلى مهام"
+
+#~ msgid "Step 5: Finalise Project"
+#~ msgstr "الخطوة 5: إنهاء المشروع"
+
+#~ msgid ""
+#~ "If you need to upload additional "
+#~ "media files to this project, such "
+#~ "as images and\n"
+#~ "          videos, log into ODK Central"
+#~ " and upload them in the form "
+#~ "settings."
+#~ msgstr ""
+#~ "إذا كنت بحاجة إلى رفع ملفات وسائط"
+#~ " إضافية إلى هذا المشروع، مثل الصور"
+#~ " ومقاطع الفيديو، فسجّل الدخول إلى ODK"
+#~ " Central وارفعها من إعدادات النموذج."
+
+#~ msgid "Ready for Mapping"
+#~ msgstr "جاهز لرسم الخرائط"
+
+#~ msgid "Loading QR code..."
+#~ msgstr "جارٍ تحميل رمز QR..."
+
+#~ msgid "Project Setup"
+#~ msgstr "إعداد المشروع"
+
+#~ msgid "Step 2: Select Survey Form"
+#~ msgstr "الخطوة 2: اختيار نموذج الاستبيان"
+
+#~ msgid "Choose a preset survey type, or upload your own custom XLSForm."
+#~ msgstr "اختر نوع الاستبيان وتابع باستخدام الإعدادات الافتراضية الموصى بها."
+
+#~ msgid "Choose Survey Type:"
+#~ msgstr "اختر نوع الاستبيان:"
+
+#~ msgid "Loading survey types..."
+#~ msgstr "جارٍ تحميل أنواع الاستبيان..."
+
+#~ msgid "Or use your own form instead:"
+#~ msgstr "أو استخدم النموذج الخاص بك بدلاً من ذلك:"
+
+#~ msgid "Upload Custom XLSForm"
+#~ msgstr "رفع نموذج مخصص"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task\n"
+#~ "          division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you\n"
+#~ "          want to ask (do not "
+#~ "include select_one_from_file fields for "
+#~ "tasks/features)."
+#~ msgstr ""
+#~ "ملاحظة: سيضيف Field-TM تلقائيًا حقولًا"
+#~ " إضافية إلى النموذج لتقسيم المهام "
+#~ "واختيار المعالم. يجب أن يحتوي النموذج"
+#~ " فقط على أسئلة الاستبيان التي تريد"
+#~ " طرحها (لا تُضمّن حقول select_one_from_file"
+#~ " الخاصة بالمهام أو المعالم)."
+
+#~ msgid ""
+#~ "Recommended defaults are active for ODK"
+#~ " projects, including ODK Collect\n"
+#~ "          compatibility."
+#~ msgstr ""
+#~ "الإعدادات الافتراضية الموصى بها مفعّلة "
+#~ "لمشاريع ODK، بما في ذلك التوافق مع"
+#~ " ODK Collect."
+
+#~ msgid "Recommended defaults are active for %(app_name)s projects."
+#~ msgstr "الإعدادات الافتراضية الموصى بها مفعّلة لمشاريع %(app_name)s."
+
+#~ msgid "Recommended defaults are active for this project."
+#~ msgstr "الإعدادات الافتراضية الموصى بها مفعّلة لهذا المشروع."
+
+#~ msgid "Default Language:"
+#~ msgstr "اللغة الافتراضية:"
+
+#~ msgid "English"
+#~ msgstr "الإنجليزية"
+
+#~ msgid "Spanish"
+#~ msgstr "الإسبانية"
+
+#~ msgid "French"
+#~ msgstr "الفرنسية"
+
+#~ msgid "Portuguese"
+#~ msgstr "البرتغالية"
+
+#~ msgid "Swahili"
+#~ msgstr "السواحيلية"
+
+#~ msgid "Hindi"
+#~ msgstr "الهندية"
+
+#~ msgid "Form Options:"
+#~ msgstr "خيارات النموذج:"
+
+#~ msgid "Include photo upload question"
+#~ msgstr "تضمين سؤال رفع صورة"
+
+#~ msgid "Make photo mandatory"
+#~ msgstr "اجعل الصورة إلزامية"
+
+#~ msgid "Asks the user to take a photo at their location."
+#~ msgstr "يطلب من المستخدم التقاط صورة في موقعه."
+
+#~ msgid "Include digitisation verification question"
+#~ msgstr "تضمين سؤال التحقق من الرقمنة"
+
+#~ msgid "Asks the mapper to verify if existing features are correctly digitised."
+#~ msgstr "يطلب من الرسام التحقق مما إذا كانت المعالم الحالية مرقمنة بشكل صحيح."
+
+#~ msgid "Continue"
+#~ msgstr "متابعة"
+
+#~ msgid "✓ Survey form uploaded successfully"
+#~ msgstr "✓ تم رفع نموذج الاستبيان بنجاح"
+
+#~ msgid "Download the recommended OSM data for your survey form."
+#~ msgstr "نزّل بيانات OSM الموصى بها لنموذج الاستبيان الخاص بك."
+
+#~ msgid "Review the data on the map, then continue."
+#~ msgstr "راجع البيانات على الخريطة ثم تابع."
+
+#~ msgid "Download OSM Data"
+#~ msgstr "تنزيل بيانات OSM"
+
+#~ msgid "Collect New Data Only"
+#~ msgstr "جمع بيانات جديدة فقط"
+
+#~ msgid "Use custom data inputs or override the default OSM download options."
+#~ msgstr "استخدم بيانات مخصصة أو تجاوز خيارات تنزيل OSM الافتراضية."
+
+#~ msgid "OSM Category:"
+#~ msgstr "فئة OSM:"
+
+#~ msgid "OSM Buildings"
+#~ msgstr "مباني OSM"
+
+#~ msgid "OSM Highways"
+#~ msgstr "طرق OSM"
+
+#~ msgid "OSM Healthcare"
+#~ msgstr "رعاية صحية OSM"
+
+#~ msgid "OSM Toilets"
+#~ msgstr "دورات مياه OSM"
+
+#~ msgid "OSM Religious"
+#~ msgstr "معالم دينية OSM"
+
+#~ msgid "OSM Landuse"
+#~ msgstr "استخدامات الأراضي OSM"
+
+#~ msgid "OSM Waterways"
+#~ msgstr "مجاري مائية OSM"
+
+#~ msgid "OSM Water Points"
+#~ msgstr "نقاط مياه OSM"
+
+#~ msgid "OSM Waste Disposal"
+#~ msgstr "التخلص من النفايات OSM"
+
+#~ msgid "OSM Education"
+#~ msgstr "تعليم OSM"
+
+#~ msgid "OSM Cemeteries"
+#~ msgstr "مقابر OSM"
+
+#~ msgid "OSM Amenities"
+#~ msgstr "مرافق OSM"
+
+#~ msgid "Geometry Type:"
+#~ msgstr "نوع الشكل الهندسي:"
+
+#~ msgid "Polygon"
+#~ msgstr "مضلع"
+
+#~ msgid "Polyline"
+#~ msgstr "خط متعدد"
+
+#~ msgid "Point"
+#~ msgstr "نقطة"
+
+#~ msgid "Use centroids"
+#~ msgstr "استخدم مراكز الأشكال"
+
+#~ msgid "Upload Custom GeoJSON"
+#~ msgstr "رفع GeoJSON مخصص"
+
+#~ msgid "Generating OSM data extract... This may take a moment."
+#~ msgstr "جارٍ إنشاء استخراج بيانات OSM... قد يستغرق ذلك بعض الوقت."
+
+#~ msgid "OSM data extract ready"
+#~ msgstr "استخراج بيانات OSM جاهز"
+
+#~ msgid "Step 4: Split into Tasks (Optional)"
+#~ msgstr "الخطوة 3: التقسيم إلى مهام (اختياري)"
+
+#~ msgid "✓ Task splitting is not relevant without existing data"
+#~ msgstr "✓ تقسيم المهام غير مناسب في غياب بيانات موجودة"
+
+#~ msgid ""
+#~ "Generate task areas by splitting the "
+#~ "Area of Interest (AOI). Choose an "
+#~ "algorithm and\n"
+#~ "      parameters, then split. Review the"
+#~ " preview, and click \"Accept Task "
+#~ "Areas\" to save. Or\n"
+#~ "      click"
+#~ msgstr ""
+#~ "أنشئ مناطق المهام من خلال تقسيم "
+#~ "منطقة الاهتمام (AOI). اختر خوارزمية "
+#~ "ومعلمات ثم قم بالتقسيم. راجع المعاينة"
+#~ " وانقر على \"قبول مناطق المهام\" "
+#~ "للحفظ. أو انقر"
+
+#~ msgid "Skip"
+#~ msgstr "تخطي"
+
+#~ msgid "to use the whole AOI as a single task."
+#~ msgstr "لاستخدام AOI بالكامل كمهمة واحدة."
+
+#~ msgid "Choose which linear features influence building-based task splitting."
+#~ msgstr "اختر المعالم الخطية التي تؤثر في تقسيم المهام المعتمد على المباني."
+
+#~ msgid "Include roads"
+#~ msgstr "تضمين الطرق"
+
+#~ msgid "Include rivers"
+#~ msgstr "تضمين الأنهار"
+
+#~ msgid "Include railways"
+#~ msgstr "تضمين السكك الحديدية"
+
+#~ msgid "Include aeroways"
+#~ msgstr "تضمين المسارات الجوية"
+
+#~ msgid "Algorithm:"
+#~ msgstr "الخوارزمية:"
+
+#~ msgid "Select splitting option..."
+#~ msgstr "اختر خيار التقسيم..."
+
+#~ msgid "Split by Square"
+#~ msgstr "التقسيم حسب المربع"
+
+#~ msgid "Average Buildings v1 (Voronoi)"
+#~ msgstr "متوسط المباني v1 (فورونوي)"
+
+#~ msgid "Average Buildings v2 (Straight Skeleton)"
+#~ msgstr "متوسط المباني v2 (الهيكل المستقيم)"
+
+#~ msgid "Split by Specific Number of Tasks"
+#~ msgstr "التقسيم حسب عدد محدد من المهام (قريبًا)"
+
+#~ msgid "Avg. Buildings per Task:"
+#~ msgstr "متوسط المباني لكل مهمة:"
+
+#~ msgid "Number of Tasks:"
+#~ msgstr "عدد المهام:"
+
+#~ msgid "Dimension (meters):"
+#~ msgstr "البعد (بالمتر):"
+
+#~ msgid "Split Again"
+#~ msgstr "إعادة التقسيم"
+
+#~ msgid "Split AOI"
+#~ msgstr "تقسيم AOI"
+
+#~ msgid "Splitting AOI into tasks... This may take a moment."
+#~ msgstr "جارٍ تقسيم AOI إلى مهام... قد يستغرق ذلك بعض الوقت."
+
+#~ msgid "Ready"
+#~ msgstr "جاهز"
+
+#~ msgid ""
+#~ "All prerequisites are complete! Create "
+#~ "the project in your chosen mapping "
+#~ "tool."
+#~ msgstr ""
+#~ "اكتملت جميع المتطلبات المسبقة! أنشئ "
+#~ "المشروع في أداة الخرائط التي اخترتها."
+
+#~ msgid "Finalise Project"
+#~ msgstr "إنهاء المشروع"
+
+#~ msgid "Confirm Project Finalisation"
+#~ msgstr "تأكيد إنهاء المشروع"
+
+#~ msgid "Are you sure you want to finalise this project?"
+#~ msgstr "هل أنت متأكد أنك تريد إنهاء هذا المشروع؟"
+
+#~ msgid "Confirm & Finalise"
+#~ msgstr "تأكيد وإنهاء"
+
+#~ msgid "Custom Credentials"
+#~ msgstr "بيانات اعتماد مخصصة"
+
+#~ msgid "ODK Central URL"
+#~ msgstr "رابط ODK Central"
+
+#~ msgid "https://your-odk-central.com"
+#~ msgstr "https://your-odk-central.com"
+
+#~ msgid "QField Cloud URL"
+#~ msgstr "رابط QField Cloud"
+
+#~ msgid "https://qfield.cloud"
+#~ msgstr "https://qfield.cloud"
+
+#~ msgid "qfield_username"
+#~ msgstr "qfield_username"
+
+#~ msgid "qfield_password"
+#~ msgstr "qfield_password"
+
+#~ msgid "Test Credentials"
+#~ msgstr "اختبار بيانات الاعتماد"
+
+#~ msgid "Save & Continue"
+#~ msgstr "حفظ ومتابعة"
+
+#~ msgid "Select a survey type..."
+#~ msgstr "اختر نوع الاستبيان..."
+
+#~ msgid "No survey types available"
+#~ msgstr "لا توجد أنواع استبيان متاحة"
+
+#~ msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#~ msgstr "لا توجد نماذج استبيان متاحة. ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
+
+#~ msgid "Select a survey type, or upload a custom form in Advanced Config."
+#~ msgstr "اختر نوع استبيان، أو ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
+
+#~ msgid "Survey type selected."
+#~ msgstr "تم اختيار نوع الاستبيان."
+
+#~ msgid "Invalid file type. Please upload a .xls or .xlsx file."
+#~ msgstr "نوع الملف غير صالح. يرجى رفع ملف .xls أو .xlsx."
+
+#~ msgid "Selected file:"
+#~ msgstr "الملف المحدد:"
+
+#~ msgid "Custom form selected."
+#~ msgstr "تم اختيار نموذج مخصص."
+
+#~ msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+#~ msgstr "اختر نوع استبيان أولاً، أو ارفع نموذجًا مخصصًا من الإعدادات المتقدمة."
+
+#~ msgid "polygons"
+#~ msgstr "مضلعات"
+
+#~ msgid "polylines"
+#~ msgstr "خطوط متعددة"
+
+#~ msgid "points"
+#~ msgstr "نقاط"
+
+#~ msgid "features"
+#~ msgstr "معالم"
+
+#~ msgid ""
+#~ "You uploaded a custom form, so "
+#~ "this OSM download is optional. Use "
+#~ "Advanced Config to upload your own "
+#~ "GeoJSON or adjust download settings."
+#~ msgstr ""
+#~ "لقد رفعت نموذجًا مخصصًا، لذا فإن "
+#~ "تنزيل OSM هذا اختياري. استخدم الإعدادات"
+#~ " المتقدمة لرفع GeoJSON الخاص بك أو"
+#~ " ضبط إعدادات التنزيل."
+
+#~ msgid ""
+#~ "Recommended source: %(title)s (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "المصدر الموصى به: %(title)s (%(geom_label)s)."
+#~ " راجع البيانات على الخريطة ثم تابع."
+
+#~ msgid ""
+#~ "Recommended source updated (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "تم تحديث المصدر الموصى به "
+#~ "(%(geom_label)s). راجع البيانات على الخريطة"
+#~ " ثم تابع."
+
+#~ msgid "Downloading..."
+#~ msgstr "جارٍ التنزيل..."
+
+#~ msgid "Confirm No Splitting"
+#~ msgstr "تأكيد عدم التقسيم"
+
+#~ msgid "Split by Buildings"
+#~ msgstr "التقسيم حسب المباني"
+
+#~ msgid "Select Option"
+#~ msgstr "اختر خيارًا"
+
+#~ msgid "Confirming..."
+#~ msgstr "جارٍ التأكيد..."
+
+#~ msgid "Splitting..."
+#~ msgstr "جارٍ التقسيم..."
+
+#~ msgid "ODK Central"
+#~ msgstr "ODK Central"
+
+#~ msgid "QField"
+#~ msgstr "QField"
+
+#~ msgid "the mapping tool"
+#~ msgstr "أداة الخرائط"
+
+#~ msgid "Project type not set. Please set the field mapping app first."
+#~ msgstr "لم يتم تعيين نوع المشروع. يرجى تعيين تطبيق الخرائط الميدانية أولاً."
+
+#~ msgid ""
+#~ "Are you sure you want to finalise"
+#~ " this project in %(project_type)s? This "
+#~ "will create the project, upload forms,"
+#~ " and generate all necessary files."
+#~ msgstr ""
+#~ "هل أنت متأكد أنك تريد إنهاء هذا"
+#~ " المشروع في %(project_type)s؟ سيؤدي ذلك "
+#~ "إلى إنشاء المشروع ورفع النماذج وتوليد"
+#~ " جميع الملفات اللازمة."
+
+#~ msgid "Custom ODK Credentials"
+#~ msgstr "بيانات اعتماد ODK مخصصة"
+
+#~ msgid "Custom QField Credentials"
+#~ msgstr "بيانات اعتماد QField مخصصة"
+
+#~ msgid "Please fill in all fields."
+#~ msgstr "يرجى ملء جميع الحقول."
+
+#~ msgid "Testing..."
+#~ msgstr "جارٍ الاختبار..."
+
+#~ msgid "Testing credentials..."
+#~ msgstr "جارٍ اختبار بيانات الاعتماد..."
+
+#~ msgid "✓ Credentials are valid!"
+#~ msgstr "✓ بيانات الاعتماد صالحة!"
+
+#~ msgid "Invalid credentials. Please check and try again."
+#~ msgstr "بيانات الاعتماد غير صالحة. يرجى التحقق والمحاولة مرة أخرى."
+
+#~ msgid "Error testing credentials: %(message)s"
+#~ msgstr "خطأ أثناء اختبار بيانات الاعتماد: %(message)s"
+
+#~ msgid "Please test credentials first before continuing."
+#~ msgstr "يرجى اختبار بيانات الاعتماد أولاً قبل المتابعة."
+
+#~ msgid "Creating project in %(project_type)s... This may take a moment."
+#~ msgstr "جارٍ إنشاء المشروع في %(project_type)s... قد يستغرق ذلك بعض الوقت."
+
+#~ msgid "Error:"
+#~ msgstr "خطأ:"
+
+#~ msgid "Basemap attach failed. Use retry to start again."
+#~ msgstr "فشل إرفاق الخريطة الأساسية. استخدم إعادة المحاولة للبدء من جديد."
+
+#~ msgid "Retry Attach"
+#~ msgstr "إعادة محاولة الإرفاق"
+
+#~ msgid ""
+#~ "Basemap attach is in progress. Use "
+#~ "the button below to check the "
+#~ "latest status."
+#~ msgstr "إرفاق الخريطة الأساسية جارٍ. استخدم الزر أدناه للتحقق من أحدث حالة."
+
+#~ msgid "Checking..."
+#~ msgstr "جارٍ التحقق..."
+
+#~ msgid "Check Status"
+#~ msgstr "حالة المشروع"
+
+#~ msgid ""
+#~ "Basemap generation is in progress. "
+#~ "Status updates automatically every few "
+#~ "seconds."
+#~ msgstr "إنشاء الخريطة الأساسية جارٍ. يتم تحديث الحالة تلقائيًا كل بضع ثوانٍ."
+
+#~ msgid "STAC item"
+#~ msgstr "عنصر STAC"
+
+#~ msgid "Zoom"
+#~ msgstr "التكبير"
+
+#~ msgid "Select one imagery item to start MBTiles generation."
+#~ msgstr "اختر عنصر صورة واحدًا لبدء إنشاء MBTiles."
+
+#~ msgid "Cloud"
+#~ msgstr "إغلاق"
+
+#~ msgid "View Metadata"
+#~ msgstr "عرض البيانات الوصفية"
+
+#~ msgid "Use this image"
+#~ msgstr "استخدم هذه الصورة"
+
+#~ msgid "No imagery items were found for this AOI."
+#~ msgstr "لم يتم العثور على أي عناصر صور لهذه المنطقة."
+
+#~ msgid "Accept Data Extract"
+#~ msgstr "قبول استخراج البيانات"
+
+#~ msgid "View technical details"
+#~ msgstr "عرض التفاصيل التقنية"
+
+#~ msgid "Project created in ODK Central."
+#~ msgstr "تم إنشاء المشروع في ODK Central."
+
+#~ msgid "Manager Access (ODK Central UI)"
+#~ msgstr "وصول المدير (واجهة ODK Central)"
+
+#~ msgid "Open project in ODK Central"
+#~ msgstr "افتح المشروع في ODK Central"
+
+#~ msgid "Save these credentials now. They will only be shown once."
+#~ msgstr "احفظ بيانات الاعتماد هذه الآن. لن تُعرض إلا مرة واحدة."
+
+#~ msgid "View FieldTM Project"
+#~ msgstr "عرض مشروع FieldTM"
+
+#~ msgid "Project created in QFieldCloud."
+#~ msgstr "تم إنشاء المشروع في QFieldCloud."
+
+#~ msgid "Manager Access (QFieldCloud)"
+#~ msgstr "وصول المدير (QFieldCloud)"
+
+#~ msgid "Open project in QFieldCloud"
+#~ msgstr "افتح المشروع في QFieldCloud"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to\n"
+#~ "      manage the project."
+#~ msgstr ""
+#~ "تعذر إنشاء حساب المدير تلقائيًا. سجّل"
+#~ " الدخول إلى QFieldCloud كمسؤول لإدارة "
+#~ "المشروع."
+
+#~ msgid "Accept Task Choices"
+#~ msgstr "قبول خيارات المهام"
+
+#~ msgid ""
+#~ "Basemap attached to QField\n"
+#~ "    project."
+#~ msgstr "تم إرفاق الخريطة الأساسية بمشروع QField."
+
+#~ msgid "Area"
+#~ msgstr "المساحة"
+
+#~ msgid "Invalid geometry"
+#~ msgstr "هندسة غير صالحة"
+
+#~ msgid "Undo last vertex"
+#~ msgstr "التراجع عن آخر رأس"
+
+#~ msgid "My location"
+#~ msgstr "موقعي"
+
+#~ msgid "Failed to validate GeoJSON"
+#~ msgstr "فشل التحقق من GeoJSON"
+
+#~ msgid "No GeoJSON returned from validation"
+#~ msgstr "لم يُرجع التحقق أي GeoJSON"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area. Maximum\n"
+#~ "    project size is 1,000 km². "
+#~ "Areas over 100 km² will show a "
+#~ "warning. The OSM data extract API "
+#~ "is\n"
+#~ "    limited to 200 km²."
+#~ msgstr ""
+#~ "ارسم مضلعًا على الخريطة أو ارفع "
+#~ "ملف GeoJSON لتحديد منطقة مشروعك. الحد"
+#~ " الأقصى لمساحة المشروع هو 1,000 كم²."
+#~ " ستظهر المناطق التي تتجاوز 100 كم²"
+#~ " تحذيرًا. واجهة برمجة تطبيقات استخراج "
+#~ "بيانات OSM محدودة بـ 200 كم²."
+
+#~ msgid ""
+#~ "Basemap attach failed for now. Your project is ready to\n"
+#~ "      use. Please retry attach."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Basemap generation is in progress. Use"
+#~ " the button below to check the "
+#~ "latest status."
+#~ msgstr "يجري إنشاء الخريطة الأساسية. استخدم الزر أدناه للتحقق من أحدث حالة."
+
+#~ msgid ""
+#~ "Basemap is\n"
+#~ "    ready. Attaching to QField project in progress."
+#~ msgstr "الخريطة الأساسية جاهزة. يجري الآن إرفاقها بمشروع QField."
+
+#~ msgid ""
+#~ "Basemap is ready. Not yet\n"
+#~ "    attached to QField project."
+#~ msgstr "الخريطة الأساسية جاهزة. لكنها لم تُرفق بعد بمشروع QField."
 

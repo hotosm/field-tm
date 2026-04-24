@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:12+0100\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sw\n"
@@ -36,18 +36,21 @@ msgstr "Mtumiaji aliyeidhinishwa anakosa kitambulisho halali."
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr "Mtumiaji lazima awe msimamizi\n"
+msgstr ""
+"Mtumiaji lazima awe msimamizi\n"
 "Mtumiaji wa"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr "hana ruhusa ya kufikia mradi.\n"
+msgstr ""
+"hana ruhusa ya kufikia mradi.\n"
 "Mradi wa"
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr "umefungwa kwa kuwa uko katika hali ya %(state)s.\n"
+msgstr ""
+"umefungwa kwa kuwa uko katika hali ya %(state)s.\n"
 "Mtumiaji wa"
 
 #: app/auth/user_crud.py:88
@@ -81,12 +84,14 @@ msgstr "XLSForm ni batili: %(error)s"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr "Conversion GeoJSON --> CSV imeshindwa\n"
+msgstr ""
+"Conversion GeoJSON --> CSV imeshindwa\n"
 "Mradi wa"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr "bado hauna mawasilisho\n"
+msgstr ""
+"bado hauna mawasilisho\n"
 "Sehemu ya data ya"
 
 #: app/central/central_crud.py:562
@@ -126,7 +131,7 @@ msgstr "Imeshindwa kuunda mtumiaji wa meneja wa ODK Central."
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Hitilafu isiyotarajiwa imetokea wakati wa kutengeneza msimbo wa QR."
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:367
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Toa faili halali la .xls au .xlsx"
 
@@ -142,9 +147,11 @@ msgstr "%(action)s imeshindwa na HTTP %(status_code)s."
 #: app/helpers/basemap_services.py:40
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
-msgstr "%(action)s imeshindwa kwa sababu ya hitilafu ya muunganisho wa mkondo wa juu."
+msgstr ""
+"%(action)s imeshindwa kwa sababu ya hitilafu ya muunganisho wa mkondo wa "
+"juu."
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API imerudisha HTTP %(status_code)s."
@@ -181,55 +188,64 @@ msgstr "Faili yako ya geojson ni batili."
 msgid "Project not found or access denied."
 msgstr "Mradi haujapatikana au ruhusa imekataliwa."
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr "Ramani msingi imeambatanishwa kwa mafanikio kwenye mradi wa QField."
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr "Kuambatanisha ramani msingi bado hakijaanza."
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+#, fuzzy
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr "Kuambatanisha ramani msingi kumeshindikana. Tafadhali jaribu tena."
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr ""
 "Imeshindikana kutafuta picha kwa sasa. Tafadhali jaribu tena baada ya "
 "muda mfupi."
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "Imeshindikana kuanza kutengeneza ramani msingi kwa sasa. Tafadhali jaribu"
 " tena baada ya muda mfupi."
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "Imeshindikana kusasisha hali ya ramani msingi kwa sasa. Tafadhali jaribu "
 "tena baada ya muda mfupi."
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr "Kuambatanisha ramani msingi kunapatikana baada ya uchapishaji."
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr "Kuambatanisha ramani msingi kunapatikana kwa miradi ya QField pekee."
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr ""
 "Ramani msingi bado haijawa tayari. Tafadhali subiri utengenezaji "
 "ukamilike."
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr "Bado hakuna URL ya kupakua ramani msingi iliyotengenezwa."
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -238,39 +254,58 @@ msgstr ""
 "Kuambatanisha ramani msingi ya QField hakujasanidiwa kwenye usambazaji "
 "huu. %(config)s inakosekana."
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr "Zana za ramani msingi zinapatikana baada ya uchapishaji."
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr "Uchoraji ramani wa uwanjani unaendelea"
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:77
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"Eneo la mradi lazima liwe JSON halali (GeoJSON Polygon, MultiPolygon, "
+"Feature, au FeatureCollection)."
+
+#: app/htmx/project_create_routes.py:385
 msgid "Failed to load template form."
 msgstr "Imeshindikana kupakia fomu ya kiolezo."
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:393
 msgid "Please select a form or upload a file."
 msgstr "Tafadhali chagua fomu au pakia faili."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:695 app/htmx/project_create_routes.py:817
+msgid "An unexpected error occurred. Please try again."
+msgstr "Hitilafu isiyotarajiwa imetokea. Tafadhali jaribu tena."
+
+#: app/htmx/project_create_routes.py:758
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr ""
+"Haikuwezekana kupakia fomu chaguomsingi ya OSM Buildings kwa uundaji "
+"rahisi wa mradi."
+
+#: app/htmx/project_create_routes.py:844 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "Mradi haujapatikana."
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:854
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "Kitambulisho cha mradi hakilingani. Huna ruhusa ya kufikia mradi huu."
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:899
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Fomu imethibitishwa na kupakiwa kwa mafanikio! Ukurasa unapakiwa upya..."
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:923 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Hitilafu isiyotarajiwa imetokea"
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:927
 msgid "Error"
 msgstr "Hitilafu"
 
@@ -457,7 +492,7 @@ msgstr "Mmiliki"
 msgid "Visibility"
 msgstr "Mwonekano"
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr "Maelezo"
@@ -488,7 +523,7 @@ msgstr "Ondoa mshiriki"
 msgid "from this project?"
 msgstr "kutoka kwenye mradi huu?"
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -821,11 +856,14 @@ msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
-msgstr "Eneo lililochaguliwa ni kubwa mno. Tafadhali chagua eneo lisilozidi km² 200."
+msgstr ""
+"Eneo lililochaguliwa ni kubwa mno. Tafadhali chagua eneo lisilozidi km² "
+"200."
 
 #: app/projects/project_crud.py:147
 msgid "Failed to generate data extract from the raw data API."
-msgstr "Imeshindwa kutoa dondoo la data kutoka kwa API ya data ghafi.\n"
+msgstr ""
+"Imeshindwa kutoa dondoo la data kutoka kwa API ya data ghafi.\n"
 "Maudhui ya Kiolezo cha"
 
 #: app/projects/project_crud.py:858
@@ -850,8 +888,31 @@ msgstr "Imeshindikana kupakia fomu ya kiolezo."
 
 #: app/projects/project_routes.py:103
 msgid "Template XLSForm content is empty."
-msgstr "XLSForm ni tupu.\n"
+msgstr ""
+"XLSForm ni tupu.\n"
 "Muhtasari wa mradi wa"
+
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"Mradi huu uliundwa kwa mtiririko rahisi wa kazi katika FieldTM na "
+"umeundwa kukusanya data za majengo ili kuboresha OpenStreetMap."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "Eneo Lisilo na Jina"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "Eneo {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
 
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
@@ -871,22 +932,26 @@ msgstr "XLSForm inahitajika ili kuunda mradi wa QField."
 
 #: app/qfield/qfield_crud.py:447
 msgid "Failed to modify XLSForm for QField."
-msgstr "Imeshindwa kurekebisha Fomu ya XLS ya QField.\n"
+msgstr ""
+"Imeshindwa kurekebisha Fomu ya XLS ya QField.\n"
 "Karatasi ya"
 
 #: app/qfield/qfield_crud.py:488
 msgid "QGIS wrapper completed but wrote no output files."
-msgstr "QGIS imekamilika lakini haikuandika faili zozote.\n"
+msgstr ""
+"QGIS imekamilika lakini haikuandika faili zozote.\n"
 "Kifungashio cha"
 
 #: app/qfield/qfield_crud.py:500
 msgid "QGIS wrapper completed but no .qgz file in output."
-msgstr "QGIS kimekamilika lakini hakuna faili ya .qgz inayotolewa.\n"
+msgstr ""
+"QGIS kimekamilika lakini hakuna faili ya .qgz inayotolewa.\n"
 "Kitambulisho cha mradi cha"
 
 #: app/qfield/qfield_crud.py:530
 msgid "QField project ID is missing; cannot attach basemap."
-msgstr "QField hakipo; haiwezi kuambatisha ramani ya msingi.\n"
+msgstr ""
+"QField hakipo; haiwezi kuambatisha ramani ya msingi.\n"
 "Uzalishaji wa mradi wa"
 
 #: app/qfield/qfield_crud.py:564
@@ -896,7 +961,8 @@ msgstr "Ramani ya msingi imeambatishwa kwenye mradi wa QField."
 #: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr "QGIS haukufaulu: %(error)s\n"
+msgstr ""
+"QGIS haukufaulu: %(error)s\n"
 "Karatasi ya"
 
 #: app/qfield/qfield_crud.py:720
@@ -915,7 +981,8 @@ msgstr "Pakua msimbo wa QR"
 #: app/qfield/qfield_crud.py:874
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr "Imeshindwa kupakia faili kwenye QFieldCloud: %(error)s\n"
+msgstr ""
+"Imeshindwa kupakia faili kwenye QFieldCloud: %(error)s\n"
 "Mradi wa"
 
 #: app/qfield/qfield_crud.py:1148
@@ -928,7 +995,9 @@ msgstr "Mradi (%(project_id)s) haujapatikana."
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
-msgstr "ni wa shirika la '%(owner)s'. Haikuweza kuongeza '%(username)s' kwenye shirika: %(error)s\n"
+msgstr ""
+"ni wa shirika la '%(owner)s'. Haikuweza kuongeza '%(username)s' kwenye "
+"shirika: %(error)s\n"
 "Mtumiaji wa"
 
 #: app/qfield/qfield_crud.py:1186
@@ -1003,7 +1072,10 @@ msgstr "Tafuta miradi…"
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr "Unda mradi"
 
@@ -1015,8 +1087,8 @@ msgstr "+ Mpya"
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] "Inaonyesha mradi %(count)s"
-msgstr[1] "Inaonyesha miradi %(count)s"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/templates/home.html:75
 #, python-format
@@ -1367,72 +1439,39 @@ msgstr "Rudi nyumbani"
 msgid "Create New Project"
 msgstr "Unda mradi mpya"
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr ""
+"Ikiwa unakusanya data za OSM Buildings, tumia mtiririko rahisi wenye AOI "
+"pekee."
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr "Jina la mradi"
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr "Weka jina la mradi"
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr "Weka maelezo ya mradi"
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr "Programu ya uchoraji ramani wa uwanjani"
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "Eneo la mradi"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "Chora eneo"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "Pakia GeoJSON"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "Futa"
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-"Chora poligoni kwenye ramani au pakia faili la GeoJSON kufafanua eneo la "
-"mradi wako. Ukubwa wa juu wa mradi ni 1,000 km². Maeneo yanayozidi 100 "
-"km² yataonyesha onyo. API ya uchotaji data ya OSM imewekewa kikomo cha "
-"200 km²."
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr "Usanidi wa hali ya juu"
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Unganisha jiometri (tumia convex hull kwa multipolygons)"
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr "Hashtags"
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr "Andika hashtags na ubonyeze Enter au koma"
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
@@ -1441,960 +1480,44 @@ msgstr ""
 "Andika hashtags na ubonyeze Enter au koma ili kuziongeza. Bofya × kwenye "
 "lebo ili kuiondoa."
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr "Inatengeneza..."
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr "Kuna tatizo limetokea. Tafadhali jaribu tena."
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "Muundo wa GeoJSON si sahihi. Tafadhali angalia faili lako."
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "Faili la GeoJSON si sahihi. Tafadhali angalia muundo wa faili."
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr ""
-"Lazima uchore au upakie Area of Interest (AOI) kwenye ramani kabla ya "
-"kuwasilisha."
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Mradi wenye jina hili tayari upo. Tafadhali chagua jina tofauti."
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr "Maelezo yanahitajika."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← Rudi kwenye miradi"
-
-#: app/templates/project_details.html:46
-msgid "Project Metadata"
-msgstr "Metadata ya mradi"
-
-#: app/templates/project_details.html:48
-msgid "Project metadata and setup information for managers."
-msgstr "Metadata ya mradi na taarifa za usanidi kwa mameneja."
-
-#: app/templates/project_details.html:66
-msgid "Project ID"
-msgstr "Kitambulisho cha mradi"
-
-#: app/templates/project_details.html:77
-msgid "Created"
-msgstr "Imeundwa"
-
-#: app/templates/project_details.html:84
-msgid "Last Updated"
-msgstr "Imesasishwa mwisho"
-
-#: app/templates/project_details.html:107
-msgid "External Project"
-msgstr "Mradi wa nje"
-
-#: app/templates/project_details.html:109
-msgid "Instance:"
-msgstr "Instansi:"
-
-#: app/templates/project_details.html:111
-msgid "Project ID:"
-msgstr "Kitambulisho cha mradi:"
-
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
-msgid "View Project in ODK Central →"
-msgstr "Tazama mradi kwenye ODK Central →"
-
-#: app/templates/project_details.html:136
-msgid "Manage QFieldCloud Project →"
-msgstr "Simamia mradi wa QFieldCloud →"
-
-#: app/templates/project_details.html:144
-msgid "View Project Externally →"
-msgstr "Tazama mradi nje →"
-
-#: app/templates/project_details.html:160
-msgid "Delete this project in downstream and Field-TM? This cannot be undone."
-msgstr ""
-"Futa mradi huu katika mfumo wa downstream na Field-TM? Hii haiwezi "
-"kutenguliwa."
-
-#: app/templates/project_details.html:163
-msgid "Delete Project"
-msgstr "Futa mradi"
-
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr "Rudi kwenye miradi"
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr "Mradi haujapatikana"
-
-#: app/templates/project_details.html:174
+#: app/templates/new_project_simple.html:8
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "Mradi unaoutafuta haupo au huna ruhusa ya kuuona."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Usimamizi wa QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
 msgstr ""
-"Ukurasa huu ni wa kusimamia watumiaji katika mradi wako wa QField baada "
-"ya kuundwa."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Weka taarifa zako za QFieldCloud ili kusimamia washiriki."
-
-#: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "URL ya QFieldCloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "URL ya msingi ya instance yako ya QFieldCloud (bila /api/v1)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Nywila"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "Unganisha"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "Inaunganisha…"
-
-#: app/templates/partials/metrics.html:5
-msgid "Features Surveyed (Approximate)"
-msgstr "Vipengele vilivyofanyiwa utafiti (takriban)"
-
-#: app/templates/partials/metrics.html:12
-msgid "Projects Created"
-msgstr "Miradi iliyoundwa"
-
-#: app/templates/partials/metrics.html:19
-msgid "Countries Covered"
-msgstr "Nchi zilizofikiwa"
-
-#: app/templates/partials/metrics.html:26
-msgid "Users Registered"
-msgstr "Watumiaji waliosajiliwa"
-
-#: app/templates/partials/metrics.html:33
-msgid "Supported Mapping Apps"
-msgstr "Programu za ramani zinazotumika"
-
-#: app/templates/partials/project_details/basemap_section.html:2
-msgid "Offline Basemap"
-msgstr "Ramani msingi ya nje ya mtandao"
-
-#: app/templates/partials/project_details/basemap_section.html:4
-msgid ""
-"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
-"basemap."
-msgstr ""
-"Tafuta picha za HOT OpenAerialMap kwa AOI hii na utengeneze ramani msingi"
-" ya MBTiles."
-
-#: app/templates/partials/project_details/basemap_section.html:26
-msgid "Search OAM Imagery"
-msgstr "Tafuta picha za OAM"
-
-#: app/templates/partials/project_details/basemap_section.html:37
-msgid "Basemap generation previously failed. Please search again and retry."
-msgstr ""
-"Utengenezaji wa ramani msingi uliwahi kushindikana. Tafadhali tafuta tena"
-" na ujaribu upya."
-
-#: app/templates/partials/project_details/basemap_section.html:41
-msgid "No basemap selected yet."
-msgstr "Bado hakuna ramani msingi iliyochaguliwa."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:3
-msgid "Manager Setup Summary"
-msgstr "Muhtasari wa usanidi wa meneja"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:6
-msgid "The project setup flow is complete and shown below for reference."
-msgstr ""
-"Mtiririko wa usanidi wa mradi umekamilika na umeonyeshwa hapa chini kwa "
-"rejea."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Mahali pa mradi"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Hatua ya 2: Pakia XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
-msgid "Complete"
-msgstr "Imekamilika"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
-msgid "Step 3: Get Data"
-msgstr "Hatua ya 3: Pata data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Hatua ya 4: Gawanya katika kazi"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
-msgid "Step 5: Finalise Project"
-msgstr "Hatua ya 5: Kamilisha mradi"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:69
-msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
-msgstr ""
-"Ikiwa unahitaji kupakia faili za ziada za media kwenye mradi huu, kama "
-"picha na video, ingia kwenye ODK Central na uzipakie kwenye mipangilio ya"
-" fomu."
-
-#: app/templates/partials/project_details/setup_steps.html:14
-msgid "Ready for Mapping"
-msgstr "Tayari kwa uchoraji ramani"
-
-#: app/templates/partials/project_details/setup_steps.html:25
-msgid "Loading QR code..."
-msgstr "Inapakia msimbo wa QR..."
-
-#: app/templates/partials/project_details/setup_steps.html:32
-msgid "Project Setup"
-msgstr "Usanidi wa mradi"
-
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "Hatua ya 2: Chagua fomu ya utafiti"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Chagua aina ya utafiti na uendelee kwa chaguo-msingi yanayopendekezwa."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "Chagua aina ya utafiti:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "Aina za utafiti zinapakiwa..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "Au tumia fomu yako mwenyewe badala yake:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "Pakia fomu maalum"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-"Kumbuka: Field-TM itaongeza kiotomatiki sehemu za ziada kwenye fomu yako "
-"kwa ajili ya mgawanyo wa kazi na uteuzi wa vipengele. Fomu yako inapaswa "
-"kuwa na maswali ya utafiti tu unayotaka kuuliza (usiweke sehemu za "
-"select_one_from_file kwa kazi/vipengele)."
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya ODK, ikiwa ni"
-" pamoja na uoanifu wa ODK Collect."
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa miradi ya %(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa mradi huu."
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr "Lugha ya msingi:"
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr "Kiingereza"
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr "Kihispania"
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr "Kifaransa"
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr "Kireno"
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr "Kiswahili"
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr "Kihindi"
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr "Chaguo za fomu:"
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr "Jumuisha swali la kupakia picha"
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr "Fanya picha iwe ya lazima"
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr "Humwomba mtumiaji apige picha katika eneo lake."
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr "Jumuisha swali la uthibitishaji wa ujanibishaji wa kidijitali"
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-"Humwomba mpangaji ramani athibitishe kama vipengele vilivyopo vimewekwa "
-"kidijitali kwa usahihi."
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr "Endelea"
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ Fomu ya utafiti imepakiwa kwa mafanikio"
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Pakua data ya OSM inayopendekezwa kwa fomu yako ya utafiti."
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr "Kagua data kwenye ramani, kisha endelea."
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "Pakua data ya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr "Kusanya data mpya pekee"
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr "Tumia data maalum au ubadilishe chaguo-msingi za upakuaji wa OSM."
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr "Kategoria ya OSM:"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr "Majengo ya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr "Barabara za OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr "Huduma za afya za OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr "Vyoo vya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr "Kidini cha OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr "Matumizi ya ardhi ya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr "Njia za maji za OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr "Vyanzo vya maji vya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr "Utupaji taka wa OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr "Elimu ya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr "Makaburi ya OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr "Huduma za OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr "Aina ya jiometri:"
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr "Poligoni"
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr "Polilaini"
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr "Nukta"
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr "Tumia centrodi"
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr "Pakia GeoJSON maalum"
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "Inazalisha dondoo la data ya OSM... Hii inaweza kuchukua muda kidogo."
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr "Dondoo la data ya OSM liko tayari"
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Hatua ya 3: Gawanya katika kazi (hiari)"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ Ugawaji wa kazi hauhitajiki bila data iliyopo"
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"Zalisha maeneo ya kazi kwa kugawanya Area of Interest (AOI). Chagua "
-"algoriti na vigezo, kisha gawanya. Kagua hakikisho na ubofye \"Kubali "
-"maeneo ya kazi\" ili kuhifadhi. Au bofya"
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr "Ruka"
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr "ili kutumia AOI yote kama kazi moja."
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr ""
-"Chagua vipengele vya mistari vinavyoathiri ugawaji wa kazi unaotegemea "
-"majengo."
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr "Jumuisha barabara"
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr "Jumuisha mito"
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr "Jumuisha reli"
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr "Jumuisha njia za ndege"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr "Algoriti:"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr "Chagua chaguo la ugawaji..."
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "Gawanya kwa mraba"
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Wastani wa majengo v1 (Voronoi)"
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Wastani wa majengo v2 (Straight Skeleton)"
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr "Gawanya kwa idadi maalum ya kazi (inakuja hivi karibuni)"
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr "Wastani wa majengo kwa kazi:"
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr "Idadi ya kazi:"
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr "Kipimo (mita):"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr "Gawanya tena"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr "Gawanya AOI"
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "Inagawanya AOI katika kazi... Hii inaweza kuchukua muda kidogo."
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr "Tayari"
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-"Masharti yote ya awali yamekamilika! Unda mradi katika zana yako "
-"uliyochagua ya uchoraji ramani."
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr "Kamilisha mradi"
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr "Thibitisha ukamilishaji wa mradi"
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr "Una uhakika unataka kukamilisha mradi huu?"
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr "Thibitisha na ukamilishe"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr "Taarifa maalum za uthibitishaji"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr "URL ya ODK Central"
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr "URL ya QField Cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "Jaribu taarifa za uthibitishaji"
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr "Hifadhi na uendelee"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "Select a survey type..."
-msgstr "Chagua aina ya utafiti..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "No survey types available"
-msgstr "Hakuna aina za utafiti zinazopatikana"
-
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
-msgstr ""
-"Hakuna fomu za utafiti zinazopatikana. Pakia fomu maalum katika usanidi "
-"wa hali ya juu."
-
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr ""
-"Chagua aina ya utafiti, au pakia fomu maalum katika usanidi wa hali ya "
-"juu."
-
-#: app/templates/partials/project_details/style_and_scripts.html:14
-msgid "Survey type selected."
-msgstr "Aina ya utafiti imechaguliwa."
-
-#: app/templates/partials/project_details/style_and_scripts.html:15
-msgid "Invalid file type. Please upload a .xls or .xlsx file."
-msgstr "Aina ya faili si sahihi. Tafadhali pakia faili la .xls au .xlsx."
-
-#: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Selected file:"
-msgstr "Faili lililochaguliwa:"
-
-#: app/templates/partials/project_details/style_and_scripts.html:17
-msgid "Custom form selected."
-msgstr "Fomu maalum imechaguliwa."
-
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr ""
-"Chagua aina ya utafiti kwanza, au pakia fomu maalum katika usanidi wa "
-"hali ya juu."
-
-#: app/templates/partials/project_details/style_and_scripts.html:19
-msgid "polygons"
-msgstr "poligoni"
-
-#: app/templates/partials/project_details/style_and_scripts.html:20
-msgid "polylines"
-msgstr "polilaini"
-
-#: app/templates/partials/project_details/style_and_scripts.html:21
-msgid "points"
-msgstr "nukta"
-
-#: app/templates/partials/project_details/style_and_scripts.html:22
-msgid "features"
-msgstr "vipengele"
-
-#: app/templates/partials/project_details/style_and_scripts.html:23
-msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
-msgstr ""
-"Umepakia fomu maalum, kwa hiyo upakuaji huu wa OSM ni wa hiari. Tumia "
-"usanidi wa hali ya juu kupakia GeoJSON yako au kurekebisha mipangilio ya "
-"upakuaji."
-
-#: app/templates/partials/project_details/style_and_scripts.html:24
-#, python-format
-msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
-msgstr ""
-"Chanzo kinachopendekezwa: %(title)s (%(geom_label)s). Kagua data kwenye "
-"ramani, kisha endelea."
-
-#: app/templates/partials/project_details/style_and_scripts.html:25
-#, python-format
-msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
-msgstr ""
-"Chanzo kilichopendekezwa kimesasishwa (%(geom_label)s). Kagua data kwenye"
-" ramani, kisha endelea."
-
-#: app/templates/partials/project_details/style_and_scripts.html:26
-msgid "Downloading..."
-msgstr "Inapakua..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Confirm No Splitting"
-msgstr "Thibitisha bila kugawanya"
-
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
-msgstr "Gawanya kwa majengo"
-
-#: app/templates/partials/project_details/style_and_scripts.html:33
-msgid "Select Option"
-msgstr "Chagua chaguo"
-
-#: app/templates/partials/project_details/style_and_scripts.html:34
-msgid "Confirming..."
-msgstr "Inathibitisha..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Splitting..."
-msgstr "Inagawanya..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
-msgid "ODK Central"
-msgstr "ODK Central"
-
-#: app/templates/partials/project_details/style_and_scripts.html:37
-msgid "QField"
-msgstr "QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:38
-msgid "the mapping tool"
-msgstr "zana ya uchoraji ramani"
-
-#: app/templates/partials/project_details/style_and_scripts.html:39
-msgid "Project type not set. Please set the field mapping app first."
-msgstr ""
-"Aina ya mradi haijawekwa. Tafadhali weka kwanza programu ya uchoraji "
-"ramani wa uwanjani."
-
-#: app/templates/partials/project_details/style_and_scripts.html:40
-#, python-format
-msgid ""
-"Are you sure you want to finalise this project in %(project_type)s? This "
-"will create the project, upload forms, and generate all necessary files."
-msgstr ""
-"Una uhakika unataka kukamilisha mradi huu katika %(project_type)s? Hii "
-"itaunda mradi, kupakia fomu, na kuzalisha faili zote zinazohitajika."
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
-msgid "Custom ODK Credentials"
-msgstr "Taarifa maalum za ODK"
-
-#: app/templates/partials/project_details/style_and_scripts.html:42
-msgid "Custom QField Credentials"
-msgstr "Taarifa maalum za QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:43
-msgid "Please fill in all fields."
-msgstr "Tafadhali jaza sehemu zote."
-
-#: app/templates/partials/project_details/style_and_scripts.html:44
-msgid "Testing..."
-msgstr "Inajaribu..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:45
-msgid "Testing credentials..."
-msgstr "Inajaribu taarifa za uthibitishaji..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:46
-msgid "✓ Credentials are valid!"
-msgstr "✓ Taarifa za uthibitishaji ni sahihi!"
-
-#: app/templates/partials/project_details/style_and_scripts.html:47
-msgid "Invalid credentials. Please check and try again."
-msgstr "Taarifa za uthibitishaji si sahihi. Tafadhali hakiki na ujaribu tena."
-
-#: app/templates/partials/project_details/style_and_scripts.html:48
-#, python-format
-msgid "Error testing credentials: %(message)s"
-msgstr "Hitilafu wakati wa kujaribu taarifa za uthibitishaji: %(message)s"
-
-#: app/templates/partials/project_details/style_and_scripts.html:50
-msgid "Please test credentials first before continuing."
-msgstr "Tafadhali jaribu kwanza taarifa za uthibitishaji kabla ya kuendelea."
-
-#: app/templates/partials/project_details/style_and_scripts.html:51
-#, python-format
-msgid "Creating project in %(project_type)s... This may take a moment."
-msgstr "Inaunda mradi katika %(project_type)s... Hii inaweza kuchukua muda kidogo."
-
-#: app/templates/partials/project_details/style_and_scripts.html:52
-msgid "Error:"
-msgstr "Hitilafu:"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
-msgstr "Kuambatanisha ramani msingi kumeshindikana. Tumia jaribu tena kuanza upya."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
-msgid "Retry Attach"
-msgstr "Jaribu kuambatanisha tena"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
-msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr ""
-"Kuambatanisha ramani msingi kunaendelea. Tumia kitufe kilicho hapa chini "
-"kukagua hali ya hivi karibuni."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
-msgid "Checking..."
-msgstr "Inakaguliwa..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
-msgid "Check Status"
-msgstr "Hali ya mradi"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
-msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
-msgstr ""
-"Utengenezaji wa ramani msingi unaendelea. Hali inasasishwa kiotomatiki "
-"kila baada ya sekunde chache."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
-msgid "STAC item"
-msgstr "Kipengee cha STAC"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
-msgid "Zoom"
-msgstr "Kukuza"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
-msgid "Select one imagery item to start MBTiles generation."
-msgstr "Chagua kipengee kimoja cha picha ili kuanza kutengeneza MBTiles."
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
-msgid "Cloud"
-msgstr "Funga"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
-msgstr "Tazama metadata"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
-msgid "Use this image"
-msgstr "Tumia picha hii"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
-msgid "No imagery items were found for this AOI."
-msgstr "Hakuna vipengee vya picha vilivyopatikana kwa AOI hii."
-
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
-msgid "Accept Data Extract"
-msgstr "Kubali dondoo la data"
-
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
-msgid "View technical details"
-msgstr "Tazama maelezo ya kiufundi"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
-msgid "Project created in ODK Central."
-msgstr "Mradi umeundwa katika ODK Central."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
-msgid "Manager Access (ODK Central UI)"
-msgstr "Ufikiaji wa meneja (ODK Central UI)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
-msgid "Open project in ODK Central"
-msgstr "Fungua mradi katika ODK Central"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
-msgid "Save these credentials now. They will only be shown once."
-msgstr "Hifadhi taarifa hizi sasa. Zitaonyeshwa mara moja tu."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "View FieldTM Project"
-msgstr "Tazama mradi wa FieldTM"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
-msgid "Project created in QFieldCloud."
-msgstr "Mradi umeundwa katika QFieldCloud."
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Ufikiaji wa meneja (QFieldCloud)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
-msgid "Open project in QFieldCloud"
-msgstr "Fungua mradi katika QFieldCloud"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
-msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
-msgstr ""
-"Akaunti ya meneja haikuweza kuundwa kiotomatiki. Ingia kwenye QFieldCloud"
-" kama msimamizi ili kusimamia mradi."
-
-#: app/templates/partials/project_details/fragments/split_preview.html:27
-msgid "Accept Task Choices"
-msgstr "Kubali machaguo ya kazi"
+"Mtiririko huu rahisi unahitaji tu eneo la mradi wako. Tutatengeneza "
+"kiotomatiki kichwa cha mradi, maelezo, na lebo za OSM Buildings."
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr "Rudi kwenye Fomu ya Kawaida"
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr "Mradi unaanzishwa na ramani inaandaliwa..."
 
 #~ msgid "Failed to add collaborator: %(error)s"
 #~ msgstr "Imeshindikana kuongeza mshiriki: %(exc)s"
 
 #~ msgid "Basemap attached to QField project."
-#~ msgstr "Ramani ya msingi imeambatishwa kwenye mradi wa QField."
+#~ msgstr "Ramani msingi imeunganishwa na mradi wa QField."
 
 #~ msgid "Basemap is ready."
 #~ msgstr "Ramani msingi iko tayari."
@@ -2403,13 +1526,13 @@ msgstr "Kubali machaguo ya kazi"
 #~ msgstr "Ukubwa wa jumla"
 
 #~ msgid "Available Zoom"
-#~ msgstr "Kiwango cha kukuza kinachopatikana"
+#~ msgstr "Zoom inayopatikana"
 
 #~ msgid "Download MBTiles"
-#~ msgstr "Pakua msimbo wa QR"
+#~ msgstr "Pakua MBTiles"
 
 #~ msgid "Attach to QField Project"
-#~ msgstr "Simamia mradi wa QFieldCloud →"
+#~ msgstr "Unganisha na Mradi wa QField"
 
 #~ msgid ""
 #~ "Use the ODK offline maps documentation"
@@ -2419,4 +1542,2046 @@ msgstr "Kubali machaguo ya kazi"
 #~ "Tumia nyaraka za ramani za ODK za"
 #~ " nje ya mtandao kusanidi faili hii"
 #~ " ya MBTiles katika Collect."
+
+#~ msgid "Validation failed"
+#~ msgstr "Uthibitishaji haukufaulu"
+
+#~ msgid "An unexpected error occurred. Please contact an admin."
+#~ msgstr "Hitilafu isiyotarajiwa imetokea. Tafadhali wasiliana na msimamizi."
+
+#~ msgid "Could not connect to database"
+#~ msgstr "Haikuweza kuunganisha kwenye hifadhidata"
+
+#~ msgid "Authenticated user is missing a valid identifier."
+#~ msgstr "Mtumiaji aliyeidhinishwa anakosa kitambulisho halali."
+
+#~ msgid "User must be an administrator"
+#~ msgstr ""
+#~ "Mtumiaji lazima awe msimamizi\n"
+#~ "Mtumiaji wa"
+
+#~ msgid "User does not have permission to access the project."
+#~ msgstr ""
+#~ "hana ruhusa ya kufikia mradi.\n"
+#~ "Mradi wa"
+
+#~ msgid "Project is locked since it is in %(state)s state."
+#~ msgstr ""
+#~ "umefungwa kwa kuwa uko katika hali ya %(state)s.\n"
+#~ "Mtumiaji wa"
+
+#~ msgid "User (%(user_sub)s) could not be inserted in db"
+#~ msgstr "(%(user_sub)s) haikuweza kuingizwa kwenye db"
+
+#~ msgid "Error listing projects on ODK Central: %(error)s"
+#~ msgstr "Fungua mradi katika ODK Central"
+
+#~ msgid "Error creating project on ODK Central: %(error)s"
+#~ msgstr "Fungua mradi katika ODK Central"
+
+#~ msgid "Failed to upload form to ODK Central: %(error)s"
+#~ msgstr "Imeshindwa kupakia fomu kwa ODK Central: %(error)s"
+
+#~ msgid "form_id is required to list submissions with pyodk."
+#~ msgstr "form_id inahitajika ili kuorodhesha mawasilisho na pyodk."
+
+#~ msgid "XLSForm is invalid: %(error)s"
+#~ msgstr "XLSForm ni batili: %(error)s"
+
+#~ msgid "Conversion GeoJSON --> CSV failed"
+#~ msgstr ""
+#~ "Conversion GeoJSON --> CSV imeshindwa\n"
+#~ "Mradi wa"
+
+#~ msgid "Project contains no submissions yet"
+#~ msgstr ""
+#~ "bado hauna mawasilisho\n"
+#~ "Sehemu ya data ya"
+
+#~ msgid "'geometry' data field is mandatory"
+#~ msgstr "'jiometri' ni ya lazima"
+
+#~ msgid "ODK project_id is missing; cannot create/merge entity lists."
+#~ msgstr "ODK project_id haipo; haiwezi kuunda/kuunganisha orodha za huluki."
+
+#~ msgid "Could not generate token for app user."
+#~ msgstr "Haikuweza kutoa tokeni kwa mtumiaji wa programu."
+
+#~ msgid "An error occurred while creating the app user token."
+#~ msgstr "Hitilafu isiyotarajiwa imetokea wakati wa kutengeneza msimbo wa QR."
+
+#~ msgid "Could not assign %(scope)s role to app user."
+#~ msgstr "Haikuweza kukabidhi jukumu la %(scope)s kwa mtumiaji wa programu."
+
+#~ msgid "Could not find 'Project Manager' role in ODK Central."
+#~ msgstr "Fungua mradi katika ODK Central"
+
+#~ msgid "ODK Central returned no user ID after creation."
+#~ msgstr "ODK Central haikurejesha kitambulisho cha mtumiaji baada ya kuunda."
+
+#~ msgid "Failed to create ODK Central manager user."
+#~ msgstr "Imeshindwa kuunda mtumiaji wa meneja wa ODK Central."
+
+#~ msgid "Unexpected error while testing ODK Central credentials."
+#~ msgstr "Hitilafu isiyotarajiwa imetokea wakati wa kutengeneza msimbo wa QR."
+
+#~ msgid "Provide a valid .xls or .xlsx file"
+#~ msgstr "Toa faili halali la .xls au .xlsx"
+
+#~ msgid "No data provided."
+#~ msgstr "Hakuna dondoo la data lililotolewa."
+
+#~ msgid "%(action)s failed with HTTP %(status_code)s."
+#~ msgstr "%(action)s imeshindwa na HTTP %(status_code)s."
+
+#~ msgid "%(action)s failed due to upstream connection error."
+#~ msgstr ""
+#~ "%(action)s imeshindwa kwa sababu ya "
+#~ "hitilafu ya muunganisho wa mkondo wa "
+#~ "juu."
+
+#~ msgid "Tilepack API returned HTTP %(status_code)s."
+#~ msgstr "Tilepack API imerudisha HTTP %(status_code)s."
+
+#~ msgid "Failed to convert YAML form to XLSForm."
+#~ msgstr "Imeshindwa kubadilisha fomu ya YAML hadi XLSForm."
+
+#~ msgid "Provide a valid .json or .geojson file"
+#~ msgstr "Toa faili halali la .xls au .xlsx"
+
+#~ msgid "Provide a valid .csv"
+#~ msgstr "Toa faili halali la .xls au .xlsx"
+
+#~ msgid "Provide a valid .json file"
+#~ msgstr "Toa faili halali la .xls au .xlsx"
+
+#~ msgid "Could not login to raw-data-api"
+#~ msgstr "Haikuweza kuingia kwa ghafi-data-api"
+
+#~ msgid "No geometries present"
+#~ msgstr "Hakuna jiometri zilizopo"
+
+#~ msgid "Your geojson file is invalid."
+#~ msgstr "Faili yako ya geojson ni batili."
+
+#~ msgid "Project not found or access denied."
+#~ msgstr "Mradi haujapatikana au ruhusa imekataliwa."
+
+#~ msgid "Basemap attached to QField project successfully."
+#~ msgstr "Ramani msingi imeambatanishwa kwa mafanikio kwenye mradi wa QField."
+
+#~ msgid "Basemap attach has not started yet."
+#~ msgstr "Kuambatanisha ramani msingi bado hakijaanza."
+
+#~ msgid "Basemap attach failed. Please try again."
+#~ msgstr "Kuambatanisha ramani msingi kumeshindikana. Tafadhali jaribu tena."
+
+#~ msgid "Failed to search imagery right now. Please try again shortly."
+#~ msgstr ""
+#~ "Imeshindikana kutafuta picha kwa sasa. "
+#~ "Tafadhali jaribu tena baada ya muda "
+#~ "mfupi."
+
+#~ msgid "Failed to start basemap generation right now. Please try again shortly."
+#~ msgstr ""
+#~ "Imeshindikana kuanza kutengeneza ramani msingi"
+#~ " kwa sasa. Tafadhali jaribu tena "
+#~ "baada ya muda mfupi."
+
+#~ msgid "Failed to refresh basemap status right now. Please try again shortly."
+#~ msgstr ""
+#~ "Imeshindikana kusasisha hali ya ramani "
+#~ "msingi kwa sasa. Tafadhali jaribu tena"
+#~ " baada ya muda mfupi."
+
+#~ msgid "Basemap attach is available after publication."
+#~ msgstr "Kuambatanisha ramani msingi kunapatikana baada ya uchapishaji."
+
+#~ msgid "Basemap attach is only available for QField projects."
+#~ msgstr "Kuambatanisha ramani msingi kunapatikana kwa miradi ya QField pekee."
+
+#~ msgid "Basemap is not ready yet. Please wait for generation to complete."
+#~ msgstr ""
+#~ "Ramani msingi bado haijawa tayari. "
+#~ "Tafadhali subiri utengenezaji ukamilike."
+
+#~ msgid "No generated basemap download URL is available yet."
+#~ msgstr "Bado hakuna URL ya kupakua ramani msingi iliyotengenezwa."
+
+#~ msgid ""
+#~ "QField basemap attach is not configured"
+#~ " on this deployment. Missing %(config)s."
+#~ msgstr ""
+#~ "Kuambatanisha ramani msingi ya QField "
+#~ "hakujasanidiwa kwenye usambazaji huu. "
+#~ "%(config)s inakosekana."
+
+#~ msgid "Basemap tools are available after publication."
+#~ msgstr "Zana za ramani msingi zinapatikana baada ya uchapishaji."
+
+#~ msgid "No basemap generation in progress."
+#~ msgstr "Uchoraji ramani wa uwanjani unaendelea"
+
+#~ msgid "Failed to load template form."
+#~ msgstr "Imeshindikana kupakia fomu ya kiolezo."
+
+#~ msgid "Please select a form or upload a file."
+#~ msgstr "Tafadhali chagua fomu au pakia faili."
+
+#~ msgid "Project not found."
+#~ msgstr "Mradi haujapatikana."
+
+#~ msgid "Project ID mismatch. You do not have access to this project."
+#~ msgstr "Kitambulisho cha mradi hakilingani. Huna ruhusa ya kufikia mradi huu."
+
+#~ msgid "Form validated and uploaded successfully! Reloading page..."
+#~ msgstr ""
+#~ "Fomu imethibitishwa na kupakiwa kwa "
+#~ "mafanikio! Ukurasa unapakiwa upya..."
+
+#~ msgid "An unexpected error occurred"
+#~ msgstr "Hitilafu isiyotarajiwa imetokea"
+
+#~ msgid "Error"
+#~ msgstr "Hitilafu"
+
+#~ msgid "Mapper Login (QFieldCloud)"
+#~ msgstr "Kuingia kwa mchoraji ramani (QFieldCloud)"
+
+#~ msgid "Username:"
+#~ msgstr "Jina la mtumiaji:"
+
+#~ msgid "Password:"
+#~ msgstr "Nywila:"
+
+#~ msgid "Scan the QR code, then enter these credentials in QField."
+#~ msgstr "Changanua msimbo wa QR, kisha weka taarifa hizi kwenye QField."
+
+#~ msgid "Scan QR Code"
+#~ msgstr "Changanua msimbo wa QR"
+
+#~ msgid "Use %(app_name)s to scan this QR code and load the project."
+#~ msgstr "Tumia %(app_name)s kuchanganua msimbo huu wa QR na kupakia mradi."
+
+#~ msgid "Project QR Code"
+#~ msgstr "Msimbo wa QR wa mradi"
+
+#~ msgid "Download QR Code"
+#~ msgstr "Pakua msimbo wa QR"
+
+#~ msgid ""
+#~ "Cannot reach the mapping server. Check"
+#~ " that ODK Central or QFieldCloud is"
+#~ " running."
+#~ msgstr ""
+#~ "Haiwezekani kufikia seva ya uchoraji "
+#~ "ramani. Hakikisha ODK Central au "
+#~ "QFieldCloud inaendeshwa."
+
+#~ msgid "The mapping server returned an error. Check its logs for details."
+#~ msgstr ""
+#~ "Seva ya uchoraji ramani imerudisha "
+#~ "hitilafu. Angalia kumbukumbu zake kwa "
+#~ "maelezo zaidi."
+
+#~ msgid ""
+#~ "Authentication failed connecting to the "
+#~ "mapping server. Check the configured "
+#~ "credentials."
+#~ msgstr ""
+#~ "Uthibitishaji umeshindikana wakati wa "
+#~ "kuunganisha kwenye seva ya uchoraji "
+#~ "ramani. Angalia taarifa za uthibitishaji "
+#~ "zilizowekwa."
+
+#~ msgid "An unexpected error occurred while generating the QR code."
+#~ msgstr "Hitilafu isiyotarajiwa imetokea wakati wa kutengeneza msimbo wa QR."
+
+#~ msgid "Project (%(project_id)s) not found."
+#~ msgstr "Mradi (%(project_id)s) haujapatikana."
+
+#~ msgid "Only the project manager can delete this project."
+#~ msgstr "Ni msimamizi wa mradi pekee anayeweza kufuta mradi huu."
+
+#~ msgid "Error: %(error_msg)s"
+#~ msgstr "Hitilafu: %(error_msg)s"
+
+#~ msgid "Admin"
+#~ msgstr "Msimamizi"
+
+#~ msgid "Manager"
+#~ msgstr "Meneja"
+
+#~ msgid "Editor"
+#~ msgstr "Mhariri"
+
+#~ msgid "Reporter"
+#~ msgstr "Mtoaji taarifa"
+
+#~ msgid "Reader"
+#~ msgstr "Msomaji"
+
+#~ msgid "This user does not exist. Please create it first."
+#~ msgstr "Mtumiaji huyu hayupo. Tafadhali muunde kwanza."
+
+#~ msgid "This user is already a collaborator on this project."
+#~ msgstr "Mtumiaji huyu tayari ni mshiriki wa mradi huu."
+
+#~ msgid "Failed to add collaborator: %(exc)s"
+#~ msgstr "Imeshindikana kuongeza mshiriki: %(exc)s"
+
+#~ msgid ""
+#~ "This project belongs to the "
+#~ "%(organization)s organization. The user must"
+#~ " be added to that organization before"
+#~ " they can be added as a "
+#~ "collaborator. Your QFieldCloud account does"
+#~ " not have permission to manage "
+#~ "organization members."
+#~ msgstr ""
+#~ "Mradi huu ni wa shirika la "
+#~ "%(organization)s. Mtumiaji lazima aongezwe "
+#~ "kwenye shirika hilo kabla ya kuongezwa"
+#~ " kama mshiriki. Akaunti yako ya "
+#~ "QFieldCloud haina ruhusa ya kusimamia "
+#~ "wanachama wa shirika."
+
+#~ msgid "All fields are required."
+#~ msgstr "Sehemu zote zinahitajika."
+
+#~ msgid "Login succeeded but no token received."
+#~ msgstr "Kuingia kumefaulu lakini hakuna tokeni iliyopokelewa."
+
+#~ msgid "Login failed. Check your URL and credentials."
+#~ msgstr "Kuingia kumeshindikana. Angalia URL yako na taarifa za uthibitishaji."
+
+#~ msgid "QFieldCloud Projects"
+#~ msgstr "Miradi ya QFieldCloud"
+
+#~ msgid "Connected as"
+#~ msgstr "Umeunganishwa kama"
+
+#~ msgid "to"
+#~ msgstr "kwenye"
+
+#~ msgid "Log Out"
+#~ msgstr "Toka"
+
+#~ msgid "No projects found."
+#~ msgstr "Hakuna miradi iliyopatikana."
+
+#~ msgid "Public"
+#~ msgstr "Umma"
+
+#~ msgid "Private"
+#~ msgstr "Binafsi"
+
+#~ msgid "Manage"
+#~ msgstr "Simamia"
+
+#~ msgid "Project"
+#~ msgstr "Mradi"
+
+#~ msgid "Owner"
+#~ msgstr "Mmiliki"
+
+#~ msgid "Visibility"
+#~ msgstr "Mwonekano"
+
+#~ msgid "Description"
+#~ msgstr "Maelezo"
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "Muda wa kikao umeisha. Tafadhali ingia tena."
+
+#~ msgid "Could not load collaborators: %(exc)s"
+#~ msgstr "Haikuwezekana kupakia washiriki: %(exc)s"
+
+#~ msgid "Update"
+#~ msgstr "Sasisha"
+
+#~ msgid "Remove"
+#~ msgstr "Ondoa"
+
+#~ msgid "Remove Collaborator"
+#~ msgstr "Ondoa mshiriki"
+
+#~ msgid "from this project?"
+#~ msgstr "kutoka kwenye mradi huu?"
+
+#~ msgid "Cancel"
+#~ msgstr "Ghairi"
+
+#~ msgid "User"
+#~ msgstr "Mtumiaji"
+
+#~ msgid "Role"
+#~ msgstr "Wajibu"
+
+#~ msgid "Actions"
+#~ msgstr "Vitendo"
+
+#~ msgid "No collaborators yet."
+#~ msgstr "Bado hakuna washiriki."
+
+#~ msgid "Username"
+#~ msgstr "Jina la mtumiaji"
+
+#~ msgid "Add Collaborator"
+#~ msgstr "Ongeza mshiriki"
+
+#~ msgid "Close"
+#~ msgstr "Funga"
+
+#~ msgid "Collaborators"
+#~ msgstr "Washiriki"
+
+#~ msgid "Username is required."
+#~ msgstr "Jina la mtumiaji linahitajika."
+
+#~ msgid "Failed to remove collaborator: %(exc)s"
+#~ msgstr "Imeshindikana kuondoa mshiriki: %(exc)s"
+
+#~ msgid "Failed to update collaborator: %(exc)s"
+#~ msgstr "Imeshindikana kusasisha mshiriki: %(exc)s"
+
+#~ msgid "Collaborator refresh failed: %(exc)s"
+#~ msgstr "Usasishaji wa washiriki umeshindikana: %(exc)s"
+
+#~ msgid ""
+#~ "Project finalisation failed. Please check "
+#~ "your settings and try again. If it"
+#~ " continues, send the technical details "
+#~ "below to your instance administrator or"
+#~ " support team."
+#~ msgstr ""
+#~ "Ukamilishaji wa mradi umeshindikana. Tafadhali"
+#~ " angalia mipangilio yako na ujaribu "
+#~ "tena. Iwapo tatizo litaendelea, tuma "
+#~ "maelezo ya kiufundi hapa chini kwa "
+#~ "msimamizi wa mfumo wako au timu ya"
+#~ " msaada."
+
+#~ msgid "Invalid GeoJSON data in request. Please try uploading again."
+#~ msgstr "Data ya GeoJSON si halali kwenye ombi. Tafadhali jaribu kupakia tena."
+
+#~ msgid "Error reading GeoJSON data from request."
+#~ msgstr "Hitilafu wakati wa kusoma data ya GeoJSON kutoka kwenye ombi."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km², which exceeds"
+#~ " the %(area_limit)s km² limit. Please "
+#~ "select a smaller area."
+#~ msgstr ""
+#~ "Eneo ni %(area_km2)s km², ambalo "
+#~ "limezidi kikomo cha %(area_limit)s km². "
+#~ "Tafadhali chagua eneo dogo zaidi."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km². Large areas"
+#~ " (>%(area_warn)s km²) may take longer "
+#~ "to process. The data extract API "
+#~ "is limited to 200 km²."
+#~ msgstr ""
+#~ "Eneo ni %(area_km2)s km². Maeneo makubwa"
+#~ " (>%(area_warn)s km²) yanaweza kuchukua "
+#~ "muda mrefu kuchakatwa. API ya uchotaji"
+#~ " data imewekewa kikomo cha 200 km²."
+
+#~ msgid "Project AOI"
+#~ msgstr "AOI ya mradi"
+
+#~ msgid "Data Extract (%(data_feature_count)s features)"
+#~ msgstr "Dondoo la data (%(data_feature_count)s vipengele)"
+
+#~ msgid "Task Boundaries (%(task_count)s tasks)"
+#~ msgstr "Mipaka ya kazi (%(task_count)s kazi)"
+
+#~ msgid "Task ID"
+#~ msgstr "Kitambulisho cha jukumu"
+
+#~ msgid "Building Count"
+#~ msgstr "Idadi ya majengo"
+
+#~ msgid ""
+#~ "No task boundaries found. Please split"
+#~ " the project into tasks first using"
+#~ " the \"Split AOI\" button above."
+#~ msgstr ""
+#~ "Hakuna mipaka ya kazi iliyopatikana. "
+#~ "Tafadhali gawanya mradi katika kazi "
+#~ "kwanza kwa kutumia kitufe cha \"Gawanya"
+#~ " AOI\" hapo juu."
+
+#~ msgid ""
+#~ "✓ AOI split successfully! Generated "
+#~ "%(task_count)s task areas using %(algorithm)s."
+#~ msgstr ""
+#~ "✓ AOI imegawanywa kwa mafanikio! Maeneo"
+#~ " ya kazi %(task_count)s yamezalishwa kwa"
+#~ " kutumia %(algorithm)s."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task "
+#~ "boundaries%(data_extract_info)s. Review the results"
+#~ " below. If satisfied, click \"Accept "
+#~ "Task Choices\" to save. Otherwise, "
+#~ "adjust parameters above and click "
+#~ "\"Split Again\" to regenerate."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la mipaka ya kazi"
+#~ " %(task_count)s%(data_extract_info)s. Kagua matokeo "
+#~ "hapa chini. Ukiridhika, bofya \"Kubali "
+#~ "machaguo ya kazi\" kuhifadhi. Vinginevyo, "
+#~ "rekebisha vigezo hapo juu na ubofye "
+#~ "\"Gawanya tena\" ili kuzalisha upya."
+
+#~ msgid "Data Extract"
+#~ msgstr "Dondoo la data"
+
+#~ msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+#~ msgstr ""
+#~ "Data ya OSM imepakuliwa kwa mafanikio!"
+#~ " Vipengele %(feature_count)s vimepatikana."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try downloading again "
+#~ "with different parameters."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la vipengele "
+#~ "%(feature_count)s kwenye ramani. Kagua data"
+#~ " hapa chini. Ukiridhika, bofya \"Kubali "
+#~ "dondoo la data\" kuhifadhi. Vinginevyo, "
+#~ "jaribu kupakua tena kwa vigezo tofauti."
+
+#~ msgid "Invalid file type. Please upload a .geojson or .json file."
+#~ msgstr "Aina ya faili si sahihi. Tafadhali pakia faili la .geojson au .json."
+
+#~ msgid "No valid geometries found in GeoJSON."
+#~ msgstr "Hakuna jiometri halali zilizopatikana kwenye GeoJSON."
+
+#~ msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+#~ msgstr ""
+#~ "✓ GeoJSON imepakiwa kwa mafanikio! "
+#~ "Vipengele %(feature_count)s vimepatikana."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try uploading a "
+#~ "different file."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la vipengele "
+#~ "%(feature_count)s kwenye ramani. Kagua data"
+#~ " hapa chini. Ukiridhika, bofya \"Kubali "
+#~ "dondoo la data\" kuhifadhi. Vinginevyo, "
+#~ "jaribu kupakia faili tofauti."
+
+#~ msgid ""
+#~ "No GeoJSON data found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Hakuna data ya GeoJSON iliyopatikana. "
+#~ "Tafadhali pakua data ya OSM au "
+#~ "pakia faili la GeoJSON kwanza."
+
+#~ msgid "Data Extract (%(feature_count)s features)"
+#~ msgstr "Dondoo la data (%(feature_count)s vipengele)"
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s data features on"
+#~ " map. Review the data, then continue"
+#~ " to the next step."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la vipengele vya "
+#~ "data %(feature_count)s kwenye ramani. Kagua"
+#~ " data, kisha endelea kwenye hatua "
+#~ "inayofuata."
+
+#~ msgid ""
+#~ "✓ Collect-new-data mode selected. "
+#~ "Task splitting is skipped and you "
+#~ "can continue."
+#~ msgstr ""
+#~ "✓ Hali ya kukusanya data mpya "
+#~ "imechaguliwa. Mgawanyo wa kazi umerukwa "
+#~ "na unaweza kuendelea."
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ Dondoo la data limehifadhiwa kwa "
+#~ "mafanikio! Sasa unaweza kuendelea hadi "
+#~ "Hatua ya 4 (gawa kazi)."
+
+#~ msgid ""
+#~ "No data extract found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Hakuna dondoo la data lililopatikana. "
+#~ "Tafadhali pakua data ya OSM au "
+#~ "pakia faili la GeoJSON kwanza."
+
+#~ msgid ""
+#~ "Previewing whole AOI (no splitting) with"
+#~ " %(data_feature_count)s data features. The "
+#~ "entire AOI will be used as a "
+#~ "single task."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la AOI yote (bila"
+#~ " kugawanya) lenye vipengele vya data "
+#~ "%(data_feature_count)s. AOI yote itatumika "
+#~ "kama kazi moja."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task boundaries and"
+#~ " %(data_feature_count)s data features together."
+#~ msgstr ""
+#~ "Inaonyesha hakikisho la mipaka ya kazi"
+#~ " %(task_count)s na vipengele vya data "
+#~ "%(data_feature_count)s pamoja."
+
+#~ msgid "Project outline not found. Cannot skip task splitting."
+#~ msgstr "Muhtasari wa mradi haukupatikana. Haiwezekani kuruka mgawanyo wa kazi."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 5."
+#~ msgstr ""
+#~ "✓ Mgawanyo wa kazi umerukwa. AOI "
+#~ "yote itatumika kama kazi moja. Unaweza"
+#~ " kuendelea hadi Hatua ya 5."
+
+#~ msgid "Please select a splitting option."
+#~ msgstr "Tafadhali chagua chaguo la mgawanyo."
+
+#~ msgid "✓ Task splitting is not required for this project setup."
+#~ msgstr "✓ Mgawanyo wa kazi hauhitajiki kwa mpangilio huu wa mradi."
+
+#~ msgid "No data extract provided."
+#~ msgstr "Hakuna dondoo la data lililotolewa."
+
+#~ msgid "Invalid data extract format."
+#~ msgstr "Muundo wa dondoo la data si sahihi."
+
+#~ msgid ""
+#~ "✓ Data extract accepted! Saved "
+#~ "%(feature_count)s features. Step 2 is "
+#~ "now complete."
+#~ msgstr ""
+#~ "✓ Dondoo la data limekubaliwa! Vipengele"
+#~ " %(feature_count)s vimehifadhiwa. Hatua ya "
+#~ "2 sasa imekamilika."
+
+#~ msgid "No task areas data provided."
+#~ msgstr "Hakuna data ya maeneo ya kazi iliyotolewa."
+
+#~ msgid "Invalid task areas data format."
+#~ msgstr "Muundo wa data ya maeneo ya kazi si sahihi."
+
+#~ msgid "✓ Split tasks saved successfully"
+#~ msgstr "✓ Kazi zilizogawanywa zimehifadhiwa kwa mafanikio"
+
+#~ msgid ""
+#~ "Provide ODK URL, username, and password"
+#~ " (all 3), or leave them all "
+#~ "blank to use server defaults."
+#~ msgstr ""
+#~ "Toa URL ya ODK, jina la mtumiaji,"
+#~ " na nywila (zote 3), au ziache "
+#~ "zote wazi ili kutumia chaguo-msingi "
+#~ "za seva."
+
+#~ msgid "GeoJSON is required"
+#~ msgstr "GeoJSON inahitajika"
+
+#~ msgid "No polygon geometries found. Project area must be a polygon."
+#~ msgstr ""
+#~ "Hakuna jiometri za poligoni zilizopatikana."
+#~ " Eneo la mradi lazima liwe poligoni."
+
+#~ msgid "Selected area is too large. Please select an area smaller than 200 km²."
+#~ msgstr ""
+#~ "Eneo lililochaguliwa ni kubwa mno. "
+#~ "Tafadhali chagua eneo lisilozidi km² "
+#~ "200."
+
+#~ msgid "Failed to generate data extract from the raw data API."
+#~ msgstr ""
+#~ "Imeshindwa kutoa dondoo la data kutoka kwa API ya data ghafi.\n"
+#~ "Maudhui ya Kiolezo cha"
+
+#~ msgid "QField project ID not found."
+#~ msgstr "Mradi haujapatikana."
+
+#~ msgid "Project name not found."
+#~ msgstr "Mradi haujapatikana."
+
+#~ msgid "ODK project ID not found."
+#~ msgstr "Mradi haujapatikana."
+
+#~ msgid "Appuser token not found."
+#~ msgstr "Mradi haujapatikana."
+
+#~ msgid "Failed to generate QR code."
+#~ msgstr "Imeshindikana kupakia fomu ya kiolezo."
+
+#~ msgid "Template XLSForm content is empty."
+#~ msgstr ""
+#~ "XLSForm ni tupu.\n"
+#~ "Muhtasari wa mradi wa"
+
+#~ msgid "Project outline is missing or has no geometry."
+#~ msgstr "haupo au hauna jiometri."
+
+#~ msgid "Project outline geometry has no coordinates."
+#~ msgstr "Jiometri ya muhtasari wa mradi haina viwianishi."
+
+#~ msgid "Project outline is required for QField project creation."
+#~ msgstr "✓ Mgawanyo wa kazi hauhitajiki kwa mpangilio huu wa mradi."
+
+#~ msgid "XLSForm is required for QField project creation."
+#~ msgstr "XLSForm inahitajika ili kuunda mradi wa QField."
+
+#~ msgid "Failed to modify XLSForm for QField."
+#~ msgstr ""
+#~ "Imeshindwa kurekebisha Fomu ya XLS ya QField.\n"
+#~ "Karatasi ya"
+
+#~ msgid "QGIS wrapper completed but wrote no output files."
+#~ msgstr ""
+#~ "QGIS imekamilika lakini haikuandika faili zozote.\n"
+#~ "Kifungashio cha"
+
+#~ msgid "QGIS wrapper completed but no .qgz file in output."
+#~ msgstr ""
+#~ "QGIS kimekamilika lakini hakuna faili ya .qgz inayotolewa.\n"
+#~ "Kitambulisho cha mradi cha"
+
+#~ msgid "QField project ID is missing; cannot attach basemap."
+#~ msgstr ""
+#~ "QField hakipo; haiwezi kuambatisha ramani ya msingi.\n"
+#~ "Uzalishaji wa mradi wa"
+
+#~ msgid "Basemap attach completed but produced no project files."
+#~ msgstr "Ramani ya msingi imeambatishwa kwenye mradi wa QField."
+
+#~ msgid "QGIS project generation failed: %(error)s"
+#~ msgstr ""
+#~ "QGIS haukufaulu: %(error)s\n"
+#~ "Karatasi ya"
+
+#~ msgid "QGIS wrapper returned invalid JSON."
+#~ msgstr "QGIS imerejesha JSON isiyo sahihi."
+
+#~ msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+#~ msgstr "Imeshindwa kupakua basemap MBTiles kwa kupakiwa (HTTP %(status)s)."
+
+#~ msgid "Downloaded basemap MBTiles is empty."
+#~ msgstr "Pakua msimbo wa QR"
+
+#~ msgid "Failed to upload files to QFieldCloud: %(error)s"
+#~ msgstr ""
+#~ "Imeshindwa kupakia faili kwenye QFieldCloud: %(error)s\n"
+#~ "Mradi wa"
+
+#~ msgid "QFieldCloud project '%(project_id)s' not found."
+#~ msgstr "Mradi (%(project_id)s) haujapatikana."
+
+#~ msgid ""
+#~ "Project belongs to organization '%(owner)s'."
+#~ " Could not add '%(username)s' to the"
+#~ " organization: %(error)s"
+#~ msgstr ""
+#~ "ni wa shirika la '%(owner)s'. Haikuweza"
+#~ " kuongeza '%(username)s' kwenye shirika: "
+#~ "%(error)s\n"
+#~ "Mtumiaji wa"
+
+#~ msgid "User '%(username)s' does not exist on QFieldCloud."
+#~ msgstr "'%(username)s' hayupo kwenye QFieldCloud."
+
+#~ msgid "User '%(username)s' is already a collaborator on this project."
+#~ msgstr "Mtumiaji huyu tayari ni mshiriki wa mradi huu."
+
+#~ msgid "QFieldCloud credentials are invalid."
+#~ msgstr "✓ Taarifa za uthibitishaji ni sahihi!"
+
+#~ msgid "Filters"
+#~ msgstr "Vichujio"
+
+#~ msgid "All projects"
+#~ msgstr "Miradi yote"
+
+#~ msgid "Draft"
+#~ msgstr "Rasimu"
+
+#~ msgid "Published"
+#~ msgstr "Imechapishwa"
+
+#~ msgid "Completed"
+#~ msgstr "Imekamilika"
+
+#~ msgid "Archived"
+#~ msgstr "Imehifadhiwa"
+
+#~ msgid "Project Status"
+#~ msgstr "Hali ya mradi"
+
+#~ msgid "Newest first"
+#~ msgstr "Mpya kwanza"
+
+#~ msgid "Oldest first"
+#~ msgstr "Ya zamani kwanza"
+
+#~ msgid "Name (A-Z)"
+#~ msgstr "Jina (A-Z)"
+
+#~ msgid "Name (Z-A)"
+#~ msgstr "Jina (Z-A)"
+
+#~ msgid "Sort By"
+#~ msgstr "Panga kwa"
+
+#~ msgid "Search"
+#~ msgstr "Tafuta"
+
+#~ msgid "Search projects…"
+#~ msgstr "Tafuta miradi…"
+
+#~ msgid "Create Project"
+#~ msgstr "Unda mradi"
+
+#~ msgid "+ New"
+#~ msgstr "+ Mpya"
+
+#~ msgid "Showing %(count)s project"
+#~ msgid_plural "Showing %(count)s projects"
+#~ msgstr[0] "Inaonyesha mradi %(count)s"
+#~ msgstr[1] "Inaonyesha miradi %(count)s"
+
+#~ msgid "in %(status)s"
+#~ msgstr "katika %(status)s"
+
+#~ msgid ""
+#~ "matching\n"
+#~ "      \"%(query)s\""
+#~ msgstr "inayolingana na \"%(query)s\""
+
+#~ msgid "Private Project"
+#~ msgstr "Mradi wa binafsi"
+
+#~ msgid "Unnamed Project"
+#~ msgstr "Mradi usio na jina"
+
+#~ msgid "Location:"
+#~ msgstr "Mahali:"
+
+#~ msgid "Created:"
+#~ msgstr "Imeundwa:"
+
+#~ msgid "N/A"
+#~ msgstr "Haitumiki"
+
+#~ msgid "No projects found. Create your first project to get started!"
+#~ msgstr "Hakuna miradi iliyopatikana. Unda mradi wako wa kwanza ili uanze!"
+
+#~ msgid "Coordinate field campaigns"
+#~ msgstr "Ratibu kampeni za uwanjani"
+
+#~ msgid ""
+#~ "Enhancing field mapping efficiency and "
+#~ "accuracy through seamless coordination."
+#~ msgstr ""
+#~ "Kuongeza ufanisi na usahihi wa uchoraji"
+#~ " ramani wa uwanjani kupitia uratibu "
+#~ "usio na vikwazo."
+
+#~ msgid "Explore Projects"
+#~ msgstr "Chunguza miradi"
+
+#~ msgid "Loading metrics..."
+#~ msgstr "Vipimo vinapakiwa..."
+
+#~ msgid "What is it?"
+#~ msgstr "Ni nini hiki?"
+
+#~ msgid ""
+#~ "The Field Tasking Manager (Field-TM) "
+#~ "helps teams add local knowledge to "
+#~ "map features\n"
+#~ "        by coordinating mapping in the field."
+#~ msgstr ""
+#~ "Field Tasking Manager (Field-TM) "
+#~ "husaidia timu kuongeza maarifa ya "
+#~ "kienyeji kwenye vipengele vya ramani kwa"
+#~ " kuratibu uchoraji ramani uwanjani."
+
+#~ msgid ""
+#~ "Field-TM facilitates collaborative mapping "
+#~ "by supporting and extending mature tools"
+#~ "\n"
+#~ "        like ODK and QField. It is"
+#~ " a standalone mobile and web workflow"
+#~ " that helps teams collect\n"
+#~ "        geospatial data efficiently with "
+#~ "commonly available Android devices."
+#~ msgstr ""
+#~ "Field-TM huwezesha uchoraji ramani wa"
+#~ " ushirikiano kwa kuunga mkono na "
+#~ "kupanua zana zilizokomaa kama ODK na "
+#~ "QField. Ni mtiririko wa kazi wa "
+#~ "simu na wavuti wa kujitegemea unaosaidia"
+#~ " timu kukusanya data ya kijiografia "
+#~ "kwa ufanisi kwa kutumia vifaa vya "
+#~ "Android vinavyopatikana kwa kawaida."
+
+#~ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+#~ msgstr ""
+#~ "Msimamizi wa mradi anaonyesha mtiririko "
+#~ "wa kazi wa uchoraji ramani wa "
+#~ "FieldTM kwenye kompyuta mpakato"
+
+#~ msgid "Main Features"
+#~ msgstr "Vipengele vikuu"
+
+#~ msgid "Flexible Data Collection"
+#~ msgstr "Ukusanyaji data wenye kubadilika"
+
+#~ msgid ""
+#~ "Support diverse survey forms, multiple "
+#~ "data formats, and adaptable workflows "
+#~ "that\n"
+#~ "          fit different operational needs."
+#~ msgstr ""
+#~ "Inasaidia aina mbalimbali za fomu za "
+#~ "utafiti, miundo mingi ya data, na "
+#~ "mtiririko wa kazi unaobadilika kulingana "
+#~ "na mahitaji tofauti ya uendeshaji."
+
+#~ msgid "Open Source and Customizable"
+#~ msgstr "Chanzo huria na kinachoweza kubinafsishwa"
+
+#~ msgid ""
+#~ "Adapt Field-TM to your own survey"
+#~ " logic, data structures, and integration"
+#~ "\n"
+#~ "          requirements."
+#~ msgstr ""
+#~ "Badilisha Field-TM ilingane na mantiki"
+#~ " yako ya utafiti, miundo ya data, "
+#~ "na mahitaji ya uunganishaji."
+
+#~ msgid "Entity-Level Tracking"
+#~ msgstr "Ufuatiliaji wa kiwango cha kipengele"
+
+#~ msgid ""
+#~ "Monitor survey progress at task and "
+#~ "feature level so managers can make "
+#~ "informed\n"
+#~ "          decisions quickly."
+#~ msgstr ""
+#~ "Fuatilia maendeleo ya utafiti katika "
+#~ "kiwango cha kazi na kipengele ili "
+#~ "mameneja waweze kufanya maamuzi sahihi "
+#~ "haraka."
+
+#~ msgid "Who is it for?"
+#~ msgstr "Ni kwa ajili ya nani?"
+
+#~ msgid "Project Manager"
+#~ msgstr "Meneja wa mradi"
+
+#~ msgid "Create and coordinate field campaigns"
+#~ msgstr "Unda na uratibu kampeni za uwanjani"
+
+#~ msgid ""
+#~ "Project managers use Field-TM to "
+#~ "set up mapping projects, define areas"
+#~ " of interest,\n"
+#~ "          design survey forms, and split work into manageable tasks."
+#~ msgstr ""
+#~ "Mameneja wa miradi hutumia Field-TM "
+#~ "kuweka miradi ya uchoraji ramani, "
+#~ "kufafanua maeneo ya maslahi, kubuni fomu"
+#~ " za utafiti, na kugawa kazi katika"
+#~ " majukumu yanayoweza kusimamiwa."
+
+#~ msgid "Define a project area and upload or choose a survey form"
+#~ msgstr "Fafanua eneo la mradi na upakie au uchague fomu ya utafiti"
+
+#~ msgid "Split the area into tasks and generate a data extract"
+#~ msgstr "Gawanya eneo katika kazi na uzalishe dondoo la data"
+
+#~ msgid "Publish the project to ODK Central or QFieldCloud"
+#~ msgstr "Chapisha mradi kwenye ODK Central au QFieldCloud"
+
+#~ msgid "Share a QR code so mappers can start collecting data"
+#~ msgstr "Shiriki msimbo wa QR ili wachoraji ramani waanze kukusanya data"
+
+#~ msgid "Field Mapper"
+#~ msgstr "Mchoraji ramani wa uwanjani"
+
+#~ msgid "Collect data in the field with your phone"
+#~ msgstr "Kusanya data uwanjani kwa kutumia simu yako"
+
+#~ msgid ""
+#~ "Mappers do not need to log in "
+#~ "to Field-TM. Once a project "
+#~ "manager publishes a\n"
+#~ "          project, mappers access it "
+#~ "directly in their mobile app of "
+#~ "choice."
+#~ msgstr ""
+#~ "Wachoraji ramani hawahitaji kuingia kwenye "
+#~ "Field-TM. Mara meneja wa mradi "
+#~ "anapochapisha mradi, wachoraji ramani huufikia"
+#~ " moja kwa moja kwenye programu yao"
+#~ " ya simu wanayoichagua."
+
+#~ msgid "Scan the QR code shared by your project manager"
+#~ msgstr "Changanua msimbo wa QR ulioshirikiwa na meneja wako wa mradi"
+
+#~ msgid "The project loads automatically in ODK Collect or QField"
+#~ msgstr "Mradi unapakia kiotomatiki kwenye ODK Collect au QField"
+
+#~ msgid "Navigate to your assigned task area and collect data"
+#~ msgstr "Nenda kwenye eneo lako la kazi ulilopewa na ukusanye data"
+
+#~ msgid "Submit your survey, which goes straight to the server"
+#~ msgstr "Wasilisha utafiti wako, ambao huenda moja kwa moja kwenye seva"
+
+#~ msgid "Field-TM Use Cases"
+#~ msgstr "Matumizi ya Field-TM"
+
+#~ msgid "Field mapping in progress"
+#~ msgstr "Uchoraji ramani wa uwanjani unaendelea"
+
+#~ msgid "1. Community Mapping"
+#~ msgstr "1. Uchoraji ramani wa jamii"
+
+#~ msgid ""
+#~ "Field Tasking Manager empowers communities "
+#~ "to map informal settlements, public\n"
+#~ "            facilities, and local services for inclusive planning."
+#~ msgstr ""
+#~ "Field Tasking Manager huwezesha jamii "
+#~ "kuchora ramani ya makazi yasiyo rasmi,"
+#~ " huduma za umma, na huduma za "
+#~ "eneo kwa ajili ya mipango shirikishi."
+
+#~ msgid "2. Urban Planning and Management"
+#~ msgstr "2. Mipango na usimamizi wa miji"
+
+#~ msgid ""
+#~ "Build smarter cities with coordinated "
+#~ "surveys of houses, roads, and utilities"
+#~ "\n"
+#~ "            through clear, manageable mapping tasks."
+#~ msgstr ""
+#~ "Jenga miji yenye akili zaidi kwa "
+#~ "tafiti zilizoratibiwa za nyumba, barabara, "
+#~ "na huduma kupitia kazi za uchoraji "
+#~ "ramani zilizo wazi na zinazoweza "
+#~ "kusimamiwa."
+
+#~ msgid "3. Disaster Response and Recovery"
+#~ msgstr "3. Mwitikio na urejeshaji baada ya maafa"
+
+#~ msgid ""
+#~ "Rapidly map damaged infrastructure after "
+#~ "disasters, coordinate volunteers, and\n"
+#~ "            deliver reliable data for relief operations."
+#~ msgstr ""
+#~ "Chora ramani kwa haraka ya miundombinu"
+#~ " iliyoharibika baada ya maafa, ratibu "
+#~ "wajitolea, na toa data ya kuaminika "
+#~ "kwa shughuli za msaada."
+
+#~ msgid "Resources"
+#~ msgstr "Rasilimali"
+
+#~ msgid "Data Prep"
+#~ msgstr "Maandalizi ya data"
+
+#~ msgid "HOT Export Tool"
+#~ msgstr "HOT Export Tool"
+
+#~ msgid "Download task-ready geospatial data extracts for your project area."
+#~ msgstr ""
+#~ "Pakua dondoo za data za kijiografia "
+#~ "zilizo tayari kwa kazi kwa eneo "
+#~ "lako la mradi."
+
+#~ msgid "Documentation"
+#~ msgstr "Nyaraka"
+
+#~ msgid "ODK Central Guide"
+#~ msgstr "Mwongozo wa ODK Central"
+
+#~ msgid "Learn how to manage forms, app users, and field submissions in ODK."
+#~ msgstr ""
+#~ "Jifunze jinsi ya kusimamia fomu, "
+#~ "watumiaji wa programu, na uwasilishaji "
+#~ "wa uwanjani katika ODK."
+
+#~ msgid "QField Guide"
+#~ msgstr "Mwongozo wa QField"
+
+#~ msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+#~ msgstr ""
+#~ "Sanidi miradi ya QFieldCloud na "
+#~ "mtiririko wa kazi wa simu kwa "
+#~ "uchoraji ramani bila mtandao."
+
+#~ msgid "Need assistance?"
+#~ msgstr "Unahitaji msaada?"
+
+#~ msgid "Email:"
+#~ msgstr "Barua pepe:"
+
+#~ msgid "Language"
+#~ msgstr "Simamia"
+
+#~ msgid "Coordinated field mapping for Open Mapping campaigns."
+#~ msgstr "Uchoraji ramani wa uwanjani ulioratibiwa kwa kampeni za Open Mapping."
+
+#~ msgid "Login"
+#~ msgstr "Ingia"
+
+#~ msgid "Projects"
+#~ msgstr "Miradi"
+
+#~ msgid "QField Admin"
+#~ msgstr "Usimamizi wa QField"
+
+#~ msgid "Sign in to Field-TM"
+#~ msgstr "Ingia kwenye Field-TM"
+
+#~ msgid "Redirecting to the centralized login service."
+#~ msgstr "Unaelekezwa kwenye huduma ya kuingia ya kati."
+
+#~ msgid "Continue to login"
+#~ msgstr "Endelea kuingia"
+
+#~ msgid "Authentication is disabled on this deployment."
+#~ msgstr "Uthibitishaji umezimwa kwenye usambazaji huu."
+
+#~ msgid "Back to home"
+#~ msgstr "Rudi nyumbani"
+
+#~ msgid "Create New Project"
+#~ msgstr "Unda mradi mpya"
+
+#~ msgid "Project Name"
+#~ msgstr "Jina la mradi"
+
+#~ msgid "Enter project name"
+#~ msgstr "Weka jina la mradi"
+
+#~ msgid "Enter project description"
+#~ msgstr "Weka maelezo ya mradi"
+
+#~ msgid "Field Mapping App"
+#~ msgstr "Programu ya uchoraji ramani wa uwanjani"
+
+#~ msgid "Project Area"
+#~ msgstr "Eneo la mradi"
+
+#~ msgid "Draw Area"
+#~ msgstr "Chora eneo"
+
+#~ msgid "Upload GeoJSON"
+#~ msgstr "Pakia GeoJSON"
+
+#~ msgid "Clear"
+#~ msgstr "Futa"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area.\n"
+#~ "          Maximum project size is 1,000"
+#~ " km². Areas over 100 km² will "
+#~ "show a warning. The OSM data\n"
+#~ "          extract API is limited to 200 km²."
+#~ msgstr ""
+#~ "Chora poligoni kwenye ramani au pakia"
+#~ " faili la GeoJSON kufafanua eneo la"
+#~ " mradi wako. Ukubwa wa juu wa "
+#~ "mradi ni 1,000 km². Maeneo yanayozidi"
+#~ " 100 km² yataonyesha onyo. API ya "
+#~ "uchotaji data ya OSM imewekewa kikomo"
+#~ " cha 200 km²."
+
+#~ msgid "Advanced Config"
+#~ msgstr "Usanidi wa hali ya juu"
+
+#~ msgid "Merge geometries (use convex hull for multipolygons)"
+#~ msgstr "Unganisha jiometri (tumia convex hull kwa multipolygons)"
+
+#~ msgid "Hashtags"
+#~ msgstr "Hashtags"
+
+#~ msgid "Type hashtags and press Enter or comma"
+#~ msgstr "Andika hashtags na ubonyeze Enter au koma"
+
+#~ msgid ""
+#~ "Type hashtags and press Enter or "
+#~ "comma to add them. Click the × "
+#~ "on a tag to remove\n"
+#~ "          it."
+#~ msgstr ""
+#~ "Andika hashtags na ubonyeze Enter au "
+#~ "koma ili kuziongeza. Bofya × kwenye "
+#~ "lebo ili kuiondoa."
+
+#~ msgid "Creating..."
+#~ msgstr "Inatengeneza..."
+
+#~ msgid "Something went wrong. Please try again."
+#~ msgstr "Kuna tatizo limetokea. Tafadhali jaribu tena."
+
+#~ msgid "Invalid GeoJSON format. Please check your file."
+#~ msgstr "Muundo wa GeoJSON si sahihi. Tafadhali angalia faili lako."
+
+#~ msgid "Invalid GeoJSON file. Please check the file format."
+#~ msgstr "Faili la GeoJSON si sahihi. Tafadhali angalia muundo wa faili."
+
+#~ msgid ""
+#~ "You must draw or upload an Area"
+#~ " of Interest (AOI) on the map "
+#~ "before submitting."
+#~ msgstr ""
+#~ "Lazima uchore au upakie Area of "
+#~ "Interest (AOI) kwenye ramani kabla ya"
+#~ " kuwasilisha."
+
+#~ msgid ""
+#~ "A project with this name already "
+#~ "exists. Please choose a different name."
+#~ msgstr "Mradi wenye jina hili tayari upo. Tafadhali chagua jina tofauti."
+
+#~ msgid "Description is required."
+#~ msgstr "Maelezo yanahitajika."
+
+#~ msgid "← Back to Projects"
+#~ msgstr "← Rudi kwenye miradi"
+
+#~ msgid "Project Metadata"
+#~ msgstr "Metadata ya mradi"
+
+#~ msgid "Project metadata and setup information for managers."
+#~ msgstr "Metadata ya mradi na taarifa za usanidi kwa mameneja."
+
+#~ msgid "Project ID"
+#~ msgstr "Kitambulisho cha mradi"
+
+#~ msgid "Created"
+#~ msgstr "Imeundwa"
+
+#~ msgid "Last Updated"
+#~ msgstr "Imesasishwa mwisho"
+
+#~ msgid "External Project"
+#~ msgstr "Mradi wa nje"
+
+#~ msgid "Instance:"
+#~ msgstr "Instansi:"
+
+#~ msgid "Project ID:"
+#~ msgstr "Kitambulisho cha mradi:"
+
+#~ msgid "View Project in ODK Central →"
+#~ msgstr "Tazama mradi kwenye ODK Central →"
+
+#~ msgid "Manage QFieldCloud Project →"
+#~ msgstr "Simamia mradi wa QFieldCloud →"
+
+#~ msgid "View Project Externally →"
+#~ msgstr "Tazama mradi nje →"
+
+#~ msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#~ msgstr ""
+#~ "Futa mradi huu katika mfumo wa "
+#~ "downstream na Field-TM? Hii haiwezi "
+#~ "kutenguliwa."
+
+#~ msgid "Delete Project"
+#~ msgstr "Futa mradi"
+
+#~ msgid "Back to Projects"
+#~ msgstr "Rudi kwenye miradi"
+
+#~ msgid "Project Not Found"
+#~ msgstr "Mradi haujapatikana"
+
+#~ msgid ""
+#~ "The project you're looking for doesn't"
+#~ " exist or you don't have permission"
+#~ " to view\n"
+#~ "        it."
+#~ msgstr "Mradi unaoutafuta haupo au huna ruhusa ya kuuona."
+
+#~ msgid "QFieldCloud Admin"
+#~ msgstr "Usimamizi wa QFieldCloud"
+
+#~ msgid ""
+#~ "This page is for managing the "
+#~ "users in your QField project, after "
+#~ "creation."
+#~ msgstr ""
+#~ "Ukurasa huu ni wa kusimamia watumiaji"
+#~ " katika mradi wako wa QField baada"
+#~ " ya kuundwa."
+
+#~ msgid "Enter your QFieldCloud credentials to manage collaborators."
+#~ msgstr "Weka taarifa zako za QFieldCloud ili kusimamia washiriki."
+
+#~ msgid "QFieldCloud URL"
+#~ msgstr "URL ya QFieldCloud"
+
+#~ msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+#~ msgstr "URL ya msingi ya instance yako ya QFieldCloud (bila /api/v1)."
+
+#~ msgid "admin"
+#~ msgstr "admin"
+
+#~ msgid "Password"
+#~ msgstr "Nywila"
+
+#~ msgid "Connect"
+#~ msgstr "Unganisha"
+
+#~ msgid "Connecting…"
+#~ msgstr "Inaunganisha…"
+
+#~ msgid "Features Surveyed (Approximate)"
+#~ msgstr "Vipengele vilivyofanyiwa utafiti (takriban)"
+
+#~ msgid "Projects Created"
+#~ msgstr "Miradi iliyoundwa"
+
+#~ msgid "Countries Covered"
+#~ msgstr "Nchi zilizofikiwa"
+
+#~ msgid "Users Registered"
+#~ msgstr "Watumiaji waliosajiliwa"
+
+#~ msgid "Supported Mapping Apps"
+#~ msgstr "Programu za ramani zinazotumika"
+
+#~ msgid "Offline Basemap"
+#~ msgstr "Ramani msingi ya nje ya mtandao"
+
+#~ msgid ""
+#~ "Search HOT OpenAerialMap imagery for "
+#~ "this AOI and generate an MBTiles "
+#~ "basemap."
+#~ msgstr ""
+#~ "Tafuta picha za HOT OpenAerialMap kwa"
+#~ " AOI hii na utengeneze ramani msingi"
+#~ " ya MBTiles."
+
+#~ msgid "Search OAM Imagery"
+#~ msgstr "Tafuta picha za OAM"
+
+#~ msgid "Basemap generation previously failed. Please search again and retry."
+#~ msgstr ""
+#~ "Utengenezaji wa ramani msingi uliwahi "
+#~ "kushindikana. Tafadhali tafuta tena na "
+#~ "ujaribu upya."
+
+#~ msgid "No basemap selected yet."
+#~ msgstr "Bado hakuna ramani msingi iliyochaguliwa."
+
+#~ msgid "Manager Setup Summary"
+#~ msgstr "Muhtasari wa usanidi wa meneja"
+
+#~ msgid "The project setup flow is complete and shown below for reference."
+#~ msgstr ""
+#~ "Mtiririko wa usanidi wa mradi "
+#~ "umekamilika na umeonyeshwa hapa chini "
+#~ "kwa rejea."
+
+#~ msgid "Project Location"
+#~ msgstr "Mahali pa mradi"
+
+#~ msgid "Step 2: Upload XLSForm"
+#~ msgstr "Hatua ya 2: Pakia XLSForm"
+
+#~ msgid "Complete"
+#~ msgstr "Imekamilika"
+
+#~ msgid "Step 3: Get Data"
+#~ msgstr "Hatua ya 3: Pata data"
+
+#~ msgid "Step 4: Split into Tasks"
+#~ msgstr "Hatua ya 4: Gawanya katika kazi"
+
+#~ msgid "Step 5: Finalise Project"
+#~ msgstr "Hatua ya 5: Kamilisha mradi"
+
+#~ msgid ""
+#~ "If you need to upload additional "
+#~ "media files to this project, such "
+#~ "as images and\n"
+#~ "          videos, log into ODK Central"
+#~ " and upload them in the form "
+#~ "settings."
+#~ msgstr ""
+#~ "Ikiwa unahitaji kupakia faili za ziada"
+#~ " za media kwenye mradi huu, kama "
+#~ "picha na video, ingia kwenye ODK "
+#~ "Central na uzipakie kwenye mipangilio ya"
+#~ " fomu."
+
+#~ msgid "Ready for Mapping"
+#~ msgstr "Tayari kwa uchoraji ramani"
+
+#~ msgid "Loading QR code..."
+#~ msgstr "Inapakia msimbo wa QR..."
+
+#~ msgid "Project Setup"
+#~ msgstr "Usanidi wa mradi"
+
+#~ msgid "Step 2: Select Survey Form"
+#~ msgstr "Hatua ya 2: Chagua fomu ya utafiti"
+
+#~ msgid "Choose a preset survey type, or upload your own custom XLSForm."
+#~ msgstr "Chagua aina ya utafiti na uendelee kwa chaguo-msingi yanayopendekezwa."
+
+#~ msgid "Choose Survey Type:"
+#~ msgstr "Chagua aina ya utafiti:"
+
+#~ msgid "Loading survey types..."
+#~ msgstr "Aina za utafiti zinapakiwa..."
+
+#~ msgid "Or use your own form instead:"
+#~ msgstr "Au tumia fomu yako mwenyewe badala yake:"
+
+#~ msgid "Upload Custom XLSForm"
+#~ msgstr "Pakia fomu maalum"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task\n"
+#~ "          division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you\n"
+#~ "          want to ask (do not "
+#~ "include select_one_from_file fields for "
+#~ "tasks/features)."
+#~ msgstr ""
+#~ "Kumbuka: Field-TM itaongeza kiotomatiki "
+#~ "sehemu za ziada kwenye fomu yako "
+#~ "kwa ajili ya mgawanyo wa kazi na"
+#~ " uteuzi wa vipengele. Fomu yako "
+#~ "inapaswa kuwa na maswali ya utafiti "
+#~ "tu unayotaka kuuliza (usiweke sehemu za"
+#~ " select_one_from_file kwa kazi/vipengele)."
+
+#~ msgid ""
+#~ "Recommended defaults are active for ODK"
+#~ " projects, including ODK Collect\n"
+#~ "          compatibility."
+#~ msgstr ""
+#~ "Chaguo-msingi yanayopendekezwa yanafanya kazi"
+#~ " kwa miradi ya ODK, ikiwa ni "
+#~ "pamoja na uoanifu wa ODK Collect."
+
+#~ msgid "Recommended defaults are active for %(app_name)s projects."
+#~ msgstr ""
+#~ "Chaguo-msingi yanayopendekezwa yanafanya kazi"
+#~ " kwa miradi ya %(app_name)s."
+
+#~ msgid "Recommended defaults are active for this project."
+#~ msgstr "Chaguo-msingi yanayopendekezwa yanafanya kazi kwa mradi huu."
+
+#~ msgid "Default Language:"
+#~ msgstr "Lugha ya msingi:"
+
+#~ msgid "English"
+#~ msgstr "Kiingereza"
+
+#~ msgid "Spanish"
+#~ msgstr "Kihispania"
+
+#~ msgid "French"
+#~ msgstr "Kifaransa"
+
+#~ msgid "Portuguese"
+#~ msgstr "Kireno"
+
+#~ msgid "Swahili"
+#~ msgstr "Kiswahili"
+
+#~ msgid "Hindi"
+#~ msgstr "Kihindi"
+
+#~ msgid "Form Options:"
+#~ msgstr "Chaguo za fomu:"
+
+#~ msgid "Include photo upload question"
+#~ msgstr "Jumuisha swali la kupakia picha"
+
+#~ msgid "Make photo mandatory"
+#~ msgstr "Fanya picha iwe ya lazima"
+
+#~ msgid "Asks the user to take a photo at their location."
+#~ msgstr "Humwomba mtumiaji apige picha katika eneo lake."
+
+#~ msgid "Include digitisation verification question"
+#~ msgstr "Jumuisha swali la uthibitishaji wa ujanibishaji wa kidijitali"
+
+#~ msgid "Asks the mapper to verify if existing features are correctly digitised."
+#~ msgstr ""
+#~ "Humwomba mpangaji ramani athibitishe kama "
+#~ "vipengele vilivyopo vimewekwa kidijitali kwa"
+#~ " usahihi."
+
+#~ msgid "Continue"
+#~ msgstr "Endelea"
+
+#~ msgid "✓ Survey form uploaded successfully"
+#~ msgstr "✓ Fomu ya utafiti imepakiwa kwa mafanikio"
+
+#~ msgid "Download the recommended OSM data for your survey form."
+#~ msgstr "Pakua data ya OSM inayopendekezwa kwa fomu yako ya utafiti."
+
+#~ msgid "Review the data on the map, then continue."
+#~ msgstr "Kagua data kwenye ramani, kisha endelea."
+
+#~ msgid "Download OSM Data"
+#~ msgstr "Pakua data ya OSM"
+
+#~ msgid "Collect New Data Only"
+#~ msgstr "Kusanya data mpya pekee"
+
+#~ msgid "Use custom data inputs or override the default OSM download options."
+#~ msgstr "Tumia data maalum au ubadilishe chaguo-msingi za upakuaji wa OSM."
+
+#~ msgid "OSM Category:"
+#~ msgstr "Kategoria ya OSM:"
+
+#~ msgid "OSM Buildings"
+#~ msgstr "Majengo ya OSM"
+
+#~ msgid "OSM Highways"
+#~ msgstr "Barabara za OSM"
+
+#~ msgid "OSM Healthcare"
+#~ msgstr "Huduma za afya za OSM"
+
+#~ msgid "OSM Toilets"
+#~ msgstr "Vyoo vya OSM"
+
+#~ msgid "OSM Religious"
+#~ msgstr "Kidini cha OSM"
+
+#~ msgid "OSM Landuse"
+#~ msgstr "Matumizi ya ardhi ya OSM"
+
+#~ msgid "OSM Waterways"
+#~ msgstr "Njia za maji za OSM"
+
+#~ msgid "OSM Water Points"
+#~ msgstr "Vyanzo vya maji vya OSM"
+
+#~ msgid "OSM Waste Disposal"
+#~ msgstr "Utupaji taka wa OSM"
+
+#~ msgid "OSM Education"
+#~ msgstr "Elimu ya OSM"
+
+#~ msgid "OSM Cemeteries"
+#~ msgstr "Makaburi ya OSM"
+
+#~ msgid "OSM Amenities"
+#~ msgstr "Huduma za OSM"
+
+#~ msgid "Geometry Type:"
+#~ msgstr "Aina ya jiometri:"
+
+#~ msgid "Polygon"
+#~ msgstr "Poligoni"
+
+#~ msgid "Polyline"
+#~ msgstr "Polilaini"
+
+#~ msgid "Point"
+#~ msgstr "Nukta"
+
+#~ msgid "Use centroids"
+#~ msgstr "Tumia centrodi"
+
+#~ msgid "Upload Custom GeoJSON"
+#~ msgstr "Pakia GeoJSON maalum"
+
+#~ msgid "Generating OSM data extract... This may take a moment."
+#~ msgstr "Inazalisha dondoo la data ya OSM... Hii inaweza kuchukua muda kidogo."
+
+#~ msgid "OSM data extract ready"
+#~ msgstr "Dondoo la data ya OSM liko tayari"
+
+#~ msgid "Step 4: Split into Tasks (Optional)"
+#~ msgstr "Hatua ya 3: Gawanya katika kazi (hiari)"
+
+#~ msgid "✓ Task splitting is not relevant without existing data"
+#~ msgstr "✓ Ugawaji wa kazi hauhitajiki bila data iliyopo"
+
+#~ msgid ""
+#~ "Generate task areas by splitting the "
+#~ "Area of Interest (AOI). Choose an "
+#~ "algorithm and\n"
+#~ "      parameters, then split. Review the"
+#~ " preview, and click \"Accept Task "
+#~ "Areas\" to save. Or\n"
+#~ "      click"
+#~ msgstr ""
+#~ "Zalisha maeneo ya kazi kwa kugawanya "
+#~ "Area of Interest (AOI). Chagua algoriti"
+#~ " na vigezo, kisha gawanya. Kagua "
+#~ "hakikisho na ubofye \"Kubali maeneo ya"
+#~ " kazi\" ili kuhifadhi. Au bofya"
+
+#~ msgid "Skip"
+#~ msgstr "Ruka"
+
+#~ msgid "to use the whole AOI as a single task."
+#~ msgstr "ili kutumia AOI yote kama kazi moja."
+
+#~ msgid "Choose which linear features influence building-based task splitting."
+#~ msgstr ""
+#~ "Chagua vipengele vya mistari vinavyoathiri "
+#~ "ugawaji wa kazi unaotegemea majengo."
+
+#~ msgid "Include roads"
+#~ msgstr "Jumuisha barabara"
+
+#~ msgid "Include rivers"
+#~ msgstr "Jumuisha mito"
+
+#~ msgid "Include railways"
+#~ msgstr "Jumuisha reli"
+
+#~ msgid "Include aeroways"
+#~ msgstr "Jumuisha njia za ndege"
+
+#~ msgid "Algorithm:"
+#~ msgstr "Algoriti:"
+
+#~ msgid "Select splitting option..."
+#~ msgstr "Chagua chaguo la ugawaji..."
+
+#~ msgid "Split by Square"
+#~ msgstr "Gawanya kwa mraba"
+
+#~ msgid "Average Buildings v1 (Voronoi)"
+#~ msgstr "Wastani wa majengo v1 (Voronoi)"
+
+#~ msgid "Average Buildings v2 (Straight Skeleton)"
+#~ msgstr "Wastani wa majengo v2 (Straight Skeleton)"
+
+#~ msgid "Split by Specific Number of Tasks"
+#~ msgstr "Gawanya kwa idadi maalum ya kazi (inakuja hivi karibuni)"
+
+#~ msgid "Avg. Buildings per Task:"
+#~ msgstr "Wastani wa majengo kwa kazi:"
+
+#~ msgid "Number of Tasks:"
+#~ msgstr "Idadi ya kazi:"
+
+#~ msgid "Dimension (meters):"
+#~ msgstr "Kipimo (mita):"
+
+#~ msgid "Split Again"
+#~ msgstr "Gawanya tena"
+
+#~ msgid "Split AOI"
+#~ msgstr "Gawanya AOI"
+
+#~ msgid "Splitting AOI into tasks... This may take a moment."
+#~ msgstr "Inagawanya AOI katika kazi... Hii inaweza kuchukua muda kidogo."
+
+#~ msgid "Ready"
+#~ msgstr "Tayari"
+
+#~ msgid ""
+#~ "All prerequisites are complete! Create "
+#~ "the project in your chosen mapping "
+#~ "tool."
+#~ msgstr ""
+#~ "Masharti yote ya awali yamekamilika! "
+#~ "Unda mradi katika zana yako uliyochagua"
+#~ " ya uchoraji ramani."
+
+#~ msgid "Finalise Project"
+#~ msgstr "Kamilisha mradi"
+
+#~ msgid "Confirm Project Finalisation"
+#~ msgstr "Thibitisha ukamilishaji wa mradi"
+
+#~ msgid "Are you sure you want to finalise this project?"
+#~ msgstr "Una uhakika unataka kukamilisha mradi huu?"
+
+#~ msgid "Confirm & Finalise"
+#~ msgstr "Thibitisha na ukamilishe"
+
+#~ msgid "Custom Credentials"
+#~ msgstr "Taarifa maalum za uthibitishaji"
+
+#~ msgid "ODK Central URL"
+#~ msgstr "URL ya ODK Central"
+
+#~ msgid "https://your-odk-central.com"
+#~ msgstr "https://your-odk-central.com"
+
+#~ msgid "QField Cloud URL"
+#~ msgstr "URL ya QField Cloud"
+
+#~ msgid "https://qfield.cloud"
+#~ msgstr "https://qfield.cloud"
+
+#~ msgid "qfield_username"
+#~ msgstr "qfield_username"
+
+#~ msgid "qfield_password"
+#~ msgstr "qfield_password"
+
+#~ msgid "Test Credentials"
+#~ msgstr "Jaribu taarifa za uthibitishaji"
+
+#~ msgid "Save & Continue"
+#~ msgstr "Hifadhi na uendelee"
+
+#~ msgid "Select a survey type..."
+#~ msgstr "Chagua aina ya utafiti..."
+
+#~ msgid "No survey types available"
+#~ msgstr "Hakuna aina za utafiti zinazopatikana"
+
+#~ msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Hakuna fomu za utafiti zinazopatikana. "
+#~ "Pakia fomu maalum katika usanidi wa "
+#~ "hali ya juu."
+
+#~ msgid "Select a survey type, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Chagua aina ya utafiti, au pakia "
+#~ "fomu maalum katika usanidi wa hali "
+#~ "ya juu."
+
+#~ msgid "Survey type selected."
+#~ msgstr "Aina ya utafiti imechaguliwa."
+
+#~ msgid "Invalid file type. Please upload a .xls or .xlsx file."
+#~ msgstr "Aina ya faili si sahihi. Tafadhali pakia faili la .xls au .xlsx."
+
+#~ msgid "Selected file:"
+#~ msgstr "Faili lililochaguliwa:"
+
+#~ msgid "Custom form selected."
+#~ msgstr "Fomu maalum imechaguliwa."
+
+#~ msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Chagua aina ya utafiti kwanza, au "
+#~ "pakia fomu maalum katika usanidi wa "
+#~ "hali ya juu."
+
+#~ msgid "polygons"
+#~ msgstr "poligoni"
+
+#~ msgid "polylines"
+#~ msgstr "polilaini"
+
+#~ msgid "points"
+#~ msgstr "nukta"
+
+#~ msgid "features"
+#~ msgstr "vipengele"
+
+#~ msgid ""
+#~ "You uploaded a custom form, so "
+#~ "this OSM download is optional. Use "
+#~ "Advanced Config to upload your own "
+#~ "GeoJSON or adjust download settings."
+#~ msgstr ""
+#~ "Umepakia fomu maalum, kwa hiyo upakuaji"
+#~ " huu wa OSM ni wa hiari. Tumia"
+#~ " usanidi wa hali ya juu kupakia "
+#~ "GeoJSON yako au kurekebisha mipangilio "
+#~ "ya upakuaji."
+
+#~ msgid ""
+#~ "Recommended source: %(title)s (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Chanzo kinachopendekezwa: %(title)s "
+#~ "(%(geom_label)s). Kagua data kwenye ramani,"
+#~ " kisha endelea."
+
+#~ msgid ""
+#~ "Recommended source updated (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Chanzo kilichopendekezwa kimesasishwa "
+#~ "(%(geom_label)s). Kagua data kwenye ramani,"
+#~ " kisha endelea."
+
+#~ msgid "Downloading..."
+#~ msgstr "Inapakua..."
+
+#~ msgid "Confirm No Splitting"
+#~ msgstr "Thibitisha bila kugawanya"
+
+#~ msgid "Split by Buildings"
+#~ msgstr "Gawanya kwa majengo"
+
+#~ msgid "Select Option"
+#~ msgstr "Chagua chaguo"
+
+#~ msgid "Confirming..."
+#~ msgstr "Inathibitisha..."
+
+#~ msgid "Splitting..."
+#~ msgstr "Inagawanya..."
+
+#~ msgid "ODK Central"
+#~ msgstr "ODK Central"
+
+#~ msgid "QField"
+#~ msgstr "QField"
+
+#~ msgid "the mapping tool"
+#~ msgstr "zana ya uchoraji ramani"
+
+#~ msgid "Project type not set. Please set the field mapping app first."
+#~ msgstr ""
+#~ "Aina ya mradi haijawekwa. Tafadhali weka"
+#~ " kwanza programu ya uchoraji ramani "
+#~ "wa uwanjani."
+
+#~ msgid ""
+#~ "Are you sure you want to finalise"
+#~ " this project in %(project_type)s? This "
+#~ "will create the project, upload forms,"
+#~ " and generate all necessary files."
+#~ msgstr ""
+#~ "Una uhakika unataka kukamilisha mradi "
+#~ "huu katika %(project_type)s? Hii itaunda "
+#~ "mradi, kupakia fomu, na kuzalisha faili"
+#~ " zote zinazohitajika."
+
+#~ msgid "Custom ODK Credentials"
+#~ msgstr "Taarifa maalum za ODK"
+
+#~ msgid "Custom QField Credentials"
+#~ msgstr "Taarifa maalum za QField"
+
+#~ msgid "Please fill in all fields."
+#~ msgstr "Tafadhali jaza sehemu zote."
+
+#~ msgid "Testing..."
+#~ msgstr "Inajaribu..."
+
+#~ msgid "Testing credentials..."
+#~ msgstr "Inajaribu taarifa za uthibitishaji..."
+
+#~ msgid "✓ Credentials are valid!"
+#~ msgstr "✓ Taarifa za uthibitishaji ni sahihi!"
+
+#~ msgid "Invalid credentials. Please check and try again."
+#~ msgstr "Taarifa za uthibitishaji si sahihi. Tafadhali hakiki na ujaribu tena."
+
+#~ msgid "Error testing credentials: %(message)s"
+#~ msgstr "Hitilafu wakati wa kujaribu taarifa za uthibitishaji: %(message)s"
+
+#~ msgid "Please test credentials first before continuing."
+#~ msgstr "Tafadhali jaribu kwanza taarifa za uthibitishaji kabla ya kuendelea."
+
+#~ msgid "Creating project in %(project_type)s... This may take a moment."
+#~ msgstr ""
+#~ "Inaunda mradi katika %(project_type)s... Hii"
+#~ " inaweza kuchukua muda kidogo."
+
+#~ msgid "Error:"
+#~ msgstr "Hitilafu:"
+
+#~ msgid "Basemap attach failed. Use retry to start again."
+#~ msgstr ""
+#~ "Kuambatanisha ramani msingi kumeshindikana. "
+#~ "Tumia jaribu tena kuanza upya."
+
+#~ msgid "Retry Attach"
+#~ msgstr "Jaribu kuambatanisha tena"
+
+#~ msgid ""
+#~ "Basemap attach is in progress. Use "
+#~ "the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Kuambatanisha ramani msingi kunaendelea. Tumia"
+#~ " kitufe kilicho hapa chini kukagua "
+#~ "hali ya hivi karibuni."
+
+#~ msgid "Checking..."
+#~ msgstr "Inakaguliwa..."
+
+#~ msgid "Check Status"
+#~ msgstr "Hali ya mradi"
+
+#~ msgid ""
+#~ "Basemap generation is in progress. "
+#~ "Status updates automatically every few "
+#~ "seconds."
+#~ msgstr ""
+#~ "Utengenezaji wa ramani msingi unaendelea. "
+#~ "Hali inasasishwa kiotomatiki kila baada "
+#~ "ya sekunde chache."
+
+#~ msgid "STAC item"
+#~ msgstr "Kipengee cha STAC"
+
+#~ msgid "Zoom"
+#~ msgstr "Kukuza"
+
+#~ msgid "Select one imagery item to start MBTiles generation."
+#~ msgstr "Chagua kipengee kimoja cha picha ili kuanza kutengeneza MBTiles."
+
+#~ msgid "Cloud"
+#~ msgstr "Funga"
+
+#~ msgid "View Metadata"
+#~ msgstr "Tazama metadata"
+
+#~ msgid "Use this image"
+#~ msgstr "Tumia picha hii"
+
+#~ msgid "No imagery items were found for this AOI."
+#~ msgstr "Hakuna vipengee vya picha vilivyopatikana kwa AOI hii."
+
+#~ msgid "Accept Data Extract"
+#~ msgstr "Kubali dondoo la data"
+
+#~ msgid "View technical details"
+#~ msgstr "Tazama maelezo ya kiufundi"
+
+#~ msgid "Project created in ODK Central."
+#~ msgstr "Mradi umeundwa katika ODK Central."
+
+#~ msgid "Manager Access (ODK Central UI)"
+#~ msgstr "Ufikiaji wa meneja (ODK Central UI)"
+
+#~ msgid "Open project in ODK Central"
+#~ msgstr "Fungua mradi katika ODK Central"
+
+#~ msgid "Save these credentials now. They will only be shown once."
+#~ msgstr "Hifadhi taarifa hizi sasa. Zitaonyeshwa mara moja tu."
+
+#~ msgid "View FieldTM Project"
+#~ msgstr "Tazama mradi wa FieldTM"
+
+#~ msgid "Project created in QFieldCloud."
+#~ msgstr "Mradi umeundwa katika QFieldCloud."
+
+#~ msgid "Manager Access (QFieldCloud)"
+#~ msgstr "Ufikiaji wa meneja (QFieldCloud)"
+
+#~ msgid "Open project in QFieldCloud"
+#~ msgstr "Fungua mradi katika QFieldCloud"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to\n"
+#~ "      manage the project."
+#~ msgstr ""
+#~ "Akaunti ya meneja haikuweza kuundwa "
+#~ "kiotomatiki. Ingia kwenye QFieldCloud kama "
+#~ "msimamizi ili kusimamia mradi."
+
+#~ msgid "Accept Task Choices"
+#~ msgstr "Kubali machaguo ya kazi"
+
+#~ msgid ""
+#~ "Basemap attached to QField\n"
+#~ "    project."
+#~ msgstr "Ramani msingi imeunganishwa na mradi wa QField."
+
+#~ msgid "Area"
+#~ msgstr "Eneo"
+
+#~ msgid "Invalid geometry"
+#~ msgstr "Jiometri batili"
+
+#~ msgid "Undo last vertex"
+#~ msgstr "Tengua nukta ya mwisho"
+
+#~ msgid "My location"
+#~ msgstr "Mahali pangu"
+
+#~ msgid "Failed to validate GeoJSON"
+#~ msgstr "Imeshindikana kuthibitisha GeoJSON"
+
+#~ msgid "No GeoJSON returned from validation"
+#~ msgstr "Hakuna GeoJSON iliyorejeshwa kutoka uthibitishaji"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area. Maximum\n"
+#~ "    project size is 1,000 km². "
+#~ "Areas over 100 km² will show a "
+#~ "warning. The OSM data extract API "
+#~ "is\n"
+#~ "    limited to 200 km²."
+#~ msgstr ""
+#~ "Chora poligoni kwenye ramani au pakia"
+#~ " faili ya GeoJSON ili kufafanua eneo"
+#~ " la mradi wako. Ukubwa wa juu "
+#~ "wa mradi ni km² 1,000. Maeneo "
+#~ "yenye zaidi ya km² 100 yataonyesha "
+#~ "onyo. API ya utoaji wa data ya "
+#~ "OSM imewekewa kikomo cha km² 200."
+
+#~ msgid ""
+#~ "Basemap attach failed for now. Your project is ready to\n"
+#~ "      use. Please retry attach."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Basemap generation is in progress. Use"
+#~ " the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Uzalishaji wa ramani msingi unaendelea. "
+#~ "Tumia kitufe hapa chini kuangalia hali"
+#~ " ya hivi karibuni."
+
+#~ msgid ""
+#~ "Basemap is\n"
+#~ "    ready. Attaching to QField project in progress."
+#~ msgstr ""
+#~ "Ramani msingi iko tayari. Uunganishaji "
+#~ "kwenye mradi wa QField unaendelea."
+
+#~ msgid ""
+#~ "Basemap is ready. Not yet\n"
+#~ "    attached to QField project."
+#~ msgstr "Ramani msingi iko tayari. Bado haijaunganishwa kwenye mradi wa QField."
 

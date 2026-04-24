@@ -12,8 +12,10 @@ from app.htmx.basemap_routes import (
 from app.htmx.landing_routes import landing, login_page, metrics_partial
 from app.htmx.project_create_routes import (
     create_project_htmx,
+    create_simple_project_htmx,
     get_template_xlsform,
     new_project,
+    new_project_simple,
     upload_xlsform_htmx,
 )
 from app.htmx.project_detail_routes import (
@@ -75,9 +77,11 @@ htmx_router = Router(
         project_listing,
         metrics_partial,
         new_project,
+        new_project_simple,
         project_details,
         delete_project_htmx,
         create_project_htmx,
+        create_simple_project_htmx,
         serve_static_css,
         serve_static_image,
         get_template_xlsform,

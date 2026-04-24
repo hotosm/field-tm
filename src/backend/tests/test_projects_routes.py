@@ -337,6 +337,95 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
         )
 
 
+async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error(
+    monkeypatch,
+):
+    """Invalid extract geometries should return actionable validation guidance."""
+    downloaded_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {"osm_id": 101},
+            }
+        ],
+    }
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return Mock(
+            id=1,
+            outline={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.30, 27.71],
+                        [85.30, 27.70],
+                        [85.31, 27.70],
+                        [85.31, 27.71],
+                        [85.30, 27.71],
+                    ]
+                ],
+            },
+        )
+
+    async def fake_generate_data_extract(*_args, **_kwargs):
+        return Mock(data={"download_url": "https://example.test/extract.geojson"})
+
+    class FakeResponse:
+        ok = True
+
+        async def text(self):
+            return json.dumps(downloaded_geojson)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+    class FakeSession:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def get(self, _url):
+            return FakeResponse()
+
+    def fake_parse_aoi(*_args, **_kwargs):
+        raise TypeError("'NoneType' object is not iterable")
+
+    monkeypatch.setattr(
+        project_services.project_deps,
+        "get_project_by_id",
+        fake_get_project_by_id,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_data_extract",
+        fake_generate_data_extract,
+    )
+    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
+
+    with pytest.raises(
+        project_services.ValidationError,
+        match=(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        ),
+    ):
+        await project_services.download_osm_data(
+            db=Mock(),
+            project_id=1,
+            osm_category="waterways",
+            geom_type="POLYLINE",
+            centroid=False,
+        )
+
+
 async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
     """Raw-data extraction failures should return actionable guidance."""
 

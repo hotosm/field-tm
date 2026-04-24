@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:12+0100\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -122,7 +122,7 @@ msgstr "Vytvoření uživatele centrálního správce ODK se nezdařilo."
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Při generování QR kódu došlo k neočekávané chybě."
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:367
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Zadejte platný soubor .xls nebo .xlsx"
 
@@ -140,7 +140,7 @@ msgstr "%(action)s se nezdařilo s HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s se nezdařilo kvůli chybě připojení proti proudu. Rozhraní API"
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack vrátilo HTTP %(status_code)s."
@@ -177,53 +177,62 @@ msgstr "Váš soubor geojson je neplatný."
 msgid "Project not found or access denied."
 msgstr "Projekt nebyl nalezen nebo byl přístup odepřen."
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr "Podkladová mapa byla úspěšně připojena k projektu QField."
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr "Připojení podkladové mapy ještě nezačalo."
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+#, fuzzy
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr "Připojení podkladové mapy se nezdařilo. Zkuste to prosím znovu."
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "Vyhledání snímků se nyní nezdařilo. Zkuste to prosím znovu za chvíli."
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "Nyní se nepodařilo spustit generování podkladové mapy. Zkuste to prosím "
 "znovu za chvíli."
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "Nyní se nepodařilo obnovit stav podkladové mapy. Zkuste to prosím znovu "
 "za chvíli."
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr "Připojení podkladové mapy je dostupné po publikování."
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr "Připojení podkladové mapy je dostupné pouze pro projekty QField."
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr ""
 "Podkladová mapa ještě není připravena. Počkejte prosím na dokončení "
 "generování."
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr "Adresa URL ke stažení vygenerované podkladové mapy zatím není k dispozici."
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -232,39 +241,58 @@ msgstr ""
 "Připojení podkladové mapy QField není v tomto nasazení nakonfigurováno. "
 "Chybí %(config)s."
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr "Nástroje pro podkladovou mapu jsou dostupné po publikování."
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr "Terénní mapování probíhá"
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:77
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"Oblast projektu musí být platný JSON (GeoJSON Polygon, MultiPolygon, "
+"Feature nebo FeatureCollection)."
+
+#: app/htmx/project_create_routes.py:385
 msgid "Failed to load template form."
 msgstr "Nepodařilo se načíst šablonu formuláře."
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:393
 msgid "Please select a form or upload a file."
 msgstr "Vyberte formulář nebo nahrajte soubor."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:695 app/htmx/project_create_routes.py:817
+msgid "An unexpected error occurred. Please try again."
+msgstr "Došlo k neočekávané chybě. Zkuste to prosím znovu."
+
+#: app/htmx/project_create_routes.py:758
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr ""
+"Nepodařilo se načíst výchozí formulář OSM Buildings pro jednoduché "
+"vytvoření projektu."
+
+#: app/htmx/project_create_routes.py:844 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "Projekt nebyl nalezen."
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:854
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "ID projektu se neshoduje. K tomuto projektu nemáte přístup."
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:899
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Formulář byl úspěšně ověřen a nahrán! Stránka se znovu načítá..."
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:923 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Došlo k neočekávané chybě"
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:927
 msgid "Error"
 msgstr "Chyba"
 
@@ -450,7 +478,7 @@ msgstr "Vlastník"
 msgid "Visibility"
 msgstr "Viditelnost"
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr "Popis"
@@ -481,7 +509,7 @@ msgstr "Odebrat spolupracovníka"
 msgid "from this project?"
 msgstr "z tohoto projektu?"
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -813,7 +841,9 @@ msgstr "Vybraná oblast je příliš velká. Vyberte prosím oblast menší než
 
 #: app/projects/project_crud.py:147
 msgid "Failed to generate data extract from the raw data API."
-msgstr "Vygenerování extraktu dat z rozhraní API nezpracovaných dat se nezdařilo. Šablona"
+msgstr ""
+"Vygenerování extraktu dat z rozhraní API nezpracovaných dat se nezdařilo."
+" Šablona"
 
 #: app/projects/project_crud.py:858
 msgid "QField project ID not found."
@@ -839,13 +869,37 @@ msgstr "Nepodařilo se načíst šablonu formuláře."
 msgid "Template XLSForm content is empty."
 msgstr "Obsah XLSformuláře je prázdný."
 
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"Tento projekt byl vytvořen pomocí zjednodušeného postupu ve FieldTM a "
+"slouží ke sběru dat o budovách pro zlepšení OpenStreetMap."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "Nepojmenovaná oblast"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "Oblast {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
+
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
 msgstr "Osnova projektu chybí nebo nemá geometrii."
 
 #: app/qfield/qfield_crud.py:116
 msgid "Project outline geometry has no coordinates."
-msgstr "Geometrie obrysu projektu nemá žádné souřadnice. Pro vytvoření projektu QField je vyžadován"
+msgstr ""
+"Geometrie obrysu projektu nemá žádné souřadnice. Pro vytvoření projektu "
+"QField je vyžadován"
 
 #: app/qfield/qfield_crud.py:425
 msgid "Project outline is required for QField project creation."
@@ -869,7 +923,9 @@ msgstr "obálka QGIS dokončena, ale žádný soubor .qgz na výstupu. Chybí"
 
 #: app/qfield/qfield_crud.py:530
 msgid "QField project ID is missing; cannot attach basemap."
-msgstr "ID projektu QField; nelze připojit podkladovou mapu. Generování projektu QGIS"
+msgstr ""
+"ID projektu QField; nelze připojit podkladovou mapu. Generování projektu "
+"QGIS"
 
 #: app/qfield/qfield_crud.py:564
 msgid "Basemap attach completed but produced no project files."
@@ -908,7 +964,9 @@ msgstr "Projekt (%(project_id)s) nebyl nalezen."
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
-msgstr "patří organizaci '%(owner)s'. Nelze přidat '%(username)s' do organizace: %(error)s"
+msgstr ""
+"patří organizaci '%(owner)s'. Nelze přidat '%(username)s' do organizace: "
+"%(error)s"
 
 #: app/qfield/qfield_crud.py:1186
 #, python-format
@@ -982,7 +1040,10 @@ msgstr "Hledat projekty…"
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr "Vytvořit projekt"
 
@@ -994,9 +1055,9 @@ msgstr "+ Nový"
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] "Zobrazen %(count)s projekt"
-msgstr[1] "Zobrazeny %(count)s projekty"
-msgstr[2] "Zobrazeno %(count)s projektů"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/templates/home.html:75
 #, python-format
@@ -1340,72 +1401,37 @@ msgstr "Zpět na domovskou stránku"
 msgid "Create New Project"
 msgstr "Vytvořit nový projekt"
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr "Pokud sbíráte data OSM Buildings, použijte jednoduchý postup pouze s AOI."
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr "Název projektu"
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr "Zadejte název projektu"
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr "Zadejte popis projektu"
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr "Aplikace pro terénní mapování"
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "Oblast projektu"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "Nakreslit oblast"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "Nahrát GeoJSON"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "Vymazat"
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-"Nakreslete polygon na mapě nebo nahrajte soubor GeoJSON pro definování "
-"oblasti projektu. Maximální velikost projektu je 1 000 km². Oblasti větší"
-" než 100 km² zobrazí varování. API pro extrakci dat OSM je omezeno na 200"
-" km²."
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr "Pokročilá konfigurace"
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Sloučit geometrie (pro multipolygony použít konvexní obal)"
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr "Hashtagy"
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr "Pište hashtagy a stiskněte Enter nebo čárku"
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
@@ -1414,950 +1440,38 @@ msgstr ""
 "Pište hashtagy a stiskněte Enter nebo čárku pro jejich přidání. Kliknutím"
 " na × u tagu jej odeberete."
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr "Vytváření..."
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr "Něco se pokazilo. Zkuste to prosím znovu."
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "Neplatný formát GeoJSON. Zkontrolujte svůj soubor."
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "Neplatný soubor GeoJSON. Zkontrolujte formát souboru."
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr "Před odesláním musíte na mapě nakreslit nebo nahrát oblast zájmu (AOI)."
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Projekt s tímto názvem již existuje. Zvolte prosím jiný název."
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr "Popis je povinný."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← Zpět na projekty"
-
-#: app/templates/project_details.html:46
-msgid "Project Metadata"
-msgstr "Metadata projektu"
-
-#: app/templates/project_details.html:48
-msgid "Project metadata and setup information for managers."
-msgstr "Metadata projektu a informace o nastavení pro manažery."
-
-#: app/templates/project_details.html:66
-msgid "Project ID"
-msgstr "ID projektu"
-
-#: app/templates/project_details.html:77
-msgid "Created"
-msgstr "Vytvořeno"
-
-#: app/templates/project_details.html:84
-msgid "Last Updated"
-msgstr "Naposledy aktualizováno"
-
-#: app/templates/project_details.html:107
-msgid "External Project"
-msgstr "Externí projekt"
-
-#: app/templates/project_details.html:109
-msgid "Instance:"
-msgstr "Instance serveru:"
-
-#: app/templates/project_details.html:111
-msgid "Project ID:"
-msgstr "ID projektu:"
-
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
-msgid "View Project in ODK Central →"
-msgstr "Zobrazit projekt v ODK Central →"
-
-#: app/templates/project_details.html:136
-msgid "Manage QFieldCloud Project →"
-msgstr "Spravovat projekt QFieldCloud →"
-
-#: app/templates/project_details.html:144
-msgid "View Project Externally →"
-msgstr "Zobrazit projekt externě →"
-
-#: app/templates/project_details.html:160
-msgid "Delete this project in downstream and Field-TM? This cannot be undone."
-msgstr ""
-"Smazat tento projekt v navazujícím systému i ve Field-TM? Tuto akci nelze"
-" vrátit zpět."
-
-#: app/templates/project_details.html:163
-msgid "Delete Project"
-msgstr "Smazat projekt"
-
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr "Zpět na projekty"
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr "Projekt nebyl nalezen"
-
-#: app/templates/project_details.html:174
+#: app/templates/new_project_simple.html:8
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "Projekt, který hledáte, neexistuje nebo nemáte oprávnění jej zobrazit."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Správa QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
 msgstr ""
-"Tato stránka slouží ke správě uživatelů ve vašem projektu QField po jeho "
-"vytvoření."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Zadejte své přihlašovací údaje QFieldCloud pro správu spolupracovníků."
-
-#: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "URL QFieldCloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "Základní URL vaší instance QFieldCloud (bez /api/v1)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Heslo"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "Připojit"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "Připojování…"
-
-#: app/templates/partials/metrics.html:5
-msgid "Features Surveyed (Approximate)"
-msgstr "Zaměřené prvky (přibližně)"
-
-#: app/templates/partials/metrics.html:12
-msgid "Projects Created"
-msgstr "Vytvořené projekty"
-
-#: app/templates/partials/metrics.html:19
-msgid "Countries Covered"
-msgstr "Pokryté země"
-
-#: app/templates/partials/metrics.html:26
-msgid "Users Registered"
-msgstr "Registrovaní uživatelé"
-
-#: app/templates/partials/metrics.html:33
-msgid "Supported Mapping Apps"
-msgstr "Podporované mapovací aplikace"
-
-#: app/templates/partials/project_details/basemap_section.html:2
-msgid "Offline Basemap"
-msgstr "Offline podkladová mapa"
-
-#: app/templates/partials/project_details/basemap_section.html:4
-msgid ""
-"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
-"basemap."
-msgstr ""
-"Vyhledejte snímky HOT OpenAerialMap pro tuto AOI a vygenerujte "
-"podkladovou mapu MBTiles."
-
-#: app/templates/partials/project_details/basemap_section.html:26
-msgid "Search OAM Imagery"
-msgstr "Hledat snímky OAM"
-
-#: app/templates/partials/project_details/basemap_section.html:37
-msgid "Basemap generation previously failed. Please search again and retry."
-msgstr ""
-"Generování podkladové mapy dříve selhalo. Vyhledejte ji znovu a opakujte "
-"akci."
-
-#: app/templates/partials/project_details/basemap_section.html:41
-msgid "No basemap selected yet."
-msgstr "Zatím nebyla vybrána žádná podkladová mapa."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:3
-msgid "Manager Setup Summary"
-msgstr "Shrnutí nastavení manažera"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:6
-msgid "The project setup flow is complete and shown below for reference."
-msgstr "Proces nastavení projektu je dokončen a níže je zobrazen pro referenci."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Poloha projektu"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Krok 2: Nahrát XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
-msgid "Complete"
-msgstr "Dokončeno"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
-msgid "Step 3: Get Data"
-msgstr "Krok 3: Získat data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Krok 4: Rozdělit na úkoly"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
-msgid "Step 5: Finalise Project"
-msgstr "Krok 5: Dokončit projekt"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:69
-msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
-msgstr ""
-"Pokud potřebujete do tohoto projektu nahrát další mediální soubory, jako "
-"jsou obrázky a videa, přihlaste se do ODK Central a nahrajte je v "
-"nastavení formuláře."
-
-#: app/templates/partials/project_details/setup_steps.html:14
-msgid "Ready for Mapping"
-msgstr "Připraveno k mapování"
-
-#: app/templates/partials/project_details/setup_steps.html:25
-msgid "Loading QR code..."
-msgstr "Načítání QR kódu..."
-
-#: app/templates/partials/project_details/setup_steps.html:32
-msgid "Project Setup"
-msgstr "Nastavení projektu"
-
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "Krok 2: Vybrat průzkumový formulář"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Vyberte typ průzkumu a pokračujte s doporučeným výchozím nastavením."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "Vyberte typ průzkumu:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "Načítání typů průzkumů..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "Nebo místo toho použijte vlastní formulář:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "Nahrát vlastní formulář"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-"Poznámka: Field-TM automaticky vloží do formuláře další pole pro "
-"rozdělení úloh a výběr prvků. Formulář by měl obsahovat pouze otázky "
-"průzkumu, které chcete položit (nezahrnujte pole select_one_from_file pro"
-" úlohy/prvky)."
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"Pro projekty ODK jsou aktivní doporučená výchozí nastavení včetně "
-"kompatibility s ODK Collect."
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "Pro projekty %(app_name)s jsou aktivní doporučená výchozí nastavení."
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr "Pro tento projekt jsou aktivní doporučená výchozí nastavení."
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr "Výchozí jazyk:"
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr "Angličtina"
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr "Španělština"
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr "Francouzština"
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr "Portugalština"
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr "Svahilština"
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr "Hindština"
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr "Možnosti formuláře:"
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr "Zahrnout otázku na nahrání fotografie"
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr "Udělat fotografii povinnou"
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr "Požádá uživatele, aby na svém místě pořídil fotografii."
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr "Zahrnout otázku pro ověření digitalizace"
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-"Požádá mapera, aby ověřil, zda jsou existující prvky správně "
-"zdigitalizované."
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr "Pokračovat"
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ Průzkumový formulář byl úspěšně nahrán"
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Stáhněte doporučená data OSM pro svůj průzkumový formulář."
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr "Zkontrolujte data na mapě a poté pokračujte."
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "Stáhnout data OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr "Shromažďovat pouze nová data"
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr ""
-"Použijte vlastní datové vstupy nebo přepište výchozí možnosti stahování "
-"OSM."
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr "Kategorie OSM:"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr "Budovy OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr "Silnice OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr "Zdravotnictví OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr "Toalety OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr "Náboženské objekty OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr "Využití území OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr "Vodní toky OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr "Vodní body OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr "Likvidace odpadu OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr "Vzdělávání OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr "Hřbitovy OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr "Vybavenost OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr "Typ geometrie:"
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr "Mnohoúhelník"
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr "Polylinie"
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr "Bod"
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr "Použít centroidy"
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr "Nahrát vlastní GeoJSON"
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "Generování datového výřezu OSM... To může chvíli trvat."
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr "Datový výřez OSM je připraven"
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Krok 3: Rozdělit na úkoly (volitelné)"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ Rozdělení úkolů není bez existujících dat relevantní"
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"Vygenerujte oblasti úkolů rozdělením oblasti zájmu (AOI). Vyberte "
-"algoritmus a parametry a poté rozdělte. Zkontrolujte náhled a klikněte na"
-" „Přijmout oblasti úkolů“ pro uložení. Nebo klikněte"
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr "Přeskočit"
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr "pro použití celé AOI jako jednoho úkolu."
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "Vyberte, které liniové prvky ovlivňují rozdělení úkolů podle budov."
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr "Zahrnout silnice"
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr "Zahrnout řeky"
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr "Zahrnout železnice"
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr "Zahrnout letecké cesty"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr "Algoritmus:"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr "Vyberte možnost rozdělení..."
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "Rozdělit podle čtverce"
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Průměrné budovy v1 (Voronoi)"
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Průměrné budovy v2 (Straight Skeleton)"
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr "Rozdělit podle konkrétního počtu úkolů (již brzy)"
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr "Prům. budov na úkol:"
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr "Počet úloh:"
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr "Rozměr (metry):"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr "Rozdělit znovu"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr "Rozdělit AOI"
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "Rozdělování AOI na úkoly... To může chvíli trvat."
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr "Připraveno"
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-"Všechny předpoklady jsou splněny! Vytvořte projekt ve zvoleném mapovacím "
-"nástroji."
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr "Dokončit projekt"
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr "Potvrdit dokončení projektu"
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr "Opravdu chcete tento projekt dokončit?"
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr "Potvrdit a dokončit"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr "Vlastní přihlašovací údaje"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr "URL ODK Central"
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr "URL QField Cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "Otestovat přihlašovací údaje"
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr "Uložit a pokračovat"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "Select a survey type..."
-msgstr "Vyberte typ průzkumu..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "No survey types available"
-msgstr "Nejsou dostupné žádné typy průzkumu"
-
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
-msgstr ""
-"Nejsou k dispozici žádné průzkumové formuláře. Nahrajte vlastní formulář "
-"v pokročilé konfiguraci."
-
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr ""
-"Vyberte typ průzkumu nebo nahrajte vlastní formulář v pokročilé "
-"konfiguraci."
-
-#: app/templates/partials/project_details/style_and_scripts.html:14
-msgid "Survey type selected."
-msgstr "Typ průzkumu byl vybrán."
-
-#: app/templates/partials/project_details/style_and_scripts.html:15
-msgid "Invalid file type. Please upload a .xls or .xlsx file."
-msgstr "Neplatný typ souboru. Nahrajte soubor .xls nebo .xlsx."
-
-#: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Selected file:"
-msgstr "Vybraný soubor:"
-
-#: app/templates/partials/project_details/style_and_scripts.html:17
-msgid "Custom form selected."
-msgstr "Byl vybrán vlastní formulář."
-
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr ""
-"Nejprve vyberte typ průzkumu nebo nahrajte vlastní formulář v pokročilé "
-"konfiguraci."
-
-#: app/templates/partials/project_details/style_and_scripts.html:19
-msgid "polygons"
-msgstr "polygony"
-
-#: app/templates/partials/project_details/style_and_scripts.html:20
-msgid "polylines"
-msgstr "polylinie"
-
-#: app/templates/partials/project_details/style_and_scripts.html:21
-msgid "points"
-msgstr "body"
-
-#: app/templates/partials/project_details/style_and_scripts.html:22
-msgid "features"
-msgstr "prvky"
-
-#: app/templates/partials/project_details/style_and_scripts.html:23
-msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
-msgstr ""
-"Nahráli jste vlastní formulář, takže toto stahování OSM je volitelné. "
-"Pomocí pokročilé konfigurace nahrajte vlastní GeoJSON nebo upravte "
-"nastavení stahování."
-
-#: app/templates/partials/project_details/style_and_scripts.html:24
-#, python-format
-msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
-msgstr ""
-"Doporučený zdroj: %(title)s (%(geom_label)s). Zkontrolujte data na mapě a"
-" poté pokračujte."
-
-#: app/templates/partials/project_details/style_and_scripts.html:25
-#, python-format
-msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
-msgstr ""
-"Doporučený zdroj byl aktualizován (%(geom_label)s). Zkontrolujte data na "
-"mapě a poté pokračujte."
-
-#: app/templates/partials/project_details/style_and_scripts.html:26
-msgid "Downloading..."
-msgstr "Stahování..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Confirm No Splitting"
-msgstr "Potvrdit bez rozdělení"
-
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
-msgstr "Rozdělit podle budov"
-
-#: app/templates/partials/project_details/style_and_scripts.html:33
-msgid "Select Option"
-msgstr "Vybrat možnost"
-
-#: app/templates/partials/project_details/style_and_scripts.html:34
-msgid "Confirming..."
-msgstr "Potvrzování..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Splitting..."
-msgstr "Rozdělování..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
-msgid "ODK Central"
-msgstr "ODK Central"
-
-#: app/templates/partials/project_details/style_and_scripts.html:37
-msgid "QField"
-msgstr "QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:38
-msgid "the mapping tool"
-msgstr "mapovací nástroj"
-
-#: app/templates/partials/project_details/style_and_scripts.html:39
-msgid "Project type not set. Please set the field mapping app first."
-msgstr ""
-"Typ projektu není nastaven. Nejprve nastavte aplikaci pro terénní "
-"mapování."
-
-#: app/templates/partials/project_details/style_and_scripts.html:40
-#, python-format
-msgid ""
-"Are you sure you want to finalise this project in %(project_type)s? This "
-"will create the project, upload forms, and generate all necessary files."
-msgstr ""
-"Opravdu chcete dokončit tento projekt v %(project_type)s? Tím se vytvoří "
-"projekt, nahrají formuláře a vygenerují všechny potřebné soubory."
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
-msgid "Custom ODK Credentials"
-msgstr "Vlastní přihlašovací údaje ODK"
-
-#: app/templates/partials/project_details/style_and_scripts.html:42
-msgid "Custom QField Credentials"
-msgstr "Vlastní přihlašovací údaje QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:43
-msgid "Please fill in all fields."
-msgstr "Vyplňte prosím všechna pole."
-
-#: app/templates/partials/project_details/style_and_scripts.html:44
-msgid "Testing..."
-msgstr "Testování..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:45
-msgid "Testing credentials..."
-msgstr "Testování přihlašovacích údajů..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:46
-msgid "✓ Credentials are valid!"
-msgstr "✓ Přihlašovací údaje jsou platné!"
-
-#: app/templates/partials/project_details/style_and_scripts.html:47
-msgid "Invalid credentials. Please check and try again."
-msgstr "Neplatné přihlašovací údaje. Zkontrolujte je a zkuste to znovu."
-
-#: app/templates/partials/project_details/style_and_scripts.html:48
-#, python-format
-msgid "Error testing credentials: %(message)s"
-msgstr "Chyba při testování přihlašovacích údajů: %(message)s"
-
-#: app/templates/partials/project_details/style_and_scripts.html:50
-msgid "Please test credentials first before continuing."
-msgstr "Před pokračováním nejprve otestujte přihlašovací údaje."
-
-#: app/templates/partials/project_details/style_and_scripts.html:51
-#, python-format
-msgid "Creating project in %(project_type)s... This may take a moment."
-msgstr "Vytváření projektu v %(project_type)s... To může chvíli trvat."
-
-#: app/templates/partials/project_details/style_and_scripts.html:52
-msgid "Error:"
-msgstr "Chyba:"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
-msgstr "Připojení podkladové mapy selhalo. Pro nový začátek použijte opakování."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
-msgid "Retry Attach"
-msgstr "Opakovat připojení"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
-msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr ""
-"Připojování podkladové mapy probíhá. Pomocí tlačítka níže zkontrolujte "
-"aktuální stav."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
-msgid "Checking..."
-msgstr "Kontroluji..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
-msgid "Check Status"
-msgstr "Stav projektu"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
-msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
-msgstr ""
-"Generování podkladové mapy probíhá. Stav se automaticky aktualizuje "
-"každých několik sekund."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
-msgid "STAC item"
-msgstr "Položka STAC"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
-msgid "Zoom"
-msgstr "Přiblížení"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
-msgid "Select one imagery item to start MBTiles generation."
-msgstr "Vyberte jednu položku snímků pro zahájení generování MBTiles."
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
-msgid "Cloud"
-msgstr "Zavřít"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
-msgstr "Zobrazit metadata"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
-msgid "Use this image"
-msgstr "Použít tento snímek"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
-msgid "No imagery items were found for this AOI."
-msgstr "Pro tuto AOI nebyly nalezeny žádné snímky."
-
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
-msgid "Accept Data Extract"
-msgstr "Přijmout datový výřez"
-
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
-msgid "View technical details"
-msgstr "Zobrazit technické podrobnosti"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
-msgid "Project created in ODK Central."
-msgstr "Projekt byl vytvořen v ODK Central."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
-msgid "Manager Access (ODK Central UI)"
-msgstr "Přístup manažera (ODK Central UI)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
-msgid "Open project in ODK Central"
-msgstr "Otevřít projekt v ODK Central"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
-msgid "Save these credentials now. They will only be shown once."
-msgstr "Uložte si tyto přihlašovací údaje nyní. Budou zobrazeny pouze jednou."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "View FieldTM Project"
-msgstr "Zobrazit projekt FieldTM"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
-msgid "Project created in QFieldCloud."
-msgstr "Projekt byl vytvořen v QFieldCloud."
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Přístup manažera (QFieldCloud)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
-msgid "Open project in QFieldCloud"
-msgstr "Otevřít projekt v QFieldCloud"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
-msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
-msgstr ""
-"Účet manažera nebylo možné vytvořit automaticky. Přihlaste se do "
-"QFieldCloud jako správce a projekt spravujte ručně."
-
-#: app/templates/partials/project_details/fragments/split_preview.html:27
-msgid "Accept Task Choices"
-msgstr "Přijmout volby úkolů"
+"Tento jednoduchý postup potřebuje pouze oblast projektu. Název projektu, "
+"popis a štítky pro OSM Buildings vygenerujeme automaticky."
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr "Zpět na standardní formulář"
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr "Projekt se vytváří a mapa se připravuje..."
 
 #~ msgid "Failed to add collaborator: %(error)s"
 #~ msgstr "Nepodařilo se přidat spolupracovníka: %(exc)s"
@@ -2372,20 +1486,2005 @@ msgstr "Přijmout volby úkolů"
 #~ msgstr "Celková velikost"
 
 #~ msgid "Available Zoom"
-#~ msgstr "Dostupné přiblížení"
+#~ msgstr "Dostupný zoom"
 
 #~ msgid "Download MBTiles"
-#~ msgstr "Stáhnout QR kód"
+#~ msgstr "Stáhnout MBTiles"
 
 #~ msgid "Attach to QField Project"
-#~ msgstr "Spravovat projekt QFieldCloud →"
+#~ msgstr "Připojit k projektu QField"
 
 #~ msgid ""
 #~ "Use the ODK offline maps documentation"
 #~ " to configure this MBTiles file in"
 #~ " Collect."
 #~ msgstr ""
-#~ "Použijte dokumentaci offline map ODK pro"
-#~ " konfiguraci tohoto souboru MBTiles v "
+#~ "Pomocí dokumentace ODK pro offline mapy"
+#~ " nastavte tento soubor MBTiles v "
 #~ "aplikaci Collect."
+
+#~ msgid "Validation failed"
+#~ msgstr "Ověření se nezdařilo"
+
+#~ msgid "An unexpected error occurred. Please contact an admin."
+#~ msgstr "Došlo k neočekávané chybě. Kontaktujte správce."
+
+#~ msgid "Could not connect to database"
+#~ msgstr "Nelze se připojit k databázi"
+
+#~ msgid "Authenticated user is missing a valid identifier."
+#~ msgstr "Ověřený uživatel postrádá platný identifikátor."
+
+#~ msgid "User must be an administrator"
+#~ msgstr "Uživatel musí být administrátor"
+
+#~ msgid "User does not have permission to access the project."
+#~ msgstr "Uživatel nemá oprávnění pro přístup k projektu. Projekt"
+
+#~ msgid "Project is locked since it is in %(state)s state."
+#~ msgstr "je uzamčen, protože je ve stavu %(state)s. Uživatele"
+
+#~ msgid "User (%(user_sub)s) could not be inserted in db"
+#~ msgstr "(%(user_sub)s) nebylo možné vložit do databáze"
+
+#~ msgid "Error listing projects on ODK Central: %(error)s"
+#~ msgstr "Otevřít projekt v ODK Central"
+
+#~ msgid "Error creating project on ODK Central: %(error)s"
+#~ msgstr "Otevřít projekt v ODK Central"
+
+#~ msgid "Failed to upload form to ODK Central: %(error)s"
+#~ msgstr "Nepodařilo se nahrát formulář do ODK Central: %(error)s"
+
+#~ msgid "form_id is required to list submissions with pyodk."
+#~ msgstr "form_id je vyžadováno pro výpis příspěvků s pyodk."
+
+#~ msgid "XLSForm is invalid: %(error)s"
+#~ msgstr "XLSForm je neplatný: %(error)s Převod"
+
+#~ msgid "Conversion GeoJSON --> CSV failed"
+#~ msgstr "GeoJSON --> CSV se nezdařilo"
+
+#~ msgid "Project contains no submissions yet"
+#~ msgstr "Projekt zatím neobsahuje žádné příspěvky"
+
+#~ msgid "'geometry' data field is mandatory"
+#~ msgstr "datové pole „geometrie“ je povinné"
+
+#~ msgid "ODK project_id is missing; cannot create/merge entity lists."
+#~ msgstr "chybí ODK project_id; nelze vytvářet/slučovat seznamy entit."
+
+#~ msgid "Could not generate token for app user."
+#~ msgstr "Nelze vygenerovat token pro uživatele aplikace."
+
+#~ msgid "An error occurred while creating the app user token."
+#~ msgstr "Při generování QR kódu došlo k neočekávané chybě."
+
+#~ msgid "Could not assign %(scope)s role to app user."
+#~ msgstr "Nelze přiřadit roli %(scope)s uživateli aplikace."
+
+#~ msgid "Could not find 'Project Manager' role in ODK Central."
+#~ msgstr "Otevřít projekt v ODK Central"
+
+#~ msgid "ODK Central returned no user ID after creation."
+#~ msgstr "ODK Central nevrátil po vytvoření žádné ID uživatele."
+
+#~ msgid "Failed to create ODK Central manager user."
+#~ msgstr "Vytvoření uživatele centrálního správce ODK se nezdařilo."
+
+#~ msgid "Unexpected error while testing ODK Central credentials."
+#~ msgstr "Při generování QR kódu došlo k neočekávané chybě."
+
+#~ msgid "Provide a valid .xls or .xlsx file"
+#~ msgstr "Zadejte platný soubor .xls nebo .xlsx"
+
+#~ msgid "No data provided."
+#~ msgstr "Nebyl poskytnut žádný datový výřez."
+
+#~ msgid "%(action)s failed with HTTP %(status_code)s."
+#~ msgstr "%(action)s se nezdařilo s HTTP %(status_code)s."
+
+#~ msgid "%(action)s failed due to upstream connection error."
+#~ msgstr ""
+#~ "%(action)s se nezdařilo kvůli chybě "
+#~ "připojení proti proudu. Rozhraní API"
+
+#~ msgid "Tilepack API returned HTTP %(status_code)s."
+#~ msgstr "Tilepack vrátilo HTTP %(status_code)s."
+
+#~ msgid "Failed to convert YAML form to XLSForm."
+#~ msgstr "Převedení formuláře YAML na XLSForm se nezdařilo."
+
+#~ msgid "Provide a valid .json or .geojson file"
+#~ msgstr "Zadejte platný soubor .xls nebo .xlsx"
+
+#~ msgid "Provide a valid .csv"
+#~ msgstr "Zadejte platný soubor .xls nebo .xlsx"
+
+#~ msgid "Provide a valid .json file"
+#~ msgstr "Zadejte platný soubor .xls nebo .xlsx"
+
+#~ msgid "Could not login to raw-data-api"
+#~ msgstr "Nelze se přihlásit k raw-data-api"
+
+#~ msgid "No geometries present"
+#~ msgstr "Nejsou k dispozici žádné geometrie"
+
+#~ msgid "Your geojson file is invalid."
+#~ msgstr "Váš soubor geojson je neplatný."
+
+#~ msgid "Project not found or access denied."
+#~ msgstr "Projekt nebyl nalezen nebo byl přístup odepřen."
+
+#~ msgid "Basemap attached to QField project successfully."
+#~ msgstr "Podkladová mapa byla úspěšně připojena k projektu QField."
+
+#~ msgid "Basemap attach has not started yet."
+#~ msgstr "Připojení podkladové mapy ještě nezačalo."
+
+#~ msgid "Basemap attach failed. Please try again."
+#~ msgstr "Připojení podkladové mapy se nezdařilo. Zkuste to prosím znovu."
+
+#~ msgid "Failed to search imagery right now. Please try again shortly."
+#~ msgstr "Vyhledání snímků se nyní nezdařilo. Zkuste to prosím znovu za chvíli."
+
+#~ msgid "Failed to start basemap generation right now. Please try again shortly."
+#~ msgstr ""
+#~ "Nyní se nepodařilo spustit generování "
+#~ "podkladové mapy. Zkuste to prosím znovu"
+#~ " za chvíli."
+
+#~ msgid "Failed to refresh basemap status right now. Please try again shortly."
+#~ msgstr ""
+#~ "Nyní se nepodařilo obnovit stav "
+#~ "podkladové mapy. Zkuste to prosím znovu"
+#~ " za chvíli."
+
+#~ msgid "Basemap attach is available after publication."
+#~ msgstr "Připojení podkladové mapy je dostupné po publikování."
+
+#~ msgid "Basemap attach is only available for QField projects."
+#~ msgstr "Připojení podkladové mapy je dostupné pouze pro projekty QField."
+
+#~ msgid "Basemap is not ready yet. Please wait for generation to complete."
+#~ msgstr ""
+#~ "Podkladová mapa ještě není připravena. "
+#~ "Počkejte prosím na dokončení generování."
+
+#~ msgid "No generated basemap download URL is available yet."
+#~ msgstr ""
+#~ "Adresa URL ke stažení vygenerované "
+#~ "podkladové mapy zatím není k dispozici."
+
+#~ msgid ""
+#~ "QField basemap attach is not configured"
+#~ " on this deployment. Missing %(config)s."
+#~ msgstr ""
+#~ "Připojení podkladové mapy QField není v"
+#~ " tomto nasazení nakonfigurováno. Chybí "
+#~ "%(config)s."
+
+#~ msgid "Basemap tools are available after publication."
+#~ msgstr "Nástroje pro podkladovou mapu jsou dostupné po publikování."
+
+#~ msgid "No basemap generation in progress."
+#~ msgstr "Terénní mapování probíhá"
+
+#~ msgid "Failed to load template form."
+#~ msgstr "Nepodařilo se načíst šablonu formuláře."
+
+#~ msgid "Please select a form or upload a file."
+#~ msgstr "Vyberte formulář nebo nahrajte soubor."
+
+#~ msgid "Project not found."
+#~ msgstr "Projekt nebyl nalezen."
+
+#~ msgid "Project ID mismatch. You do not have access to this project."
+#~ msgstr "ID projektu se neshoduje. K tomuto projektu nemáte přístup."
+
+#~ msgid "Form validated and uploaded successfully! Reloading page..."
+#~ msgstr "Formulář byl úspěšně ověřen a nahrán! Stránka se znovu načítá..."
+
+#~ msgid "An unexpected error occurred"
+#~ msgstr "Došlo k neočekávané chybě"
+
+#~ msgid "Error"
+#~ msgstr "Chyba"
+
+#~ msgid "Mapper Login (QFieldCloud)"
+#~ msgstr "Přihlášení mapovače (QFieldCloud)"
+
+#~ msgid "Username:"
+#~ msgstr "Uživatelské jméno:"
+
+#~ msgid "Password:"
+#~ msgstr "Heslo:"
+
+#~ msgid "Scan the QR code, then enter these credentials in QField."
+#~ msgstr "Naskenujte QR kód a poté zadejte tyto přihlašovací údaje do QField."
+
+#~ msgid "Scan QR Code"
+#~ msgstr "Naskenovat QR kód"
+
+#~ msgid "Use %(app_name)s to scan this QR code and load the project."
+#~ msgstr "Použijte %(app_name)s ke skenování tohoto QR kódu a načtení projektu."
+
+#~ msgid "Project QR Code"
+#~ msgstr "QR kód projektu"
+
+#~ msgid "Download QR Code"
+#~ msgstr "Stáhnout QR kód"
+
+#~ msgid ""
+#~ "Cannot reach the mapping server. Check"
+#~ " that ODK Central or QFieldCloud is"
+#~ " running."
+#~ msgstr ""
+#~ "Nelze se připojit k mapovacímu serveru."
+#~ " Zkontrolujte, zda běží ODK Central "
+#~ "nebo QFieldCloud."
+
+#~ msgid "The mapping server returned an error. Check its logs for details."
+#~ msgstr "Mapovací server vrátil chybu. Podrobnosti zkontrolujte v jeho logu."
+
+#~ msgid ""
+#~ "Authentication failed connecting to the "
+#~ "mapping server. Check the configured "
+#~ "credentials."
+#~ msgstr ""
+#~ "Při připojování k mapovacímu serveru se"
+#~ " nezdařilo ověření. Zkontrolujte nastavené "
+#~ "přihlašovací údaje."
+
+#~ msgid "An unexpected error occurred while generating the QR code."
+#~ msgstr "Při generování QR kódu došlo k neočekávané chybě."
+
+#~ msgid "Project (%(project_id)s) not found."
+#~ msgstr "Projekt (%(project_id)s) nebyl nalezen."
+
+#~ msgid "Only the project manager can delete this project."
+#~ msgstr "Tento projekt může smazat pouze správce projektu."
+
+#~ msgid "Error: %(error_msg)s"
+#~ msgstr "Chyba: %(error_msg)s"
+
+#~ msgid "Admin"
+#~ msgstr "Správce"
+
+#~ msgid "Manager"
+#~ msgstr "Manažer"
+
+#~ msgid "Editor"
+#~ msgstr "Editor"
+
+#~ msgid "Reporter"
+#~ msgstr "Reportér"
+
+#~ msgid "Reader"
+#~ msgstr "Čtenář"
+
+#~ msgid "This user does not exist. Please create it first."
+#~ msgstr "Tento uživatel neexistuje. Nejprve jej vytvořte."
+
+#~ msgid "This user is already a collaborator on this project."
+#~ msgstr "Tento uživatel je již spolupracovníkem tohoto projektu."
+
+#~ msgid "Failed to add collaborator: %(exc)s"
+#~ msgstr "Nepodařilo se přidat spolupracovníka: %(exc)s"
+
+#~ msgid ""
+#~ "This project belongs to the "
+#~ "%(organization)s organization. The user must"
+#~ " be added to that organization before"
+#~ " they can be added as a "
+#~ "collaborator. Your QFieldCloud account does"
+#~ " not have permission to manage "
+#~ "organization members."
+#~ msgstr ""
+#~ "Tento projekt patří organizaci "
+#~ "%(organization)s. Uživatel musí být nejprve"
+#~ " přidán do této organizace, než jej"
+#~ " bude možné přidat jako spolupracovníka."
+#~ " Váš účet QFieldCloud nemá oprávnění "
+#~ "spravovat členy organizace."
+
+#~ msgid "All fields are required."
+#~ msgstr "Všechna pole jsou povinná."
+
+#~ msgid "Login succeeded but no token received."
+#~ msgstr "Přihlášení bylo úspěšné, ale nebyl přijat žádný token."
+
+#~ msgid "Login failed. Check your URL and credentials."
+#~ msgstr "Přihlášení se nezdařilo. Zkontrolujte URL a přihlašovací údaje."
+
+#~ msgid "QFieldCloud Projects"
+#~ msgstr "Projekty QFieldCloud"
+
+#~ msgid "Connected as"
+#~ msgstr "Připojeno jako"
+
+#~ msgid "to"
+#~ msgstr "k"
+
+#~ msgid "Log Out"
+#~ msgstr "Odhlásit se"
+
+#~ msgid "No projects found."
+#~ msgstr "Nebyly nalezeny žádné projekty."
+
+#~ msgid "Public"
+#~ msgstr "Veřejný"
+
+#~ msgid "Private"
+#~ msgstr "Soukromý"
+
+#~ msgid "Manage"
+#~ msgstr "Spravovat"
+
+#~ msgid "Project"
+#~ msgstr "Projekt"
+
+#~ msgid "Owner"
+#~ msgstr "Vlastník"
+
+#~ msgid "Visibility"
+#~ msgstr "Viditelnost"
+
+#~ msgid "Description"
+#~ msgstr "Popis"
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "Platnost relace vypršela. Přihlaste se znovu."
+
+#~ msgid "Could not load collaborators: %(exc)s"
+#~ msgstr "Nepodařilo se načíst spolupracovníky: %(exc)s"
+
+#~ msgid "Update"
+#~ msgstr "Aktualizovat"
+
+#~ msgid "Remove"
+#~ msgstr "Odebrat"
+
+#~ msgid "Remove Collaborator"
+#~ msgstr "Odebrat spolupracovníka"
+
+#~ msgid "from this project?"
+#~ msgstr "z tohoto projektu?"
+
+#~ msgid "Cancel"
+#~ msgstr "Zrušit"
+
+#~ msgid "User"
+#~ msgstr "Uživatel"
+
+#~ msgid "Role"
+#~ msgstr "Role"
+
+#~ msgid "Actions"
+#~ msgstr "Akce"
+
+#~ msgid "No collaborators yet."
+#~ msgstr "Zatím žádní spolupracovníci."
+
+#~ msgid "Username"
+#~ msgstr "Uživatelské jméno"
+
+#~ msgid "Add Collaborator"
+#~ msgstr "Přidat spolupracovníka"
+
+#~ msgid "Close"
+#~ msgstr "Zavřít"
+
+#~ msgid "Collaborators"
+#~ msgstr "Spolupracovníci"
+
+#~ msgid "Username is required."
+#~ msgstr "Uživatelské jméno je povinné."
+
+#~ msgid "Failed to remove collaborator: %(exc)s"
+#~ msgstr "Nepodařilo se odebrat spolupracovníka: %(exc)s"
+
+#~ msgid "Failed to update collaborator: %(exc)s"
+#~ msgstr "Nepodařilo se aktualizovat spolupracovníka: %(exc)s"
+
+#~ msgid "Collaborator refresh failed: %(exc)s"
+#~ msgstr "Obnovení spolupracovníků se nezdařilo: %(exc)s"
+
+#~ msgid ""
+#~ "Project finalisation failed. Please check "
+#~ "your settings and try again. If it"
+#~ " continues, send the technical details "
+#~ "below to your instance administrator or"
+#~ " support team."
+#~ msgstr ""
+#~ "Dokončení projektu se nezdařilo. Zkontrolujte"
+#~ " nastavení a zkuste to znovu. Pokud"
+#~ " problém přetrvá, pošlete níže uvedené "
+#~ "technické podrobnosti správci instance nebo"
+#~ " týmu podpory."
+
+#~ msgid "Invalid GeoJSON data in request. Please try uploading again."
+#~ msgstr "V požadavku jsou neplatná data GeoJSON. Zkuste nahrání znovu."
+
+#~ msgid "Error reading GeoJSON data from request."
+#~ msgstr "Chyba při čtení dat GeoJSON z požadavku."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km², which exceeds"
+#~ " the %(area_limit)s km² limit. Please "
+#~ "select a smaller area."
+#~ msgstr ""
+#~ "Oblast má %(area_km2)s km², což "
+#~ "překračuje limit %(area_limit)s km². Vyberte"
+#~ " menší oblast."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km². Large areas"
+#~ " (>%(area_warn)s km²) may take longer "
+#~ "to process. The data extract API "
+#~ "is limited to 200 km²."
+#~ msgstr ""
+#~ "Oblast má %(area_km2)s km². Zpracování "
+#~ "velkých oblastí (>%(area_warn)s km²) může "
+#~ "trvat déle. API pro extrakci dat "
+#~ "je omezeno na 200 km²."
+
+#~ msgid "Project AOI"
+#~ msgstr "AOI projektu"
+
+#~ msgid "Data Extract (%(data_feature_count)s features)"
+#~ msgstr "Datový výřez (%(data_feature_count)s prvků)"
+
+#~ msgid "Task Boundaries (%(task_count)s tasks)"
+#~ msgstr "Hranice úkolů (%(task_count)s úkolů)"
+
+#~ msgid "Task ID"
+#~ msgstr "ID úkolu"
+
+#~ msgid "Building Count"
+#~ msgstr "Počet budov"
+
+#~ msgid ""
+#~ "No task boundaries found. Please split"
+#~ " the project into tasks first using"
+#~ " the \"Split AOI\" button above."
+#~ msgstr ""
+#~ "Nebyly nalezeny žádné hranice úkolů. "
+#~ "Nejprve rozdělte projekt na úkoly pomocí"
+#~ " tlačítka „Rozdělit AOI“ výše."
+
+#~ msgid ""
+#~ "✓ AOI split successfully! Generated "
+#~ "%(task_count)s task areas using %(algorithm)s."
+#~ msgstr ""
+#~ "✓ AOI byla úspěšně rozdělena! Pomocí "
+#~ "%(algorithm)s bylo vytvořeno %(task_count)s "
+#~ "oblastí úkolů."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task "
+#~ "boundaries%(data_extract_info)s. Review the results"
+#~ " below. If satisfied, click \"Accept "
+#~ "Task Choices\" to save. Otherwise, "
+#~ "adjust parameters above and click "
+#~ "\"Split Again\" to regenerate."
+#~ msgstr ""
+#~ "Zobrazuje se náhled %(task_count)s hranic "
+#~ "úkolů%(data_extract_info)s. Zkontrolujte výsledky "
+#~ "níže. Pokud jste spokojeni, klikněte na"
+#~ " „Přijmout volby úkolů“ pro uložení. "
+#~ "Jinak upravte parametry výše a klikněte"
+#~ " na „Rozdělit znovu“ pro nové "
+#~ "vygenerování."
+
+#~ msgid "Data Extract"
+#~ msgstr "Datový výřez"
+
+#~ msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+#~ msgstr "Data OSM byla úspěšně stažena! Nalezeno %(feature_count)s prvků."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try downloading again "
+#~ "with different parameters."
+#~ msgstr ""
+#~ "Zobrazuje se náhled %(feature_count)s prvků"
+#~ " na mapě. Zkontrolujte data níže. "
+#~ "Pokud jste spokojeni, klikněte na "
+#~ "„Přijmout datový výřez“ pro uložení. "
+#~ "Jinak zkuste stahování znovu s jinými"
+#~ " parametry."
+
+#~ msgid "Invalid file type. Please upload a .geojson or .json file."
+#~ msgstr "Neplatný typ souboru. Nahrajte soubor .geojson nebo .json."
+
+#~ msgid "No valid geometries found in GeoJSON."
+#~ msgstr "V GeoJSON nebyly nalezeny žádné platné geometrie."
+
+#~ msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+#~ msgstr "✓ GeoJSON bylo úspěšně nahráno! Nalezeno %(feature_count)s prvků."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try uploading a "
+#~ "different file."
+#~ msgstr ""
+#~ "Zobrazuje se náhled %(feature_count)s prvků"
+#~ " na mapě. Zkontrolujte data níže. "
+#~ "Pokud jste spokojeni, klikněte na "
+#~ "„Přijmout datový výřez“ pro uložení. "
+#~ "Jinak zkuste nahrát jiný soubor."
+
+#~ msgid ""
+#~ "No GeoJSON data found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Nebyla nalezena žádná data GeoJSON. "
+#~ "Nejprve stáhněte data OSM nebo nahrajte"
+#~ " soubor GeoJSON."
+
+#~ msgid "Data Extract (%(feature_count)s features)"
+#~ msgstr "Datový výřez (%(feature_count)s prvků)"
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s data features on"
+#~ " map. Review the data, then continue"
+#~ " to the next step."
+#~ msgstr ""
+#~ "Zobrazuje se náhled %(feature_count)s datových"
+#~ " prvků na mapě. Zkontrolujte data a"
+#~ " poté pokračujte na další krok."
+
+#~ msgid ""
+#~ "✓ Collect-new-data mode selected. "
+#~ "Task splitting is skipped and you "
+#~ "can continue."
+#~ msgstr ""
+#~ "✓ Byl vybrán režim sběru nových "
+#~ "dat. Rozdělení úkolů je přeskočeno a "
+#~ "můžete pokračovat."
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ Datový výřez byl úspěšně uložen! "
+#~ "Nyní můžete pokračovat ke kroku 4 "
+#~ "(rozdělení úloh)."
+
+#~ msgid ""
+#~ "No data extract found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Nebyl nalezen žádný datový výřez. "
+#~ "Nejprve stáhněte data OSM nebo nahrajte"
+#~ " soubor GeoJSON."
+
+#~ msgid ""
+#~ "Previewing whole AOI (no splitting) with"
+#~ " %(data_feature_count)s data features. The "
+#~ "entire AOI will be used as a "
+#~ "single task."
+#~ msgstr ""
+#~ "Zobrazuje se náhled celé AOI (bez "
+#~ "rozdělení) s %(data_feature_count)s datovými "
+#~ "prvky. Celá AOI bude použita jako "
+#~ "jeden úkol."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task boundaries and"
+#~ " %(data_feature_count)s data features together."
+#~ msgstr ""
+#~ "Zobrazuje se náhled %(task_count)s hranic "
+#~ "úkolů a %(data_feature_count)s datových prvků"
+#~ " dohromady."
+
+#~ msgid "Project outline not found. Cannot skip task splitting."
+#~ msgstr "Obrys projektu nebyl nalezen. Rozdělení úkolů nelze přeskočit."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 5."
+#~ msgstr ""
+#~ "✓ Rozdělení úkolů bylo přeskočeno. Celá"
+#~ " AOI bude použita jako jeden úkol."
+#~ " Můžete pokračovat na Krok 5."
+
+#~ msgid "Please select a splitting option."
+#~ msgstr "Vyberte možnost rozdělení."
+
+#~ msgid "✓ Task splitting is not required for this project setup."
+#~ msgstr "✓ Pro toto nastavení projektu není rozdělení úkolů vyžadováno."
+
+#~ msgid "No data extract provided."
+#~ msgstr "Nebyl poskytnut žádný datový výřez."
+
+#~ msgid "Invalid data extract format."
+#~ msgstr "Neplatný formát datového výřezu."
+
+#~ msgid ""
+#~ "✓ Data extract accepted! Saved "
+#~ "%(feature_count)s features. Step 2 is "
+#~ "now complete."
+#~ msgstr ""
+#~ "✓ Datový výřez byl přijat! Uloženo "
+#~ "%(feature_count)s prvků. Krok 2 je nyní"
+#~ " dokončen."
+
+#~ msgid "No task areas data provided."
+#~ msgstr "Nebyla poskytnuta žádná data oblastí úkolů."
+
+#~ msgid "Invalid task areas data format."
+#~ msgstr "Neplatný formát dat oblastí úkolů."
+
+#~ msgid "✓ Split tasks saved successfully"
+#~ msgstr "✓ Rozdělené úkoly byly úspěšně uloženy"
+
+#~ msgid ""
+#~ "Provide ODK URL, username, and password"
+#~ " (all 3), or leave them all "
+#~ "blank to use server defaults."
+#~ msgstr ""
+#~ "Zadejte URL ODK, uživatelské jméno a "
+#~ "heslo (všechny 3), nebo je všechny "
+#~ "ponechte prázdné pro použití výchozího "
+#~ "nastavení serveru."
+
+#~ msgid "GeoJSON is required"
+#~ msgstr "GeoJSON je povinné"
+
+#~ msgid "No polygon geometries found. Project area must be a polygon."
+#~ msgstr ""
+#~ "Nebyly nalezeny žádné polygonové geometrie."
+#~ " Oblast projektu musí být polygon."
+
+#~ msgid "Selected area is too large. Please select an area smaller than 200 km²."
+#~ msgstr ""
+#~ "Vybraná oblast je příliš velká. Vyberte"
+#~ " prosím oblast menší než 200 km²."
+
+#~ msgid "Failed to generate data extract from the raw data API."
+#~ msgstr ""
+#~ "Vygenerování extraktu dat z rozhraní API"
+#~ " nezpracovaných dat se nezdařilo. Šablona"
+
+#~ msgid "QField project ID not found."
+#~ msgstr "Projekt nebyl nalezen."
+
+#~ msgid "Project name not found."
+#~ msgstr "Projekt nebyl nalezen."
+
+#~ msgid "ODK project ID not found."
+#~ msgstr "Projekt nebyl nalezen."
+
+#~ msgid "Appuser token not found."
+#~ msgstr "Projekt nebyl nalezen."
+
+#~ msgid "Failed to generate QR code."
+#~ msgstr "Nepodařilo se načíst šablonu formuláře."
+
+#~ msgid "Template XLSForm content is empty."
+#~ msgstr "Obsah XLSformuláře je prázdný."
+
+#~ msgid "Project outline is missing or has no geometry."
+#~ msgstr "Osnova projektu chybí nebo nemá geometrii."
+
+#~ msgid "Project outline geometry has no coordinates."
+#~ msgstr ""
+#~ "Geometrie obrysu projektu nemá žádné "
+#~ "souřadnice. Pro vytvoření projektu QField "
+#~ "je vyžadován"
+
+#~ msgid "Project outline is required for QField project creation."
+#~ msgstr "✓ Pro toto nastavení projektu není rozdělení úkolů vyžadováno."
+
+#~ msgid "XLSForm is required for QField project creation."
+#~ msgstr "XLSForm."
+
+#~ msgid "Failed to modify XLSForm for QField."
+#~ msgstr "Nepodařilo se upravit XLSForm pro QField."
+
+#~ msgid "QGIS wrapper completed but wrote no output files."
+#~ msgstr "QGIS wrapper byl dokončen, ale nezapsal žádné výstupní soubory."
+
+#~ msgid "QGIS wrapper completed but no .qgz file in output."
+#~ msgstr "obálka QGIS dokončena, ale žádný soubor .qgz na výstupu. Chybí"
+
+#~ msgid "QField project ID is missing; cannot attach basemap."
+#~ msgstr ""
+#~ "ID projektu QField; nelze připojit "
+#~ "podkladovou mapu. Generování projektu QGIS"
+
+#~ msgid "Basemap attach completed but produced no project files."
+#~ msgstr "Podkladová mapa byla připojena k projektu QField."
+
+#~ msgid "QGIS project generation failed: %(error)s"
+#~ msgstr "se nezdařilo: %(error)s"
+
+#~ msgid "QGIS wrapper returned invalid JSON."
+#~ msgstr "obal QGIS vrátil neplatný JSON."
+
+#~ msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+#~ msgstr ""
+#~ "Nepodařilo se stáhnout základní mapy "
+#~ "MBTile pro nahrání (HTTP %(status)s)."
+
+#~ msgid "Downloaded basemap MBTiles is empty."
+#~ msgstr "Stáhnout QR kód"
+
+#~ msgid "Failed to upload files to QFieldCloud: %(error)s"
+#~ msgstr "Nepodařilo se nahrát soubory do QFieldCloud: %(error)s Projekt"
+
+#~ msgid "QFieldCloud project '%(project_id)s' not found."
+#~ msgstr "Projekt (%(project_id)s) nebyl nalezen."
+
+#~ msgid ""
+#~ "Project belongs to organization '%(owner)s'."
+#~ " Could not add '%(username)s' to the"
+#~ " organization: %(error)s"
+#~ msgstr ""
+#~ "patří organizaci '%(owner)s'. Nelze přidat "
+#~ "'%(username)s' do organizace: %(error)s"
+
+#~ msgid "User '%(username)s' does not exist on QFieldCloud."
+#~ msgstr "Uživatel '%(username)s' v QFieldCloud neexistuje."
+
+#~ msgid "User '%(username)s' is already a collaborator on this project."
+#~ msgstr "Tento uživatel je již spolupracovníkem tohoto projektu."
+
+#~ msgid "QFieldCloud credentials are invalid."
+#~ msgstr "✓ Přihlašovací údaje jsou platné!"
+
+#~ msgid "Filters"
+#~ msgstr "Filtry"
+
+#~ msgid "All projects"
+#~ msgstr "Všechny projekty"
+
+#~ msgid "Draft"
+#~ msgstr "Koncept"
+
+#~ msgid "Published"
+#~ msgstr "Publikováno"
+
+#~ msgid "Completed"
+#~ msgstr "Dokončeno"
+
+#~ msgid "Archived"
+#~ msgstr "Archivováno"
+
+#~ msgid "Project Status"
+#~ msgstr "Stav projektu"
+
+#~ msgid "Newest first"
+#~ msgstr "Nejnovější první"
+
+#~ msgid "Oldest first"
+#~ msgstr "Nejstarší první"
+
+#~ msgid "Name (A-Z)"
+#~ msgstr "Název (A-Z)"
+
+#~ msgid "Name (Z-A)"
+#~ msgstr "Název (Z-A)"
+
+#~ msgid "Sort By"
+#~ msgstr "Seřadit podle"
+
+#~ msgid "Search"
+#~ msgstr "Hledat"
+
+#~ msgid "Search projects…"
+#~ msgstr "Hledat projekty…"
+
+#~ msgid "Create Project"
+#~ msgstr "Vytvořit projekt"
+
+#~ msgid "+ New"
+#~ msgstr "+ Nový"
+
+#~ msgid "Showing %(count)s project"
+#~ msgid_plural "Showing %(count)s projects"
+#~ msgstr[0] "Zobrazen %(count)s projekt"
+#~ msgstr[1] "Zobrazeny %(count)s projekty"
+#~ msgstr[2] "Zobrazeno %(count)s projektů"
+
+#~ msgid "in %(status)s"
+#~ msgstr "ve stavu %(status)s"
+
+#~ msgid ""
+#~ "matching\n"
+#~ "      \"%(query)s\""
+#~ msgstr "odpovídající „%(query)s“"
+
+#~ msgid "Private Project"
+#~ msgstr "Soukromý projekt"
+
+#~ msgid "Unnamed Project"
+#~ msgstr "Nepojmenovaný projekt"
+
+#~ msgid "Location:"
+#~ msgstr "Lokalita:"
+
+#~ msgid "Created:"
+#~ msgstr "Vytvořeno:"
+
+#~ msgid "N/A"
+#~ msgstr "N/A"
+
+#~ msgid "No projects found. Create your first project to get started!"
+#~ msgstr ""
+#~ "Nebyly nalezeny žádné projekty. Začněte "
+#~ "vytvořením svého prvního projektu!"
+
+#~ msgid "Coordinate field campaigns"
+#~ msgstr "Koordinace terénních kampaní"
+
+#~ msgid ""
+#~ "Enhancing field mapping efficiency and "
+#~ "accuracy through seamless coordination."
+#~ msgstr ""
+#~ "Zvyšování efektivity a přesnosti terénního "
+#~ "mapování díky bezproblémové koordinaci."
+
+#~ msgid "Explore Projects"
+#~ msgstr "Prozkoumat projekty"
+
+#~ msgid "Loading metrics..."
+#~ msgstr "Načítání metrik..."
+
+#~ msgid "What is it?"
+#~ msgstr "Co to je?"
+
+#~ msgid ""
+#~ "The Field Tasking Manager (Field-TM) "
+#~ "helps teams add local knowledge to "
+#~ "map features\n"
+#~ "        by coordinating mapping in the field."
+#~ msgstr ""
+#~ "Field Tasking Manager (Field-TM) pomáhá"
+#~ " týmům doplňovat místní znalosti k "
+#~ "mapovým prvkům tím, že koordinuje "
+#~ "mapování v terénu."
+
+#~ msgid ""
+#~ "Field-TM facilitates collaborative mapping "
+#~ "by supporting and extending mature tools"
+#~ "\n"
+#~ "        like ODK and QField. It is"
+#~ " a standalone mobile and web workflow"
+#~ " that helps teams collect\n"
+#~ "        geospatial data efficiently with "
+#~ "commonly available Android devices."
+#~ msgstr ""
+#~ "Field-TM usnadňuje spolupracující mapování "
+#~ "tím, že podporuje a rozšiřuje vyspělé"
+#~ " nástroje jako ODK a QField. Jde "
+#~ "o samostatný mobilní a webový pracovní"
+#~ " postup, který pomáhá týmům efektivně "
+#~ "sbírat geoprostorová data pomocí běžně "
+#~ "dostupných zařízení Android."
+
+#~ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+#~ msgstr ""
+#~ "Projektový manažer předvádí pracovní postup"
+#~ " mapování FieldTM na notebooku"
+
+#~ msgid "Main Features"
+#~ msgstr "Hlavní funkce"
+
+#~ msgid "Flexible Data Collection"
+#~ msgstr "Flexibilní sběr dat"
+
+#~ msgid ""
+#~ "Support diverse survey forms, multiple "
+#~ "data formats, and adaptable workflows "
+#~ "that\n"
+#~ "          fit different operational needs."
+#~ msgstr ""
+#~ "Podpora různých průzkumových formulářů, více"
+#~ " datových formátů a přizpůsobitelných "
+#~ "workflow, která odpovídají různým provozním"
+#~ " potřebám."
+
+#~ msgid "Open Source and Customizable"
+#~ msgstr "Open source a přizpůsobitelné"
+
+#~ msgid ""
+#~ "Adapt Field-TM to your own survey"
+#~ " logic, data structures, and integration"
+#~ "\n"
+#~ "          requirements."
+#~ msgstr ""
+#~ "Přizpůsobte Field-TM své vlastní logice"
+#~ " průzkumu, datovým strukturám a požadavkům"
+#~ " na integraci."
+
+#~ msgid "Entity-Level Tracking"
+#~ msgstr "Sledování na úrovni prvků"
+
+#~ msgid ""
+#~ "Monitor survey progress at task and "
+#~ "feature level so managers can make "
+#~ "informed\n"
+#~ "          decisions quickly."
+#~ msgstr ""
+#~ "Sledujte průběh průzkumu na úrovni úkolů"
+#~ " a prvků, aby manažeři mohli rychle"
+#~ " činit informovaná rozhodnutí."
+
+#~ msgid "Who is it for?"
+#~ msgstr "Pro koho je to určeno?"
+
+#~ msgid "Project Manager"
+#~ msgstr "Projektový manažer"
+
+#~ msgid "Create and coordinate field campaigns"
+#~ msgstr "Vytvářejte a koordinujte terénní kampaně"
+
+#~ msgid ""
+#~ "Project managers use Field-TM to "
+#~ "set up mapping projects, define areas"
+#~ " of interest,\n"
+#~ "          design survey forms, and split work into manageable tasks."
+#~ msgstr ""
+#~ "Projektoví manažeři používají Field-TM k"
+#~ " nastavení mapovacích projektů, definování "
+#~ "oblastí zájmu, návrhu průzkumových formulářů"
+#~ " a rozdělení práce na zvládnutelné "
+#~ "úkoly."
+
+#~ msgid "Define a project area and upload or choose a survey form"
+#~ msgstr "Definujte oblast projektu a nahrajte nebo vyberte průzkumový formulář"
+
+#~ msgid "Split the area into tasks and generate a data extract"
+#~ msgstr "Rozdělte oblast na úkoly a vygenerujte datový výřez"
+
+#~ msgid "Publish the project to ODK Central or QFieldCloud"
+#~ msgstr "Publikujte projekt do ODK Central nebo QFieldCloud"
+
+#~ msgid "Share a QR code so mappers can start collecting data"
+#~ msgstr "Sdílejte QR kód, aby mohli mapovači začít sbírat data"
+
+#~ msgid "Field Mapper"
+#~ msgstr "Terénní mapovač"
+
+#~ msgid "Collect data in the field with your phone"
+#~ msgstr "Sbírejte data v terénu pomocí telefonu"
+
+#~ msgid ""
+#~ "Mappers do not need to log in "
+#~ "to Field-TM. Once a project "
+#~ "manager publishes a\n"
+#~ "          project, mappers access it "
+#~ "directly in their mobile app of "
+#~ "choice."
+#~ msgstr ""
+#~ "Mapovači se nemusí přihlašovat do "
+#~ "Field-TM. Jakmile projektový manažer "
+#~ "projekt publikuje, mapovači k němu "
+#~ "přistupují přímo ve své zvolené mobilní"
+#~ " aplikaci."
+
+#~ msgid "Scan the QR code shared by your project manager"
+#~ msgstr "Naskenujte QR kód sdílený vaším projektovým manažerem"
+
+#~ msgid "The project loads automatically in ODK Collect or QField"
+#~ msgstr "Projekt se automaticky načte v ODK Collect nebo QField"
+
+#~ msgid "Navigate to your assigned task area and collect data"
+#~ msgstr "Přejděte do přiřazené oblasti úkolu a sbírejte data"
+
+#~ msgid "Submit your survey, which goes straight to the server"
+#~ msgstr "Odešlete svůj průzkum, který jde přímo na server"
+
+#~ msgid "Field-TM Use Cases"
+#~ msgstr "Případy použití Field-TM"
+
+#~ msgid "Field mapping in progress"
+#~ msgstr "Terénní mapování probíhá"
+
+#~ msgid "1. Community Mapping"
+#~ msgstr "1. Komunitní mapování"
+
+#~ msgid ""
+#~ "Field Tasking Manager empowers communities "
+#~ "to map informal settlements, public\n"
+#~ "            facilities, and local services for inclusive planning."
+#~ msgstr ""
+#~ "Field Tasking Manager umožňuje komunitám "
+#~ "mapovat neformální sídla, veřejná zařízení "
+#~ "a místní služby pro inkluzivní "
+#~ "plánování."
+
+#~ msgid "2. Urban Planning and Management"
+#~ msgstr "2. Urbanistické plánování a správa"
+
+#~ msgid ""
+#~ "Build smarter cities with coordinated "
+#~ "surveys of houses, roads, and utilities"
+#~ "\n"
+#~ "            through clear, manageable mapping tasks."
+#~ msgstr ""
+#~ "Budujte chytřejší města pomocí koordinovaných"
+#~ " průzkumů domů, silnic a infrastruktury "
+#~ "prostřednictvím jasných a zvládnutelných "
+#~ "mapovacích úkolů."
+
+#~ msgid "3. Disaster Response and Recovery"
+#~ msgstr "3. Reakce na katastrofy a obnova"
+
+#~ msgid ""
+#~ "Rapidly map damaged infrastructure after "
+#~ "disasters, coordinate volunteers, and\n"
+#~ "            deliver reliable data for relief operations."
+#~ msgstr ""
+#~ "Rychle zmapujte poškozenou infrastrukturu po"
+#~ " katastrofách, koordinujte dobrovolníky a "
+#~ "poskytujte spolehlivá data pro záchranné "
+#~ "operace."
+
+#~ msgid "Resources"
+#~ msgstr "Zdroje"
+
+#~ msgid "Data Prep"
+#~ msgstr "Příprava dat"
+
+#~ msgid "HOT Export Tool"
+#~ msgstr "HOT Export Tool"
+
+#~ msgid "Download task-ready geospatial data extracts for your project area."
+#~ msgstr ""
+#~ "Stáhněte si geoprostorové datové výřezy "
+#~ "připravené pro úkoly pro oblast vašeho"
+#~ " projektu."
+
+#~ msgid "Documentation"
+#~ msgstr "Dokumentace"
+
+#~ msgid "ODK Central Guide"
+#~ msgstr "Průvodce ODK Central"
+
+#~ msgid "Learn how to manage forms, app users, and field submissions in ODK."
+#~ msgstr ""
+#~ "Zjistěte, jak v ODK spravovat formuláře,"
+#~ " uživatele aplikace a odesílání z "
+#~ "terénu."
+
+#~ msgid "QField Guide"
+#~ msgstr "Průvodce QField"
+
+#~ msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+#~ msgstr "Nastavte projekty QFieldCloud a mobilní workflow pro offline mapování."
+
+#~ msgid "Need assistance?"
+#~ msgstr "Potřebujete pomoc?"
+
+#~ msgid "Email:"
+#~ msgstr "E-mail:"
+
+#~ msgid "Language"
+#~ msgstr "Spravovat"
+
+#~ msgid "Coordinated field mapping for Open Mapping campaigns."
+#~ msgstr "Koordinované terénní mapování pro kampaně Open Mapping."
+
+#~ msgid "Login"
+#~ msgstr "Přihlásit se"
+
+#~ msgid "Projects"
+#~ msgstr "Projekty"
+
+#~ msgid "QField Admin"
+#~ msgstr "Správa QField"
+
+#~ msgid "Sign in to Field-TM"
+#~ msgstr "Přihlásit se do Field-TM"
+
+#~ msgid "Redirecting to the centralized login service."
+#~ msgstr "Přesměrování na centralizovanou přihlašovací službu."
+
+#~ msgid "Continue to login"
+#~ msgstr "Pokračovat k přihlášení"
+
+#~ msgid "Authentication is disabled on this deployment."
+#~ msgstr "Ověřování je v této instalaci zakázáno."
+
+#~ msgid "Back to home"
+#~ msgstr "Zpět na domovskou stránku"
+
+#~ msgid "Create New Project"
+#~ msgstr "Vytvořit nový projekt"
+
+#~ msgid "Project Name"
+#~ msgstr "Název projektu"
+
+#~ msgid "Enter project name"
+#~ msgstr "Zadejte název projektu"
+
+#~ msgid "Enter project description"
+#~ msgstr "Zadejte popis projektu"
+
+#~ msgid "Field Mapping App"
+#~ msgstr "Aplikace pro terénní mapování"
+
+#~ msgid "Project Area"
+#~ msgstr "Oblast projektu"
+
+#~ msgid "Draw Area"
+#~ msgstr "Nakreslit oblast"
+
+#~ msgid "Upload GeoJSON"
+#~ msgstr "Nahrát GeoJSON"
+
+#~ msgid "Clear"
+#~ msgstr "Vymazat"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area.\n"
+#~ "          Maximum project size is 1,000"
+#~ " km². Areas over 100 km² will "
+#~ "show a warning. The OSM data\n"
+#~ "          extract API is limited to 200 km²."
+#~ msgstr ""
+#~ "Nakreslete polygon na mapě nebo nahrajte"
+#~ " soubor GeoJSON pro definování oblasti "
+#~ "projektu. Maximální velikost projektu je "
+#~ "1 000 km². Oblasti větší než 100"
+#~ " km² zobrazí varování. API pro "
+#~ "extrakci dat OSM je omezeno na 200"
+#~ " km²."
+
+#~ msgid "Advanced Config"
+#~ msgstr "Pokročilá konfigurace"
+
+#~ msgid "Merge geometries (use convex hull for multipolygons)"
+#~ msgstr "Sloučit geometrie (pro multipolygony použít konvexní obal)"
+
+#~ msgid "Hashtags"
+#~ msgstr "Hashtagy"
+
+#~ msgid "Type hashtags and press Enter or comma"
+#~ msgstr "Pište hashtagy a stiskněte Enter nebo čárku"
+
+#~ msgid ""
+#~ "Type hashtags and press Enter or "
+#~ "comma to add them. Click the × "
+#~ "on a tag to remove\n"
+#~ "          it."
+#~ msgstr ""
+#~ "Pište hashtagy a stiskněte Enter nebo"
+#~ " čárku pro jejich přidání. Kliknutím "
+#~ "na × u tagu jej odeberete."
+
+#~ msgid "Creating..."
+#~ msgstr "Vytváření..."
+
+#~ msgid "Something went wrong. Please try again."
+#~ msgstr "Něco se pokazilo. Zkuste to prosím znovu."
+
+#~ msgid "Invalid GeoJSON format. Please check your file."
+#~ msgstr "Neplatný formát GeoJSON. Zkontrolujte svůj soubor."
+
+#~ msgid "Invalid GeoJSON file. Please check the file format."
+#~ msgstr "Neplatný soubor GeoJSON. Zkontrolujte formát souboru."
+
+#~ msgid ""
+#~ "You must draw or upload an Area"
+#~ " of Interest (AOI) on the map "
+#~ "before submitting."
+#~ msgstr "Před odesláním musíte na mapě nakreslit nebo nahrát oblast zájmu (AOI)."
+
+#~ msgid ""
+#~ "A project with this name already "
+#~ "exists. Please choose a different name."
+#~ msgstr "Projekt s tímto názvem již existuje. Zvolte prosím jiný název."
+
+#~ msgid "Description is required."
+#~ msgstr "Popis je povinný."
+
+#~ msgid "← Back to Projects"
+#~ msgstr "← Zpět na projekty"
+
+#~ msgid "Project Metadata"
+#~ msgstr "Metadata projektu"
+
+#~ msgid "Project metadata and setup information for managers."
+#~ msgstr "Metadata projektu a informace o nastavení pro manažery."
+
+#~ msgid "Project ID"
+#~ msgstr "ID projektu"
+
+#~ msgid "Created"
+#~ msgstr "Vytvořeno"
+
+#~ msgid "Last Updated"
+#~ msgstr "Naposledy aktualizováno"
+
+#~ msgid "External Project"
+#~ msgstr "Externí projekt"
+
+#~ msgid "Instance:"
+#~ msgstr "Instance serveru:"
+
+#~ msgid "Project ID:"
+#~ msgstr "ID projektu:"
+
+#~ msgid "View Project in ODK Central →"
+#~ msgstr "Zobrazit projekt v ODK Central →"
+
+#~ msgid "Manage QFieldCloud Project →"
+#~ msgstr "Spravovat projekt QFieldCloud →"
+
+#~ msgid "View Project Externally →"
+#~ msgstr "Zobrazit projekt externě →"
+
+#~ msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#~ msgstr ""
+#~ "Smazat tento projekt v navazujícím "
+#~ "systému i ve Field-TM? Tuto akci"
+#~ " nelze vrátit zpět."
+
+#~ msgid "Delete Project"
+#~ msgstr "Smazat projekt"
+
+#~ msgid "Back to Projects"
+#~ msgstr "Zpět na projekty"
+
+#~ msgid "Project Not Found"
+#~ msgstr "Projekt nebyl nalezen"
+
+#~ msgid ""
+#~ "The project you're looking for doesn't"
+#~ " exist or you don't have permission"
+#~ " to view\n"
+#~ "        it."
+#~ msgstr "Projekt, který hledáte, neexistuje nebo nemáte oprávnění jej zobrazit."
+
+#~ msgid "QFieldCloud Admin"
+#~ msgstr "Správa QFieldCloud"
+
+#~ msgid ""
+#~ "This page is for managing the "
+#~ "users in your QField project, after "
+#~ "creation."
+#~ msgstr ""
+#~ "Tato stránka slouží ke správě uživatelů"
+#~ " ve vašem projektu QField po jeho "
+#~ "vytvoření."
+
+#~ msgid "Enter your QFieldCloud credentials to manage collaborators."
+#~ msgstr "Zadejte své přihlašovací údaje QFieldCloud pro správu spolupracovníků."
+
+#~ msgid "QFieldCloud URL"
+#~ msgstr "URL QFieldCloud"
+
+#~ msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+#~ msgstr "Základní URL vaší instance QFieldCloud (bez /api/v1)."
+
+#~ msgid "admin"
+#~ msgstr "admin"
+
+#~ msgid "Password"
+#~ msgstr "Heslo"
+
+#~ msgid "Connect"
+#~ msgstr "Připojit"
+
+#~ msgid "Connecting…"
+#~ msgstr "Připojování…"
+
+#~ msgid "Features Surveyed (Approximate)"
+#~ msgstr "Zaměřené prvky (přibližně)"
+
+#~ msgid "Projects Created"
+#~ msgstr "Vytvořené projekty"
+
+#~ msgid "Countries Covered"
+#~ msgstr "Pokryté země"
+
+#~ msgid "Users Registered"
+#~ msgstr "Registrovaní uživatelé"
+
+#~ msgid "Supported Mapping Apps"
+#~ msgstr "Podporované mapovací aplikace"
+
+#~ msgid "Offline Basemap"
+#~ msgstr "Offline podkladová mapa"
+
+#~ msgid ""
+#~ "Search HOT OpenAerialMap imagery for "
+#~ "this AOI and generate an MBTiles "
+#~ "basemap."
+#~ msgstr ""
+#~ "Vyhledejte snímky HOT OpenAerialMap pro "
+#~ "tuto AOI a vygenerujte podkladovou mapu"
+#~ " MBTiles."
+
+#~ msgid "Search OAM Imagery"
+#~ msgstr "Hledat snímky OAM"
+
+#~ msgid "Basemap generation previously failed. Please search again and retry."
+#~ msgstr ""
+#~ "Generování podkladové mapy dříve selhalo. "
+#~ "Vyhledejte ji znovu a opakujte akci."
+
+#~ msgid "No basemap selected yet."
+#~ msgstr "Zatím nebyla vybrána žádná podkladová mapa."
+
+#~ msgid "Manager Setup Summary"
+#~ msgstr "Shrnutí nastavení manažera"
+
+#~ msgid "The project setup flow is complete and shown below for reference."
+#~ msgstr "Proces nastavení projektu je dokončen a níže je zobrazen pro referenci."
+
+#~ msgid "Project Location"
+#~ msgstr "Poloha projektu"
+
+#~ msgid "Step 2: Upload XLSForm"
+#~ msgstr "Krok 2: Nahrát XLSForm"
+
+#~ msgid "Complete"
+#~ msgstr "Dokončeno"
+
+#~ msgid "Step 3: Get Data"
+#~ msgstr "Krok 3: Získat data"
+
+#~ msgid "Step 4: Split into Tasks"
+#~ msgstr "Krok 4: Rozdělit na úkoly"
+
+#~ msgid "Step 5: Finalise Project"
+#~ msgstr "Krok 5: Dokončit projekt"
+
+#~ msgid ""
+#~ "If you need to upload additional "
+#~ "media files to this project, such "
+#~ "as images and\n"
+#~ "          videos, log into ODK Central"
+#~ " and upload them in the form "
+#~ "settings."
+#~ msgstr ""
+#~ "Pokud potřebujete do tohoto projektu "
+#~ "nahrát další mediální soubory, jako jsou"
+#~ " obrázky a videa, přihlaste se do "
+#~ "ODK Central a nahrajte je v "
+#~ "nastavení formuláře."
+
+#~ msgid "Ready for Mapping"
+#~ msgstr "Připraveno k mapování"
+
+#~ msgid "Loading QR code..."
+#~ msgstr "Načítání QR kódu..."
+
+#~ msgid "Project Setup"
+#~ msgstr "Nastavení projektu"
+
+#~ msgid "Step 2: Select Survey Form"
+#~ msgstr "Krok 2: Vybrat průzkumový formulář"
+
+#~ msgid "Choose a preset survey type, or upload your own custom XLSForm."
+#~ msgstr "Vyberte typ průzkumu a pokračujte s doporučeným výchozím nastavením."
+
+#~ msgid "Choose Survey Type:"
+#~ msgstr "Vyberte typ průzkumu:"
+
+#~ msgid "Loading survey types..."
+#~ msgstr "Načítání typů průzkumů..."
+
+#~ msgid "Or use your own form instead:"
+#~ msgstr "Nebo místo toho použijte vlastní formulář:"
+
+#~ msgid "Upload Custom XLSForm"
+#~ msgstr "Nahrát vlastní formulář"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task\n"
+#~ "          division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you\n"
+#~ "          want to ask (do not "
+#~ "include select_one_from_file fields for "
+#~ "tasks/features)."
+#~ msgstr ""
+#~ "Poznámka: Field-TM automaticky vloží do"
+#~ " formuláře další pole pro rozdělení "
+#~ "úloh a výběr prvků. Formulář by "
+#~ "měl obsahovat pouze otázky průzkumu, "
+#~ "které chcete položit (nezahrnujte pole "
+#~ "select_one_from_file pro úlohy/prvky)."
+
+#~ msgid ""
+#~ "Recommended defaults are active for ODK"
+#~ " projects, including ODK Collect\n"
+#~ "          compatibility."
+#~ msgstr ""
+#~ "Pro projekty ODK jsou aktivní doporučená"
+#~ " výchozí nastavení včetně kompatibility s"
+#~ " ODK Collect."
+
+#~ msgid "Recommended defaults are active for %(app_name)s projects."
+#~ msgstr "Pro projekty %(app_name)s jsou aktivní doporučená výchozí nastavení."
+
+#~ msgid "Recommended defaults are active for this project."
+#~ msgstr "Pro tento projekt jsou aktivní doporučená výchozí nastavení."
+
+#~ msgid "Default Language:"
+#~ msgstr "Výchozí jazyk:"
+
+#~ msgid "English"
+#~ msgstr "Angličtina"
+
+#~ msgid "Spanish"
+#~ msgstr "Španělština"
+
+#~ msgid "French"
+#~ msgstr "Francouzština"
+
+#~ msgid "Portuguese"
+#~ msgstr "Portugalština"
+
+#~ msgid "Swahili"
+#~ msgstr "Svahilština"
+
+#~ msgid "Hindi"
+#~ msgstr "Hindština"
+
+#~ msgid "Form Options:"
+#~ msgstr "Možnosti formuláře:"
+
+#~ msgid "Include photo upload question"
+#~ msgstr "Zahrnout otázku na nahrání fotografie"
+
+#~ msgid "Make photo mandatory"
+#~ msgstr "Udělat fotografii povinnou"
+
+#~ msgid "Asks the user to take a photo at their location."
+#~ msgstr "Požádá uživatele, aby na svém místě pořídil fotografii."
+
+#~ msgid "Include digitisation verification question"
+#~ msgstr "Zahrnout otázku pro ověření digitalizace"
+
+#~ msgid "Asks the mapper to verify if existing features are correctly digitised."
+#~ msgstr ""
+#~ "Požádá mapera, aby ověřil, zda jsou "
+#~ "existující prvky správně zdigitalizované."
+
+#~ msgid "Continue"
+#~ msgstr "Pokračovat"
+
+#~ msgid "✓ Survey form uploaded successfully"
+#~ msgstr "✓ Průzkumový formulář byl úspěšně nahrán"
+
+#~ msgid "Download the recommended OSM data for your survey form."
+#~ msgstr "Stáhněte doporučená data OSM pro svůj průzkumový formulář."
+
+#~ msgid "Review the data on the map, then continue."
+#~ msgstr "Zkontrolujte data na mapě a poté pokračujte."
+
+#~ msgid "Download OSM Data"
+#~ msgstr "Stáhnout data OSM"
+
+#~ msgid "Collect New Data Only"
+#~ msgstr "Shromažďovat pouze nová data"
+
+#~ msgid "Use custom data inputs or override the default OSM download options."
+#~ msgstr ""
+#~ "Použijte vlastní datové vstupy nebo "
+#~ "přepište výchozí možnosti stahování OSM."
+
+#~ msgid "OSM Category:"
+#~ msgstr "Kategorie OSM:"
+
+#~ msgid "OSM Buildings"
+#~ msgstr "Budovy OSM"
+
+#~ msgid "OSM Highways"
+#~ msgstr "Silnice OSM"
+
+#~ msgid "OSM Healthcare"
+#~ msgstr "Zdravotnictví OSM"
+
+#~ msgid "OSM Toilets"
+#~ msgstr "Toalety OSM"
+
+#~ msgid "OSM Religious"
+#~ msgstr "Náboženské objekty OSM"
+
+#~ msgid "OSM Landuse"
+#~ msgstr "Využití území OSM"
+
+#~ msgid "OSM Waterways"
+#~ msgstr "Vodní toky OSM"
+
+#~ msgid "OSM Water Points"
+#~ msgstr "Vodní body OSM"
+
+#~ msgid "OSM Waste Disposal"
+#~ msgstr "Likvidace odpadu OSM"
+
+#~ msgid "OSM Education"
+#~ msgstr "Vzdělávání OSM"
+
+#~ msgid "OSM Cemeteries"
+#~ msgstr "Hřbitovy OSM"
+
+#~ msgid "OSM Amenities"
+#~ msgstr "Vybavenost OSM"
+
+#~ msgid "Geometry Type:"
+#~ msgstr "Typ geometrie:"
+
+#~ msgid "Polygon"
+#~ msgstr "Mnohoúhelník"
+
+#~ msgid "Polyline"
+#~ msgstr "Polylinie"
+
+#~ msgid "Point"
+#~ msgstr "Bod"
+
+#~ msgid "Use centroids"
+#~ msgstr "Použít centroidy"
+
+#~ msgid "Upload Custom GeoJSON"
+#~ msgstr "Nahrát vlastní GeoJSON"
+
+#~ msgid "Generating OSM data extract... This may take a moment."
+#~ msgstr "Generování datového výřezu OSM... To může chvíli trvat."
+
+#~ msgid "OSM data extract ready"
+#~ msgstr "Datový výřez OSM je připraven"
+
+#~ msgid "Step 4: Split into Tasks (Optional)"
+#~ msgstr "Krok 3: Rozdělit na úkoly (volitelné)"
+
+#~ msgid "✓ Task splitting is not relevant without existing data"
+#~ msgstr "✓ Rozdělení úkolů není bez existujících dat relevantní"
+
+#~ msgid ""
+#~ "Generate task areas by splitting the "
+#~ "Area of Interest (AOI). Choose an "
+#~ "algorithm and\n"
+#~ "      parameters, then split. Review the"
+#~ " preview, and click \"Accept Task "
+#~ "Areas\" to save. Or\n"
+#~ "      click"
+#~ msgstr ""
+#~ "Vygenerujte oblasti úkolů rozdělením oblasti"
+#~ " zájmu (AOI). Vyberte algoritmus a "
+#~ "parametry a poté rozdělte. Zkontrolujte "
+#~ "náhled a klikněte na „Přijmout oblasti"
+#~ " úkolů“ pro uložení. Nebo klikněte"
+
+#~ msgid "Skip"
+#~ msgstr "Přeskočit"
+
+#~ msgid "to use the whole AOI as a single task."
+#~ msgstr "pro použití celé AOI jako jednoho úkolu."
+
+#~ msgid "Choose which linear features influence building-based task splitting."
+#~ msgstr "Vyberte, které liniové prvky ovlivňují rozdělení úkolů podle budov."
+
+#~ msgid "Include roads"
+#~ msgstr "Zahrnout silnice"
+
+#~ msgid "Include rivers"
+#~ msgstr "Zahrnout řeky"
+
+#~ msgid "Include railways"
+#~ msgstr "Zahrnout železnice"
+
+#~ msgid "Include aeroways"
+#~ msgstr "Zahrnout letecké cesty"
+
+#~ msgid "Algorithm:"
+#~ msgstr "Algoritmus:"
+
+#~ msgid "Select splitting option..."
+#~ msgstr "Vyberte možnost rozdělení..."
+
+#~ msgid "Split by Square"
+#~ msgstr "Rozdělit podle čtverce"
+
+#~ msgid "Average Buildings v1 (Voronoi)"
+#~ msgstr "Průměrné budovy v1 (Voronoi)"
+
+#~ msgid "Average Buildings v2 (Straight Skeleton)"
+#~ msgstr "Průměrné budovy v2 (Straight Skeleton)"
+
+#~ msgid "Split by Specific Number of Tasks"
+#~ msgstr "Rozdělit podle konkrétního počtu úkolů (již brzy)"
+
+#~ msgid "Avg. Buildings per Task:"
+#~ msgstr "Prům. budov na úkol:"
+
+#~ msgid "Number of Tasks:"
+#~ msgstr "Počet úloh:"
+
+#~ msgid "Dimension (meters):"
+#~ msgstr "Rozměr (metry):"
+
+#~ msgid "Split Again"
+#~ msgstr "Rozdělit znovu"
+
+#~ msgid "Split AOI"
+#~ msgstr "Rozdělit AOI"
+
+#~ msgid "Splitting AOI into tasks... This may take a moment."
+#~ msgstr "Rozdělování AOI na úkoly... To může chvíli trvat."
+
+#~ msgid "Ready"
+#~ msgstr "Připraveno"
+
+#~ msgid ""
+#~ "All prerequisites are complete! Create "
+#~ "the project in your chosen mapping "
+#~ "tool."
+#~ msgstr ""
+#~ "Všechny předpoklady jsou splněny! Vytvořte "
+#~ "projekt ve zvoleném mapovacím nástroji."
+
+#~ msgid "Finalise Project"
+#~ msgstr "Dokončit projekt"
+
+#~ msgid "Confirm Project Finalisation"
+#~ msgstr "Potvrdit dokončení projektu"
+
+#~ msgid "Are you sure you want to finalise this project?"
+#~ msgstr "Opravdu chcete tento projekt dokončit?"
+
+#~ msgid "Confirm & Finalise"
+#~ msgstr "Potvrdit a dokončit"
+
+#~ msgid "Custom Credentials"
+#~ msgstr "Vlastní přihlašovací údaje"
+
+#~ msgid "ODK Central URL"
+#~ msgstr "URL ODK Central"
+
+#~ msgid "https://your-odk-central.com"
+#~ msgstr "https://your-odk-central.com"
+
+#~ msgid "QField Cloud URL"
+#~ msgstr "URL QField Cloud"
+
+#~ msgid "https://qfield.cloud"
+#~ msgstr "https://qfield.cloud"
+
+#~ msgid "qfield_username"
+#~ msgstr "qfield_username"
+
+#~ msgid "qfield_password"
+#~ msgstr "qfield_password"
+
+#~ msgid "Test Credentials"
+#~ msgstr "Otestovat přihlašovací údaje"
+
+#~ msgid "Save & Continue"
+#~ msgstr "Uložit a pokračovat"
+
+#~ msgid "Select a survey type..."
+#~ msgstr "Vyberte typ průzkumu..."
+
+#~ msgid "No survey types available"
+#~ msgstr "Nejsou dostupné žádné typy průzkumu"
+
+#~ msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Nejsou k dispozici žádné průzkumové "
+#~ "formuláře. Nahrajte vlastní formulář v "
+#~ "pokročilé konfiguraci."
+
+#~ msgid "Select a survey type, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Vyberte typ průzkumu nebo nahrajte "
+#~ "vlastní formulář v pokročilé konfiguraci."
+
+#~ msgid "Survey type selected."
+#~ msgstr "Typ průzkumu byl vybrán."
+
+#~ msgid "Invalid file type. Please upload a .xls or .xlsx file."
+#~ msgstr "Neplatný typ souboru. Nahrajte soubor .xls nebo .xlsx."
+
+#~ msgid "Selected file:"
+#~ msgstr "Vybraný soubor:"
+
+#~ msgid "Custom form selected."
+#~ msgstr "Byl vybrán vlastní formulář."
+
+#~ msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Nejprve vyberte typ průzkumu nebo "
+#~ "nahrajte vlastní formulář v pokročilé "
+#~ "konfiguraci."
+
+#~ msgid "polygons"
+#~ msgstr "polygony"
+
+#~ msgid "polylines"
+#~ msgstr "polylinie"
+
+#~ msgid "points"
+#~ msgstr "body"
+
+#~ msgid "features"
+#~ msgstr "prvky"
+
+#~ msgid ""
+#~ "You uploaded a custom form, so "
+#~ "this OSM download is optional. Use "
+#~ "Advanced Config to upload your own "
+#~ "GeoJSON or adjust download settings."
+#~ msgstr ""
+#~ "Nahráli jste vlastní formulář, takže "
+#~ "toto stahování OSM je volitelné. Pomocí"
+#~ " pokročilé konfigurace nahrajte vlastní "
+#~ "GeoJSON nebo upravte nastavení stahování."
+
+#~ msgid ""
+#~ "Recommended source: %(title)s (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Doporučený zdroj: %(title)s (%(geom_label)s). "
+#~ "Zkontrolujte data na mapě a poté "
+#~ "pokračujte."
+
+#~ msgid ""
+#~ "Recommended source updated (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Doporučený zdroj byl aktualizován "
+#~ "(%(geom_label)s). Zkontrolujte data na mapě"
+#~ " a poté pokračujte."
+
+#~ msgid "Downloading..."
+#~ msgstr "Stahování..."
+
+#~ msgid "Confirm No Splitting"
+#~ msgstr "Potvrdit bez rozdělení"
+
+#~ msgid "Split by Buildings"
+#~ msgstr "Rozdělit podle budov"
+
+#~ msgid "Select Option"
+#~ msgstr "Vybrat možnost"
+
+#~ msgid "Confirming..."
+#~ msgstr "Potvrzování..."
+
+#~ msgid "Splitting..."
+#~ msgstr "Rozdělování..."
+
+#~ msgid "ODK Central"
+#~ msgstr "ODK Central"
+
+#~ msgid "QField"
+#~ msgstr "QField"
+
+#~ msgid "the mapping tool"
+#~ msgstr "mapovací nástroj"
+
+#~ msgid "Project type not set. Please set the field mapping app first."
+#~ msgstr ""
+#~ "Typ projektu není nastaven. Nejprve "
+#~ "nastavte aplikaci pro terénní mapování."
+
+#~ msgid ""
+#~ "Are you sure you want to finalise"
+#~ " this project in %(project_type)s? This "
+#~ "will create the project, upload forms,"
+#~ " and generate all necessary files."
+#~ msgstr ""
+#~ "Opravdu chcete dokončit tento projekt v"
+#~ " %(project_type)s? Tím se vytvoří projekt,"
+#~ " nahrají formuláře a vygenerují všechny "
+#~ "potřebné soubory."
+
+#~ msgid "Custom ODK Credentials"
+#~ msgstr "Vlastní přihlašovací údaje ODK"
+
+#~ msgid "Custom QField Credentials"
+#~ msgstr "Vlastní přihlašovací údaje QField"
+
+#~ msgid "Please fill in all fields."
+#~ msgstr "Vyplňte prosím všechna pole."
+
+#~ msgid "Testing..."
+#~ msgstr "Testování..."
+
+#~ msgid "Testing credentials..."
+#~ msgstr "Testování přihlašovacích údajů..."
+
+#~ msgid "✓ Credentials are valid!"
+#~ msgstr "✓ Přihlašovací údaje jsou platné!"
+
+#~ msgid "Invalid credentials. Please check and try again."
+#~ msgstr "Neplatné přihlašovací údaje. Zkontrolujte je a zkuste to znovu."
+
+#~ msgid "Error testing credentials: %(message)s"
+#~ msgstr "Chyba při testování přihlašovacích údajů: %(message)s"
+
+#~ msgid "Please test credentials first before continuing."
+#~ msgstr "Před pokračováním nejprve otestujte přihlašovací údaje."
+
+#~ msgid "Creating project in %(project_type)s... This may take a moment."
+#~ msgstr "Vytváření projektu v %(project_type)s... To může chvíli trvat."
+
+#~ msgid "Error:"
+#~ msgstr "Chyba:"
+
+#~ msgid "Basemap attach failed. Use retry to start again."
+#~ msgstr "Připojení podkladové mapy selhalo. Pro nový začátek použijte opakování."
+
+#~ msgid "Retry Attach"
+#~ msgstr "Opakovat připojení"
+
+#~ msgid ""
+#~ "Basemap attach is in progress. Use "
+#~ "the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Připojování podkladové mapy probíhá. Pomocí"
+#~ " tlačítka níže zkontrolujte aktuální stav."
+
+#~ msgid "Checking..."
+#~ msgstr "Kontroluji..."
+
+#~ msgid "Check Status"
+#~ msgstr "Stav projektu"
+
+#~ msgid ""
+#~ "Basemap generation is in progress. "
+#~ "Status updates automatically every few "
+#~ "seconds."
+#~ msgstr ""
+#~ "Generování podkladové mapy probíhá. Stav "
+#~ "se automaticky aktualizuje každých několik "
+#~ "sekund."
+
+#~ msgid "STAC item"
+#~ msgstr "Položka STAC"
+
+#~ msgid "Zoom"
+#~ msgstr "Přiblížení"
+
+#~ msgid "Select one imagery item to start MBTiles generation."
+#~ msgstr "Vyberte jednu položku snímků pro zahájení generování MBTiles."
+
+#~ msgid "Cloud"
+#~ msgstr "Zavřít"
+
+#~ msgid "View Metadata"
+#~ msgstr "Zobrazit metadata"
+
+#~ msgid "Use this image"
+#~ msgstr "Použít tento snímek"
+
+#~ msgid "No imagery items were found for this AOI."
+#~ msgstr "Pro tuto AOI nebyly nalezeny žádné snímky."
+
+#~ msgid "Accept Data Extract"
+#~ msgstr "Přijmout datový výřez"
+
+#~ msgid "View technical details"
+#~ msgstr "Zobrazit technické podrobnosti"
+
+#~ msgid "Project created in ODK Central."
+#~ msgstr "Projekt byl vytvořen v ODK Central."
+
+#~ msgid "Manager Access (ODK Central UI)"
+#~ msgstr "Přístup manažera (ODK Central UI)"
+
+#~ msgid "Open project in ODK Central"
+#~ msgstr "Otevřít projekt v ODK Central"
+
+#~ msgid "Save these credentials now. They will only be shown once."
+#~ msgstr "Uložte si tyto přihlašovací údaje nyní. Budou zobrazeny pouze jednou."
+
+#~ msgid "View FieldTM Project"
+#~ msgstr "Zobrazit projekt FieldTM"
+
+#~ msgid "Project created in QFieldCloud."
+#~ msgstr "Projekt byl vytvořen v QFieldCloud."
+
+#~ msgid "Manager Access (QFieldCloud)"
+#~ msgstr "Přístup manažera (QFieldCloud)"
+
+#~ msgid "Open project in QFieldCloud"
+#~ msgstr "Otevřít projekt v QFieldCloud"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to\n"
+#~ "      manage the project."
+#~ msgstr ""
+#~ "Účet manažera nebylo možné vytvořit "
+#~ "automaticky. Přihlaste se do QFieldCloud "
+#~ "jako správce a projekt spravujte ručně."
+
+#~ msgid "Accept Task Choices"
+#~ msgstr "Přijmout volby úkolů"
+
+#~ msgid ""
+#~ "Basemap attached to QField\n"
+#~ "    project."
+#~ msgstr "Podkladová mapa byla připojena k projektu QField."
+
+#~ msgid "Area"
+#~ msgstr "Oblast"
+
+#~ msgid "Invalid geometry"
+#~ msgstr "Neplatná geometrie"
+
+#~ msgid "Undo last vertex"
+#~ msgstr "Vrátit poslední vrchol"
+
+#~ msgid "My location"
+#~ msgstr "Moje poloha"
+
+#~ msgid "Failed to validate GeoJSON"
+#~ msgstr "Ověření GeoJSON selhalo"
+
+#~ msgid "No GeoJSON returned from validation"
+#~ msgstr "Z ověření nebyl vrácen žádný GeoJSON"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area. Maximum\n"
+#~ "    project size is 1,000 km². "
+#~ "Areas over 100 km² will show a "
+#~ "warning. The OSM data extract API "
+#~ "is\n"
+#~ "    limited to 200 km²."
+#~ msgstr ""
+#~ "Nakreslete do mapy polygon nebo nahrajte"
+#~ " soubor GeoJSON a vymezte oblast "
+#~ "projektu. Maximální velikost projektu je "
+#~ "1 000 km². U oblastí větších než"
+#~ " 100 km² se zobrazí upozornění. API"
+#~ " pro extrakci dat OSM je omezeno "
+#~ "na 200 km²."
+
+#~ msgid ""
+#~ "Basemap attach failed for now. Your project is ready to\n"
+#~ "      use. Please retry attach."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Basemap generation is in progress. Use"
+#~ " the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Generování podkladové mapy probíhá. Pomocí "
+#~ "tlačítka níže zkontrolujte nejnovější stav."
+
+#~ msgid ""
+#~ "Basemap is\n"
+#~ "    ready. Attaching to QField project in progress."
+#~ msgstr ""
+#~ "Podkladová mapa je připravena. Připojování "
+#~ "k projektu QField právě probíhá."
+
+#~ msgid ""
+#~ "Basemap is ready. Not yet\n"
+#~ "    attached to QField project."
+#~ msgstr ""
+#~ "Podkladová mapa je připravena. Zatím "
+#~ "však není připojena k projektu QField."
 

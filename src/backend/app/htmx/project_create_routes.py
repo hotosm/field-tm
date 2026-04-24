@@ -19,13 +19,17 @@
 """Project creation and XLSForm upload HTMX routes."""
 
 import ast
+import asyncio
 import json
 import logging
+from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote
+from uuid import uuid4
 
-from litestar import get, post
+from area_splitter import SplittingAlgorithm
+from litestar import Litestar, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
@@ -44,13 +48,31 @@ from app.auth.roles import mapper
 from app.config import AuthProvider, settings
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, XLSFormType
+from app.db.models import DbProject
+from app.helpers.basemap_services import (
+    check_tilepack_status,
+    search_oam_imagery,
+    trigger_tilepack_generation,
+)
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.i18n import _
+from app.projects import project_schemas
+from app.projects.project_crud import (
+    claim_simple_project_basemap_generation,
+    claim_simple_project_basemap_resume,
+)
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
+    SplitAoiOptions,
     create_project_stub,
+    derive_simple_project_metadata,
+    download_osm_data,
+    finalize_qfield_project,
     process_xlsform,
+    save_data_extract,
+    save_task_areas,
+    split_aoi,
 )
 from app.projects.project_services import (
     ValidationError as SvcValidationError,
@@ -61,10 +83,12 @@ from .htmx_helpers import callout as _callout
 log = logging.getLogger(__name__)
 
 
-_OUTLINE_JSON_ERROR = (
-    "Project area must be valid JSON "
-    "(GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection)."
-)
+def _outline_json_error() -> str:
+    """Return a translated validation message for malformed outline JSON."""
+    return _(
+        "Project area must be valid JSON "
+        "(GeoJSON Polygon, MultiPolygon, Feature, or FeatureCollection)."
+    )
 
 
 def _first_form_value(value: object) -> str:
@@ -134,7 +158,7 @@ def _parse_outline_payload(raw_value: object) -> dict:
     if isinstance(parsed, (list, tuple)) and len(parsed) == 1:
         return _parse_outline_payload(parsed[0])
 
-    raise ValueError(_OUTLINE_JSON_ERROR)
+    raise ValueError(_outline_json_error())
 
 
 def _normalize_field_mapping_app(value: object) -> str:
@@ -167,6 +191,42 @@ def _project_form_error(message: str) -> str:
     )
 
 
+def _build_unique_simple_project_name(project_name: str) -> str:
+    """Append a short unique suffix for simple-flow duplicate names."""
+    return f"{project_name} {uuid4().hex[:8]}"
+
+
+def _extract_has_features(data_extract_geojson: dict | None) -> bool:
+    """Return whether a data extract contains at least one feature."""
+    if not isinstance(data_extract_geojson, dict):
+        return False
+    features = data_extract_geojson.get("features")
+    return isinstance(features, list) and len(features) > 0
+
+
+def _simple_empty_extract_hx_trigger() -> str:
+    """Build HTMX trigger payload for simple-flow empty extract notifications."""
+    return json.dumps(
+        {
+            "simpleCollectNewDataNotice": _(
+                "No existing OSM buildings were found in this area. "
+                "Continue mapping from scratch."
+            )
+        }
+    )
+
+
+_SIMPLE_EMPTY_EXTRACT_VALIDATION_MARKERS = (
+    "No data found in OSM",
+    "No valid geometries found in OSM",
+)
+
+
+def _is_empty_extract_validation_error(message: str) -> bool:
+    """Return whether service validation message indicates empty usable OSM extract."""
+    return any(marker in message for marker in _SIMPLE_EMPTY_EXTRACT_VALIDATION_MARKERS)
+
+
 def _parse_project_create_form(data: dict) -> tuple[str, str, str, list[str], dict]:
     """Normalize the HTMX project-create form payload."""
     project_name = _first_form_value(data.get("project_name", ""))
@@ -189,12 +249,402 @@ def _to_bool_form_value(value: object, default: bool = False) -> bool:
     return bool(value)
 
 
-def _login_prompt_path(return_to: str) -> str:
-    """Build the local login page path with a post-login return target."""
-    return f"/login?return_to={quote(return_to, safe='')}"
+async def _mark_basemap_autostart_failed(
+    bg_db: AsyncConnection, project_id: int
+) -> None:
+    """Persist a failed basemap autostart state."""
+    await DbProject.update(
+        bg_db,
+        project_id,
+        project_schemas.ProjectUpdate(basemap_status="failed"),
+    )
+    await bg_db.commit()
 
 
-async def _validate_xlsform_extension(data) -> BytesIO:
+async def _resume_simple_project_tilepack_if_needed(
+    bg_db: AsyncConnection, project: DbProject
+) -> bool:
+    """Resume a previously-triggered tilepack generation if one already exists."""
+    stac_item_id = str(project.basemap_stac_item_id or "").strip()
+    if not stac_item_id:
+        return False
+
+    status_value, download_url = await check_tilepack_status(stac_item_id)
+    now = datetime.now(timezone.utc)
+    await DbProject.update(
+        bg_db,
+        project.id,
+        project_schemas.ProjectUpdate(
+            basemap_status=status_value,
+            basemap_url=download_url or project.basemap_url,
+            basemap_attach_status=(
+                "in_progress" if status_value == "ready" else "idle"
+            ),
+            basemap_attach_error=None,
+            basemap_attach_updated_at=(now if status_value == "ready" else None),
+        ),
+    )
+    await bg_db.commit()
+
+    if status_value == "ready" and (download_url or project.basemap_url):
+        from app.htmx.basemap_routes import _run_basemap_attach_background
+
+        asyncio.create_task(
+            _run_basemap_attach_background(
+                project.id, download_url or project.basemap_url
+            )
+        )
+
+    return True
+
+
+def _basemap_autostart_skipped(project: DbProject | None) -> bool:
+    """Return whether basemap autostart should stop before any remote calls."""
+    if not project:
+        return True
+
+    if project.field_mapping_app != FieldMappingApp.QFIELD:
+        return True
+
+    if project.status != project_schemas.ProjectStatus.PUBLISHED:
+        return True
+
+    if project.basemap_status == "ready":
+        return True
+
+    return bool(
+        project.basemap_status == "generating"
+        and str(project.basemap_stac_item_id or "").strip()
+    )
+
+
+async def _select_simple_project_basemap(outline: dict) -> dict | None:
+    """Return the first matching STAC item for a simple-project outline."""
+    from app.qfield.qfield_crud import _outline_to_bbox_str
+
+    bbox = [float(v) for v in _outline_to_bbox_str(outline).split(",")]
+    items = await search_oam_imagery(bbox)
+    if not items:
+        return None
+    return items[0]
+
+
+async def _start_simple_project_tilepack(
+    bg_db: AsyncConnection,
+    project_id: int,
+    selected: dict,
+) -> tuple[str, str | None]:
+    """Persist tilepack request metadata and trigger generation."""
+    stac_item_id = str(selected.get("id") or "").strip()
+    if not stac_item_id:
+        raise ValueError("Missing STAC item id")
+
+    await DbProject.update(
+        bg_db,
+        project_id,
+        project_schemas.ProjectUpdate(
+            basemap_stac_item_id=stac_item_id,
+            basemap_status="generating",
+            basemap_url=None,
+            basemap_minzoom=selected.get("minzoom"),
+            basemap_maxzoom=selected.get("maxzoom"),
+            basemap_attach_status="idle",
+            basemap_attach_error=None,
+            basemap_attach_updated_at=None,
+        ),
+    )
+
+    status_value, download_url = await trigger_tilepack_generation(stac_item_id)
+    now = datetime.now(timezone.utc)
+    await DbProject.update(
+        bg_db,
+        project_id,
+        project_schemas.ProjectUpdate(
+            basemap_status=status_value,
+            basemap_url=download_url,
+            basemap_attach_status=(
+                "in_progress" if status_value == "ready" else "idle"
+            ),
+            basemap_attach_error=None,
+            basemap_attach_updated_at=(now if status_value == "ready" else None),
+        ),
+    )
+    await bg_db.commit()
+    return status_value, download_url
+
+
+async def _maybe_resume_simple_project_tilepack(
+    bg_db: AsyncConnection, project: DbProject
+) -> bool:
+    """Resume generating tilepacks that already have a selected STAC item."""
+    existing_stac_item_id = str(project.basemap_stac_item_id or "").strip()
+    if project.basemap_status != "generating" or not existing_stac_item_id:
+        return False
+
+    await _resume_simple_project_tilepack_if_needed(bg_db, project)
+    return True
+
+
+async def _select_and_start_simple_project_tilepack(
+    bg_db: AsyncConnection, project_id: int, outline: dict
+) -> tuple[str, str | None] | None:
+    """Select a basemap candidate and start tilepack generation."""
+    selected = await _select_simple_project_basemap(outline)
+    if selected is None:
+        await _mark_basemap_autostart_failed(bg_db, project_id)
+        return None
+
+    try:
+        return await _start_simple_project_tilepack(bg_db, project_id, selected)
+    except ValueError:
+        await _mark_basemap_autostart_failed(bg_db, project_id)
+        return None
+
+
+def _enqueue_simple_project_basemap_attach(
+    project_id: int, download_url: str | None
+) -> None:
+    """Queue basemap attachment once a tilepack is ready."""
+    if not download_url:
+        return
+
+    from app.htmx.basemap_routes import _run_basemap_attach_background
+
+    asyncio.create_task(_run_basemap_attach_background(project_id, download_url))
+
+
+async def _run_simple_project_basemap_autostart(
+    bg_db: AsyncConnection, project_id: int, outline: dict
+) -> None:
+    """Execute simple-project basemap autostart once a DB connection is open."""
+    project = await DbProject.one(bg_db, project_id)
+    if not project:
+        return
+
+    if await _maybe_resume_simple_project_tilepack(bg_db, project):
+        return
+
+    if _basemap_autostart_skipped(project):
+        return
+
+    tilepack = await _select_and_start_simple_project_tilepack(
+        bg_db, project_id, outline
+    )
+    if tilepack is None:
+        return
+
+    status_value, download_url = tilepack
+    if status_value == "ready" and download_url:
+        _enqueue_simple_project_basemap_attach(project_id, download_url)
+
+
+async def _persist_simple_project_basemap_autostart_failure(project_id: int) -> None:
+    """Best-effort persistence for background basemap autostart failures."""
+    try:
+        async with await AsyncConnection.connect(settings.FTM_DB_URL) as bg_db:
+            await _mark_basemap_autostart_failed(bg_db, project_id)
+    except Exception:
+        log.exception(
+            "Failed to persist basemap autostart failure for project %s", project_id
+        )
+
+
+async def _autostart_basemap_for_simple_project(project_id: int, outline: dict) -> None:
+    """Auto-start basemap generation for simple projects in the background."""
+    try:
+        async with await AsyncConnection.connect(settings.FTM_DB_URL) as bg_db:
+            await _run_simple_project_basemap_autostart(bg_db, project_id, outline)
+    except Exception:
+        log.exception(
+            "Simple-project basemap autostart failed for project %s", project_id
+        )
+        await _persist_simple_project_basemap_autostart_failure(project_id)
+
+
+def _is_simple_basemap_reconcile_candidate(project_row: dict) -> bool:
+    """Return whether a project row is eligible for simple-flow basemap recovery."""
+    if project_row.get("field_mapping_app") != FieldMappingApp.QFIELD.value:
+        return False
+
+    if project_row.get("status") != project_schemas.ProjectStatus.PUBLISHED.value:
+        return False
+
+    outline = project_row.get("outline")
+    if not isinstance(outline, dict):
+        return False
+
+    outline_type = str(outline.get("type") or "").strip()
+    return bool(outline_type)
+
+
+async def _claim_simple_project_basemap_reconcile(
+    conn: AsyncConnection, row: dict
+) -> bool:
+    """Claim a stranded basemap row for either generation or resume."""
+    project_id = int(row["id"])
+    existing_stac_item_id = str(row.get("basemap_stac_item_id") or "").strip()
+
+    if existing_stac_item_id:
+        return await claim_simple_project_basemap_resume(
+            db=conn,
+            project_id=project_id,
+        )
+
+    return await claim_simple_project_basemap_generation(
+        db=conn,
+        project_id=project_id,
+    )
+
+
+def _enqueue_simple_project_basemap_reconcile(row: dict) -> None:
+    """Schedule basemap autostart for a claimed reconcile row."""
+    project_id = int(row["id"])
+    outline = row["outline"]
+    asyncio.create_task(_autostart_basemap_for_simple_project(project_id, outline))
+
+
+async def reconcile_simple_project_basemap_autostarts(server: Litestar) -> None:
+    """Re-enqueue simple basemap autostarts stranded across process restarts."""
+    enqueued = 0
+
+    async with server.state.db_pool.connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            await cur.execute(
+                """
+                SELECT
+                    id,
+                    field_mapping_app::text AS field_mapping_app,
+                    status::text AS status,
+                    basemap_stac_item_id,
+                    ST_AsGeoJSON(outline)::jsonb AS outline
+                FROM projects
+                WHERE basemap_status = 'generating';
+                """
+            )
+            rows = await cur.fetchall()
+
+        if not rows:
+            return
+
+        for row in rows:
+            try:
+                if not _is_simple_basemap_reconcile_candidate(row):
+                    continue
+
+                claimed = await _claim_simple_project_basemap_reconcile(conn, row)
+                if not claimed:
+                    continue
+
+                _enqueue_simple_project_basemap_reconcile(row)
+                enqueued += 1
+            except Exception:
+                log.exception(
+                    "Failed to re-enqueue simple basemap autostart for project %s",
+                    row.get("id"),
+                )
+
+    if enqueued:
+        log.info(
+            "Re-enqueued basemap autostarts for %s stranded simple projects", enqueued
+        )
+
+
+def _login_prompt_path(next_path: str) -> str:
+    """Build login URL preserving a return-to path."""
+    return f"/login?return_to={quote(next_path, safe='')}"
+
+
+async def _create_simple_project_stub(
+    db: AsyncConnection,
+    auth_user: object,
+    project_name: str,
+    description: str,
+    outline: dict,
+    hashtags: list[str],
+):
+    """Create a simple-flow project, retrying once with a unique name."""
+    create_kwargs = {
+        "db": db,
+        "field_mapping_app": FieldMappingApp.QFIELD.value,
+        "description": description,
+        "outline": outline,
+        "hashtags": hashtags,
+        "user_sub": get_user_sub(auth_user),
+    }
+
+    try:
+        return await create_project_stub(
+            project_name=project_name,
+            **create_kwargs,
+        )
+    except ConflictError:
+        return await create_project_stub(
+            project_name=_build_unique_simple_project_name(project_name),
+            **create_kwargs,
+        )
+
+
+async def _finalize_simple_project_creation(
+    db: AsyncConnection,
+    project_id: int,
+    outline: dict,
+) -> tuple[bool, dict[str, str]]:
+    """Prepare extract, finalize QField setup, and enqueue basemap autostart."""
+    default_template_bytes = await _get_default_buildings_template_bytes(db)
+    if not default_template_bytes:
+        raise ServiceError(
+            _("Could not load default OSM Buildings form for simple project creation.")
+        )
+
+    await process_xlsform(
+        db=db,
+        project_id=project_id,
+        xlsform_bytes=BytesIO(default_template_bytes),
+        need_verification_fields=True,
+        include_photo_upload=True,
+        mandatory_photo_upload=False,
+        use_odk_collect=False,
+        default_language=None,
+    )
+
+    await _prepare_simple_project_data_extract(db=db, project_id=project_id)
+
+    refreshed_project = await DbProject.one(db, project_id)
+    extract_has_features = _extract_has_features(
+        refreshed_project.data_extract_geojson if refreshed_project else None
+    )
+
+    if extract_has_features:
+        tasks_geojson = await split_aoi(
+            db,
+            project_id,
+            SplitAoiOptions(
+                algorithm=SplittingAlgorithm.AVG_BUILDING_SKELETON.value,
+                no_of_buildings=10,
+                include_roads=True,
+                include_rivers=True,
+                include_railways=True,
+                include_aeroways=True,
+            ),
+        )
+        await save_task_areas(db, project_id, tasks_geojson)
+
+    await finalize_qfield_project(db=db, project_id=project_id)
+
+    claimed = await claim_simple_project_basemap_generation(
+        db=db, project_id=project_id
+    )
+    if claimed:
+        asyncio.create_task(_autostart_basemap_for_simple_project(project_id, outline))
+
+    headers = {"HX-Redirect": f"/projects/{project_id}"}
+    if not extract_has_features:
+        headers["HX-Trigger"] = _simple_empty_extract_hx_trigger()
+
+    return extract_has_features, headers
+
+
+async def _validate_xlsform_extension(data: XLSFormUploadData) -> BytesIO:
     """Validate an uploaded XLSForm has .xls or .xlsx extension and return bytes."""
     filename = Path(data.filename or "")
     file_ext = filename.suffix.lower()
@@ -263,6 +713,33 @@ async def new_project(
     return HTMXTemplate(template_name="new_project.html")
 
 
+@get(
+    path="/new/simple",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(get_optional_auth_user),
+    },
+)
+async def new_project_simple(
+    request: HTMXRequest, db: AsyncConnection, auth_user: object | None
+) -> Template | Response:
+    """Render the simple AOI-only project creation form."""
+    if settings.AUTH_PROVIDER != AuthProvider.DISABLED and auth_user is None:
+        login_path = _login_prompt_path(str(request.url.path))
+        if request.headers.get("HX-Request") == "true":
+            return Response(
+                content="",
+                status_code=status.HTTP_200_OK,
+                headers={"HX-Redirect": login_path},
+            )
+        return Response(
+            content="",
+            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            headers={"Location": login_path},
+        )
+    return HTMXTemplate(template_name="new_project_simple.html")
+
+
 def _template_form_type_from_title(form_title: str | None) -> XLSFormType | None:
     """Resolve a template title to an XLSFormType enum member."""
     if not form_title:
@@ -312,6 +789,83 @@ async def _get_template_xlsform_bytes(
         log.error(f"Error converting YAML to XLSForm: {e}", exc_info=True)
 
     return None
+
+
+async def _get_default_buildings_template_bytes(db: AsyncConnection) -> bytes | None:
+    """Get bytes for the default OSM Buildings XLSForm template."""
+    sql = """
+        SELECT id
+        FROM template_xlsforms
+        WHERE title = %(title)s
+        ORDER BY id
+        LIMIT 1;
+    """
+
+    async with db.cursor(row_factory=dict_row) as cur:
+        await cur.execute(sql, {"title": XLSFormType.buildings.value})
+        result = await cur.fetchone()
+
+    if result and result.get("id") is not None:
+        xlsx_bytes = await _get_template_xlsform_bytes(int(result["id"]), db)
+        if xlsx_bytes:
+            return xlsx_bytes
+
+    try:
+        fallback_path = f"{xlsforms_path}/{XLSFormType.buildings.name}.yaml"
+        return convert_to_xlsform(fallback_path)
+    except Exception as e:
+        log.error(
+            "Error converting default OSM Buildings YAML to XLSForm: %s",
+            e,
+            exc_info=True,
+        )
+        return None
+
+
+async def _prepare_simple_project_data_extract(
+    db: AsyncConnection,
+    project_id: int,
+) -> None:
+    """Populate simple workflow extract, falling back to collect-new-data mode."""
+    try:
+        geojson_data = await download_osm_data(
+            db=db,
+            project_id=project_id,
+            osm_category="buildings",
+            geom_type="POLYGON",
+            centroid=False,
+        )
+        await save_data_extract(
+            db=db,
+            project_id=project_id,
+            geojson_data=geojson_data,
+        )
+        return
+    except SvcValidationError as e:
+        if not _is_empty_extract_validation_error(e.message):
+            raise
+        log.info(
+            "No OSM data found for simple workflow project %s; "
+            "defaulting to collect-new-data mode.",
+            project_id,
+        )
+    except ServiceError as e:
+        log.warning(
+            "OSM data extract failed for simple workflow project %s; "
+            "defaulting to collect-new-data mode: %s",
+            project_id,
+            e,
+        )
+
+    await DbProject.update(
+        db,
+        project_id,
+        project_schemas.ProjectUpdate(
+            data_extract_geojson={"type": "FeatureCollection", "features": []},
+            task_areas_geojson={},
+        ),
+    )
+    await db.commit()
 
 
 @get(
@@ -364,7 +918,7 @@ async def create_project_htmx(
             )
         except ValueError:
             return Response(
-                content=_project_form_error(_OUTLINE_JSON_ERROR),
+                content=_project_form_error(_outline_json_error()),
                 media_type="text/html",
                 # Keep HTMX validation responses as 200 so reverse proxies / WAF
                 # don't replace the body with branded error pages.
@@ -426,7 +980,95 @@ async def create_project_htmx(
         )
         return Response(
             content=_project_form_error(
-                "An unexpected error occurred. Please try again."
+                _("An unexpected error occurred. Please try again.")
+            ),
+            media_type="text/html",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@post(
+    path="/projects/create-simple",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
+async def create_simple_project_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    auth_user: object,
+    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
+) -> Response:
+    """Create a simple OSM buildings project from AOI only."""
+    try:
+        try:
+            outline = _parse_outline_payload(data.get("outline", ""))
+        except ValueError:
+            return Response(
+                content=_project_form_error(_outline_json_error()),
+                media_type="text/html",
+                status_code=status.HTTP_200_OK,
+            )
+
+        (
+            project_name,
+            description,
+            hashtags,
+            _location_str,
+        ) = await derive_simple_project_metadata(db=db, outline=outline)
+        project = await _create_simple_project_stub(
+            db=db,
+            auth_user=auth_user,
+            project_name=project_name,
+            description=description,
+            outline=outline,
+            hashtags=hashtags,
+        )
+        _extract_has_features, headers = await _finalize_simple_project_creation(
+            db=db,
+            project_id=project.id,
+            outline=outline,
+        )
+
+        return Response(
+            content="",
+            status_code=status.HTTP_200_OK,
+            headers=headers,
+        )
+    except SvcValidationError as e:
+        message = e.message
+        headers = {}
+        if "Area of Interest" in message or "too large" in message:
+            headers["HX-Trigger"] = json.dumps({"missingOutline": message})
+        return Response(
+            content=_project_form_error(message),
+            media_type="text/html",
+            status_code=status.HTTP_200_OK,
+            headers=headers,
+        )
+    except ConflictError as e:
+        hx_trigger = json.dumps({"duplicateProjectName": e.message})
+        return Response(
+            content=_project_form_error(e.message),
+            media_type="text/html",
+            status_code=status.HTTP_200_OK,
+            headers={"HX-Trigger": hx_trigger},
+        )
+    except ServiceError as e:
+        return Response(
+            content=_project_form_error(e.message),
+            media_type="text/html",
+            status_code=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        log.error(
+            f"Error creating simple project via HTMX: {e}",
+            exc_info=True,
+        )
+        return Response(
+            content=_project_form_error(
+                _("An unexpected error occurred. Please try again.")
             ),
             media_type="text/html",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

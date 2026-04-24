@@ -362,11 +362,29 @@ async def test_check_tilepack_status_generating(monkeypatch):
     assert download_url is None
     assert client.calls == [
         (
-            "POST",
+            "GET",
             "https://packager.imagery.hotosm.org/tilepacks/item?format=mbtiles",
             {},
         )
     ]
+
+
+async def test_check_tilepack_status_handles_invalid_json_as_generating(monkeypatch):
+    """Status polling should tolerate invalid JSON payloads from upstream."""
+    response = Mock(status_code=202, content=b"<!doctype html>")
+    response.json = Mock(side_effect=ValueError("invalid json"))
+    client = _DummyAsyncClient(response=response)
+
+    monkeypatch.setattr(
+        basemap_services.httpx,
+        "AsyncClient",
+        lambda **_kwargs: client,
+    )
+
+    status_value, download_url = await basemap_services.check_tilepack_status("item")
+
+    assert status_value == "generating"
+    assert download_url is None
 
 
 async def test_check_tilepack_status_raises_on_upstream_4xx(monkeypatch):

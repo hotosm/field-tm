@@ -1,10 +1,13 @@
 <wa-callout variant="success">
   <span>
-    {% if is_qfield and project.basemap_attach_status == "ready" %} {{ _("Basemap attached to QField
-    project.") }} {% else %} {{ _("Basemap is ready.") }} {% endif %}{% if basemap_size_display or
-    basemap_zoom_display %} ({% if basemap_size_display %} {{ _("Total size") }}: {{
-    basemap_size_display }} {% endif %}{% if basemap_zoom_display %}{% if basemap_size_display %} ·
-    {% endif %}{{ _("Available Zoom") }}: {{ basemap_zoom_display }}{% endif %}){% endif %}
+    {% if is_qfield %} {% if project.basemap_attach_status == "ready" %} {{ _("Basemap attached to
+    QField project.") }} {% elif project.basemap_attach_status == "in_progress" %} {{ _("Basemap is
+    ready. Attaching to QField project in progress.") }} {% else %} {{ _("Basemap is ready. Not yet
+    attached to QField project.") }} {% endif %} {% else %} {{ _("Basemap is ready.") }} {% endif
+    %}{% if basemap_size_display or basemap_zoom_display %} ({% if basemap_size_display %} {{
+    _("Total size") }}: {{ basemap_size_display }} {% endif %}{% if basemap_zoom_display %}{% if
+    basemap_size_display %} · {% endif %}{{ _("Available Zoom") }}: {{ basemap_zoom_display }}{%
+    endif %}){% endif %}
   </span>
 </wa-callout>
 

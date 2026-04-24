@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:12+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: yo\n"
@@ -28,28 +28,33 @@ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ. Jọwọ kan si alabojuto."
 
 #: app/main.py:287
 msgid "Could not connect to database"
-msgstr "Ko le sopọ si ibi ipamọ data\n"
+msgstr ""
+"Ko le sopọ si ibi ipamọ data\n"
 "Olumulo"
 
 #: app/auth/auth_deps.py:73
 msgid "Authenticated user is missing a valid identifier."
-msgstr "sonu oludamọ to wulo.\n"
+msgstr ""
+"sonu oludamọ to wulo.\n"
 "Olumulo"
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr "gbọdọ jẹ alabojuto\n"
+msgstr ""
+"gbọdọ jẹ alabojuto\n"
 "Olumulo"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr "ko ni igbanilaaye lati wọle si iṣẹ akanṣe naa.\n"
+msgstr ""
+"ko ni igbanilaaye lati wọle si iṣẹ akanṣe naa.\n"
 "Ise agbese"
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr "ti wa ni titiipa niwon o wa ni ipo %(state)s.\n"
+msgstr ""
+"ti wa ni titiipa niwon o wa ni ipo %(state)s.\n"
 "Olumulo"
 
 #: app/auth/user_crud.py:88
@@ -79,17 +84,20 @@ msgstr "form_id nilo lati ṣe atokọ awọn ifisilẹ pẹlu pyodk."
 #: app/central/central_crud.py:302
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
-msgstr "XLSForm ko wulo: %(error)s\n"
+msgstr ""
+"XLSForm ko wulo: %(error)s\n"
 "Iyipada"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr "GeoJSON --> CSV kuna\n"
+msgstr ""
+"GeoJSON --> CSV kuna\n"
 "Ise agbese"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr "ko ni awọn ifisilẹ sibẹsibẹ\n"
+msgstr ""
+"ko ni awọn ifisilẹ sibẹsibẹ\n"
 "Aaye data"
 
 #: app/central/central_crud.py:562
@@ -129,7 +137,7 @@ msgstr "Kuna lati ṣẹda olumulo oluṣakoso ODK Central."
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ nígbà tí a ń dá kóòdù QR sílẹ̀."
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:367
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Pese fáìlì .xls tàbí .xlsx tó wulo"
 
@@ -147,7 +155,7 @@ msgstr "%(action)s kuna pẹlu HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s kuna nitori aṣiṣe asopọ oke."
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API da HTTP %(status_code)s pada."
@@ -184,88 +192,114 @@ msgstr "Faili geojson rẹ ko wulo."
 msgid "Project not found or access denied."
 msgstr "A kò rí iṣẹ́ náà tàbí a kọ ọ́ láàyè."
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr "A so basemap pọ mọ iṣẹ QField ni aṣeyọri."
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr "Fifi basemap pọ kò tíì bẹ̀rẹ̀."
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+#, fuzzy
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr "Fifi basemap pọ kuna. Jọ̀wọ́ tún gbìyànjú."
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "A kò lè wá àwọn àwòrán báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr "A kò lè bẹ̀rẹ̀ ṣíṣe basemap báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr "A kò lè tún ipo basemap ṣe báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr "Fifi basemap pọ wà lẹ́yìn ìtẹ̀jáde."
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr "Fifi basemap pọ wà fún àwọn iṣẹ́ QField nìkan."
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Basemap kò tíì ṣetán. Jọ̀wọ́ dúró kí ìṣelọpọ parí."
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr "Kò sí URL ìgbàkalẹ̀ basemap tí a ṣe tó wà báyìí."
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
 "%(config)s."
 msgstr "A kò tíì túnto fifi basemap QField pọ sí ìfìdíkalẹ̀ yìí. %(config)s ò sí."
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr "Àwọn irinṣẹ́ basemap wà lẹ́yìn ìtẹ̀jáde."
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr "Iṣẹ́ maapu pápá ń lọ lọwọ"
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:77
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"Agbegbe iṣẹ akanṣe gbọdọ jẹ JSON to wulo (GeoJSON Polygon, MultiPolygon, "
+"Feature, tabi FeatureCollection)."
+
+#: app/htmx/project_create_routes.py:385
 msgid "Failed to load template form."
 msgstr "Kò ṣee ṣe láti kó fọ́ọ̀mù àpẹrẹ wọlé."
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:393
 msgid "Please select a form or upload a file."
 msgstr "Jọwọ yan fọ́ọ̀mù kan tàbí gbe fáìlì kan sókè."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:695 app/htmx/project_create_routes.py:817
+msgid "An unexpected error occurred. Please try again."
+msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ. Jọwọ gbiyanju lẹẹkansi."
+
+#: app/htmx/project_create_routes.py:758
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr "A ko le gbe fọọmu OSM Buildings aiyipada fun ṣiṣẹda iṣẹ akanṣe rọọrun."
+
+#: app/htmx/project_create_routes.py:844 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "A kò rí iṣẹ́ náà."
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:854
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "ID iṣẹ́ kò bá mu. O kò ní ààyè sí iṣẹ́ yìí."
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:899
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr ""
 "A ti jẹ́rìí fọ́ọ̀mù náà, a sì ti gbé e sókè ní àṣeyọrí! A ń tún ojú-ìwé "
 "náà ṣí..."
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:923 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ"
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:927
 msgid "Error"
 msgstr "Aṣiṣe"
 
@@ -450,7 +484,7 @@ msgstr "Oní"
 msgid "Visibility"
 msgstr "Ìfarahàn"
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr "Àpèjúwe"
@@ -481,7 +515,7 @@ msgstr "Yọ alábàáṣiṣẹ́pọ̀ kúrò"
 msgid "from this project?"
 msgstr "kúrò nínú iṣẹ́ yìí?"
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -835,12 +869,36 @@ msgstr "Kò ṣee ṣe láti kó fọ́ọ̀mù àpẹrẹ wọlé."
 
 #: app/projects/project_routes.py:103
 msgid "Template XLSForm content is empty."
-msgstr "Àdàkọ XLSForm akoonu ti sofo.\n"
+msgstr ""
+"Àdàkọ XLSForm akoonu ti sofo.\n"
 "Eto ilana"
+
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"A ṣẹda iṣẹ akanṣe yii pẹlu ilana iṣẹ ti a rọọrun ni FieldTM, a sì ṣe e "
+"lati ko data awọn ile jọ lati mu OpenStreetMap dara si."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "Agbegbe Ailórúkọ"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "Agbegbe {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
 
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
-msgstr "sonu tabi ko ni geometry.\n"
+msgstr ""
+"sonu tabi ko ni geometry.\n"
 "Jiometirika ilana ilana"
 
 #: app/qfield/qfield_crud.py:116
@@ -878,7 +936,8 @@ msgstr "A ti so basemapu mọ iṣẹ́ QField."
 #: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr "QGIS iran ise agbese kuna: %(error)s\n"
+msgstr ""
+"QGIS iran ise agbese kuna: %(error)s\n"
 "Apoti"
 
 #: app/qfield/qfield_crud.py:720
@@ -897,7 +956,8 @@ msgstr "Ṣe igbasilẹ kóòdù QR"
 #: app/qfield/qfield_crud.py:874
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr "kuna lati gbe awọn faili sori QFieldCloud: %(error)s\n"
+msgstr ""
+"kuna lati gbe awọn faili sori QFieldCloud: %(error)s\n"
 "Ise agbese"
 
 #: app/qfield/qfield_crud.py:1148
@@ -910,7 +970,8 @@ msgstr "A kò rí iṣẹ́ (%(project_id)s)."
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
-msgstr "jẹ ti agbari '%(owner)s'. Ko le fi '%(username)s' kun si ajo: %(error)s\n"
+msgstr ""
+"jẹ ti agbari '%(owner)s'. Ko le fi '%(username)s' kun si ajo: %(error)s\n"
 "Olumulo"
 
 #: app/qfield/qfield_crud.py:1186
@@ -985,7 +1046,10 @@ msgstr "Ṣàwárí iṣẹ́…"
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr "Dá iṣẹ́ sílẹ̀"
 
@@ -997,8 +1061,8 @@ msgstr "+ Tuntun"
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] "A ń fi iṣẹ́ %(count)s hàn"
-msgstr[1] "A ń fi iṣẹ́ %(count)s hàn"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/templates/home.html:75
 #, python-format
@@ -1344,71 +1408,37 @@ msgstr "Padà sí ojúlé àkọ́kọ́"
 msgid "Create New Project"
 msgstr "Dá iṣẹ́ tuntun sílẹ̀"
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr "Ti o ba n ko data OSM Buildings jọ, lo ilana rọọrun pẹlu AOI nikan."
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr "Orúkọ iṣẹ́"
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr "Tẹ orúkọ iṣẹ́ sílẹ̀"
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr "Tẹ àpèjúwe iṣẹ́ sílẹ̀"
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr "Ohun èlò maapu pápá"
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "Agbègbè iṣẹ́"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "Ya agbègbè"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "Gbe GeoJSON sókè"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "Nu"
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-"Ya polygon kan lórí maapu tàbí gbe fáìlì GeoJSON sókè láti ṣàlàyé agbègbè"
-" iṣẹ́ rẹ. Iwọn tó pọ̀ jùlọ fún iṣẹ́ ni 1,000 km². Àwọn agbègbè tó ju 100 "
-"km² lọ yóò fi ìkìlọ̀ hàn. API ìyọkúrò data OSM ní ààlà 200 km²."
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr "Ètò tó jinlẹ̀"
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Darapọ̀ àwọn geometry (lo convex hull fún multipolygons)"
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr "Àwọn hashtag"
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr "Tẹ àwọn hashtag kí o sì tẹ Enter tàbí kọ́mà"
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
@@ -1417,963 +1447,2064 @@ msgstr ""
 "Tẹ àwọn hashtag kí o sì tẹ Enter tàbí kọ́mà láti fi wọn kún. Tẹ × lórí "
 "àmi kan láti yọ ọ́ kúrò."
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr "A ń dá sílẹ̀..."
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr "Nkankan ṣì lọ ní ònà tí kò tọ́. Jọwọ tún gbìyànjú."
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "Ọ̀nà ìṣètò GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò fáìlì rẹ."
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "Fáìlì GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò ọ̀nà ìṣètò fáìlì náà."
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr ""
-"O gbọ́dọ̀ ya tàbí gbe Area of Interest (AOI) sókè lórí maapu kí o tó fi "
-"ránṣẹ́."
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Iṣẹ́ kan pẹ̀lú orúkọ yìí ti wà tẹ́lẹ̀. Jọwọ yan orúkọ mìíràn."
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr "Àpèjúwe jẹ́ dandan."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← Padà sí àwọn iṣẹ́"
-
-#: app/templates/project_details.html:46
-msgid "Project Metadata"
-msgstr "Metadata iṣẹ́"
-
-#: app/templates/project_details.html:48
-msgid "Project metadata and setup information for managers."
-msgstr "Metadata iṣẹ́ àti àlàyé ìṣètò fún àwọn alákóso."
-
-#: app/templates/project_details.html:66
-msgid "Project ID"
-msgstr "ID iṣẹ́"
-
-#: app/templates/project_details.html:77
-msgid "Created"
-msgstr "A dá sílẹ̀"
-
-#: app/templates/project_details.html:84
-msgid "Last Updated"
-msgstr "Ìmúdójúìwọ̀n tó ṣẹ̀ṣẹ̀ ṣẹlẹ̀"
-
-#: app/templates/project_details.html:107
-msgid "External Project"
-msgstr "Iṣẹ́ òde"
-
-#: app/templates/project_details.html:109
-msgid "Instance:"
-msgstr "Àpẹẹrẹ:"
-
-#: app/templates/project_details.html:111
-msgid "Project ID:"
-msgstr "ID iṣẹ́:"
-
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
-msgid "View Project in ODK Central →"
-msgstr "Wo iṣẹ́ ní ODK Central →"
-
-#: app/templates/project_details.html:136
-msgid "Manage QFieldCloud Project →"
-msgstr "Ṣakoso iṣẹ́ QFieldCloud →"
-
-#: app/templates/project_details.html:144
-msgid "View Project Externally →"
-msgstr "Wo iṣẹ́ láti òde →"
-
-#: app/templates/project_details.html:160
-msgid "Delete this project in downstream and Field-TM? This cannot be undone."
-msgstr "Ṣé o fẹ́ pa iṣẹ́ yìí rẹ́ ní downstream àti Field-TM? Kò ṣeé yí padà."
-
-#: app/templates/project_details.html:163
-msgid "Delete Project"
-msgstr "Pa iṣẹ́ rẹ́"
-
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr "Padà sí àwọn iṣẹ́"
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr "A kò rí iṣẹ́"
-
-#: app/templates/project_details.html:174
+#: app/templates/new_project_simple.html:8
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "Iṣẹ́ tí o ń wá kò sí tàbí o kò ní àṣẹ láti wo ó."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Alabojuto QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
 msgstr ""
-"Ojú-ìwé yìí jẹ́ fún ṣíṣakoso àwọn olumulo nínú iṣẹ́ QField rẹ lẹ́yìn tí a"
-" bá dá a sílẹ̀."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Tẹ àwọn ìdánimọ̀ QFieldCloud rẹ láti ṣakoso àwọn alábàáṣiṣẹ́pọ̀."
-
-#: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "URL QFieldCloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "URL ìpilẹ̀ àpẹẹrẹ QFieldCloud rẹ (láìsí /api/v1)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Ọ̀rọ̀ aṣínà"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "So pọ̀"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "A ń so pọ̀…"
-
-#: app/templates/partials/metrics.html:5
-msgid "Features Surveyed (Approximate)"
-msgstr "Àwọn ẹ̀yà tí a ṣàyẹ̀wò (ní àfojúsùn)"
-
-#: app/templates/partials/metrics.html:12
-msgid "Projects Created"
-msgstr "Àwọn iṣẹ́ tí a dá sílẹ̀"
-
-#: app/templates/partials/metrics.html:19
-msgid "Countries Covered"
-msgstr "Àwọn orílẹ̀-èdè tí a bo"
-
-#: app/templates/partials/metrics.html:26
-msgid "Users Registered"
-msgstr "Àwọn olumulo tí a forúkọsílẹ̀"
-
-#: app/templates/partials/metrics.html:33
-msgid "Supported Mapping Apps"
-msgstr "Àwọn ohun èlò maapu tí a ń ṣètìlẹ́yìn fún"
-
-#: app/templates/partials/project_details/basemap_section.html:2
-msgid "Offline Basemap"
-msgstr "Basemap àìsí asopọ"
-
-#: app/templates/partials/project_details/basemap_section.html:4
-msgid ""
-"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
-"basemap."
-msgstr ""
-"Wá àwọn àwòrán HOT OpenAerialMap fún AOI yìí, kí o sì dá basemap MBTiles "
-"ṣẹ̀dá."
-
-#: app/templates/partials/project_details/basemap_section.html:26
-msgid "Search OAM Imagery"
-msgstr "Wá àwòrán OAM"
-
-#: app/templates/partials/project_details/basemap_section.html:37
-msgid "Basemap generation previously failed. Please search again and retry."
-msgstr "Ṣíṣe basemap ti kuna tẹ́lẹ̀. Jọ̀wọ́ tún wá a kí o sì tún gbìyànjú."
-
-#: app/templates/partials/project_details/basemap_section.html:41
-msgid "No basemap selected yet."
-msgstr "Kò tíì sí basemap tí a yàn."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:3
-msgid "Manager Setup Summary"
-msgstr "Àkótán ìṣètò alákóso"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:6
-msgid "The project setup flow is complete and shown below for reference."
-msgstr "Ìlànà ìṣètò iṣẹ́ ti parí, a sì fi hàn ní isalẹ fún ìtọ́kasí."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Ibi iṣẹ́"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Ìgbésẹ̀ 2: Gbe XLSForm sókè"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
-msgid "Complete"
-msgstr "Parí"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
-msgid "Step 3: Get Data"
-msgstr "Ìgbésẹ̀ 3: Gba data"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Ìgbésẹ̀ 4: Pín sí iṣẹ́"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
-msgid "Step 5: Finalise Project"
-msgstr "Ìgbésẹ̀ 5: Parí iṣẹ́"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:69
-msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
-msgstr ""
-"Tí o bá nílò láti gbe àwọn fáìlì media míì sókè sí iṣẹ́ yìí, bíi àwòrán "
-"àti fídíò, wọlé sí ODK Central kí o sì gbe wọn sókè nínú ètò fọ́ọ̀mù."
-
-#: app/templates/partials/project_details/setup_steps.html:14
-msgid "Ready for Mapping"
-msgstr "Ti ṣetan fún ṣíṣe maapu"
-
-#: app/templates/partials/project_details/setup_steps.html:25
-msgid "Loading QR code..."
-msgstr "A ń gbé kóòdù QR wọlé..."
-
-#: app/templates/partials/project_details/setup_steps.html:32
-msgid "Project Setup"
-msgstr "Ìṣètò iṣẹ́"
-
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "Ìgbésẹ̀ 2: Yan fọ́ọ̀mù ìwádìí"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Yan irú ìwádìí kan kí o sì tẹ̀síwájú pẹ̀lú àwọn àìyẹsẹ̀ tí a ṣeduro."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "Yan irú ìwádìí:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "A ń gbé irú ìwádìí wọlé..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "Tabi lo fọọmu tirẹ dipo:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "Gbe fọ́ọ̀mù àdáni sókè"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-"Àkíyèsí: Field-TM máa fi àwọn pápá míì kún fọ́ọ̀mù rẹ laifọwọyi fún "
-"pínpín iṣẹ́ àti yíyan ààmì. Fọ́ọ̀mù rẹ gbọ́dọ̀ ní àwọn ìbéèrè ìwádìí "
-"nìkan tí o fẹ́ béèrè (má ṣe fi àwọn pápá select_one_from_file fún "
-"iṣẹ́/ààmì kún un)."
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún àwọn iṣẹ́ ODK, pẹ̀lú ibámu ODK "
-"Collect."
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún àwọn iṣẹ́ %(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún iṣẹ́ yìí."
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr "Èdè àìyẹsẹ̀:"
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr "Gẹ̀ẹ́sì"
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr "Sípáníìṣì"
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr "Faransé"
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr "Pọ́túgì"
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr "Swahili"
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr "Hindi"
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr "Àwọn aṣayan fọ́ọ̀mù:"
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr "Fi ìbéèrè ìgbékalẹ̀ fọ́tò kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr "Ṣe fọ́tò di dandan"
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr "Ó ń béèrè fún oníṣe láti ya fọ́tò ní ibi tí wọ́n wà."
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr "Fi ìbéèrè ìmúdájú digitisation kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-"Ó ń béèrè fún olùṣe maapu láti jẹ́rìí bóyá àwọn ààmì tó wà ti digitise "
-"dáadáa."
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr "Tẹ̀síwájú"
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ A gbe fọ́ọ̀mù ìwádìí sókè ní àṣeyọrí"
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Gba data OSM tí a ṣeduro wọlé fún fọ́ọ̀mù ìwádìí rẹ."
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr "Ṣàyẹ̀wò data lórí maapu, lẹ́yìn náà tẹ̀síwájú."
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "Gba data OSM wọlé"
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr "Kó data tuntun nìkan jọ"
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr "Lo àwọn ìwọlé data àdáni tàbí yí àwọn aṣayan ìgbasilẹ OSM àìyẹsẹ̀ padà."
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr "Ẹ̀ka OSM:"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr "Ilé OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr "Ọ̀nà OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr "Ìtọju ìlera OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr "Ilé ìgbónsẹ̀ OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr "Ibùdó ẹ̀sìn OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr "Lílò ilẹ̀ OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr "Ọ̀nà omi OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr "Ibùdó omi OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr "Ìtójú ìdọ̀tí OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr "Ẹ̀kọ́ OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr "Sàré OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr "Àwọn ohun ìní OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr "Irú geometry:"
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr "Poligoni"
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr "Polilaini"
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr "Àmì"
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr "Lo centroid"
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr "Gbe GeoJSON àdáni sókè"
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "A ń ṣe ìyọkúrò data OSM... Èyí lè gba àkókò díẹ̀."
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr "Ìyọkúrò data OSM ti ṣetan"
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Ìgbésẹ̀ 3: Pín sí iṣẹ́ (àṣàyàn)"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ Pínpín iṣẹ́ kò ṣe pàtàkì bí kò bá sí data tó ti wà tẹ́lẹ̀"
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"Ṣẹ̀dá àwọn agbègbè iṣẹ́ nípasẹ̀ pínpín Area of Interest (AOI). Yan "
-"algorithm àti àwọn ìwọn, lẹ́yìn náà pín un. Ṣàyẹ̀wò ohun tí a fi hàn, kí "
-"o sì tẹ \"Accept Task Areas\" láti fipamọ́. Tàbí tẹ"
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr "Foju kọ́"
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr "láti lo gbogbo AOI gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "Yan àwọn ẹ̀yà oníla tí yóò ní ipa lórí pínpín iṣẹ́ tó dá lórí ilé."
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr "Fi ọ̀nà kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr "Fi odò kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr "Fi ojú irin kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr "Fi ọ̀nà ojú òfurufú kún un"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr "Algorithm:"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr "Yan aṣayan pínpín..."
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "Pín nípasẹ̀ onígun mẹ́rin"
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Apapọ ilé v1 (Voronoi)"
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Apapọ ilé v2 (Straight Skeleton)"
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr "Pín gẹ́gẹ́ bí iye iṣẹ́ kan pàtó (yóò dé láìpẹ́)"
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr "Apapọ ilé fún iṣẹ́ kọọkan:"
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr "Nọ́mbà iṣẹ́:"
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr "Ìwọn (mítà):"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr "Tun pín"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr "Pín AOI"
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "A ń pín AOI sí iṣẹ́... Èyí lè gba àkókò díẹ̀."
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr "Ṣetan"
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-"Gbogbo ohun tí ó yẹ kó ti pé! Dá iṣẹ́ náà sílẹ̀ nínú irinṣẹ́ maapu tí o "
-"yàn."
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr "Parí iṣẹ́"
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr "Jẹ́rìí ìparí iṣẹ́"
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr "Ṣé o dá ọ lójú pé o fẹ́ parí iṣẹ́ yìí?"
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr "Jẹ́rìí kí o sì parí"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr "Ìdánimọ̀ àdáni"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr "URL ODK Central"
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr "URL QField Cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "Ṣàyẹ̀wò àwọn ìdánimọ̀"
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr "Fipamọ́ kí o sì tẹ̀síwájú"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "Select a survey type..."
-msgstr "Yan irú ìwádìí kan..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "No survey types available"
-msgstr "Kò sí irú ìwádìí tó wà"
-
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
-msgstr "Kò sí fọ́ọ̀mù ìwádìí tó wà. Gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó jinlẹ̀."
-
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "Yan irú ìwádìí kan, tàbí gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó jinlẹ̀."
-
-#: app/templates/partials/project_details/style_and_scripts.html:14
-msgid "Survey type selected."
-msgstr "A ti yan irú ìwádìí náà."
-
-#: app/templates/partials/project_details/style_and_scripts.html:15
-msgid "Invalid file type. Please upload a .xls or .xlsx file."
-msgstr "Irú fáìlì kò tọ́. Jọwọ gbe fáìlì .xls tàbí .xlsx sókè."
-
-#: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Selected file:"
-msgstr "Fáìlì tí a yàn:"
-
-#: app/templates/partials/project_details/style_and_scripts.html:17
-msgid "Custom form selected."
-msgstr "A ti yan fọ́ọ̀mù àdáni."
-
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr "Yan irú ìwádìí kan kọ́kọ́, tàbí gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó jinlẹ̀."
-
-#: app/templates/partials/project_details/style_and_scripts.html:19
-msgid "polygons"
-msgstr "polygon"
-
-#: app/templates/partials/project_details/style_and_scripts.html:20
-msgid "polylines"
-msgstr "polyline"
-
-#: app/templates/partials/project_details/style_and_scripts.html:21
-msgid "points"
-msgstr "àwọn àmì"
-
-#: app/templates/partials/project_details/style_and_scripts.html:22
-msgid "features"
-msgstr "àwọn ẹ̀yà"
-
-#: app/templates/partials/project_details/style_and_scripts.html:23
-msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
-msgstr ""
-"O ti gbe fọ́ọ̀mù àdáni sókè, nítorí náà igbasilẹ OSM yìí jẹ́ àṣàyàn. Lo "
-"Ètò tó jinlẹ̀ láti gbe GeoJSON tirẹ sókè tàbí ṣàtúnṣe àwọn ètò igbasilẹ."
-
-#: app/templates/partials/project_details/style_and_scripts.html:24
-#, python-format
-msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
-msgstr ""
-"Orísun tí a ṣeduro: %(title)s (%(geom_label)s). Ṣàyẹ̀wò data lórí maapu, "
-"lẹ́yìn náà tẹ̀síwájú."
-
-#: app/templates/partials/project_details/style_and_scripts.html:25
-#, python-format
-msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
-msgstr ""
-"A ti ṣe àtúnṣe orísun tí a ṣeduro (%(geom_label)s). Ṣàyẹ̀wò data lórí "
-"maapu, lẹ́yìn náà tẹ̀síwájú."
-
-#: app/templates/partials/project_details/style_and_scripts.html:26
-msgid "Downloading..."
-msgstr "A ń gba a wọlé..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Confirm No Splitting"
-msgstr "Jẹ́rìí pé kò sí pínpín"
-
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
-msgstr "Pín nípasẹ̀ ilé"
-
-#: app/templates/partials/project_details/style_and_scripts.html:33
-msgid "Select Option"
-msgstr "Yan aṣayan"
-
-#: app/templates/partials/project_details/style_and_scripts.html:34
-msgid "Confirming..."
-msgstr "A ń jẹ́rìí..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Splitting..."
-msgstr "A ń pín..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
-msgid "ODK Central"
-msgstr "ODK Central"
-
-#: app/templates/partials/project_details/style_and_scripts.html:37
-msgid "QField"
-msgstr "QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:38
-msgid "the mapping tool"
-msgstr "irinṣẹ́ maapu"
-
-#: app/templates/partials/project_details/style_and_scripts.html:39
-msgid "Project type not set. Please set the field mapping app first."
-msgstr "A kò tíì ṣètò irú iṣẹ́. Jọwọ kọ́kọ́ ṣètò ohun èlò maapu pápá."
-
-#: app/templates/partials/project_details/style_and_scripts.html:40
-#, python-format
-msgid ""
-"Are you sure you want to finalise this project in %(project_type)s? This "
-"will create the project, upload forms, and generate all necessary files."
-msgstr ""
-"Ṣé o dá ọ lójú pé o fẹ́ parí iṣẹ́ yìí nínú %(project_type)s? Èyí máa dá "
-"iṣẹ́ náà sílẹ̀, máa gbe àwọn fọ́ọ̀mù sókè, ó sì máa ṣẹ̀dá gbogbo àwọn "
-"fáìlì tó yẹ."
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
-msgid "Custom ODK Credentials"
-msgstr "Ìdánimọ̀ ODK àdáni"
-
-#: app/templates/partials/project_details/style_and_scripts.html:42
-msgid "Custom QField Credentials"
-msgstr "Ìdánimọ̀ QField àdáni"
-
-#: app/templates/partials/project_details/style_and_scripts.html:43
-msgid "Please fill in all fields."
-msgstr "Jọwọ kún gbogbo àwọn pápá."
-
-#: app/templates/partials/project_details/style_and_scripts.html:44
-msgid "Testing..."
-msgstr "A ń dánwò..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:45
-msgid "Testing credentials..."
-msgstr "A ń dán àwọn ìdánimọ̀ wò..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:46
-msgid "✓ Credentials are valid!"
-msgstr "✓ Àwọn ìdánimọ̀ wulo!"
-
-#: app/templates/partials/project_details/style_and_scripts.html:47
-msgid "Invalid credentials. Please check and try again."
-msgstr "Àwọn ìdánimọ̀ kò tọ́. Jọwọ ṣàyẹ̀wò kí o sì tún gbìyànjú."
-
-#: app/templates/partials/project_details/style_and_scripts.html:48
-#, python-format
-msgid "Error testing credentials: %(message)s"
-msgstr "Aṣiṣe nígbà tí a ń dán àwọn ìdánimọ̀ wò: %(message)s"
-
-#: app/templates/partials/project_details/style_and_scripts.html:50
-msgid "Please test credentials first before continuing."
-msgstr "Jọwọ dán àwọn ìdánimọ̀ wò kọ́kọ́ kí o tó tẹ̀síwájú."
-
-#: app/templates/partials/project_details/style_and_scripts.html:51
-#, python-format
-msgid "Creating project in %(project_type)s... This may take a moment."
-msgstr "A ń dá iṣẹ́ sílẹ̀ nínú %(project_type)s... Èyí lè gba àkókò díẹ̀."
-
-#: app/templates/partials/project_details/style_and_scripts.html:52
-msgid "Error:"
-msgstr "Aṣiṣe:"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
-msgstr "Fifi basemap pọ kuna. Lo tún gbìyànjú láti bẹ̀rẹ̀ lẹ́ẹ̀kan síi."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
-msgid "Retry Attach"
-msgstr "Tún fi pọ̀"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
-msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr ""
-"Fifi basemap pọ ń lọ lọwọ. Lo bọtìnì tó wà ní isalẹ láti ṣàyẹ̀wò ipo "
-"tuntun jù."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
-msgid "Checking..."
-msgstr "N ṣàyẹ̀wò..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
-msgid "Check Status"
-msgstr "Ipò iṣẹ́"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
-msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
-msgstr "Ṣíṣe basemap ń lọ lọwọ. Ipo ń tún ara rẹ ṣe laifọwọyi lẹ́ẹ̀kọ̀ọ̀kan."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
-msgid "STAC item"
-msgstr "Ohun STAC"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
-msgid "Zoom"
-msgstr "Sún"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
-msgid "Select one imagery item to start MBTiles generation."
-msgstr "Yan ohun àwòrán kan láti bẹ̀rẹ̀ ṣíṣe MBTiles."
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
-msgid "Cloud"
-msgstr "Pa"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
-msgstr "Wo metadata"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
-msgid "Use this image"
-msgstr "Lo àwòrán yìí"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
-msgid "No imagery items were found for this AOI."
-msgstr "A kò rí ohun àwòrán kankan fún AOI yìí."
-
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
-msgid "Accept Data Extract"
-msgstr "Gba ìyọkúrò data"
-
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
-msgid "View technical details"
-msgstr "Wo àwọn àlàyé imọ̀ẹ̀rọ"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
-msgid "Project created in ODK Central."
-msgstr "A ti dá iṣẹ́ sílẹ̀ nínú ODK Central."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
-msgid "Manager Access (ODK Central UI)"
-msgstr "Ìwọlé alákóso (ODK Central UI)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
-msgid "Open project in ODK Central"
-msgstr "Ṣí iṣẹ́ nínú ODK Central"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
-msgid "Save these credentials now. They will only be shown once."
-msgstr "Fipamọ́ àwọn ìdánimọ̀ wọ̀nyí báyìí. A máa fi wọ́n hàn lẹ́ẹ̀kan ṣoṣo."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "View FieldTM Project"
-msgstr "Wo iṣẹ́ FieldTM"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
-msgid "Project created in QFieldCloud."
-msgstr "A ti dá iṣẹ́ sílẹ̀ nínú QFieldCloud."
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Ìwọlé alákóso (QFieldCloud)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
-msgid "Open project in QFieldCloud"
-msgstr "Ṣí iṣẹ́ nínú QFieldCloud"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
-msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
-msgstr ""
-"A kò lè dá àkọọlẹ alákóso sílẹ̀ laifọwọyi. Wọlé sí QFieldCloud gẹ́gẹ́ bí "
-"admin láti ṣakoso iṣẹ́ náà."
-
-#: app/templates/partials/project_details/fragments/split_preview.html:27
-msgid "Accept Task Choices"
-msgstr "Gba àwọn yíyàn iṣẹ́"
+"Ilana rọọrun yii nilo agbegbe iṣẹ akanṣe rẹ nikan. A yoo ṣẹda akọle iṣẹ "
+"akanṣe, apejuwe, ati awọn ami-famisi fun OSM Buildings laifọwọyi."
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr "Pada si Fọọmu Boṣewa"
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr "N ṣẹda iṣẹ akanṣe ati n mura maapu..."
 
 #~ msgid "Failed to add collaborator: %(error)s"
 #~ msgstr "Fífikun alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
 
 #~ msgid "Basemap attached to QField project."
-#~ msgstr "A ti so basemapu mọ iṣẹ́ QField."
+#~ msgstr "A ti so basemap pọ mọ iṣẹ akanṣe QField."
 
 #~ msgid "Basemap is ready."
-#~ msgstr "Basemap ti ṣetán."
+#~ msgstr "Basemap ti ṣetan."
 
 #~ msgid "Total size"
-#~ msgstr "Ìwọ̀n àpapọ̀"
+#~ msgstr "Iwọn lapapọ"
 
 #~ msgid "Available Zoom"
-#~ msgstr "Sún tó wà"
+#~ msgstr "Sun-un to wa"
 
 #~ msgid "Download MBTiles"
-#~ msgstr "Ṣe igbasilẹ kóòdù QR"
+#~ msgstr "Ṣe igbasilẹ MBTiles"
 
 #~ msgid "Attach to QField Project"
-#~ msgstr "Ṣakoso iṣẹ́ QFieldCloud →"
+#~ msgstr "So mọ Iṣẹ Akanṣe QField"
 
 #~ msgid ""
 #~ "Use the ODK offline maps documentation"
 #~ " to configure this MBTiles file in"
 #~ " Collect."
 #~ msgstr ""
-#~ "Lo ìwé àlàyé maapu àìsí asopọ ODK"
-#~ " láti tún fáìlì MBTiles yìí tó "
-#~ "nínú Collect."
+#~ "Lo iwe itọnisọna maapu aisinipo ODK "
+#~ "lati tunto faili MBTiles yii ninu "
+#~ "Collect."
+
+#~ msgid "Validation failed"
+#~ msgstr "kuna"
+
+#~ msgid "An unexpected error occurred. Please contact an admin."
+#~ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ. Jọwọ kan si alabojuto."
+
+#~ msgid "Could not connect to database"
+#~ msgstr ""
+#~ "Ko le sopọ si ibi ipamọ data\n"
+#~ "Olumulo"
+
+#~ msgid "Authenticated user is missing a valid identifier."
+#~ msgstr ""
+#~ "sonu oludamọ to wulo.\n"
+#~ "Olumulo"
+
+#~ msgid "User must be an administrator"
+#~ msgstr ""
+#~ "gbọdọ jẹ alabojuto\n"
+#~ "Olumulo"
+
+#~ msgid "User does not have permission to access the project."
+#~ msgstr ""
+#~ "ko ni igbanilaaye lati wọle si iṣẹ akanṣe naa.\n"
+#~ "Ise agbese"
+
+#~ msgid "Project is locked since it is in %(state)s state."
+#~ msgstr ""
+#~ "ti wa ni titiipa niwon o wa ni ipo %(state)s.\n"
+#~ "Olumulo"
+
+#~ msgid "User (%(user_sub)s) could not be inserted in db"
+#~ msgstr "(%(user_sub)s) ko le fi sii ni db"
+
+#~ msgid "Error listing projects on ODK Central: %(error)s"
+#~ msgstr "Ṣí iṣẹ́ nínú ODK Central"
+
+#~ msgid "Error creating project on ODK Central: %(error)s"
+#~ msgstr "Ṣí iṣẹ́ nínú ODK Central"
+
+#~ msgid "Failed to upload form to ODK Central: %(error)s"
+#~ msgstr "Kuna lati gbe fọọmu si ODK Central: %(error)s"
+
+#~ msgid "form_id is required to list submissions with pyodk."
+#~ msgstr "form_id nilo lati ṣe atokọ awọn ifisilẹ pẹlu pyodk."
+
+#~ msgid "XLSForm is invalid: %(error)s"
+#~ msgstr ""
+#~ "XLSForm ko wulo: %(error)s\n"
+#~ "Iyipada"
+
+#~ msgid "Conversion GeoJSON --> CSV failed"
+#~ msgstr ""
+#~ "GeoJSON --> CSV kuna\n"
+#~ "Ise agbese"
+
+#~ msgid "Project contains no submissions yet"
+#~ msgstr ""
+#~ "ko ni awọn ifisilẹ sibẹsibẹ\n"
+#~ "Aaye data"
+
+#~ msgid "'geometry' data field is mandatory"
+#~ msgstr "'jiometirika' jẹ dandan"
+
+#~ msgid "ODK project_id is missing; cannot create/merge entity lists."
+#~ msgstr "ODK project_id sonu; ko le ṣẹda/dapọ nkankan awọn akojọ."
+
+#~ msgid "Could not generate token for app user."
+#~ msgstr "Ko le ṣe ipilẹṣẹ àmi fun olumulo app."
+
+#~ msgid "An error occurred while creating the app user token."
+#~ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ nígbà tí a ń dá kóòdù QR sílẹ̀."
+
+#~ msgid "Could not assign %(scope)s role to app user."
+#~ msgstr "Ko le fi ipa %(scope)s si olumulo app."
+
+#~ msgid "Could not find 'Project Manager' role in ODK Central."
+#~ msgstr "Ṣí iṣẹ́ nínú ODK Central"
+
+#~ msgid "ODK Central returned no user ID after creation."
+#~ msgstr "ODK Central pada ko si olumulo ID lẹhin ẹda."
+
+#~ msgid "Failed to create ODK Central manager user."
+#~ msgstr "Kuna lati ṣẹda olumulo oluṣakoso ODK Central."
+
+#~ msgid "Unexpected error while testing ODK Central credentials."
+#~ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ nígbà tí a ń dá kóòdù QR sílẹ̀."
+
+#~ msgid "Provide a valid .xls or .xlsx file"
+#~ msgstr "Pese fáìlì .xls tàbí .xlsx tó wulo"
+
+#~ msgid "No data provided."
+#~ msgstr "A kò pèsè ìyọkúrò data kankan."
+
+#~ msgid "%(action)s failed with HTTP %(status_code)s."
+#~ msgstr "%(action)s kuna pẹlu HTTP %(status_code)s."
+
+#~ msgid "%(action)s failed due to upstream connection error."
+#~ msgstr "%(action)s kuna nitori aṣiṣe asopọ oke."
+
+#~ msgid "Tilepack API returned HTTP %(status_code)s."
+#~ msgstr "Tilepack API da HTTP %(status_code)s pada."
+
+#~ msgid "Failed to convert YAML form to XLSForm."
+#~ msgstr "Kuna lati yi fọọmu YAML pada si XLSForm."
+
+#~ msgid "Provide a valid .json or .geojson file"
+#~ msgstr "Pese fáìlì .xls tàbí .xlsx tó wulo"
+
+#~ msgid "Provide a valid .csv"
+#~ msgstr "Pese fáìlì .xls tàbí .xlsx tó wulo"
+
+#~ msgid "Provide a valid .json file"
+#~ msgstr "Pese fáìlì .xls tàbí .xlsx tó wulo"
+
+#~ msgid "Could not login to raw-data-api"
+#~ msgstr "Ko le buwolu wọle si raw-data-api"
+
+#~ msgid "No geometries present"
+#~ msgstr "Ko si awọn geoometries ti o wa"
+
+#~ msgid "Your geojson file is invalid."
+#~ msgstr "Faili geojson rẹ ko wulo."
+
+#~ msgid "Project not found or access denied."
+#~ msgstr "A kò rí iṣẹ́ náà tàbí a kọ ọ́ láàyè."
+
+#~ msgid "Basemap attached to QField project successfully."
+#~ msgstr "A so basemap pọ mọ iṣẹ QField ni aṣeyọri."
+
+#~ msgid "Basemap attach has not started yet."
+#~ msgstr "Fifi basemap pọ kò tíì bẹ̀rẹ̀."
+
+#~ msgid "Basemap attach failed. Please try again."
+#~ msgstr "Fifi basemap pọ kuna. Jọ̀wọ́ tún gbìyànjú."
+
+#~ msgid "Failed to search imagery right now. Please try again shortly."
+#~ msgstr "A kò lè wá àwọn àwòrán báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
+
+#~ msgid "Failed to start basemap generation right now. Please try again shortly."
+#~ msgstr "A kò lè bẹ̀rẹ̀ ṣíṣe basemap báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
+
+#~ msgid "Failed to refresh basemap status right now. Please try again shortly."
+#~ msgstr "A kò lè tún ipo basemap ṣe báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
+
+#~ msgid "Basemap attach is available after publication."
+#~ msgstr "Fifi basemap pọ wà lẹ́yìn ìtẹ̀jáde."
+
+#~ msgid "Basemap attach is only available for QField projects."
+#~ msgstr "Fifi basemap pọ wà fún àwọn iṣẹ́ QField nìkan."
+
+#~ msgid "Basemap is not ready yet. Please wait for generation to complete."
+#~ msgstr "Basemap kò tíì ṣetán. Jọ̀wọ́ dúró kí ìṣelọpọ parí."
+
+#~ msgid "No generated basemap download URL is available yet."
+#~ msgstr "Kò sí URL ìgbàkalẹ̀ basemap tí a ṣe tó wà báyìí."
+
+#~ msgid ""
+#~ "QField basemap attach is not configured"
+#~ " on this deployment. Missing %(config)s."
+#~ msgstr ""
+#~ "A kò tíì túnto fifi basemap QField"
+#~ " pọ sí ìfìdíkalẹ̀ yìí. %(config)s ò"
+#~ " sí."
+
+#~ msgid "Basemap tools are available after publication."
+#~ msgstr "Àwọn irinṣẹ́ basemap wà lẹ́yìn ìtẹ̀jáde."
+
+#~ msgid "No basemap generation in progress."
+#~ msgstr "Iṣẹ́ maapu pápá ń lọ lọwọ"
+
+#~ msgid "Failed to load template form."
+#~ msgstr "Kò ṣee ṣe láti kó fọ́ọ̀mù àpẹrẹ wọlé."
+
+#~ msgid "Please select a form or upload a file."
+#~ msgstr "Jọwọ yan fọ́ọ̀mù kan tàbí gbe fáìlì kan sókè."
+
+#~ msgid "Project not found."
+#~ msgstr "A kò rí iṣẹ́ náà."
+
+#~ msgid "Project ID mismatch. You do not have access to this project."
+#~ msgstr "ID iṣẹ́ kò bá mu. O kò ní ààyè sí iṣẹ́ yìí."
+
+#~ msgid "Form validated and uploaded successfully! Reloading page..."
+#~ msgstr ""
+#~ "A ti jẹ́rìí fọ́ọ̀mù náà, a sì "
+#~ "ti gbé e sókè ní àṣeyọrí! A "
+#~ "ń tún ojú-ìwé náà ṣí..."
+
+#~ msgid "An unexpected error occurred"
+#~ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ"
+
+#~ msgid "Error"
+#~ msgstr "Aṣiṣe"
+
+#~ msgid "Mapper Login (QFieldCloud)"
+#~ msgstr "Ìwọlé olùtàsíwájú maapu (QFieldCloud)"
+
+#~ msgid "Username:"
+#~ msgstr "Orúkọ olumulo:"
+
+#~ msgid "Password:"
+#~ msgstr "Ọ̀rọ̀ aṣínà:"
+
+#~ msgid "Scan the QR code, then enter these credentials in QField."
+#~ msgstr "Ṣe skani kóòdù QR náà, lẹ́yìn náà tẹ àwọn ìdánimọ̀ wọ̀nyí sínú QField."
+
+#~ msgid "Scan QR Code"
+#~ msgstr "Ṣe skani kóòdù QR"
+
+#~ msgid "Use %(app_name)s to scan this QR code and load the project."
+#~ msgstr "Lo %(app_name)s láti ṣe skani kóòdù QR yìí kí o sì ṣí iṣẹ́ náà."
+
+#~ msgid "Project QR Code"
+#~ msgstr "Kóòdù QR iṣẹ́"
+
+#~ msgid "Download QR Code"
+#~ msgstr "Ṣe igbasilẹ kóòdù QR"
+
+#~ msgid ""
+#~ "Cannot reach the mapping server. Check"
+#~ " that ODK Central or QFieldCloud is"
+#~ " running."
+#~ msgstr ""
+#~ "Kò ṣee ṣe láti dé olupin maapu."
+#~ " Ṣàyẹ̀wò pé ODK Central tàbí "
+#~ "QFieldCloud ń ṣiṣẹ́."
+
+#~ msgid "The mapping server returned an error. Check its logs for details."
+#~ msgstr "Olupin maapu da aṣiṣe padà. Ṣàyẹ̀wò àkọọlẹ rẹ fún àlàyé."
+
+#~ msgid ""
+#~ "Authentication failed connecting to the "
+#~ "mapping server. Check the configured "
+#~ "credentials."
+#~ msgstr ""
+#~ "Ìmúdájú kuna nígbà tí a ń so "
+#~ "mọ́ olupin maapu. Ṣàyẹ̀wò àwọn ìdánimọ̀"
+#~ " tí a ti ṣètò."
+
+#~ msgid "An unexpected error occurred while generating the QR code."
+#~ msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ nígbà tí a ń dá kóòdù QR sílẹ̀."
+
+#~ msgid "Project (%(project_id)s) not found."
+#~ msgstr "A kò rí iṣẹ́ (%(project_id)s)."
+
+#~ msgid "Only the project manager can delete this project."
+#~ msgstr "Alákóso iṣẹ́ nìkan ló lè pa iṣẹ́ yìí rẹ́."
+
+#~ msgid "Error: %(error_msg)s"
+#~ msgstr "Aṣiṣe: %(error_msg)s"
+
+#~ msgid "Admin"
+#~ msgstr "Alabojuto"
+
+#~ msgid "Manager"
+#~ msgstr "Alákóso"
+
+#~ msgid "Editor"
+#~ msgstr "Alátúnṣe"
+
+#~ msgid "Reporter"
+#~ msgstr "Olùròyìn"
+
+#~ msgid "Reader"
+#~ msgstr "Olùkà"
+
+#~ msgid "This user does not exist. Please create it first."
+#~ msgstr "Olumulo yìí kò sí. Jọwọ dá a sílẹ̀ kíákíá."
+
+#~ msgid "This user is already a collaborator on this project."
+#~ msgstr "Olumulo yìí ti jẹ́ alábàáṣiṣẹ́pọ̀ lórí iṣẹ́ yìí tẹ́lẹ̀."
+
+#~ msgid "Failed to add collaborator: %(exc)s"
+#~ msgstr "Fífikun alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
+
+#~ msgid ""
+#~ "This project belongs to the "
+#~ "%(organization)s organization. The user must"
+#~ " be added to that organization before"
+#~ " they can be added as a "
+#~ "collaborator. Your QFieldCloud account does"
+#~ " not have permission to manage "
+#~ "organization members."
+#~ msgstr ""
+#~ "Iṣẹ́ yìí jẹ́ ti àjọ %(organization)s."
+#~ " A gbọ́dọ̀ kọ́kọ́ fi olumulo náà "
+#~ "kún àjọ náà kí a tó lè fi"
+#~ " sílẹ̀ gẹ́gẹ́ bí alábàáṣiṣẹ́pọ̀. Àkọọlẹ "
+#~ "QFieldCloud rẹ kò ní àṣẹ láti "
+#~ "ṣakoso ọmọ ẹgbẹ́ àjọ."
+
+#~ msgid "All fields are required."
+#~ msgstr "Gbogbo àwọn pápá jẹ́ dandan."
+
+#~ msgid "Login succeeded but no token received."
+#~ msgstr "Ìwọlé ṣàṣeyọrí ṣùgbọ́n a kò gba token kankan."
+
+#~ msgid "Login failed. Check your URL and credentials."
+#~ msgstr "Ìwọlé kuna. Ṣàyẹ̀wò URL àti àwọn ìdánimọ̀ rẹ."
+
+#~ msgid "QFieldCloud Projects"
+#~ msgstr "Àwọn iṣẹ́ QFieldCloud"
+
+#~ msgid "Connected as"
+#~ msgstr "A so pọ̀ gẹ́gẹ́ bí"
+
+#~ msgid "to"
+#~ msgstr "sí"
+
+#~ msgid "Log Out"
+#~ msgstr "Jáde"
+
+#~ msgid "No projects found."
+#~ msgstr "A kò rí iṣẹ́ kankan."
+
+#~ msgid "Public"
+#~ msgstr "Gbogbo ènìyàn lè rí i"
+
+#~ msgid "Private"
+#~ msgstr "Ìkọ̀kọ̀"
+
+#~ msgid "Manage"
+#~ msgstr "Ṣakoso"
+
+#~ msgid "Project"
+#~ msgstr "Iṣẹ́"
+
+#~ msgid "Owner"
+#~ msgstr "Oní"
+
+#~ msgid "Visibility"
+#~ msgstr "Ìfarahàn"
+
+#~ msgid "Description"
+#~ msgstr "Àpèjúwe"
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "Sẹ́ṣọ̀nù ti parí. Jọwọ wọlé lẹ́ẹ̀kan sí i."
+
+#~ msgid "Could not load collaborators: %(exc)s"
+#~ msgstr "Kò lè ṣí àwọn alábàáṣiṣẹ́pọ̀: %(exc)s"
+
+#~ msgid "Update"
+#~ msgstr "Ṣe àtúnṣe"
+
+#~ msgid "Remove"
+#~ msgstr "Yọ kúrò"
+
+#~ msgid "Remove Collaborator"
+#~ msgstr "Yọ alábàáṣiṣẹ́pọ̀ kúrò"
+
+#~ msgid "from this project?"
+#~ msgstr "kúrò nínú iṣẹ́ yìí?"
+
+#~ msgid "Cancel"
+#~ msgstr "Fagilé"
+
+#~ msgid "User"
+#~ msgstr "Olumulo"
+
+#~ msgid "Role"
+#~ msgstr "Ipò"
+
+#~ msgid "Actions"
+#~ msgstr "Àwọn ìgbésẹ̀"
+
+#~ msgid "No collaborators yet."
+#~ msgstr "Kò tíì sí alábàáṣiṣẹ́pọ̀ kankan."
+
+#~ msgid "Username"
+#~ msgstr "Orúkọ olumulo"
+
+#~ msgid "Add Collaborator"
+#~ msgstr "Fi alábàáṣiṣẹ́pọ̀ kún"
+
+#~ msgid "Close"
+#~ msgstr "Pa"
+
+#~ msgid "Collaborators"
+#~ msgstr "Àwọn alábàáṣiṣẹ́pọ̀"
+
+#~ msgid "Username is required."
+#~ msgstr "Orúkọ olumulo jẹ́ dandan."
+
+#~ msgid "Failed to remove collaborator: %(exc)s"
+#~ msgstr "Yíyọ alábàáṣiṣẹ́pọ̀ kúrò kuna: %(exc)s"
+
+#~ msgid "Failed to update collaborator: %(exc)s"
+#~ msgstr "Àtúnṣe alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
+
+#~ msgid "Collaborator refresh failed: %(exc)s"
+#~ msgstr "Ìtúnṣe àtòjọ alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
+
+#~ msgid ""
+#~ "Project finalisation failed. Please check "
+#~ "your settings and try again. If it"
+#~ " continues, send the technical details "
+#~ "below to your instance administrator or"
+#~ " support team."
+#~ msgstr ""
+#~ "Ìparí iṣẹ́ kuna. Jọwọ ṣàyẹ̀wò àwọn "
+#~ "ètò rẹ kí o sì tún gbìyànjú. "
+#~ "Tí ó bá ń bá a lọ, fi "
+#~ "àwọn àlàyé imọ̀ẹ̀rọ tó wà ní isalẹ"
+#~ " ranṣẹ́ sí alabojuto àpẹẹrẹ rẹ tàbí"
+#~ " ẹgbẹ́ atilẹyin."
+
+#~ msgid "Invalid GeoJSON data in request. Please try uploading again."
+#~ msgstr "Data GeoJSON nínú ìbéèrè kò tọ́. Jọwọ tún gbé e sókè."
+
+#~ msgid "Error reading GeoJSON data from request."
+#~ msgstr "Aṣiṣe ṣẹlẹ nígbà tí a ń ka data GeoJSON láti inú ìbéèrè."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km², which exceeds"
+#~ " the %(area_limit)s km² limit. Please "
+#~ "select a smaller area."
+#~ msgstr ""
+#~ "Agbègbè náà jẹ́ %(area_km2)s km², èyí"
+#~ " tó ju ààlà %(area_limit)s km² lọ."
+#~ " Jọwọ yan agbègbè tó kere síi."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km². Large areas"
+#~ " (>%(area_warn)s km²) may take longer "
+#~ "to process. The data extract API "
+#~ "is limited to 200 km²."
+#~ msgstr ""
+#~ "Agbègbè náà jẹ́ %(area_km2)s km². Àwọn"
+#~ " agbègbè ńlá (>%(area_warn)s km²) lè "
+#~ "gba àkókò púpọ̀ síi láti ṣiṣẹ́. "
+#~ "API ìyọkúrò data ní ààlà 200 km²."
+
+#~ msgid "Project AOI"
+#~ msgstr "AOI iṣẹ́"
+
+#~ msgid "Data Extract (%(data_feature_count)s features)"
+#~ msgstr "Ìyọkúrò data (%(data_feature_count)s àwọn ẹ̀yà)"
+
+#~ msgid "Task Boundaries (%(task_count)s tasks)"
+#~ msgstr "Ààlà iṣẹ́ (%(task_count)s iṣẹ́)"
+
+#~ msgid "Task ID"
+#~ msgstr "ID Iṣẹ-ṣiṣe"
+
+#~ msgid "Building Count"
+#~ msgstr "Iye Awọn Ile"
+
+#~ msgid ""
+#~ "No task boundaries found. Please split"
+#~ " the project into tasks first using"
+#~ " the \"Split AOI\" button above."
+#~ msgstr ""
+#~ "A kò rí ààlà iṣẹ́ kankan. Jọwọ "
+#~ "kọ́kọ́ pín iṣẹ́ náà sí àwọn iṣẹ́"
+#~ " kéékèèké pẹ̀lú bọtìnì \"Split AOI\" "
+#~ "tó wà lókè."
+
+#~ msgid ""
+#~ "✓ AOI split successfully! Generated "
+#~ "%(task_count)s task areas using %(algorithm)s."
+#~ msgstr ""
+#~ "✓ A pín AOI ní àṣeyọrí! A "
+#~ "ṣẹ̀dá agbègbè iṣẹ́ %(task_count)s pẹ̀lú "
+#~ "%(algorithm)s."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task "
+#~ "boundaries%(data_extract_info)s. Review the results"
+#~ " below. If satisfied, click \"Accept "
+#~ "Task Choices\" to save. Otherwise, "
+#~ "adjust parameters above and click "
+#~ "\"Split Again\" to regenerate."
+#~ msgstr ""
+#~ "A ń fi ààlà iṣẹ́ %(task_count)s "
+#~ "hàn%(data_extract_info)s. Ṣàyẹ̀wò àwọn àbájáde "
+#~ "tó wà ní isalẹ. Tí ó bá yọ"
+#~ " ọ lójú, tẹ \"Accept Task Choices\""
+#~ " láti fipamọ́. Bí kò bá rí "
+#~ "bẹ́ẹ̀, ṣàtúnṣe àwọn ìwọn tó wà "
+#~ "lókè kí o sì tẹ \"Split Again\""
+#~ " láti tún ṣẹ̀dá a."
+
+#~ msgid "Data Extract"
+#~ msgstr "Ìyọkúrò data"
+
+#~ msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+#~ msgstr "A gba data OSM wọlé ní àṣeyọrí! A rí %(feature_count)s àwọn ẹ̀yà."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try downloading again "
+#~ "with different parameters."
+#~ msgstr ""
+#~ "A ń fi %(feature_count)s àwọn ẹ̀yà "
+#~ "hàn lórí maapu. Ṣàyẹ̀wò data tó wà"
+#~ " ní isalẹ. Tí ó bá yọ ọ "
+#~ "lójú, tẹ \"Accept Data Extract\" láti"
+#~ " fipamọ́. Bí kò bá rí bẹ́ẹ̀, "
+#~ "gbìyànjú láti tún ṣe igbasilẹ pẹ̀lú "
+#~ "àwọn ìwọn mìíràn."
+
+#~ msgid "Invalid file type. Please upload a .geojson or .json file."
+#~ msgstr "Irú fáìlì kò tọ́. Jọwọ gbe fáìlì .geojson tàbí .json sókè."
+
+#~ msgid "No valid geometries found in GeoJSON."
+#~ msgstr "A kò rí àwọn geometry tó wulo nínú GeoJSON."
+
+#~ msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+#~ msgstr "✓ A gbe GeoJSON sókè ní àṣeyọrí! A rí %(feature_count)s àwọn ẹ̀yà."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try uploading a "
+#~ "different file."
+#~ msgstr ""
+#~ "A ń fi %(feature_count)s àwọn ẹ̀yà "
+#~ "hàn lórí maapu. Ṣàyẹ̀wò data tó wà"
+#~ " ní isalẹ. Tí ó bá yọ ọ "
+#~ "lójú, tẹ \"Accept Data Extract\" láti"
+#~ " fipamọ́. Bí kò bá rí bẹ́ẹ̀, "
+#~ "gbìyànjú láti gbe fáìlì míì sókè."
+
+#~ msgid ""
+#~ "No GeoJSON data found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "A kò rí data GeoJSON kankan. Jọwọ"
+#~ " gba data OSM wọlé tàbí gbe "
+#~ "fáìlì GeoJSON sókè kọ́kọ́."
+
+#~ msgid "Data Extract (%(feature_count)s features)"
+#~ msgstr "Ìyọkúrò data (%(feature_count)s àwọn ẹ̀yà)"
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s data features on"
+#~ " map. Review the data, then continue"
+#~ " to the next step."
+#~ msgstr ""
+#~ "A ń fi %(feature_count)s àwọn ẹ̀yà "
+#~ "data hàn lórí maapu. Ṣàyẹ̀wò data "
+#~ "náà, lẹ́yìn náà tẹ̀síwájú sí ìgbésẹ̀ "
+#~ "tó kàn."
+
+#~ msgid ""
+#~ "✓ Collect-new-data mode selected. "
+#~ "Task splitting is skipped and you "
+#~ "can continue."
+#~ msgstr ""
+#~ "✓ A ti yan ipo kíkó data "
+#~ "tuntun nìkan. A foju kọ́ pínpín "
+#~ "iṣẹ́, o sì lè tẹ̀síwájú."
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ A ti fi ìyọkúrò dátà pamọ́ "
+#~ "ní aṣeyọri! O lè bá a lọ sí"
+#~ " Ìgbésẹ̀ 4 (pín iṣẹ́)."
+
+#~ msgid ""
+#~ "No data extract found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "A kò rí ìyọkúrò data kankan. Jọwọ"
+#~ " gba data OSM wọlé tàbí gbe "
+#~ "fáìlì GeoJSON sókè kọ́kọ́."
+
+#~ msgid ""
+#~ "Previewing whole AOI (no splitting) with"
+#~ " %(data_feature_count)s data features. The "
+#~ "entire AOI will be used as a "
+#~ "single task."
+#~ msgstr ""
+#~ "A ń fi gbogbo AOI hàn (láìpín) "
+#~ "pẹ̀lú %(data_feature_count)s àwọn ẹ̀yà data."
+#~ " Gbogbo AOI náà ni a máa lò "
+#~ "gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task boundaries and"
+#~ " %(data_feature_count)s data features together."
+#~ msgstr ""
+#~ "A ń fi ààlà iṣẹ́ %(task_count)s "
+#~ "àti %(data_feature_count)s àwọn ẹ̀yà data "
+#~ "hàn pọ̀."
+
+#~ msgid "Project outline not found. Cannot skip task splitting."
+#~ msgstr "A kò rí àgbékalẹ̀ iṣẹ́ náà. Kò ṣee ṣe láti foju kọ́ pínpín iṣẹ́."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 5."
+#~ msgstr ""
+#~ "✓ A foju kọ́ pínpín iṣẹ́. Gbogbo"
+#~ " AOI ni a máa lò gẹ́gẹ́ bí "
+#~ "iṣẹ́ kan ṣoṣo. O lè lọ sí "
+#~ "Ìgbésẹ̀ 5."
+
+#~ msgid "Please select a splitting option."
+#~ msgstr "Jọwọ yan ọ̀nà pínpín kan."
+
+#~ msgid "✓ Task splitting is not required for this project setup."
+#~ msgstr "✓ Kò sí dandan fún pínpín iṣẹ́ nínú ètò iṣẹ́ yìí."
+
+#~ msgid "No data extract provided."
+#~ msgstr "A kò pèsè ìyọkúrò data kankan."
+
+#~ msgid "Invalid data extract format."
+#~ msgstr "Ọ̀nà ìṣètò ìyọkúrò data kò tọ́."
+
+#~ msgid ""
+#~ "✓ Data extract accepted! Saved "
+#~ "%(feature_count)s features. Step 2 is "
+#~ "now complete."
+#~ msgstr ""
+#~ "✓ A ti gba ìyọkúrò data! A "
+#~ "fipamọ́ %(feature_count)s àwọn ẹ̀yà. Ìgbésẹ̀"
+#~ " 2 ti parí báyìí."
+
+#~ msgid "No task areas data provided."
+#~ msgstr "A kò pèsè data agbègbè iṣẹ́ kankan."
+
+#~ msgid "Invalid task areas data format."
+#~ msgstr "Ọ̀nà ìṣètò data agbègbè iṣẹ́ kò tọ́."
+
+#~ msgid "✓ Split tasks saved successfully"
+#~ msgstr "✓ A ti fipamọ́ àwọn iṣẹ́ tí a pín ní àṣeyọrí"
+
+#~ msgid ""
+#~ "Provide ODK URL, username, and password"
+#~ " (all 3), or leave them all "
+#~ "blank to use server defaults."
+#~ msgstr ""
+#~ "Pese ODK URL, orúkọ olumulo, àti "
+#~ "ọ̀rọ̀ aṣínà (gbogbo mẹ́ta), tàbí fi "
+#~ "gbogbo wọn sílẹ̀ ní àfojúdi láti "
+#~ "lò àwọn ètò àìyẹsẹ̀ olupin."
+
+#~ msgid "GeoJSON is required"
+#~ msgstr "GeoJSON jẹ́ dandan"
+
+#~ msgid "No polygon geometries found. Project area must be a polygon."
+#~ msgstr "A kò rí polygon geometries kankan. Agbègbè iṣẹ́ gbọ́dọ̀ jẹ́ polygon."
+
+#~ msgid "Selected area is too large. Please select an area smaller than 200 km²."
+#~ msgstr "Agbegbe ti a yan ti tobi ju. Jọwọ yan agbegbe ti o kere ju 200 km²."
+
+#~ msgid "Failed to generate data extract from the raw data API."
+#~ msgstr "Kuna lati ṣe ipilẹṣẹ data jade lati API data aise."
+
+#~ msgid "QField project ID not found."
+#~ msgstr "A kò rí iṣẹ́ náà."
+
+#~ msgid "Project name not found."
+#~ msgstr "A kò rí iṣẹ́ náà."
+
+#~ msgid "ODK project ID not found."
+#~ msgstr "A kò rí iṣẹ́ náà."
+
+#~ msgid "Appuser token not found."
+#~ msgstr "A kò rí iṣẹ́ náà."
+
+#~ msgid "Failed to generate QR code."
+#~ msgstr "Kò ṣee ṣe láti kó fọ́ọ̀mù àpẹrẹ wọlé."
+
+#~ msgid "Template XLSForm content is empty."
+#~ msgstr ""
+#~ "Àdàkọ XLSForm akoonu ti sofo.\n"
+#~ "Eto ilana"
+
+#~ msgid "Project outline is missing or has no geometry."
+#~ msgstr ""
+#~ "sonu tabi ko ni geometry.\n"
+#~ "Jiometirika ilana ilana"
+
+#~ msgid "Project outline geometry has no coordinates."
+#~ msgstr "ko ni awọn ipoidojuko."
+
+#~ msgid "Project outline is required for QField project creation."
+#~ msgstr "✓ Kò sí dandan fún pínpín iṣẹ́ nínú ètò iṣẹ́ yìí."
+
+#~ msgid "XLSForm is required for QField project creation."
+#~ msgstr "XLSForm wa ni ti beere fun QField ise agbese ẹda."
+
+#~ msgid "Failed to modify XLSForm for QField."
+#~ msgstr "Kuna lati yipada XLSForm fun QField."
+
+#~ msgid "QGIS wrapper completed but wrote no output files."
+#~ msgstr "QGIS wrapper ti pari ṣugbọn ko kọ awọn faili ti o wu jade."
+
+#~ msgid "QGIS wrapper completed but no .qgz file in output."
+#~ msgstr "QGIS wrapper ti pari ṣugbọn ko si faili .qgz ninu iṣẹjade."
+
+#~ msgid "QField project ID is missing; cannot attach basemap."
+#~ msgstr "QField ID ise agbese sonu; ko le so basemap."
+
+#~ msgid "Basemap attach completed but produced no project files."
+#~ msgstr "A ti so basemapu mọ iṣẹ́ QField."
+
+#~ msgid "QGIS project generation failed: %(error)s"
+#~ msgstr ""
+#~ "QGIS iran ise agbese kuna: %(error)s\n"
+#~ "Apoti"
+
+#~ msgid "QGIS wrapper returned invalid JSON."
+#~ msgstr "QGIS pada JSON ti ko tọ."
+
+#~ msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+#~ msgstr ""
+#~ "Kuna lati ṣe igbasilẹ maapu ipilẹ "
+#~ "MBTiles fun ikojọpọ (HTTP %(status)s)."
+
+#~ msgid "Downloaded basemap MBTiles is empty."
+#~ msgstr "Ṣe igbasilẹ kóòdù QR"
+
+#~ msgid "Failed to upload files to QFieldCloud: %(error)s"
+#~ msgstr ""
+#~ "kuna lati gbe awọn faili sori QFieldCloud: %(error)s\n"
+#~ "Ise agbese"
+
+#~ msgid "QFieldCloud project '%(project_id)s' not found."
+#~ msgstr "A kò rí iṣẹ́ (%(project_id)s)."
+
+#~ msgid ""
+#~ "Project belongs to organization '%(owner)s'."
+#~ " Could not add '%(username)s' to the"
+#~ " organization: %(error)s"
+#~ msgstr ""
+#~ "jẹ ti agbari '%(owner)s'. Ko le fi"
+#~ " '%(username)s' kun si ajo: %(error)s\n"
+#~ ""
+#~ "Olumulo"
+
+#~ msgid "User '%(username)s' does not exist on QFieldCloud."
+#~ msgstr "'%(username)s' ko si lori QFieldCloud."
+
+#~ msgid "User '%(username)s' is already a collaborator on this project."
+#~ msgstr "Olumulo yìí ti jẹ́ alábàáṣiṣẹ́pọ̀ lórí iṣẹ́ yìí tẹ́lẹ̀."
+
+#~ msgid "QFieldCloud credentials are invalid."
+#~ msgstr "✓ Àwọn ìdánimọ̀ wulo!"
+
+#~ msgid "Filters"
+#~ msgstr "Àwọn afáráyé"
+
+#~ msgid "All projects"
+#~ msgstr "Gbogbo iṣẹ́"
+
+#~ msgid "Draft"
+#~ msgstr "Àkójọpọ̀ àkọ́kọ́"
+
+#~ msgid "Published"
+#~ msgstr "A ti tẹ̀ jáde"
+
+#~ msgid "Completed"
+#~ msgstr "A ti parí"
+
+#~ msgid "Archived"
+#~ msgstr "A ti fi pamọ́ sínú àkójọ ìpamọ́"
+
+#~ msgid "Project Status"
+#~ msgstr "Ipò iṣẹ́"
+
+#~ msgid "Newest first"
+#~ msgstr "Tuntun jùlọ kọ́kọ́"
+
+#~ msgid "Oldest first"
+#~ msgstr "Àtijọ́ jùlọ kọ́kọ́"
+
+#~ msgid "Name (A-Z)"
+#~ msgstr "Orúkọ (A-Z)"
+
+#~ msgid "Name (Z-A)"
+#~ msgstr "Orúkọ (Z-A)"
+
+#~ msgid "Sort By"
+#~ msgstr "Tò lẹ́sẹ̀sẹ̀ nípa"
+
+#~ msgid "Search"
+#~ msgstr "Ṣàwárí"
+
+#~ msgid "Search projects…"
+#~ msgstr "Ṣàwárí iṣẹ́…"
+
+#~ msgid "Create Project"
+#~ msgstr "Dá iṣẹ́ sílẹ̀"
+
+#~ msgid "+ New"
+#~ msgstr "+ Tuntun"
+
+#~ msgid "Showing %(count)s project"
+#~ msgid_plural "Showing %(count)s projects"
+#~ msgstr[0] "A ń fi iṣẹ́ %(count)s hàn"
+#~ msgstr[1] "A ń fi iṣẹ́ %(count)s hàn"
+
+#~ msgid "in %(status)s"
+#~ msgstr "nínú %(status)s"
+
+#~ msgid ""
+#~ "matching\n"
+#~ "      \"%(query)s\""
+#~ msgstr "tó bá \"%(query)s\" mu"
+
+#~ msgid "Private Project"
+#~ msgstr "Iṣẹ́ ìkọ̀kọ̀"
+
+#~ msgid "Unnamed Project"
+#~ msgstr "Iṣẹ́ aláìlórúkọ"
+
+#~ msgid "Location:"
+#~ msgstr "Ibi:"
+
+#~ msgid "Created:"
+#~ msgstr "A dá sílẹ̀:"
+
+#~ msgid "N/A"
+#~ msgstr "Kò kan"
+
+#~ msgid "No projects found. Create your first project to get started!"
+#~ msgstr "A kò rí iṣẹ́ kankan. Dá iṣẹ́ àkọ́kọ́ rẹ sílẹ̀ láti bẹ̀rẹ̀!"
+
+#~ msgid "Coordinate field campaigns"
+#~ msgstr "Ṣètò ìpolongo pápá pọ̀"
+
+#~ msgid ""
+#~ "Enhancing field mapping efficiency and "
+#~ "accuracy through seamless coordination."
+#~ msgstr ""
+#~ "Mú kí iṣẹ́ maapu pápá munadoko àti"
+#~ " péye sí i nípasẹ̀ ìṣọ̀kan "
+#~ "aláìlábùkù."
+
+#~ msgid "Explore Projects"
+#~ msgstr "Ṣàwárí iṣẹ́"
+
+#~ msgid "Loading metrics..."
+#~ msgstr "A ń gbé àwọn ìwọ̀n wọlé..."
+
+#~ msgid "What is it?"
+#~ msgstr "Kí ni èyí?"
+
+#~ msgid ""
+#~ "The Field Tasking Manager (Field-TM) "
+#~ "helps teams add local knowledge to "
+#~ "map features\n"
+#~ "        by coordinating mapping in the field."
+#~ msgstr ""
+#~ "Field Tasking Manager (Field-TM) ń "
+#~ "ran àwọn ẹgbẹ́ lọ́wọ́ láti fi ìmọ̀"
+#~ " agbègbè kún àwọn ẹ̀yà maapu nípasẹ̀"
+#~ " ìṣọ̀kan iṣẹ́ maapu ní pápá."
+
+#~ msgid ""
+#~ "Field-TM facilitates collaborative mapping "
+#~ "by supporting and extending mature tools"
+#~ "\n"
+#~ "        like ODK and QField. It is"
+#~ " a standalone mobile and web workflow"
+#~ " that helps teams collect\n"
+#~ "        geospatial data efficiently with "
+#~ "commonly available Android devices."
+#~ msgstr ""
+#~ "Field-TM ń jẹ́ kí iṣẹ́ maapu "
+#~ "àjọṣe rọrùn nípasẹ̀ títì lẹ́yìn àti "
+#~ "fífi agbára kún àwọn irinṣẹ́ tó ti"
+#~ " dàgbà bí ODK àti QField. Ó jẹ́"
+#~ " ìlànà iṣẹ́ alágbèéká àti wẹẹbù "
+#~ "olómìnira tí ń ran àwọn ẹgbẹ́ "
+#~ "lọ́wọ́ láti kó data àyè-ìbùdó jọ "
+#~ "ní ìmúṣẹ́ tó dára pẹ̀lú àwọn ẹ̀rọ"
+#~ " Android tí ó rọrùn láti rí."
+
+#~ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+#~ msgstr ""
+#~ "Alákóso iṣẹ́ kan ń fi ìlànà iṣẹ́"
+#~ " maapu FieldTM hàn lórí kọ̀ǹpútà "
+#~ "alágbèéká"
+
+#~ msgid "Main Features"
+#~ msgstr "Àwọn àǹfààní pàtàkì"
+
+#~ msgid "Flexible Data Collection"
+#~ msgstr "Ìkó data tó rọrùn láti yí padà"
+
+#~ msgid ""
+#~ "Support diverse survey forms, multiple "
+#~ "data formats, and adaptable workflows "
+#~ "that\n"
+#~ "          fit different operational needs."
+#~ msgstr ""
+#~ "Ó ń ṣètìlẹ́yìn fún oríṣìíríṣìí fọ́ọ̀mù"
+#~ " ìwádìí, ọ̀pọ̀lọpọ̀ ọ̀nà data, àti "
+#~ "àwọn ìlànà iṣẹ́ tó lè yí padà "
+#~ "láti bá onírúurú àìní iṣiṣẹ́ mu."
+
+#~ msgid "Open Source and Customizable"
+#~ msgstr "Orísun ṣíṣi àti ètò tí a lè ṣe sí ìfẹ́"
+
+#~ msgid ""
+#~ "Adapt Field-TM to your own survey"
+#~ " logic, data structures, and integration"
+#~ "\n"
+#~ "          requirements."
+#~ msgstr ""
+#~ "Ṣe Field-TM sí ìfẹ́ rẹ gẹ́gẹ́ "
+#~ "bí ọgbọ́n ìwádìí rẹ, àkópọ̀ data, "
+#~ "àti ìbéèrè ìṣọ̀kan."
+
+#~ msgid "Entity-Level Tracking"
+#~ msgstr "Ìtẹ̀lé ní ipele nkan"
+
+#~ msgid ""
+#~ "Monitor survey progress at task and "
+#~ "feature level so managers can make "
+#~ "informed\n"
+#~ "          decisions quickly."
+#~ msgstr ""
+#~ "Máa tọ́pasẹ̀ ìlọsíwájú ìwádìí ní ipele"
+#~ " iṣẹ́ àti ẹ̀yà kí àwọn alákóso "
+#~ "lè ṣe ìpinnu tó dá lórí ìmọ̀ "
+#~ "ní kíákíá."
+
+#~ msgid "Who is it for?"
+#~ msgstr "Ta ni ó jẹ́ fún?"
+
+#~ msgid "Project Manager"
+#~ msgstr "Alákóso iṣẹ́"
+
+#~ msgid "Create and coordinate field campaigns"
+#~ msgstr "Dá ìpolongo pápá sílẹ̀ kí o sì ṣọ̀kan wọn"
+
+#~ msgid ""
+#~ "Project managers use Field-TM to "
+#~ "set up mapping projects, define areas"
+#~ " of interest,\n"
+#~ "          design survey forms, and split work into manageable tasks."
+#~ msgstr ""
+#~ "Àwọn alákóso iṣẹ́ máa n lo "
+#~ "Field-TM láti ṣètò iṣẹ́ maapu, ṣàlàyé"
+#~ " àwọn agbègbè ìfẹ́, dá fọ́ọ̀mù ìwádìí"
+#~ " sílẹ̀, kí wọ́n sì pín iṣẹ́ sí"
+#~ " àwọn iṣẹ́ kéékèèké tó rọrùn láti "
+#~ "ṣakoso."
+
+#~ msgid "Define a project area and upload or choose a survey form"
+#~ msgstr "Ṣàlàyé agbègbè iṣẹ́ kí o sì gbe fọ́ọ̀mù ìwádìí sókè tàbí yan ọkan"
+
+#~ msgid "Split the area into tasks and generate a data extract"
+#~ msgstr "Pín agbègbè náà sí iṣẹ́ kí o sì dá ìyọkúrò data sílẹ̀"
+
+#~ msgid "Publish the project to ODK Central or QFieldCloud"
+#~ msgstr "Tẹ iṣẹ́ náà jáde sí ODK Central tàbí QFieldCloud"
+
+#~ msgid "Share a QR code so mappers can start collecting data"
+#~ msgstr "Pín kóòdù QR kan kí àwọn olùṣe maapu lè bẹ̀rẹ̀ sí í kó data jọ"
+
+#~ msgid "Field Mapper"
+#~ msgstr "Olùṣe maapu pápá"
+
+#~ msgid "Collect data in the field with your phone"
+#~ msgstr "Kó data jọ ní pápá pẹ̀lú fóònù rẹ"
+
+#~ msgid ""
+#~ "Mappers do not need to log in "
+#~ "to Field-TM. Once a project "
+#~ "manager publishes a\n"
+#~ "          project, mappers access it "
+#~ "directly in their mobile app of "
+#~ "choice."
+#~ msgstr ""
+#~ "Àwọn olùṣe maapu kò nílò láti wọlé"
+#~ " sí Field-TM. Ní kete tí "
+#~ "alákóso iṣẹ́ bá ti tẹ iṣẹ́ kan "
+#~ "jáde, àwọn olùṣe maapu máa lè wọlé"
+#~ " sí i taara nínú ohun èlò "
+#~ "alágbèéká tí wọ́n bá yàn."
+
+#~ msgid "Scan the QR code shared by your project manager"
+#~ msgstr "Ṣe skani kóòdù QR tí alákóso iṣẹ́ rẹ pín"
+
+#~ msgid "The project loads automatically in ODK Collect or QField"
+#~ msgstr "Iṣẹ́ náà máa ṣíra rẹ̀ lọ́fàá ní ODK Collect tàbí QField"
+
+#~ msgid "Navigate to your assigned task area and collect data"
+#~ msgstr "Lọ sí agbègbè iṣẹ́ tí a yàn fún ọ kí o sì kó data jọ"
+
+#~ msgid "Submit your survey, which goes straight to the server"
+#~ msgstr "Fìdí ìwádìí rẹ múlẹ̀, èyí tí yóò lọ taara sí olupin"
+
+#~ msgid "Field-TM Use Cases"
+#~ msgstr "Àwọn ọ̀nà lílò Field-TM"
+
+#~ msgid "Field mapping in progress"
+#~ msgstr "Iṣẹ́ maapu pápá ń lọ lọwọ"
+
+#~ msgid "1. Community Mapping"
+#~ msgstr "1. Maapu àwùjọ"
+
+#~ msgid ""
+#~ "Field Tasking Manager empowers communities "
+#~ "to map informal settlements, public\n"
+#~ "            facilities, and local services for inclusive planning."
+#~ msgstr ""
+#~ "Field Tasking Manager ń fún àwọn "
+#~ "àwùjọ ní agbára láti ṣe maapu àwọn"
+#~ " ibùgbé àìlétò, àwọn ilé ìṣèjọba "
+#~ "gbogbo ènìyàn, àti iṣẹ́ agbègbè fún "
+#~ "ìṣètò tó kó gbogbo ènìyàn sí i."
+
+#~ msgid "2. Urban Planning and Management"
+#~ msgstr "2. Ìṣètò àti ìṣàkóso ìlú"
+
+#~ msgid ""
+#~ "Build smarter cities with coordinated "
+#~ "surveys of houses, roads, and utilities"
+#~ "\n"
+#~ "            through clear, manageable mapping tasks."
+#~ msgstr ""
+#~ "Kọ́ àwọn ìlú ọlọ́gbọ́n sí i pẹ̀lú"
+#~ " ìwádìí ilé, ọ̀nà, àti àwọn "
+#~ "amáyédẹrùn tó wà ní ìṣọ̀kan nípasẹ̀ "
+#~ "àwọn iṣẹ́ maapu tó ṣòro díẹ̀ láti"
+#~ " ṣakoso."
+
+#~ msgid "3. Disaster Response and Recovery"
+#~ msgstr "3. Ìdáhùn sí àjálù àti ìmúpadàbọ̀sípò"
+
+#~ msgid ""
+#~ "Rapidly map damaged infrastructure after "
+#~ "disasters, coordinate volunteers, and\n"
+#~ "            deliver reliable data for relief operations."
+#~ msgstr ""
+#~ "Ṣe maapu àwọn amáyédẹrùn tí wọ́n "
+#~ "bajẹ́ lẹ́yìn àjálù ní kíákíá, ṣọ̀kan "
+#~ "àwọn olùfẹ̀yàrá, kí o sì pèsè data"
+#~ " tó gbẹ́kẹ̀lé fún àwọn iṣẹ́ ìrànwọ́."
+
+#~ msgid "Resources"
+#~ msgstr "Àwọn orísun"
+
+#~ msgid "Data Prep"
+#~ msgstr "Ìmúra data"
+
+#~ msgid "HOT Export Tool"
+#~ msgstr "Irinṣẹ́ fífi data jáde HOT"
+
+#~ msgid "Download task-ready geospatial data extracts for your project area."
+#~ msgstr ""
+#~ "Ṣe igbasilẹ àwọn ìyọkúrò data àyè-ìbùdó"
+#~ " tó ti ṣetan fún iṣẹ́ fún "
+#~ "agbègbè iṣẹ́ rẹ."
+
+#~ msgid "Documentation"
+#~ msgstr "Ìwé àlàyé"
+
+#~ msgid "ODK Central Guide"
+#~ msgstr "Ìtọ́sọ́nà ODK Central"
+
+#~ msgid "Learn how to manage forms, app users, and field submissions in ODK."
+#~ msgstr ""
+#~ "Kọ́ bí a ṣe ń ṣakoso fọ́ọ̀mù, "
+#~ "àwọn olumulo ohun èlò, àti àwọn "
+#~ "fífiṣẹ́ pápá nínú ODK."
+
+#~ msgid "QField Guide"
+#~ msgstr "Ìtọ́sọ́nà QField"
+
+#~ msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+#~ msgstr ""
+#~ "Ṣètò àwọn iṣẹ́ QFieldCloud àti àwọn "
+#~ "ìlànà iṣẹ́ alágbèéká fún iṣẹ́ maapu "
+#~ "àìsí ìkànnì."
+
+#~ msgid "Need assistance?"
+#~ msgstr "Ṣé o nílò ìrànlọ́wọ́?"
+
+#~ msgid "Email:"
+#~ msgstr "Ímẹ́lì:"
+
+#~ msgid "Language"
+#~ msgstr "Èdè"
+
+#~ msgid "Coordinated field mapping for Open Mapping campaigns."
+#~ msgstr "Iṣẹ́ maapu pápá tó wà ní ìṣọ̀kan fún àwọn ìpolongo Open Mapping."
+
+#~ msgid "Login"
+#~ msgstr "Wọlé"
+
+#~ msgid "Projects"
+#~ msgstr "Àwọn iṣẹ́"
+
+#~ msgid "QField Admin"
+#~ msgstr "Alabojuto QField"
+
+#~ msgid "Sign in to Field-TM"
+#~ msgstr "Wọlé sí Field-TM"
+
+#~ msgid "Redirecting to the centralized login service."
+#~ msgstr "A ń tọ́ ọ sí iṣẹ́ ìwọlé àárín."
+
+#~ msgid "Continue to login"
+#~ msgstr "Tẹ̀síwájú sí ìwọlé"
+
+#~ msgid "Authentication is disabled on this deployment."
+#~ msgstr "A ti pa ìmúdájú mọ́ lórí ìfìdíṣẹ́ yìí."
+
+#~ msgid "Back to home"
+#~ msgstr "Padà sí ojúlé àkọ́kọ́"
+
+#~ msgid "Create New Project"
+#~ msgstr "Dá iṣẹ́ tuntun sílẹ̀"
+
+#~ msgid "Project Name"
+#~ msgstr "Orúkọ iṣẹ́"
+
+#~ msgid "Enter project name"
+#~ msgstr "Tẹ orúkọ iṣẹ́ sílẹ̀"
+
+#~ msgid "Enter project description"
+#~ msgstr "Tẹ àpèjúwe iṣẹ́ sílẹ̀"
+
+#~ msgid "Field Mapping App"
+#~ msgstr "Ohun èlò maapu pápá"
+
+#~ msgid "Project Area"
+#~ msgstr "Agbègbè iṣẹ́"
+
+#~ msgid "Draw Area"
+#~ msgstr "Ya agbègbè"
+
+#~ msgid "Upload GeoJSON"
+#~ msgstr "Gbe GeoJSON sókè"
+
+#~ msgid "Clear"
+#~ msgstr "Nu"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area.\n"
+#~ "          Maximum project size is 1,000"
+#~ " km². Areas over 100 km² will "
+#~ "show a warning. The OSM data\n"
+#~ "          extract API is limited to 200 km²."
+#~ msgstr ""
+#~ "Ya polygon kan lórí maapu tàbí gbe"
+#~ " fáìlì GeoJSON sókè láti ṣàlàyé "
+#~ "agbègbè iṣẹ́ rẹ. Iwọn tó pọ̀ jùlọ"
+#~ " fún iṣẹ́ ni 1,000 km². Àwọn "
+#~ "agbègbè tó ju 100 km² lọ yóò "
+#~ "fi ìkìlọ̀ hàn. API ìyọkúrò data "
+#~ "OSM ní ààlà 200 km²."
+
+#~ msgid "Advanced Config"
+#~ msgstr "Ètò tó jinlẹ̀"
+
+#~ msgid "Merge geometries (use convex hull for multipolygons)"
+#~ msgstr "Darapọ̀ àwọn geometry (lo convex hull fún multipolygons)"
+
+#~ msgid "Hashtags"
+#~ msgstr "Àwọn hashtag"
+
+#~ msgid "Type hashtags and press Enter or comma"
+#~ msgstr "Tẹ àwọn hashtag kí o sì tẹ Enter tàbí kọ́mà"
+
+#~ msgid ""
+#~ "Type hashtags and press Enter or "
+#~ "comma to add them. Click the × "
+#~ "on a tag to remove\n"
+#~ "          it."
+#~ msgstr ""
+#~ "Tẹ àwọn hashtag kí o sì tẹ "
+#~ "Enter tàbí kọ́mà láti fi wọn kún."
+#~ " Tẹ × lórí àmi kan láti yọ "
+#~ "ọ́ kúrò."
+
+#~ msgid "Creating..."
+#~ msgstr "A ń dá sílẹ̀..."
+
+#~ msgid "Something went wrong. Please try again."
+#~ msgstr "Nkankan ṣì lọ ní ònà tí kò tọ́. Jọwọ tún gbìyànjú."
+
+#~ msgid "Invalid GeoJSON format. Please check your file."
+#~ msgstr "Ọ̀nà ìṣètò GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò fáìlì rẹ."
+
+#~ msgid "Invalid GeoJSON file. Please check the file format."
+#~ msgstr "Fáìlì GeoJSON kò tọ́. Jọwọ ṣàyẹ̀wò ọ̀nà ìṣètò fáìlì náà."
+
+#~ msgid ""
+#~ "You must draw or upload an Area"
+#~ " of Interest (AOI) on the map "
+#~ "before submitting."
+#~ msgstr ""
+#~ "O gbọ́dọ̀ ya tàbí gbe Area of "
+#~ "Interest (AOI) sókè lórí maapu kí "
+#~ "o tó fi ránṣẹ́."
+
+#~ msgid ""
+#~ "A project with this name already "
+#~ "exists. Please choose a different name."
+#~ msgstr "Iṣẹ́ kan pẹ̀lú orúkọ yìí ti wà tẹ́lẹ̀. Jọwọ yan orúkọ mìíràn."
+
+#~ msgid "Description is required."
+#~ msgstr "Àpèjúwe jẹ́ dandan."
+
+#~ msgid "← Back to Projects"
+#~ msgstr "← Padà sí àwọn iṣẹ́"
+
+#~ msgid "Project Metadata"
+#~ msgstr "Metadata iṣẹ́"
+
+#~ msgid "Project metadata and setup information for managers."
+#~ msgstr "Metadata iṣẹ́ àti àlàyé ìṣètò fún àwọn alákóso."
+
+#~ msgid "Project ID"
+#~ msgstr "ID iṣẹ́"
+
+#~ msgid "Created"
+#~ msgstr "A dá sílẹ̀"
+
+#~ msgid "Last Updated"
+#~ msgstr "Ìmúdójúìwọ̀n tó ṣẹ̀ṣẹ̀ ṣẹlẹ̀"
+
+#~ msgid "External Project"
+#~ msgstr "Iṣẹ́ òde"
+
+#~ msgid "Instance:"
+#~ msgstr "Àpẹẹrẹ:"
+
+#~ msgid "Project ID:"
+#~ msgstr "ID iṣẹ́:"
+
+#~ msgid "View Project in ODK Central →"
+#~ msgstr "Wo iṣẹ́ ní ODK Central →"
+
+#~ msgid "Manage QFieldCloud Project →"
+#~ msgstr "Ṣakoso iṣẹ́ QFieldCloud →"
+
+#~ msgid "View Project Externally →"
+#~ msgstr "Wo iṣẹ́ láti òde →"
+
+#~ msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#~ msgstr "Ṣé o fẹ́ pa iṣẹ́ yìí rẹ́ ní downstream àti Field-TM? Kò ṣeé yí padà."
+
+#~ msgid "Delete Project"
+#~ msgstr "Pa iṣẹ́ rẹ́"
+
+#~ msgid "Back to Projects"
+#~ msgstr "Padà sí àwọn iṣẹ́"
+
+#~ msgid "Project Not Found"
+#~ msgstr "A kò rí iṣẹ́"
+
+#~ msgid ""
+#~ "The project you're looking for doesn't"
+#~ " exist or you don't have permission"
+#~ " to view\n"
+#~ "        it."
+#~ msgstr "Iṣẹ́ tí o ń wá kò sí tàbí o kò ní àṣẹ láti wo ó."
+
+#~ msgid "QFieldCloud Admin"
+#~ msgstr "Alabojuto QFieldCloud"
+
+#~ msgid ""
+#~ "This page is for managing the "
+#~ "users in your QField project, after "
+#~ "creation."
+#~ msgstr ""
+#~ "Ojú-ìwé yìí jẹ́ fún ṣíṣakoso àwọn "
+#~ "olumulo nínú iṣẹ́ QField rẹ lẹ́yìn "
+#~ "tí a bá dá a sílẹ̀."
+
+#~ msgid "Enter your QFieldCloud credentials to manage collaborators."
+#~ msgstr "Tẹ àwọn ìdánimọ̀ QFieldCloud rẹ láti ṣakoso àwọn alábàáṣiṣẹ́pọ̀."
+
+#~ msgid "QFieldCloud URL"
+#~ msgstr "URL QFieldCloud"
+
+#~ msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+#~ msgstr "URL ìpilẹ̀ àpẹẹrẹ QFieldCloud rẹ (láìsí /api/v1)."
+
+#~ msgid "admin"
+#~ msgstr "admin"
+
+#~ msgid "Password"
+#~ msgstr "Ọ̀rọ̀ aṣínà"
+
+#~ msgid "Connect"
+#~ msgstr "So pọ̀"
+
+#~ msgid "Connecting…"
+#~ msgstr "A ń so pọ̀…"
+
+#~ msgid "Features Surveyed (Approximate)"
+#~ msgstr "Àwọn ẹ̀yà tí a ṣàyẹ̀wò (ní àfojúsùn)"
+
+#~ msgid "Projects Created"
+#~ msgstr "Àwọn iṣẹ́ tí a dá sílẹ̀"
+
+#~ msgid "Countries Covered"
+#~ msgstr "Àwọn orílẹ̀-èdè tí a bo"
+
+#~ msgid "Users Registered"
+#~ msgstr "Àwọn olumulo tí a forúkọsílẹ̀"
+
+#~ msgid "Supported Mapping Apps"
+#~ msgstr "Àwọn ohun èlò maapu tí a ń ṣètìlẹ́yìn fún"
+
+#~ msgid "Offline Basemap"
+#~ msgstr "Basemap àìsí asopọ"
+
+#~ msgid ""
+#~ "Search HOT OpenAerialMap imagery for "
+#~ "this AOI and generate an MBTiles "
+#~ "basemap."
+#~ msgstr ""
+#~ "Wá àwọn àwòrán HOT OpenAerialMap fún "
+#~ "AOI yìí, kí o sì dá basemap "
+#~ "MBTiles ṣẹ̀dá."
+
+#~ msgid "Search OAM Imagery"
+#~ msgstr "Wá àwòrán OAM"
+
+#~ msgid "Basemap generation previously failed. Please search again and retry."
+#~ msgstr "Ṣíṣe basemap ti kuna tẹ́lẹ̀. Jọ̀wọ́ tún wá a kí o sì tún gbìyànjú."
+
+#~ msgid "No basemap selected yet."
+#~ msgstr "Kò tíì sí basemap tí a yàn."
+
+#~ msgid "Manager Setup Summary"
+#~ msgstr "Àkótán ìṣètò alákóso"
+
+#~ msgid "The project setup flow is complete and shown below for reference."
+#~ msgstr "Ìlànà ìṣètò iṣẹ́ ti parí, a sì fi hàn ní isalẹ fún ìtọ́kasí."
+
+#~ msgid "Project Location"
+#~ msgstr "Ibi iṣẹ́"
+
+#~ msgid "Step 2: Upload XLSForm"
+#~ msgstr "Ìgbésẹ̀ 2: Gbe XLSForm sókè"
+
+#~ msgid "Complete"
+#~ msgstr "Parí"
+
+#~ msgid "Step 3: Get Data"
+#~ msgstr "Ìgbésẹ̀ 3: Gba data"
+
+#~ msgid "Step 4: Split into Tasks"
+#~ msgstr "Ìgbésẹ̀ 4: Pín sí iṣẹ́"
+
+#~ msgid "Step 5: Finalise Project"
+#~ msgstr "Ìgbésẹ̀ 5: Parí iṣẹ́"
+
+#~ msgid ""
+#~ "If you need to upload additional "
+#~ "media files to this project, such "
+#~ "as images and\n"
+#~ "          videos, log into ODK Central"
+#~ " and upload them in the form "
+#~ "settings."
+#~ msgstr ""
+#~ "Tí o bá nílò láti gbe àwọn "
+#~ "fáìlì media míì sókè sí iṣẹ́ yìí,"
+#~ " bíi àwòrán àti fídíò, wọlé sí "
+#~ "ODK Central kí o sì gbe wọn "
+#~ "sókè nínú ètò fọ́ọ̀mù."
+
+#~ msgid "Ready for Mapping"
+#~ msgstr "Ti ṣetan fún ṣíṣe maapu"
+
+#~ msgid "Loading QR code..."
+#~ msgstr "A ń gbé kóòdù QR wọlé..."
+
+#~ msgid "Project Setup"
+#~ msgstr "Ìṣètò iṣẹ́"
+
+#~ msgid "Step 2: Select Survey Form"
+#~ msgstr "Ìgbésẹ̀ 2: Yan fọ́ọ̀mù ìwádìí"
+
+#~ msgid "Choose a preset survey type, or upload your own custom XLSForm."
+#~ msgstr "Yan irú ìwádìí kan kí o sì tẹ̀síwájú pẹ̀lú àwọn àìyẹsẹ̀ tí a ṣeduro."
+
+#~ msgid "Choose Survey Type:"
+#~ msgstr "Yan irú ìwádìí:"
+
+#~ msgid "Loading survey types..."
+#~ msgstr "A ń gbé irú ìwádìí wọlé..."
+
+#~ msgid "Or use your own form instead:"
+#~ msgstr "Tabi lo fọọmu tirẹ dipo:"
+
+#~ msgid "Upload Custom XLSForm"
+#~ msgstr "Gbe fọ́ọ̀mù àdáni sókè"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task\n"
+#~ "          division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you\n"
+#~ "          want to ask (do not "
+#~ "include select_one_from_file fields for "
+#~ "tasks/features)."
+#~ msgstr ""
+#~ "Àkíyèsí: Field-TM máa fi àwọn pápá"
+#~ " míì kún fọ́ọ̀mù rẹ laifọwọyi fún "
+#~ "pínpín iṣẹ́ àti yíyan ààmì. Fọ́ọ̀mù "
+#~ "rẹ gbọ́dọ̀ ní àwọn ìbéèrè ìwádìí "
+#~ "nìkan tí o fẹ́ béèrè (má ṣe "
+#~ "fi àwọn pápá select_one_from_file fún "
+#~ "iṣẹ́/ààmì kún un)."
+
+#~ msgid ""
+#~ "Recommended defaults are active for ODK"
+#~ " projects, including ODK Collect\n"
+#~ "          compatibility."
+#~ msgstr ""
+#~ "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́"
+#~ " fún àwọn iṣẹ́ ODK, pẹ̀lú ibámu "
+#~ "ODK Collect."
+
+#~ msgid "Recommended defaults are active for %(app_name)s projects."
+#~ msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún àwọn iṣẹ́ %(app_name)s."
+
+#~ msgid "Recommended defaults are active for this project."
+#~ msgstr "Àwọn àìyẹsẹ̀ tí a ṣeduro ti ṣiṣẹ́ fún iṣẹ́ yìí."
+
+#~ msgid "Default Language:"
+#~ msgstr "Èdè àìyẹsẹ̀:"
+
+#~ msgid "English"
+#~ msgstr "Gẹ̀ẹ́sì"
+
+#~ msgid "Spanish"
+#~ msgstr "Sípáníìṣì"
+
+#~ msgid "French"
+#~ msgstr "Faransé"
+
+#~ msgid "Portuguese"
+#~ msgstr "Pọ́túgì"
+
+#~ msgid "Swahili"
+#~ msgstr "Swahili"
+
+#~ msgid "Hindi"
+#~ msgstr "Hindi"
+
+#~ msgid "Form Options:"
+#~ msgstr "Àwọn aṣayan fọ́ọ̀mù:"
+
+#~ msgid "Include photo upload question"
+#~ msgstr "Fi ìbéèrè ìgbékalẹ̀ fọ́tò kún un"
+
+#~ msgid "Make photo mandatory"
+#~ msgstr "Ṣe fọ́tò di dandan"
+
+#~ msgid "Asks the user to take a photo at their location."
+#~ msgstr "Ó ń béèrè fún oníṣe láti ya fọ́tò ní ibi tí wọ́n wà."
+
+#~ msgid "Include digitisation verification question"
+#~ msgstr "Fi ìbéèrè ìmúdájú digitisation kún un"
+
+#~ msgid "Asks the mapper to verify if existing features are correctly digitised."
+#~ msgstr ""
+#~ "Ó ń béèrè fún olùṣe maapu láti "
+#~ "jẹ́rìí bóyá àwọn ààmì tó wà ti "
+#~ "digitise dáadáa."
+
+#~ msgid "Continue"
+#~ msgstr "Tẹ̀síwájú"
+
+#~ msgid "✓ Survey form uploaded successfully"
+#~ msgstr "✓ A gbe fọ́ọ̀mù ìwádìí sókè ní àṣeyọrí"
+
+#~ msgid "Download the recommended OSM data for your survey form."
+#~ msgstr "Gba data OSM tí a ṣeduro wọlé fún fọ́ọ̀mù ìwádìí rẹ."
+
+#~ msgid "Review the data on the map, then continue."
+#~ msgstr "Ṣàyẹ̀wò data lórí maapu, lẹ́yìn náà tẹ̀síwájú."
+
+#~ msgid "Download OSM Data"
+#~ msgstr "Gba data OSM wọlé"
+
+#~ msgid "Collect New Data Only"
+#~ msgstr "Kó data tuntun nìkan jọ"
+
+#~ msgid "Use custom data inputs or override the default OSM download options."
+#~ msgstr "Lo àwọn ìwọlé data àdáni tàbí yí àwọn aṣayan ìgbasilẹ OSM àìyẹsẹ̀ padà."
+
+#~ msgid "OSM Category:"
+#~ msgstr "Ẹ̀ka OSM:"
+
+#~ msgid "OSM Buildings"
+#~ msgstr "Ilé OSM"
+
+#~ msgid "OSM Highways"
+#~ msgstr "Ọ̀nà OSM"
+
+#~ msgid "OSM Healthcare"
+#~ msgstr "Ìtọju ìlera OSM"
+
+#~ msgid "OSM Toilets"
+#~ msgstr "Ilé ìgbónsẹ̀ OSM"
+
+#~ msgid "OSM Religious"
+#~ msgstr "Ibùdó ẹ̀sìn OSM"
+
+#~ msgid "OSM Landuse"
+#~ msgstr "Lílò ilẹ̀ OSM"
+
+#~ msgid "OSM Waterways"
+#~ msgstr "Ọ̀nà omi OSM"
+
+#~ msgid "OSM Water Points"
+#~ msgstr "Ibùdó omi OSM"
+
+#~ msgid "OSM Waste Disposal"
+#~ msgstr "Ìtójú ìdọ̀tí OSM"
+
+#~ msgid "OSM Education"
+#~ msgstr "Ẹ̀kọ́ OSM"
+
+#~ msgid "OSM Cemeteries"
+#~ msgstr "Sàré OSM"
+
+#~ msgid "OSM Amenities"
+#~ msgstr "Àwọn ohun ìní OSM"
+
+#~ msgid "Geometry Type:"
+#~ msgstr "Irú geometry:"
+
+#~ msgid "Polygon"
+#~ msgstr "Poligoni"
+
+#~ msgid "Polyline"
+#~ msgstr "Polilaini"
+
+#~ msgid "Point"
+#~ msgstr "Àmì"
+
+#~ msgid "Use centroids"
+#~ msgstr "Lo centroid"
+
+#~ msgid "Upload Custom GeoJSON"
+#~ msgstr "Gbe GeoJSON àdáni sókè"
+
+#~ msgid "Generating OSM data extract... This may take a moment."
+#~ msgstr "A ń ṣe ìyọkúrò data OSM... Èyí lè gba àkókò díẹ̀."
+
+#~ msgid "OSM data extract ready"
+#~ msgstr "Ìyọkúrò data OSM ti ṣetan"
+
+#~ msgid "Step 4: Split into Tasks (Optional)"
+#~ msgstr "Ìgbésẹ̀ 3: Pín sí iṣẹ́ (àṣàyàn)"
+
+#~ msgid "✓ Task splitting is not relevant without existing data"
+#~ msgstr "✓ Pínpín iṣẹ́ kò ṣe pàtàkì bí kò bá sí data tó ti wà tẹ́lẹ̀"
+
+#~ msgid ""
+#~ "Generate task areas by splitting the "
+#~ "Area of Interest (AOI). Choose an "
+#~ "algorithm and\n"
+#~ "      parameters, then split. Review the"
+#~ " preview, and click \"Accept Task "
+#~ "Areas\" to save. Or\n"
+#~ "      click"
+#~ msgstr ""
+#~ "Ṣẹ̀dá àwọn agbègbè iṣẹ́ nípasẹ̀ pínpín"
+#~ " Area of Interest (AOI). Yan "
+#~ "algorithm àti àwọn ìwọn, lẹ́yìn náà "
+#~ "pín un. Ṣàyẹ̀wò ohun tí a fi "
+#~ "hàn, kí o sì tẹ \"Accept Task "
+#~ "Areas\" láti fipamọ́. Tàbí tẹ"
+
+#~ msgid "Skip"
+#~ msgstr "Foju kọ́"
+
+#~ msgid "to use the whole AOI as a single task."
+#~ msgstr "láti lo gbogbo AOI gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
+
+#~ msgid "Choose which linear features influence building-based task splitting."
+#~ msgstr "Yan àwọn ẹ̀yà oníla tí yóò ní ipa lórí pínpín iṣẹ́ tó dá lórí ilé."
+
+#~ msgid "Include roads"
+#~ msgstr "Fi ọ̀nà kún un"
+
+#~ msgid "Include rivers"
+#~ msgstr "Fi odò kún un"
+
+#~ msgid "Include railways"
+#~ msgstr "Fi ojú irin kún un"
+
+#~ msgid "Include aeroways"
+#~ msgstr "Fi ọ̀nà ojú òfurufú kún un"
+
+#~ msgid "Algorithm:"
+#~ msgstr "Algorithm:"
+
+#~ msgid "Select splitting option..."
+#~ msgstr "Yan aṣayan pínpín..."
+
+#~ msgid "Split by Square"
+#~ msgstr "Pín nípasẹ̀ onígun mẹ́rin"
+
+#~ msgid "Average Buildings v1 (Voronoi)"
+#~ msgstr "Apapọ ilé v1 (Voronoi)"
+
+#~ msgid "Average Buildings v2 (Straight Skeleton)"
+#~ msgstr "Apapọ ilé v2 (Straight Skeleton)"
+
+#~ msgid "Split by Specific Number of Tasks"
+#~ msgstr "Pín gẹ́gẹ́ bí iye iṣẹ́ kan pàtó (yóò dé láìpẹ́)"
+
+#~ msgid "Avg. Buildings per Task:"
+#~ msgstr "Apapọ ilé fún iṣẹ́ kọọkan:"
+
+#~ msgid "Number of Tasks:"
+#~ msgstr "Nọ́mbà iṣẹ́:"
+
+#~ msgid "Dimension (meters):"
+#~ msgstr "Ìwọn (mítà):"
+
+#~ msgid "Split Again"
+#~ msgstr "Tun pín"
+
+#~ msgid "Split AOI"
+#~ msgstr "Pín AOI"
+
+#~ msgid "Splitting AOI into tasks... This may take a moment."
+#~ msgstr "A ń pín AOI sí iṣẹ́... Èyí lè gba àkókò díẹ̀."
+
+#~ msgid "Ready"
+#~ msgstr "Ṣetan"
+
+#~ msgid ""
+#~ "All prerequisites are complete! Create "
+#~ "the project in your chosen mapping "
+#~ "tool."
+#~ msgstr ""
+#~ "Gbogbo ohun tí ó yẹ kó ti "
+#~ "pé! Dá iṣẹ́ náà sílẹ̀ nínú irinṣẹ́"
+#~ " maapu tí o yàn."
+
+#~ msgid "Finalise Project"
+#~ msgstr "Parí iṣẹ́"
+
+#~ msgid "Confirm Project Finalisation"
+#~ msgstr "Jẹ́rìí ìparí iṣẹ́"
+
+#~ msgid "Are you sure you want to finalise this project?"
+#~ msgstr "Ṣé o dá ọ lójú pé o fẹ́ parí iṣẹ́ yìí?"
+
+#~ msgid "Confirm & Finalise"
+#~ msgstr "Jẹ́rìí kí o sì parí"
+
+#~ msgid "Custom Credentials"
+#~ msgstr "Ìdánimọ̀ àdáni"
+
+#~ msgid "ODK Central URL"
+#~ msgstr "URL ODK Central"
+
+#~ msgid "https://your-odk-central.com"
+#~ msgstr "https://your-odk-central.com"
+
+#~ msgid "QField Cloud URL"
+#~ msgstr "URL QField Cloud"
+
+#~ msgid "https://qfield.cloud"
+#~ msgstr "https://qfield.cloud"
+
+#~ msgid "qfield_username"
+#~ msgstr "qfield_username"
+
+#~ msgid "qfield_password"
+#~ msgstr "qfield_password"
+
+#~ msgid "Test Credentials"
+#~ msgstr "Ṣàyẹ̀wò àwọn ìdánimọ̀"
+
+#~ msgid "Save & Continue"
+#~ msgstr "Fipamọ́ kí o sì tẹ̀síwájú"
+
+#~ msgid "Select a survey type..."
+#~ msgstr "Yan irú ìwádìí kan..."
+
+#~ msgid "No survey types available"
+#~ msgstr "Kò sí irú ìwádìí tó wà"
+
+#~ msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#~ msgstr "Kò sí fọ́ọ̀mù ìwádìí tó wà. Gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó jinlẹ̀."
+
+#~ msgid "Select a survey type, or upload a custom form in Advanced Config."
+#~ msgstr "Yan irú ìwádìí kan, tàbí gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó jinlẹ̀."
+
+#~ msgid "Survey type selected."
+#~ msgstr "A ti yan irú ìwádìí náà."
+
+#~ msgid "Invalid file type. Please upload a .xls or .xlsx file."
+#~ msgstr "Irú fáìlì kò tọ́. Jọwọ gbe fáìlì .xls tàbí .xlsx sókè."
+
+#~ msgid "Selected file:"
+#~ msgstr "Fáìlì tí a yàn:"
+
+#~ msgid "Custom form selected."
+#~ msgstr "A ti yan fọ́ọ̀mù àdáni."
+
+#~ msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Yan irú ìwádìí kan kọ́kọ́, tàbí "
+#~ "gbe fọ́ọ̀mù àdáni sókè nínú Ètò tó"
+#~ " jinlẹ̀."
+
+#~ msgid "polygons"
+#~ msgstr "polygon"
+
+#~ msgid "polylines"
+#~ msgstr "polyline"
+
+#~ msgid "points"
+#~ msgstr "àwọn àmì"
+
+#~ msgid "features"
+#~ msgstr "àwọn ẹ̀yà"
+
+#~ msgid ""
+#~ "You uploaded a custom form, so "
+#~ "this OSM download is optional. Use "
+#~ "Advanced Config to upload your own "
+#~ "GeoJSON or adjust download settings."
+#~ msgstr ""
+#~ "O ti gbe fọ́ọ̀mù àdáni sókè, "
+#~ "nítorí náà igbasilẹ OSM yìí jẹ́ "
+#~ "àṣàyàn. Lo Ètò tó jinlẹ̀ láti gbe"
+#~ " GeoJSON tirẹ sókè tàbí ṣàtúnṣe àwọn"
+#~ " ètò igbasilẹ."
+
+#~ msgid ""
+#~ "Recommended source: %(title)s (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Orísun tí a ṣeduro: %(title)s "
+#~ "(%(geom_label)s). Ṣàyẹ̀wò data lórí maapu, "
+#~ "lẹ́yìn náà tẹ̀síwájú."
+
+#~ msgid ""
+#~ "Recommended source updated (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "A ti ṣe àtúnṣe orísun tí a "
+#~ "ṣeduro (%(geom_label)s). Ṣàyẹ̀wò data lórí "
+#~ "maapu, lẹ́yìn náà tẹ̀síwájú."
+
+#~ msgid "Downloading..."
+#~ msgstr "A ń gba a wọlé..."
+
+#~ msgid "Confirm No Splitting"
+#~ msgstr "Jẹ́rìí pé kò sí pínpín"
+
+#~ msgid "Split by Buildings"
+#~ msgstr "Pín nípasẹ̀ ilé"
+
+#~ msgid "Select Option"
+#~ msgstr "Yan aṣayan"
+
+#~ msgid "Confirming..."
+#~ msgstr "A ń jẹ́rìí..."
+
+#~ msgid "Splitting..."
+#~ msgstr "A ń pín..."
+
+#~ msgid "ODK Central"
+#~ msgstr "ODK Central"
+
+#~ msgid "QField"
+#~ msgstr "QField"
+
+#~ msgid "the mapping tool"
+#~ msgstr "irinṣẹ́ maapu"
+
+#~ msgid "Project type not set. Please set the field mapping app first."
+#~ msgstr "A kò tíì ṣètò irú iṣẹ́. Jọwọ kọ́kọ́ ṣètò ohun èlò maapu pápá."
+
+#~ msgid ""
+#~ "Are you sure you want to finalise"
+#~ " this project in %(project_type)s? This "
+#~ "will create the project, upload forms,"
+#~ " and generate all necessary files."
+#~ msgstr ""
+#~ "Ṣé o dá ọ lójú pé o fẹ́ "
+#~ "parí iṣẹ́ yìí nínú %(project_type)s? Èyí"
+#~ " máa dá iṣẹ́ náà sílẹ̀, máa gbe"
+#~ " àwọn fọ́ọ̀mù sókè, ó sì máa "
+#~ "ṣẹ̀dá gbogbo àwọn fáìlì tó yẹ."
+
+#~ msgid "Custom ODK Credentials"
+#~ msgstr "Ìdánimọ̀ ODK àdáni"
+
+#~ msgid "Custom QField Credentials"
+#~ msgstr "Ìdánimọ̀ QField àdáni"
+
+#~ msgid "Please fill in all fields."
+#~ msgstr "Jọwọ kún gbogbo àwọn pápá."
+
+#~ msgid "Testing..."
+#~ msgstr "A ń dánwò..."
+
+#~ msgid "Testing credentials..."
+#~ msgstr "A ń dán àwọn ìdánimọ̀ wò..."
+
+#~ msgid "✓ Credentials are valid!"
+#~ msgstr "✓ Àwọn ìdánimọ̀ wulo!"
+
+#~ msgid "Invalid credentials. Please check and try again."
+#~ msgstr "Àwọn ìdánimọ̀ kò tọ́. Jọwọ ṣàyẹ̀wò kí o sì tún gbìyànjú."
+
+#~ msgid "Error testing credentials: %(message)s"
+#~ msgstr "Aṣiṣe nígbà tí a ń dán àwọn ìdánimọ̀ wò: %(message)s"
+
+#~ msgid "Please test credentials first before continuing."
+#~ msgstr "Jọwọ dán àwọn ìdánimọ̀ wò kọ́kọ́ kí o tó tẹ̀síwájú."
+
+#~ msgid "Creating project in %(project_type)s... This may take a moment."
+#~ msgstr "A ń dá iṣẹ́ sílẹ̀ nínú %(project_type)s... Èyí lè gba àkókò díẹ̀."
+
+#~ msgid "Error:"
+#~ msgstr "Aṣiṣe:"
+
+#~ msgid "Basemap attach failed. Use retry to start again."
+#~ msgstr "Fifi basemap pọ kuna. Lo tún gbìyànjú láti bẹ̀rẹ̀ lẹ́ẹ̀kan síi."
+
+#~ msgid "Retry Attach"
+#~ msgstr "Tún fi pọ̀"
+
+#~ msgid ""
+#~ "Basemap attach is in progress. Use "
+#~ "the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Fifi basemap pọ ń lọ lọwọ. Lo "
+#~ "bọtìnì tó wà ní isalẹ láti ṣàyẹ̀wò"
+#~ " ipo tuntun jù."
+
+#~ msgid "Checking..."
+#~ msgstr "N ṣàyẹ̀wò..."
+
+#~ msgid "Check Status"
+#~ msgstr "Ipò iṣẹ́"
+
+#~ msgid ""
+#~ "Basemap generation is in progress. "
+#~ "Status updates automatically every few "
+#~ "seconds."
+#~ msgstr "Ṣíṣe basemap ń lọ lọwọ. Ipo ń tún ara rẹ ṣe laifọwọyi lẹ́ẹ̀kọ̀ọ̀kan."
+
+#~ msgid "STAC item"
+#~ msgstr "Ohun STAC"
+
+#~ msgid "Zoom"
+#~ msgstr "Sún"
+
+#~ msgid "Select one imagery item to start MBTiles generation."
+#~ msgstr "Yan ohun àwòrán kan láti bẹ̀rẹ̀ ṣíṣe MBTiles."
+
+#~ msgid "Cloud"
+#~ msgstr "Pa"
+
+#~ msgid "View Metadata"
+#~ msgstr "Wo metadata"
+
+#~ msgid "Use this image"
+#~ msgstr "Lo àwòrán yìí"
+
+#~ msgid "No imagery items were found for this AOI."
+#~ msgstr "A kò rí ohun àwòrán kankan fún AOI yìí."
+
+#~ msgid "Accept Data Extract"
+#~ msgstr "Gba ìyọkúrò data"
+
+#~ msgid "View technical details"
+#~ msgstr "Wo àwọn àlàyé imọ̀ẹ̀rọ"
+
+#~ msgid "Project created in ODK Central."
+#~ msgstr "A ti dá iṣẹ́ sílẹ̀ nínú ODK Central."
+
+#~ msgid "Manager Access (ODK Central UI)"
+#~ msgstr "Ìwọlé alákóso (ODK Central UI)"
+
+#~ msgid "Open project in ODK Central"
+#~ msgstr "Ṣí iṣẹ́ nínú ODK Central"
+
+#~ msgid "Save these credentials now. They will only be shown once."
+#~ msgstr "Fipamọ́ àwọn ìdánimọ̀ wọ̀nyí báyìí. A máa fi wọ́n hàn lẹ́ẹ̀kan ṣoṣo."
+
+#~ msgid "View FieldTM Project"
+#~ msgstr "Wo iṣẹ́ FieldTM"
+
+#~ msgid "Project created in QFieldCloud."
+#~ msgstr "A ti dá iṣẹ́ sílẹ̀ nínú QFieldCloud."
+
+#~ msgid "Manager Access (QFieldCloud)"
+#~ msgstr "Ìwọlé alákóso (QFieldCloud)"
+
+#~ msgid "Open project in QFieldCloud"
+#~ msgstr "Ṣí iṣẹ́ nínú QFieldCloud"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to\n"
+#~ "      manage the project."
+#~ msgstr ""
+#~ "A kò lè dá àkọọlẹ alákóso sílẹ̀"
+#~ " laifọwọyi. Wọlé sí QFieldCloud gẹ́gẹ́ "
+#~ "bí admin láti ṣakoso iṣẹ́ náà."
+
+#~ msgid "Accept Task Choices"
+#~ msgstr "Gba àwọn yíyàn iṣẹ́"
+
+#~ msgid ""
+#~ "Basemap attached to QField\n"
+#~ "    project."
+#~ msgstr "A ti so basemap pọ mọ iṣẹ akanṣe QField."
+
+#~ msgid "Area"
+#~ msgstr "Agbegbe"
+
+#~ msgid "Invalid geometry"
+#~ msgstr "Jiometiri ti ko wulo"
+
+#~ msgid "Undo last vertex"
+#~ msgstr "Yọ ipari vertex to kẹhin kuro"
+
+#~ msgid "My location"
+#~ msgstr "Ipo mi"
+
+#~ msgid "Failed to validate GeoJSON"
+#~ msgstr "Ijerisi GeoJSON kuna"
+
+#~ msgid "No GeoJSON returned from validation"
+#~ msgstr "Ko si GeoJSON ti ijerisi da pada"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area. Maximum\n"
+#~ "    project size is 1,000 km². "
+#~ "Areas over 100 km² will show a "
+#~ "warning. The OSM data extract API "
+#~ "is\n"
+#~ "    limited to 200 km²."
+#~ msgstr ""
+#~ "Fa polygon sori maapu tabi gbe "
+#~ "faili GeoJSON soke lati ṣalaye agbegbe"
+#~ " iṣẹ akanṣe rẹ. Iwọn to pọ julọ"
+#~ " fun iṣẹ akanṣe jẹ 1,000 km². "
+#~ "Awọn agbegbe ti o ju 100 km² "
+#~ "lọ yoo fi ikilọ han. API yiyọ "
+#~ "data OSM ni opin si 200 km²."
+
+#~ msgid ""
+#~ "Basemap attach failed for now. Your project is ready to\n"
+#~ "      use. Please retry attach."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Basemap generation is in progress. Use"
+#~ " the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Ṣiṣẹda basemap n lọ lọwọ. Lo "
+#~ "bọtini ti o wa ni isalẹ lati "
+#~ "ṣayẹwo ipo tuntun julọ."
+
+#~ msgid ""
+#~ "Basemap is\n"
+#~ "    ready. Attaching to QField project in progress."
+#~ msgstr "Basemap ti ṣetan. Ilana sisọ ọ mọ iṣẹ akanṣe QField n lọ lọwọ."
+
+#~ msgid ""
+#~ "Basemap is ready. Not yet\n"
+#~ "    attached to QField project."
+#~ msgstr "Basemap ti ṣetan. Ṣugbọn a kò tíì so ọ mọ iṣẹ akanṣe QField."
 

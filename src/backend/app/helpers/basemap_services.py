@@ -242,11 +242,19 @@ async def check_tilepack_status(stac_item_id: str) -> tuple[str, str | None]:
     endpoint = _tilepack_endpoint(stac_item_id)
     try:
         async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
-            response = await client.post(endpoint)
+            response = await client.get(endpoint)
     except httpx.HTTPError as exc:
         _raise_remote_request_error(exc, "Tilepack status check")
 
-    payload = response.json() if response.content else {}
+    payload: dict[str, Any] = {}
+    if response.content:
+        try:
+            parsed = response.json()
+        except ValueError:
+            parsed = {}
+        if isinstance(parsed, dict):
+            payload = parsed
+
     return _parse_tilepack_status(response.status_code, payload)
 
 

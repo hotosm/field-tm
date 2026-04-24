@@ -1,14 +1,14 @@
-# Translations template for PROJECT.
+# Translations template for Field-TM.
 # Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# This file is distributed under the same license as the Field-TM project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,7 +120,7 @@ msgstr ""
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr ""
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:391
 msgid "Provide a valid .xls or .xlsx file"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 msgid "%(action)s failed due to upstream connection error."
 msgstr ""
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr ""
@@ -175,86 +175,115 @@ msgstr ""
 msgid "Project not found or access denied."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
 "%(config)s."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:81
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+
+#: app/htmx/project_create_routes.py:204
+msgid ""
+"No existing OSM buildings were found in this area. Continue mapping from "
+"scratch."
+msgstr ""
+
+#: app/htmx/project_create_routes.py:409
 msgid "Failed to load template form."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:417
 msgid "Please select a form or upload a file."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:719 app/htmx/project_create_routes.py:866
+msgid "An unexpected error occurred. Please try again."
+msgstr ""
+
+#: app/htmx/project_create_routes.py:782
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr ""
+
+#: app/htmx/project_create_routes.py:893 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:903
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:948
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:972 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr ""
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:976
 msgid "Error"
 msgstr ""
 
@@ -432,7 +461,7 @@ msgstr ""
 msgid "Visibility"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr ""
@@ -463,7 +492,7 @@ msgstr ""
 msgid "from this project?"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -778,6 +807,26 @@ msgstr ""
 msgid "Template XLSForm content is empty."
 msgstr ""
 
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr ""
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr ""
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr ""
+
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
 msgstr ""
@@ -921,7 +970,10 @@ msgstr ""
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr ""
 
@@ -1248,106 +1300,77 @@ msgstr ""
 msgid "Create New Project"
 msgstr ""
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr ""
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr ""
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr ""
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr ""
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr ""
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr ""
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr ""
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr ""
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr ""
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr ""
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr ""
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr ""
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr ""
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
 "          it."
 msgstr ""
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr ""
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr ""
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr ""
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr ""
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr ""
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr ""
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
+#: app/templates/new_project_simple.html:8
+msgid ""
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
+msgstr ""
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr ""
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr ""
+
+#: app/templates/project_details.html:6 app/templates/project_details.html:166
+#: app/templates/project_details.html:177
+msgid "Back to Projects"
 msgstr ""
 
 #: app/templates/project_details.html:46
@@ -1403,15 +1426,6 @@ msgstr ""
 msgid "Delete Project"
 msgstr ""
 
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr ""
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr ""
-
 #: app/templates/project_details.html:174
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
@@ -1433,8 +1447,9 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr ""
 
+#: app/templates/partials/project_details/setup_steps.html:756
 #: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
+msgid "QField Cloud URL"
 msgstr ""
 
 #: app/templates/qfc_admin.html:46
@@ -1478,6 +1493,81 @@ msgstr ""
 
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:3
+msgid "Area"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:4
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:5
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:6
+msgid "Invalid geometry"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:7
+msgid "Undo last vertex"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:8
+msgid "My location"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:9
+msgid "Failed to validate GeoJSON"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:10
+msgid "No GeoJSON returned from validation"
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:11
+msgid ""
+"You must draw or upload an Area of Interest (AOI) on the map before "
+"submitting."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:3
+msgid "Project Area"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:12
+msgid "Draw Area"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:20
+msgid "Upload GeoJSON"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:23
+msgid "Clear"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:31
+msgid ""
+"Draw a polygon on the map or upload a GeoJSON file to define your project"
+" area. Maximum\n"
+"    project size is 1,000 km². Areas over 100 km² will show a warning. "
+"The OSM data extract API is\n"
+"    limited to 200 km²."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:42
+#: app/templates/partials/project_details/setup_steps.html:159
+#: app/templates/partials/project_details/setup_steps.html:335
+#: app/templates/partials/project_details/setup_steps.html:476
+#: app/templates/partials/project_details/setup_steps.html:684
+msgid "Advanced Config"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:50
+msgid "Merge geometries (use convex hull for multipolygons)"
 msgstr ""
 
 #: app/templates/partials/project_details/basemap_section.html:2
@@ -1910,10 +2000,6 @@ msgstr ""
 msgid "https://your-odk-central.com"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr ""
-
 #: app/templates/partials/project_details/setup_steps.html:762
 msgid "https://qfield.cloud"
 msgstr ""
@@ -2100,43 +2186,99 @@ msgstr ""
 msgid "Error:"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
+#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+msgid ""
+"Basemap attach failed for now. Your project is ready to\n"
+"      use. Please retry attach."
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
+#: app/templates/partials/project_details/fragments/basemap_progress.html:23
 msgid "Retry Attach"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
+#: app/templates/partials/project_details/fragments/basemap_progress.html:29
 msgid ""
 "Basemap attach is in progress. Use the button below to check the latest "
 "status."
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
+#: app/templates/partials/project_details/fragments/basemap_progress.html:43
+#: app/templates/partials/project_details/fragments/basemap_progress.html:47
+#: app/templates/partials/project_details/fragments/basemap_progress.html:109
+#: app/templates/partials/project_details/fragments/basemap_progress.html:113
 msgid "Checking..."
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
+#: app/templates/partials/project_details/fragments/basemap_progress.html:44
+#: app/templates/partials/project_details/fragments/basemap_progress.html:47
+#: app/templates/partials/project_details/fragments/basemap_progress.html:110
+#: app/templates/partials/project_details/fragments/basemap_progress.html:113
 msgid "Check Status"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
+#: app/templates/partials/project_details/fragments/basemap_progress.html:67
 msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
+"Basemap generation is in progress. Use the button below to check the "
+"latest status."
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
+#: app/templates/partials/project_details/fragments/basemap_progress.html:68
 msgid "STAC item"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
+#: app/templates/partials/project_details/fragments/basemap_progress.html:69
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+msgid ""
+"Basemap attached to\n"
+"    QField project."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+msgid ""
+"Basemap is\n"
+"    ready. Attaching to QField project in progress."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+msgid ""
+"Basemap is ready. Not yet\n"
+"    attached to QField project."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+msgid "Basemap is ready."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid "Total size"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+msgid "Available Zoom"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+msgid "Download MBTiles"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
+msgid "View Metadata"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:43
+#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+msgid "Attach to QField Project"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+msgid ""
+"Use the ODK offline maps documentation to configure this MBTiles file in "
+"Collect."
 msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:3
@@ -2145,10 +2287,6 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:13
 msgid "Cloud"
-msgstr ""
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
 msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:49

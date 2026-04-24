@@ -55,6 +55,8 @@ from .htmx_helpers import callout as _callout
 
 log = logging.getLogger(__name__)
 BYTES_PER_UNIT = 1024
+AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS = 8
+AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS = 1
 METADATA_BROWSER_URL_TEMPLATE = (
     "https://api.imagery.hotosm.org/browser/external/"
     "api.imagery.hotosm.org/stac/collections/openaerialmap/items/{stac_item_id}"
@@ -181,6 +183,12 @@ def _progress_fragment(
     basemap_maxzoom: int | None = None,
 ) -> Template:
     """Render progress fragment."""
+    is_initially_processing = (
+        project.basemap_attach_status == "in_progress"
+        if progress_scope == "attach"
+        else project.basemap_status == "generating"
+    )
+
     return Template(
         template_name="partials/project_details/fragments/basemap_progress.html",
         context={
@@ -191,6 +199,7 @@ def _progress_fragment(
                 basemap_maxzoom=basemap_maxzoom,
             ),
             "progress_scope": progress_scope,
+            "is_initially_processing": is_initially_processing,
         },
         media_type="text/html",
         status_code=status.HTTP_200_OK,
@@ -248,11 +257,71 @@ def _attach_status_fragment(project: DbProject) -> Response | Template:
 
 def _attach_error_text(exc: Exception) -> str:
     """Return a concise user-facing attach failure message."""
-    if isinstance(exc, HTTPException):
-        detail = exc.detail if isinstance(exc.detail, str) else None
-        return detail or _("Basemap attach failed. Please try again.")
+    fallback_message = _(
+        "Basemap attach failed for now. Your project is ready to use. "
+        "Please retry attach."
+    )
 
-    return _("Basemap attach failed. Please try again.")
+    transient_message = _(
+        "Basemap attach could not complete due to a temporary network issue. "
+        "Your project is ready to use. Please retry attach."
+    )
+
+    if _is_transient_attach_exception(exc):
+        return transient_message
+
+    return fallback_message
+
+
+_TRANSIENT_ATTACH_FRAGMENTS = (
+    "name or service not known",
+    "temporary failure in name resolution",
+    "failed to resolve",
+    "dns",
+    "timed out",
+    "timeout",
+    "connection reset",
+    "connection refused",
+    "connection aborted",
+    "temporarily unavailable",
+    "temporary failure",
+    "network is unreachable",
+    "protocolerror",
+)
+
+
+def _contains_transient_attach_fragment(value: str) -> bool:
+    """Return whether text contains a retryable transient-network fragment."""
+    text = value.lower()
+    return any(fragment in text for fragment in _TRANSIENT_ATTACH_FRAGMENTS)
+
+
+def _next_exception(exc: Exception) -> Exception | None:
+    """Return the next chained exception when present."""
+    next_exc = exc.__cause__ or exc.__context__
+    return next_exc if isinstance(next_exc, Exception) else None
+
+
+def _is_transient_attach_exception(exc: Exception) -> bool:
+    """Return True when an attach exception looks temporary and retryable."""
+    if isinstance(exc, TimeoutError):
+        return True
+
+    current: Exception | None = exc
+    visited: set[int] = set()
+    while current is not None and id(current) not in visited:
+        visited.add(id(current))
+        if _contains_transient_attach_fragment(str(current)):
+            return True
+
+        if isinstance(current, HTTPException):
+            detail = current.detail if isinstance(current.detail, str) else ""
+            if _contains_transient_attach_fragment(detail):
+                return True
+
+        current = _next_exception(current)
+
+    return False
 
 
 def _search_failure_response() -> Response:
@@ -390,36 +459,50 @@ async def _start_basemap_attach(
 
 async def _run_basemap_attach_background(project_id: int, basemap_url: str) -> None:
     """Run heavy basemap attach flow in background and persist terminal state."""
+    await asyncio.sleep(AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS)
     now = datetime.now(timezone.utc)
 
-    try:
-        async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
-            project = await DbProject.one(db, project_id)
-            await attach_basemap_to_qfield_project(db, project, basemap_url)
-            await DbProject.update(
-                db,
-                project_id,
-                ProjectUpdate(
-                    basemap_attach_status="ready",
-                    basemap_attach_error=None,
-                    basemap_attach_updated_at=now,
-                ),
-            )
-            await db.commit()
-    except Exception as exc:
-        log.exception("Basemap attach failed for project %s", project_id)
-        error_text = _attach_error_text(exc)
-        async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
-            await DbProject.update(
-                db,
-                project_id,
-                ProjectUpdate(
-                    basemap_attach_status="failed",
-                    basemap_attach_error=error_text,
-                    basemap_attach_updated_at=now,
-                ),
-            )
-            await db.commit()
+    for attempt in range(AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS + 1):
+        try:
+            async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
+                project = await DbProject.one(db, project_id)
+                await attach_basemap_to_qfield_project(db, project, basemap_url)
+                await DbProject.update(
+                    db,
+                    project_id,
+                    ProjectUpdate(
+                        basemap_attach_status="ready",
+                        basemap_attach_error=None,
+                        basemap_attach_updated_at=now,
+                    ),
+                )
+                await db.commit()
+                return
+        except Exception as exc:
+            is_last_attempt = attempt >= AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS
+            retryable = _is_transient_attach_exception(exc)
+            if retryable and not is_last_attempt:
+                log.warning(
+                    "Basemap attach transient failure for project %s; retrying once",
+                    project_id,
+                    exc_info=exc,
+                )
+                continue
+
+            log.exception("Basemap attach failed for project %s", project_id)
+            error_text = _attach_error_text(exc)
+            async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
+                await DbProject.update(
+                    db,
+                    project_id,
+                    ProjectUpdate(
+                        basemap_attach_status="failed",
+                        basemap_attach_error=error_text,
+                        basemap_attach_updated_at=now,
+                    ),
+                )
+                await db.commit()
+            return
 
 
 @post(
@@ -610,6 +693,10 @@ async def basemap_status_htmx(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
+    basemap_size_bytes: int | None = None
+    basemap_minzoom: int | None = None
+    basemap_maxzoom: int | None = None
+
     try:
         (
             basemap_size_bytes,
@@ -650,12 +737,13 @@ async def basemap_status_htmx(
         )
     except Exception:
         log.exception("Basemap status refresh failed for project %s", project_id)
-        await DbProject.update(
-            db,
-            project_id,
-            ProjectUpdate(basemap_status="failed"),
-        )
-        await db.commit()
+        if project.basemap_status == "generating":
+            return _progress_fragment(
+                project,
+                basemap_size_bytes=basemap_size_bytes,
+                basemap_minzoom=basemap_minzoom,
+                basemap_maxzoom=basemap_maxzoom,
+            )
         return _status_failure_response()
 
 

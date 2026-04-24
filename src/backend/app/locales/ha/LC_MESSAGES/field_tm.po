@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 17:46+0100\n"
+"POT-Creation-Date: 2026-04-24 17:12+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ha\n"
@@ -36,18 +36,21 @@ msgstr "ingantaccen mai amfani ya rasa ingantaccen mai ganowa."
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr "Mai amfani dole ne ya zama mai gudanarwa\n"
+msgstr ""
+"Mai amfani dole ne ya zama mai gudanarwa\n"
 "Mai amfani na"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr "bashi da izinin shiga aikin.\n"
+msgstr ""
+"bashi da izinin shiga aikin.\n"
 "Aikin"
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr "yana kulle tunda yana cikin jihar %(state)s.\n"
+msgstr ""
+"yana kulle tunda yana cikin jihar %(state)s.\n"
 "An kasa saka Mai amfani da"
 
 #: app/auth/user_crud.py:88
@@ -68,7 +71,8 @@ msgstr "Buɗe aiki a ODK Central"
 #: app/central/central_crud.py:244
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
-msgstr "ya kasa loda fom zuwa ODK ta Tsakiya: %(error)s\n"
+msgstr ""
+"ya kasa loda fom zuwa ODK ta Tsakiya: %(error)s\n"
 "Ana buƙatar"
 
 #: app/central/central_crud.py:259
@@ -78,17 +82,20 @@ msgstr "form_id don lissafin abubuwan da aka gabatar tare da pyodk."
 #: app/central/central_crud.py:302
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
-msgstr "XLSForm mara inganci: %(error)s\n"
+msgstr ""
+"XLSForm mara inganci: %(error)s\n"
 "Juyawar"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr "GeoJSON --> CSV ta kasa\n"
+msgstr ""
+"GeoJSON --> CSV ta kasa\n"
 "Aikin"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr "bai ƙunshi abubuwan gabatarwa ba tukuna\n"
+msgstr ""
+"bai ƙunshi abubuwan gabatarwa ba tukuna\n"
 "Filin bayanai na"
 
 #: app/central/central_crud.py:562
@@ -128,7 +135,7 @@ msgstr "ya kasa ƙirƙirar mai amfani na ODK Central Manager."
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "An samu kuskuren da ba a zata ba yayin ƙirƙirar lambar QR."
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:205
+#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:367
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Bayar da ingantaccen fayil .xls ko .xlsx"
 
@@ -144,10 +151,11 @@ msgstr "%(action)s ya kasa tare da HTTP %(status_code)s."
 #: app/helpers/basemap_services.py:40
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
-msgstr "%(action)s ya gaza saboda kuskuren haɗin kai.\n"
+msgstr ""
+"%(action)s ya gaza saboda kuskuren haɗin kai.\n"
 "API ɗin Tilepack"
 
-#: app/helpers/basemap_services.py:176
+#: app/helpers/basemap_services.py:178
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "ya dawo da HTTP %(status_code)s."
@@ -184,53 +192,62 @@ msgstr "Fayil ɗin ku na geojson ba shi da inganci."
 msgid "Project not found or access denied."
 msgstr "Ba a samu aikin ba ko an hana shiga."
 
-#: app/htmx/basemap_routes.py:233
+#: app/htmx/basemap_routes.py:240
 msgid "Basemap attached to QField project successfully."
 msgstr "An haɗa taswirar tushe da aikin QField cikin nasara."
 
-#: app/htmx/basemap_routes.py:243
+#: app/htmx/basemap_routes.py:250
 msgid "Basemap attach has not started yet."
 msgstr "Haɗa taswirar tushe bai fara ba tukuna."
 
-#: app/htmx/basemap_routes.py:253 app/htmx/basemap_routes.py:255
-msgid "Basemap attach failed. Please try again."
+#: app/htmx/basemap_routes.py:259
+#, fuzzy
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
 msgstr "Haɗa taswirar tushe ya gaza. Don Allah a sake gwadawa."
 
-#: app/htmx/basemap_routes.py:263
+#: app/htmx/basemap_routes.py:264
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+
+#: app/htmx/basemap_routes.py:305
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr ""
 "An kasa binciken hotunan yanzu. Don Allah a sake gwadawa nan ba da jimawa"
 " ba."
 
-#: app/htmx/basemap_routes.py:276
+#: app/htmx/basemap_routes.py:318
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "An kasa fara ƙirƙirar taswirar tushe yanzu. Don Allah a sake gwadawa nan "
 "ba da jimawa ba."
 
-#: app/htmx/basemap_routes.py:290
+#: app/htmx/basemap_routes.py:332
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "An kasa sabunta matsayin taswirar tushe yanzu. Don Allah a sake gwadawa "
 "nan ba da jimawa ba."
 
-#: app/htmx/basemap_routes.py:318
+#: app/htmx/basemap_routes.py:360
 msgid "Basemap attach is available after publication."
 msgstr "Haɗa taswirar tushe yana samuwa bayan bugawa."
 
-#: app/htmx/basemap_routes.py:327
+#: app/htmx/basemap_routes.py:369
 msgid "Basemap attach is only available for QField projects."
 msgstr "Haɗa taswirar tushe yana samuwa ne kawai ga ayyukan QField."
 
-#: app/htmx/basemap_routes.py:337
+#: app/htmx/basemap_routes.py:379
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Taswirar tushe ba ta shirya ba tukuna. Don Allah a jira a gama ƙirƙirawa."
 
-#: app/htmx/basemap_routes.py:346
+#: app/htmx/basemap_routes.py:388
 msgid "No generated basemap download URL is available yet."
 msgstr "Ba a samu URL na saukar da taswirar tushe da aka ƙirƙira ba tukuna."
 
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap_routes.py:402
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -239,39 +256,56 @@ msgstr ""
 "Ba a saita haɗa taswirar tushe ta QField a wannan shimfiɗawa ba. "
 "%(config)s ya ɓace."
 
-#: app/htmx/basemap_routes.py:448
+#: app/htmx/basemap_routes.py:490
 msgid "Basemap tools are available after publication."
 msgstr "Kayan aikin taswirar tushe suna samuwa bayan bugawa."
 
-#: app/htmx/basemap_routes.py:608
+#: app/htmx/basemap_routes.py:650
 msgid "No basemap generation in progress."
 msgstr "Aikin taswira na fili yana gudana"
 
-#: app/htmx/project_create_routes.py:223
+#: app/htmx/project_create_routes.py:77
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"Dole ne yankin aikin ya zama ingantaccen JSON (GeoJSON Polygon, "
+"MultiPolygon, Feature, ko FeatureCollection)."
+
+#: app/htmx/project_create_routes.py:385
 msgid "Failed to load template form."
 msgstr "An kasa loda fom na samfuri."
 
-#: app/htmx/project_create_routes.py:231
+#: app/htmx/project_create_routes.py:393
 msgid "Please select a form or upload a file."
 msgstr "Da fatan a zaɓi fom ko a ɗora fayil."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:294
+#: app/htmx/project_create_routes.py:695 app/htmx/project_create_routes.py:817
+msgid "An unexpected error occurred. Please try again."
+msgstr "An samu kuskuren da ba a zata ba. Da fatan a sake gwadawa."
+
+#: app/htmx/project_create_routes.py:758
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr "Ba a iya loda tsohon fom na OSM Buildings don kirkirar aiki mai sauki ba."
+
+#: app/htmx/project_create_routes.py:844 app/htmx/project_detail_routes.py:294
+#: app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "Ba a samu aikin ba."
 
-#: app/htmx/project_create_routes.py:466
+#: app/htmx/project_create_routes.py:854
 msgid "Project ID mismatch. You do not have access to this project."
 msgstr "ID na aikin bai dace ba. Ba ka da izinin shiga wannan aikin."
 
-#: app/htmx/project_create_routes.py:511
+#: app/htmx/project_create_routes.py:899
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "An tantance kuma an ɗora fom cikin nasara! Ana sake loda shafin..."
 
-#: app/htmx/project_create_routes.py:535 app/htmx/setup_step_routes.py:77
+#: app/htmx/project_create_routes.py:923 app/htmx/setup_step_routes.py:77
 msgid "An unexpected error occurred"
 msgstr "An samu kuskuren da ba a zata ba"
 
-#: app/htmx/project_create_routes.py:539
+#: app/htmx/project_create_routes.py:927
 msgid "Error"
 msgstr "Kuskure"
 
@@ -456,7 +490,7 @@ msgstr "Mai shi"
 msgid "Visibility"
 msgstr "Bayyanuwa"
 
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:38
+#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
 #: app/templates/project_details.html:58
 msgid "Description"
 msgstr "Bayani"
@@ -487,7 +521,7 @@ msgstr "Cire mai haɗin gwiwa"
 msgid "from this project?"
 msgstr "daga wannan aikin?"
 
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:176
+#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
 #: app/templates/partials/project_details/setup_steps.html:700
 #: app/templates/partials/project_details/setup_steps.html:795
 msgid "Cancel"
@@ -843,8 +877,31 @@ msgstr "An kasa loda fom na samfuri."
 
 #: app/projects/project_routes.py:103
 msgid "Template XLSForm content is empty."
-msgstr "Samfuran XLSForm abun ciki babu komai.\n"
+msgstr ""
+"Samfuran XLSForm abun ciki babu komai.\n"
 "Shaidar aikin"
+
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"An kirkiri wannan aikin da tsarin aiki mai sauki a FieldTM kuma an yi shi"
+" ne don tattara bayanan gine-gine domin inganta OpenStreetMap."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "Yanki mara suna"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "Yanki {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
 
 #: app/qfield/qfield_crud.py:110
 msgid "Project outline is missing or has no geometry."
@@ -852,7 +909,8 @@ msgstr "ya ɓace ko bashi da lissafi."
 
 #: app/qfield/qfield_crud.py:116
 msgid "Project outline geometry has no coordinates."
-msgstr "jigon jigo na aikin aikin ba shi da haɗin kai.\n"
+msgstr ""
+"jigon jigo na aikin aikin ba shi da haɗin kai.\n"
 "Ana buƙatar"
 
 #: app/qfield/qfield_crud.py:425
@@ -865,7 +923,8 @@ msgstr "XLSForm don ƙirƙirar aikin QField."
 
 #: app/qfield/qfield_crud.py:447
 msgid "Failed to modify XLSForm for QField."
-msgstr "ya kasa gyara XLSForm don QField.\n"
+msgstr ""
+"ya kasa gyara XLSForm don QField.\n"
 "Rubutun"
 
 #: app/qfield/qfield_crud.py:488
@@ -878,7 +937,8 @@ msgstr "QGIS wrapper an kammala amma babu fayil .qgz a fitarwa."
 
 #: app/qfield/qfield_crud.py:530
 msgid "QField project ID is missing; cannot attach basemap."
-msgstr "QField ID aikin ya ɓace; ba zai iya haɗa taswirar tushe ba.\n"
+msgstr ""
+"QField ID aikin ya ɓace; ba zai iya haɗa taswirar tushe ba.\n"
 "Ƙirƙirar aikin"
 
 #: app/qfield/qfield_crud.py:564
@@ -888,7 +948,8 @@ msgstr "An haɗa taswirar tushe da aikin QField."
 #: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr "QGIS ya gaza: %(error)s\n"
+msgstr ""
+"QGIS ya gaza: %(error)s\n"
 "Rubutun"
 
 #: app/qfield/qfield_crud.py:720
@@ -907,7 +968,8 @@ msgstr "Sauke lambar QR"
 #: app/qfield/qfield_crud.py:874
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr "ya kasa loda fayiloli zuwa QFieldCloud: %(error)s\n"
+msgstr ""
+"ya kasa loda fayiloli zuwa QFieldCloud: %(error)s\n"
 "Aikin"
 
 #: app/qfield/qfield_crud.py:1148
@@ -920,7 +982,9 @@ msgstr "Ba a samu aikin (%(project_id)s) ba."
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
-msgstr "na ƙungiyar '%(owner)s' ne. Ba za a iya ƙara '%(username)s' ga ƙungiyar ba: %(error)s\n"
+msgstr ""
+"na ƙungiyar '%(owner)s' ne. Ba za a iya ƙara '%(username)s' ga ƙungiyar "
+"ba: %(error)s\n"
 "Babu mai amfani da"
 
 #: app/qfield/qfield_crud.py:1186
@@ -995,7 +1059,10 @@ msgstr "Bincika ayyuka…"
 
 #: app/templates/home.html:68 app/templates/landing.html:568
 #: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:171
+#: app/templates/new_project.html:20 app/templates/new_project.html:128
+#: app/templates/new_project_simple.html:1
+#: app/templates/new_project_simple.html:4
+#: app/templates/new_project_simple.html:36
 msgid "Create Project"
 msgstr "Ƙirƙiri aiki"
 
@@ -1007,8 +1074,8 @@ msgstr "+ Sabo"
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
-msgstr[0] "Ana nuna aiki %(count)s"
-msgstr[1] "Ana nuna ayyuka %(count)s"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/templates/home.html:75
 #, python-format
@@ -1354,72 +1421,39 @@ msgstr "Koma gida"
 msgid "Create New Project"
 msgstr "Ƙirƙiri sabon aiki"
 
-#: app/templates/new_project.html:25
+#: app/templates/new_project.html:17
+msgid ""
+"If you are collecting OSM Buildings, use the simple workflow with AOI "
+"only."
+msgstr ""
+"Idan kana tattara bayanan OSM Buildings, yi amfani da tsarin mai sauki da"
+" AOI kawai."
+
+#: app/templates/new_project.html:45
 msgid "Project Name"
 msgstr "Sunan aiki"
 
-#: app/templates/new_project.html:30
+#: app/templates/new_project.html:50
 msgid "Enter project name"
 msgstr "Shigar da sunan aiki"
 
-#: app/templates/new_project.html:43
+#: app/templates/new_project.html:63
 msgid "Enter project description"
 msgstr "Shigar da bayanin aiki"
 
-#: app/templates/new_project.html:52
+#: app/templates/new_project.html:72
 msgid "Field Mapping App"
 msgstr "Manhajar taswirar fili"
 
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "Yankin aiki"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "Zana yanki"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "Ɗora GeoJSON"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "Goge"
-
-#: app/templates/new_project.html:125
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area.\n"
-"          Maximum project size is 1,000 km². Areas over 100 km² will show"
-" a warning. The OSM data\n"
-"          extract API is limited to 200 km²."
-msgstr ""
-"Zana polygon a taswira ko ka ɗora fayil GeoJSON don tantance yankin "
-"aikinka. Matsakaicin girman aiki shi ne 1,000 km². Yankuna sama da 100 "
-"km² za su nuna gargaɗi. API na cire bayanan OSM yana da iyaka zuwa 200 "
-"km²."
-
-#: app/templates/new_project.html:135
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
-msgid "Advanced Config"
-msgstr "Babban tsari"
-
-#: app/templates/new_project.html:147
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Haɗa geometries (yi amfani da convex hull don multipolygons)"
-
-#: app/templates/new_project.html:156 app/templates/project_details.html:95
+#: app/templates/new_project.html:113 app/templates/project_details.html:95
 msgid "Hashtags"
 msgstr "Hashtag"
 
-#: app/templates/new_project.html:159
+#: app/templates/new_project.html:116
 msgid "Type hashtags and press Enter or comma"
 msgstr "Rubuta hashtag sannan danna Enter ko comma"
 
-#: app/templates/new_project.html:164
+#: app/templates/new_project.html:121
 msgid ""
 "Type hashtags and press Enter or comma to add them. Click the × on a tag "
 "to remove\n"
@@ -1428,945 +1462,38 @@ msgstr ""
 "Rubuta hashtag sannan danna Enter ko comma don ƙara su. Danna × a kan "
 "alama don cire ta."
 
-#: app/templates/new_project.html:174
+#: app/templates/new_project.html:131
 msgid "Creating..."
 msgstr "Ana ƙirƙira..."
 
-#: app/templates/new_project.html:184
+#: app/templates/new_project.html:141
 msgid "Something went wrong. Please try again."
 msgstr "Wani abu ya tafi ba daidai ba. Da fatan a sake gwadawa."
 
-#: app/templates/new_project.html:185
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "Tsarin GeoJSON ba daidai ba ne. Da fatan a duba fayil ɗinka."
-
-#: app/templates/new_project.html:186
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "Fayil ɗin GeoJSON ba daidai ba ne. Da fatan a duba tsarin fayil."
-
-#: app/templates/new_project.html:187 app/templates/new_project.html:743
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr "Dole ne ka zana ko ka ɗora Area of Interest (AOI) a taswira kafin miƙawa."
-
-#: app/templates/new_project.html:708
+#: app/templates/new_project.html:264
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Akwai aikin da ke da wannan suna tuni. Da fatan a zaɓi wani suna dabam."
 
-#: app/templates/new_project.html:868
+#: app/templates/new_project.html:349
 msgid "Description is required."
 msgstr "Ana buƙatar bayani."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← Koma zuwa ayyuka"
-
-#: app/templates/project_details.html:46
-msgid "Project Metadata"
-msgstr "Bayanan aikin"
-
-#: app/templates/project_details.html:48
-msgid "Project metadata and setup information for managers."
-msgstr "Bayanan aiki da bayanin saiti ga masu kula."
-
-#: app/templates/project_details.html:66
-msgid "Project ID"
-msgstr "ID na aiki"
-
-#: app/templates/project_details.html:77
-msgid "Created"
-msgstr "An ƙirƙira"
-
-#: app/templates/project_details.html:84
-msgid "Last Updated"
-msgstr "Sabuntawa ta ƙarshe"
-
-#: app/templates/project_details.html:107
-msgid "External Project"
-msgstr "Aiki na waje"
-
-#: app/templates/project_details.html:109
-msgid "Instance:"
-msgstr "Instans:"
-
-#: app/templates/project_details.html:111
-msgid "Project ID:"
-msgstr "ID na aiki:"
-
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
-msgid "View Project in ODK Central →"
-msgstr "Duba aiki a ODK Central →"
-
-#: app/templates/project_details.html:136
-msgid "Manage QFieldCloud Project →"
-msgstr "Gudanar da aikin QFieldCloud →"
-
-#: app/templates/project_details.html:144
-msgid "View Project Externally →"
-msgstr "Duba aiki daga waje →"
-
-#: app/templates/project_details.html:160
-msgid "Delete this project in downstream and Field-TM? This cannot be undone."
-msgstr "A share wannan aiki a downstream da Field-TM? Ba za a iya janye wannan ba."
-
-#: app/templates/project_details.html:163
-msgid "Delete Project"
-msgstr "Share aiki"
-
-#: app/templates/project_details.html:166
-#: app/templates/project_details.html:177
-msgid "Back to Projects"
-msgstr "Koma zuwa ayyuka"
-
-#: app/templates/project_details.html:172
-msgid "Project Not Found"
-msgstr "Ba a samu aikin ba"
-
-#: app/templates/project_details.html:174
+#: app/templates/new_project_simple.html:8
 msgid ""
-"The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "Aikin da kake nema bai wanzu ba ko kuma ba ka da izinin dubawa."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Gudanar da QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
+"This simple flow only needs your project area. We will auto-generate the "
+"project title,\n"
+"      description, and tags for OSM Buildings."
 msgstr ""
-"Wannan shafi na kula da masu amfani a aikin QField ɗinka ne bayan an "
-"ƙirƙira shi."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Shigar da bayanan shaidar QFieldCloud ɗinka don kula da masu haɗin gwiwa."
-
-#: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "URL na QFieldCloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "Asalin URL na instans ɗinka na QFieldCloud (ba tare da /api/v1 ba)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Kalmar sirri"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "Haɗa"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "Ana haɗawa…"
-
-#: app/templates/partials/metrics.html:5
-msgid "Features Surveyed (Approximate)"
-msgstr "Siffofin da aka bincika (kimanin)"
-
-#: app/templates/partials/metrics.html:12
-msgid "Projects Created"
-msgstr "Ayyukan da aka ƙirƙira"
-
-#: app/templates/partials/metrics.html:19
-msgid "Countries Covered"
-msgstr "Ƙasashen da aka rufe"
-
-#: app/templates/partials/metrics.html:26
-msgid "Users Registered"
-msgstr "Masu amfani da aka yi rijista"
-
-#: app/templates/partials/metrics.html:33
-msgid "Supported Mapping Apps"
-msgstr "Manhajojin taswira da ake tallafawa"
-
-#: app/templates/partials/project_details/basemap_section.html:2
-msgid "Offline Basemap"
-msgstr "Taswirar tushe ba tare da intanet ba"
-
-#: app/templates/partials/project_details/basemap_section.html:4
-msgid ""
-"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
-"basemap."
-msgstr ""
-"Bincika hotunan HOT OpenAerialMap na wannan AOI kuma ƙirƙiri taswirar "
-"tushe ta MBTiles."
-
-#: app/templates/partials/project_details/basemap_section.html:26
-msgid "Search OAM Imagery"
-msgstr "Bincika hotunan OAM"
-
-#: app/templates/partials/project_details/basemap_section.html:37
-msgid "Basemap generation previously failed. Please search again and retry."
-msgstr ""
-"Ƙirƙirar taswirar tushe ta gaza a baya. Don Allah a sake bincike sannan a"
-" sake gwadawa."
-
-#: app/templates/partials/project_details/basemap_section.html:41
-msgid "No basemap selected yet."
-msgstr "Ba a zaɓi taswirar tushe ba tukuna."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:3
-msgid "Manager Setup Summary"
-msgstr "Taƙaitaccen saitin mai kula"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:6
-msgid "The project setup flow is complete and shown below for reference."
-msgstr "An kammala tsarin saitin aiki kuma an nuna shi a ƙasa domin tunani."
-
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Wurin aiki"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Mataki na 2: Ɗora XLSForm"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
-msgid "Complete"
-msgstr "Kammala"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
-msgid "Step 3: Get Data"
-msgstr "Mataki na 3: Samu bayanai"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Mataki na 4: Raba zuwa ayyuka"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
-msgid "Step 5: Finalise Project"
-msgstr "Mataki na 5: Kammala aiki"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:69
-msgid ""
-"If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
-msgstr ""
-"Idan kana buƙatar ɗora ƙarin fayilolin media zuwa wannan aiki, kamar "
-"hotuna da bidiyo, shiga ODK Central sannan ka ɗora su a cikin saitunan "
-"fom."
-
-#: app/templates/partials/project_details/setup_steps.html:14
-msgid "Ready for Mapping"
-msgstr "A shirye don taswira"
-
-#: app/templates/partials/project_details/setup_steps.html:25
-msgid "Loading QR code..."
-msgstr "Ana loda lambar QR..."
-
-#: app/templates/partials/project_details/setup_steps.html:32
-msgid "Project Setup"
-msgstr "Saitin aiki"
-
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "Mataki na 2: Zaɓi fom na bincike"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr ""
-"Zaɓi nau'in bincike sannan ka ci gaba da tsoffin saitunan da aka ba da "
-"shawara."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "Zaɓi nau'in bincike:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "Ana loda nau'ikan bincike..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "Ko kuma amfani da fom naka maimakon haka:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "Ɗora fom na musamman"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-"Lura: Field-TM zai ƙara wasu filaye a cikin fom ɗinka ta atomatik domin "
-"raba ayyuka da zaɓin fasali. Fom ɗinka ya kamata ya ƙunshi tambayoyin "
-"bincike kawai da kake son yi (kar a haɗa filayen select_one_from_file na "
-"ayyuka/fasali)."
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"Tsoffin saitunan da aka ba da shawara suna aiki ga ayyukan ODK, har da "
-"dacewa da ODK Collect."
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "Tsoffin saitunan da aka ba da shawara suna aiki ga ayyukan %(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr "Tsoffin saitunan da aka ba da shawara suna aiki ga wannan aikin."
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr "Tsohon harshe:"
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr "Turanci"
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr "Sifaniyanci"
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr "Faransanci"
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr "Fotugis"
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr "Swahili"
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr "Hindi"
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr "Zaɓuɓɓukan fom:"
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr "Haɗa tambayar loda hoto"
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr "Sanya hoto ya zama dole"
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr "Yana roƙon mai amfani ya ɗauki hoto a wurinsa."
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr "Haɗa tambayar tabbatar da digitisation"
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-"Yana roƙon mai taswira ya tabbatar ko an digitise siffofin da ke akwai "
-"daidai."
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr "Ci gaba"
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ An ɗora fom na bincike cikin nasara"
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Sauke bayanan OSM da aka ba da shawara don fom ɗin bincikenka."
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr "Duba bayanan a taswira, sannan ka ci gaba."
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "Sauke bayanan OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr "Tattara sabbin bayanai kawai"
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr ""
-"Yi amfani da bayanan shigarwa na musamman ko ka canza tsoffin zaɓuɓɓukan "
-"sauke OSM."
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr "Rukunin OSM:"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr "Gine-ginen OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr "Hanyoyin OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr "Kiwon lafiya na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr "Bandakuna na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr "Addini na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr "Amfanin ƙasa na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr "Hanyoyin ruwa na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr "Wuraren ruwa na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr "Zubar da shara na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr "Ilimi na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr "Makabartu na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr "Kayayyakin more rayuwa na OSM"
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr "Nau'in geometry:"
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr "Poligon"
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr "Polilayi"
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr "Batu"
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr "Yi amfani da centroids"
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr "Ɗora GeoJSON na musamman"
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "Ana samar da cire bayanan OSM... Wannan na iya ɗaukar ɗan lokaci."
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr "Cire bayanan OSM a shirye yake"
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Mataki na 3: Raba zuwa ayyuka (na zaɓi)"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ Rabon aiki ba shi da amfani idan babu bayanan da suke akwai"
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"Samar da yankunan aiki ta hanyar raba Area of Interest (AOI). Zaɓi "
-"algorithm da sigogi, sannan ka raba. Duba abin da aka nuna, sannan ka "
-"danna \"Accept Task Areas\" don ajiye. Ko kuma ka danna"
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr "Tsallake"
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr "don amfani da dukan AOI a matsayin aiki guda ɗaya."
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "Zaɓi waɗanne siffofi masu layi za su shafi rabon aiki bisa gine-gine."
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr "Haɗa hanyoyi"
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr "Haɗa koguna"
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr "Haɗa layin dogo"
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr "Haɗa hanyoyin jirgi"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr "Algorithm:"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr "Zaɓi zaɓin rabawa..."
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "Raba ta murabba'i"
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Matsakaicin gine-gine v1 (Voronoi)"
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Matsakaicin gine-gine v2 (Straight Skeleton)"
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr "Raba da takamaiman adadin ayyuka (zuwa nan ba da jimawa ba)"
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr "Matsakaicin gine-gine a kowane aiki:"
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr "Yawan ayyuka:"
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr "Girma (mita):"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr "Sake raba"
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr "Raba AOI"
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "Ana raba AOI zuwa ayyuka... Wannan na iya ɗaukar ɗan lokaci."
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr "A shirye"
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-"An cika duk abubuwan da ake buƙata! Ƙirƙiri aikin a kayan aikin taswira "
-"da ka zaɓa."
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr "Kammala aiki"
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr "Tabbatar da kammala aiki"
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr "Ka tabbata kana son kammala wannan aikin?"
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr "Tabbatar kuma ka kammala"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr "Bayanan shaidar na musamman"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr "URL na ODK Central"
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "QField Cloud URL"
-msgstr "URL na QField Cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "Gwada bayanan shaida"
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr "Ajiye kuma ci gaba"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "Select a survey type..."
-msgstr "Zaɓi nau'in bincike..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "No survey types available"
-msgstr "Babu nau'ikan bincike da ake samu"
-
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
-msgstr "Babu fom na bincike da ake samu. Ɗora fom na musamman a Babban tsari."
-
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "Zaɓi nau'in bincike, ko ka ɗora fom na musamman a Babban tsari."
-
-#: app/templates/partials/project_details/style_and_scripts.html:14
-msgid "Survey type selected."
-msgstr "An zaɓi nau'in bincike."
-
-#: app/templates/partials/project_details/style_and_scripts.html:15
-msgid "Invalid file type. Please upload a .xls or .xlsx file."
-msgstr "Nau'in fayil ba daidai ba ne. Da fatan a ɗora fayil .xls ko .xlsx."
-
-#: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Selected file:"
-msgstr "Fayil da aka zaɓa:"
-
-#: app/templates/partials/project_details/style_and_scripts.html:17
-msgid "Custom form selected."
-msgstr "An zaɓi fom na musamman."
-
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr ""
-"Da farko ka zaɓi nau'in bincike, ko ka ɗora fom na musamman a Babban "
-"tsari."
-
-#: app/templates/partials/project_details/style_and_scripts.html:19
-msgid "polygons"
-msgstr "polygons"
-
-#: app/templates/partials/project_details/style_and_scripts.html:20
-msgid "polylines"
-msgstr "polylines"
-
-#: app/templates/partials/project_details/style_and_scripts.html:21
-msgid "points"
-msgstr "maki"
-
-#: app/templates/partials/project_details/style_and_scripts.html:22
-msgid "features"
-msgstr "siffofi"
-
-#: app/templates/partials/project_details/style_and_scripts.html:23
-msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
-msgstr ""
-"Ka ɗora fom na musamman, don haka wannan saukar OSM na zaɓi ne. Yi amfani"
-" da Babban tsari don ɗora GeoJSON naka ko daidaita saitunan sauke."
-
-#: app/templates/partials/project_details/style_and_scripts.html:24
-#, python-format
-msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
-msgstr ""
-"Asalin da aka ba da shawara: %(title)s (%(geom_label)s). Duba bayanan a "
-"taswira, sannan ka ci gaba."
-
-#: app/templates/partials/project_details/style_and_scripts.html:25
-#, python-format
-msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
-msgstr ""
-"An sabunta asalin da aka ba da shawara (%(geom_label)s). Duba bayanan a "
-"taswira, sannan ka ci gaba."
-
-#: app/templates/partials/project_details/style_and_scripts.html:26
-msgid "Downloading..."
-msgstr "Ana saukewa..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Confirm No Splitting"
-msgstr "Tabbatar babu rabawa"
-
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
-msgstr "Raba ta gine-gine"
-
-#: app/templates/partials/project_details/style_and_scripts.html:33
-msgid "Select Option"
-msgstr "Zaɓi zaɓi"
-
-#: app/templates/partials/project_details/style_and_scripts.html:34
-msgid "Confirming..."
-msgstr "Ana tabbatarwa..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Splitting..."
-msgstr "Ana rabawa..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
-msgid "ODK Central"
-msgstr "ODK Central"
-
-#: app/templates/partials/project_details/style_and_scripts.html:37
-msgid "QField"
-msgstr "QField"
-
-#: app/templates/partials/project_details/style_and_scripts.html:38
-msgid "the mapping tool"
-msgstr "kayan aikin taswira"
-
-#: app/templates/partials/project_details/style_and_scripts.html:39
-msgid "Project type not set. Please set the field mapping app first."
-msgstr "Ba a saita nau'in aiki ba. Da fatan a fara saita manhajar taswirar fili."
-
-#: app/templates/partials/project_details/style_and_scripts.html:40
-#, python-format
-msgid ""
-"Are you sure you want to finalise this project in %(project_type)s? This "
-"will create the project, upload forms, and generate all necessary files."
-msgstr ""
-"Ka tabbata kana son kammala wannan aiki a %(project_type)s? Wannan zai "
-"ƙirƙiri aikin, ya ɗora fom, kuma ya samar da duk fayilolin da ake buƙata."
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
-msgid "Custom ODK Credentials"
-msgstr "Bayanan shaidar ODK na musamman"
-
-#: app/templates/partials/project_details/style_and_scripts.html:42
-msgid "Custom QField Credentials"
-msgstr "Bayanan shaidar QField na musamman"
-
-#: app/templates/partials/project_details/style_and_scripts.html:43
-msgid "Please fill in all fields."
-msgstr "Da fatan a cika duk filaye."
-
-#: app/templates/partials/project_details/style_and_scripts.html:44
-msgid "Testing..."
-msgstr "Ana gwadawa..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:45
-msgid "Testing credentials..."
-msgstr "Ana gwada bayanan shaida..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:46
-msgid "✓ Credentials are valid!"
-msgstr "✓ Bayanan shaida suna da inganci!"
-
-#: app/templates/partials/project_details/style_and_scripts.html:47
-msgid "Invalid credentials. Please check and try again."
-msgstr "Bayanan shaida ba su da inganci. Da fatan a duba sannan a sake gwadawa."
-
-#: app/templates/partials/project_details/style_and_scripts.html:48
-#, python-format
-msgid "Error testing credentials: %(message)s"
-msgstr "Kuskure wajen gwada bayanan shaida: %(message)s"
-
-#: app/templates/partials/project_details/style_and_scripts.html:50
-msgid "Please test credentials first before continuing."
-msgstr "Da fatan a fara gwada bayanan shaida kafin ci gaba."
-
-#: app/templates/partials/project_details/style_and_scripts.html:51
-#, python-format
-msgid "Creating project in %(project_type)s... This may take a moment."
-msgstr "Ana ƙirƙirar aiki a %(project_type)s... Wannan na iya ɗaukar ɗan lokaci."
-
-#: app/templates/partials/project_details/style_and_scripts.html:52
-msgid "Error:"
-msgstr "Kuskure:"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
-msgid "Basemap attach failed. Use retry to start again."
-msgstr ""
-"Haɗa taswirar tushe ya gaza. Yi amfani da sake gwadawa don fara daga "
-"farko."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:19
-msgid "Retry Attach"
-msgstr "Sake gwada haɗawa"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:25
-msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr ""
-"Ana haɗa taswirar tushe yanzu. Yi amfani da maɓallin da ke ƙasa don duba "
-"sabon matsayi."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:39
-msgid "Checking..."
-msgstr "Ana dubawa..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:40
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:131
-msgid "Check Status"
-msgstr "Matsayin aiki"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:60
-msgid ""
-"Basemap generation is in progress. Status updates automatically every few"
-" seconds."
-msgstr ""
-"Ana ƙirƙirar taswirar tushe yanzu. Matsayi yana sabuntawa ta atomatik "
-"kowane ƴan daƙiƙu."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:61
-msgid "STAC item"
-msgstr "Abun STAC"
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
-msgid "Zoom"
-msgstr "Zuƙowa"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
-msgid "Select one imagery item to start MBTiles generation."
-msgstr "Zaɓi abu guda na hoto don fara ƙirƙirar MBTiles."
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
-msgid "Cloud"
-msgstr "Rufe"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
-msgid "View Metadata"
-msgstr "Duba bayanan meta"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
-msgid "Use this image"
-msgstr "Yi amfani da wannan hoton"
-
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
-msgid "No imagery items were found for this AOI."
-msgstr "Ba a sami wasu abubuwan hoto na wannan AOI ba."
-
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
-msgid "Accept Data Extract"
-msgstr "Karɓi cire bayanai"
-
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
-msgid "View technical details"
-msgstr "Duba bayanan fasaha"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
-msgid "Project created in ODK Central."
-msgstr "An ƙirƙiri aikin a ODK Central."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
-msgid "Manager Access (ODK Central UI)"
-msgstr "Shigar mai kula (ODK Central UI)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
-msgid "Open project in ODK Central"
-msgstr "Buɗe aiki a ODK Central"
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
-msgid "Save these credentials now. They will only be shown once."
-msgstr "Ajiye waɗannan bayanan shaida yanzu. Za a nuna su sau ɗaya kacal."
-
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
-msgid "View FieldTM Project"
-msgstr "Duba aikin FieldTM"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
-msgid "Project created in QFieldCloud."
-msgstr "An ƙirƙiri aikin a QFieldCloud."
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Shigar mai kula (QFieldCloud)"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
-msgid "Open project in QFieldCloud"
-msgstr "Buɗe aiki a QFieldCloud"
-
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
-msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
-msgstr ""
-"Ba a iya ƙirƙirar asusun mai kula ta atomatik ba. Shiga QFieldCloud a "
-"matsayin admin don kula da aikin."
-
-#: app/templates/partials/project_details/fragments/split_preview.html:27
-msgid "Accept Task Choices"
-msgstr "Karɓi zaɓin ayyuka"
+"Wannan tsari mai sauki yana bukatar yankin aikinka kawai. Za mu samar da "
+"taken aiki, bayaninsa, da alamominsa na OSM Buildings ta atomatik."
+
+#: app/templates/new_project_simple.html:38
+msgid "Back to Standard Form"
+msgstr "Koma zuwa Daidaitaccen Fom"
+
+#: app/templates/new_project_simple.html:46
+msgid "Creating project and preparing map..."
+msgstr "Ana kirkirar aikin kuma ana shirya taswira..."
 
 #~ msgid "Failed to add collaborator: %(error)s"
 #~ msgstr "An kasa ƙara mai haɗin gwiwa: %(exc)s"
@@ -2381,20 +1508,2061 @@ msgstr "Karɓi zaɓin ayyuka"
 #~ msgstr "Jimillar girma"
 
 #~ msgid "Available Zoom"
-#~ msgstr "Zuƙowa da ake da shi"
+#~ msgstr "Samammen zuƙowa"
 
 #~ msgid "Download MBTiles"
-#~ msgstr "Sauke lambar QR"
+#~ msgstr "Sauke MBTiles"
 
 #~ msgid "Attach to QField Project"
-#~ msgstr "Gudanar da aikin QFieldCloud →"
+#~ msgstr "Haɗa zuwa Aikin QField"
 
 #~ msgid ""
 #~ "Use the ODK offline maps documentation"
 #~ " to configure this MBTiles file in"
 #~ " Collect."
 #~ msgstr ""
-#~ "Yi amfani da takardun taswirar ODK "
-#~ "marasa intanet don saita wannan fayil"
-#~ " ɗin MBTiles a cikin Collect."
+#~ "Yi amfani da takardun taswirorin ODK "
+#~ "na offline don saita wannan fayil "
+#~ "na MBTiles a Collect."
+
+#~ msgid "Validation failed"
+#~ msgstr "ya gaza"
+
+#~ msgid "An unexpected error occurred. Please contact an admin."
+#~ msgstr "An samu kuskuren da ba a zata ba. Da fatan a tuntuɓi mai gudanarwa."
+
+#~ msgid "Could not connect to database"
+#~ msgstr "Ba zai iya haɗawa zuwa bayanan bayanai ba"
+
+#~ msgid "Authenticated user is missing a valid identifier."
+#~ msgstr "ingantaccen mai amfani ya rasa ingantaccen mai ganowa."
+
+#~ msgid "User must be an administrator"
+#~ msgstr ""
+#~ "Mai amfani dole ne ya zama mai gudanarwa\n"
+#~ "Mai amfani na"
+
+#~ msgid "User does not have permission to access the project."
+#~ msgstr ""
+#~ "bashi da izinin shiga aikin.\n"
+#~ "Aikin"
+
+#~ msgid "Project is locked since it is in %(state)s state."
+#~ msgstr ""
+#~ "yana kulle tunda yana cikin jihar %(state)s.\n"
+#~ "An kasa saka Mai amfani da"
+
+#~ msgid "User (%(user_sub)s) could not be inserted in db"
+#~ msgstr "(%(user_sub)s) a db"
+
+#~ msgid "Error listing projects on ODK Central: %(error)s"
+#~ msgstr "Buɗe aiki a ODK Central"
+
+#~ msgid "Error creating project on ODK Central: %(error)s"
+#~ msgstr "Buɗe aiki a ODK Central"
+
+#~ msgid "Failed to upload form to ODK Central: %(error)s"
+#~ msgstr ""
+#~ "ya kasa loda fom zuwa ODK ta Tsakiya: %(error)s\n"
+#~ "Ana buƙatar"
+
+#~ msgid "form_id is required to list submissions with pyodk."
+#~ msgstr "form_id don lissafin abubuwan da aka gabatar tare da pyodk."
+
+#~ msgid "XLSForm is invalid: %(error)s"
+#~ msgstr ""
+#~ "XLSForm mara inganci: %(error)s\n"
+#~ "Juyawar"
+
+#~ msgid "Conversion GeoJSON --> CSV failed"
+#~ msgstr ""
+#~ "GeoJSON --> CSV ta kasa\n"
+#~ "Aikin"
+
+#~ msgid "Project contains no submissions yet"
+#~ msgstr ""
+#~ "bai ƙunshi abubuwan gabatarwa ba tukuna\n"
+#~ "Filin bayanai na"
+
+#~ msgid "'geometry' data field is mandatory"
+#~ msgstr "'geometry' ya zama tilas"
+
+#~ msgid "ODK project_id is missing; cannot create/merge entity lists."
+#~ msgstr "ODK project_id ya ɓace; ba zai iya ƙirƙira/ haɗa lissafin mahaɗan ba."
+
+#~ msgid "Could not generate token for app user."
+#~ msgstr "Ba zai iya samar da alamar ga mai amfani da app ba."
+
+#~ msgid "An error occurred while creating the app user token."
+#~ msgstr "An samu kuskuren da ba a zata ba yayin ƙirƙirar lambar QR."
+
+#~ msgid "Could not assign %(scope)s role to app user."
+#~ msgstr "Ba zai iya sanya rawar %(scope)s ga mai amfani da app ba."
+
+#~ msgid "Could not find 'Project Manager' role in ODK Central."
+#~ msgstr "Buɗe aiki a ODK Central"
+
+#~ msgid "ODK Central returned no user ID after creation."
+#~ msgstr "ODK Central ba a dawo da ID mai amfani ba bayan ƙirƙira."
+
+#~ msgid "Failed to create ODK Central manager user."
+#~ msgstr "ya kasa ƙirƙirar mai amfani na ODK Central Manager."
+
+#~ msgid "Unexpected error while testing ODK Central credentials."
+#~ msgstr "An samu kuskuren da ba a zata ba yayin ƙirƙirar lambar QR."
+
+#~ msgid "Provide a valid .xls or .xlsx file"
+#~ msgstr "Bayar da ingantaccen fayil .xls ko .xlsx"
+
+#~ msgid "No data provided."
+#~ msgstr "Ba a bayar da cire bayanai ba."
+
+#~ msgid "%(action)s failed with HTTP %(status_code)s."
+#~ msgstr "%(action)s ya kasa tare da HTTP %(status_code)s."
+
+#~ msgid "%(action)s failed due to upstream connection error."
+#~ msgstr ""
+#~ "%(action)s ya gaza saboda kuskuren haɗin kai.\n"
+#~ "API ɗin Tilepack"
+
+#~ msgid "Tilepack API returned HTTP %(status_code)s."
+#~ msgstr "ya dawo da HTTP %(status_code)s."
+
+#~ msgid "Failed to convert YAML form to XLSForm."
+#~ msgstr "ya kasa canza tsarin YAML zuwa XLSForm."
+
+#~ msgid "Provide a valid .json or .geojson file"
+#~ msgstr "Bayar da ingantaccen fayil .xls ko .xlsx"
+
+#~ msgid "Provide a valid .csv"
+#~ msgstr "Bayar da ingantaccen fayil .xls ko .xlsx"
+
+#~ msgid "Provide a valid .json file"
+#~ msgstr "Bayar da ingantaccen fayil .xls ko .xlsx"
+
+#~ msgid "Could not login to raw-data-api"
+#~ msgstr "ya kasa shiga raw-data-api"
+
+#~ msgid "No geometries present"
+#~ msgstr "Babu geometries ba"
+
+#~ msgid "Your geojson file is invalid."
+#~ msgstr "Fayil ɗin ku na geojson ba shi da inganci."
+
+#~ msgid "Project not found or access denied."
+#~ msgstr "Ba a samu aikin ba ko an hana shiga."
+
+#~ msgid "Basemap attached to QField project successfully."
+#~ msgstr "An haɗa taswirar tushe da aikin QField cikin nasara."
+
+#~ msgid "Basemap attach has not started yet."
+#~ msgstr "Haɗa taswirar tushe bai fara ba tukuna."
+
+#~ msgid "Basemap attach failed. Please try again."
+#~ msgstr "Haɗa taswirar tushe ya gaza. Don Allah a sake gwadawa."
+
+#~ msgid "Failed to search imagery right now. Please try again shortly."
+#~ msgstr ""
+#~ "An kasa binciken hotunan yanzu. Don "
+#~ "Allah a sake gwadawa nan ba da "
+#~ "jimawa ba."
+
+#~ msgid "Failed to start basemap generation right now. Please try again shortly."
+#~ msgstr ""
+#~ "An kasa fara ƙirƙirar taswirar tushe "
+#~ "yanzu. Don Allah a sake gwadawa "
+#~ "nan ba da jimawa ba."
+
+#~ msgid "Failed to refresh basemap status right now. Please try again shortly."
+#~ msgstr ""
+#~ "An kasa sabunta matsayin taswirar tushe"
+#~ " yanzu. Don Allah a sake gwadawa "
+#~ "nan ba da jimawa ba."
+
+#~ msgid "Basemap attach is available after publication."
+#~ msgstr "Haɗa taswirar tushe yana samuwa bayan bugawa."
+
+#~ msgid "Basemap attach is only available for QField projects."
+#~ msgstr "Haɗa taswirar tushe yana samuwa ne kawai ga ayyukan QField."
+
+#~ msgid "Basemap is not ready yet. Please wait for generation to complete."
+#~ msgstr ""
+#~ "Taswirar tushe ba ta shirya ba "
+#~ "tukuna. Don Allah a jira a gama"
+#~ " ƙirƙirawa."
+
+#~ msgid "No generated basemap download URL is available yet."
+#~ msgstr "Ba a samu URL na saukar da taswirar tushe da aka ƙirƙira ba tukuna."
+
+#~ msgid ""
+#~ "QField basemap attach is not configured"
+#~ " on this deployment. Missing %(config)s."
+#~ msgstr ""
+#~ "Ba a saita haɗa taswirar tushe ta"
+#~ " QField a wannan shimfiɗawa ba. "
+#~ "%(config)s ya ɓace."
+
+#~ msgid "Basemap tools are available after publication."
+#~ msgstr "Kayan aikin taswirar tushe suna samuwa bayan bugawa."
+
+#~ msgid "No basemap generation in progress."
+#~ msgstr "Aikin taswira na fili yana gudana"
+
+#~ msgid "Failed to load template form."
+#~ msgstr "An kasa loda fom na samfuri."
+
+#~ msgid "Please select a form or upload a file."
+#~ msgstr "Da fatan a zaɓi fom ko a ɗora fayil."
+
+#~ msgid "Project not found."
+#~ msgstr "Ba a samu aikin ba."
+
+#~ msgid "Project ID mismatch. You do not have access to this project."
+#~ msgstr "ID na aikin bai dace ba. Ba ka da izinin shiga wannan aikin."
+
+#~ msgid "Form validated and uploaded successfully! Reloading page..."
+#~ msgstr "An tantance kuma an ɗora fom cikin nasara! Ana sake loda shafin..."
+
+#~ msgid "An unexpected error occurred"
+#~ msgstr "An samu kuskuren da ba a zata ba"
+
+#~ msgid "Error"
+#~ msgstr "Kuskure"
+
+#~ msgid "Mapper Login (QFieldCloud)"
+#~ msgstr "Shigar mai taswira (QFieldCloud)"
+
+#~ msgid "Username:"
+#~ msgstr "Sunan mai amfani:"
+
+#~ msgid "Password:"
+#~ msgstr "Kalmar sirri:"
+
+#~ msgid "Scan the QR code, then enter these credentials in QField."
+#~ msgstr "Duba lambar QR, sannan ka shigar da waɗannan bayanai a QField."
+
+#~ msgid "Scan QR Code"
+#~ msgstr "Duba lambar QR"
+
+#~ msgid "Use %(app_name)s to scan this QR code and load the project."
+#~ msgstr "Yi amfani da %(app_name)s don duba wannan lambar QR kuma ka loda aikin."
+
+#~ msgid "Project QR Code"
+#~ msgstr "Lambar QR ta aikin"
+
+#~ msgid "Download QR Code"
+#~ msgstr "Sauke lambar QR"
+
+#~ msgid ""
+#~ "Cannot reach the mapping server. Check"
+#~ " that ODK Central or QFieldCloud is"
+#~ " running."
+#~ msgstr ""
+#~ "Ba a iya isa sabar taswira ba. "
+#~ "Duba ko ODK Central ko QFieldCloud "
+#~ "suna aiki."
+
+#~ msgid "The mapping server returned an error. Check its logs for details."
+#~ msgstr "Sabar taswira ta dawo da kuskure. Duba rubuce-rubucenta don bayani."
+
+#~ msgid ""
+#~ "Authentication failed connecting to the "
+#~ "mapping server. Check the configured "
+#~ "credentials."
+#~ msgstr ""
+#~ "Tabbatarwa ta kasa yayin haɗawa da "
+#~ "sabar taswira. Duba bayanan shaidar da"
+#~ " aka saita."
+
+#~ msgid "An unexpected error occurred while generating the QR code."
+#~ msgstr "An samu kuskuren da ba a zata ba yayin ƙirƙirar lambar QR."
+
+#~ msgid "Project (%(project_id)s) not found."
+#~ msgstr "Ba a samu aikin (%(project_id)s) ba."
+
+#~ msgid "Only the project manager can delete this project."
+#~ msgstr "Mai kula da aikin kaɗai zai iya share wannan aikin."
+
+#~ msgid "Error: %(error_msg)s"
+#~ msgstr "Kuskure: %(error_msg)s"
+
+#~ msgid "Admin"
+#~ msgstr "Mai gudanarwa"
+
+#~ msgid "Manager"
+#~ msgstr "Mai kula"
+
+#~ msgid "Editor"
+#~ msgstr "Mai gyara"
+
+#~ msgid "Reporter"
+#~ msgstr "Mai ba da rahoto"
+
+#~ msgid "Reader"
+#~ msgstr "Mai karatu"
+
+#~ msgid "This user does not exist. Please create it first."
+#~ msgstr "Wannan mai amfani bai wanzu ba. Da fatan a fara ƙirƙirarsa."
+
+#~ msgid "This user is already a collaborator on this project."
+#~ msgstr "Wannan mai amfani tuni yana cikin masu haɗin gwiwa na wannan aikin."
+
+#~ msgid "Failed to add collaborator: %(exc)s"
+#~ msgstr "An kasa ƙara mai haɗin gwiwa: %(exc)s"
+
+#~ msgid ""
+#~ "This project belongs to the "
+#~ "%(organization)s organization. The user must"
+#~ " be added to that organization before"
+#~ " they can be added as a "
+#~ "collaborator. Your QFieldCloud account does"
+#~ " not have permission to manage "
+#~ "organization members."
+#~ msgstr ""
+#~ "Wannan aikin na ƙungiyar %(organization)s "
+#~ "ne. Dole ne a fara ƙara mai "
+#~ "amfani a cikin ƙungiyar kafin a "
+#~ "ƙara shi a matsayin mai haɗin "
+#~ "gwiwa. Asusunka na QFieldCloud ba shi"
+#~ " da izinin kula da mambobin ƙungiya."
+
+#~ msgid "All fields are required."
+#~ msgstr "Dukkan filaye wajibi ne."
+
+#~ msgid "Login succeeded but no token received."
+#~ msgstr "An shiga cikin nasara amma ba a samu token ba."
+
+#~ msgid "Login failed. Check your URL and credentials."
+#~ msgstr "Shiga ya kasa. Duba URL da bayanan shaidarka."
+
+#~ msgid "QFieldCloud Projects"
+#~ msgstr "Ayyukan QFieldCloud"
+
+#~ msgid "Connected as"
+#~ msgstr "An haɗa a matsayin"
+
+#~ msgid "to"
+#~ msgstr "zuwa"
+
+#~ msgid "Log Out"
+#~ msgstr "Fita"
+
+#~ msgid "No projects found."
+#~ msgstr "Ba a samu ayyuka ba."
+
+#~ msgid "Public"
+#~ msgstr "Na jama'a"
+
+#~ msgid "Private"
+#~ msgstr "Na sirri"
+
+#~ msgid "Manage"
+#~ msgstr "Gudanar"
+
+#~ msgid "Project"
+#~ msgstr "Aiki"
+
+#~ msgid "Owner"
+#~ msgstr "Mai shi"
+
+#~ msgid "Visibility"
+#~ msgstr "Bayyanuwa"
+
+#~ msgid "Description"
+#~ msgstr "Bayani"
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "Zaman ya ƙare. Da fatan a sake shiga."
+
+#~ msgid "Could not load collaborators: %(exc)s"
+#~ msgstr "Ba a iya loda masu haɗin gwiwa ba: %(exc)s"
+
+#~ msgid "Update"
+#~ msgstr "Sabunta"
+
+#~ msgid "Remove"
+#~ msgstr "Cire"
+
+#~ msgid "Remove Collaborator"
+#~ msgstr "Cire mai haɗin gwiwa"
+
+#~ msgid "from this project?"
+#~ msgstr "daga wannan aikin?"
+
+#~ msgid "Cancel"
+#~ msgstr "Soke"
+
+#~ msgid "User"
+#~ msgstr "Mai amfani"
+
+#~ msgid "Role"
+#~ msgstr "Matsayi"
+
+#~ msgid "Actions"
+#~ msgstr "Ayyuka"
+
+#~ msgid "No collaborators yet."
+#~ msgstr "Har yanzu babu masu haɗin gwiwa."
+
+#~ msgid "Username"
+#~ msgstr "Sunan mai amfani"
+
+#~ msgid "Add Collaborator"
+#~ msgstr "Ƙara mai haɗin gwiwa"
+
+#~ msgid "Close"
+#~ msgstr "Rufe"
+
+#~ msgid "Collaborators"
+#~ msgstr "Masu haɗin gwiwa"
+
+#~ msgid "Username is required."
+#~ msgstr "Sunan mai amfani wajibi ne."
+
+#~ msgid "Failed to remove collaborator: %(exc)s"
+#~ msgstr "An kasa cire mai haɗin gwiwa: %(exc)s"
+
+#~ msgid "Failed to update collaborator: %(exc)s"
+#~ msgstr "An kasa sabunta mai haɗin gwiwa: %(exc)s"
+
+#~ msgid "Collaborator refresh failed: %(exc)s"
+#~ msgstr "Sabunta jerin masu haɗin gwiwa ya kasa: %(exc)s"
+
+#~ msgid ""
+#~ "Project finalisation failed. Please check "
+#~ "your settings and try again. If it"
+#~ " continues, send the technical details "
+#~ "below to your instance administrator or"
+#~ " support team."
+#~ msgstr ""
+#~ "Kammala aikin ya kasa. Da fatan a"
+#~ " duba saituna kuma a sake gwadawa."
+#~ " Idan matsalar ta ci gaba, a "
+#~ "aika da bayanan fasaha da ke ƙasa"
+#~ " zuwa ga mai gudanar da instans "
+#~ "ko ƙungiyar tallafi."
+
+#~ msgid "Invalid GeoJSON data in request. Please try uploading again."
+#~ msgstr ""
+#~ "Bayanan GeoJSON a cikin buƙatar ba "
+#~ "su da inganci. Da fatan a sake "
+#~ "ɗorawa."
+
+#~ msgid "Error reading GeoJSON data from request."
+#~ msgstr "Kuskure wajen karanta bayanan GeoJSON daga buƙatar."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km², which exceeds"
+#~ " the %(area_limit)s km² limit. Please "
+#~ "select a smaller area."
+#~ msgstr ""
+#~ "Yankin ya kai %(area_km2)s km², wanda"
+#~ " ya wuce iyakar %(area_limit)s km². "
+#~ "Da fatan a zaɓi ƙaramin yanki."
+
+#~ msgid ""
+#~ "Area is %(area_km2)s km². Large areas"
+#~ " (>%(area_warn)s km²) may take longer "
+#~ "to process. The data extract API "
+#~ "is limited to 200 km²."
+#~ msgstr ""
+#~ "Yankin ya kai %(area_km2)s km². Manyan"
+#~ " yankuna (>%(area_warn)s km²) na iya "
+#~ "ɗaukar lokaci fiye da haka wajen "
+#~ "sarrafawa. API na cire bayanai yana "
+#~ "da iyaka zuwa 200 km²."
+
+#~ msgid "Project AOI"
+#~ msgstr "AOI na aikin"
+
+#~ msgid "Data Extract (%(data_feature_count)s features)"
+#~ msgstr "Cire bayanai (%(data_feature_count)s siffofi)"
+
+#~ msgid "Task Boundaries (%(task_count)s tasks)"
+#~ msgstr "Iyakokin aiki (%(task_count)s ayyuka)"
+
+#~ msgid "Task ID"
+#~ msgstr "ID na aiki"
+
+#~ msgid "Building Count"
+#~ msgstr "Adadin gine-gine"
+
+#~ msgid ""
+#~ "No task boundaries found. Please split"
+#~ " the project into tasks first using"
+#~ " the \"Split AOI\" button above."
+#~ msgstr ""
+#~ "Ba a samu iyakokin aiki ba. Da "
+#~ "fatan a fara raba aikin zuwa "
+#~ "ayyuka ta amfani da maɓallin \"Split "
+#~ "AOI\" da ke sama."
+
+#~ msgid ""
+#~ "✓ AOI split successfully! Generated "
+#~ "%(task_count)s task areas using %(algorithm)s."
+#~ msgstr ""
+#~ "✓ An raba AOI cikin nasara! An "
+#~ "samar da yankunan aiki %(task_count)s ta"
+#~ " amfani da %(algorithm)s."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task "
+#~ "boundaries%(data_extract_info)s. Review the results"
+#~ " below. If satisfied, click \"Accept "
+#~ "Task Choices\" to save. Otherwise, "
+#~ "adjust parameters above and click "
+#~ "\"Split Again\" to regenerate."
+#~ msgstr ""
+#~ "Ana duba iyakokin aiki "
+#~ "%(task_count)s%(data_extract_info)s. Duba sakamakon "
+#~ "da ke ƙasa. Idan ka gamsu, danna"
+#~ " \"Accept Task Choices\" don ajiye. "
+#~ "In ba haka ba, gyara sigogin da"
+#~ " ke sama sannan danna \"Split Again\""
+#~ " don sake samarwa."
+
+#~ msgid "Data Extract"
+#~ msgstr "Cire bayanai"
+
+#~ msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+#~ msgstr "An sauke bayanan OSM cikin nasara! An samu siffofi %(feature_count)s."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try downloading again "
+#~ "with different parameters."
+#~ msgstr ""
+#~ "Ana duba siffofi %(feature_count)s a kan"
+#~ " taswira. Duba bayanan da ke ƙasa."
+#~ " Idan ka gamsu, danna \"Accept Data"
+#~ " Extract\" don ajiye. In ba haka "
+#~ "ba, sake gwada saukewa da wasu "
+#~ "sigogi dabam."
+
+#~ msgid "Invalid file type. Please upload a .geojson or .json file."
+#~ msgstr "Nau'in fayil ba daidai ba ne. Da fatan a ɗora fayil .geojson ko .json."
+
+#~ msgid "No valid geometries found in GeoJSON."
+#~ msgstr "Ba a samu ingantattun geometry a cikin GeoJSON ba."
+
+#~ msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+#~ msgstr "✓ An ɗora GeoJSON cikin nasara! An samu siffofi %(feature_count)s."
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s features on map."
+#~ " Review the data below. If satisfied,"
+#~ " click \"Accept Data Extract\" to "
+#~ "save. Otherwise, try uploading a "
+#~ "different file."
+#~ msgstr ""
+#~ "Ana duba siffofi %(feature_count)s a kan"
+#~ " taswira. Duba bayanan da ke ƙasa."
+#~ " Idan ka gamsu, danna \"Accept Data"
+#~ " Extract\" don ajiye. In ba haka "
+#~ "ba, gwada ɗora wani fayil dabam."
+
+#~ msgid ""
+#~ "No GeoJSON data found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Ba a samu bayanan GeoJSON ba. Da"
+#~ " fatan a fara sauke bayanan OSM "
+#~ "ko a ɗora fayil GeoJSON."
+
+#~ msgid "Data Extract (%(feature_count)s features)"
+#~ msgstr "Cire bayanai (%(feature_count)s siffofi)"
+
+#~ msgid ""
+#~ "Previewing %(feature_count)s data features on"
+#~ " map. Review the data, then continue"
+#~ " to the next step."
+#~ msgstr ""
+#~ "Ana duba siffofin bayanai %(feature_count)s"
+#~ " a kan taswira. Duba bayanan, sannan"
+#~ " a ci gaba zuwa mataki na gaba."
+
+#~ msgid ""
+#~ "✓ Collect-new-data mode selected. "
+#~ "Task splitting is skipped and you "
+#~ "can continue."
+#~ msgstr ""
+#~ "✓ An zaɓi yanayin tattara sabbin "
+#~ "bayanai. An tsallake rabon aiki kuma "
+#~ "za ka iya ci gaba."
+
+#~ msgid ""
+#~ "✓ Data extract successfully saved! You"
+#~ " can now proceed to Step 4 "
+#~ "(split tasks)."
+#~ msgstr ""
+#~ "✓ An adana fitar da bayanai cikin"
+#~ " nasara! Yanzu za ka iya ci "
+#~ "gaba zuwa Mataki na 4 (raba "
+#~ "ayyuka)."
+
+#~ msgid ""
+#~ "No data extract found. Please download"
+#~ " OSM data or upload a GeoJSON "
+#~ "file first."
+#~ msgstr ""
+#~ "Ba a samu cire bayanai ba. Da "
+#~ "fatan a fara sauke bayanan OSM ko"
+#~ " a ɗora fayil GeoJSON."
+
+#~ msgid ""
+#~ "Previewing whole AOI (no splitting) with"
+#~ " %(data_feature_count)s data features. The "
+#~ "entire AOI will be used as a "
+#~ "single task."
+#~ msgstr ""
+#~ "Ana duba duka AOI (ba tare da "
+#~ "rabawa ba) tare da siffofin bayanai "
+#~ "%(data_feature_count)s. Za a yi amfani "
+#~ "da dukan AOI a matsayin aiki guda"
+#~ " ɗaya."
+
+#~ msgid ""
+#~ "Previewing %(task_count)s task boundaries and"
+#~ " %(data_feature_count)s data features together."
+#~ msgstr ""
+#~ "Ana duba iyakokin aiki %(task_count)s da"
+#~ " siffofin bayanai %(data_feature_count)s tare."
+
+#~ msgid "Project outline not found. Cannot skip task splitting."
+#~ msgstr "Ba a samu iyakar aikin ba. Ba za a iya tsallake rabon aiki ba."
+
+#~ msgid ""
+#~ "✓ Task splitting skipped. The whole "
+#~ "AOI will be used as a single "
+#~ "task. You can proceed to Step 5."
+#~ msgstr ""
+#~ "✓ An tsallake rabon aiki. Za a "
+#~ "yi amfani da dukan AOI a matsayin"
+#~ " aiki guda ɗaya. Za ka iya ci"
+#~ " gaba zuwa Mataki na 5."
+
+#~ msgid "Please select a splitting option."
+#~ msgstr "Da fatan a zaɓi wani zaɓin rabawa."
+
+#~ msgid "✓ Task splitting is not required for this project setup."
+#~ msgstr "✓ Rabon aiki ba ya da muhimmanci ga wannan tsarin aikin."
+
+#~ msgid "No data extract provided."
+#~ msgstr "Ba a bayar da cire bayanai ba."
+
+#~ msgid "Invalid data extract format."
+#~ msgstr "Tsarin cire bayanai ba daidai ba ne."
+
+#~ msgid ""
+#~ "✓ Data extract accepted! Saved "
+#~ "%(feature_count)s features. Step 2 is "
+#~ "now complete."
+#~ msgstr ""
+#~ "✓ An karɓi cire bayanai! An ajiye"
+#~ " siffofi %(feature_count)s. Mataki na 2 "
+#~ "yanzu ya cika."
+
+#~ msgid "No task areas data provided."
+#~ msgstr "Ba a bayar da bayanan yankunan aiki ba."
+
+#~ msgid "Invalid task areas data format."
+#~ msgstr "Tsarin bayanan yankunan aiki ba daidai ba ne."
+
+#~ msgid "✓ Split tasks saved successfully"
+#~ msgstr "✓ An ajiye rababbun ayyuka cikin nasara"
+
+#~ msgid ""
+#~ "Provide ODK URL, username, and password"
+#~ " (all 3), or leave them all "
+#~ "blank to use server defaults."
+#~ msgstr ""
+#~ "Bayar da ODK URL, sunan mai "
+#~ "amfani, da kalmar sirri (duk uku), "
+#~ "ko kuma a bar su a fanko don"
+#~ " amfani da tsoffin saitunan sabar."
+
+#~ msgid "GeoJSON is required"
+#~ msgstr "Ana buƙatar GeoJSON"
+
+#~ msgid "No polygon geometries found. Project area must be a polygon."
+#~ msgstr ""
+#~ "Ba a samu polygon geometries ba. "
+#~ "Yankin aikin dole ne ya kasance "
+#~ "polygon."
+
+#~ msgid "Selected area is too large. Please select an area smaller than 200 km²."
+#~ msgstr ""
+#~ "Zaɓin yanki yayi girma da yawa. Da"
+#~ " fatan za a zaɓi yanki ƙasa da"
+#~ " 200 km²."
+
+#~ msgid "Failed to generate data extract from the raw data API."
+#~ msgstr "ya kasa samar da tsantsar bayanai daga danyen bayanan API."
+
+#~ msgid "QField project ID not found."
+#~ msgstr "Ba a samu aikin ba."
+
+#~ msgid "Project name not found."
+#~ msgstr "Ba a samu aikin ba."
+
+#~ msgid "ODK project ID not found."
+#~ msgstr "Ba a samu aikin ba."
+
+#~ msgid "Appuser token not found."
+#~ msgstr "Ba a samu aikin ba."
+
+#~ msgid "Failed to generate QR code."
+#~ msgstr "An kasa loda fom na samfuri."
+
+#~ msgid "Template XLSForm content is empty."
+#~ msgstr ""
+#~ "Samfuran XLSForm abun ciki babu komai.\n"
+#~ "Shaidar aikin"
+
+#~ msgid "Project outline is missing or has no geometry."
+#~ msgstr "ya ɓace ko bashi da lissafi."
+
+#~ msgid "Project outline geometry has no coordinates."
+#~ msgstr ""
+#~ "jigon jigo na aikin aikin ba shi da haɗin kai.\n"
+#~ "Ana buƙatar"
+
+#~ msgid "Project outline is required for QField project creation."
+#~ msgstr "✓ Rabon aiki ba ya da muhimmanci ga wannan tsarin aikin."
+
+#~ msgid "XLSForm is required for QField project creation."
+#~ msgstr "XLSForm don ƙirƙirar aikin QField."
+
+#~ msgid "Failed to modify XLSForm for QField."
+#~ msgstr ""
+#~ "ya kasa gyara XLSForm don QField.\n"
+#~ "Rubutun"
+
+#~ msgid "QGIS wrapper completed but wrote no output files."
+#~ msgstr "QGIS an kammala amma ba a rubuta fayilolin fitarwa ba."
+
+#~ msgid "QGIS wrapper completed but no .qgz file in output."
+#~ msgstr "QGIS wrapper an kammala amma babu fayil .qgz a fitarwa."
+
+#~ msgid "QField project ID is missing; cannot attach basemap."
+#~ msgstr ""
+#~ "QField ID aikin ya ɓace; ba zai iya haɗa taswirar tushe ba.\n"
+#~ "Ƙirƙirar aikin"
+
+#~ msgid "Basemap attach completed but produced no project files."
+#~ msgstr "An haɗa taswirar tushe da aikin QField."
+
+#~ msgid "QGIS project generation failed: %(error)s"
+#~ msgstr ""
+#~ "QGIS ya gaza: %(error)s\n"
+#~ "Rubutun"
+
+#~ msgid "QGIS wrapper returned invalid JSON."
+#~ msgstr "QGIS ya dawo JSON mara inganci."
+
+#~ msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+#~ msgstr "ya kasa sauke taswirar tushe MBTiles don lodawa (HTTP %(status)s)."
+
+#~ msgid "Downloaded basemap MBTiles is empty."
+#~ msgstr "Sauke lambar QR"
+
+#~ msgid "Failed to upload files to QFieldCloud: %(error)s"
+#~ msgstr ""
+#~ "ya kasa loda fayiloli zuwa QFieldCloud: %(error)s\n"
+#~ "Aikin"
+
+#~ msgid "QFieldCloud project '%(project_id)s' not found."
+#~ msgstr "Ba a samu aikin (%(project_id)s) ba."
+
+#~ msgid ""
+#~ "Project belongs to organization '%(owner)s'."
+#~ " Could not add '%(username)s' to the"
+#~ " organization: %(error)s"
+#~ msgstr ""
+#~ "na ƙungiyar '%(owner)s' ne. Ba za "
+#~ "a iya ƙara '%(username)s' ga ƙungiyar"
+#~ " ba: %(error)s\n"
+#~ "Babu mai amfani da"
+
+#~ msgid "User '%(username)s' does not exist on QFieldCloud."
+#~ msgstr "'%(username)s' akan QFieldCloud."
+
+#~ msgid "User '%(username)s' is already a collaborator on this project."
+#~ msgstr "Wannan mai amfani tuni yana cikin masu haɗin gwiwa na wannan aikin."
+
+#~ msgid "QFieldCloud credentials are invalid."
+#~ msgstr "✓ Bayanan shaida suna da inganci!"
+
+#~ msgid "Filters"
+#~ msgstr "Tacewa"
+
+#~ msgid "All projects"
+#~ msgstr "Dukkan ayyuka"
+
+#~ msgid "Draft"
+#~ msgstr "Daftari"
+
+#~ msgid "Published"
+#~ msgstr "An wallafa"
+
+#~ msgid "Completed"
+#~ msgstr "An kammala"
+
+#~ msgid "Archived"
+#~ msgstr "An adana"
+
+#~ msgid "Project Status"
+#~ msgstr "Matsayin aiki"
+
+#~ msgid "Newest first"
+#~ msgstr "Mafi sabo da farko"
+
+#~ msgid "Oldest first"
+#~ msgstr "Mafi tsoho da farko"
+
+#~ msgid "Name (A-Z)"
+#~ msgstr "Suna (A-Z)"
+
+#~ msgid "Name (Z-A)"
+#~ msgstr "Suna (Z-A)"
+
+#~ msgid "Sort By"
+#~ msgstr "Tsara ta"
+
+#~ msgid "Search"
+#~ msgstr "Bincika"
+
+#~ msgid "Search projects…"
+#~ msgstr "Bincika ayyuka…"
+
+#~ msgid "Create Project"
+#~ msgstr "Ƙirƙiri aiki"
+
+#~ msgid "+ New"
+#~ msgstr "+ Sabo"
+
+#~ msgid "Showing %(count)s project"
+#~ msgid_plural "Showing %(count)s projects"
+#~ msgstr[0] "Ana nuna aiki %(count)s"
+#~ msgstr[1] "Ana nuna ayyuka %(count)s"
+
+#~ msgid "in %(status)s"
+#~ msgstr "a %(status)s"
+
+#~ msgid ""
+#~ "matching\n"
+#~ "      \"%(query)s\""
+#~ msgstr "mai dacewa da \"%(query)s\""
+
+#~ msgid "Private Project"
+#~ msgstr "Aiki na sirri"
+
+#~ msgid "Unnamed Project"
+#~ msgstr "Aiki mara suna"
+
+#~ msgid "Location:"
+#~ msgstr "Wuri:"
+
+#~ msgid "Created:"
+#~ msgstr "An ƙirƙira:"
+
+#~ msgid "N/A"
+#~ msgstr "Babu"
+
+#~ msgid "No projects found. Create your first project to get started!"
+#~ msgstr "Ba a samu wani aiki ba. Ƙirƙiri aikinka na farko don farawa!"
+
+#~ msgid "Coordinate field campaigns"
+#~ msgstr "Daidaita kamfen na fili"
+
+#~ msgid ""
+#~ "Enhancing field mapping efficiency and "
+#~ "accuracy through seamless coordination."
+#~ msgstr ""
+#~ "Inganta inganci da daidaiton taswirar "
+#~ "fili ta hanyar haɗin kai mai "
+#~ "sauƙi."
+
+#~ msgid "Explore Projects"
+#~ msgstr "Duba ayyuka"
+
+#~ msgid "Loading metrics..."
+#~ msgstr "Ana loda ma'auni..."
+
+#~ msgid "What is it?"
+#~ msgstr "Menene wannan?"
+
+#~ msgid ""
+#~ "The Field Tasking Manager (Field-TM) "
+#~ "helps teams add local knowledge to "
+#~ "map features\n"
+#~ "        by coordinating mapping in the field."
+#~ msgstr ""
+#~ "Field Tasking Manager (Field-TM) yana"
+#~ " taimaka wa ƙungiyoyi su ƙara ilimin"
+#~ " gari zuwa siffofin taswira ta hanyar"
+#~ " daidaita aikin taswira a fili."
+
+#~ msgid ""
+#~ "Field-TM facilitates collaborative mapping "
+#~ "by supporting and extending mature tools"
+#~ "\n"
+#~ "        like ODK and QField. It is"
+#~ " a standalone mobile and web workflow"
+#~ " that helps teams collect\n"
+#~ "        geospatial data efficiently with "
+#~ "commonly available Android devices."
+#~ msgstr ""
+#~ "Field-TM yana sauƙaƙa aikin taswira "
+#~ "na haɗin gwiwa ta hanyar tallafa "
+#~ "da faɗaɗa kayan aiki masu ƙarfi "
+#~ "kamar ODK da QField. Tsarin aiki "
+#~ "ne na wayar hannu da yanar gizo"
+#~ " wanda ke taimaka wa ƙungiyoyi "
+#~ "tattara bayanan sarari cikin inganci ta"
+#~ " amfani da na'urorin Android da ake"
+#~ " yawan samu."
+
+#~ msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
+#~ msgstr ""
+#~ "Mai kula da aiki yana nuna tsarin"
+#~ " aikin taswira na FieldTM a kan "
+#~ "kwamfutar tafi-da-gidanka"
+
+#~ msgid "Main Features"
+#~ msgstr "Muhimman siffofi"
+
+#~ msgid "Flexible Data Collection"
+#~ msgstr "Tattara bayanai mai sassauci"
+
+#~ msgid ""
+#~ "Support diverse survey forms, multiple "
+#~ "data formats, and adaptable workflows "
+#~ "that\n"
+#~ "          fit different operational needs."
+#~ msgstr ""
+#~ "Yana tallafa wa fom ɗin bincike "
+#~ "iri-iri, tsarin bayanai da yawa, da"
+#~ " tsarin aiki masu daidaituwa da suka"
+#~ " dace da bukatun gudanarwa daban-"
+#~ "daban."
+
+#~ msgid "Open Source and Customizable"
+#~ msgstr "Buɗaɗɗen tushe kuma ana iya daidaitawa"
+
+#~ msgid ""
+#~ "Adapt Field-TM to your own survey"
+#~ " logic, data structures, and integration"
+#~ "\n"
+#~ "          requirements."
+#~ msgstr ""
+#~ "Daidaita Field-TM da tsarin bincikeka,"
+#~ " tsarin bayanai, da bukatun haɗakawa."
+
+#~ msgid "Entity-Level Tracking"
+#~ msgstr "Bibiyar matakin abu"
+
+#~ msgid ""
+#~ "Monitor survey progress at task and "
+#~ "feature level so managers can make "
+#~ "informed\n"
+#~ "          decisions quickly."
+#~ msgstr ""
+#~ "Sa ido kan ci gaban bincike a "
+#~ "matakin aiki da siffa don masu "
+#~ "kula su yanke shawara cikin sauri "
+#~ "da sani."
+
+#~ msgid "Who is it for?"
+#~ msgstr "Ga wa ne wannan?"
+
+#~ msgid "Project Manager"
+#~ msgstr "Mai kula da aiki"
+
+#~ msgid "Create and coordinate field campaigns"
+#~ msgstr "Ƙirƙira kuma daidaita kamfen na fili"
+
+#~ msgid ""
+#~ "Project managers use Field-TM to "
+#~ "set up mapping projects, define areas"
+#~ " of interest,\n"
+#~ "          design survey forms, and split work into manageable tasks."
+#~ msgstr ""
+#~ "Masu kula da aiki suna amfani da"
+#~ " Field-TM don kafa ayyukan taswira,"
+#~ " tantance yankunan sha'awa, ƙirƙirar fom"
+#~ " ɗin bincike, da raba aiki zuwa "
+#~ "ayyuka masu sauƙin kulawa."
+
+#~ msgid "Define a project area and upload or choose a survey form"
+#~ msgstr "Tantance yankin aiki sannan ka ɗora ko ka zaɓi fom na bincike"
+
+#~ msgid "Split the area into tasks and generate a data extract"
+#~ msgstr "Raba yankin zuwa ayyuka sannan ka samar da cire bayanai"
+
+#~ msgid "Publish the project to ODK Central or QFieldCloud"
+#~ msgstr "Wallafa aikin zuwa ODK Central ko QFieldCloud"
+
+#~ msgid "Share a QR code so mappers can start collecting data"
+#~ msgstr "Raba lambar QR domin masu taswira su fara tattara bayanai"
+
+#~ msgid "Field Mapper"
+#~ msgstr "Mai taswirar fili"
+
+#~ msgid "Collect data in the field with your phone"
+#~ msgstr "Tattara bayanai a fili da wayarka"
+
+#~ msgid ""
+#~ "Mappers do not need to log in "
+#~ "to Field-TM. Once a project "
+#~ "manager publishes a\n"
+#~ "          project, mappers access it "
+#~ "directly in their mobile app of "
+#~ "choice."
+#~ msgstr ""
+#~ "Masu taswira ba sa buƙatar shiga "
+#~ "Field-TM. Da zarar mai kula da "
+#~ "aiki ya wallafa aiki, masu taswira "
+#~ "za su iya shiga kai tsaye ta "
+#~ "manhajar wayar da suka zaɓa."
+
+#~ msgid "Scan the QR code shared by your project manager"
+#~ msgstr "Duba lambar QR da mai kula da aikinka ya raba"
+
+#~ msgid "The project loads automatically in ODK Collect or QField"
+#~ msgstr "Aikin yana loda kansa kai tsaye a ODK Collect ko QField"
+
+#~ msgid "Navigate to your assigned task area and collect data"
+#~ msgstr "Je zuwa yankin aikin da aka ware maka sannan ka tattara bayanai"
+
+#~ msgid "Submit your survey, which goes straight to the server"
+#~ msgstr "Miƙa bincikenka, wanda zai tafi kai tsaye zuwa sabar"
+
+#~ msgid "Field-TM Use Cases"
+#~ msgstr "Amfanin Field-TM"
+
+#~ msgid "Field mapping in progress"
+#~ msgstr "Aikin taswira na fili yana gudana"
+
+#~ msgid "1. Community Mapping"
+#~ msgstr "1. Taswira ta al'umma"
+
+#~ msgid ""
+#~ "Field Tasking Manager empowers communities "
+#~ "to map informal settlements, public\n"
+#~ "            facilities, and local services for inclusive planning."
+#~ msgstr ""
+#~ "Field Tasking Manager yana ba al'ummomi"
+#~ " damar taswira gidajen da ba na "
+#~ "hukuma ba, wuraren jama'a, da ayyukan"
+#~ " yankinsu domin tsari mai haɗa kowa."
+
+#~ msgid "2. Urban Planning and Management"
+#~ msgstr "2. Tsarin birane da kulawa"
+
+#~ msgid ""
+#~ "Build smarter cities with coordinated "
+#~ "surveys of houses, roads, and utilities"
+#~ "\n"
+#~ "            through clear, manageable mapping tasks."
+#~ msgstr ""
+#~ "Gina birane masu basira ta hanyar "
+#~ "bincike mai daidaituwa na gidaje, "
+#~ "hanyoyi, da kayayyakin more rayuwa ta"
+#~ " ayyukan taswira masu bayyani da "
+#~ "sauƙin kulawa."
+
+#~ msgid "3. Disaster Response and Recovery"
+#~ msgstr "3. Amsa bala'i da farfaɗowa"
+
+#~ msgid ""
+#~ "Rapidly map damaged infrastructure after "
+#~ "disasters, coordinate volunteers, and\n"
+#~ "            deliver reliable data for relief operations."
+#~ msgstr ""
+#~ "Yi taswira da gaggawa ga lalatattun "
+#~ "kayayyakin more rayuwa bayan bala'i, "
+#~ "daidaita masu sa kai, kuma samar "
+#~ "da amintattun bayanai don ayyukan agaji."
+
+#~ msgid "Resources"
+#~ msgstr "Albarkatu"
+
+#~ msgid "Data Prep"
+#~ msgstr "Shirya bayanai"
+
+#~ msgid "HOT Export Tool"
+#~ msgstr "Kayan fitarwa na HOT"
+
+#~ msgid "Download task-ready geospatial data extracts for your project area."
+#~ msgstr "Sauke cire bayanan sarari da suka shirya don aiki a yankin aikinka."
+
+#~ msgid "Documentation"
+#~ msgstr "Takardun bayani"
+
+#~ msgid "ODK Central Guide"
+#~ msgstr "Jagorar ODK Central"
+
+#~ msgid "Learn how to manage forms, app users, and field submissions in ODK."
+#~ msgstr ""
+#~ "Koyi yadda ake kula da fom, masu"
+#~ " amfani da manhaja, da ƙaddamarwar "
+#~ "fili a ODK."
+
+#~ msgid "QField Guide"
+#~ msgstr "Jagorar QField"
+
+#~ msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
+#~ msgstr ""
+#~ "Saita ayyukan QFieldCloud da tsarin "
+#~ "wayar hannu don taswira ba tare da"
+#~ " intanet ba."
+
+#~ msgid "Need assistance?"
+#~ msgstr "Kana buƙatar taimako?"
+
+#~ msgid "Email:"
+#~ msgstr "Imel:"
+
+#~ msgid "Language"
+#~ msgstr "Harshe"
+
+#~ msgid "Coordinated field mapping for Open Mapping campaigns."
+#~ msgstr "Taswirar fili mai daidaituwa don kamfen na Open Mapping."
+
+#~ msgid "Login"
+#~ msgstr "Shiga"
+
+#~ msgid "Projects"
+#~ msgstr "Ayyuka"
+
+#~ msgid "QField Admin"
+#~ msgstr "Gudanar da QField"
+
+#~ msgid "Sign in to Field-TM"
+#~ msgstr "Shiga Field-TM"
+
+#~ msgid "Redirecting to the centralized login service."
+#~ msgstr "Ana tura ka zuwa sabis ɗin shiga na tsakiya."
+
+#~ msgid "Continue to login"
+#~ msgstr "Ci gaba da shiga"
+
+#~ msgid "Authentication is disabled on this deployment."
+#~ msgstr "An kashe tantancewa a wannan girke-girke."
+
+#~ msgid "Back to home"
+#~ msgstr "Koma gida"
+
+#~ msgid "Create New Project"
+#~ msgstr "Ƙirƙiri sabon aiki"
+
+#~ msgid "Project Name"
+#~ msgstr "Sunan aiki"
+
+#~ msgid "Enter project name"
+#~ msgstr "Shigar da sunan aiki"
+
+#~ msgid "Enter project description"
+#~ msgstr "Shigar da bayanin aiki"
+
+#~ msgid "Field Mapping App"
+#~ msgstr "Manhajar taswirar fili"
+
+#~ msgid "Project Area"
+#~ msgstr "Yankin aiki"
+
+#~ msgid "Draw Area"
+#~ msgstr "Zana yanki"
+
+#~ msgid "Upload GeoJSON"
+#~ msgstr "Ɗora GeoJSON"
+
+#~ msgid "Clear"
+#~ msgstr "Goge"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area.\n"
+#~ "          Maximum project size is 1,000"
+#~ " km². Areas over 100 km² will "
+#~ "show a warning. The OSM data\n"
+#~ "          extract API is limited to 200 km²."
+#~ msgstr ""
+#~ "Zana polygon a taswira ko ka ɗora"
+#~ " fayil GeoJSON don tantance yankin "
+#~ "aikinka. Matsakaicin girman aiki shi ne"
+#~ " 1,000 km². Yankuna sama da 100 "
+#~ "km² za su nuna gargaɗi. API na "
+#~ "cire bayanan OSM yana da iyaka "
+#~ "zuwa 200 km²."
+
+#~ msgid "Advanced Config"
+#~ msgstr "Babban tsari"
+
+#~ msgid "Merge geometries (use convex hull for multipolygons)"
+#~ msgstr "Haɗa geometries (yi amfani da convex hull don multipolygons)"
+
+#~ msgid "Hashtags"
+#~ msgstr "Hashtag"
+
+#~ msgid "Type hashtags and press Enter or comma"
+#~ msgstr "Rubuta hashtag sannan danna Enter ko comma"
+
+#~ msgid ""
+#~ "Type hashtags and press Enter or "
+#~ "comma to add them. Click the × "
+#~ "on a tag to remove\n"
+#~ "          it."
+#~ msgstr ""
+#~ "Rubuta hashtag sannan danna Enter ko "
+#~ "comma don ƙara su. Danna × a "
+#~ "kan alama don cire ta."
+
+#~ msgid "Creating..."
+#~ msgstr "Ana ƙirƙira..."
+
+#~ msgid "Something went wrong. Please try again."
+#~ msgstr "Wani abu ya tafi ba daidai ba. Da fatan a sake gwadawa."
+
+#~ msgid "Invalid GeoJSON format. Please check your file."
+#~ msgstr "Tsarin GeoJSON ba daidai ba ne. Da fatan a duba fayil ɗinka."
+
+#~ msgid "Invalid GeoJSON file. Please check the file format."
+#~ msgstr "Fayil ɗin GeoJSON ba daidai ba ne. Da fatan a duba tsarin fayil."
+
+#~ msgid ""
+#~ "You must draw or upload an Area"
+#~ " of Interest (AOI) on the map "
+#~ "before submitting."
+#~ msgstr ""
+#~ "Dole ne ka zana ko ka ɗora "
+#~ "Area of Interest (AOI) a taswira "
+#~ "kafin miƙawa."
+
+#~ msgid ""
+#~ "A project with this name already "
+#~ "exists. Please choose a different name."
+#~ msgstr "Akwai aikin da ke da wannan suna tuni. Da fatan a zaɓi wani suna dabam."
+
+#~ msgid "Description is required."
+#~ msgstr "Ana buƙatar bayani."
+
+#~ msgid "← Back to Projects"
+#~ msgstr "← Koma zuwa ayyuka"
+
+#~ msgid "Project Metadata"
+#~ msgstr "Bayanan aikin"
+
+#~ msgid "Project metadata and setup information for managers."
+#~ msgstr "Bayanan aiki da bayanin saiti ga masu kula."
+
+#~ msgid "Project ID"
+#~ msgstr "ID na aiki"
+
+#~ msgid "Created"
+#~ msgstr "An ƙirƙira"
+
+#~ msgid "Last Updated"
+#~ msgstr "Sabuntawa ta ƙarshe"
+
+#~ msgid "External Project"
+#~ msgstr "Aiki na waje"
+
+#~ msgid "Instance:"
+#~ msgstr "Instans:"
+
+#~ msgid "Project ID:"
+#~ msgstr "ID na aiki:"
+
+#~ msgid "View Project in ODK Central →"
+#~ msgstr "Duba aiki a ODK Central →"
+
+#~ msgid "Manage QFieldCloud Project →"
+#~ msgstr "Gudanar da aikin QFieldCloud →"
+
+#~ msgid "View Project Externally →"
+#~ msgstr "Duba aiki daga waje →"
+
+#~ msgid "Delete this project in downstream and Field-TM? This cannot be undone."
+#~ msgstr ""
+#~ "A share wannan aiki a downstream "
+#~ "da Field-TM? Ba za a iya "
+#~ "janye wannan ba."
+
+#~ msgid "Delete Project"
+#~ msgstr "Share aiki"
+
+#~ msgid "Back to Projects"
+#~ msgstr "Koma zuwa ayyuka"
+
+#~ msgid "Project Not Found"
+#~ msgstr "Ba a samu aikin ba"
+
+#~ msgid ""
+#~ "The project you're looking for doesn't"
+#~ " exist or you don't have permission"
+#~ " to view\n"
+#~ "        it."
+#~ msgstr "Aikin da kake nema bai wanzu ba ko kuma ba ka da izinin dubawa."
+
+#~ msgid "QFieldCloud Admin"
+#~ msgstr "Gudanar da QFieldCloud"
+
+#~ msgid ""
+#~ "This page is for managing the "
+#~ "users in your QField project, after "
+#~ "creation."
+#~ msgstr ""
+#~ "Wannan shafi na kula da masu "
+#~ "amfani a aikin QField ɗinka ne "
+#~ "bayan an ƙirƙira shi."
+
+#~ msgid "Enter your QFieldCloud credentials to manage collaborators."
+#~ msgstr ""
+#~ "Shigar da bayanan shaidar QFieldCloud "
+#~ "ɗinka don kula da masu haɗin "
+#~ "gwiwa."
+
+#~ msgid "QFieldCloud URL"
+#~ msgstr "URL na QFieldCloud"
+
+#~ msgid "The base URL of your QFieldCloud instance (without /api/v1)."
+#~ msgstr "Asalin URL na instans ɗinka na QFieldCloud (ba tare da /api/v1 ba)."
+
+#~ msgid "admin"
+#~ msgstr "admin"
+
+#~ msgid "Password"
+#~ msgstr "Kalmar sirri"
+
+#~ msgid "Connect"
+#~ msgstr "Haɗa"
+
+#~ msgid "Connecting…"
+#~ msgstr "Ana haɗawa…"
+
+#~ msgid "Features Surveyed (Approximate)"
+#~ msgstr "Siffofin da aka bincika (kimanin)"
+
+#~ msgid "Projects Created"
+#~ msgstr "Ayyukan da aka ƙirƙira"
+
+#~ msgid "Countries Covered"
+#~ msgstr "Ƙasashen da aka rufe"
+
+#~ msgid "Users Registered"
+#~ msgstr "Masu amfani da aka yi rijista"
+
+#~ msgid "Supported Mapping Apps"
+#~ msgstr "Manhajojin taswira da ake tallafawa"
+
+#~ msgid "Offline Basemap"
+#~ msgstr "Taswirar tushe ba tare da intanet ba"
+
+#~ msgid ""
+#~ "Search HOT OpenAerialMap imagery for "
+#~ "this AOI and generate an MBTiles "
+#~ "basemap."
+#~ msgstr ""
+#~ "Bincika hotunan HOT OpenAerialMap na "
+#~ "wannan AOI kuma ƙirƙiri taswirar tushe"
+#~ " ta MBTiles."
+
+#~ msgid "Search OAM Imagery"
+#~ msgstr "Bincika hotunan OAM"
+
+#~ msgid "Basemap generation previously failed. Please search again and retry."
+#~ msgstr ""
+#~ "Ƙirƙirar taswirar tushe ta gaza a "
+#~ "baya. Don Allah a sake bincike "
+#~ "sannan a sake gwadawa."
+
+#~ msgid "No basemap selected yet."
+#~ msgstr "Ba a zaɓi taswirar tushe ba tukuna."
+
+#~ msgid "Manager Setup Summary"
+#~ msgstr "Taƙaitaccen saitin mai kula"
+
+#~ msgid "The project setup flow is complete and shown below for reference."
+#~ msgstr "An kammala tsarin saitin aiki kuma an nuna shi a ƙasa domin tunani."
+
+#~ msgid "Project Location"
+#~ msgstr "Wurin aiki"
+
+#~ msgid "Step 2: Upload XLSForm"
+#~ msgstr "Mataki na 2: Ɗora XLSForm"
+
+#~ msgid "Complete"
+#~ msgstr "Kammala"
+
+#~ msgid "Step 3: Get Data"
+#~ msgstr "Mataki na 3: Samu bayanai"
+
+#~ msgid "Step 4: Split into Tasks"
+#~ msgstr "Mataki na 4: Raba zuwa ayyuka"
+
+#~ msgid "Step 5: Finalise Project"
+#~ msgstr "Mataki na 5: Kammala aiki"
+
+#~ msgid ""
+#~ "If you need to upload additional "
+#~ "media files to this project, such "
+#~ "as images and\n"
+#~ "          videos, log into ODK Central"
+#~ " and upload them in the form "
+#~ "settings."
+#~ msgstr ""
+#~ "Idan kana buƙatar ɗora ƙarin fayilolin"
+#~ " media zuwa wannan aiki, kamar hotuna"
+#~ " da bidiyo, shiga ODK Central sannan"
+#~ " ka ɗora su a cikin saitunan "
+#~ "fom."
+
+#~ msgid "Ready for Mapping"
+#~ msgstr "A shirye don taswira"
+
+#~ msgid "Loading QR code..."
+#~ msgstr "Ana loda lambar QR..."
+
+#~ msgid "Project Setup"
+#~ msgstr "Saitin aiki"
+
+#~ msgid "Step 2: Select Survey Form"
+#~ msgstr "Mataki na 2: Zaɓi fom na bincike"
+
+#~ msgid "Choose a preset survey type, or upload your own custom XLSForm."
+#~ msgstr ""
+#~ "Zaɓi nau'in bincike sannan ka ci "
+#~ "gaba da tsoffin saitunan da aka ba"
+#~ " da shawara."
+
+#~ msgid "Choose Survey Type:"
+#~ msgstr "Zaɓi nau'in bincike:"
+
+#~ msgid "Loading survey types..."
+#~ msgstr "Ana loda nau'ikan bincike..."
+
+#~ msgid "Or use your own form instead:"
+#~ msgstr "Ko kuma amfani da fom naka maimakon haka:"
+
+#~ msgid "Upload Custom XLSForm"
+#~ msgstr "Ɗora fom na musamman"
+
+#~ msgid ""
+#~ "Note: Field-TM will automatically inject"
+#~ " additional fields into your form for"
+#~ " task\n"
+#~ "          division and feature selection. "
+#~ "Your form should only contain the "
+#~ "survey questions you\n"
+#~ "          want to ask (do not "
+#~ "include select_one_from_file fields for "
+#~ "tasks/features)."
+#~ msgstr ""
+#~ "Lura: Field-TM zai ƙara wasu "
+#~ "filaye a cikin fom ɗinka ta "
+#~ "atomatik domin raba ayyuka da zaɓin "
+#~ "fasali. Fom ɗinka ya kamata ya "
+#~ "ƙunshi tambayoyin bincike kawai da kake"
+#~ " son yi (kar a haɗa filayen "
+#~ "select_one_from_file na ayyuka/fasali)."
+
+#~ msgid ""
+#~ "Recommended defaults are active for ODK"
+#~ " projects, including ODK Collect\n"
+#~ "          compatibility."
+#~ msgstr ""
+#~ "Tsoffin saitunan da aka ba da "
+#~ "shawara suna aiki ga ayyukan ODK, "
+#~ "har da dacewa da ODK Collect."
+
+#~ msgid "Recommended defaults are active for %(app_name)s projects."
+#~ msgstr ""
+#~ "Tsoffin saitunan da aka ba da "
+#~ "shawara suna aiki ga ayyukan "
+#~ "%(app_name)s."
+
+#~ msgid "Recommended defaults are active for this project."
+#~ msgstr "Tsoffin saitunan da aka ba da shawara suna aiki ga wannan aikin."
+
+#~ msgid "Default Language:"
+#~ msgstr "Tsohon harshe:"
+
+#~ msgid "English"
+#~ msgstr "Turanci"
+
+#~ msgid "Spanish"
+#~ msgstr "Sifaniyanci"
+
+#~ msgid "French"
+#~ msgstr "Faransanci"
+
+#~ msgid "Portuguese"
+#~ msgstr "Fotugis"
+
+#~ msgid "Swahili"
+#~ msgstr "Swahili"
+
+#~ msgid "Hindi"
+#~ msgstr "Hindi"
+
+#~ msgid "Form Options:"
+#~ msgstr "Zaɓuɓɓukan fom:"
+
+#~ msgid "Include photo upload question"
+#~ msgstr "Haɗa tambayar loda hoto"
+
+#~ msgid "Make photo mandatory"
+#~ msgstr "Sanya hoto ya zama dole"
+
+#~ msgid "Asks the user to take a photo at their location."
+#~ msgstr "Yana roƙon mai amfani ya ɗauki hoto a wurinsa."
+
+#~ msgid "Include digitisation verification question"
+#~ msgstr "Haɗa tambayar tabbatar da digitisation"
+
+#~ msgid "Asks the mapper to verify if existing features are correctly digitised."
+#~ msgstr ""
+#~ "Yana roƙon mai taswira ya tabbatar "
+#~ "ko an digitise siffofin da ke "
+#~ "akwai daidai."
+
+#~ msgid "Continue"
+#~ msgstr "Ci gaba"
+
+#~ msgid "✓ Survey form uploaded successfully"
+#~ msgstr "✓ An ɗora fom na bincike cikin nasara"
+
+#~ msgid "Download the recommended OSM data for your survey form."
+#~ msgstr "Sauke bayanan OSM da aka ba da shawara don fom ɗin bincikenka."
+
+#~ msgid "Review the data on the map, then continue."
+#~ msgstr "Duba bayanan a taswira, sannan ka ci gaba."
+
+#~ msgid "Download OSM Data"
+#~ msgstr "Sauke bayanan OSM"
+
+#~ msgid "Collect New Data Only"
+#~ msgstr "Tattara sabbin bayanai kawai"
+
+#~ msgid "Use custom data inputs or override the default OSM download options."
+#~ msgstr ""
+#~ "Yi amfani da bayanan shigarwa na "
+#~ "musamman ko ka canza tsoffin zaɓuɓɓukan"
+#~ " sauke OSM."
+
+#~ msgid "OSM Category:"
+#~ msgstr "Rukunin OSM:"
+
+#~ msgid "OSM Buildings"
+#~ msgstr "Gine-ginen OSM"
+
+#~ msgid "OSM Highways"
+#~ msgstr "Hanyoyin OSM"
+
+#~ msgid "OSM Healthcare"
+#~ msgstr "Kiwon lafiya na OSM"
+
+#~ msgid "OSM Toilets"
+#~ msgstr "Bandakuna na OSM"
+
+#~ msgid "OSM Religious"
+#~ msgstr "Addini na OSM"
+
+#~ msgid "OSM Landuse"
+#~ msgstr "Amfanin ƙasa na OSM"
+
+#~ msgid "OSM Waterways"
+#~ msgstr "Hanyoyin ruwa na OSM"
+
+#~ msgid "OSM Water Points"
+#~ msgstr "Wuraren ruwa na OSM"
+
+#~ msgid "OSM Waste Disposal"
+#~ msgstr "Zubar da shara na OSM"
+
+#~ msgid "OSM Education"
+#~ msgstr "Ilimi na OSM"
+
+#~ msgid "OSM Cemeteries"
+#~ msgstr "Makabartu na OSM"
+
+#~ msgid "OSM Amenities"
+#~ msgstr "Kayayyakin more rayuwa na OSM"
+
+#~ msgid "Geometry Type:"
+#~ msgstr "Nau'in geometry:"
+
+#~ msgid "Polygon"
+#~ msgstr "Poligon"
+
+#~ msgid "Polyline"
+#~ msgstr "Polilayi"
+
+#~ msgid "Point"
+#~ msgstr "Batu"
+
+#~ msgid "Use centroids"
+#~ msgstr "Yi amfani da centroids"
+
+#~ msgid "Upload Custom GeoJSON"
+#~ msgstr "Ɗora GeoJSON na musamman"
+
+#~ msgid "Generating OSM data extract... This may take a moment."
+#~ msgstr "Ana samar da cire bayanan OSM... Wannan na iya ɗaukar ɗan lokaci."
+
+#~ msgid "OSM data extract ready"
+#~ msgstr "Cire bayanan OSM a shirye yake"
+
+#~ msgid "Step 4: Split into Tasks (Optional)"
+#~ msgstr "Mataki na 3: Raba zuwa ayyuka (na zaɓi)"
+
+#~ msgid "✓ Task splitting is not relevant without existing data"
+#~ msgstr "✓ Rabon aiki ba shi da amfani idan babu bayanan da suke akwai"
+
+#~ msgid ""
+#~ "Generate task areas by splitting the "
+#~ "Area of Interest (AOI). Choose an "
+#~ "algorithm and\n"
+#~ "      parameters, then split. Review the"
+#~ " preview, and click \"Accept Task "
+#~ "Areas\" to save. Or\n"
+#~ "      click"
+#~ msgstr ""
+#~ "Samar da yankunan aiki ta hanyar "
+#~ "raba Area of Interest (AOI). Zaɓi "
+#~ "algorithm da sigogi, sannan ka raba. "
+#~ "Duba abin da aka nuna, sannan ka"
+#~ " danna \"Accept Task Areas\" don "
+#~ "ajiye. Ko kuma ka danna"
+
+#~ msgid "Skip"
+#~ msgstr "Tsallake"
+
+#~ msgid "to use the whole AOI as a single task."
+#~ msgstr "don amfani da dukan AOI a matsayin aiki guda ɗaya."
+
+#~ msgid "Choose which linear features influence building-based task splitting."
+#~ msgstr "Zaɓi waɗanne siffofi masu layi za su shafi rabon aiki bisa gine-gine."
+
+#~ msgid "Include roads"
+#~ msgstr "Haɗa hanyoyi"
+
+#~ msgid "Include rivers"
+#~ msgstr "Haɗa koguna"
+
+#~ msgid "Include railways"
+#~ msgstr "Haɗa layin dogo"
+
+#~ msgid "Include aeroways"
+#~ msgstr "Haɗa hanyoyin jirgi"
+
+#~ msgid "Algorithm:"
+#~ msgstr "Algorithm:"
+
+#~ msgid "Select splitting option..."
+#~ msgstr "Zaɓi zaɓin rabawa..."
+
+#~ msgid "Split by Square"
+#~ msgstr "Raba ta murabba'i"
+
+#~ msgid "Average Buildings v1 (Voronoi)"
+#~ msgstr "Matsakaicin gine-gine v1 (Voronoi)"
+
+#~ msgid "Average Buildings v2 (Straight Skeleton)"
+#~ msgstr "Matsakaicin gine-gine v2 (Straight Skeleton)"
+
+#~ msgid "Split by Specific Number of Tasks"
+#~ msgstr "Raba da takamaiman adadin ayyuka (zuwa nan ba da jimawa ba)"
+
+#~ msgid "Avg. Buildings per Task:"
+#~ msgstr "Matsakaicin gine-gine a kowane aiki:"
+
+#~ msgid "Number of Tasks:"
+#~ msgstr "Yawan ayyuka:"
+
+#~ msgid "Dimension (meters):"
+#~ msgstr "Girma (mita):"
+
+#~ msgid "Split Again"
+#~ msgstr "Sake raba"
+
+#~ msgid "Split AOI"
+#~ msgstr "Raba AOI"
+
+#~ msgid "Splitting AOI into tasks... This may take a moment."
+#~ msgstr "Ana raba AOI zuwa ayyuka... Wannan na iya ɗaukar ɗan lokaci."
+
+#~ msgid "Ready"
+#~ msgstr "A shirye"
+
+#~ msgid ""
+#~ "All prerequisites are complete! Create "
+#~ "the project in your chosen mapping "
+#~ "tool."
+#~ msgstr ""
+#~ "An cika duk abubuwan da ake "
+#~ "buƙata! Ƙirƙiri aikin a kayan aikin "
+#~ "taswira da ka zaɓa."
+
+#~ msgid "Finalise Project"
+#~ msgstr "Kammala aiki"
+
+#~ msgid "Confirm Project Finalisation"
+#~ msgstr "Tabbatar da kammala aiki"
+
+#~ msgid "Are you sure you want to finalise this project?"
+#~ msgstr "Ka tabbata kana son kammala wannan aikin?"
+
+#~ msgid "Confirm & Finalise"
+#~ msgstr "Tabbatar kuma ka kammala"
+
+#~ msgid "Custom Credentials"
+#~ msgstr "Bayanan shaidar na musamman"
+
+#~ msgid "ODK Central URL"
+#~ msgstr "URL na ODK Central"
+
+#~ msgid "https://your-odk-central.com"
+#~ msgstr "https://your-odk-central.com"
+
+#~ msgid "QField Cloud URL"
+#~ msgstr "URL na QField Cloud"
+
+#~ msgid "https://qfield.cloud"
+#~ msgstr "https://qfield.cloud"
+
+#~ msgid "qfield_username"
+#~ msgstr "qfield_username"
+
+#~ msgid "qfield_password"
+#~ msgstr "qfield_password"
+
+#~ msgid "Test Credentials"
+#~ msgstr "Gwada bayanan shaida"
+
+#~ msgid "Save & Continue"
+#~ msgstr "Ajiye kuma ci gaba"
+
+#~ msgid "Select a survey type..."
+#~ msgstr "Zaɓi nau'in bincike..."
+
+#~ msgid "No survey types available"
+#~ msgstr "Babu nau'ikan bincike da ake samu"
+
+#~ msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#~ msgstr "Babu fom na bincike da ake samu. Ɗora fom na musamman a Babban tsari."
+
+#~ msgid "Select a survey type, or upload a custom form in Advanced Config."
+#~ msgstr "Zaɓi nau'in bincike, ko ka ɗora fom na musamman a Babban tsari."
+
+#~ msgid "Survey type selected."
+#~ msgstr "An zaɓi nau'in bincike."
+
+#~ msgid "Invalid file type. Please upload a .xls or .xlsx file."
+#~ msgstr "Nau'in fayil ba daidai ba ne. Da fatan a ɗora fayil .xls ko .xlsx."
+
+#~ msgid "Selected file:"
+#~ msgstr "Fayil da aka zaɓa:"
+
+#~ msgid "Custom form selected."
+#~ msgstr "An zaɓi fom na musamman."
+
+#~ msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+#~ msgstr ""
+#~ "Da farko ka zaɓi nau'in bincike, "
+#~ "ko ka ɗora fom na musamman a "
+#~ "Babban tsari."
+
+#~ msgid "polygons"
+#~ msgstr "polygons"
+
+#~ msgid "polylines"
+#~ msgstr "polylines"
+
+#~ msgid "points"
+#~ msgstr "maki"
+
+#~ msgid "features"
+#~ msgstr "siffofi"
+
+#~ msgid ""
+#~ "You uploaded a custom form, so "
+#~ "this OSM download is optional. Use "
+#~ "Advanced Config to upload your own "
+#~ "GeoJSON or adjust download settings."
+#~ msgstr ""
+#~ "Ka ɗora fom na musamman, don haka"
+#~ " wannan saukar OSM na zaɓi ne. "
+#~ "Yi amfani da Babban tsari don ɗora"
+#~ " GeoJSON naka ko daidaita saitunan "
+#~ "sauke."
+
+#~ msgid ""
+#~ "Recommended source: %(title)s (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "Asalin da aka ba da shawara: "
+#~ "%(title)s (%(geom_label)s). Duba bayanan a "
+#~ "taswira, sannan ka ci gaba."
+
+#~ msgid ""
+#~ "Recommended source updated (%(geom_label)s). "
+#~ "Review the data on the map, then"
+#~ " continue."
+#~ msgstr ""
+#~ "An sabunta asalin da aka ba da "
+#~ "shawara (%(geom_label)s). Duba bayanan a "
+#~ "taswira, sannan ka ci gaba."
+
+#~ msgid "Downloading..."
+#~ msgstr "Ana saukewa..."
+
+#~ msgid "Confirm No Splitting"
+#~ msgstr "Tabbatar babu rabawa"
+
+#~ msgid "Split by Buildings"
+#~ msgstr "Raba ta gine-gine"
+
+#~ msgid "Select Option"
+#~ msgstr "Zaɓi zaɓi"
+
+#~ msgid "Confirming..."
+#~ msgstr "Ana tabbatarwa..."
+
+#~ msgid "Splitting..."
+#~ msgstr "Ana rabawa..."
+
+#~ msgid "ODK Central"
+#~ msgstr "ODK Central"
+
+#~ msgid "QField"
+#~ msgstr "QField"
+
+#~ msgid "the mapping tool"
+#~ msgstr "kayan aikin taswira"
+
+#~ msgid "Project type not set. Please set the field mapping app first."
+#~ msgstr ""
+#~ "Ba a saita nau'in aiki ba. Da "
+#~ "fatan a fara saita manhajar taswirar "
+#~ "fili."
+
+#~ msgid ""
+#~ "Are you sure you want to finalise"
+#~ " this project in %(project_type)s? This "
+#~ "will create the project, upload forms,"
+#~ " and generate all necessary files."
+#~ msgstr ""
+#~ "Ka tabbata kana son kammala wannan "
+#~ "aiki a %(project_type)s? Wannan zai "
+#~ "ƙirƙiri aikin, ya ɗora fom, kuma "
+#~ "ya samar da duk fayilolin da ake"
+#~ " buƙata."
+
+#~ msgid "Custom ODK Credentials"
+#~ msgstr "Bayanan shaidar ODK na musamman"
+
+#~ msgid "Custom QField Credentials"
+#~ msgstr "Bayanan shaidar QField na musamman"
+
+#~ msgid "Please fill in all fields."
+#~ msgstr "Da fatan a cika duk filaye."
+
+#~ msgid "Testing..."
+#~ msgstr "Ana gwadawa..."
+
+#~ msgid "Testing credentials..."
+#~ msgstr "Ana gwada bayanan shaida..."
+
+#~ msgid "✓ Credentials are valid!"
+#~ msgstr "✓ Bayanan shaida suna da inganci!"
+
+#~ msgid "Invalid credentials. Please check and try again."
+#~ msgstr "Bayanan shaida ba su da inganci. Da fatan a duba sannan a sake gwadawa."
+
+#~ msgid "Error testing credentials: %(message)s"
+#~ msgstr "Kuskure wajen gwada bayanan shaida: %(message)s"
+
+#~ msgid "Please test credentials first before continuing."
+#~ msgstr "Da fatan a fara gwada bayanan shaida kafin ci gaba."
+
+#~ msgid "Creating project in %(project_type)s... This may take a moment."
+#~ msgstr ""
+#~ "Ana ƙirƙirar aiki a %(project_type)s... "
+#~ "Wannan na iya ɗaukar ɗan lokaci."
+
+#~ msgid "Error:"
+#~ msgstr "Kuskure:"
+
+#~ msgid "Basemap attach failed. Use retry to start again."
+#~ msgstr ""
+#~ "Haɗa taswirar tushe ya gaza. Yi "
+#~ "amfani da sake gwadawa don fara "
+#~ "daga farko."
+
+#~ msgid "Retry Attach"
+#~ msgstr "Sake gwada haɗawa"
+
+#~ msgid ""
+#~ "Basemap attach is in progress. Use "
+#~ "the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Ana haɗa taswirar tushe yanzu. Yi "
+#~ "amfani da maɓallin da ke ƙasa don"
+#~ " duba sabon matsayi."
+
+#~ msgid "Checking..."
+#~ msgstr "Ana dubawa..."
+
+#~ msgid "Check Status"
+#~ msgstr "Matsayin aiki"
+
+#~ msgid ""
+#~ "Basemap generation is in progress. "
+#~ "Status updates automatically every few "
+#~ "seconds."
+#~ msgstr ""
+#~ "Ana ƙirƙirar taswirar tushe yanzu. "
+#~ "Matsayi yana sabuntawa ta atomatik "
+#~ "kowane ƴan daƙiƙu."
+
+#~ msgid "STAC item"
+#~ msgstr "Abun STAC"
+
+#~ msgid "Zoom"
+#~ msgstr "Zuƙowa"
+
+#~ msgid "Select one imagery item to start MBTiles generation."
+#~ msgstr "Zaɓi abu guda na hoto don fara ƙirƙirar MBTiles."
+
+#~ msgid "Cloud"
+#~ msgstr "Rufe"
+
+#~ msgid "View Metadata"
+#~ msgstr "Duba bayanan meta"
+
+#~ msgid "Use this image"
+#~ msgstr "Yi amfani da wannan hoton"
+
+#~ msgid "No imagery items were found for this AOI."
+#~ msgstr "Ba a sami wasu abubuwan hoto na wannan AOI ba."
+
+#~ msgid "Accept Data Extract"
+#~ msgstr "Karɓi cire bayanai"
+
+#~ msgid "View technical details"
+#~ msgstr "Duba bayanan fasaha"
+
+#~ msgid "Project created in ODK Central."
+#~ msgstr "An ƙirƙiri aikin a ODK Central."
+
+#~ msgid "Manager Access (ODK Central UI)"
+#~ msgstr "Shigar mai kula (ODK Central UI)"
+
+#~ msgid "Open project in ODK Central"
+#~ msgstr "Buɗe aiki a ODK Central"
+
+#~ msgid "Save these credentials now. They will only be shown once."
+#~ msgstr "Ajiye waɗannan bayanan shaida yanzu. Za a nuna su sau ɗaya kacal."
+
+#~ msgid "View FieldTM Project"
+#~ msgstr "Duba aikin FieldTM"
+
+#~ msgid "Project created in QFieldCloud."
+#~ msgstr "An ƙirƙiri aikin a QFieldCloud."
+
+#~ msgid "Manager Access (QFieldCloud)"
+#~ msgstr "Shigar mai kula (QFieldCloud)"
+
+#~ msgid "Open project in QFieldCloud"
+#~ msgstr "Buɗe aiki a QFieldCloud"
+
+#~ msgid ""
+#~ "Manager account could not be created "
+#~ "automatically. Log in to QFieldCloud as"
+#~ " admin to\n"
+#~ "      manage the project."
+#~ msgstr ""
+#~ "Ba a iya ƙirƙirar asusun mai kula"
+#~ " ta atomatik ba. Shiga QFieldCloud a"
+#~ " matsayin admin don kula da aikin."
+
+#~ msgid "Accept Task Choices"
+#~ msgstr "Karɓi zaɓin ayyuka"
+
+#~ msgid ""
+#~ "Basemap attached to QField\n"
+#~ "    project."
+#~ msgstr "An hada taswirar tushe da aikin QField."
+
+#~ msgid "Area"
+#~ msgstr "Yanki"
+
+#~ msgid "Invalid geometry"
+#~ msgstr "Siffar yanayi ba ta da inganci"
+
+#~ msgid "Undo last vertex"
+#~ msgstr "Mayar da maki na karshe baya"
+
+#~ msgid "My location"
+#~ msgstr "Wurina"
+
+#~ msgid "Failed to validate GeoJSON"
+#~ msgstr "An kasa tantance GeoJSON"
+
+#~ msgid "No GeoJSON returned from validation"
+#~ msgstr "Babu GeoJSON da aka dawo daga tantancewa"
+
+#~ msgid ""
+#~ "Draw a polygon on the map or "
+#~ "upload a GeoJSON file to define "
+#~ "your project area. Maximum\n"
+#~ "    project size is 1,000 km². "
+#~ "Areas over 100 km² will show a "
+#~ "warning. The OSM data extract API "
+#~ "is\n"
+#~ "    limited to 200 km²."
+#~ msgstr ""
+#~ "Zana polygon a kan taswira ko loda"
+#~ " fayil din GeoJSON don ayyana yankin"
+#~ " aikinka. Matsakaicin girman aikin shi "
+#~ "ne 1,000 km². Yankuna da suka wuce"
+#~ " 100 km² za su nuna gargadi. "
+#~ "API din fitar da bayanan OSM yana"
+#~ " iyakance zuwa 200 km²."
+
+#~ msgid ""
+#~ "Basemap attach failed for now. Your project is ready to\n"
+#~ "      use. Please retry attach."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Basemap generation is in progress. Use"
+#~ " the button below to check the "
+#~ "latest status."
+#~ msgstr ""
+#~ "Ana samar da taswirar tushe. Yi "
+#~ "amfani da maballin da ke kasa "
+#~ "domin duba sabuwar matsayi."
+
+#~ msgid ""
+#~ "Basemap is\n"
+#~ "    ready. Attaching to QField project in progress."
+#~ msgstr "Taswirar tushe ta shirya. Ana ci gaba da haɗa ta da aikin QField."
+
+#~ msgid ""
+#~ "Basemap is ready. Not yet\n"
+#~ "    attached to QField project."
+#~ msgstr ""
+#~ "Taswirar tushe ta shirya. Amma har "
+#~ "yanzu ba a haɗa ta da aikin "
+#~ "QField ba."
 

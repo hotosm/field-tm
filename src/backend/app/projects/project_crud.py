@@ -217,6 +217,84 @@ async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
             log.info(f"Deleted XLSForms from the database: {forms_to_delete}")
 
 
+async def claim_simple_project_basemap_generation(
+    db: AsyncConnection,
+    project_id: int,
+) -> bool:
+    """Atomically claim a simple-flow project for basemap autostart generation."""
+    claim_sql = """
+        UPDATE projects
+        SET
+            basemap_status = 'generating',
+            basemap_url = NULL,
+            basemap_attach_status = 'idle',
+            basemap_attach_error = NULL,
+            basemap_attach_updated_at = NULL,
+            updated_at = NOW()
+        WHERE id = %(project_id)s
+          AND field_mapping_app::text = %(field_mapping_app)s
+          AND status::text = %(project_status)s
+          AND (
+              basemap_stac_item_id IS NULL
+              OR BTRIM(basemap_stac_item_id) = ''
+          )
+          AND COALESCE(BTRIM(basemap_status), '') IN ('', 'generating', 'failed')
+        RETURNING id;
+    """
+
+    async with db.cursor() as cur:
+        await cur.execute(
+            claim_sql,
+            {
+                "project_id": project_id,
+                "field_mapping_app": FieldMappingApp.QFIELD.value,
+                "project_status": ProjectStatus.PUBLISHED.value,
+            },
+        )
+        claimed_row = await cur.fetchone()
+
+    if not claimed_row:
+        return False
+
+    await db.commit()
+    return True
+
+
+async def claim_simple_project_basemap_resume(
+    db: AsyncConnection,
+    project_id: int,
+) -> bool:
+    """Atomically claim a triggered simple basemap for status reconciliation."""
+    claim_sql = """
+        UPDATE projects
+        SET updated_at = NOW()
+        WHERE id = %(project_id)s
+          AND field_mapping_app::text = %(field_mapping_app)s
+          AND status::text = %(project_status)s
+          AND basemap_status = 'generating'
+          AND basemap_stac_item_id IS NOT NULL
+          AND BTRIM(basemap_stac_item_id) <> ''
+        RETURNING id;
+    """
+
+    async with db.cursor() as cur:
+        await cur.execute(
+            claim_sql,
+            {
+                "project_id": project_id,
+                "field_mapping_app": FieldMappingApp.QFIELD.value,
+                "project_status": ProjectStatus.PUBLISHED.value,
+            },
+        )
+        claimed_row = await cur.fetchone()
+
+    if not claimed_row:
+        return False
+
+    await db.commit()
+    return True
+
+
 async def generate_odk_central_project_content(
     project_odk_id: int,
     project_odk_form_id: str,

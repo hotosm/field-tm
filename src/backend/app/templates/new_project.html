@@ -3,6 +3,25 @@ endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
   <h1 style="margin-bottom: 30px">{{ _("Create New Project") }}</h1>
 
+  <wa-callout variant="brand" style="margin-bottom: 16px">
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      "
+    >
+      <span>
+        {{ _("If you are collecting OSM Buildings, use the simple workflow with AOI only.") }}
+      </span>
+      <wa-button href="/new/simple" variant="brand" size="small" id="open-simple-workflow-btn">
+        {{ _("Create Project") }}
+      </wa-button>
+    </div>
+  </wa-callout>
+
   <wa-card>
     <form
       id="create-project-form"
@@ -11,6 +30,7 @@ endblock %} {% block content %}
       hx-target="#form-error-container"
       hx-swap="innerHTML"
       hx-indicator="#submit-indicator"
+      data-require-outline="true"
     >
       <div id="form-error-container">
         <div id="form-error" style="margin-bottom: 16px; display: none">
@@ -87,70 +107,7 @@ endblock %} {% block content %}
         </div>
       </div>
 
-      <div class="ftm-form-group">
-        <label class="ftm-form-label">
-          {{ _("Project Area") }} <span class="ftm-form-required">*</span>
-        </label>
-        <div class="ftm-map-actions">
-          <wa-button
-            type="button"
-            id="draw-polygon-btn"
-            variant="default"
-            style="flex: 1; min-width: 120px"
-          >
-            {{ _("Draw Area") }}
-          </wa-button>
-          <wa-button
-            type="button"
-            id="upload-geojson-btn"
-            variant="default"
-            style="flex: 1; min-width: 120px"
-          >
-            {{ _("Upload GeoJSON") }}
-          </wa-button>
-          <wa-button
-            type="button"
-            id="clear-map-btn"
-            variant="default"
-            style="flex: 1; min-width: 120px"
-          >
-            {{ _("Clear") }}
-          </wa-button>
-        </div>
-        <input type="file" id="geojson-file-input" accept=".geojson,.json" style="display: none" />
-        <div id="map" class="ftm-map-container"></div>
-        <div id="map-error" style="margin-top: 8px"></div>
-        <div id="area-info" style="margin-top: 8px"></div>
-        <small class="ftm-form-help">
-          {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area.
-          Maximum project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data
-          extract API is limited to 200 km².") }}
-        </small>
-        <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
-          <button
-            type="button"
-            id="aoi-advanced-config-toggle"
-            class="wa-button wa-button--default ftm-advanced-toggle"
-          >
-            {{ _("Advanced Config") }}
-          </button>
-        </div>
-        <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
-          <div class="ftm-advanced-config__content">
-            <div class="ftm-checkbox-row">
-              <input
-                type="checkbox"
-                id="merge-geometries-checkbox"
-                style="margin: 0; cursor: pointer"
-              />
-              <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
-                {{ _("Merge geometries (use convex hull for multipolygons)") }}
-              </label>
-            </div>
-          </div>
-        </div>
-        <textarea name="outline" id="outline-geojson" style="display: none"></textarea>
-      </div>
+      {% include "partials/new_project/map_section.html" %}
 
       <div class="ftm-form-group">
         <label class="ftm-form-label">{{ _("Hashtags") }}</label>
@@ -167,9 +124,9 @@ endblock %} {% block content %}
       </div>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn">
-          {{ _("Create Project") }}
-        </wa-button>
+        <wa-button type="submit" variant="brand" id="submit-btn"
+          >{{ _("Create Project") }}</wa-button
+        >
         <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
           >{{ _("Creating...") }}</span
         >
@@ -182,24 +139,14 @@ endblock %} {% block content %}
 <script type="module">
   const I18N = {
     somethingWentWrong: {{ _("Something went wrong. Please try again.")|tojson }},
-    invalidGeoJSONFormat: {{ _("Invalid GeoJSON format. Please check your file.")|tojson }},
-    invalidGeoJSONFile: {{ _("Invalid GeoJSON file. Please check the file format.")|tojson }},
-    mustDrawAOI: {{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.")|tojson }},
   };
+
   const form = document.getElementById("create-project-form");
   const errorContainer = document.getElementById("form-error");
   const errorMessageEl = document.getElementById("form-error-message");
   const hashtagInput = document.getElementById("hashtag-input");
   const hashtagsContainer = document.getElementById("hashtags-container");
-  const aoiAdvancedConfigToggle = document.getElementById("aoi-advanced-config-toggle");
-  const aoiAdvancedConfigPanel = document.getElementById("aoi-advanced-config-panel");
   const hashtags = new Set();
-
-  if (aoiAdvancedConfigToggle && aoiAdvancedConfigPanel) {
-    aoiAdvancedConfigToggle.addEventListener("click", () => {
-      aoiAdvancedConfigPanel.classList.toggle("ftm-advanced-config--hidden");
-    });
-  }
 
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;
@@ -213,32 +160,11 @@ endblock %} {% block content %}
     errorContainer.style.display = "none";
   }
 
-  function showAreaInfo(areaKm2, warning) {
-    const areaInfo = document.getElementById("area-info");
-    if (!areaInfo) return;
-    if (areaKm2 == null) {
-      areaInfo.innerHTML = "";
-      return;
-    }
-    const formatted = areaKm2.toLocaleString(undefined, {
-      maximumFractionDigits: 1,
-    });
-    if (warning) {
-      areaInfo.innerHTML = `<wa-callout variant="warning"><span>${warning}</span></wa-callout>`;
-    } else {
-      areaInfo.innerHTML = `<small style="color: #666;">Area: ${formatted} km²</small>`;
-    }
-  }
-
   function addHashtag(tag) {
-    // Clean up the tag: remove # if present, trim whitespace
     tag = tag.trim().replace(/^#+/, "");
     if (!tag) return;
 
-    // Add # prefix if not present
     const hashtag = tag.startsWith("#") ? tag : `#${tag}`;
-
-    // Don't add duplicates
     if (hashtags.has(hashtag)) return;
 
     hashtags.add(hashtag);
@@ -256,22 +182,18 @@ endblock %} {% block content %}
       const tagEl = document.createElement("wa-tag");
       tagEl.setAttribute("with-remove", "");
       tagEl.textContent = tag;
-      tagEl.dataset.tag = tag; // Store tag value in data attribute
+      tagEl.dataset.tag = tag;
       hashtagsContainer.appendChild(tagEl);
     });
   }
 
-  // Set up event delegation on the container - listen for all events
   if (hashtagsContainer) {
-    // Listen for click events
     hashtagsContainer.addEventListener("click", (e) => {
       const tagEl = e.target.closest("wa-tag");
       if (tagEl && tagEl.dataset.tag) {
-        // Get the actual clicked element (might be in shadow DOM)
         const path = e.composedPath ? e.composedPath() : [e.target];
         const clickedElement = path[0];
 
-        // Check if it's a button, icon, or remove-related element
         const isRemoveButton =
           clickedElement.tagName === "BUTTON" ||
           clickedElement.tagName === "svg" ||
@@ -284,35 +206,30 @@ endblock %} {% block content %}
         if (isRemoveButton) {
           e.preventDefault();
           e.stopPropagation();
-          const tag = tagEl.dataset.tag;
-          removeHashtag(tag);
+          removeHashtag(tagEl.dataset.tag);
           return;
         }
       }
     });
 
-    // Also listen for custom 'remove' event (case-insensitive check)
     ["remove", "wa-remove", "tag-remove"].forEach((eventName) => {
       hashtagsContainer.addEventListener(eventName, (e) => {
         const tagEl = e.target;
         if (tagEl && tagEl.dataset.tag) {
           e.preventDefault();
           e.stopPropagation();
-          const tag = tagEl.dataset.tag;
-          removeHashtag(tag);
+          removeHashtag(tagEl.dataset.tag);
         }
       });
     });
   }
 
-  // Handle input events for hashtag input
   if (hashtagInput) {
     hashtagInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === ",") {
         e.preventDefault();
         const value = hashtagInput.value ? hashtagInput.value.trim() : "";
         if (value) {
-          // Split by comma in case multiple were pasted
           value.split(",").forEach((tag) => addHashtag(tag));
           hashtagInput.value = "";
         }
@@ -328,367 +245,7 @@ endblock %} {% block content %}
     });
   }
 
-  // Initialize Leaflet map
-  let map;
-  let drawnLayers;
-  let drawControl;
-  let activeDrawHandler = null;
-  let undoControl = null;
-
-  function initMap() {
-    // Wait for Leaflet to be available
-    if (typeof L === "undefined") {
-      console.error("Leaflet is not loaded");
-      return;
-    }
-
-    // Initialize map centered on world
-    map = L.map("map").setView([20, 0], 2);
-
-    // Add OpenStreetMap tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors",
-      maxZoom: 19,
-    }).addTo(map);
-
-    // Initialize drawn layers
-    drawnLayers = new L.FeatureGroup();
-    map.addLayer(drawnLayers);
-
-    // Initialize draw control (no edit/delete toolbar - we use our own Clear + Undo)
-    drawControl = new L.Control.Draw({
-      draw: {
-        polygon: {
-          allowIntersection: false,
-          showArea: true,
-        },
-        rectangle: true,
-        circle: false,
-        marker: false,
-        circlemarker: false,
-        polyline: false,
-      },
-      edit: false,
-    });
-
-    map.addControl(drawControl);
-
-    // ── Custom Undo Vertex control (visible only while drawing) ──
-    const UndoControl = L.Control.extend({
-      options: { position: "topleft" },
-      onAdd: function () {
-        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
-        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
-        btn.href = "#";
-        btn.title = "Undo last vertex";
-        btn.setAttribute("role", "button");
-        btn.innerHTML =
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
-        L.DomEvent.disableClickPropagation(container);
-        L.DomEvent.on(btn, "click", function (e) {
-          L.DomEvent.preventDefault(e);
-          if (activeDrawHandler && activeDrawHandler.deleteLastVertex) {
-            activeDrawHandler.deleteLastVertex();
-          }
-        });
-        container.style.display = "none";
-        this._container = container;
-        return container;
-      },
-      show: function () { if (this._container) this._container.style.display = ""; },
-      hide: function () { if (this._container) this._container.style.display = "none"; },
-    });
-    undoControl = new UndoControl();
-    map.addControl(undoControl);
-
-    // ── Custom Locate control (geolocation) ──
-    const LocateControl = L.Control.extend({
-      options: { position: "bottomleft" },
-      onAdd: function (map) {
-        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
-        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
-        btn.href = "#";
-        btn.title = "My location";
-        btn.setAttribute("role", "button");
-        btn.innerHTML =
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/></svg>';
-        L.DomEvent.disableClickPropagation(container);
-        this._btn = btn;
-        this._map = map;
-        this._marker = null;
-        this._circle = null;
-        const self = this;
-
-        L.DomEvent.on(btn, "click", function (e) {
-          L.DomEvent.preventDefault(e);
-          btn.classList.add("ftm-map-ctrl-btn--loading");
-          map.locate({ setView: true, maxZoom: 16 });
-        });
-
-        map.on("locationfound", function (e) {
-          btn.classList.remove("ftm-map-ctrl-btn--loading");
-          // Remove previous markers
-          if (self._marker) map.removeLayer(self._marker);
-          if (self._circle) map.removeLayer(self._circle);
-          self._circle = L.circle(e.latlng, {
-            radius: e.accuracy / 2,
-            color: "#4a90d9",
-            fillColor: "#4a90d9",
-            fillOpacity: 0.15,
-            weight: 1,
-          }).addTo(map);
-          self._marker = L.circleMarker(e.latlng, {
-            radius: 7,
-            color: "#fff",
-            fillColor: "#4a90d9",
-            fillOpacity: 1,
-            weight: 2,
-          }).addTo(map);
-        });
-
-        map.on("locationerror", function () {
-          btn.classList.remove("ftm-map-ctrl-btn--loading");
-        });
-
-        return container;
-      },
-    });
-    map.addControl(new LocateControl());
-
-    // Handle draw events
-    map.on("draw:drawstart", function (e) {
-      // Capture the active handler from toolbar if not set by our button
-      if (!activeDrawHandler && drawControl._toolbars && drawControl._toolbars.draw) {
-        const mode = drawControl._toolbars.draw._activeMode;
-        if (mode && mode.handler) {
-          activeDrawHandler = mode.handler;
-        }
-      }
-      if (undoControl) undoControl.show();
-    });
-
-    map.on(L.Draw.Event.CREATED, function (e) {
-      const layer = e.layer;
-      drawnLayers.clearLayers();
-      drawnLayers.addLayer(layer);
-      updateGeoJSON();
-      validateAndShowAreaInfo();
-      activeDrawHandler = null;
-      if (undoControl) undoControl.hide();
-    });
-
-    // Also hide undo if drawing is cancelled (e.g. pressing Escape)
-    map.on("draw:drawstop", function () {
-      activeDrawHandler = null;
-      if (undoControl) undoControl.hide();
-    });
-  }
-
-  function updateGeoJSON() {
-    if (!drawnLayers) return;
-
-    const geojson = drawnLayers.toGeoJSON();
-    const outlineTextarea = document.getElementById("outline-geojson");
-
-    if (geojson.features && geojson.features.length > 0) {
-      // If single feature, use it directly; otherwise use FeatureCollection
-      const outline = geojson.features.length === 1 ? geojson.features[0] : geojson;
-      outlineTextarea.value = JSON.stringify(outline, null, 2);
-    } else {
-      outlineTextarea.value = "";
-      showAreaInfo(null);
-    }
-  }
-
-  async function validateAndShowAreaInfo() {
-    const outlineTextarea = document.getElementById("outline-geojson");
-    const outlineValue = outlineTextarea.value.trim();
-    const mapError = document.getElementById("map-error");
-
-    if (!outlineValue) {
-      showAreaInfo(null);
-      return;
-    }
-
-    try {
-      const geojsonData = JSON.parse(outlineValue);
-      const mergeCheckbox = document.getElementById("merge-geometries-checkbox");
-      const mergeGeometries = mergeCheckbox ? mergeCheckbox.checked : false;
-
-      const response = await fetch("/validate-geojson", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          geojson: geojsonData,
-          merge_geometries: mergeGeometries,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        const errorMsg = result.error || "Invalid geometry";
-        if (mapError) {
-          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-        }
-        showAreaInfo(null);
-        return;
-      }
-
-      // Update textarea with normalized/validated geometry
-      if (result.geojson) {
-        outlineTextarea.value = JSON.stringify(result.geojson, null, 2);
-      }
-
-      showAreaInfo(result.area_km2, result.warning);
-
-      // Clear any previous map errors on success
-      if (mapError) {
-        mapError.innerHTML = "";
-      }
-    } catch (err) {
-      console.error("Error validating drawn geometry:", err);
-    }
-  }
-
-  function loadGeoJSONOnMap(geojson) {
-    if (!drawnLayers || !map) return;
-
-    drawnLayers.clearLayers();
-
-    try {
-      const geoJsonLayer = L.geoJSON(geojson, {
-        style: {
-          color: "#3388ff",
-          weight: 3,
-          fillColor: "#3388ff",
-          fillOpacity: 0.2,
-        },
-      });
-
-      drawnLayers.addLayer(geoJsonLayer);
-      map.fitBounds(geoJsonLayer.getBounds());
-      updateGeoJSON();
-    } catch (error) {
-      console.error("Error loading GeoJSON:", error);
-      showError(I18N.invalidGeoJSONFormat);
-    }
-  }
-
-  // Initialize map when DOM and Leaflet are ready
-  function waitForLeaflet() {
-    if (
-      typeof L !== "undefined" &&
-      typeof L.Control !== "undefined" &&
-      typeof L.Control.Draw !== "undefined"
-    ) {
-      initMap();
-    } else {
-      setTimeout(waitForLeaflet, 100);
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", waitForLeaflet);
-  } else {
-    waitForLeaflet();
-  }
-
-  // Draw polygon button
-  document.getElementById("draw-polygon-btn")?.addEventListener("click", function () {
-    if (!map) return;
-    activeDrawHandler = new L.Draw.Polygon(map, {
-      allowIntersection: false,
-      showArea: true,
-    });
-    activeDrawHandler.enable();
-  });
-
-  // Upload GeoJSON button
-  document.getElementById("upload-geojson-btn")?.addEventListener("click", function () {
-    document.getElementById("geojson-file-input").click();
-  });
-
-  // Handle file upload
-  document.getElementById("geojson-file-input")?.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-      try {
-        // Parse the file content
-        const geojsonData = JSON.parse(e.target.result);
-
-        // Clear any previous errors
-        clearError();
-        const mapError = document.getElementById("map-error");
-        if (mapError) {
-          mapError.innerHTML = "";
-        }
-
-        // Get merge geometries checkbox value
-        const mergeGeometriesCheckbox = document.getElementById("merge-geometries-checkbox");
-        const mergeGeometries = mergeGeometriesCheckbox ? mergeGeometriesCheckbox.checked : false;
-
-        // Send the geojson to API to validate, normalize, and merge into single polygon
-        const response = await fetch("/validate-geojson", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            geojson: geojsonData,
-            merge_geometries: mergeGeometries,
-          }),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          const errorMsg = result.error || "Failed to validate GeoJSON";
-          console.error("Error validating GeoJSON:", errorMsg);
-          if (mapError) {
-            mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-          } else {
-            showError(errorMsg);
-          }
-          return;
-        }
-
-        // Load the normalized, merged GeoJSON onto the map
-        if (result.geojson) {
-          loadGeoJSONOnMap(result.geojson);
-          showAreaInfo(result.area_km2, result.warning);
-        } else {
-          throw new Error("No GeoJSON returned from validation");
-        }
-      } catch (error) {
-        console.error("Error processing GeoJSON:", error);
-        const errorMsg = error.message || I18N.invalidGeoJSONFile;
-        const mapError = document.getElementById("map-error");
-        if (mapError) {
-          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-        } else {
-          showError(errorMsg);
-        }
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  // Clear map button
-  document.getElementById("clear-map-btn")?.addEventListener("click", function () {
-    if (drawnLayers) {
-      drawnLayers.clearLayers();
-      updateGeoJSON();
-      showAreaInfo(null);
-    }
-  });
-
-  // Listen for duplicate project name error
   document.body.addEventListener("duplicateProjectName", function (event) {
-    // HTMX passes the object as event.detail, so access the property
     let errorMsg = "";
     if (event.detail && typeof event.detail === "object") {
       errorMsg = event.detail.duplicateProjectName || "";
@@ -699,7 +256,6 @@ endblock %} {% block content %}
     const projectNameError = document.getElementById("project-name-error");
     const projectNameInput = document.getElementById("project_name_input");
 
-    // Show error under project name field
     if (projectNameError) {
       if (errorMsg) {
         projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
@@ -709,115 +265,42 @@ endblock %} {% block content %}
       }
     }
 
-    // Focus the project name input
     if (projectNameInput) {
       setTimeout(() => {
         projectNameInput.focus();
-        projectNameInput.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+        projectNameInput.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 100);
     }
   });
 
-  // Listen for missing outline error
-  document.body.addEventListener("missingOutline", function (event) {
-    console.log("missingOutline event received", event.detail);
-    let errorMsg = "";
-    if (event.detail && typeof event.detail === "object") {
-      errorMsg = event.detail.missingOutline || "";
-    } else if (typeof event.detail === "string") {
-      errorMsg = event.detail;
-    }
-
-    const mapError = document.getElementById("map-error");
-    const mapContainer = document.getElementById("map");
-
-    // Show error near the map
-    if (mapError) {
-      if (errorMsg) {
-        mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-      } else {
-        mapError.innerHTML =
-          '<wa-callout variant="danger"><span>{{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.") }}</span></wa-callout>';
-      }
-    }
-
-    // Scroll to map
-    if (mapContainer) {
-      setTimeout(() => {
-        mapContainer.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 100);
-    }
-  });
-
-  // Also listen for HTMX afterSwap to handle errors that come in the response
   document.body.addEventListener("htmx:afterSwap", function (event) {
     const xhr = event.detail.xhr;
-    const status = xhr.status;
-
-    // Handle 409 (duplicate name) - check if error is in response
-    if (status === 409) {
-      const responseText = xhr.responseText;
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(responseText, "text/html");
-      const errorMessage = doc.querySelector("#form-error-message")?.textContent;
-
-      if (errorMessage) {
-        const projectNameError = document.getElementById("project-name-error");
-        if (projectNameError) {
-          projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
-        }
-
-        const projectNameInput = document.getElementById("project_name_input");
-        if (projectNameInput) {
-          setTimeout(() => {
-            projectNameInput.focus();
-            projectNameInput.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }, 100);
-        }
-      }
+    if (xhr.status !== 409) {
+      return;
     }
 
-    // Handle 400 (map/area-related errors)
-    if (status === 400) {
-      const responseText = xhr.responseText;
-      if (
-        responseText.includes("AOI") ||
-        responseText.includes("Area of Interest") ||
-        responseText.includes("outline") ||
-        responseText.includes("Project area") ||
-        responseText.includes("too large")
-      ) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(responseText, "text/html");
-        const errorMessage = doc.querySelector("#form-error-message")?.textContent;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xhr.responseText, "text/html");
+    const errorMessage = doc.querySelector("#form-error-message")?.textContent;
 
-        if (errorMessage) {
-          const mapError = document.getElementById("map-error");
-          if (mapError) {
-            mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
-          }
+    if (!errorMessage) {
+      return;
+    }
 
-          const mapContainer = document.getElementById("map");
-          if (mapContainer) {
-            setTimeout(() => {
-              mapContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
-            }, 100);
-          }
-        }
-      }
+    const projectNameError = document.getElementById("project-name-error");
+    if (projectNameError) {
+      projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
+    }
+
+    const projectNameInput = document.getElementById("project_name_input");
+    if (projectNameInput) {
+      setTimeout(() => {
+        projectNameInput.focus();
+        projectNameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     }
   });
 
-  // Clear project name error when user starts typing
   const projectNameInput = document.getElementById("project_name_input");
   if (projectNameInput) {
     projectNameInput.addEventListener("input", function () {
@@ -828,38 +311,36 @@ endblock %} {% block content %}
     });
   }
 
-  // Handle radio button styling for field mapping app selection
+  const descriptionInput = document.getElementById("description_input");
+  if (descriptionInput) {
+    descriptionInput.addEventListener("input", function () {
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) {
+        descriptionError.innerHTML = "";
+      }
+    });
+  }
+
   const appRadioLabels = document.querySelectorAll(".app-radio-label");
   appRadioLabels.forEach((label) => {
     const radio = label.querySelector('input[type="radio"]');
-
-    // Update styling on change
     radio.addEventListener("change", function () {
-      appRadioLabels.forEach((l) => {
-        l.classList.remove("ftm-radio-card--selected");
-      });
+      appRadioLabels.forEach((l) => l.classList.remove("ftm-radio-card--selected"));
       if (this.checked) {
         label.classList.add("ftm-radio-card--selected");
       }
     });
   });
 
-  // Update hashtags before form submission (HTMX will handle the rest)
   if (form) {
     form.addEventListener("submit", function (e) {
-      // Clear previous errors
-      const projectNameError = document.getElementById("project-name-error");
-      if (projectNameError) {
-        projectNameError.innerHTML = "";
-      }
-      const descriptionError = document.getElementById("description-error");
-      if (descriptionError) {
-        descriptionError.innerHTML = "";
-      }
+      clearError();
 
-      // Validate description
-      // wa-textarea value can be undefined before the element upgrades
-      const descriptionInput = document.getElementById("description_input");
+      const projectNameError = document.getElementById("project-name-error");
+      if (projectNameError) projectNameError.innerHTML = "";
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) descriptionError.innerHTML = "";
+
       if (!descriptionInput || !(descriptionInput.value ?? "").trim()) {
         e.preventDefault();
         e.stopPropagation();
@@ -870,16 +351,12 @@ endblock %} {% block content %}
         if (descriptionInput) {
           setTimeout(() => {
             descriptionInput.focus();
-            descriptionInput.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
+            descriptionInput.scrollIntoView({ behavior: "smooth", block: "center" });
           }, 100);
         }
         return false;
       }
 
-      // Update hashtags hidden field
       const hashtagsArray = Array.from(hashtags);
       let hashtagsInput = document.getElementById("hashtags-hidden");
       if (!hashtagsInput) {
@@ -891,45 +368,8 @@ endblock %} {% block content %}
       }
       hashtagsInput.value = hashtagsArray.join(", ");
 
-      // Validate outline is present before HTMX submits
-      const outlineValue = document.getElementById("outline-geojson").value.trim();
-      if (!outlineValue) {
-        e.preventDefault();
-        e.stopPropagation();
-        const mapError = document.getElementById("map-error");
-        const errorMsg = I18N.mustDrawAOI;
-        if (mapError) {
-          mapError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-        }
-        const mapContainer = document.getElementById("map");
-        if (mapContainer) {
-          setTimeout(() => {
-            mapContainer.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }, 100);
-        }
-        return false;
-      }
-
-      // Clear map error if outline is present
-      const mapError = document.getElementById("map-error");
-      if (mapError) {
-        mapError.innerHTML = "";
-      }
-    });
-  }
-
-  // Clear description error when user starts typing
-  const descriptionInput = document.getElementById("description_input");
-  if (descriptionInput) {
-    descriptionInput.addEventListener("input", function () {
-      const descriptionError = document.getElementById("description-error");
-      if (descriptionError) {
-        descriptionError.innerHTML = "";
-      }
+      return true;
     });
   }
 </script>
-{% endblock %}
+{% include "partials/new_project/map_script.html" %} {% endblock %}

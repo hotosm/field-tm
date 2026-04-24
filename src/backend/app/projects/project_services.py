@@ -56,6 +56,7 @@ from app.helpers.geometry_utils import (
     geojson_area_km2,
     polygon_to_centroid,
 )
+from app.i18n import _
 from app.projects import project_crud, project_deps, project_schemas
 from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
@@ -65,6 +66,33 @@ log = logging.getLogger(__name__)
 HTTP_STATUS_OK_MIN = 200
 HTTP_STATUS_OK_MAX_EXCLUSIVE = 300
 HTTP_STATUS_NOT_FOUND = 404
+SIMPLE_PROJECT_TAGS = ["osm", "buildings", "simple"]
+
+
+def _simple_project_description() -> str:
+    """Return the translated description for simple workflow projects."""
+    return _(
+        "This project was created with a simplified workflow in FieldTM and is made "
+        "to collect building data to enhance OpenStreetMap."
+    )
+
+
+def _simple_project_fallback_city() -> str:
+    """Return the translated fallback location label for simple workflow projects."""
+    return _("Unnamed Area")
+
+
+def _format_simple_fallback_city(centroid) -> str:
+    """Build a deterministic fallback city-like label from centroid coordinates."""
+    if centroid is None:
+        return _simple_project_fallback_city()
+
+    lon = getattr(centroid, "x", None)
+    lat = getattr(centroid, "y", None)
+    if lon is None or lat is None:
+        return _simple_project_fallback_city()
+
+    return _("Area {latitude:.4f}_{longitude:.4f}").format(latitude=lat, longitude=lon)
 
 
 # ============================================================================
@@ -365,6 +393,83 @@ def _format_location_str(location) -> str | None:
     return None
 
 
+def _normalize_city_name(city_name: str | None) -> str | None:
+    """Normalize nearest-city text before using it in generated names."""
+    if not city_name:
+        return None
+    normalized = " ".join(str(city_name).split())
+    return normalized or None
+
+
+def _derive_simple_project_name(location, centroid=None) -> str:
+    """Build the simplified project title from nearest city with fallback."""
+    city_name = _normalize_city_name(getattr(location, "city", None))
+    fallback_city = _format_simple_fallback_city(centroid)
+    return _("{location} OSM Buildings").format(location=city_name or fallback_city)
+
+
+def _derive_simple_project_metadata(
+    location, centroid=None
+) -> tuple[str, str, list[str]]:
+    """Build name/description/tags for the simplified AOI-only workflow."""
+    return (
+        _derive_simple_project_name(location, centroid=centroid),
+        _simple_project_description(),
+        SIMPLE_PROJECT_TAGS.copy(),
+    )
+
+
+def _build_simple_outline_payload(outline: dict) -> dict:
+    """Normalize simplified-flow outlines to GeoJSON geometry for storage."""
+    featcol = parse_aoi(settings.FTM_DB_URL, outline, merge=True)
+    features = featcol.get("features", [])
+    if not features:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+    geometry = features[0].get("geometry")
+    if not geometry:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+    return geometry
+
+
+async def derive_simple_project_metadata(
+    db: AsyncConnection,
+    outline: dict,
+) -> tuple[str, str, list[str], str | None]:
+    """Derive simplified-flow project metadata from AOI centroid lookup."""
+    if not outline:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+
+    normalized_outline = _build_simple_outline_payload(outline)
+    centroid = await polygon_to_centroid(normalized_outline)
+
+    try:
+        async with AsyncNearestCity(db) as geocoder:
+            location = await geocoder.query(centroid.x, centroid.y)
+    except Exception as e:
+        log.warning(
+            "Nearest-city lookup failed for simple workflow at lat=%s lon=%s; "
+            "falling back to default naming. Error: %s",
+            centroid.y,
+            centroid.x,
+            e,
+            exc_info=True,
+        )
+        location = None
+
+    project_name, description, hashtags = _derive_simple_project_metadata(
+        location,
+        centroid=centroid,
+    )
+    location_str = _format_location_str(location)
+    return project_name, description, hashtags, location_str
+
+
 async def _populate_project_location(
     db: AsyncConnection,
     project_name: str,
@@ -375,7 +480,7 @@ async def _populate_project_location(
         outline_dict = project_data.outline.model_dump()
         async with AsyncNearestCity(db) as geocoder:
             centroid = await polygon_to_centroid(outline_dict)
-            location = await geocoder.query(centroid.y, centroid.x)
+            location = await geocoder.query(centroid.x, centroid.y)
             project_data.location_str = _format_location_str(location)
     except Exception as e:
         log.error(
@@ -650,7 +755,20 @@ async def download_osm_data(
     geojson_data = _validate_downloaded_geojson(geojson_data)
 
     # Validate and clean GeoJSON
-    featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
+    try:
+        featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
+    except TypeError as exc:
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        ) from exc
+
+    if not featcol or not isinstance(featcol, dict) or not featcol.get("features"):
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        )
+
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if not featcol_single_geom_type:

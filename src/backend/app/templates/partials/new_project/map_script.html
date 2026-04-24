@@ -1,0 +1,401 @@
+<script type="module">
+  const MAP_I18N = {
+    areaLabel: {{ _("Area")|tojson }},
+    invalidGeoJSONFormat: {{ _("Invalid GeoJSON format. Please check your file.")|tojson }},
+    invalidGeoJSONFile: {{ _("Invalid GeoJSON file. Please check the file format.")|tojson }},
+    invalidGeometry: {{ _("Invalid geometry")|tojson }},
+    undoLastVertex: {{ _("Undo last vertex")|tojson }},
+    myLocation: {{ _("My location")|tojson }},
+    failedToValidateGeoJSON: {{ _("Failed to validate GeoJSON")|tojson }},
+    noGeoJSONReturned: {{ _("No GeoJSON returned from validation")|tojson }},
+    mustDrawAOI: {{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.")|tojson }},
+  };
+
+  let map;
+  let drawnLayers;
+  let drawControl;
+  let activeDrawHandler = null;
+  let undoControl = null;
+
+  function showAreaInfo(areaKm2, warning) {
+    const areaInfo = document.getElementById("area-info");
+    if (!areaInfo) return;
+    if (areaKm2 == null) {
+      areaInfo.innerHTML = "";
+      return;
+    }
+    const formatted = areaKm2.toLocaleString(undefined, {
+      maximumFractionDigits: 1,
+    });
+    if (warning) {
+      areaInfo.innerHTML = `<wa-callout variant="warning"><span>${warning}</span></wa-callout>`;
+    } else {
+      areaInfo.innerHTML =
+        `<small style="color: #666;">${MAP_I18N.areaLabel}: ${formatted} km²</small>`;
+    }
+  }
+
+  function setMapError(message) {
+    const mapError = document.getElementById("map-error");
+    if (!mapError) return;
+    mapError.innerHTML = message
+      ? `<wa-callout variant="danger"><span>${message}</span></wa-callout>`
+      : "";
+  }
+
+  function updateGeoJSON() {
+    if (!drawnLayers) return;
+
+    const geojson = drawnLayers.toGeoJSON();
+    const outlineTextarea = document.getElementById("outline-geojson");
+    if (!outlineTextarea) return;
+
+    if (geojson.features && geojson.features.length > 0) {
+      const outline = geojson.features.length === 1 ? geojson.features[0] : geojson;
+      outlineTextarea.value = JSON.stringify(outline, null, 2);
+    } else {
+      outlineTextarea.value = "";
+      showAreaInfo(null);
+    }
+  }
+
+  async function validateAndShowAreaInfo() {
+    const outlineTextarea = document.getElementById("outline-geojson");
+    if (!outlineTextarea) return;
+
+    const outlineValue = outlineTextarea.value.trim();
+    if (!outlineValue) {
+      showAreaInfo(null);
+      return;
+    }
+
+    try {
+      const geojsonData = JSON.parse(outlineValue);
+      const mergeCheckbox = document.getElementById("merge-geometries-checkbox");
+      const mergeGeometries = mergeCheckbox ? mergeCheckbox.checked : false;
+
+      const response = await fetch("/validate-geojson", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          geojson: geojsonData,
+          merge_geometries: mergeGeometries,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setMapError(result.error || MAP_I18N.invalidGeometry);
+        showAreaInfo(null);
+        return;
+      }
+
+      if (result.geojson) {
+        outlineTextarea.value = JSON.stringify(result.geojson, null, 2);
+      }
+
+      showAreaInfo(result.area_km2, result.warning);
+      setMapError("");
+    } catch (err) {
+      console.error("Error validating drawn geometry:", err);
+    }
+  }
+
+  function loadGeoJSONOnMap(geojson) {
+    if (!drawnLayers || !map) return;
+
+    drawnLayers.clearLayers();
+
+    try {
+      const geoJsonLayer = L.geoJSON(geojson, {
+        style: {
+          color: "#3388ff",
+          weight: 3,
+          fillColor: "#3388ff",
+          fillOpacity: 0.2,
+        },
+      });
+
+      drawnLayers.addLayer(geoJsonLayer);
+      map.fitBounds(geoJsonLayer.getBounds());
+      updateGeoJSON();
+    } catch (error) {
+      console.error("Error loading GeoJSON:", error);
+      setMapError(MAP_I18N.invalidGeoJSONFormat);
+    }
+  }
+
+  function initMap() {
+    if (typeof L === "undefined") {
+      console.error("Leaflet is not loaded");
+      return;
+    }
+
+    map = L.map("map").setView([20, 0], 2);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+      maxZoom: 19,
+    }).addTo(map);
+
+    drawnLayers = new L.FeatureGroup();
+    map.addLayer(drawnLayers);
+
+    drawControl = new L.Control.Draw({
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+        },
+        rectangle: true,
+        circle: false,
+        marker: false,
+        circlemarker: false,
+        polyline: false,
+      },
+      edit: false,
+    });
+
+    map.addControl(drawControl);
+
+    const UndoControl = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = MAP_I18N.undoLastVertex;
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          if (activeDrawHandler && activeDrawHandler.deleteLastVertex) {
+            activeDrawHandler.deleteLastVertex();
+          }
+        });
+        container.style.display = "none";
+        this._container = container;
+        return container;
+      },
+      show: function () {
+        if (this._container) this._container.style.display = "";
+      },
+      hide: function () {
+        if (this._container) this._container.style.display = "none";
+      },
+    });
+    undoControl = new UndoControl();
+    map.addControl(undoControl);
+
+    const LocateControl = L.Control.extend({
+      options: { position: "bottomleft" },
+      onAdd: function (map) {
+        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control ftm-map-ctrl");
+        const btn = L.DomUtil.create("a", "ftm-map-ctrl-btn", container);
+        btn.href = "#";
+        btn.title = MAP_I18N.myLocation;
+        btn.setAttribute("role", "button");
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/></svg>';
+        L.DomEvent.disableClickPropagation(container);
+        this._btn = btn;
+        this._map = map;
+        this._marker = null;
+        this._circle = null;
+        const self = this;
+
+        L.DomEvent.on(btn, "click", function (e) {
+          L.DomEvent.preventDefault(e);
+          btn.classList.add("ftm-map-ctrl-btn--loading");
+          map.locate({ setView: true, maxZoom: 16 });
+        });
+
+        map.on("locationfound", function (e) {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+          if (self._marker) map.removeLayer(self._marker);
+          if (self._circle) map.removeLayer(self._circle);
+          self._circle = L.circle(e.latlng, {
+            radius: e.accuracy / 2,
+            color: "#4a90d9",
+            fillColor: "#4a90d9",
+            fillOpacity: 0.15,
+            weight: 1,
+          }).addTo(map);
+          self._marker = L.circleMarker(e.latlng, {
+            radius: 7,
+            color: "#fff",
+            fillColor: "#4a90d9",
+            fillOpacity: 1,
+            weight: 2,
+          }).addTo(map);
+        });
+
+        map.on("locationerror", function () {
+          btn.classList.remove("ftm-map-ctrl-btn--loading");
+        });
+
+        return container;
+      },
+    });
+    map.addControl(new LocateControl());
+
+    map.on("draw:drawstart", function () {
+      if (!activeDrawHandler && drawControl._toolbars && drawControl._toolbars.draw) {
+        const mode = drawControl._toolbars.draw._activeMode;
+        if (mode && mode.handler) {
+          activeDrawHandler = mode.handler;
+        }
+      }
+      if (undoControl) undoControl.show();
+    });
+
+    map.on(L.Draw.Event.CREATED, function (e) {
+      const layer = e.layer;
+      drawnLayers.clearLayers();
+      drawnLayers.addLayer(layer);
+      updateGeoJSON();
+      validateAndShowAreaInfo();
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
+    });
+
+    map.on("draw:drawstop", function () {
+      activeDrawHandler = null;
+      if (undoControl) undoControl.hide();
+    });
+  }
+
+  function waitForLeaflet() {
+    if (
+      typeof L !== "undefined" &&
+      typeof L.Control !== "undefined" &&
+      typeof L.Control.Draw !== "undefined"
+    ) {
+      initMap();
+    } else {
+      setTimeout(waitForLeaflet, 100);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", waitForLeaflet);
+  } else {
+    waitForLeaflet();
+  }
+
+  document.getElementById("draw-polygon-btn")?.addEventListener("click", function () {
+    if (!map) return;
+    activeDrawHandler = new L.Draw.Polygon(map, {
+      allowIntersection: false,
+      showArea: true,
+    });
+    activeDrawHandler.enable();
+  });
+
+  document.getElementById("upload-geojson-btn")?.addEventListener("click", function () {
+    document.getElementById("geojson-file-input")?.click();
+  });
+
+  document.getElementById("geojson-file-input")?.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      try {
+        const geojsonData = JSON.parse(e.target.result);
+        setMapError("");
+
+        const mergeGeometriesCheckbox = document.getElementById("merge-geometries-checkbox");
+        const mergeGeometries = mergeGeometriesCheckbox ? mergeGeometriesCheckbox.checked : false;
+
+        const response = await fetch("/validate-geojson", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            geojson: geojsonData,
+            merge_geometries: mergeGeometries,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          setMapError(result.error || MAP_I18N.failedToValidateGeoJSON);
+          return;
+        }
+
+        if (result.geojson) {
+          loadGeoJSONOnMap(result.geojson);
+          showAreaInfo(result.area_km2, result.warning);
+        } else {
+          throw new Error(MAP_I18N.noGeoJSONReturned);
+        }
+      } catch (error) {
+        console.error("Error processing GeoJSON:", error);
+        setMapError(error.message || MAP_I18N.invalidGeoJSONFile);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById("clear-map-btn")?.addEventListener("click", function () {
+    if (drawnLayers) {
+      drawnLayers.clearLayers();
+      updateGeoJSON();
+      showAreaInfo(null);
+      setMapError("");
+    }
+  });
+
+  const aoiAdvancedConfigToggle = document.getElementById("aoi-advanced-config-toggle");
+  const aoiAdvancedConfigPanel = document.getElementById("aoi-advanced-config-panel");
+  if (aoiAdvancedConfigToggle && aoiAdvancedConfigPanel) {
+    aoiAdvancedConfigToggle.addEventListener("click", () => {
+      aoiAdvancedConfigPanel.classList.toggle("ftm-advanced-config--hidden");
+    });
+  }
+
+  document.body.addEventListener("missingOutline", function (event) {
+    let errorMsg = "";
+    if (event.detail && typeof event.detail === "object") {
+      errorMsg = event.detail.missingOutline || "";
+    } else if (typeof event.detail === "string") {
+      errorMsg = event.detail;
+    }
+
+    setMapError(errorMsg || MAP_I18N.mustDrawAOI);
+
+    const mapContainer = document.getElementById("map");
+    if (mapContainer) {
+      setTimeout(() => {
+        mapContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  });
+
+  document.querySelectorAll("form[data-require-outline='true']").forEach((form) => {
+    form.addEventListener("submit", function (e) {
+      const outlineValue = document.getElementById("outline-geojson")?.value?.trim() || "";
+      if (!outlineValue) {
+        e.preventDefault();
+        e.stopPropagation();
+        setMapError(MAP_I18N.mustDrawAOI);
+        const mapContainer = document.getElementById("map");
+        if (mapContainer) {
+          setTimeout(() => {
+            mapContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 100);
+        }
+        return false;
+      }
+      setMapError("");
+      return true;
+    });
+  });
+</script>

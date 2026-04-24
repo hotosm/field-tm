@@ -35,6 +35,7 @@ from app.db.database import close_db_connection_pool, db_conn, get_db_connection
 from app.db.models import DbUser
 from app.helpers.helper_routes import helper_router
 from app.htmx.htmx_routes import htmx_router
+from app.htmx.project_create_routes import reconcile_simple_project_basemap_autostarts
 from app.i18n import (
     LOCALE_LABELS,
     SUPPORTED_LOCALES,
@@ -372,7 +373,12 @@ def create_app() -> Litestar:
     app = Litestar(
         route_handlers=route_handlers,
         plugins=plugins,
-        on_startup=[get_db_connection_pool, server_init, create_local_admin_user],
+        on_startup=[
+            get_db_connection_pool,
+            server_init,
+            reconcile_simple_project_basemap_autostarts,
+            create_local_admin_user,
+        ],
         on_shutdown=[close_db_connection_pool],
         cors_config=_build_cors_config(),
         openapi_config=OpenAPIConfig(title="Field-TM", version=__version__),

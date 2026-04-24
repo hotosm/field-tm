@@ -8,6 +8,7 @@ delivery work correctly through the whole chain.
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from io import BytesIO
+from types import SimpleNamespace
 from typing import Optional
 from unittest.mock import AsyncMock, patch
 
@@ -15,11 +16,13 @@ import pytest
 
 from app.central.central_schemas import ODKCentral
 from app.db.models import DbProject
+from app.projects import project_services
 from app.projects.project_services import (
     ODKFinalizeResult,
     ServiceError,
     ValidationError,
     _build_feature_dataset_payload,
+    derive_simple_project_metadata,
     finalize_odk_project,
 )
 
@@ -797,3 +800,215 @@ async def test_build_feature_dataset_payload_allows_empty_data_extract_features(
 
     assert entity_properties == []
     assert entities_list == []
+
+
+@pytest.mark.asyncio
+async def test_derive_simple_project_metadata_uses_lon_lat_order_for_nearest_city():
+    """Nearest-city lookup must pass coordinates as (lon, lat)."""
+    outline = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [85.30, 27.71],
+                            [85.30, 27.70],
+                            [85.31, 27.70],
+                            [85.31, 27.71],
+                            [85.30, 27.71],
+                        ]
+                    ],
+                },
+                "properties": {},
+            }
+        ],
+    }
+
+    class CapturingNearestCity:
+        def __init__(self, _db):
+            self.calls = []
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def query(self, lon, lat):
+            self.calls.append((lon, lat))
+            return SimpleNamespace(city="Kathmandu", country="NP")
+
+    geocoder = CapturingNearestCity(None)
+
+    with (
+        patch(
+            "app.projects.project_services.parse_aoi",
+            return_value=outline,
+        ),
+        patch(
+            "app.projects.project_services.polygon_to_centroid",
+            new=AsyncMock(return_value=SimpleNamespace(x=85.305, y=27.705)),
+        ),
+        patch(
+            "app.projects.project_services.AsyncNearestCity",
+            return_value=geocoder,
+        ),
+    ):
+        (
+            project_name,
+            _description,
+            hashtags,
+            location_str,
+        ) = await derive_simple_project_metadata(db=AsyncMock(), outline=outline)
+
+    assert geocoder.calls == [(85.305, 27.705)]
+    assert project_name == "Kathmandu OSM Buildings"
+    assert hashtags == ["osm", "buildings", "simple"]
+    assert location_str == "Kathmandu, Nepal"
+
+
+@pytest.mark.asyncio
+async def test_derive_simple_project_metadata_falls_back_when_nearest_city_fails():
+    """Nearest-city errors should fall back to a deterministic project name."""
+    outline = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [85.30, 27.71],
+                            [85.30, 27.70],
+                            [85.31, 27.70],
+                            [85.31, 27.71],
+                            [85.30, 27.71],
+                        ]
+                    ],
+                },
+                "properties": {},
+            }
+        ],
+    }
+
+    class RaisingNearestCity:
+        def __init__(self, _db):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def query(self, lon, lat):
+            raise RuntimeError("pg_nearest_city unavailable")
+
+    with (
+        patch(
+            "app.projects.project_services.parse_aoi",
+            return_value=outline,
+        ),
+        patch(
+            "app.projects.project_services.polygon_to_centroid",
+            new=AsyncMock(return_value=SimpleNamespace(x=85.305, y=27.705)),
+        ),
+        patch(
+            "app.projects.project_services.AsyncNearestCity",
+            new=RaisingNearestCity,
+        ),
+    ):
+        (
+            project_name,
+            description,
+            hashtags,
+            location_str,
+        ) = await derive_simple_project_metadata(db=AsyncMock(), outline=outline)
+
+    assert project_name == "Area 27.7050_85.3050 OSM Buildings"
+    assert "simplified workflow" in description.lower()
+    assert hashtags == ["osm", "buildings", "simple"]
+    assert location_str is None
+
+
+@pytest.mark.asyncio
+async def test_derive_simple_project_metadata_uses_translated_fallback_strings():
+    """Fallback simple-project strings should use gettext-backed text."""
+    outline = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [85.30, 27.71],
+                            [85.30, 27.70],
+                            [85.31, 27.70],
+                            [85.31, 27.71],
+                            [85.30, 27.71],
+                        ]
+                    ],
+                },
+                "properties": {},
+            }
+        ],
+    }
+
+    class RaisingNearestCity:
+        def __init__(self, _db):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def query(self, lon, lat):
+            raise RuntimeError("pg_nearest_city unavailable")
+
+    translations = {
+        (
+            "This project was created with a simplified workflow in FieldTM "
+            "and is made to collect building data to enhance OpenStreetMap."
+        ): "Descripcion traducida",
+        "Area {latitude:.4f}_{longitude:.4f}": "Zona {latitude:.4f}_{longitude:.4f}",
+        "{location} OSM Buildings": "{location} Edificios OSM",
+    }
+
+    with (
+        patch(
+            "app.projects.project_services.parse_aoi",
+            return_value=outline,
+        ),
+        patch(
+            "app.projects.project_services.polygon_to_centroid",
+            new=AsyncMock(return_value=SimpleNamespace(x=85.305, y=27.705)),
+        ),
+        patch(
+            "app.projects.project_services.AsyncNearestCity",
+            new=RaisingNearestCity,
+        ),
+        patch.object(
+            project_services,
+            "_",
+            side_effect=lambda message: translations.get(message, message),
+        ),
+    ):
+        (
+            project_name,
+            description,
+            hashtags,
+            location_str,
+        ) = await derive_simple_project_metadata(db=AsyncMock(), outline=outline)
+
+    assert project_name == "Zona 27.7050_85.3050 Edificios OSM"
+    assert description == "Descripcion traducida"
+    assert hashtags == ["osm", "buildings", "simple"]
+    assert location_str is None

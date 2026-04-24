@@ -1,0 +1,57 @@
+<div class="ftm-form-group">
+  <label class="ftm-form-label">
+    {{ _("Project Area") }} <span class="ftm-form-required">*</span>
+  </label>
+  <div class="ftm-map-actions">
+    <wa-button
+      type="button"
+      id="draw-polygon-btn"
+      variant="default"
+      style="flex: 1; min-width: 120px"
+    >
+      {{ _("Draw Area") }}
+    </wa-button>
+    <wa-button
+      type="button"
+      id="upload-geojson-btn"
+      variant="default"
+      style="flex: 1; min-width: 120px"
+    >
+      {{ _("Upload GeoJSON") }}
+    </wa-button>
+    <wa-button type="button" id="clear-map-btn" variant="default" style="flex: 1; min-width: 120px">
+      {{ _("Clear") }}
+    </wa-button>
+  </div>
+  <input type="file" id="geojson-file-input" accept=".geojson,.json" style="display: none" />
+  <div id="map" class="ftm-map-container"></div>
+  <div id="map-error" style="margin-top: 8px"></div>
+  <div id="area-info" style="margin-top: 8px"></div>
+  <small class="ftm-form-help">
+    {{ _("Draw a polygon on the map or upload a GeoJSON file to define your project area. Maximum
+    project size is 1,000 km². Areas over 100 km² will show a warning. The OSM data extract API is
+    limited to 200 km².") }}
+  </small>
+  {% if not hide_advanced_config %}
+  <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
+    <button
+      type="button"
+      id="aoi-advanced-config-toggle"
+      class="wa-button wa-button--default ftm-advanced-toggle"
+    >
+      {{ _("Advanced Config") }}
+    </button>
+  </div>
+  <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
+    <div class="ftm-advanced-config__content">
+      <div class="ftm-checkbox-row">
+        <input type="checkbox" id="merge-geometries-checkbox" style="margin: 0; cursor: pointer" />
+        <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
+          {{ _("Merge geometries (use convex hull for multipolygons)") }}
+        </label>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <textarea name="outline" id="outline-geojson" style="display: none"></textarea>
+</div>
