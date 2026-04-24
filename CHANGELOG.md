@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026.2.0 (2026-04-24)
+
+### Feat
+
+- add simplified project creation workflow - streamlined, fix #3067
+- **monitoring**: filter robots.txt noise from sentry traces and events (#3046)
+- update qgis packager wrapper for generic usage field-tm / drone-tm
+
+### Fix
+
+- **osm-fieldwork**: ensure selected language is passed to xlsform, fix qfield project setup
+- **qgis**: ensure dem layer is not visible in drone-tm qfield projects
+- **deps**: update dependency litestar to v2.21.1 (#3051)
+- **deps**: update dependency cryptography to v46.0.6 (#3050)
+
+### Refactor
+
+- add option to bundle OAM imagery, update translations, fix issues
+- **translations**: osm_fieldwork is monolingual PO, update UI string for all langs
+
 ## 2026.1.3 (2026-03-23)
 
 ### Feat
