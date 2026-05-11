@@ -202,8 +202,8 @@ async def skip_task_split_htmx(
             "Will use whole AOI as single task."
         )
 
-        return _step4_completion_response(
-            request=request,
+        return await _step4_completion_response(
+            db=db,
             project_id=project_id,
             message=_(
                 "✓ Task splitting skipped. The whole AOI will be used as "
@@ -278,8 +278,8 @@ async def split_aoi_htmx(
         )
 
         if tasks_featcol == {}:
-            return _step4_completion_response(
-                request=request,
+            return await _step4_completion_response(
+                db=db,
                 project_id=project_id,
                 message=_("✓ Task splitting is not required for this project setup."),
                 mode=mode,
@@ -351,8 +351,8 @@ async def accept_split_htmx(
             f"Accepted and saved task areas for project {project_id} "
             f"(empty: {is_empty_task_areas}, count: {task_count})"
         )
-        return _step4_completion_response(
-            request=request,
+        return await _step4_completion_response(
+            db=db,
             project_id=project_id,
             message=_("✓ Split tasks saved successfully"),
             mode=mode,

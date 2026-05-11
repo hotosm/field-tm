@@ -6,9 +6,10 @@ import json
 from typing import TYPE_CHECKING
 
 from litestar import status_codes as status
-from litestar.plugins.htmx import HTMXRequest
 from litestar.response import Response, Template
+from psycopg import AsyncConnection
 
+from app.db.models import DbProject
 from app.i18n import _
 from app.projects.project_services import (
     ODKFinalizeResult,
@@ -21,7 +22,6 @@ from ..htmx_helpers import callout as _callout
 
 if TYPE_CHECKING:
     from app.auth.auth_schemas import ProjectUserDict
-    from app.db.models import DbProject
 
 
 def _hx_trigger_header(
@@ -250,9 +250,9 @@ def is_fragment_mode(mode: str | None) -> bool:
     return (mode or "").strip().lower() == "fragment"
 
 
-def step4_completion_response(
+async def step4_completion_response(
     *,
-    request: HTMXRequest,
+    db: AsyncConnection,
     project_id: int,
     message: str,
     mode: str | None,
@@ -272,9 +272,10 @@ def step4_completion_response(
             headers=_hx_trigger_header("project-setup:step4-complete", trigger_payload),
         )
 
+    project = await DbProject.one(db, project_id)
     return Template(
         template_name="partials/project_details/setup_steps.html",
-        context=request.template_context,
+        context={"project": project},
         media_type="text/html",
         status_code=status.HTTP_200_OK,
         headers={

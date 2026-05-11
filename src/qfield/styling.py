@@ -43,17 +43,25 @@ def _resolve_over_point_label_placement() -> Any:
 
 
 def _resolve_identifiable_map_layer_flag() -> Any:
-    """Return the map-layer identifiable flag enum value when available."""
-    from qgis.core import Qgis
+    """Return the map-layer identifiable flag enum value when available.
 
-    map_layer_flag = getattr(Qgis, "MapLayerFlag", None)
-    if map_layer_flag is None:
-        return None
+    QGIS 3.30+ exposes ``Qgis.MapLayerFlag``; QGIS 3.44 / current ships
+    ``QgsMapLayer.LayerFlag``.  Try both so the resolver works across
+    versions.
+    """
+    from qgis.core import Qgis, QgsMapLayer
 
-    for attr_name in ("Identifiable", "IdentifiableLayer"):
-        flag_value = getattr(map_layer_flag, attr_name, None)
-        if flag_value is not None:
-            return flag_value
+    enum_holders = (
+        getattr(Qgis, "MapLayerFlag", None),
+        getattr(QgsMapLayer, "LayerFlag", None),
+    )
+    for holder in enum_holders:
+        if holder is None:
+            continue
+        for attr_name in ("Identifiable", "IdentifiableLayer"):
+            flag_value = getattr(holder, attr_name, None)
+            if flag_value is not None:
+                return flag_value
 
     return None
 
@@ -62,11 +70,10 @@ def set_layer_not_identifiable(layer, log: logging.Logger) -> None:
     """Disable identify interaction for the given layer when supported."""
     if hasattr(layer, "flags") and hasattr(layer, "setFlags"):
         identifiable_flag = _resolve_identifiable_map_layer_flag()
-        if identifiable_flag is None:
-            log.warning("Could not resolve QGIS identifiable layer flag")
+        if identifiable_flag is not None:
+            layer.setFlags(layer.flags() & ~identifiable_flag)
             return
-        layer.setFlags(layer.flags() & ~identifiable_flag)
-        return
+        log.debug("Identifiable flag enum unresolved; falling back to setIdentifiable")
 
     if hasattr(layer, "setIdentifiable"):
         layer.setIdentifiable(False)
