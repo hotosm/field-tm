@@ -67,6 +67,14 @@ async def qfield_client(creds: Optional[QFieldCloud] = None):
     with ``loop.run_in_executor(…)`` when calling from async code.
 
     The yielded client has a ``username`` attribute set for downstream use.
+
+    We deliberately do **not** call ``logout()`` on exit.  QFieldCloud's
+    worker_wrapper looks up the most recent ``AuthToken`` for the user who
+    created a job and uses it for callbacks to the QFC API.  If we
+    invalidate the token immediately after triggering an upload / job, the
+    worker fails with a 401 a few seconds later.  Letting tokens live to
+    their natural TTL is the QFC-recommended pattern; the server prunes
+    expired tokens itself.
     """
     resolved_creds = _resolve_qfield_creds(creds)
     qfc_url = resolved_creds.qfield_cloud_url
@@ -86,28 +94,20 @@ async def qfield_client(creds: Optional[QFieldCloud] = None):
         partial(Client, url=qfc_url),
     )
 
-    try:
-        # Authenticate to obtain a session token
-        await loop.run_in_executor(
-            None,
-            partial(login_client.login, qfc_user, qfc_password),
-        )
+    # Authenticate to obtain a session token
+    await loop.run_in_executor(
+        None,
+        partial(login_client.login, qfc_user, qfc_password),
+    )
 
-        if not login_client.token:
-            raise ValueError("QFieldCloud login failed: no token received.")
+    if not login_client.token:
+        raise ValueError("QFieldCloud login failed: no token received.")
 
-        # Build a fresh client with the token (avoids credential leakage)
-        authed_client = await loop.run_in_executor(
-            None,
-            partial(Client, url=qfc_url, token=login_client.token),
-        )
-        # Attach the username so callers can resolve project ownership
-        authed_client.username = qfc_user
-        yield authed_client
-
-    finally:
-        try:
-            await loop.run_in_executor(None, login_client.logout)
-        except Exception as e:
-            # Log but never suppress the main exception
-            log.warning("Failed to logout QFieldCloud client: %s", e)
+    # Build a fresh client with the token (avoids credential leakage)
+    authed_client = await loop.run_in_executor(
+        None,
+        partial(Client, url=qfc_url, token=login_client.token),
+    )
+    # Attach the username so callers can resolve project ownership
+    authed_client.username = qfc_user
+    yield authed_client
