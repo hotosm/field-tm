@@ -10,6 +10,7 @@
 !backend/uv.lock
 !qfield
 !qfield/**/*.py
+!qfield-plugin
 !app-entrypoint.sh
 !migrate-entrypoint.sh
 !migrations

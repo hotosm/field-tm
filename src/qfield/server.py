@@ -59,6 +59,16 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             if db_url is None:
                 return
 
+            # Decode optional base64-encoded plugin zip
+            plugin_zip = None
+            plugin_b64 = data.get("plugin_zip")
+            if plugin_b64:
+                try:
+                    plugin_zip = base64.b64decode(plugin_b64)
+                except Exception as e:
+                    self._send_error(400, f"Invalid plugin_zip encoding: {e}")
+                    return
+
             self.log.info(f"Processing /field request for project: {data.get('title')}")
             result = self._dispatch_to_main_thread(
                 "field",
@@ -70,6 +80,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
                     "extent": data["extent"],
                     "open_in_edit_mode": parse_bool(data.get("open_in_edit_mode"), True),
                     "log": self.log,
+                    "plugin_zip": plugin_zip,
                 },
             )
 

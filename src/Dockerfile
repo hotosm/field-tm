@@ -169,6 +169,7 @@ USER appuser
 FROM runtime-base AS runtime
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
+COPY --chown=appuser:appuser qfield-plugin/ /opt/qfield-plugin/
 RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
     -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 
@@ -193,6 +194,7 @@ EOT
 # As we rebuilt before running the tests anyway, just copy all the files in
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
+COPY --chown=appuser:appuser qfield-plugin/ /opt/qfield-plugin/
 RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
     -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 COPY --chown=appuser:appuser backend/pyproject.toml /opt/pyproject.toml

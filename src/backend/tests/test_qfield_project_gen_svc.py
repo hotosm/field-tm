@@ -100,8 +100,10 @@ def _load_field_project_module():
     sys_modules.setdefault(
         "styling",
         SimpleNamespace(
-            configure_task_layer_style=lambda *args, **kwargs: None,
-            configure_survey_layer_style=lambda *args, **kwargs: None,
+            configure_drone_task_layer_style=lambda *args, **kwargs: None,
+            apply_styles_from_dir=lambda *args, **kwargs: set(),
+            set_layer_not_identifiable=lambda *args, **kwargs: None,
+            unpack_plugin_zip=lambda *args, **kwargs: None,
         ),
     )
     sys_modules.setdefault(
@@ -580,7 +582,7 @@ def test_normalize_root_layer_order_in_drone_project_places_vectors_above_raster
     )
     sys_modules.setdefault(
         "styling",
-        SimpleNamespace(configure_task_layer_style=lambda *args, **kwargs: None),
+        SimpleNamespace(configure_drone_task_layer_style=lambda *args, **kwargs: None),
     )
 
     drone_spec.loader.exec_module(drone_module)
@@ -766,6 +768,9 @@ def _load_styling_module_with_fakes(monkeypatch):
         QgsTextBufferSettings=_FakeTextBufferSettings,
         QgsTextFormat=_FakeTextFormat,
         QgsVectorLayerSimpleLabeling=_FakeVectorLayerSimpleLabeling,
+        QgsMapLayer=SimpleNamespace(
+            StyleCategory=SimpleNamespace(Labeling=0b01, Symbology=0b10),
+        ),
     )
     fake_qt_gui = SimpleNamespace(QColor=_FakeQColor, QFont=_FakeQFont)
 
@@ -782,14 +787,14 @@ def _load_styling_module_with_fakes(monkeypatch):
     return module
 
 
-def test_configure_task_layer_style_sets_blue_stroke_and_non_identifiable(
+def test_configure_drone_task_layer_style_sets_blue_stroke_and_non_identifiable(
     monkeypatch,
 ):
-    """Task style uses transparent fill, blue stroke, and disables identify."""
+    """Drone task style uses transparent fill, blue stroke, and disables identify."""
     styling = _load_styling_module_with_fakes(monkeypatch)
     layer = _FakeLayerForStyling()
 
-    styling.configure_task_layer_style(layer, logging.getLogger(__name__))
+    styling.configure_drone_task_layer_style(layer, logging.getLogger(__name__))
 
     symbol_props = layer.renderer().symbol.symbolLayer(0).properties()
     assert symbol_props["color"] == "0,0,0,0"
@@ -797,13 +802,91 @@ def test_configure_task_layer_style_sets_blue_stroke_and_non_identifiable(
     assert layer.flags() == 0b1101
 
 
-def test_configure_survey_layer_style_sets_transparent_fill_grey_stroke(monkeypatch):
-    """Survey style uses transparent fill with grey stroke."""
+def test_unpack_plugin_zip_renames_main_qml_and_returns_styles_dir(
+    monkeypatch, tmp_path
+):
+    """``main.qml`` is renamed to ``{basename}.qml`` and styles/ is reported."""
+    import io
+    import zipfile
+
     styling = _load_styling_module_with_fakes(monkeypatch)
-    layer = _FakeLayerForStyling()
 
-    styling.configure_survey_layer_style(layer, logging.getLogger(__name__))
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("main.qml", "plugin body")
+        zf.writestr("styles/tasks.qml", "<qgis/>")
+        zf.writestr("styles/survey.qml", "<qgis/>")
 
-    symbol_props = layer.renderer().symbol.symbolLayer(0).properties()
-    assert symbol_props["color"] == "0,0,0,0"
-    assert symbol_props["outline_color"] == "64,66,72,255"
+    styles_dir = styling.unpack_plugin_zip(
+        buf.getvalue(), tmp_path, "myproject", logging.getLogger(__name__)
+    )
+
+    assert (tmp_path / "myproject.qml").read_text() == "plugin body"
+    assert not (tmp_path / "main.qml").exists()
+    assert styles_dir == tmp_path / "styles"
+    assert (styles_dir / "tasks.qml").is_file()
+
+
+def test_unpack_plugin_zip_strips_wrapping_directory(monkeypatch, tmp_path):
+    """A single wrapping directory inside the zip is stripped on unpack."""
+    import io
+    import zipfile
+
+    styling = _load_styling_module_with_fakes(monkeypatch)
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("qfield-plugin/main.qml", "plugin body")
+        zf.writestr("qfield-plugin/styles/tasks.qml", "<qgis/>")
+
+    styling.unpack_plugin_zip(
+        buf.getvalue(), tmp_path, "p", logging.getLogger(__name__)
+    )
+
+    assert (tmp_path / "p.qml").is_file()
+    assert (tmp_path / "styles" / "tasks.qml").is_file()
+    assert not (tmp_path / "qfield-plugin").exists()
+
+
+def test_apply_styles_from_dir_calls_load_named_style_for_matching_layers(
+    monkeypatch, tmp_path
+):
+    """Each ``{layer}.qml`` is applied to the layer with that name."""
+    styling = _load_styling_module_with_fakes(monkeypatch)
+
+    (tmp_path / "tasks.qml").write_text("<qgis/>")
+    (tmp_path / "project-area.qml").write_text("<qgis/>")
+    (tmp_path / "no-such-layer.qml").write_text("<qgis/>")
+
+    calls: list[tuple[str, str]] = []
+
+    class _FakeStyledLayer:
+        def __init__(self, name: str) -> None:
+            self._name = name
+
+        def name(self) -> str:
+            return self._name
+
+        def loadNamedStyle(self, path, default, categories):  # noqa: N802
+            calls.append((self._name, path))
+            return ("", True)
+
+        def triggerRepaint(self):  # noqa: N802
+            return None
+
+    layers = {
+        "tasks": _FakeStyledLayer("tasks"),
+        "project-area": _FakeStyledLayer("project-area"),
+    }
+
+    class _FakeProject:
+        def mapLayersByName(self, name):  # noqa: N802
+            return [layers[name]] if name in layers else []
+
+    styled = styling.apply_styles_from_dir(
+        _FakeProject(), tmp_path, logging.getLogger(__name__)
+    )
+
+    assert styled == {"tasks", "project-area"}
+    called_layers = {name for name, _ in calls}
+    assert called_layers == {"tasks", "project-area"}

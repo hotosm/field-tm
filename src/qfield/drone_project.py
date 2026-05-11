@@ -13,7 +13,7 @@ from urllib.error import URLError
 
 from basemaps import create_osm_basemap
 from sanitize import sanitize_generated_qgis_metadata
-from styling import configure_task_layer_style
+from styling import configure_drone_task_layer_style
 
 
 def generate_drone_project(
@@ -138,7 +138,7 @@ def _add_task_layer(
         raise RuntimeError(f"Failed to load tasks layer from {tasks_gpkg_path}")
     project.addMapLayer(task_layer)
 
-    configure_task_layer_style(
+    configure_drone_task_layer_style(
         task_layer,
         log,
         label_field='coalesce("project_task_id", $id)',

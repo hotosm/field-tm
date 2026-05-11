@@ -14,7 +14,11 @@ import psycopg
 import requests
 
 from geometry import validate_geometry_file, analyse_and_fix_geometries
-from styling import configure_task_layer_style, configure_survey_layer_style
+from styling import (
+    apply_styles_from_dir,
+    set_layer_not_identifiable,
+    unpack_plugin_zip,
+)
 from sanitize import sanitize_generated_qgis_metadata
 from utils import parse_and_validate_extent, set_project_file_permissions
 
@@ -160,7 +164,11 @@ def _prepare_tasks_layer(
     final_output_dir: Path,
     log: logging.Logger,
 ) -> Optional[str]:
-    """Convert task GeoJSON to a packaged GeoPackage when available."""
+    """Convert task GeoJSON to a packaged GeoPackage when available.
+
+    Adds ``status`` and ``assigned_to`` string columns to the tasks layer
+    so the field-tm QField plugin can drive task assignment state.
+    """
     log.info("Processing task geometries")
     set_project_file_permissions(project_path)
     tasks_geojson_path = project_path / "tasks.geojson"
@@ -173,7 +181,40 @@ def _prepare_tasks_layer(
     log.debug("Moving %s --> %s", tasks_gpkg_path_input, tasks_gpkg_path_final)
     shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
     set_project_file_permissions(project_path)
+
+    _add_plugin_task_fields(str(tasks_gpkg_path_final), log)
     return str(tasks_gpkg_path_final)
+
+
+def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
+    """Add ``status`` and ``assigned_to`` string columns to the tasks layer."""
+    from qgis.core import QgsField, QgsVectorLayer
+    from qgis.PyQt.QtCore import QMetaType
+
+    layer = QgsVectorLayer(tasks_gpkg_path, "tasks", "ogr")
+    if not layer.isValid():
+        log.warning("Could not open tasks GPKG to add plugin fields: %s", tasks_gpkg_path)
+        return
+
+    status_field = QgsField("status", QMetaType.Type.QString)
+    assigned_to_field = QgsField("assigned_to", QMetaType.Type.QString)
+
+    if not layer.startEditing():
+        log.warning("Could not start editing tasks layer to add plugin fields")
+        return
+    layer.addAttribute(status_field)
+    layer.addAttribute(assigned_to_field)
+
+    status_idx = layer.fields().indexOf("status")
+    assigned_idx = layer.fields().indexOf("assigned_to")
+    for feature in layer.getFeatures():
+        layer.changeAttributeValue(feature.id(), status_idx, "available")
+        layer.changeAttributeValue(feature.id(), assigned_idx, "")
+
+    if not layer.commitChanges():
+        log.warning("Failed to commit plugin fields to tasks layer")
+        return
+    log.info("Added status/assigned_to fields to tasks layer")
 
 
 def _load_generated_project(project_file: str):
@@ -217,6 +258,45 @@ def _add_task_layer_to_project(
     log.info("Tasks layer added to project")
 
 
+def _add_project_area_layer(
+    project,
+    tasks_gpkg_path: str,
+    final_output_dir: Path,
+    log: logging.Logger,
+) -> None:
+    """Add a dissolved tasks layer as ``project-area`` (non-identifiable)."""
+    from qgis import processing
+    from qgis.core import QgsVectorLayer
+
+    project_area_gpkg = final_output_dir / "project-area.gpkg"
+    try:
+        processing.run(
+            "native:dissolve",
+            {
+                "INPUT": tasks_gpkg_path,
+                "FIELD": [],
+                "OUTPUT": str(project_area_gpkg),
+            },
+        )
+    except Exception as exc:
+        log.warning("Failed to dissolve tasks into project-area: %s", exc)
+        return
+
+    layer = QgsVectorLayer(str(project_area_gpkg), "project-area", "ogr")
+    if not layer.isValid():
+        log.warning("Generated project-area GPKG is not a valid QGIS layer")
+        return
+
+    registered = project.addMapLayer(layer, addToLegend=False)
+    if not registered:
+        log.warning("Failed to register project-area layer in project")
+        return
+
+    project.layerTreeRoot().insertLayer(2, layer)
+    set_layer_not_identifiable(layer, log)
+    log.info("Project-area layer added to project")
+
+
 def _layer_order_priority(layer) -> int:
     """Return canonical ordering priority for known layer names."""
     layer_name = (layer.name() or "").strip().lower()
@@ -224,6 +304,8 @@ def _layer_order_priority(layer) -> int:
         return 0
     if layer_name in {"tasks", "dtm-tasks"}:
         return 1
+    if layer_name == "project-area":
+        return 50
     if layer_name == "basemap":
         return 90
     if layer_name == "openstreetmap":
@@ -272,28 +354,31 @@ def _normalize_root_layer_order(project, log: logging.Logger) -> None:
         log.info("Normalized field project layer order in root tree")
 
 
-def configure_project_settings(qgis_project, log: logging.Logger) -> None:
-    """Configure the QField project for field mapping."""
-    log.info("Configuring QField project settings for field mapping")
+def _apply_plugin_and_styles(
+    project,
+    plugin_zip: Optional[bytes],
+    final_output_dir: Path,
+    project_file: str,
+    log: logging.Logger,
+) -> None:
+    """Unpack the caller-supplied plugin zip and apply bundled QML styles.
 
-    # Configure tasks layer
-    task_layers = qgis_project.mapLayersByName("tasks")
-    if task_layers:
-        configure_task_layer_style(task_layers, log)
-        log.info("Tasks layer styled successfully")
-    else:
-        log.warning("Tasks layer not found in project")
+    The plugin's ``main.qml`` lands next to the ``.qgz`` with the same
+    basename so QField auto-discovers it, and any
+    ``styles/{layer_name}.qml`` is applied to the matching project layer
+    via ``loadNamedStyle``.
+    """
+    if not plugin_zip:
+        log.info("No plugin_zip supplied; skipping plugin/style application")
+        return
 
-    # Configure features layer (survey layer with blue stroke, no fill)
-    survey_layers = qgis_project.mapLayersByName("survey")
-    if survey_layers:
-        configure_survey_layer_style(survey_layers, log)
-        log.info("Survey/features layer styled successfully")
-    else:
-        log.warning("Survey layer not found in project")
+    project_basename = Path(project_file).stem
+    styles_dir = unpack_plugin_zip(plugin_zip, final_output_dir, project_basename, log)
+    if styles_dir is None:
+        log.info("Plugin zip has no styles/ directory; nothing to apply")
+        return
 
-    # Save project changes
-    qgis_project.write()
+    apply_styles_from_dir(project, styles_dir, log)
 
 
 def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.Logger) -> None:
@@ -387,6 +472,7 @@ def generate_qgis_project(
     extent: str,
     open_in_edit_mode: bool,
     log: logging.Logger,
+    plugin_zip: Optional[bytes] = None,
 ) -> Dict[str, Any]:
     """Generate QGIS project using input files from the database.
 
@@ -421,12 +507,14 @@ def generate_qgis_project(
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
+        if tasks_gpkg_path_final:
+            _add_project_area_layer(project, tasks_gpkg_path_final, final_output_dir, log)
         _normalize_root_layer_order(project, log)
+
+        _apply_plugin_and_styles(project, plugin_zip, final_output_dir, project_file, log)
 
         # Finalise the project
         project.write()
-
-        configure_project_settings(project, log)
         sanitize_generated_qgis_metadata(project_file, log, extent_bbox=extent_bbox)
 
         num_files = _write_job_outputs(db_url, job_id, final_output_dir, log)

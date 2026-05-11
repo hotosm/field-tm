@@ -20,9 +20,11 @@
 import base64
 import json
 import logging
+import os
 import re
 import shutil
 import tempfile
+import zipfile
 from asyncio import get_running_loop
 from copy import deepcopy
 from dataclasses import dataclass
@@ -60,6 +62,58 @@ log = logging.getLogger(__name__)
 # Timeout for QGIS wrapper HTTP calls (project generation can be slow)
 QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
 QFC_NAME_SANITIZE_PATTERN = re.compile(r"[^A-Za-z0-9_.-]+")
+
+# Field-TM QField plugin: bundled and sent to the QGIS wrapper on every
+# field-project generation.  The wrapper unpacks ``main.qml`` as the
+# project plugin and applies any ``styles/{layer_name}.qml`` to matching
+# layers.  Path is overridable via env for tests / non-standard layouts.
+QFIELD_PLUGIN_DIR = os.environ.get("QFIELD_PLUGIN_DIR", "/opt/qfield-plugin")
+_qfield_plugin_zip_b64: Optional[str] = None
+
+
+def _build_qfield_plugin_zip_b64() -> Optional[str]:
+    """Build (once) a base64-encoded zip of the bundled QField plugin dir."""
+    global _qfield_plugin_zip_b64
+    if _qfield_plugin_zip_b64 is not None:
+        return _qfield_plugin_zip_b64 or None
+
+    plugin_dir = Path(QFIELD_PLUGIN_DIR)
+    if not plugin_dir.is_dir():
+        log.warning(
+            "QFIELD_PLUGIN_DIR %s not found; sending no plugin to wrapper", plugin_dir
+        )
+        _qfield_plugin_zip_b64 = ""
+        return None
+
+    buf = BytesIO()
+    files_added = 0
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(plugin_dir.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(plugin_dir)
+            arcname = str(rel)
+            # The plugin .qml at the root is renamed to ``main.qml`` so the
+            # wrapper can rebrand it to ``{title}.qml`` per QField convention.
+            if rel.parent == Path(".") and rel.suffix == ".qml":
+                arcname = "main.qml"
+            zf.write(path, arcname)
+            files_added += 1
+
+    if files_added == 0:
+        log.warning(
+            "QFIELD_PLUGIN_DIR %s is empty; sending no plugin to wrapper", plugin_dir
+        )
+        _qfield_plugin_zip_b64 = ""
+        return None
+
+    _qfield_plugin_zip_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    log.info(
+        "Built QField plugin zip (%d files, %d bytes b64)",
+        files_added,
+        len(_qfield_plugin_zip_b64),
+    )
+    return _qfield_plugin_zip_b64
 
 
 @dataclass(slots=True)
@@ -691,6 +745,10 @@ async def _call_qgis_wrapper(
         "extent": extent,
         "open_in_edit_mode": open_in_edit_mode,
     }
+    if endpoint in ("/", "/field"):
+        plugin_zip_b64 = _build_qfield_plugin_zip_b64()
+        if plugin_zip_b64:
+            payload["plugin_zip"] = plugin_zip_b64
     if qfield_cloud:
         if qfield_cloud.qfield_cloud_url:
             payload["qfield_cloud_url"] = qfield_cloud.qfield_cloud_url
